@@ -30,3 +30,10 @@ phases:
   status: pending
   gate: Backend/frontend contracts, stubs, and expected-red tests define acceptance
     without shipping implementation logic.
+- id: core-domain-implementation
+  name: Core Domain Implementation
+  status: locked
+  gate: Core domain behavior is implemented with unit/contract tests green, spec conformance
+    checked, and wiring audited before runtime/API work.
+  depends_on:
+  - contract-foundation-and-expected-red-tests
