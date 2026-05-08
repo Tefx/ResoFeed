@@ -1856,12 +1856,18 @@ phases:
 
       agent_source: default
 
+      runtime_owned_debt_policy: EXPECTED_STUB_DEBT for `cmd/resofeed/main.go`, `resofeed.Main`,
+      `NewRouter`, `NewMCPHandler`, HTTP/MCP handler stubs, `ServeConfig` runtime
+      consumption, and serve lifecycle until runtime-api-and-mcp-integration.
 
-      Spec conformance verification via adversarial divergence hunting.
+
+      Spec conformance verification via adversarial divergence hunting after `fix-core-domain-verification-blockers`.
 
 
       SCOPE: Core domain implementation only — state portability, ingestion/status,
-      ranking/search/steering, SQLite shape.
+      core doctor diagnostics/snapshot data, ranking/search/steering, SQLite shape,
+      FTS freshness/provenance, duplicate/grouped-original retrievability at core
+      store/detail/provenance level.
 
 
       This is NOT "do tests pass" — it is "does implementation match what the specs
@@ -1872,47 +1878,158 @@ phases:
       gates.
 
 
+      Required recheck findings from the prior failed audit:
+
+      - R3: `exported_at` MUST be export creation time, not imported timestamp metadata.
+
+      - R6: Gemini `ValueTier` or equivalent priority category MUST be persisted/read
+      from item storage.
+
+      - R9: duplicate/grouped original retrievability MUST be proven at core level
+      or mapped to a precise runtime owner with core evidence.
+
+      - R10: active steering rules MUST affect ranking while preserving freshness/source/resonance
+      guardrails.
+
+      - R11: FTS index freshness/provenance MUST be maintained after ingest/import.
+
+      - R12: human-vs-agent steering precedence MUST be provable via actor provenance
+      or minimal contract-compliant equivalent.
+
+      - Core doctor diagnostics MUST satisfy raw RSS/Gemini/extraction failure proof
+      obligations at the core snapshot/output level.
+
+
+      Runtime/API debt classification:
+
+      - Do NOT mark HTTP/MCP route/handler/serve stubs as core DIVERGES/PARTIAL solely
+      because downstream runtime phase has not run.
+
+      - For any runtime-owned spec obligation, record EXPECTED_STUB_DEBT with downstream
+      owner: `runtime-api-and-mcp-integration.complete-http-api-handlers`, `runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`,
+      or `runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`.
+
+      - Still mark DIVERGES/PARTIAL/NEEDS_TEST as blocking when a core-domain function
+      or persistence behavior needed by those runtime surfaces is absent, panicking,
+      or unproven.
+
+
       For EACH requirement, cite the spec section AND implementation file:line. Behavioral
       precedence claims must be flagged as NEEDS_TEST with concrete test suggestion
       if not directly proven.'
     verification: '- Requirements register covers state bundle, state import replacement,
-      SQLite tables, ingestion statuses, Gemini boundary, Ranking Contract, Search
-      contract, Steering Conflict Contract
+      export timestamp semantics, SQLite tables, ingestion statuses/value tier persistence,
+      Gemini boundary, Ranking Contract, Search/FTS contract, Steering Conflict Contract,
+      actor precedence, duplicate provenance/detail retrievability, and core doctor
+      diagnostic requirements.
 
       - Verdicts use CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
-      | SPEC_POSSIBLY_STALE
+      | SPEC_POSSIBLY_STALE.
 
-      - Any DIVERGES/PARTIAL/NEEDS_TEST has explicit closure path before gate opens'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      - Any DIVERGES/PARTIAL/NEEDS_TEST has explicit closure path before gate opens.
+
+      - Runtime/API phase-owned HTTP/MCP/serve stubs are classified as EXPECTED_STUB_DEBT
+      only when they do not intersect core-domain persistence/behavior proof; each
+      such item names the downstream owner step and non-intersection rationale.
+
+      - Gate decision basis maps all unresolved core behavioral obligations to OPEN/BLOCK
+      recommendations; no OPEN recommendation may bypass unresolved core-domain runtime
+      evidence.'
+    evidence_template: '## Spec Conformance Report
+
+      **Phase**: core-domain-implementation
+
+      **Spec source**: docs/ARCHITECTURE.md, docs/PRD.md, docs/USAGE.md, docs/DESIGN.md
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
       - docs/PRD.md — key passage or "NOT READ: <reason>"
 
-      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
 
 
-      ## Spec Conformance Report
-
-      - Requirements Register:
-
-      - Evidence Table:
-
-      - Coverage Summary:
-
-      - Top Risks:
-
-      - Suggested Tests for NEEDS_TEST:
-
-      - Behavioral proof register: requirement_ref | behavior_claim | runtime_proof_expected
-      | evidence_ref | status | closure_path | gate_decision_basis
+      If no refs were provided, state: "No refs for this step."
 
 
-      ## Headline
+      ## Requirements Register
 
-      PASS | PASS_WITH_DEBT | FAIL'
+      | R# | Spec Section | Requirement | Level | Checkable? | Core-owned? | Runtime
+      owner if not core |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes | Closure
+      Path |
+
+      |---|---|---|---|---|---|---|
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE | EXPECTED_STUB_DEBT
+
+
+      ## Prior Failure Recheck
+
+      - R3 exported_at:
+
+      - R6 value tier persistence:
+
+      - R9 duplicate/grouped original retrievability:
+
+      - R10 steering affects ranking:
+
+      - R11 FTS freshness/provenance:
+
+      - R12 actor provenance/precedence:
+
+      - Core doctor diagnostics:
+
+
+      ## Runtime-Owned Debt Classification
+
+      | Runtime stub/debt | Owner step | Why non-blocking for core gate | Remaining
+      core dependency |
+
+      |---|---|---|---|
+
+
+      ## Coverage Summary
+
+      - Total requirements:
+
+      - CONFORMS:
+
+      - DIVERGES/PARTIAL/NEEDS_TEST core-owned:
+
+      - EXPECTED_STUB_DEBT runtime-owned:
+
+      - Unchecked sections:
+
+
+      ## Top Risks
+
+      [DIVERGES/PARTIAL/NEEDS_TEST items ranked by severity]
+
+
+      ## Suggested Tests (for NEEDS_TEST items)
+
+
+      ## Gate Decision Basis
+
+      OPEN/BLOCK recommendation and rationale.'
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -1924,6 +2041,7 @@ phases:
     - core-domain-implementation.complete-sqlite-state-and-restore-logic
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
+    - fix-core-domain-verification-blockers
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-08T22:27:07.977661+00:00'
