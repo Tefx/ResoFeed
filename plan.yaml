@@ -1804,6 +1804,74 @@ phases:
     depends_on:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     agent: frontend-engineer
+  - id: frontend-implementation.frontend-green-retest
+    name: Frontend green retest
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+
+      As an INDEPENDENT TESTER, validate frontend implementation from a fresh perspective.
+
+
+      Verification scope: phase-check protecting UI/UX audit and end-to-end integration.
+
+
+      Test for rendered owner-token prompt, first-use empty state, feed/inspector/source/state/search
+      surfaces, API client auth/error behavior, accessibility roles/names/live regions,
+      and DESIGN.md lint readiness.
+
+
+      Finding issues is a successful verification outcome; document blockers precisely.'
+    verification: '- `npm --prefix web install` if needed and `npm --prefix web run
+      build` / frontend tests pass
+
+      - `npx @google/design.md lint docs/DESIGN.md` reports 0 errors/0 warnings
+
+      - Tests assert visible rendered content for required states and accessibility
+      behavior
+
+      - Evidence includes actual command output and DOM/test-renderer artifacts'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Verification Report
+
+      - Commands executed:
+
+      - Actual output:
+
+      - Rendered states verified:
+
+      - Accessibility checks:
+
+      - Issues found:
+
+      - Coverage not tested and why:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
+    - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
+    agent: integration-verifier
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
