@@ -395,7 +395,7 @@ phases:
       \ changes.\n\n## Headline\nPASS"
   - id: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     name: Backend expected red contract tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -487,6 +487,72 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-08T21:55:32.573923+00:00'
+    done_at: '2026-05-08T22:00:40.870238+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Key passage: single Go binary, one SQLite DB, owner-token boundary, strict\
+      \ query validation, and no product logic expansion beyond flat internal/resofeed\
+      \ files.\n- docs/ARCHITECTURE.md — Key passage: §§5-7 define ranking guardrails,\
+      \ steering conflict receipts, state bundle schema/import replacement, strict\
+      \ HTTP auth/query validation/error bodies, and MCP auth/tool schemas.\n- docs/PRD.md\
+      \ — Key passage: §15 acceptance criteria require freshness protection, star-not-pin,\
+      \ human authority over agents, external handoff idempotency, state portability,\
+      \ diagnostics, and unauthorized agent rejection.\n- docs/DESIGN.md — Key passage:\
+      \ backend-facing surfaces require owner-token prompt before API calls, terse\
+      \ steering receipts, flat Source Ledger, state import replacing active sources/rules/stars,\
+      \ and raw `/doctor` text.\n- docs/DESIGN_VISION.md — Key passage: ResoFeed preserves\
+      \ Inspect/Resonate/Steer, avoids inbox-zero/folders/settings, and treats agent\
+      \ handoffs as same unified feed/product concepts.\n- docs/USAGE.md — Key passage:\
+      \ HTTP Command Reference documents owner-token header, canonical unauthorized\
+      \ error JSON, feed/search query examples, state export/import JSON, and MCP\
+      \ Streamable HTTP connection shape.\n\n## Expected-Red Test Evidence\n- step_intent:\
+      \ test_define_red\n- expected_result: red\n- observed_result: red\n- failure_alignment:\
+      \ Failures align with current contract stubs panicking in NewRouter, NewMCPHandler,\
+      \ OpenDB, and ValidateStateBundle; these are the missing backend implementations\
+      \ this red suite is intended to expose.\n- verdict: PASS_EXPECTED_RED\n- blockers:\
+      \ []\n- product_implementation_files_modified: none\n- Commit hash(es):\n  -\
+      \ Worker branch: 3db803bd25326d216881ab644cd5625cea7f5420\n  - Main squash merge:\
+      \ 7124551\n- Test files added/changed:\n  - internal/resofeed/backend_contract_test.go\n\
+      \  - tests/go/fixtures/error_bad_query_limit.json\n  - tests/go/fixtures/error_unauthorized.json\n\
+      \  - tests/go/fixtures/mcp_connection.json\n  - tests/go/fixtures/state_full.json\n\
+      \  - tests/go/fixtures/state_minimal.json\n- Spec-derived fixtures and cited\
+      \ sections:\n  - state_minimal.json uses docs/USAGE.md Export state example\
+      \ and docs/ARCHITECTURE.md §5.5 minimal state bundle fields.\n  - state_full.json\
+      \ uses docs/ARCHITECTURE.md §5.5 documented full JSON example exactly.\n  -\
+      \ error_unauthorized.json uses docs/ARCHITECTURE.md §6 and docs/USAGE.md HTTP\
+      \ auth error body.\n  - error_bad_query_limit.json uses docs/ARCHITECTURE.md\
+      \ §6 HTTP query validation/error body.\n  - mcp_connection.json uses docs/USAGE.md\
+      \ MCP canonical client connection values and docs/ARCHITECTURE.md §7 auth boundary.\n\
+      - Commands run:\n  - Worker branch: `gofmt -w internal/resofeed/backend_contract_test.go`\
+      \ — exit 0.\n  - Worker branch: `go test ./...` — exit 1 expected red; failures\
+      \ expose TODO contract stubs.\n  - Worker branch: `go build ./...` — exit 0.\n\
+      \  - Worker branch: `go test -race ./...` — exit 1 expected red; same stub gaps,\
+      \ no race-specific failure observed.\n  - Worker branch: `golangci-lint run`\
+      \ — exit 0.\n  - Mainline final-state: `go test ./...` — exit 1 expected red,\
+      \ with failures only from intended TODO contract stubs in NewRouter, NewMCPHandler,\
+      \ OpenDB, and ValidateStateBundle.\n  - Mainline final-state: `test -z \"$(gofmt\
+      \ -l cmd internal)\" && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-backend-red-mainline-check\
+      \ ./cmd/resofeed && golangci-lint run ./...` — exit 0; golangci-lint reported\
+      \ 0 issues.\n  - Mainline final-state: `go test -race ./...` — exit 1 expected\
+      \ red; failures align with intended TODO contract stubs.\n- Expected failures\
+      \ or exposed gaps:\n  - NewRouter panics: HTTP owner-token auth, /api/feed/today\
+      \ query validation, /api/search query validation, and canonical error body not\
+      \ implemented.\n  - NewMCPHandler panics: MCP /mcp auth boundary and tool/resource\
+      \ handling not implemented.\n  - OpenDB panics: SQLite runtime/migration path\
+      \ absent, blocking restore replacement, ranking corpus, and steering receipt\
+      \ tests.\n  - ValidateStateBundle panics: state schema validation for exact\
+      \ v1 JSON, unknown top-level rejection, and duplicate id rejection not implemented.\n\
+      \  - Ranking guardrails unimplemented: freshness quota, old resonated cap, source\
+      \ coverage, surfaced suppression, and duplicate grouping remain red.\n  - Steering\
+      \ conflict receipt unimplemented: invariant-conflicting commands should return\
+      \ 200-equivalent receipt with empty changed_rules and terse message.\n- Downstream\
+      \ implementation steps expected to turn green:\n  - HTTP router/auth/query validation\
+      \ and canonical error body implementation.\n  - SQLite open/migrations/state\
+      \ import/export implementation.\n  - Ranking/ListTodayFeed guardrail implementation.\n\
+      \  - Steering ApplySteering conflict/precedence receipt implementation.\n  -\
+      \ MCP Streamable HTTP auth/tool schema/resource implementation.\n- Gaps/Notes:\n\
+      \  - No product logic was modified.\n  - Expected-red tests intentionally recover\
+      \ panics into test failures so all exposed backend gaps are visible in one test\
+      \ run.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
     name: Frontend expected red rendering tests
     status: claimed
