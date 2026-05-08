@@ -158,7 +158,7 @@ phases:
     claimed_at: '2026-05-08T21:46:24.449247+00:00'
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -263,6 +263,74 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-08T21:46:22.157817+00:00'
+    done_at: '2026-05-08T21:54:42.768467+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Read by frontend-engineer. Key passage: canonical docs are `docs/ARCHITECTURE.md`\
+      \ and `docs/DESIGN.md`; UI must use functional labels and must not add onboarding\
+      \ wizards, folders/tags, unread counts, settings sliders, or drag-and-drop ordering.\n\
+      - docs/ARCHITECTURE.md — Read. Key passage: §6 defines canonical HTTP JSON shapes/errors/query\
+      \ validation; §8 says frontend lives in `web/`, must show Owner Token Prompt\
+      \ before `/api/*`, store token as `resofeed.ownerToken`, avoid Tailwind/UI libraries,\
+      \ and keep Source Ledger/state portability terse.\n- docs/PRD.md — Read. Key\
+      \ passage: ResoFeed has exactly three primary primitives: Inspect, Resonate,\
+      \ and Steer; first-run must avoid account registration/onboarding and state\
+      \ portability is the minimal current-state bundle.\n- docs/DESIGN.md — Read.\
+      \ Key passage: front matter defines tokens; Owner Token Prompt, First-Use Empty\
+      \ State, Feed Item, Inspector, Source Ledger, State Portability, and Search/Retrieval\
+      \ component contracts specify states and accessibility expectations.\n- docs/DESIGN_VISION.md\
+      \ — Read. Key passage: archival/high-density/typographic/low-fatigue workbench;\
+      \ no cute error states, account login/onboarding, numeric indicators, or settings\
+      \ panels.\n- docs/USAGE.md — Read. Key passage: HTTP examples require `Authorization:\
+      \ Bearer <OWNER_TOKEN>`, first open stores token as `resofeed.ownerToken`, source\
+      \ addition is via Steer or flattened OPML import, and search/state/doctor examples\
+      \ mirror architecture contracts.\n\n## Contract Evidence\n- Commit hash(es):\n\
+      \  - Worker branch: bb9e640460a8b77cefdf082185436489ad67d881\n  - Remediation\
+      \ branch: be285521a2b5f73d1914a739f11cf25df3236004\n  - Main squash merge: 7511958\n\
+      \  - Conflict-resolved remediation merge: 8b87a2b\n- Files created/changed:\n\
+      \  - web/package.json; web/package-lock.json; web/.gitignore; web/svelte.config.js;\
+      \ web/tsconfig.json; web/vite.config.ts; web/src/app.html; web/src/app.d.ts;\
+      \ web/src/app.css\n  - web/src/lib/api-contract.ts; web/src/lib/design-tokens.ts;\
+      \ web/src/lib/design-tokens.css\n  - web/src/routes/+layout.svelte; web/src/routes/+page.svelte\n\
+      \  - web/src/routes/components/OwnerTokenPrompt.svelte; FirstUseEmptyState.svelte;\
+      \ FeedContractStub.svelte; InspectorContractStub.svelte; SourceLedgerContractStub.svelte;\
+      \ StatePortabilityContractStub.svelte; SearchRetrievalContractStub.svelte\n\
+      - Types/tokens/component stubs added:\n  - Canonical TypeScript API response/error/state\
+      \ bundle contracts from docs/ARCHITECTURE.md §6 and state bundle shape from\
+      \ §5.5.\n  - Design token TS and CSS variable mappings from docs/DESIGN.md front\
+      \ matter colors, typography, rounded, spacing, and selected component tokens.\n\
+      \  - Svelte contract stubs for owner token prompt, first-use empty state, feed/resonate,\
+      \ inspector, source ledger, state portability warning/actions, and search/retrieval.\n\
+      - Accessibility contracts captured:\n  - Owner token label/input/submit/rejected\
+      \ aria-live note/focus contract; independent feed open/resonate controls; inspector\
+      \ heading/focus return; source delete buttons named `Delete source: <name>`;\
+      \ state portability live-region/warning; search results region and labelled\
+      \ query field.\n- Confirmation no completed UI behavior was shipped:\n  - Added\
+      \ visible stubs/placeholders and prop/type contracts only. No API client implementation,\
+      \ owner-token persistence behavior, data fetching, mutation handlers, routing\
+      \ behavior, import/export behavior, or completed interaction state machines\
+      \ were implemented.\n- Forbidden UI scan summary:\n  - No Tailwind or component\
+      \ UI library dependencies introduced. No account/login/profile/password reset\
+      \ flow, onboarding wizard, folders/tags UI, unread counts, mark-all-read, archive\
+      \ workflow, settings dashboard, vector search, or semantic/RAG answer behavior\
+      \ added.\n- Mainline merge/remediation:\n  - Mainline final-state gate initially\
+      \ failed because cold `npm --prefix web run check` could not read generated\
+      \ `web/.svelte-kit/tsconfig.json`.\n  - Focused remediation changed `web` check\
+      \ script to run `svelte-kit sync && svelte-check --tsconfig ./tsconfig.json`.\n\
+      \  - Merge conflict in `web/package.json` was resolved by conflict-resolver\
+      \ preserving the main scaffold and applying the cold-safe check script.\n- Verification\
+      \ commands and output:\n  - Worker branch: `npx @google/design.md lint docs/DESIGN.md`\
+      \ — exit 0, 0 errors, 0 warnings, 1 info.\n  - Worker branch: `npm --prefix\
+      \ web run check` — exit 0, svelte-check found 0 errors and 0 warnings.\n  -\
+      \ Worker branch: `npm --prefix web run build` — exit 0, SvelteKit static build\
+      \ completed.\n  - Mainline final-state: `npm --prefix web ci` — exit 0, installed\
+      \ 59 packages; npm reported 3 low severity vulnerabilities.\n  - Mainline final-state:\
+      \ `npx @google/design.md lint docs/DESIGN.md` — exit 0, 0 errors, 0 warnings,\
+      \ 1 info.\n  - Mainline final-state: `npm --prefix web run check` — exit 0,\
+      \ `svelte-kit sync` ran and svelte-check found 0 errors and 0 warnings.\n  -\
+      \ Mainline final-state: `npm --prefix web run build` — exit 0, adapter-static\
+      \ wrote site to `build`.\n- Gaps/Notes:\n  - `npm ci`/audit reports 3 low severity\
+      \ dependency vulnerabilities; not fixed to avoid scope expansion/breaking dependency\
+      \ changes.\n\n## Headline\nPASS"
   - id: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     name: Backend expected red contract tests
     status: pending
