@@ -1472,6 +1472,69 @@ phases:
     - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: spec-verifier
+  - id: runtime-api-and-mcp-integration.runtime-wiring-audit
+    name: Runtime wiring audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Wiring completeness audit for runtime/API/MCP surfaces.
+
+
+      REQUIRED CHECKS:
+
+      1. CLI entrypoint invokes real runtime shell, not private placeholder runtime
+      stubs
+
+      2. HTTP routes are registered and reachable from `resofeed serve`
+
+      3. MCP tools/resources are registered and reachable from `/mcp`
+
+      4. Config/flag fields are consumed by non-test runtime code
+
+      5. No `_Runtime*`, `_Stub*`, `_Placeholder*`, state merger, conflict resolver,
+      or sync coordinator remains wired as production dependency
+
+
+      Verification scope: phase-check protecting runtime gate and end-to-end integration.'
+    verification: '- Static trace/grep output shows `cmd/resofeed/main.go` reaches
+      real HTTP/MCP/core implementations
+
+      - Route/tool registration evidence lists all documented endpoints/tools/resources
+
+      - No production runtime placeholder/stub class/function remains for documented
+      surfaces
+
+      - Config/flags are consumed by runtime code'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Wiring Audit Report
+
+      - CLI entrypoint trace:
+
+      - HTTP route registration:
+
+      - MCP tool/resource registration:
+
+      - Config/flag consumption:
+
+      - Stub/placeholder scan:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-http-api-handlers
+    - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+    - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    agent: wiring-auditor
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
