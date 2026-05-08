@@ -2250,6 +2250,73 @@ phases:
 
       - Headline: PASS | PASS_WITH_DEBT | FAIL'
     agent: blind-tester
+  - id: end-to-end-integration.end-to-end-wiring-audit
+    name: End to end wiring audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+      phase_dependencies: runtime-api-and-mcp-integration, frontend-implementation
+
+
+      System wiring audit: verify vertical integration completeness after all implementation
+      phases.
+
+
+      REQUIRED CHECKS:
+
+      1. Every documented public HTTP endpoint is reachable from `resofeed serve`
+
+      2. Every documented MCP resource/tool is registered and reachable through `/mcp`
+
+      3. Frontend calls documented API paths with owner-token header
+
+      4. State export/import UI maps to `/api/state/export` and `/api/state/import`
+
+      5. No entrypoint path terminates at a stub/placeholder
+
+      6. No write-only config/state fields in implemented scope
+
+
+      Verification scope: full-plan-check precursor protecting finalization.'
+    verification: '- Static and runtime trace evidence covers HTTP routes, MCP tools/resources,
+      frontend API calls, and state portability paths
+
+      - Stub/placeholder scan shows none wired as production dependencies
+
+      - Orphan/write-only field report is empty or has explicit non-blocking disposition
+
+      - Evidence uses grep/import-trace/runtime output, not unsupported assertions'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Wiring Audit Report
+
+      - HTTP route reachability:
+
+      - MCP resource/tool reachability:
+
+      - Frontend API call trace:
+
+      - State export/import path trace:
+
+      - Stub/placeholder scan:
+
+      - Orphan/write-only fields:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    agent: wiring-auditor
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
