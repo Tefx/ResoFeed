@@ -3,8 +3,29 @@ package resofeed
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"net/url"
+	"sort"
+	"strings"
 	"time"
 )
+
+const (
+	defaultFeedLimit = 50
+	maxFeedLimit     = 100
+	freshWindow      = 48 * time.Hour
+)
+
+type rankedCandidate struct {
+	item      ItemSummary
+	firstSeen *time.Time
+	fresh     bool
+	memory    bool
+	related   bool
+	score     int
+	ordinal   int
+}
 
 // RankingOptions define feed candidate limits only. Contract guardrails are
 // authoritative over any future scoring formula.
@@ -19,24 +40,399 @@ type RankingOptions struct {
 // surfaced items unless new related developments exist, and keep duplicates
 // transparently retrievable.
 func ListTodayFeed(ctx context.Context, db *sql.DB, opts RankingOptions) ([]ItemSummary, error) {
-	panic("TODO contract stub: rank today feed")
+	if db == nil {
+		return nil, errors.New("list today feed: db is nil")
+	}
+	limit := normalizeLimit(opts.Limit, defaultFeedLimit, maxFeedLimit)
+	now := opts.Now
+	if now.IsZero() {
+		now = time.Now().UTC()
+	}
+
+	rows, err := db.QueryContext(ctx, `
+select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title,
+       i.summary, i.core_insight, i.published_at,
+       i.extraction_status, i.model_status,
+       coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
+       i.story_key, i.duplicate_of_item_id, i.first_seen_at
+from items i
+join sources s on s.id = i.source_id and s.is_active = 1
+left join item_state st on st.item_id = i.id
+order by coalesce(i.published_at, i.first_seen_at) desc, i.id asc`)
+	if err != nil {
+		return nil, fmt.Errorf("list today feed query: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	var items []rankedCandidate
+	ordinal := 0
+	for rows.Next() {
+		candidate, err := scanRankedCandidate(rows, now, ordinal)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, candidate)
+		ordinal++
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate today feed rows: %w", err)
+	}
+
+	return rankCandidates(items, limit, now), nil
 }
 
 // ApplySteering accepts natural-language steering and RSS URL subscription
 // commands. Gemini may propose structured changes, but Go validates and applies
 // them in one SQLite transaction.
 func ApplySteering(ctx context.Context, db *sql.DB, gemini GeminiClient, req SteerRequest) (SteerResult, error) {
-	panic("TODO contract stub: apply steering")
+	command := strings.TrimSpace(req.Command)
+	if command == "" {
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "empty", ChangedRules: []SteerRule{}, Message: "err: empty steering command"}}, nil
+	}
+	if conflictsWithInvariants(command) {
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: "not fully applied: freshness, coverage, provenance, and minimalism invariants stay enabled"}}, nil
+	}
+	if req.ActorKind == ActorKindAgent && hasActiveHumanLikeRules(ctx, db) {
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "human_precedence", ChangedRules: []SteerRule{}, Message: "not applied: active human steering takes precedence"}}, nil
+	}
+	if parsedURL, ok := parseRSSURL(command); ok {
+		return applySourceURLSteering(ctx, db, parsedURL)
+	}
+
+	proposal := GeminiSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
+	if gemini != nil {
+		active, err := loadActiveSteerRules(ctx, db)
+		if err != nil {
+			return SteerResult{}, err
+		}
+		translated, err := gemini.TranslateSteering(ctx, GeminiSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
+		if err != nil {
+			return SteerResult{}, fmt.Errorf("translate steering: %w", err)
+		}
+		if translated.InterpretedAs != "" {
+			proposal.InterpretedAs = translated.InterpretedAs
+		}
+		if len(translated.RuleTexts) > 0 {
+			proposal.RuleTexts = translated.RuleTexts
+		}
+		if translated.Message != "" {
+			proposal.Message = translated.Message
+		}
+	}
+	return applySteeringRules(ctx, db, proposal)
 }
 
 // MarkItemInspected records deliberate human attention. Agent silent evaluation
 // must not call this contract.
 func MarkItemInspected(ctx context.Context, db *sql.DB, itemID string, req InspectRequest) (InspectResult, error) {
-	panic("TODO contract stub: mark item inspected")
+	if db == nil {
+		return InspectResult{}, errors.New("mark item inspected: db is nil")
+	}
+	if strings.TrimSpace(itemID) == "" {
+		return InspectResult{}, errors.New("mark item inspected: item id is empty")
+	}
+	now := time.Now().UTC()
+	timestamp := now.Format(time.RFC3339Nano)
+	_, err := db.ExecContext(ctx, `
+insert into item_state (item_id, is_resonated, human_inspected_at, last_actor_kind, last_actor_id)
+values (?, 0, ?, ?, ?)
+on conflict(item_id) do update set
+  human_inspected_at = coalesce(item_state.human_inspected_at, excluded.human_inspected_at),
+  last_actor_kind = excluded.last_actor_kind,
+  last_actor_id = excluded.last_actor_id`, itemID, timestamp, string(req.ActorKind), req.ActorID)
+	if err != nil {
+		return InspectResult{}, fmt.Errorf("mark item inspected: %w", err)
+	}
+	var stored string
+	if err := db.QueryRowContext(ctx, `select human_inspected_at from item_state where item_id = ?`, itemID).Scan(&stored); err != nil {
+		return InspectResult{}, fmt.Errorf("read inspection state: %w", err)
+	}
+	inspectedAt, err := parseDBTime(stored)
+	if err != nil {
+		return InspectResult{}, fmt.Errorf("parse inspection timestamp: %w", err)
+	}
+	return InspectResult{ItemID: itemID, HumanInspectedAt: inspectedAt, AlreadyApplied: !inspectedAt.Equal(now)}, nil
 }
 
 // SetItemResonance toggles durable memory state. Resonance improves retrieval
 // but must not permanently pin old items into daily attention.
 func SetItemResonance(ctx context.Context, db *sql.DB, itemID string, req ResonanceRequest) (ResonanceResult, error) {
-	panic("TODO contract stub: set item resonance")
+	if db == nil {
+		return ResonanceResult{}, errors.New("set item resonance: db is nil")
+	}
+	if strings.TrimSpace(itemID) == "" {
+		return ResonanceResult{}, errors.New("set item resonance: item id is empty")
+	}
+	_, err := db.ExecContext(ctx, `
+insert into item_state (item_id, is_resonated, last_actor_kind, last_actor_id)
+values (?, ?, ?, ?)
+on conflict(item_id) do update set
+  is_resonated = excluded.is_resonated,
+  last_actor_kind = excluded.last_actor_kind,
+  last_actor_id = excluded.last_actor_id`, itemID, req.Resonated, string(req.ActorKind), req.ActorID)
+	if err != nil {
+		return ResonanceResult{}, fmt.Errorf("set item resonance: %w", err)
+	}
+	return ResonanceResult{ItemID: itemID, IsResonated: req.Resonated, AlreadyApplied: false}, nil
+}
+
+func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCandidate, error) {
+	var item ItemSummary
+	var summary, coreInsight, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen sql.NullString
+	var resonated bool
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &summary, &coreInsight, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &resonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen); err != nil {
+		return rankedCandidate{}, fmt.Errorf("scan today feed row: %w", err)
+	}
+	item.Summary = stringPtrFromNull(summary)
+	item.CoreInsight = stringPtrFromNull(coreInsight)
+	item.PublishedAt = timePtrFromNull(publishedAt)
+	item.IsResonated = resonated
+	item.HumanInspectedAt = timePtrFromNull(inspectedAt)
+	item.ExternalSurfacedAt = timePtrFromNull(surfacedAt)
+	item.StoryKey = stringPtrFromNull(storyKey)
+	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
+	firstSeenAt := timePtrFromNull(firstSeen)
+	fresh := isFresh(item.PublishedAt, firstSeenAt, now)
+	return rankedCandidate{item: item, firstSeen: firstSeenAt, fresh: fresh, memory: !fresh, ordinal: ordinal}, nil
+}
+
+func rankCandidates(candidates []rankedCandidate, limit int, now time.Time) []ItemSummary {
+	storyHasFresh := map[string]bool{}
+	storyHasTouchedMemory := map[string]bool{}
+	freshSources := map[string]bool{}
+	for _, candidate := range candidates {
+		if candidate.item.StoryKey != nil {
+			if candidate.fresh {
+				storyHasFresh[*candidate.item.StoryKey] = true
+			}
+			if candidate.memory && (candidate.item.IsResonated || candidate.item.HumanInspectedAt != nil || candidate.item.ExternalSurfacedAt != nil) {
+				storyHasTouchedMemory[*candidate.item.StoryKey] = true
+			}
+		}
+		if candidate.fresh {
+			freshSources[candidate.item.SourceID] = true
+		}
+	}
+
+	eligible := make([]rankedCandidate, 0, len(candidates))
+	for _, candidate := range candidates {
+		if candidate.item.DuplicateOfItemID != nil {
+			continue
+		}
+		if candidate.item.StoryKey != nil {
+			key := *candidate.item.StoryKey
+			candidate.related = storyHasFresh[key] && storyHasTouchedMemory[key]
+		}
+		if candidate.item.ExternalSurfacedAt != nil && !candidate.related {
+			continue
+		}
+		candidate.score = scoreCandidate(candidate, now)
+		eligible = append(eligible, candidate)
+	}
+	sort.SliceStable(eligible, func(i, j int) bool {
+		if eligible[i].score != eligible[j].score {
+			return eligible[i].score > eligible[j].score
+		}
+		return itemTime(eligible[i]).After(itemTime(eligible[j]))
+	})
+
+	selected := make([]rankedCandidate, 0, minInt(limit, len(eligible)))
+	selectedIDs := map[string]bool{}
+	if limit >= 10 && len(freshSources) >= 3 {
+		covered := map[string]bool{}
+		for len(covered) < 3 {
+			idx := -1
+			for i, candidate := range eligible {
+				if selectedIDs[candidate.item.ID] || !candidate.fresh || covered[candidate.item.SourceID] {
+					continue
+				}
+				idx = i
+				break
+			}
+			if idx == -1 {
+				break
+			}
+			selected = append(selected, eligible[idx])
+			selectedIDs[eligible[idx].item.ID] = true
+			covered[eligible[idx].item.SourceID] = true
+		}
+	}
+
+	freshQuota := 0
+	if limit >= 10 {
+		freshQuota = limit / 2
+	}
+	for countFresh(selected) < freshQuota && len(selected) < limit {
+		candidate, ok := firstCandidate(eligible, selectedIDs, func(c rankedCandidate) bool { return c.fresh })
+		if !ok {
+			break
+		}
+		selected = append(selected, candidate)
+		selectedIDs[candidate.item.ID] = true
+	}
+
+	memoryCap := limit
+	if limit >= 10 && countFreshIn(eligible) > 0 {
+		memoryCap = maxInt(1, limit/5)
+	}
+	for _, candidate := range eligible {
+		if len(selected) >= limit {
+			break
+		}
+		if selectedIDs[candidate.item.ID] {
+			continue
+		}
+		oldResonatedMemory := candidate.memory && candidate.item.IsResonated && !candidate.related
+		if oldResonatedMemory && countOldResonatedMemory(selected) >= memoryCap && countFresh(selected) < countFreshIn(eligible) {
+			continue
+		}
+		selected = append(selected, candidate)
+		selectedIDs[candidate.item.ID] = true
+	}
+	sort.SliceStable(selected, func(i, j int) bool { return selected[i].score > selected[j].score })
+
+	result := make([]ItemSummary, 0, len(selected))
+	for _, candidate := range selected {
+		result = append(result, candidate.item)
+	}
+	return result
+}
+
+func scoreCandidate(candidate rankedCandidate, now time.Time) int {
+	score := 0
+	if candidate.fresh {
+		score += 1000
+	} else {
+		score += 100
+	}
+	if candidate.related {
+		score += 500
+	}
+	if candidate.item.IsResonated {
+		score += 80
+	}
+	age := now.Sub(itemTime(candidate))
+	if age < 0 {
+		age = 0
+	}
+	score -= int(age / time.Hour)
+	score -= candidate.ordinal
+	return score
+}
+
+func isFresh(publishedAt *time.Time, firstSeenAt *time.Time, now time.Time) bool {
+	for _, ts := range []*time.Time{publishedAt, firstSeenAt} {
+		if ts != nil && !ts.Before(now.Add(-freshWindow)) {
+			return true
+		}
+	}
+	return false
+}
+
+func itemTime(candidate rankedCandidate) time.Time {
+	if candidate.item.PublishedAt != nil {
+		return *candidate.item.PublishedAt
+	}
+	if candidate.firstSeen != nil {
+		return *candidate.firstSeen
+	}
+	return time.Time{}
+}
+
+func conflictsWithInvariants(command string) bool {
+	lower := strings.ToLower(command)
+	conflictPhrases := []string{"hide all fresh", "only my old starred", "only old starred", "disable freshness", "disable coverage", "disable provenance", "hide all items", "show only my old", "forever"}
+	matches := 0
+	for _, phrase := range conflictPhrases {
+		if strings.Contains(lower, phrase) {
+			matches++
+		}
+	}
+	return matches >= 1 && (strings.Contains(lower, "fresh") || strings.Contains(lower, "coverage") || strings.Contains(lower, "provenance") || strings.Contains(lower, "only"))
+}
+
+func parseRSSURL(command string) (string, bool) {
+	parsed, err := url.Parse(command)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return "", false
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return "", false
+	}
+	return parsed.String(), true
+}
+
+func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (SteerResult, error) {
+	if db == nil {
+		return SteerResult{}, errors.New("apply source steering: db is nil")
+	}
+	now := time.Now().UTC().Format(time.RFC3339Nano)
+	id := stableTextID("src", sourceURL)
+	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1) on conflict(url) do update set is_active = 1, revision = revision + 1`, id, sourceURL, sourceURL, now)
+	if err != nil {
+		return SteerResult{}, fmt.Errorf("add source through steering: %w", err)
+	}
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added"}}, nil
+}
+
+func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteeringOutput) (SteerResult, error) {
+	if db == nil {
+		return SteerResult{}, errors.New("apply steering rules: db is nil")
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return SteerResult{}, fmt.Errorf("begin steering transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	changed := make([]SteerRule, 0, len(proposal.RuleTexts))
+	for _, text := range proposal.RuleTexts {
+		text = strings.TrimSpace(text)
+		if text == "" || conflictsWithInvariants(text) {
+			continue
+		}
+		id := stableTextID("rule", text)
+		_, err := tx.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, revision) values (?, ?, 1, 1) on conflict(id) do update set rule_text = excluded.rule_text, is_active = 1, revision = steer_rules.revision + 1`, id, text)
+		if err != nil {
+			return SteerResult{}, fmt.Errorf("upsert steering rule: %w", err)
+		}
+		changed = append(changed, SteerRule{ID: id, RuleText: text, IsActive: true, Revision: 1})
+	}
+	if err := tx.Commit(); err != nil {
+		return SteerResult{}, fmt.Errorf("commit steering transaction: %w", err)
+	}
+	if len(changed) == 0 {
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "no_safe_policy_change", ChangedRules: []SteerRule{}, Message: "not applied: no safe product-valid steering rule remained"}}, nil
+	}
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: proposal.InterpretedAs, ChangedRules: changed, Message: proposal.Message}}, nil
+}
+
+func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) {
+	if db == nil {
+		return nil, nil
+	}
+	rows, err := db.QueryContext(ctx, `select id, rule_text, is_active, superseded_by, revision from steer_rules where is_active = 1 order by revision desc, id asc`)
+	if err != nil {
+		return nil, fmt.Errorf("load active steering rules: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	var rules []SteerRule
+	for rows.Next() {
+		var rule SteerRule
+		var superseded sql.NullString
+		if err := rows.Scan(&rule.ID, &rule.RuleText, &rule.IsActive, &superseded, &rule.Revision); err != nil {
+			return nil, fmt.Errorf("scan active steering rule: %w", err)
+		}
+		rule.SupersededBy = stringPtrFromNull(superseded)
+		rules = append(rules, rule)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate active steering rules: %w", err)
+	}
+	return rules, nil
+}
+
+func hasActiveHumanLikeRules(ctx context.Context, db *sql.DB) bool {
+	rules, err := loadActiveSteerRules(ctx, db)
+	return err == nil && len(rules) > 0
 }
