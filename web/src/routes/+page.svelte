@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { FeedTodayResponse, ItemSummary, Source, SourcesResponse } from '$lib/api-contract';
+  import type { ItemSummary, Source } from '$lib/api-contract';
+  import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import FeedContractStub from './components/FeedContractStub.svelte';
@@ -32,35 +33,15 @@
         : 'feed-temporarily-empty'
   );
 
-  async function fetchJson<T>(path: string, token: string): Promise<T> {
-    const response = await fetch(path, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      window.localStorage.removeItem(tokenStorageKey);
-      ownerToken = '';
-      promptState = 'rejected';
-      throw new Error('err: owner token rejected');
-    }
-
-    if (!response.ok) {
-      throw new Error(`err: api ${response.status}`);
-    }
-
-    return (await response.json()) as T;
-  }
-
   async function loadShellData(token: string): Promise<void> {
     loadState = 'loading';
     apiError = null;
 
     try {
+      const client = new ResoFeedApiClient({ ownerToken: token });
       const [sourceResponse, feedResponse] = await Promise.all([
-        fetchJson<SourcesResponse>('/api/sources', token),
-        fetchJson<FeedTodayResponse>('/api/feed/today', token)
+        client.sources(),
+        client.today()
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
@@ -69,6 +50,11 @@
       await tick();
       steerInput?.focus();
     } catch (error) {
+      if (error instanceof ResoFeedApiError && error.status === 401) {
+        window.localStorage.removeItem(tokenStorageKey);
+        ownerToken = '';
+        promptState = 'rejected';
+      }
       loadState = 'error';
       apiError = error instanceof Error ? error.message : 'err: api unavailable';
     }

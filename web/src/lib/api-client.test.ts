@@ -1,0 +1,109 @@
+import { render, screen, within } from '@testing-library/svelte';
+import { describe, expect, it, vi } from 'vitest';
+
+import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
+import type { ErrorBody, FeedTodayResponse, SearchResponse, SourcesResponse, StateBundleV1 } from '$lib/api-contract';
+import FeedContractStub from '../routes/components/FeedContractStub.svelte';
+import SearchRetrievalContractStub from '../routes/components/SearchRetrievalContractStub.svelte';
+import SourceLedgerContractStub from '../routes/components/SourceLedgerContractStub.svelte';
+import StatePortabilityContractStub from '../routes/components/StatePortabilityContractStub.svelte';
+import { expectedRedItem, expectedRedSource } from '../test/contract-fixtures';
+
+const feedFixture: FeedTodayResponse = { items: [expectedRedItem] };
+const sourcesFixture: SourcesResponse = { sources: [expectedRedSource] };
+const searchFixture: SearchResponse = {
+  items: [expectedRedItem],
+  query: {
+    q: 'sqlite',
+    source: 'Example Source',
+    from: '2026-01-01',
+    to: '2026-12-31',
+    resonated: false,
+    limit: 50
+  }
+};
+const stateFixture: StateBundleV1 = {
+  schema_version: 'resofeed.state.v1',
+  exported_at: '2026-05-09T00:00:00Z',
+  sources: [{ id: expectedRedSource.id, url: expectedRedSource.url, title: expectedRedSource.title }],
+  steer_rules: [{ id: 'rule_01', rule_text: 'Push more technical documents.' }],
+  resonated_items: [
+    {
+      item_id: expectedRedItem.id,
+      url: expectedRedItem.url,
+      source_url: expectedRedSource.url,
+      title: expectedRedItem.title
+    }
+  ]
+};
+
+function jsonResponse(body: FeedTodayResponse | SourcesResponse | SearchResponse | StateBundleV1 | ErrorBody, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' }
+  });
+}
+
+describe('ResoFeed API client and rendered sinks', () => {
+  it('sends the owner-token header and renders source/feed fixtures into visible DOM', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
+      const url = String(input);
+      if (url.endsWith('/api/sources')) return jsonResponse(sourcesFixture);
+      if (url.endsWith('/api/feed/today')) return jsonResponse(feedFixture);
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, 404);
+    });
+
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+    const [sources, feed] = await Promise.all([client.sources(), client.today()]);
+
+    render(SourceLedgerContractStub, { props: { sources: sources.sources } });
+    expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent(expectedRedSource.url);
+
+    render(FeedContractStub, { props: { items: feed.items, selectedItemId: feed.items[0]?.id } });
+    const list = screen.getByRole('list', { name: 'Today feed contract items' });
+    expect(within(list).getByText(expectedRedItem.title)).toBeVisible();
+    expect(within(list).getByLabelText('Extraction: partial_extraction')).toHaveTextContent('partial');
+  });
+
+  it('renders search and state portability fixtures from API client responses', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
+      const url = String(input);
+      if (url.includes('/api/search')) return jsonResponse(searchFixture);
+      if (url.endsWith('/api/state/export')) return jsonResponse(stateFixture);
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, 404);
+    });
+
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+    const [search, state] = await Promise.all([
+      client.search({ q: 'sqlite', source: 'Example Source', from: '2026-01-01', to: '2026-12-31', resonated: false }),
+      client.exportState()
+    ]);
+
+    expect(state.schema_version).toBe('resofeed.state.v1');
+
+    render(SearchRetrievalContractStub, { props: { items: search.items, query: search.query.q } });
+    const searchRegion = screen.getByRole('region', { name: 'Search and Retrieval' });
+    expect(within(searchRegion).getByText('match: summary')).toBeVisible();
+    expect(within(searchRegion).getByText('src: Example Source')).toBeVisible();
+
+    render(StatePortabilityContractStub, { props: { state: 'idle' } });
+    expect(screen.getByRole('region', { name: 'State Portability' })).toHaveTextContent(
+      'import replaces active sources, rules, and stars'
+    );
+  });
+
+  it('throws canonical API errors without replacing backend code/message/details', async () => {
+    const badRequest: ErrorBody = {
+      error: { code: 'bad_request', message: 'invalid query parameter', details: { field: 'q' } }
+    };
+    const fetcher = vi.fn<typeof fetch>(async () => jsonResponse(badRequest, 400));
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    await expect(client.search({ q: 'x'.repeat(501) })).rejects.toMatchObject({
+      status: 400,
+      body: badRequest
+    } satisfies Partial<ResoFeedApiError>);
+  });
+});
