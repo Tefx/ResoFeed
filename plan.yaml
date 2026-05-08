@@ -555,7 +555,7 @@ phases:
       \ run.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
     name: Frontend expected red rendering tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -645,6 +645,71 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-08T21:55:36.485345+00:00'
+    done_at: '2026-05-08T22:01:26.495021+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; UI must use\
+      \ dense/legible archival labels and Owner Token Prompt / First-Use Empty State,\
+      \ with folders/tags/unread/settings flows forbidden.\n- docs/ARCHITECTURE.md\
+      \ — §8 Frontend Boundary requires `web/` to show owner-token prompt before `/api/*`,\
+      \ store token as `resofeed.ownerToken`, render dense feed/Inspector, flat Source\
+      \ Ledger, terse state export/import, and no Tailwind/UI-library or extra dashboard\
+      \ surfaces.\n- docs/PRD.md — First-run has no onboarding wizard; core primitives\
+      \ are Inspect, Resonate, Steer; state portability is active Source Ledger +\
+      \ active steering rules + currently resonated items only.\n- docs/DESIGN.md\
+      \ — Component contracts define Owner Token Prompt states/focus/live-region,\
+      \ exact first-use copy, feed row anatomy/accessibility, Inspector focus/provenance,\
+      \ Source Ledger flat delete confirmation, State Portability warning text, and\
+      \ Search/Retrieval states.\n- docs/DESIGN_VISION.md — Aesthetic is archival/high-density/typographic/low-fatigue\
+      \ with no cute errors, no onboarding/account flows, no numeric indicators, and\
+      \ raw utility fallbacks.\n- docs/USAGE.md — First open requires pasting owner\
+      \ token stored in browser local storage and sent as `Authorization: Bearer`;\
+      \ source addition via Steer or OPML; search is lexical/metadata only; `/doctor`\
+      \ is raw text.\n\n## Expected-Red Test Evidence\n- step_intent: test_define_red\n\
+      - expected_result: red\n- observed_result: red\n- failure_alignment: Rendering\
+      \ tests execute in jsdom and fail on missing implementation/interaction behavior:\
+      \ owner-token initial focus/localStorage/alert semantics, feed keyboard inspect\
+      \ focus and star toggle, Inspector terse `partial`/why provenance/focus, Source\
+      \ Ledger delete confirmation, State Portability file input/live export feedback,\
+      \ and Search filters/provenance result anatomy.\n- verdict: PASS_EXPECTED_RED\n\
+      - blockers: []\n- product_implementation_files_modified: none\n- Commit hash(es):\n\
+      \  - Worker branch: 175ef8b\n  - Main squash merge: abe8d37\n- Test files added/changed:\n\
+      \  - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n  -\
+      \ web/src/test/contract-fixtures.ts\n  - web/src/test/setup.ts\n  - web/package.json\n\
+      \  - web/package-lock.json\n  - web/vite.config.ts\n- Rendered states covered:\n\
+      \  - owner-token prompt empty/rejected; first-use empty no-sources; feed row\
+      \ selected/external/resonated variants; Inspector desktop split; Source Ledger\
+      \ populated row; State Portability idle warning; Search/Retrieval populated\
+      \ results.\n- Spec-derived fixtures/copy and cited sections:\n  - First-use\
+      \ copy from DESIGN.md First-Use Empty State; warning `import replaces active\
+      \ sources, rules, and stars` from DESIGN.md State Portability; API item/source\
+      \ fixture fields from ARCHITECTURE.md §6; owner token storage key from ARCHITECTURE.md\
+      \ §8 and USAGE.md Open the UI; Search filters from PRD §10 / USAGE Search.\n\
+      - Commands run:\n  - Worker branch: `npm install --save-dev vitest @testing-library/svelte\
+      \ @testing-library/jest-dom @testing-library/user-event jsdom` — exit 0.\n \
+      \ - Worker branch: `npm run check` — exit 0; svelte-check found 0 errors and\
+      \ 0 warnings.\n  - Worker branch: `npm run test:render` — exit 1 expected red;\
+      \ 7 failed, 1 passed.\n  - Worker branch: `npm test` — exit 1 expected red after\
+      \ check passed; 7 failed, 1 passed.\n  - Mainline final-state: `npm --prefix\
+      \ web ci` — exit 0; installed 147 packages; npm reported 3 low severity vulnerabilities.\n\
+      \  - Mainline final-state: `npx @google/design.md lint docs/DESIGN.md` — exit\
+      \ 0; 0 errors, 0 warnings, 1 info.\n  - Mainline final-state: `npm --prefix\
+      \ web run check` — exit 0; svelte-check found 0 errors and 0 warnings.\n  -\
+      \ Mainline final-state: `npm --prefix web run build` — exit 0; adapter-static\
+      \ wrote site to `build`.\n  - Mainline final-state: `npm --prefix web run test:render`\
+      \ — exit 1 expected red; 7 failed, 1 passed. Failures align with missing implementation/interaction\
+      \ behavior.\n  - Mainline final-state: `npm --prefix web test` — exit 1 expected\
+      \ red after check passed; 7 failed, 1 passed.\n- Expected failures or exposed\
+      \ gaps:\n  - Owner token input does not receive initial focus; rejected error\
+      \ is not role=alert; submit/localStorage flow is absent.\n  - Feed Enter does\
+      \ not open/focus Inspector; star button does not toggle accessible name/glyph.\n\
+      \  - Inspector lacks terse `partial`, why-this-appeared copy, and heading focus\
+      \ behavior.\n  - Source Ledger delete does not reveal confirmation.\n  - State\
+      \ import does not reveal keyboard-reachable file input; export does not emit\
+      \ status text.\n  - Search surface lacks source/date/resonance filters and match/provenance\
+      \ result line.\n- Gaps/Notes:\n  - No product UI logic was implemented; only\
+      \ web test harness/dependencies/fixtures were added.\n  - Vitest emits a non-blocking\
+      \ jsdom warning: `--localstorage-file was provided without a valid path`.\n\
+      \  - No ref contradictions found.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.foundation-gate
     name: Foundation gate
     status: pending
