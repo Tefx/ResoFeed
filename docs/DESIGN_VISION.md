@@ -63,7 +63,7 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 ## 10. Craft Guardrails & Anti-Slop
 - **No Paternalism:** No "You're all caught up!" messages, no hidden rate limits, no auto-collapsed "spam" folders.
 - **No Cute Error States:** If the AI summary fails, show the raw RSS description or an unstyled error string. No ghost/skeleton loaders or friendly illustrations.
-- **No Onboarding or Auth:** Single-tenant nature means no login screens, no "ghost briefings", no setup wizards. The app boots directly into the feed.
+- **No Account Login or Onboarding:** Single-tenant nature means no account screens, no "ghost briefings", no setup wizards. If an owner token is required, show a terse local access gate before feed API calls.
 - **No Numeric Indicators:** Absolutely no numeric badges or bolded unseen states.
 - **No Moderation Consoles / Activity Logs:** We do not expose secondary holding queues or extensive activity logs. Avoid building a second hidden inbox.
 - **Whitespace over Borders:** Avoid the "Border-Box Maze." Separate feed items using generous vertical whitespace or stark 1px rules.
@@ -86,9 +86,9 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 | **Resonate** | A prominent, unambiguous Star toggle (`[☆]`) on every Item Card, plus double-tap gesture and a star in the Inspector when in single-column mobile view. |
 | **Steer** | A lightweight Command Bar / Sticky input for natural language intents, or pasting raw RSS URLs to subscribe. |
 | **Diagnostics** | `/doctor` renders raw system health as plain text inside the existing Steer/feedback surface. |
-| **State Portability** | Full export/import appears as terse text actions, covering sources, steering history, interpreted steering state, and resonance signals without a settings dashboard. |
+| **State Portability** | Export/import appears as terse text actions covering active sources, active steering rules, and currently resonated items without a settings dashboard. |
 | **No Inbox-Zero / Anxiety** | Absence of counters, bold/unseen typography. |
 | **Persistent Feed** | Time-grouped pagination; older items remain accessible without auto-deletion. |
 | **No Paternalism** | No auto-collapsing of noisy feeds, no algorithmic "Top Stories" tabs, no "Mark All Read". |
 | **AI as Utility** | Raw text fallbacks when summaries fail; no friendly error illustrations. |
-| **Single-Tenant** | No onboarding screens, login flows, or setup wizards. Immediate access to the feed. |
+| **Single-Tenant** | No onboarding screens, account login flows, or setup wizards. If an owner token is required, present it as a terse local access gate before feed API calls. |

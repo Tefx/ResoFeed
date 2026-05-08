@@ -154,7 +154,7 @@ The product is a single-user tool, not a multi-tenant SaaS. There is no account 
 
 ### 4.8 Complete State Portability
 
-The user owns their data. The user's active state must be exportable and importable as raw text, JSON, or OPML without vendor lock-in. Complete state includes, at minimum, the Source Ledger, current active steering policy rules, and currently resonated items.
+The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML remains source-ledger import/export only and is not a complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
 
 ## 5. Core Product Primitives
 
@@ -218,10 +218,10 @@ Product requirements:
 
 ### 5.4 Intent Data Management
 
-The system must manage user preferences—specifically Steering commands and Resonate signals—according to the following minimalist constraint:
+The system must manage user preferences—specifically Steering commands and current Resonate state—according to the following minimalist constraint:
 
 - **Current State Only:** The system must treat user steering commands and resonated items as active state. The system is not required to maintain a complex event-sourced ledger of past corrections. When a rule is deleted or superseded by a new Steer command, the active policy is simply updated or softly deleted.
-- **Data Transparency (Exportability):** The user's active steering rules and resonance signals must be exportable in a raw, human-readable format.
+- **Data Transparency (Exportability):** The user's active steering rules and current resonance state must be exportable through the JSON state bundle, using human-readable fields where defined by architecture.
 
 ## 6. Actor Model and Authority
 
@@ -238,7 +238,8 @@ ResoFeed must distinguish at least these actor classes at the product level:
 - Human steering has priority over delegated-agent steering.
 - Delegated-agent actions must be clearly attributable to the human via simple receipt tags (no extensive activity ledgers).
 - Agents may inspect items and return user feedback.
-- Agents may resonate or steer only when authorized by the human’s workflow or explicit delegation.
+- In the current product scope, possession of the owner token is the delegation boundary for external agents; ResoFeed does not maintain a separate per-agent authorization registry.
+- Agents may resonate or steer only through owner-token-authorized workflows.
 - The human must be able to correct or override agent-generated drift.
 - Agent-generated steering must produce a user-visible receipt that identifies the agent, summarizes the change, and offers an understandable correction path.
 
@@ -247,7 +248,7 @@ ResoFeed must distinguish at least these actor classes at the product level:
 - Agent mutating actions must be safe under retries and loops; duplicate submissions of the same intended action must not corrupt user state.
 - Agent silent evaluation must be separated from external surfacing.
 - Agent-mediated delivery must be recorded in a way that prevents repetitive surfacing of the same item.
-- Unauthorized agent attempts to resonate or steer must be silently rejected or dropped to prevent building a complex holding queue.
+- Missing or invalid owner-token authority is rejected at the transport/auth boundary and must not create a holding queue, moderation queue, or pending-agent workflow.
 
 ## 7. Source Intake and Item Understanding
 
@@ -279,7 +280,7 @@ Requirements:
 
 - repeated versions of the same article **must** not appear as separate equal-priority items;
 - multiple reports of the same story **must** be transparently clustered or otherwise made understandable as one story-level event;
-- the user **must** be able to access source provenance when the system merges or groups related items;
+- the user **must** be able to access source provenance when the system deduplicates or groups related feed items;
 - grouping **must** preserve direct access to every original source item and provenance so false-positive grouping does not destroy or hide individual source context; grouping must never behave like source suppression, hidden volume throttling, or a spam folder.
 
 ### 7.4 Content extraction quality
@@ -330,7 +331,7 @@ Requirements:
 
 ### 8.3 Resonance constraint
 
-Resonated history should improve relevance and retrieval without becoming a hoarding mechanism.
+Current resonance state should improve relevance and retrieval without becoming a hoarding mechanism.
 
 Requirements:
 
@@ -438,7 +439,7 @@ Required agent capabilities:
 - retrieve eligible high-priority recent items;
 - silently evaluate item candidates without changing human-visible inspection status;
 - retrieve item detail for briefing or handoff;
-- execute searches across the user's corpus, including history and resonance status;
+- execute searches across the user's stored corpus, including older feed items and resonance status;
 - maintain an active but minimal understanding of current steering preferences;
 - report that an item was delivered or surfaced externally;
 - forward human inspect, resonate, or steer actions from external contexts;
@@ -537,7 +538,7 @@ Given a delegated agent submits steering or resonance that the human later corre
 
 ### AC-7 External handoff idempotency
 
-Given an authorized external agent has already surfaced an item, when it requests candidates again, then ResoFeed must avoid repeatedly returning the same already-surfaced item unless new context makes it relevant again.
+Given an authorized external agent has already surfaced an item, when it requests candidates again, then ResoFeed must avoid repeatedly returning the same already-surfaced item unless a newer related item creates new context under the architecture ranking contract.
 
 ### AC-8 Steering clarity
 
@@ -557,7 +558,7 @@ Given a delegated agent submits a steering instruction, when the human next inte
 
 ### AC-12 Unauthorized agent action
 
-Given an agent attempts to resonate or steer without the required delegation, when the action is processed, then ResoFeed must silently reject the action to prevent building a complex holding queue or moderation workflow.
+Given an agent attempts to resonate or steer without owner-token authority, when the action is processed, then ResoFeed must reject it at the auth boundary and must not create a complex holding queue or moderation workflow.
 
 ### AC-13 Duplicate/story provenance
 
@@ -573,7 +574,7 @@ Given a new user imports or configures sources, when enough items are available,
 
 ### AC-16 State Portability
 
-Given the user requests an export, when executed, the system must output the active user state in raw text, JSON, or OPML format, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via import.
+Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML remains source-ledger-only and is not a complete state restore format.
 
 ### AC-17 Diagnostics Output
 

@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: ResoFeed Analyst Workbench System
-description: "Single-tenant RSS intelligence interface: low-fatigue archival workbench, editorial reading payload, lightweight Steer input, durable feed history, flat Source Ledger."
+description: "Single-tenant RSS intelligence interface: low-fatigue archival workbench, editorial reading payload, lightweight Steer input, durable local feed access, flat Source Ledger."
 colors:
   primary: "#24231E"
   background: "#F3F0E7"
@@ -42,6 +42,7 @@ spacing:
   xxs: "2px"
   xs: "4px"
   sm: "8px"
+  row: "12px"
   md: "16px"
   lg: "24px"
   xl: "32px"
@@ -61,17 +62,39 @@ components:
     rounded: "{rounded.sm}"
     padding: "{spacing.md}"
     height: "44px"
+  steer-input-focused:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    rounded: "{rounded.sm}"
+  steer-input-submitting:
+    backgroundColor: "{colors.surface-active}"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    rounded: "{rounded.sm}"
   feed-item:
     backgroundColor: "{colors.background}"
     textColor: "{colors.text}"
     typography: "{typography.feed-title}"
-    padding: "12px 12px 11px 0"
+    padding: "{spacing.row} {spacing.row} 11px 0"
+    rounded: "{rounded.none}"
+  feed-item-hover:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.feed-title}"
+    padding: "{spacing.row} {spacing.row} 11px 0"
+    rounded: "{rounded.none}"
+  feed-item-focused:
+    backgroundColor: "{colors.surface-active}"
+    textColor: "{colors.text}"
+    typography: "{typography.feed-title}"
+    padding: "{spacing.row} {spacing.row} 11px 0"
     rounded: "{rounded.none}"
   feed-item-selected:
     backgroundColor: "{colors.surface-active}"
     textColor: "{colors.text}"
     typography: "{typography.feed-title}"
-    padding: "12px 12px 11px 0"
+    padding: "{spacing.row} {spacing.row} 11px 0"
     rounded: "{rounded.none}"
   feed-summary:
     backgroundColor: "{colors.background}"
@@ -121,6 +144,30 @@ components:
     typography: "{typography.chrome}"
     padding: "{spacing.md}"
     rounded: "{rounded.none}"
+  state-portability-importing:
+    backgroundColor: "{colors.surface-active}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.md}"
+    rounded: "{rounded.none}"
+  state-portability-warning:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.warning}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  owner-token-prompt:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.xl}"
+    rounded: "{rounded.none}"
+  first-use-empty:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.xl}"
+    rounded: "{rounded.none}"
   steering-receipt:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
@@ -134,6 +181,12 @@ components:
     padding: "{spacing.md}"
     rounded: "{rounded.none}"
   raw-error-line:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.danger}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  feedback-error-line:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.danger}"
     typography: "{typography.chrome}"
@@ -192,22 +245,22 @@ components:
 ---
 
 ## Overview
-
 ResoFeed is a single-tenant RSS intelligence tool for one human owner and delegated agents. The interface is an analyst's workbench: archival index chrome around a calm editorial payload. It does not protect the user from their own subscriptions, does not create queue-clearing rituals, and does not hide high-volume sources behind paternalistic automation.
 
 Primary surfaces covered by this contract:
 
+- owner-token prompt before API calls;
+- first-use empty state inside the standard shell;
 - unified time-grouped feed;
 - right-side or full-screen Inspector for item detail;
 - Steer input for natural-language correction, RSS URL subscription, and `/doctor` diagnostics;
-- flat Source Ledger for viewing/deleting sources and importing flattened OPML;
+- flat Source Ledger for viewing/deleting sources, importing flattened OPML, and reaching state export/import actions;
 - search and retrieval surfaces;
 - agent receipt/provenance markers.
 
 Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
 
 Product copy rule: internal design metaphors and principles are not user-visible slogans. Do not render “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” in the app UI. The product chrome should use only operational labels such as `RESOFEED`, `TODAY`, `YESTERDAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`, and raw status strings.
-
 ## Colors
 
 The color system is nearly monochrome, but not literal terminal black-and-white. Low-fatigue neutrals carry almost every pixel. `primary`, `text`, `surface`, `background`, `muted`, and `border` form the base utility palette. `accent` is scarce and reserved for Resonate state or one active command affordance per view. Implementation should normally show no more than two accent moments per screen.
@@ -315,6 +368,25 @@ Purpose: hold Steer, feed, and optional Inspector with no settings-sidebar bloat
 
 Anatomy: top command row, feed viewport, detail pane, optional Source Ledger route/overlay. States: default, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; skip-to-feed link may exist but should be visually quiet.
 
+### Owner Token Prompt
+
+Purpose: gate API access with the local owner token without creating account, login, or onboarding semantics.
+
+Anatomy: product label, one terse line (`Enter owner token`), token input, submit action, and raw invalid-token line (`err: owner token rejected`). It appears before the app calls `/api/*`; after acceptance, the token is stored as `resofeed.ownerToken` according to architecture. It must not use registration, account, profile, password-reset, or cloud-auth language.
+
+States: empty, focused, submitting, accepted, rejected. Rejected state keeps the input focused and uses `feedback-error-line` styling.
+
+Keyboard and accessibility: token input receives initial focus, submit is reachable by keyboard, rejection uses `aria-live="assertive"`, and accepted state moves focus to the Steer input or first feed item.
+
+### First-Use Empty State
+
+Purpose: explain the Inspect / Resonate / Steer loop inside the normal shell without a tour or wizard.
+
+Anatomy: a terse empty feed block with these plain-language lines: `Paste RSS URL in Steer or import OPML.`, `Inspect opens the item.`, `Star preserves durable value.`, `Steer is optional correction.` No carousel, checklist, celebratory art, or setup-progress tracker.
+
+States: no token, no sources, sources added but no items, feed temporarily empty. The no-token state uses Owner Token Prompt, not this empty state.
+
+Keyboard and accessibility: the first actionable control remains Steer or OPML import; explanatory text is static and not focusable unless it is an action.
 ### Steer Input
 
 Purpose: lightweight intent entry for natural-language correction, RSS URL subscription, `/doctor`, and source commands.
@@ -333,11 +405,9 @@ No chat transcript, no multi-turn clarification, no rule builder. Receipt text s
 Keyboard and accessibility: `Tab` reaches the Steer field first, `Enter` submits, `Escape` clears only unsent text. Applied/rejected receipts use `aria-live="polite"`; raw errors use `aria-live="assertive"` only when the command failed.
 
 ### Steering Receipt
-
 Purpose: expose the minimum product-required steering transparency without creating a rule-management UI.
 
-Anatomy: raw command excerpt, interpreted summary, actor (`human` or delegated agent name), timestamp, optional superseded marker, and terse `undo` or `correct` text action when reversible. States: applied, superseded, agent-applied, rejected, failed. Receipts are inline near Steer or the affected feed item; they must not accumulate into a dedicated activity ledger.
-
+Anatomy: raw command excerpt, interpreted summary, actor (`human` or delegated agent name), and terse `undo` or `correct` text action when reversible. Timestamp and superseded marker render only when already present in the API response or local transient UI state; the design does not require new persistent receipt fields. States: applied, superseded, agent-applied, rejected, failed. Receipts are inline near Steer or the affected feed item; they must not accumulate into a dedicated activity ledger.
 ### Feed Item
 
 Purpose: scan one RSS-derived item.
@@ -391,10 +461,9 @@ Inspector must not include related-content carousels, recommendation modules, or
 Keyboard and accessibility: opening Inspector moves focus to the detail heading; closing/back returns focus to the originating feed item and preserves scroll. Original links, grouped sources, and provenance labels must be screen-reader readable.
 
 ### Source Ledger
-
 Purpose: flat source management without settings-dashboard behavior.
 
-Anatomy: title, OPML import action, flat source rows, delete action, source export text action. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, optional last fetch status if needed for diagnostics. States:
+Anatomy: title, OPML import action, flat source rows, delete action, and terse links to the State Portability `export state` / `import state` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, optional last fetch status if needed for diagnostics. States:
 
 - empty: `No sources. Paste RSS URL in Steer.`;
 - import pending: raw progress line;
@@ -405,15 +474,12 @@ Anatomy: title, OPML import action, flat source rows, delete action, source expo
 Forbidden: folders, tags, pause/resume toggles, drag ordering, scoring sliders, source categories.
 
 Keyboard and accessibility: source rows are list items; delete is a named button (`Delete source: <name>`) and requires a terse confirmation before destructive removal. Focus returns to the next row or Ledger heading after deletion.
-
 ### State Portability
+Purpose: satisfy active state export/import without adding a settings dashboard.
 
-Purpose: satisfy complete state export/import without adding a settings dashboard.
-
-Anatomy: two terse text actions reachable from Source Ledger footer or `/doctor` output: `export state` and `import state`. Export includes Source Ledger, raw steering command history, interpreted and superseded steering policy state, and resonance signal history. Import accepts the same raw state bundle and restores it. States: idle, exporting, export complete, importing, import complete, import failed. Feedback is raw text (`exported state.json`, `err: import failed`) and must not add account, cloud sync, privacy, or backup-management UI.
+Anatomy: two terse text actions reachable from Source Ledger footer or `/doctor` output: `export state` and `import state`. Export includes active Source Ledger rows, active steering policy rules, and currently resonated items. Import accepts the same portable state bundle and replaces local portable active state with it. Before file selection or final submit, show the warning text `import replaces active sources, rules, and stars`. It must not expose raw command history, superseded steering state, resonance signal history, sync controls, portable receipts, account setup, cloud sync, privacy, or backup-management UI. States: idle, exporting, export complete, importing, import complete, import failed. Feedback is raw text (`exported state.json`, `err: import failed`).
 
 Keyboard and accessibility: export/import actions are buttons or links with explicit names. Completion and failure messages use live regions. File inputs must remain reachable by keyboard.
-
 ### Diagnostics Output
 
 Purpose: `/doctor` output for power-user operational truth.
@@ -443,7 +509,7 @@ Do:
 - Do keep Inspect, Resonate, and Steer as the only primary primitives.
 - Do use Steer for RSS URL paste, correction, and `/doctor` commands.
 - Do keep Source Ledger flat and delete-only beyond import/export.
-- Do expose full state export/import as terse text actions covering sources, steering history, interpreted steering state, and resonance signals.
+- Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
 - Do preserve persistent feed access through time groups and pagination.
@@ -456,7 +522,7 @@ Do:
 
 Don't:
 
-- Don't add account/login/onboarding wizard surfaces.
+- Don't add account registration, profile, password-reset, or onboarding wizard surfaces; the owner-token prompt is a local access gate, not account login.
 - Don't add folders, tags, source hierarchy, ranking sliders, or settings dashboards.
 - Don't hide high-volume feeds behind paternalistic auto-collapsing.
 - Don't use unread counts, mark-all-read, queue-clearing, or archive workflows.
@@ -495,7 +561,7 @@ Motion is functional, brief, and optional.
 | src: blog.example · 1d · partial                     YESTERDAY |                                    |
 | Older item remains reachable.       [☆]   |                                    |
 +--------------------------------------------------------------------------------+
-| /doctor is raw text; Source Ledger is flat; export/import state is text-only   |
+| /doctor is raw text; Source Ledger is flat; export/import are terse JSON actions |
 +--------------------------------------------------------------------------------+
 ```
 
