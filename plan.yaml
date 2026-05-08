@@ -2726,7 +2726,7 @@ phases:
       \ a valid path`; targeted tests still pass.\n\n## Headline\nPASS"
   - id: frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     name: Complete feed inspector source state and search UI
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -2829,6 +2829,8 @@ phases:
     depends_on:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-08T22:27:17.310132+00:00'
   - id: frontend-implementation.frontend-green-retest
     name: Frontend green retest
     status: pending
