@@ -722,7 +722,8 @@ phases:
 
 
       Scope: Go/backend runtime contracts, frontend design/API contracts, expected-red
-      backend tests, expected-red frontend tests.
+      backend tests, expected-red frontend tests, and the B1 remediation step for
+      Go JSON contract shapes.
 
 
       Review criteria:
@@ -737,6 +738,38 @@ phases:
 
       - No forbidden architecture/UI patterns were introduced
 
+      - Go JSON contracts distinguish ItemSummary and ItemDetail exactly as canonical
+      docs require
+
+      - Summary/list/search/MCP summary surfaces do not leak detail-only JSON fields
+
+      - Detail surfaces include feed_excerpt, extracted_text, and provenance with
+      required nullable/present semantics
+
+
+      Frontend dependency bootstrap requirement (prevents recurrence of B2):
+
+      - In the gate worktree, run `npm --prefix web ci` before any frontend command
+      that requires svelte-kit/vite/vitest.
+
+      - Then run `npm --prefix web run check`, `npm --prefix web run build`, and `npm
+      --prefix web run test:render`.
+
+      - Classify frontend render test failure as expected-red only after vitest actually
+      runs and reports the expected implementation-gap failure. Missing dependencies,
+      missing vitest, or command-not-found is gate evidence failure, not expected-red
+      product evidence.
+
+
+      CLI contract-only handling:
+
+      - `go run ./cmd/resofeed --help` panic through a contract stub is non-blocking
+      EXPECTED_STUB_DEBT in this contract-only phase.
+
+      - The gate must record this as implementation-phase verification debt, not as
+      a current foundation blocker, unless the panic is caused by new non-stub contract
+      drift.
+
 
       review_depth: STANDARD
 
@@ -750,43 +783,79 @@ phases:
 
       - owner-token delegation boundary
 
-      - DESIGN.md surface coverage'
-    verification: phase-check protecting all implementation phases. Gate may OPEN
+      - DESIGN.md surface coverage
+
+      - frontend dependency bootstrap before render/check/build proof
+
+      - contract-only CLI stub debt tracking'
+    verification: 'phase-check protecting all implementation phases. Gate may OPEN
       only if contract artifacts are acceptance-only, tests intentionally expose gaps,
-      and no implementation/business logic is smuggled into contract/test steps.
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - .agents/instructions.md — key passage or "NOT READ: <reason>"
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
-
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
-
-      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+      Go JSON contract drift from B1 is remediated, frontend dependency bootstrap
+      proof from B2 is present, and no implementation/business logic is smuggled into
+      contract/test steps.
 
 
-      ## Gate Review Report
+      Required gate commands/evidence:
 
-      - Step evidence quality table:
+      - Review Go remediation evidence: gofmt, `go build ./...`, focused JSON contract
+      test passing, and backend expected-red tests failing only on implementation
+      stubs.
 
-      - Contract purity verdict:
+      - Run `npm --prefix web ci` in the isolated gate worktree before frontend verification.
 
-      - Expected-red validity verdict:
+      - After dependency bootstrap, run `npm --prefix web run check`, `npm --prefix
+      web run build`, and `npm --prefix web run test:render`.
 
-      - Drift/forbidden-pattern findings:
+      - Frontend render expected-red classification is valid only if vitest actually
+      executes and reports the expected implementation-gap failure.
 
-      - Gate decision basis: OPEN | BLOCKED
+      - Record `go run ./cmd/resofeed --help` panic through contract stub as non-blocking
+      EXPECTED_STUB_DEBT for implementation verification, unless evidence shows non-stub
+      contract drift.
 
-      - Required remediation if BLOCKED:
-
-
-      ## Headline
-
-      OPEN | BLOCKED'
+      - Gate decision basis must list any unresolved behavioral/runtime obligations
+      and classify them as PROVEN, EXPECTED_RED, EXPECTED_STUB_DEBT, BLOCKING, or
+      non-intersecting with explicit rationale.'
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: contract-foundation-and-expected-red-tests\n\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- .agents/instructions.md — key passage or \"NOT READ:\
+      \ <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md —\
+      \ key passage or \"NOT READ: <reason>\"\n- docs/DESIGN_VISION.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or \"NOT READ: <reason>\"\
+      \n\nIf no refs were provided, state: \"No refs for this step.\"\n\n### Execution\
+      \ Review\n| Step ID | Status | Evidence Quality | Concerns |\n| ------- | ------\
+      \ | ---------------- | -------- |\n| contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n### Required\
+      \ Command Evidence\n```sh\nnpm --prefix web ci\nnpm --prefix web run check\n\
+      npm --prefix web run build\nnpm --prefix web run test:render\n```\nPaste actual\
+      \ command output summaries. Do not classify frontend render tests as expected-red\
+      \ unless vitest actually ran.\n\n### Go JSON Contract Drift Check\n- ItemSummary\
+      \ and ItemDetail are distinct canonical structs: ✅/❌\n- Summary excludes feed_excerpt/extracted_text/provenance:\
+      \ ✅/❌\n- Detail includes feed_excerpt/extracted_text/provenance with required\
+      \ nullable/present semantics: ✅/❌\n- Contract/test-only boundary preserved:\
+      \ ✅/❌\n\n### Behavioral Proof Register\n| requirement_ref | behavior_claim |\
+      \ runtime_proof_expected | evidence_ref | status | closure_path | gate_decision_basis\
+      \ |\n| --------------- | -------------- | ---------------------- | ------------\
+      \ | ------ | ------------ | ------------------- |\n| docs/ARCHITECTURE.md ItemSummary/ItemDetail\
+      \ | Summary/detail JSON shapes are distinct | Focused Go JSON contract test\
+      \ | <test output> | PROVEN/BLOCKING | <path> | <basis> |\n| frontend render\
+      \ expected-red | Vitest executes after npm ci and exposes implementation gap\
+      \ | npm ci + test:render output | <output> | EXPECTED_RED/BLOCKING | <path>\
+      \ | <basis> |\n| CLI --help contract stub | Panic is expected contract-only\
+      \ stub debt | Evidence classification only | <output/notes> | EXPECTED_STUB_DEBT/BLOCKING\
+      \ | implementation verification debt | <basis> |\n\n### Issues Identified\n\
+      | Severity | Description | Related Step | Blocking? |\n| -------- | -----------\
+      \ | ------------ | --------- |\n| blocker/should_fix/suggestion/tech_debt |\
+      \ <issue> | <step_id> | YES/NO |\n\n### Gate Decision\n- [ ] OPEN: Phase passes\
+      \ gate, proceed to implementation phases\n- [ ] BLOCKED: Issues must be resolved\
+      \ before proceeding\n  - Blocking issues: <list>\n  - Required actions: <what\
+      \ needs to happen>"
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -799,6 +868,7 @@ phases:
     - contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     - contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
+    - contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     agent: gate-reviewer
   - id: contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     name: Fix Go JSON contract shapes
