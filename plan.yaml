@@ -1186,7 +1186,7 @@ phases:
   steps:
   - id: core-domain-implementation.complete-sqlite-state-and-restore-logic
     name: Complete SQLite state and restore logic
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: default\nphase_dependency:\
       \ contract-foundation-and-expected-red-tests\nrisk_tags: [persistence, state,\
       \ migration, restore, backward_compatibility]\n\nFill in stub bodies in `internal/resofeed/db.go`,\
@@ -1265,6 +1265,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-08T22:14:33.372552+00:00'
   - id: core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     name: Complete ingestion and Gemini transform logic
     status: claimed
