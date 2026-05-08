@@ -1104,6 +1104,88 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+    name: Complete MCP Streamable HTTP surface
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: core-domain-implementation
+
+      risk_tags: [api, auth, integration]
+
+      tags: [integration]
+
+
+      Fill in stub bodies in `internal/resofeed/mcp.go` per the MCP contract and core-domain
+      outputs.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - MCP tool/resource contracts from contract step
+
+      - Agent Authorization Contract in docs/ARCHITECTURE.md §7
+
+      - core domain functions from `core-domain-implementation`
+
+
+      YOUR SCOPE: MCP Streamable HTTP endpoint at `/mcp`, resources, tools, owner-token
+      auth, idempotency requirements, actor_id attribution validation, tool/resource
+      not-found semantics, and parity with equivalent HTTP operations.
+
+
+      Integration Evidence Required: actual MCP-compatible request or test harness
+      path through `/mcp` for doctor resource, feed resource/list candidates, search_items,
+      read_item, and one mutating tool with idempotency.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. MCP
+      tools/resources must call real core functions and produce documented outputs
+      varying by input.
+
+
+      Out-of-scope: per-agent registry, Telegram/Slack/email delivery ownership, portable
+      receipts.'
+    verification: '- MCP tests or harness prove owner-token auth, required fields,
+      query requiredness, idempotency_key enforcement for mutating tools, and HTTP-operation
+      parity
+
+      - Evidence includes actual requests/output through `/mcp` or an equivalent Streamable
+      HTTP harness
+
+      - No per-agent registry or delivery-channel ownership added'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Integration Evidence
+
+      - MCP commands/harness requests:
+
+      - Actual output:
+
+      - Path exercised: MCP request → tool/resource → core → response
+
+      - Auth/idempotency proof:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
