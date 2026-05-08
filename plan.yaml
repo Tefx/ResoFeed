@@ -503,6 +503,81 @@ phases:
     checked, and wiring audited before runtime/API work.
   depends_on:
   - contract-foundation-and-expected-red-tests
+  steps:
+  - id: core-domain-implementation.complete-sqlite-state-and-restore-logic
+    name: Complete SQLite state and restore logic
+    status: pending
+    description: "step_type: implementation\nagent_source: default\nphase_dependency:\
+      \ contract-foundation-and-expected-red-tests\nrisk_tags: [persistence, state,\
+      \ migration, restore, backward_compatibility]\n\nFill in stub bodies in `internal/resofeed/db.go`,\
+      \ `internal/resofeed/migrations.go`, `internal/resofeed/state.go`, and related\
+      \ type helpers per the contract from step `contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts`.\n\
+      \nUPSTREAM ARTIFACTS (authoritative):\n- `internal/resofeed/types.go` — signatures/types/doc\
+      \ comments from contract step\n- `internal/resofeed/db.go` / `migrations.go`\
+      \ / `state.go` — stub signatures from contract step\n- backend expected-red\
+      \ tests from `contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests`\
+      \ are PROTECTED\n\nYOUR SCOPE: Replace stub markers with working logic for SQLite\
+      \ open/migrate, runtime metadata owner-token storage, state bundle export/import\
+      \ validation, transactional restore replacement semantics, and FTS rebuild hooks\
+      \ if needed. Use direct functions inside `internal/resofeed`; no repository/service\
+      \ layer.\n\nFailure-mode checklist:\n- relative vs absolute `--db` path behavior\n\
+      - missing DB file creation and migration behavior\n- invalid state bundle schema,\
+      \ unknown top-level fields, duplicate ids/item_ids\n- explicit restore replacement:\
+      \ local portable rows absent from bundle are removed\n- no merge/conflict/tombstone/portable\
+      \ receipt behavior\n- partial-write rollback on validation or transaction failure\n\
+      \nState semantics:\n- State import is transactional replacement, not merge\n\
+      - Portable state includes active sources, active steering rules, currently resonated\
+      \ items only\n- Owner-token runtime metadata is not portable\n- Last-writer\
+      \ behavior applies only to ordinary local mutations, not import reconciliation\n\
+      \nOut-of-scope guardrail: HTTP handlers, MCP tools, ranking, frontend, and sync/conflict\
+      \ systems are out of scope.\n\n## Completion Criteria (stub exclusion)\nThis\
+      \ is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each deliverable\
+      \ MUST contain substantive logic that processes its inputs and produces outputs\
+      \ that vary based on those inputs.\n\nupstream_artifacts:\n- path: internal/resofeed/types.go\n\
+      \  from_step: contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts\n\
+      \  tier: contract\n- path: internal/resofeed/state.go\n  from_step: contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts\n\
+      \  tier: contract\n- path: internal/resofeed/*_test.go\n  from_step: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests\n\
+      \  tier: test"
+    verification: '- Main path: targeted tests for DB migration, runtime metadata,
+      export, import restore replacement pass
+
+      - Failure path: tests cover invalid schema, unknown top-level fields, duplicate
+      ids, transaction rollback, and no portable receipts
+
+      - Proof: grep/static review shows no state merger, conflict resolver, sync coordinator,
+      tombstone portability, or portable agent_receipts
+
+      - Evidence includes commands and actual outputs'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Stub bodies completed:
+
+      - Main-path tests/commands with output:
+
+      - Failure-path tests/commands with output:
+
+      - State portability no-sync/no-merge scan:
+
+      - Transaction rollback proof:
+
+      - Deviations record (type, what, why, impact):
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
