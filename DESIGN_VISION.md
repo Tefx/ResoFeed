@@ -48,21 +48,15 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 +-------------------------------------------------------------------------+
 | > Steer or Subscribe...                                      [ RESOFEED ] |
 |                                                                         |
-|   TODAY                                     INSPECTOR                   |
-|                                                                         |
-|   [src: nyt] [2h ago]                       [src: nyt]                  |
-|   The Main Headline Goes Here               The Main Headline Goes Here |
-|   Dense factual summary preserving          --------------------------- |
-|   uncertainty and original claims.                                      |
-|                                [☆]          Full extracted text or      |
-|   ----------------------------------        expanded summary lives here.|
-|                                             No tracking scripts, no     |
-|   YESTERDAY                                 paywall modals.             |
-|                                                                         |
-|   [src: delivery-bot] [1d ago]                                          |
-|   Secondary Story                                                       |
-|   ...                                                                   |
-|                                [☆]                                      |
+|   src: nyt · 2h ago                                       TODAY         |
+|   The Main Headline Goes Here               INSPECTOR                   |
+|   Dense factual summary clamped to          [src: nyt]                  |
+|   two lines.                                The Main Headline Goes Here |
+|                                [☆]          --------------------------- |
+|   ----------------------------------        Full extracted text or      |
+|   src: delivery-bot · 1d ago          YESTERDAY     expanded summary lives here.|
+|   Secondary Story                           No tracking scripts, no     |
+|   ...                          [★]          paywall modals.             |
 +-------------------------------------------------------------------------+
 ```
 
@@ -76,12 +70,12 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 
 ## 11. Micro-Interactions & States
 - **Hover:** Feed items shift slightly in background tone. No layout shifting.
-- **Focus:** Strict 2px solid outline using primary UI text color.
+- **Focus:** Strict 3px solid outline using primary UI text color.
 - **Steer (Lightweight Intent):** Steer is a simple directional input for shaping the feed. It has basic states (default, focused, submitting) and avoids multi-step feedback loops. It trades strict determinism for pure simplicity. No multi-turn clarification workflows or configuration lists.
 - **Resonate:** The star icon uses a snappy, non-bouncy transition.
 
 ## 12. Component Inventory
-- **Item Card:** Combines Source Pill, Timestamp, Serif Title, Summary snippet, and the Resonate action.
+- **Item Card:** Combines inline metadata line (source, time), inline time-group badge, Serif Title, clamped Summary snippet, and the Resonate action.
 - **Steer Input:** A simple text input for natural language commands.
 - **Inspector Pane:** The detailed reading view.
 
@@ -89,7 +83,7 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 | PRD Requirement | UI/UX Representation |
 | --- | --- |
 | **Inspect** | Clicking an Item Card opens the Inspector Pane. |
-| **Resonate** | A prominent, unambiguous Star toggle (`[☆]`) on every Item Card. |
+| **Resonate** | A prominent, unambiguous Star toggle (`[☆]`) on every Item Card, plus double-tap gesture and a star in the Inspector when in single-column mobile view. |
 | **Steer** | A lightweight Command Bar / Sticky input for natural language intents, or pasting raw RSS URLs to subscribe. |
 | **Diagnostics** | `/doctor` renders raw system health as plain text inside the existing Steer/feedback surface. |
 | **State Portability** | Full export/import appears as terse text actions, covering sources, steering history, interpreted steering state, and resonance signals without a settings dashboard. |

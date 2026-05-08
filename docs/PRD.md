@@ -135,9 +135,18 @@ Trustworthy compression requires:
 
 The system does not "protect" the user from their own choices. If a user subscribes to a high-volume source, the system delivers it. We do not build hidden rate-limiters, auto-collapsing spammers, or "smart" noise reduction beyond what the user explicitly Steers.
 
-### 4.6 AI as Utility (No Elaborate Fallbacks)
+### 4.6 AI as Utility & Minimal Fallback Taxonomy
 
 AI is treated as fundamental infrastructure (like electricity). We do not build complex UI degradation states, elaborate error screens, or secondary fallback modes for the rare event that the LLM API goes down.
+
+However, the system **must** support and document a strict canonical fallback taxonomy to maintain operational transparency:
+- `summary unavailable`: When the AI fails to generate a summary, show the raw feed excerpt.
+- `partial extraction`: When full extraction is blocked (paywall/anti-bot), show the RSS excerpt with a `partial` warning label and a link to the original.
+- `original unavailable`: When the source link is dead or malformed.
+- `model latency/error`: Exposed only in the `/doctor` command.
+- `RSS fetch error`: Exposed only in the `/doctor` command.
+
+We explicitly forbid "cute" illustrations, skeleton loaders, or conversational apologies for these states.
 
 ### 4.7 Single-Tenant / Tool-like Nature
 
@@ -203,8 +212,8 @@ Product requirements:
 - Steering must be expressible in natural language.
 - Steering must adjust future scoring, surfacing, or summary behavior.
 - Steering must be treated as an explicit correction, not as casual conversation.
-- Steering changes should be understandable and reversible by the human.
-- Steering should be a lightweight intent control with basic inputs. We accept reduced determinism for the sake of strict UI simplicity.
+- Steering changes **must** be understandable and reversible by the human.
+- Steering **must** be a lightweight intent control with basic inputs. We accept reduced determinism for the sake of strict UI simplicity.
 - Steering must not become a rule-management product: no rule builder, no manual weight editor, no per-rule CRUD workflow, and no requirement that the user maintain a complex policy document.
 
 ### 5.4 Intent Data Management
@@ -269,10 +278,10 @@ ResoFeed must reduce attention waste from duplicate reporting.
 
 Requirements:
 
-- repeated versions of the same article should not appear as separate equal-priority items;
-- multiple reports of the same story should be transparently clustered or otherwise made understandable as one story-level event;
-- the user should be able to access source provenance when the system merges or groups related items;
-- grouping must preserve direct access to every original source item and provenance so false-positive grouping does not destroy or hide individual source context; grouping must never behave like source suppression, hidden volume throttling, or a spam folder.
+- repeated versions of the same article **must** not appear as separate equal-priority items;
+- multiple reports of the same story **must** be transparently clustered or otherwise made understandable as one story-level event;
+- the user **must** be able to access source provenance when the system merges or groups related items;
+- grouping **must** preserve direct access to every original source item and provenance so false-positive grouping does not destroy or hide individual source context; grouping must never behave like source suppression, hidden volume throttling, or a spam folder.
 
 ### 7.4 Content extraction quality
 
@@ -280,10 +289,10 @@ ResoFeed must attempt to understand the full linked article, not only the feed e
 
 Requirements:
 
-- if full content is unavailable, the item must remain visible when appropriate rather than silently disappearing;
-- extraction limitations must be visible as source-quality/provenance information;
-- unusually large, inaccessible, or paywalled content must degrade gracefully;
-- summary quality expectations should adapt to available source quality.
+- if full content is unavailable, the item **must** remain visible when appropriate rather than silently disappearing;
+- extraction limitations **must** be visible as source-quality/provenance information (see Fallback Taxonomy);
+- unusually large, inaccessible, or paywalled content **must** degrade gracefully;
+- summary quality expectations **must** adapt to available source quality.
 
 ### 7.5 Item understanding outputs
 
@@ -316,9 +325,9 @@ Fresh items must have a reliable path into the daily experience.
 Requirements:
 
 - recent items must not be crowded out solely by older resonated interests;
-- old resonated items should move from daily attention into memory/retrieval;
+- old resonated items **must** move from daily attention into memory/retrieval;
 - old items may reappear only when they are useful context for a new related development;
-- the default product policy must distinguish newly arrived items from older memory items.
+- the default product policy **must** distinguish newly arrived items from older memory items.
 
 ### 8.3 Resonance constraint
 
@@ -327,8 +336,8 @@ Resonated history should improve relevance and retrieval without becoming a hoar
 Requirements:
 
 - resonated topics may influence future relevance;
-- resonated items should rank higher in later search when relevant;
-- resonated items must not become persistent homepage pins by default.
+- resonated items **must** rank higher in later search when relevant;
+- resonated items **must** not become persistent homepage pins by default.
 
 ### 8.4 Coverage constraint
 
@@ -336,10 +345,10 @@ News-like items often matter even when the user does not star them.
 
 Requirements:
 
-- ResoFeed must preserve awareness of small but relevant news from the user’s configured or trusted source universe;
-- lack of resonance on news items must not automatically mean the user does not want news coverage;
-- coverage items should avoid overwhelming higher-value analysis or documents;
-- coverage must favor configured sources and sources the product can justify as trusted through visible provenance or user policy.
+- ResoFeed **must** preserve awareness of small but relevant news from the user’s configured source universe;
+- lack of resonance on news items **must** not automatically mean the user does not want news coverage;
+- the feed algorithm **must** not invent a hidden "trusted source" taxonomy; trusted status is exclusively derived from explicitly configured subscriptions or transparently logged Steer intents, and must never be managed via a hidden editable category.
+- coverage items **must** avoid overwhelming higher-value analysis or documents;
 
 ### 8.5 Daily habit loop
 
@@ -347,11 +356,11 @@ ResoFeed must support a repeatable daily rhythm without inbox-zero mechanics.
 
 Requirements:
 
-- the daily experience should be useful in a short session, such as a commute or workday start;
-- the user should be able to leave without clearing, archiving, or triaging all items;
-- the system should distinguish “important today” from “retrievable later”;
-- external digests should provide enough context for quick judgment while preserving a path to inspect the original item;
-- the product should avoid creating guilt through stale queues, badges, or unresolved counts.
+- the daily experience **must** be useful in a short session, such as a commute or workday start;
+- the user **must** be able to leave without clearing, archiving, or triaging all items;
+- the system **must** distinguish “important today” from “retrievable later”;
+- external digests **must** provide enough context for quick judgment while preserving a path to inspect the original item;
+- the product **must** avoid creating guilt through stale queues, badges, or unresolved counts.
 
 ### 8.6 Feed lifecycle
 
@@ -397,25 +406,25 @@ ResoFeed must make steering understandable.
 
 Requirements:
 
-- a steering instruction should have a visible interpretation or confirmation;
-- the human should be able to correct a bad interpretation;
-- accumulated steering should remain inspectable at a product level;
-- materially conflicting steering should be surfaced in plain language when it affects future behavior;
-- human steering should be reversible or supersedable;
-- agent-generated steering must be visibly attributable and easy to correct;
-- steering transparency should be provided through a concise human-readable summary, not through a complex rule-management interface.
+- a steering instruction **must** have a visible interpretation or confirmation receipt inline;
+- the human **must** be able to correct a bad interpretation via the Steer text input;
+- accumulated steering **must** remain inspectable at a product level through a single explicit text action (`export state`) and through terse inline receipts. There must be no dedicated Settings Dashboard or Policy Rules UI;
+- materially conflicting steering **must** be surfaced in plain language when it affects future behavior;
+- human steering **must** be reversible or supersedable;
+- agent-generated steering **must** be visibly attributable and easy to correct;
+- steering transparency **must** be provided through a concise human-readable summary or raw JSON export, not through a complex rule-management interface.
 
 ## 10. Search and Retrieval
 
-Search is a first-class workflow, not an afterthought.
+Search is a first-class workflow, but not a core visual primitive on par with Inspect/Resonate/Steer. It may appear via command syntax inside the Steer input or as a lightweight retrieval surface, but must not become a fourth top-level navigation tab.
 
 Requirements:
 
-- users must be able to search by natural language, keyword, source, time, and resonance status;
-- resonated items should be easier to retrieve when relevant;
-- non-resonated but inspected or high-quality items should remain retrievable;
-- search should support “I vaguely remember...” queries;
-- search results should explain enough provenance for the user to verify the result.
+- users **must** be able to search by natural language, keyword, source, time, and resonance status;
+- resonated items **must** be easier to retrieve when relevant;
+- non-resonated but inspected or high-quality items **must** remain retrievable;
+- search **must** support “I vaguely remember...” queries;
+- search results **must** explain enough provenance for the user to verify the result.
 
 Exact retrieval algorithms and indexing strategies are architecture-owned.
 
@@ -444,7 +453,7 @@ ResoFeed itself must not own Telegram, Slack, email, or other delivery-channel i
 
 ### 12.1 Why this appeared
 
-For surfaced items, ResoFeed should provide a concise explanation of why the item appeared when useful.
+For surfaced items, ResoFeed **must** provide a concise explanation of why the item appeared when useful (e.g., when surfaced by an agent, steered by a rule, or contextually contradictory).
 
 Examples:
 
@@ -458,14 +467,14 @@ The explanation must not expose implementation details, but should help the user
 
 ### 12.2 Summary reliability
 
-ResoFeed summaries must expose extraction limitations to enable objective verification.
+ResoFeed summaries **must** expose extraction limitations to enable objective verification.
 
 Requirements:
 
-- users should be able to tell when a summary is based on full content versus partial/excerpt-only content;
-- uncertainty, disagreement, or extraction limitations should be visible when material;
-- source provenance should remain accessible from summaries and search results;
-- summaries should avoid unsupported synthesis across unrelated sources.
+- users **must** be able to tell when a summary is based on full content versus partial/excerpt-only content;
+- uncertainty, disagreement, or extraction limitations **must** be visible when material;
+- source provenance **must** remain accessible from summaries and search results;
+- summaries **must** avoid unsupported synthesis across unrelated sources.
 
 ## 13. Experience Requirements
 
