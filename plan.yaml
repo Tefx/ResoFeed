@@ -2562,7 +2562,7 @@ phases:
   steps:
   - id: frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     name: Complete web shell owner token and first-use UI
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -2655,6 +2655,69 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-08T22:14:36.658352+00:00'
+    done_at: '2026-05-08T22:26:40.024453+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ confirmed single-tenant owner-token boundary, DESIGN.md as UI law, no accounts/onboarding/folders/tags/unread/archive/settings\
+      \ dashboards.\n- `docs/ARCHITECTURE.md`: confirmed static assets load without\
+      \ token, every `/api/*` uses `Authorization: Bearer <OWNER_TOKEN>`, browser\
+      \ stores `resofeed.ownerToken`, frontend must prompt before API calls.\n- `docs/PRD.md`:\
+      \ confirmed first-run uses standard UI, no onboarding wizards/account registration,\
+      \ first useful loop is add/import sources → scan TODAY → inspect → resonate\
+      \ → optional Steer.\n- `docs/DESIGN.md`: confirmed Owner Token Prompt anatomy/copy/error\
+      \ `err: owner token rejected`, initial focus, `aria-live=\"assertive\"`, first-use\
+      \ copy lines, operational labels only.\n- `docs/DESIGN_VISION.md`: confirmed\
+      \ split shell, local access gate before feed API calls, no account login/onboarding,\
+      \ 3px focus outline.\n- `docs/USAGE.md`: confirmed first UI open stores token\
+      \ locally as `resofeed.ownerToken` and sends it for `/api/*`; sources added\
+      \ via Steer RSS URL or OPML.\n\n## Frontend Implementation Evidence\n- Commit\
+      \ hash(es):\n  - Worker branch: 24909ff06e3d772458bcd51b8305b45867bc6eaf\n \
+      \ - Main squash merge: f9121d1\n- Files changed:\n  - `web/src/routes/components/OwnerTokenPrompt.svelte`\n\
+      \  - `web/src/routes/+page.svelte`\n  - `web/src/app.css`\n  - `web/src/test/setup.ts`\n\
+      - Components completed:\n  - Owner token prompt renders visible form, receives\
+      \ initial focus, stores accepted token in `window.localStorage[\"resofeed.ownerToken\"\
+      ]`, exposes rejected state as `role=\"alert\"` with assertive live region, and\
+      \ keeps focus on token input.\n  - App shell gates `/api/*` fetches behind local\
+      \ owner token, sends `Authorization: Bearer <token>`, clears rejected tokens,\
+      \ focuses Steer after accepted load, and renders TODAY/INSPECTOR/SOURCE LEDGER/search\
+      \ surfaces without fake placeholder data.\n  - First-use empty state remains\
+      \ visible for no-sources/no-items and preserves required copy.\n- Rendered output\
+      \ / DOM snapshots:\n  - Default token state includes `<section aria-labelledby=\"\
+      owner-token-heading\" class=\"contract-region contract-token-prompt\">`, `RESOFEED`,\
+      \ heading `Enter owner token`, password input `#owner-token-input`, submit button\
+      \ disabled until token text.\n  - Rejected token state includes `<p id=\"owner-token-error\"\
+      \ role=\"alert\" aria-live=\"assertive\">err: owner token rejected</p>`.\n \
+      \ - Accepted token state disables prompt controls after submit and populates\
+      \ `resofeed.ownerToken`.\n  - No-sources state includes `<section aria-labelledby=\"\
+      first-use-heading\" data-state=\"no-sources\">` with `TODAY`, `Paste RSS URL\
+      \ in Steer or import OPML.`, `Inspect opens the item.`, `Star preserves durable\
+      \ value.`, `Steer is optional correction.`\n- Accessibility checks:\n  - Initial\
+      \ focus and rejected-state focus asserted in Testing Library.\n  - Rejected\
+      \ token error asserted via `getByRole(\"alert\")`.\n  - Submit is keyboard-reachable\
+      \ form submit.\n  - Shell includes skip-to-feed link, labeled Steer input, landmarks/regions,\
+      \ 44px controls, and 3px focus outline.\n- Test/build commands and output:\n\
+      \  - Worker branch: `npm --prefix web ci` — exit 0.\n  - Worker branch: `npm\
+      \ --prefix web run check` — exit 0, svelte-check found 0 errors and 0 warnings.\n\
+      \  - Worker branch: `npm --prefix web run test:render -- -t \"owner-token|first-use\"\
+      ` — exit 0, 3 passed, 5 skipped.\n  - Worker branch: `npx @google/design.md\
+      \ lint docs/DESIGN.md` — exit 0, errors 0, warnings 0.\n  - Worker branch: `npm\
+      \ --prefix web run build` — exit 0.\n  - Mainline final-state: `npm --prefix\
+      \ web ci && npm --prefix web run check && npm --prefix web run test:render --\
+      \ -t \"owner-token|first-use\" && npx @google/design.md lint docs/DESIGN.md\
+      \ && npm --prefix web run build` — exit 0; dependencies installed, svelte-check\
+      \ found 0 errors/0 warnings, Vitest ran 1 file with 3 passed/5 skipped, design\
+      \ lint 0 errors/0 warnings/1 info, SvelteKit static build completed.\n- Forbidden-pattern\
+      \ scan:\n  - Scan found only pre-existing/contract-allowed mentions: `archive`\
+      \ in a contract note and `folders_flattened` in API contract.\n  - No Tailwind/UI\
+      \ libraries, account/register/password-reset/onboarding wizard copy, folders/tags/unread/settings\
+      \ UI introduced.\n- Deviations record:\n  - None against component/API/design\
+      \ contracts.\n  - Test harness compatibility shim added in `web/src/test/setup.ts`\
+      \ because this Node/Vitest environment exposed `window.localStorage` without\
+      \ `getItem/setItem`; shim preserves browser Storage API contract for render\
+      \ tests.\n- Gaps/Notes:\n  - Later expected-red surfaces (feed keyboard inspect/star,\
+      \ inspector provenance/focus, source delete confirmation, state import/export\
+      \ feedback, search filters/provenance) were intentionally not fixed per scope.\n\
+      \  - Vitest emits a Node warning: `--localstorage-file was provided without\
+      \ a valid path`; targeted tests still pass.\n\n## Headline\nPASS"
   - id: frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     name: Complete feed inspector source state and search UI
     status: pending
