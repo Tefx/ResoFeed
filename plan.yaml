@@ -2360,6 +2360,13 @@ phases:
       ## Headline
 
       PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: integration-verifier
   - id: end-to-end-integration.black-box-acceptance-pass
     name: Black box acceptance pass
