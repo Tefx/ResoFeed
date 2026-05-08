@@ -1786,34 +1786,68 @@ phases:
 
       agent_source: default
 
+      runtime_owned_debt_policy: EXPECTED_STUB_DEBT for `cmd/resofeed/main.go`, `resofeed.Main`,
+      `NewRouter`, `NewMCPHandler`, HTTP/MCP handler stubs, `ServeConfig` runtime
+      consumption, and serve lifecycle until runtime-api-and-mcp-integration.
 
-      Wiring completeness audit for core domain symbols before runtime/API work.
+
+      Wiring completeness audit for core domain symbols before runtime/API work, after
+      `fix-core-domain-verification-blockers`.
 
 
       REQUIRED CHECKS:
 
-      1. Every new exported/public-ish symbol in `internal/resofeed` has a planned
-      or actual caller outside its own file or is documented as contract-only
+      1. Every new exported/public-ish symbol in `internal/resofeed` for state, ingest,
+      Gemini transform/status, ranking/search/steering, FTS, provenance/detail, and
+      core doctor diagnostics has a planned or actual caller outside its own file
+      or is documented as contract-only.
 
-      2. Config/runtime metadata fields are consumed by non-test code
+      2. Core metadata/config fields used by core functions are consumed by non-test
+      code; runtime-only `ServeConfig` fields are EXPECTED_STUB_DEBT for runtime phase
+      and must be mapped to runtime owner steps rather than blocking this core phase.
 
-      3. No NotImplementedError/TODO/panic stubs remain in core implementation files
-      where this phase owns completion
+      3. No TODO/panic stubs remain in core implementation files where this phase
+      owns completion, including `internal/resofeed/doctor.go` core diagnostic functions.
 
       4. No state merger/conflict resolver/sync coordinator/portable receipt path
-      exists
+      exists.
+
+
+      Runtime/API debt classification:
+
+      - Do NOT classify `cmd/resofeed/main.go -> resofeed.Main`, HTTP router/handler
+      stubs, MCP handler stubs, route/tool registration gaps, or serve lifecycle gaps
+      as core blockers when the only missing owner is runtime/API phase wiring.
+
+      - Map those findings to downstream runtime owner steps: `runtime-api-and-mcp-integration.complete-http-api-handlers`,
+      `runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`, `runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`,
+      and `runtime-api-and-mcp-integration.runtime-wiring-audit`.
+
+      - Still block on any core-domain function that is unreachable because it is
+      not exported/callable by the runtime phase, remains panic/TODO, or lacks an
+      owner.
 
 
       Verification scope: phase-check protecting runtime API/MCP integration gate.'
     verification: '- Static trace/grep/import evidence shows no orphan core symbols
-      expected to be wired now
+      expected to be wired now for state, ingest, Gemini/status failure, ranking/search/steering,
+      FTS, provenance/detail, and core doctor diagnostics.
 
-      - No unconsumed runtime metadata/config fields in the core scope
+      - No unconsumed core-scope metadata/config fields remain; runtime-only `ServeConfig`
+      consumption gaps are mapped to runtime owner steps as EXPECTED_STUB_DEBT.
 
-      - No implementation-owned stubs remain in `internal/resofeed/{db,migrations,state,ingest,gemini,ranking,search}.go`
+      - No implementation-owned stubs/panics remain in `internal/resofeed/{db,migrations,state,ingest,gemini,ranking,search,doctor}.go`
+      for core-owned behavior.
 
-      - No forbidden sync/merge/conflict/portable receipt module or function exists'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      - Runtime/API stubs in `cmd/resofeed/main.go`, HTTP handlers, MCP handlers,
+      route/tool registration, and serve lifecycle are explicitly classified as downstream
+      runtime debt when they do not hide a core-domain blocker.
+
+      - No forbidden sync/merge/conflict/portable receipt module or function exists.'
+    evidence_template: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -1821,20 +1855,63 @@ phases:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
 
-      ## Wiring Audit Report
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-      - Orphan exports:
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
 
-      - Unconsumed config/runtime fields:
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
 
-      - Remaining implementation stubs:
 
-      - Forbidden state-portability patterns:
+      If no refs were provided, state: "No refs for this step."
 
-      - Static commands/searches used:
 
-      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+      **Core orphan exports / public-ish symbols**:
+
+      ```
+
+      <grep/static trace output or "none found">
+
+      ```
+
+
+      **Core-owned stubs/panics/TODOs**:
+
+      ```
+
+      <grep output for internal/resofeed core files or "none found">
+
+      ```
+
+
+      **Runtime-owned expected stub debt**:
+
+      | Finding | Runtime owner step | Why non-blocking for core | Core dependency
+      remaining |
+
+      |---|---|---|---|
+
+
+      **Unconsumed core fields**:
+
+      ```
+
+      <grep/static trace output or "none found">
+
+      ```
+
+
+      **Forbidden architecture patterns**:
+
+      ```
+
+      <grep output for sync/merge/conflict/vector/per-agent registry or "none found">
+
+      ```
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -1846,6 +1923,7 @@ phases:
     - core-domain-implementation.complete-sqlite-state-and-restore-logic
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
+    - fix-core-domain-verification-blockers
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-08T22:27:14.414357+00:00'
