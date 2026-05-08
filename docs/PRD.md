@@ -37,7 +37,7 @@ ResoFeed is not a generic AI news digest detached from user-owned sources.
 
 ResoFeed is a personal intelligence stream built on user-controlled RSS sources, trustworthy compression, durable memory, and natural-language steering.
 
-The reason to switch from a conventional RSS reader or AI digest is that ResoFeed combines user-owned sources, low-anxiety daily review, trustworthy summaries, durable semantic memory, and plain-language correction in one minimal loop.
+The reason to switch from a conventional RSS reader or AI digest is that ResoFeed combines user-owned sources, efficient daily review, trustworthy summaries, durable semantic memory, and plain-language correction in one minimal loop.
 
 ## 2. Target Users and Core Workflows
 
@@ -64,22 +64,18 @@ ResoFeed must deliver its core daily value without requiring the user to configu
 3. **Long-term retrieval:** The user searches for an article or topic later. Previously resonated items should be easier to retrieve, but not manually filed.
 4. **Policy correction:** The user can tell ResoFeed how to adjust future scoring or summaries in natural language.
 
-### 2.4 First-run onboarding
+### 2.4 First-run experience
 
-ResoFeed must make the first useful experience fast and low-friction.
+As a single-tenant tool, ResoFeed has no onboarding wizards, no account registration flows, and no "ghost briefings" for empty states. The first useful experience must be fast, low-friction, and completely utilitarian.
 
 Requirements:
 
-- support importing existing RSS subscriptions from common interchange formats, including OPML unless superseded by architecture constraints;
-- support manual source entry;
-- optionally support curated starter source packs without requiring them;
-- detect broken, inactive, duplicate, or unusually noisy sources;
-- explain Inspect, Resonate, and Steer in plain user language;
-- produce an initial useful daily surface as soon as enough items are processed;
-- avoid requiring folders, tags, ranking sliders, or notification configuration during onboarding.
+- support importing existing RSS subscriptions via OPML, with all folder structures instantly flattened;
+- support manual source entry exclusively by pasting URLs into the Steer input;
+- explain Inspect, Resonate, and Steer in plain user language within the standard UI, not via a separate tour;
+- produce an initial useful daily surface as soon as enough items are processed.
 
-**First-session success:** A new user should be able to import or add sources, see a useful Today surface, inspect at least one item, resonate with at least one item, and understand that steering is optional. Agent setup, delivery-channel configuration, foldering, tagging, and ranking customization must not be required for first value.
-
+**First-session success:** A new user should be able to import or add sources, see a useful Today surface, inspect at least one item, resonate with at least one item, and understand that steering is optional. Agent setup, delivery-channel configuration, foldering, tagging, and ranking customization must not exist or be required for first value.
 ## 3. Product Vocabulary
 
 This vocabulary defines product semantics only. Architecture and UI/UX own implementation details.
@@ -93,7 +89,6 @@ This vocabulary defines product semantics only. Architecture and UI/UX own imple
 | **Steer** | Explicit natural-language correction to future system behavior. | Casual chat or a hidden configuration language. |
 | **Trusted source** | A configured or justifiable source whose provenance is visible enough for coverage decisions. | A hardcoded source list hidden from the user. |
 | **Coverage** | Lightweight awareness of relevant news-like items that may not deserve resonance. | A separate tab, a firehose, or generic world-news injection beyond the user’s source universe. |
-| **Diversity exposure** | High-quality content that broadens the user’s current resonance pattern within configured or trusted sources. | Generic algorithmic recommendations, moralized content injection, or content detached from the user’s source universe. |
 | **Eligible for surfacing** | Allowed to appear in a daily or agent-mediated experience under product rules. | Guaranteed top placement. |
 | **Surfaced externally** | Delivered or presented to the human by a delegated agent. | Merely fetched by an agent for silent evaluation. |
 
@@ -108,6 +103,7 @@ Minimalism means:
 - no inbox-zero pressure;
 - no unread-count optimization;
 - no manual archive workflow;
+- no secondary holding queues, isolated filter views, or moderation consoles;
 - no folders or tag trees as primary organization;
 - no settings screens full of ranking sliders;
 - no separate human and agent behavior models.
@@ -134,6 +130,22 @@ Trustworthy compression requires:
 - easy access to the original article;
 - avoidance of unsupported synthesis across sources;
 - distinction between reported fact, source claim, and model-generated interpretation when relevant.
+
+### 4.5 User Sovereignty (No Paternalism)
+
+The system does not "protect" the user from their own choices. If a user subscribes to a high-volume source, the system delivers it. We do not build hidden rate-limiters, auto-collapsing spammers, or "smart" noise reduction beyond what the user explicitly Steers.
+
+### 4.6 AI as Utility (No Elaborate Fallbacks)
+
+AI is treated as fundamental infrastructure (like electricity). We do not build complex UI degradation states, elaborate error screens, or secondary fallback modes for the rare event that the LLM API goes down.
+
+### 4.7 Single-Tenant / Tool-like Nature
+
+The product is a single-user tool, not a multi-tenant SaaS. There is no account registration flow, no onboarding wizards, no "ghost briefings" for empty states, and no complex auth models.
+
+### 4.8 Complete State Portability
+
+The user owns their data. The entire user state must be exportable and importable as raw text, JSON, or OPML without vendor lock-in. Complete state includes, at minimum, the Source Ledger, raw steering command history, interpreted and superseded steering policy state, and resonance signal history.
 
 ## 5. Core Product Primitives
 
@@ -179,10 +191,12 @@ Product requirements:
 
 Examples:
 
+- "https://example.com/feed.xml" (pastes an RSS URL to subscribe)
 - “There is too much XXX recently; reduce it.”
 - “Push more YYY technical documents.”
 - “Do not penalize ZZZ articles just because they disagree with me.”
 - “Add AAA perspective to future summaries.”
+- `/doctor` (outputs raw system health: RSS fetch errors, LLM API latency in plain text)
 
 Product requirements:
 
@@ -190,8 +204,16 @@ Product requirements:
 - Steering must adjust future scoring, surfacing, or summary behavior.
 - Steering must be treated as an explicit correction, not as casual conversation.
 - Steering changes should be understandable and reversible by the human.
-- Steering should be a lightweight delta over an opinionated baseline policy, not a requirement that the user author a personal constitution.
+- Steering should be a lightweight intent control with basic inputs. We accept reduced determinism for the sake of strict UI simplicity.
 - Steering must not become a rule-management product: no rule builder, no manual weight editor, no per-rule CRUD workflow, and no requirement that the user maintain a complex policy document.
+
+### 5.4 Intent Data Management
+
+The system must strictly manage user preferences—specifically Steering commands and Resonate signals—according to the following behavioral constraints:
+
+- **Immutable Intent History:** The system must treat user steering commands and resonated items as a chronological history of intents. It must not silently overwrite or destructively merge older intents without preserving the raw history.
+- **Corruption Resilience:** If the AI makes a mistake while interpreting user preferences (e.g., corrupts its own internal rules), the system must be capable of recovering the user's preferences from their raw, original inputs.
+- **Data Transparency (Exportability):** The user's entire history of steering commands and resonance signals must be exportable in a raw, human-readable format.
 
 ## 6. Actor Model and Authority
 
@@ -206,7 +228,7 @@ ResoFeed must distinguish at least these actor classes at the product level:
 ### 6.2 Authority rules
 
 - Human steering has priority over delegated-agent steering.
-- Delegated-agent actions must be attributable and auditable to the human.
+- Delegated-agent actions must be clearly attributable to the human via simple receipt tags (no extensive activity ledgers).
 - Agents may inspect items and return user feedback.
 - Agents may resonate or steer only when authorized by the human’s workflow or explicit delegation.
 - The human must be able to correct or override agent-generated drift.
@@ -217,7 +239,7 @@ ResoFeed must distinguish at least these actor classes at the product level:
 - Agent mutating actions must be safe under retries and loops; duplicate submissions of the same intended action must not corrupt user state.
 - Agent silent evaluation must be separated from external surfacing.
 - Agent-mediated delivery must be recorded in a way that prevents repetitive surfacing of the same item.
-- Unauthorized agent attempts to resonate or steer must be rejected or quarantined and remain attributable.
+- Unauthorized agent attempts to resonate or steer must be silently rejected or dropped to prevent building a complex holding queue.
 
 ## 7. Source Intake and Item Understanding
 
@@ -230,17 +252,16 @@ ResoFeed must:
 - detect source failures without blocking other sources;
 - preserve enough source provenance for the user to understand where each item came from.
 
-### 7.2 Source management
+### 7.2 Source management: Steer + Flat Ledger
 
-Minimalism must not prevent users from controlling their source universe.
+Source management adheres to a "Steer + Flat Ledger" hybrid pattern to strictly enforce the product's extreme KISS constraint and eliminate settings panels.
 
 Requirements:
 
-- users must be able to add, remove, and pause sources;
-- users must be able to see source health, including failed or inactive feeds;
-- users should be able to identify unusually noisy sources;
-- source controls must not require folder hierarchies or tag trees;
-- source trust should influence coverage behavior where appropriate.
+- **Source Addition:** Pasting an RSS URL directly into the existing `Steer` command input is the primary way to subscribe. There is no dedicated "Add Source" wizard.
+- **Source Ledger:** Source management is restricted to a strictly flat, barebones "Source Ledger" view.
+- **No Hierarchies:** The ledger ONLY supports viewing the source name/URL and deleting it. There are no folders, no tags, no pause/resume toggles, no drag-and-drop ordering, and no complex settings panels.
+- **OPML Import:** OPML files can be imported via the ledger, but all folder structures within the OPML must be ignored and flattened instantly upon import.
 
 ### 7.3 Duplicate and story handling
 
@@ -249,9 +270,9 @@ ResoFeed must reduce attention waste from duplicate reporting.
 Requirements:
 
 - repeated versions of the same article should not appear as separate equal-priority items;
-- multiple reports of the same story should be collapsed, grouped, or otherwise made understandable as one story-level event;
+- multiple reports of the same story should be transparently clustered or otherwise made understandable as one story-level event;
 - the user should be able to access source provenance when the system merges or groups related items;
-- grouping must preserve access to original source provenance so false-positive grouping does not destroy or hide individual source context.
+- grouping must preserve direct access to every original source item and provenance so false-positive grouping does not destroy or hide individual source context; grouping must never behave like source suppression, hidden volume throttling, or a spam folder.
 
 ### 7.4 Content extraction quality
 
@@ -284,7 +305,7 @@ Exact data shapes, models, schemas, and storage choices are architecture-owned a
 
 ### 8.1 Unified daily attention surface
 
-ResoFeed must provide a primary daily experience that lets the human quickly understand what is new, relevant, and worth inspecting without managing folders, unread counts, or archive states.
+ResoFeed must provide a primary daily experience that lets the human quickly understand what is new, relevant, and worth inspecting without managing folders, numeric indicators, or archive states.
 
 The product requirement is a unified low-friction daily experience. Specific layout, navigation, density, and visual hierarchy are UI/UX-owned.
 
@@ -320,19 +341,7 @@ Requirements:
 - coverage items should avoid overwhelming higher-value analysis or documents;
 - coverage must favor configured sources and sources the product can justify as trusted through visible provenance or user policy.
 
-### 8.5 Diversity exposure constraint
-
-ResoFeed must actively resist narrow repetition without becoming a generic algorithmic feed.
-
-Requirements:
-
-- high-quality items outside the user’s recent resonance cluster must still have a path into the daily experience;
-- disagreement or unfamiliarity must not be treated as low value by default;
-- diversity exposure should operate within the user’s configured source universe, explicit steering, and source-quality constraints;
-- diversity exposure must not require additional user-facing controls beyond Inspect, Resonate, and Steer;
-- the system must maintain viewpoint and topic diversity unless doing so conflicts with explicit safety, source, or user-declared constraints.
-
-### 8.6 Daily habit loop
+### 8.5 Daily habit loop
 
 ResoFeed must support a repeatable daily rhythm without inbox-zero mechanics.
 
@@ -343,6 +352,17 @@ Requirements:
 - the system should distinguish “important today” from “retrievable later”;
 - external digests should provide enough context for quick judgment while preserving a path to inspect the original item;
 - the product should avoid creating guilt through stale queues, badges, or unresolved counts.
+
+### 8.6 Feed lifecycle
+
+Feeds are persistent by default and remain accessible without automatic expiry mechanisms.
+
+Requirements:
+
+- unread items must not be deleted at midnight;
+- if a user is busy for days, they should not lose their feed;
+- the feed must provide pagination or continuous scroll, grouped softly by time (e.g., "Today", "Yesterday");
+- empty states simply indicate "no new items" rather than punishing the user for missing days.
 
 ## 9. Policy and Conflict Rules
 
@@ -357,7 +377,6 @@ Default behavior should prioritize:
 - novelty;
 - factual density;
 - source quality;
-- viewpoint diversity;
 - freshness.
 
 ### 9.2 Steering precedence
@@ -365,12 +384,12 @@ Default behavior should prioritize:
 When rules conflict, ResoFeed must follow this product-level precedence:
 
 1. **Safety and legality constraints.**
-2. **Product invariants:** freshness, coverage, anti-filter-bubble behavior, provenance, and minimalism.
+2. **Product invariants:** freshness, coverage, provenance, and minimalism.
 3. **Human steering.**
 4. **Delegated-agent steering.**
 5. **Default scoring and summarization policy.**
 
-Human steering can strongly influence ranking and summaries, but must not silently disable product invariants such as freshness and anti-filter-bubble coverage. If a user explicitly requests behavior that conflicts with an invariant, ResoFeed should explain the conflict and offer the closest allowable interpretation.
+Human steering can strongly influence ranking and summaries, but must not silently disable product invariants such as freshness and coverage. If a user explicitly requests behavior that conflicts with an invariant, ResoFeed should explain the conflict and offer the closest allowable interpretation.
 
 ### 9.3 Steering lifecycle
 
@@ -396,7 +415,7 @@ Requirements:
 - resonated items should be easier to retrieve when relevant;
 - non-resonated but inspected or high-quality items should remain retrievable;
 - search should support “I vaguely remember...” queries;
-- search results should explain enough provenance for the user to trust the result.
+- search results should explain enough provenance for the user to verify the result.
 
 Exact retrieval algorithms and indexing strategies are architecture-owned.
 
@@ -412,7 +431,7 @@ Required agent capabilities:
 - silently evaluate item candidates without changing human-visible inspection status;
 - retrieve item detail for briefing or handoff;
 - execute searches across the user's corpus, including history and resonance status;
-- retrieve active steering rules to answer user questions about current policy;
+- maintain an active but minimal understanding of current steering preferences;
 - report that an item was delivered or surfaced externally;
 - forward human inspect, resonate, or steer actions from external contexts;
 - avoid duplicating externally surfaced or human-inspected content unless a new related development makes resurfacing useful;
@@ -431,7 +450,6 @@ Examples:
 
 - fresh from a trusted or configured source;
 - related to a resonated topic;
-- high-quality diversity exposure;
 - coverage item from configured sources;
 - follow-up to a previously inspected story;
 - surfaced by a delegated agent.
@@ -440,7 +458,7 @@ The explanation must not expose implementation details, but should help the user
 
 ### 12.2 Summary reliability
 
-ResoFeed summaries must help users calibrate trust.
+ResoFeed summaries must expose extraction limitations to enable objective verification.
 
 Requirements:
 
@@ -456,19 +474,23 @@ These are product-level experience outcomes, not layout prescriptions.
 ResoFeed must feel:
 
 - fast enough that inspecting an item does not interrupt reading flow;
-- low-anxiety, with no pressure to clear a queue;
+- predictable, with no requirement to clear a queue;
 - transparent enough that users understand why surprising items appear;
 - correctable through natural language rather than configuration panels;
 - consistent across human and agent-mediated workflows.
 
-UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details.
+UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details. Frontend details such as design tokens and font fallbacks are explicitly deferred to the later `DESIGN.md` phase.
 
 ## 14. Explicit Non-Goals
-
 The following are out of scope unless a future product decision explicitly reverses them:
 
-- unread counters or inbox-zero mechanics;
+- account registration flows, onboarding wizards, or "ghost briefings" for empty states;
+- hidden rate-limiters, auto-collapsing spammers, or "smart" noise reduction (User Sovereignty);
+- complex UI degradation states or elaborate error screens when the AI is down;
+- numeric indicators or inbox-zero mechanics;
 - archive workflows;
+- moderation consoles, isolated filter views, holding queues, or extensive activity ledgers;
+- privacy and anti-snooping mechanisms;
 - save-for-later as a separate core primitive;
 - agree/disagree or like/dislike controls;
 - manual ranking-weight sliders;
@@ -477,7 +499,6 @@ The following are out of scope unless a future product decision explicitly rever
 - folder hierarchies or tag trees as the primary organization model;
 - built-in Telegram or notification-channel ownership;
 - multi-user team SaaS features.
-
 ## 15. Acceptance Criteria
 
 Acceptance criteria are product-level behavioral tests. Architecture and QA must define measurable corpus thresholds, latency budgets, and exact evaluation fixtures before implementation where this PRD uses terms such as “appropriate,” “enough,” “some,” or “fast enough.”
@@ -494,9 +515,9 @@ Given an item was resonated several days ago, when no new related development ex
 
 Given the user inspects news items but rarely resonates with them, when news-like items from trusted or configured sources continue to arrive, then ResoFeed must continue providing appropriate news coverage rather than concluding the user dislikes news.
 
-### AC-4 Diversity exposure behavior
+### AC-4 Strict Policy Execution
 
-Given the user resonates heavily with one topic cluster for a period of time, when high-quality diverse items from the configured or trusted source universe arrive, then at least some diverse items must remain eligible for daily surfacing with clear rationale.
+Given the user sets a steer policy to explicitly filter or boost a specific topic, when new items arrive, then the system must correctly execute these filter rules regardless of resulting echo-chamber effects.
 
 ### AC-5 Interest is not agreement
 
@@ -524,23 +545,31 @@ Given an agent retries the same resonate or steer action because of a network fa
 
 ### AC-11 Agent steering receipt
 
-Given a delegated agent submits a steering instruction, when the human next reviews system activity, then the human must be able to see what changed, which actor initiated it, and how to correct or supersede it.
+Given a delegated agent submits a steering instruction, when the human next interacts with the feed, then the human must be able to see what changed, which actor initiated it, and how to correct or supersede it.
 
 ### AC-12 Unauthorized agent action
 
-Given an agent attempts to resonate or steer without the required delegation, when the action is processed, then ResoFeed must reject or quarantine the action and preserve attribution for review.
+Given an agent attempts to resonate or steer without the required delegation, when the action is processed, then ResoFeed must silently reject the action to prevent building a complex holding queue or moderation workflow.
 
 ### AC-13 Duplicate/story provenance
 
-Given multiple sources report the same story, when ResoFeed collapses or groups them, then the user must be able to understand that multiple sources contributed and access source provenance.
+Given multiple sources report the same story, when ResoFeed transparently clusters them, then the user must be able to understand that multiple sources contributed and access every original source item and provenance.
 
-### AC-14 Summary trust
+### AC-14 Summary transparency
 
 Given source extraction is partial, unavailable, contradictory, or low-confidence, when ResoFeed presents a summary, then the summary must reveal the relevant limitation rather than appearing fully authoritative.
 
 ### AC-15 First useful session
 
 Given a new user imports or configures sources, when enough items are available, then ResoFeed must produce a usable first daily experience without requiring folders, archive rules, ranking sliders, or delivery-channel configuration.
+
+### AC-16 State Portability
+
+Given the user requests an export, when executed, the system must output the entire user state in raw text, JSON, or OPML format, including the Source Ledger, raw steering command history, interpreted and superseded steering policy state, and resonance signal history, and that exported state must be completely restorable via import.
+
+### AC-17 Diagnostics Output
+
+Given the user inputs `/doctor` in the Steer input, when processed, the system must output raw system health data (including RSS fetch errors and LLM API latency) in plain text.
 
 ## 16. Ownership Boundaries
 
@@ -573,4 +602,5 @@ Given a new user imports or configures sources, when enough items are available,
 - density;
 - motion;
 - microcopy;
-- accessibility implementation details.
+- accessibility implementation details;
+- frontend details such as design tokens and font fallbacks (deferred to DESIGN.md).
