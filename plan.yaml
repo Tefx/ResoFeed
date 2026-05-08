@@ -794,6 +794,13 @@ phases:
       ## Headline
 
       PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: golang-developer
   - id: core-domain-implementation.core-green-retest
     name: Core green retest
