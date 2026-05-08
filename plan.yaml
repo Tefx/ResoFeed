@@ -33,7 +33,7 @@ phases:
   steps:
   - id: contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
     name: Go runtime API MCP state contracts
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -154,6 +154,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-08T21:46:24.449247+00:00'
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
     status: claimed
