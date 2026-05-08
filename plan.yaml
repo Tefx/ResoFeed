@@ -661,6 +661,91 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: core-domain-implementation.complete-ranking-search-and-steering-logic
+    name: Complete ranking search and steering logic
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: contract-foundation-and-expected-red-tests
+
+
+      Fill in stub bodies in `internal/resofeed/ranking.go`, `internal/resofeed/search.go`,
+      and steering helpers per the contract from `contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts`.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - Ranking, SearchQueryEcho, SteerRule, receipt, item state contracts from contract
+      step
+
+      - Expected-red tests for ranking guardrails, query/search behavior, and steering
+      conflict receipts
+
+
+      YOUR SCOPE: lexical search over SQLite/FTS, daily feed ranking guardrails, duplicate/story
+      grouping behavior, active steering rule application, deterministic steering
+      conflict receipts.
+
+
+      Gate Preview (what reviewers will reject):
+
+      1. Vector DB, embeddings, generated answer search, hidden trusted-source taxonomy
+
+      2. User-facing ranking sliders/settings
+
+      3. Old resonated items dominating daily feed against the Ranking Contract
+
+      4. Steering that silently disables freshness/coverage/provenance/minimalism
+      invariants
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Ranking/search/steering
+      outputs must vary based on stored items, source state, resonance state, steering
+      rules, and query inputs.
+
+
+      Out-of-scope: HTTP/MCP transport and frontend.'
+    verification: '- Targeted tests for lexical search, q/source/date/resonated/limit
+      behavior, ranking freshness/resonance/source coverage guardrails, externally
+      surfaced suppression, story grouping, and steering conflict receipts pass
+
+      - Failure paths prove invariant-conflicting steering returns receipt with empty
+      changed_rules where required
+
+      - Evidence confirms no vector/RAG, sliders, hidden trusted taxonomy, or state/history
+      ledger'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Stub bodies completed:
+
+      - Ranking/search/steering test commands and output:
+
+      - Guardrail fixture summary:
+
+      - Forbidden-pattern scan:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
