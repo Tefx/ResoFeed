@@ -1020,6 +1020,90 @@ phases:
     HTTP, and background ingest loop with real entrypoint/liveness evidence.
   depends_on:
   - core-domain-implementation
+  steps:
+  - id: runtime-api-and-mcp-integration.complete-http-api-handlers
+    name: Complete HTTP API handlers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: core-domain-implementation
+
+      risk_tags: [api, auth, integration]
+
+      tags: [integration]
+
+
+      Fill in stub bodies in `internal/resofeed/http.go` per the contract from `contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts`
+      and core-domain outputs.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - HTTP types/error/query contracts from contract step
+
+      - core domain functions from `core-domain-implementation`
+
+      - backend expected-red HTTP tests are PROTECTED
+
+
+      YOUR SCOPE: HTTP router/handlers for static API contract: owner-token auth,
+      standard JSON error body, `/api/feed/today`, item inspect/resonance, steer,
+      sources/OPML import, search, state export/import, doctor. Preserve exact query
+      validation and error details.
+
+
+      Integration Evidence Required: full path source → HTTP handler → core function
+      → response body for at least auth failure, feed/today, search, state import/export,
+      and doctor.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Handlers
+      must process real requests, call core functions, and produce input-dependent
+      status codes/bodies.
+
+
+      Out-of-scope: MCP transport, frontend UI, extra routes, account systems.'
+    verification: '- Targeted HTTP handler tests pass for auth, content types, query
+      validation, error body, all endpoint success shapes, state restore result, and
+      doctor text/plain
+
+      - Integration evidence exercises real handler path to core functions
+
+      - No unknown/duplicate query parameter is accepted on feed/search
+
+      - No extra product concepts/routes are added beyond docs'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Integration Evidence
+
+      - Commands/tests exercising full HTTP paths:
+
+      - Actual output:
+
+      - Path exercised: HTTP request → handler → core → response
+
+      - Query validation proof:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
