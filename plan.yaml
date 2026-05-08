@@ -2619,3 +2619,64 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.full-plan-verification-sweep
     agent: doc-reviewer
+  - id: finalization-docs-and-deep-review.final-wiring-audit
+    name: Final wiring audit
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: default
+
+
+      Complete system wiring audit after full-plan verification.
+
+
+      Verify:
+
+      - Every public export has a runtime caller or explicit contract-only status
+
+      - Every CLI/runtime command path is reachable
+
+      - Every HTTP endpoint and MCP tool/resource is registered
+
+      - Every config/flag field is consumed
+
+      - No NotImplemented/TODO/panic stubs remain in production code
+
+      - No write-only fields or dead integration paths remain
+
+      - No forbidden sync/merge/history/account/RAG architecture appears'
+    verification: '- Static and runtime wiring evidence covers CLI, HTTP, MCP, frontend
+      API calls, state portability, and docs-defined config
+
+      - Orphan/dead-path/stub findings are none or have explicit remediation ownership
+
+      - Headline PASS/PASS_WITH_DEBT/FAIL with evidence'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Deep Wiring Audit Report
+
+      - Public export reachability:
+
+      - CLI/runtime reachability:
+
+      - HTTP/MCP registration:
+
+      - Frontend API calls:
+
+      - Config consumption:
+
+      - Stub/dead path scan:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.full-plan-verification-sweep
+    agent: wiring-auditor
