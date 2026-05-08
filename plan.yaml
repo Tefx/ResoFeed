@@ -2473,3 +2473,73 @@ phases:
     with final gate OPEN.
   depends_on:
   - end-to-end-integration
+  steps:
+  - id: finalization-docs-and-deep-review.full-plan-verification-sweep
+    name: Full plan verification sweep
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      agent_source: default
+
+      phase_dependency: end-to-end-integration
+
+
+      Run the authoritative full-plan verification sweep before docs sync and deep
+      review.
+
+
+      Scope:
+
+      - Go build and test suite
+
+      - frontend install/build/test suite
+
+      - DESIGN.md lint
+
+      - runtime smoke if feasible
+
+      - any full-repo/static checks available in the project
+
+
+      This full-plan check protects doc-sync, deep-review, and final gate. If it finds
+      broad repo-wide failures, evidence must create or recommend remediation ownership;
+      do not label failures merely pre-existing/out-of-scope without non-intersection
+      proof.'
+    verification: '- `go test ./...` passes
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed` passes
+
+      - `npm --prefix web run build` and frontend tests pass if scripts exist
+
+      - `npx @google/design.md lint docs/DESIGN.md` reports 0 errors/0 warnings
+
+      - Runtime smoke command output included if feasible
+
+      - Any failure has explicit remediation/closure path'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Full-Plan Verification Report
+
+      - Commands executed:
+
+      - Actual output:
+
+      - Failures and remediation ownership:
+
+      - Coverage/gaps:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    agent: integration-verifier
