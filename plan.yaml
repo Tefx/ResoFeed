@@ -413,6 +413,89 @@ phases:
     depends_on:
     - contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     agent: frontend-engineer
+  - id: contract-foundation-and-expected-red-tests.foundation-gate
+    name: Foundation gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, assess contract foundation readiness before implementation.
+
+
+      Scope: Go/backend runtime contracts, frontend design/API contracts, expected-red
+      backend tests, expected-red frontend tests.
+
+
+      Review criteria:
+
+      - Contract steps contain stubs/types/signatures only, not implementation logic
+
+      - Expected-red tests are test-only, spec-derived, and clearly expected red
+
+      - Each step evidence cites key passages from refs
+
+      - Downstream implementation can proceed without inventing public/runtime contracts
+
+      - No forbidden architecture/UI patterns were introduced
+
+
+      review_depth: STANDARD
+
+      cross_cutting_focus:
+
+      - contract purity
+
+      - docs-to-code drift prevention
+
+      - state portability no-sync/no-merge boundary
+
+      - owner-token delegation boundary
+
+      - DESIGN.md surface coverage'
+    verification: phase-check protecting all implementation phases. Gate may OPEN
+      only if contract artifacts are acceptance-only, tests intentionally expose gaps,
+      and no implementation/business logic is smuggled into contract/test steps.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      - Step evidence quality table:
+
+      - Contract purity verdict:
+
+      - Expected-red validity verdict:
+
+      - Drift/forbidden-pattern findings:
+
+      - Gate decision basis: OPEN | BLOCKED
+
+      - Required remediation if BLOCKED:
+
+
+      ## Headline
+
+      OPEN | BLOCKED'
+    depends_on:
+    - contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
+    - contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
+    - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
+    - contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
+    agent: gate-reviewer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
