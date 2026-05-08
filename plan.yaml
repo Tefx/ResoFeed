@@ -2512,6 +2512,13 @@ phases:
       - Orphan/write-only fields:
 
       - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: wiring-auditor
   - id: end-to-end-integration.end-to-end-spec-conformance
     name: End to end spec conformance
