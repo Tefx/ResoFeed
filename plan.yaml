@@ -1186,7 +1186,7 @@ phases:
   steps:
   - id: core-domain-implementation.complete-sqlite-state-and-restore-logic
     name: Complete SQLite state and restore logic
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: default\nphase_dependency:\
       \ contract-foundation-and-expected-red-tests\nrisk_tags: [persistence, state,\
       \ migration, restore, backward_compatibility]\n\nFill in stub bodies in `internal/resofeed/db.go`,\
@@ -1267,6 +1267,54 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-08T22:14:33.372552+00:00'
+    done_at: '2026-05-08T22:26:06.143114+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ enforced one Go binary, one SQLite DB, flat `internal/resofeed`, and state\
+      \ portability as only active sources/rules/resonated items; no sync/merge/activity\
+      \ ledger.\n- `docs/ARCHITECTURE.md`: implemented §4.7 `runtime_metadata`, §5.5\
+      \ state bundle validation/import replacement, and startup SQLite open/migration\
+      \ behavior; owner token hash is runtime-only and non-portable.\n- `docs/PRD.md`:\
+      \ aligned with AC-16 state portability and active-current-state-only rules.\n\
+      - `docs/DESIGN.md`: respected State Portability UI/backend contract: import\
+      \ replaces active sources, rules, and stars; no history/receipts/sync.\n- `docs/DESIGN_VISION.md`:\
+      \ preserved no folders/tags/settings/sync-style expansion.\n- `docs/USAGE.md`:\
+      \ followed SQLite open/migrate, owner-token runtime metadata, and state export/import\
+      \ replacement contract.\n\n## Implementation Evidence\n- Commit hash(es):\n\
+      \  - Worker branch: e760b02e234d0aa11e55b1879fafdc87145181db\n  - Main squash\
+      \ merge: c3700d6\n- Files changed:\n  - `go.mod`\n  - `go.sum`\n  - `internal/resofeed/db.go`\n\
+      \  - `internal/resofeed/migrations.go`\n  - `internal/resofeed/state.go`\n \
+      \ - `internal/resofeed/state_impl_test.go`\n- Stub bodies completed:\n  - `OpenDB`,\
+      \ `ResolveOwnerToken`, `RunMigrations`, `Migrations`, `ExportState`, `ImportState`,\
+      \ `ValidateStateBundle`.\n- Main-path tests/commands with output:\n  - Worker\
+      \ branch: `golangci-lint run` — exit 0, 0 issues.\n  - Worker branch: targeted\
+      \ state tests — exit 0, `ok resofeed/internal/resofeed`.\n  - Worker branch:\
+      \ targeted race tests — exit 0, `ok resofeed/internal/resofeed`.\n  - Worker\
+      \ branch: `go build ./...` and `git diff --check` — exit 0.\n  - Mainline final-state:\
+      \ `test -z \"$(gofmt -l internal/resofeed/db.go internal/resofeed/migrations.go\
+      \ internal/resofeed/state.go internal/resofeed/state_impl_test.go)\" && go test\
+      \ ./internal/resofeed -run 'Test(StateBundleValidationAndRestoreReplacementContract|OpenDBCreatesMissingParentAndOwnerTokenMetadataIsRuntimeOnly|ImportStateRollsBackWhenTransactionFails|ResolveOwnerTokenRejectsInvalidWithoutReplacingStoredHash)$'\
+      \ -count=1 && go test -race ./internal/resofeed -run 'Test(StateBundleValidationAndRestoreReplacementContract|OpenDBCreatesMissingParentAndOwnerTokenMetadataIsRuntimeOnly|ImportStateRollsBackWhenTransactionFails|ResolveOwnerTokenRejectsInvalidWithoutReplacingStoredHash)$'\
+      \ -count=1 && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-sqlite-mainline-check\
+      \ ./cmd/resofeed && golangci-lint run ./... && git diff --check` — exit 0; targeted\
+      \ tests/race passed and golangci-lint reported 0 issues.\n- Failure-path tests/commands\
+      \ with output:\n  - Unknown top-level `agent_receipts`, duplicate source IDs,\
+      \ invalid owner token, and forced transaction rollback covered by targeted tests.\n\
+      \  - Mainline broad `go test ./...` after core merges — exit 1 only on out-of-scope\
+      \ HTTP/MCP stubs: NewRouter and NewMCPHandler.\n- State portability no-sync/no-merge\
+      \ scan:\n  - Search for `StateMerger|MergeState|ConflictResolver|SyncCoordinator|portable.*receipt|receipt.*portable|agent_receipts.*ExportState|runtime_metadata.*ExportState`\
+      \ found only the negative contract comment `not a ... portable-agent-receipt\
+      \ format`; no implementation of sync/merge/conflict/portable receipts.\n- Transaction\
+      \ rollback proof:\n  - `TestImportStateRollsBackWhenTransactionFails` creates\
+      \ an SQLite trigger that aborts restore after existing portable rows are cleared\
+      \ inside the transaction; assertion confirms original source remains active\
+      \ after rollback.\n- Deviations record:\n  - `contract_gap`: Added `modernc.org/sqlite`\
+      \ because Go stdlib has no SQLite driver. Minimal pure-Go dependency; no alternate\
+      \ storage engine or abstraction layer introduced.\n  - `contract_gap`: Stored\
+      \ `last_state_import_exported_at` in runtime metadata so import→export fixture\
+      \ roundtrips remain deterministic; runtime metadata is not exported.\n- Gaps/Notes:\n\
+      \  - Full suite still fails only on protected expected-red HTTP router/MCP handler\
+      \ stubs outside this step.\n  - `Main` remains a CLI runtime stub and was out\
+      \ of scope.\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     name: Complete ingestion and Gemini transform logic
     status: done
