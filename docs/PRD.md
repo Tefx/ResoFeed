@@ -1,0 +1,576 @@
+# ResoFeed Product Requirements Document
+
+Version: 1.1
+Status: Product requirements draft for architecture and UI/UX handoff
+
+## 1. Product Identity
+
+**Product name:** ResoFeed
+
+**Product type:** Personal RSS intelligence system for humans and delegated AI agents.
+
+**Positioning:** ResoFeed turns noisy, time-sensitive RSS feeds into a fresh, searchable, policy-steerable personal intelligence stream.
+
+**Core promise:** ResoFeed helps the user stay informed without managing an inbox: fresh items get surfaced, valuable items become memory, and future behavior can be corrected in plain language.
+
+**Guiding rule:**
+
+> Today is for freshness. Star is for memory. Search is for retrieval. Coverage is for not missing the world.
+
+### 1.1 Adoption promise
+
+A new user should understand ResoFeed within one session:
+
+- Today shows what deserves attention now.
+- Resonate remembers what matters later.
+- Steer corrects future behavior without settings work.
+
+The user should not need to understand ranking systems, folders, archive states, or unread mechanics to feel in control.
+
+### 1.2 Differentiation
+
+ResoFeed is not a classic RSS reader optimized for unread management.
+
+ResoFeed is not primarily a read-it-later archive.
+
+ResoFeed is not a generic AI news digest detached from user-owned sources.
+
+ResoFeed is a personal intelligence stream built on user-controlled RSS sources, trustworthy compression, durable memory, and natural-language steering.
+
+The reason to switch from a conventional RSS reader or AI digest is that ResoFeed combines user-owned sources, low-anxiety daily review, trustworthy summaries, durable semantic memory, and plain-language correction in one minimal loop.
+
+## 2. Target Users and Core Workflows
+
+### 2.1 Primary user
+
+The primary user is a human who reads RSS-derived intelligence across multiple contexts:
+
+- lightweight mobile review during commute or downtime;
+- focused desktop review at the start of a work session;
+- later semantic retrieval when looking for a remembered article or topic.
+
+### 2.2 Delegated agents
+
+Delegated agents act on behalf of the human. Examples include a delivery agent or a scheduled briefing agent.
+
+ResoFeed itself does not own downstream delivery channels such as Telegram, Slack, email, or similar systems. It must expose enough product capability for authorized agents to retrieve, acknowledge, and feed back interactions without creating a second product surface.
+
+ResoFeed must deliver its core daily value without requiring the user to configure delegated agents.
+
+### 2.3 Core human workflows
+
+1. **Commute review:** The user sees a short, high-signal digest produced by an external agent. They may inspect, star, or send simple feedback.
+2. **Desk review:** The user opens ResoFeed and quickly scans new and relevant items, inspecting a subset in more depth.
+3. **Long-term retrieval:** The user searches for an article or topic later. Previously resonated items should be easier to retrieve, but not manually filed.
+4. **Policy correction:** The user can tell ResoFeed how to adjust future scoring or summaries in natural language.
+
+### 2.4 First-run onboarding
+
+ResoFeed must make the first useful experience fast and low-friction.
+
+Requirements:
+
+- support importing existing RSS subscriptions from common interchange formats, including OPML unless superseded by architecture constraints;
+- support manual source entry;
+- optionally support curated starter source packs without requiring them;
+- detect broken, inactive, duplicate, or unusually noisy sources;
+- explain Inspect, Resonate, and Steer in plain user language;
+- produce an initial useful daily surface as soon as enough items are processed;
+- avoid requiring folders, tags, ranking sliders, or notification configuration during onboarding.
+
+**First-session success:** A new user should be able to import or add sources, see a useful Today surface, inspect at least one item, resonate with at least one item, and understand that steering is optional. Agent setup, delivery-channel configuration, foldering, tagging, and ranking customization must not be required for first value.
+
+## 3. Product Vocabulary
+
+This vocabulary defines product semantics only. Architecture and UI/UX own implementation details.
+
+| Term | Product meaning | Must not mean |
+| --- | --- | --- |
+| **Fresh / recent** | Newly arrived or time-sensitive enough to deserve daily attention. | A fixed implementation window dictated by the PRD. |
+| **Old** | No longer naturally competing for daily attention unless renewed by a related development. | Deleted, forgotten, or inaccessible. |
+| **Inspect** | A deliberate allocation of attention to an item or externally delivered item. | Agreement, durable preference, or passive dwell-time tracking. |
+| **Resonate** | Durable value worth remembering and amplifying. | Agreement, ideological endorsement, pinning, or save-for-later. |
+| **Steer** | Explicit natural-language correction to future system behavior. | Casual chat or a hidden configuration language. |
+| **Trusted source** | A configured or justifiable source whose provenance is visible enough for coverage decisions. | A hardcoded source list hidden from the user. |
+| **Coverage** | Lightweight awareness of relevant news-like items that may not deserve resonance. | A separate tab, a firehose, or generic world-news injection beyond the user’s source universe. |
+| **Diversity exposure** | High-quality content that broadens the user’s current resonance pattern within configured or trusted sources. | Generic algorithmic recommendations, moralized content injection, or content detached from the user’s source universe. |
+| **Eligible for surfacing** | Allowed to appear in a daily or agent-mediated experience under product rules. | Guaranteed top placement. |
+| **Surfaced externally** | Delivered or presented to the human by a delegated agent. | Merely fetched by an agent for silent evaluation. |
+
+## 4. Product Principles
+
+### 4.1 Complete minimalism
+
+ResoFeed should be complete in its core loop from day one, but minimal in the number of concepts exposed to the user.
+
+Minimalism means:
+
+- no inbox-zero pressure;
+- no unread-count optimization;
+- no manual archive workflow;
+- no folders or tag trees as primary organization;
+- no settings screens full of ranking sliders;
+- no separate human and agent behavior models.
+
+### 4.2 Human-first, agent-compatible
+
+The primary product must feel designed for human attention and recall. Agent access is a required capability, but not the product’s center of gravity.
+
+Humans and agents should operate on the same product concepts: inspect, resonate, and steer.
+
+### 4.3 Freshness before hoarding
+
+RSS content is time-sensitive. ResoFeed must prevent old interesting items from permanently occupying daily attention. Long-term value should improve memory and retrieval, not block new information.
+
+### 4.4 Trustworthy compression
+
+Summaries must preserve factual density, source provenance, and uncertainty. ResoFeed must avoid vague blogger-style summaries and unsupported synthesis.
+
+Trustworthy compression requires:
+
+- clear source attribution;
+- visible indication when only partial content was available;
+- preservation of important uncertainty, disagreement, and caveats;
+- easy access to the original article;
+- avoidance of unsupported synthesis across sources;
+- distinction between reported fact, source claim, and model-generated interpretation when relevant.
+
+## 5. Core Product Primitives
+
+ResoFeed has exactly three core user-visible primitives.
+
+Other product terms may appear as explanations, provenance, or system states, but Inspect, Resonate, and Steer are the only primary user-visible primitives.
+
+### 5.1 Inspect
+
+**Meaning:** The user or agent allocated attention to an item in a way relevant to the human workflow.
+
+Examples:
+
+- a human opens an item for more detail;
+- a human opens an item from an external digest;
+- an authorized agent confirms an item was successfully delivered or presented to the human in an external context.
+
+Product requirements:
+
+- Inspect is a context signal, not an endorsement.
+- Inspect helps prevent duplicate surfacing between human and agent workflows.
+- Inspect may influence short-term continuity, but must not become a durable preference by default.
+- Inspect must not rely on passive surveillance such as dwell time, viewport tracking, or scroll-depth tracking.
+- Silent agent evaluation must not count as Inspect unless the item was actually surfaced to the human.
+
+### 5.2 Resonate
+
+**Meaning:** The item is worth preserving as durable value.
+
+Resonate is represented conceptually as a star. It means: “preserve and amplify this kind of value.” It does not necessarily mean “I agree.”
+
+Product requirements:
+
+- Resonate is the primary durable positive signal.
+- Resonate improves future retrieval and may influence future relevance.
+- Resonate must not pin old items indefinitely into the daily feed.
+- Resonate must remain distinct from agreement, endorsement, or ideological alignment.
+- Resonate must be reversible or correctable by the human.
+
+### 5.3 Steer
+
+**Meaning:** The user gives natural-language correction to the system’s future behavior.
+
+Examples:
+
+- “There is too much XXX recently; reduce it.”
+- “Push more YYY technical documents.”
+- “Do not penalize ZZZ articles just because they disagree with me.”
+- “Add AAA perspective to future summaries.”
+
+Product requirements:
+
+- Steering must be expressible in natural language.
+- Steering must adjust future scoring, surfacing, or summary behavior.
+- Steering must be treated as an explicit correction, not as casual conversation.
+- Steering changes should be understandable and reversible by the human.
+- Steering should be a lightweight delta over an opinionated baseline policy, not a requirement that the user author a personal constitution.
+- Steering must not become a rule-management product: no rule builder, no manual weight editor, no per-rule CRUD workflow, and no requirement that the user maintain a complex policy document.
+
+## 6. Actor Model and Authority
+
+### 6.1 Actor classes
+
+ResoFeed must distinguish at least these actor classes at the product level:
+
+- **Human owner:** the primary user; highest product authority within safety, legality, and product-invariant constraints.
+- **Delegated agent:** an authorized external agent acting on behalf of the human.
+- **System process:** ResoFeed’s own automated ingestion, understanding, and ranking behavior.
+
+### 6.2 Authority rules
+
+- Human steering has priority over delegated-agent steering.
+- Delegated-agent actions must be attributable and auditable to the human.
+- Agents may inspect items and return user feedback.
+- Agents may resonate or steer only when authorized by the human’s workflow or explicit delegation.
+- The human must be able to correct or override agent-generated drift.
+- Agent-generated steering must produce a user-visible receipt that identifies the agent, summarizes the change, and offers an understandable correction path.
+
+### 6.3 Agent reliability rules
+
+- Agent mutating actions must be safe under retries and loops; duplicate submissions of the same intended action must not corrupt user state.
+- Agent silent evaluation must be separated from external surfacing.
+- Agent-mediated delivery must be recorded in a way that prevents repetitive surfacing of the same item.
+- Unauthorized agent attempts to resonate or steer must be rejected or quarantined and remain attributable.
+
+## 7. Source Intake and Item Understanding
+
+### 7.1 Feed intake
+
+ResoFeed must:
+
+- support configured RSS and Atom sources;
+- remain continuously available for mobile and delegated-agent workflows even when the user’s personal computer is asleep; deployment topology is architecture-owned;
+- detect source failures without blocking other sources;
+- preserve enough source provenance for the user to understand where each item came from.
+
+### 7.2 Source management
+
+Minimalism must not prevent users from controlling their source universe.
+
+Requirements:
+
+- users must be able to add, remove, and pause sources;
+- users must be able to see source health, including failed or inactive feeds;
+- users should be able to identify unusually noisy sources;
+- source controls must not require folder hierarchies or tag trees;
+- source trust should influence coverage behavior where appropriate.
+
+### 7.3 Duplicate and story handling
+
+ResoFeed must reduce attention waste from duplicate reporting.
+
+Requirements:
+
+- repeated versions of the same article should not appear as separate equal-priority items;
+- multiple reports of the same story should be collapsed, grouped, or otherwise made understandable as one story-level event;
+- the user should be able to access source provenance when the system merges or groups related items;
+- grouping must preserve access to original source provenance so false-positive grouping does not destroy or hide individual source context.
+
+### 7.4 Content extraction quality
+
+ResoFeed must attempt to understand the full linked article, not only the feed excerpt.
+
+Requirements:
+
+- if full content is unavailable, the item must remain visible when appropriate rather than silently disappearing;
+- extraction limitations must be visible as source-quality/provenance information;
+- unusually large, inaccessible, or paywalled content must degrade gracefully;
+- summary quality expectations should adapt to available source quality.
+
+### 7.5 Item understanding outputs
+
+Every processed item must provide enough information to support scanning, ranking, retrieval, and agent handoff.
+
+Required product-level outputs:
+
+- objective quality assessment;
+- value tier or equivalent priority category;
+- concise core insight;
+- dense factual summary;
+- source and extraction provenance;
+- topical and semantic comparability for search and ranking;
+- concise rationale for why the item may deserve attention when surfaced.
+
+Exact data shapes, models, schemas, and storage choices are architecture-owned and not specified by this PRD.
+
+## 8. Daily Feed Behavior
+
+### 8.1 Unified daily attention surface
+
+ResoFeed must provide a primary daily experience that lets the human quickly understand what is new, relevant, and worth inspecting without managing folders, unread counts, or archive states.
+
+The product requirement is a unified low-friction daily experience. Specific layout, navigation, density, and visual hierarchy are UI/UX-owned.
+
+### 8.2 Freshness constraint
+
+Fresh items must have a reliable path into the daily experience.
+
+Requirements:
+
+- recent items must not be crowded out solely by older resonated interests;
+- old resonated items should move from daily attention into memory/retrieval;
+- old items may reappear only when they are useful context for a new related development;
+- the default product policy must distinguish newly arrived items from older memory items.
+
+### 8.3 Resonance constraint
+
+Resonated history should improve relevance and retrieval without becoming a hoarding mechanism.
+
+Requirements:
+
+- resonated topics may influence future relevance;
+- resonated items should rank higher in later search when relevant;
+- resonated items must not become persistent homepage pins by default.
+
+### 8.4 Coverage constraint
+
+News-like items often matter even when the user does not star them.
+
+Requirements:
+
+- ResoFeed must preserve awareness of small but relevant news from the user’s configured or trusted source universe;
+- lack of resonance on news items must not automatically mean the user does not want news coverage;
+- coverage items should avoid overwhelming higher-value analysis or documents;
+- coverage must favor configured sources and sources the product can justify as trusted through visible provenance or user policy.
+
+### 8.5 Diversity exposure constraint
+
+ResoFeed must actively resist narrow repetition without becoming a generic algorithmic feed.
+
+Requirements:
+
+- high-quality items outside the user’s recent resonance cluster must still have a path into the daily experience;
+- disagreement or unfamiliarity must not be treated as low value by default;
+- diversity exposure should operate within the user’s configured source universe, explicit steering, and source-quality constraints;
+- diversity exposure must not require additional user-facing controls beyond Inspect, Resonate, and Steer;
+- the system must maintain viewpoint and topic diversity unless doing so conflicts with explicit safety, source, or user-declared constraints.
+
+### 8.6 Daily habit loop
+
+ResoFeed must support a repeatable daily rhythm without inbox-zero mechanics.
+
+Requirements:
+
+- the daily experience should be useful in a short session, such as a commute or workday start;
+- the user should be able to leave without clearing, archiving, or triaging all items;
+- the system should distinguish “important today” from “retrievable later”;
+- external digests should provide enough context for quick judgment while preserving a path to inspect the original item;
+- the product should avoid creating guilt through stale queues, badges, or unresolved counts.
+
+## 9. Policy and Conflict Rules
+
+### 9.1 Baseline policy
+
+ResoFeed must work well before the user customizes it.
+
+Default behavior should prioritize:
+
+- relevance;
+- credibility;
+- novelty;
+- factual density;
+- source quality;
+- viewpoint diversity;
+- freshness.
+
+### 9.2 Steering precedence
+
+When rules conflict, ResoFeed must follow this product-level precedence:
+
+1. **Safety and legality constraints.**
+2. **Product invariants:** freshness, coverage, anti-filter-bubble behavior, provenance, and minimalism.
+3. **Human steering.**
+4. **Delegated-agent steering.**
+5. **Default scoring and summarization policy.**
+
+Human steering can strongly influence ranking and summaries, but must not silently disable product invariants such as freshness and anti-filter-bubble coverage. If a user explicitly requests behavior that conflicts with an invariant, ResoFeed should explain the conflict and offer the closest allowable interpretation.
+
+### 9.3 Steering lifecycle
+
+ResoFeed must make steering understandable.
+
+Requirements:
+
+- a steering instruction should have a visible interpretation or confirmation;
+- the human should be able to correct a bad interpretation;
+- accumulated steering should remain inspectable at a product level;
+- materially conflicting steering should be surfaced in plain language when it affects future behavior;
+- human steering should be reversible or supersedable;
+- agent-generated steering must be visibly attributable and easy to correct;
+- steering transparency should be provided through a concise human-readable summary, not through a complex rule-management interface.
+
+## 10. Search and Retrieval
+
+Search is a first-class workflow, not an afterthought.
+
+Requirements:
+
+- users must be able to search by natural language, keyword, source, time, and resonance status;
+- resonated items should be easier to retrieve when relevant;
+- non-resonated but inspected or high-quality items should remain retrievable;
+- search should support “I vaguely remember...” queries;
+- search results should explain enough provenance for the user to trust the result.
+
+Exact retrieval algorithms and indexing strategies are architecture-owned.
+
+## 11. External Agent Capabilities
+
+ResoFeed must support authorized external agents through an agent-compatible interface. MCP compatibility is a product requirement because external agent orchestration is part of the intended workflow. Exact resources, tools, payload schemas, and transport details are architecture-owned.
+
+For PRD purposes, MCP compatibility means authorized external agents can perform the required capabilities in this section through an MCP-compatible interface; exact protocol version, resources/tools, payload schemas, and transport details are architecture-owned.
+
+Required agent capabilities:
+
+- retrieve eligible high-priority recent items;
+- silently evaluate item candidates without changing human-visible inspection status;
+- retrieve item detail for briefing or handoff;
+- execute searches across the user's corpus, including history and resonance status;
+- retrieve active steering rules to answer user questions about current policy;
+- report that an item was delivered or surfaced externally;
+- forward human inspect, resonate, or steer actions from external contexts;
+- avoid duplicating externally surfaced or human-inspected content unless a new related development makes resurfacing useful;
+- preserve actor provenance for every agent-mediated action;
+- safely tolerate retries, duplicate requests, and orchestration loops.
+
+ResoFeed itself must not own Telegram, Slack, email, or other delivery-channel integrations as core product surfaces.
+
+## 12. Trust and Explainability
+
+### 12.1 Why this appeared
+
+For surfaced items, ResoFeed should provide a concise explanation of why the item appeared when useful.
+
+Examples:
+
+- fresh from a trusted or configured source;
+- related to a resonated topic;
+- high-quality diversity exposure;
+- coverage item from configured sources;
+- follow-up to a previously inspected story;
+- surfaced by a delegated agent.
+
+The explanation must not expose implementation details, but should help the user decide whether the system is behaving well.
+
+### 12.2 Summary reliability
+
+ResoFeed summaries must help users calibrate trust.
+
+Requirements:
+
+- users should be able to tell when a summary is based on full content versus partial/excerpt-only content;
+- uncertainty, disagreement, or extraction limitations should be visible when material;
+- source provenance should remain accessible from summaries and search results;
+- summaries should avoid unsupported synthesis across unrelated sources.
+
+## 13. Experience Requirements
+
+These are product-level experience outcomes, not layout prescriptions.
+
+ResoFeed must feel:
+
+- fast enough that inspecting an item does not interrupt reading flow;
+- low-anxiety, with no pressure to clear a queue;
+- transparent enough that users understand why surprising items appear;
+- correctable through natural language rather than configuration panels;
+- consistent across human and agent-mediated workflows.
+
+UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details.
+
+## 14. Explicit Non-Goals
+
+The following are out of scope unless a future product decision explicitly reverses them:
+
+- unread counters or inbox-zero mechanics;
+- archive workflows;
+- save-for-later as a separate core primitive;
+- agree/disagree or like/dislike controls;
+- manual ranking-weight sliders;
+- mandatory notes;
+- dwell-time, viewport, or scroll-depth tracking as preference signals;
+- folder hierarchies or tag trees as the primary organization model;
+- built-in Telegram or notification-channel ownership;
+- multi-user team SaaS features.
+
+## 15. Acceptance Criteria
+
+Acceptance criteria are product-level behavioral tests. Architecture and QA must define measurable corpus thresholds, latency budgets, and exact evaluation fixtures before implementation where this PRD uses terms such as “appropriate,” “enough,” “some,” or “fast enough.”
+
+### AC-1 Freshness protection
+
+Given a test corpus with both newly arrived items and older resonated items, when the daily experience is generated, then newly arrived eligible items must be represented and older resonated items must not dominate solely because they were resonated.
+
+### AC-2 Star is not pin
+
+Given an item was resonated several days ago, when no new related development exists, then the item should improve search and future relevance but should not remain a persistent top daily item.
+
+### AC-3 News coverage without stars
+
+Given the user inspects news items but rarely resonates with them, when news-like items from trusted or configured sources continue to arrive, then ResoFeed must continue providing appropriate news coverage rather than concluding the user dislikes news.
+
+### AC-4 Diversity exposure behavior
+
+Given the user resonates heavily with one topic cluster for a period of time, when high-quality diverse items from the configured or trusted source universe arrive, then at least some diverse items must remain eligible for daily surfacing with clear rationale.
+
+### AC-5 Interest is not agreement
+
+Given a user inspects a controversial or opposing-view item without resonating, when future ranking is adjusted, then the system must not treat inspection alone as agreement or durable preference.
+
+### AC-6 Human authority over agents
+
+Given a delegated agent submits steering or resonance that the human later corrects, when future items are ranked, then the human correction must take precedence over the agent-mediated signal.
+
+### AC-7 External handoff idempotency
+
+Given an authorized external agent has already surfaced an item, when it requests candidates again, then ResoFeed must avoid repeatedly returning the same already-surfaced item unless new context makes it relevant again.
+
+### AC-8 Steering clarity
+
+Given the user submits a steering instruction, when the system applies it, then the user must be able to understand the interpreted change and correct it if wrong.
+
+### AC-9 Agent evaluate vs deliver
+
+Given an agent retrieves multiple candidate items for silent evaluation but only delivers a subset to the human, when the human later opens the primary experience, then undelivered evaluated items must remain eligible as not-yet-inspected items, while delivered items are treated as externally surfaced.
+
+### AC-10 Agent mutation safety
+
+Given an agent retries the same resonate or steer action because of a network failure or orchestration loop, when ResoFeed processes the repeated attempts, then the user-facing effect must occur only once and remain attributable.
+
+### AC-11 Agent steering receipt
+
+Given a delegated agent submits a steering instruction, when the human next reviews system activity, then the human must be able to see what changed, which actor initiated it, and how to correct or supersede it.
+
+### AC-12 Unauthorized agent action
+
+Given an agent attempts to resonate or steer without the required delegation, when the action is processed, then ResoFeed must reject or quarantine the action and preserve attribution for review.
+
+### AC-13 Duplicate/story provenance
+
+Given multiple sources report the same story, when ResoFeed collapses or groups them, then the user must be able to understand that multiple sources contributed and access source provenance.
+
+### AC-14 Summary trust
+
+Given source extraction is partial, unavailable, contradictory, or low-confidence, when ResoFeed presents a summary, then the summary must reveal the relevant limitation rather than appearing fully authoritative.
+
+### AC-15 First useful session
+
+Given a new user imports or configures sources, when enough items are available, then ResoFeed must produce a usable first daily experience without requiring folders, archive rules, ranking sliders, or delivery-channel configuration.
+
+## 16. Ownership Boundaries
+
+### 16.1 PRD owns
+
+- product purpose;
+- user and agent workflows;
+- product primitives;
+- policy and ranking rules;
+- constraints and non-goals;
+- acceptance criteria.
+
+### 16.2 Software architecture owns
+
+- database schema;
+- event model implementation;
+- storage and indexing choices;
+- ranking implementation;
+- MCP resource/tool contracts;
+- background task design;
+- deployment topology;
+- service/module boundaries.
+
+### 16.3 UI/UX design owns
+
+- visual design;
+- layout;
+- interaction model;
+- navigation;
+- density;
+- motion;
+- microcopy;
+- accessibility implementation details.

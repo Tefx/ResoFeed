@@ -1,0 +1,13 @@
+# Local agent/tooling files
+.gemini/
+.opencode/
+.claude/
+.codex/
+
+# Local locks
+plan.yaml.lock
+
+# Agent instruction files
+GEMINI.md
+AGENTS.md
+CLAUDE.md
