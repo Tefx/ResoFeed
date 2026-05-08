@@ -958,6 +958,61 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: spec-verifier
+  - id: core-domain-implementation.core-domain-gate
+    name: Core domain gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, assess whether the Core Domain Implementation phase
+      meets the quality bar for runtime/API/MCP work.
+
+
+      Review criteria:
+
+      1. All implementation steps completed with substantive logic, not stubs
+
+      2. Expected-red tests are now green or have explicit closure paths
+
+      3. Wiring audit has no blocking orphan/stub/forbidden-pattern findings
+
+      4. Spec conformance has no unresolved blocker-class divergence
+
+      5. No forbidden architecture: sync server, state merger, conflict resolver,
+      vector/RAG, repositories/service layer, per-agent registry
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - phase touches persistence/state restore and ranking/steering semantics
+
+      - phase defines behavior that downstream runtime/API/MCP gates rely on
+
+
+      Gate decision basis must map requirement refs, evidence refs, unresolved statuses,
+      and OPEN/BLOCK recommendation.'
+    verification: phase-check protecting Runtime API and MCP Integration. Gate may
+      OPEN only when core behavior evidence is specific, blockers are closed, and
+      unresolved behavioral obligations are PROVEN or have explicit non-intersection/closure
+      paths.
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\n## Gate Review Report\n- Step evidence quality table:\n\
+      - Issues identified:\n- Gate Decision Basis:\n  - requirement/proof-obligation\
+      \ refs:\n  - evidence refs reviewed:\n  - unresolved statuses:\n  - OPEN/BLOCK\
+      \ recommendation:\n- Required remediation if BLOCKED:\n\n## Headline\nOPEN |\
+      \ BLOCKED"
+    depends_on:
+    - core-domain-implementation.core-green-retest
+    - core-domain-implementation.core-wiring-audit
+    - core-domain-implementation.core-spec-conformance
+    agent: gate-reviewer
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
