@@ -2726,7 +2726,7 @@ phases:
       \ a valid path`; targeted tests still pass.\n\n## Headline\nPASS"
   - id: frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     name: Complete feed inspector source state and search UI
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -2831,6 +2831,60 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-08T22:27:17.310132+00:00'
+    done_at: '2026-05-08T22:32:45.781848+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ followed single deployable/SQLite/minimal UI boundaries, owner-token boundary,\
+      \ flat Source Ledger, and forbidden folders/tags/unread/archive/settings patterns.\n\
+      - `docs/ARCHITECTURE.md`: implemented `/api/*` owner-token Authorization header,\
+      \ canonical JSON error handling, feed/search/source/state endpoint contracts,\
+      \ and state portability as active sources/rules/stars only.\n- `docs/PRD.md`:\
+      \ preserved Inspect/Resonate/Steer semantics, lexical/metadata search, provenance\
+      \ visibility, OPML flattening, and terse raw fallback/error states.\n- `docs/DESIGN.md`:\
+      \ used dense feed rows, `INSPECTOR`, `SOURCE LEDGER`, state warning text `import\
+      \ replaces active sources, rules, and stars`, keyboard focus behavior, 44px\
+      \ star controls, and raw status copy.\n- `docs/DESIGN_VISION.md`: followed high-density,\
+      \ low-fatigue, typographic workbench direction with no SaaS/onboarding/dashboard\
+      \ expansion.\n- `docs/USAGE.md`: aligned owner-token local storage/API header,\
+      \ source OPML import, search filters, state export/import, and `/doctor` raw-text\
+      \ API expectations.\n\n## Frontend Integration Evidence\n- Commit hash(es):\n\
+      \  - Worker branch: c1833a9\n  - Main squash merge: f83de48\n- Files changed:\n\
+      \  - `web/src/lib/api-client.ts`\n  - `web/src/lib/api-client.test.ts`\n  -\
+      \ `web/src/routes/+page.svelte`\n  - `web/src/routes/components/FeedContractStub.svelte`\n\
+      \  - `web/src/routes/components/InspectorContractStub.svelte`\n  - `web/src/routes/components/SearchRetrievalContractStub.svelte`\n\
+      \  - `web/src/routes/components/SourceLedgerContractStub.svelte`\n  - `web/src/routes/components/StatePortabilityContractStub.svelte`\n\
+      - Components completed:\n  - Feed rows: source/extraction/agent provenance,\
+      \ keyboard Enter open/focus sink, star glyph/name toggle.\n  - Inspector: focusable\
+      \ heading, original link, partial label, why line, provenance line.\n  - Source\
+      \ Ledger: OPML action/status, flat rows, delete confirmation, export/import\
+      \ state links.\n  - State Portability: required warning, keyboard-reachable\
+      \ file input, export live status.\n  - Search/Retrieval: query/source/date/resonance\
+      \ filters, result count, match/provenance lines.\n  - API client: owner-token\
+      \ Authorization header for endpoints, canonical error exception, state/search/feed/source\
+      \ methods.\n- Rendered output / DOM snapshots:\n  - Feed DOM asserted visible:\
+      \ `src: Example Source`, `partial`, `agent:external`, `SQLite FTS changes ranking\
+      \ contract`, star `☆` -> `★`.\n  - Inspector DOM asserted visible/focused: `INSPECTOR`,\
+      \ `original link`, `partial`, `why: fresh from configured source`.\n  - Source\
+      \ Ledger DOM asserted visible: `SOURCE LEDGER`, `import OPML`, source URL, `confirm\
+      \ delete source: Example Source`.\n  - State DOM asserted visible: `import replaces\
+      \ active sources, rules, and stars`, `Choose state JSON`, `exported state.json`.\n\
+      \  - Search DOM asserted visible: `Plain text query`, `Source filter`, `From\
+      \ date`, `Resonated only`, `1 results`, `match: summary`, `src: Example Source`.\n\
+      - API client fixtures and source docs:\n  - Fixtures derive from docs/ARCHITECTURE.md\
+      \ §6 HTTP Surface shapes: `FeedTodayResponse`, `SourcesResponse`, `SearchResponse`,\
+      \ `StateBundleV1`, `ErrorBody`.\n  - API tests prove `Authorization: Bearer\
+      \ <owner-token>` and canonical `bad_request` body/details preservation.\n- Test/build\
+      \ commands and output:\n  - Worker branch: `npm --prefix web ci` — exit 0; installed\
+      \ 147 packages.\n  - Worker branch: `npm --prefix web run test` — exit 0; svelte-check\
+      \ found 0 errors and 0 warnings; 2 test files passed; 11 tests passed.\n  -\
+      \ Worker branch: `npm --prefix web run build` — exit 0; Vite/SvelteKit build\
+      \ completed.\n  - Mainline final-state: `npm --prefix web ci && npm --prefix\
+      \ web run test && npm --prefix web run build && npx @google/design.md lint docs/DESIGN.md`\
+      \ — exit 0; 2 test files passed/11 tests passed, build completed, design lint\
+      \ 0 errors/0 warnings/1 info.\n- Forbidden-pattern scan:\n  - Grep over `web/src/routes/components/*.svelte`\
+      \ for forbidden UI pattern terms returned no forbidden implementation.\n- Deviations\
+      \ record:\n  - None.\n- Gaps/Notes:\n  - Real browser/runtime E2E remains reserved\
+      \ for end-to-end phase. Component/API-client render integration is covered by\
+      \ Vitest/jsdom.\n\n## Headline\nPASS"
   - id: frontend-implementation.frontend-green-retest
     name: Frontend green retest
     status: pending
