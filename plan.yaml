@@ -889,6 +889,75 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: wiring-auditor
+  - id: core-domain-implementation.core-spec-conformance
+    name: Core spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Spec conformance verification via adversarial divergence hunting.
+
+
+      SCOPE: Core domain implementation only — state portability, ingestion/status,
+      ranking/search/steering, SQLite shape.
+
+
+      This is NOT "do tests pass" — it is "does implementation match what the specs
+      say?"
+
+
+      Verification scope: phase-check protecting runtime API/MCP and final deep review
+      gates.
+
+
+      For EACH requirement, cite the spec section AND implementation file:line. Behavioral
+      precedence claims must be flagged as NEEDS_TEST with concrete test suggestion
+      if not directly proven.'
+    verification: '- Requirements register covers state bundle, state import replacement,
+      SQLite tables, ingestion statuses, Gemini boundary, Ranking Contract, Search
+      contract, Steering Conflict Contract
+
+      - Verdicts use CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+      - Any DIVERGES/PARTIAL/NEEDS_TEST has explicit closure path before gate opens'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Spec Conformance Report
+
+      - Requirements Register:
+
+      - Evidence Table:
+
+      - Coverage Summary:
+
+      - Top Risks:
+
+      - Suggested Tests for NEEDS_TEST:
+
+      - Behavioral proof register: requirement_ref | behavior_claim | runtime_proof_expected
+      | evidence_ref | status | closure_path | gate_decision_basis
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - core-domain-implementation.complete-sqlite-state-and-restore-logic
+    - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
+    - core-domain-implementation.complete-ranking-search-and-steering-logic
+    agent: spec-verifier
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
