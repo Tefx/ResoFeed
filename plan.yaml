@@ -578,6 +578,89 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: core-domain-implementation.complete-ingestion-and-gemini-transform-logic
+    name: Complete ingestion and Gemini transform logic
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: contract-foundation-and-expected-red-tests
+
+
+      Fill in stub bodies in `internal/resofeed/ingest.go`, `internal/resofeed/gemini.go`,
+      and extraction/status helpers per the contract from `contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts`.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - contract stubs/types from `contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts`
+
+      - backend expected-red tests from `contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests`
+
+
+      YOUR SCOPE: RSS/Atom source fetch, source-level failure isolation, item extraction
+      status mapping, Gemini request/response JSON transform for summaries and steering
+      translation support. Gemini must not own durable state, orchestration, or DB
+      writes.
+
+
+      Known risks / Gate Preview:
+
+      - Do not add alternate LLM providers or provider abstraction layers
+
+      - Do not turn Gemini into an agent/orchestrator
+
+      - `/doctor` must receive raw RSS/Gemini/extraction failure data without SaaS
+      copy
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Logic
+      must process real feed/model inputs and produce status/output varying by input.
+
+
+      Out-of-scope: HTTP/MCP routing, frontend rendering, vector/RAG search, sync
+      systems.'
+    verification: '- Targeted tests for RSS/Atom parsing, source failure isolation,
+      extraction/model status mapping, Gemini JSON request/response handling pass
+
+      - Failure paths cover dead/malformed URLs, fetch errors, partial extraction,
+      model latency/error, and no DB writes by Gemini transform
+
+      - Evidence includes actual commands/output and confirms no alternate LLM provider
+      abstraction or RAG/vector path'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Stub bodies completed:
+
+      - Main-path tests/commands with output:
+
+      - Failure-path tests/commands with output:
+
+      - Gemini boundary proof:
+
+      - Forbidden-pattern scan:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
