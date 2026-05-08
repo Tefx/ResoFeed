@@ -8,4 +8,19 @@
 # =============================================================
 version: 1
 project: ResoFeed
-context: Implementation plan for ResoFeed.
+strategy_ref: Contract-first implementation plan derived from docs/ARCHITECTURE.md,
+  docs/PRD.md, docs/DESIGN.md, docs/DESIGN_VISION.md, docs/USAGE.md, and .agents/instructions.md
+  after four-agent documentation review PASS.
+context: 'work_type: new_capability. Architecture basis approved by recent doc/spec/demolition/design
+  review loop. Implementation must proceed contract -> expected-red tests -> implementation
+  -> green retest -> independent audits/gates. Runtime surface preservation applies:
+  `resofeed serve`, HTTP API, MCP Streamable HTTP, static UI, and background ingest
+  loop must be runnable end-to-end.'
+project_guidance: All implementation agents must begin by reading `.agents/instructions.md`,
+  `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/DESIGN.md`, `docs/DESIGN_VISION.md`,
+  and `docs/USAGE.md` sections referenced by their step. Evidence for every step must
+  include the mandatory refs read confirmation with key passages. Preserve the single
+  Go binary, SQLite-only storage, Gemini JSON-transform role, owner-token delegation
+  boundary, active-state JSON backup/restore model, and DESIGN.md UI contract. Do
+  not introduce sync/merge engines, vector DBs/RAG, account systems, repositories/service
+  layers, event buses, settings dashboards, or UI patterns forbidden by the docs.
