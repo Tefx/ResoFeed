@@ -746,6 +746,88 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: core-domain-implementation.core-green-retest
+    name: Core green retest
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+
+      As an INDEPENDENT TESTER, validate core-domain behavior after implementation
+      from a fresh perspective.
+
+
+      Verification scope: local-check / phase-check protecting runtime API/MCP and
+      frontend integration gates.
+
+
+      Test for:
+
+      - DB migrations/runtime metadata/state backup-restore
+
+      - ingestion/Gemini transform/status failures
+
+      - ranking/search/steering guardrails
+
+      - no forbidden architecture patterns
+
+
+      Finding issues is a successful verification outcome; document blockers precisely.'
+    verification: '- `go test ./...` or targeted Go test commands for core package
+      pass with expected-red tests now green
+
+      - Evidence includes actual command output, not summary only
+
+      - Failure path coverage includes invalid state import, query/search boundary
+      cases, model/fetch errors, and steering conflicts
+
+      - Behavioral proof register records PROVEN/NEEDS_TEST status for core obligations'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Verification Report
+
+      - Tester: integration-verifier
+
+      - Scope: core domain
+
+      - Independence Level: L2
+
+      - Commands executed:
+
+      - Actual output:
+
+      - Issues found:
+
+      - Behavioral proof register: requirement_ref | behavior_claim | runtime_proof_expected
+      | evidence_ref | status | closure_path | gate_decision_basis
+
+      - Coverage not tested and why:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - core-domain-implementation.complete-sqlite-state-and-restore-logic
+    - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
+    - core-domain-implementation.complete-ranking-search-and-steering-logic
+    agent: integration-verifier
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
