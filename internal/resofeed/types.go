@@ -54,34 +54,74 @@ type Source struct {
 	Revision        int64      `json:"revision"`
 }
 
-// Item is the canonical item cache contract. Grouping and duplicate fields
-// preserve provenance; grouping must never become hidden source suppression.
+// Item is the canonical item cache contract. Public JSON response shapes must
+// use ItemSummary for list/search/MCP candidate surfaces and ItemDetail for
+// inspect/read surfaces so detail-only fields cannot leak into summaries.
 type Item struct {
-	ID                 string      `json:"id"`
-	SourceID           string      `json:"source_id"`
-	SourceTitle        string      `json:"source_title"`
-	URL                string      `json:"url"`
-	Title              string      `json:"title"`
-	Summary            *string     `json:"summary"`
-	CoreInsight        *string     `json:"core_insight"`
-	PublishedAt        *time.Time  `json:"published_at"`
-	ExtractionStatus   string      `json:"extraction_status"`
-	ModelStatus        string      `json:"model_status"`
-	IsResonated        bool        `json:"is_resonated"`
-	HumanInspectedAt   *time.Time  `json:"human_inspected_at"`
-	ExternalSurfacedAt *time.Time  `json:"external_surfaced_at"`
-	StoryKey           *string     `json:"story_key"`
-	DuplicateOfItemID  *string     `json:"duplicate_of_item_id"`
-	FeedExcerpt        *string     `json:"feed_excerpt,omitempty"`
-	ExtractedText      *string     `json:"extracted_text,omitempty"`
-	Provenance         *Provenance `json:"provenance,omitempty"`
+	ID                 string
+	SourceID           string
+	SourceTitle        string
+	URL                string
+	Title              string
+	Summary            *string
+	CoreInsight        *string
+	PublishedAt        *time.Time
+	ExtractionStatus   string
+	ModelStatus        string
+	IsResonated        bool
+	HumanInspectedAt   *time.Time
+	ExternalSurfacedAt *time.Time
+	StoryKey           *string
+	DuplicateOfItemID  *string
+	FeedExcerpt        *string
+	ExtractedText      *string
+	Provenance         Provenance
 }
 
-// ItemSummary is the canonical HTTP/MCP list item shape.
-type ItemSummary = Item
+// ItemSummary is the canonical HTTP/MCP list, search, and candidate item shape.
+// It intentionally excludes feed_excerpt, extracted_text, and provenance; those
+// fields belong only on ItemDetail.
+type ItemSummary struct {
+	ID                 string     `json:"id"`
+	SourceID           string     `json:"source_id"`
+	SourceTitle        string     `json:"source_title"`
+	URL                string     `json:"url"`
+	Title              string     `json:"title"`
+	Summary            *string    `json:"summary"`
+	CoreInsight        *string    `json:"core_insight"`
+	PublishedAt        *time.Time `json:"published_at"`
+	ExtractionStatus   string     `json:"extraction_status"`
+	ModelStatus        string     `json:"model_status"`
+	IsResonated        bool       `json:"is_resonated"`
+	HumanInspectedAt   *time.Time `json:"human_inspected_at"`
+	ExternalSurfacedAt *time.Time `json:"external_surfaced_at"`
+	StoryKey           *string    `json:"story_key"`
+	DuplicateOfItemID  *string    `json:"duplicate_of_item_id"`
+}
 
-// ItemDetail is ItemSummary plus extracted payload and provenance.
-type ItemDetail = Item
+// ItemDetail is the canonical HTTP/MCP inspect/read item shape. Nullable fields
+// are present as null when unavailable; provenance is always present as an
+// object so original source context remains accessible.
+type ItemDetail struct {
+	ID                 string     `json:"id"`
+	SourceID           string     `json:"source_id"`
+	SourceTitle        string     `json:"source_title"`
+	URL                string     `json:"url"`
+	Title              string     `json:"title"`
+	Summary            *string    `json:"summary"`
+	CoreInsight        *string    `json:"core_insight"`
+	PublishedAt        *time.Time `json:"published_at"`
+	ExtractionStatus   string     `json:"extraction_status"`
+	ModelStatus        string     `json:"model_status"`
+	IsResonated        bool       `json:"is_resonated"`
+	HumanInspectedAt   *time.Time `json:"human_inspected_at"`
+	ExternalSurfacedAt *time.Time `json:"external_surfaced_at"`
+	StoryKey           *string    `json:"story_key"`
+	DuplicateOfItemID  *string    `json:"duplicate_of_item_id"`
+	FeedExcerpt        *string    `json:"feed_excerpt"`
+	ExtractedText      *string    `json:"extracted_text"`
+	Provenance         Provenance `json:"provenance"`
+}
 
 // Provenance is included on item detail so summaries, grouping, and search
 // results remain verifiable without hiding original source items.
