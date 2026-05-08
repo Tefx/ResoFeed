@@ -1706,6 +1706,104 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: frontend-engineer
+  - id: frontend-implementation.complete-feed-inspector-source-state-and-search-ui
+    name: Complete feed inspector source state and search UI
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: contract-foundation-and-expected-red-tests
+
+      risk_tags: [frontend, user_visible, integration]
+
+      tags: [integration]
+
+
+      Fill in stub bodies/components in `web/` for feed, Inspector, Source Ledger,
+      State Portability, Search/Retrieval, feedback lines, and API client per the
+      contract from `contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts`.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - DESIGN.md component contracts and tokens from contract step
+
+      - API response/error TypeScript contracts from frontend contract step
+
+      - frontend expected-red rendering tests are PROTECTED
+
+
+      YOUR SCOPE: Render dense feed rows, inspector detail/provenance, source ledger
+      with OPML import and links to `export state`/`import state`, state import warning
+      text `import replaces active sources, rules, and stars`, search form/results,
+      raw feedback/error lines, and HTTP API client using owner-token header.
+
+
+      Integration Evidence Required: component/API-client tests should exercise source
+      → API client mock fixture → rendered sink for feed/search/state portability.
+      Real runtime integration is reserved for end-to-end phase.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires visible DOM output for every required state/surface. DOM
+      snapshots, screenshots, or test-renderer output must show actual content, not
+      empty containers.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.
+
+
+      Forbidden: folders/tags/unread counts/mark-all-read/settings sliders/backup
+      dashboard/drag ordering/cute SaaS copy.'
+    verification: '- Frontend tests render feed, inspector, source ledger, state portability
+      warning, search/retrieval, feedback/error states with visible DOM assertions
+
+      - API client tests prove owner token header and canonical error handling using
+      docs-derived fixtures
+
+      - Build/test commands pass with actual output
+
+      - Evidence includes rendered output or DOM snapshots for required states
+
+      - Forbidden UI patterns scan reports none'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Frontend Integration Evidence
+
+      - Components completed:
+
+      - Rendered output / DOM snapshots:
+
+      - API client fixtures and source docs:
+
+      - Test/build commands and output:
+
+      - Forbidden-pattern scan:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
+    agent: frontend-engineer
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
