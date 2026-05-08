@@ -44,3 +44,10 @@ phases:
     HTTP, and background ingest loop with real entrypoint/liveness evidence.
   depends_on:
   - core-domain-implementation
+- id: frontend-implementation
+  name: Frontend Implementation
+  status: locked
+  gate: Svelte UI implements DESIGN.md surfaces, owner-token prompt, first-use state,
+    feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
+  depends_on:
+  - runtime-api-and-mcp-integration
