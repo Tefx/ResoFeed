@@ -2885,3 +2885,69 @@ phases:
     - finalization-docs-and-deep-review.full-plan-verification-sweep
     - finalization-docs-and-deep-review.documentation-sync
     agent: design-reviewer
+  - id: finalization-docs-and-deep-review.final-black-box-verification
+    name: Final black box verification
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: default
+
+
+      Using ONLY public docs and public interfaces, perform final black-box verification
+      of the completed system.
+
+
+      Scope:
+
+      - CLI serve startup and auth
+
+      - HTTP feed/search/state/doctor flows
+
+      - MCP resource/tool flows
+
+      - UI owner-token/first-use/feed/state/search surfaces
+
+      - PRD acceptance criteria sampled through public behavior
+
+
+      Do not inspect implementation source except as needed to run documented commands.
+      Finding issues is valuable and should block final gate if blocker-class.'
+    verification: '- Public-interface scripts/commands run from clean environment
+
+      - Evidence includes exact commands, outputs, and rendered artifacts/screenshots
+      where applicable
+
+      - PRD acceptance coverage table has no unresolved blocker-class gaps
+
+      - No implementation-source assumptions required'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Final Black-Box Report
+
+      - Commands/scripts:
+
+      - Actual outputs/artifacts:
+
+      - Acceptance coverage:
+
+      - Issues found:
+
+      - Not tested and why:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.final-spec-conformance-audit
+    agent: blind-tester
