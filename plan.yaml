@@ -2179,6 +2179,77 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: integration-verifier
+  - id: end-to-end-integration.black-box-acceptance-pass
+    name: Black box acceptance pass
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+      phase_dependencies: runtime-api-and-mcp-integration, frontend-implementation
+
+
+      Black-box acceptance verification using public docs/interfaces only. Do not
+      rely on implementation internals.
+
+
+      Scope: user-visible and agent-visible flows from docs/USAGE.md, docs/PRD.md
+      acceptance criteria, and docs/DESIGN.md rendered behavior.
+
+
+      Test as an external owner/agent would:
+
+      - start or connect to `resofeed serve`
+
+      - authenticate with owner token
+
+      - read feed/search/item/doctor
+
+      - perform inspect/resonate/steer/report_delivery when fixtures allow
+
+      - export/import state bundle
+
+      - verify UI owner-token prompt, first-use state, state portability warning
+
+
+      Finding issues is a successful verification outcome; report exact reproduction
+      steps.'
+    verification: '- Black-box scripts/commands use only public docs/interfaces
+
+      - Evidence includes exact reproduction commands, outputs, and screenshots/DOM
+      artifacts where applicable
+
+      - Acceptance coverage maps to PRD AC-1..AC-17 where feasible; any not tested
+      has rationale and closure path
+
+      - No implementation-source assumptions are required'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Black-Box Verification Report
+
+      - Public commands/scripts:
+
+      - Actual outputs/artifacts:
+
+      - Acceptance coverage map:
+
+      - Issues found:
+
+      - Not tested and why:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    agent: blind-tester
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
