@@ -1,0 +1,7 @@
+{
+  "type": "streamable-http",
+  "url": "https://resofeed.example.com/mcp",
+  "headers": {
+    "Authorization": "Bearer <OWNER_TOKEN>"
+  }
+}

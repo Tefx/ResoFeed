@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "unauthorized",
+    "message": "owner token required",
+    "details": {}
+  }
+}
