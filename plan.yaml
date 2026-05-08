@@ -248,6 +248,13 @@ phases:
       ## Headline
 
       PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: frontend-engineer
   - id: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     name: Backend expected red contract tests
