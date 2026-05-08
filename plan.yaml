@@ -1280,6 +1280,72 @@ phases:
     - runtime-api-and-mcp-integration.complete-http-api-handlers
     - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     agent: golang-developer
+  - id: runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
+    name: Early runtime vertical slice proof
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Early vertical slice: verify ONE complete real path from `resofeed serve` entrypoint
+      to observable effect using real implementations and no stubs/mocks at boundaries.
+
+
+      Minimum path: `./bin/resofeed serve --db <temp> --gemini-api-key <key-or-test-double-config>`
+      → owner-token auth → `GET /api/feed/today?limit=20` → ranking/core → JSON response.
+      Also include `/api/doctor` text/plain if feasible.
+
+
+      This step exists to catch integration failures early, before frontend/end-to-end
+      phases.
+
+
+      Verification scope: phase-check protecting runtime gate and frontend integration
+      assumptions.'
+    verification: '- Real binary starts from documented command
+
+      - At least one HTTP request reaches real entrypoint path end-to-end and returns
+      documented output
+
+      - Evidence lists layers traversed: CLI → runtime → HTTP router → core → SQLite/state/search
+      → response
+
+      - Stubs/mocks at runtime boundaries: NONE, except documented external Gemini
+      test configuration if required'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Vertical Slice Evidence
+
+      - Entry point:
+
+      - Command executed:
+
+      - Layers traversed:
+
+      - Observable output:
+
+      - Stubs/mocks used at boundaries (must be NONE except documented external-service
+      test config):
+
+      - Issues found:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    agent: integration-verifier
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
