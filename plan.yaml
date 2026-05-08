@@ -1872,6 +1872,74 @@ phases:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     agent: integration-verifier
+  - id: frontend-implementation.native-ui-ux-implementation-audit
+    name: Native UI UX implementation audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Native multimodal implementation audit. Compare real rendered artifacts against
+      `docs/DESIGN.md`.
+
+
+      Scope: owner-token prompt, first-use empty, feed, inspector, source ledger,
+      state portability warning, search/retrieval, feedback/error lines, desktop and
+      mobile layouts.
+
+
+      This is screenshot/render-first. Standard tests, DOM-only checks, and type-checking
+      do not replace this audit.
+
+
+      Required artifacts:
+
+      - screenshots or equivalent rendered images/terminal captures for required states/viewports
+
+      - evidence-bound PASS/FAIL handoff
+
+      - list of design divergences with severity and remediation path
+
+
+      Independence Level: L2/L3 visual audit.'
+    verification: '- Rendered artifacts cover required states and desktop/mobile viewport
+      philosophy
+
+      - Audit checks visual density, typography/token usage, owner-token gate, first-use
+      empty state, state portability warning, accessibility-visible affordances, and
+      forbidden UI patterns
+
+      - PASS handoff must be parseable; any blockers require remediation before frontend
+      gate'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Native UI/UX Audit Report
+
+      - Rendered artifact list:
+
+      - Viewports/states covered:
+
+      - Contract comparison findings:
+
+      - Accessibility observations:
+
+      - Forbidden-pattern scan:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
+    - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
+    agent: uiux-auditor
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
