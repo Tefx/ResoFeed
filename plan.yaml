@@ -1269,7 +1269,7 @@ phases:
     claimed_at: '2026-05-08T22:14:33.372552+00:00'
   - id: core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     name: Complete ingestion and Gemini transform logic
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -1359,6 +1359,60 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-08T22:14:24.145658+00:00'
+    done_at: '2026-05-08T22:25:07.774539+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ read; one Go binary, one SQLite DB, Gemini as pure JSON-in/JSON-out transformer\
+      \ only, flat `internal/resofeed/` shape, no vector/RAG/sync/provider abstraction.\n\
+      - `docs/ARCHITECTURE.md`: read; §1 decisions require one deployable, one SQLite\
+      \ DB, Gemini request/response JSON transformer only, lexical retrieval only;\
+      \ §5.1 requires independent active-source fetch, RSS/Atom parse, extraction/model\
+      \ fallback status, and source-level failure isolation.\n- `docs/PRD.md`: read;\
+      \ §4.6 fallback taxonomy (`summary unavailable`, `partial extraction`, `original\
+      \ unavailable`, `model latency/error`, `RSS fetch error`); §7.1 source failures\
+      \ must not block other sources; §7.4 unavailable extraction must keep items\
+      \ visible.\n- `docs/DESIGN.md`: read; `/doctor` diagnostics must be raw/plain\
+      \ text, no dashboards/SaaS copy; feed/Inspector expose fallback markers plainly.\n\
+      - `docs/DESIGN_VISION.md`: read; AI as raw utility, raw fallbacks when summaries\
+      \ fail, no cute error states.\n- `docs/USAGE.md`: read; ingestion fetches sources/extracts/summarizes\
+      \ with Gemini; `/doctor` includes RSS/model/extraction failures; search is lexical,\
+      \ not vector/RAG.\n\n## Implementation Evidence\n- Commit hash(es):\n  - Worker\
+      \ branch implementation: 9adbbe44919f53c3c3264d404dafdbf0eef48642\n  - Main\
+      \ squash implementation: b5054e9\n  - Worker branch lint remediation: 222b2724755265d81df0f63f1c1a331621427eb5\n\
+      \  - Main conflict-resolved remediation: 343952ac9abe23d9b7e75d62e2a752258c455045\n\
+      - Files changed:\n  - `internal/resofeed/ingest.go`\n  - `internal/resofeed/gemini.go`\n\
+      \  - `internal/resofeed/ingest_gemini_test.go`\n- Stub bodies completed:\n \
+      \ - `RunIngestLoop`, `IngestOnce`, `ImportOPML`, `DeleteSource`, `NewGeminiClient`.\n\
+      \  - Added RSS/Atom parsing, OPML flattening, source fetch status updates, extraction/model\
+      \ status mapping helpers, item upsert helper, Gemini HTTP JSON request/response\
+      \ transform, retry for network/429/5xx.\n- Main-path tests/commands with output:\n\
+      \  - Worker branch targeted test/race/build passed: `go test ./internal/resofeed\
+      \ -run 'Test(ParseFeedSupportsRSSAndAtom|ExtractionStatusMappingCoversFullPartialAndOriginalUnavailable|IngestOnceIsolatesSourceFailuresAndMapsModelFailure|GeminiClientHandlesJSONSummarySteeringAndRetry)'`\
+      \ exit 0; race targeted exit 0; `go build ./cmd/resofeed` exit 0.\n  - Mainline\
+      \ final-state after remediation: `test -z \"$(gofmt -l internal/resofeed/ingest.go\
+      \ internal/resofeed/gemini.go internal/resofeed/ingest_gemini_test.go)\" &&\
+      \ go test ./internal/resofeed -run 'Test(ParseFeedSupportsRSSAndAtom|ExtractionStatusMappingCoversFullPartialAndOriginalUnavailable|IngestOnceIsolatesSourceFailuresAndMapsModelFailure|GeminiClientHandlesJSONSummarySteeringAndRetry)'\
+      \ && go test -race ./internal/resofeed -run 'Test(ParseFeedSupportsRSSAndAtom|ExtractionStatusMappingCoversFullPartialAndOriginalUnavailable|IngestOnceIsolatesSourceFailuresAndMapsModelFailure|GeminiClientHandlesJSONSummarySteeringAndRetry)'\
+      \ && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-ingestion-mainline-check\
+      \ ./cmd/resofeed && golangci-lint run ./...` — exit 0; targeted tests passed\
+      \ and golangci-lint reported 0 issues.\n- Failure-path tests/commands with output:\n\
+      \  - Targeted tests cover malformed/dead article URLs, source fetch failure\
+      \ isolation, partial extraction fallback, model latency/error mapping via failing\
+      \ Gemini mock, Gemini retry on 429, and JSON response validation.\n  - Broad\
+      \ `go test ./...` remains expected red due out-of-scope stubs unrelated to this\
+      \ step.\n- Gemini boundary proof:\n  - `internal/resofeed/gemini.go` imports\
+      \ no `database/sql` and performs no DB writes.\n  - Gemini client only constructs\
+      \ HTTP JSON `generateContent` requests, parses JSON responses, validates fields/status,\
+      \ and returns values/errors.\n  - Steering translation output is only a proposal;\
+      \ Go validates invariants and owns final SQLite transaction.\n- Forbidden-pattern\
+      \ scan:\n  - Scan for vector/embedding/RAG/provider/repository/factory/sync/conflict/event\
+      \ bus/agent registry found only pre-existing contract comments forbidding vector/RAG;\
+      \ no new implementation path or provider abstraction added.\n- Remediation:\n\
+      \  - Initial mainline lint failed on unchecked Close return values; focused\
+      \ remediation checked `rows.Close()`, HTTP response body closes, and test `db.Close()`\
+      \ cleanup. Conflict resolver preserved existing behavior and applied only close/error-checking\
+      \ remediation.\n- Deviations record:\n  - None.\n- Gaps/Notes:\n  - Full suite\
+      \ remains red due unrelated contract stubs outside this step scope (`http.go`,\
+      \ `mcp.go`, `db.go`, `state.go`, `ranking.go`, etc.).\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.complete-ranking-search-and-steering-logic
     name: Complete ranking search and steering logic
     status: claimed
