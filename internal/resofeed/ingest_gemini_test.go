@@ -81,7 +81,11 @@ func TestIngestOnceIsolatesSourceFailuresAndMapsModelFailure(t *testing.T) {
 		},
 	}
 	db := openIngestFakeDB(t, state)
-	defer db.Close()
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("close fake db: %v", err)
+		}
+	})
 
 	err := IngestOnce(ctx, db, IngestConfig{Gemini: failingGemini{}})
 	if err != nil {

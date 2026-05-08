@@ -64,7 +64,7 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 }
 
 // IngestOnce performs one ingestion pass over active sources.
-func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
+func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
 	if db == nil {
 		return errors.New("ingest once: db required")
 	}
@@ -72,7 +72,11 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 	if err != nil {
 		return fmt.Errorf("ingest once: query active sources: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil && retErr == nil {
+			retErr = fmt.Errorf("ingest once: close source rows: %w", closeErr)
+		}
+	}()
 
 	var sources []Source
 	for rows.Next() {
@@ -202,7 +206,7 @@ type feedEntry struct {
 	PublishedAt *time.Time
 }
 
-func fetchFeed(ctx context.Context, feedURL string) (parsedFeed, error) {
+func fetchFeed(ctx context.Context, feedURL string) (feed parsedFeed, retErr error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feedURL, nil)
 	if err != nil {
 		return parsedFeed{}, fmt.Errorf("rss fetch: create request: %w", err)
@@ -211,7 +215,11 @@ func fetchFeed(ctx context.Context, feedURL string) (parsedFeed, error) {
 	if err != nil {
 		return parsedFeed{}, fmt.Errorf("rss fetch: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil && retErr == nil {
+			retErr = fmt.Errorf("rss fetch: close body: %w", closeErr)
+		}
+	}()
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return parsedFeed{}, fmt.Errorf("rss fetch: status %d", resp.StatusCode)
 	}
@@ -219,14 +227,14 @@ func fetchFeed(ctx context.Context, feedURL string) (parsedFeed, error) {
 	if err != nil {
 		return parsedFeed{}, fmt.Errorf("rss fetch: read body: %w", err)
 	}
-	feed, err := parseFeed(body)
+	parsed, err := parseFeed(body)
 	if err != nil {
 		return parsedFeed{}, err
 	}
-	if len(feed.Items) == 0 {
+	if len(parsed.Items) == 0 {
 		return parsedFeed{}, errors.New("rss parse: no items")
 	}
-	return feed, nil
+	return parsed, nil
 }
 
 func parseFeed(data []byte) (parsedFeed, error) {
@@ -337,7 +345,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, gemini Gemin
 	return item, nil
 }
 
-func extractArticleText(ctx context.Context, itemURL string, fallback string) (string, string) {
+func extractArticleText(ctx context.Context, itemURL string, fallback string) (text string, status string) {
 	parsed, err := url.Parse(itemURL)
 	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
 		if strings.TrimSpace(fallback) != "" {
@@ -359,7 +367,15 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (s
 		}
 		return "", extractionStatusOriginalNA
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			if strings.TrimSpace(fallback) != "" {
+				text, status = "", extractionStatusPartial
+				return
+			}
+			text, status = "", extractionStatusOriginalNA
+		}
+	}()
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
@@ -373,14 +389,14 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (s
 		}
 		return "", extractionStatusOriginalNA
 	}
-	text := textFromHTML(string(body))
-	if text == "" {
+	extracted := textFromHTML(string(body))
+	if extracted == "" {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
 		}
 		return "", extractionStatusOriginalNA
 	}
-	return text, extractionStatusFull
+	return extracted, extractionStatusFull
 }
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) error {
