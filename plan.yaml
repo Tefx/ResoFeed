@@ -2317,6 +2317,77 @@ phases:
 
       - Headline: PASS | PASS_WITH_DEBT | FAIL'
     agent: wiring-auditor
+  - id: end-to-end-integration.end-to-end-spec-conformance
+    name: End to end spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+      phase_dependencies: runtime-api-and-mcp-integration, frontend-implementation
+
+
+      System-level spec conformance verification. SCOPE: cross-surface requirements
+      that require HTTP + MCP + UI + core behavior together.
+
+
+      Focus areas:
+
+      - HTTP/MCP operation parity
+
+      - owner-token delegation boundary across HTTP/MCP/UI
+
+      - state portability replacement semantics through API/UI
+
+      - PRD acceptance criteria AC-1..AC-17 with evidence/disposition
+
+      - DESIGN.md rendered surface obligations
+
+
+      Do NOT re-verify every unit requirement already covered unless integration context
+      changed; focus on emergent cross-surface drift.'
+    verification: '- Evidence table maps cross-surface requirements to runtime/UI
+      artifacts
+
+      - Any NEEDS_TEST/PARTIAL/DIVERGES item has explicit closure path before gate
+
+      - PRD acceptance criteria have PROVEN/non-intersection/closure disposition
+
+      - No contradiction between HTTP, MCP, UI, and docs remains unresolved'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## System Spec Conformance Report
+
+      - Cross-surface Requirements Register:
+
+      - Evidence Table:
+
+      - PRD AC disposition table:
+
+      - Top Risks:
+
+      - Suggested Tests/Remediation:
+
+      - Behavioral proof register:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: spec-verifier
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
