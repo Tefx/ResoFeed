@@ -712,7 +712,7 @@ phases:
       \  - No ref contradictions found.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.foundation-gate
     name: Foundation gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -870,6 +870,8 @@ phases:
     - contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
     - contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-08T22:10:35.716734+00:00'
   - id: contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     name: Fix Go JSON contract shapes
     status: done
