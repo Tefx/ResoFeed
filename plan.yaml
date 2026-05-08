@@ -1736,6 +1736,13 @@ phases:
       ## Headline
 
       OPEN | BLOCKED'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     depends_on:
     - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     - runtime-api-and-mcp-integration.runtime-liveness-probe
