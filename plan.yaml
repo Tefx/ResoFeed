@@ -58,3 +58,10 @@ phases:
     no stubs and no mock-only seam evidence.
   depends_on:
   - frontend-implementation
+- id: finalization-docs-and-deep-review
+  name: Finalization Docs and Deep Review
+  status: locked
+  gate: Full-plan verification, doc sync, and independent deep-review audits are complete
+    with final gate OPEN.
+  depends_on:
+  - end-to-end-integration
