@@ -2543,3 +2543,79 @@ phases:
 
       - Headline: PASS | PASS_WITH_DEBT | FAIL'
     agent: integration-verifier
+  - id: finalization-docs-and-deep-review.documentation-sync
+    name: Documentation sync
+    status: pending
+    description: 'step_type: documentation
+
+      agent_source: default
+
+
+      Sync all project documentation with implemented behavior after full-plan verification.
+
+
+      REQUIRED CHECKS:
+
+      - README/USAGE commands and examples match actual CLI/API behavior
+
+      - ARCHITECTURE module/file descriptions match actual structure
+
+      - DESIGN.md remains lint-clean and matches implemented UI surfaces
+
+      - PRD acceptance criteria remain consistent with architecture and observed behavior
+
+      - Error code tables match actual error responses
+
+      - Config/flag examples match runtime behavior
+
+      - Remove references to unimplemented features or add explicit deferrals where
+      architecture allows
+
+
+      Do not broaden scope: preserve single binary, SQLite-only, Gemini JSON-transform,
+      active-state backup/restore, owner-token delegation, and no forbidden UI/product
+      patterns.'
+    verification: '- Documentation diff only reflects implemented behavior and does
+      not change product scope without explicit architecture/spec note
+
+      - All command examples that are meant to be runnable match current CLI/API
+
+      - DESIGN.md lint remains 0 errors/0 warnings
+
+      - Evidence lists docs updated and sections intentionally left unchanged'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Doc Sync Report
+
+      - Docs updated:
+
+      - Behavior/docs mismatches fixed:
+
+      - Commands/examples checked:
+
+      - Scope-preservation notes:
+
+      - Remaining doc debt:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.full-plan-verification-sweep
+    agent: doc-reviewer
