@@ -872,7 +872,7 @@ phases:
     agent: gate-reviewer
   - id: contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     name: Fix Go JSON contract shapes
-    status: pending
+    status: claimed
     description: 'step_type: contract/test remediation
 
       agent_source: default
@@ -1008,6 +1008,8 @@ phases:
     - contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
     - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-08T22:07:12.858348+00:00'
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
