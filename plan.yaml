@@ -712,7 +712,7 @@ phases:
       \  - No ref contradictions found.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.foundation-gate
     name: Foundation gate
-    status: claimed
+    status: pending
     description: 'step_type: gate
 
       agent_source: default
@@ -800,8 +800,6 @@ phases:
     - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     - contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
     agent: gate-reviewer
-    claimed_by: gate-reviewer
-    claimed_at: '2026-05-08T22:01:45.937089+00:00'
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
