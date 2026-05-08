@@ -1415,7 +1415,7 @@ phases:
       \ `mcp.go`, `db.go`, `state.go`, `ranking.go`, etc.).\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.complete-ranking-search-and-steering-logic
     name: Complete ranking search and steering logic
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -1507,6 +1507,53 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-08T22:14:27.539609+00:00'
+    done_at: '2026-05-08T22:25:32.915721+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ confirmed one SQLite + FTS5 only, lexical search only, flat `internal/resofeed/`\
+      \ shape, owner-token boundary, steering invariant receipts, no vectl plan edits.\n\
+      - `docs/ARCHITECTURE.md`: implemented against §5.2 ranking guardrails, §5.3\
+      \ steering conflict contract, §5.4 lexical search, §4.6 search_fts derived index,\
+      \ and §8/§10 forbidden vector/RAG/settings surfaces.\n- `docs/PRD.md`: followed\
+      \ “Today is for freshness. Star is for memory. Search is for retrieval. Coverage\
+      \ is for not missing the world”; freshness-before-hoarding, coverage, duplicate/story\
+      \ provenance, and lexical retrieval requirements.\n- `docs/DESIGN.md`: preserved\
+      \ backend-only scope; no UI concepts such as settings sliders, folders, activity\
+      \ ledgers, or RAG/chat surfaces.\n- `docs/DESIGN_VISION.md`: confirmed no paternalistic\
+      \ hidden suppression, no numeric/inbox behaviors, no settings maze.\n- `docs/USAGE.md`:\
+      \ confirmed Today/search/Steer contracts, lexical retrieval, no vector DB/embeddings/RAG,\
+      \ and no delivery-channel ownership.\n\n## Implementation Evidence\n- Commit\
+      \ hash(es):\n  - Worker branch: 3d67c85a8ce2c6a865c6e99480564c2a2268ee03\n \
+      \ - Main squash merge: 8cae31a\n- Files changed:\n  - `internal/resofeed/ranking.go`\n\
+      \  - `internal/resofeed/search.go`\n  - `internal/resofeed/ranking_search_logic_test.go`\n\
+      - Stub bodies completed:\n  - `ListTodayFeed`, `ApplySteering`, `MarkItemInspected`,\
+      \ `SetItemResonance`, `SearchItems`, `RebuildSearchIndex`.\n- Ranking/search/steering\
+      \ test commands and output:\n  - Worker branch: `gofmt -w internal/resofeed/ranking.go\
+      \ internal/resofeed/search.go internal/resofeed/ranking_search_logic_test.go\
+      \ && go test ./internal/resofeed -run 'TestRankCandidatesGuardrailsWithoutSQLiteOwnership|TestSearchSQLPlanCoversLexicalAndMetadataFilters|TestSteeringConflictReceiptHasNoChangedRules'`\
+      \ — exit 0, `ok resofeed/internal/resofeed`.\n  - Worker branch: targeted race\
+      \ test — exit 0, `ok resofeed/internal/resofeed`.\n  - Worker branch: `go build\
+      \ ./...` — exit 0; `golangci-lint run ./...` — exit 0, 0 issues.\n  - Mainline\
+      \ final-state: `test -z \"$(gofmt -l internal/resofeed/ranking.go internal/resofeed/search.go\
+      \ internal/resofeed/ranking_search_logic_test.go)\" && go test ./internal/resofeed\
+      \ -run 'TestRankCandidatesGuardrailsWithoutSQLiteOwnership|TestSearchSQLPlanCoversLexicalAndMetadataFilters|TestSteeringConflictReceiptHasNoChangedRules'\
+      \ && go test -race ./internal/resofeed -run 'TestRankCandidatesGuardrailsWithoutSQLiteOwnership|TestSearchSQLPlanCoversLexicalAndMetadataFilters|TestSteeringConflictReceiptHasNoChangedRules'\
+      \ && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-ranking-mainline-check\
+      \ ./cmd/resofeed && golangci-lint run ./...` — exit 0; tests passed and golangci-lint\
+      \ reported 0 issues.\n- Guardrail fixture summary:\n  - Added focused non-DB\
+      \ tests because DB ownership was separate in this branch.\n  - Ranking test\
+      \ proves fresh quota, old resonated memory cap, source coverage, externally\
+      \ surfaced suppression, and duplicate suppression.\n  - Search SQL plan test\
+      \ proves q/source/date/resonated/limit lexical/metadata planning and limit capping.\n\
+      \  - Steering conflict test proves invariant-conflicting command returns receipt\
+      \ with empty `changed_rules` and freshness conflict message.\n- Forbidden-pattern\
+      \ scan:\n  - Modified ranking/search implementation checked for vector/embedding/RAG/slider/activity-ledger/settings-dashboard\
+      \ patterns. Matches were only contract/comment exclusions or allowed coverage/provenance\
+      \ terms; no vector DB, embeddings, generated answer search, hidden trusted taxonomy,\
+      \ sliders, sync/history ledger, or RAG surface implemented.\n- Deviations record:\n\
+      \  - None.\n- Gaps/Notes:\n  - DB open/migration ownership was out of scope\
+      \ for the worker branch; SQL paths implemented against documented table/column\
+      \ contracts and will be integrated with SQLite state step.\n  - HTTP/MCP/state/ingest/frontend\
+      \ stubs intentionally untouched.\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-green-retest
     name: Core green retest
     status: pending
