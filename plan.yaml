@@ -27,7 +27,7 @@ project_guidance: All implementation agents must begin by reading `.agents/instr
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Backend/frontend contracts, stubs, and expected-red tests define acceptance
     without shipping implementation logic.
   steps:
@@ -712,7 +712,7 @@ phases:
       \  - No ref contradictions found.\n\n## Headline\nPASS_EXPECTED_RED"
   - id: contract-foundation-and-expected-red-tests.foundation-gate
     name: Foundation gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -872,6 +872,115 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-08T22:10:35.716734+00:00'
+    done_at: '2026-05-08T22:14:03.270851+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ READ. Key passages: single Go binary and SQLite-only storage; no vector/RAG/accounts/service\
+      \ layers; portable state is only active sources, steering rules, and resonated\
+      \ items, no sync/merge/history; owner token is universal boundary; UI forbids\
+      \ folders/tags/unread/settings/onboarding patterns.\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages: one deployable Go process and single owner token; CLI\
+      \ flags and no sidecar commands; ItemSummary excludes detail-only fields and\
+      \ ItemDetail adds feed_excerpt/extracted_text/provenance; HTTP/MCP surfaces\
+      \ and auth contracts; frontend boundary and forbidden Tailwind/UI-library/extra-dashboard\
+      \ patterns.\n- docs/PRD.md — READ. Key passages: core promise and “Today is\
+      \ for freshness. Star is for memory. Search is for retrieval. Coverage is for\
+      \ not missing the world.”; no inbox-zero/folders/archive/settings; owner-token\
+      \ delegation boundary and no per-agent auth registry; lexical search/no RAG;\
+      \ acceptance criteria AC-1..AC-17.\n- docs/DESIGN.md — READ. Key passages: primary\
+      \ surfaces include owner-token prompt, feed, Inspector, Steer, Source Ledger,\
+      \ search, receipts; owner-token prompt requirements; feed/resonate/inspector/source-ledger/state-portability/search\
+      \ contracts; explicit do/don’t constraints.\n- docs/DESIGN_VISION.md — READ.\
+      \ Key passages: high-density analyst workbench with Inspect/Resonate/Steer,\
+      \ no numeric indicators/folders/settings; no paternalism, no cute errors, no\
+      \ account/onboarding, no activity logs; functional PRD-to-UI mapping for Inspect/Resonate/Steer/Diagnostics/Portability.\n\
+      - docs/USAGE.md — READ. Key passages: target usage contract and not-in-scope\
+      \ list; `serve` starts all runtime surfaces and no migrate/worker/doctor/admin/sync\
+      \ commands; flags and owner-token behavior; HTTP/MCP examples and state portability/search\
+      \ constraints.\n\n## Gate Review Report\n- Commit hash(es): none — read-only\
+      \ gate. Reviewed worktree HEAD: 821305aeff7eabf216ccc926df35a313df1aaa99.\n\
+      - Step evidence quality table:\n  - Mandatory refs: PROVEN by direct artifact\
+      \ review.\n  - Go JSON contract B1: PROVEN by `internal/resofeed/types.go:81-124`,\
+      \ `internal/resofeed/json_contract_test.go:9-86`, and focused test exit 0.\n\
+      \  - Backend expected-red tests: EXPECTED_RED; `go test ./...` exit 1 only on\
+      \ TODO stubs NewRouter/NewMCPHandler/OpenDB/ValidateStateBundle.\n  - Frontend\
+      \ expected-red tests: EXPECTED_RED; `npm --prefix web run test:render` exit\
+      \ 1 after Vitest v4.1.5 executed, 7 failed/1 passed.\n  - Frontend bootstrap:\
+      \ PROVEN; `npm --prefix web ci` exit 0 before frontend commands.\n  - Frontend\
+      \ build/check: PROVEN; `npm --prefix web run check` exit 0 and `npm --prefix\
+      \ web run build` exit 0.\n  - Contract purity: PROVEN; Go stubs use TODO panics;\
+      \ Svelte components are static contract stubs and notes.\n  - Forbidden-pattern\
+      \ audit: PROVEN; scan found only guardrail comments/API fields such as `folders_flattened`,\
+      \ no implementation of forbidden systems.\n  - CLI surface: EXPECTED_STUB_DEBT;\
+      \ static entrypoint exists and `go run ./cmd/resofeed --help` panics in `Main`\
+      \ stub.\n- Contract purity verdict:\n  - PASS. Contract artifacts contain public\
+      \ types, signatures, constants, static Svelte contract stubs, and TODO panics\
+      \ only. No production business logic was smuggled into Go stubs or frontend\
+      \ stubs.\n- Expected-red validity verdict:\n  - PASS. Backend failures align\
+      \ with documented implementation stubs. Frontend render failures are valid because\
+      \ `npm ci` completed first, Vitest actually executed, and failures are implementation\
+      \ gaps: focus/localStorage, alert role, keyboard inspect/focus, inspector provenance,\
+      \ delete confirmation, state import/export feedback, search filters/provenance.\n\
+      - Drift/forbidden-pattern findings:\n  - Blockers: none.\n  - Warnings: `npm\
+      \ --prefix web ci` reports 3 low-severity vulnerabilities in dev dependency\
+      \ tree; Vitest warning `--localstorage-file was provided without a valid path`.\
+      \ Both non-blocking for contract foundation.\n  - No forbidden architecture/UI\
+      \ implementation patterns found: no vector/RAG implementation, sync coordinator,\
+      \ account system, settings dashboard, unread/archive UI, Tailwind/component\
+      \ UI library, service/repository layers, event bus, or DI container.\n- Wiring\
+      \ audit results (W1-W8):\n  - W1 CLI/runtime: `cmd/resofeed/main.go` delegates\
+      \ to `resofeed.Main`; only `serve` documented; CLI help panic is expected stub\
+      \ debt.\n  - W2 HTTP surface: `internal/resofeed/http.go` defines router/auth/query-validation\
+      \ contract; backend tests cover auth and strict query validation expected-red.\n\
+      \  - W3 MCP surface: `internal/resofeed/mcp.go` defines owner-token auth, tool\
+      \ inputs, operation stubs; tests cover auth-before-tool handling and schemas\
+      \ expected-red.\n  - W4 State portability: `internal/resofeed/state.go` defines\
+      \ minimal bundle/no sync/merge/receipts; fixtures cover state shapes; tests\
+      \ cover validate/import/export expected-red.\n  - W5 JSON summary/detail: `types.go`\
+      \ distinguishes ItemSummary vs ItemDetail; `json_contract_test.go` passes and\
+      \ proves summaries exclude detail-only fields while details include nullable/present\
+      \ fields.\n  - W6 Ranking/steering: `ranking.go` exposes guardrail-owned contracts;\
+      \ backend tests contain spec-derived expected-red guardrails and steering conflict\
+      \ receipts.\n  - W7 Frontend design/API: `web/src/lib/api-contract.ts` mirrors\
+      \ ItemSummary/ItemDetail; Svelte stubs cover owner token, first-use, feed, inspector,\
+      \ source ledger, portability, search; render tests are spec-derived expected-red.\n\
+      \  - W8 Build/bootstrap ownership: `web/package.json` scripts work after `npm\
+      \ ci`; frontend check/build pass; Go gofmt/build/focused JSON tests pass. No\
+      \ dead path blocking downstream implementation identified.\n- Escape hatch audit\
+      \ results:\n  - No `@invar:allow` found in Go or frontend source scans.\n- CLI\
+      \ Surface Preservation Protocol:\n  - Surface snapshot: `cmd/resofeed/main.go`\
+      \ is single binary entrypoint delegating to `resofeed.Main`; only `resofeed\
+      \ serve` is documented/allowed.\n  - CLI Executability Matrix:\n    - `resofeed\
+      \ serve`: Surface listed yes; handler exists as stub `Main`; `--help` does not\
+      \ work because `go run ./cmd/resofeed --help` exits 1 with TODO stub panic;\
+      \ status EXPECTED_STUB_DEBT.\n    - `migrate`/`worker`/`doctor`/`admin`/`sync`:\
+      \ explicitly forbidden; no handlers found; status PROVEN absent.\n  - Regression/dangling\
+      \ detection: no extra command handlers found. The only executable failure is\
+      \ contract stub debt, not non-stub drift.\n- Commands run and results:\n  -\
+      \ `test -z \"$(gofmt -l cmd internal)\"` — exit 0.\n  - `go build ./...` — exit\
+      \ 0.\n  - `go test ./internal/resofeed -run 'TestItem(SummaryJSONExcludesDetailOnlyFields|DetailJSONIncludesRequiredNullableDetailFields)$'\
+      \ -count=1` — exit 0.\n  - `go test ./...` — exit 1 EXPECTED_RED; failures only\
+      \ TODO contract stubs NewRouter/NewMCPHandler/OpenDB/ValidateStateBundle.\n\
+      \  - `go test -race ./...` — exit 1 EXPECTED_RED; same stub classes.\n  - `go\
+      \ run ./cmd/resofeed --help` — exit 1 EXPECTED_STUB_DEBT; panic through `resofeed.Main`\
+      \ TODO stub.\n  - `npm --prefix web ci` — exit 0.\n  - `npm --prefix web run\
+      \ check` — exit 0; svelte-check found 0 errors and 0 warnings.\n  - `npm --prefix\
+      \ web run build` — exit 0; Vite/SvelteKit static build completed.\n  - `npm\
+      \ --prefix web run test:render` — exit 1 EXPECTED_RED; Vitest v4.1.5 executed\
+      \ 8 tests, 7 failed/1 passed with expected implementation-gap failures.\n  -\
+      \ `git status --short --branch` after verification — clean worktree.\n- behavioral_proof_register:\n\
+      \  - Contract artifacts acceptance-only: PROVEN.\n  - Go JSON ItemSummary/ItemDetail\
+      \ split: PROVEN.\n  - Backend behavior implementation: EXPECTED_RED.\n  - Frontend\
+      \ behavior/render implementation: EXPECTED_RED.\n  - Frontend dependency bootstrap:\
+      \ PROVEN.\n  - CLI `--help` executability: EXPECTED_STUB_DEBT, non-blocking\
+      \ for this contract-only phase.\n  - No forbidden architecture/UI patterns:\
+      \ PROVEN.\n  - npm low vulnerabilities: non-intersecting.\n  - Vitest localstorage\
+      \ warning: non-intersecting.\n- headline: PASS_WITH_DEBT\n- proof_gap_status:\
+      \ NON_BLOCKING\n- blocking_status: CLOSED\n- gate_open_allowed: true\n- verdict:\
+      \ PASS\n- blockers: []\n- orchestrator_action_hint: COMPLETE\n- Gate decision\
+      \ basis: OPEN\n- Required remediation if BLOCKED: N/A. Non-blocking implementation-phase\
+      \ debt: replace Go TODO stubs, satisfy backend expected-red tests, implement\
+      \ frontend behavior to turn render tests green, and make CLI `--help`/`serve`\
+      \ executable without stub panic.\n\n## Headline\nOPEN"
   - id: contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
     name: Fix Go JSON contract shapes
     status: done
@@ -1069,7 +1178,7 @@ phases:
       \ on distinct summary/detail JSON contracts.\n\n## Headline\nPASS"
 - id: core-domain-implementation
   name: Core Domain Implementation
-  status: locked
+  status: pending
   gate: Core domain behavior is implemented with unit/contract tests green, spec conformance
     checked, and wiring audited before runtime/API work.
   depends_on:
@@ -2287,7 +2396,7 @@ phases:
     agent: gate-reviewer
 - id: frontend-implementation
   name: Frontend Implementation
-  status: locked
+  status: pending
   gate: Svelte UI implements DESIGN.md surfaces, owner-token prompt, first-use state,
     feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
   context: Implements responsive web/mobile UI from DESIGN.md against the documented
