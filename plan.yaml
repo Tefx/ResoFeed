@@ -30,6 +30,123 @@ phases:
   status: pending
   gate: Backend/frontend contracts, stubs, and expected-red tests define acceptance
     without shipping implementation logic.
+  steps:
+  - id: contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
+    name: Go runtime API MCP state contracts
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      agent_source: default
+
+
+      Create only acceptance-defining Go contract artifacts for the backend/runtime
+      surface. Read every ref first.
+
+
+      SPEC_REFS:
+
+      - docs/ARCHITECTURE.md §3 Backend Shape, §4 SQLite Shape, §5 Operation Contracts,
+      §6 HTTP Surface, §7 MCP Surface, §9 Minimal File Shape
+
+      - docs/PRD.md §§4-11, §15 acceptance criteria
+
+      - .agents/instructions.md project hard boundaries
+
+
+      TOUCH_PATHS:
+
+      - go.mod
+
+      - cmd/resofeed/main.go
+
+      - internal/resofeed/types.go
+
+      - internal/resofeed/db.go
+
+      - internal/resofeed/migrations.go
+
+      - internal/resofeed/state.go
+
+      - internal/resofeed/http.go
+
+      - internal/resofeed/mcp.go
+
+      - internal/resofeed/ranking.go
+
+      - internal/resofeed/search.go
+
+      - internal/resofeed/ingest.go
+
+      - internal/resofeed/gemini.go
+
+      - internal/resofeed/doctor.go
+
+
+      CONTRACT OUTPUTS ONLY:
+
+      - Go module/package skeleton
+
+      - exported/unexported structs matching canonical HTTP/MCP/state types
+
+      - function signatures/stubs for DB opening/migration, state export/import, ranking/search/steering,
+      HTTP router/server, MCP handler, ingest loop, Gemini JSON transform, doctor
+      output
+
+      - doc comments pinning the exact owner-token, JSON state bundle, query validation,
+      ranking guardrail, steering conflict, and MCP authorization contracts
+
+
+      DO NOT implement business logic. Stub bodies may use `panic("TODO")` or equivalent.
+      Do not introduce repositories, DI containers, service layers, sync/merge/conflict
+      components, vector DB/RAG, accounts, or per-agent registries.
+
+
+      authoritative_interface: docs define external contracts; Go internal signatures
+      are contract artifacts for downstream tests/implementation.
+
+      step_intent: contract_lock'
+    verification: '- Contract-only: no substantive business/runtime logic beyond stubs
+      and type/signature declarations
+
+      - Interfaces cover `resofeed serve`, HTTP API, MCP Streamable HTTP, SQLite/state
+      bundle, ranking/search/steering, ingest/Gemini/doctor seams
+
+      - No forbidden architecture appears: repositories, service layers, sync/merge/conflict
+      resolver, vector DB/RAG, account system, per-agent registry
+
+      - Existing docs remain canonical; no schema invented beyond documented contracts'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Evidence
+
+      - Files created/changed:
+
+      - Signatures/types/stubs added:
+
+      - Stub markers used:
+
+      - Confirmation no business/runtime logic was implemented:
+
+      - Forbidden architecture scan summary:
+
+      - Deviations from docs, if any:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: golang-developer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
