@@ -1187,6 +1187,13 @@ phases:
       ## Headline
 
       PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: golang-developer
   - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     name: Complete MCP Streamable HTTP surface
