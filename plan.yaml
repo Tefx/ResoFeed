@@ -2680,3 +2680,78 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.full-plan-verification-sweep
     agent: wiring-auditor
+  - id: finalization-docs-and-deep-review.final-spec-conformance-audit
+    name: Final spec conformance audit
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: default
+
+
+      Full-system adversarial conformance audit via spec-verifier.
+
+
+      SCOPE: Cross-cutting and integration-level requirements across docs/ARCHITECTURE.md,
+      docs/PRD.md, docs/DESIGN.md, docs/USAGE.md, and .agents/instructions.md.
+
+
+      Focus on:
+
+      - End-to-end behavioral claims spanning modules
+
+      - Cross-phase accumulated drift
+
+      - Runtime lifecycle contracts
+
+      - State portability active-state JSON model
+
+      - Owner-token auth/delegation
+
+      - Ranking/steering guardrails
+
+      - UI contract vs implementation
+
+
+      Do NOT re-verify per-phase items unless context changed. Focus on emergent properties.'
+    verification: '- Full evidence table with 7-verdict model, coverage summary, and
+      top risks
+
+      - Any DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND item has explicit closure path
+
+      - Final conformance recommendation supports or blocks final gate'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Full Spec Conformance Audit
+
+      - Requirements Register:
+
+      - Evidence Table:
+
+      - Coverage Summary:
+
+      - Top Risks:
+
+      - Closure paths:
+
+      - Recommendation:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.final-wiring-audit
+    agent: spec-verifier
