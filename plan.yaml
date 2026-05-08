@@ -2137,16 +2137,40 @@ phases:
 
       Review criteria:
 
-      1. All implementation steps completed with substantive logic, not stubs
+      1. All implementation/remediation steps completed with substantive logic, not
+      stubs.
 
-      2. Expected-red tests are now green or have explicit closure paths
+      2. Expected-red tests are now green or have explicit closure paths.
 
-      3. Wiring audit has no blocking orphan/stub/forbidden-pattern findings
+      3. Wiring audit has no blocking orphan/stub/forbidden-pattern findings for core-domain-owned
+      behavior.
 
-      4. Spec conformance has no unresolved blocker-class divergence
+      4. Spec conformance has no unresolved blocker-class divergence for core-domain-owned
+      behavior.
 
-      5. No forbidden architecture: sync server, state merger, conflict resolver,
-      vector/RAG, repositories/service layer, per-agent registry
+      5. Runtime/API phase-owned debt is classified precisely as EXPECTED_STUB_DEBT
+      with downstream owner steps and non-intersection rationale; core gate must not
+      block solely on `cmd/resofeed/main.go`, `resofeed.Main`, HTTP/MCP handlers,
+      `ServeConfig`, or serve lifecycle stubs.
+
+      6. No forbidden architecture: sync server, state merger, conflict resolver,
+      vector/RAG, repositories/service layer, per-agent registry/accounts.
+
+
+      Core-owned behavior that MUST be closed before OPEN:
+
+      - ExportState export-time semantics.
+
+      - Gemini value tier or equivalent priority category persistence.
+
+      - Active steering effects on ranking plus human-vs-agent precedence proof.
+
+      - FTS freshness/provenance after ingest/import.
+
+      - Duplicate/grouped original retrievability at core level or precise runtime
+      owner with core proof.
+
+      - Core doctor raw diagnostics/snapshot behavior for RSS/Gemini/extraction failures.
 
 
       review_depth: THOROUGH
@@ -2157,22 +2181,37 @@ phases:
 
       - phase defines behavior that downstream runtime/API/MCP gates rely on
 
+      - prior concurrent verification failures exposed spec, wiring, and test-scope
+      drift
+
 
       Gate decision basis must map requirement refs, evidence refs, unresolved statuses,
-      and OPEN/BLOCK recommendation.'
+      runtime-owned expected stub debt, and OPEN/BLOCK recommendation.'
     verification: phase-check protecting Runtime API and MCP Integration. Gate may
       OPEN only when core behavior evidence is specific, blockers are closed, and
       unresolved behavioral obligations are PROVEN or have explicit non-intersection/closure
-      paths.
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      paths. Runtime/API phase-owned stubs may be non-blocking only when each is labeled
+      EXPECTED_STUB_DEBT with a named downstream owner and no hidden core-domain behavior
+      gap.
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: core-domain-implementation\n**Timestamp**:\
+      \ <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each ref in this\
       \ step:\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\n\
       - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md\
-      \ — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or\
-      \ \"NOT READ: <reason>\"\n\n## Gate Review Report\n- Step evidence quality table:\n\
-      - Issues identified:\n- Gate Decision Basis:\n  - requirement/proof-obligation\
-      \ refs:\n  - evidence refs reviewed:\n  - unresolved statuses:\n  - OPEN/BLOCK\
-      \ recommendation:\n- Required remediation if BLOCKED:\n\n## Headline\nOPEN |\
-      \ BLOCKED"
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN_VISION.md — key passage or \"NOT READ:\
+      \ <reason>\"\n- docs/USAGE.md — key passage or \"NOT READ: <reason>\"\n\nIf\
+      \ no refs were provided, state: \"No refs for this step.\"\n\n### Execution\
+      \ Review\n| Step ID | Status | Evidence Quality | Concerns |\n|---|---|---|---|\n\
+      \n### Core Blocker Closure Matrix\n| Blocker | Evidence ref | Status | Gate\
+      \ decision basis |\n|---|---|---|---|\n| doctor diagnostics | | PROVEN/OPEN\
+      \ | |\n| exported_at | | PROVEN/OPEN | |\n| value tier persistence | | PROVEN/OPEN\
+      \ | |\n| steering ranking/precedence | | PROVEN/OPEN | |\n| FTS freshness/provenance\
+      \ | | PROVEN/OPEN | |\n| duplicate retrievability | | PROVEN/OPEN | |\n\n###\
+      \ Runtime-Owned Expected Stub Debt\n| Debt | Owner step | Non-intersection evidence\
+      \ | Accepted? |\n|---|---|---|---|\n\n### Gate Decision\n- [ ] OPEN: Phase passes\
+      \ gate, proceed to runtime/API/MCP integration\n- [ ] BLOCKED: Core-domain issues\
+      \ must be resolved before proceeding\n  - Blocking issues:\n  - Required actions:"
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -2184,6 +2223,7 @@ phases:
     - core-domain-implementation.core-green-retest
     - core-domain-implementation.core-wiring-audit
     - core-domain-implementation.core-spec-conformance
+    - fix-core-domain-verification-blockers
     agent: gate-reviewer
   - id: fix-core-domain-verification-blockers
     name: Fix core domain verification blockers
