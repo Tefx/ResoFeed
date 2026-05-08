@@ -1940,6 +1940,76 @@ phases:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     agent: uiux-auditor
+  - id: frontend-implementation.frontend-spec-conformance
+    name: Frontend spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Spec conformance verification for frontend implementation. SCOPE: DESIGN.md
+      contract, Architecture frontend boundary, Usage examples consumed by UI/API
+      client.
+
+
+      This is NOT just screenshots or tests passing. For each UI/UX/API-client requirement,
+      cite spec section and implementation file/component.
+
+
+      Focus areas:
+
+      - owner-token prompt before API calls
+
+      - first-use empty state
+
+      - active-state portability only
+
+      - no forbidden UI patterns
+
+      - API client header/error handling
+
+      - rendered surface coverage'
+    verification: '- Requirements register covers DESIGN.md components and Architecture
+      §8 frontend boundary
+
+      - Evidence table maps docs requirements to component/test artifacts
+
+      - No blocker-class divergence or untested required surface remains without closure
+      path'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Spec Conformance Report
+
+      - Requirements Register:
+
+      - Evidence Table:
+
+      - Coverage Summary:
+
+      - Top Risks:
+
+      - Suggested Tests:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
+    - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
+    agent: spec-verifier
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
