@@ -150,6 +150,9 @@ phases:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
     - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: golang-developer
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
