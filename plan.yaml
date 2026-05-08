@@ -33,7 +33,7 @@ phases:
   steps:
   - id: contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
     name: Go runtime API MCP state contracts
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -156,6 +156,68 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-08T21:46:24.449247+00:00'
+    done_at: '2026-05-08T21:55:21.924812+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Read by golang-developer. Key passage: one Go binary, one SQLite+FTS5 store,\
+      \ Gemini as JSON transformer only, flat internal/resofeed file shape, owner\
+      \ token as universal auth boundary, no vector/RAG/accounts/per-agent registry/sync.\n\
+      - docs/ARCHITECTURE.md — Read. Key passage: `resofeed serve` is the single process;\
+      \ SQLite current-state schema; owner-token behavior; strict HTTP query validation;\
+      \ MCP Streamable HTTP at `/mcp`; state bundle is only active sources, active\
+      \ steering rules, resonated items; minimal file shape matches this step.\n-\
+      \ docs/PRD.md — Read. Key passage: Inspect, Resonate, and Steer primitives;\
+      \ freshness before hoarding; human authority over agents; agent mutation idempotency;\
+      \ state portability; `/doctor` plain-text diagnostics.\n- docs/DESIGN.md — Read.\
+      \ Key passage: owner-token prompt before API calls, flat Source Ledger, terse\
+      \ state export/import, raw `/doctor`, no settings dashboard/activity ledger/folders/tags/unread/archive\
+      \ flows.\n- docs/DESIGN_VISION.md — Read. Key passage: analyst workbench, high-density\
+      \ low-fatigue, no account/onboarding, no paternalistic source suppression, MCP\
+      \ agent handoff within same feed concepts.\n- docs/USAGE.md — Read. Key passage:\
+      \ build/run `resofeed serve`, owner-token startup behavior, HTTP endpoints,\
+      \ MCP resources/tools, lexical search, state export/import, `/doctor`.\n\n##\
+      \ Contract Evidence\n- Commit hash(es):\n  - Worker branch: 0107c33 contract:\
+      \ add backend Go surface skeleton\n  - Main squash merge: 58c934a\n- Files created/changed:\n\
+      \  - go.mod\n  - cmd/resofeed/main.go\n  - internal/resofeed/types.go\n  - internal/resofeed/db.go\n\
+      \  - internal/resofeed/migrations.go\n  - internal/resofeed/state.go\n  - internal/resofeed/http.go\n\
+      \  - internal/resofeed/mcp.go\n  - internal/resofeed/ranking.go\n  - internal/resofeed/search.go\n\
+      \  - internal/resofeed/ingest.go\n  - internal/resofeed/gemini.go\n  - internal/resofeed/doctor.go\n\
+      - Signatures/types/stubs added:\n  - CLI/runtime: Main, ServeConfig, OpenDB,\
+      \ ResolveOwnerToken, RunMigrations, Migrations.\n  - State: StateBundle, SourceState,\
+      \ SteerRuleState, ResonatedItemState, ExportState, ImportState, ValidateStateBundle.\n\
+      \  - HTTP: HTTPServerConfig, NewRouter, ServeHTTPRuntime, response envelope\
+      \ types.\n  - MCP: MCPConfig, NewMCPHandler, MCP tool input types, ListCandidateItemsForMCP,\
+      \ SearchItemsForMCP, ReadItemForMCP, MarkInspectedForMCP, ResonateItemForMCP,\
+      \ SteerForMCP, ReportDeliveryForMCP.\n  - Ranking/search/steering: RankingOptions,\
+      \ ListTodayFeed, ApplySteering, MarkItemInspected, SetItemResonance, SearchQuery,\
+      \ SearchItems, RebuildSearchIndex.\n  - Ingest/Gemini/doctor: IngestConfig,\
+      \ RunIngestLoop, IngestOnce, ImportOPML, DeleteSource, GeminiClient, Gemini\
+      \ transform types, WriteDoctor, ReadDoctorSnapshot.\n  - Canonical shared structs:\
+      \ Source, Item/ItemSummary/ItemDetail, ItemState, SteerRule, Provenance, ErrorBody,\
+      \ SearchQueryEcho, mutation request/result types.\n- Stub markers used:\n  -\
+      \ 31 `panic(\"TODO contract stub: ...\")` markers, intentionally contract-only\
+      \ per step allowance.\n- Confirmation no business/runtime logic was implemented:\n\
+      \  - All behavior-bearing functions are stubs only. Added type declarations,\
+      \ signatures, constants, and doc comments pinning contracts. No SQL bodies,\
+      \ HTTP routing logic, MCP protocol logic, ranking/search algorithms, Gemini\
+      \ calls, or ingest loops implemented.\n- Forbidden architecture scan summary:\n\
+      \  - Go file scan found repository/service layer/sync/merge/conflict/vector/embedding/RAG/account/per-agent\
+      \ registry/DI/event bus matches only in contract-prohibitive doc comments, not\
+      \ implementations. No repositories, DI containers, service layers, sync/merge/conflict\
+      \ resolver, vector DB/RAG implementation, account system, or per-agent registry\
+      \ added.\n- Verification commands and output:\n  - Worker branch: `gofmt -w\
+      \ ... && go test ./...` — exit 0; packages had no test files.\n  - Worker branch:\
+      \ `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-contract-check\
+      \ ./cmd/resofeed && go test -race ./...` — exit 0; packages had no test files.\n\
+      \  - Worker branch: `golangci-lint run ./...` — exit 0; 0 issues.\n  - Mainline\
+      \ final-state: `test -z \"$(gofmt -l cmd internal)\"` — exit 0; no unformatted\
+      \ Go files reported.\n  - Mainline final-state: `go test ./...` — exit 0; `resofeed/cmd/resofeed`\
+      \ and `resofeed/internal/resofeed` had no test files.\n  - Mainline final-state:\
+      \ `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-contract-check\
+      \ ./cmd/resofeed` — exit 0.\n  - Mainline final-state: `go test -race ./...`\
+      \ — exit 0; packages had no test files.\n  - Mainline final-state: `golangci-lint\
+      \ run ./...` — exit 0; 0 issues.\n- Gaps/Notes:\n  - This is intentionally acceptance-defining\
+      \ contract foundation only; expected downstream red tests should fail until\
+      \ runtime logic replaces stubs.\n\n## Headline\nPASS"
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
     status: done
