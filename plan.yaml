@@ -2600,9 +2600,9 @@ phases:
       tags: [integration]
 
 
-      Fill in stub bodies in `cmd/resofeed/main.go`, `internal/resofeed/doctor.go`,
-      and runtime lifecycle wiring per the contract. This step depends on HTTP and
-      MCP implementations inside this phase.
+      Fill in stub bodies in `cmd/resofeed/main.go` and runtime lifecycle wiring per
+      the contract. This step depends on HTTP and MCP implementations inside this
+      phase and consumes core-domain doctor diagnostics implemented by `fix-core-domain-verification-blockers`.
 
 
       UPSTREAM ARTIFACTS:
@@ -2611,17 +2611,34 @@ phases:
 
       - HTTP/MCP handlers from sibling runtime steps
 
+      - Core-domain functions from `core-domain-implementation`, including doctor
+      snapshot/raw diagnostics if completed by `fix-core-domain-verification-blockers`
+
 
       YOUR SCOPE: `resofeed serve` flag parsing, required Gemini config validation,
       SQLite open/migrate, owner-token resolution/generation/storage/printing, HTTP
       static/API server startup, MCP endpoint mounting, background ingest loop start
-      after storage, graceful shutdown.
+      after storage, graceful shutdown, and wiring `/doctor` through the runtime entrypoint
+      to the core doctor diagnostic functions.
+
+
+      Runtime ownership clarification:
+
+      - This step owns `cmd/resofeed/main.go`, `resofeed.Main`, `ServeConfig` runtime
+      consumption, process lifecycle, and end-to-end server startup.
+
+      - It does NOT own inventing core doctor diagnostic semantics; it must wire and
+      expose the core diagnostic functions completed in the core phase.
+
+      - If any core doctor function is still a panic/TODO after the core phase, report
+      it as an upstream core blocker rather than replacing it with a runtime-only
+      stub.
 
 
       Runtime Surface Preservation:
 
-      - `server`, `CLI`, `MCP`, `HTTP API`, static UI, and background ingest are runnable
-      surfaces, not handler-only code.
+      - `server`, `CLI`, `MCP`, `HTTP API`, static UI, `/doctor`, and background ingest
+      are runnable surfaces, not handler-only code.
 
       - Must identify exact launch command and prove startup path.
 
@@ -2634,18 +2651,26 @@ phases:
 
 
       Out-of-scope: frontend rendering implementation, deployment packaging beyond
-      local binary.'
-    verification: '- `go build -o ./bin/resofeed ./cmd/resofeed` succeeds
+      local binary, core-domain state/ranking/search/doctor diagnostic semantics already
+      owned by core-domain steps.'
+    verification: '- `go build -o ./bin/resofeed ./cmd/resofeed` succeeds.
 
       - Launch command starts server with DB and Gemini config; missing Gemini config
-      fails deterministically
+      fails deterministically.
 
-      - First-run owner-token generation/reuse behavior matches docs
+      - First-run owner-token generation/reuse behavior matches docs.
 
-      - HTTP API and MCP endpoint are mounted through real entrypoint
+      - HTTP API, MCP endpoint, static UI, background ingest loop, and `/doctor` are
+      mounted through the real entrypoint.
 
-      - Evidence includes startup command/output and shutdown behavior'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      - Evidence includes startup command/output and shutdown behavior.
+
+      - Runtime wiring uses real core-domain functions; any remaining core-domain
+      panic/TODO is reported as upstream core debt, not masked by a runtime stub.'
+    evidence_template: '## Runtime Lifecycle Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -2653,29 +2678,52 @@ phases:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
       - docs/USAGE.md — key passage or "NOT READ: <reason>"
 
 
-      ## Runtime Evidence
-
-      - Build command/output:
-
-      - Launch command/output:
-
-      - Entrypoint path identified:
-
-      - Owner-token proof:
-
-      - HTTP/MCP mount proof:
-
-      - Shutdown proof:
-
-      - Deviations record:
+      If no refs were provided, state: "No refs for this step."
 
 
-      ## Headline
+      **Launch command**:
 
-      PASS | PASS_WITH_DEBT | FAIL'
+      ```
+
+      <exact command>
+
+      ```
+
+
+      **Startup/shutdown output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      **Runtime paths wired**:
+
+      - CLI/main:
+
+      - HTTP API:
+
+      - MCP:
+
+      - Static UI:
+
+      - Background ingest:
+
+      - /doctor core diagnostics:
+
+
+      **Remaining stubs**: <none or justified with owner>'
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
