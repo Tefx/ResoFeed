@@ -800,6 +800,144 @@ phases:
     - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     - contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
     agent: gate-reviewer
+  - id: contract-foundation-and-expected-red-tests.fix-go-json-contract-shapes
+    name: Fix Go JSON contract shapes
+    status: pending
+    description: 'step_type: contract/test remediation
+
+      agent_source: default
+
+
+      Batched remediation for foundation gate blocker B1 (Go contract drift). This
+      is a CONTRACT/TEST-ONLY remediation step before implementation begins.
+
+
+      Scope: internal/resofeed/types.go and focused Go JSON contract tests only. Do
+      NOT implement DB, HTTP handlers, MCP handlers, ranking, ingest, state persistence,
+      or business behavior. Do NOT make downstream implementation decisions beyond
+      public JSON contract shape.
+
+
+      Required contract corrections:
+
+      - Split Go ItemSummary and ItemDetail into exact canonical structs instead of
+      aliasing both to Item.
+
+      - Ensure detail-only fields are present with required nullable semantics according
+      to docs/ARCHITECTURE.md: feed_excerpt, extracted_text, and provenance must be
+      represented in detail responses as documented, including present/null behavior
+      where values are unavailable.
+
+      - Remove `omitempty` from required nullable detail fields, or otherwise prove
+      JSON output includes required keys with null/present semantics.
+
+      - Preserve the distinction between list/search/MCP summary surfaces and detail
+      surfaces: summary JSON must not leak detail-only fields; detail JSON must include
+      the detail-only contract fields.
+
+      - Add or adjust focused Go JSON contract tests that assert summary excludes
+      detail-only fields and detail includes feed_excerpt/extracted_text/provenance
+      with the documented null/present semantics.
+
+      - Preserve existing expected-red backend tests as implementation-gap exposure:
+      they should still fail only on implementation stubs, not because public JSON
+      contracts are underspecified or drifting.
+
+
+      Failure-mode checklist:
+
+      - Summary vs detail shape drift: verify list/search/MCP summary encoders cannot
+      emit detail-only keys.
+
+      - Nullable required fields: verify required detail keys remain present even
+      when source values are unavailable.
+
+      - Stub boundary: keep contract/test artifacts acceptance-defining only; no runtime/product
+      behavior implementation.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a CONTRACT/TEST REMEDIATION step. Stub-only completion is acceptable
+      only where the artifact is explicitly a contract stub; the JSON contract structs
+      and tests must be concrete enough for downstream implementers to follow without
+      inventing public response shape.'
+    verification: '- gofmt applied to touched Go files.
+
+      - `go build ./...` completes far enough to prove contract/test edits compile,
+      or any remaining failure is documented as existing contract-stub debt unrelated
+      to JSON shape drift.
+
+      - Focused Go JSON contract test passes and proves: summary excludes feed_excerpt/extracted_text/provenance;
+      detail includes feed_excerpt/extracted_text/provenance with required nullable/present
+      semantics.
+
+      - Existing expected-red backend contract tests remain expected-red only on implementation
+      stubs; no failure is caused by ambiguous ItemSummary/ItemDetail JSON contracts.
+
+      - Evidence includes exact commands and outputs, plus file:line references for
+      the corrected structs/tests.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage defining ItemSummary/ItemDetail JSON semantics
+      or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract/Test Remediation Evidence
+
+
+      **Files changed**:
+
+      - <file:line summary>
+
+
+      **JSON contract proof**:
+
+      - Summary shape excludes detail-only fields: <test name/output>
+
+      - Detail shape includes required nullable fields: <test name/output>
+
+
+      **Commands executed**:
+
+      ```sh
+
+      <gofmt command>
+
+      <go build ./... command/output>
+
+      <focused JSON contract test command/output>
+
+      <expected-red backend test command/output>
+
+      ```
+
+
+      **Expected-red preservation**:
+
+      - Existing backend expected-red tests fail only on implementation stubs: <yes/no
+      with output excerpt>
+
+
+      **Out-of-scope confirmation**:
+
+      - No DB/HTTP/MCP/ranking/business implementation added: <yes/no with file summary>'
+    depends_on:
+    - contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
+    - contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
+    agent: golang-developer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
