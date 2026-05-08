@@ -1763,7 +1763,7 @@ phases:
     agent: wiring-auditor
   - id: core-domain-implementation.core-spec-conformance
     name: Core spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -1837,6 +1837,8 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-08T22:27:07.977661+00:00'
   - id: core-domain-implementation.core-domain-gate
     name: Core domain gate
     status: pending
