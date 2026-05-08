@@ -1613,37 +1613,84 @@ phases:
 
       agent_source: default
 
+      runtime_owned_debt_policy: EXPECTED_STUB_DEBT for `cmd/resofeed/main.go`, `resofeed.Main`,
+      `NewRouter`, `NewMCPHandler`, HTTP/MCP handler stubs, `ServeConfig` runtime
+      consumption, and serve lifecycle until runtime-api-and-mcp-integration.
 
-      As an INDEPENDENT TESTER, validate core-domain behavior after implementation
+
+      As an INDEPENDENT TESTER, validate core-domain behavior after the batched remediation
       from a fresh perspective.
 
 
-      Verification scope: local-check / phase-check protecting runtime API/MCP and
-      frontend integration gates.
+      Verification scope: phase-check protecting runtime API/MCP and frontend integration
+      gates.
 
 
-      Test for:
+      Core-owned blockers to retest:
 
-      - DB migrations/runtime metadata/state backup-restore
+      - DB migrations/runtime metadata/state backup-restore, including `ExportState.exported_at`
+      as export creation time.
 
-      - ingestion/Gemini transform/status failures
+      - ingestion/Gemini transform/status failures, including persisted `ValueTier`
+      or equivalent priority category.
 
-      - ranking/search/steering guardrails
+      - ranking/search/steering guardrails, including active steering effects and
+      human-vs-agent precedence proof.
 
-      - no forbidden architecture patterns
+      - FTS freshness/provenance after ingest/import.
+
+      - duplicate/grouped original retrievability at core store/detail/provenance
+      level.
+
+      - core doctor snapshot/raw diagnostics for RSS/Gemini/extraction failures; `/doctor`
+      HTTP exposure itself is runtime-owned.
+
+      - no forbidden architecture patterns.
 
 
-      Finding issues is a successful verification outcome; document blockers precisely.'
-    verification: '- `go test ./...` or targeted Go test commands for core package
-      pass with expected-red tests now green
+      Runtime/API debt classification:
 
-      - Evidence includes actual command output, not summary only
+      - Do NOT classify downstream runtime/API phase stubs as core blockers when the
+      only failing path is `cmd/resofeed/main.go`, `resofeed.Main`, `NewRouter`, `NewMCPHandler`,
+      HTTP/MCP route registration, `ServeConfig` consumption, or serve lifecycle.
 
-      - Failure path coverage includes invalid state import, query/search boundary
-      cases, model/fetch errors, and steering conflicts
+      - DO classify any `internal/resofeed` core-domain panic/TODO/stub as blocking
+      when it affects state, ingestion, ranking, search, steering, provenance/detail,
+      or core doctor diagnostics.
 
-      - Behavioral proof register records PROVEN/NEEDS_TEST status for core obligations'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      Finding issues is a successful verification outcome; document blockers precisely
+      with provenance and disposition.'
+    verification: '- Targeted core-domain Go tests pass with expected-red tests now
+      green for state export/import, ingest/value tier persistence, ranking/steering,
+      FTS freshness/provenance, duplicate retrievability, and core doctor diagnostics.
+
+      - `go test ./...` result is reported, but failures solely from EXPECTED_STUB_DEBT
+      in downstream runtime/API surfaces (`cmd/resofeed/main.go`, `NewRouter`, `NewMCPHandler`,
+      HTTP/MCP/serve lifecycle) are classified as non-blocking for this core phase
+      and mapped to runtime owner steps.
+
+      - Evidence includes actual command output, not summary only.
+
+      - Failure path coverage includes invalid state import, export timestamp reuse
+      prevention, query/search boundary cases, model/fetch/extraction errors, FTS
+      stale-index prevention, and steering conflicts/precedence.
+
+      - Behavioral proof register records PROVEN/NEEDS_TEST status for core obligations
+      and explicit non-intersection/owner mapping for runtime-owned stubs.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Core domain retest after batched remediation
+
+      **Independence Level**: L1
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -1653,32 +1700,72 @@ phases:
 
       - docs/PRD.md — key passage or "NOT READ: <reason>"
 
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
       - docs/USAGE.md — key passage or "NOT READ: <reason>"
 
 
-      ## Verification Report
+      If no refs were provided, state: "No refs for this step."
 
-      - Tester: integration-verifier
 
-      - Scope: core domain
-
-      - Independence Level: L2
+      ### Test Execution
 
       - Commands executed:
 
-      - Actual output:
+      ```
 
-      - Issues found:
+      <paste actual commands>
 
-      - Behavioral proof register: requirement_ref | behavior_claim | runtime_proof_expected
-      | evidence_ref | status | closure_path | gate_decision_basis
+      ```
 
-      - Coverage not tested and why:
+      - Output summary:
+
+      ```
+
+      <paste output, including targeted tests and broad go test ./... if run>
+
+      ```
 
 
-      ## Headline
+      ### Runtime-Owned Debt Classification
 
-      PASS | PASS_WITH_DEBT | FAIL'
+      | Finding | Core blocker? | Runtime owner step | Rationale |
+
+      |---|---:|---|---|
+
+      | <cmd/main/http/mcp/serve stub> | no | runtime-api-and-mcp-integration.<step>
+      | EXPECTED_STUB_DEBT for runtime phase |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | <ref> | <claim> | <proof> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path>
+      | OPEN/BLOCK basis |
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction | Disposition |
+
+      |---|---|---|---|---|
+
+      | blocker | <issue> | <file:line> | <steps> | blocking-now |
+
+
+      ### Headline
+
+      - [ ] PASS: No blocking core-domain issues found
+
+      - [ ] PASS_WITH_DEBT: Only explicitly runtime-owned non-blocking debt remains
+
+      - [ ] FAIL: Blocking core issue or unowned proof gap remains'
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -1690,6 +1777,7 @@ phases:
     - core-domain-implementation.complete-sqlite-state-and-restore-logic
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
+    - fix-core-domain-verification-blockers
     agent: integration-verifier
   - id: core-domain-implementation.core-wiring-audit
     name: Core wiring audit
