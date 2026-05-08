@@ -2388,6 +2388,84 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: spec-verifier
+  - id: end-to-end-integration.end-to-end-gate
+    name: End to end gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, assess whether the full implemented product is ready
+      for finalization.
+
+
+      Review criteria:
+
+      - Real system end-to-end proof has actual commands/output and no boundary stubs
+
+      - Black-box acceptance has no unresolved blockers
+
+      - Wiring audit confirms all documented routes/tools/UI paths are reachable
+
+      - Spec conformance has no blocker-class cross-surface drift
+
+      - Behavioral proof register supports OPEN/BLOCK decision for remaining gates
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - runtime liveness and real entrypoint paths
+
+      - HTTP/MCP parity
+
+      - DESIGN.md rendered fidelity
+
+      - active-state portability
+
+      - no sync/merge/history/account/RAG drift'
+    verification: phase-check protecting finalization. Gate may OPEN only when full-system
+      evidence is specific, runtime/UI/MCP paths are real, and all blocker-class behavioral
+      obligations are PROVEN or have explicit closure paths.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      - Evidence quality table:
+
+      - Cross-surface issues:
+
+      - Behavioral proof decision basis:
+
+      - OPEN/BLOCK recommendation:
+
+      - Required remediation if BLOCKED:
+
+
+      ## Headline
+
+      OPEN | BLOCKED'
+    depends_on:
+    - end-to-end-integration.real-system-end-to-end-proof
+    - end-to-end-integration.black-box-acceptance-pass
+    - end-to-end-integration.end-to-end-wiring-audit
+    - end-to-end-integration.end-to-end-spec-conformance
+    agent: gate-reviewer
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
