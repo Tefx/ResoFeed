@@ -1604,7 +1604,7 @@ phases:
       \ stubs intentionally untouched.\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-green-retest
     name: Core green retest
-    status: claimed
+    status: pending
     description: 'step_type: test
 
       step_intent: retest_green
@@ -1691,8 +1691,6 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: integration-verifier
-    claimed_by: integration-verifier
-    claimed_at: '2026-05-08T22:27:04.722629+00:00'
   - id: core-domain-implementation.core-wiring-audit
     name: Core wiring audit
     status: claimed
