@@ -1085,6 +1085,13 @@ phases:
       \ refs:\n  - evidence refs reviewed:\n  - unresolved statuses:\n  - OPEN/BLOCK\
       \ recommendation:\n- Required remediation if BLOCKED:\n\n## Headline\nOPEN |\
       \ BLOCKED"
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     depends_on:
     - core-domain-implementation.core-green-retest
     - core-domain-implementation.core-wiring-audit
