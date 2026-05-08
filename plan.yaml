@@ -24,3 +24,9 @@ project_guidance: All implementation agents must begin by reading `.agents/instr
   boundary, active-state JSON backup/restore model, and DESIGN.md UI contract. Do
   not introduce sync/merge engines, vector DBs/RAG, account systems, repositories/service
   layers, event buses, settings dashboards, or UI patterns forbidden by the docs.
+phases:
+- id: contract-foundation-and-expected-red-tests
+  name: Contract Foundation and Expected-Red Tests
+  status: pending
+  gate: Backend/frontend contracts, stubs, and expected-red tests define acceptance
+    without shipping implementation logic.
