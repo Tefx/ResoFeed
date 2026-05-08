@@ -330,6 +330,89 @@ phases:
     depends_on:
     - contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
     agent: golang-developer
+  - id: contract-foundation-and-expected-red-tests.frontend-expected-red-rendering-tests
+    name: Frontend expected red rendering tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: default
+
+
+      Define frontend tests that expose missing rendering/interaction before implementation.
+      Tests must be limited to web tests plus minimal fixtures/helpers. Read refs
+      first.
+
+
+      SPEC_REFS:
+
+      - docs/DESIGN.md component contracts and front matter tokens
+
+      - docs/ARCHITECTURE.md §8 Frontend Boundary and §6 API schemas
+
+      - docs/USAGE.md first-use/API examples
+
+
+      TOUCH_PATHS:
+
+      - web test harness files
+
+      - component test files for Owner Token Prompt, First-Use Empty State, Feed/Inspector,
+      Source Ledger, State Portability warning, Search/Retrieval
+
+      - visual/DOM fixture snapshots
+
+
+      Frontend Rendering Completeness: tests must render components and assert visible
+      DOM or test-renderer output. Data-only view-model tests are insufficient.
+
+
+      Expected red is success before implementation: evidence must list exposed gaps
+      and must not modify product UI logic.'
+    verification: '- Tests render owner-token prompt, first-use empty state, state
+      import warning, feed row, inspector, source ledger, and search surfaces
+
+      - Tests assert accessibility roles/names/live-region behavior and visible text,
+      not just type correctness
+
+      - Expected failures/exposed gaps are documented before implementation
+
+      - Product UI logic is not implemented in this test step'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/changed:
+
+      - Rendered states covered:
+
+      - Spec-derived fixtures/copy and cited sections:
+
+      - Commands run, if any:
+
+      - Expected failures or exposed gaps:
+
+      - Product code changes (must be none or justified):
+
+
+      ## Headline
+
+      PASS_EXPECTED_RED | FAIL'
+    depends_on:
+    - contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
+    agent: frontend-engineer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
