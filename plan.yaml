@@ -59,7 +59,11 @@ phases:
   status: locked
   gate: Full vertical behavior works through real CLI/server/API/MCP/UI paths with
     no stubs and no mock-only seam evidence.
+  context: System-level fan-in after backend/runtime/frontend phases. Verifies real
+    entrypoints, state roundtrip, MCP parity, UI rendered behavior, and black-box
+    liveness.
   depends_on:
+  - runtime-api-and-mcp-integration
   - frontend-implementation
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
