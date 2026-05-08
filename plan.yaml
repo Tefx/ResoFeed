@@ -245,6 +245,91 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: frontend-engineer
+  - id: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
+    name: Backend expected red contract tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: default
+
+
+      Define backend tests that expose missing implementation before product code
+      exists. Tests must be limited to tests/ plus minimal fixtures/helpers. Read
+      refs first.
+
+
+      SPEC_REFS:
+
+      - docs/ARCHITECTURE.md §§5-7, §10
+
+      - docs/PRD.md §15
+
+      - docs/USAGE.md HTTP Command Reference
+
+
+      TOUCH_PATHS:
+
+      - tests/go or internal/resofeed/*_test.go as appropriate for Go
+
+      - test fixtures for HTTP errors, query validation, state bundle import/export,
+      ranking guardrails, steering conflict receipts, MCP schema/auth
+
+
+      Spec-Fixture Conformance (MANDATORY): fixtures must use exact documented JSON
+      formats from docs/ARCHITECTURE.md and docs/USAGE.md, including minimal state
+      bundles without convenience fields.
+
+
+      Expected red is success before implementation: evidence must list exposed gaps
+      and must not modify product logic.'
+    verification: '- Tests cover owner-token auth, /api/feed/today and /api/search
+      query validation, standard error body, state bundle validation/restore replacement,
+      ranking guardrails, steering conflict receipts, MCP auth/tool schemas
+
+      - Tests are expected to fail or be skipped with explicit exposed gaps before
+      implementation
+
+      - Product code changes are limited to fixtures/build glue only if unavoidable;
+      no business logic
+
+      - Evidence includes expected_failures/exposed_gaps and downstream implementation
+      owners'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/changed:
+
+      - Spec-derived fixtures and cited sections:
+
+      - Commands run, if any:
+
+      - Expected failures or exposed gaps:
+
+      - Product code changes (must be none or justified):
+
+      - Downstream implementation steps expected to turn green:
+
+
+      ## Headline
+
+      PASS_EXPECTED_RED | FAIL'
+    depends_on:
+    - contract-foundation-and-expected-red-tests.go-runtime-api-mcp-state-contracts
+    agent: golang-developer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
