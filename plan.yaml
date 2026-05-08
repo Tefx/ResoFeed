@@ -2755,3 +2755,66 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
     agent: spec-verifier
+  - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
+    name: Final architecture and concurrency review
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: default
+
+
+      Review module boundaries, dependency direction, runtime lifecycle, and concurrency/state
+      safety.
+
+
+      Specifically check:
+
+      - Single Go binary, flat `internal/resofeed` file shape, no repositories/service
+      layers/event bus
+
+      - SQLite transaction safety for mutations and state restore
+
+      - Background ingest loop lifecycle and shutdown
+
+      - Module-level mutable state/concurrency protection
+
+      - Runtime owner-token metadata isolation
+
+      - No sync/merge/conflict resolver or vector/RAG architecture
+
+
+      This is a read-only review; findings should be blocker/should_fix/suggestion
+      with remediation paths.'
+    verification: '- Evidence reviews code and docs for architecture conformance,
+      concurrency safety, and forbidden abstractions
+
+      - Any blocker-class issue has remediation owner/path before final gate opens
+
+      - PASS/PASS_WITH_DEBT/FAIL headline included'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Architecture Review Report
+
+      - Boundary review:
+
+      - Dependency direction review:
+
+      - Runtime/concurrency review:
+
+      - Forbidden abstraction scan:
+
+      - Issues and severity:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.final-wiring-audit
+    agent: software-architect
