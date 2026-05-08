@@ -37,7 +37,7 @@ ResoFeed is not a generic AI news digest detached from user-owned sources.
 
 ResoFeed is a personal intelligence stream built on user-controlled RSS sources, trustworthy compression, durable memory, and natural-language steering.
 
-The reason to switch from a conventional RSS reader or AI digest is that ResoFeed combines user-owned sources, efficient daily review, trustworthy summaries, durable semantic memory, and plain-language correction in one minimal loop.
+The reason to switch from a conventional RSS reader or AI digest is that ResoFeed combines user-owned sources, efficient daily review, trustworthy summaries, durable memory, and plain-language correction in one minimal loop.
 
 ## 2. Target Users and Core Workflows
 
@@ -47,7 +47,7 @@ The primary user is a human who reads RSS-derived intelligence across multiple c
 
 - lightweight mobile review during commute or downtime;
 - focused desktop review at the start of a work session;
-- later semantic retrieval when looking for a remembered article or topic.
+- later retrieval when looking for a remembered article or topic.
 
 ### 2.2 Delegated agents
 
@@ -154,7 +154,7 @@ The product is a single-user tool, not a multi-tenant SaaS. There is no account 
 
 ### 4.8 Complete State Portability
 
-The user owns their data. The entire user state must be exportable and importable as raw text, JSON, or OPML without vendor lock-in. Complete state includes, at minimum, the Source Ledger, raw steering command history, interpreted and superseded steering policy state, and resonance signal history.
+The user owns their data. The user's active state must be exportable and importable as raw text, JSON, or OPML without vendor lock-in. Complete state includes, at minimum, the Source Ledger, current active steering policy rules, and currently resonated items.
 
 ## 5. Core Product Primitives
 
@@ -218,11 +218,10 @@ Product requirements:
 
 ### 5.4 Intent Data Management
 
-The system must strictly manage user preferences—specifically Steering commands and Resonate signals—according to the following behavioral constraints:
+The system must manage user preferences—specifically Steering commands and Resonate signals—according to the following minimalist constraint:
 
-- **Immutable Intent History:** The system must treat user steering commands and resonated items as a chronological history of intents. It must not silently overwrite or destructively merge older intents without preserving the raw history.
-- **Corruption Resilience:** If the AI makes a mistake while interpreting user preferences (e.g., corrupts its own internal rules), the system must be capable of recovering the user's preferences from their raw, original inputs.
-- **Data Transparency (Exportability):** The user's entire history of steering commands and resonance signals must be exportable in a raw, human-readable format.
+- **Current State Only:** The system must treat user steering commands and resonated items as active state. The system is not required to maintain a complex event-sourced ledger of past corrections. When a rule is deleted or superseded by a new Steer command, the active policy is simply updated or softly deleted.
+- **Data Transparency (Exportability):** The user's active steering rules and resonance signals must be exportable in a raw, human-readable format.
 
 ## 6. Actor Model and Authority
 
@@ -305,7 +304,7 @@ Required product-level outputs:
 - concise core insight;
 - dense factual summary;
 - source and extraction provenance;
-- topical and semantic comparability for search and ranking;
+- topical metadata and searchable text for retrieval and ranking;
 - concise rationale for why the item may deserve attention when surfaced.
 
 Exact data shapes, models, schemas, and storage choices are architecture-owned and not specified by this PRD.
@@ -408,7 +407,7 @@ Requirements:
 
 - a steering instruction **must** have a visible interpretation or confirmation receipt inline;
 - the human **must** be able to correct a bad interpretation via the Steer text input;
-- accumulated steering **must** remain inspectable at a product level through a single explicit text action (`export state`) and through terse inline receipts. There must be no dedicated Settings Dashboard or Policy Rules UI;
+- active steering rules **must** remain inspectable at a product level through a single explicit text action (`export state`) and through terse inline receipts. There must be no dedicated Settings Dashboard or Policy Rules UI;
 - materially conflicting steering **must** be surfaced in plain language when it affects future behavior;
 - human steering **must** be reversible or supersedable;
 - agent-generated steering **must** be visibly attributable and easy to correct;
@@ -416,23 +415,23 @@ Requirements:
 
 ## 10. Search and Retrieval
 
-Search is a first-class workflow, but not a core visual primitive on par with Inspect/Resonate/Steer. It may appear via command syntax inside the Steer input or as a lightweight retrieval surface, but must not become a fourth top-level navigation tab.
+Search is a first-class workflow, but not a core visual primitive on par with Inspect/Resonate/Steer. It may appear via command syntax inside the Steer input or as a lightweight retrieval surface, but must not become a fourth top-level navigation tab. Search is lexical and metadata-driven; ResoFeed must not become a built-in RAG product, semantic answer engine, or vector-search system.
 
 Requirements:
 
-- users **must** be able to search by natural language, keyword, source, time, and resonance status;
+- users **must** be able to search by keyword/plain text, source, time, and resonance status;
 - resonated items **must** be easier to retrieve when relevant;
 - non-resonated but inspected or high-quality items **must** remain retrievable;
-- search **must** support “I vaguely remember...” queries;
+- search **must** support practical recall through indexed title, summary, source, provenance, and extracted-text fields, without requiring embeddings or RAG-style generation;
 - search results **must** explain enough provenance for the user to verify the result.
 
-Exact retrieval algorithms and indexing strategies are architecture-owned.
+Exact retrieval algorithms and indexing strategies are architecture-owned, but the product boundary forbids embedding/vector search as a required capability. If future RAG-grade retrieval is desired, it should be a separate system or explicitly approved product expansion rather than hidden inside ResoFeed.
 
 ## 11. External Agent Capabilities
 
-ResoFeed must support authorized external agents through an agent-compatible interface. MCP compatibility is a product requirement because external agent orchestration is part of the intended workflow. Exact resources, tools, payload schemas, and transport details are architecture-owned.
+ResoFeed must support authorized external agents through an agent-compatible interface. MCP compatibility is a product requirement because external agent orchestration is part of the intended workflow. ResoFeed must support MCP over remote Streamable HTTP for authorized agents that do not run on the same host. Exact resources, tools, payload schemas, authentication, and protocol-version pinning are architecture-owned.
 
-For PRD purposes, MCP compatibility means authorized external agents can perform the required capabilities in this section through an MCP-compatible interface; exact protocol version, resources/tools, payload schemas, and transport details are architecture-owned.
+For PRD purposes, MCP compatibility means authorized external agents can perform the required capabilities in this section through an MCP-compatible interface, including remote Streamable HTTP transport. Local stdio MCP may exist as an implementation convenience, but it must not be the only supported MCP access path.
 
 Required agent capabilities:
 
@@ -488,7 +487,7 @@ ResoFeed must feel:
 - correctable through natural language rather than configuration panels;
 - consistent across human and agent-mediated workflows.
 
-UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details. Frontend details such as design tokens and font fallbacks are explicitly deferred to the later `DESIGN.md` phase.
+UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details. Frontend details such as design tokens and font fallbacks are explicitly deferred to the later `docs/DESIGN.md` phase.
 
 ## 14. Explicit Non-Goals
 The following are out of scope unless a future product decision explicitly reverses them:
@@ -574,7 +573,7 @@ Given a new user imports or configures sources, when enough items are available,
 
 ### AC-16 State Portability
 
-Given the user requests an export, when executed, the system must output the entire user state in raw text, JSON, or OPML format, including the Source Ledger, raw steering command history, interpreted and superseded steering policy state, and resonance signal history, and that exported state must be completely restorable via import.
+Given the user requests an export, when executed, the system must output the active user state in raw text, JSON, or OPML format, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via import.
 
 ### AC-17 Diagnostics Output
 
@@ -594,7 +593,7 @@ Given the user inputs `/doctor` in the Steer input, when processed, the system m
 ### 16.2 Software architecture owns
 
 - database schema;
-- event model implementation;
+- data model implementation;
 - storage and indexing choices;
 - ranking implementation;
 - MCP resource/tool contracts;
@@ -612,4 +611,4 @@ Given the user inputs `/doctor` in the Steer input, when processed, the system m
 - motion;
 - microcopy;
 - accessibility implementation details;
-- frontend details such as design tokens and font fallbacks (deferred to DESIGN.md).
+- frontend details such as design tokens and font fallbacks (deferred to `docs/DESIGN.md`).

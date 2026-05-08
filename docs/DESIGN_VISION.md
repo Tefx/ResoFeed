@@ -22,14 +22,14 @@ The color system reflects a precision utility without punishing the eyes. Pure t
 - **Canvas & Surfaces:** Low-fatigue neutrals (e.g., zinc, stone, or slate). Not `#000000` or `#FFFFFF`, but carefully calibrated off-whites and dark grays that reduce eye strain while maintaining stark structural borders.
 - **Text & Contrast:** Maximum contrast for readability (e.g., dark charcoal on off-white, or soft ash on dark slate).
 - **The Singular Accent (Resonate):** A stark, functional accent (e.g., a pure cyan, amber, or sharp magenta) that cuts through the monochrome like a highlighter pen.
-*(Note: Strict semantic token mappings, contrast pairs, and typography fallback rules are deferred to the DESIGN.md phase.)*
+*(Note: Strict semantic token mappings, contrast pairs, and typography fallback rules are deferred to the `docs/DESIGN.md` phase.)*
 
 ## 6. Typography & Scale
 Typography separates "Payload" (content) from "Chrome" (utility):
 - **Content Typeface:** A high-legibility, beautiful Serif for article titles, summaries, and full text (preserving the calm, low-fatigue reading experience).
 - **System/UI Typeface:** A dense, raw Monospace for metadata, timestamps, feed URLs, and the Steer input. This reinforces the "archival index" nature of the tool without making it look like a bash script.
 - **Scale & Rhythm:** Strict grid, tightly packed metadata, generous line-height (1.5 - 1.6) only for the Serif reading payload.
-*(Note: Font loading strategies, exact scale values, and overflow behaviors will be detailed in the future DESIGN.md.)*
+*(Note: Font loading strategies, exact scale values, and overflow behaviors will be detailed in `docs/DESIGN.md`.)*
 
 ## 7. Layout & Surfaces
 - **Desktop (Desk Review):** A split-pane layout. A unified scrolling feed on the left (or center), and an "Inspector" pane on the right when an item is clicked. No left-hand navigation sidebar.

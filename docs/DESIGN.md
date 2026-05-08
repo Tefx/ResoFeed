@@ -424,7 +424,7 @@ Accessibility: diagnostics output uses a labelled `status`/`log` region. Long li
 
 ### Search and Retrieval
 
-Purpose: retrieve corpus by natural language, keyword, source, time, and resonance status.
+Purpose: retrieve corpus by keyword/plain text, source, time, and resonance status. This surface is not a RAG chat or semantic answer engine.
 
 Anatomy: query field may reuse Steer chrome or a dedicated search field if implementation separates modes; results use feed-item anatomy with extra match/provenance line. States: empty query, loading, no results, partial results, error. Results must explain enough provenance to verify the match.
 
@@ -503,7 +503,7 @@ Mobile structure: Steer command at bottom, feed as a touch-safe compact single c
 
 ## Trend / Platform Evidence
 
-The design inherits `DESIGN_VISION.md` rather than trend-chasing. Relevant conventions are durable: archival index metadata for source-heavy work, broadsheet typography for long reading, split-pane readers for desktop, and single-column detail routes on mobile. ResoFeed rejects consumer SaaS softness in favor of sovereign utility: raw strings, visible provenance, no coaching copy, no settings maze.
+The design inherits `docs/DESIGN_VISION.md` rather than trend-chasing. Relevant conventions are durable: archival index metadata for source-heavy work, broadsheet typography for long reading, split-pane readers for desktop, and single-column detail routes on mobile. ResoFeed rejects consumer SaaS softness in favor of sovereign utility: raw strings, visible provenance, no coaching copy, no settings maze.
 
 ## Contract Self-Critique
 
