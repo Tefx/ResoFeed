@@ -2670,6 +2670,13 @@ phases:
       ## Headline
 
       OPEN | BLOCKED'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     depends_on:
     - end-to-end-integration.real-system-end-to-end-proof
     - end-to-end-integration.black-box-acceptance-pass
