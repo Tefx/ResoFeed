@@ -1535,6 +1535,80 @@ phases:
     - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: wiring-auditor
+  - id: runtime-api-and-mcp-integration.runtime-gate
+    name: Runtime gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, assess whether the Runtime API and MCP Integration
+      phase meets the quality bar for frontend and end-to-end work.
+
+
+      Review criteria:
+
+      - Runnable `resofeed serve` surface exists and starts
+
+      - HTTP and MCP paths use real entrypoint/runtime/core wiring
+
+      - Liveness and vertical slice evidence include commands and output
+
+      - Spec conformance and wiring audit have no unresolved blocker-class findings
+
+      - No handler-only completion for deployability-bearing surfaces
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - runnable-surface evidence
+
+      - owner-token auth/delegation
+
+      - HTTP/MCP parity
+
+      - state import/export JSON-only active-state model
+
+      - no stubs/placeholders in entrypoint'
+    verification: phase-check protecting End to End Integration. Gate may OPEN only
+      with real startup, liveness, HTTP/MCP path evidence, and no blocker-class runtime/spec/wiring
+      issues.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      - Step evidence quality table:
+
+      - Runnable surface decision basis:
+
+      - Issues identified:
+
+      - Gate Decision Basis:
+
+      - OPEN/BLOCK recommendation:
+
+
+      ## Headline
+
+      OPEN | BLOCKED'
+    depends_on:
+    - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
+    - runtime-api-and-mcp-integration.runtime-liveness-probe
+    - runtime-api-and-mcp-integration.runtime-spec-conformance
+    - runtime-api-and-mcp-integration.runtime-wiring-audit
+    agent: gate-reviewer
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
