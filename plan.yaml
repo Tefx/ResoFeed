@@ -2257,6 +2257,13 @@ phases:
       ## Headline
 
       OPEN | BLOCKED'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     depends_on:
     - frontend-implementation.frontend-green-retest
     - frontend-implementation.native-ui-ux-implementation-audit
