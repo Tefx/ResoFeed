@@ -2010,6 +2010,83 @@ phases:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     agent: spec-verifier
+  - id: frontend-implementation.frontend-gate
+    name: Frontend gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, assess whether the Frontend Implementation phase
+      meets the quality bar for end-to-end integration.
+
+
+      Review criteria:
+
+      - Frontend implementation renders visible DOM for all required DESIGN.md surfaces
+
+      - Owner-token and first-use UX contracts are satisfied
+
+      - State portability UI is active-state JSON action only with replacement warning
+
+      - UI/UX audit has no blocker-class findings
+
+      - Frontend tests/build/lint are green
+
+      - No forbidden UI/product patterns introduced
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - DESIGN.md fidelity
+
+      - rendered completeness
+
+      - accessibility/live-region behavior
+
+      - active-state portability and no backup dashboard
+
+      - no account/login/onboarding drift'
+    verification: phase-check protecting End to End Integration. Gate may OPEN only
+      with rendered UI evidence, uiux-auditor PASS/PASS_WITH_DEBT without blockers,
+      spec conformance closure, and green frontend build/tests.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      - Step evidence quality table:
+
+      - UI/UX audit decision basis:
+
+      - Issues identified:
+
+      - Gate Decision Basis:
+
+      - OPEN/BLOCK recommendation:
+
+
+      ## Headline
+
+      OPEN | BLOCKED'
+    depends_on:
+    - frontend-implementation.frontend-green-retest
+    - frontend-implementation.native-ui-ux-implementation-audit
+    - frontend-implementation.frontend-spec-conformance
+    agent: gate-reviewer
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
