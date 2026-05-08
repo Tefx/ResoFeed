@@ -1,0 +1,54 @@
+:root {
+  --rf-color-primary: #24231e;
+  --rf-color-background: #f3f0e7;
+  --rf-color-background-dark: #171a18;
+  --rf-color-surface: #fbf8ef;
+  --rf-color-surface-active: #ece6d8;
+  --rf-color-surface-dark: #20231f;
+  --rf-color-text: #24231e;
+  --rf-color-text-dark: #e8e2d4;
+  --rf-color-muted: #68645b;
+  --rf-color-muted-dark: #b8b1a2;
+  --rf-color-border: #d7d0c0;
+  --rf-color-border-dark: #3b3e37;
+  --rf-color-accent: #7a4600;
+  --rf-color-accent-contrast: #fff2d0;
+  --rf-color-focus: #2f6f7e;
+  --rf-color-focus-dark: #8ed1dd;
+  --rf-color-danger: #9e2a20;
+  --rf-color-warning: #7e5b00;
+  --rf-color-success: #276749;
+
+  --rf-typography-chrome: 500 14px/20px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --rf-typography-metadata: 500 12px/16px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --rf-typography-feed-title: 600 18px/24px Newsreader, Georgia, 'Times New Roman', serif;
+  --rf-typography-feed-summary: 400 14px/20px Newsreader, Georgia, 'Times New Roman', serif;
+  --rf-typography-payload: 400 18px/28px Newsreader, Georgia, 'Times New Roman', serif;
+  --rf-typography-section-title: 600 24px/32px Newsreader, Georgia, 'Times New Roman', serif;
+  --rf-typography-inspector-title: 600 28px/32px Newsreader, Georgia, 'Times New Roman', serif;
+  --rf-typography-display: 700 32px/40px Newsreader, Georgia, 'Times New Roman', serif;
+
+  --rf-radius-none: 0;
+  --rf-radius-xs: 2px;
+  --rf-radius-sm: 4px;
+  --rf-radius-md: 8px;
+  --rf-radius-pill: 999px;
+
+  --rf-space-none: 0;
+  --rf-space-xxs: 2px;
+  --rf-space-xs: 4px;
+  --rf-space-sm: 8px;
+  --rf-space-row: 12px;
+  --rf-space-md: 16px;
+  --rf-space-lg: 24px;
+  --rf-space-xl: 32px;
+  --rf-space-xxl: 48px;
+  --rf-space-column: 64px;
+
+  --rf-component-app-shell-background-color: var(--rf-color-background);
+  --rf-component-app-shell-text-color: var(--rf-color-primary);
+  --rf-component-inspector-pane-background-color: var(--rf-color-surface);
+  --rf-component-inspector-pane-text-color: var(--rf-color-text);
+  --rf-component-diagnostic-output-background-color: var(--rf-color-primary);
+  --rf-component-diagnostic-output-text-color: var(--rf-color-text-dark);
+}

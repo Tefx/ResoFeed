@@ -1,0 +1,126 @@
+@import './lib/design-tokens.css';
+
+:root {
+  font: var(--rf-typography-chrome);
+  color: var(--rf-color-text);
+  background: var(--rf-color-background);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--rf-color-background);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.contract-feed-open {
+  appearance: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  text-align: start;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--rf-color-focus);
+  outline-offset: 2px;
+}
+
+.contract-shell {
+  min-height: 100vh;
+  background: var(--rf-component-app-shell-background-color);
+  color: var(--rf-component-app-shell-text-color);
+}
+
+.contract-region {
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: var(--rf-space-md);
+}
+
+.contract-region h1,
+.contract-region h2,
+.contract-region h3,
+.contract-region p {
+  margin-block: 0 var(--rf-space-sm);
+}
+
+.contract-label {
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contract-feedback-error {
+  color: var(--rf-color-danger);
+}
+
+.contract-warning {
+  color: var(--rf-color-warning);
+}
+
+.contract-muted {
+  color: var(--rf-color-muted);
+}
+
+.contract-list {
+  margin: 0;
+  padding-inline-start: var(--rf-space-lg);
+}
+
+.contract-token-prompt,
+.contract-empty,
+.contract-source-ledger,
+.contract-portability,
+.contract-search {
+  padding: var(--rf-space-xl);
+}
+
+.contract-feed-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: var(--rf-space-row);
+  align-items: start;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: var(--rf-space-row) var(--rf-space-row) 11px 0;
+}
+
+.contract-feed-title {
+  font: var(--rf-typography-feed-title);
+}
+
+.contract-feed-summary {
+  font: var(--rf-typography-feed-summary);
+  color: var(--rf-color-muted);
+}
+
+.contract-resonate {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.contract-inspector {
+  background: var(--rf-component-inspector-pane-background-color);
+  color: var(--rf-component-inspector-pane-text-color);
+  padding: var(--rf-space-xl);
+}
+
+.contract-inspector h2 {
+  font: var(--rf-typography-inspector-title);
+}
+
+.contract-diagnostics {
+  overflow-wrap: anywhere;
+  background: var(--rf-component-diagnostic-output-background-color);
+  color: var(--rf-component-diagnostic-output-text-color);
+  padding: var(--rf-space-md);
+}
