@@ -147,6 +147,104 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
+    name: Frontend design and API contracts
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      agent_source: default
+
+
+      Create only acceptance-defining frontend contract artifacts. Read every ref
+      first.
+
+
+      SPEC_REFS:
+
+      - docs/DESIGN.md full contract, especially Owner Token Prompt, First-Use Empty
+      State, Source Ledger, State Portability, Feed Item, Inspector, Search and Retrieval
+
+      - docs/ARCHITECTURE.md §6 HTTP Surface and §8 Frontend Boundary
+
+      - docs/USAGE.md HTTP command examples
+
+      - .agents/instructions.md UI/design hard boundaries
+
+
+      TOUCH_PATHS:
+
+      - web/package.json
+
+      - web/src or equivalent Svelte app skeleton
+
+      - web/src/lib/design-tokens.*
+
+      - web/src/lib/api-contract.*
+
+      - web/src/routes/components stubs for owner token, first-use empty, feed, inspector,
+      source ledger, state portability, search
+
+
+      CONTRACT OUTPUTS ONLY:
+
+      - package/build/test scripts and lint hooks as contract scaffolding
+
+      - TypeScript types for canonical API responses/errors and state bundle echoes
+
+      - Svelte component stubs with props and accessibility notes
+
+      - design token mapping from DESIGN.md front matter
+
+
+      DO NOT implement UI behavior beyond visible stubs/placeholders. Do not introduce
+      UI libraries, Tailwind, account/login flows, onboarding wizard, folders/tags/unread
+      counts/settings dashboards.
+
+
+      authoritative_interface: docs/DESIGN.md and docs/ARCHITECTURE.md are binding.'
+    verification: '- Contract-only: no completed UI/API behavior beyond stubs, props,
+      tokens, and type declarations
+
+      - `npx @google/design.md lint docs/DESIGN.md` remains 0 warnings/errors if run
+
+      - Component stubs cover owner-token prompt, first-use empty state, feed/inspector,
+      source ledger, state portability warning, search/retrieval
+
+      - No forbidden UI patterns or libraries introduced'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Evidence
+
+      - Files created/changed:
+
+      - Types/tokens/component stubs added:
+
+      - Accessibility contracts captured:
+
+      - Confirmation no completed UI behavior was shipped:
+
+      - Forbidden UI scan summary:
+
+      - Deviations from docs, if any:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: frontend-engineer
 - id: core-domain-implementation
   name: Core Domain Implementation
   status: locked
