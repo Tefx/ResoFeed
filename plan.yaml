@@ -2759,6 +2759,13 @@ phases:
       - Coverage/gaps:
 
       - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     agent: integration-verifier
   - id: finalization-docs-and-deep-review.documentation-sync
     name: Documentation sync
