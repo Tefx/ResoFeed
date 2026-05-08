@@ -2098,6 +2098,87 @@ phases:
   depends_on:
   - runtime-api-and-mcp-integration
   - frontend-implementation
+  steps:
+  - id: end-to-end-integration.real-system-end-to-end-proof
+    name: Real system end to end proof
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+      phase_dependencies: runtime-api-and-mcp-integration, frontend-implementation
+
+      tags: [integration]
+
+
+      Provide seam-level real path evidence for the complete system using real implementations.
+
+
+      Scope:
+
+      - Build frontend and Go binary
+
+      - Start `resofeed serve`
+
+      - Exercise owner-token prompt/API auth path
+
+      - HTTP: feed/today, search, item detail if fixture exists, state export/import,
+      doctor
+
+      - MCP: doctor resource, list candidates, search_items, one mutating idempotent
+      tool if fixture exists
+
+      - UI: load app and verify rendered owner-token/first-use/feed surfaces with
+      real or seeded backend data
+
+
+      Changed seams require actual command/output. Mock-heavy unit tests alone are
+      insufficient.
+
+
+      Verification scope: full integration check protecting finalization.'
+    verification: '- Actual commands build and start the real system
+
+      - Evidence includes HTTP curl output, MCP harness output, and UI rendered proof
+
+      - State export/import roundtrip proves replacement semantics in a temp DB
+
+      - No runtime stubs/placeholders/mocks at system boundaries except documented
+      external service test configuration'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Seam-Level Integration Evidence
+
+      - Changed seam paths:
+
+      - Exact commands executed:
+
+      - Actual output:
+
+      - Path exercised:
+
+      - UI rendered artifact references:
+
+      - Remaining mocks and justification:
+
+      - Issues found:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    agent: integration-verifier
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
