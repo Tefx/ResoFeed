@@ -49,8 +49,11 @@ phases:
   status: locked
   gate: Svelte UI implements DESIGN.md surfaces, owner-token prompt, first-use state,
     feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
+  context: Implements responsive web/mobile UI from DESIGN.md against the documented
+    API contract. May proceed after contract foundation using mocked API fixtures;
+    real backend integration is verified in End to End Integration.
   depends_on:
-  - runtime-api-and-mcp-integration
+  - contract-foundation-and-expected-red-tests
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
