@@ -1186,6 +1186,100 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     agent: golang-developer
+  - id: runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    name: Complete serve runtime lifecycle
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      phase_dependency: core-domain-implementation
+
+      risk_tags: [runtime, cli, lifecycle, integration]
+
+      tags: [integration]
+
+
+      Fill in stub bodies in `cmd/resofeed/main.go`, `internal/resofeed/doctor.go`,
+      and runtime lifecycle wiring per the contract. This step depends on HTTP and
+      MCP implementations inside this phase.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - `resofeed serve` contract from docs/ARCHITECTURE.md §§3,8,10
+
+      - HTTP/MCP handlers from sibling runtime steps
+
+
+      YOUR SCOPE: `resofeed serve` flag parsing, required Gemini config validation,
+      SQLite open/migrate, owner-token resolution/generation/storage/printing, HTTP
+      static/API server startup, MCP endpoint mounting, background ingest loop start
+      after storage, graceful shutdown.
+
+
+      Runtime Surface Preservation:
+
+      - `server`, `CLI`, `MCP`, `HTTP API`, static UI, and background ingest are runnable
+      surfaces, not handler-only code.
+
+      - Must identify exact launch command and prove startup path.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      binary must start, wire real handlers/core functions, and behave differently
+      based on flags/config/token state.
+
+
+      Out-of-scope: frontend rendering implementation, deployment packaging beyond
+      local binary.'
+    verification: '- `go build -o ./bin/resofeed ./cmd/resofeed` succeeds
+
+      - Launch command starts server with DB and Gemini config; missing Gemini config
+      fails deterministically
+
+      - First-run owner-token generation/reuse behavior matches docs
+
+      - HTTP API and MCP endpoint are mounted through real entrypoint
+
+      - Evidence includes startup command/output and shutdown behavior'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Runtime Evidence
+
+      - Build command/output:
+
+      - Launch command/output:
+
+      - Entrypoint path identified:
+
+      - Owner-token proof:
+
+      - HTTP/MCP mount proof:
+
+      - Shutdown proof:
+
+      - Deviations record:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-http-api-handlers
+    - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+    agent: golang-developer
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
