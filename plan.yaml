@@ -2818,3 +2818,70 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
     agent: software-architect
+  - id: finalization-docs-and-deep-review.final-design-contract-review
+    name: Final DESIGN contract review
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: default
+
+
+      Review `docs/DESIGN.md` and rendered implementation for final design-system
+      conformance.
+
+
+      Scope:
+
+      - DESIGN.md lint readiness/token integrity
+
+      - Owner Token Prompt and First-Use Empty State
+
+      - Dense feed/Inspector/source/state/search surfaces
+
+      - Accessibility commitments
+
+      - No forbidden UI patterns
+
+      - Evidence from uiux-auditor and frontend tests
+
+
+      This step audits design contract and implementation evidence, not product code
+      architecture.'
+    verification: '- `npx @google/design.md lint docs/DESIGN.md` remains 0 errors/0
+      warnings
+
+      - Rendered evidence supports DESIGN.md required surfaces/states
+
+      - No blocking design drift remains; any should-fix has explicit disposition'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Design Contract Review Report
+
+      - Lint result:
+
+      - Token integrity:
+
+      - Surface coverage:
+
+      - Accessibility review:
+
+      - Rendered evidence reviewed:
+
+      - Findings and severity:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - finalization-docs-and-deep-review.full-plan-verification-sweep
+    - finalization-docs-and-deep-review.documentation-sync
+    agent: design-reviewer
