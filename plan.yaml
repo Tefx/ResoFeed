@@ -1346,6 +1346,75 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: integration-verifier
+  - id: runtime-api-and-mcp-integration.runtime-liveness-probe
+    name: Runtime liveness probe
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Blind liveness probe for runnable surfaces. Use only public docs and public
+      interfaces where possible.
+
+
+      Mode: black-box / liveness.
+
+
+      Scope: `resofeed serve`, HTTP API, MCP Streamable HTTP, and static UI asset
+      serving if web build exists.
+
+
+      Must prove:
+
+      - Entry point starts
+
+      - Server stays alive long enough for requests
+
+      - Owner-token behavior works
+
+      - At least one documented HTTP request reaches the real entrypoint path
+
+      - MCP endpoint accepts at least one documented resource/tool operation
+
+
+      Handler-only evidence is insufficient.'
+    verification: '- Launch documented binary command from a clean/temp environment
+
+      - Observe HTTP auth failure/success and `/api/doctor` or `/api/feed/today` output
+
+      - Observe MCP connection/resource/tool behavior through `/mcp`
+
+      - Report exact commands, output, and any startup/shutdown failures'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Liveness Probe Evidence
+
+      - Launch command:
+
+      - Process/liveness observation:
+
+      - HTTP command/output:
+
+      - MCP command/harness output:
+
+      - Static asset observation:
+
+      - Issues found:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    agent: blind-tester
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
