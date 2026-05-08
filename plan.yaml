@@ -1359,7 +1359,7 @@ phases:
     claimed_at: '2026-05-08T22:14:24.145658+00:00'
   - id: core-domain-implementation.complete-ranking-search-and-steering-logic
     name: Complete ranking search and steering logic
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -1449,6 +1449,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-08T22:14:27.539609+00:00'
   - id: core-domain-implementation.core-green-retest
     name: Core green retest
     status: pending
