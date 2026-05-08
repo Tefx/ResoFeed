@@ -428,6 +428,13 @@ phases:
       ## Headline
 
       PASS_EXPECTED_RED | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/USAGE.md
     depends_on:
     - contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     agent: frontend-engineer
