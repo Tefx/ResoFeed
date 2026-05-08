@@ -27,16 +27,19 @@ This architecture strictly enforces extreme KISS (Keep It Simple, Stupid) and mi
 
 ## 3. Core Modules (Go)
 
-The Go backend avoids "Clean Architecture" bloat (no `IItemRepositoryImpl` interfaces for single implementations) but enforces clear boundaries.
+The Go backend violently rejects "Clean Architecture" bloat (no `internal/app`, no `internal/domain`, no `IItemRepository` interfaces). We use an extremely flat, file-oriented package structure.
 
-*   `cmd/resofeed`: Main entry point. Wires up configuration, DB connection, and starts the HTTP/MCP servers.
-*   `internal/app`: The "Shared Use-Case Layer". All business logic (e.g., `ResonateItem`, `AddSource`, `SearchItems`, `ExportState`). This is the only layer allowed to orchestrate the DB and LLM.
-*   `internal/store`: The SQLite wrapper. Raw SQL queries using `database/sql` or `sqlc`. Enforces schema and transactions.
-*   `internal/ingest`: Scheduled worker (using a simple Go `time.Ticker`). Fetches RSS, extracts text, calls the LLM for summarization, and saves to the store.
-*   `internal/llm`: HTTP client wrapper for OpenAI/DeepSeek/Anthropic APIs. Responsible for retries, schema validation of JSON outputs, and translating errors into the canonical Fallback Taxonomy.
-*   `internal/api`: The transport layer.
-    *   `http_handler.go`: REST endpoints for the Svelte UI. Serves the static `/web/dist` directory.
-    *   `mcp_adapter.go`: Implements the Model Context Protocol over remote Streamable HTTP (SSE). Translates MCP Tool Calls into `internal/app` use cases.
+*   `cmd/resofeed`: The only `main` package. Parses configuration, opens the SQLite file, runs migrations, starts the ingest loop, and starts the HTTP/MCP servers.
+*   `internal/resofeed`: The single application package containing all logic, separated by file rather than by abstract layers.
+    *   `types.go`: Canonical structs (`Source`, `Item`, `SteerRule`, `Resonance`).
+    *   `db.go`: Direct SQLite wrappers (`*sql.DB` or `sqlc` generated code). No generic repository interfaces.
+    *   `migrations.go`: Embedded SQL schema migrations.
+    *   `llm.go`: Dumb HTTP client wrapper for OpenAI/Anthropic APIs. Handles retries and schema validation.
+    *   `feeds.go`: RSS/Atom fetching and parsing.
+    *   `extract.go`: HTML-to-text extraction.
+    *   `ingest.go`: The background scheduler (using a simple Go `time.Ticker`). Orchestrates `feeds` -> `extract` -> `llm` -> `db`.
+    *   `http.go`: REST endpoints for the Svelte UI. Serves the static `/web/dist` directory.
+    *   `mcp.go`: Implements the Model Context Protocol over remote Streamable HTTP (SSE). Translates MCP Tool Calls into the exact same DB/LLM functions used by `http.go`.
 
 ## 4. Frontend (SvelteKit)
 
@@ -95,7 +98,7 @@ To satisfy the PRD's requirement for State Portability without a central sync se
 
 LLM operations are strictly scoped and synchronous where possible:
 
-1.  **Item Summarization (Async):** The `internal/ingest` worker fetches the full HTML, cleans it, and POSTs to the LLM to generate a `summary` and `core_insight`. The output is strictly JSON validated against a schema before being saved to SQLite. If it fails, the `extraction_status` is updated according to the Fallback Taxonomy.
+1.  **Item Summarization (Async):** The `ingest.go` worker fetches the full HTML, cleans it, and POSTs to the LLM to generate a `summary` and `core_insight`. The output is strictly JSON validated against a schema before being saved to SQLite. If it fails, the `extraction_status` is updated according to the Fallback Taxonomy.
 2.  **Steering Translation (Sync):** User inputs raw text: *"Less tech news"*. The Go backend POSTs to the LLM alongside the current `steer_rules`. The LLM returns a structured JSON payload dictating which rule IDs to soft-delete and what new rules to insert. The backend executes this as a single SQLite transaction and bumps the `revision`.
 
 ## 8. Agent Integration (MCP)
@@ -109,4 +112,4 @@ Agents connect to ResoFeed via a Remote Streamable HTTP (SSE) endpoint. The Go s
     *   `resonate(id string)` -> Toggles the star.
     *   `steer(command string)` -> Translates natural language into rule updates.
 
-Both the Web UI (via REST) and the Agent (via MCP) trigger the exact same `internal/app` functions, guaranteeing absolute behavioral parity.
+Both the Web UI (via `http.go`) and the Agent (via `mcp.go`) trigger the exact same package-level functions in `internal/resofeed`, guaranteeing absolute behavioral parity.
