@@ -1415,6 +1415,63 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: blind-tester
+  - id: runtime-api-and-mcp-integration.runtime-spec-conformance
+    name: Runtime spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Spec conformance verification for runtime/API/MCP surfaces. SCOPE: `cmd/resofeed`,
+      HTTP handlers, MCP endpoint, auth, content types, query validation, error matrix,
+      state import/export endpoint behavior, and runtime lifecycle.
+
+
+      For EACH requirement, cite spec section and implementation file:line. Flag any
+      behavioral claim without runtime proof as NEEDS_TEST with closure path.'
+    verification: '- Requirements register covers CLI serve, startup order, owner-token
+      behavior, HTTP endpoint contracts, MCP resources/tools, error bodies, content
+      types, query validation, state restore response
+
+      - Verdicts use CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+      - No downstream gate opens with unresolved blocker-class runtime evidence'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Spec Conformance Report
+
+      - Requirements Register:
+
+      - Evidence Table:
+
+      - Coverage Summary:
+
+      - Top Risks:
+
+      - Suggested Tests:
+
+      - Behavioral proof register:
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-http-api-handlers
+    - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+    - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    agent: spec-verifier
 - id: frontend-implementation
   name: Frontend Implementation
   status: locked
