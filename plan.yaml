@@ -37,3 +37,10 @@ phases:
     checked, and wiring audited before runtime/API work.
   depends_on:
   - contract-foundation-and-expected-red-tests
+- id: runtime-api-and-mcp-integration
+  name: Runtime API and MCP Integration
+  status: locked
+  gate: The runnable `resofeed serve` binary starts HTTP static/API, MCP Streamable
+    HTTP, and background ingest loop with real entrypoint/liveness evidence.
+  depends_on:
+  - core-domain-implementation
