@@ -1178,7 +1178,7 @@ phases:
       \ on distinct summary/detail JSON contracts.\n\n## Headline\nPASS"
 - id: core-domain-implementation
   name: Core Domain Implementation
-  status: pending
+  status: in_progress
   gate: Core domain behavior is implemented with unit/contract tests green, spec conformance
     checked, and wiring audited before runtime/API work.
   depends_on:
@@ -1267,7 +1267,7 @@ phases:
     agent: golang-developer
   - id: core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     name: Complete ingestion and Gemini transform logic
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -1355,6 +1355,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-08T22:14:24.145658+00:00'
   - id: core-domain-implementation.complete-ranking-search-and-steering-logic
     name: Complete ranking search and steering logic
     status: pending
