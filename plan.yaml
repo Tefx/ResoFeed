@@ -2951,3 +2951,91 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-spec-conformance-audit
     agent: blind-tester
+  - id: finalization-docs-and-deep-review.final-deep-review-gate
+    name: Final deep review gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      Final independent gate. Assess whether the whole ResoFeed implementation and
+      documentation are complete enough to declare plan done.
+
+
+      Review criteria:
+
+      1. Full-plan verification sweep is green or only explicit non-blocking debt
+      remains
+
+      2. Documentation sync is complete
+
+      3. Wiring audit, spec conformance, architecture/concurrency review, design contract
+      review, and black-box verification have no blocker-class findings
+
+      4. Behavioral proof register supports final OPEN decision
+
+      5. No forbidden scope drift: sync/merge/history portability, vector/RAG, account
+      system, per-agent registry, UI dashboards, service/repository layers
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - runtime deployability
+
+      - contract conformance
+
+      - UI/design fidelity
+
+      - active-state portability
+
+      - agent/MCP parity
+
+      - architecture minimalism'
+    verification: full-plan-check final gate. Gate may OPEN only when all blocker-class
+      findings are resolved and all behavioral/runtime obligations are PROVEN or explicitly
+      non-intersecting with remaining gates (none).
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Final Gate Review Report
+
+      - Evidence quality table:
+
+      - Unresolved issue disposition:
+
+      - Behavioral/runtime proof basis:
+
+      - Scope-drift audit:
+
+      - Final decision: OPEN | BLOCKED
+
+      - Required remediation if BLOCKED:
+
+
+      ## Headline
+
+      OPEN | BLOCKED'
+    depends_on:
+    - finalization-docs-and-deep-review.full-plan-verification-sweep
+    - finalization-docs-and-deep-review.documentation-sync
+    - finalization-docs-and-deep-review.final-wiring-audit
+    - finalization-docs-and-deep-review.final-spec-conformance-audit
+    - finalization-docs-and-deep-review.final-architecture-and-concurrency-review
+    - finalization-docs-and-deep-review.final-design-contract-review
+    - finalization-docs-and-deep-review.final-black-box-verification
+    agent: gate-reviewer
