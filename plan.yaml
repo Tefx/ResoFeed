@@ -146,6 +146,10 @@ phases:
       ## Headline
 
       PASS | PASS_WITH_DEBT | FAIL'
+    refs:
+    - .agents/instructions.md
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
     agent: golang-developer
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
