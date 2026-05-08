@@ -51,3 +51,10 @@ phases:
     feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
   depends_on:
   - runtime-api-and-mcp-integration
+- id: end-to-end-integration
+  name: End to End Integration
+  status: locked
+  gate: Full vertical behavior works through real CLI/server/API/MCP/UI paths with
+    no stubs and no mock-only seam evidence.
+  depends_on:
+  - frontend-implementation
