@@ -2402,7 +2402,7 @@ phases:
     agent: gate-reviewer
 - id: frontend-implementation
   name: Frontend Implementation
-  status: pending
+  status: in_progress
   gate: Svelte UI implements DESIGN.md surfaces, owner-token prompt, first-use state,
     feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
   context: Implements responsive web/mobile UI from DESIGN.md against the documented
@@ -2413,7 +2413,7 @@ phases:
   steps:
   - id: frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     name: Complete web shell owner token and first-use UI
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -2504,6 +2504,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-08T22:14:36.658352+00:00'
   - id: frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     name: Complete feed inspector source state and search UI
     status: pending
