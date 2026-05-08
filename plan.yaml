@@ -27,7 +27,7 @@ project_guidance: All implementation agents must begin by reading `.agents/instr
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Backend/frontend contracts, stubs, and expected-red tests define acceptance
     without shipping implementation logic.
   steps:
@@ -156,7 +156,7 @@ phases:
     agent: golang-developer
   - id: contract-foundation-and-expected-red-tests.frontend-design-and-api-contracts
     name: Frontend design and API contracts
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -259,6 +259,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-08T21:46:22.157817+00:00'
   - id: contract-foundation-and-expected-red-tests.backend-expected-red-contract-tests
     name: Backend expected red contract tests
     status: pending
