@@ -1901,6 +1901,220 @@ phases:
     - core-domain-implementation.core-wiring-audit
     - core-domain-implementation.core-spec-conformance
     agent: gate-reviewer
+  - id: fix-core-domain-verification-blockers
+    name: Fix core domain verification blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      priority: HIGH
+
+      work_type: defect_repair
+
+      runtime_owned_debt_policy: EXPECTED_STUB_DEBT for resofeed.Main, HTTP router,
+      MCP handler, and serve lifecycle until runtime-api-and-mcp-integration; BLOCKING_NOW
+      for core-domain doctor snapshot/diagnostics, state export semantics, ingestion
+      persistence, ranking/steering, FTS freshness, duplicate provenance, and steering
+      actor precedence.
+
+
+      Fix ALL blocker-class core-domain verification findings from the concurrent
+      core green retest, core spec conformance, and core wiring audit failures. This
+      is a batched remediation step; do not split into separate serial fix steps unless
+      a finding is proven to be exclusively runtime/API owned and the downstream runtime
+      owner is updated.
+
+
+      Scope and required remediation:
+
+      1. `internal/resofeed/doctor.go`: replace panic/TODO behavior in core-domain
+      doctor snapshot/diagnostic functions (`WriteDoctor`, `ReadDoctorSnapshot`, and
+      any helper they require) with substantive raw diagnostic output for RSS fetch,
+      Gemini transform, and extraction/status failure proof. Runtime/API steps own
+      exposing `/doctor` and wiring it through `resofeed serve`; this step owns the
+      core diagnostic data/snapshot behavior those surfaces consume.
+
+      2. State export timestamp: make `ExportState.exported_at` the current export
+      creation time, not reused import metadata. Add/update regression tests proving
+      import metadata cannot override a later export timestamp.
+
+      3. Ingestion priority/category persistence: persist Gemini `ValueTier` or the
+      contract-equivalent priority category into the SQLite item record during ingest.
+      Add/update ingestion tests proving value tier survives storage and later feed/detail/search
+      reads where applicable.
+
+      4. Ranking and steering: apply active steering rules to ranking while preserving
+      freshness, source, resonance, and product guardrails. Add/update tests for human
+      steering effects, rejected/partial steering constraints, and non-regression
+      of existing ranking guardrails.
+
+      5. Search FTS freshness/provenance: maintain or rebuild `search_fts` after ingest/import
+      paths and improve provenance indexing enough that newly ingested/imported items
+      are searchable with source/title/link provenance. Add/update tests for both
+      ingest and restore/import freshness paths.
+
+      6. Duplicate/grouped original retrievability: add or prove a core-domain detail/provenance
+      path that can retrieve grouped/duplicate originals. If the final HTTP item-detail
+      route is runtime-owned, keep this step''s proof at the core function/store level
+      and explicitly name the downstream HTTP/MCP owner in evidence.
+
+      7. Steering actor provenance/precedence: add actor provenance or a minimal contract-compliant
+      equivalent that distinguishes human steering from delegated-agent steering,
+      so human steering supersedes delegated agent steering. Add/update tests proving
+      precedence and preserving the no per-agent-registry architecture rule.
+
+
+      Runtime-owned debt classification:
+
+      - `cmd/resofeed/main.go`, `resofeed.Main`, `NewRouter`, `NewMCPHandler`, HTTP/MCP
+      handler stubs, `ServeConfig` runtime consumption, and server lifecycle are EXPECTED_STUB_DEBT
+      for this core phase and are owned by `runtime-api-and-mcp-integration.complete-http-api-handlers`,
+      `runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`, and
+      `runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`.
+
+      - Core verification must not fail solely because those downstream runtime/API
+      stubs still exist, but it MUST fail if core-domain functions they need remain
+      stubbed, panicking, unreachable inside `internal/resofeed`, or behaviorally
+      unproven.
+
+
+      Failure-mode checklist:
+
+      - exported_at creation time vs imported metadata precedence
+
+      - missing Gemini value tier fallback behavior
+
+      - steering conflict/precedence for human vs delegated-agent actor provenance
+
+      - FTS stale index after ingest/import/restore
+
+      - duplicate original provenance retrievability without introducing sync/merge
+      concepts
+
+      - doctor diagnostics for failed RSS/Gemini/extraction paths without relying
+      on HTTP/MCP runtime wiring
+
+
+      State semantics:
+
+      - State backup/restore remains JSON backup/restore only; do not introduce sync,
+      merge, 409 conflict resolution, portable activity ledger, or portable receipts.
+
+      - Last-writer/precedence semantics for steering must explicitly favor human
+      steering over delegated-agent steering while keeping `actor_id` as provenance/idempotency,
+      not authorization.
+
+      - Backward compatibility may use migration/default values, but must not treat
+      all legacy active rules as delegated-agent rules if that would erase human steering
+      behavior; document the chosen legacy default.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. `panic("TODO")`, TODO-only placeholders,
+      hardcoded constant returns, and unexercised stubs do not satisfy this step.
+
+
+      Out-of-scope guardrail:
+
+      - Do not implement HTTP/MCP handlers, serve lifecycle, account systems, per-agent
+      registries, vector/semantic search, sync servers, state mergers, command history,
+      or portable user-visible receipts in this step.
+
+      - If a runtime/API endpoint is needed to expose a core function, record the
+      downstream runtime owner instead of implementing the endpoint here.'
+    verification: '- Main path: targeted core-domain tests for state export/import,
+      ingest/value tier persistence, ranking/steering, search FTS, duplicate provenance,
+      and doctor diagnostics pass.
+
+      - Failure path: regression tests cover export timestamp reuse prevention, stale
+      FTS after ingest/import, human-vs-agent steering precedence, and doctor raw
+      diagnostics for RSS/Gemini/extraction failures.
+
+      - Runtime debt classification: evidence explicitly shows HTTP/MCP/serve stubs
+      are not modified here and are owned by downstream runtime steps; no core-domain
+      panic/TODO remains for the behaviors above.
+
+      - Architecture guardrails: no sync/merge coordinator, vector/RAG search, per-agent
+      registry, account system, or Java-style repository/service layering is introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Core Remediation Evidence
+
+
+      **Findings addressed**:
+
+      - B1 doctor diagnostics:
+
+      - R3 exported_at:
+
+      - R6 value tier persistence:
+
+      - R10 steering affects ranking:
+
+      - R11 FTS freshness/provenance:
+
+      - R12 actor provenance/precedence:
+
+      - R9 duplicate original retrievability:
+
+
+      **Commands/tests executed**:
+
+      ```
+
+      <paste exact targeted Go test commands and outputs>
+
+      ```
+
+
+      **Runtime-owned debt classification**:
+
+      - HTTP/MCP/serve stubs left for runtime phase: <list and owner step ids>
+
+      - Core-domain stubs/panics remaining: <none or justified non-blocking with downstream
+      owner>
+
+
+      **Architecture guardrails checked**:
+
+      - No sync/merge coordinator:
+
+      - No vector/RAG search:
+
+      - No per-agent registry/accounts:
+
+      - No repository/service layering:
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - core-domain-implementation.complete-sqlite-state-and-restore-logic
+    - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
+    - core-domain-implementation.complete-ranking-search-and-steering-logic
+    agent: golang-developer
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
