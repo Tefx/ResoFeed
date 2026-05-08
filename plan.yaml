@@ -828,6 +828,67 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: integration-verifier
+  - id: core-domain-implementation.core-wiring-audit
+    name: Core wiring audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+
+      Wiring completeness audit for core domain symbols before runtime/API work.
+
+
+      REQUIRED CHECKS:
+
+      1. Every new exported/public-ish symbol in `internal/resofeed` has a planned
+      or actual caller outside its own file or is documented as contract-only
+
+      2. Config/runtime metadata fields are consumed by non-test code
+
+      3. No NotImplementedError/TODO/panic stubs remain in core implementation files
+      where this phase owns completion
+
+      4. No state merger/conflict resolver/sync coordinator/portable receipt path
+      exists
+
+
+      Verification scope: phase-check protecting runtime API/MCP integration gate.'
+    verification: '- Static trace/grep/import evidence shows no orphan core symbols
+      expected to be wired now
+
+      - No unconsumed runtime metadata/config fields in the core scope
+
+      - No implementation-owned stubs remain in `internal/resofeed/{db,migrations,state,ingest,gemini,ranking,search}.go`
+
+      - No forbidden sync/merge/conflict/portable receipt module or function exists'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Wiring Audit Report
+
+      - Orphan exports:
+
+      - Unconsumed config/runtime fields:
+
+      - Remaining implementation stubs:
+
+      - Forbidden state-portability patterns:
+
+      - Static commands/searches used:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - core-domain-implementation.complete-sqlite-state-and-restore-logic
+    - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
+    - core-domain-implementation.complete-ranking-search-and-steering-logic
+    agent: wiring-auditor
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
