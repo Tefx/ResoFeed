@@ -12158,3 +12158,88 @@ phases:
     and complete local plus live/smoke system evidence.
   depends_on:
   - finalization-docs-and-deep-review
+  steps:
+  - id: docs-and-contract-update
+    name: Docs and OpenRouter contract update
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      agent_source: default
+
+      work_type: new_capability
+
+
+      Update the authoritative product and architecture documentation before code
+      changes.
+
+
+      Spec refs: docs/ARCHITECTURE.md, docs/USAGE.md, docs/PRD.md, .agents/instructions.md.
+
+      Touch paths: docs/ARCHITECTURE.md, docs/USAGE.md, docs/PRD.md if Gemini/provider
+      wording exists, .agents/instructions.md, and tests/docs that mention Gemini
+      or `gemini:` diagnostics.
+
+      Authoritative interface: `resofeed serve --openrouter-api-key <key> [--openrouter-model
+      <model>]`; omit OpenRouter model when empty; no Gemini compatibility flags.
+
+
+      Required contract decisions to record:
+
+      - LLM provider is OpenRouter; old Gemini flags are removed rather than retained.
+
+      - `--openrouter-api-key` is required for runtime LLM use; live tests pass `.env`
+      `OPENROUTER_KEY` into this flag without printing the value.
+
+      - `--openrouter-model` is optional; empty means account default and no model
+      field is sent.
+
+      - No model whitelist, no startup network model validation, no provider registry/plugin
+      framework, no DI container/service/repository layer, no cost ledger, and no
+      persistence/export of API key or model.
+
+      - OpenRouter requests send only `Authorization: Bearer <redacted>` and `Content-Type:
+      application/json`.
+
+      - `/doctor` diagnostics use `openrouter:` with configured/default/resolved model
+      clarity.
+
+      - LLM remains a pure JSON-in/JSON-out transformer and does not own durable state,
+      orchestration, auth, or direct DB writes.'
+    verification: '- Documentation names OpenRouter as the LLM backend and removes
+      Gemini-specific runtime guidance.
+
+      - CLI/docs describe required `--openrouter-api-key` and optional `--openrouter-model`
+      account-default behavior.
+
+      - `/doctor` docs use concrete `openrouter:` status examples.
+
+      - No docs introduce forbidden sidecars, provider registries, model whitelists,
+      persisted API keys/models, or semantic/vector search.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Update Evidence
+
+      - Files changed:
+
+      - Gemini references removed/replaced:
+
+      - OpenRouter CLI and doctor examples added:
+
+      - Forbidden architecture avoided:
+
+      - Secret-handling statement: evidence references only `OPENROUTER_KEY`, never
+      its value.'
+    agent: doc-reviewer
