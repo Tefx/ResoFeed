@@ -4278,6 +4278,268 @@ phases:
     - runtime-api-and-mcp-integration.runtime-spec-conformance
     - runtime-api-and-mcp-integration.runtime-wiring-audit
     agent: gate-reviewer
+  - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
+    name: Fix runtime verification blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      rework_context: batched remediation for failed runtime verification cluster
+
+
+      Fix ALL runtime verification blockers found by liveness, spec-conformance, and
+      wiring-audit. This is one batched remediation step; do not create sibling fix
+      loops.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### B1_static_ui_root_returns_plain_text_not_html
+
+      Serve built web/static assets from `web/build` or the contract-correct static
+      output so `GET /` returns HTML/static UI after the documented web build. The
+      root response MUST expose the documented static web UI surface including the
+      owner-token prompt/interactive content. Preserve ResoFeed design constraints:
+      no SaaS onboarding, no accounts, no sync concepts, no friendly AI-magic copy.
+
+
+      ### B2_mcp_tools_list_schemas_skeletal
+
+      Complete MCP `tools/list` input schemas for every documented tool. Schemas MUST
+      expose required fields, defaults, bounds/limits, and documented field semantics
+      per `docs/ARCHITECTURE.md` and `docs/USAGE.md`; do not leave skeletal `{}` or
+      underspecified schemas.
+
+
+      ### B3_mcp_steer_drops_configured_gemini
+
+      Pass the configured Gemini runtime dependency through MCP wiring. Extend the
+      runtime chain so `NewRouter` / `NewMCPHandler` receive the configured Gemini
+      and MCP `steer` uses it, preserving owner-token authorization, actor/idempotency
+      receipts, and HTTP/MCP operation parity. Current failure evidence: `NewRouter`
+      calls `NewMCPHandler(MCPConfig{DB, OwnerToken, OwnerTokenHash})`; `MCPConfig`
+      lacks Gemini; `SteerForMCP` calls `ApplySteering(ctx, db, nil, ...)` while HTTP
+      steer uses `h.cfg.Gemini`.
+
+
+      ### B4_stale_expected_stub_debt_contract_tests
+
+      Remove or replace stale skipped HTTP/MCP expected-stub-debt contract tests in
+      `internal/resofeed/backend_contract_test.go:20-68,246-265` now that runtime
+      HTTP/MCP surfaces are implemented. Prefer converting them into active assertions
+      for the implemented runtime surfaces. The final test suite MUST NOT preserve
+      skip text that says HTTP/MCP runtime is expected stub debt.
+
+
+      ### B5_startup_and_listener_runtime_proof_gaps
+
+      Add runtime proof/tests for:
+
+      - startup validation no-bind matrix: invalid addr, invalid public URL, invalid
+      DB path/config, invalid Gemini config, invalid/absent token cases fail before
+      socket bind
+
+      - startup order/liveness: startup validates config before bind, then serves
+      HTTP/API/MCP and shuts down cleanly
+
+      - first-run owner-token generation/reuse at process level
+
+      - real bound-listener `/mcp` Streamable HTTP proof, including non-local in-process
+      listener evidence rather than handler-only tests
+
+
+      ## Runtime Surface Preservation
+
+      This step remediates a deployability-bearing surface. Handler-only fixes are
+      insufficient. Preserve the single Go binary (`cmd/resofeed`) serving static
+      assets, JSON HTTP, MCP Streamable HTTP, and background ingest loop. Do not introduce
+      sidecars, sync servers, account systems, vector DBs, or agent registries.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub/placeholder code paths
+      are structurally restricted from satisfying this requirement.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. `GET /` returning `text/plain` or only `RESOFEED` after documented web build.
+
+      2. MCP `tools/list` schemas missing documented required fields/defaults/limits.
+
+      3. MCP `steer` bypassing configured Gemini or diverging from HTTP steer semantics.
+
+      4. Skipped tests preserving expected runtime HTTP/MCP stub debt.
+
+      5. Startup tests that bind a socket before rejecting invalid configuration.
+
+      6. MCP proof that exercises only handlers instead of a real bound Streamable
+      HTTP listener.'
+    verification: '- Run the documented web build and binary build successfully.
+
+      - Prove `GET /` after documented web build returns HTML/static UI content, not
+      `text/plain` `RESOFEED`, and includes the owner-token prompt/interactive surface.
+
+      - Run `go test ./...` with no stale runtime expected-stub skips in HTTP/MCP
+      contract tests.
+
+      - Focused MCP `tools/list` schema assertions cover required fields, defaults,
+      and limits for every documented tool.
+
+      - Focused MCP `steer` test proves configured Gemini is passed and used with
+      owner-token/auth/idempotency behavior preserved and parity with HTTP steer.
+
+      - Runtime tests prove startup validation no-bind matrix for invalid addr/public-url/db/Gemini/token
+      cases.
+
+      - Process-level test proves first-run owner-token generation and reuse behavior.
+
+      - Real bound-listener `/mcp` Streamable HTTP proof exercises initialize/resources/tools
+      through the listener, not just handlers.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Runtime Blocker Fix Evidence
+
+
+      **Documented web build command and output**:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+
+      **Binary build command and output**:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+
+      **Root static UI proof**:
+
+      - URL: <bound URL>
+
+      - Status: <status>
+
+      - Content-Type: <content-type>
+
+      - Body excerpt proving HTML/static UI and owner-token prompt/interactive content:
+
+      ```
+
+      <paste excerpt>
+
+      ```
+
+
+      **MCP tools/list schema assertions**:
+
+      - Tools covered: <list every documented tool>
+
+      - Required fields/defaults/limits asserted: <summary>
+
+
+      **MCP steer Gemini parity proof**:
+
+      - HTTP steer path uses Gemini: <evidence>
+
+      - MCP steer path uses same configured Gemini/test double: <evidence>
+
+      - Auth/idempotency/provenance preserved: <evidence>
+
+
+      **Stale expected-stub debt cleanup**:
+
+      - Removed/converted skips in `internal/resofeed/backend_contract_test.go`: <details>
+
+      - Search output showing no runtime HTTP/MCP expected-stub skip text remains:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      **Startup validation no-bind matrix**:
+
+      | Case | Expected | Socket bind observed? | Evidence |
+
+      |---|---|---|---|
+
+      | invalid addr | fail before bind | no | <ref> |
+
+      | invalid public URL | fail before bind | no | <ref> |
+
+      | invalid DB | fail before bind | no | <ref> |
+
+      | invalid Gemini | fail before bind | no | <ref> |
+
+      | invalid/absent token | fail before bind or documented safe generation path
+      | <yes/no> | <ref> |
+
+
+      **First-run owner-token generation/reuse process proof**:
+
+      ```
+
+      <paste command/output>
+
+      ```
+
+
+      **Real bound-listener /mcp proof**:
+
+      ```
+
+      <paste initialize/resources/tools command/output through bound listener>
+
+      ```
+
+
+      **Full test output**:
+
+      ```
+
+      go test ./...
+
+      <paste output>
+
+      ```
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - runtime-api-and-mcp-integration.complete-http-api-handlers
+    - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+    - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
+    agent: golang-developer
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
