@@ -14091,7 +14091,7 @@ phases:
     claimed_at: '2026-05-09T18:30:04.333631+00:00'
   - id: openrouter-llm-implementation.serve-liveness-probe
     name: serve-liveness-probe
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -14211,6 +14211,100 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-09T18:29:52.578707+00:00'
+    done_at: '2026-05-09T18:35:21.949574+00:00'
+    evidence: 'Blind-tester liveness PASS accepted and audit artifact merged.
+
+
+      ## Verification Report
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: absent in isolated worktree.
+
+      - .agents/instructions.md — one deployable Go binary; runtime-only LLM secrets;
+      OpenRouter accepted names; no secret evidence leakage.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` is one process; OpenRouter key from
+      `OPENROUTER_KEY`; `/doctor` must use `openrouter:` and never print keys.
+
+      - docs/USAGE.md — build/run command, OpenRouter env contract, `/api/doctor`
+      text/plain examples, redaction requirements.
+
+
+      Worker audit commits: 8938c21, 987b0e8.
+
+      Main squash merge commit: 027f711 (`[vectl] step-openrouter-llm-implementation.serve-liveness-probe
+      completed`).
+
+      Artifact merged: `.audit-artifacts/openrouter_implementation_verification/serve-liveness-probe.md`.
+
+
+      Runnable surface evidence:
+
+      - Built real `./bin/resofeed` from `./cmd/resofeed`.
+
+      - Started `resofeed serve` with controlled fake `OPENROUTER_KEY` and no CLI
+      API-key flag.
+
+      - Authenticated `GET /api/doctor` returned 200 text/plain with `openrouter:
+      ok configured_model=account_default resolved_model=unknown`.
+
+      - `GET /` returned 200 HTML; unauthenticated `/mcp` returned expected 401 JSON.
+
+      - Legacy `--gemini-api-key` rejected by CLI parse.
+
+      - Fake OpenRouter key absent from raw logs and doctor output.
+
+
+      Behavioral proof register:
+
+      - build_real_entrypoint — PASS: documented web build plus Go build.
+
+      - serve_liveness — PASS: real process bound port and served routes.
+
+      - doctor_openrouter_no_secret — PASS: `openrouter:` diagnostics with no fake
+      key.
+
+      - legacy_gemini_flag_rejected — PASS: exit 2 parser rejection, no secret echo.
+
+
+      Issues found:
+
+      - Non-blocking local bootstrap note: cold worktree lacked web deps, so `npm
+      --prefix web run build` alone failed until documented `npm --prefix web install`
+      was run. This does not intersect remaining gates because liveness succeeded
+      after documented bootstrap and mainline `go test ./...` passed.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```
+
+
+      Headline: PASS.'
   - id: openrouter-llm-implementation.implementation-gate
     name: implementation-gate
     status: pending
