@@ -30,43 +30,44 @@ mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 ```
 
-### 2. Configure the Gemini API key safely
+### 2. Configure the OpenRouter API key safely
 
-ResoFeed resolves the Gemini API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history.
+ResoFeed resolves the OpenRouter API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history.
 
 Safe options:
 
-- Set `GEMINI_API_KEY` through your OS, shell profile, service manager, or hosting platform secret manager without committing it to the repository.
+- Set `OPENROUTER_KEY` through your OS, shell profile, service manager, or hosting platform secret manager without committing it to the repository.
 - Create a local `.env` file with your editor or another secret-safe workflow:
 
 ```text
 # .env is local-only; do not commit or print the real value.
-GEMINI_API_KEY=<redacted-local-value>
+OPENROUTER_KEY=<redacted-local-value>
 ```
 
 The `.env` file is local runtime input only. Do not commit it, paste it into issue comments, include it in state exports, or print it in logs/evidence.
 
-Secret-source precedence for the current Gemini path is:
+Secret-source precedence for OpenRouter is:
 
-1. explicit `--gemini-api-key` value, if the current binary still supports it, as a discouraged compatibility override;
-2. OS environment variable `GEMINI_API_KEY`;
-3. local `.env` fallback.
+1. OS environment variable `OPENROUTER_KEY`;
+2. local `.env` fallback.
+
+`OPENROUTER_KEY` is the only documented OpenRouter API-key name. OpenRouter secrets must not be passed through CLI flags.
 
 Empty or whitespace-only values are invalid. Parser and validation errors must not include the secret value.
 
 Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are supported; blank lines and `#` comments are ignored. ResoFeed must not source shell scripts, expand variables, run commands, or evaluate command substitution from `.env`.
 
-The existing `--gemini-api-key` CLI flag is transitional compatibility behavior only. Avoid it for new setups because command-line secrets can be captured by shell history and process listings. Removing that flag is a future architecture decision requiring explicit confirmation, not a silent setup change.
-
-### 3. Run with Gemini
+### 3. Run with OpenRouter
 
 ```bash
 ./bin/resofeed serve \
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
-  --gemini-model gemini-2.5-flash
+  --openrouter-model openai/gpt-4.1-mini
 ```
+
+`--openrouter-model` is optional and non-secret. If it is omitted or empty, ResoFeed uses the OpenRouter account default and reports the configured model as `account_default`. Provided model strings are passed to OpenRouter unchanged; startup does not perform a network model validation check.
 
 `serve` starts everything: web UI, JSON HTTP API, MCP Streamable HTTP at `/mcp`, background ingestion, SQLite open/migrate, and static asset serving.
 
@@ -79,8 +80,7 @@ Flags:
 | `--addr` | No | Bind address for web UI, HTTP API, and MCP endpoint. Default: `127.0.0.1:8080`. |
 | `--public-url` | No | Base URL external agents should use. Default derives from `--addr` for local use. |
 | `--db` | No | SQLite database file path. Default: `./data/resofeed.sqlite3`. |
-| `--gemini-api-key` | No; discouraged | Transitional Gemini API-key compatibility override if still present. Prefer `GEMINI_API_KEY` from OS environment or local `.env`. |
-| `--gemini-model` | No | Gemini model. Default: `gemini-2.5-flash`. |
+| `--openrouter-model` | No | Optional OpenRouter model. Empty or omitted means account default; provided values are passed through unchanged. |
 | `--owner-token` | No | Explicit owner token. If omitted, ResoFeed generates or reuses one automatically. |
 
 ### 4. Owner token behavior
@@ -113,7 +113,7 @@ To rotate or recover the token, start ResoFeed once with a new explicit token:
   --owner-token "rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
 ```
 
-This example assumes `GEMINI_API_KEY` is already available through the OS environment or local `.env` fallback.
+This example assumes `OPENROUTER_KEY` is already available through the OS environment or local `.env` fallback.
 
 ### 5. Open the UI
 
@@ -132,7 +132,7 @@ OPML folders are ignored and flattened immediately.
 
 ### 7. Let ingestion run
 
-ResoFeed fetches sources, extracts content when possible, summarizes items with Gemini, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes.
+ResoFeed fetches sources, extracts content when possible, summarizes items with OpenRouter, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes.
 
 Use an always-on host if mobile access or external-agent workflows should continue while your laptop sleeps.
 
@@ -438,7 +438,7 @@ Abridged example response: `text/plain`, canonical contract is in `docs/ARCHITEC
 
 ```text
 rss: ok
-gemini: ok
+openrouter: ok configured_model=account_default resolved_model=unknown
 ingest: last_run=2026-05-09T00:00:00Z
 ```
 
@@ -659,13 +659,17 @@ Expected diagnostic content includes:
 
 `/doctor` is plain text. It is not a dashboard, chart surface, friendly remediation wizard, or settings page.
 
-Diagnostics and live-smoke evidence must redact LLM API keys. Acceptable evidence says a key was resolved from `os_env` or `.env` and shows `GEMINI_API_KEY=<redacted>`; it must not show the actual value.
+Diagnostics and live-smoke evidence must redact LLM API keys. Acceptable evidence says a key was resolved from `os_env` or `.env` and shows `OPENROUTER_KEY=<redacted>`; it must not show the actual value. `/doctor` OpenRouter lines use the `openrouter:` prefix, include the configured model (`account_default` when omitted), include a resolved model only when available, and never print keys, secret-source metadata, `.env` paths, or provider configuration.
 
-## Future OpenRouter Configuration
+## OpenRouter Configuration Contract
 
-Future OpenRouter work must reuse the same runtime secret-source policy instead of requiring CLI-passed API keys. Before implementation, the OpenRouter contract must explicitly lock whether `OPENROUTER_KEY`, `OPENROUTER_API_KEY`, or both names are accepted and how they take precedence.
+OpenRouter is the sole LLM backend. ResoFeed sends JSON-in/JSON-out requests to the OpenRouter chat completions endpoint:
 
-OpenRouter setup and live-smoke docs must use OS environment variables or local `.env` files with redacted evidence only. Do not add examples that paste real API keys into command lines or shell history.
+```text
+https://openrouter.ai/api/v1/chat/completions
+```
+
+OpenRouter setup and live-smoke docs must use OS environment variables or local `.env` files with redacted evidence only. Do not add examples that paste real API keys into command lines or shell history. ResoFeed does not send OpenRouter attribution headers for now.
 
 ## External Agent Usage Through MCP
 

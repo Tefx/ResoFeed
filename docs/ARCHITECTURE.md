@@ -9,12 +9,12 @@ Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
 Contract baseline: these decisions are anchored in the current product/design documents and user constraints.
 
 1. **One deployable Go process.** ResoFeed is one binary started with `resofeed serve`. It serves the static SvelteKit app, JSON HTTP API, MCP Streamable HTTP at `/mcp`, and background ingestion loop. Rationale: the product is a single-tenant tool, not SaaS infrastructure. Fails if team/multi-tenant scale becomes product scope.
-2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, Gemini model, optional owner token, and the existing Gemini API-key flag only as a discouraged compatibility override. Gemini and future LLM provider API keys must be resolved at startup from runtime-only secret sources and must never be persisted, exported, logged, or committed. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
+2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, optional OpenRouter model, and optional owner token. OpenRouter API keys must be resolved at startup from runtime-only secret sources and must never be passed by CLI flag, persisted, exported, logged, or committed. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history, process listings, or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
 3. **One SQLite database.** SQLite is the durable source of truth; FTS5 is the lexical index. Rationale: local ownership and operational simplicity matter more than distributed scale. Fails if multi-writer distributed deployment becomes required.
 4. **Current state only.** Store the present state needed for feed display, search, import/export, agent idempotency, and provenance. Do not build event sourcing, JSONL runtime state, or a user-visible activity ledger. Fails if audit-grade historical reconstruction becomes a hard requirement.
 5. **One backend package.** Product behavior lives in `internal/resofeed` as direct functions and SQL, not `app/domain/repository/service` layers. Rationale: there is one runtime and one database. Fails if multiple storage backends or independently deployed services become real requirements.
 6. **Thin transports.** HTTP and MCP validate auth/payloads and call the same product operations. Rationale: humans and agents must share Inspect, Resonate, Steer, search, and retrieval semantics. Fails if MCP gets product concepts unavailable to humans.
-7. **Gemini as the LLM backend.** LLM calls use Gemini for summaries and steering translation. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes. Rationale: the user explicitly chose Gemini while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
+7. **OpenRouter as the sole LLM backend.** LLM calls use OpenRouter chat completions for summaries and steering translation at `https://openrouter.ai/api/v1/chat/completions`. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes; Go validates every structured output before applying or saving it. Rationale: the user explicitly chose an OpenRouter-only migration while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
 8. **Lexical retrieval only.** Search uses SQLite FTS5 and metadata filters. No embeddings, vector DB, built-in RAG, or semantic answer engine. Rationale: explicitly forbidden by product constraints. Fails only by explicit product reversal.
 9. **Single owner token with auto-generation.** Static web assets are public to load, but every `/api/*` route and every `/mcp` request requires one owner token. If `--owner-token` is omitted, ResoFeed reuses a stored token hash or generates a token, stores its hash, and prints the token once on first startup. No accounts, OAuth, roles, teams, or registration flow. Rationale: single-tenant tool with low-friction first run and no ambiguous public API reads. Fails if shared/team use becomes product scope.
 
@@ -35,12 +35,12 @@ Browser SPA (SvelteKit static)
 +--------------------------+
    |             |        |
    v             v        v
-SQLite+FTS5   RSS/Atom   Gemini API
+SQLite+FTS5   RSS/Atom   OpenRouter API
 
 External agents connect to the same Go binary through MCP Streamable HTTP at `/mcp`.
 ```
 
-There are no internal services. Runtime components are the Go process, embedded static assets, one SQLite file, RSS/Atom sources, and Gemini as the external LLM API.
+There are no internal services. Runtime components are the Go process, embedded static assets, one SQLite file, RSS/Atom sources, and OpenRouter as the external LLM API.
 
 Runtime command contract:
 
@@ -49,7 +49,7 @@ resofeed serve \
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
-  --gemini-model gemini-2.5-flash
+  --openrouter-model openai/gpt-4.1-mini
 ```
 
 Required/recognized flags:
@@ -59,38 +59,37 @@ Required/recognized flags:
 | `--addr` | No | `127.0.0.1:8080` | Bind address for web UI, HTTP API, and MCP endpoint. |
 | `--public-url` | No | derived from `--addr` for local use | Base URL external agents should use. If omitted and `--addr` is `HOST:PORT`, default to `http://HOST:PORT`; if host is `0.0.0.0`, default to `http://127.0.0.1:PORT`. |
 | `--db` | No | `./data/resofeed.sqlite3` | SQLite database path. |
-| `--gemini-api-key` | No; discouraged compatibility override | N/A | Transitional Gemini API-key override. If still present in the current binary, an explicit non-empty value overrides `GEMINI_API_KEY` from the OS environment. Do not use in examples or new integrations because CLI secrets can land in shell history and process listings. |
-| `--gemini-model` | No | `gemini-2.5-flash` | Gemini model. |
+| `--openrouter-model` | No | empty / account default | Optional OpenRouter model. Empty or omitted means use the OpenRouter account default. Provided values are passed through unchanged with no startup network model validation. |
 | `--owner-token` | No | reuse or auto-generate | Explicit owner token; omitted means reuse or auto-generate. |
+
+When `--openrouter-model` is omitted or empty, diagnostics and startup/runtime status should refer to the configured model as `account_default`. If OpenRouter later returns a concrete resolved model in a response, `/doctor` may include that resolved model; absence of a resolved model is not a startup failure.
 
 `serve` runs SQLite migrations during startup and then starts the web UI, HTTP API, MCP endpoint, and ingestion loop. No separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process is part of the architecture.
 
-Runtime LLM secret-source contract:
+Runtime OpenRouter LLM contract:
 
-- Gemini API-key resolution happens during startup before LLM provider construction.
-- Precedence for the current Gemini path is: explicit current `--gemini-api-key` value, if the flag still exists and is non-empty, overrides OS environment; OS environment variable `GEMINI_API_KEY` overrides local `.env`; local `.env` is a fallback only.
+- OpenRouter is the only LLM backend after this migration. Do not preserve prior provider runtime flags in the future runtime contract.
+- OpenRouter API-key resolution happens during startup before LLM client construction.
+- `OPENROUTER_KEY` is the only accepted OpenRouter API-key name for OS environment and local `.env` sources. CLI-passed API keys are forbidden for OpenRouter.
+- Precedence is OS environment variable `OPENROUTER_KEY` first, then local `.env` fallback.
 - Empty or whitespace-only secret values from any source are invalid and must fail startup before binding the server socket.
-- The `--gemini-api-key` flag is a compatibility override only. It is discouraged and transitional because command-line secrets may be captured in shell history and process listings. Removing or deprecating the flag beyond that warning is an architecture decision requiring explicit user confirmation; implementation must not silently remove current behavior in this inserted phase.
 - LLM API keys are runtime input only. They must never be written to SQLite, `runtime_metadata`, migrations, state bundles, logs, `/doctor`, HTTP/MCP responses, frontend assets, test fixtures, docs examples, or committed artifacts.
-- State export/import must never include LLM secret values or secret-source metadata. Redacted evidence such as `GEMINI_API_KEY=<redacted>` or `source=os_env` is acceptable; raw key values are not.
+- State export/import must never include LLM secret values, selected model, provider name, secret-source metadata, `.env` path, or provider configuration. Redacted evidence such as `OPENROUTER_KEY=<redacted>` or `source=os_env/.env` is acceptable; raw key values are not.
 - Parser or validation errors must identify the field/source class tersely without including secret values.
+- OpenRouter requests use JSON-in/JSON-out chat completions and should request structured JSON where the API supports it; Go remains responsible for validating model outputs before any state mutation.
+- No OpenRouter attribution headers are sent for now.
+- Live smoke checks must use `OPENROUTER_KEY` from the OS environment or local `.env` and capture redacted evidence only.
+- `/doctor` OpenRouter diagnostics must use an `openrouter:` line prefix, include the configured model (`account_default` when omitted), include a resolved model only when available from runtime responses, and never include the API key, secret source, `.env` path, or raw provider configuration.
 
 Local `.env` contract for runtime secret fallback:
 
 - `.env` is a local runtime input only and must not be committed or exported.
 - The parser is intentionally minimal: support only `KEY=VALUE` lines; ignore blank lines and lines whose first non-whitespace character is `#`.
 - Do not source `.env` through a shell. Do not perform shell expansion, command substitution, variable interpolation, command execution, quoting semantics, includes, or multiline parsing.
-- For `GEMINI_API_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
+- For `OPENROUTER_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
 - Parser and validation errors must not print the rejected value.
 
-Future OpenRouter migration contract:
-
-- OpenRouter implementation must reuse this same runtime secret-source contract rather than requiring CLI-passed API keys.
-- Before implementation, the OpenRouter contract must explicitly lock accepted environment names. Candidate names are `OPENROUTER_KEY` and `OPENROUTER_API_KEY`; implementation must document whether one or both are accepted and their precedence before provider construction changes ship.
-- OpenRouter live-smoke documentation and evidence must use OS environment variables or local `.env` with redacted output only.
-- Future docs must not regress to examples that require CLI secret flags or put API keys directly in shell history.
-
-Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, missing/empty resolved Gemini API key, invalid `--owner-token`, and failed SQLite migrations.
+Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, missing/empty resolved OpenRouter API key, invalid `--owner-token`, and failed SQLite migrations.
 
 Startup validation matrix:
 
@@ -100,7 +99,7 @@ Startup validation matrix:
 | `--public-url` | not absolute `http`/`https`, missing host, has query/fragment, path not empty or `/` | `2` | `err: invalid_public_url: expected absolute http(s) URL without path/query/fragment` | No |
 | omitted `--public-url` | N/A | N/A | derive from `--addr`; `0.0.0.0:PORT` derives to `http://127.0.0.1:PORT`; remove trailing slash | N/A |
 | `--db` | parent directory cannot be created, path cannot be opened as SQLite | `2` | `err: invalid_db: cannot open sqlite database` | No |
-| resolved Gemini API key | missing, empty, or all whitespace after applying CLI compatibility override > OS environment > `.env` fallback precedence | `2` | `err: invalid_gemini_api_key: value required` | No |
+| resolved OpenRouter API key | missing, empty, or all whitespace after applying OS environment `OPENROUTER_KEY` > `.env` fallback precedence | `2` | `err: invalid_openrouter_key: value required` | No |
 | `--owner-token` | fewer than 32 visible non-whitespace characters or contains leading/trailing whitespace | `2` | `err: invalid_owner_token: expected at least 32 visible non-whitespace characters` | No |
 | migrations | migration fails | `1` | `err: migration_failed: <migration id>` | No |
 
@@ -139,7 +138,7 @@ Out of scope:
 | Runtime shell | `cmd/resofeed` | Parse `serve` flags, open/migrate SQLite, resolve owner token, start/stop lifecycle | Product behavior beyond wiring |
 | Product core | `internal/resofeed` | Source ledger, item state, ingestion, search, steering, state backup/restore, HTTP/MCP operations | Repositories, factories, plugins, alternate storage engines |
 | Persistence | SQLite file | Durable current state, owner-token runtime metadata, and FTS index | Event log semantics or sync-server behavior |
-| External IO | RSS/Atom + Gemini API | Inputs and transformations | Durable source of truth |
+| External IO | RSS/Atom + OpenRouter API | Inputs and transformations | Durable source of truth |
 
 ### 3.2 Source of Truth
 
@@ -159,7 +158,7 @@ Out of scope:
 
 Startup order:
 
-1. parse `resofeed serve` flags and resolve required Gemini secret configuration before LLM provider construction;
+1. parse `resofeed serve` flags and resolve required OpenRouter secret configuration before LLM client construction;
 2. open SQLite;
 3. run migrations;
 4. resolve owner token from `--owner-token`, stored runtime metadata, or first-run generation;
@@ -341,23 +340,23 @@ Responsibilities:
 - parse RSS/Atom entries;
 - upsert item cache rows;
 - extract article content when possible;
-- request Gemini summary/metadata only after source text or fallback text exists;
-- validate Gemini response JSON before saving;
+- request OpenRouter summary/metadata only after source text or fallback text exists;
+- validate OpenRouter response JSON before saving;
 - update diagnostic fields for failures.
 
 Runtime limits:
 
 - background ingest interval default: 15 minutes;
 - source fetch timeout: 20 seconds per source;
-- Gemini request timeout: 45 seconds;
-- Gemini retry policy: at most one retry for network/429/5xx failures;
-- failed Gemini responses must not block item visibility.
+- OpenRouter request timeout: 45 seconds;
+- OpenRouter retry policy: at most one retry for network/429/5xx failures;
+- failed OpenRouter responses must not block item visibility.
 
 Failure contract:
 
 - feed failure affects only that source;
 - extraction failure maps to `partial extraction` or `original unavailable` where appropriate;
-- Gemini/model failure maps to `summary unavailable` or `/doctor` model diagnostics;
+- OpenRouter/model failure maps to `summary unavailable` or `/doctor` model diagnostics;
 - no failure path creates an elaborate UI degradation mode.
 
 ### 5.2 Ranking and Daily Feed
@@ -404,13 +403,13 @@ Responsibilities:
 
 - accept natural-language commands from Steer UI and MCP;
 - detect RSS URL subscription commands without a separate add-source wizard;
-- translate policy changes through Gemini only when needed;
+- translate policy changes through OpenRouter only when needed;
 - apply rule changes in one SQLite transaction;
 - return a terse steering receipt suitable for UI and MCP.
 
 Invariants:
 
-- Gemini proposes structured changes; Go validates and applies them;
+- OpenRouter proposes structured changes; Go validates and applies them;
 - current active rules are the only rules used for ranking;
 - inactive/superseded rows are steering replacement safety, not visible command history.
 
@@ -912,7 +911,7 @@ internal/resofeed/ingest.go
 internal/resofeed/ranking.go
 internal/resofeed/search.go
 internal/resofeed/state.go
-internal/resofeed/gemini.go
+internal/resofeed/llm.go
 internal/resofeed/http.go
 internal/resofeed/mcp.go
 internal/resofeed/doctor.go
@@ -928,12 +927,12 @@ Do not introduce repositories, factories, DI containers, event buses, plugin reg
 Implementation is architecture-conformant when:
 
 - `resofeed serve` is the single runtime command;
-- `serve` accepts `--addr`, `--public-url`, `--db`, `--gemini-model`, optional `--owner-token`, and preserves `--gemini-api-key` only as the current discouraged Gemini compatibility override if that flag exists;
-- Gemini startup secret resolution follows explicit current CLI flag value > OS `GEMINI_API_KEY` > local `.env` fallback, rejects empty/whitespace values, and never persists, exports, logs, or commits raw secrets;
+- `resofeed serve` accepts `--addr`, `--public-url`, `--db`, optional `--openrouter-model`, and optional `--owner-token`; it does not require CLI API-key flags in the future runtime contract;
+- OpenRouter startup secret resolution follows OS `OPENROUTER_KEY` > local `.env` fallback, rejects empty/whitespace values, and never persists, exports, logs, prints, or commits raw secrets;
 - omitting `--owner-token` reuses a stored token or generates, stores, and prints a first-run token;
 - one Go process serves static UI, HTTP API, MCP endpoint, and ingest loop;
 - no separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process exists;
-- Gemini is used for summaries and steering translation;
+- OpenRouter is used as the sole LLM backend for summaries and steering translation;
 - only SQLite is required for durable state;
 - HTTP and MCP mutations produce equivalent state changes;
 - MCP Streamable HTTP works from a non-local agent client at `/mcp`;
@@ -941,7 +940,7 @@ Implementation is architecture-conformant when:
 - state export/import restores sources, steering, and resonance state without a sync server;
 - state import replaces portable active state with the validated bundle rather than merging or resolving conflicts;
 - duplicate/story grouping preserves every original source item;
-- `/doctor` reports RSS/Gemini/extraction failures as raw text;
+- `/doctor` reports RSS/OpenRouter/extraction failures as raw text with an `openrouter:` prefix and never prints keys;
 - no folders, tags, settings dashboard, archive flow, notification ownership, or RAG surface appears.
 
 Runnable verification commands after implementation:
@@ -956,7 +955,7 @@ go test ./...
 
 First-run token generation check:
 
-Assumes `GEMINI_API_KEY` is already available from the OS environment, service manager, hosting secret, or local non-committed `.env`; do not include API-key values in the command line or captured evidence.
+Assumes `OPENROUTER_KEY` is already available from the OS environment, service manager, hosting secret, or local non-committed `.env`; do not include API-key values in the command line or captured evidence.
 
 ```bash
 ./bin/resofeed serve --db ./data/test.sqlite3
