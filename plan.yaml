@@ -12336,7 +12336,7 @@ phases:
       \ config loaders, provider construction, or `.env` contents were added/read/printed."
   - id: openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests
     name: define-cli-adapter-docs-red-tests
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
       \ red\nagent_source: project\n\nDefine expected-red Go tests for CLI/runtime\
       \ docs and the OpenRouter adapter contract. Modified files must be limited to\
@@ -12386,6 +12386,41 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T17:46:31.990285+00:00'
+    done_at: '2026-05-09T17:51:00.493977+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — READ. Key passage: runtime LLM secrets are runtime-only, must never be persisted/logged/printed/committed;\
+      \ future OpenRouter must reuse secret-source contract and avoid CLI API-key\
+      \ examples.\n- docs/ARCHITECTURE.md — READ. Key passage: OpenRouter is sole\
+      \ LLM backend, `OPENROUTER_KEY` resolves OS env > local `.env`, CLI API-key\
+      \ flags are forbidden, `--openrouter-model` is optional and no startup network\
+      \ model validation occurs.\n\n## Expected-Red Test Evidence\nstep_intent: test_define_red\n\
+      expected_result: red\nobserved_result: red\nfailure_alignment: Red failures\
+      \ match intended OpenRouter migration gaps: legacy Gemini flags are still accepted/recognized,\
+      \ startup still resolves Gemini secrets instead of `OPENROUTER_KEY`, `--openrouter-model`\
+      \ is not recognized, and the current adapter still emits Gemini/Google request\
+      \ shape instead of OpenRouter chat completions.\nverdict: PASS\nblockers: []\n\
+      product_implementation_files_modified: false\n- Modified files limited to tests/fixtures/helpers:\n\
+      \  - `internal/resofeed/openrouter_cli_adapter_contract_test.go`\n- Commands\
+      \ run by worker:\n  ```bash\n  gofmt -w internal/resofeed/openrouter_cli_adapter_contract_test.go\n\
+      \  go test ./internal/resofeed -run 'TestOpenRouterDocsRuntimeSecretContract'\
+      \ -count=1  # exit 0\n  go test ./internal/resofeed -run 'TestOpenRouter' -count=1\
+      \  # exit 1 expected-red\n  ```\n- Mainline verification after merge:\n  ```bash\n\
+      \  go test ./internal/resofeed -run 'TestOpenRouterDocsRuntimeSecretContract'\
+      \ -count=1\n  go test ./internal/resofeed -run 'TestOpenRouter' -count=1\n \
+      \ ```\n  Docs contract test passed; OpenRouter test command exited 1 for expected\
+      \ red gaps.\n- Expected failures or exposed_gaps:\n  - CLI flag gap: `--gemini-api-key`\
+      \ / `--gemini-model` are not rejected as required; `--openrouter-model` is unknown;\
+      \ startup still errors on `invalid_gemini_api_key`.\n  - adapter contract gap:\
+      \ request path is Gemini `:generateContent`, Authorization bearer header is\
+      \ absent, `response_format` is absent, explicit model is not sent as an OpenRouter\
+      \ body field.\n  - docs Gemini residue gap: docs contract test is green; no\
+      \ public ARCHITECTURE/USAGE/README Gemini flag residue found by the added docs\
+      \ test.\n- Secret handling: no real OpenRouter key printed; all test keys are\
+      \ fake fixtures and failure evidence is redacted.\n- Downstream implementation\
+      \ owner: `openrouter-llm-implementation.*`\n\n## Files changed\n- `internal/resofeed/openrouter_cli_adapter_contract_test.go`\n\
+      \n## Commit hash(es)\n- Worker: `2ae765d`\n- Main squash: `104c254`\n\n## Gaps/Notes\n\
+      - Expected implementation follow-up must replace Gemini CLI/runtime/adapter\
+      \ behavior with OpenRouter env/.env secret source and chat completions contract."
   - id: openrouter-llm-contract-and-red-tests.define-product-integration-red-tests
     name: define-product-integration-red-tests
     status: claimed
