@@ -11236,28 +11236,79 @@ phases:
       - If any blocker remains, evidence reports `verdict: FAIL`, non-empty `blockers`,
       `gate_open_allowed: false`, and `orchestrator_action_hint: create_followup_fix`
       with exact remaining blocker IDs.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
-      \ step:\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\n\
-      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md\
-      \ — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or\
-      \ \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this\
-      \ step.\"\n\n## Retest Closure Fields\n\n```yaml\nverdict: PASS|FAIL\nblockers:\n\
-      \  - <remaining blocker id, or omit when none>\ngate_open_allowed: true|false\n\
-      orchestrator_action_hint: proceed_to_final_gate|create_followup_fix|escalate_spec_conflict\n\
-      ```\n\n## Final Wiring Audit Retest\n\n**Blocker under retest**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY\n\
-      \n**Wiring audit result**:\n- idempotency_key validation location: <file:line>\n\
-      - idempotency_key consumption/persistence location: <file:line>\n- replay lookup/write\
-      \ location: <file:line>\n\n## Runtime / Targeted Smoke Evidence\n\n**Automated\
-      \ command executed**:\n```sh\ngo test ./internal/resofeed -run 'Idempotency|Inspect|Resonance|Steer'\
-      \ -count=1\n```\n\n**Actual output**:\n```text\n<paste output>\n```\n\n**Duplicate\
-      \ HTTP mutation smoke**:\n| Mutation | First response | Replay response | Duplicate/altered\
-      \ effect? | PASS/FAIL |\n| --- | --- | --- | --- | --- |\n| inspect | <status/body>\
-      \ | <status/body> | <none or details> | <PASS/FAIL> |\n| resonance | <status/body>\
-      \ | <status/body> | <none or details> | <PASS/FAIL> |\n| steer | <status/body>\
-      \ | <status/body> | <none or details> | <PASS/FAIL> |\n\n**Architecture invariant\
-      \ check**:\n- One Go binary / one SQLite DB preserved: YES/NO\n- No account\
-      \ system, sync/merge/history/activity ledger, sidecar worker, vector DB, or\
-      \ RAG introduced: YES/NO\n- Portable state scope unchanged: YES/NO"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - No refs for this step.
+
+
+      ## Retest Evidence
+
+
+      **Verdict**: PASS | FAIL
+
+      **Blockers**: [] or [<remaining blocker ids>]
+
+      **gate_open_allowed**: true | false
+
+      **orchestrator_action_hint**: proceed_to_final_gate | create_followup_fix |
+      escalate_spec_conflict
+
+
+      ## Commands / Runtime Smoke
+
+
+      **Targeted automated tests**:
+
+      ```sh
+
+      go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer'' -count=1
+
+      ```
+
+      Actual output:
+
+      ```text
+
+      <paste output>
+
+      ```
+
+
+      **Final wiring audit rerun / focused audit evidence**:
+
+      ```text
+
+      <paste audit evidence showing idempotency_key is consumed for persistence/replay,
+      not only validated>
+
+      ```
+
+
+      **Duplicate HTTP mutation smoke**:
+
+      | Endpoint | Same-key replay proven? | No duplicate/altered effect? | Evidence
+      |
+
+      | --- | --- | --- | --- |
+
+      | POST /api/items/{id}/inspect | yes/no | yes/no | <status/body/effect count>
+      |
+
+      | POST /api/items/{id}/resonance | yes/no | yes/no | <status/body/effect count>
+      |
+
+      | POST /api/steer | yes/no | yes/no | <status/body/effect count> |
+
+
+      **HTTP/MCP parity and portability check**:
+
+      - <evidence that retry/idempotency contract is aligned and portable state scope
+      is unchanged>
+
+      '
     depends_on:
     - fix-http-idempotency-wiring
     agent: wiring-auditor
