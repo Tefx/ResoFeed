@@ -10685,7 +10685,7 @@ phases:
     claimed_at: '2026-05-09T12:30:20.094535+00:00'
   - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     name: Final architecture and concurrency review
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10756,6 +10756,79 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-09T12:30:03.028734+00:00'
+    done_at: '2026-05-09T12:35:57.619539+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one deployable Go binary, one SQLite DB, flat `internal/resofeed`,
+      no repository/service/event bus, JSON backup/restore only, no sync/merge/conflict
+      resolver, single owner token.
+
+      - docs/ARCHITECTURE.md — one Go process, one SQLite DB, one backend package,
+      thin transports, owner-token runtime metadata excluded from export, SQLite transactions
+      for state changes, no event bus/plugin registry/DI/repository layer.
+
+      - docs/PRD.md — single-tenant, no unread/folders/settings complexity, state
+      portability only active sources/rules/resonated items.
+
+      - docs/DESIGN.md — owner-token prompt, Source Ledger, state portability, no
+      SaaS/onboarding/dashboard patterns.
+
+      - docs/DESIGN_VISION.md — analyst workbench; no folders/tags/drag-and-drop/accounts/onboarding/activity
+      logs.
+
+      - docs/USAGE.md — `serve` starts web UI, JSON HTTP API, MCP `/mcp`, background
+      ingestion, SQLite open/migrate/static assets; no separate migrate/worker/doctor/admin/sync
+      processes.
+
+
+      ## Architecture Review Report
+
+      - Boundary review: PASS. Thin `cmd/resofeed` entry; flat `internal/resofeed`;
+      only `serve` command; SQLite+FTS5; no vector DB/RAG/sync/account/event/repository
+      architecture.
+
+      - Dependency direction: PASS. HTTP/MCP call shared product functions; Gemini
+      is request-response JSON transformer only and does not own durable state.
+
+      - Runtime/concurrency: PASS_WITH_DEBT. Startup/shutdown/context/ingest/state-restore
+      transaction structure coherent; no module-level mutable state beyond immutable
+      regex/local maps.
+
+      - Forbidden abstraction scan: PASS.
+
+      - Issues and severity: blockers []; should_fix: make idempotency receipt handling
+      atomic with wrapped mutations; make ingest item upsert + FTS refresh atomic;
+      wrap smaller multi-step mutations/readbacks in transactions. These were classified
+      as non-blocking debt with remediation paths and gate_open_allowed true.
+
+      - Worker verification: `go test ./...` passed; no product files modified.
+
+      - Mainline verification: ran `go test ./...` in main; passed.
+
+      - Headline: PASS_WITH_DEBT
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      should_fix:
+
+      - Atomic idempotency receipt/mutation boundary
+
+      - Atomic ingest item upsert + FTS refresh
+
+      - Transaction-scope smaller multi-step mutations/readbacks
+
+      product_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      uncertainty_sources: no long-running race/load test was executed.'
   - id: finalization-docs-and-deep-review.final-design-contract-review
     name: Final DESIGN contract review
     status: done
