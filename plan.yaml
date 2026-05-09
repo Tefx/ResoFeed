@@ -4748,12 +4748,12 @@ phases:
 
 
       As an INDEPENDENT TESTER, rerun and prove closure for the failed runtime verification
-      cluster after `runtime-api-and-mcp-integration.fix-runtime-verification-blockers`.
+      cluster after `runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof`.
 
 
       YOUR GOAL IS TO FIND PROBLEMS, not to rubber-stamp the fix. This retest must
       cover every blocker class from the failed liveness, spec-conformance, and wiring-audit
-      steps.
+      steps, with special focus on the remaining B3 MCP steer Gemini proof failure.
 
 
       Rerun/prove all of the following through real runtime surfaces where applicable:
@@ -4765,17 +4765,23 @@ phases:
 
       3. HTTP API liveness and owner-token auth behavior through public surfaces.
 
-      4. MCP real bound listener `/mcp` Streamable HTTP initialize/resources/tools,
-      including `steer` using the configured Gemini test double/proof.
+      4. MCP real bound listener `/mcp` Streamable HTTP initialize/resources/tools.
 
       5. MCP `tools/list` schemas expose documented required fields/defaults/limits.
 
-      6. Startup validation no-bind matrix for invalid addr/public-url/db/Gemini/token
-      cases.
+      6. MCP `tools/call steer` uses configured Gemini test double/proof successfully
+      through a real bound listener or a documented contract-correct in-process bound
+      listener, returns a successful steering receipt, and idempotent replay does
+      not call Gemini a second time.
 
-      7. First-run owner-token generation and reuse at process level.
+      7. Unauthorized MCP `steer` does not call Gemini.
 
-      8. `go test ./...` passes and no stale runtime expected-stub skip text remains.
+      8. Startup validation no-bind matrix for invalid addr/public-url/db/Gemini/token
+      cases remains green.
+
+      9. First-run owner-token generation and reuse at process level remains green.
+
+      10. `go test ./...` passes and no stale runtime expected-stub skip text remains.
 
 
       This step is successful only if blocker closure is explicit with `verdict: PASS`,
@@ -4790,8 +4796,13 @@ phases:
 
       - Evidence includes HTTP API liveness/auth commands and outputs.
 
-      - Evidence includes MCP real bound-listener initialize/resources/tools outputs,
-      including `steer` Gemini test double/proof.
+      - Evidence includes MCP real bound-listener initialize/resources/tools outputs.
+
+      - Evidence includes MCP steer configured-Gemini proof: successful receipt, idempotent
+      replay without second Gemini call, unauthorized request not calling Gemini.
+
+      - Evidence explains whether the proof uses public binary or contract-correct
+      in-process bound listener and why.
 
       - Evidence includes startup validation no-bind matrix with explicit outputs
       for invalid addr/public-url/db/Gemini/token cases.
@@ -4986,7 +4997,7 @@ phases:
 
       - [ ] FAIL: one or more blockers/proof gaps remain'
     depends_on:
-    - runtime-api-and-mcp-integration.fix-runtime-verification-blockers
+    - runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     agent: integration-verifier
   - id: runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     name: Fix MCP steer Gemini proof
