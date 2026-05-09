@@ -4735,7 +4735,7 @@ phases:
       tree; not fixed because this remediation targeted runtime/static/MCP blockers.'
   - id: runtime-api-and-mcp-integration.runtime-blockers-retest
     name: Runtime blockers retest
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -4999,6 +4999,8 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T09:09:27.105612+00:00'
   - id: runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     name: Fix MCP steer Gemini proof
     status: done
