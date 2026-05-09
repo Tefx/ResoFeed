@@ -12716,6 +12716,143 @@ phases:
     depends_on:
     - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
     agent: golang-developer
+  - id: openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    name: complete-runtime-doctor-http-mcp-wiring
+    status: pending
+    description: 'step_type: implementation
+
+      tags: integration
+
+      agent_source: project
+
+      risk_tags: runtime,entrypoint,http,mcp,doctor,ui_microcopy
+
+
+      Complete runtime wiring within existing signatures and flat internal/resofeed
+      boundaries so the single `resofeed serve` binary constructs and passes the OpenRouter
+      LLM client through HTTP, MCP, background ingest, and `/doctor` paths.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - Runtime contract from lock-openrouter-contract-and-docs.
+
+      - Expected-red product integration tests from define-product-integration-red-tests.
+
+      - OpenRouter adapter and product LLM migration from prior implementation steps.
+
+
+      YOUR SCOPE: Replace remaining Gemini wiring and visible text with OpenRouter/model-neutral
+      behavior. Use direct construction in serve startup and explicit dependency passing.
+      Preserve HTTP/MCP product operation equivalence.
+
+
+      Touch_paths:
+
+      - internal/resofeed/http.go, internal/resofeed/mcp.go, runtime startup/serve
+      wiring files.
+
+      - internal/resofeed/ingest runtime loop construction.
+
+      - `/doctor` rendering and any UI microcopy that mentions Gemini.
+
+      - related Go tests and minimal frontend/static smoke hooks only where existing
+      code requires.
+
+
+      Integration evidence required:
+
+      - Source → sink path: CLI flags → runtime config → OpenRouter client → ingest/steering
+      consumers → HTTP/MCP/doctor presenters.
+
+      - `/doctor` raw output includes `openrouter:` and configured/default/resolved
+      model behavior.
+
+      - No `gemini:` output remains in runtime-facing text.
+
+      - HTTP and MCP expose same product operations; agents receive no special product
+      concepts.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Any retained Gemini compatibility flag or visible `gemini:` runtime output.
+
+      2. A provider registry/plugin layer when OpenRouter is the sole backend.
+
+      3. Secret printing in logs, doctor output, tests, or evidence.
+
+      4. Handler-only wiring that does not start through `resofeed serve`.
+
+      5. HTTP/MCP steering drift where one surface bypasses LLMClient or idempotency.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs. Private `_Runtime*`, `_Stub*`, or `_Placeholder*`
+      runtime substitutes do not satisfy this requirement.
+
+
+      If a contract artifact is wrong or incomplete, document a deviation record (type,
+      what, why, impact) — do NOT silently rewrite.'
+    verification: 'phase-check protecting implementation gate. Main path: focused
+      tests prove runtime wiring, HTTP/MCP parity, and doctor output. Failure path:
+      tests prove no Gemini runtime text, no secret output, and no handler-only bypass
+      of serve wiring.'
+    evidence_template: '## Integration Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <go test or local serve harness command>
+
+      ```
+
+
+      **Actual output** (paste redacted output, not just "tests pass"):
+
+      ```
+
+      <stdout/stderr with secrets redacted>
+
+      ```
+
+
+      **Path exercised**: CLI flags → runtime config → OpenRouter client → ingest/steering
+      → HTTP/MCP/doctor
+
+
+      **Checks**:
+
+      - `openrouter:` doctor output present:
+
+      - configured vs default/resolved model behavior shown:
+
+      - `gemini:` absent:
+
+      - HTTP/MCP operation parity preserved:
+
+      - No secrets printed:
+
+      - No provider registry/DI/service layer introduced:'
+    depends_on:
+    - openrouter-llm-implementation.complete-ingest-steering-state-migration
+    agent: golang-developer
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
