@@ -4284,7 +4284,7 @@ phases:
     agent: gate-reviewer
   - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     name: Fix runtime verification blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -4546,6 +4546,193 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T08:41:33.241293+00:00'
+    done_at: '2026-05-09T08:53:08.908652+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary runs static assets, JSON HTTP, MCP
+      Streamable HTTP, and ingest; owner token is universal delegation boundary; no
+      accounts/OAuth/sync/vector layers.
+
+      - docs/ARCHITECTURE.md — startup failures exit before binding; static UI is
+      public while `/api/*` and `/mcp` require owner token; MCP tools expose required
+      fields/defaults/limits.
+
+      - docs/PRD.md — ResoFeed primitives are Inspect, Resonate, Steer; not inbox-zero/RAG/SaaS.
+
+      - docs/DESIGN.md — Owner Token Prompt requires `Enter owner token`, token input,
+      no account/cloud-auth language.
+
+      - docs/DESIGN_VISION.md — no account login/onboarding; terse local access gate.
+
+      - docs/USAGE.md — documented web/binary build commands; owner token generation/reuse;
+      MCP Streamable HTTP at `/mcp`.
+
+
+      ## Runtime Blocker Fix Evidence
+
+      **Documented web build command and output**:
+
+      ```text
+
+      npm --prefix web install && npm --prefix web run build
+
+      exit 0; adapter-static wrote site to "build".
+
+      ```
+
+
+      **Binary build command and output**:
+
+      ```text
+
+      go build -o ./bin/resofeed ./cmd/resofeed
+
+      exit 0
+
+      ```
+
+
+      **Root static UI proof**:
+
+      - URL: `http://127.0.0.1:52380/`
+
+      - Status: HTTP 200
+
+      - Content-Type: `text/html; charset=utf-8`
+
+      - Body excerpt proved HTML/static UI and owner-token prompt/interactive content:
+      `<main class="contract-shell resofeed-shell" aria-label="RESOFEED">`, `Enter
+      owner token`, `Owner token`, password input.
+
+
+      **MCP tools/list schema assertions**:
+
+      - Tools covered: `list_candidate_items`, `search_items`, `read_item`, `mark_inspected`,
+      `resonate_item`, `steer`, `report_delivery`.
+
+      - Active test `TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas`
+      asserts required fields, defaults, max bounds, `date-time` format, actor/idempotency
+      fields.
+
+
+      **MCP steer Gemini parity proof**:
+
+      - Configured Gemini path now flows `HTTPServerConfig.Gemini -> MCPConfig.Gemini
+      -> mcpHandler.gemini -> SteerForMCP -> ApplySteering`.
+
+      - `TestMCPSteerUsesConfiguredGeminiAndReceipts` verifies MCP steer uses configured
+      Gemini, unauthorized request does not call Gemini, and idempotent retry reuses
+      stored receipt without second Gemini call.
+
+
+      **Runtime startup/token/listener proofs**:
+
+      - `TestServeStartupValidationFailsBeforeSocketBind` covers invalid public URL,
+      invalid Gemini API key, invalid owner token, invalid DB path and verifies each
+      fails before socket bind.
+
+      - `TestServeStartupRejectsInvalidAddrBeforeDBAndSocket` covers invalid address.
+
+      - `TestServeFirstRunOwnerTokenGenerationAndReuseAtProcessLevel` proves generated
+      token on first run and stored-hash reuse on second run.
+
+      - `TestMCPRealBoundListenerInitializeResourcesAndTools` exercises `/mcp` over
+      a real bound HTTP listener.
+
+
+      **Stale expected-stub test debt cleanup**:
+
+      - Removed stale `t.Skip` expected-stub-debt lines from `backend_contract_test.go`
+      and converted coverage into active assertions for HTTP auth/query validation
+      and MCP schema/auth.
+
+      - Search for `expected stub debt`, `runtime HTTP router is expected stub debt`,
+      and `runtime MCP handler is expected stub debt` found no files.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: implementation
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: yes — `internal/resofeed/backend_contract_test.go`,
+      `internal/resofeed/http.go`, `internal/resofeed/http_impl_test.go`, `internal/resofeed/mcp.go`,
+      `internal/resofeed/mcp_integration_test.go`, `internal/resofeed/runtime_startup_test.go`,
+      `web/svelte.config.js`, `web/src/routes/+layout.ts`
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Run
+
+      Subagent worktree:
+
+      - `npm --prefix web install && npm --prefix web run build` → exit 0
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed` → exit 0
+
+      - `go test ./...` → exit 0
+
+      - `go test -race ./internal/resofeed` → exit 0
+
+      - real bound root proof → exit 0
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.fix-runtime-verification-blockers`
+      applied 8 files.
+
+      - `npm --prefix web install && npm --prefix web run build && go test ./... &&
+      go test -race ./internal/resofeed && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-runtime-fix-build
+      ./cmd/resofeed` → all succeeded. NPM audit reports 3 low severity vulnerabilities,
+      unchanged/out-of-scope.
+
+      - Merge commit: `26ebb14` (`[vectl] step-runtime-api-and-mcp-integration.fix-runtime-verification-blockers
+      completed`).
+
+
+      ## Commit hash(es)
+
+      - isolated branch commit: `ba8c19cf0abf87075660857b541c515ee0f139a2`
+
+      - main merge commit: `26ebb14`
+
+
+      ## Files changed
+
+      - `internal/resofeed/backend_contract_test.go`
+
+      - `internal/resofeed/http.go`
+
+      - `internal/resofeed/http_impl_test.go`
+
+      - `internal/resofeed/mcp.go`
+
+      - `internal/resofeed/mcp_integration_test.go`
+
+      - `internal/resofeed/runtime_startup_test.go`
+
+      - `web/svelte.config.js`
+
+      - `web/src/routes/+layout.ts`
+
+
+      ## Gaps/Notes
+
+      NPM audit reports 3 low severity vulnerabilities in existing frontend dependency
+      tree; not fixed because this remediation targeted runtime/static/MCP blockers.'
   - id: runtime-api-and-mcp-integration.runtime-blockers-retest
     name: Runtime blockers retest
     status: pending
