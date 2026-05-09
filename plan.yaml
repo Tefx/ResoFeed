@@ -12671,7 +12671,7 @@ phases:
       \ phase remains blocked until fix and independent retest complete."
   - id: openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps
     name: fix-red-test-gate-gaps
-    status: pending
+    status: claimed
     description: 'Remediate ALL blockers from gate step openrouter-llm-contract-and-red-tests.contract-red-tests-gate.
 
 
@@ -12769,6 +12769,8 @@ phases:
     depends_on:
     - openrouter-llm-contract-and-red-tests.contract-red-tests-gate
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T17:57:08.344505+00:00'
   - id: openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps
     name: retest-red-test-gate-gaps
     status: pending
