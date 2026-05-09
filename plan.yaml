@@ -12853,6 +12853,112 @@ phases:
     depends_on:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     agent: golang-developer
+  - id: openrouter-llm-implementation.wiring-audit
+    name: wiring-audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check protecting openrouter-llm-implementation.gate
+
+
+      Wiring completeness audit: verify every OpenRouter runtime and public symbol
+      is reachable through the single `resofeed serve` binary and no Gemini wiring
+      remains.
+
+
+      REQUIRED CHECKS:
+
+      1. Export/reachability: OpenRouter adapter and LLMClient consumers are reachable
+      from runtime startup and not orphaned.
+
+      2. CLI registration: `--openrouter-api-key` and `--openrouter-model` are registered;
+      Gemini flags are absent.
+
+      3. Config consumption: OpenRouter key/model runtime fields are consumed by adapter
+      construction and not persisted/exported.
+
+      4. Contract consumption: tests and docs reflect exact OpenRouter endpoint/model
+      semantics.
+
+      5. Stub detection: no `_Runtime*`, `_Stub*`, `_Placeholder*`, hardcoded model
+      outputs, or fake runtime dependencies remain in production serve path.
+
+      6. Transport parity: HTTP/MCP steering and product operations share product
+      logic and do not re-derive provider facts independently.
+
+
+      Use grep/import-trace output as evidence, not assertions.'
+    verification: phase-check protecting openrouter-llm-implementation.gate. Wiring
+      audit must return PASS only if no Gemini runtime wiring, no orphan OpenRouter
+      adapter, no unconsumed config fields, and no production stubs are found.
+    evidence_template: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      **Orphan exports / unreachable adapter symbols**:
+
+      ```
+
+      <grep/import-trace output or "none found">
+
+      ```
+
+      **Unregistered/misregistered CLI flags**:
+
+      ```
+
+      <grep output or "none found">
+
+      ```
+
+      **Unconsumed or persisted OpenRouter config fields**:
+
+      ```
+
+      <grep output or "none found">
+
+      ```
+
+      **Gemini runtime residue**:
+
+      ```
+
+      <grep output or "none found">
+
+      ```
+
+      **Production stubs/placeholders**:
+
+      ```
+
+      <grep output or "none found">
+
+      ```
+
+      **HTTP/MCP provider fact re-derivation**:
+
+      ```
+
+      <trace output or "none found">
+
+      ```
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+    - openrouter-llm-implementation.complete-ingest-steering-state-migration
+    - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    agent: wiring-auditor
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
