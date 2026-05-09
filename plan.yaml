@@ -14674,7 +14674,7 @@ phases:
       \ README fix and independent retest complete."
   - id: runtime-secret-env-config-foundation.secret-config-gate
     name: secret-config-gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -14778,6 +14778,8 @@ phases:
     - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     - runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T17:34:39.964594+00:00'
   - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
     name: fix-readme-secret-cli-regression
     status: done
