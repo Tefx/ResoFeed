@@ -13924,3 +13924,11 @@ phases:
     - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     - openrouter-llm-verification-and-live-smoke.documentation-sync
     agent: gate-reviewer
+- id: runtime-secret-env-config-foundation
+  name: Runtime Secret Env Config Foundation
+  status: pending
+  gate: Runtime LLM secret resolution via environment variables and local .env files
+    is contract-locked, implemented for the current Gemini path, verified secret-safe,
+    and ready as the required foundation before OpenRouter migration.
+  depends_on:
+  - finalization-docs-and-deep-review
