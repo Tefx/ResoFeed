@@ -9279,6 +9279,160 @@ phases:
     - end-to-end-integration.end-to-end-spec-conformance
     - end-to-end-integration.end-to-end-wiring-audit
     agent: python-senior
+  - id: retest-end-to-end-blockers
+    name: Retest end-to-end blockers
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+      verification_scope: phase-check protecting end-to-end-gate, finalization-docs-and-deep-review
+      gates
+
+
+      As an INDEPENDENT TESTER, rerun the affected spec-conformance and wiring-proof
+      closure after the batched remediation in fix-end-to-end-blockers.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works. This retest succeeds
+      only when the proof artifacts can support gate opening.
+
+
+      ## Required retest scope
+
+      1. Top-level nav compliance: verify UI no longer exposes SEARCH or STATE as
+      top-level surface-nav buttons and remains compliant with PRD/Architecture/Design.
+
+      2. Agent steering attribution visible to human: verify an MCP/agent steering
+      action produces a human-visible attribution/receipt on the next relevant UI
+      interaction without introducing accounts or per-agent auth.
+
+      3. AC-4 strict filter/boost: verify strict filters and boost execution at system
+      level through real runtime paths.
+
+      4. AC-5 inspect-not-preference: verify inspecting controversial items does not
+      create a preference signal.
+
+      5. MCP delivery/candidate resurfacing: verify related HTTP/MCP/UI cross-surface
+      behaviors with concrete runtime evidence.
+
+      6. value_tier disposition: verify `items.value_tier` is either consumed/exposed
+      by a real production read path with tests, removed from production scope, or
+      explicitly justified as non-scope with non-intersection evidence.
+
+      7. No remaining blocker-class write-only/orphan seams: re-check `SteerRule.SupersededBy`,
+      `ServeHTTPRuntime`, `RebuildSearchIndex`, `DeliveryReportRequest`, and `/api/state/import`
+      frontend path for final-gate intersection.
+
+
+      ## Closure fields required in terminal evidence
+
+      Return these fields exactly:
+
+      - verdict: PASS | FAIL
+
+      - blockers: [] or [B1, B2, B3, W1, W2...]
+
+      - gate_open_allowed: true | false
+
+      - orchestrator_action_hint: COMPLETE_AND_OPEN_GATE | DO_NOT_COMPLETE
+
+
+      ## Behavioral proof register required
+
+      For each blocker-class obligation, include:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      NEEDS_TEST, UNPROVEN, and UNCERTAIN_BLOCKING must include explicit remediation/retest
+      ownership or explicit non-intersection evidence. Do not mark gate_open_allowed=true
+      while blocker-class behavioral obligations remain unresolved.'
+    verification: '- expected_result: green
+
+      - Top-level nav compliance is proven with rendered UI/test evidence: SEARCH
+      and STATE are not top-level nav buttons.
+
+      - Agent steering attribution is proven visible to a human after an MCP/agent
+      steering action.
+
+      - AC-4 strict filter/boost and AC-5 inspect-not-preference are proven via real
+      system-level evidence.
+
+      - MCP delivery/candidate resurfacing cross-surface behavior is proven with runtime
+      evidence.
+
+      - value_tier has an accepted disposition: consumed/exposed with production read-path
+      tests, removed, or explicitly non-scope with non-intersection evidence.
+
+      - Static/runtime evidence shows no remaining blocker-class write-only/orphan
+      seams that intersect end-to-end-gate or finalization/deep-review gates.
+
+      - Closure fields are present and gate_open_allowed=true only when blockers=[]
+      and verdict=PASS.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of implementation)\n**Scope**: End-to-end blocker retest for\
+      \ spec conformance and wiring audit failures\n**Independence Level**: L2\n**Timestamp**:\
+      \ <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN_VISION.md — key passage or \"NOT READ:\
+      \ <reason>\"\n- docs/USAGE.md — key passage or \"NOT READ: <reason>\"\n\nIf\
+      \ no refs were provided, state: \"No refs for this step.\"\n\n## Closure Fields\
+      \ (MANDATORY)\n```yaml\nverdict: \"PASS|FAIL\"\nblockers:\n  - \"<blocker id,\
+      \ or leave empty>\"\ngate_open_allowed: true|false\norchestrator_action_hint:\
+      \ \"COMPLETE_AND_OPEN_GATE|DO_NOT_COMPLETE\"\n```\n\n## Behavioral Proof Register\n\
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |\
+      \ status | closure_path | gate_decision_basis |\n| --- | --- | --- | --- | ---\
+      \ | --- | --- |\n| PRD/DESIGN top-level nav | SEARCH/STATE are not top-level\
+      \ nav surfaces | rendered UI/test artifact | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n| PRD steering attribution | agent steering attribution\
+      \ visible to human | MCP action + next UI interaction | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n| PRD AC-4 | strict filter/boost executed | real runtime/API\
+      \ proof | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <basis>\
+      \ |\n| PRD AC-5 | inspect is not preference signal | real runtime/API proof\
+      \ | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <basis>\
+      \ |\n| MCP resurfacing | delivery/candidate resurfacing works cross-surface\
+      \ | MCP + HTTP/UI proof | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n| wiring value_tier | value_tier consumed/exposed/removed/non-scope\
+      \ | static + runtime proof | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n\n## Concrete Evidence\n\n### Top-level nav compliance\n\
+      ```text\n<paste rendered UI/test output showing allowed nav only>\n```\n\n###\
+      \ Agent steering attribution visible to human\n```text\n<paste MCP action +\
+      \ next human-visible UI/receipt output>\n```\n\n### AC-4 strict filter/boost\
+      \ execution\n```text\n<paste exact runtime command/test and output>\n```\n\n\
+      ### AC-5 inspect-not-preference behavior\n```text\n<paste exact runtime command/test\
+      \ and output>\n```\n\n### MCP delivery/candidate resurfacing\n```text\n<paste\
+      \ exact MCP/HTTP/UI command/test and output>\n```\n\n### value_tier disposition\n\
+      ```text\n<paste static search plus production read-path/removal/non-intersection\
+      \ proof>\n```\n\n### Write-only/orphan seam scan\n```text\n<paste static reachability/search\
+      \ output for value_tier, SteerRule.SupersededBy, ServeHTTPRuntime, RebuildSearchIndex,\
+      \ DeliveryReportRequest, and /api/state/import frontend path>\n```\n\n## Issues\
+      \ Found\n| Severity | Description | Location | Reproduction |\n| --- | --- |\
+      \ --- | --- |\n| blocker | <issue or none> | <file:line/surface> | <steps> |\n\
+      | should_fix | <issue or none> | <location> | <steps> |\n\n## Headline\n- [\
+      \ ] PASS: verdict=PASS, blockers=[], gate_open_allowed=true\n- [ ] FAIL: blocker-class\
+      \ proof gaps remain or closure fields prohibit gate opening\n\n**Confidence**:\
+      \ high/medium/low\n"
+    depends_on:
+    - fix-end-to-end-blockers
+    agent: integration-verifier
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
