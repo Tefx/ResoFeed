@@ -14021,7 +14021,7 @@ phases:
   steps:
   - id: runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
     name: lock-runtime-secret-source-policy
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -14155,6 +14155,42 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-09T17:10:17.136515+00:00'
+    done_at: '2026-05-09T17:13:28.980817+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages before change: one Go process, CLI flags for runtime\
+      \ config, Gemini as JSON transformer, SQLite/current-state constraints, no repositories/DI/event\
+      \ buses, and state export excluding non-portable runtime metadata. Updated passages\
+      \ now lock runtime LLM secret-source precedence, `.env` parser limits, non-persistence/non-export/non-logging,\
+      \ Gemini CLI compatibility override, and OpenRouter reuse obligations.\n- docs/USAGE.md\
+      \ — READ. Key passages before change: Quick Start used `--gemini-api-key`, owner-token\
+      \ behavior, state export/import scope, `/doctor`, MCP usage, and forbidden product\
+      \ categories. Updated passages now document safe OS env/local `.env` configuration,\
+      \ discourage CLI secret flags, redact diagnostics evidence, and require OpenRouter\
+      \ env/.env reuse.\n- AGENTS.md — NOT READ: `AGENTS.md` was not present in the\
+      \ isolated worktree root. Equivalent project instructions `.agents/instructions.md`\
+      \ were read and updated. Key passage before change: one Go binary, one SQLite\
+      \ DB, Gemini as utility, flat `internal/resofeed/`, no sync/merge/activity/history\
+      \ concepts, no accounts/OAuth/RBAC, and plan guardrails.\n- .agents/instructions.md\
+      \ — READ as equivalent project instructions; added canonical runtime secret-handling\
+      \ guardrails.\n\n## Contract Evidence\n- Secret-source precedence documented:\
+      \ CLI compatibility override (current Gemini only, if existing) > OS env > `.env`\
+      \ fallback.\n- Non-persistence/non-export/non-logging guarantees documented\
+      \ in `docs/ARCHITECTURE.md`, `docs/USAGE.md`, and `.agents/instructions.md`.\n\
+      - `.env` local-runtime-only and no actual secret reading/printing/committing\
+      \ documented.\n- Future OpenRouter reuse obligation documented, including env/.env\
+      \ and redacted evidence.\n- Architecture decision note present: removing/deprecating\
+      \ the Gemini CLI key flag beyond warning requires explicit user confirmation.\n\
+      - Files changed limited to docs/instructions/contracts; no runnable resolver\
+      \ logic shipped.\n\n## Verification\n- Worker commands included `git diff --check`,\
+      \ `git diff --stat`, `git status --short`, and successful commit creation.\n\
+      - Mainline merge and verification:\n  - Squash merged worker commit `f14f2678947669737907ffb99fd3a03c073c9df8`\
+      \ into main as `10b43de` (`[vectl] step-runtime-secret-env-config-foundation.lock-runtime-secret-source-policy\
+      \ completed`).\n  - Ran `git diff --check HEAD` after merge; passed with no\
+      \ output.\n\n## Files changed\n- `.agents/instructions.md`\n- `docs/ARCHITECTURE.md`\n\
+      - `docs/USAGE.md`\n\n## Commit hash(es)\n- Worker: `f14f2678947669737907ffb99fd3a03c073c9df8`\n\
+      - Main squash: `10b43de`\n\n## Gaps/Notes\n- `AGENTS.md` absent in worktree;\
+      \ `.agents/instructions.md` used as equivalent project instructions.\n- No `.env`\
+      \ contents were read, printed, or committed."
   - id: runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     name: define-runtime-secret-red-tests
     status: pending
