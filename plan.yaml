@@ -10600,7 +10600,7 @@ phases:
       FAIL'
   - id: finalization-docs-and-deep-review.final-spec-conformance-audit
     name: Final spec conformance audit
-    status: pending
+    status: claimed
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10681,6 +10681,8 @@ phases:
     - finalization-docs-and-deep-review.final-wiring-audit
     - retest-http-idempotency-wiring
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T12:30:20.094535+00:00'
   - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     name: Final architecture and concurrency review
     status: claimed
