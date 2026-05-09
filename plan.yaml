@@ -16312,7 +16312,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.documentation-sync
     name: documentation-sync
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -16414,6 +16414,8 @@ phases:
     - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-09T19:28:13.147991+00:00'
   - id: openrouter-llm-verification-and-live-smoke.final-openrouter-gate
     name: final-openrouter-gate
     status: pending
