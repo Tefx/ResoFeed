@@ -13579,9 +13579,10 @@ phases:
       verification_scope: full-plan-check protecting final OpenRouter gate
 
 
-      Complete live/smoke system test using `.env` `OPENROUTER_KEY` or equivalent
-      environment injection. Do NOT read, print, commit, or expose the key. Evidence
-      must redact secrets and owner token values.
+      Complete live/smoke system test using `.env` `OPENROUTER_KEY` / `OPENROUTER_API_KEY`
+      or equivalent OS environment injection according to the locked OpenRouter contract.
+      Do NOT pass the OpenRouter API key on the command line. Do NOT read, print,
+      commit, or expose the key. Evidence must redact secrets and owner token values.
 
 
       Independence Level: L3 black-box/public-interface oriented. Use the built binary
@@ -13590,11 +13591,12 @@ phases:
 
       Preconditions:
 
-      - If `OPENROUTER_KEY` is absent, mark this step BLOCKED with exact missing precondition;
+      - If the locked OpenRouter env variable is absent and no safe local `.env` test
+      secret is available, mark this step BLOCKED with exact missing precondition;
       do not fake live evidence.
 
-      - Source `.env` or equivalent in a way that does not echo values (for example
-      shell export without `set -x`).
+      - Load `.env` or equivalent in a way that does not echo values (for example
+      env injection without `set -x`). Never paste `.env` contents.
 
       - Use a temporary SQLite DB and temporary runtime directories.
 
@@ -13605,9 +13607,10 @@ phases:
 
       1. Build the single `cmd/resofeed` binary.
 
-      2. Run `resofeed serve --openrouter-api-key "$OPENROUTER_KEY"` with `--openrouter-model`
-      omitted to exercise account default behavior; optionally run a second pass with
-      a non-secret configured model name if safe.
+      2. Run `resofeed serve` without any CLI API-key flag, using `.env`/OS environment
+      OpenRouter key resolution; omit `--openrouter-model` to exercise account default
+      behavior; optionally run a second pass with a non-secret configured model name
+      if safe.
 
       3. Exercise auth boundary: unauthenticated request rejected; owner-token request
       accepted.
@@ -13619,8 +13622,8 @@ phases:
       6. Exercise `/api/doctor` and capture redacted `openrouter:` output including
       configured/default/resolved model behavior where available.
 
-      7. Exercise `/api/state/export` and confirm no OpenRouter key/model/provider
-      config.
+      7. Exercise `/api/state/export` and confirm no OpenRouter key, env source, `.env`
+      path, model secret config, or provider config.
 
       8. Exercise OPML import path without treating OPML as portable state restoration.
 
@@ -13631,15 +13634,20 @@ phases:
       10. Exercise UI smoke where possible: load page, confirm no broken blank page,
       capture screenshot/DOM/rendered evidence if browser tooling is available.
 
-      11. Confirm no Gemini flags/output in live-visible paths.
+      11. Confirm no Gemini flags/output and no CLI-secret instructions in live-visible
+      paths.
+
+      12. Confirm stdout/stderr/logs do not contain the OpenRouter key or fake owner
+      token.
 
 
       Live smoke is allowed to make real OpenRouter calls but must keep prompt/input
       minimal and safe. Never paste full request headers containing the key.'
     verification: full-plan-check protecting final gate. PASS requires actual command/output
-      evidence for build, server startup, auth, feed, search, doctor, state export,
-      OPML import, MCP initialize/tools/resources/steer, and UI smoke where possible.
-      Handler-only or fake-provider evidence is insufficient for this live step.
+      evidence for build, server startup without CLI API key, auth, feed, search,
+      doctor, state export, OPML import, MCP initialize/tools/resources/steer, UI
+      smoke where possible, and secret redaction. Handler-only, fake-provider, or
+      CLI-key evidence is insufficient for this live step.
     evidence_template: '## Live OpenRouter Smoke Evidence
 
       **Tester**: blind-tester
