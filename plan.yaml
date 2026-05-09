@@ -11637,3 +11637,162 @@ phases:
       ## Gaps/Notes
 
       - No artifacts/product files modified by retest worker.'
+  - id: finalization-docs-and-deep-review.fix-http-query-validation-contract
+    name: Fix HTTP query validation contract drift
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      priority: HIGH
+
+
+      Fix all blocker-class HTTP query validation drift reported by finalization-docs-and-deep-review.final-spec-conformance-audit,
+      and resolve the OPML wording drift if it is documentation-only.
+
+
+      Scope:
+
+      - B1 strict query validation drift: endpoints whose contract says request/query
+      params are none must reject unknown query parameters after owner-token authentication
+      and before backend reads. Cover no-query HTTP endpoints including /api/sources,
+      /api/state/export, /api/doctor, /api/steer/active, item detail, and mutation
+      endpoints. Do not broaden endpoint contracts silently.
+
+      - B2 empty feed limit drift: /api/feed/today?limit= must return 400 bad_request
+      with field=limit; limit must be a base-10 integer string in range 1..100 when
+      present.
+
+      - Should-fix OPML wording drift: if current intended product scope is OPML import-only,
+      clarify .agents/PRD/Usage wording so it no longer promises OPML export. Only
+      implement OPML export if an authoritative existing contract already requires
+      it; otherwise prefer documentation clarification.
+
+
+      Required tests:
+
+      1. Unknown query rejected for no-query endpoints after valid auth, with 400
+      bad_request and the offending field identified.
+
+      2. /api/feed/today?limit= returns 400 bad_request field=limit.
+
+      3. Auth-before-validation preserved: unauthenticated requests with unknown query
+      parameters still fail auth before query validation and do not leak validation
+      details.
+
+      4. Backend-read prevention: for authenticated no-query requests with unknown
+      query parameters, handler/backend reads are not performed before rejection where
+      test harness can observe this.
+
+
+      Failure-mode checklist:
+
+      - Missing-file fallback behavior: not applicable; do not introduce filesystem/config
+      fallback.
+
+      - Explicit clear/null overwrite semantics: not applicable; do not change state
+      mutation payload semantics.
+
+      - Stale-definition vs new-state precedence: HTTP request contract is authoritative;
+      implementation must not infer backend acceptance from ignored query strings.
+
+      - Partial-write behavior: mutation endpoints with unknown query params must
+      reject before any state write.
+
+
+      State semantics:
+
+      - Query validation is per-request and has no last-writer-wins semantics.
+
+      - Owner-token authentication must remain the universal delegation boundary and
+      must run before query validation details are exposed.
+
+      - Backward-compatible behavior means documented query parameters still work
+      exactly as before; undocumented query parameters are rejected.
+
+
+      Out-of-scope guardrail:
+
+      - Do not add accounts, per-agent auth, sync/merge, activity/history concepts,
+      or new service/repository layers.
+
+      - Do not change API response schemas except the required bad_request validation
+      response for invalid query params.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION/DOC FIX step. Stub-only completion is NOT acceptable.
+      Each code deliverable MUST contain substantive request validation logic that
+      processes actual query keys and produces outcomes that vary based on inputs.
+      Private stub classes or placeholder handlers do not satisfy this requirement.'
+    verification: '- Targeted Go tests prove unknown query rejection for no-query
+      endpoints, empty limit rejection, auth-before-validation preservation, and mutation
+      no-write-before-reject behavior.
+
+      - Documentation diff resolves OPML import/export wording drift without expanding
+      product scope unless an authoritative contract already required OPML export.
+
+      - Main path: documented query parameters and no-query requests without query
+      strings still work.
+
+      - Highest-risk failure path: authenticated mutation endpoint with unknown query
+      param returns 400 before backend/state mutation; unauthenticated unknown query
+      returns auth failure before validation details.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fix Evidence
+
+
+      **Blockers fixed**:
+
+      - B1 strict query validation drift: <summary and files changed>
+
+      - B2 empty feed limit drift: <summary and files changed>
+
+
+      **Should-fix disposition**:
+
+      - OPML wording drift: DOC_CLARIFIED | EXPORT_IMPLEMENTED | NOT_CHANGED with
+      reason
+
+
+      **Targeted tests added/updated**:
+
+      - Unknown query rejected for no-query endpoints: <test names>
+
+      - /api/feed/today?limit= returns 400 bad_request field=limit: <test name>
+
+      - Auth-before-validation preserved: <test name>
+
+      - Backend read/write not performed before unknown-query rejection: <test name>
+
+
+      **Commands run**:
+
+      ```
+
+      <paste exact go test commands and output>
+
+      ```
+
+
+      **Remaining gaps**: <none or explicit non-blocking disposition>'
+    depends_on:
+    - finalization-docs-and-deep-review.final-spec-conformance-audit
+    agent: golang-developer
