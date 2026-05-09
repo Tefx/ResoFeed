@@ -2465,7 +2465,7 @@ phases:
       exists.'
   - id: core-domain-implementation.core-domain-gate
     name: Core domain gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -2565,6 +2565,8 @@ phases:
     - core-domain-implementation.core-spec-conformance
     - fix-core-domain-verification-blockers
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T07:06:11.521693+00:00'
   - id: fix-core-domain-verification-blockers
     name: Fix core domain verification blockers
     status: done
