@@ -7289,7 +7289,7 @@ phases:
     agent: gate-reviewer
   - id: fix-steer-diagnostics-and-mobile-ui-contract
     name: Fix steer diagnostics and mobile UI contract blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -7527,6 +7527,8 @@ phases:
     - frontend-implementation.frontend-spec-conformance
     - frontend-implementation.native-ui-ux-implementation-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-09T10:02:47.941864+00:00'
   - id: retest-frontend-contract-closure
     name: Retest frontend contract closure
     status: pending
