@@ -14286,3 +14286,100 @@ phases:
     - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
     - runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     agent: golang-developer
+  - id: runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+    name: verify-runtime-secret-env-config
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases
+
+
+      As an INDEPENDENT TESTER, verify the runtime secret env/.env foundation from
+      a fresh perspective.
+
+
+      Independence Level: L2 semi-blind integration verification. Use repository code
+      and public runtime/startup surfaces, but do not rely on implementation-process
+      context.
+
+
+      Scope:
+
+      - Current Gemini runtime key resolution through OS env and local `.env`.
+
+      - Startup without CLI API key using fake keys only.
+
+      - Secret redaction in stdout/stderr/logs/errors.
+
+      - State export/import non-portability of secrets and runtime secret config.
+
+      - Docs/search checks preventing shell-history key examples and future OpenRouter
+      CLI-secret regression.
+
+
+      Required verification:
+
+      1. Run focused Go tests covering resolver, CLI/runtime startup, state export/import,
+      and docs/search checks.
+
+      2. Smoke startup using a temporary `.env` with a fake `GEMINI_API_KEY`; do not
+      print the file contents; prove server starts without passing a CLI API key.
+
+      3. Capture stdout/stderr and grep/search for the fake key value; evidence must
+      show no leakage while redacting the actual fake value.
+
+      4. Confirm state export/import output omits API keys, `.env` values, secret
+      source paths, provider secret config, and env-derived config.
+
+      5. Confirm docs do not require command-line API key examples that put keys in
+      shell history and that `.env` is documented as local/non-committed.
+
+      6. Confirm OpenRouter pending plan/docs contract now depends on this foundation
+      and requires `.env`/env secret input with redacted live-smoke evidence.
+
+
+      Finding issues is a successful verification outcome if documented precisely.
+      Evidence missing or fake smoke evidence is incomplete.'
+    verification: phase-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases. PASS requires focused Go tests, doc/grep checks,
+      state-export proof, and smoke startup with temporary `.env` fake key with no
+      secret leakage. Handler-only evidence is insufficient.
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of implementation)\n**Scope**: runtime secret env/.env foundation\n\
+      **Independence Level**: L2\n**Timestamp**: <ISO 8601>\n\n## refs Read Confirmation\
+      \ (MANDATORY)\n\nFor each ref in this step:\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided,\
+      \ state: \"No refs for this step.\"\n\n## Test Execution\n- Commands executed:\n\
+      \  ```\n  <actual go test/doc grep/smoke commands; secrets redacted>\n  ```\n\
+      - `.env` smoke setup: temporary file used with fake key; contents NOT printed.\n\
+      - Startup proof without CLI API key:\n  ```\n  <redacted stdout/stderr showing\
+      \ server startup>\n  ```\n- Secret leakage search:\n  ```\n  <redacted grep/search\
+      \ evidence showing fake key not present in stdout/stderr/logs/export>\n  ```\n\
+      - State export/import non-portability proof:\n  ```\n  <redacted export inspection\
+      \ showing no key/env/.env/provider secret config>\n  ```\n- Docs/search proof:\n\
+      \  ```\n  <output showing no docs require CLI-passed API keys or shell-history\
+      \ key examples>\n  ```\n\n## Issues Found\n| Severity | Description | Location\
+      \ | Reproduction |\n| --- | --- | --- | --- |\n| blocker/should_fix/suggestion/tech_debt\
+      \ | <issue or none> | <file:line or command> | <steps> |\n\n## Behavioral Proof\
+      \ Register\n| requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref\
+      \ | status | closure_path | gate_decision_basis |\n| --- | --- | --- | --- |\
+      \ --- | --- | --- |\n| secret-precedence | env/.env/CLI compatibility precedence\
+      \ works | Go tests + smoke | <ref> | PROVEN/NEEDS_TEST | <path> | <basis> |\n\
+      | no-secret-leakage | secrets not printed/logged/exported | captured output\
+      \ + grep | <ref> | PROVEN/NEEDS_TEST | <path> | <basis> |\n| state-nonportable\
+      \ | secrets are not portable state | export/import test | <ref> | PROVEN/NEEDS_TEST\
+      \ | <path> | <basis> |\n\n## Headline\n- [ ] PASS: No blocking issues found\
+      \ and coverage justified\n- [ ] PASS_WITH_DEBT: Only explicit non-blocking debt\
+      \ remains\n- [ ] FAIL: Blocking issues or blocking proof gaps remain\n\nConfidence:\
+      \ high/medium/low"
+    depends_on:
+    - runtime-secret-env-config-foundation.complete-runtime-secret-resolver
+    agent: integration-verifier
