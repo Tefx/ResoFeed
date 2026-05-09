@@ -3228,7 +3228,7 @@ phases:
       by sibling MCP step.'
   - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     name: Complete MCP Streamable HTTP surface
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -3317,6 +3317,147 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T07:12:15.574716+00:00'
+    done_at: '2026-05-09T07:20:59.584816+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: Owner token is universal delegation boundary; `actor_id`
+      is idempotency/provenance, not authorization.
+
+      - `docs/ARCHITECTURE.md`: every `/mcp` request/session requires `Authorization:
+      Bearer <OWNER_TOKEN>`; mutating tools require `idempotency_key`; MCP resource/tool
+      table is contract.
+
+      - `docs/PRD.md`: authorized external agents use agent-compatible MCP over remote
+      Streamable HTTP; agent mutation retries must be safe.
+
+      - `docs/DESIGN.md`: `/doctor` output is plain text, no dashboard; no extra UI/product
+      concepts.
+
+      - `docs/DESIGN_VISION.md`: agent handoffs live within unified feed; no moderation
+      consoles/activity logs.
+
+      - `docs/USAGE.md`: external agents use MCP Streamable HTTP at `/mcp`; target
+      resources/tools list used.
+
+
+      ## Integration Evidence
+
+      - Replaced MCP stubs in `internal/resofeed/mcp.go` with `/mcp` Streamable HTTP
+      JSON-RPC handler.
+
+      - Implemented owner-token auth before MCP dispatch, resources, tool list/call/read
+      dispatch, schema validation, not-found semantics, actor/idempotency validation,
+      receipt-backed retry behavior.
+
+      - Wired MCP resources/tools to core functions: `ListTodayFeed`, `SearchItems`,
+      `ReadItemDetail`, `MarkItemInspected`, `SetItemResonance`, `ApplySteering`,
+      `WriteDoctor`.
+
+      - Harness requests: doctor resource, feed resource, list_candidate_items, search_items,
+      read_item, repeated resonate_item with same idempotency key, auth failure, required-field
+      failures.
+
+      - Actual outputs asserted: unauthorized HTTP 401; doctor text contains `rss:
+      ok`/`gemini: ok`; feed/search/read return seeded item/provenance; duplicate
+      resonate returns `already_applied: true`.
+
+      - Path exercised: MCP request → auth → JSON-RPC dispatch → tool/resource validation
+      → core function/database → MCP JSON-RPC response.
+
+      - Auth/idempotency proof: missing owner token fails before dispatch; missing
+      query/idempotency_key return invalid params; repeated mutation reuses `agent_receipts`
+      snapshot.
+
+      - Deviations record: none.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: implementation
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: yes — `internal/resofeed/mcp.go`, `internal/resofeed/mcp_integration_test.go`
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Run
+
+      Subagent worktree:
+
+      - `gofmt -w internal/resofeed/mcp.go internal/resofeed/mcp_integration_test.go`
+      → exit 0
+
+      - `go test ./internal/resofeed` → exit 0
+
+      - `go test ./...` → exit 0
+
+      - `go test -race ./internal/resofeed` → exit 0
+
+      - `golangci-lint run` → exit 0; `0 issues`
+
+      - `go build ./cmd/resofeed` → exit 0
+
+      - `go test ./internal/resofeed -run TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency
+      -v` → exit 0
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`
+      → automatic merge applied `internal/resofeed/mcp.go` and new `internal/resofeed/mcp_integration_test.go`.
+
+      - Mainline `go test ./...` after squash merge → `? resofeed/cmd/resofeed [no
+      test files]`; `ok resofeed/internal/resofeed 0.541s`.
+
+      - Merge commit: `f931a36` (`[vectl] step-runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
+      completed`).
+
+
+      ## Commit hash(es)
+
+      - isolated branch commit: `8484a103c5a053d5e2140a31e547c4ec099dfb91`
+
+      - main merge commit: `f931a36`
+
+
+      ## Files changed
+
+      - `internal/resofeed/mcp.go`
+
+      - `internal/resofeed/mcp_integration_test.go`
+
+
+      ## Spec link
+
+      - `.agents/instructions.md` §§2,4
+
+      - `docs/ARCHITECTURE.md` §§6,7
+
+      - `docs/PRD.md` §§6,11
+
+      - `docs/DESIGN.md` Diagnostics Output / MCP-compatible constraints
+
+      - `docs/DESIGN_VISION.md` §§7,10
+
+      - `docs/USAGE.md` External Agent Usage Through MCP
+
+
+      ## Gaps/Notes
+
+      HTTP REST router work stayed out of scope; no per-agent registry, delivery-channel
+      ownership, vector/RAG, sync/merge, or activity ledger was added.'
   - id: runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     name: Complete serve runtime lifecycle
     status: pending
