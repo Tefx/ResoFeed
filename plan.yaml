@@ -4068,7 +4068,7 @@ phases:
     claimed_at: '2026-05-09T09:16:33.088370+00:00'
   - id: runtime-api-and-mcp-integration.runtime-spec-conformance
     name: Runtime spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -4131,6 +4131,8 @@ phases:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     - runtime-api-and-mcp-integration.runtime-blockers-retest
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T09:16:35.916978+00:00'
   - id: runtime-api-and-mcp-integration.runtime-wiring-audit
     name: Runtime wiring audit
     status: pending
