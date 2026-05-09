@@ -16191,6 +16191,134 @@ phases:
     - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     - openrouter-llm-verification-and-live-smoke.documentation-sync
     agent: gate-reviewer
+  - id: openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
+    name: fix-startup-validation-order
+    status: pending
+    description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
+      verification_scope: phase-check protecting final OpenRouter gate\n\nFix B1 startup\
+      \ validation-order divergence reported by `openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit`\
+      \ and salvaged in `.audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md`.\n\
+      \n## Required remediation\n1. Adjust startup validation order so deterministic\
+      \ CLI/runtime config validation matrix errors are reported before missing OpenRouter\
+      \ key when applicable, matching `docs/ARCHITECTURE.md:92-104`.\n   - Reproduction\
+      \ to close: `env -u OPENROUTER_KEY -u GEMINI_API_KEY go run ./cmd/resofeed serve\
+      \ --addr bad ...`\n   - Current blocker: returns `invalid_openrouter_key: value\
+      \ required`.\n   - Expected: returns `invalid_addr`.\n2. Add focused regression\
+      \ tests for mixed-invalid startup cases:\n   - invalid `--addr` with no OpenRouter\
+      \ key MUST return `invalid_addr`.\n   - Consider `--public-url`, `--owner-token`,\
+      \ and missing key ordering based on the documented startup matrix; add/update\
+      \ tests for each deterministic matrix ordering that is applicable.\n3. Preserve\
+      \ OpenRouter safety invariants:\n   - OpenRouter secrets remain redacted; no\
+      \ secret printing in logs, stdout/stderr, test artifacts, docs, or error messages.\n\
+      \   - No startup network model validation.\n   - No CLI API-key flag.\n   -\
+      \ Existing OpenRouter tests continue to pass.\n4. If safe and within this bounded\
+      \ fix, refresh stale Gemini-era wording in `.agents/instructions.md` around\
+      \ the recurring audit lines so agent guidance is OpenRouter-only. Do not alter\
+      \ product architecture or introduce new concepts. If not updated, record why\
+      \ it is intentionally left for documentation sync and why it does not block\
+      \ runtime validation semantics.\n\n## Gate Preview (what the gate WILL reject)\n\
+      - Invalid `--addr` still masked by missing OpenRouter key.\n- Mixed-invalid\
+      \ startup tests only cover the observed case and miss documented sibling deterministic\
+      \ validation ordering.\n- Any evidence or docs print OpenRouter keys or imply\
+      \ a CLI API-key flag.\n- Any startup path performs network model validation\
+      \ before local deterministic config validation.\n- `.agents/instructions.md`\
+      \ remains misleading without explicit disposition if touched by this fix.\n\n\
+      ## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only\
+      \ completion is NOT acceptable. Each deliverable MUST contain substantive logic\
+      \ that processes its inputs and produces outputs that vary based on those inputs."
+    verification: '- Main path: mixed-invalid startup regression proves invalid `--addr`
+      without OpenRouter/Gemini env reports `invalid_addr` before missing OpenRouter
+      key.
+
+      - Sibling paths: focused tests cover documented deterministic validation ordering
+      for `--public-url`, `--owner-token`, and missing OpenRouter key where applicable,
+      or evidence cites why a case is not applicable under `docs/ARCHITECTURE.md:92-104`.
+
+      - Safety path: existing OpenRouter tests pass; no secret values appear in stdout/stderr/log/test
+      evidence; no CLI API-key flag or startup network model validation is introduced.
+
+      - Guidance drift: `.agents/instructions.md` Gemini-era wording is refreshed
+      to OpenRouter-only if safe, or a non-runtime disposition is recorded for the
+      spec conformance retest.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - .audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md
+      — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## B1 Startup Validation-Order Fix Evidence
+
+
+      **Root cause vs symptom**:
+
+      - Root cause: <why missing OpenRouter key was evaluated before deterministic
+      local validation>
+
+      - Symptom: invalid --addr returned invalid_openrouter_key
+
+      - Why this fix is not surface-level: <one line>
+
+
+      **Files changed**:
+
+      - <paths>
+
+
+      **Regression tests added/updated**:
+
+      - invalid --addr with no OpenRouter key -> invalid_addr: <test name + result>
+
+      - --public-url ordering: <test/disposition>
+
+      - --owner-token ordering: <test/disposition>
+
+      - missing OpenRouter key ordering: <test/disposition>
+
+
+      **Commands executed and outputs**:
+
+      ```text
+
+      <paste focused go test/go run outputs with secrets redacted>
+
+      ```
+
+
+      **OpenRouter safety invariants preserved**:
+
+      - Secret redaction checked: PASS/FAIL + evidence
+
+      - No startup network model validation: PASS/FAIL + evidence
+
+      - No CLI API-key flag: PASS/FAIL + evidence
+
+      - Existing OpenRouter tests pass: PASS/FAIL + evidence
+
+
+      **.agents guidance drift disposition**:
+
+      - Updated safely: yes/no
+
+      - If no, why non-runtime and where remaining doc-sync ownership is recorded
+
+
+      **Residual gaps**:
+
+      - <none or explicit non-intersection with final gate>'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    - openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
+    agent: golang-developer
 - id: runtime-secret-env-config-foundation
   name: Runtime Secret Env Config Foundation
   status: done
