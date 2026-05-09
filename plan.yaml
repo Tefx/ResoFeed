@@ -14849,3 +14849,171 @@ phases:
     depends_on:
     - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     agent: doc-reviewer
+  - id: runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
+    name: retest-readme-secret-cli-regression
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      priority: HIGH
+
+      agent_source: project
+
+      verification_scope: phase-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases
+
+
+      As an INDEPENDENT TESTER, retest closure of the README/API-key shell-history
+      regression found by runtime-secret-env-config-foundation.verify-runtime-secret-env-config.
+
+
+      Scope:
+
+      - Rerun markdown searches for CLI-secret examples across README.md, USAGE-style
+      docs, docs/ARCHITECTURE.md, docs/DESIGN.md, and adjacent public docs.
+
+      - Verify no public runnable example requires `--gemini-api-key`, `--openrouter-api-key`,
+      or equivalent argv-carried API key secrets.
+
+      - Verify docs now direct users to OS environment variables or local `.env` safe
+      patterns.
+
+      - Rerun focused runtime-secret checks as needed to ensure the documentation
+      fix did not mask the original runtime obligations: Go focused tests, temporary
+      `.env` fake-key smoke without CLI API key, secret leakage search, and state
+      export forbidden-term search.
+
+
+      Document finding issues as useful verification output, but gate_open_allowed
+      must remain false unless all blocker-class documentation and runtime-secret
+      obligations are closed.
+
+
+      Independence Level: L2 semi-blind integration verification. Use repository code
+      and public docs/runtime surfaces, but do not rely on implementation-process
+      context.'
+    verification: phase-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases. PASS requires clean markdown CLI-secret search
+      for README/USAGE/ARCHITECTURE/DESIGN examples, focused runtime-secret checks
+      as needed, no fake-key leakage, no state export secret portability, and an explicit
+      gate_open_allowed closure decision.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - README.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Report
+
+
+      **Tester**: integration-verifier (independent of doc-reviewer)
+
+      **Scope**: README/API-key shell-history regression plus focused runtime-secret
+      regression checks
+
+      **Independence Level**: L2
+
+
+      ### Commands Executed
+
+
+      **Markdown CLI-secret search**:
+
+      ```
+
+      <exact command(s) and output>
+
+      ```
+
+
+      **Focused runtime-secret checks rerun as needed**:
+
+      ```
+
+      <Go tests / smoke command(s) and output summary>
+
+      ```
+
+
+      **Secret leakage/state export searches**:
+
+      ```
+
+      <exact command(s) and output; redact fake key value if shown>
+
+      ```
+
+
+      ### Documentation Closure
+
+
+      - README runnable examples require CLI API key secrets: YES/NO
+
+      - USAGE/public docs require CLI API key secrets: YES/NO/NOT PRESENT
+
+      - ARCHITECTURE examples require CLI API key secrets: YES/NO
+
+      - DESIGN examples require CLI API key secrets: YES/NO
+
+      - Safe OS env/local `.env` pattern documented: YES/NO
+
+      - `.env` local/non-committed warning present where relevant: YES/NO
+
+
+      ### Runtime Secret Regression Closure
+
+
+      - Focused Go tests: PASS/FAIL/NOT RERUN (<reason>)
+
+      - Live `.env` fake-key server smoke without `--gemini-api-key`: PASS/FAIL/NOT
+      RERUN (<reason>)
+
+      - Fake key absent from stdout/stderr/logs/state export: PASS/FAIL/NOT RERUN
+      (<reason>)
+
+      - State export forbidden-term search: PASS/FAIL/NOT RERUN (<reason>)
+
+
+      ### gate_open_allowed Closure Fields
+
+
+      - original_verifier: runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+
+      - blocker: README shell-history regression for `--gemini-api-key` runnable command
+
+      - blocker_status: CLOSED | STILL_OPEN | PARTIAL
+
+      - runtime_secret_original_green_status: STILL_GREEN | REGRESSED | NOT_RERUN_WITH_JUSTIFICATION
+
+      - unresolved_blockers: [] or list
+
+      - non_intersection_rationale: <only for any unresolved non-blocking item; otherwise
+      "none">
+
+      - gate_open_allowed: true|false
+
+      - gate_decision_basis: <why the phase gate may open or must remain blocked>
+
+
+      ### Headline
+
+      - [ ] PASS: blocker closed and gate_open_allowed=true
+
+      - [ ] FAIL: blocker or runtime-secret regression remains
+
+      '
+    depends_on:
+    - runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
+    agent: integration-verifier
