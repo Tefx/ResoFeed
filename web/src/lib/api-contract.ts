@@ -184,6 +184,140 @@ export interface ImportOpmlResponse {
   folders_flattened: true;
 }
 
+/**
+ * Manual RSS Fetch frontend contract lock.
+ *
+ * Acceptance-only schema declarations from the frontend-contract step. These
+ * types intentionally do not add live API-client methods, DOM transitions, or
+ * styling. The step description is authoritative for the two new POST routes;
+ * docs/ARCHITECTURE.md §6 does not yet list them and only allows the common
+ * error codes, while this step explicitly requires 409 conflict handling.
+ */
+export type EmptyJsonObject = { readonly [key: string]: never };
+
+export const manualRssFetchEndpoints = {
+  runIngest: '/api/ingest',
+  fetchSource: '/api/sources/{id}/fetch'
+} as const;
+
+export type ManualRssFetchEndpointPath =
+  | typeof manualRssFetchEndpoints.runIngest
+  | typeof manualRssFetchEndpoints.fetchSource;
+
+export interface ManualRssFetchRequestContract {
+  readonly method: 'POST';
+  readonly queryParams: false;
+  readonly body: EmptyJsonObject;
+}
+
+export type ManualRssFetchErrorCode = ApiErrorCode | 'conflict';
+
+export interface ManualRssFetchErrorBody {
+  error: {
+    code: ManualRssFetchErrorCode;
+    message: string;
+    details: Record<string, string | number | boolean>;
+  };
+}
+
+export type ManualFetchStatus = 'idle' | 'fetching' | 'ok' | 'rss_fetch_error' | 'not_found';
+
+export interface ManualFetchSourceResult {
+  source_id: OpaqueId;
+  last_fetch_at: Rfc3339UtcString | null;
+  status: ManualFetchStatus;
+  message: string | null;
+}
+
+export interface RunIngestSuccessResponse {
+  ingest: {
+    last_ingest_at: Rfc3339UtcString;
+    status: 'ok' | 'source_errors';
+    sources: ManualFetchSourceResult[];
+  };
+}
+
+export interface FetchSourceSuccessResponse {
+  source: Source;
+  fetch: ManualFetchSourceResult;
+}
+
+export type ManualRssFetchApiResult<T> =
+  | { ok: true; status: 200; body: T }
+  | { ok: false; status: 404 | 409; body: ManualRssFetchErrorBody };
+
+export interface SourceLedgerManualFetchRenderContract {
+  readonly globalIdleLabel: '[RUN INGEST]';
+  readonly globalActiveLabel: '[INGESTING...]';
+  readonly sourceIdleLabel: '[FETCH]';
+  readonly sourceActiveLabel: '[FETCHING...]';
+  readonly activeControlDisabled: true;
+  readonly timestampFormat: 'HH:MM:SS';
+  readonly timestampInputs: readonly ['last_ingest', 'last_fetch'];
+  readonly errorCopy: 'terse-truncated-non-layout-shifting';
+  readonly bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible';
+  readonly accessibility: readonly [
+    'native-button',
+    'named-global-ingest-control',
+    'named-per-source-fetch-control',
+    'disabled-active-fetch-controls',
+    'visible-keyboard-focus'
+  ];
+  readonly forbiddenPatterns: readonly [
+    'spinner',
+    'progress-animation',
+    'box-shadow',
+    'rounded-saas-button',
+    'friendly-copy',
+    'folder-affordance',
+    'tag-affordance',
+    'unread-count',
+    'archive-affordance',
+    'settings-slider',
+    'drag-and-drop-ordering',
+    'local-fake-job',
+    'client-queue',
+    'client-receipt',
+    'optimistic-durable-state'
+  ];
+}
+
+export const sourceLedgerManualFetchRenderContract: SourceLedgerManualFetchRenderContract = {
+  globalIdleLabel: '[RUN INGEST]',
+  globalActiveLabel: '[INGESTING...]',
+  sourceIdleLabel: '[FETCH]',
+  sourceActiveLabel: '[FETCHING...]',
+  activeControlDisabled: true,
+  timestampFormat: 'HH:MM:SS',
+  timestampInputs: ['last_ingest', 'last_fetch'],
+  errorCopy: 'terse-truncated-non-layout-shifting',
+  bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible',
+  accessibility: [
+    'native-button',
+    'named-global-ingest-control',
+    'named-per-source-fetch-control',
+    'disabled-active-fetch-controls',
+    'visible-keyboard-focus'
+  ],
+  forbiddenPatterns: [
+    'spinner',
+    'progress-animation',
+    'box-shadow',
+    'rounded-saas-button',
+    'friendly-copy',
+    'folder-affordance',
+    'tag-affordance',
+    'unread-count',
+    'archive-affordance',
+    'settings-slider',
+    'drag-and-drop-ordering',
+    'local-fake-job',
+    'client-queue',
+    'client-receipt',
+    'optimistic-durable-state'
+  ]
+};
+
 export type ApiResult<T> =
   | { ok: true; status: 200; body: T }
   | { ok: false; status: 400 | 401 | 404 | 500; body: ErrorBody };
