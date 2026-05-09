@@ -190,7 +190,18 @@ func reserveRuntimeSecretTestAddr(t *testing.T) *net.TCPListener {
 func writeLocalDotEnv(t *testing.T, content string) {
 	t.Helper()
 	dir := t.TempDir()
-	t.Chdir(dir)
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory before local .env fixture: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("enter local .env fixture directory: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(oldDir); err != nil {
+			t.Errorf("restore working directory after local .env fixture: %v", err)
+		}
+	})
 	if err := os.WriteFile(filepath.Join(dir, ".env"), []byte(content), 0o600); err != nil {
 		t.Fatalf("write local .env fixture: %v", err)
 	}

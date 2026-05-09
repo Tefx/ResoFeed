@@ -44,6 +44,12 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 	if cfg.GeminiModel == "" {
 		cfg.GeminiModel = DefaultGeminiModel
 	}
+	geminiAPIKey, err := ResolveGeminiRuntimeSecret(cfg)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		return 2
+	}
+	cfg.GeminiAPIKey = geminiAPIKey
 	if cfg.PublicURL == "" {
 		publicURL, err := derivePublicURL(cfg.Addr)
 		if err != nil {
@@ -101,6 +107,11 @@ Flags:
 		_, _ = fmt.Fprintf(stderr, "err: unexpected_argument: %s\n", fs.Arg(0))
 		return ServeConfig{}, 2, false
 	}
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "gemini-api-key" {
+			cfg.GeminiAPIKeySet = true
+		}
+	})
 	return cfg, 0, true
 }
 

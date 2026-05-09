@@ -21,12 +21,13 @@ const (
 // primary runtime configuration surface: --addr, --public-url, --db,
 // --gemini-api-key, --gemini-model, and optional --owner-token.
 type ServeConfig struct {
-	Addr         string
-	PublicURL    string
-	DBPath       string
-	GeminiAPIKey string
-	GeminiModel  string
-	OwnerToken   string
+	Addr            string
+	PublicURL       string
+	DBPath          string
+	GeminiAPIKey    string
+	GeminiAPIKeySet bool
+	GeminiModel     string
+	OwnerToken      string
 }
 
 // ErrorBody is the canonical JSON error envelope for HTTP API failures.
