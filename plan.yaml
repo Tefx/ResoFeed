@@ -9631,7 +9631,7 @@ phases:
     agent: integration-verifier
   - id: uiux-audit-end-to-end-blockers
     name: UI/UX audit end-to-end blocker remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -9775,6 +9775,8 @@ phases:
     depends_on:
     - fix-end-to-end-blockers
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-09T11:34:38.067281+00:00'
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
