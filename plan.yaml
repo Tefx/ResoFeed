@@ -19615,3 +19615,80 @@ phases:
     depends_on:
     - backend-contract
     agent: golang-developer
+  - id: frontend-contract
+    name: Frontend API and UI Contract Lock
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - API client wire schemas\n  - Source Ledger rendering contract\n  - UI state\
+      \ contract\n  - accessibility and design constraints\nagent_source: project\n\
+      work_type: new_capability\n\nLock the frontend Manual RSS Fetch API/client/rendering\
+      \ contract before implementation.\n\nAuthoritative refs:\n- docs/DESIGN.md —\
+      \ Source Ledger controls, labels, density, typography, no SaaS styling, no onboarding\
+      \ wizard.\n- docs/ui-preview.html — rendered Source Ledger visual reference.\n\
+      - docs/ARCHITECTURE.md — HTTP API paths, response/status contracts, owner-token\
+      \ boundary, no extra product concepts.\n- docs/PRD.md — Manual RSS Fetch product\
+      \ intent.\n\nRequired contract decisions to record in acceptance-only artifacts\
+      \ and/or test notes:\n- API client exposes POST /api/ingest and POST /api/sources/{id}/fetch\
+      \ using exactly documented empty `{}` request bodies and no query params.\n\
+      - Client handles 200 success/source-level error payloads, 409 conflict, and\
+      \ 404 not_found without local fake jobs, queues, receipts, optimistic durable\
+      \ state, or new product concepts.\n- Source Ledger renders global `[RUN INGEST]`\
+      \ and per-row `[FETCH]` controls.\n- Active global ingest renders `[INGESTING...]`,\
+      \ disabled.\n- Active source fetch renders `[FETCHING...]`, disabled.\n- No\
+      \ spinner, progress animation, shadow, rounded SaaS button, friendly copy, folder/tag/unread/archive/settings/drag-and-drop\
+      \ affordance.\n- RFC3339 timestamps render as HH:MM:SS for last_ingest/last_fetch.\n\
+      - Errors/conflicts use terse truncated text that does not shift the Source Ledger\
+      \ layout.\n- Bracket action styling preserves bracket padding, uppercase labels,\
+      \ terminal hover inversion, and accessibility/focus visibility consistent with\
+      \ DESIGN.md and docs/ui-preview.html.\n\nContract purity constraints:\n- This\
+      \ step may add or update acceptance-defining types, API contract declarations,\
+      \ comments, story/test fixtures, or inert stubs only.\n- Do NOT implement live\
+      \ API calls, DOM state transitions, styling changes, or completed rendering\
+      \ behavior in this step.\n- If docs/DESIGN.md and docs/ui-preview.html disagree,\
+      \ record the conflict instead of inventing visual behavior.\n\n## Completion\
+      \ Criteria\n- Frontend API and rendering contracts are explicit enough for expected-red\
+      \ tests to be written without implementation judgment.\n- No production UI behavior\
+      \ is shipped by this step.\n- Design/a11y constraints are pinned against docs/ui-preview.html."
+    verification: '- Contract artifacts pin endpoint paths, request shape, response/status
+      handling, Source Ledger labels/states, timestamp formatting, terse errors, and
+      forbidden visual patterns.
+
+      - Evidence identifies exact docs/ui-preview.html and DESIGN.md passages/markup
+      used for each UI contract decision.
+
+      - No live client implementation, DOM state transition logic, or styling behavior
+      is introduced.
+
+      - Downstream gates protected: manual-rss-fetch.uiux-audit, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Evidence
+
+      - Contract artifacts changed: <files>
+
+      - API client contract pinned: <summary>
+
+      - Source Ledger DOM states pinned: <summary>
+
+      - Timestamp/error formatting pinned: <summary>
+
+      - Visual/a11y forbidden patterns excluded: <summary>
+
+      - Production UI behavior introduced: NONE required'
+    agent: frontend-engineer
