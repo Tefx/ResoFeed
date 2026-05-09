@@ -22,6 +22,14 @@
 - **Steering Contracts**: Human steering supersedes delegated agent steering. Commands that violate core product invariants (e.g., "hide all items") must be partially applied or safely rejected with a terse receipt, not blindly executed.
 - **Idempotency**: Agent receipts exist purely for idempotency and provenance. They are not a portable user-visible activity feed.
 
+## 4A. Runtime Secret Handling
+- **Runtime-Only LLM Secrets**: Gemini and future LLM provider API keys are runtime input only. Never persist them to SQLite, include them in state bundles, expose them through HTTP/MCP/UI, log them, print them in `/doctor`, place them in fixtures, or commit them in artifacts.
+- **Gemini Secret Precedence**: Current Gemini startup resolution is explicit existing `--gemini-api-key` value as a discouraged compatibility override > OS `GEMINI_API_KEY` > local `.env` fallback. Empty or whitespace-only values are invalid.
+- **CLI Secret Flags Are Transitional**: Do not add new examples or integrations that require CLI-passed API keys. Do not remove the current Gemini CLI key flag silently; any deprecation/removal beyond documenting it as discouraged requires explicit user confirmation.
+- **Local `.env` Boundary**: `.env` is local runtime input only. Do not read, print, or commit actual `.env` contents unless a task explicitly requires safe contract review without values. Minimal parser only: `KEY=VALUE`, blank lines, and `#` comments; no shell sourcing, expansion, command substitution, command execution, includes, or multiline semantics.
+- **Redacted Evidence Only**: Verification may state `GEMINI_API_KEY=<redacted>`, `OPENROUTER_KEY=<redacted>`, or `source=os_env/.env`; never include raw API-key values. Parser and validation errors must not contain secret values.
+- **Future OpenRouter Reuse**: OpenRouter work must reuse this runtime secret-source contract and lock accepted names (`OPENROUTER_KEY` and/or `OPENROUTER_API_KEY`) before implementation. Do not regress to CLI API-key examples.
+
 ## 5. HTTP/API Contract Rules
 - **Deterministic Validation**: HTTP query validation for `/api/feed/today` and `/api/search` is strict and contract-test oriented. Reject unknown or duplicate query parameters with `400 bad_request`.
 - **Uniformity**: HTTP endpoints and MCP tools must expose the same product operations (Inspect, Resonate, Steer, Retrieve). Agents do not get "special" product concepts unavailable to humans.

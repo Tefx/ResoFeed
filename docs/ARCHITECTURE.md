@@ -9,7 +9,7 @@ Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
 Contract baseline: these decisions are anchored in the current product/design documents and user constraints.
 
 1. **One deployable Go process.** ResoFeed is one binary started with `resofeed serve`. It serves the static SvelteKit app, JSON HTTP API, MCP Streamable HTTP at `/mcp`, and background ingestion loop. Rationale: the product is a single-tenant tool, not SaaS infrastructure. Fails if team/multi-tenant scale becomes product scope.
-2. **CLI flags are the primary runtime configuration surface.** `serve` accepts flags for bind address, public URL, SQLite path, Gemini API key/model, and optional owner token. Rationale: the user requested fewer environment variables and a concrete command-line usage contract. Fails if deployment later requires a full config-file management surface.
+2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, Gemini model, optional owner token, and the existing Gemini API-key flag only as a discouraged compatibility override. Gemini and future LLM provider API keys must be resolved at startup from runtime-only secret sources and must never be persisted, exported, logged, or committed. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
 3. **One SQLite database.** SQLite is the durable source of truth; FTS5 is the lexical index. Rationale: local ownership and operational simplicity matter more than distributed scale. Fails if multi-writer distributed deployment becomes required.
 4. **Current state only.** Store the present state needed for feed display, search, import/export, agent idempotency, and provenance. Do not build event sourcing, JSONL runtime state, or a user-visible activity ledger. Fails if audit-grade historical reconstruction becomes a hard requirement.
 5. **One backend package.** Product behavior lives in `internal/resofeed` as direct functions and SQL, not `app/domain/repository/service` layers. Rationale: there is one runtime and one database. Fails if multiple storage backends or independently deployed services become real requirements.
@@ -49,7 +49,6 @@ resofeed serve \
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
-  --gemini-api-key "<GEMINI_API_KEY>" \
   --gemini-model gemini-2.5-flash
 ```
 
@@ -60,13 +59,38 @@ Required/recognized flags:
 | `--addr` | No | `127.0.0.1:8080` | Bind address for web UI, HTTP API, and MCP endpoint. |
 | `--public-url` | No | derived from `--addr` for local use | Base URL external agents should use. If omitted and `--addr` is `HOST:PORT`, default to `http://HOST:PORT`; if host is `0.0.0.0`, default to `http://127.0.0.1:PORT`. |
 | `--db` | No | `./data/resofeed.sqlite3` | SQLite database path. |
-| `--gemini-api-key` | Yes | N/A | Gemini API key. |
+| `--gemini-api-key` | No; discouraged compatibility override | N/A | Transitional Gemini API-key override. If still present in the current binary, an explicit non-empty value overrides `GEMINI_API_KEY` from the OS environment. Do not use in examples or new integrations because CLI secrets can land in shell history and process listings. |
 | `--gemini-model` | No | `gemini-2.5-flash` | Gemini model. |
 | `--owner-token` | No | reuse or auto-generate | Explicit owner token; omitted means reuse or auto-generate. |
 
 `serve` runs SQLite migrations during startup and then starts the web UI, HTTP API, MCP endpoint, and ingestion loop. No separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process is part of the architecture.
 
-Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, empty `--gemini-api-key`, invalid `--owner-token`, and failed SQLite migrations.
+Runtime LLM secret-source contract:
+
+- Gemini API-key resolution happens during startup before LLM provider construction.
+- Precedence for the current Gemini path is: explicit current `--gemini-api-key` value, if the flag still exists and is non-empty, overrides OS environment; OS environment variable `GEMINI_API_KEY` overrides local `.env`; local `.env` is a fallback only.
+- Empty or whitespace-only secret values from any source are invalid and must fail startup before binding the server socket.
+- The `--gemini-api-key` flag is a compatibility override only. It is discouraged and transitional because command-line secrets may be captured in shell history and process listings. Removing or deprecating the flag beyond that warning is an architecture decision requiring explicit user confirmation; implementation must not silently remove current behavior in this inserted phase.
+- LLM API keys are runtime input only. They must never be written to SQLite, `runtime_metadata`, migrations, state bundles, logs, `/doctor`, HTTP/MCP responses, frontend assets, test fixtures, docs examples, or committed artifacts.
+- State export/import must never include LLM secret values or secret-source metadata. Redacted evidence such as `GEMINI_API_KEY=<redacted>` or `source=os_env` is acceptable; raw key values are not.
+- Parser or validation errors must identify the field/source class tersely without including secret values.
+
+Local `.env` contract for runtime secret fallback:
+
+- `.env` is a local runtime input only and must not be committed or exported.
+- The parser is intentionally minimal: support only `KEY=VALUE` lines; ignore blank lines and lines whose first non-whitespace character is `#`.
+- Do not source `.env` through a shell. Do not perform shell expansion, command substitution, variable interpolation, command execution, quoting semantics, includes, or multiline parsing.
+- For `GEMINI_API_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
+- Parser and validation errors must not print the rejected value.
+
+Future OpenRouter migration contract:
+
+- OpenRouter implementation must reuse this same runtime secret-source contract rather than requiring CLI-passed API keys.
+- Before implementation, the OpenRouter contract must explicitly lock accepted environment names. Candidate names are `OPENROUTER_KEY` and `OPENROUTER_API_KEY`; implementation must document whether one or both are accepted and their precedence before provider construction changes ship.
+- OpenRouter live-smoke documentation and evidence must use OS environment variables or local `.env` with redacted output only.
+- Future docs must not regress to examples that require CLI secret flags or put API keys directly in shell history.
+
+Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, missing/empty resolved Gemini API key, invalid `--owner-token`, and failed SQLite migrations.
 
 Startup validation matrix:
 
@@ -76,7 +100,7 @@ Startup validation matrix:
 | `--public-url` | not absolute `http`/`https`, missing host, has query/fragment, path not empty or `/` | `2` | `err: invalid_public_url: expected absolute http(s) URL without path/query/fragment` | No |
 | omitted `--public-url` | N/A | N/A | derive from `--addr`; `0.0.0.0:PORT` derives to `http://127.0.0.1:PORT`; remove trailing slash | N/A |
 | `--db` | parent directory cannot be created, path cannot be opened as SQLite | `2` | `err: invalid_db: cannot open sqlite database` | No |
-| `--gemini-api-key` | empty or all whitespace | `2` | `err: invalid_gemini_api_key: value required` | No |
+| resolved Gemini API key | missing, empty, or all whitespace after applying CLI compatibility override > OS environment > `.env` fallback precedence | `2` | `err: invalid_gemini_api_key: value required` | No |
 | `--owner-token` | fewer than 32 visible non-whitespace characters or contains leading/trailing whitespace | `2` | `err: invalid_owner_token: expected at least 32 visible non-whitespace characters` | No |
 | migrations | migration fails | `1` | `err: migration_failed: <migration id>` | No |
 
@@ -127,7 +151,7 @@ Out of scope:
 | Current steering policy | `steer_rules` | Yes | User-owned policy state. |
 | Current attention state | `item_state` | Resonance state: yes; inspection/external-surface state: no | Stars are user-owned retrieval state; inspection/external-surface timestamps are operational state. |
 | Agent idempotency receipts | `agent_receipts` | No by default | Required for retry safety/provenance, not a user-facing activity ledger. |
-| Runtime credential metadata | `runtime_metadata` | No | Stores owner-token hash and runtime-only keys; not user state. |
+| Runtime credential metadata | `runtime_metadata` | No | Stores owner-token hash only; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
 | Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. |
 
@@ -135,7 +159,7 @@ Out of scope:
 
 Startup order:
 
-1. parse `resofeed serve` flags and validate required Gemini configuration;
+1. parse `resofeed serve` flags and resolve required Gemini secret configuration before LLM provider construction;
 2. open SQLite;
 3. run migrations;
 4. resolve owner token from `--owner-token`, stored runtime metadata, or first-run generation;
@@ -904,7 +928,8 @@ Do not introduce repositories, factories, DI containers, event buses, plugin reg
 Implementation is architecture-conformant when:
 
 - `resofeed serve` is the single runtime command;
-- `serve` accepts `--addr`, `--public-url`, `--db`, `--gemini-api-key`, `--gemini-model`, and optional `--owner-token`;
+- `serve` accepts `--addr`, `--public-url`, `--db`, `--gemini-model`, optional `--owner-token`, and preserves `--gemini-api-key` only as the current discouraged Gemini compatibility override if that flag exists;
+- Gemini startup secret resolution follows explicit current CLI flag value > OS `GEMINI_API_KEY` > local `.env` fallback, rejects empty/whitespace values, and never persists, exports, logs, or commits raw secrets;
 - omitting `--owner-token` reuses a stored token or generates, stores, and prints a first-run token;
 - one Go process serves static UI, HTTP API, MCP endpoint, and ingest loop;
 - no separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process exists;
@@ -932,7 +957,7 @@ go test ./...
 First-run token generation check:
 
 ```bash
-./bin/resofeed serve --db ./data/test.sqlite3 --gemini-api-key "<GEMINI_API_KEY>"
+GEMINI_API_KEY="<redacted>" ./bin/resofeed serve --db ./data/test.sqlite3
 # expect startup log line: owner token generated: rfeed_...
 ```
 

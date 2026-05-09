@@ -30,14 +30,40 @@ mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 ```
 
-### 2. Run with Gemini
+### 2. Configure the Gemini API key safely
+
+ResoFeed resolves the Gemini API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history.
+
+Safe options:
+
+- Set `GEMINI_API_KEY` through your OS, shell profile, service manager, or hosting platform secret manager without committing it to the repository.
+- Create a local `.env` file with your editor or another secret-safe workflow:
+
+```text
+GEMINI_API_KEY=<your Gemini API key>
+```
+
+The `.env` file is local runtime input only. Do not commit it, paste it into issue comments, include it in state exports, or print it in logs/evidence.
+
+Secret-source precedence for the current Gemini path is:
+
+1. explicit `--gemini-api-key` value, if the current binary still supports it, as a discouraged compatibility override;
+2. OS environment variable `GEMINI_API_KEY`;
+3. local `.env` fallback.
+
+Empty or whitespace-only values are invalid. Parser and validation errors must not include the secret value.
+
+Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are supported; blank lines and `#` comments are ignored. ResoFeed must not source shell scripts, expand variables, run commands, or evaluate command substitution from `.env`.
+
+The existing `--gemini-api-key` CLI flag is transitional compatibility behavior only. Avoid it for new setups because command-line secrets can be captured by shell history and process listings. Removing that flag is a future architecture decision requiring explicit confirmation, not a silent setup change.
+
+### 3. Run with Gemini
 
 ```bash
 ./bin/resofeed serve \
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
-  --gemini-api-key "<GEMINI_API_KEY>" \
   --gemini-model gemini-2.5-flash
 ```
 
@@ -52,11 +78,11 @@ Flags:
 | `--addr` | No | Bind address for web UI, HTTP API, and MCP endpoint. Default: `127.0.0.1:8080`. |
 | `--public-url` | No | Base URL external agents should use. Default derives from `--addr` for local use. |
 | `--db` | No | SQLite database file path. Default: `./data/resofeed.sqlite3`. |
-| `--gemini-api-key` | Yes | Gemini API key used for summaries and steering translation. |
+| `--gemini-api-key` | No; discouraged | Transitional Gemini API-key compatibility override if still present. Prefer `GEMINI_API_KEY` from OS environment or local `.env`. |
 | `--gemini-model` | No | Gemini model. Default: `gemini-2.5-flash`. |
 | `--owner-token` | No | Explicit owner token. If omitted, ResoFeed generates or reuses one automatically. |
 
-### 3. Owner token behavior
+### 4. Owner token behavior
 
 If `--owner-token` is provided, ResoFeed uses that plaintext token for this startup, stores only its SHA-256 hash as the current owner-token verifier, and never stores the plaintext token.
 
@@ -83,11 +109,12 @@ To rotate or recover the token, start ResoFeed once with a new explicit token:
 ```bash
 ./bin/resofeed serve \
   --db ./data/resofeed.sqlite3 \
-  --gemini-api-key "<GEMINI_API_KEY>" \
   --owner-token "rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
 ```
 
-### 4. Open the UI
+This example assumes `GEMINI_API_KEY` is already available through the OS environment or local `.env` fallback.
+
+### 5. Open the UI
 
 ```text
 http://127.0.0.1:8080
@@ -95,14 +122,14 @@ http://127.0.0.1:8080
 
 On first open, paste the owner token printed at startup or supplied with `--owner-token`. The browser stores it locally as `resofeed.ownerToken` and sends it as `Authorization: Bearer <OWNER_TOKEN>` for every `/api/*` request.
 
-### 5. Add sources
+### 6. Add sources
 
 - Paste an RSS/Atom URL into Steer; or
 - import OPML from the Source Ledger.
 
 OPML folders are ignored and flattened immediately.
 
-### 6. Let ingestion run
+### 7. Let ingestion run
 
 ResoFeed fetches sources, extracts content when possible, summarizes items with Gemini, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes.
 
@@ -630,6 +657,14 @@ Expected diagnostic content includes:
 - other raw status lines useful for debugging.
 
 `/doctor` is plain text. It is not a dashboard, chart surface, friendly remediation wizard, or settings page.
+
+Diagnostics and live-smoke evidence must redact LLM API keys. Acceptable evidence says a key was resolved from `os_env` or `.env` and shows `GEMINI_API_KEY=<redacted>`; it must not show the actual value.
+
+## Future OpenRouter Configuration
+
+Future OpenRouter work must reuse the same runtime secret-source policy instead of requiring CLI-passed API keys. Before implementation, the OpenRouter contract must explicitly lock whether `OPENROUTER_KEY`, `OPENROUTER_API_KEY`, or both names are accepted and how they take precedence.
+
+OpenRouter setup and live-smoke docs must use OS environment variables or local `.env` files with redacted evidence only. Do not add examples that paste real API keys into command lines or shell history.
 
 ## External Agent Usage Through MCP
 
