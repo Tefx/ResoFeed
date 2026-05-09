@@ -19157,3 +19157,133 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+  - id: manual-rss-fetch.uiux-audit
+    name: Strict UI/UX Audit Against ui-preview
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      Native multimodal implementation audit for Manual RSS Fetch Source Ledger states.
+
+
+      CRITICAL: Compare the rendered implementation against `docs/ui-preview.html`.
+      If the visual effect deviates in ANY way (e.g., incorrect bracket padding, missing
+      terminal hover inversion, presence of SaaS animations/spinners/shadows, layout
+      shifts), this step MUST BE REJECTED/FAILED. Only exact visual compliance passes.
+
+
+      Required rendered states/artifacts:
+
+      - Source Ledger default with global [RUN INGEST] and per-source [FETCH].
+
+      - Source fetch active state with [FETCHING...] disabled.
+
+      - Global ingest active state with [INGESTING...] disabled.
+
+      - Completion state showing last_ingest/last_fetch as HH:MM:SS.
+
+      - Error/conflict state showing terse truncated diagnostic text without layout
+      shift.
+
+      - Hover/focus state demonstrating terminal inversion for bracket actions.
+
+
+      Audit rules:
+
+      - Use screenshots, DOM snapshots, or equivalent visual/spatial artifacts from
+      the running implementation.
+
+      - Compare against docs/ui-preview.html, not against memory or prose summaries.
+
+      - Standard tests, DOM-only assertions, or "looks close" summaries do not pass
+      this gate.
+
+      - Any SaaS animation, spinner, shadow, friendly copy, pill rounding drift, or
+      bracket-label/padding drift is blocking.'
+    verification: '- Strict visual comparison artifacts are attached for all required
+      states.
+
+      - Audit explicitly checks bracket padding, uppercase labels, terminal hover
+      inversion, no spinners/animations/shadows, no layout shifts, and exact Source
+      Ledger density.
+
+      - Result must be parseable PASS only if every visual requirement exactly matches
+      docs/ui-preview.html; otherwise REJECTED/FAILED with blocker findings.
+
+      - This phase-check protects manual-rss-fetch.gate and is mandatory for UI/UX
+      implementation acceptance.'
+    evidence_template: '## Strict UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Visual Comparison Artifacts
+
+      | State | Rendered artifact | ui-preview reference | Verdict | Notes |
+
+      | --- | --- | --- | --- | --- |
+
+      | default ledger | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+      | source fetching | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+      | global ingesting | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+      | completion HH:MM:SS | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+      | error/conflict | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+      | hover/focus inversion | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
+      |
+
+
+      ## Mandatory rejection checklist
+
+      - Incorrect bracket padding: YES/NO
+
+      - Missing terminal hover inversion: YES/NO
+
+      - SaaS animations/spinners/shadows present: YES/NO
+
+      - Layout shifts present: YES/NO
+
+      - Lowercase or non-canonical labels present: YES/NO
+
+      - Raw RFC3339 shown where HH:MM:SS required: YES/NO
+
+
+      ## Headline
+
+      - [ ] PASS: Exact visual compliance with docs/ui-preview.html
+
+      - [ ] REJECTED/FAILED: Any visual deviation found
+
+      '
+    depends_on:
+    - manual-rss-fetch.frontend-implementation
+    - manual-rss-fetch.integration-proof
