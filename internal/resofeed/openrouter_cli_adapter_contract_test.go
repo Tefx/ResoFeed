@@ -139,8 +139,8 @@ func TestOpenRouterAdapterRequestContractWithFakeServer(t *testing.T) {
 			}))
 			defer server.Close()
 
-			client := &geminiHTTPClient{apiKey: fakeOpenRouterOSKey, model: tc.model, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
-			_, err := client.SummarizeItem(context.Background(), GeminiSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
+			client := &openRouterHTTPClient{apiKey: fakeOpenRouterOSKey, model: tc.model, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
+			_, err := client.SummarizeItem(context.Background(), OpenRouterSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
 			if err != nil {
 				t.Fatalf("fake OpenRouter summary request should decode JSON-mode response: %v", err)
 			}
@@ -181,8 +181,8 @@ func TestOpenRouterAdapterRetryAndSafeErrorMapping(t *testing.T) {
 				}))
 				defer server.Close()
 
-				client := &geminiHTTPClient{apiKey: fakeOpenRouterOSKey, model: fakeOpenRouterModel, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
-				_, _ = client.SummarizeItem(context.Background(), GeminiSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
+				client := &openRouterHTTPClient{apiKey: fakeOpenRouterOSKey, model: fakeOpenRouterModel, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
+				_, _ = client.SummarizeItem(context.Background(), OpenRouterSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
 				if got := attempts.Load(); got != 2 {
 					t.Fatalf("status %d attempts = %d, want one retry", status, got)
 				}
@@ -206,8 +206,8 @@ func TestOpenRouterAdapterRetryAndSafeErrorMapping(t *testing.T) {
 				}))
 				defer server.Close()
 
-				client := &geminiHTTPClient{apiKey: fakeOpenRouterOSKey, model: fakeOpenRouterModel, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
-				out, err := client.SummarizeItem(context.Background(), GeminiSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
+				client := &openRouterHTTPClient{apiKey: fakeOpenRouterOSKey, model: fakeOpenRouterModel, endpoint: strings.TrimRight(server.URL, "/"), client: server.Client()}
+				out, err := client.SummarizeItem(context.Background(), OpenRouterSummaryInput{ItemID: "item_1", Title: "Item", SourceTitle: "Source", URL: "https://example.test/item", AvailableText: "body"})
 				if err == nil {
 					t.Fatal("invalid JSON/provider error should return a safe Go error")
 				}

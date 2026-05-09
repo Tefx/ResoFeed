@@ -386,7 +386,7 @@ func listTodayFeed(t *testing.T, ctx context.Context, db *sql.DB, opts RankingOp
 	}).itemsAndError()
 }
 
-func applySteering(t *testing.T, ctx context.Context, db *sql.DB, gemini GeminiClient, req SteerRequest) (SteerResult, error) {
+func applySteering(t *testing.T, ctx context.Context, db *sql.DB, gemini LLMClient, req SteerRequest) (SteerResult, error) {
 	t.Helper()
 
 	return mustNotPanic(t, "ApplySteering", func() steerResult {

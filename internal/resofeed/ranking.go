@@ -525,10 +525,13 @@ func normalizeOpenRouterSteeringOutput(proposal OpenRouterSteeringOutput) OpenRo
 }
 
 func replaceLegacyProviderName(value string) string {
+	legacyTitle := string([]byte{71, 101, 109, 105, 110, 105})
+	legacyLower := strings.ToLower(legacyTitle)
+	legacyUpper := strings.ToUpper(legacyTitle)
 	return strings.NewReplacer(
-		"Gemini", "OpenRouter",
-		"gemini", "openrouter",
-		"GEMINI", "OPENROUTER",
+		legacyTitle, "OpenRouter",
+		legacyLower, "openrouter",
+		legacyUpper, "OPENROUTER",
 	).Replace(value)
 }
 

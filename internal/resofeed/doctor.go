@@ -86,7 +86,9 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
-	lines = append(lines, modelLines...)
+	if hasFailureDiagnostics(modelLines) {
+		lines = append(lines, modelLines...)
+	}
 	extractionLines, err := readItemStatusDiagnostics(ctx, db, "extraction", "extraction_status", []string{extractionStatusPartial, extractionStatusOriginalNA, extractionStatusSummaryNA})
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -98,6 +100,13 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		lines = append(lines, "ingest: last_run=never")
 	}
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+func hasFailureDiagnostics(lines []string) bool {
+	if len(lines) == 0 {
+		return false
+	}
+	return !strings.HasSuffix(lines[0], ": ok")
 }
 
 func openRouterDoctorLine(cfg DoctorConfig) string {

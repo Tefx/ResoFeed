@@ -31,7 +31,7 @@ func TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor(t *testing.T) {
 		_, _ = io.WriteString(w, `{"id":"chatcmpl_runtime","model":"openrouter/resolved-runtime","choices":[{"message":{"role":"assistant","content":"{\"summary\":\"Runtime dense summary.\",\"core_insight\":\"Runtime validated insight.\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
 	}))
 	defer model.Close()
-	llm := &geminiHTTPClient{apiKey: "fake-openrouter-runtime-key", model: "openrouter/configured-runtime", endpoint: model.URL, client: model.Client()}
+	llm := &openRouterHTTPClient{apiKey: "fake-openrouter-runtime-key", model: "openrouter/configured-runtime", endpoint: model.URL, client: model.Client()}
 
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -144,6 +144,15 @@ func mcpDoctorText(t *testing.T, url string) string {
 
 func assertRuntimeDoctorOpenRouterStatus(t *testing.T, body string) {
 	t.Helper()
+	bareStatusLines := 0
+	for _, line := range strings.Split(body, "\n") {
+		if strings.TrimSpace(line) == "openrouter: ok" {
+			bareStatusLines++
+		}
+	}
+	if bareStatusLines != 0 {
+		t.Fatalf("doctor output included redundant bare OpenRouter status line:\n%s", body)
+	}
 	for _, want := range []string{"openrouter: ok", "configured_model=openrouter/configured-runtime", "resolved_model=openrouter/resolved-runtime"} {
 		if !strings.Contains(body, want) {
 			t.Fatalf("doctor output missing %q:\n%s", want, body)

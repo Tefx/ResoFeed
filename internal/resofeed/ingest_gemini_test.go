@@ -135,8 +135,8 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := &geminiHTTPClient{apiKey: "test-key", model: "openrouter-test", endpoint: server.URL, client: server.Client()}
-	summary, err := client.SummarizeItem(context.Background(), GeminiSummaryInput{ItemID: "item_01", Title: "Title", SourceTitle: "Source", URL: "https://example.com", AvailableText: "body"})
+	client := &openRouterHTTPClient{apiKey: "test-key", model: "openrouter-test", endpoint: server.URL, client: server.Client()}
+	summary, err := client.SummarizeItem(context.Background(), OpenRouterSummaryInput{ItemID: "item_01", Title: "Title", SourceTitle: "Source", URL: "https://example.com", AvailableText: "body"})
 	if err != nil {
 		t.Fatalf("SummarizeItem returned error: %v", err)
 	}
@@ -144,7 +144,7 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 		t.Fatalf("summary = %+v calls=%d, want ok with one retry", summary, calls)
 	}
 
-	steering, err := client.TranslateSteering(context.Background(), GeminiSteeringInput{Command: "Push more systems papers.", ActorKind: ActorKindHuman})
+	steering, err := client.TranslateSteering(context.Background(), OpenRouterSteeringInput{Command: "Push more systems papers.", ActorKind: ActorKindHuman})
 	if err != nil {
 		t.Fatalf("TranslateSteering returned error: %v", err)
 	}
@@ -155,12 +155,12 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 
 type failingGemini struct{}
 
-func (failingGemini) SummarizeItem(context.Context, GeminiSummaryInput) (GeminiSummaryOutput, error) {
-	return GeminiSummaryOutput{}, context.DeadlineExceeded
+func (failingGemini) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{}, context.DeadlineExceeded
 }
 
-func (failingGemini) TranslateSteering(context.Context, GeminiSteeringInput) (GeminiSteeringOutput, error) {
-	return GeminiSteeringOutput{}, context.DeadlineExceeded
+func (failingGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, context.DeadlineExceeded
 }
 
 type ingestFakeState struct {

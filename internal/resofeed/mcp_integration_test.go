@@ -336,14 +336,14 @@ func mcpHTTPPostWithToken(t *testing.T, url string, payload map[string]any, toke
 type recordingSteeringGemini struct {
 	mu  sync.Mutex
 	n   int
-	out GeminiSteeringOutput
+	out OpenRouterSteeringOutput
 }
 
-func (g *recordingSteeringGemini) SummarizeItem(context.Context, GeminiSummaryInput) (GeminiSummaryOutput, error) {
-	return GeminiSummaryOutput{}, nil
+func (g *recordingSteeringGemini) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{}, nil
 }
 
-func (g *recordingSteeringGemini) TranslateSteering(context.Context, GeminiSteeringInput) (GeminiSteeringOutput, error) {
+func (g *recordingSteeringGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.n++

@@ -329,12 +329,12 @@ type staticGemini struct {
 	valueTier   string
 }
 
-func (g staticGemini) SummarizeItem(context.Context, GeminiSummaryInput) (GeminiSummaryOutput, error) {
-	return GeminiSummaryOutput{Summary: g.summary, CoreInsight: g.coreInsight, ValueTier: g.valueTier, ModelStatus: modelStatusOK}, nil
+func (g staticGemini) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{Summary: g.summary, CoreInsight: g.coreInsight, ValueTier: g.valueTier, ModelStatus: modelStatusOK}, nil
 }
 
-func (g staticGemini) TranslateSteering(context.Context, GeminiSteeringInput) (GeminiSteeringOutput, error) {
-	return GeminiSteeringOutput{}, context.DeadlineExceeded
+func (g staticGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, context.DeadlineExceeded
 }
 
 func insertSource(t *testing.T, ctx context.Context, db execDB, id string, sourceURL string, title string) {

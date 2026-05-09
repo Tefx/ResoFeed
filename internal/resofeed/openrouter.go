@@ -20,10 +20,6 @@ type LLMClient interface {
 	TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error)
 }
 
-// GeminiClient is retained as a source-compatible alias for model transform test
-// helpers. Runtime injection surfaces use LLMClient/OpenRouter names.
-type GeminiClient = LLMClient
-
 // OpenRouterConfig contains OpenRouter request/response JSON transformer configuration.
 type OpenRouterConfig struct {
 	APIKey string
@@ -32,7 +28,7 @@ type OpenRouterConfig struct {
 
 // NewOpenRouterClient constructs the OpenRouter JSON transformer client.
 func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
-	return &geminiHTTPClient{
+	return &openRouterHTTPClient{
 		apiKey:   cfg.APIKey,
 		model:    cfg.Model,
 		endpoint: "https://openrouter.ai",
@@ -42,7 +38,7 @@ func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
 	}
 }
 
-type geminiHTTPClient struct {
+type openRouterHTTPClient struct {
 	apiKey        string
 	model         string
 	endpoint      string
@@ -51,14 +47,14 @@ type geminiHTTPClient struct {
 	resolvedModel string
 }
 
-func (c *geminiHTTPClient) ConfiguredModel() string {
+func (c *openRouterHTTPClient) ConfiguredModel() string {
 	if c == nil {
 		return ""
 	}
 	return strings.TrimSpace(c.model)
 }
 
-func (c *geminiHTTPClient) ResolvedModel() string {
+func (c *openRouterHTTPClient) ResolvedModel() string {
 	if c == nil {
 		return ""
 	}
@@ -67,7 +63,7 @@ func (c *geminiHTTPClient) ResolvedModel() string {
 	return c.resolvedModel
 }
 
-func (c *geminiHTTPClient) setResolvedModel(model string) {
+func (c *openRouterHTTPClient) setResolvedModel(model string) {
 	trimmed := strings.TrimSpace(model)
 	if c == nil || trimmed == "" {
 		return
@@ -77,7 +73,7 @@ func (c *geminiHTTPClient) setResolvedModel(model string) {
 	c.resolvedMu.Unlock()
 }
 
-func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	if strings.TrimSpace(input.AvailableText) == "" {
 		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: available_text required")
 	}
@@ -110,7 +106,7 @@ func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input OpenRouterSu
 	return out, nil
 }
 
-func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+func (c *openRouterHTTPClient) TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	if strings.TrimSpace(input.Command) == "" {
 		return OpenRouterSteeringOutput{}, errors.New("openrouter steering: command required")
 	}
@@ -138,7 +134,7 @@ func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input OpenRout
 	return out, nil
 }
 
-func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst any) error {
+func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, dst any) error {
 	if c == nil {
 		return errors.New("nil openrouter client")
 	}
@@ -222,7 +218,7 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 	return lastErr
 }
 
-func (c *geminiHTTPClient) requestURL() string {
+func (c *openRouterHTTPClient) requestURL() string {
 	base := strings.TrimRight(c.endpoint, "/")
 	if strings.HasSuffix(base, "/api/v1/chat/completions") {
 		return base
@@ -247,7 +243,7 @@ type openRouterChatResponse struct {
 		Message openRouterMessage `json:"message"`
 	} `json:"choices"`
 	Candidates []struct {
-		Content geminiContent `json:"content"`
+		Content openRouterCandidateContent `json:"content"`
 	} `json:"candidates"`
 }
 
@@ -267,11 +263,11 @@ type openRouterErrorResponse struct {
 	} `json:"error"`
 }
 
-type geminiContent struct {
-	Parts []geminiPart `json:"parts"`
+type openRouterCandidateContent struct {
+	Parts []openRouterCandidatePart `json:"parts"`
 }
 
-type geminiPart struct {
+type openRouterCandidatePart struct {
 	Text string `json:"text"`
 }
 
@@ -321,10 +317,3 @@ type OpenRouterSteeringOutput struct {
 	RuleTexts     []string `json:"rule_texts"`
 	Message       string   `json:"message"`
 }
-
-// Gemini* aliases are retained for source compatibility in older package-local
-// tests and helpers only. Runtime injection surfaces use LLMClient/OpenRouter.
-type GeminiSummaryInput = OpenRouterSummaryInput
-type GeminiSummaryOutput = OpenRouterSummaryOutput
-type GeminiSteeringInput = OpenRouterSteeringInput
-type GeminiSteeringOutput = OpenRouterSteeringOutput
