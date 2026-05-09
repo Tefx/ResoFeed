@@ -12439,6 +12439,145 @@ phases:
     /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
   depends_on:
   - openrouter-llm-contract-and-red-tests
+  steps:
+  - id: openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+    name: complete-cli-and-openrouter-adapter
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      risk_tags: integration,state,external_api,secret_runtime
+
+
+      Complete the implementation within the contract-locked boundaries from openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
+      and the expected-red tests from openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - docs/ARCHITECTURE.md / docs/USAGE.md from lock-openrouter-contract-and-docs
+      — runtime flags and OpenRouter-only contract are AUTHORITATIVE.
+
+      - CLI/adapter expected-red tests from define-cli-adapter-docs-red-tests — assertions
+      are PROTECTED.
+
+
+      YOUR SCOPE: Replace Gemini runtime flag parsing and Gemini adapter behavior
+      with OpenRouter-only CLI/runtime configuration and a small `internal/resofeed/openrouter.go`
+      adapter. Use direct construction and dependency passing only.
+
+
+      Touch_paths:
+
+      - cmd/resofeed and/or internal/resofeed/db.go flag/runtime parsing surface identified
+      by existing code.
+
+      - internal/resofeed/openrouter.go or equivalent flat internal/resofeed file.
+
+      - existing Gemini adapter files: remove or replace references; do not keep compatibility
+      flags.
+
+      - related tests only as needed to make expected-red tests green after implementation.
+
+
+      Required behavior:
+
+      - `--gemini-api-key` and `--gemini-model` are removed/rejected.
+
+      - `--openrouter-api-key` is validated as required without printing the value.
+
+      - `--openrouter-model` is optional; empty means account default.
+
+      - No startup network model validation or model whitelist.
+
+      - OpenRouter chat completions request uses the configured endpoint and JSON
+      response mode.
+
+      - `model` is omitted when empty and passed unchanged when set.
+
+      - 429/5xx retries, invalid JSON, and OpenRouter error responses map to safe
+      Go errors/model_status.
+
+      - No OpenRouter attribution headers now.
+
+
+      Failure-mode checklist:
+
+      - Missing key behavior is deterministic and secret-safe.
+
+      - Explicit empty model has account-default semantics.
+
+      - Network failure does not corrupt SQLite state.
+
+      - Partial/write failure does not persist runtime key/model.
+
+      - Legacy Gemini flag use fails clearly rather than silently falling back.
+
+
+      State semantics:
+
+      - runtime_secret: OpenRouter API key is last-process-runtime only, never persisted/exported.
+
+      - runtime_preference: OpenRouter model is runtime-only, never portable state.
+
+      - model_outputs: only validated summaries/core insights/model_status may persist.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT add provider registries, Gemini compatibility, DI containers, service/repository
+      layers, event buses, sidecar workers, sync/merge/history portability, vector
+      DBs, embeddings, or RAG.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs. Private stub classes/functions or hardcoded
+      fake OpenRouter responses do not satisfy this requirement.
+
+
+      If a contract artifact is wrong or incomplete, document a deviation record (type,
+      what, why, impact) — do NOT silently rewrite.'
+    verification: 'local-check protecting openrouter-llm-implementation. Main path:
+      CLI/adapter tests for OpenRouter pass. Failure path: tests cover missing key,
+      legacy Gemini flag rejection, 429/5xx retry, invalid JSON/error mapping, and
+      empty-model omission.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Commands run:
+
+      ```
+
+      <go test targeted CLI/adapter commands>
+
+      ```
+
+      - Main path proof:
+
+      - Highest-risk failure path proof:
+
+      - Confirmation: no `.env` content read, no OPENROUTER_KEY printed, no key persisted/exported.
+
+      - Confirmation: no Gemini compatibility flags retained.
+
+      - Confirmation: no provider registry/DI/service layer introduced.
+
+      - Deviation records, if any:'
+    agent: golang-developer
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
