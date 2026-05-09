@@ -14538,7 +14538,7 @@ phases:
     agent: uiux-auditor
   - id: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     name: fix-openrouter-runtime-naming-and-doctor-status
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -14680,6 +14680,8 @@ phases:
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     - openrouter-llm-implementation.serve-liveness-probe
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T18:39:06.394042+00:00'
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
