@@ -10614,6 +10614,7 @@ phases:
     - docs/USAGE.md
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
+    - retest-http-idempotency-wiring
     agent: spec-verifier
   - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     name: Final architecture and concurrency review
