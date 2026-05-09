@@ -4988,6 +4988,103 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     agent: integration-verifier
+  - id: runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
+    name: Fix MCP steer Gemini proof
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      rework_context: focused remediation after runtime-blockers-retest found B3 still
+      open
+
+      root_cause_required: true
+
+
+      Fix the remaining MCP steer Gemini proof blocker without regressing already-closed
+      runtime blockers.
+
+
+      ## Remaining blocker
+
+      B3_mcp_steer_configured_gemini_success_not_proven: after the batched runtime
+      fix, independent retest proved static root HTML/UI, MCP tools/list schemas,
+      startup no-bind, token reuse, real bound MCP listener, and stale skip cleanup.
+      However the real bound `/mcp` `steer` natural-language path returned JSON-RPC
+      `internal error` when attempting configured Gemini via proxy, so a successful
+      configured-Gemini steering receipt and idempotent replay were not proven.
+
+
+      ## Required root-cause record in evidence
+
+      - why_previous_fix_failed: distinguish whether the implementation path is wrong,
+      the deterministic proof harness is missing/invalid, or the public binary cannot
+      safely inject a Gemini test double.
+
+      - why_previous_retest_failed: include the observed JSON-RPC internal error and
+      proxy CONNECT evidence.
+
+      - reversal_risk: explain how the fix prevents returning to handler-only proof
+      or nil-Gemini MCP wiring.
+
+
+      ## Required fix scope
+
+      1. Preserve the runtime chain that passes configured Gemini into MCP steer;
+      do not reintroduce `ApplySteering(..., nil, ...)` for MCP steer.
+
+      2. Add a deterministic real bound-listener `/mcp` proof for `tools/call steer`
+      using a configured Gemini test double or equivalent contract-compliant configured
+      Gemini proof. The proof must traverse HTTP listener -> `/mcp` -> auth -> JSON-RPC
+      dispatch -> `SteerForMCP` -> `ApplySteering` -> configured Gemini -> successful
+      steering receipt.
+
+      3. Prove idempotent replay for the same MCP `steer` `idempotency_key` returns
+      the stored receipt without a second Gemini translation call.
+
+      4. Prove unauthorized MCP `steer` does not call Gemini.
+
+      5. If the public `resofeed serve` binary cannot inject a Gemini test double
+      without adding an unapproved public flag, do NOT add a new product flag. Instead
+      provide a real bound in-process runtime listener test using `NewRouter`/`HTTPServerConfig`
+      with a fake Gemini client, and document why this is the contract-correct proof
+      surface for configured Gemini wiring.
+
+      6. Do not alter product semantics or add accounts, sync, vector/RAG, sidecars,
+      per-agent registry, or delivery-channel ownership.
+
+
+      ## Non-regression constraints
+
+      - Static root must remain HTML/static UI with owner-token prompt after documented
+      web build.
+
+      - MCP `tools/list` schemas must remain complete.
+
+      - Startup no-bind/token reuse tests must remain active.
+
+      - No stale HTTP/MCP expected-stub-debt skips may reappear.'
+    verification: '- Focused bound-listener MCP steer test passes and proves successful
+      receipt using configured Gemini test double/proof.
+
+      - The focused test proves idempotent replay avoids a second Gemini call and
+      unauthorized requests do not call Gemini.
+
+      - Static/grep evidence confirms MCP steer no longer calls `ApplySteering` with
+      nil Gemini.
+
+      - `go test ./...` passes with no stale runtime expected-stub skip text.
+
+      - `go test -race ./internal/resofeed` passes.
+
+      - Documented web build still succeeds and root HTML proof remains non-regressed
+      if static serving files are touched.
+
+      - Evidence includes root-cause fields: why_previous_fix_failed, why_previous_retest_failed,
+      reversal_risk.'
+    depends_on:
+    - runtime-api-and-mcp-integration.fix-runtime-verification-blockers
+    agent: golang-developer
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
