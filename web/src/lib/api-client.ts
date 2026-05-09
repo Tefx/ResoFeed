@@ -3,14 +3,18 @@ import type {
   DeleteSourceResponse,
   ErrorBody,
   FeedTodayResponse,
+  FetchSourceSuccessResponse,
   ImportOpmlResponse,
   InspectRequest,
   InspectResponse,
   ItemDetailResponse,
+  ManualRssFetchApiResult,
+  ManualRssFetchErrorBody,
   OpaqueId,
   ResonanceRequest,
   ResonanceResponse,
   RestoreResult,
+  RunIngestSuccessResponse,
   RulesResponse,
   SearchResponse,
   SourcesResponse,
@@ -53,6 +57,15 @@ function fallbackError(code: ApiErrorCode, message: string): ErrorBody {
 }
 
 function isCanonicalErrorBody(value: ErrorBody): boolean {
+  return (
+    typeof value.error?.code === 'string' &&
+    typeof value.error?.message === 'string' &&
+    typeof value.error?.details === 'object' &&
+    value.error.details !== null
+  );
+}
+
+function isManualRssFetchErrorBody(value: ManualRssFetchErrorBody): boolean {
   return (
     typeof value.error?.code === 'string' &&
     typeof value.error?.message === 'string' &&
@@ -149,6 +162,16 @@ export class ResoFeedApiClient {
     });
   }
 
+  async runIngest(): Promise<ManualRssFetchApiResult<RunIngestSuccessResponse>> {
+    return this.manualRssFetchRequest<RunIngestSuccessResponse>('/api/ingest');
+  }
+
+  async fetchSource(sourceId: OpaqueId): Promise<ManualRssFetchApiResult<FetchSourceSuccessResponse>> {
+    return this.manualRssFetchRequest<FetchSourceSuccessResponse>(
+      `/api/sources/${encodeURIComponent(sourceId)}/fetch`
+    );
+  }
+
   async search(params: SearchRequestParams): Promise<SearchResponse> {
     const query = new URLSearchParams();
     if (params.q !== undefined) query.set('q', params.q);
@@ -197,6 +220,45 @@ export class ResoFeedApiClient {
     }
 
     return parseJson<T>(response);
+  }
+
+  private async manualRssFetchRequest<T>(path: string): Promise<ManualRssFetchApiResult<T>> {
+    const response = await this.fetcher(`${this.baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.ownerToken}`
+      },
+      body: '{}'
+    });
+
+    if (response.status === 200) {
+      return { ok: true, status: 200, body: await parseJson<T>(response) };
+    }
+
+    if (response.status === 404 || response.status === 409) {
+      const fallback: ManualRssFetchErrorBody = {
+        error: {
+          code: response.status === 404 ? 'not_found' : 'conflict',
+          message: response.status === 404 ? 'source not found' : 'ingest already running',
+          details: emptyDetails
+        }
+      };
+
+      try {
+        const parsed = await parseJson<ManualRssFetchErrorBody>(response);
+        return {
+          ok: false,
+          status: response.status,
+          body: isManualRssFetchErrorBody(parsed) ? parsed : fallback
+        };
+      } catch {
+        return { ok: false, status: response.status, body: fallback };
+      }
+    }
+
+    await this.throwCanonicalError(response);
+    throw new Error('unreachable');
   }
 
   private async throwCanonicalError(response: Response): Promise<never> {

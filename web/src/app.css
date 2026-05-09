@@ -114,6 +114,62 @@ a:focus-visible,
   padding-inline-start: var(--rf-space-lg);
 }
 
+.source-ledger-head,
+.source-ledger-row,
+.source-ledger-actions {
+  display: flex;
+  gap: var(--rf-space-row);
+  align-items: center;
+}
+
+.source-ledger-head,
+.source-ledger-row {
+  justify-content: space-between;
+}
+
+.source-ledger-row {
+  min-height: 44px;
+  border-block-start: 1px solid var(--rf-color-border);
+  padding-block: var(--rf-space-xs);
+}
+
+.source-ledger-copy {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ledger-time,
+.source-error {
+  font: var(--rf-typography-metadata);
+  font-variant-numeric: tabular-nums;
+}
+
+.source-error {
+  display: block;
+  color: var(--rf-color-danger);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.manual-fetch-action {
+  min-height: 44px;
+  border-color: var(--rf-color-primary);
+  padding: var(--rf-space-sm) var(--rf-space-row);
+  color: var(--rf-color-primary);
+  background: var(--rf-color-surface);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manual-fetch-action:hover:not(:disabled),
+.manual-fetch-action:focus-visible:not(:disabled) {
+  color: var(--rf-color-background);
+  background: var(--rf-color-primary);
+}
+
 .contract-token-prompt,
 .contract-empty,
   .contract-source-ledger,

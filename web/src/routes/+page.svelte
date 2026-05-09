@@ -15,6 +15,12 @@
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
   type Surface = 'feed' | 'inspector' | 'ledger' | 'search';
+  type ManualFetchState = {
+    readonly ingesting: boolean;
+    readonly fetchingSourceIds: readonly string[];
+    readonly lastIngestAt: string | null;
+    readonly sourceErrors: Readonly<Record<string, string>>;
+  };
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -40,6 +46,12 @@
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
+  let manualFetchState = $state<ManualFetchState>({
+    ingesting: false,
+    fetchingSourceIds: [],
+    lastIngestAt: null,
+    sourceErrors: {}
+  });
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -194,6 +206,74 @@
     sources = (await apiClient().sources()).sources;
   }
 
+  async function runManualIngest(): Promise<void> {
+    if (manualFetchState.ingesting) return;
+    manualFetchState = { ...manualFetchState, ingesting: true };
+    try {
+      const result = await apiClient().runIngest();
+      if (result.ok) {
+        const sourceErrors = Object.fromEntries(
+          result.body.ingest.sources
+            .filter((source) => source.message)
+            .map((source) => [source.source_id, source.message as string])
+        );
+        manualFetchState = {
+          ...manualFetchState,
+          lastIngestAt: result.body.ingest.last_ingest_at,
+          sourceErrors
+        };
+        await refreshShellLists();
+        return;
+      }
+      apiError = `err: ${result.body.error.message}`;
+    } catch (error) {
+      apiError = error instanceof Error ? error.message : 'err: ingest failed';
+    } finally {
+      manualFetchState = { ...manualFetchState, ingesting: false };
+    }
+  }
+
+  async function fetchManualSource(source: Source): Promise<void> {
+    if (manualFetchState.fetchingSourceIds.includes(source.id)) return;
+    manualFetchState = {
+      ...manualFetchState,
+      fetchingSourceIds: [...manualFetchState.fetchingSourceIds, source.id]
+    };
+    try {
+      const result = await apiClient().fetchSource(source.id);
+      if (result.ok) {
+        const remainingErrors: Record<string, string> = { ...manualFetchState.sourceErrors };
+        delete remainingErrors[source.id];
+        manualFetchState = {
+          ...manualFetchState,
+          sourceErrors: result.body.fetch.message
+            ? { ...remainingErrors, [source.id]: result.body.fetch.message }
+            : remainingErrors
+        };
+        sources = sources.map((candidate) => (candidate.id === source.id ? result.body.source : candidate));
+        await refreshShellLists();
+        return;
+      }
+      manualFetchState = {
+        ...manualFetchState,
+        sourceErrors: { ...manualFetchState.sourceErrors, [source.id]: `err: ${result.body.error.message}` }
+      };
+    } catch (error) {
+      manualFetchState = {
+        ...manualFetchState,
+        sourceErrors: {
+          ...manualFetchState.sourceErrors,
+          [source.id]: error instanceof Error ? error.message : 'err: fetch failed'
+        }
+      };
+    } finally {
+      manualFetchState = {
+        ...manualFetchState,
+        fetchingSourceIds: manualFetchState.fetchingSourceIds.filter((sourceId) => sourceId !== source.id)
+      };
+    }
+  }
+
   async function exportState(): Promise<StateBundleV1> {
     return apiClient().exportState();
   }
@@ -311,7 +391,14 @@
 
     <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label="SOURCE LEDGER surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
-      <SourceLedger sources={sources} onDeleteSource={deleteSource} onImportOpml={importOpml} />
+      <SourceLedger
+        sources={sources}
+        onDeleteSource={deleteSource}
+        onImportOpml={importOpml}
+        onRunIngest={runManualIngest}
+        onFetchSource={fetchManualSource}
+        manualFetchState={manualFetchState}
+      />
       <StatePortability onExportState={exportState} onImportState={importState} />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
