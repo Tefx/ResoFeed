@@ -3027,7 +3027,7 @@ phases:
   steps:
   - id: runtime-api-and-mcp-integration.complete-http-api-handlers
     name: Complete HTTP API handlers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -3117,6 +3117,115 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T07:12:12.005932+00:00'
+    done_at: '2026-05-09T07:20:09.451121+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: `/api/feed/today` and `/api/search` reject unknown/duplicate
+      query params with `400 bad_request`; owner token is single delegation boundary;
+      no accounts/vector/sync layers.
+
+      - `docs/ARCHITECTURE.md`: `/api/*` routes require `Authorization: Bearer <OWNER_TOKEN>`,
+      canonical JSON error bodies, strict feed/search query validation, state import/export
+      replacement, `/api/doctor` text/plain.
+
+      - `docs/PRD.md`: Today/freshness, Resonate/memory, Search/lexical retrieval,
+      `/doctor` raw health, no RAG/accounts/activity ledger.
+
+      - `docs/DESIGN.md`: `/doctor` is text, not dashboard; state portability is terse
+      active sources/rules/stars export/import only.
+
+      - `docs/DESIGN_VISION.md`: Owner Token Prompt is terse local gate; Source Ledger
+      is flat; no inbox-zero/folders/settings.
+
+      - `docs/USAGE.md`: HTTP examples for auth, Today, search, state export/import,
+      OPML, and diagnostics.
+
+
+      ## Integration Evidence
+
+      - Commands/tests exercising full HTTP paths: `go test -run ''TestHTTPHandlersExerciseCorePaths|TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters''
+      -v ./internal/resofeed`, `go test ./...`, `go test -race ./internal/resofeed`,
+      `go build ./cmd/resofeed`, `golangci-lint run` all reported exit 0 in isolated
+      worktree.
+
+      - Actual output: targeted tests passed auth_failure, feed_today, search, state_export_import,
+      doctor, feed_unknown, feed_duplicate, search_unknown, search_duplicate; full
+      suite ok; linter 0 issues.
+
+      - Path exercised: HTTP request → handler → core → response for auth failure,
+      `/api/feed/today`, `/api/search`, `/api/state/export`, `/api/state/import`,
+      `/api/doctor`.
+
+      - Query validation proof: tests prove `/api/feed/today` rejects unknown `topic`
+      and duplicate `limit`; `/api/search` rejects unknown `semantic` and duplicate
+      `q`.
+
+      - Deviations record: none.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: implementation
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: yes — `internal/resofeed/http.go`,
+      `internal/resofeed/http_impl_test.go`
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Mainline merge/final-state verification
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.complete-http-api-handlers`
+      applied `internal/resofeed/http.go` and new `internal/resofeed/http_impl_test.go`.
+
+      - Mainline `go test ./...` after squash merge → `? resofeed/cmd/resofeed [no
+      test files]`; `ok resofeed/internal/resofeed 0.553s`.
+
+      - Merge commit: `43308bc` (`[vectl] step-runtime-api-and-mcp-integration.complete-http-api-handlers
+      completed`).
+
+
+      ## Commit hash(es)
+
+      - isolated branch commit: `f8c6938f92f7620ef275729e928aa6f989de1094`
+
+      - main merge commit: `43308bc`
+
+
+      ## Files changed
+
+      - `internal/resofeed/http.go`
+
+      - `internal/resofeed/http_impl_test.go`
+
+
+      ## Spec link
+
+      - docs/ARCHITECTURE.md §5.5 State Portability, §6 HTTP Surface
+
+      - docs/USAGE.md HTTP Command Reference
+
+      - docs/PRD.md §§10, 15
+
+      - docs/DESIGN.md State Portability and Diagnostics Output
+
+
+      ## Gaps/Notes
+
+      MCP implementation intentionally not included in this step; `/mcp` remains owned
+      by sibling MCP step.'
   - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     name: Complete MCP Streamable HTTP surface
     status: claimed
