@@ -6832,7 +6832,7 @@ phases:
       \ frontend retest.\n\n## Headline\nPASS_WITH_DEBT"
   - id: frontend-implementation.native-ui-ux-implementation-audit
     name: Native UI UX implementation audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -6907,6 +6907,87 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-09T09:49:17.859132+00:00'
+    done_at: '2026-05-09T10:02:18.056315+00:00'
+    evidence: "## Native UI/UX Audit Report\n\n**Semantic outcome:** FAIL report delivered;\
+      \ blocker-class issues were batched into remediation before completion.\n\n\
+      ### Orchestrator Remediation Ownership\n- Parallel failure aggregation applied\
+      \ for `frontend-implementation.frontend-spec-conformance` and `frontend-implementation.native-ui-ux-implementation-audit`.\n\
+      - Planner created batched fix step: `fix-steer-diagnostics-and-mobile-ui-contract`.\n\
+      - Planner created retest step: `retest-frontend-contract-closure`.\n- Planner\
+      \ strengthened `frontend-implementation.frontend-gate` dependencies/criteria\
+      \ to require retest-based closure before opening.\n\n### Orchestrator Mainline\
+      \ Final-State Barrier\n- Worker branch status before merge: clean.\n- UI audit\
+      \ rendered artifacts were merged as evidence commit `0f654f6` (`[vectl] step-frontend-implementation.native-ui-ux-implementation-audit\
+      \ artifacts`).\n- Mainline verification after artifact merge:\n  - `go test\
+      \ ./... -count=1` — PASS.\n  - `npm --prefix web run check` — PASS; 0 errors,\
+      \ 0 warnings.\n  - `npm --prefix web run build` — PASS; static site written.\n\
+      \  - `npm --prefix web run test` — PASS; 2 files / 11 tests passed.\n\n## refs\
+      \ Read Confirmation (MANDATORY)\n- .agents/instructions.md — Canonical docs\
+      \ are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; UI must be dense but legible\
+      \ archival index with muted colors and rare accents, using defined Owner Token\
+      \ Prompt and First-Use Empty State.\n- docs/ARCHITECTURE.md — Frontend must\
+      \ render `docs/DESIGN.md`, show owner-token prompt before `/api/*`, keep Source\
+      \ Ledger flat, expose terse state export/import, and avoid settings/dashboard\
+      \ surfaces.\n- docs/PRD.md — No onboarding wizards, no unread/inbox-zero/archive\
+      \ mechanics; Inspect, Resonate, and Steer are the core user primitives.\n- docs/DESIGN.md\
+      \ — Muted archival workbench, exact owner-token/first-use copy, desktop split\
+      \ feed+Inspector, mobile single-column feed with full-screen Inspector route,\
+      \ 44px touch targets, flat Source Ledger, state portability warning, no gradients/AI\
+      \ slop.\n- docs/DESIGN_VISION.md — Archival, high-density, typographic, low-fatigue;\
+      \ no cute errors, no account/onboarding, no numeric indicators.\n- docs/USAGE.md\
+      \ — UI opens with owner token stored as `resofeed.ownerToken`; add sources through\
+      \ Steer or OPML; state import replaces active state; `/doctor` is raw text.\n\
+      \n## Rendered artifact list\n- `.audit-artifacts/owner-token-desktop.png`\n\
+      - `.audit-artifacts/owner-token-mobile.png`\n- `.audit-artifacts/invalid-token-error-desktop.png`\n\
+      - `.audit-artifacts/first-use-empty-desktop.png`\n- `.audit-artifacts/first-use-empty-mobile.png`\n\
+      - `.audit-artifacts/populated-desktop-full.png`\n- `.audit-artifacts/populated-mobile-full.png`\n\
+      \n## Contract comparison findings\n- BLOCKER: Mobile layout violates DESIGN.md\
+      \ mobile/Inspector requirements. `populated-mobile-full.png` shows feed, Inspector,\
+      \ Source Ledger, State Portability, Search, and bottom Steer stacked into one\
+      \ long page. Spec requires mobile feed as compact single column and item tap\
+      \ opening a full-screen Inspector route; Source Ledger should open as flat full-screen\
+      \ list, not be permanently appended below feed.\n- BLOCKER: Selected-item treatment\
+      \ violates Feed Item/Desktop layout. `populated-desktop-full.png` lacks required\
+      \ non-layout-shifting 3px selected marker on selected feed row and instead renders\
+      \ duplicate inline Inspector focus target after feed list, disrupting feed rhythm\
+      \ and duplicating detail content outside right Inspector.\n- HIGH: Time grouping/headings\
+      \ diverge; duplicate `TODAY` headings/sections appear instead of time labels\
+      \ anchored inside first item metadata row.\n- HIGH: Resonate buttons overuse\
+      \ primary black filled buttons. Inactive stars visually read as primary actions\
+      \ rather than muted/surface star; active accent should be scarce `#7A4600`.\n\
+      - MEDIUM: First-use empty state adds extra internal-sounding `Contract:` copy\
+      \ beyond terse required lines.\n- MEDIUM: Search/Retrieval renders duplicate\
+      \ result counts.\n\n## Accessibility observations\n- Owner-token prompt and\
+      \ invalid error line are legible; error uses raw `err: owner token rejected`.\n\
+      - Touch target sizes appear broadly 44px, but mobile page physics are poor because\
+      \ major sections are stacked into a long scroll rather than route/full-screen\
+      \ surfaces.\n- Focus visibility could not be visually proven from static screenshots;\
+      \ source CSS indicates focus outline, but audit did not PASS focus behavior\
+      \ from source alone.\n\n## Forbidden-pattern scan\n- No visible purple AI palette,\
+      \ gradients, blobs, mascots, confetti, unread badges, folders, tags, archive/mark-all-read,\
+      \ or settings sliders found in rendered artifacts.\n- Mobile all-in-one stacked\
+      \ page creates settings-dashboard-like surface sprawl contrary to low-chrome\
+      \ platform contract.\n\n### Behavioral Proof Register\n- owner-token prompt\
+      \ desktop/mobile: PASS — terse local token gate, no account/register/password-reset\
+      \ language, visible token input and submit.\n- invalid-token feedback line:\
+      \ PASS — raw `err: owner token rejected` line visible and non-cute.\n- first-use\
+      \ empty state: PARTIAL — required lines present, but extra `Contract:` copy\
+      \ and duplicate `TODAY` heading diverge.\n- desktop feed and Inspector: DIVERGES\
+      \ — missing selected marker; duplicate inline Inspector focus target appears\
+      \ after feed; time-group labels not implemented as specified.\n- mobile feed/detail/source/search\
+      \ layout: DIVERGES — mobile renders one giant stacked page instead of feed +\
+      \ full-screen Inspector route and separate ledger route.\n- state portability\
+      \ warning: PASS — required warning `import replaces active sources, rules, and\
+      \ stars` visible.\n- search/retrieval: PARTIAL — lexical/provenance result anatomy\
+      \ visible, but duplicate counts and permanent stacked placement add chrome debt.\n\
+      \n## Semantic Closure Fields\nheadline: FAIL\nstep_intent: visual_audit\nexpected_result:\
+      \ green\nobserved_result: red\nverdict: FAIL\nblockers:\n  - Mobile layout violates\
+      \ full-screen Inspector route/platform physics contract.\n  - Desktop selected-state/Inspector\
+      \ behavior duplicates detail content and misses non-layout-shifting selected\
+      \ marker.\n  - Resonate button styling makes inactive stars primary black controls\
+      \ instead of muted surface controls with scarce active accent.\nproof_gap_status:\
+      \ NONE\nblocking_status: OPEN\ngate_open_allowed: false\norchestrator_action_hint:\
+      \ DO_NOT_COMPLETE\nproduct_implementation_files_modified: false"
   - id: frontend-implementation.frontend-spec-conformance
     name: Frontend spec conformance
     status: done
