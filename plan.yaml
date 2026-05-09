@@ -15438,7 +15438,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     name: spec-doc-state-conformance-audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -15620,6 +15620,122 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T19:11:05.101498+00:00'
+    done_at: '2026-05-09T19:18:08.546143+00:00'
+    evidence: 'Spec conformance retest PASS accepted and artifact merged.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+
+      Worker commit: 0790b14.
+
+      Main squash merge commit: af58480 (`[vectl] step-openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
+      completed`).
+
+      Artifact merged: `.audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit-retest.md`.
+
+
+      Refs read confirmation:
+
+      - docs/ARCHITECTURE.md — startup validation matrix, OpenRouter-only runtime
+      contract, `/doctor` rules, state portability, HTTP/MCP parity.
+
+      - .audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md
+      — prior B1: invalid `--addr` with missing key returned `invalid_openrouter_key`.
+
+      - .agents/instructions.md — current guidance now has OpenRouter-only/OPENROUTER_KEY
+      wording; Gemini drift closed.
+
+      - docs/USAGE.md — OpenRouter key/model, no CLI secrets, `/doctor`, state import/export,
+      MCP owner-token usage.
+
+      - relevant source/tests — read cmd/resofeed/main.go; internal/resofeed db/runtime_secret/openrouter/doctor/state/http/mcp
+      and tests.
+
+
+      Requirements register summary:
+
+      - R1 startup validation ordering: CONFORMS.
+
+      - R2 OpenRouter-only/secrets: CONFORMS.
+
+      - R3 model semantics: CONFORMS.
+
+      - R4 doctor reporting: CONFORMS.
+
+      - R5 portable state exclusion: CONFORMS.
+
+      - R6 transport parity: CONFORMS.
+
+      - R7 `.agents` guidance drift closed: CONFORMS.
+
+
+      B1 runtime/test evidence:
+
+      - invalid `--addr` with no OPENROUTER_KEY/GEMINI_API_KEY -> `invalid_addr`:
+      PASS (`err: invalid_addr: expected HOST:PORT`, exit 2).
+
+      - `--public-url` mixed-invalid ordering: PASS (`err: invalid_public_url: expected
+      absolute http(s) URL without path/query/fragment`, exit 2).
+
+      - `--owner-token` mixed-invalid ordering: PASS (`err: invalid_owner_token: expected
+      at least 32 visible non-whitespace characters`, exit 2).
+
+      - missing OpenRouter key baseline after valid local config: PASS (`err: invalid_openrouter_key:
+      value required`, exit 2).
+
+      - Targeted tests: PASS.
+
+      - Full suite with OpenRouter/Gemini env unset: PASS.
+
+
+      Coverage summary:
+
+      - Total requirements: 7
+
+      - CONFORMS: 7
+
+      - DIVERGES/PARTIAL: 0
+
+      - NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC: 0
+
+
+      Issues found:
+
+      - Low: test helper names/comments still contain Gemini-era names in *_test.go
+      only. Non-blocking; no final gate intersection because production/runtime/docs
+      conform.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     name: doctor-ui-multimodal-audit
     status: done
