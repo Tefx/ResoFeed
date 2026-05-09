@@ -13198,3 +13198,108 @@ phases:
     remain redacted.
   depends_on:
   - openrouter-llm-implementation
+  steps:
+  - id: openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    name: independent-regression-suite
+    status: pending
+    description: "step_type: verification\nstep_intent: retest_green\nexpected_result:\
+      \ green\nagent_source: project\nverification_scope: full-plan-check protecting\
+      \ final OpenRouter gate\n\nAs an INDEPENDENT TESTER, run the complete local\
+      \ regression suite for the OpenRouter backend migration from a fresh perspective.\n\
+      \nIndependence Level: L2. Use repository code and public test commands; do not\
+      \ rely on implementation-process claims.\n\nRequired detailed green coverage:\n\
+      1. CLI flags:\n   - old Gemini flags rejected.\n   - OpenRouter key required.\n\
+      \   - OpenRouter model optional.\n   - no startup network model validation.\n\
+      2. Adapter with httptest fake OpenRouter:\n   - request headers and endpoint.\n\
+      \   - response_format JSON mode.\n   - model omitted when empty.\n   - model\
+      \ passed unchanged when set.\n   - retries/429/5xx.\n   - invalid JSON/error\
+      \ mapping.\n3. Ingest:\n   - summary/core insight saved from OpenRouter-shaped\
+      \ response.\n   - model failure does not hide item.\n4. Steering:\n   - HTTP\
+      \ and MCP steering use LLMClient/OpenRouter path.\n   - idempotent retries do\
+      \ not re-call model.\n   - invalid proposal rejected safely.\n5. `/doctor`:\n\
+      \   - `openrouter:` raw text.\n   - configured/default/resolved model behavior.\n\
+      \   - no `gemini:` remains.\n6. State export/import:\n   - no OpenRouter key/model\
+      \ in portable state.\n7. Docs/search tests:\n   - ARCHITECTURE/USAGE no longer\
+      \ promise Gemini flags.\n\nA test that discovers issues is successful verification\
+      \ output; classify findings and do not hide blockers."
+    verification: full-plan-check protecting final gate. Green pass required for the
+      listed local tests unless a blocker is reported with precise reproduction and
+      downstream remediation path.
+    evidence_template: '## Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: OpenRouter local regression suite
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ### Test Execution
+
+      Commands executed:
+
+      ```
+
+      <go test commands and docs/search commands>
+
+      ```
+
+      Output summary:
+
+      ```
+
+      <actual output snippets, redacted>
+
+      ```
+
+
+      ### Coverage Matrix
+
+      | Area | Command/Test | Result | Notes |
+
+      |---|---|---|---|
+
+      | CLI flags | | | |
+
+      | Adapter httptest | | | |
+
+      | Ingest | | | |
+
+      | Steering HTTP/MCP | | | |
+
+      | Doctor | | | |
+
+      | State export/import | | | |
+
+      | Docs/search | | | |
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|
+
+
+      ### Secret Safety
+
+      - Confirm no `.env` content or OPENROUTER_KEY value printed:
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    agent: integration-verifier
