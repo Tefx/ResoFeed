@@ -7896,6 +7896,167 @@ phases:
       verdict: PASS\nblockers: []\nproof_gap_status: NON_BLOCKING\nblocking_status:\
       \ CLOSED\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\nproduct_implementation_files_modified:\
       \ false"
+  - id: frontend-implementation.fix-frontend-gate-proof-artifacts
+    name: Fix frontend gate proof artifacts
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+
+      Create durable non-plan proof artifacts that close the semantic proof gaps reported
+      by `frontend-implementation.frontend-gate` without altering completed product
+      implementation steps unless regenerated render evidence shows product code is
+      still broken.
+
+
+      Scope:
+
+      - Write a semantic closure register artifact for `retest-frontend-contract-closure`
+      outside plan state, preferably under `.audit-artifacts/frontend-gate/`, covering
+      B1, B2, B3, B5, U1, U2, U3, and safe should-fix dispositions.
+
+      - Each register item MUST include: `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,
+      `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis`.
+
+      - Regenerate current desktop and mobile rendered artifacts from the current
+      implementation. Desktop evidence MUST prove B3: no Resonate star appears inside
+      the split-pane desktop Inspector. Mobile evidence MUST support the closure states
+      needed by the register.
+
+      - Replace or supersede the stale `.audit-artifacts/populated-desktop-full.png`
+      artifact with current evidence, clearly recording which artifact is current
+      and which stale artifact is superseded.
+
+      - Ensure all proof artifacts are durable and available to gate reviewers outside
+      plan state. If artifact commits are orchestrator-owned in this environment,
+      explicitly record the non-plan artifact paths and the durability handoff needed
+      for commit.
+
+      - If regenerated render evidence shows product UI is still broken, make only
+      the minimal UI correction required for the failing closure claim and document
+      the exact product-code delta in the register.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Closure claims that exist only in plan completion evidence and not in a non-plan
+      artifact.
+
+      2. A semantic closure register missing any of the required fields for B1/B2/B3/B5/U1/U2/U3
+      or safe should-fix dispositions.
+
+      3. Reuse of stale desktop screenshots that still show an Inspector Resonate
+      star.
+
+      4. Render artifacts that do not prove desktop split-pane Inspector and mobile
+      closure-relevant states from the current implementation.
+
+      5. Ambiguous artifact durability; the gate reviewer must be able to inspect
+      files outside plan state.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a proof-artifact remediation step. Stub-only or placeholder artifacts
+      are NOT acceptable. Artifacts MUST contain substantive current runtime/render
+      evidence and closure claims tied to concrete file paths.'
+    verification: '- Artifact path: semantic closure register exists outside plan
+      state and includes all required fields for B1, B2, B3, B5, U1, U2, U3, and safe
+      should-fix dispositions.
+
+      - Render proof: current desktop artifact proves no Inspector Resonate star in
+      split-pane mode; current mobile artifact(s) prove closure-relevant mobile states.
+
+      - Staleness proof: stale `.audit-artifacts/populated-desktop-full.png` is replaced
+      or explicitly superseded by current artifacts.
+
+      - Durability proof: evidence lists non-plan artifact paths and confirms they
+      are available to the gate reviewer outside plan state, with orchestrator commit
+      handoff noted if needed.
+
+      - Product-code guardrail: no completed product implementation step is altered
+      unless regenerated current render evidence still fails; any such minimal UI
+      fix is documented with before/after artifact paths.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Gate Proof Artifact Report
+
+
+      **Semantic closure register path**: <non-plan artifact path>
+
+      **Rendered desktop artifact path**: <current artifact path>
+
+      **Rendered mobile artifact path(s)**: <current artifact paths>
+
+      **Superseded stale artifact(s)**: <paths and reason>
+
+
+      ## Closure Register Field Coverage
+
+
+      For each of B1, B2, B3, B5, U1, U2, U3, and safe should-fix dispositions, cite:
+
+      - requirement_ref:
+
+      - behavior_claim:
+
+      - runtime_proof_expected:
+
+      - evidence_ref:
+
+      - status:
+
+      - closure_path:
+
+      - gate_decision_basis:
+
+
+      ## Rendered Proof Summary
+
+
+      - Desktop split-pane Inspector no-star proof: <artifact path + observation>
+
+      - Mobile closure-relevant proof: <artifact path + observation>
+
+      - Current implementation source/date basis: <how currency was established>
+
+
+      ## Durability Handoff
+
+
+      - Artifacts are available outside plan state: YES/NO
+
+      - Artifact paths to be committed or otherwise preserved by orchestrator: <list>
+
+      - Product code changed: YES/NO; if YES, list exact files and why regenerated
+      proof showed code still broken.
+
+
+      ## Headline
+
+
+      - [ ] PASS: durable proof artifacts are complete and current
+
+      - [ ] FAIL: artifacts are missing, stale, or incomplete'
+    depends_on:
+    - frontend-implementation.frontend-gate
+    agent: frontend-engineer
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
