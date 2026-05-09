@@ -15224,7 +15224,7 @@ phases:
   steps:
   - id: openrouter-llm-verification-and-live-smoke.independent-regression-suite
     name: independent-regression-suite
-    status: claimed
+    status: done
     description: "step_type: verification\nstep_intent: retest_green\nexpected_result:\
       \ green\nagent_source: project\nverification_scope: full-plan-check protecting\
       \ final OpenRouter gate\n\nAs an INDEPENDENT TESTER, run the complete local\
@@ -15328,6 +15328,114 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T18:54:23.080785+00:00'
+    done_at: '2026-05-09T18:58:01.373489+00:00'
+    evidence: 'Integration verifier local regression PASS_WITH_DEBT accepted: gate_open_allowed=true,
+      verdict=PASS, blockers=[], proof_gap_status=NON_BLOCKING, blocking_status=CLOSED.
+
+
+      Tester: integration-verifier (independent of implementation)
+
+      Scope: OpenRouter local regression suite
+
+      Independence Level: L2
+
+      Worker commit: cabf0ed (`audit: record OpenRouter regression verification`)
+
+      Main squash merge commit: be34ecc (`[vectl] step-openrouter-llm-verification-and-live-smoke.independent-regression-suite
+      completed`)
+
+      Artifact merged: `.audit-artifacts/openrouter_verification/independent-regression-suite.md`.
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; read attempt returned file
+      not found.
+
+      - .agents/instructions.md — canonical docs are docs/ARCHITECTURE.md/docs/DESIGN.md;
+      runtime secrets must not be printed or committed; stale Gemini guidance noted
+      at lines 27/30.
+
+      - docs/ARCHITECTURE.md — OpenRouter is sole LLM backend; `OPENROUTER_KEY` runtime-only;
+      `--openrouter-model` optional; `/doctor` uses `openrouter:` and excludes keys/source
+      metadata.
+
+      - docs/USAGE.md — OpenRouter key via OS env or local `.env`; no CLI API-key
+      flag; model optional; `/doctor` plain text.
+
+      - docs/DESIGN.md — `/doctor` diagnostics are text/log output, not dashboard.
+
+
+      Test execution:
+
+      ```text
+
+      go test -count=1 -v ./... — PASS
+
+      rg forbidden Gemini patterns in docs/ARCHITECTURE.md docs/USAGE.md README.md;
+      no matches — PASS
+
+      rg OpenRouter terms in docs/ARCHITECTURE.md docs/USAGE.md README.md — PASS
+
+      ```
+
+
+      Coverage matrix:
+
+      - CLI flags: PASS — legacy Gemini flags rejected; key required; model optional;
+      no startup network model validation.
+
+      - Adapter httptest: PASS — endpoint, auth header, JSON mode, model omit/pass-through,
+      retry 429/5xx, invalid JSON/error mapping.
+
+      - Ingest: PASS — summary/core insight persisted; model failure keeps item visible.
+
+      - Steering HTTP/MCP: PASS — shared LLMClient path; idempotent retry avoids re-call;
+      unsafe proposal rejected.
+
+      - Doctor: PASS — `openrouter:` raw text with configured/resolved model; no runtime
+      Gemini text.
+
+      - State export/import: PASS — OpenRouter key/model/provider/source metadata
+      excluded/rejected.
+
+      - Docs/search: PASS_WITH_DEBT — ARCHITECTURE/USAGE/README clean; stale `.agents`
+      and test fixture residue non-blocking.
+
+
+      Behavioral proof register:
+
+      - complete_go_regression — PASS.
+
+      - docs_no_gemini_flags — PASS.
+
+      - runtime_doctor_openrouter — PASS.
+
+
+      Issues found / gate intersection:
+
+      - tech_debt: stale agent instructions mention Gemini secret precedence and `GEMINI_API_KEY`
+      at `.agents/instructions.md:27,30`. Non-blocking because it is not product docs/runtime
+      and canonical ARCHITECTURE/USAGE are clean.
+
+      - tech_debt: legacy `gemini: ok` appears in frontend expected-red fixture `web/src/routes/components/__tests__/rendering-expected-red.test.ts:175`.
+      Non-blocking unless that expected-red fixture becomes gate input; current required
+      docs/runtime/local regression gates do not depend on it.
+
+
+      Secret safety:
+
+      - No `.env` content or real `OPENROUTER_KEY` value printed; no `.env` was read;
+      only fake/local-safe test keys appeared in code/test context.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     name: spec-doc-state-conformance-audit
     status: pending
