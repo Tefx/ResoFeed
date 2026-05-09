@@ -13416,3 +13416,96 @@ phases:
     depends_on:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
     agent: spec-verifier
+  - id: openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
+    name: doctor-ui-multimodal-audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check protecting final OpenRouter gate
+
+
+      Native multimodal implementation audit for user-visible `/doctor`, terminal/API
+      text, and UI smoke surfaces affected by the Gemini-to-OpenRouter migration.
+
+
+      Independence Level: L1/L2. Use rendered screenshots/images/terminal captures
+      or equivalent visual/spatial artifacts for required states.
+
+
+      Audit scope:
+
+      - `/doctor` raw text or rendered surface uses concrete `openrouter:` prefix.
+
+      - Configured model vs account default/resolved model are distinguishable when
+      available.
+
+      - No `gemini:` text remains in visible runtime output.
+
+      - UI smoke where possible: page loads and any provider/model status display
+      is dense, functional, and consistent with DESIGN.md; no friendly SaaS/AI-magic
+      copy.
+
+      - Terminal/API captures redact owner token and OpenRouter key.
+
+
+      Standard tests, DOM snapshots alone, or integration test pass summaries do not
+      replace this multimodal audit; include actual terminal captures, screenshots,
+      or equivalent rendered artifacts.'
+    verification: phase-check protecting final gate. PASS requires visual/terminal
+      artifacts proving the visible provider migration and no secret leakage. If UI
+      provider text is not visible by design, evidence must state that and audit `/doctor`/terminal
+      captures instead.
+    evidence_template: '## Native Multimodal Audit Report
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: `/doctor`, terminal/API text, UI smoke surfaces
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ### Artifacts Reviewed
+
+      - Terminal/API capture paths or pasted redacted snippets:
+
+      - Screenshot/image/test-renderer artifact paths:
+
+      - Viewports/states covered:
+
+
+      ### Findings
+
+      | Surface | Expected | Observed | Status |
+
+      |---|---|---|---|
+
+      | /doctor raw text | openrouter prefix | | |
+
+      | configured/default/resolved model | distinguishable | | |
+
+      | Gemini residue | absent | | |
+
+      | UI smoke | visible content / no broken state | | |
+
+      | Secret redaction | no key/token visible | | |
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    agent: uiux-auditor
