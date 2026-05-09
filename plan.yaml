@@ -14300,7 +14300,7 @@ phases:
       \ or logging secret values."
   - id: runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     name: complete-runtime-secret-resolver
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -14462,6 +14462,54 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T17:18:27.013508+00:00'
+    done_at: '2026-05-09T17:22:27.195140+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages: one deployable Go process; one SQLite DB; Gemini API\
+      \ keys are runtime inputs only; Gemini startup precedence is explicit current\
+      \ `--gemini-api-key` if non-empty > OS `GEMINI_API_KEY` > local `.env`; empty/whitespace\
+      \ values are invalid; secrets and secret-source metadata must never be persisted/exported/logged;\
+      \ `.env` parser is only `KEY=VALUE`, comments/blank ignored, no shell sourcing/expansion/execution.\n\
+      - docs/USAGE.md — READ. Key passages: prefer OS env or local `.env`; avoid CLI\
+      \ secrets due shell history/process listing; `.env` is local runtime only and\
+      \ must not be committed/exported/logged; precedence is CLI compatibility override\
+      \ > OS env > `.env`; parser must not source scripts, expand variables, run commands,\
+      \ or evaluate command substitution.\n- AGENTS.md — NOT READ: absent in isolated\
+      \ worktree. `.agents/instructions.md` read instead: one binary, one SQLite DB,\
+      \ flat `internal/resofeed/` shape; Gemini is pure JSON transformer and does\
+      \ not own state; runtime-only LLM secrets must not be persisted, exposed, logged,\
+      \ printed in `/doctor`, placed in fixtures, or committed; no DI/services/registries/sidecars/sync/vector\
+      \ DB.\n\n## Implementation Evidence\n- Files changed:\n  - `internal/resofeed/runtime_secret.go`\n\
+      \  - `internal/resofeed/db.go`\n  - `internal/resofeed/types.go`\n  - `internal/resofeed/runtime_secret_config_test.go`\n\
+      - Secret resolver location: `internal/resofeed/runtime_secret.go:ResolveGeminiRuntimeSecret`,\
+      \ `requireRuntimeSecretValue`, `readLocalDotEnvRuntimeSecrets`.\n- Provider\
+      \ construction wiring point: `internal/resofeed/db.go:Main` resolves the Gemini\
+      \ secret before `runServe`; `internal/resofeed/db.go:runServe` still constructs\
+      \ Gemini directly via `NewGeminiClient`.\n- `.env` parser limits confirmed:\
+      \ local working-directory `.env` fallback only; `KEY=VALUE` lines only; blank/comment\
+      \ lines ignored; no shell expansion, command substitution, command execution,\
+      \ includes, multiline, or quoting semantics.\n- Commands run by worker:\n  ```text\n\
+      \  go test ./internal/resofeed -run 'TestGeminiRuntimeSecret|TestDotEnvParserSafety|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration|TestDocsRuntimeSecret'\
+      \ — exit 0\n  go test ./... — exit 0\n  go build ./cmd/resofeed — exit 0\n \
+      \ golangci-lint run — exit 0\n  go test -race ./internal/resofeed -run 'TestGeminiRuntimeSecret|TestDotEnvParserSafety|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration|TestDocsRuntimeSecret'\
+      \ — exit 0\n  ```\n- Main path proof: targeted tests passed for OS env fallback,\
+      \ local `.env` fallback, CLI compatibility precedence, and OS-env-over-`.env`\
+      \ precedence.\n- Failure path proof: targeted tests passed for empty/missing\
+      \ key, empty/whitespace values, parser comments/blank lines, no command substitution\
+      \ execution, unsupported shell syntax, redacted output, and state export non-portability.\n\
+      - Secret leakage check: runtime secret tests assert stdout/stderr do not contain\
+      \ fake fixture secret values; command outputs contain no secret values.\n- Deviation\
+      \ records:\n  - type: test_error; artifact: `internal/resofeed/runtime_secret_config_test.go`;\
+      \ changed `t.Chdir(dir)` to explicit `os.Getwd`/`os.Chdir` plus cleanup because\
+      \ module Go 1.22 and `golangci-lint` `stdversion` rejects `testing.Chdir` as\
+      \ Go 1.24+; no contract behavior changed.\n\n## Mainline Final-State Verification\n\
+      - Squash merged worker commit `ce3f9537263514f274cb2d5fc164879ee94159e3` into\
+      \ main as `a3a6874`.\n- Ran after merge:\n  ```bash\n  go test ./internal/resofeed\
+      \ -run 'TestGeminiRuntimeSecret|TestDotEnvParserSafety|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration|TestDocsRuntimeSecret'\
+      \ && go test ./... && go build ./cmd/resofeed\n  ```\n- Result: PASS.\n\n##\
+      \ Files changed\n- `internal/resofeed/runtime_secret.go`\n- `internal/resofeed/db.go`\n\
+      - `internal/resofeed/types.go`\n- `internal/resofeed/runtime_secret_config_test.go`\n\
+      \n## Commit hash(es)\n- Worker: `ce3f9537263514f274cb2d5fc164879ee94159e3`\n\
+      - Main squash: `a3a6874`\n\n## Gaps/Notes\n- None."
   - id: runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     name: verify-runtime-secret-env-config
     status: pending
