@@ -11334,7 +11334,7 @@ phases:
       rather than removed.'
   - id: retest-http-idempotency-wiring
     name: Retest HTTP idempotency wiring
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       agent_source: default\nverification_scope: full-plan-check\n\nRe-run the final\
       \ wiring audit closure path for blocker HTTP_IDEMPOTENCY_KEY_WRITE_ONLY and\
@@ -11465,3 +11465,5 @@ phases:
     depends_on:
     - fix-http-idempotency-wiring
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-09T12:27:05.985460+00:00'
