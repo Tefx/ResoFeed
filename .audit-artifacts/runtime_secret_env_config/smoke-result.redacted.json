@@ -1,0 +1,37 @@
+{
+  "command_redacted": [
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/runtime-secret-env-config-foundation.verify-runtime-secret-env-config/.audit-artifacts/runtime_secret_env_config/resofeed-smoke",
+    "serve",
+    "--addr",
+    "127.0.0.1:49829",
+    "--public-url",
+    "http://127.0.0.1:49829",
+    "--db",
+    "<audit-smoke-db>",
+    "--owner-token",
+    "<redacted-owner-token>"
+  ],
+  "passed_no_cli_gemini_api_key": true,
+  "pid_observed": 4506,
+  "process_exit_after_terminate": 0,
+  "root_http_status": 200,
+  "doctor_http_status": 200,
+  "state_export_http_status": 200,
+  "last_probe_error": "URLError(ConnectionRefusedError(61, 'Connection refused'))",
+  "stdout_redacted_excerpt": "owner token explicit: stored hash\nserving ResoFeed on 127.0.0.1:49829 (public-url http://127.0.0.1:49829)\nshutdown complete\n",
+  "stderr_redacted_excerpt": "",
+  "leak_search_targets": [
+    "stdout",
+    "stderr",
+    "state_export"
+  ],
+  "fake_key_leak_found_in_targets": [],
+  "state_export_bytes": 155,
+  "state_export_forbidden_terms_found": [],
+  "state_export_redacted_excerpt": "{\n  \"schema_version\": \"resofeed.state.v1\",\n  \"exported_at\": \"2026-05-09T17:24:23.730466Z\",\n  \"sources\": [],\n  \"steer_rules\": [],\n  \"resonated_items\": []\n}\n",
+  "artifacts": [
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/runtime-secret-env-config-foundation.verify-runtime-secret-env-config/.audit-artifacts/runtime_secret_env_config/smoke.stdout.log",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/runtime-secret-env-config-foundation.verify-runtime-secret-env-config/.audit-artifacts/runtime_secret_env_config/smoke.stderr.log",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/runtime-secret-env-config-foundation.verify-runtime-secret-env-config/.audit-artifacts/runtime_secret_env_config/state-export.json"
+  ]
+}
