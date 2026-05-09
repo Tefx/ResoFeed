@@ -11005,7 +11005,7 @@ phases:
       no blocking design drift.'
   - id: finalization-docs-and-deep-review.final-black-box-verification
     name: Final black box verification
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: default
@@ -11080,6 +11080,82 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-09T12:53:24.496875+00:00'
+    done_at: '2026-05-09T12:59:56.512401+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- docs/USAGE.md\
+      \ — READ. Key passage: `serve` starts web UI, JSON HTTP API, MCP Streamable\
+      \ HTTP at `/mcp`, background ingestion, SQLite migrations, and static asset\
+      \ serving; all `/api/*` requests require `Authorization: Bearer <OWNER_TOKEN>`.\n\
+      - docs/PRD.md — READ. Key passage: acceptance criteria AC-1..AC-17 cover freshness,\
+      \ star-not-pin, agent safety, state portability, and `/doctor` diagnostics.\n\
+      - docs/DESIGN.md — READ. Key passage: UI must show owner-token prompt, first-use\
+      \ empty state text, Steer input, flat Source Ledger, state export/import actions,\
+      \ raw `/doctor`, and search/retrieval surfaces.\n- docs/DESIGN_VISION.md — READ.\
+      \ Key passage: no account login/onboarding, no numeric indicators, no cute error\
+      \ states, flat Source Ledger, and high-density low-fatigue interface.\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passage: one Go binary `resofeed serve` serves static UI, HTTP\
+      \ API, MCP `/mcp`, and ingest; every `/api/*` and `/mcp` request requires owner-token\
+      \ auth; state bundle includes only active sources, active steering rules, and\
+      \ resonated items.\n- .agents/instructions.md — READ. Key passage: single-tenant\
+      \ analyst workbench; no vector DB/RAG, no multi-user auth, no sync/merge; HTTP\
+      \ endpoints and MCP expose the same product operations.\n\n## Final Black-Box\
+      \ Report\n- Commands/scripts:\n  - `npm --prefix web install`\n  - `npm --prefix\
+      \ web run build`\n  - `go build -o ./bin/resofeed ./cmd/resofeed`\n  - `./bin/resofeed\
+      \ serve ...`\n  - `curl` probes for HTTP and MCP public surfaces\n  - Playwright\
+      \ black-box browser probes for UI surfaces\n- Actual outputs/artifacts:\n  -\
+      \ Build succeeded; server bound to `127.0.0.1:18080`.\n  - Unauthenticated `/api/feed/today`\
+      \ returned expected `401 unauthorized`; authenticated call returned `200 {\"\
+      items\":[]}`.\n  - Duplicate/unknown/invalid query parameters returned `400\
+      \ bad_request` with correct `details.field`.\n  - OPML import flattened folders\
+      \ and `/api/sources` showed a flat source.\n  - State export/import roundtrip\
+      \ matched `resofeed.state.v1`; invalid unknown top-level state field rejected.\n\
+      \  - `/api/doctor` returned `200 text/plain` raw diagnostic lines.\n  - `/mcp`\
+      \ unauthenticated rejected; authenticated initialize, tools/list, resources/list,\
+      \ doctor resource read, and `list_candidate_items` tool call succeeded.\n  -\
+      \ UI rendered owner-token prompt, invalid-token error, first-use empty state,\
+      \ Source Ledger/state portability, and search via Steer.\n  - Screenshots/text\
+      \ artifacts committed under `.audit-artifacts/final_black_box_verification/`.\n\
+      - Acceptance coverage:\n  - PASS sampled: auth boundary, strict query validation,\
+      \ OPML flattening, state portability, diagnostics, MCP auth/resources/tools,\
+      \ owner-token UI, first-use UI, Source Ledger/state UI, search UI.\n  - NON_BLOCKING_GAP:\
+      \ no real Gemini key or populated item corpus, so ranking/freshness quotas,\
+      \ duplicate grouping, and item inspect/resonate idempotency were not fully proven\
+      \ by this public clean-environment pass.\n- Issues found:\n  - No blocker-class\
+      \ public-interface failure found.\n  - Non-blocking proof debt: ranking/item-corpus\
+      \ semantics require deterministic populated corpus or real ingestion fixture.\n\
+      \  - Non-blocking hygiene: `npm install` reported 3 low severity dependency\
+      \ vulnerabilities.\n- Not tested and why:\n  - Real Gemini summarization/ranking:\
+      \ no real Gemini key.\n  - Item detail/inspect/resonance/report-delivery happy\
+      \ path: clean DB had no item IDs within bounded public setup.\n  - Duplicate/story\
+      \ provenance and old-star ranking: require seeded corpus.\n- Headline: PASS_WITH_DEBT\n\
+      \n### Broad Verifier Disposition Pass\n- Ranking/freshness quotas, duplicate\
+      \ grouping, and item inspect/resonate idempotency not fully proven in this black-box\
+      \ clean DB run: `explicitly_non_blocking_with_non_intersection_evidence` for\
+      \ this step because no public blocker was observed, the limitation is fixture/key\
+      \ availability rather than product failure, and earlier plan verification/e2e/idempotency\
+      \ checks own those semantics. Final gate receives this debt explicitly for final\
+      \ disposition.\n- Low-severity npm audit findings: `explicitly_non_blocking_with_non_intersection_evidence`;\
+      \ no build/runtime/public-interface failure and no blocker-class acceptance\
+      \ criterion failure reported.\n\n### Test-step semantic reporting\nstep_intent:\
+      \ deep_review\nexpected_result: green\nobserved_result: green\nfailure_alignment:\
+      \ none\nverdict: PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nproduct_implementation_files_modified: false\n\n### behavioral_proof_register\n\
+      - proof: Public CLI startup/validation, network port binding, HTTP auth/query/state/doctor\
+      \ flows, MCP auth/resources/tools, and rendered UI owner-token/first-use/source-ledger/state/search\
+      \ surfaces were exercised through documented commands only.\n- uncertainty_sources:\
+      \ No populated item/ranking corpus and no real Gemini key; ranking, duplicate\
+      \ grouping, and item mutation idempotency remain non-blocking proof debt.\n\
+      - proof_gap_status: NON_BLOCKING\n- blocking_status: CLOSED\nheadline: PASS_WITH_DEBT\n\
+      \n**Headline**: PASS_WITH_DEBT\n**Blocking Status**: CLOSED\n**Proof-Gap Status**:\
+      \ NON_BLOCKING\n**Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**:\
+      \ COMPLETE\n\n## Merge / Mainline Verification\n- Worker artifact commit: `6c71a5c`\
+      \ (`audit: add final black-box verification evidence`)\n- Main squash merge\
+      \ commit: `607b98b` (`[vectl] step-finalization-docs-and-deep-review.final-black-box-verification\
+      \ completed`)\n- Mainline final-state verification after merge:\n  - `go test\
+      \ ./...` — PASS (`resofeed/cmd/resofeed` no test files; `resofeed/internal/resofeed`\
+      \ ok)\n  - `npm --prefix web run build` — PASS (`vite build` and SvelteKit static\
+      \ adapter completed)\n\n## Files Changed\n- `.audit-artifacts/final_black_box_verification/*`\
+      \ (21 committed evidence artifacts, including report, HTTP responses, logs,\
+      \ and UI screenshots)\n\n## Gaps/Notes\n- No product implementation files modified."
   - id: finalization-docs-and-deep-review.final-deep-review-gate
     name: Final deep review gate
     status: pending
