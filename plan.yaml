@@ -11858,7 +11858,7 @@ phases:
       - No out-of-scope architecture changes introduced."
   - id: finalization-docs-and-deep-review.retest-http-query-validation-contract
     name: Retest HTTP query validation contract drift
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -11930,3 +11930,5 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.fix-http-query-validation-contract
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T12:49:39.176550+00:00'
