@@ -14448,7 +14448,7 @@ phases:
     agent: gate-reviewer
   - id: openrouter-llm-implementation.uiux-doctor-diagnostics-audit
     name: uiux-doctor-diagnostics-audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -14540,6 +14540,138 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-09T18:45:04.600041+00:00'
+    done_at: '2026-05-09T18:48:34.047598+00:00'
+    evidence: 'UI/UX visible-output retest PASS accepted and audit artifact merged.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Refs read confirmation:
+
+      - .audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md
+      — prior debt was duplicate OpenRouter status: contract-rich `openrouter: ok
+      configured_model=... resolved_model=...` plus second bare `openrouter: ok`.
+
+      - docs/DESIGN.md — `/doctor` diagnostics must be raw monospace text, not dashboard/charts/friendly
+      remediation cards; product chrome uses operational labels and raw status strings.
+
+      - docs/ARCHITECTURE.md — `/api/doctor` is `text/plain`; OpenRouter diagnostics
+      use `openrouter:` prefix, `account_default` when model omitted, and must never
+      include API keys, secret source, `.env` paths, or provider config.
+
+      - .agents/instructions.md — runtime LLM secrets are runtime-only; evidence may
+      say redacted values but must never include raw API-key values.
+
+      - docs/USAGE.md — `/doctor` is plain text; OpenRouter line includes configured
+      model and must redact LLM secrets.
+
+
+      Artifact merged:
+
+      - .audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit-retest.md
+
+      Main squash merge commit: 14e01f4 (`[vectl] step-openrouter-llm-implementation.uiux-doctor-diagnostics-audit
+      completed`).
+
+
+      Runtime-visible output evidence:
+
+      ```text
+
+      Authorized /api/doctor with omitted --openrouter-model:
+
+      rss: ok
+
+      openrouter: ok configured_model=account_default resolved_model=unknown
+
+      extraction: ok
+
+      ingest: last_run=never
+
+
+      Authorized /api/doctor with --openrouter-model openai/gpt-4.1-mini:
+
+      rss: ok
+
+      openrouter: ok configured_model=openai/gpt-4.1-mini resolved_model=unknown
+
+      extraction: ok
+
+      ingest: last_run=never
+
+
+      Unauthorized /api/doctor:
+
+      HTTP/1.1 401 Unauthorized
+
+      {"error":{"code":"unauthorized","message":"owner token required","details":{}}}
+
+
+      Missing OPENROUTER_KEY startup validation:
+
+      exit_code=2
+
+      err: invalid_openrouter_key: value required
+
+      ```
+
+
+      DESIGN.md voice compliance:
+
+      - Functional labels / archival density: PASS — raw operational prefixes only.
+
+      - No SaaS/AI-magic/friendly onboarding tone: PASS.
+
+      - No Gemini-facing runtime text: PASS.
+
+      - OpenRouter model/default wording: PASS.
+
+      - Duplicate OpenRouter status debt closed: PASS — no second bare `openrouter:
+      ok` line observed.
+
+
+      Behavioral proof register:
+
+      - doctor_account_default_single_openrouter_line — PASS.
+
+      - doctor_configured_model_single_openrouter_line — PASS.
+
+      - auth_error_microcopy — PASS.
+
+      - startup_secret_validation_microcopy — PASS.
+
+      - secret_redaction_visible_output — PASS.
+
+
+      Issues Found: none.
+
+      Headline: PASS.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     name: fix-openrouter-runtime-naming-and-doctor-status
     status: done
