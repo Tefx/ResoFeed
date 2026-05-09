@@ -3019,7 +3019,7 @@ phases:
       PASS_WITH_DEBT"
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
-  status: pending
+  status: in_progress
   gate: The runnable `resofeed serve` binary starts HTTP static/API, MCP Streamable
     HTTP, and background ingest loop with real entrypoint/liveness evidence.
   depends_on:
@@ -3027,7 +3027,7 @@ phases:
   steps:
   - id: runtime-api-and-mcp-integration.complete-http-api-handlers
     name: Complete HTTP API handlers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -3115,6 +3115,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T07:12:12.005932+00:00'
   - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     name: Complete MCP Streamable HTTP surface
     status: pending
