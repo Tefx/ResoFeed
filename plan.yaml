@@ -4062,6 +4062,7 @@ phases:
     - docs/USAGE.md
     depends_on:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    - runtime-api-and-mcp-integration.runtime-blockers-retest
     agent: blind-tester
   - id: runtime-api-and-mcp-integration.runtime-spec-conformance
     name: Runtime spec conformance
