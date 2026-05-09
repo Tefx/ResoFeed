@@ -14185,6 +14185,83 @@ phases:
     - openrouter-llm-implementation.wiring-audit
     - openrouter-llm-implementation.serve-liveness-probe
     agent: gate-reviewer
+  - id: openrouter-llm-implementation.uiux-doctor-diagnostics-audit
+    name: uiux-doctor-diagnostics-audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check protecting openrouter-llm-implementation.implementation-gate
+
+
+      Native UI/UX and visible-output audit for runtime-visible `/doctor` and OpenRouter
+      diagnostic microcopy after `complete-runtime-doctor-http-mcp-wiring`.
+
+
+      As an INDEPENDENT UI/UX AUDITOR, verify `/doctor`, runtime diagnostic text,
+      `ui_microcopy`, and CLI-like diagnostic output adhere to `docs/DESIGN.md` and
+      ResoFeed project voice:
+
+      - dense, archival, functional labels only (`/doctor`, `RESOFEED`, provider/status
+      facts)
+
+      - no friendly SaaS copy, AI-magic trust palette language, mascots, or onboarding-wizard
+      tone
+
+      - no Gemini-facing runtime text or Gemini compatibility wording in user-visible
+      runtime output
+
+      - no OpenRouter secret values, fake keys, bearer tokens, account identifiers,
+      or raw authorization headers in doctor/log/user-visible output
+
+      - OpenRouter model status/default/account_default wording is clear, terse, and
+      contract-compliant without inventing unsupported product concepts
+
+
+      Evidence should use screenshots, terminal captures, HTTP response excerpts,
+      or DOM/output snippets only when safe and redacted. If visual screenshots are
+      not meaningful for this diagnostic surface, provide terminal/HTTP output excerpts
+      plus a brief rationale.
+
+
+      ## Completion Criteria
+
+      - `/doctor` and OpenRouter diagnostics are reviewed against DESIGN.md voice
+      and chrome requirements.
+
+      - Secret-bearing fields are redacted or absent in every captured artifact.
+
+      - Any visible-output drift is classified as blocker/should_fix/suggestion with
+      a concrete reproduction path.
+
+      - A parseable PASS/PASS_WITH_DEBT/FAIL headline is provided for the implementation
+      gate.'
+    verification: phase-check protecting openrouter-llm-implementation.implementation-gate.
+      uiux-auditor must provide rendered or runtime-visible output evidence for `/doctor`
+      and OpenRouter diagnostics, verify DESIGN.md voice compliance, prove no secrets
+      are exposed, and return a parseable PASS/PASS_WITH_DEBT/FAIL decision before
+      the implementation gate can open.
+    evidence_template: "## UI/UX Visible-Output Audit Report\n\n### refs Read Confirmation\
+      \ (MANDATORY)\nFor each ref in this step:\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
+      \ <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\n\
+      \n**Auditor**: uiux-auditor\n**Scope**: `/doctor`, runtime-visible OpenRouter\
+      \ diagnostics, `ui_microcopy`, and CLI-like diagnostic text\n\n### Artifacts\
+      \ Reviewed\n- Safe screenshots / terminal captures / HTTP excerpts:\n  ```\n\
+      \  <paste redacted output or describe screenshot path>\n  ```\n- Redaction statement:\
+      \ <confirm no secret values, fake keys, bearer tokens, account IDs, or auth\
+      \ headers are present>\n\n### DESIGN.md Voice Compliance\n- Functional labels\
+      \ / archival density: PASS | FAIL | NOTES\n- No SaaS/AI-magic/friendly onboarding\
+      \ tone: PASS | FAIL | NOTES\n- No Gemini-facing runtime text: PASS | FAIL |\
+      \ NOTES\n- OpenRouter model/default/account_default wording clear and contract-compliant:\
+      \ PASS | FAIL | NOTES\n\n### Findings\n| Severity | Description | Surface |\
+      \ Reproduction |\n| --- | --- | --- | --- |\n| blocker/should_fix/suggestion\
+      \ | <issue or none> | </doctor/log/output> | <steps> |\n\n### Headline\nPASS\
+      \ | PASS_WITH_DEBT | FAIL"
+    depends_on:
+    - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    agent: uiux-auditor
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
