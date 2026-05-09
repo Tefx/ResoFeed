@@ -18588,3 +18588,156 @@ phases:
     are independently verified before release.
   depends_on:
   - openrouter-llm-verification-and-live-smoke
+  steps:
+  - id: manual-rss-fetch.backend-implementation
+    name: Backend Implementation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Implement the locked backend Manual RSS Fetch contracts.
+
+
+      Scope and files:
+
+      - internal/resofeed/ingest.go — own the in-process ingest concurrency guard
+      and all RSS/Atom fetch orchestration semantics.
+
+      - internal/resofeed/http.go — add POST /api/ingest and POST /api/sources/{id}/fetch
+      routing, request validation, owner-token enforcement, status-code mapping, and
+      JSON serialization.
+
+      - internal/resofeed/types.go only if shared response structs are genuinely needed
+      across boundaries.
+
+      - internal/resofeed/*test.go — add focused contract/runtime tests for the new
+      HTTP and ingest behavior.
+
+
+      Required behavior:
+
+      - Permit at most one ingest/fetch operation at a time across background ingest,
+      POST /api/ingest, and POST /api/sources/{id}/fetch.
+
+      - HTTP manual triggers return 409 conflict when the guard is already held; do
+      not enqueue, persist, retry, or create command/job/receipt rows.
+
+      - Background ticks may be skipped while the guard is held.
+
+      - POST /api/ingest with zero active sources returns HTTP 200 immediately with
+      completed status, zero counts, and errors: [].
+
+      - POST /api/sources/{id}/fetch returns 404 for missing, deleted, or inactive
+      sources.
+
+      - Operational RSS/source failures are request-level 200 results with source-level
+      errors as specified, not generic transport failures.
+
+      - Preserve the one-binary architecture and flat internal/resofeed boundaries.
+      Do NOT introduce workers, queues, job tables, activity ledgers, sync coordinators,
+      service/repository layers, DI containers, or event buses.
+
+
+      Failure-mode checklist:
+
+      - concurrent manual/manual and background/manual overlap
+
+      - missing/deleted/inactive source lookup
+
+      - zero active sources
+
+      - source timeout / RSS fetch diagnostic mapping
+
+      - JSON body must be exactly {} with no query params
+
+      - stale guard release after error/panic path
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or placeholder
+      functions do not satisfy this requirement.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any durable queue, job table, command ledger, portable receipt, or sync/merge
+      machinery.
+
+      2. Handler-only endpoints that do not exercise the real ingest guard path.
+
+      3. Generic 500/400 responses where the docs require 409 conflict, 404 not_found,
+      or 200 source-level failure payloads.
+
+      4. Concurrency guard that covers only manual endpoints but not background ingest.'
+    verification: '- Main path: Go tests cover POST /api/ingest success, POST /api/sources/{id}/fetch
+      success, and JSON schemas from docs/ARCHITECTURE.md.
+
+      - Failure path: focused regressions cover 409 guard conflict, zero-source global
+      ingest, missing/deleted/inactive source fetch, and source-level RSS failure
+      responses.
+
+      - Runtime path: evidence identifies the exact handler route and the ingest.go
+      guard function exercised by tests.
+
+      - Downstream gates protected: manual-rss-fetch.integration-proof, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Backend Implementation Evidence
+
+
+      **Files changed**:
+
+      - <list>
+
+
+      **Concurrency guard proof**:
+
+      - Guard owner/function:
+
+      - Background + manual + per-source coverage:
+
+
+      **Endpoint/schema tests run**:
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Failure paths covered**:
+
+      - 409 conflict:
+
+      - zero sources:
+
+      - missing/deleted/inactive source:
+
+      - source-level fetch failure:
+
+
+      **Forbidden architecture check**:
+
+      - queues/jobs/ledgers/sync/service layers introduced: YES/NO
+
+      '
