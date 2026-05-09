@@ -8057,6 +8057,158 @@ phases:
     depends_on:
     - frontend-implementation.frontend-gate
     agent: frontend-engineer
+  - id: frontend-implementation.retest-frontend-gate-proof-artifacts
+    name: Retest frontend gate proof artifacts
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER, rerun the frontend gate decision specifically for
+      the proof-artifact blockers reported by `frontend-implementation.frontend-gate`.
+
+
+      This retest is a phase-check protecting End to End Integration. It must decide
+      whether the frontend phase can proceed after the new durable non-plan proof
+      artifacts exist.
+
+
+      Review scope:
+
+      - Confirm the semantic closure register artifact for `retest-frontend-contract-closure`
+      exists outside plan state and covers B1, B2, B3, B5, U1, U2, U3, and safe should-fix
+      dispositions.
+
+      - Confirm every register item includes `requirement_ref`, `behavior_claim`,
+      `runtime_proof_expected`, `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis`.
+
+      - Confirm current desktop rendered evidence supersedes the stale contradictory
+      screenshot and proves no Resonate star appears inside the split-pane desktop
+      Inspector.
+
+      - Confirm current mobile rendered evidence supports closure-relevant states.
+
+      - Confirm any remaining NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item has
+      an explicit closure path and cannot OPEN the gate unless it has accepted non-intersection
+      evidence.
+
+
+      Gate decision basis MUST cite artifact file paths, not only plan state or completion
+      evidence. Gate may OPEN only if artifact evidence is current, durable, and sufficient
+      for zero-trust review.'
+    verification: 'phase-check protecting End to End Integration.
+
+      - PASS requires a durable non-plan semantic closure register with all required
+      fields for B1/B2/B3/B5/U1/U2/U3 and safe should-fix dispositions.
+
+      - PASS requires current desktop/mobile rendered artifacts cited by path; desktop
+      evidence must prove no Inspector Resonate star in split-pane mode.
+
+      - PASS requires a structured gate decision basis mapping requirement/proof obligations
+      to artifact refs, unresolved statuses, closure paths, and OPEN/BLOCK recommendation.
+
+      - BLOCK if closure evidence exists only in plan state, if artifacts are stale/missing,
+      if any blocker-class status remains NEEDS_TEST/UNPROVEN without accepted non-intersection
+      evidence, or if durability outside plan state is unclear.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Gate Proof Artifact Retest
+
+
+      **Reviewer**: gate-reviewer (independent of proof artifact/product implementation)
+
+      **Retested gate**: frontend-implementation.frontend-gate
+
+      **Proof artifact step**: frontend-implementation.fix-frontend-gate-proof-artifacts
+
+
+      ## Artifact Review
+
+
+      - Semantic closure register path: <path>
+
+      - Desktop rendered artifact path: <path>
+
+      - Mobile rendered artifact path(s): <paths>
+
+      - Stale artifact disposition: <replaced/superseded and evidence>
+
+
+      ## Behavioral Proof Register Review
+
+
+      | Item | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref
+      | status | closure_path | gate_decision_basis | Verdict |
+
+      | ---- | --------------- | -------------- | ---------------------- | ------------
+      | ------ | ------------ | ------------------- | ------- |
+
+      | B1 | | | | | | | | PASS/FAIL |
+
+      | B2 | | | | | | | | PASS/FAIL |
+
+      | B3 | | | | | | | | PASS/FAIL |
+
+      | B5 | | | | | | | | PASS/FAIL |
+
+      | U1 | | | | | | | | PASS/FAIL |
+
+      | U2 | | | | | | | | PASS/FAIL |
+
+      | U3 | | | | | | | | PASS/FAIL |
+
+      | Safe should-fix dispositions | | | | | | | | PASS/FAIL |
+
+
+      ## Render Artifact Findings
+
+
+      - Desktop split-pane Inspector no-star: PASS/FAIL with artifact citation
+
+      - Mobile closure-relevant states: PASS/FAIL with artifact citation
+
+      - Artifact currency/durability: PASS/FAIL
+
+
+      ## Gate Decision Basis
+
+
+      - Unresolved NEEDS_TEST / UNPROVEN / UNCERTAIN_BLOCKING items: <list or none>
+
+      - Closure path for unresolved items: <required if any>
+
+      - OPEN/BLOCK recommendation: OPEN | BLOCK
+
+      - Reason: <artifact-based rationale>
+
+
+      ## Headline
+
+
+      - [ ] PASS: proof-artifact blockers closed; frontend phase may proceed to downstream
+      gate dependency.
+
+      - [ ] FAIL: proof-artifact blockers remain open; downstream phase must stay
+      blocked.'
+    depends_on:
+    - frontend-implementation.fix-frontend-gate-proof-artifacts
+    agent: gate-reviewer
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
