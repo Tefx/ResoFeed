@@ -13453,7 +13453,7 @@ phases:
       diagnostic path.'
   - id: openrouter-llm-implementation.complete-ingest-steering-state-migration
     name: complete-ingest-steering-state-migration
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -13591,6 +13591,115 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T18:16:32.081503+00:00'
+    done_at: '2026-05-09T18:21:23.795033+00:00'
+    evidence: 'Implementation SUCCESS accepted after worktree-local and mainline verification.
+
+
+      ## refs Read Confirmation
+
+      - AGENTS.md — NOT READ: absent from isolated worktree; subagent''s read tool
+      returned file not found.
+
+      - .agents/instructions.md — runtime-only LLM secrets must not be persisted,
+      logged, exposed, or committed; OpenRouter must reuse runtime secret-source contract.
+
+      - docs/ARCHITECTURE.md — OpenRouter is the sole LLM backend; Go validates JSON
+      outputs before saving/applying; portable state excludes LLM key/model/provider
+      config.
+
+      - docs/USAGE.md — OpenRouter key comes from `OPENROUTER_KEY` env/.env only;
+      `--openrouter-model` is non-secret and optional; unavailable summaries remain
+      visible.
+
+      - internal/resofeed/openrouter_product_integration_contract_test.go — asserts
+      OpenRouter summaries persist, model failure keeps items visible, HTTP/MCP steering
+      share LLM path, idempotent retries avoid duplicate model calls, and state excludes
+      OpenRouter runtime config.
+
+      - internal/resofeed/openrouter_cli_adapter_contract_test.go — adapter/runtime
+      contract asserts OpenRouter chat completions path, bearer auth, JSON mode, model
+      omission/forwarding, retry/safe error mapping, and redacted secret handling.
+
+
+      ## Implementation Evidence
+
+      - Worker commit: 735bf87231dd592bd3ae65ec68f7b6dc520d5af2 (`migrate product
+      LLM seams to OpenRouter`)
+
+      - Main squash merge commit: f2683c3 (`[vectl] step-openrouter-llm-implementation.complete-ingest-steering-state-migration
+      completed`)
+
+      - Files changed: internal/resofeed/gemini.go, ingest.go, ranking.go, http_impl_test.go,
+      mcp_integration_test.go.
+
+      - Spec link: openrouter-llm-implementation.complete-ingest-steering-state-migration
+      plus upstream artifacts.
+
+
+      Main path proof:
+
+      - Product LLM boundary now uses OpenRouter-named input/output types through
+      `LLMClient`.
+
+      - Ingest calls `OpenRouterSummaryInput`.
+
+      - Steering calls `OpenRouterSteeringInput` and normalizes legacy provider text
+      in receipts.
+
+      - Focused OpenRouter/steering/state/transport tests passed on mainline.
+
+
+      Highest-risk failure path proof:
+
+      - Model failure preserving item visibility and invalid steering proposal safe
+      rejection passed in focused tests.
+
+      - Idempotency evidence: `TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety`,
+      HTTP idempotency tests, and MCP idempotency tests assert model calls are counted
+      once on retry.
+
+      - State export evidence: `TestStateExportExcludesOpenRouterRuntimeConfigAndSecrets`
+      and `TestStateImportRejectsOpenRouterRuntimeConfigAndSecrets` passed; no OpenRouter
+      key/model/provider config present in portable state.
+
+
+      Commands run on mainline after merge:
+
+      ```text
+
+      go test ./internal/resofeed -run ''TestOpenRouter|TestSteeringHTTP|TestInvalidOpenRouter|TestDoctorUsesOpenRouter|TestStateExportExcludes|TestStateImportRejects|TestHTTPAndMCPTransportParity|TestOpenRouterMigration|TestHTTPMutationIdempotency|TestMCPSteerUsesConfiguredOpenRouter|TestMCPRealBoundListenerSteerUsesConfiguredOpenRouter''
+      -count=1 — PASS
+
+      go test ./... -count=1 — PASS
+
+      go build ./cmd/resofeed — PASS
+
+      golangci-lint run — PASS (0 issues)
+
+      go test -race ./internal/resofeed -run ''Test(OpenRouter|SteeringHTTP|InvalidOpenRouter|HTTPMutationIdempotency|MCPSteerUsesConfiguredOpenRouter|MCPRealBoundListenerSteerUsesConfiguredOpenRouter)''
+      -count=1 — PASS
+
+      ```
+
+
+      Confirmations:
+
+      - no `.env` content read/printed; no runtime key values added.
+
+      - no runtime key/model inserted into durable or portable state.
+
+      - no sync/merge/history/account/agent-registry/provider-registry/DI/service
+      layer introduced.
+
+
+      Deviation records: none.
+
+
+      Gaps/Notes:
+
+      - `geminiHTTPClient` and `Gemini*` aliases remain for source-compatible internal
+      tests/helpers only; runtime-facing `LLMClient` signatures and product call sites
+      now use OpenRouter-named types.'
   - id: openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     name: complete-runtime-doctor-http-mcp-wiring
     status: pending
