@@ -18591,7 +18591,7 @@ phases:
   steps:
   - id: manual-rss-fetch.backend-implementation
     name: Backend Implementation
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
       upstream_artifacts:\n  - path: internal/resofeed/*contract* or backend contract\
       \ artifacts created by backend-contract\n    from_step: backend-contract\n \
@@ -18707,6 +18707,95 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T21:27:25.827601+00:00'
+    done_at: '2026-05-09T21:35:59.867791+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read. Key: one Go binary, flat internal/resofeed boundaries,
+      owner-token required for every /api/* route, strict query validation, source
+      failures isolated, no queues/service layers/sync.
+
+      - docs/PRD.md — Read. Key: RSS/Atom sources must preserve provenance; source
+      failures must not block other sources; RSS fetch errors are diagnostic/source-level
+      operational failures.
+
+      - AGENTS.md — NOT READ: not present at isolated worktree root.
+
+      - .agents/instructions.md — Read. Key: canonical docs are law; one binary/SQLite;
+      no service/repository layers, queues, ledgers, sync coordinators, or vector/RAG
+      additions.
+
+      - internal/resofeed/manual_fetch_contract.go — Read. Key: POST /api/ingest and
+      POST /api/sources/{id}/fetch require auth, no query, exactly {}, 409 conflict
+      on guard collision, source errors in 200 response.
+
+      - internal/resofeed/manual_fetch_contract_test.go — Read. Key: pinned endpoint
+      constants, JSON schemas, conflict code, and forbidden expansion list.
+
+      - internal/resofeed/manual_fetch_expected_red_test.go — Read. Key: expected
+      400 validation, 200 zero-source ingest, 404 missing/inactive source, 200 source-level
+      RSS errors, shared guard conflict/release semantics.
+
+
+      ## Implementation Evidence
+
+      - Contract step consumed: backend-contract
+
+      - Protected tests consumed: backend-expected-red-tests
+
+      - Product files changed: `internal/resofeed/ingest.go`, `internal/resofeed/http.go`
+
+      - Tests preserved/updated only as contract-faithful: no tests modified.
+
+      - Main path command/output: worker ran `go test ./internal/resofeed -run ''TestManualRSSFetch|TestManualFetchContract''`
+      exit 0 (`ok resofeed/internal/resofeed 0.598s`); `go test ./...` exit 0; `go
+      build ./cmd/resofeed` exit 0; `golangci-lint run ./...` exit 0 (`0 issues`).
+
+      - Highest-risk failure path command/output: worker ran `go test -race ./internal/resofeed
+      -run ''TestManualRSSFetch''` exit 0 (`ok resofeed/internal/resofeed 1.734s`).
+
+      - Guard release proof: `internal/resofeed/ingest.go` now has one package-level
+      in-process `sync.Mutex` guard acquired by `IngestOnce`, `ManualIngest`, and
+      `ManualFetchSource`. Manual/manual and background/manual overlap use `TryLock`:
+      manual collisions return 409 conflict, while background ticks skip by returning
+      nil. Each acquired path defers `releaseGuardRecover`, unlocking on normal success,
+      returned error, and recovered panic-style failure before returning an error.
+
+      - Runtime path exercised by tests: HTTP routes in `apiHandler.ServeHTTP` for
+      `POST /api/ingest` and `POST /api/sources/{id}/fetch` call `handleManualIngest`/`handleManualSourceFetch`,
+      which call `ManualIngest`/`ManualFetchSource` in `ingest.go`.
+
+      - Concurrent access scenario: if one manual ingest is fetching a slow source,
+      a second manual source fetch observes the same guard held and receives HTTP
+      409 without queueing or persistence. A background `IngestOnce` tick during that
+      window observes the guard held and skips without creating work. When the first
+      operation exits, deferred release makes subsequent operations eligible again.
+
+      - Cleanup/reset semantics: guard release is deferred immediately after acquisition.
+      Success, operational RSS errors reported in `ManualFetchResult.Errors`, SQL/runtime
+      errors, and recovered panic paths all run the same release defer.
+
+      - Bounded growth/isolation guarantee: no queue, job, ledger, receipt, sync,
+      service, repository, DI, or event-bus artifacts were introduced. Manual fetch
+      reads active sources, fetches RSS/Atom, upserts items/search rows through existing
+      ingestion paths, and updates source fetch diagnostics.
+
+      - Forbidden durable queue/job/ledger/sync artifacts introduced: NONE
+
+      - Deviation records: none
+
+      - Worker commit: `77a40a8925ae9ec4d9a53731ac570e16b00febef`.
+
+      - Squash merge commit on main: `81f20e6 [vectl] step-manual-rss-fetch.backend-implementation
+      completed`.
+
+      - Mainline final-state verification after merge: `go test ./internal/resofeed
+      -run ''TestManualRSSFetch|TestManualFetchContract'' && go test ./... && go build
+      -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-backend-implementation
+      ./cmd/resofeed && golangci-lint run ./... && go test -race ./internal/resofeed
+      -run ''TestManualRSSFetch''` exit 0; output included `ok resofeed/internal/resofeed`,
+      `0 issues`, and race test pass.
+
+      - Gaps/Notes: none'
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
     status: claimed
