@@ -2102,7 +2102,7 @@ phases:
       must be owned in the runtime phase and must not be forgotten.'
   - id: core-domain-implementation.core-spec-conformance
     name: Core spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -2296,6 +2296,173 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T07:00:34.124869+00:00'
+    done_at: '2026-05-09T07:05:43.955318+00:00'
+    evidence: '## Spec Conformance Report
+
+      **Phase**: core-domain-implementation
+
+      **Spec source**: docs/ARCHITECTURE.md, docs/PRD.md, docs/USAGE.md, docs/DESIGN.md
+
+
+      ### refs Read Confirmation
+
+      - `.agents/instructions.md` — canonical docs are law; SQLite+FTS5 only; portable
+      state limited to active sources, active steering rules, currently resonated
+      items; actor_id is provenance not auth; human steering supersedes delegated-agent
+      steering.
+
+      - `docs/ARCHITECTURE.md` — one Go process/one SQLite DB/Gemini JSON transformer/lexical
+      retrieval; SQLite item fields include value tier and grouping/duplicate provenance;
+      Ranking Contract and State Portability contract are explicit.
+
+      - `docs/PRD.md` — freshness/star/search/coverage principles; value tier required;
+      duplicate grouping preserves direct access to every original source item; human
+      steering priority over agents.
+
+      - `docs/DESIGN.md` — `/doctor` raw diagnostics include RSS fetch errors, model
+      latency, last run time, extraction failures; State Portability export/import
+      replaces active sources/rules/stars only; grouped duplicate/story preserves
+      access/provenance.
+
+      - `docs/DESIGN_VISION.md` — no hidden vector/RAG surfaces or paternalistic queues;
+      AI failures degrade to raw RSS/blank; Inspect/Resonate/Steer and `/doctor` remain
+      explicit.
+
+      - `docs/USAGE.md` — `serve` owns web/API/MCP/background ingestion; state import/export
+      is minimal current state and replaces local portable rows; MCP rules require
+      idempotency/provenance and human precedence.
+
+
+      ## Requirements Register / Evidence Summary
+
+      - R1 state bundle minimality: CONFORMS — `state.go` exports active portable
+      state only; tests cover runtime metadata exclusion.
+
+      - R2 state import replacement/validation/transaction/FTS rebuild: CONFORMS —
+      `state.go`, `search.go`; behavioral tests cover replacement, rejection/rollback,
+      search after import.
+
+      - R3 `exported_at` export creation time: CONFORMS — `state.go` uses `time.Now().UTC()`;
+      tests cover import-then-export timestamp semantics.
+
+      - R4 SQLite current-state schema: CONFORMS — migrations include sources/items/item_state/steer_rules/agent_receipts/runtime_metadata/search_fts,
+      value tier, grouping fields, no vector schema.
+
+      - R5 ingestion/status/failure behavior: CONFORMS — independent source failures,
+      extraction/model statuses, item remains on failures.
+
+      - R6 value tier persistence/read: CONFORMS — `items.value_tier`, Gemini output,
+      ingest write, test reads stored tier.
+
+      - R7 Gemini JSON transformer only: CONFORMS — Gemini client has no DB handle;
+      Go validates/writes.
+
+      - R8 ranking guardrails: CONFORMS — freshness, source coverage, resonated cap,
+      duplicate/external suppression tested.
+
+      - R9 duplicate/grouped original retrievability: CONFORMS — `ReadItemDetail`
+      returns original URL, canonical URL, story key, duplicate pointer.
+
+      - R10 steering affects ranking while preserving guardrails: CONFORMS — active
+      rules loaded/scored; conflict tests cover no changed rules under human precedence.
+
+      - R11 FTS freshness/provenance after ingest/import: CONFORMS — ingest refreshes
+      per-item FTS; import rebuilds FTS; provenance searchable.
+
+      - R12 human-vs-agent precedence: CONFORMS — actor provenance fields and behavioral
+      test prove agent steering conflict does not override human rule.
+
+      - R13 core doctor diagnostics: CONFORMS — raw RSS/model/extraction/last-run
+      snapshot/output covered.
+
+
+      ## Runtime/API Expected Stub Debt
+
+      - `cmd/resofeed/main.go` / `resofeed.Main` / `ServeConfig` / serve lifecycle
+      → `runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`; non-blocking
+      because core DB/open/migration/token helpers are separately implemented and
+      assessed.
+
+      - `NewRouter` / HTTP handlers → `runtime-api-and-mcp-integration.complete-http-api-handlers`;
+      non-blocking because core operations behind routes are implemented/tested.
+
+      - `NewMCPHandler` / MCP tool wrappers → `runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`;
+      non-blocking because core ranking/search/detail/steering/resonance primitives
+      are implemented/tested, while Streamable HTTP auth/wrapper dispatch is downstream.
+
+
+      ## Gate Decision Basis
+
+      - headline: PASS_WITH_DEBT
+
+      - proof_gap_status: NON_BLOCKING
+
+      - blocking_status: CLOSED
+
+      - gate_open_allowed: true
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Behavioral proof / uncertainty
+
+      - step_intent: verification
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - product_implementation_files_modified: no
+
+      - behavioral_proof_register: state export/import, ingestion/fallback/value-tier,
+      ranking/search/steering/actor precedence, duplicate detail/provenance, and doctor
+      diagnostics have implementation citations plus behavioral tests.
+
+      - NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING items: none for core-domain obligations.
+      Runtime HTTP/MCP/serve proof deferred as named EXPECTED_STUB_DEBT.
+
+
+      ## Commands run
+
+      Subagent worktree:
+
+      - `go test ./internal/resofeed` → ok
+
+      - `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed`
+
+      - `git status --short` → no output; clean worktree.
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-core-domain-implementation.core-spec-conformance`
+      → Already up to date; nothing to squash.
+
+      - `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed
+      (cached)`
+
+
+      ## Commit hash(es)
+
+      - none — read-only verification
+
+
+      ## Files changed
+
+      - none
+
+
+      ## Gaps/Notes
+
+      Runtime/API/MCP/serve stubs remain but are downstream-owned by the step policy
+      and do not block core-domain gate because core persistence/behavior evidence
+      exists.'
   - id: core-domain-implementation.core-domain-gate
     name: Core domain gate
     status: pending
