@@ -11672,7 +11672,7 @@ phases:
       - No artifacts/product files modified by retest worker.'
   - id: finalization-docs-and-deep-review.fix-http-query-validation-contract
     name: Fix HTTP query validation contract drift
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -11829,6 +11829,8 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-spec-conformance-audit
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T12:42:36.780699+00:00'
   - id: finalization-docs-and-deep-review.retest-http-query-validation-contract
     name: Retest HTTP query validation contract drift
     status: pending
