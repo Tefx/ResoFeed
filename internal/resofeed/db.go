@@ -41,12 +41,6 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 	if !ok {
 		return exitCode
 	}
-	openRouterKey, err := ResolveOpenRouterRuntimeSecret()
-	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
-		return 2
-	}
-	cfg.OpenRouterKey = openRouterKey
 	if cfg.PublicURL == "" {
 		publicURL, err := derivePublicURL(cfg.Addr)
 		if err != nil {
@@ -55,6 +49,16 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 		}
 		cfg.PublicURL = publicURL
 	}
+	if err := validateServeConfigBeforeSecret(cfg); err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		return 2
+	}
+	openRouterKey, err := ResolveOpenRouterRuntimeSecret()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		return 2
+	}
+	cfg.OpenRouterKey = openRouterKey
 	if err := validateServeConfig(cfg); err != nil {
 		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 		return 2
@@ -107,14 +111,21 @@ Flags:
 }
 
 func validateServeConfig(cfg ServeConfig) error {
+	if err := validateServeConfigBeforeSecret(cfg); err != nil {
+		return err
+	}
+	if strings.TrimSpace(cfg.OpenRouterKey) == "" {
+		return errors.New("invalid_openrouter_key: value required")
+	}
+	return nil
+}
+
+func validateServeConfigBeforeSecret(cfg ServeConfig) error {
 	if err := validateAddr(cfg.Addr); err != nil {
 		return err
 	}
 	if err := validatePublicURL(cfg.PublicURL); err != nil {
 		return err
-	}
-	if strings.TrimSpace(cfg.OpenRouterKey) == "" {
-		return errors.New("invalid_openrouter_key: value required")
 	}
 	if cfg.OwnerToken != "" {
 		if err := validateOwnerToken(cfg.OwnerToken); err != nil {

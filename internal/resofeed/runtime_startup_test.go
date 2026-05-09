@@ -91,6 +91,51 @@ func TestServeStartupRejectsInvalidAddrBeforeDBAndSocket(t *testing.T) {
 	}
 }
 
+func TestServeStartupValidationOrdersLocalConfigBeforeMissingOpenRouterKey(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		args       []string
+		wantStderr string
+	}{
+		{
+			name:       "invalid addr before missing openrouter key",
+			args:       []string{"serve", "--addr", "bad", "--db", "resofeed.sqlite3", "--owner-token", contractOwnerToken},
+			wantStderr: "invalid_addr: expected HOST:PORT",
+		},
+		{
+			name:       "invalid public url before missing openrouter key",
+			args:       []string{"serve", "--addr", "127.0.0.1:18080", "--public-url", "http://127.0.0.1:8080/path", "--db", "resofeed.sqlite3", "--owner-token", contractOwnerToken},
+			wantStderr: "invalid_public_url: expected absolute http(s) URL without path/query/fragment",
+		},
+		{
+			name:       "invalid owner token before missing openrouter key",
+			args:       []string{"serve", "--addr", "127.0.0.1:18080", "--db", "resofeed.sqlite3", "--owner-token", "short"},
+			wantStderr: "invalid_owner_token: expected at least 32 visible non-whitespace characters",
+		},
+		{
+			name:       "missing openrouter key baseline after valid local config",
+			args:       []string{"serve", "--addr", "127.0.0.1:18080", "--db", "resofeed.sqlite3", "--owner-token", contractOwnerToken},
+			wantStderr: "invalid_openrouter_key: value required",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			withoutRuntimeStartupOpenRouterSecretSources(t)
+
+			var stdout, stderr bytes.Buffer
+			code := Main(tc.args, &stdout, &stderr)
+			if code != 2 {
+				t.Fatalf("Main exit code = %d, want 2; stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+			}
+			if !strings.Contains(stderr.String(), tc.wantStderr) {
+				t.Fatalf("stderr = %q, want %q", stderr.String(), tc.wantStderr)
+			}
+			if tc.wantStderr != "invalid_openrouter_key: value required" && strings.Contains(stderr.String(), "invalid_openrouter_key") {
+				t.Fatalf("local config validation was masked by missing OpenRouter key: stderr=%q", stderr.String())
+			}
+		})
+	}
+}
+
 func TestServeFirstRunOwnerTokenGenerationAndReuseAtProcessLevel(t *testing.T) {
 	occupied, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -216,4 +261,23 @@ func unusedTCPAddr(t *testing.T) string {
 		t.Fatalf("close tcp addr listener: %v", err)
 	}
 	return addr
+}
+
+func withoutRuntimeStartupOpenRouterSecretSources(t *testing.T) {
+	t.Helper()
+	withoutOpenRouterKeyEnv(t)
+	withoutGeminiAPIKeyEnv(t)
+	dir := t.TempDir()
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory before startup validation fixture: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("enter startup validation fixture directory: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(oldDir); err != nil {
+			t.Errorf("restore working directory after startup validation fixture: %v", err)
+		}
+	})
 }

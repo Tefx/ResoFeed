@@ -8,7 +8,7 @@
 ## 2. Hard Architecture & File Boundaries
 - **One Deployable**: A single Go binary (`cmd/resofeed`) runs static assets, JSON HTTP, MCP Streamable HTTP, and a background ingest loop. No sidecar worker or admin processes.
 - **One SQLite DB**: SQLite + FTS5 is the only storage. **Do not** introduce vector databases, embeddings, or RAG semantic search. Lexical search only.
-- **LLM Utility**: Gemini is a pure JSON-in/JSON-out transformer for summaries and steering translation. It does not orchestrate, hold state, or write to the database directly.
+- **LLM Utility**: OpenRouter is a pure JSON-in/JSON-out transformer for summaries and steering translation. It does not orchestrate, hold state, or write to the database directly.
 - **Minimal File Shape**: Keep domain logic inside flat files in `internal/resofeed/` (e.g., `ingest.go`, `ranking.go`, `state.go`). **Do not** introduce Java-style App/Domain/Service/Repository layers, DI containers, or event buses.
 
 ## 3. State Portability (Strict No-Sync/No-Merge Rule)
@@ -23,12 +23,12 @@
 - **Idempotency**: Agent receipts exist purely for idempotency and provenance. They are not a portable user-visible activity feed.
 
 ## 4A. Runtime Secret Handling
-- **Runtime-Only LLM Secrets**: Gemini and future LLM provider API keys are runtime input only. Never persist them to SQLite, include them in state bundles, expose them through HTTP/MCP/UI, log them, print them in `/doctor`, place them in fixtures, or commit them in artifacts.
-- **Gemini Secret Precedence**: Current Gemini startup resolution is explicit existing `--gemini-api-key` value as a discouraged compatibility override > OS `GEMINI_API_KEY` > local `.env` fallback. Empty or whitespace-only values are invalid.
-- **CLI Secret Flags Are Transitional**: Do not add new examples or integrations that require CLI-passed API keys. Do not remove the current Gemini CLI key flag silently; any deprecation/removal beyond documenting it as discouraged requires explicit user confirmation.
+- **Runtime-Only LLM Secrets**: OpenRouter API keys are runtime input only. Never persist them to SQLite, include them in state bundles, expose them through HTTP/MCP/UI, log them, print them in `/doctor`, place them in fixtures, or commit them in artifacts.
+- **OpenRouter Secret Precedence**: Current OpenRouter startup resolution is OS `OPENROUTER_KEY` > local `.env` fallback. Empty or whitespace-only values are invalid.
+- **No CLI Secret Flags**: Do not add examples or integrations that require CLI-passed API keys. OpenRouter API keys must not be accepted by CLI flag.
 - **Local `.env` Boundary**: `.env` is local runtime input only. Do not read, print, or commit actual `.env` contents unless a task explicitly requires safe contract review without values. Minimal parser only: `KEY=VALUE`, blank lines, and `#` comments; no shell sourcing, expansion, command substitution, command execution, includes, or multiline semantics.
-- **Redacted Evidence Only**: Verification may state `GEMINI_API_KEY=<redacted>`, `OPENROUTER_KEY=<redacted>`, or `source=os_env/.env`; never include raw API-key values. Parser and validation errors must not contain secret values.
-- **Future OpenRouter Reuse**: OpenRouter work must reuse this runtime secret-source contract and lock accepted names (`OPENROUTER_KEY` and/or `OPENROUTER_API_KEY`) before implementation. Do not regress to CLI API-key examples.
+- **Redacted Evidence Only**: Verification may state `OPENROUTER_KEY=<redacted>` or `source=os_env/.env`; never include raw API-key values. Parser and validation errors must not contain secret values.
+- **OpenRouter-Only Runtime**: `OPENROUTER_KEY` is the only accepted OpenRouter API-key name for OS environment and local `.env` sources. Do not regress to CLI API-key examples or alternate provider compatibility flags.
 
 ## 5. HTTP/API Contract Rules
 - **Deterministic Validation**: HTTP query validation for `/api/feed/today` and `/api/search` is strict and contract-test oriented. Reject unknown or duplicate query parameters with `400 bad_request`.
