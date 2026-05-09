@@ -15215,7 +15215,7 @@ phases:
       production non-test runtime grep is clean.'
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
-  status: pending
+  status: in_progress
   gate: All local, integration, live smoke, UI/multimodal, docs, state-export, HTTP/MCP
     parity, and final gate evidence demonstrate the migration is complete and secrets
     remain redacted.
@@ -15224,7 +15224,7 @@ phases:
   steps:
   - id: openrouter-llm-verification-and-live-smoke.independent-regression-suite
     name: independent-regression-suite
-    status: pending
+    status: claimed
     description: "step_type: verification\nstep_intent: retest_green\nexpected_result:\
       \ green\nagent_source: project\nverification_scope: full-plan-check protecting\
       \ final OpenRouter gate\n\nAs an INDEPENDENT TESTER, run the complete local\
@@ -15326,6 +15326,8 @@ phases:
 
       - [ ] FAIL'
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T18:54:23.080785+00:00'
   - id: openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     name: spec-doc-state-conformance-audit
     status: pending
