@@ -10685,6 +10685,7 @@ phases:
     - docs/USAGE.md
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
+    - retest-http-idempotency-wiring
     agent: software-architect
   - id: finalization-docs-and-deep-review.final-design-contract-review
     name: Final DESIGN contract review
