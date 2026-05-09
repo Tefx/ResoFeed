@@ -1604,7 +1604,7 @@ phases:
       \ stubs intentionally untouched.\n\n## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-green-retest
     name: Core green retest
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -1781,6 +1781,77 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T06:47:19.406320+00:00'
+    done_at: '2026-05-09T06:51:03.580381+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ key passages cited: single deployable Go binary; SQLite + FTS5 only; Gemini\
+      \ as JSON transformer; domain logic flat in `internal/resofeed`; state portability\
+      \ only active sources/rules/resonated items; no folders/tags/unread/settings.\n\
+      - `docs/ARCHITECTURE.md`: key passages cited: one Go process, one SQLite DB,\
+      \ thin HTTP/MCP transports; product core owns source ledger, item state, ingestion,\
+      \ search, steering, state backup/restore; runtime-owned startup/serve/http/mcp\
+      \ lifecycle; state export `exported_at` is export creation time; duplicate provenance\
+      \ must preserve original item retrievability; `/doctor` raw RSS/Gemini/extraction\
+      \ diagnostics.\n- `docs/PRD.md`: key passages cited: freshness before hoarding;\
+      \ value tier/equivalent priority category; human steering precedence over delegated-agent\
+      \ steering; duplicate/story provenance; lexical search only; state portability;\
+      \ raw diagnostics.\n- `docs/DESIGN.md`: key passages cited: dense operational\
+      \ UI, `/doctor` raw text, Source Ledger flat, state portability terse, no settings\
+      \ dashboard/folders/tags/archive.\n- `docs/DESIGN_VISION.md`: key passages cited:\
+      \ Inspect/Resonate/Steer primitives; no numeric indicators/folders/settings;\
+      \ AI failures degrade to raw RSS/blank without cute states.\n- `docs/USAGE.md`:\
+      \ key passages cited: `serve` starts web/API/MCP/ingest/migrations; no separate\
+      \ migrate/worker/doctor/admin/sync; state import/export minimal current-state;\
+      \ search lexical only; `/doctor` plain text.\n\n## Verification Report\n- Commit\
+      \ hash(es): none — read-only verification.\n- step_intent: retest_green\n- expected_result:\
+      \ green\n- observed_result: green for core-domain package and `go test ./...`;\
+      \ runtime/API contract tests are explicitly skipped as expected stub debt.\n\
+      - failure_alignment: aligned. Core-owned remediation tests now pass. Skipped\
+      \ tests map to runtime-api-and-mcp-integration debt: HTTP router/query/auth\
+      \ and MCP handler.\n- verdict: PASS\n- blockers: []\n- product_implementation_files_modified:\
+      \ none\n- Tester: integration-verifier\n- Scope: core domain\n- Commands executed:\n\
+      \  - `pwd && git status --short --branch`\n  - `go test -list . ./internal/resofeed`\n\
+      \  - `go test -v ./internal/resofeed`\n  - `go test ./...`\n  - grep scan for\
+      \ `TODO|panic(|stub|not implemented|IMPLEMENT ME` under `internal/resofeed`\n\
+      \  - grep scan for forbidden architecture terms in Go files\n  - `git status\
+      \ --short && git diff --stat`\n- Actual output:\n  - Worktree/branch: `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/core-domain-implementation.core-green-retest`;\
+      \ `## vectl/step-core-domain-implementation.core-green-retest`.\n  - Test list\
+      \ included targeted core tests: `TestExportStateUsesCurrentCreationTimeAfterImport`,\
+      \ `TestIngestPersistsValueTierAndFreshSearchIndex`, `TestImportRebuildsSearchIndexForRestoredResonatedProvenance`,\
+      \ `TestHumanSteeringAffectsRankingAndSupersedesAgentSteering`, `TestDoctorReportsRawRSSGeminiAndExtractionFailures`,\
+      \ `TestReadItemDetailKeepsDuplicateOriginalRetrievable`, plus existing core\
+      \ tests.\n  - `go test -v ./internal/resofeed` — exit 0, PASS, `ok resofeed/internal/resofeed`;\
+      \ skips observed: runtime HTTP router/MCP handler expected stub debt.\n  - `go\
+      \ test ./...` — exit 0, `resofeed/cmd/resofeed [no test files]`, `ok resofeed/internal/resofeed`.\n\
+      \  - Stub scan found only runtime-owned stubs in `internal/resofeed/http.go`,\
+      \ `internal/resofeed/mcp.go`, and `internal/resofeed/db.go` for router/MCP/serve/Main\
+      \ surfaces; no core-domain state/ingest/ranking/search/doctor/detail blocking\
+      \ stub.\n  - Forbidden architecture scan: no implementation evidence of vector\
+      \ DB/embeddings/RAG/repository/service/event-bus/sync-coordinator patterns;\
+      \ matches were contract comments/tests forbidding those patterns.\n  - Final\
+      \ worktree status/diff: clean.\n- Runtime-Owned Debt Classification:\n  - Non-blocking\
+      \ expected stub debt: `cmd/resofeed/main.go`, `resofeed.Main`, `NewRouter`,\
+      \ `NewMCPHandler`, HTTP/MCP route registration/handlers, `ServeConfig` runtime\
+      \ consumption, serve lifecycle.\n  - Observed skipped tests and stubs map to\
+      \ runtime-api-and-mcp-integration, not core-domain blockers.\n- Issues found:\n\
+      \  - No core-owned blockers found.\n  - Suspicious-green note: 4 HTTP/MCP contract\
+      \ tests are skipped, but skip reason exactly matches expected runtime-owned\
+      \ debt. Core-domain tests are not empty; `go test -v` executed substantive pass\
+      \ bodies.\n- behavioral_proof_register:\n  - state export/import and invalid\
+      \ import: PROVEN.\n  - export timestamp reuse prevention: PROVEN.\n  - ingest\
+      \ value tier persistence and FTS freshness/provenance: PROVEN.\n  - model/fetch/extraction\
+      \ errors: PROVEN.\n  - ranking/steering guardrails: PROVEN.\n  - human-vs-agent\
+      \ precedence: PROVEN.\n  - search core SQL boundary/filter coverage: PROVEN.\n\
+      \  - HTTP query validation boundary: NEEDS_TEST, runtime-owned; skipped with\
+      \ explicit runtime debt message.\n  - duplicate/grouped original retrievability:\
+      \ PROVEN.\n  - core doctor raw diagnostics: PROVEN; `/doctor` HTTP exposure\
+      \ remains runtime-owned.\n  - no forbidden architecture patterns: PROVEN.\n\
+      - gate_open_allowed: true\n- orchestrator_action_hint: COMPLETE\n- Coverage\
+      \ not tested and why:\n  - Live Gemini/RSS external calls were not run; core\
+      \ tests use deterministic local fakes for failure mapping. Live external service\
+      \ verification belongs later runtime/integration phases with credentials/network.\n\
+      \  - HTTP/MCP liveness was not tested because router/handler/serve lifecycle\
+      \ is explicitly expected runtime-owned stub debt for a downstream phase.\n\n\
+      ## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-wiring-audit
     name: Core wiring audit
     status: claimed
