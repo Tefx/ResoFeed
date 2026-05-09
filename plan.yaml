@@ -5699,6 +5699,144 @@ phases:
     - runtime-api-and-mcp-integration.runtime-spec-conformance
     - runtime-api-and-mcp-integration.runtime-wiring-audit
     agent: frontend-engineer
+  - id: runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
+    name: Retest runtime proof and production stub wiring
+    status: pending
+    description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
+      agent_source: default\nverification_scope: phase-check protecting runtime gate,\
+      \ frontend gate intersection, end-to-end integration, and final deep-review\
+      \ checks.\n\nAs an INDEPENDENT TESTER, rerun BOTH failed check families after\
+      \ the batched remediation:\n\n1. Runtime spec conformance closure for R4 startup\
+      \ lifecycle order:\n   - Verify concrete behavioral runtime proof that HTTP/MCP\
+      \ bind/readiness occurs before background ingest starts.\n   - Static goroutine\
+      \ launch order is NOT sufficient.\n   - Confirm evidence includes `why_previous_gate_missed_it`\
+      \ and `reversal_risk`.\n\n2. Runtime wiring/stub scan closure for production\
+      \ UI route dependencies:\n   - Verify production `web/src/routes/+page.svelte`\
+      \ no longer imports/renders `*ContractStub` components for documented UI surfaces.\n\
+      \   - Verify documented UI surfaces use real API client paths or explicit frontend\
+      \ phase contract-owned real components.\n   - Verify grep/build/test evidence\
+      \ includes actual commands and outputs.\n\nFinding remaining issues is a successful\
+      \ retest outcome, but this step may only report PASS when both blocker families\
+      \ are closed. Any `NEEDS_TEST`, `UNPROVEN`, or `DIVERGES` finding for either\
+      \ family remains blocking for the runtime gate and downstream E2E/final gates."
+    verification: '- R4 spec conformance retest: behavioral proof demonstrates bind/readiness
+      before ingest start, with command output and explicit ordered-event evidence.
+
+      - Wiring retest: production route and component tree have no documented-surface
+      `*ContractStub` dependency; grep output and frontend build/test output are pasted.
+
+      - Behavioral proof register includes requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for both blocker
+      families.
+
+      - Headline must be PASS only if both failed checks are green/closed; otherwise
+      report blocker-class findings for automatic remediation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Report
+
+
+      **Tester**: integration-verifier (independent of remediation)
+
+      **Scope**: R4 lifecycle proof + production UI ContractStub wiring closure
+
+      **Independence Level**: L2
+
+
+      ### Commands Executed
+
+      **Runtime lifecycle proof command**:
+
+      ```
+
+      <exact go test command, expected go test ./... -run TestServeReadinessBeforeBackgroundIngest
+      -count=1 or concrete equivalent>
+
+      ```
+
+      **Runtime lifecycle proof output**:
+
+      ```
+
+      <paste actual output>
+
+      ```
+
+      **Stub scan command**:
+
+      ```
+
+      grep -R "ContractStub" web/src/routes web/src/lib --include=''*.svelte'' --include=''*.ts''
+
+      ```
+
+      **Stub scan output**:
+
+      ```
+
+      <paste actual output and justify any remaining non-production hits>
+
+      ```
+
+      **Frontend build/test command**:
+
+      ```
+
+      <exact command>
+
+      ```
+
+      **Frontend build/test output**:
+
+      ```
+
+      <paste actual output>
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | R4 docs/ARCHITECTURE.md:136-145 | HTTP/MCP readiness occurs before background
+      ingest starts | deterministic runtime test/instrumentation ordered events |
+      <test/output ref> | PROVEN/NEEDS_TEST/UNPROVEN | <closure path> | <OPEN/BLOCK
+      basis> |
+
+      | UI wiring docs/DESIGN.md documented surfaces | Production route uses real
+      UI/API paths, not ContractStub local-only behavior | grep + build/test + surface
+      trace | <grep/build ref> | PROVEN/NEEDS_TEST/UNPROVEN | <closure path> | <OPEN/BLOCK
+      basis> |
+
+
+      ### Headline
+
+      - [ ] PASS: Both blocker families closed; runtime gate may review this evidence.
+
+      - [ ] FAIL: One or both blocker families remain open.
+
+
+      **Confidence**: high/medium/low'
+    depends_on:
+    - runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring
+    agent: integration-verifier
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
