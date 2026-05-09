@@ -14097,6 +14097,9 @@ phases:
 
       - Secret handling and state export non-persistence are blocker-class obligations.
 
+      - Phase includes runtime-visible `/doctor` and diagnostic microcopy; UI/UX visible-output
+      audit must complete before this gate opens.
+
 
       Gate criteria:
 
@@ -14108,15 +14111,19 @@ phases:
       3. Liveness probe proves the actual entrypoint starts through `resofeed serve`
       and reaches `/doctor`/runtime path.
 
-      4. No Gemini compatibility flags or runtime `gemini:` output remain.
+      4. UI/UX visible-output audit is PASS or any debt has explicit non-intersection
+      with remaining gates; blocker-class DESIGN.md voice, diagnostic microcopy, or
+      secret-leak findings block this gate.
 
-      5. No secret printing/persistence/export.
+      5. No Gemini compatibility flags or runtime `gemini:` output remain.
 
-      6. No provider registry, DI container, sidecar worker, service/repository layer,
+      6. No secret printing/persistence/export.
+
+      7. No provider registry, DI container, sidecar worker, service/repository layer,
       event bus, vector DB, embeddings, RAG, OAuth/RBAC/accounts, sync/merge/history
       portability.
 
-      7. HTTP/MCP parity and owner-token boundary remain intact.
+      8. HTTP/MCP parity and owner-token boundary remain intact.
 
 
       REALISM CHECK:
@@ -14124,7 +14131,11 @@ phases:
       - Seam-level real path evidence must show actual commands/output, not only unit
       assertions.
 
-      - Mock-heavy adapter/unit tests must be balanced by liveness evidence.'
+      - Mock-heavy adapter/unit tests must be balanced by liveness evidence.
+
+      - Visible-output compliance must include safe redacted screenshots, terminal
+      captures, HTTP response excerpts, or equivalent runtime-visible artifacts from
+      uiux-auditor.'
     verification: phase-check protecting openrouter-llm-verification-and-live-smoke.
       Gate decision basis must map each unresolved behavioral/runtime obligation and
       block if any OpenRouter runtime, secret, state, or Gemini-removal obligation
@@ -14184,6 +14195,7 @@ phases:
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     - openrouter-llm-implementation.wiring-audit
     - openrouter-llm-implementation.serve-liveness-probe
+    - openrouter-llm-implementation.uiux-doctor-diagnostics-audit
     agent: gate-reviewer
   - id: openrouter-llm-implementation.uiux-doctor-diagnostics-audit
     name: uiux-doctor-diagnostics-audit
