@@ -14089,7 +14089,7 @@ phases:
     agent: wiring-auditor
   - id: openrouter-llm-implementation.serve-liveness-probe
     name: serve-liveness-probe
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -14207,6 +14207,8 @@ phases:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-09T18:29:52.578707+00:00'
   - id: openrouter-llm-implementation.implementation-gate
     name: implementation-gate
     status: pending
