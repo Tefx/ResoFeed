@@ -13990,6 +13990,11 @@ phases:
       resolver is reused, and no Gemini wiring remains.
 
 
+      RETEST AFTER BATCHED FIX: This audit must specifically verify remediation from
+      `openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status`
+      and compare against `.audit-artifacts/openrouter_implementation_verification/wiring-audit.md`.
+
+
       REQUIRED CHECKS:
 
       1. Export/reachability: OpenRouter adapter and LLMClient consumers are reachable
@@ -14015,12 +14020,18 @@ phases:
       7. Secret foundation reuse: implementation reuses the runtime-secret-env-config-foundation
       resolver rather than a second parser or ad hoc secret path.
 
+      8. Retest fingerprint: non-test runtime files contain no production `GeminiClient`,
+      `geminiHTTPClient`, `geminiContent`, or `geminiPart` symbols, and production
+      serve no longer constructs a Gemini-named adapter via `NewOpenRouterClient`.
+
 
       Use grep/import-trace output as evidence, not assertions.'
     verification: phase-check protecting openrouter-llm-implementation.gate. Wiring
       audit must return PASS only if no Gemini runtime wiring, no orphan OpenRouter
       adapter, no required CLI API-key flag, no duplicated secret resolver, no unconsumed
-      config fields, and no production stubs are found.
+      config fields, no production stubs are found, and the batched-fix fingerprints
+      from `.audit-artifacts/openrouter_implementation_verification/wiring-audit.md`
+      are closed.
     evidence_template: '## Wiring Audit Report
 
 
@@ -14086,6 +14097,8 @@ phases:
     - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    - openrouter-llm-implementation.serve-liveness-probe
+    - openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     agent: wiring-auditor
   - id: openrouter-llm-implementation.serve-liveness-probe
     name: serve-liveness-probe
