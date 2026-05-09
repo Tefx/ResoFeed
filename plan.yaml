@@ -12152,11 +12152,14 @@ phases:
       \ calls query rejection before no-query handlers."
 - id: openrouter-llm-contract-and-red-tests
   name: OpenRouter LLM Contract and Expected-Red Tests
-  status: pending
+  status: locked
   gate: Contract artifacts and expected-red tests define the Gemini removal/OpenRouter
     acceptance surface without product implementation logic.
+  context: OpenRouter migration is blocked behind the runtime secret env/.env foundation.
+    Phase may not begin until runtime-secret-env-config-foundation.secret-config-gate
+    opens.
   depends_on:
-  - finalization-docs-and-deep-review
+  - runtime-secret-env-config-foundation
   steps:
   - id: openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     name: lock-openrouter-contract-and-docs
