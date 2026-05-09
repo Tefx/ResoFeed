@@ -8667,7 +8667,7 @@ phases:
     agent: wiring-auditor
   - id: end-to-end-integration.end-to-end-spec-conformance
     name: End to end spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -8743,6 +8743,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T10:56:02.883229+00:00'
   - id: end-to-end-integration.end-to-end-gate
     name: End to end gate
     status: pending
