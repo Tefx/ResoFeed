@@ -14538,7 +14538,7 @@ phases:
     agent: uiux-auditor
   - id: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     name: fix-openrouter-runtime-naming-and-doctor-status
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -14682,6 +14682,140 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T18:39:06.394042+00:00'
+    done_at: '2026-05-09T18:44:44.278159+00:00'
+    evidence: 'Batched audit remediation SUCCESS accepted after mainline verification.
+
+
+      ## refs Read Confirmation
+
+      - .audit-artifacts/openrouter_implementation_verification/wiring-audit.md —
+      blocker: production `NewOpenRouterClient` returned `&geminiHTTPClient`; non-test
+      runtime retained `GeminiClient`, `geminiContent`, and `geminiPart`.
+
+      - .audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md
+      — `/doctor` emitted both model-rich `openrouter: ok configured_model=... resolved_model=...`
+      and redundant bare `openrouter: ok`.
+
+      - docs/ARCHITECTURE.md — OpenRouter is sole LLM backend; `/doctor` must use
+      `openrouter:` prefix and never print keys, secret source, `.env` paths, or provider
+      config.
+
+      - docs/DESIGN.md — `/doctor` diagnostics are raw monospace text, not dashboards/cards/friendly
+      remediation copy.
+
+      - .agents/instructions.md — runtime LLM secrets are runtime-only; evidence may
+      only use redacted secret references.
+
+      - docs/USAGE.md — expected `/doctor` text includes one OpenRouter model/status
+      line, e.g. `openrouter: ok configured_model=account_default resolved_model=unknown`.
+
+
+      ## Batched Fix Evidence
+
+      - Worker commit: 86e5478.
+
+      - Main squash merge commit: e7171c8 (`[vectl] step-openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
+      completed`).
+
+      - Files changed: internal/resofeed/openrouter.go (renamed from gemini.go), doctor.go,
+      ranking.go, and focused OpenRouter tests.
+
+      - Spec link: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
+      plus audit artifacts.
+
+
+      Wiring blocker fixed:
+
+      ```text
+
+      git grep -n -E ''GeminiClient|geminiHTTPClient|geminiContent|geminiPart'' --
+      ''internal/resofeed/*.go'' '':!internal/resofeed/*_test.go'' — no matches (exit
+      1 expected)
+
+      git grep -n -E ''Gemini|gemini'' -- ''internal/resofeed/*.go'' '':!internal/resofeed/*_test.go''
+      — no matches (exit 1 expected)
+
+      ```
+
+      Runtime OpenRouter construction path:
+
+      ```text
+
+      internal/resofeed/db.go: NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey,
+      Model: cfg.OpenRouterModel})
+
+      internal/resofeed/openrouter.go: NewOpenRouterClient returns &openRouterHTTPClient{...}
+
+      ```
+
+
+      /doctor duplicate status fixed:
+
+      ```text
+
+      go test ./internal/resofeed -run TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor
+      -v — PASS
+
+      HTTP /api/doctor output:
+
+      rss: ok
+
+      openrouter: ok configured_model=openrouter/configured-runtime resolved_model=openrouter/resolved-runtime
+
+      extraction: failures=1
+
+      extraction: item=item_c05df2fd5649c597fbdf237789f0c24c source=src_runtime_openrouter
+      status=partial_extraction title=Runtime OpenRouter Item
+
+      ingest: last_run=2026-05-09T18:44:26Z
+
+      ```
+
+      No bare second `openrouter: ok` line is present.
+
+
+      Preservation proof:
+
+      - Secret redaction: `/doctor` output contains model labels/status only; no API
+      key, secret source, `.env` path, or auth header.
+
+      - OpenRouter-only CLI/runtime contract: production non-test grep has no Gemini-named
+      runtime symbols.
+
+      - HTTP/MCP parity: runtime test captured identical OpenRouter model/status line
+      through HTTP `/api/doctor` and MCP `resofeed://system/doctor`.
+
+      - State secrecy: no state/export code changed; OpenRouter runtime config remains
+      outside persisted state.
+
+      - No provider registry/DI/service layer: changes stayed in flat internal/resofeed
+      files.
+
+
+      Mainline commands run after merge:
+
+      ```text
+
+      git grep non-test production Gemini symbols — no matches
+
+      go test ./internal/resofeed -run TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor
+      -v — PASS
+
+      go test ./internal/resofeed -run ''OpenRouter|Doctor'' -count=1 — PASS
+
+      go test ./... — PASS
+
+      go build ./cmd/resofeed — PASS
+
+      go test -race ./internal/resofeed -run ''OpenRouter|Doctor'' -count=1 — PASS
+
+      ```
+
+
+      Deviation records: none.
+
+      Gaps/Notes: existing test-only Gemini names remain only in test identifiers/files;
+      production non-test runtime grep is clean.'
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
