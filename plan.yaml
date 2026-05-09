@@ -12150,11 +12150,10 @@ phases:
       \ is primarily proven by code ordering plus response tests, not side-effect\
       \ counters for every read endpoint; accepted as non-blocking because implementation\
       \ calls query rejection before no-query handlers."
-- id: openrouter-llm-backend
-  name: Replace Gemini LLM backend with OpenRouter and live system smoke testing
+- id: openrouter-llm-contract-and-tests
+  name: OpenRouter LLM Contract, Docs, and Expected-Red Tests
   status: pending
-  gate: OpenRouter backend migration is implemented, documented, locally tested, live-smoke
-    tested with .env OPENROUTER_KEY without exposing secrets, independently audited,
-    and final gate is OPEN.
+  gate: OpenRouter contract, documentation updates, and behavior-defining tests are
+    complete; tests are expected to expose Gemini-to-OpenRouter gaps before implementation.
   depends_on:
   - finalization-docs-and-deep-review
