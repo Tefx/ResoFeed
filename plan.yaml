@@ -18591,7 +18591,7 @@ phases:
   steps:
   - id: manual-rss-fetch.backend-implementation
     name: Backend Implementation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
       upstream_artifacts:\n  - path: internal/resofeed/*contract* or backend contract\
       \ artifacts created by backend-contract\n    from_step: backend-contract\n \
@@ -18705,6 +18705,8 @@ phases:
     - backend-contract
     - backend-expected-red-tests
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T21:27:25.827601+00:00'
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
     status: pending
