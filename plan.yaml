@@ -18741,3 +18741,169 @@ phases:
       - queues/jobs/ledgers/sync/service layers introduced: YES/NO
 
       '
+  - id: manual-rss-fetch.frontend-implementation
+    name: Frontend Implementation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Implement the locked frontend Manual RSS Fetch behavior for the Source Ledger.
+
+
+      Scope and files:
+
+      - web/src/routes/components/SourceLedger.svelte — add manual Source Ledger controls
+      and exact state rendering.
+
+      - web/src/routes/+page.svelte — wire handlers and refresh source/feed state
+      after fetch/ingest completion.
+
+      - web/src/lib/api-client.ts and web/src/lib/api-contract.ts — add client methods/types
+      for POST /api/ingest and POST /api/sources/{id}/fetch using the documented wire
+      schemas.
+
+      - web/src/app.css / design token files only if needed to match docs/ui-preview.html
+      exactly.
+
+      - web/src/routes/components/__tests__ and web/src/lib/*.test.ts — add rendering/client
+      tests.
+
+
+      Required behavior:
+
+      - Source Ledger header/action bar renders global [RUN INGEST].
+
+      - Each source row renders [FETCH] on the same row as the source, with right-aligned
+      action block.
+
+      - Active global ingest replaces label with [INGESTING...], disabled, no spinner,
+      no progress animation.
+
+      - Active source fetch replaces label with [FETCHING...], disabled, no spinner,
+      no progress animation.
+
+      - Completion reverts labels and updates last_ingest or last_fetch as HH:MM:SS
+      derived from RFC3339.
+
+      - Error text is terse/truncated per DESIGN.md; no friendly SaaS copy.
+
+      - Terminal bracket action styling must preserve bracket padding, hover inversion,
+      uppercase labels, no shadows, no rounded SaaS buttons, no animations.
+
+      - Frontend must handle 409 conflict and surface terse Source Ledger state without
+      creating local fake jobs/queues.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: API calls, state transitions, RFC3339-to-HH:MM:SS formatting,
+      and error truncation work.
+
+      2. Rendering completeness: Source Ledger produces visible DOM elements matching
+      the design.
+
+      A component that returns data objects instead of rendered elements does NOT
+      satisfy this step. Evidence MUST include rendered output proof (DOM snapshot,
+      screenshot, or test renderer output).
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. SaaS-style spinners, shadows, animations, rounded pills/buttons, or friendly
+      copy.
+
+      2. Incorrect labels such as lowercase fetch/import/export text.
+
+      3. State text that appears outside the bracket action replacement contract.
+
+      4. RFC3339 timestamps displayed raw where DESIGN.md requires HH:MM:SS.
+
+      5. Error strings that cause Source Ledger layout shifts instead of terse truncation.'
+    verification: '- Rendering tests prove [FETCH], [RUN INGEST], [FETCHING...], and
+      [INGESTING...] visible in Source Ledger DOM.
+
+      - Client tests prove POST /api/ingest and POST /api/sources/{id}/fetch call
+      the exact endpoints and handle 200/409/404 payloads.
+
+      - Time-format tests prove RFC3339 is rendered as HH:MM:SS.
+
+      - Visual artifact evidence is produced for the Source Ledger default, source-fetch
+      active, global-ingest active, error, and completion states.
+
+      - Downstream gates protected: manual-rss-fetch.uiux-audit and manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Implementation Evidence
+
+
+      **Files changed**:
+
+      - <list>
+
+
+      **Rendered states captured**:
+
+      - default Source Ledger:
+
+      - source fetch active:
+
+      - global ingest active:
+
+      - conflict/error:
+
+      - completion timestamp:
+
+
+      **Commands/tests run**:
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Exact UI text proof**:
+
+      - [FETCH]:
+
+      - [FETCHING...]:
+
+      - [RUN INGEST]:
+
+      - [INGESTING...]:
+
+      - HH:MM:SS example:
+
+
+      **Forbidden visual patterns check**:
+
+      - spinners/animations/shadows/SaaS button styling present: YES/NO
+
+      '
