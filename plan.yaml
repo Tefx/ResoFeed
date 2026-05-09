@@ -1854,7 +1854,7 @@ phases:
       ## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-wiring-audit
     name: Core wiring audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -2000,6 +2000,106 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T06:54:44.329063+00:00'
+    done_at: '2026-05-09T06:59:32.294345+00:00'
+    evidence: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation
+
+      - .agents/instructions.md — project requires one Go binary, one SQLite DB, Gemini
+      as JSON transformer, flat `internal/resofeed`, and forbids sync/merge coordinators/portable
+      receipts.
+
+      - docs/ARCHITECTURE.md — one deployable, CLI flags, SQLite+FTS5, thin HTTP/MCP
+      transports, Gemini utility, lexical-only search, owner-token boundary; forbids
+      event buses, sync coordinators, mergers, DI layers.
+
+      - docs/PRD.md — summary/extraction/model/RSS fallback taxonomy; lexical search
+      required and RAG/vector retrieval forbidden.
+
+      - docs/DESIGN.md — state portability limited to active sources/rules/stars;
+      `/doctor` is raw text diagnostics, not dashboard.
+
+      - docs/DESIGN_VISION.md — Inspect/Resonate/Steer, `/doctor`, state portability,
+      and no inbox-zero; forbids hidden queues/activity logs.
+
+      - docs/USAGE.md — `serve` starts UI/API/MCP/ingest/migrations; no separate migrate/worker/doctor/admin/sync
+      processes; state import/export is current-state only.
+
+
+      ### Audit verdict
+
+      - HEADLINE: PASS — no core-domain wiring blockers found.
+
+      - Verdict: PASS
+
+      - Blockers: []
+
+      - Gate open allowed: true
+
+      - Product implementation files modified: no
+
+      - Commit hash(es): none — read-only audit
+
+      - Files changed: none
+
+
+      ### Core orphan exports / public-ish symbols
+
+      Static export/reference scan covered state, ingest, Gemini, ranking, search,
+      doctor, db, and migrations surfaces. Runtime callers are pending by design behind
+      expected runtime stubs; core operations are exported/callable for runtime phase
+      and not hidden by uncallable core implementation.
+
+
+      ### Core-owned stubs/panics/TODOs
+
+      No TODO/panic matches in core-owned `state.go`, `ingest.go`, `gemini.go`, `ranking.go`,
+      `search.go`, `doctor.go`, or `migrations.go`. Panic/TODO hits were runtime/API
+      expected stub debt in `db.go`, `http.go`, and `mcp.go`.
+
+
+      ### Runtime-owned expected stub debt
+
+      Mapped to downstream runtime owners:
+
+      - `cmd/resofeed/main.go -> resofeed.Main` / `ServeConfig` / serve lifecycle
+      → `runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`
+
+      - `NewRouter` / HTTP handlers → `runtime-api-and-mcp-integration.complete-http-api-handlers`
+
+      - `NewMCPHandler` / MCP tool wrappers → `runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface`
+
+      - Runtime wiring verification → `runtime-api-and-mcp-integration.runtime-wiring-audit`
+
+
+      ### Unconsumed core fields
+
+      Core config/state fields were statically traced as consumed in ingest, Gemini,
+      state export/import, doctor, search, ranking. Runtime-only `ServeConfig` fields
+      remain unconsumed only because `Main`/serve wiring is expected runtime debt.
+
+
+      ### Forbidden sync/merge/conflict/portable receipt scan
+
+      No forbidden sync/merge/conflict/portable receipt module or function detected.
+      Matches were prohibitive comments, SQL `on conflict` upserts, or test-only synchronization
+      utilities.
+
+
+      ### Mainline final-state verification
+
+      - `git merge --squash vectl/step-core-domain-implementation.core-wiring-audit`
+      → Already up to date; nothing to squash.
+
+      - `git status --short --branch` → `## main` plus untracked `.vectl/` orchestrator
+      worktree directory only.
+
+
+      ### Gaps/Notes
+
+      Static-only audit; no tests/app execution by the auditor. Runtime/API stubs
+      must be owned in the runtime phase and must not be forgotten.'
   - id: core-domain-implementation.core-spec-conformance
     name: Core spec conformance
     status: claimed
