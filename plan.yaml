@@ -15215,7 +15215,7 @@ phases:
       production non-test runtime grep is clean.'
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
-  status: in_progress
+  status: done
   gate: All local, integration, live smoke, UI/multimodal, docs, state-export, HTTP/MCP
     parity, and final gate evidence demonstrate the migration is complete and secrets
     remain redacted.
@@ -16533,7 +16533,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.final-openrouter-gate
     name: final-openrouter-gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -16680,6 +16680,202 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T19:31:01.588628+00:00'
+    done_at: '2026-05-09T19:35:02.163863+00:00'
+    evidence: 'Final OpenRouter gate PASS_WITH_DEBT accepted with explicit non-blocking
+      debt; final gate OPEN.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      headline: PASS_WITH_DEBT
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+
+      Reviewer: gate-reviewer
+
+      Phase: openrouter-llm-verification-and-live-smoke
+
+      Worker commit: 408e56e (`audit: add final OpenRouter gate report`)
+
+      Main squash merge commit: a15ac3d (`[vectl] step-openrouter-llm-verification-and-live-smoke.final-openrouter-gate
+      completed`)
+
+      Artifact merged: `.audit-artifacts/openrouter_verification/final-openrouter-gate.md`.
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: no tracked AGENTS.md exists in isolated worktree.
+
+      - .agents/instructions.md — one binary, SQLite/FTS only, OpenRouter runtime-only
+      secrets, no CLI secret flags, owner-token boundary, HTTP/MCP parity.
+
+      - docs/ARCHITECTURE.md — one deployable, OpenRouter-only runtime, OPENROUTER_KEY
+      OS > .env, no secret persistence/export/logging, `/doctor` OpenRouter output.
+
+      - docs/DESIGN.md — owner-token prompt and raw diagnostic output constraints.
+
+      - docs/USAGE.md — safe key setup, serve command, HTTP/MCP usage, `/api/doctor`,
+      redaction rules.
+
+      - README.md — one binary, OpenRouter transformer, runtime-only secrets, forbidden
+      architecture concepts.
+
+      - required audit artifacts — all required artifacts read.
+
+
+      Behavioral proof register summary:
+
+      - G1 contract/docs and expected-red tests existed before implementation: PASS.
+
+      - G2 regression suite coverage: PASS.
+
+      - G3 spec conformance no blocker divergence: PASS.
+
+      - G4 visible output uses OpenRouter and no Gemini runtime output: PASS.
+
+      - G5 live smoke real binary/server/key surfaces: PASS_WITH_DEBT.
+
+      - G6 state export/import excludes LLM config/secrets: PASS.
+
+      - G7 forbidden architecture concepts absent: PASS.
+
+      - G8 HTTP/MCP parity and owner-token boundary preserved: PASS.
+
+      - G9 docs match behavior: PASS.
+
+
+      Blocking invariant checklist:
+
+      - No Gemini flags/output/compatibility path remains: PASS.
+
+      - OpenRouter key/model runtime-only; not persisted/exported: PASS.
+
+      - No secrets printed in evidence: PASS.
+
+      - Single Go binary deployability preserved: PASS.
+
+      - SQLite/FTS only; no vector/RAG/embeddings: PASS.
+
+      - No provider registry/DI/service layer/sidecar/event bus: PASS.
+
+      - No accounts/OAuth/RBAC/sync/merge/history portability: PASS.
+
+      - HTTP/MCP product-operation parity and owner-token boundary preserved: PASS.
+
+      - Documentation matches implemented behavior: PASS.
+
+
+      CLI surface preservation:
+
+      - root `resofeed --help`: PASS.
+
+      - `resofeed serve`: PASS.
+
+      - `--openrouter-model`: PASS.
+
+      - legacy `--gemini-api-key`: PASS rejected.
+
+      - legacy `--gemini-model`: PASS rejected by contract test.
+
+      - secret CLI flag: PASS none found.
+
+
+      Wiring audit W1-W8: PASS for reachability, CLI/env registration, config consumption,
+      contract consumption, stub/escape-hatch detection, HTTP/MCP parity, secret resolver
+      reuse, and remediation fingerprint closure.
+
+
+      Liveness/live smoke proof:
+
+      - Real `resofeed serve` built and started.
+
+      - `.env` OPENROUTER_KEY fallback exercised without printing key.
+
+      - HTTP feed/search/doctor/state/OPML/steer, MCP initialize/tools/resources/steer,
+      and UI root all exercised.
+
+      - Unit/fake-server tests separately identified and balanced by real serve/live
+      evidence.
+
+
+      State export / secret proof:
+
+      - `StateBundle` contains only schema_version, exported_at, sources, steer_rules,
+      resonated_items.
+
+      - Tests seed fake OpenRouter key/model/source metadata and assert export exclusion/import
+      rejection.
+
+      - Live export reported `leaks=[]`.
+
+
+      Escape hatch audit:
+
+      - No source `@invar:allow` annotations found in cmd, internal/resofeed, product
+      docs, README, or .agents; matches only in plan/audit text describing no-match
+      scans.
+
+
+      Non-blocking issues / gate-intersection reasoning:
+
+      - Warning: live smoke did not force upstream OpenRouter completion; `resolved_model=unknown`.
+      Non-blocking because required live surfaces, state/export, auth, MCP, UI, and
+      OpenRouter key path were proven, and no remaining final gate requires upstream
+      model completion.
+
+      - Note: Gemini-era names remain in tests/old audit history only. Non-blocking
+      because production/runtime/docs scans pass and these do not intersect runtime
+      or documentation gates.
+
+      - Note: original live smoke was blocked but retry closed it with staged `.env`
+      and real server evidence.
+
+
+      Commands run by gate reviewer:
+
+      ```text
+
+      env -u OPENROUTER_KEY -u OPENROUTER_API_KEY -u GEMINI_API_KEY go test ./...
+      — PASS
+
+      go run ./cmd/resofeed --help && go run ./cmd/resofeed serve --help — PASS
+
+      Grep scans for @invar:allow, Gemini/docs residue, boundary terms, secret patterns
+      — PASS/non-blocking notes as above
+
+      ```
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```
+
+
+      Gate Decision: OPEN.'
   - id: openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
     name: fix-startup-validation-order
     status: done
