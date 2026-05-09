@@ -7976,7 +7976,7 @@ phases:
       \ false"
   - id: frontend-implementation.fix-frontend-gate-proof-artifacts
     name: Fix frontend gate proof artifacts
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -8137,6 +8137,59 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T10:35:40.692730+00:00'
+    done_at: '2026-05-09T10:49:33.295070+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — Canonical docs\
+      \ are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; UI must be dense/legible\
+      \ with operational labels and no forbidden reader features.\n- docs/ARCHITECTURE.md\
+      \ — ResoFeed is one Go deployable with one SQLite DB; UI is static SvelteKit,\
+      \ protected APIs require owner token, and portable state is only sources/rules/resonated\
+      \ items.\n- docs/DESIGN.md — Inspector must duplicate Resonate only in single-column\
+      \ mobile route; desktop split-pane Inspector must not show a star.\n- docs/DESIGN_VISION.md\
+      \ — Desktop is split-pane feed + Inspector; mobile is single-column feed with\
+      \ full-screen Inspector route.\n- docs/USAGE.md — Core loop is Inspect, Resonate,\
+      \ Steer; owner token is stored locally after acceptance and APIs use `Authorization:\
+      \ Bearer`.\n\n## Frontend Gate Proof Artifact Report\n**Semantic closure register\
+      \ path**: `.audit-artifacts/frontend-gate/semantic-closure-register.yaml`\n\
+      **Rendered desktop artifact path**: `.audit-artifacts/frontend-gate/current-populated-desktop-full.png`\n\
+      **Rendered mobile artifact path(s)**: `.audit-artifacts/frontend-gate/current-mobile-feed.png`,\
+      \ `.audit-artifacts/frontend-gate/current-mobile-inspector.png`, `.audit-artifacts/frontend-gate/current-mobile-source-ledger.png`\n\
+      **Superseded stale artifact(s)**: `.audit-artifacts/populated-desktop-full.png`\
+      \ and `.audit-artifacts/populated-mobile-full.png` were regenerated from current\
+      \ implementation; current canonical replacements listed above.\n\n## Orchestrator\
+      \ Mainline Final-State Barrier\n- Initial mainline verification failed after\
+      \ artifact merge because `generate-proof-artifacts.mjs` imported undeclared\
+      \ Playwright dependency.\n- Retried and repaired dependency/generator on the\
+      \ same step.\n- Merged proof artifacts commit `536f13e` and verification repair\
+      \ commit `d79572b`.\n- Mainline verification after repair:\n  - `npm --prefix\
+      \ web ci` — PASS; installed 150 packages.\n  - `node .audit-artifacts/frontend-gate/generate-proof-artifacts.mjs`\
+      \ — PASS.\n  - `go test ./... -count=1` — PASS.\n  - `npm --prefix web run check`\
+      \ — PASS; 0 errors, 0 warnings.\n  - `npm --prefix web run build` — PASS; static\
+      \ site written.\n  - `npm --prefix web run test` — PASS; 2 files / 14 tests\
+      \ passed.\n\n## Closure Register Field Coverage\nEach register item B1, B2,\
+      \ B3, B5, U1, U2, U3, and `safe-should-fix-dispositions` includes:\n`requirement_ref`,\
+      \ `behavior_claim`, `runtime_proof_expected`, `evidence_ref`, `status`, `closure_path`,\
+      \ and `gate_decision_basis`.\n\n## Render/Staleness/Durability Proof\n- `node\
+      \ .audit-artifacts/frontend-gate/generate-proof-artifacts.mjs` — exit 0 after\
+      \ dependency repair.\n- `.audit-artifacts/frontend-gate/render-proof.json` reports:\n\
+      \  - `desktop_split_inspector_resonate_button_count: 0`\n  - `desktop_feed_resonate_button_count:\
+      \ 2`\n  - `mobile_route_inspector_resonate_button_count: 1`\n  - `mobile_route_back_to_today_visible:\
+      \ true`\n  - closure-register required fields present for B1/B2/B3/B5/U1/U2/U3\n\
+      \  - `safe_should_fix_disposition_present: true`\n- Durable artifacts committed\
+      \ outside plan state in main commits `536f13e` and `d79572b`.\n\n## Implementation\
+      \ Evidence\nCommit hash(es): worker commits `b81f9d7b6eea3e66e7473d5035dec604e5088b66`,\
+      \ `a0fca46`; merged main commits `536f13e`, `d79572b`.\nFiles changed:\n- `.audit-artifacts/frontend-gate/current-mobile-feed.png`\n\
+      - `.audit-artifacts/frontend-gate/current-mobile-inspector.png`\n- `.audit-artifacts/frontend-gate/current-mobile-source-ledger.png`\n\
+      - `.audit-artifacts/frontend-gate/current-populated-desktop-full.png`\n- `.audit-artifacts/frontend-gate/generate-proof-artifacts.mjs`\n\
+      - `.audit-artifacts/frontend-gate/render-proof.json`\n- `.audit-artifacts/frontend-gate/semantic-closure-register.yaml`\n\
+      - `.audit-artifacts/populated-desktop-full.png`\n- `.audit-artifacts/populated-mobile-full.png`\n\
+      - `web/package.json`\n- `web/package-lock.json`\nVerification: npm ci, proof\
+      \ generator, go test, frontend check/build/test all green on mainline.\nSpec\
+      \ link: docs/ARCHITECTURE.md, docs/DESIGN.md, docs/DESIGN_VISION.md, docs/USAGE.md\n\
+      Gaps/Notes: No product implementation files modified; Playwright declared as\
+      \ dev dependency solely for durable proof generation.\n\n## Semantic Closure\
+      \ Fields\nstep_intent: proof_artifact_remediation\nexpected_result: green\n\
+      observed_result: green\nverdict: PASS\nblockers: []\nproduct_implementation_files_modified:\
+      \ false"
   - id: frontend-implementation.retest-frontend-gate-proof-artifacts
     name: Retest frontend gate proof artifacts
     status: pending
