@@ -10600,7 +10600,7 @@ phases:
       FAIL'
   - id: finalization-docs-and-deep-review.final-spec-conformance-audit
     name: Final spec conformance audit
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10683,6 +10683,37 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T12:30:20.094535+00:00'
+    done_at: '2026-05-09T12:42:11.478661+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — canonical docs\
+      \ are ARCHITECTURE/DESIGN; one Go deployable, SQLite+FTS only, single owner\
+      \ token, strict query validation, no vectl state edits by subagents.\n- docs/ARCHITECTURE.md\
+      \ — owner token, HTTP/MCP auth, state portability, ranking guardrails, endpoint\
+      \ schemas, strict query validation, verification targets.\n- docs/PRD.md — Inspect/Resonate/Steer\
+      \ primitives, freshness, human-over-agent, no forbidden inbox/archive/folders/settings/vector/RAG.\n\
+      - docs/DESIGN.md — owner-token prompt, functional chrome, flat Source Ledger,\
+      \ no onboarding/folders/tags/unread/archive/settings/cute states.\n- docs/DESIGN_VISION.md\
+      \ — analyst workbench; no hidden rate limiting/cute AI failures/folders/tags/numeric\
+      \ indicators/activity logs.\n- docs/USAGE.md — `serve` single runtime, owner-token\
+      \ lifecycle, HTTP/MCP reference, state import/export, `/doctor`, non-goals.\n\
+      \n## Full Spec Conformance Audit\n- Worker verdict: FAIL/BLOCKED; gate_open_allowed\
+      \ false; product files modified false.\n- Required commands after dependency\
+      \ installation passed: `go test ./...`, `go build ./cmd/resofeed`, `npm --prefix\
+      \ web ci`, `npm --prefix web test`, `npm --prefix web run build`.\n- Blocking\
+      \ findings:\n  - B1: strict HTTP query validation drift — endpoints with no\
+      \ query params (e.g. `/api/sources`, `/api/state/export`, `/api/doctor`, `/api/steer/active`,\
+      \ item detail, mutation endpoints) do not reject unknown query params after\
+      \ auth/before backend reads.\n  - B2: `/api/feed/today?limit=` is accepted as\
+      \ omitted/default, but ARCH requires `limit` to be base-10 integer string 1..100.\n\
+      - Should-fix: OPML wording drift between .agents/PRD wording and Architecture/Usage\
+      \ import-only contract.\n- Broad verifier disposition: B1/B2 are fix_now downstream\
+      \ blockers; OPML wording is batched with remediation as documentation clarification\
+      \ unless product scope demands implementation.\n\n## Remediation Ownership Created\n\
+      - Planner added `finalization-docs-and-deep-review.fix-http-query-validation-contract`\
+      \ and `finalization-docs-and-deep-review.retest-http-query-validation-contract`.\n\
+      - Downstream final black-box verification and final deep review gate now depend\
+      \ on the retest.\n- This audit step is complete as a blocker report; final gate\
+      \ remains blocked until query validation remediation/retest passes.\n\n## Headline\n\
+      FAIL"
   - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     name: Final architecture and concurrency review
     status: done
