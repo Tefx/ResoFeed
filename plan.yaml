@@ -3989,7 +3989,7 @@ phases:
       - none'
   - id: runtime-api-and-mcp-integration.runtime-liveness-probe
     name: Runtime liveness probe
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       agent_source: default
@@ -4063,8 +4063,6 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: blind-tester
-    claimed_by: blind-tester
-    claimed_at: '2026-05-09T07:28:44.118078+00:00'
   - id: runtime-api-and-mcp-integration.runtime-spec-conformance
     name: Runtime spec conformance
     status: claimed
