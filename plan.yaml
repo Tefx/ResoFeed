@@ -3019,7 +3019,7 @@ phases:
       PASS_WITH_DEBT"
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
-  status: in_progress
+  status: done
   gate: The runnable `resofeed serve` binary starts HTTP static/API, MCP Streamable
     HTTP, and background ingest loop with real entrypoint/liveness evidence.
   depends_on:
@@ -4474,7 +4474,7 @@ phases:
       \ is considered served production surface, which static route evidence supports"
   - id: runtime-api-and-mcp-integration.runtime-gate
     name: Runtime gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -4597,6 +4597,136 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T09:41:55.704110+00:00'
+    done_at: '2026-05-09T09:47:44.812587+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ single Go binary runs static assets, JSON HTTP, MCP, background ingest; one\
+      \ owner token; HTTP/MCP same product operations.\n- docs/ARCHITECTURE.md — `resofeed\
+      \ serve` is one deployable process; `/api/*` and `/mcp` require owner token;\
+      \ startup order binds HTTP/MCP before background ingest.\n- docs/PRD.md — ResoFeed\
+      \ is single-tenant; MCP remote Streamable HTTP is required; state portability\
+      \ is active sources, active rules, resonated items only.\n- docs/DESIGN.md —\
+      \ owner-token prompt before API calls; state portability UI must expose terse\
+      \ export/import actions only.\n- docs/DESIGN_VISION.md — no onboarding/accounts;\
+      \ owner token is a terse local access gate.\n- docs/USAGE.md — build/run contract:\
+      \ `./bin/resofeed serve`; starts web UI, JSON HTTP API, MCP `/mcp`, background\
+      \ ingest, SQLite, static serving.\n\n## Orchestrator Mainline Final-State Barrier\n\
+      - Worker branch status before merge: clean.\n- Worker branch plan local changes:\
+      \ none.\n- Squash merge result: `Already up to date. (nothing to squash)`.\n\
+      - Mainline verification:\n  - `go test ./... -count=1` — PASS.\n  - `npm --prefix\
+      \ web run check` — PASS; 0 errors, 0 warnings.\n  - `npm --prefix web run build`\
+      \ — PASS; static site written.\n  - `npm --prefix web run test` — PASS; 2 files\
+      \ / 11 tests passed.\n\n## Gate Review Report\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: runtime-api-and-mcp-integration\n\n###\
+      \ Execution Review\n| Step ID | Status | Evidence Quality | Concerns |\n|---|---|---|---|\n\
+      | runtime-api-and-mcp-integration.runtime-gate | PASS_WITH_DEBT | Direct source\
+      \ review, CLI help/smoke, live binary HTTP/MCP liveness, Go suite, frontend\
+      \ check/build/test after `npm ci` | Initial frontend commands failed because\
+      \ `web/node_modules` absent; `npm ci` from lockfile was required. `npm ci` reported\
+      \ 3 low-severity vulnerabilities. |\n\n### Required Blocker Closure Review\n\
+      - R4 lifecycle proof retest reviewed: PASS — `go test ./internal/resofeed -run\
+      \ TestServeReadinessBeforeBackgroundIngest -v` logged `ordered lifecycle proof:\
+      \ bind/listen ready -> HTTP/MCP readiness observable -> background ingest start`.\n\
+      - Production UI ContractStub wiring retest reviewed: PASS — `ContractStub` grep\
+      \ over `web/src/routes/*.svelte`, `web/src/routes/components/*.svelte`, and\
+      \ `web/src/lib/*.ts` returned no files; `+page.svelte` imports real `Feed`,\
+      \ `Inspector`, `SourceLedger`, `StatePortability`, `SearchRetrieval` and `ResoFeedApiClient`.\n\
+      - Any unresolved NEEDS_TEST/UNPROVEN/DIVERGES: no — targeted source grep in\
+      \ `cmd`, `internal`, and `web/src` found no `NEEDS_TEST`, `UNPROVEN`, `DIVERGES`,\
+      \ `EXPECTED_STUB_DEBT`, or `ContractStub`.\n\n### Wiring Audit Results\n- W1\
+      \ CLI entry: PASS. `cmd/resofeed/main.go:12-13` exits through `resofeed.Main(os.Args[1:],\
+      \ os.Stdout, os.Stderr)`.\n- W2 serve dispatch: PASS. `internal/resofeed/db.go:31-59`\
+      \ accepts only `serve`, parses documented flags, validates config, and calls\
+      \ `runServe`.\n- W3 runtime startup: PASS. `internal/resofeed/db.go:163-196`\
+      \ opens DB, runs migrations, resolves owner token, creates Gemini client, and\
+      \ invokes `ServeHTTPAndIngestRuntime`.\n- W4 static/API/MCP router: PASS. `internal/resofeed/http.go:52-58`\
+      \ registers `/api/`, `/mcp`, and `/` static UI.\n- W5 owner-token auth: PASS.\
+      \ HTTP auth at `http.go:274-288`; MCP auth at `mcp.go:269-275,293-305`; live\
+      \ smoke showed unauth `/api/feed/today` and `/mcp` both 401.\n- W6 HTTP/MCP\
+      \ parity: PASS. HTTP today/search/item/inspect/resonance/steer/state/source\
+      \ handlers call core functions in `http.go:290-471`; MCP tools call matching\
+      \ core functions in `mcp.go:85-229,373-445`.\n- W7 state portability: PASS.\
+      \ `state.go:14-17,47-49,134-136` states JSON-only active sources/rules/resonated-items\
+      \ with no sync/merge/activity ledger; targeted state tests passed.\n- W8 production\
+      \ UI wiring: PASS. `web/src/routes/+page.svelte:5-12,48-134,147-193` uses real\
+      \ API client and real production components.\n- Entry-to-effect trace: `resofeed`\
+      \ binary -> `main.go` -> `resofeed.Main` -> `parseServeFlags` -> `runServe`\
+      \ -> `OpenDB`/`RunMigrations`/`ResolveOwnerToken` -> `ServeHTTPAndIngestRuntime`\
+      \ -> `NewRouter` -> `/`, `/api/*`, `/mcp` -> core product functions.\n\n###\
+      \ Escape Hatch Audit Results\n- `@invar:allow`: no production/source matches\
+      \ in `cmd`, `internal`, or `web/src`.\n- Stub/placeholder scan: no `panic(\"\
+      TODO`, `unimplemented`, `TODO contract`, or `stub` in `cmd/resofeed`, `internal/resofeed`,\
+      \ or `web/src`.\n- Anomaly notes: no handler-only completion detected for deployability-bearing\
+      \ surface; tests include live listener and compiled-binary smoke.\n\n### Smoke/Liveness\
+      \ Evidence\n- `go build -o .audit-tmp/resofeed ./cmd/resofeed`: exit 0.\n- CLI\
+      \ help:\n  - `resofeed --help`: exit 0; listed command `serve`.\n  - `resofeed\
+      \ serve --help`: exit 0; listed flags `-addr`, `-db`, `-gemini-api-key`, `-gemini-model`,\
+      \ `-owner-token`, `-public-url`.\n  - `resofeed nope`: exit 2; `err: unknown_command:\
+      \ nope`.\n- Runtime live smoke with compiled binary:\n  - started `resofeed\
+      \ serve --addr 127.0.0.1:18089 --db .audit-tmp/smoke.sqlite3 --gemini-api-key\
+      \ test-key --owner-token <token>`.\n  - `/`: 200 `text/html`, served built production\
+      \ Svelte HTML.\n  - unauth `/api/feed/today`: 401 canonical unauthorized.\n\
+      \  - auth `/api/feed/today`: 200 `{\"items\":[]}`.\n  - auth `/api/doctor`:\
+      \ 200 `text/plain`, included `rss: ok`, `gemini: ok`, `ingest: last_run=never`.\n\
+      \  - unauth `/mcp`: 401 canonical unauthorized.\n  - auth MCP `initialize`:\
+      \ 200, protocol `2025-03-26`.\n  - auth MCP `resources/list`, `resources/read\
+      \ resofeed://system/doctor`, `tools/list`, `tools/call list_candidate_items`:\
+      \ all 200.\n  - graceful SIGTERM: exit 0; log `owner token explicit: stored\
+      \ hash`, `serving ResoFeed`, `shutdown complete`.\n- Verification runs:\n  -\
+      \ `go test ./...`: exit 0.\n  - `go test ./internal/resofeed -run TestServeReadinessBeforeBackgroundIngest\
+      \ -v`: exit 0.\n  - initial frontend checks before dependencies: exit 127 (`svelte-kit`/`vite`\
+      \ not found).\n  - `npm --prefix web ci`: exit 0; 147 packages installed; 3\
+      \ low severity vulnerabilities reported.\n  - `npm --prefix web run check`:\
+      \ exit 0; 0 errors, 0 warnings.\n  - `npm --prefix web run build`: exit 0; production\
+      \ site written to `build`.\n  - `npm --prefix web test`: exit 0; 2 test files,\
+      \ 11 tests passed.\n  - targeted HTTP/MCP/state tests: exit 0; auth, core HTTP\
+      \ paths, MCP resources/tools/idempotency, Gemini steering receipt, state validation/import/export\
+      \ all passed.\n\n### Real Integration vs Fixture-Injected Tests\n- Real integration\
+      \ evidence: compiled binary launched via documented `serve`; real TCP listener;\
+      \ real SQLite file; real production frontend build served from `/`; HTTP and\
+      \ MCP requests sent over network.\n- Fixture/injected evidence: R4 lifecycle\
+      \ test injects `runIngest` callback to prove ordering; MCP Gemini tests use\
+      \ configured fake Gemini to avoid external network while proving configured-client\
+      \ wiring and idempotency receipts.\n- Gate basis: fixture tests are not treated\
+      \ as sole deployability proof; live binary smoke closes the runnable-surface\
+      \ requirement.\n\n### CLI Executability Matrix\n| Command | Surface Listed?\
+      \ | Handler Exists? | --help Works? | Smoke Test | Status |\n|---|---|---|---|---|---|\n\
+      | `resofeed` | yes, root help lists `serve` only | yes, `cmd/resofeed/main.go:12-13`\
+      \ -> `resofeed.Main` | yes, exit 0 | invalid `nope` exits 2 with `unknown_command`\
+      \ | PASS |\n| `resofeed serve` | yes, root help and serve help | yes, `parseServeFlags`\
+      \ and `runServe` in `internal/resofeed/db.go:72-217` | yes, exit 0 | live startup/liveness\
+      \ smoke over HTTP/MCP passed | PASS |\n\nRegression Check:\n- Removed commands:\
+      \ none detected; docs intentionally define no `migrate`, `worker`, `doctor`,\
+      \ `admin`, or `sync` process.\n- Broken commands: none detected for documented\
+      \ `resofeed` / `resofeed serve`.\n\nDangling Detection:\n- Root help lists only\
+      \ `serve`; code dispatch has only `serve`, help, and unknown-command branch.\n\
+      - MCP `tools/list` entries correspond to dispatch cases: `list_candidate_items`,\
+      \ `search_items`, `read_item`, `mark_inspected`, `resonate_item`, `steer`, `report_delivery`.\n\
+      \n### Behavioral Proof Register\n- requirement_ref: ARCHITECTURE §1/§3.3; USAGE\
+      \ Quick Start\n  behavior_claim: runnable `resofeed serve` surface exists and\
+      \ starts one runtime\n  evidence_ref: compiled binary live smoke; `/`, `/api/*`,\
+      \ `/mcp` all reachable\n  status: PASS\n  gate_decision_basis: real binary/network\
+      \ proof\n- requirement_ref: ARCHITECTURE startup order\n  behavior_claim: HTTP/MCP\
+      \ readiness occurs before background ingest starts\n  evidence_ref: `TestServeReadinessBeforeBackgroundIngest`\
+      \ ordered log\n  status: PASS\n  gate_decision_basis: behavioral ordering test\
+      \ over listener readiness probes\n- requirement_ref: DESIGN owner-token prompt;\
+      \ ARCHITECTURE auth\n  behavior_claim: static UI loads without auth; API/MCP\
+      \ require owner token\n  evidence_ref: live smoke `/` 200; unauth `/api/feed/today`\
+      \ 401; unauth `/mcp` 401\n  status: PASS\n  gate_decision_basis: live request/response\
+      \ proof\n- requirement_ref: ARCHITECTURE thin transports / HTTP-MCP parity\n\
+      \  behavior_claim: HTTP and MCP share core product operations\n  evidence_ref:\
+      \ source trace `http.go` and `mcp.go`; targeted tests pass\n  status: PASS\n\
+      \  gate_decision_basis: code review plus tests\n- requirement_ref: PRD AC-16\
+      \ / ARCHITECTURE §5.5\n  behavior_claim: state import/export is JSON-only active-state\
+      \ model\n  evidence_ref: `state.go:14-17,47-49,134-136`; targeted state tests\
+      \ pass\n  status: PASS\n  gate_decision_basis: source and behavioral tests\n\
+      - requirement_ref: production UI stub closure\n  behavior_claim: served production\
+      \ UI does not depend on `*ContractStub`\n  evidence_ref: grep no matches in\
+      \ `web/src/routes`/`web/src/lib`; frontend check/build/test pass\n  status:\
+      \ PASS\n  gate_decision_basis: source scan and production build\n\n## Semantic\
+      \ Closure Fields\nheadline: PASS_WITH_DEBT\nstep_intent: gate_review\nexpected_result:\
+      \ green\nobserved_result: green\nverdict: PASS\nblockers: []\nproof_gap_status:\
+      \ NON_BLOCKING\nblocking_status: CLOSED\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nproduct_implementation_files_modified: false"
   - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     name: Fix runtime verification blockers
     status: done
