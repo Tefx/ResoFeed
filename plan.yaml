@@ -10994,6 +10994,8 @@ phases:
     - finalization-docs-and-deep-review.full-plan-verification-sweep
     - finalization-docs-and-deep-review.documentation-sync
     - finalization-docs-and-deep-review.final-wiring-audit
+    - fix-http-idempotency-wiring
+    - retest-http-idempotency-wiring
     - finalization-docs-and-deep-review.final-spec-conformance-audit
     - finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     - finalization-docs-and-deep-review.final-design-contract-review
