@@ -8414,7 +8414,7 @@ phases:
       \ false"
 - id: end-to-end-integration
   name: End to End Integration
-  status: in_progress
+  status: done
   gate: Full vertical behavior works through real CLI/server/API/MCP/UI paths with
     no stubs and no mock-only seam evidence.
   context: System-level fan-in after backend/runtime/frontend phases. Verifies real
@@ -8968,7 +8968,7 @@ phases:
       \ until remediation/retest closes the issues."
   - id: end-to-end-integration.end-to-end-gate
     name: End to end gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -9055,6 +9055,140 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T11:45:13.405719+00:00'
+    done_at: '2026-05-09T11:58:29.990770+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one deployable Go binary, one SQLite DB, no vector/RAG/sync/accounts,
+      owner-token boundary, HTTP/MCP parity, functional UI labels only.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` is the single runtime; static UI,
+      `/api/*`, `/mcp`, SQLite migrations, owner token, ingest loop share one process;
+      state portability is active sources/rules/stars only.
+
+      - docs/PRD.md — acceptance criteria require freshness, non-pinning resonance,
+      inspection not preference, agent idempotency/MCP handoff, agent attribution,
+      state portability, `/doctor`.
+
+      - docs/DESIGN.md — app shell uses `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`,
+      `/doctor`; search/state are not peer top-level tabs; Source Ledger flat; state
+      import/export terse.
+
+      - docs/DESIGN_VISION.md — analyst workbench, high-density/low-fatigue UI, no
+      onboarding/accounts/cute states/numeric badges/activity logs.
+
+      - docs/USAGE.md — accepted CLI/HTTP/MCP contracts: build, `resofeed serve`,
+      `/api/*`, `/mcp`, lexical search, state import/export, no forbidden surfaces.
+
+
+      ## Gate Review Report
+
+      - Headline: OPEN
+
+      - Verdict: PASS
+
+      - Blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - Product files modified: false
+
+
+      ## Evidence Quality / Verification
+
+      - Gate retry verification: `go test -v ./internal/resofeed -run ''Test.*(Strict|Boost|Inspect|Preference|MCP|Candidate|Delivery|Value|Superseded|Runtime|Rebuild|StateImport|Agent|Attribution|Nav|Search)''`
+      PASS; `go test ./...` PASS; `npm --prefix web ci && npm --prefix web test &&
+      npm --prefix web run build` PASS; temp binary CLI/help/runtime smoke PASS.
+
+      - Supplemental blind-tester Mode D liveness: PASS, blockers [], proof_gap_status
+      NONE; built and started `resofeed serve`, verified static UI `/`, owner-token/first-use
+      UI, unauthenticated 401 for `/api/feed/today` and `/mcp`, authenticated feed/search/doctor/state
+      export/import, MCP initialize/tools/resources/read-only call, and forbidden
+      visible UI text absent.
+
+      - Supplemental artifact merged: `.audit-artifacts/mode-d-liveness-report.md`
+      as main commit `f0667ad`.
+
+      - Mainline verification after supplemental merge: `go test ./... && npm --prefix
+      web ci && npm --prefix web test && npm --prefix web run build` PASS.
+
+
+      ## Wiring Audit W1-W8
+
+      - W1 CLI/runtime: PASS — `cmd/resofeed/main.go` -> `resofeed.Main`, root/serve
+      handling.
+
+      - W2 static UI: PASS — static UI served via HTTP; smoke `/` returned 200 HTML.
+
+      - W3 HTTP API routes: PASS — feed/search/sources/OPML/state/doctor/steer/items
+      wired.
+
+      - W4 MCP `/mcp`: PASS — handler mounted and MCP initialize/tools/resources smoke
+      passed.
+
+      - W5 auth boundary: PASS — `/api/*` and `/mcp` owner-token boundary; unauth
+      `/mcp` 401.
+
+      - W6 UI-to-API wiring: PASS — API client covers today/item/inspect/resonance/steer/sources/OPML/search/state/doctor
+      with bearer token.
+
+      - W7 state portability: PASS — active-state only; black-box export/import roundtrip
+      and invalid import validation passed.
+
+      - W8 design/nav: PASS — top-level peer nav has only TODAY and SOURCE LEDGER;
+      agent receipt source/audit evidence present.
+
+
+      ## Escape Hatch / CLI / Integration
+
+      - Escape hatch audit: no production/source `@invar:allow`; no blocker-class
+      exported orphan seams after remediation.
+
+      - CLI matrix: `resofeed --help`, `resofeed serve --help`, `resofeed serve` PASS;
+      nonexistent migrate/worker/admin/sync/doctor commands not listed and unknown-command
+      behavior PASS.
+
+      - Integration vs fixture: real compiled binary, real HTTP/MCP/static UI socket
+      smoke and real bound-listener MCP tests; deterministic Gemini fakes/seeded DB
+      used only for controlled verification, not transport liveness.
+
+
+      ## Behavioral Proof Register
+
+      - PRD AC-4 strict filter/boost: PROVEN.
+
+      - PRD AC-5 inspect not durable preference/agreement: PROVEN.
+
+      - PRD AC-7/AC-9 delivery suppression vs silent evaluation: PROVEN.
+
+      - PRD AC-6 human authority over agents: PROVEN.
+
+      - PRD AC-10 idempotent agent mutation safety: PROVEN.
+
+      - PRD AC-11 agent steering receipt: PROVEN.
+
+      - PRD AC-12 unauthorized agent action: PROVEN.
+
+      - PRD AC-16 state portability: PROVEN.
+
+      - PRD AC-17 diagnostics: PROVEN.
+
+      - HTTP/MCP parity: PROVEN.
+
+      - DESIGN rendered fidelity: PROVEN.
+
+      - No sync/merge/history/account/RAG drift: PROVEN.
+
+
+      ## Notes
+
+      - npm audit reports 3 low-severity dependency vulnerabilities; non-blocking
+      for this gate because tests/build pass and no exploitability evidence observed.
+
+      - Stale older black-box UI artifact still includes SEARCH/STATE text, but current
+      source, UI/UX audit, retest evidence, and blind Mode D evidence close current
+      gate.'
   - id: fix-end-to-end-blockers
     name: Fix end-to-end blockers
     status: done
@@ -10035,7 +10169,7 @@ phases:
       - None for required UI/UX audit checks.'
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
-  status: locked
+  status: pending
   gate: Full-plan verification, doc sync, and independent deep-review audits are complete
     with final gate OPEN.
   depends_on:
