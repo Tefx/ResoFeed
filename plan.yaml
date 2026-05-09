@@ -12152,7 +12152,7 @@ phases:
       \ calls query rejection before no-query handlers."
 - id: openrouter-llm-contract-and-red-tests
   name: OpenRouter LLM Contract and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Contract artifacts and expected-red tests define the Gemini removal/OpenRouter
     acceptance surface without product implementation logic.
   context: OpenRouter migration is blocked behind the runtime secret env/.env foundation.
@@ -12818,7 +12818,7 @@ phases:
       \ failures are intentionally product migration gaps, not syntax/build failures."
   - id: openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps
     name: retest-red-test-gate-gaps
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER, rerun the red-test gate checks for the
       remediation from openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps.
 
@@ -13025,9 +13025,93 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T18:00:31.679118+00:00'
+    done_at: '2026-05-09T18:06:35.812167+00:00'
+    evidence: 'Gate-reviewer retest PASS accepted and mainline-verified after squash
+      merge.
+
+
+      Commit hash(es):
+
+      - Worker artifact commit: 01c914b8d3aeb2cc89c52d53edca6872927cf8bf
+
+      - Main squash merge commit: 1906798 ([vectl] step-openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps
+      completed)
+
+
+      Files changed:
+
+      - .audit-artifacts/openrouter_contract_red_tests_gate/retest-red-test-gate-gaps.md
+      only
+
+      - No product implementation files modified; no docs files modified by the audit.
+
+
+      Gate closure fields from audit artifact:
+
+      - gate_open_allowed: true
+
+      - blocker_1_expected_result_red_metadata: PROVEN
+
+      - blocker_2_state_import_secrecy_coverage: PROVEN
+
+      - docs_public_contract_clean: PROVEN
+
+      - secret_safety: PROVEN
+
+      - downstream_openrouter_implementation_unblocked: true
+
+      - product_implementation_files_modified: false
+
+
+      Mainline final-state verification after merge:
+
+      - `grep -n "expected_result: red" internal/resofeed/*openrouter*contract_test.go`
+      => status 0; matches in openrouter_cli_adapter_contract_test.go and openrouter_product_integration_contract_test.go.
+
+      - `go test ./internal/resofeed -run ''^$''` => PASS (`ok resofeed/internal/resofeed
+      ... [no tests to run]`).
+
+      - `go test ./internal/resofeed -run ''TestOpenRouter'' -count=1` => expected
+      red status 1; failures align with intended OpenRouter/Gemini product migration
+      gaps (legacy Gemini flags/required key, missing OpenRouter model flag, adapter
+      path/auth/JSON-mode gaps, nil summary, Gemini-named injection surface).
+
+      - `grep -n -E "TestState(Export|Import)|openrouter_key|openrouter_model|provider|secret_source|runtime_config|assertNoImportedOpenRouterRuntimeState"
+      internal/resofeed/openrouter_product_integration_contract_test.go` => status
+      0; import/export secrecy coverage present.
+
+      - `go test ./internal/resofeed -run ''TestState(ExportExcludesOpenRouterRuntimeConfigAndSecrets|ImportRejectsOpenRouterRuntimeConfigAndSecrets)''
+      -count=1` => PASS.
+
+      - `go test ./internal/resofeed -run ''TestOpenRouterDocsRuntimeSecretContract''
+      -count=1` => PASS.
+
+      - `git status --short && git ls-files .env ''.env*''` => status 0; did not read/print/commit
+      real .env contents.
+
+
+      Spec link / refs confirmation:
+
+      - Reviewed docs/ARCHITECTURE.md for OpenRouter-only backend, runtime-only secrets,
+      and non-persistence/import/export exclusions.
+
+      - Reviewed docs/DESIGN.md for state portability warning/diagnostic styling.
+
+      - Reviewed OpenRouter contract tests for expected-red metadata and public docs/runtime
+      secret/state secrecy coverage.
+
+      - Reviewed .agents/instructions.md for runtime-only secret handling and redacted
+      evidence.
+
+
+      Gaps/Notes:
+
+      - Targeted TestOpenRouter remains red by design for downstream implementation;
+      this retest confirms the contract/test gate blockers are closed and downstream
+      OpenRouter implementation is unblocked.'
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
-  status: locked
+  status: pending
   gate: OpenRouter is wired as the sole LLM backend through CLI runtime, ingest, steering,
     /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
   depends_on:
