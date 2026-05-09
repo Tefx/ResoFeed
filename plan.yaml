@@ -11796,3 +11796,77 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-spec-conformance-audit
     agent: golang-developer
+  - id: finalization-docs-and-deep-review.retest-http-query-validation-contract
+    name: Retest HTTP query validation contract drift
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: full-plan-check
+
+      agent_source: default
+
+
+      As an INDEPENDENT TESTER, retest the HTTP query validation and OPML wording
+      closure after finalization-docs-and-deep-review.fix-http-query-validation-contract.
+
+
+      Scope:
+
+      - Verify B1 strict query validation is closed for no-query endpoints after auth
+      and before backend reads.
+
+      - Verify B2 empty feed limit drift is closed: /api/feed/today?limit= returns
+      400 bad_request field=limit.
+
+      - Verify auth-before-validation behavior is preserved.
+
+      - Verify OPML wording drift is resolved as documentation-only unless authoritative
+      contracts require OPML export.
+
+      - Reassess the final spec conformance finding and produce explicit closure fields.
+
+
+      This step protects finalization-docs-and-deep-review.final-deep-review-gate
+      by proving the blocker-class spec conformance findings are closed before the
+      final gate can open.
+
+
+      Independence Level: L1 independent review. The tester may read code and docs
+      but must not be the fix agent.'
+    verification: '- Rerun targeted Go tests for strict query validation, including
+      unknown query rejected for no-query endpoints, /api/feed/today?limit= returns
+      400 bad_request field=limit, and auth-before-validation preservation.
+
+      - Verify OPML documentation wording no longer conflicts across .agents/PRD/Architecture/Usage,
+      or report an explicit remaining contract conflict.
+
+      - Produce spec closure fields: verdict, blockers, gate_open_allowed, orchestrator_action_hint.
+
+      - Expected result: green. Any remaining blocker-class DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND
+      item must include an explicit closure path and gate_open_allowed=false.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this\
+      \ step.\"\n\n## Retest Report\n\n**Tester**: spec-verifier (independent of golang-developer)\n\
+      **Scope**: HTTP query validation contract drift and OPML wording closure\n**Independence\
+      \ Level**: L1\n\n### Targeted Go Tests\nCommands executed:\n```\n<paste exact\
+      \ go test commands>\n```\nActual output:\n```\n<paste stdout/stderr>\n```\n\n\
+      Required coverage:\n- [ ] Unknown query rejected for no-query endpoints\n- [\
+      \ ] /api/feed/today?limit= returns 400 bad_request field=limit\n- [ ] Auth-before-validation\
+      \ preserved\n- [ ] Authenticated mutation/no-query backend read or write prevented\
+      \ before rejection\n\n### Spec Closure Fields\nverdict: \"CONFORMS|DIVERGES|PARTIAL|NEEDS_TEST|AMBIGUOUS_SPEC\"\
+      \nblockers:\n  - \"<none or remaining blocker>\"\ngate_open_allowed: true|false\n\
+      orchestrator_action_hint: \"proceed_to_final_gate|create_remediation|request_clarification\"\
+      \n\n### OPML Wording Closure\n- Architecture/Usage stance: <import-only or import/export>\n\
+      - .agents/PRD wording: <aligned or remaining drift>\n- Disposition: <DOC_CLARIFIED|EXPORT_IMPLEMENTED|BLOCKED>\n\
+      \n### Headline\n- [ ] PASS: blocker-class drift closed and gate_open_allowed=true\n\
+      - [ ] FAIL: remaining blocker-class drift or unresolved proof gap"
+    depends_on:
+    - finalization-docs-and-deep-review.fix-http-query-validation-contract
+    agent: spec-verifier
