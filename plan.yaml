@@ -11143,6 +11143,7 @@ phases:
     - finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     - finalization-docs-and-deep-review.final-design-contract-review
     - finalization-docs-and-deep-review.final-black-box-verification
+    - finalization-docs-and-deep-review.retest-http-query-validation-contract
     agent: gate-reviewer
   - id: fix-http-idempotency-wiring
     name: Fix HTTP idempotency wiring
