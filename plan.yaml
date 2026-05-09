@@ -9631,7 +9631,7 @@ phases:
     agent: integration-verifier
   - id: uiux-audit-end-to-end-blockers
     name: UI/UX audit end-to-end blocker remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -9777,6 +9777,106 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-09T11:34:38.067281+00:00'
+    done_at: '2026-05-09T11:39:43.289833+00:00'
+    evidence: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation
+
+      - .agents/instructions.md — canonical docs are DESIGN/ARCHITECTURE; UI must
+      stay dense/functional with no SEARCH/STATE/settings bloat.
+
+      - docs/DESIGN.md — allowed app shell labels include RESOFEED/TODAY/SOURCE LEDGER/INSPECTOR;
+      state import/export only via Source Ledger footer or /doctor; search is lexical
+      retrieval, not RAG.
+
+      - docs/ARCHITECTURE.md — SQLite FTS5 lexical only; no vector/embeddings/RAG;
+      state portability excludes receipts/history/sync/merge.
+
+      - docs/PRD.md — Search must not become a fourth top-level nav tab; agent steering
+      receipt must be visible with actor/change/correction path.
+
+      - docs/DESIGN_VISION.md — analyst workbench; flat Source Ledger; terse state
+      portability.
+
+      - docs/USAGE.md — Search is lexical/not chat; state import/export not cloud
+      backup/account/sync; delegated agent receipt example matches UI.
+
+
+      ### Rendered Evidence
+
+      - Top-level navigation artifact: `.audit-artifacts/top-navigation-agent-receipt.png`
+
+      - State portability affordance artifacts: `.audit-artifacts/source-ledger-state-portability.png`,
+      `.audit-artifacts/state-import-warning-focus.png`
+
+      - Search presentation artifacts: `.audit-artifacts/search-presentation.png`,
+      `.audit-artifacts/visible-text-search-state.txt`
+
+      - Agent attribution artifact: `.audit-artifacts/top-navigation-agent-receipt.png`
+
+      - Accessibility/labels artifact: `.audit-artifacts/accessibility-role-labels.json`
+
+      - Audit branch commit: `e6904f3 Add UIUX audit evidence for end-to-end blockers`;
+      main squash commit: `c4c3f1c`.
+
+
+      ### Required Checks
+
+      | Check | Verdict | Evidence Ref | Notes |
+
+      | --- | --- | --- | --- |
+
+      | No top-level SEARCH/STATE peer nav | PASS | top-navigation-agent-receipt.png;
+      visible-text-search-state.txt | Nav contains only TODAY and SOURCE LEDGER. |
+
+      | State portability only in allowed location | PASS | source-ledger-state-portability.png;
+      state-import-warning-focus.png | Export/import appear in Source Ledger context;
+      no STATE tab/dashboard. |
+
+      | Search not RAG/product tab | PASS | search-presentation.png; visible-text-search-state.txt
+      | Copy says lexical/metadata retrieval; no RAG/vector/semantic framing. |
+
+      | Agent attribution human-visible without forbidden constructs | PASS | top-navigation-agent-receipt.png;
+      accessibility-role-labels.json | Inline receipt shows `agent:briefing-agent
+      ... correct in Steer`; no account/activity feed. |
+
+      | Accessibility/labels intact | PASS | accessibility-role-labels.json | Functional
+      names and 44px primary control heights observed. |
+
+      | No invariant drift | PASS | screenshots plus Svelte surface grep | No folders/tags/unread/wizard/settings/sync/merge/account/RAG
+      framing observed. |
+
+
+      ### Handoff Fields
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      should_fix: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_files_modified: false
+
+
+      ### Mainline Final-State Verification
+
+      - Ran after squash merge in main: `npm --prefix web ci && npm --prefix web test
+      && npm --prefix web run build`.
+
+      - Output: npm ci installed 150 packages; `svelte-check found 0 errors and 0
+      warnings`; vitest 2 files/16 tests passed; web production build succeeded.
+
+
+      ## Gaps/Notes
+
+      - None for required UI/UX audit checks.'
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
