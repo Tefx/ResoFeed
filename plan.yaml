@@ -12152,7 +12152,7 @@ phases:
       \ calls query rejection before no-query handlers."
 - id: openrouter-llm-contract-and-red-tests
   name: OpenRouter LLM Contract and Expected-Red Tests
-  status: locked
+  status: pending
   gate: Contract artifacts and expected-red tests define the Gemini removal/OpenRouter
     acceptance surface without product implementation logic.
   context: OpenRouter migration is blocked behind the runtime secret env/.env foundation.
@@ -14012,7 +14012,7 @@ phases:
     agent: gate-reviewer
 - id: runtime-secret-env-config-foundation
   name: Runtime Secret Env Config Foundation
-  status: in_progress
+  status: done
   gate: Runtime LLM secret resolution via environment variables and local .env files
     is contract-locked, implemented for the current Gemini path, verified secret-safe,
     and ready as the required foundation before OpenRouter migration.
@@ -14674,7 +14674,7 @@ phases:
       \ README fix and independent retest complete."
   - id: runtime-secret-env-config-foundation.secret-config-gate
     name: secret-config-gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -14780,6 +14780,86 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T17:34:39.964594+00:00'
+    done_at: '2026-05-09T17:41:35.412695+00:00'
+    evidence: "status: SUCCESS\n\n## Gate Review Report\n\n**Reviewer**: gate-reviewer\
+      \ (independent of phase implementation)\n**Phase**: runtime-secret-env-config-foundation\n\
+      **Timestamp**: 2026-05-10T00:00:00Z\n\n## refs Read Confirmation (MANDATORY)\n\
+      \n- docs/ARCHITECTURE.md — READ. Key passages: lines 12, 68-91, 153-154, 902-924\
+      \ define runtime-only LLM secrets, precedence, `.env` parser limits, non-persistence/export,\
+      \ OpenRouter reuse, and minimal architecture.\n- docs/USAGE.md — READ. Key passages:\
+      \ lines 33-59 and 662-668 require OS env/local `.env`, shell-history safety,\
+      \ redacted evidence, and OpenRouter reuse.\n- AGENTS.md — NOT READ: absent.\
+      \ `.agents/instructions.md` READ. Key passages: lines 25-31 define runtime-only\
+      \ LLM secrets, precedence, local `.env` boundary, redacted evidence, and future\
+      \ OpenRouter reuse.\n- README.md — READ. Key passages: lines 14-31 show env/`.env`\
+      \ quick start without runnable CLI API-key command.\n- docs/DESIGN.md — READ.\
+      \ Key passages: lines 247-263 and 477-480 preserve single-tenant workbench/state-portability\
+      \ boundaries.\n\n## Execution Review\n- `runtime-secret-env-config-foundation.lock-runtime-secret-source-policy`:\
+      \ PASS; evidence quality adequate/excellent; no concerns.\n- `runtime-secret-env-config-foundation.define-runtime-secret-red-tests`:\
+      \ PASS; expected-red tests cover env, `.env`, precedence, empty/missing, redaction,\
+      \ state export, and docs guards; no concerns.\n- `runtime-secret-env-config-foundation.complete-runtime-secret-resolver`:\
+      \ PASS; direct flat resolver before provider construction; no concerns.\n- `runtime-secret-env-config-foundation.verify-runtime-secret-env-config`:\
+      \ PASS with blocker ownership created; runtime was green and README blocker\
+      \ was identified; no unresolved concern after fix/retest.\n- `runtime-secret-env-config-foundation.fix-readme-secret-cli-regression`:\
+      \ PASS; README CLI-secret example removed; no concerns.\n- `runtime-secret-env-config-foundation.retest-readme-secret-cli-regression`:\
+      \ PASS; no runnable public doc CLI-secret examples remain; no concerns.\n\n\
+      ## Wiring Audit Results\n- W1 CLI flag/env/.env source resolution: PASS. `db.go`\
+      \ preserves compatibility flag detection; `runtime_secret.go` resolves CLI override\
+      \ > OS `GEMINI_API_KEY` > local `.env`; tests verify fallback/precedence/empty/missing.\n\
+      - W2 ServeConfig/Main/provider construction: PASS. Flat `ServeConfig`; secret\
+      \ resolved before `NewGeminiClient`.\n- W3 `.env` parser safety: PASS. Direct\
+      \ file scan, no shell sourcing; tests verify comments/blanks, non-execution\
+      \ of command substitution, and unsupported shell syntax handling.\n- W4 stdout/stderr/log\
+      \ redaction: PASS. Tests and live smoke found zero fake-secret leaks.\n- W5\
+      \ SQLite/state export non-portability: PASS. State export contains only `schema_version`,\
+      \ `exported_at`, `sources`, `steer_rules`, `resonated_items`.\n- W6 docs/README\
+      \ shell-history closure: PASS. README/USAGE prefer env/`.env`; no runnable serve\
+      \ example with CLI API key.\n- W7 OpenRouter downstream dependency reuse: PASS.\
+      \ ARCHITECTURE/USAGE/.agents require OpenRouter to reuse env/`.env` contract\
+      \ with redacted evidence.\n- W8 architecture minimalism/no forbidden scope drift:\
+      \ PASS. Flat `internal/resofeed/runtime_secret.go` + direct provider construction;\
+      \ no DI/container/registry/service/sidecar/product-scope expansion.\n\n## Escape\
+      \ Hatch Audit\n- `@invar:allow` findings: none in reviewed source/docs/artifacts.\n\
+      \n## CLI Surface Preservation Protocol\n- Surface snapshot:\n  - `resofeed --help`:\
+      \ only `serve`.\n  - `resofeed serve --help`: `--addr`, `--public-url`, `--db`,\
+      \ `--gemini-api-key`, `--gemini-model`, `--owner-token`.\n  - `resofeed doctor`:\
+      \ unknown-command exit 2, preserving no-sidecar command boundary.\n- Executability\
+      \ matrix:\n  - `resofeed` / `help`: listed yes; handler exists; help exit 0;\
+      \ PASS.\n  - `resofeed serve`: listed yes; handler exists; help exit 0; `.env`\
+      \ runtime server smoke PASS.\n  - `resofeed doctor`: not listed; no handler\
+      \ by architecture; unknown-command exit 2; PASS.\n\n## Runnable Surface Smoke/Liveness\
+      \ Evidence\n- Worker ran:\n  - focused runtime-secret tests — exit 0\n  - `go\
+      \ test ./... -count=1` — exit 0\n  - focused race tests — exit 0\n  - `go vet\
+      \ ./...` — exit 0\n  - `go build -o ./bin/resofeed ./cmd/resofeed` — exit 0\n\
+      \  - temp `.env` smoke with no `--gemini-api-key`, probes `/`, `/api/doctor`,\
+      \ `/api/state/export` — exit 0\n- Output highlights:\n  - `SMOKE_SECRET_LEAK_HITS=0`\n\
+      \  - `SMOKE_DOCTOR=rss: ok|gemini: ok|extraction: ok|ingest: last_run=never|`\n\
+      \  - `SMOKE_EXPORT_KEYS=schema_version,exported_at,sources,steer_rules,resonated_items`\n\
+      \n## Integration Proof Quality\n- Real integration evidence: built binary startup\
+      \ from temporary local `.env` without CLI API-key flag; HTTP root, doctor, and\
+      \ state export probes succeeded; output/export scan found no fake secret.\n\
+      - Fixture-backed evidence: focused Go tests cover resolver and state/doc contracts\
+      \ using fake sentinel values and bind-failure harnesses.\n- Residual proof gaps:\
+      \ none blocking.\n\n## Behavioral/runtime proof basis\nbehavioral_proof_register:\n\
+      \  - B1 Spec Alignment: PASS — docs lock precedence and OpenRouter reuse; docs\
+      \ tests/search passed.\n  - B2 Production Quality: PASS — runtime resolver/direct\
+      \ wiring verified by tests/full tests/race/vet/build.\n  - B3 Security/Redaction:\
+      \ PASS — fake secret absent from stdout/stderr/state export.\n  - B4 State Portability:\
+      \ PASS — no secret metadata in state export.\n  - W1 DX/Maintainability warning:\
+      \ non-public repro/test harnesses still use fake `--gemini-api-key`; non-blocking\
+      \ because public docs/live smoke use env/`.env` and no real secrets.\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nuncertainty_sources:\n  - none\n\
+      proof_gap_status: NONE\nblocking_status: CLOSED\nheadline: PASS\n\n## Final\
+      \ Decision\nOPEN\n\n## Required remediation if BLOCKED\n- none\n\n## Artifacts\
+      \ / Merge / Mainline Verification\n- Worker artifact commit: `1db4a69d38b4ce0cd555de2776f60b5231d94627`\n\
+      - Main squash merge commit: `6dfd0ae` (`[vectl] step-runtime-secret-env-config-foundation.secret-config-gate\
+      \ completed`)\n- Artifact changed: `.audit-artifacts/runtime_secret_env_config_gate/gate-review-report.md`\n\
+      - Mainline verification after merge:\n  ```bash\n  go test ./internal/resofeed\
+      \ -run 'Test(GeminiRuntimeSecret|DotEnvParser|StatePortabilityExcludes|DocsRuntimeSecret|DocsDoNotRequire)'\
+      \ -count=1 && go test ./... -count=1 && go vet ./...\n  ```\n  Result: PASS.\n\
+      \n## Files changed\n- `.audit-artifacts/runtime_secret_env_config_gate/gate-review-report.md`\n\
+      \n## Commit hash(es)\n- Worker: `1db4a69d38b4ce0cd555de2776f60b5231d94627`\n\
+      - Main squash: `6dfd0ae`"
   - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
     name: fix-readme-secret-cli-regression
     status: done
