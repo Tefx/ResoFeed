@@ -19258,6 +19258,7 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+    agent: spec-verifier
   - id: manual-rss-fetch.uiux-audit
     name: Strict UI/UX Audit Against ui-preview
     status: pending
