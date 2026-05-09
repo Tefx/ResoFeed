@@ -10687,7 +10687,7 @@ phases:
     agent: software-architect
   - id: finalization-docs-and-deep-review.final-design-contract-review
     name: Final DESIGN contract review
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10761,6 +10761,73 @@ phases:
     agent: design-reviewer
     claimed_by: design-reviewer
     claimed_at: '2026-05-09T12:11:39.653527+00:00'
+    done_at: '2026-05-09T12:14:58.221456+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — canonical docs are ARCHITECTURE/DESIGN; UI dense/legible,
+      functional-label-only, avoid folders/tags/unread/mark-all-read/settings flows.
+
+      - docs/ARCHITECTURE.md — frontend must render DESIGN.md surfaces, show owner-token
+      prompt before `/api/*`, keep Steer/Source Ledger/state portability terse, avoid
+      folders/tags/settings dashboards/RAG/vector surfaces.
+
+      - docs/PRD.md — first-run utilitarian; search lexical/retrieval not fourth top-level
+      tab/RAG; non-goals forbid accounts/onboarding/folders/unread/archive/settings/vectors.
+
+      - docs/DESIGN.md — canonical design covers owner-token prompt, first-use empty
+      state, dense feed/Inspector/Source Ledger/state/search surfaces, accessibility
+      states, motion/no-layout-shift, wireframe, anti-slop constraints.
+
+      - docs/DESIGN_VISION.md — archival high-density low-fatigue workbench; no cute
+      errors/account/onboarding/numeric indicators/activity logs.
+
+      - docs/USAGE.md — UI token prompt, first-use loop, Inspect/Resonate/Steer behavior,
+      flat Source Ledger, state import/export, raw `/doctor`, forbidden surfaces.
+
+
+      ## Design Contract Review Report
+
+      - Worker headline: PASS_WITH_DEBT; semantic PASS; blockers [].
+
+      - Lint result: `npx @google/design.md lint docs/DESIGN.md` returned 0 errors/0
+      warnings/1 info.
+
+      - Token integrity: PASS; front matter valid; token references resolve; spot
+      contrast checks passed.
+
+      - Surface coverage: PASS; DESIGN.md covers Owner Token Prompt, First-Use Empty
+      State, Steer, Feed/Resonate, Inspector, Source Ledger/state portability, Diagnostics,
+      Search, motion, wireframe.
+
+      - Accessibility review: PASS; contract specifies focus, aria-live, names, live
+      regions, labels, 44px targets, non-color star/status semantics, no layout shift,
+      reduced motion.
+
+      - Rendered evidence reviewed: uiux-auditor PASS artifacts, frontend gate render
+      proof, semantic closure register, full-plan verification sweep.
+
+      - Findings: one SHOULD_FIX evidence freshness item only—local `npm --prefix
+      web test` in isolated worktree lacked dependencies (`svelte-kit` unavailable);
+      prior full-plan artifact and mainline rerun cover it.
+
+      - Product implementation files modified: false; gate_open_allowed true; orchestrator_action_hint
+      COMPLETE.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran after worker completion in main: `npx @google/design.md lint docs/DESIGN.md
+      && npm --prefix web ci && npm --prefix web test && npm --prefix web run build`.
+
+      - Output: DESIGN lint 0 errors/0 warnings/1 info; npm ci installed 150 packages;
+      svelte-check 0 errors/0 warnings; vitest 2 files/16 tests passed; web production
+      build succeeded.
+
+
+      ## Gaps/Notes
+
+      - Non-blocking debt only: npm audit reports 3 low-severity dependency findings;
+      no blocking design drift.'
   - id: finalization-docs-and-deep-review.final-black-box-verification
     name: Final black box verification
     status: pending
