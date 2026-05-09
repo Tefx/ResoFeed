@@ -4266,7 +4266,7 @@ phases:
       \ sufficient behavioral proof"
   - id: runtime-api-and-mcp-integration.runtime-wiring-audit
     name: Runtime wiring audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -4337,6 +4337,141 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T09:16:39.467810+00:00'
+    done_at: '2026-05-09T09:26:26.474684+00:00'
+    evidence: "## Wiring Audit Report\n\n**Semantic outcome:** FAIL report delivered;\
+      \ blocker-class issue was batched into remediation before completion.\n\n###\
+      \ Orchestrator Remediation Ownership\n- Parallel failure aggregation applied\
+      \ for `runtime-api-and-mcp-integration.runtime-spec-conformance` and `runtime-api-and-mcp-integration.runtime-wiring-audit`.\n\
+      - Planner created batched fix step: `runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring`.\n\
+      - Planner created retest step: `runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring`.\n\
+      - Planner updated runtime gate dependency to include the retest.\n\n### Orchestrator\
+      \ Mainline Final-State Barrier\n- Worker branch had no local modifications (`git\
+      \ status --short` clean).\n- Squash merge result: `Already up to date. (nothing\
+      \ to squash)`.\n- Mainline verification command: `go test ./...`\n```text\n\
+      ?   \tresofeed/cmd/resofeed\t[no test files]\nok  \tresofeed/internal/resofeed\t\
+      (cached)\n```\n\n## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — READ. Key passage: one Go binary (`cmd/resofeed`) runs static assets, JSON\
+      \ HTTP, MCP Streamable HTTP, and background ingest; no sync coordinator/state\
+      \ merger/conflict resolver; HTTP and MCP expose same product operations.\n-\
+      \ docs/ARCHITECTURE.md — READ. Key passage: `resofeed serve` must start SQLite\
+      \ migrations, static UI, JSON HTTP API, `/mcp`, and ingest loop; documented\
+      \ HTTP endpoints are in §6 and MCP resources/tools in §7.\n- docs/PRD.md — READ.\
+      \ Key passage: external agents require MCP over remote Streamable HTTP, with\
+      \ retrieve/search/inspect/resonate/steer/report-delivery capabilities; no delivery-channel\
+      \ ownership or complex holding queues.\n- docs/DESIGN.md — READ. Key passage:\
+      \ owner-token prompt, Today feed, Inspector, Source Ledger, State Portability,\
+      \ and Search are production UI surfaces; no onboarding/settings/dashboard/activity-ledger\
+      \ creep.\n- docs/DESIGN_VISION.md — READ. Key passage: three primitives are\
+      \ Inspect, Resonate, Steer; no folders, numeric indicators, hidden queues, or\
+      \ friendly SaaS error states.\n- docs/USAGE.md — READ. Key passage: `serve`\
+      \ starts web UI, JSON HTTP API, MCP at `/mcp`, background ingestion, SQLite\
+      \ open/migrate, and static asset serving; target MCP resources/tools are listed.\n\
+      \n## Wiring Audit Findings\nHeadline: FAIL — runtime/API/MCP server wiring is\
+      \ statically reachable from `resofeed serve`, but production frontend route\
+      \ wiring still imports and renders `*ContractStub` components for documented\
+      \ UI surfaces, violating the no-stub production dependency check.\nStatus: red\n\
+      Verdict: FAIL\nAction hint: DO_NOT_COMPLETE until production `ContractStub`\
+      \ dependencies are removed or renamed/replaced with real wired components.\n\
+      \n### W13 Entry-to-Effect Trace\n- CLI entrypoint trace: `cmd/resofeed/main.go:13`\
+      \ calls `resofeed.Main(...)`.\n- Runtime shell trace: `internal/resofeed/db.go:31-59`\
+      \ accepts only `serve`, parses flags, validates config, then calls `runServe`.\n\
+      - Real I/O trace:\n  - SQLite: `runServe` opens DB at `internal/resofeed/db.go:163`,\
+      \ runs migrations at `170`, resolves owner token at `175`.\n  - Gemini: `runServe`\
+      \ creates real Gemini client at `188`.\n  - HTTP/MCP: `runServe` calls `ServeHTTPRuntime`\
+      \ at `195`; `ServeHTTPRuntime` constructs `http.Server{Addr: cfg.Addr, Handler:\
+      \ NewRouter(cfg)}` and calls `ListenAndServe()` at `internal/resofeed/http.go:85-90`.\n\
+      \  - Ingest: `runServe` starts `RunIngestLoop` at `internal/resofeed/db.go:197-199`;\
+      \ `RunIngestLoop` uses a real `time.NewTicker` and `IngestOnce` at `internal/resofeed/ingest.go:44-63`.\n\
+      - Classification: runtime shell is WIRED to real I/O primitives; not a hollow/stub\
+      \ runtime.\n\n### HTTP route registration\n- Router registration: `internal/resofeed/http.go:38-44`\
+      \ registers `/api/`, `/mcp`, and `/`.\n- Documented HTTP endpoints are statically\
+      \ dispatched:\n  - `GET /api/feed/today` — `http.go:123-124` → `handleToday`\
+      \ → `ListTodayFeed` at `http.go:169`.\n  - `GET /api/search` — `http.go:125-126`\
+      \ → `SearchItems` at `http.go:182`.\n  - `GET /api/sources` — `http.go:127-128`\
+      \ → `listSources`.\n  - `POST /api/sources/import-opml` — `http.go:129-130`\
+      \ → `ImportOPML` at `http.go:304`.\n  - `GET /api/state/export` — `http.go:131-132`\
+      \ → `ExportState` at `http.go:314`.\n  - `POST /api/state/import` — `http.go:133-134`\
+      \ → `ImportState` at `http.go:331`.\n  - `GET /api/doctor` — `http.go:135-136`\
+      \ → `WriteDoctor` at `http.go:342`.\n  - `POST /api/steer` — `http.go:137-138`\
+      \ → `ApplySteering` at `http.go:265`.\n  - `GET /api/items/{id}`, `POST /api/items/{id}/inspect`,\
+      \ `POST /api/items/{id}/resonance` — dynamic item subrouter at `http.go:190-235`.\n\
+      \  - `DELETE /api/sources/{id}` — `http.go:141-142` → `DeleteSource` at `http.go:288`.\n\
+      - Classification: HTTP routes WIRED statically; runtime execution not performed\
+      \ per static-only constraint.\n\n### MCP tool/resource registration\n- `/mcp`\
+      \ mounted by HTTP router: `internal/resofeed/http.go:42`.\n- MCP handler: `internal/resofeed/mcp.go:30-32`.\n\
+      - MCP JSON-RPC dispatch supports `initialize`, `tools/list`, `resources/list`,\
+      \ `resources/read`, `tools/call`: `mcp.go:308-324`.\n- Resources wired: `resofeed://feed/today`,\
+      \ `resofeed://rules/active`, `resofeed://system/doctor`, `resofeed://sources`\
+      \ via `mcp.go:338-363`, resource list `mcp.go:667-674`.\n- Tools wired: `list_candidate_items`,\
+      \ `search_items`, `read_item`, `mark_inspected`, `resonate_item`, `steer`, `report_delivery`\
+      \ via `mcp.go:387-434`, tool list `mcp.go:620-629`.\n- Classification: MCP tools/resources\
+      \ WIRED statically; runtime MCP client execution not performed.\n\n### Config/flag\
+      \ consumption\n- CLI flags registered in non-test code: `--addr`, `--public-url`,\
+      \ `--db`, `--gemini-api-key`, `--gemini-model`, `--owner-token` at `internal/resofeed/db.go:72-81`.\n\
+      - Consumption: `Addr` → `HTTPServerConfig.Addr` → `http.Server.Addr`; `DBPath`\
+      \ → `OpenDB`; `GeminiAPIKey` + `GeminiModel` → `NewGeminiClient`; `OwnerToken`\
+      \ → `ResolveOwnerToken` then HTTP/MCP auth.\n- Classification: WIRED; `public-url`\
+      \ consumption is weak/log/config-only, with no observed behavior beyond advertised\
+      \ URL logging.\n\n### Stub/placeholder scan\n- Production Go runtime/API/MCP\
+      \ scan found no `RuntimeStub`, `PrivateRuntime`, `Placeholder`, state merger,\
+      \ conflict resolver, sync coordinator, or `@invar:allow` in `cmd/` or `internal/`.\n\
+      - BLOCKER: production frontend route imports and renders stub-named documented\
+      \ surface components:\n  - `web/src/routes/+page.svelte:7-11` imports `FeedContractStub`,\
+      \ `InspectorContractStub`, `SourceLedgerContractStub`, `StatePortabilityContractStub`,\
+      \ `SearchRetrievalContractStub`.\n  - `web/src/routes/+page.svelte:108,114,121-123`\
+      \ renders those components in the production route.\n  - Stub behavior evidence:\
+      \ `FeedContractStub.svelte:36-39`, `SourceLedgerContractStub.svelte:13-15`,\
+      \ `33-35`, `StatePortabilityContractStub.svelte:17-24`, `30-34`, `SearchRetrievalContractStub.svelte:12-29`.\n\
+      - Classification: runtime/API/MCP stubs absent; production UI documented surfaces\
+      \ PARTIAL/STUB-WIRED. This is a blocker for the no `_Stub*` / placeholder production\
+      \ dependency check.\n\n### Escape hatch audit results\n- Source scan fallback\
+      \ found `@invar:allow`/`invar:allow` only in `plan.yaml`, not in production\
+      \ Go/web source. No production escape-hatch concentration found.\n\n## Findings\n\
+      - Severity: BLOCKER\n  Title: Production UI route still renders ContractStub\
+      \ components for documented surfaces.\n  Call Chain: `resofeed serve` → `ServeHTTPRuntime`\
+      \ (`internal/resofeed/http.go:85-90`) → `NewRouter` static UI handler (`http.go:43`)\
+      \ → built Svelte route `web/src/routes/+page.svelte` → `FeedContractStub`/`InspectorContractStub`/`SourceLedgerContractStub`/`StatePortabilityContractStub`/`SearchRetrievalContractStub`.\n\
+      \  Evidence:\n    - Imports: `web/src/routes/+page.svelte:7-11`.\n    - Renders:\
+      \ `web/src/routes/+page.svelte:108`, `114`, `121-123`.\n    - Local-only mutation/search\
+      \ examples: `FeedContractStub.svelte:36-39`, `SourceLedgerContractStub.svelte:13-15`,\
+      \ `33-35`, `StatePortabilityContractStub.svelte:17-24`, `30-34`, `SearchRetrievalContractStub.svelte:12-29`.\n\
+      \  Impact: The HTTP/MCP backend can be wired while the served production UI\
+      \ presents documented surfaces that are not end-to-end wired to backend behavior.\
+      \ This violates the no-stub production dependency check.\n  Smallest verification\
+      \ check: replace/remove `*ContractStub` production imports and statically grep\
+      \ `web/src/routes/+page.svelte` plus component tree for `ContractStub|Stub`;\
+      \ then verify UI actions call `ResoFeedApiClient` methods for resonance, inspect,\
+      \ source delete/import, state export/import, and search.\n\n## Verification\
+      \ Run\nCommand: `pwd && git status --short && git grep -n -E 'resofeed\\.Main\\\
+      (|func Main\\(|runServe\\(|ServeHTTPRuntime\\(|NewRouter\\(|NewMCPHandler\\\
+      (|mux\\.Handle\\(\"/mcp\"|case r\\.Method == http\\.Method|case \"(list_candidate_items|search_items|read_item|mark_inspected|resonate_item|steer|report_delivery|resofeed://feed/today|resofeed://rules/active|resofeed://system/doctor|resofeed://sources)\"\
+      |StringVar\\(&cfg\\.(Addr|PublicURL|DBPath|GeminiAPIKey|GeminiModel|OwnerToken)'\
+      \ -- cmd internal web/src/routes/+page.svelte web/src/lib/api-client.ts && git\
+      \ grep -n -E '(RuntimeStub|PrivateRuntime|Placeholder|ContractStub|Stub|state\
+      \ merger|conflict resolver|sync coordinator|@invar:allow|invar:allow)' -- cmd\
+      \ internal web/src || true`\nExit Code: 0\nNotes: Static grep only; no app/tests\
+      \ executed.\n\n## Artifacts Modified\nNone. Verify-only audit; no product/code/docs\
+      \ files modified and no commit created.\n\n## Semantic Closure Fields\nstep_intent:\
+      \ retest_green\nexpected_result: green\nobserved_result: red\nfailure_alignment:\
+      \ new blocker\nverdict: FAIL\nblockers:\n  - Production `web/src/routes/+page.svelte`\
+      \ imports/renders `*ContractStub` components for documented UI surfaces, with\
+      \ local-only behavior.\nproof_gap_status: BLOCKING\nblocking_status: OPEN\n\
+      gate_open_allowed: false\norchestrator_action_hint: DO_NOT_COMPLETE\nproduct_implementation_files_modified:\
+      \ false\nbehavioral_proof_register:\n  - check: CLI entrypoint invokes real\
+      \ runtime shell\n    proof: `cmd/resofeed/main.go:13` → `internal/resofeed/db.go:31-59`\
+      \ → `runServe`\n    uncertainty: NONE\n  - check: HTTP routes registered/reachable\
+      \ from serve\n    proof: `db.go:195` → `ServeHTTPRuntime`; `http.go:38-44`;\
+      \ endpoint switch at `http.go:123-142`\n    uncertainty: NEEDS_TEST — static\
+      \ only, no server run\n  - check: MCP tools/resources registered/reachable from\
+      \ `/mcp`\n    proof: `http.go:42`; `mcp.go:308-324`, `338-363`, `387-434`, `620-629`,\
+      \ `667-674`\n    uncertainty: NEEDS_TEST — static only, no MCP client run\n\
+      \  - check: Config/flag fields consumed by runtime code\n    proof: `db.go:72-81`,\
+      \ `163`, `175`, `188-189`, `201`; auth uses token/hash in `http.go:148-162`,\
+      \ `mcp.go:293-306`\n    uncertainty: NON_BLOCKING — `public-url` is weak/log-only\
+      \ consumption\n  - check: No placeholder/stub production dependency remains\n\
+      \    proof: No Go runtime stubs found, but `web/src/routes/+page.svelte:7-11,108,114,121-123`\
+      \ wires `*ContractStub`\n    uncertainty: UNCERTAIN_BLOCKING — blocker if UI\
+      \ is considered served production surface, which static route evidence supports"
   - id: runtime-api-and-mcp-integration.runtime-gate
     name: Runtime gate
     status: pending
