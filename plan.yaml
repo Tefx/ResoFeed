@@ -18581,3 +18581,10 @@ phases:
       ## Gaps/Notes
 
       - none.'
+- id: manual-rss-fetch
+  name: Manual RSS Fetch
+  status: pending
+  gate: Manual RSS fetch backend, frontend, visual compliance, and runtime behavior
+    are independently verified before release.
+  depends_on:
+  - openrouter-llm-verification-and-live-smoke
