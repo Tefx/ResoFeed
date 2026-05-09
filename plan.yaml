@@ -13932,3 +13932,138 @@ phases:
     and ready as the required foundation before OpenRouter migration.
   depends_on:
   - finalization-docs-and-deep-review
+  steps:
+  - id: runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+    name: lock-runtime-secret-source-policy
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: docs, runtime secret-source contract, redaction rules, acceptance
+      checklist
+
+      agent_source: project
+
+
+      Lock the runtime LLM secret-source policy before any implementation or OpenRouter
+      migration work.
+
+
+      Scope and touch_paths:
+
+      - docs/ARCHITECTURE.md: define runtime-only LLM secret source policy, precedence,
+      and non-persistence/non-export/non-logging guarantees.
+
+      - docs/USAGE.md: document safe local configuration via OS environment variables
+      and local .env files without putting real API keys in shell history.
+
+      - AGENTS.md or equivalent project instructions: preserve canonical secret-handling
+      guardrails for future execution agents.
+
+
+      Authoritative constraints:
+
+      - Preserve one Go binary (`cmd/resofeed`) and flat `internal/resofeed/` implementation
+      shape.
+
+      - Do NOT add DI containers, config services, sidecars, service/repository/event-bus
+      layers, accounts/OAuth/RBAC, vector DB/RAG, sync/merge/activity/history concepts,
+      or portable agent receipts.
+
+      - Secret config is runtime input only: never persisted to SQLite, never exported
+      in state bundles, never logged, and never committed in artifacts.
+
+      - `.env` is local runtime input only. This step must not require reading, printing,
+      or committing actual `.env` contents.
+
+
+      Contract to lock for the current Gemini path:
+
+      - Add runtime secret resolution before LLM provider construction.
+
+      - Support `GEMINI_API_KEY` from OS environment and local `.env` fallback.
+
+      - Preserve existing current Gemini CLI secret flag behavior only as a compatibility
+      override if it already exists; document CLI secret flags as discouraged and
+      transitional rather than silently removing current behavior in this inserted
+      phase.
+
+      - Precedence: explicit current CLI flag value, if still present, overrides OS
+      environment; OS environment overrides `.env`; `.env` is fallback; empty or whitespace
+      values are invalid.
+
+      - Any decision to deprecate/remove the current Gemini CLI key flag in this phase
+      is an architecture decision requiring user confirmation; do not make that change
+      silently.
+
+
+      Contract to lock for future OpenRouter migration:
+
+      - OpenRouter work must reuse this secret-source contract instead of requiring
+      CLI-passed API keys.
+
+      - OpenRouter contract should lock `OPENROUTER_KEY` and/or `OPENROUTER_API_KEY`
+      naming explicitly before implementation.
+
+      - Future live smoke must use `.env` or OS environment with redacted evidence
+      only.
+
+      - Future docs must not regress to requiring CLI secret flags or examples that
+      put API keys in shell history.
+
+
+      `.env` parsing contract:
+
+      - Minimal parser only: `KEY=VALUE` lines, ignore blank lines and `#` comments.
+
+      - No shell expansion, no command substitution, no command execution, no sourcing
+      shell scripts.
+
+      - Values are trimmed only according to the locked contract; empty/whitespace-only
+      values are invalid.
+
+      - Parser errors must not include secret values.
+
+
+      This CONTRACT step may update docs/instructions/contracts only. It MUST NOT
+      ship runnable resolver logic or provider construction changes.'
+    verification: local-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and all downstream OpenRouter phases. Verify docs define precedence, `.env`
+      parser limits, redaction, non-persistence/non-export guarantees, current Gemini
+      compatibility behavior, and future OpenRouter reuse obligations without adding
+      new product architecture.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Evidence
+
+      - Secret-source precedence documented: CLI compatibility override (current Gemini
+      only, if existing) > OS env > .env fallback.
+
+      - Non-persistence/non-export/non-logging guarantees documented.
+
+      - `.env` local-runtime-only and no actual secret reading/printing/committing
+      documented.
+
+      - Future OpenRouter reuse obligation documented, including env/.env and redacted
+      evidence.
+
+      - Architecture decision note present if any CLI secret flag deprecation/removal
+      is proposed.
+
+      - Files changed limited to docs/instructions/contracts; no runnable resolver
+      logic shipped.'
+    agent: doc-reviewer
