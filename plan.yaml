@@ -8721,7 +8721,7 @@ phases:
       and remain non-blocking for this black-box acceptance pass.'
   - id: end-to-end-integration.end-to-end-wiring-audit
     name: End to end wiring audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -8795,6 +8795,68 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T10:56:05.866520+00:00'
+    done_at: '2026-05-09T11:22:09.185087+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary, one SQLite DB, owner-token boundary,
+      HTTP/MCP uniformity, and portable state limited to active sources/rules/resonated
+      items.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` starts static UI, JSON HTTP, MCP `/mcp`,
+      SQLite migrations, ingest loop; HTTP endpoints and MCP tools/resources are canonical.
+
+      - docs/PRD.md — AC-16 restorable JSON state bundle; AC-12 unauthorized agent
+      action rejection; core primitives Inspect/Resonate/Steer.
+
+      - docs/DESIGN.md — owner-token prompt before API calls; Source Ledger export/import
+      actions; no dashboards/settings bloat.
+
+      - docs/DESIGN_VISION.md — state portability as terse export/import actions;
+      no account/login/onboarding/settings bloat.
+
+      - docs/USAGE.md — UI sends Authorization header for every `/api/*`; public HTTP
+      and MCP surfaces.
+
+
+      ## Wiring Audit Report
+
+      - Worker result: static audit completed, semantic FAIL. Closure fields: `verdict:
+      FAIL`, `gate_open_allowed: false`, `orchestrator_action_hint: DO_NOT_COMPLETE`,
+      product implementation files modified: false.
+
+      - HTTP route reachability: statically wired from `cmd/resofeed/main.go` through
+      `runServe`, router, and handlers for feed/search/sources/state/doctor/steer/items.
+
+      - MCP reachability: `/mcp` mounted; resources and tools registered and dispatched.
+
+      - Frontend API trace: owner-token storage and Authorization header, calls to
+      today/item/inspect/resonance/steer/sources/search/state/doctor.
+
+      - State export/import path: UI component -> page callbacks -> API client ->
+      `/api/state/export` and `/api/state/import` -> HTTP handlers -> core state transaction/validation.
+
+      - Stub scan: no production stub terminus found.
+
+      - Blocking orphan/write-only finding: `items.value_tier` is generated and persisted
+      but not read/exposed/consumed by HTTP, MCP, frontend, or ranking paths. Impact:
+      item-understanding/value-tier output is unavailable at runtime.
+
+      - Non-blocking/debt noted: `SteerRule.SupersededBy` reserved/unset, internal
+      orphan exports, frontend state import behavioral test gap.
+
+      - Broad verifier disposition: `items.value_tier` write-only seam intersects
+      final gate and requires remediation; debt items included for same batched fix
+      where relevant.
+
+
+      ## Remediation Ownership Created
+
+      - Planner aggregated this failure with `end-to-end-integration.end-to-end-spec-conformance`
+      and added blocker remediation steps: `fix-end-to-end-blockers`, `retest-end-to-end-blockers`,
+      and updated `end-to-end-integration.end-to-end-gate` dependencies.
+
+      - This verification/audit step is complete as a blocker report; gate remains
+      blocked until remediation/retest closes the issues.'
   - id: end-to-end-integration.end-to-end-spec-conformance
     name: End to end spec conformance
     status: done
