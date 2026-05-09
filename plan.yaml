@@ -12423,7 +12423,7 @@ phases:
       \ behavior with OpenRouter env/.env secret source and chat completions contract."
   - id: openrouter-llm-contract-and-red-tests.define-product-integration-red-tests
     name: define-product-integration-red-tests
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
       \ red\nagent_source: project\n\nDefine expected-red Go/integration tests for\
       \ product behavior that must migrate from Gemini-shaped assumptions to the shared\
@@ -12468,6 +12468,49 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T17:46:37.444342+00:00'
+    done_at: '2026-05-09T17:51:42.574674+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — READ. Key passage: canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`;\
+      \ one Go binary/SQLite only; LLM secrets runtime-only; HTTP and MCP must expose\
+      \ the same product operations. `AGENTS.md` was not present in the isolated worktree.\n\
+      - docs/ARCHITECTURE.md — READ. Key passage: OpenRouter is the sole LLM backend;\
+      \ Go validates model JSON before state mutation; `/doctor` must use `openrouter:`\
+      \ and never print keys/provider config; portable state excludes LLM/provider/runtime\
+      \ config.\n- docs/DESIGN.md — READ. Key passage: `/doctor` is raw monospace\
+      \ operational text, not a dashboard; State Portability exports only active sources/rules/stars;\
+      \ UI primitives remain Inspect/Resonate/Steer.\n- docs/USAGE.md — READ. Key\
+      \ passage: OpenRouter key comes from runtime-only `OPENROUTER_KEY`; `/doctor`\
+      \ expected `openrouter:` line with configured/resolved model and no secrets.\n\
+      \n## Expected-Red Product Test Evidence\nstep_intent: test_define_red\nexpected_result:\
+      \ red\nobserved_result: red\nfailure_alignment: Expected-red failures isolate\
+      \ the current Gemini-shaped implementation: OpenRouter chat-completion responses\
+      \ are not parsed/persisted; `/doctor` still emits `gemini:` and lacks configured\
+      \ model/account-default OpenRouter text; runtime injection surfaces still expose\
+      \ `Gemini` instead of shared LLMClient/OpenRouter naming. Mainline run also\
+      \ includes the CLI/adapter expected-red failures already accepted from the sibling\
+      \ test step.\nverdict: PASS\nblockers: []\nproduct_implementation_files_modified:\
+      \ false\n- Modified files limited to tests/fixtures/helpers: yes, only `internal/resofeed/openrouter_product_integration_contract_test.go`.\n\
+      - Commands run by worker:\n  ```bash\n  gofmt -w internal/resofeed/openrouter_product_integration_contract_test.go\n\
+      \  go test ./internal/resofeed -run 'Test(OpenRouter|DoctorUsesOpenRouter|StateExportExcludesOpenRouter|HTTPAndMCPTransportParity)'\
+      \  # exit 1 expected red\n  ```\n- Mainline verification after merge:\n  ```bash\n\
+      \  go test ./internal/resofeed -run 'Test(OpenRouter|DoctorUsesOpenRouter|StateExportExcludesOpenRouter|HTTPAndMCPTransportParity)'\n\
+      \  ```\n  Exit 1 expected red with current Gemini-shaped implementation.\n-\
+      \ Expected failures or exposed_gaps:\n  - ingest summary/core insight: `TestOpenRouterChatCompletionSummaryResponseValidatesAndPersists`\
+      \ fails because OpenRouter chat-completion response content is not parsed into\
+      \ saved summary/core insight.\n  - steering HTTP/MCP/idempotency: HTTP/MCP shared\
+      \ fake-LLM path, idempotency retry, unsafe proposal rejection, and human-precedence\
+      \ coverage added.\n  - doctor openrouter raw text: `TestDoctorUsesOpenRouterPrefixAndNoGeminiRuntimeText`\
+      \ fails on current `gemini: ok` output and missing `openrouter:`/`configured_model=account_default`.\n\
+      \  - state export/import secret exclusion: runtime metadata/secret fake-key\
+      \ exclusion test added using fake values only.\n  - transport parity: HTTP/MCP\
+      \ parity assertions for Inspect, Resonate, Steer, Retrieve surfaces added.\n\
+      - Secret handling: no `OPENROUTER_KEY` read or printed; only fake keys/fixtures\
+      \ used.\n- Downstream implementation owner: `openrouter-llm-implementation.*`\n\
+      \n## Files changed\n- `internal/resofeed/openrouter_product_integration_contract_test.go`\n\
+      \n## Commit hash(es)\n- Worker: `cc85f17`\n- Main squash: `0dcf08c`\n\n## Gaps/Notes\n\
+      - Expected implementation follow-up must migrate product wiring and doctor output\
+      \ to OpenRouter/shared LLM surfaces while preserving HTTP/MCP parity and state\
+      \ secrecy."
   - id: openrouter-llm-contract-and-red-tests.contract-red-tests-gate
     name: contract-red-tests-gate
     status: pending
