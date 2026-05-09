@@ -14674,9 +14674,10 @@ phases:
       unresolved statuses, blocker/non-intersection rationale, and OPEN/BLOCK recommendation.'
     verification: phase-check protecting OpenRouter migration phases. PASS/OPEN requires
       complete evidence for contract, tests, implementation, smoke startup, redaction,
-      state non-portability, docs safety, and explicit OpenRouter dependency reuse.
-      BLOCK if any secret leakage, persistence/export, shell execution, architecture
-      expansion, or CLI-secret regression remains.
+      state non-portability, docs safety, README/API-key shell-history regression
+      retest closure, and explicit OpenRouter dependency reuse. BLOCK if any secret
+      leakage, persistence/export, shell execution, architecture expansion, unresolved
+      gate_open_allowed=false, or CLI-secret regression remains.
     evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
       \ of phase implementation)\n**Phase**: runtime-secret-env-config-foundation\n\
       **Timestamp**: <ISO 8601>\n\n## refs Read Confirmation (MANDATORY)\n\nFor each\
@@ -14712,6 +14713,7 @@ phases:
     - runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     - runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+    - runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
     agent: gate-reviewer
   - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
     name: fix-readme-secret-cli-regression
