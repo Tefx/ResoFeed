@@ -16262,7 +16262,7 @@ phases:
     agent: gate-reviewer
   - id: openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
     name: fix-startup-validation-order
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
       verification_scope: phase-check protecting final OpenRouter gate\n\nFix B1 startup\
       \ validation-order divergence reported by `openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit`\
@@ -16388,6 +16388,8 @@ phases:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
     - openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T19:06:27.063182+00:00'
 - id: runtime-secret-env-config-foundation
   name: Runtime Secret Env Config Foundation
   status: done
