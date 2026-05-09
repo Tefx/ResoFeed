@@ -19354,7 +19354,7 @@ phases:
     - manual-rss-fetch.uiux-audit
   - id: backend-contract
     name: Backend Contract Lock
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - HTTP endpoint contracts\n  - response schemas\n  - concurrency guard contract\n\
       \  - acceptance-only test seams\nagent_source: project\nwork_type: new_capability\n\
@@ -19429,6 +19429,79 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T21:18:12.809389+00:00'
+    done_at: '2026-05-09T21:21:52.289839+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — Read. Key passages: §1 decisions require one Go process,
+      one SQLite DB, one backend package in `internal/resofeed`, owner-token auth
+      for every `/api/*`, and no queues/services/repositories/event buses; §5.1 says
+      feed failures affect only that source; §6 defines auth, strict query validation,
+      JSON error body, and HTTP error matrix.
+
+      - docs/PRD.md — Read. Key passages: Manual/source intent is RSS intelligence
+      without inbox/queue mechanics; §7.1 says source failures must not block other
+      sources; §6.3 says missing/invalid owner-token authority must not create holding
+      queues/moderation workflows; explicit non-goals include holding queues and extensive
+      activity ledgers.
+
+      - AGENTS.md — NOT READ: `AGENTS.md` was not present inside the isolated worktree
+      `.vectl/worktrees/backend-contract` (`glob AGENTS.md` returned no files). Used
+      `.agents/instructions.md` instead where present.
+
+      - .agents/instructions.md — Read. Key passages: one deployable, one SQLite DB,
+      flat `internal/resofeed`, owner token as universal delegation boundary, strict
+      HTTP validation, and forbidden sync/merge/ledger/service/repository/DI/event-bus
+      expansions.
+
+
+      ## Contract Evidence
+
+      - Contract artifacts changed: `internal/resofeed/manual_fetch_contract.go`,
+      `internal/resofeed/manual_fetch_contract_test.go`
+
+      - Endpoint/request contract pinned: `POST /api/ingest`; `POST /api/sources/{id}/fetch`;
+      both require owner token, no query parameters, `application/json`, and exactly
+      `{}` as request body.
+
+      - Status/response mapping pinned: `200` request-level `ManualFetchResult`; zero-active
+      global ingest completed true, zero counts, `errors: []`; source RSS failures
+      request-level `200` with source-level `errors`; missing/deleted/inactive source
+      `404 not_found`; auth `401 unauthorized`; bad body/query `400 bad_request`;
+      overlap `409 conflict`.
+
+      - Concurrency guard contract pinned: single in-process guard across background
+      ingest, global manual ingest, and per-source fetch; manual overlap returns `409
+      conflict`; no queued work; release guaranteed on normal completion, returned
+      error, and panic/recover path.
+
+      - Forbidden architecture expansions excluded: durable queue, job table, receipt
+      ledger, sync coordinator, service layer, repository layer, DI container, event
+      bus.
+
+      - Implementation logic introduced: NONE required; only constants, acceptance-only
+      schema markers, doc comments, and schema/contract tests were added.
+
+      - Conflict/Deviation notes: `docs/ARCHITECTURE.md §6` lists common errors without
+      `conflict`; this step requires `409 conflict`, so step description was preferred.
+      Endpoint table does not yet list the manual fetch endpoints; step description
+      was authoritative for this contract step.
+
+      - Worker commit: `6629910 contract: pin manual RSS fetch backend surface`.
+
+      - Squash merge commit on main: `33cee62 [vectl] step-backend-contract completed`.
+
+      - Worker verification: `gofmt -w internal/resofeed/manual_fetch_contract.go
+      internal/resofeed/manual_fetch_contract_test.go && go test ./...` exit 0; `go
+      build ./cmd/resofeed` exit 0; `golangci-lint run ./...` exit 0.
+
+      - Mainline final-state verification after merge: `go test ./... && go build
+      -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-backend-contract
+      ./cmd/resofeed && golangci-lint run ./...` exit 0; output included `ok resofeed/internal/resofeed
+      0.675s` and `0 issues.`
+
+      - Gaps/Notes: `AGENTS.md` missing from isolated worktree; `.agents/instructions.md`
+      was read. Build artifact was directed to temp path during mainline verification.'
   - id: backend-expected-red-tests
     name: Backend Expected-Red Contract Tests
     status: pending
