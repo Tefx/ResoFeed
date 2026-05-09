@@ -12150,3 +12150,11 @@ phases:
       \ is primarily proven by code ordering plus response tests, not side-effect\
       \ counters for every read endpoint; accepted as non-blocking because implementation\
       \ calls query rejection before no-query handlers."
+- id: openrouter-llm-migration
+  name: OpenRouter LLM Migration
+  status: pending
+  gate: ResoFeed migrates from Gemini to OpenRouter while preserving the single-binary
+    architecture, JSON transformer contract, HTTP/MCP parity, owner-token boundary,
+    and complete local plus live/smoke system evidence.
+  depends_on:
+  - finalization-docs-and-deep-review
