@@ -3460,7 +3460,7 @@ phases:
       ownership, vector/RAG, sync/merge, or activity ledger was added.'
   - id: runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     name: Complete serve runtime lifecycle
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -3607,6 +3607,8 @@ phases:
     - runtime-api-and-mcp-integration.complete-http-api-handlers
     - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T07:21:25.942634+00:00'
   - id: runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     name: Early runtime vertical slice proof
     status: pending
