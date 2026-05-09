@@ -10465,7 +10465,7 @@ phases:
       PASS'
   - id: finalization-docs-and-deep-review.final-wiring-audit
     name: Final wiring audit
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10533,6 +10533,71 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T12:03:29.210455+00:00'
+    done_at: '2026-05-09T12:19:44.771305+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary, one SQLite DB, owner-token boundary,
+      no sync/merge/history/accounts/RAG; plan mutation restricted.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` is the single runtime command wiring
+      static UI, JSON HTTP API, `/mcp`, migrations, owner token, and ingest loop;
+      HTTP/MCP share product operations.
+
+      - docs/PRD.md — core primitives are Inspect, Resonate, Steer; agent mutations
+      must tolerate retries without duplicate effects; forbidden accounts/activity
+      ledgers/archive/vector/RAG.
+
+      - docs/DESIGN.md — owner token prompt before API calls; Source Ledger flat;
+      state portability current active sources/rules/stars only; no settings/activity
+      surfaces.
+
+      - docs/DESIGN_VISION.md — high-density analyst workbench; no accounts/onboarding/numeric
+      indicators/activity logs; `/doctor` raw diagnostics.
+
+      - docs/USAGE.md — usage lists only `serve` and documented flags; lists HTTP/MCP
+      surfaces.
+
+
+      ## Deep Wiring Audit Report
+
+      - Worker verdict: FAIL; gate_open_allowed false; product implementation files
+      modified false.
+
+      - Public export/CLI/runtime/HTTP/MCP/frontend/config/stub scans mostly PASS/PASS_WITH_DEBT.
+
+      - Blocking finding: `HTTP_IDEMPOTENCY_KEY_WRITE_ONLY` — HTTP mutation `idempotency_key`
+      is validated but not consumed for idempotency semantics.
+
+      - Affected endpoints: `POST /api/items/{id}/inspect`, `POST /api/items/{id}/resonance`,
+      `POST /api/steer`.
+
+      - Evidence: validation in `internal/resofeed/http.go:589-600`; handlers validate
+      then call core mutations at `http.go:321-330`, `337-345`, `374-383`; core mutations
+      in `ranking.go` do not persist/replay idempotency; MCP receipt helper exists
+      at `mcp.go:485-508`.
+
+      - Impact: HTTP retries can duplicate/alter effects; HTTP/MCP parity and documented
+      idempotency contract are broken.
+
+
+      ## Remediation Ownership Created
+
+      - Planner added/strengthened remediation steps: `fix-http-idempotency-wiring`
+      and `retest-http-idempotency-wiring`.
+
+      - Fix step is responsible for HTTP idempotency persistence/replay across inspect/resonance/steer
+      with tests while preserving ResoFeed invariants.
+
+      - Retest step is responsible for duplicate HTTP mutation smoke, final wiring
+      audit rerun, and closure fields.
+
+      - This audit step is complete as a blocker report; downstream finalization remains
+      blocked until remediation/retest closes the issue.
+
+
+      ## Headline
+
+      FAIL'
   - id: finalization-docs-and-deep-review.final-spec-conformance-audit
     name: Final spec conformance audit
     status: pending
