@@ -75,32 +75,32 @@ func TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency(t *testing.T) {
 	}
 }
 
-func TestMCPSteerUsesConfiguredGeminiAndReceipts(t *testing.T) {
+func TestMCPSteerUsesConfiguredOpenRouterAndReceipts(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
-	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Gemini translated systems policy."}, Message: "gemini steering updated"}}
-	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})
+	llm := &recordingSteeringGemini{out: OpenRouterSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"OpenRouter translated systems policy."}, Message: "openrouter steering updated"}}
+	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
 
-	first := mcpToolJSON[SteerResult](t, handler, "steer", map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "steer-gemini-001"})
-	if first.Receipt.InterpretedAs != "gemini_policy_update" || first.Receipt.Message != "gemini steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "Gemini translated systems policy." {
-		t.Fatalf("first steer receipt = %+v, want Gemini translated policy", first.Receipt)
+	first := mcpToolJSON[SteerResult](t, handler, "steer", map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "steer-openrouter-001"})
+	if first.Receipt.InterpretedAs != "openrouter_policy_update" || first.Receipt.Message != "openrouter steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "OpenRouter translated systems policy." {
+		t.Fatalf("first steer receipt = %+v, want OpenRouter translated policy", first.Receipt)
 	}
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini TranslateSteering calls = %d, want 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter TranslateSteering calls = %d, want 1", got)
 	}
-	second := mcpToolJSON[SteerResult](t, handler, "steer", map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "steer-gemini-001"})
+	second := mcpToolJSON[SteerResult](t, handler, "steer", map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "steer-openrouter-001"})
 	if second.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(second.Receipt.ChangedRules) != 1 {
 		t.Fatalf("idempotent steer receipt = %+v, want stored first receipt", second.Receipt)
 	}
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini calls after idempotent retry = %d, want still 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter calls after idempotent retry = %d, want still 1", got)
 	}
 	unauthorized := httptest.NewRecorder()
 	body := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"steer","arguments":{"command":"Push more databases.","actor_id":"briefing-agent","idempotency_key":"steer-no-auth"}}}`
 	handler.ServeHTTP(unauthorized, httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(body)))
 	assertStatus(t, unauthorized, http.StatusUnauthorized)
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini calls after unauthorized request = %d, want still 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter calls after unauthorized request = %d, want still 1", got)
 	}
 }
 
@@ -142,15 +142,15 @@ func TestMCPRealBoundListenerInitializeResourcesAndTools(t *testing.T) {
 	}
 }
 
-func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.T) {
+func TestMCPRealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
-	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Gemini translated systems policy."}, Message: "gemini steering updated"}}
+	llm := &recordingSteeringGemini{out: OpenRouterSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"OpenRouter translated systems policy."}, Message: "openrouter steering updated"}}
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})}
+	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})}
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- server.Serve(listener)
@@ -166,15 +166,15 @@ func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.
 		}
 	})
 	baseURL := "http://" + listener.Addr().String() + "/mcp"
-	payload := map[string]any{"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": map[string]any{"name": "steer", "arguments": map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "bound-steer-gemini-001"}}}
+	payload := map[string]any{"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": map[string]any{"name": "steer", "arguments": map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "bound-steer-openrouter-001"}}}
 
 	firstResp := mcpHTTPPost(t, baseURL, payload)
 	first := mcpToolResultJSON[SteerResult](t, firstResp, "steer")
-	if first.Receipt.InterpretedAs != "gemini_policy_update" || first.Receipt.Message != "gemini steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "Gemini translated systems policy." {
-		t.Fatalf("first bound steer receipt = %+v, want configured Gemini translated policy", first.Receipt)
+	if first.Receipt.InterpretedAs != "openrouter_policy_update" || first.Receipt.Message != "openrouter steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "OpenRouter translated systems policy." {
+		t.Fatalf("first bound steer receipt = %+v, want configured OpenRouter translated policy", first.Receipt)
 	}
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini TranslateSteering calls after first bound steer = %d, want 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter TranslateSteering calls after first bound steer = %d, want 1", got)
 	}
 
 	secondResp := mcpHTTPPost(t, baseURL, payload)
@@ -182,8 +182,8 @@ func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.
 	if second.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(second.Receipt.ChangedRules) != 1 || second.Receipt.ChangedRules[0].RuleText != first.Receipt.ChangedRules[0].RuleText {
 		t.Fatalf("idempotent bound steer receipt = %+v, want stored first receipt", second.Receipt)
 	}
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini TranslateSteering calls after bound retry = %d, want still 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter TranslateSteering calls after bound retry = %d, want still 1", got)
 	}
 
 	unauthorized := mcpHTTPPostWithToken(t, baseURL, payload, "wrong-owner-token")
@@ -191,8 +191,8 @@ func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.
 		t.Fatalf("unauthorized bound steer status = %d, want 401; body=%s", unauthorized.status, unauthorized.body)
 	}
 	assertErrorCode(t, unauthorized.body, "unauthorized")
-	if got := gemini.calls(); got != 1 {
-		t.Fatalf("Gemini TranslateSteering calls after unauthorized bound steer = %d, want still 1", got)
+	if got := llm.calls(); got != 1 {
+		t.Fatalf("OpenRouter TranslateSteering calls after unauthorized bound steer = %d, want still 1", got)
 	}
 }
 

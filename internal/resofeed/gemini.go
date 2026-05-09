@@ -15,8 +15,8 @@ import (
 // LLMClient is defined at the use boundary for the external JSON transformer.
 // The model never owns durable state, orchestration, or direct database writes.
 type LLMClient interface {
-	SummarizeItem(ctx context.Context, input GeminiSummaryInput) (GeminiSummaryOutput, error)
-	TranslateSteering(ctx context.Context, input GeminiSteeringInput) (GeminiSteeringOutput, error)
+	SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error)
+	TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error)
 }
 
 // GeminiClient is retained as a source-compatible alias for model transform test
@@ -48,9 +48,9 @@ type geminiHTTPClient struct {
 	client   *http.Client
 }
 
-func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummaryInput) (GeminiSummaryOutput, error) {
+func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	if strings.TrimSpace(input.AvailableText) == "" {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: available_text required")
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: available_text required")
 	}
 	prompt := map[string]any{
 		"task": "summarize_rss_item",
@@ -61,9 +61,9 @@ func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummar
 		},
 		"item": input,
 	}
-	var out GeminiSummaryOutput
+	var out OpenRouterSummaryOutput
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
-		return GeminiSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("openrouter summarize: %w", err)
+		return OpenRouterSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("openrouter summarize: %w", err)
 	}
 	out.Summary = strings.TrimSpace(out.Summary)
 	out.CoreInsight = strings.TrimSpace(out.CoreInsight)
@@ -73,17 +73,17 @@ func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummar
 		out.ModelStatus = "ok"
 	}
 	if out.ModelStatus != "ok" && out.ModelStatus != "summary_unavailable" && out.ModelStatus != "model_latency_error" {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
 	}
 	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: summary and core_insight required")
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: summary and core_insight required")
 	}
 	return out, nil
 }
 
-func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSteeringInput) (GeminiSteeringOutput, error) {
+func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	if strings.TrimSpace(input.Command) == "" {
-		return GeminiSteeringOutput{}, errors.New("openrouter steering: command required")
+		return OpenRouterSteeringOutput{}, errors.New("openrouter steering: command required")
 	}
 	prompt := map[string]any{
 		"task": "translate_steering",
@@ -94,9 +94,9 @@ func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSt
 		},
 		"steering": input,
 	}
-	var out GeminiSteeringOutput
+	var out OpenRouterSteeringOutput
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
-		return GeminiSteeringOutput{}, fmt.Errorf("openrouter steering: %w", err)
+		return OpenRouterSteeringOutput{}, fmt.Errorf("openrouter steering: %w", err)
 	}
 	out.InterpretedAs = strings.TrimSpace(out.InterpretedAs)
 	out.Message = strings.TrimSpace(out.Message)
@@ -104,7 +104,7 @@ func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSt
 		out.RuleTexts[i] = strings.TrimSpace(out.RuleTexts[i])
 	}
 	if out.InterpretedAs == "" || out.Message == "" {
-		return GeminiSteeringOutput{}, errors.New("openrouter steering: interpreted_as and message required")
+		return OpenRouterSteeringOutput{}, errors.New("openrouter steering: interpreted_as and message required")
 	}
 	return out, nil
 }
@@ -257,9 +257,9 @@ func stripJSONFence(text string) string {
 	return strings.TrimSpace(trimmed)
 }
 
-// GeminiSummaryInput is the summary transform request. It is populated only
+// OpenRouterSummaryInput is the summary transform request. It is populated only
 // after source text or fallback feed text exists.
-type GeminiSummaryInput struct {
+type OpenRouterSummaryInput struct {
 	ItemID        string `json:"item_id"`
 	Title         string `json:"title"`
 	SourceTitle   string `json:"source_title"`
@@ -267,26 +267,33 @@ type GeminiSummaryInput struct {
 	AvailableText string `json:"available_text"`
 }
 
-// GeminiSummaryOutput is validated before saving summary metadata.
-type GeminiSummaryOutput struct {
+// OpenRouterSummaryOutput is validated before saving summary metadata.
+type OpenRouterSummaryOutput struct {
 	Summary     string `json:"summary"`
 	CoreInsight string `json:"core_insight"`
 	ValueTier   string `json:"value_tier"`
 	ModelStatus string `json:"model_status"`
 }
 
-// GeminiSteeringInput asks Gemini to translate natural language only when Go
-// cannot deterministically classify a source URL or command.
-type GeminiSteeringInput struct {
+// OpenRouterSteeringInput asks OpenRouter to translate natural language only
+// when Go cannot deterministically classify a source URL or command.
+type OpenRouterSteeringInput struct {
 	Command     string      `json:"command"`
 	ActorKind   ActorKind   `json:"actor_kind"`
 	ActiveRules []SteerRule `json:"active_rules"`
 }
 
-// GeminiSteeringOutput is a proposal; Go validates product invariants and owns
-// the final SQLite transaction.
-type GeminiSteeringOutput struct {
+// OpenRouterSteeringOutput is a proposal; Go validates product invariants and
+// owns the final SQLite transaction.
+type OpenRouterSteeringOutput struct {
 	InterpretedAs string   `json:"interpreted_as"`
 	RuleTexts     []string `json:"rule_texts"`
 	Message       string   `json:"message"`
 }
+
+// Gemini* aliases are retained for source compatibility in older package-local
+// tests and helpers only. Runtime injection surfaces use LLMClient/OpenRouter.
+type GeminiSummaryInput = OpenRouterSummaryInput
+type GeminiSummaryOutput = OpenRouterSummaryOutput
+type GeminiSteeringInput = OpenRouterSteeringInput
+type GeminiSteeringOutput = OpenRouterSteeringOutput

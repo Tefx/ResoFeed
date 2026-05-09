@@ -105,16 +105,17 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		return applySourceURLSteering(ctx, db, parsedURL)
 	}
 
-	proposal := GeminiSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
+	proposal := OpenRouterSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
 	if llm != nil {
 		active, err := loadActiveSteerRules(ctx, db)
 		if err != nil {
 			return SteerResult{}, err
 		}
-		translated, err := llm.TranslateSteering(ctx, GeminiSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
+		translated, err := llm.TranslateSteering(ctx, OpenRouterSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
 		if err != nil {
 			return SteerResult{}, fmt.Errorf("translate steering: %w", err)
 		}
+		translated = normalizeOpenRouterSteeringOutput(translated)
 		if translated.InterpretedAs != "" {
 			proposal.InterpretedAs = translated.InterpretedAs
 		}
@@ -472,7 +473,7 @@ func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (
 	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added"}}, nil
 }
 
-func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteeringOutput, actorKind ActorKind, actorID string) (SteerResult, error) {
+func applySteeringRules(ctx context.Context, db *sql.DB, proposal OpenRouterSteeringOutput, actorKind ActorKind, actorID string) (SteerResult, error) {
 	if db == nil {
 		return SteerResult{}, errors.New("apply steering rules: db is nil")
 	}
@@ -512,6 +513,23 @@ func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteering
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "no_safe_policy_change", ChangedRules: []SteerRule{}, Message: "not applied: no safe product-valid steering rule remained"}}, nil
 	}
 	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: proposal.InterpretedAs, ChangedRules: changed, Message: proposal.Message}}, nil
+}
+
+func normalizeOpenRouterSteeringOutput(proposal OpenRouterSteeringOutput) OpenRouterSteeringOutput {
+	proposal.InterpretedAs = replaceLegacyProviderName(strings.TrimSpace(proposal.InterpretedAs))
+	proposal.Message = replaceLegacyProviderName(strings.TrimSpace(proposal.Message))
+	for i := range proposal.RuleTexts {
+		proposal.RuleTexts[i] = strings.TrimSpace(proposal.RuleTexts[i])
+	}
+	return proposal
+}
+
+func replaceLegacyProviderName(value string) string {
+	return strings.NewReplacer(
+		"Gemini", "OpenRouter",
+		"gemini", "openrouter",
+		"GEMINI", "OPENROUTER",
+	).Replace(value)
 }
 
 func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) {

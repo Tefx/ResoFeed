@@ -194,8 +194,8 @@ func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
 	db := newContractDB(t, ctx)
 	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
 	seedHTTPHandlerCorpus(t, ctx, db, now)
-	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Prioritize replicated storage papers."}, Message: "gemini steering updated"}}
-	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})
+	llm := &recordingSteeringGemini{out: OpenRouterSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Prioritize replicated storage papers."}, Message: "openrouter steering updated"}}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
 
 	t.Run("inspect replay returns stored timestamp and no duplicate receipt", func(t *testing.T) {
 		body := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"http-inspect-001"}`
@@ -232,26 +232,26 @@ func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
 		assertReceiptCount(t, ctx, db, "http-resonance-001", 1)
 	})
 
-	t.Run("steer replay returns first receipt and skips Gemini duplicate", func(t *testing.T) {
+	t.Run("steer replay returns first receipt and skips OpenRouter duplicate", func(t *testing.T) {
 		body := `{"command":"Push more replicated storage papers.","actor_kind":"human","actor_id":"owner","idempotency_key":"http-steer-001"}`
 		first := postHTTPJSON[SteerResult](t, router, "/api/steer", body, http.StatusOK)
-		if first.Receipt.InterpretedAs != "gemini_policy_update" || len(first.Receipt.ChangedRules) != 1 {
-			t.Fatalf("first steer = %+v, want Gemini-backed rule", first)
+		if first.Receipt.InterpretedAs != "openrouter_policy_update" || len(first.Receipt.ChangedRules) != 1 {
+			t.Fatalf("first steer = %+v, want OpenRouter-backed rule", first)
 		}
-		if got := gemini.calls(); got != 1 {
-			t.Fatalf("Gemini calls after first steer = %d, want 1", got)
+		if got := llm.calls(); got != 1 {
+			t.Fatalf("OpenRouter calls after first steer = %d, want 1", got)
 		}
 		second := postHTTPJSON[SteerResult](t, router, "/api/steer", body, http.StatusOK)
 		if second.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(second.Receipt.ChangedRules) != 1 || second.Receipt.ChangedRules[0].ID != first.Receipt.ChangedRules[0].ID {
 			t.Fatalf("second steer = %+v, want stored first receipt %+v", second, first)
 		}
-		if got := gemini.calls(); got != 1 {
-			t.Fatalf("Gemini calls after idempotent steer replay = %d, want still 1", got)
+		if got := llm.calls(); got != 1 {
+			t.Fatalf("OpenRouter calls after idempotent steer replay = %d, want still 1", got)
 		}
 		incompatible := `{"command":"Push more battery chemistry papers.","actor_kind":"human","actor_id":"owner","idempotency_key":"http-steer-001"}`
 		postHTTPJSON[ErrorBody](t, router, "/api/steer", incompatible, http.StatusBadRequest)
-		if got := gemini.calls(); got != 1 {
-			t.Fatalf("Gemini calls after incompatible key reuse = %d, want still 1", got)
+		if got := llm.calls(); got != 1 {
+			t.Fatalf("OpenRouter calls after incompatible key reuse = %d, want still 1", got)
 		}
 		assertReceiptCount(t, ctx, db, "http-steer-001", 1)
 	})

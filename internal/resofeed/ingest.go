@@ -330,7 +330,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 		item.ModelStatus = modelStatusSummaryNA
 		return item, nil
 	}
-	out, err := llm.SummarizeItem(ctx, GeminiSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
 	if err != nil {
 		item.ModelStatus = modelStatusLatencyError
 		return item, nil
