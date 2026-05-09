@@ -13765,17 +13765,27 @@ phases:
 
       Required checks:
 
-      - README/USAGE/ARCHITECTURE commands and examples use `--openrouter-api-key`
-      and optional `--openrouter-model`.
+      - README/USAGE/ARCHITECTURE commands and examples use OS environment or local
+      `.env` for OpenRouter API key configuration according to the locked `OPENROUTER_KEY`
+      / `OPENROUTER_API_KEY` contract.
+
+      - Docs do NOT require `--openrouter-api-key` or any command-line secret flag,
+      and do not show API keys inline in shell history examples.
+
+      - If `--openrouter-model` remains, docs describe it as optional and non-secret;
+      empty means account default.
 
       - No docs promise `--gemini-api-key`, `--gemini-model`, Gemini backend configuration,
       or Gemini compatibility mode.
 
       - `/doctor` docs describe `openrouter:` raw text and configured/default/resolved
-      model distinction.
+      model distinction without printing keys.
 
-      - State export docs confirm OpenRouter key/model are runtime-only and not portable
-      state.
+      - State export docs confirm OpenRouter key, env source, `.env` path, model secret
+      config, and provider config are runtime-only and not portable state.
+
+      - `.env` docs clearly say it is local runtime input only, must not be committed,
+      and examples use placeholders/redaction rather than real keys.
 
       - MCP/HTTP docs preserve same product operations and owner-token boundary.
 
@@ -13786,8 +13796,9 @@ phases:
       If live smoke found external-service caveats, document operational guidance
       without printing secrets.'
     verification: phase-check protecting final gate. Documentation must match implemented
-      behavior and canonical architecture. Docs must contain no Gemini flag promises
-      and no secret examples using real keys.
+      behavior and canonical architecture. Docs must contain no Gemini flag promises,
+      no required CLI secret flags, no shell-history key examples, and no secret examples
+      using real keys.
     evidence_template: '## Documentation Sync Report
 
 
