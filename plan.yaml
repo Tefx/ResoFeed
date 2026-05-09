@@ -8515,7 +8515,7 @@ phases:
     claimed_at: '2026-05-09T10:56:09.429652+00:00'
   - id: end-to-end-integration.black-box-acceptance-pass
     name: Black box acceptance pass
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -8593,6 +8593,67 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-09T10:55:59.871558+00:00'
+    done_at: '2026-05-09T11:16:51.671130+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary, one SQLite DB, owner-token boundary,
+      deterministic HTTP validation, no folders/tags/unread/settings surfaces.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` is single runtime; `/api/*` and `/mcp`
+      require owner token; state export/import minimal current-state only.
+
+      - docs/PRD.md — AC-1..AC-17 define freshness, steering, agent idempotency, state
+      portability, diagnostics, first useful session.
+
+      - docs/DESIGN.md — owner-token prompt, first-use empty state, flat Source Ledger,
+      warning text `import replaces active sources, rules, and stars`.
+
+      - docs/DESIGN_VISION.md — Inspect/Resonate/Steer; no SaaS/onboarding/settings
+      bloat.
+
+      - docs/USAGE.md — public build/run/API/MCP usage contract.
+
+
+      ## Black-Box Verification Report
+
+      - Worker result: PASS_WITH_DEBT, semantic PASS, blockers: [], proof_gap_status:
+      NON_BLOCKING, gate_open_allowed: true, product implementation files modified:
+      false.
+
+      - Public commands/scripts from worker: `npm --prefix web install`, `npm --prefix
+      web run build`, `mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed`,
+      `python3 tests/repro/spec_verify_end_to_end_blackbox.py`, `node tests/repro/spec_verify_ui_blackbox.mjs`.
+
+      - Worker artifacts: `.audit-artifacts/end_to_end_blackbox/report.json`, `ui-report.json`,
+      DOM text/html artifacts, screenshots, `doctor.txt`, `state-export.json`.
+
+      - Acceptance coverage: HTTP/MCP auth boundary, strict query validation, state
+      export/import, OPML import, doctor, UI owner-token prompt, first-use state,
+      Source Ledger/state warning. Item-specific flows and ranking/duplicate/summary
+      ACs not fully tested due no feed corpus/items; classified non-blocking fixture
+      gap.
+
+      - Issues found: no blocking public-surface failures.
+
+
+      ## Mainline Final-State Verification
+
+      - Squash merged branch `vectl/step-end-to-end-integration.black-box-acceptance-pass`
+      into main as commit `3b05265`.
+
+      - Ran after merge in main: `npm --prefix web ci && npm --prefix web run build
+      && mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/spec_verify_end_to_end_blackbox.py
+      && node tests/repro/spec_verify_ui_blackbox.mjs`.
+
+      - Output: npm ci installed 150 packages; web build succeeded; Go build succeeded;
+      Python black-box report returned `status: PASS`; UI black-box report returned
+      `status: PASS` with no failures.
+
+
+      ## Gaps/Notes
+
+      - Live Gemini/RSS quality and item-specific flows require deterministic corpus/fixtures
+      and remain non-blocking for this black-box acceptance pass.'
   - id: end-to-end-integration.end-to-end-wiring-audit
     name: End to end wiring audit
     status: claimed
