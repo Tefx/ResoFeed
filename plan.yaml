@@ -18907,3 +18907,129 @@ phases:
       - spinners/animations/shadows/SaaS button styling present: YES/NO
 
       '
+  - id: manual-rss-fetch.integration-proof
+    name: Manual RSS Fetch Runtime Integration Proof
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an INDEPENDENT TESTER, verify the manual RSS fetch feature through real runtime
+      seams, not handler-only or mock-only tests.
+
+
+      Scope:
+
+      - Start the single cmd/resofeed server path.
+
+      - Exercise POST /api/ingest and POST /api/sources/{id}/fetch through HTTP.
+
+      - Verify frontend Source Ledger calls the new API client methods and reflects
+      runtime state.
+
+      - Confirm backend and frontend interpret the same response fields consistently.
+
+
+      This check protects manual-rss-fetch.uiux-audit and manual-rss-fetch.gate. Finding
+      issues is a successful verification outcome; unresolved blocker-class issues
+      require fix/retest ownership before the gate can open.
+
+
+      Required behavioral proof register fields for each runtime obligation:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      Changed seams require at least one real execution proof. Mock-heavy unit tests
+      alone are insufficient.'
+    verification: '- local/phase check: exact server launch or test harness command
+      starts the single binary path.
+
+      - HTTP proof: POST /api/ingest returns documented 200 or 409 behavior; POST
+      /api/sources/{id}/fetch returns documented 200/404/409 behavior.
+
+      - UI proof: rendered Source Ledger invokes the client path and updates state
+      text/timestamps from real or contract-faithful HTTP responses.
+
+      - Conflict proof: concurrent trigger produces 409 conflict without queue/job/receipt
+      artifacts.
+
+      - Proof register includes explicit closure paths for any NEEDS_TEST, UNPROVEN,
+      or UNCERTAIN_BLOCKING status.'
+    evidence_template: '## Integration Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact command/test invoking HTTP and UI seams>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <stdout/stderr or test output>
+
+      ```
+
+
+      **Path exercised**: SourceLedger.svelte → api-client.ts → POST /api/ingest or
+      /api/sources/{id}/fetch → http.go → ingest.go guard/fetch path
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | <doc section> | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <fix/retest/non-intersection> | <OPEN/BLOCK basis> |
+
+
+      **Remaining mocks in related tests**: <count>
+
+      **Justification for remaining mocks**: <why acceptable>
+
+      '
+    depends_on:
+    - manual-rss-fetch.backend-implementation
+    - manual-rss-fetch.frontend-implementation
