@@ -15451,6 +15451,28 @@ phases:
       docs and architecture_basis say."
 
 
+      This retest MUST specifically re-check the remediated B1 startup validation-order
+      divergence after `openrouter-llm-verification-and-live-smoke.fix-startup-validation-order`:
+
+      - Invalid `--addr` with no `OPENROUTER_KEY` / `GEMINI_API_KEY` must report `invalid_addr`,
+      not `invalid_openrouter_key`.
+
+      - Deterministic local runtime config validation matrix errors from `docs/ARCHITECTURE.md:92-104`
+      must precede missing OpenRouter key where the matrix says they are applicable.
+
+      - Regression tests and/or runtime command evidence must cover mixed-invalid
+      startup cases for `--addr`, and must consider `--public-url`, `--owner-token`,
+      and missing key ordering.
+
+      - Preserve OpenRouter-only safety: no secret printing, no startup network model
+      validation, no CLI API-key flag, and no Gemini compatibility runtime behavior.
+
+      - If `.agents/instructions.md` was updated by the fix, verify Gemini-era guidance
+      drift is closed. If it was not updated, record whether the stale guidance is
+      non-runtime, whether it still risks misleading verification agents, and whether
+      documentation-sync/final gate has explicit ownership.
+
+
       SCOPE:
 
       - OpenRouter runtime flags and model semantics.
@@ -15465,8 +15487,14 @@ phases:
 
       - Documentation promises in ARCHITECTURE/USAGE/DESIGN-adjacent microcopy.
 
+      - `.agents/instructions.md` guidance drift only insofar as it can mislead verification
+      agents about OpenRouter-only architecture.
+
 
       FOCUS AREAS:
+
+      - B1 startup validation-order closure: invalid local config errors are not masked
+      by missing OpenRouter key.
 
       - Naming & format semantics: `openrouter:` prefix, no `gemini:` runtime output,
       exact flag names.
@@ -15486,37 +15514,80 @@ phases:
       if not proven by runtime evidence.'
     verification: phase-check protecting final gate. Requirement register must have
       no DIVERGES/PARTIAL/NOT_FOUND blocker-class items unless an explicit remediation
-      path is recorded before final gate.
-    evidence_template: '## Spec Conformance Report
+      path is recorded before final gate. B1 is closed only if mixed-invalid startup
+      runtime/test evidence proves `invalid_addr` takes precedence over missing OpenRouter
+      key for invalid `--addr`, and sibling deterministic validation ordering cases
+      are proven or explicitly dispositioned. If `.agents/instructions.md` was updated,
+      verify OpenRouter-only guidance; if not updated, record non-runtime status and
+      downstream documentation-sync/final-gate ownership.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
 
-      **Phase**: openrouter-llm-verification-and-live-smoke
-
-      **Spec source**: AGENTS.md, docs/ARCHITECTURE.md, docs/DESIGN.md, user architecture_basis
-
-
-      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
-
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+      - .audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md
+      — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec Conformance Retest Report
+
+      **Phase**: openrouter-llm-verification-and-live-smoke
+
+      **Retested blocker**: B1 startup validation-order divergence
 
 
       ## Requirements Register
 
       | R# | Spec Section | Requirement | Level | Checkable? |
 
-      |---|---|---|---|---|
+      | --- | --- | --- | --- | --- |
+
+
+      ## B1 Runtime/Test Evidence
+
+      - invalid --addr with no OPENROUTER_KEY/GEMINI_API_KEY -> invalid_addr: PASS/FAIL
+      + command/test output
+
+      - --public-url mixed-invalid ordering: PASS/FAIL/NOT_APPLICABLE + reason
+
+      - --owner-token mixed-invalid ordering: PASS/FAIL/NOT_APPLICABLE + reason
+
+      - missing OpenRouter key ordering after deterministic validation: PASS/FAIL
+      + evidence
+
+
+      ## Safety Invariants
+
+      - No OpenRouter secret printed: PASS/FAIL + evidence
+
+      - No CLI API-key flag: PASS/FAIL + evidence
+
+      - No startup network model validation: PASS/FAIL + evidence
+
+      - Existing OpenRouter tests preserved: PASS/FAIL + evidence
+
+
+      ## .agents Guidance Drift
+
+      - Updated by fix: yes/no
+
+      - Gemini-era guidance remaining: none / non-runtime / blocking-risk
+
+      - Disposition and downstream owner if any: <documentation-sync/final gate/non-intersection>
 
 
       ## Evidence Table
 
       | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
 
-      |---|---|---|---|---|---|
+      | --- | --- | --- | --- | --- | --- |
 
       Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
       | SPEC_POSSIBLY_STALE
@@ -15524,30 +15595,28 @@ phases:
 
       ## Coverage Summary
 
-      - Total requirements:
+      - Total requirements: N
 
-      - CONFORMS:
+      - CONFORMS: N | DIVERGES: N | PARTIAL: N
 
-      - DIVERGES/PARTIAL:
+      - NEEDS_TEST: N | NOT_FOUND: N | AMBIGUOUS_SPEC: N
 
-      - NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC:
-
-      - Unchecked sections:
+      - Unchecked sections: [list]
 
 
-      ## Top Risks
+      ## Gate Decision Basis
 
-
-      ## Suggested Tests for NEEDS_TEST
-
-
-      ## Secret/State Confirmation
-
-      - OpenRouter key/model absent from portable state:
-
-      - No secret values printed:'
+      Map every NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING item to remediation/retest
+      or explicit non-intersection with final gate. Do not recommend OPEN if B1 runtime
+      evidence remains unproven.'
+    refs:
+    - docs/ARCHITECTURE.md
+    - .audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md
+    - .agents/instructions.md
     depends_on:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    - openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
+    - openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
     agent: spec-verifier
   - id: openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     name: doctor-ui-multimodal-audit
