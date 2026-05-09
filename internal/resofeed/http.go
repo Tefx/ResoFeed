@@ -326,10 +326,16 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		if !h.itemExists(w, r, parts[0]) {
 			return
 		}
-		result, err := MarkItemInspected(r.Context(), h.cfg.DB, parts[0], req)
+		var result InspectResult
+		applied, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "mark_inspected", parts[0], mutationFingerprintPayload(req.MutationRequestFields), &result, func() (InspectResult, error) {
+			return MarkItemInspected(r.Context(), h.cfg.DB, parts[0], req)
+		})
 		if err != nil {
-			writeNotFoundOrInternal(w, parts[0], err)
+			writeMutationError(w, parts[0], err)
 			return
+		}
+		if applied {
+			result.AlreadyApplied = true
 		}
 		writeJSON(w, http.StatusOK, result)
 		return
@@ -342,10 +348,20 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		if !h.itemExists(w, r, parts[0]) {
 			return
 		}
-		result, err := SetItemResonance(r.Context(), h.cfg.DB, parts[0], req)
+		var result ResonanceResult
+		applied, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "resonate_item", parts[0], struct {
+			Resonated bool      `json:"resonated"`
+			ActorKind ActorKind `json:"actor_kind"`
+			ActorID   string    `json:"actor_id"`
+		}{Resonated: req.Resonated, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (ResonanceResult, error) {
+			return SetItemResonance(r.Context(), h.cfg.DB, parts[0], req)
+		})
 		if err != nil {
-			writeNotFoundOrInternal(w, parts[0], err)
+			writeMutationError(w, parts[0], err)
 			return
+		}
+		if applied {
+			result.AlreadyApplied = true
 		}
 		writeJSON(w, http.StatusOK, result)
 		return
@@ -380,8 +396,20 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "command"})
 		return
 	}
-	result, err := ApplySteering(r.Context(), h.cfg.DB, h.cfg.Gemini, req)
+	var result SteerResult
+	_, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "steer", "", struct {
+		Command   string    `json:"command"`
+		ActorKind ActorKind `json:"actor_kind"`
+		ActorID   string    `json:"actor_id"`
+	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
+		return ApplySteering(r.Context(), h.cfg.DB, h.cfg.Gemini, req)
+	})
 	if err != nil {
+		var fieldErr mcpFieldError
+		if errors.As(err, &fieldErr) {
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": fieldErr.field})
+			return
+		}
 		writeInternal(w)
 		return
 	}
@@ -670,6 +698,15 @@ func writeNotFoundOrInternal(w http.ResponseWriter, id string, err error) {
 		return
 	}
 	writeInternal(w)
+}
+
+func writeMutationError(w http.ResponseWriter, id string, err error) {
+	var fieldErr mcpFieldError
+	if errors.As(err, &fieldErr) {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": fieldErr.field})
+		return
+	}
+	writeNotFoundOrInternal(w, id, err)
 }
 
 func writeInternal(w http.ResponseWriter) {

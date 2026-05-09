@@ -115,6 +115,74 @@ func TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters(t *testing.T) {
 	}
 }
 
+func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	seedHTTPHandlerCorpus(t, ctx, db, now)
+	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Prioritize replicated storage papers."}, Message: "gemini steering updated"}}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: gemini})
+
+	t.Run("inspect replay returns stored timestamp and no duplicate receipt", func(t *testing.T) {
+		body := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"http-inspect-001"}`
+		first := postHTTPJSON[InspectResult](t, router, "/api/items/item_http_01/inspect", body, http.StatusOK)
+		if first.ItemID != "item_http_01" || first.AlreadyApplied {
+			t.Fatalf("first inspect = %+v, want fresh application", first)
+		}
+		second := postHTTPJSON[InspectResult](t, router, "/api/items/item_http_01/inspect", body, http.StatusOK)
+		if second.ItemID != first.ItemID || !second.AlreadyApplied || !second.HumanInspectedAt.Equal(first.HumanInspectedAt) {
+			t.Fatalf("second inspect = %+v, want replay of %+v with already_applied", second, first)
+		}
+		assertReceiptCount(t, ctx, db, "http-inspect-001", 1)
+	})
+
+	t.Run("resonance replay preserves first target and rejects incompatible reuse", func(t *testing.T) {
+		body := `{"resonated":true,"actor_kind":"human","actor_id":"owner","idempotency_key":"http-resonance-001"}`
+		first := postHTTPJSON[ResonanceResult](t, router, "/api/items/item_http_01/resonance", body, http.StatusOK)
+		if !first.IsResonated || first.AlreadyApplied {
+			t.Fatalf("first resonance = %+v, want resonated application", first)
+		}
+		second := postHTTPJSON[ResonanceResult](t, router, "/api/items/item_http_01/resonance", body, http.StatusOK)
+		if !second.IsResonated || !second.AlreadyApplied {
+			t.Fatalf("second resonance = %+v, want replay already_applied", second)
+		}
+		incompatible := `{"resonated":false,"actor_kind":"human","actor_id":"owner","idempotency_key":"http-resonance-001"}`
+		postHTTPJSON[ErrorBody](t, router, "/api/items/item_http_01/resonance", incompatible, http.StatusBadRequest)
+		var resonated bool
+		if err := db.QueryRowContext(ctx, `select is_resonated from item_state where item_id = 'item_http_01'`).Scan(&resonated); err != nil {
+			t.Fatalf("read resonance state: %v", err)
+		}
+		if !resonated {
+			t.Fatalf("incompatible idempotency reuse changed resonance state to false")
+		}
+		assertReceiptCount(t, ctx, db, "http-resonance-001", 1)
+	})
+
+	t.Run("steer replay returns first receipt and skips Gemini duplicate", func(t *testing.T) {
+		body := `{"command":"Push more replicated storage papers.","actor_kind":"human","actor_id":"owner","idempotency_key":"http-steer-001"}`
+		first := postHTTPJSON[SteerResult](t, router, "/api/steer", body, http.StatusOK)
+		if first.Receipt.InterpretedAs != "gemini_policy_update" || len(first.Receipt.ChangedRules) != 1 {
+			t.Fatalf("first steer = %+v, want Gemini-backed rule", first)
+		}
+		if got := gemini.calls(); got != 1 {
+			t.Fatalf("Gemini calls after first steer = %d, want 1", got)
+		}
+		second := postHTTPJSON[SteerResult](t, router, "/api/steer", body, http.StatusOK)
+		if second.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(second.Receipt.ChangedRules) != 1 || second.Receipt.ChangedRules[0].ID != first.Receipt.ChangedRules[0].ID {
+			t.Fatalf("second steer = %+v, want stored first receipt %+v", second, first)
+		}
+		if got := gemini.calls(); got != 1 {
+			t.Fatalf("Gemini calls after idempotent steer replay = %d, want still 1", got)
+		}
+		incompatible := `{"command":"Push more battery chemistry papers.","actor_kind":"human","actor_id":"owner","idempotency_key":"http-steer-001"}`
+		postHTTPJSON[ErrorBody](t, router, "/api/steer", incompatible, http.StatusBadRequest)
+		if got := gemini.calls(); got != 1 {
+			t.Fatalf("Gemini calls after incompatible key reuse = %d, want still 1", got)
+		}
+		assertReceiptCount(t, ctx, db, "http-steer-001", 1)
+	})
+}
+
 func TestStaticRootServesHTMLAccessGate(t *testing.T) {
 	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
 	recorder := httptest.NewRecorder()
@@ -143,6 +211,38 @@ func seedHTTPHandlerCorpus(t *testing.T, ctx context.Context, db *sql.DB, now ti
 	}
 	if err := rebuildSearchIndex(ctx, db); err != nil {
 		t.Fatalf("rebuild search index: %v", err)
+	}
+}
+
+func postHTTPJSON[T any](t *testing.T, router http.Handler, path string, body string, wantStatus int) T {
+	t.Helper()
+	recorder := httptest.NewRecorder()
+	req := authorizedRequest(http.MethodPost, path, bytes.NewReader([]byte(body)))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(recorder, req)
+	assertStatus(t, recorder, wantStatus)
+	var parsed T
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal %s response: %v; body=%s", path, err, recorder.Body.String())
+	}
+	if wantStatus == http.StatusBadRequest {
+		if errBody, ok := any(parsed).(ErrorBody); ok {
+			if errBody.Error.Details["field"] != "idempotency_key" {
+				t.Fatalf("bad_request field = %#v, want idempotency_key", errBody.Error.Details["field"])
+			}
+		}
+	}
+	return parsed
+}
+
+func assertReceiptCount(t *testing.T, ctx context.Context, db *sql.DB, key string, want int) {
+	t.Helper()
+	var got int
+	if err := db.QueryRowContext(ctx, `select count(*) from agent_receipts where idempotency_key = ?`, key).Scan(&got); err != nil {
+		t.Fatalf("count receipts for %s: %v", key, err)
+	}
+	if got != want {
+		t.Fatalf("receipt count for %s = %d, want %d", key, got, want)
 	}
 }
 

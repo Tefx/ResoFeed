@@ -99,7 +99,7 @@ func TestValueTierExposedThroughHTTPAndMCPReadPaths(t *testing.T) {
 	if err != nil {
 		t.Fatalf("http today: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var today TodayFeedResponse
 	if err := json.NewDecoder(resp.Body).Decode(&today); err != nil {
 		t.Fatalf("decode today: %v", err)

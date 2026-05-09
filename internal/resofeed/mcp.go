@@ -129,11 +129,12 @@ func MarkInspectedForMCP(ctx context.Context, db *sql.DB, input MCPMarkInspected
 		return InspectResult{}, err
 	}
 	var result InspectResult
-	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "mark_inspected", input.ItemID, &result, func() (InspectResult, error) {
+	req := InspectRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "mark_inspected", input.ItemID, mutationFingerprintPayload(req.MutationRequestFields), &result, func() (InspectResult, error) {
 		if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
 			return InspectResult{}, err
 		}
-		return MarkItemInspected(ctx, db, input.ItemID, InspectRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}})
+		return MarkItemInspected(ctx, db, input.ItemID, req)
 	})
 	if err != nil {
 		return InspectResult{}, err
@@ -150,11 +151,16 @@ func ResonateItemForMCP(ctx context.Context, db *sql.DB, input MCPResonateItemIn
 		return ResonanceResult{}, err
 	}
 	var result ResonanceResult
-	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "resonate_item", input.ItemID, &result, func() (ResonanceResult, error) {
+	req := ResonanceRequest{Resonated: input.Resonated, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "resonate_item", input.ItemID, struct {
+		Resonated bool      `json:"resonated"`
+		ActorKind ActorKind `json:"actor_kind"`
+		ActorID   string    `json:"actor_id"`
+	}{Resonated: req.Resonated, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (ResonanceResult, error) {
 		if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
 			return ResonanceResult{}, err
 		}
-		return SetItemResonance(ctx, db, input.ItemID, ResonanceRequest{Resonated: input.Resonated, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}})
+		return SetItemResonance(ctx, db, input.ItemID, req)
 	})
 	if err != nil {
 		return ResonanceResult{}, err
@@ -175,8 +181,13 @@ func SteerForMCP(ctx context.Context, db *sql.DB, gemini GeminiClient, input MCP
 		return SteerResult{}, err
 	}
 	var result SteerResult
-	_, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "steer", "", &result, func() (SteerResult, error) {
-		return ApplySteering(ctx, db, gemini, SteerRequest{Command: input.Command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}})
+	req := SteerRequest{Command: input.Command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	_, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "steer", "", struct {
+		Command   string    `json:"command"`
+		ActorKind ActorKind `json:"actor_kind"`
+		ActorID   string    `json:"actor_id"`
+	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
+		return ApplySteering(ctx, db, gemini, req)
 	})
 	if err != nil {
 		return SteerResult{}, err
@@ -195,7 +206,11 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		return DeliveryReportResult{}, fieldError("delivered_at")
 	}
 	var result DeliveryReportResult
-	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "report_delivery", input.ItemID, &result, func() (DeliveryReportResult, error) {
+	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "report_delivery", input.ItemID, struct {
+		DeliveredAt time.Time `json:"delivered_at"`
+		ActorKind   ActorKind `json:"actor_kind"`
+		ActorID     string    `json:"actor_id"`
+	}{DeliveredAt: input.DeliveredAt.UTC(), ActorKind: ActorKindAgent, ActorID: input.ActorID}, &result, func() (DeliveryReportResult, error) {
 		if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
 			return DeliveryReportResult{}, err
 		}
@@ -482,35 +497,8 @@ func ensureItemExists(ctx context.Context, db *sql.DB, itemID string) error {
 	return fmt.Errorf("check MCP item exists: %w", err)
 }
 
-func withMCPReceipt[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, target *T, apply func() (T, error)) (bool, error) {
-	if db == nil {
-		return false, errors.New("MCP receipt: db is nil")
-	}
-	var snapshot string
-	err := db.QueryRowContext(ctx, `select result_snapshot from agent_receipts where idempotency_key = ?`, key).Scan(&snapshot)
-	if err == nil {
-		if err := json.Unmarshal([]byte(snapshot), target); err != nil {
-			return false, fmt.Errorf("decode MCP receipt snapshot: %w", err)
-		}
-		return true, nil
-	}
-	if err != sql.ErrNoRows {
-		return false, fmt.Errorf("read MCP receipt: %w", err)
-	}
-	result, err := apply()
-	if err != nil {
-		return false, err
-	}
-	data, err := json.Marshal(result)
-	if err != nil {
-		return false, fmt.Errorf("encode MCP receipt snapshot: %w", err)
-	}
-	_, err = db.ExecContext(ctx, `insert into agent_receipts (idempotency_key, actor_id, operation, item_id, created_at, result_snapshot) values (?, ?, ?, ?, ?, ?)`, key, actorID, operation, nullableStringValue(itemID), time.Now().UTC().Format(time.RFC3339Nano), string(data))
-	if err != nil {
-		return false, fmt.Errorf("write MCP receipt: %w", err)
-	}
-	*target = result
-	return false, nil
+func withMCPReceipt[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, fingerprintPayload any, target *T, apply func() (T, error)) (bool, error) {
+	return withIdempotencyReceipt(ctx, db, key, actorID, operation, itemID, fingerprintPayload, target, apply)
 }
 
 func validateItemMutationInput(itemID string, actorID string, key string) error {

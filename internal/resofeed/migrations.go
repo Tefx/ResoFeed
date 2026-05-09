@@ -139,5 +139,9 @@ create virtual table if not exists search_fts using fts5(
 );
 `,
 		},
+		{
+			ID:  "002_agent_receipts_request_fingerprint",
+			SQL: `alter table agent_receipts add column request_fingerprint text;`,
+		},
 	}
 }
