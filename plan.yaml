@@ -19440,7 +19440,7 @@ phases:
     - manual-rss-fetch.integration-proof
     - manual-rss-fetch.spec-conformance
     - manual-rss-fetch.uiux-audit
-  - id: backend-contract
+  - id: manual-rss-fetch.backend-contract
     name: Backend Contract (manual RSS fetch)
     status: pending
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
@@ -19494,4 +19494,6 @@ phases:
       - Forbidden machinery absent: PASS/FAIL
 
       - Deviation records, if any: <type/what/why/impact or none>'
+    refs:
+    - docs/ARCHITECTURE.md
     agent: golang-developer
