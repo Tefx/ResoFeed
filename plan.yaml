@@ -13702,7 +13702,7 @@ phases:
       now use OpenRouter-named types.'
   - id: openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     name: complete-runtime-doctor-http-mcp-wiring
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       tags: integration
@@ -13837,6 +13837,8 @@ phases:
     depends_on:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T18:23:14.124328+00:00'
   - id: openrouter-llm-implementation.wiring-audit
     name: wiring-audit
     status: pending
