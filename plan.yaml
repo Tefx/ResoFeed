@@ -8968,7 +8968,7 @@ phases:
       \ until remediation/retest closes the issues."
   - id: end-to-end-integration.end-to-end-gate
     name: End to end gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -9053,6 +9053,8 @@ phases:
     - end-to-end-integration.end-to-end-spec-conformance
     - retest-end-to-end-blockers
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T11:45:13.405719+00:00'
   - id: fix-end-to-end-blockers
     name: Fix end-to-end blockers
     status: done
