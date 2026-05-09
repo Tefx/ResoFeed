@@ -14124,3 +14124,165 @@ phases:
     depends_on:
     - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
     agent: golang-developer
+  - id: runtime-secret-env-config-foundation.complete-runtime-secret-resolver
+    name: complete-runtime-secret-resolver
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      risk_tags: secret_runtime,state,cli,env_file,integration
+
+
+      Complete the implementation within the contract locked by runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+      and the expected-red tests from runtime-secret-env-config-foundation.define-runtime-secret-red-tests.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - docs/ARCHITECTURE.md / docs/USAGE.md from lock-runtime-secret-source-policy
+      — secret-source precedence, `.env` parser limits, redaction rules, and non-persistence
+      guarantees are AUTHORITATIVE.
+
+      - Expected-red Go/docs tests from define-runtime-secret-red-tests — assertions
+      are PROTECTED.
+
+
+      YOUR SCOPE: Complete runtime secret resolution for the current Gemini API key
+      path before LLM provider construction. Use the flat `internal/resofeed/` shape
+      and direct provider construction. Do not introduce config services, provider
+      registries, DI containers, sidecars, or new auth/product concepts.
+
+
+      Touch_paths:
+
+      - internal/resofeed/secret or config-adjacent flat Go file(s) for a minimal
+      runtime secret resolver.
+
+      - cmd/resofeed and/or current runtime startup/provider construction code that
+      currently accepts the Gemini key.
+
+      - existing tests only as needed to make the expected-red tests green after implementation.
+
+
+      Required behavior:
+
+      - Resolve current Gemini key from existing explicit CLI flag value first only
+      if that flag already exists and remains in this phase.
+
+      - Resolve `GEMINI_API_KEY` from OS environment as preferred non-CLI runtime
+      source.
+
+      - Resolve `GEMINI_API_KEY` from local `.env` fallback when OS env is absent.
+
+      - Reject empty/whitespace-only values from all sources.
+
+      - Minimal `.env` parser only: `KEY=VALUE`, ignore blank/comment lines, no shell
+      expansion, no command substitution, no command execution.
+
+      - Redact secret values in all errors, logs, stdout/stderr, and test evidence.
+
+      - Do not persist secrets, `.env` paths, provider secret config, or env-derived
+      config to SQLite.
+
+      - Do not include secrets or runtime secret config in state export/import bundles.
+
+      - Keep provider construction direct and before current Gemini provider construction;
+      do not expand product scope.
+
+
+      Failure-mode checklist:
+
+      - Relative vs absolute `.env` lookup behavior is explicit and tested.
+
+      - Missing `.env` fallback is non-fatal if OS env or CLI compatibility value
+      is present.
+
+      - Missing key failure is deterministic and redacted.
+
+      - Empty/whitespace value from higher-precedence source does not silently fall
+      through unless the contract explicitly says so; document and test the chosen
+      behavior.
+
+      - Invalid `.env` syntax errors do not include secret values.
+
+      - No command execution or shell expansion occurs for `.env` content.
+
+      - State export/import remains free of secret configuration.
+
+
+      State semantics:
+
+      - runtime_secret: process-local only, never persisted/exported/logged.
+
+      - runtime_source: source category may be used internally for error/debug classification
+      only if redacted and not portable.
+
+      - portable_state: unchanged; only active sources, active steering rules, and
+      resonated items.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT remove/deprecate current Gemini CLI secret flag in this implementation
+      unless the contract step recorded explicit user-confirmed architecture approval.
+
+      - Do NOT add OpenRouter adapter logic here; this is the secret-source foundation
+      only.
+
+      - Do NOT add accounts/OAuth/RBAC, vector DB/RAG, sync/merge/activity/history,
+      provider registries, DI containers, service/repository layers, sidecars, or
+      event buses.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any path that prints a fake or real API key in stdout/stderr/logs/errors.
+
+      2. Any `.env` parser behavior that executes commands, expands shell variables,
+      or behaves like sourcing a shell script.
+
+      3. Any SQLite persistence or state export of API keys, `.env` values, secret
+      source paths, or provider secret config.
+
+      4. Any OpenRouter implementation work beginning before this foundation gate
+      is open.
+
+      5. Any new architecture layer that violates flat `internal/resofeed/` and one-binary
+      constraints.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs. Private placeholder functions or hardcoded
+      fake key resolution do not satisfy this requirement.
+
+
+      If a contract artifact is wrong or incomplete, document a deviation record (type,
+      what, why, impact) — do NOT silently rewrite.'
+    verification: 'local-check protecting runtime-secret-env-config-foundation.secret-config-gate.
+      Main path: targeted Go tests for env var fallback, `.env` fallback, precedence,
+      and startup without CLI key pass. Failure path: tests cover empty values, missing
+      key, parser no-execution/no-expansion, redacted errors/logs, and state export/import
+      non-portability.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\
+      \n\n## Implementation Evidence\n- Files changed: <list>\n- Secret resolver location:\
+      \ <file:functions>\n- Provider construction wiring point: <file:function>\n\
+      - `.env` parser limits confirmed: KEY=VALUE only, comments/blank ignored, no\
+      \ expansion/execution.\n- Commands run:\n  ```\n  <targeted go test commands\
+      \ and outputs, with secrets redacted>\n  ```\n- Main path proof: env var fallback,\
+      \ `.env` fallback, and precedence tests pass.\n- Failure path proof: empty/missing\
+      \ key, parser safety, no secret leakage, and state export/import non-portability\
+      \ tests pass.\n- Secret leakage check: stdout/stderr/log captures searched for\
+      \ fake key labels/values; result redacted and PASS/FAIL.\n- Architecture guardrail\
+      \ confirmation: no DI/container/registry/sidecar/auth/product-scope expansion\
+      \ introduced.\n- Deviation records: <none or list>."
+    depends_on:
+    - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+    - runtime-secret-env-config-foundation.define-runtime-secret-red-tests
+    agent: golang-developer
