@@ -8797,7 +8797,7 @@ phases:
     claimed_at: '2026-05-09T10:56:05.866520+00:00'
   - id: end-to-end-integration.end-to-end-spec-conformance
     name: End to end spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -8875,6 +8875,35 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T10:56:02.883229+00:00'
+    done_at: '2026-05-09T11:21:54.660841+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — owner-token\
+      \ boundary, HTTP/MCP operation uniformity, and UI anti-bloat constraints.\n\
+      - docs/ARCHITECTURE.md — state portability semantics and MCP parity/auth/tools.\n\
+      - docs/PRD.md — AC-1..AC-17 and constraints against RAG/vector search/fourth\
+      \ top-level navigation tab.\n- docs/DESIGN.md — owner-token prompt, state actions\
+      \ from Source Ledger footer or `/doctor`, Do/Don't UI constraints.\n- docs/DESIGN_VISION.md\
+      \ — Inspect/Resonate/Steer primitives; forbid account/activity-log/settings\
+      \ bloat.\n- docs/USAGE.md — one `serve` runtime, state import replacement, MCP\
+      \ external-agent usage.\n\n## System Spec Conformance Report\n- Worker result:\
+      \ semantic FAIL report delivered. Closure fields: `verdict: FAIL`, `blockers:\
+      \ [B1, B2, B3]`, `gate_open_allowed: false`, `orchestrator_action_hint: DO_NOT_COMPLETE`,\
+      \ product implementation files modified: false.\n- Evidence table covered HTTP/MCP\
+      \ owner-token boundary, state replacement, query validation, ranking fixtures,\
+      \ steering conflict behavior, owner-token UI, first-use copy, Source Ledger/state\
+      \ surfaces, search surface, `/doctor`.\n- Blocking findings:\n  - B1: UI exposes\
+      \ `SEARCH` and `STATE` as top-level surface-nav buttons, conflicting with minimal\
+      \ design/navigation constraints and state portability placement.\n  - B2: Agent\
+      \ steering attribution is not proven visible to human on next UI interaction;\
+      \ backend stores actor but UI receipt text omits actor and runtime proof is\
+      \ missing.\n  - B3: PRD behavioral ACs remain unproven at system level, especially\
+      \ AC-4 strict filter/boost and AC-5 inspect-not-preference plus related cross-surface\
+      \ behaviors.\n- Broad verifier disposition: all blockers intersect `end-to-end-gate`/finalization\
+      \ and are downstream blockers, not non-blocking debt.\n\n## Remediation Ownership\
+      \ Created\n- Planner aggregated this failure with `end-to-end-integration.end-to-end-wiring-audit`\
+      \ and added blocker remediation steps: `fix-end-to-end-blockers`, `retest-end-to-end-blockers`,\
+      \ and updated `end-to-end-integration.end-to-end-gate` dependencies.\n- This\
+      \ verification/report step is complete as a blocker report; gate remains blocked\
+      \ until remediation/retest closes the issues."
   - id: end-to-end-integration.end-to-end-gate
     name: End to end gate
     status: pending
