@@ -19504,7 +19504,7 @@ phases:
       was read. Build artifact was directed to temp path during mainline verification.'
   - id: backend-expected-red-tests
     name: Backend Expected-Red Contract Tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -19602,6 +19602,8 @@ phases:
     depends_on:
     - backend-contract
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T21:22:45.628777+00:00'
   - id: frontend-contract
     name: Frontend API and UI Contract Lock
     status: done
