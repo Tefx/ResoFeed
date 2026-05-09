@@ -15946,7 +15946,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     name: live-openrouter-smoke-system-test
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -16129,6 +16129,187 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-09T19:22:16.346633+00:00'
+    done_at: '2026-05-09T19:27:55.223169+00:00'
+    evidence: 'Live OpenRouter smoke PASS accepted after environment-precondition
+      repair and mainline verification.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+
+      Tester: blind-tester
+
+      Independence Level: L3
+
+      Worker commit: 5f0fc58 (`audit: add live OpenRouter smoke evidence`).
+
+      Main squash merge commit: b56dc54 (`[vectl] step-openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
+      completed`).
+
+
+      Repair applied before retry:
+
+      - Prior live-smoke attempt was blocked because the isolated worktree lacked
+      the live secret precondition.
+
+      - Orchestrator safely staged `.env` into the isolated worktree without reading
+      or printing contents.
+
+      - Subagent confirmed `.env`/OPENROUTER_KEY value was not printed and `.env`
+      remained untracked/uncommitted.
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: no tracked `AGENTS.md` exists at isolated worktree root.
+
+      - .agents/instructions.md — one binary, SQLite only, OpenRouter runtime-only
+      secrets, owner-token boundary, strict validation.
+
+      - docs/ARCHITECTURE.md — OpenRouter-only runtime, `.env`/OS `OPENROUTER_KEY`,
+      omitted model=`account_default`, no secret exposure.
+
+      - docs/DESIGN.md — owner-token prompt, first-use empty state, operational chrome,
+      `/doctor` diagnostic behavior.
+
+      - docs/USAGE.md — build/run, auth, feed/search/state/doctor/OPML/MCP/UI contracts.
+
+
+      Secret handling:
+
+      - `.env`/OPENROUTER_KEY value was not printed; only presence checked.
+
+      - `.env` was not committed or staged (`git status --short` showed only `?? .env`
+      in worktree before cleanup).
+
+      - Owner token value redacted.
+
+      - Commands ran without shell tracing secrets; no CLI API-key flag used.
+
+
+      Smoke results:
+
+      ```text
+
+      env_file_present=True
+
+      openrouter_key_present=True
+
+      openrouter_api_key_alias_present=False
+
+      Server: root_status=200, tcp_connect=True
+
+      Auth/feed: unauth=401 auth=200 auth_body={"items":[]}
+
+      Search: unknown=400 duplicate=400 valid=200
+
+      Doctor:
+
+      rss: ok
+
+      openrouter: ok configured_model=account_default resolved_model=unknown
+
+      extraction: ok
+
+      ingest: last_run=never
+
+      State export: schema_version=resofeed.state.v1; leaks=[]
+
+      OPML import: {"imported":1,"skipped":0,"folders_flattened":true}
+
+      HTTP steer: {"receipt":{"interpreted_as":"add_source","changed_rules":[],"message":"source
+      added"}}
+
+      MCP: init=200 tools=200 resources=200 steer=200 missing=[]
+
+      UI: root 200 text/html; visible RESOFEED/owner-token/first-use text; interactive_count=1
+
+      Secret/log scan: key_leak=False owner_leak=False visible_bad=[]
+
+      ```
+
+
+      Smoke matrix:
+
+      - Build: PASS — cmd/resofeed binary built.
+
+      - Server: PASS — `.env` fallback exercised, port bound.
+
+      - Auth: PASS — unauth/auth 401/200.
+
+      - Feed: PASS — `/api/feed/today` reachable.
+
+      - Search: PASS — unknown/duplicate 400, valid 200.
+
+      - Doctor: PASS — OpenRouter account-default output, no secrets/source/path.
+
+      - State: PASS — portable state only, leaks=[].
+
+      - OPML: PASS — import path flattened OPML, not portable state restoration.
+
+      - MCP: PASS — initialize/tools/resources/steer all 200 and expected surfaces
+      present.
+
+      - UI: PASS — root loaded nonblank visible content/input.
+
+
+      Non-blocking note:
+
+      - Initial UI script probed `/doctor` as a frontend route and got 404; docs define
+      `/doctor` as Steer command and `/api/doctor` endpoint. Corrected documented-root
+      UI recheck passed.
+
+
+      Artifacts merged:
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test-retry.md`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/doctor.txt`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/mcp-snippets.txt`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/server-ui-recheck.log`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/server.log`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/smoke-results.json`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/state-export.json`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/ui-recheck.json`
+
+      - `.audit-artifacts/openrouter_verification/live-openrouter-smoke-system-test/ui.html`
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-verification-and-live-smoke.documentation-sync
     name: documentation-sync
     status: pending
