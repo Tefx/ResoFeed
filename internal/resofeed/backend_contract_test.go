@@ -19,7 +19,6 @@ const contractOwnerToken = "rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
 
 func TestHTTPRequiresOwnerTokenAndCanonicalError(t *testing.T) {
 	t.Parallel()
-	t.Skip("runtime HTTP router is expected stub debt for runtime-api-and-mcp-integration")
 
 	router := mustNotPanic(t, "NewRouter", func() http.Handler {
 		return NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
@@ -35,7 +34,6 @@ func TestHTTPRequiresOwnerTokenAndCanonicalError(t *testing.T) {
 
 func TestHTTPFeedTodayQueryValidationUsesStrictContract(t *testing.T) {
 	t.Parallel()
-	t.Skip("runtime HTTP router is expected stub debt for runtime-api-and-mcp-integration")
 
 	router := mustNotPanic(t, "NewRouter", func() http.Handler {
 		return NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
@@ -65,7 +63,6 @@ func TestHTTPFeedTodayQueryValidationUsesStrictContract(t *testing.T) {
 
 func TestHTTPSearchQueryValidationUsesStrictContract(t *testing.T) {
 	t.Parallel()
-	t.Skip("runtime HTTP router is expected stub debt for runtime-api-and-mcp-integration")
 
 	router := mustNotPanic(t, "NewRouter", func() http.Handler {
 		return NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
@@ -245,7 +242,6 @@ func TestSteeringConflictReceiptsDoNotDisableInvariants(t *testing.T) {
 
 func TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas(t *testing.T) {
 	t.Parallel()
-	t.Skip("runtime MCP handler is expected stub debt for runtime-api-and-mcp-integration")
 
 	handler := mustNotPanic(t, "NewMCPHandler", func() http.Handler {
 		return NewMCPHandler(MCPConfig{OwnerToken: contractOwnerToken})
@@ -262,6 +258,77 @@ func TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas(t *test
 	assertMarshaledJSON(t, MCPSearchItemsInput{Query: "sqlite", Limit: 20}, `{"query":"sqlite","source":null,"from":null,"to":null,"resonated":null,"limit":20}`)
 	assertMarshaledJSON(t, MCPReadItemInput{ItemID: "item_01"}, `{"item_id":"item_01"}`)
 	assertMarshaledJSON(t, MCPResonateItemInput{ItemID: "item_01", Resonated: true, ActorID: "briefing-agent", IdempotencyKey: "briefing-agent-resonate-item_01-001"}, `{"item_id":"item_01","resonated":true,"actor_id":"briefing-agent","idempotency_key":"briefing-agent-resonate-item_01-001"}`)
+
+	tools := mcpToolsListForTest(t, handler)
+	for _, name := range []string{"list_candidate_items", "search_items", "read_item", "mark_inspected", "resonate_item", "steer", "report_delivery"} {
+		if _, ok := tools[name]; !ok {
+			t.Fatalf("tools/list missing %s; tools=%v", name, tools)
+		}
+	}
+	assertSchemaProperty(t, tools, "list_candidate_items", "limit", "default", float64(20))
+	assertSchemaProperty(t, tools, "list_candidate_items", "limit", "maximum", float64(50))
+	assertSchemaRequired(t, tools, "search_items", "query")
+	assertSchemaProperty(t, tools, "search_items", "query", "maxLength", float64(500))
+	assertSchemaRequired(t, tools, "read_item", "item_id")
+	for _, tool := range []string{"mark_inspected", "resonate_item", "steer", "report_delivery"} {
+		assertSchemaRequired(t, tools, tool, "actor_id")
+		assertSchemaRequired(t, tools, tool, "idempotency_key")
+		assertSchemaProperty(t, tools, tool, "actor_id", "maxLength", float64(128))
+		assertSchemaProperty(t, tools, tool, "idempotency_key", "maxLength", float64(200))
+	}
+	assertSchemaProperty(t, tools, "steer", "command", "maxLength", float64(4000))
+	assertSchemaProperty(t, tools, "report_delivery", "delivered_at", "format", "date-time")
+}
+
+func mcpToolsListForTest(t *testing.T, handler http.Handler) map[string]map[string]any {
+	t.Helper()
+	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"tools/list"}`))
+	req.Header.Set("Authorization", "Bearer "+contractOwnerToken)
+	handler.ServeHTTP(recorder, req)
+	assertStatus(t, recorder, http.StatusOK)
+	var resp mcpResponse
+	if err := json.Unmarshal(recorder.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal tools/list response: %v; body=%s", err, recorder.Body.String())
+	}
+	data, err := json.Marshal(resp.Result)
+	if err != nil {
+		t.Fatalf("marshal tools/list result: %v", err)
+	}
+	var parsed struct {
+		Tools []map[string]any `json:"tools"`
+	}
+	if err := json.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("unmarshal tools/list result: %v; result=%s", err, data)
+	}
+	tools := make(map[string]map[string]any, len(parsed.Tools))
+	for _, tool := range parsed.Tools {
+		name, _ := tool["name"].(string)
+		tools[name] = tool
+	}
+	return tools
+}
+
+func assertSchemaRequired(t *testing.T, tools map[string]map[string]any, tool string, field string) {
+	t.Helper()
+	schema := tools[tool]["inputSchema"].(map[string]any)
+	required, _ := schema["required"].([]any)
+	for _, got := range required {
+		if got == field {
+			return
+		}
+	}
+	t.Fatalf("%s required fields = %v, want %s", tool, required, field)
+}
+
+func assertSchemaProperty(t *testing.T, tools map[string]map[string]any, tool string, property string, key string, want any) {
+	t.Helper()
+	schema := tools[tool]["inputSchema"].(map[string]any)
+	properties := schema["properties"].(map[string]any)
+	prop := properties[property].(map[string]any)
+	if got := prop[key]; got != want {
+		t.Fatalf("%s.%s.%s = %#v, want %#v", tool, property, key, got, want)
+	}
 }
 
 func authorizedRequest(method string, target string, body *bytes.Reader) *http.Request {

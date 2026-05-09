@@ -21,13 +21,14 @@ type MCPConfig struct {
 	DB             *sql.DB
 	OwnerToken     string
 	OwnerTokenHash string
+	Gemini         GeminiClient
 }
 
 // NewMCPHandler returns the /mcp Streamable HTTP handler. MCP exposes the same
 // product concepts as HTTP/UI: inspect, resonate, steer, retrieve, and report
 // delivery. It must not add per-agent registries or MCP-only product concepts.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash}
+	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, gemini: cfg.Gemini}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -166,7 +167,7 @@ func ResonateItemForMCP(ctx context.Context, db *sql.DB, input MCPResonateItemIn
 
 // SteerForMCP applies natural-language steering with owner-token authority,
 // actor attribution, idempotency, and human-over-agent precedence.
-func SteerForMCP(ctx context.Context, db *sql.DB, input MCPSteerInput) (SteerResult, error) {
+func SteerForMCP(ctx context.Context, db *sql.DB, gemini GeminiClient, input MCPSteerInput) (SteerResult, error) {
 	if strings.TrimSpace(input.Command) == "" || len(input.Command) > 4000 {
 		return SteerResult{}, fieldError("command")
 	}
@@ -175,7 +176,7 @@ func SteerForMCP(ctx context.Context, db *sql.DB, input MCPSteerInput) (SteerRes
 	}
 	var result SteerResult
 	_, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "steer", "", &result, func() (SteerResult, error) {
-		return ApplySteering(ctx, db, nil, SteerRequest{Command: input.Command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}})
+		return ApplySteering(ctx, db, gemini, SteerRequest{Command: input.Command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}})
 	})
 	if err != nil {
 		return SteerResult{}, err
@@ -231,6 +232,7 @@ type mcpHandler struct {
 	db             *sql.DB
 	ownerToken     string
 	ownerTokenHash string
+	gemini         GeminiClient
 }
 
 type mcpRequest struct {
@@ -422,7 +424,7 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input MCPSteerInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = SteerForMCP(ctx, h.db, input)
+			result, err = SteerForMCP(ctx, h.db, h.gemini, input)
 		}
 	case "report_delivery":
 		var input MCPReportDeliveryInput
@@ -617,14 +619,49 @@ func writeMCPJSONRPC(w http.ResponseWriter, resp mcpResponse) {
 
 func mcpToolList() []map[string]any {
 	return []map[string]any{
-		{"name": "list_candidate_items", "description": "Retrieve eligible feed candidates.", "inputSchema": map[string]any{"type": "object"}},
-		{"name": "search_items", "description": "Lexical and metadata item search.", "inputSchema": map[string]any{"type": "object", "required": []string{"query"}}},
-		{"name": "read_item", "description": "Read item detail and provenance.", "inputSchema": map[string]any{"type": "object", "required": []string{"item_id"}}},
-		{"name": "mark_inspected", "description": "Forward human inspection from an external context.", "inputSchema": map[string]any{"type": "object", "required": []string{"item_id", "actor_id", "idempotency_key"}}},
-		{"name": "resonate_item", "description": "Set resonance state.", "inputSchema": map[string]any{"type": "object", "required": []string{"item_id", "resonated", "actor_id", "idempotency_key"}}},
-		{"name": "steer", "description": "Apply natural-language steering.", "inputSchema": map[string]any{"type": "object", "required": []string{"command", "actor_id", "idempotency_key"}}},
-		{"name": "report_delivery", "description": "Record external surfacing.", "inputSchema": map[string]any{"type": "object", "required": []string{"item_id", "actor_id", "delivered_at", "idempotency_key"}}},
+		{"name": "list_candidate_items", "description": "Retrieve eligible feed candidates.", "inputSchema": objectSchema(nil, map[string]any{"limit": integerSchema("Result limit. Defaults to 20; maximum 50.", 1, 50, 20)})},
+		{"name": "search_items", "description": "Lexical and metadata item search. query is required for MCP; use list_candidate_items for empty-feed browsing.", "inputSchema": objectSchema([]string{"query"}, map[string]any{"query": stringSchema("Plain text lexical query; required for MCP search_items.", 1, 500), "source": nullableStringSchema("Optional source name or source id filter."), "from": nullableDateSchema("Optional inclusive lower calendar date, YYYY-MM-DD."), "to": nullableDateSchema("Optional inclusive upper calendar date, YYYY-MM-DD."), "resonated": nullableBoolSchema("Optional resonance filter."), "limit": integerSchema("Result limit. Defaults to 20; maximum 50.", 1, 50, 20)})},
+		{"name": "read_item", "description": "Read item detail and provenance.", "inputSchema": objectSchema([]string{"item_id"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0)})},
+		{"name": "mark_inspected", "description": "Forward human inspection from an external context.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "resonate_item", "description": "Set resonance state.", "inputSchema": objectSchema([]string{"item_id", "resonated", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "resonated": map[string]any{"type": "boolean", "description": "Required target resonance state."}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "steer", "description": "Apply natural-language steering.", "inputSchema": objectSchema([]string{"command", "actor_id", "idempotency_key"}, map[string]any{"command": stringSchema("Required natural-language steering command, max 4000 bytes.", 1, 4000), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "report_delivery", "description": "Record external surfacing.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "delivered_at", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "delivered_at": map[string]any{"type": "string", "format": "date-time", "description": "Required RFC3339 time the item was externally surfaced."}, "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 	}
+}
+
+func objectSchema(required []string, properties map[string]any) map[string]any {
+	schema := map[string]any{"type": "object", "additionalProperties": false, "properties": properties}
+	if len(required) > 0 {
+		schema["required"] = required
+	}
+	return schema
+}
+
+func stringSchema(description string, minLength int, maxLength int) map[string]any {
+	schema := map[string]any{"type": "string", "description": description}
+	if minLength > 0 {
+		schema["minLength"] = minLength
+	}
+	if maxLength > 0 {
+		schema["maxLength"] = maxLength
+	}
+	return schema
+}
+
+func integerSchema(description string, minimum int, maximum int, defaultValue int) map[string]any {
+	return map[string]any{"type": "integer", "description": description, "minimum": minimum, "maximum": maximum, "default": defaultValue}
+}
+
+func nullableStringSchema(description string) map[string]any {
+	return map[string]any{"type": []string{"string", "null"}, "description": description, "default": nil}
+}
+
+func nullableDateSchema(description string) map[string]any {
+	return map[string]any{"type": []string{"string", "null"}, "format": "date", "description": description, "default": nil}
+}
+
+func nullableBoolSchema(description string) map[string]any {
+	return map[string]any{"type": []string{"boolean", "null"}, "description": description, "default": nil}
 }
 
 func mcpResourceList() []map[string]string {

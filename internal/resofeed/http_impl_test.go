@@ -115,6 +115,22 @@ func TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters(t *testing.T) {
 	}
 }
 
+func TestStaticRootServesHTMLAccessGate(t *testing.T) {
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/", nil))
+
+	assertStatus(t, recorder, http.StatusOK)
+	contentType := recorder.Header().Get("Content-Type")
+	if !strings.HasPrefix(contentType, "text/html") {
+		t.Fatalf("Content-Type = %q, want text/html", contentType)
+	}
+	body := recorder.Body.String()
+	if strings.TrimSpace(body) == "RESOFEED" || !strings.Contains(body, "RESOFEED") || !strings.Contains(strings.ToLower(body), "owner token") {
+		t.Fatalf("root body did not expose HTML owner-token access gate; body=%q", body)
+	}
+}
+
 func seedHTTPHandlerCorpus(t *testing.T, ctx context.Context, db *sql.DB, now time.Time) {
 	t.Helper()
 	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_at, last_fetch_status, is_active, revision) values ('src_http', 'https://http.example/feed.xml', 'HTTP Source', ?, ?, 'ok', 1, 1)`, now.Format(time.RFC3339), now.Format(time.RFC3339))
