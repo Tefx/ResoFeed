@@ -19515,3 +19515,103 @@ phases:
 
       - Implementation logic introduced: NONE required'
     agent: golang-developer
+  - id: backend-expected-red-tests
+    name: Backend Expected-Red Contract Tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Define backend tests that expose the Manual RSS Fetch behavior gap before implementation.
+
+
+      Scope is limited to tests, fixtures, and minimal test helpers under internal/resofeed/*test.go.
+      Do NOT add product implementation code in this step.
+
+
+      Test obligations:
+
+      - POST /api/ingest requires owner token, rejects query parameters, accepts exactly
+      `{}`, and returns documented JSON.
+
+      - POST /api/sources/{id}/fetch requires owner token, rejects query parameters,
+      accepts exactly `{}`, and returns documented JSON.
+
+      - Manual/manual overlap returns 409 conflict without durable queue/job/receipt
+      artifacts.
+
+      - Background/manual overlap returns 409 for manual HTTP trigger or skips background
+      tick per contract, with one shared guard path.
+
+      - Guard releases after success, operational error, and panic/recover-style failure
+      path so stale guard state cannot persist.
+
+      - POST /api/ingest with zero active sources returns request-level 200, completed/zero-count
+      result, and errors: [].
+
+      - Missing, deleted, and inactive source fetch return 404 not_found.
+
+      - Operational RSS/source failures return request-level 200 with source-level
+      errors.
+
+      - No tests should rely on convenience request bodies or uncontracted query parameters.
+
+
+      Expected-red semantics:
+
+      - Red is expected before manual-rss-fetch.backend-implementation completes.
+
+      - Success for this step means the tests expose the missing behavior without
+      modifying product code.
+
+      - Evidence must list expected_failures or exposed_gaps and name manual-rss-fetch.backend-implementation
+      as the downstream implementation owner.'
+    verification: '- Modified files are limited to backend tests/fixtures/helpers.
+
+      - Test cases cover main path and the highest-risk failure paths: 409 overlap,
+      stale guard release, zero sources, 404 inactive/missing/deleted, source-level
+      RSS failure, auth, empty-body/no-query validation.
+
+      - Evidence records expected red failures before implementation and does not
+      claim green until implementation/retest.
+
+      - Downstream gates protected: manual-rss-fetch.integration-proof, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files changed: <files>
+
+      - Product files changed: NONE required
+
+      - Exact tests added: <test names>
+
+      - Expected command: <go test command>
+
+      - Expected failures / exposed gaps before implementation: <list>
+
+      - Downstream implementation owner: manual-rss-fetch.backend-implementation'
+    depends_on:
+    - backend-contract
+    agent: golang-developer
