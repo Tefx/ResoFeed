@@ -18708,106 +18708,72 @@ phases:
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
     status: pending
-    description: 'step_type: implementation
+    description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
+      upstream_artifacts:\n  - path: web/src/lib/api-contract.ts or frontend contract\
+      \ artifacts created by frontend-contract\n    from_step: frontend-contract\n\
+      \    tier: contract\n  - path: web/src/routes/components/__tests__ and web/src/lib/*.test.ts\n\
+      \    from_step: frontend-expected-red-tests\n    tier: test\n\nComplete the\
+      \ frontend Manual RSS Fetch behavior for the Source Ledger within the locked\
+      \ contract from frontend-contract and the protected expected-red tests from\
+      \ frontend-expected-red-tests.\n\nUPSTREAM ARTIFACTS (authoritative):\n- frontend-contract\
+      \ — API wire schemas, Source Ledger DOM states, visual constraints, a11y/focus\
+      \ expectations, timestamp formatting, and terse error copy are AUTHORITATIVE.\n\
+      - frontend-expected-red-tests — client/rendering tests, fixtures, DOM assertions,\
+      \ and snapshots are PROTECTED; do not weaken or delete them to make implementation\
+      \ pass.\n\nYOUR SCOPE: Fill in missing client methods and Svelte rendering/state-transition\
+      \ bodies within the existing signatures and component structure. Use Edit tool\
+      \ to modify bodies only where contract artifacts already define the surface.\n\
+      \nScope and files:\n- web/src/routes/components/SourceLedger.svelte — add manual\
+      \ Source Ledger controls and exact state rendering.\n- web/src/routes/+page.svelte\
+      \ — wire handlers and refresh source/feed state after fetch/ingest completion.\n\
+      - web/src/lib/api-client.ts and web/src/lib/api-contract.ts — add client methods/types\
+      \ for POST /api/ingest and POST /api/sources/{id}/fetch using the documented\
+      \ wire schemas.\n- web/src/app.css / design token files only if needed to match\
+      \ docs/ui-preview.html exactly.\n- web/src/routes/components/__tests__ and web/src/lib/*.test.ts\
+      \ — preserve and satisfy protected tests from frontend-expected-red-tests.\n\
+      \nRequired behavior:\n- Source Ledger header/action bar renders global [RUN\
+      \ INGEST].\n- Each source row renders [FETCH] on the same row as the source,\
+      \ with right-aligned action block.\n- Active global ingest replaces label with\
+      \ [INGESTING...], disabled, no spinner, no progress animation.\n- Active source\
+      \ fetch replaces label with [FETCHING...], disabled, no spinner, no progress\
+      \ animation.\n- Completion reverts labels and updates last_ingest or last_fetch\
+      \ as HH:MM:SS derived from RFC3339.\n- Error text is terse/truncated per DESIGN.md;\
+      \ no friendly SaaS copy.\n- Terminal bracket action styling must preserve bracket\
+      \ padding, hover inversion, uppercase labels, no shadows, no rounded SaaS buttons,\
+      \ no animations.\n- Frontend must handle 409 conflict and 404 not_found without\
+      \ creating local fake jobs/queues.\n\n## Frontend Completion Criteria (rendering\
+      \ required)\nThis is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:\n\
+      1. Logic correctness: API calls, state transitions, RFC3339-to-HH:MM:SS formatting,\
+      \ and error truncation work.\n2. Rendering completeness: Source Ledger produces\
+      \ visible DOM elements matching the design.\nA component that returns data objects\
+      \ instead of rendered elements does NOT satisfy this step. Evidence MUST include\
+      \ rendered output proof (DOM snapshot, screenshot, or test renderer output).\n\
+      \nIf a contract artifact is wrong or incomplete, document a deviation record\
+      \ (type, what, why, impact) — do NOT silently rewrite the contract or weaken\
+      \ tests.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only completion is NOT acceptable. Each deliverable MUST contain\
+      \ substantive logic that processes its inputs and produces outputs that vary\
+      \ based on those inputs.\n\n## Gate Preview (what the gate WILL reject)\n1.\
+      \ SaaS-style spinners, shadows, animations, rounded pills/buttons, or friendly\
+      \ copy.\n2. Incorrect labels such as lowercase fetch/import/export text.\n3.\
+      \ State text that appears outside the bracket action replacement contract.\n\
+      4. RFC3339 timestamps displayed raw where DESIGN.md requires HH:MM:SS.\n5. Error\
+      \ strings that cause Source Ledger layout shifts instead of terse truncation.\n\
+      6. Weakened expected-red tests or contract drift from frontend-contract."
+    verification: '- Rendering tests from frontend-expected-red-tests now pass and
+      prove [FETCH], [RUN INGEST], [FETCHING...], and [INGESTING...] visible in Source
+      Ledger DOM.
 
-      agent_source: project
+      - Client tests pass and prove POST /api/ingest and POST /api/sources/{id}/fetch
+      call the exact endpoints with `{}` and handle 200/409/404 payloads.
 
-      work_type: new_capability
-
-
-      Implement the locked frontend Manual RSS Fetch behavior for the Source Ledger.
-
-
-      Scope and files:
-
-      - web/src/routes/components/SourceLedger.svelte — add manual Source Ledger controls
-      and exact state rendering.
-
-      - web/src/routes/+page.svelte — wire handlers and refresh source/feed state
-      after fetch/ingest completion.
-
-      - web/src/lib/api-client.ts and web/src/lib/api-contract.ts — add client methods/types
-      for POST /api/ingest and POST /api/sources/{id}/fetch using the documented wire
-      schemas.
-
-      - web/src/app.css / design token files only if needed to match docs/ui-preview.html
-      exactly.
-
-      - web/src/routes/components/__tests__ and web/src/lib/*.test.ts — add rendering/client
-      tests.
-
-
-      Required behavior:
-
-      - Source Ledger header/action bar renders global [RUN INGEST].
-
-      - Each source row renders [FETCH] on the same row as the source, with right-aligned
-      action block.
-
-      - Active global ingest replaces label with [INGESTING...], disabled, no spinner,
-      no progress animation.
-
-      - Active source fetch replaces label with [FETCHING...], disabled, no spinner,
-      no progress animation.
-
-      - Completion reverts labels and updates last_ingest or last_fetch as HH:MM:SS
-      derived from RFC3339.
-
-      - Error text is terse/truncated per DESIGN.md; no friendly SaaS copy.
-
-      - Terminal bracket action styling must preserve bracket padding, hover inversion,
-      uppercase labels, no shadows, no rounded SaaS buttons, no animations.
-
-      - Frontend must handle 409 conflict and surface terse Source Ledger state without
-      creating local fake jobs/queues.
-
-
-      ## Frontend Completion Criteria (rendering required)
-
-      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
-
-      1. Logic correctness: API calls, state transitions, RFC3339-to-HH:MM:SS formatting,
-      and error truncation work.
-
-      2. Rendering completeness: Source Ledger produces visible DOM elements matching
-      the design.
-
-      A component that returns data objects instead of rendered elements does NOT
-      satisfy this step. Evidence MUST include rendered output proof (DOM snapshot,
-      screenshot, or test renderer output).
-
-
-      ## Completion Criteria (stub exclusion)
-
-      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
-      deliverable MUST contain substantive logic that processes its inputs and produces
-      outputs that vary based on those inputs.
-
-
-      ## Gate Preview (what the gate WILL reject)
-
-      1. SaaS-style spinners, shadows, animations, rounded pills/buttons, or friendly
-      copy.
-
-      2. Incorrect labels such as lowercase fetch/import/export text.
-
-      3. State text that appears outside the bracket action replacement contract.
-
-      4. RFC3339 timestamps displayed raw where DESIGN.md requires HH:MM:SS.
-
-      5. Error strings that cause Source Ledger layout shifts instead of terse truncation.'
-    verification: '- Rendering tests prove [FETCH], [RUN INGEST], [FETCHING...], and
-      [INGESTING...] visible in Source Ledger DOM.
-
-      - Client tests prove POST /api/ingest and POST /api/sources/{id}/fetch call
-      the exact endpoints and handle 200/409/404 payloads.
-
-      - Time-format tests prove RFC3339 is rendered as HH:MM:SS.
+      - Time-format tests pass and prove RFC3339 is rendered as HH:MM:SS.
 
       - Visual artifact evidence is produced for the Source Ledger default, source-fetch
-      active, global-ingest active, error, and completion states.
+      active, global-ingest active, error/conflict, and completion states.
 
-      - Downstream gates protected: manual-rss-fetch.uiux-audit and manual-rss-fetch.gate.'
+      - Downstream gates protected: manual-rss-fetch.uiux-audit, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
@@ -18819,58 +18785,40 @@ phases:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Frontend Implementation Evidence
+      ## Implementation Evidence
 
+      - Contract step consumed: frontend-contract
 
-      **Files changed**:
+      - Protected tests consumed: frontend-expected-red-tests
 
-      - <list>
+      - Product files changed: <files>
 
+      - Tests preserved/updated only as contract-faithful: <summary>
 
-      **Rendered states captured**:
+      - Client command/output: <paste>
 
-      - default Source Ledger:
+      - Rendering command/output or DOM snapshot: <paste>
 
-      - source fetch active:
+      - Visual artifacts for required states: <paths>
 
-      - global ingest active:
+      - Forbidden spinner/animation/SaaS styling introduced: NONE required
 
-      - conflict/error:
-
-      - completion timestamp:
-
-
-      **Commands/tests run**:
-
-      ```
-
-      <paste commands and output>
-
-      ```
-
-
-      **Exact UI text proof**:
-
-      - [FETCH]:
-
-      - [FETCHING...]:
-
-      - [RUN INGEST]:
-
-      - [INGESTING...]:
-
-      - HH:MM:SS example:
-
-
-      **Forbidden visual patterns check**:
-
-      - spinners/animations/shadows/SaaS button styling present: YES/NO
-
-      '
+      - Deviation records: <none or list>'
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    depends_on:
+    - frontend-contract
+    - frontend-expected-red-tests
+    agent: frontend-engineer
   - id: manual-rss-fetch.integration-proof
     name: Manual RSS Fetch Runtime Integration Proof
     status: pending
