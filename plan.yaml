@@ -7976,7 +7976,7 @@ phases:
       \ false"
   - id: frontend-implementation.fix-frontend-gate-proof-artifacts
     name: Fix frontend gate proof artifacts
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -8135,6 +8135,8 @@ phases:
     depends_on:
     - frontend-implementation.frontend-gate
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-09T10:35:40.692730+00:00'
   - id: frontend-implementation.retest-frontend-gate-proof-artifacts
     name: Retest frontend gate proof artifacts
     status: pending
