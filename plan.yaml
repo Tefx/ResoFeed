@@ -12289,28 +12289,37 @@ phases:
       \ docs and the OpenRouter adapter contract. Modified files must be limited to\
       \ tests, fixtures, and minimal test helpers.\n\nSpec refs and touch_paths:\n\
       - spec_refs: user architecture_basis runtime_contract, docs/ARCHITECTURE.md,\
-      \ AGENTS.md.\n- touch_paths: internal/resofeed/*_test.go, cmd/resofeed/*_test.go\
-      \ if present, docs test/search harness if present.\n- harness_refs: Go test\
-      \ harness, httptest fake OpenRouter server, docs grep/search test harness.\n\
-      - authoritative_interface: runtime flags and OpenRouter endpoint from architecture_basis.\n\
-      \nRequired expected-red coverage:\n1. CLI/runtime flags:\n   - `--gemini-api-key`\
-      \ and `--gemini-model` are rejected/unknown.\n   - `--openrouter-api-key` is\
-      \ required for serve/runtime LLM setup.\n   - `--openrouter-model` is optional;\
+      \ AGENTS.md, and runtime-secret-env-config-foundation.lock-runtime-secret-source-policy.\n\
+      - touch_paths: internal/resofeed/*_test.go, cmd/resofeed/*_test.go if present,\
+      \ docs test/search harness if present.\n- harness_refs: Go test harness, httptest\
+      \ fake OpenRouter server, temporary `.env` fixture with fake OpenRouter key,\
+      \ docs grep/search test harness.\n- authoritative_interface: runtime flags,\
+      \ OpenRouter endpoint, and env/.env secret-source contract.\n\nRequired expected-red\
+      \ coverage:\n1. CLI/runtime flags and secret source:\n   - `--gemini-api-key`\
+      \ and `--gemini-model` are rejected/unknown after OpenRouter migration.\n  \
+      \ - OpenRouter API key is not required on the command line; it is resolved from\
+      \ the secret resolver contract.\n   - `.env` with fake `OPENROUTER_KEY` and/or\
+      \ `OPENROUTER_API_KEY` can satisfy startup without printing the value.\n   -\
+      \ OS environment overrides `.env` according to the locked OpenRouter alias/precedence\
+      \ contract.\n   - Empty/whitespace OpenRouter key values are rejected with redacted\
+      \ errors.\n   - `--openrouter-model` is optional and non-secret if retained;\
       \ empty means account default.\n   - No startup network model validation occurs\
       \ for explicit or empty model.\n2. Adapter httptest fake OpenRouter:\n   - POST\
       \ path equivalent to `/api/v1/chat/completions`.\n   - Authorization bearer\
-      \ header uses configured key but tests never print the key.\n   - JSON request\
+      \ header uses resolved key but tests never print the key.\n   - JSON request\
       \ includes `response_format` JSON mode.\n   - `model` omitted when empty and\
       \ passed unchanged when set.\n   - 429 and 5xx retry behavior is specified.\n\
       \   - invalid JSON and OpenRouter error responses map to safe Go errors/model_status\
       \ without panics.\n3. Docs/search tests:\n   - ARCHITECTURE/USAGE docs no longer\
-      \ promise Gemini flags.\n   - OpenRouter flags and optional model semantics\
-      \ are present.\n\nExpected result: red before implementation because Gemini\
+      \ promise Gemini flags.\n   - Docs describe OpenRouter env/.env configuration\
+      \ and optional model semantics.\n   - Docs do not require CLI secret flags or\
+      \ shell-history API key examples.\n   - Docs reiterate `.env` is local and must\
+      \ not be committed.\n\nExpected result: red before implementation because Gemini\
       \ flags/adapter behavior are not yet migrated. Success means the tests expose\
-      \ the gap without product code changes."
+      \ the gap without product code changes and without leaking fake secrets."
     verification: local-check protecting openrouter-llm-contract-and-red-tests.gate
       and downstream openrouter-llm-implementation. Tests should run and fail for
-      the expected OpenRouter/Gemini gaps only.
+      the expected OpenRouter/Gemini/secret-source gaps only, with fake secrets redacted.
     evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
       \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
       \ — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red Test Evidence\n\
