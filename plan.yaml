@@ -9463,7 +9463,7 @@ phases:
       - No forbidden ResoFeed surfaces introduced per worker evidence.'
   - id: retest-end-to-end-blockers
     name: Retest end-to-end blockers
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -9631,6 +9631,158 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T11:39:57.290862+00:00'
+    done_at: '2026-05-09T11:44:56.567238+00:00'
+    evidence: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: End-to-end blocker retest for spec conformance and wiring audit failures
+
+      **Independence Level**: L2
+
+      **Timestamp**: 2026-05-09T19:45:00-07:00
+
+
+      ### refs Read Confirmation
+
+      - .agents/instructions.md — canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`;
+      one Go deployable, one SQLite DB, no SEARCH/STATE/settings bloat, owner-token
+      only.
+
+      - docs/PRD.md — AC-4 filter/boost execution; AC-5 Inspect is not agreement;
+      AC-7/9 delivery suppression and silent evaluation separation; AC-11 visible
+      agent steering receipt.
+
+      - docs/ARCHITECTURE.md — HTTP/MCP share operations; `ItemSummary.value_tier`
+      required; ranking suppresses externally surfaced items unless fresh related
+      development exists; state import atomic active-state replacement.
+
+      - docs/DESIGN.md — top operational labels TODAY/SOURCE LEDGER; steering receipts
+      show actor/change/correction path; value tier can render as terse label; state
+      import/export under Source Ledger.
+
+      - docs/DESIGN_VISION.md — no left sidebar/settings dashboard; flat Source Ledger;
+      subtle agent receipt pills.
+
+      - docs/USAGE.md — `serve` starts UI/API/MCP; `/api/state/import` requires JSON
+      + owner token; delegated agent steering may render `agent:briefing-agent ...
+      correct in Steer`.
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      uiux_audit_verdict: PASS
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE_AND_OPEN_GATE
+
+
+      ## Required Evidence Fields
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: green
+
+      - failure_alignment: none; prior blockers B1/B2/B3/W1 and should-fix seams have
+      runtime/static closure evidence.
+
+      - product_implementation_files_modified: false
+
+      - uncertainty_sources: frontend first run in worker failed only because `web/node_modules`
+      was absent; after dependency install, tests passed. No live Gemini call; deterministic
+      fakes used for MCP/steering seams.
+
+
+      ## Commands Run by Worker
+
+      - `go test -v ./internal/resofeed -run ''Test.*(Strict|Boost|Inspect|Preference|MCP|Candidate|Delivery|Value|Superseded|Runtime|Rebuild|StateImport|Agent|Attribution|Nav|Search)''`
+      → PASS including strict filter/boost, inspect-not-preference, MCP delivery resurfacing,
+      value_tier exposure, SupersededBy.
+
+      - `go test -v ./...` → PASS; `cmd/resofeed [no test files]`; `internal/resofeed`
+      all tests pass.
+
+      - `npm --prefix web test -- --runInBand` → initial 127 due missing node_modules;
+      after `npm --prefix web install`, PASS with svelte-check 0 errors/0 warnings
+      and 2 test files/16 tests passed.
+
+      - `npm --prefix web run build && go build -o ./bin/resofeed ./cmd/resofeed`
+      → PASS.
+
+      - Runtime smoke: temp binary served `/api/doctor` over real socket with 200
+      text/plain body containing rss/gemini/extraction/ingest statuses.
+
+      - Static seam scan: no exported `ServeHTTPRuntime`, `RebuildSearchIndex`, or
+      `DeliveryReportRequest`; `/api/state/import` frontend client posts JSON with
+      auth via shared request wrapper.
+
+
+      ## Behavioral Proof Register
+
+      - PRD §10 / DESIGN App Shell: SEARCH and STATE are not top-level peer nav buttons.
+      status: PROVEN. Evidence: UI/UX audit artifacts show nav `TODAY`/`SOURCE LEDGER`;
+      `+page.svelte` nav buttons only TODAY and SOURCE LEDGER.
+
+      - PRD AC-11 / DESIGN Steering Receipt: MCP/agent steering produces human-visible
+      attribution without accounts/per-agent auth. status: PROVEN. Evidence: audit
+      visible text includes `agent:briefing-agent ... correct in Steer`; UI renders
+      `agent:{rule.created_by_actor_id}`.
+
+      - PRD AC-4: strict filter and boost policies execute at system level. status:
+      PROVEN. Evidence: `TestStrictFilterAndBoostSteeringExecuteOnRealFeedRanking`
+      passed.
+
+      - PRD AC-5: inspecting controversial item does not create durable preference/agreement
+      signal. status: PROVEN. Evidence: `TestInspectionOfControversialItemDoesNotCreateDurablePreference`
+      passed.
+
+      - PRD AC-7/AC-9: delivered item suppresses candidate resurfacing until fresh
+      related development; silent candidates remain eligible. status: PROVEN. Evidence:
+      `TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment` and MCP bound-listener
+      tests passed.
+
+      - Architecture `ItemSummary.value_tier` / DESIGN Feed Item/Inspector: value_tier
+      consumed/exposed through production read paths and UI. status: PROVEN. Evidence:
+      `TestIngestPersistsValueTierAndFreshSearchIndex`, `TestValueTierExposedThroughHTTPAndMCPReadPaths`,
+      and UI artifact visible text includes `HIGH`.
+
+      - Should-fix seam disposition: no remaining blocker-class write-only/orphan
+      seams intersect final gates. status: PROVEN. Evidence: `TestHumanSteeringSupersedesPriorAgentRuleWithSupersededBy`,
+      static scan no exported orphan names, and `/api/state/import` client wiring.
+
+      - UI/UX audit dependency: status: PROVEN. Evidence: `uiux-audit-end-to-end-blockers`
+      PASS, blockers [], should_fix [], gate_open_allowed true.
+
+
+      ## Mainline Final-State Verification
+
+      - No branch delta to merge from `vectl/step-retest-end-to-end-blockers`; worker
+      reported clean worktree.
+
+      - Ran after worker completion in main: `go test -v ./internal/resofeed -run
+      ''Test.*(Strict|Boost|Inspect|Preference|MCP|Candidate|Delivery|Value|Superseded|Runtime|Rebuild|StateImport|Agent|Attribution|Nav|Search)''
+      && go test ./... && npm --prefix web ci && npm --prefix web test && npm --prefix
+      web run build && mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed`.
+
+      - Output: targeted Go tests PASS; `go test ./...` PASS; npm ci installed 150
+      packages; svelte-check 0 errors/0 warnings; vitest 2 files/16 tests PASS; web
+      production build PASS; Go binary build PASS.
+
+
+      ## Findings
+
+      - No blocker-class findings.
+
+      - Non-blocking debt: npm audit still reports 3 low-severity dependency findings;
+      outside this retest blocker scope.'
   - id: uiux-audit-end-to-end-blockers
     name: UI/UX audit end-to-end blocker remediation
     status: done
