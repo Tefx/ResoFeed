@@ -8914,8 +8914,9 @@ phases:
 
       - no sync/merge/history/account/RAG drift'
     verification: phase-check protecting finalization. Gate may OPEN only when full-system
-      evidence is specific, runtime/UI/MCP paths are real, and all blocker-class behavioral
-      obligations are PROVEN or have explicit closure paths.
+      evidence is specific, runtime/UI/MCP paths are real, all blocker-class behavioral
+      obligations are PROVEN or have explicit closure paths, and retest-end-to-end-blockers
+      reports verdict=PASS, blockers=[], gate_open_allowed=true, orchestrator_action_hint=COMPLETE_AND_OPEN_GATE.
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
@@ -8959,6 +8960,7 @@ phases:
     - end-to-end-integration.black-box-acceptance-pass
     - end-to-end-integration.end-to-end-wiring-audit
     - end-to-end-integration.end-to-end-spec-conformance
+    - retest-end-to-end-blockers
     agent: gate-reviewer
   - id: fix-end-to-end-blockers
     name: Fix end-to-end blockers
