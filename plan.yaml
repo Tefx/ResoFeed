@@ -19133,6 +19133,7 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+    agent: integration-verifier
   - id: manual-rss-fetch.spec-conformance
     name: Manual RSS Fetch Spec Conformance
     status: pending
