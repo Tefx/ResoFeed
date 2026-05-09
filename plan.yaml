@@ -19497,3 +19497,115 @@ phases:
     refs:
     - docs/ARCHITECTURE.md
     agent: golang-developer
+  - id: manual-rss-fetch.backend-expected-red-tests
+    name: Backend Expected-Red Tests (manual RSS fetch)
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Define expected-red backend tests for the Manual RSS Fetch contract before backend
+      implementation exists.
+
+
+      Purpose:
+
+      - Expose the gap between the locked backend contract and current behavior without
+      modifying product implementation code.
+
+      - Red is expected before manual fetch implementation. Success means tests fail
+      for the intended missing endpoints/guard/result behavior and do not fail because
+      of malformed tests or unrelated setup errors.
+
+
+      Allowed scope:
+
+      - internal/resofeed/*_test.go and test fixtures/helpers only.
+
+      - No product-code implementation edits in internal/resofeed/*.go.
+
+
+      Required expected-red coverage:
+
+      - POST /api/ingest accepts exactly JSON {} with no query params and returns
+      documented IngestRunResult shape.
+
+      - POST /api/sources/{id}/fetch accepts exactly JSON {} with no query params
+      and returns documented { ingest, source } shape for an active source.
+
+      - 409 conflict when any manual/background ingest/fetch operation already holds
+      the single process guard; conflict body includes ingest_running:true, scope:"all",
+      retry_allowed:true.
+
+      - POST /api/ingest with zero active sources returns HTTP 200 completed with
+      zero counts and errors: [].
+
+      - POST /api/sources/{id}/fetch returns 404 not_found for missing, deleted, or
+      inactive sources.
+
+      - Operational RSS/source failure returns HTTP 200 with source-level errors,
+      not a generic transport failure.
+
+      - Guard release is covered after error path so a stale held guard is exposed.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      At least one request fixture MUST use the exact documented body `{}` and no
+      query parameters from docs/ARCHITECTURE.md §6. Do not include convenience fields
+      such as idempotency_key.
+
+
+      Evidence requirements:
+
+      - Identify the exact expected failing tests and failure messages.
+
+      - Name the exposed gaps and downstream owner: manual-rss-fetch.backend-implementation.
+
+      - Confirm modified files are limited to tests/fixtures/helpers and no product-code
+      implementation edits occurred.'
+    verification: '- Expected-red tests are added and intentionally fail before implementation
+      for the missing Manual RSS Fetch behavior.
+
+      - Failure output demonstrates the intended gap: missing routes, missing conflict
+      guard, missing response schemas, or missing failure-path mapping.
+
+      - No product implementation code is modified in this step.
+
+      - Downstream implementation owner: manual-rss-fetch.backend-implementation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Tests added/updated: <file::test names>
+
+      - Command run: <go test command>
+
+      - Expected failures / exposed_gaps: <paste relevant output>
+
+      - Confirmation: red is expected before manual-rss-fetch.backend-implementation
+
+      - Scope confirmation: only test/fixture/helper files changed; no product-code
+      implementation edits
+
+      - Spec-derived minimal fixtures: request body `{}` with no query params; idempotency_key
+      omitted'
+    depends_on:
+    - manual-rss-fetch.backend-contract
+    agent: golang-developer
