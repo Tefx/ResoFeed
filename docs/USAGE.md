@@ -1,8 +1,8 @@
 # ResoFeed Usage Guide
 
-Status: target usage contract
+Status: implemented usage contract
 
-ResoFeed is still being implemented. This document defines the concrete user-facing command and API contract implementation should satisfy.
+This document describes the implemented user-facing command, UI, HTTP API, and MCP usage contract. `docs/ARCHITECTURE.md` remains the canonical schema and boundary source.
 
 ## What ResoFeed Is
 
@@ -26,6 +26,7 @@ ResoFeed is not an inbox-zero reader, read-it-later app, semantic chat product, 
 ```bash
 npm --prefix web install
 npm --prefix web run build
+mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 ```
 
@@ -75,7 +76,7 @@ Save this token. Use it for protected HTTP requests and MCP clients.
 
 The generated owner token is runtime credential state. It is not part of Source Ledger export/import and is not a user-facing activity record.
 
-Explicit `--owner-token` values must be at least 32 characters. Tokens are not trimmed; leading or trailing whitespace makes the token invalid.
+Explicit `--owner-token` values must be at least 32 visible non-whitespace characters. Tokens are not trimmed; leading or trailing whitespace makes the token invalid.
 
 To rotate or recover the token, start ResoFeed once with a new explicit token:
 
@@ -464,8 +465,8 @@ Use Steer to:
 
 - add a source by pasting an RSS/Atom URL;
 - adjust future scoring or summaries;
-- run lightweight commands such as `/doctor`;
-- optionally enter search-like commands if the implementation reuses Steer for search.
+- run `/doctor`, which the web UI dispatches to `GET /api/doctor` and renders as raw text;
+- enter `search <query>` to open the lexical search surface in the current web UI.
 
 Examples:
 

@@ -1,7 +1,7 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Proposed
+Status: Implemented current contract
 Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
 
 ## 1. Decisions
@@ -864,7 +864,7 @@ Responsibilities:
 - render the dense-but-legible feed and Inspector;
 - show an owner-token prompt on first open before calling `/api/*`;
 - store the owner token in browser-local storage as `resofeed.ownerToken` and send it as `Authorization: Bearer <OWNER_TOKEN>` on every `/api/*` request;
-- keep Steer as the primary command surface for URL subscription, steering, search command entry if reused, and `/doctor`;
+- keep Steer as the primary command surface for URL subscription, steering, search command entry, and `/doctor`; the current web UI routes `/doctor` to `GET /api/doctor` rather than posting it to `/api/steer`;
 - expose flat Source Ledger without folders/tags/settings-dashboard behavior;
 - expose state export/import as terse actions, not backup-management UI;
 - show fallback/status labels plainly.
@@ -924,6 +924,7 @@ Runnable verification commands after implementation:
 ```bash
 npm --prefix web install
 npm --prefix web run build
+mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 go test ./...
 ```
