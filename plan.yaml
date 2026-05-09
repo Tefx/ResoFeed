@@ -19504,7 +19504,7 @@ phases:
       was read. Build artifact was directed to temp path during mainline verification.'
   - id: backend-expected-red-tests
     name: Backend Expected-Red Contract Tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -19604,6 +19604,87 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T21:22:45.628777+00:00'
+    done_at: '2026-05-09T21:26:38.460741+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — `/api/*` requires owner-token auth; query validation
+      runs after auth and before backend reads; current HTTP contract permits strict
+      400 bad_request for invalid query/body and documents single-process/no-queue
+      architecture.
+
+      - docs/PRD.md — ResoFeed is a minimal single-tenant RSS intelligence tool; feed
+      intake must isolate source failures without blocking other sources and avoid
+      complex queues/activity ledgers.
+
+      - AGENTS.md — NOT READ: not present in isolated worktree; direct read returned
+      file not found and `glob AGENTS.md` returned no files.
+
+      - .agents/instructions.md — canonical docs are law; one Go binary, one SQLite
+      DB, flat `internal/resofeed` files, owner token boundary, no queues/sync/activity-ledger
+      expansions.
+
+      - internal/resofeed/manual_fetch_contract.go — pins `/api/ingest`, `/api/sources/{id}/fetch`,
+      exact `{}` body, 409 conflict semantics, request-level 200 with source-level
+      errors, zero-source completed result, and memory-only shared guard release semantics.
+
+      - internal/resofeed/manual_fetch_contract_test.go — upstream tests already pin
+      constants, JSON schema for `ManualFetchResult`, 409 conflict code, and forbidden
+      architecture expansions.
+
+
+      ## Expected-Red Test Evidence
+
+      - step_intent: test_define_red
+
+      - expected_result: red
+
+      - observed_result: red; `go test ./internal/resofeed -run ''TestManualRSSFetch''`
+      failed as expected because manual fetch endpoints currently return 404.
+
+      - failure_alignment: observed failures expose the intended missing Manual RSS
+      Fetch backend implementation: `/api/ingest` and `/api/sources/{id}/fetch` are
+      not routed yet, so validation, JSON result, overlap guard, zero-source, and
+      source-level operational error behavior cannot pass before `manual-rss-fetch.backend-implementation`.
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - Test files changed: `internal/resofeed/manual_fetch_expected_red_test.go`
+
+      - Product files changed: NONE required
+
+      - Exact tests added: `TestManualRSSFetchHTTPContractsRequireAuthNoQueryAndExactEmptyObject`;
+      `TestManualRSSFetchGlobalIngestZeroSourcesReturnsCompletedZeroCounts`; `TestManualRSSFetchSourceFetchMissingDeletedAndInactiveReturnNotFound`;
+      `TestManualRSSFetchOperationalSourceFailuresReturnRequestLevelOK`; `TestManualRSSFetchSharedGuardRejectsManualOverlapAndDoesNotPersistArtifacts`;
+      `TestManualRSSFetchGuardReleasesAfterSuccessOperationalErrorAndRecoveredFailure`.
+
+      - Expected command: `go test ./internal/resofeed -run ''TestManualRSSFetch''`
+
+      - Expected failures / exposed gaps before implementation: missing `/api/ingest`;
+      missing `/api/sources/{id}/fetch`; no exact `{}`/no-query validation; no 409
+      shared guard; no zero-active-source response; no request-level 200/source-level
+      RSS error response; guard release behavior not observable yet.
+
+      - Downstream implementation owner: `manual-rss-fetch.backend-implementation`
+
+      - Worker commit: `b7d38725324bdd9f62e5b17dc9208aaf9fd99dd0`.
+
+      - Squash merge commit on main: `620d4c6 [vectl] step-backend-expected-red-tests
+      completed`.
+
+      - Worker verification: `gofmt -w internal/resofeed/manual_fetch_expected_red_test.go
+      && go test ./internal/resofeed -run ''TestManualRSSFetch''` exit 1 expected
+      red.
+
+      - Mainline final-state verification after merge: `go test ./internal/resofeed
+      -run ''TestManualRSSFetch''` exit 1 expected red; failures show 404 for `/api/ingest`
+      and `/api/sources/{id}/fetch` where tests expect contracted 200/400/409 behavior.
+
+      - Gaps/Notes: missing/deleted/inactive source test currently passes via broad
+      missing-route 404 but remains scoped to lock desired 404 contract after route
+      implementation.'
   - id: frontend-contract
     name: Frontend API and UI Contract Lock
     status: done
