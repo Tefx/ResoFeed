@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { tick } from 'svelte';
   import type { ItemSummary } from '$lib/api-contract';
 
   interface Props {
@@ -11,18 +10,12 @@
 
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
-  let inspectorHeading = $state<HTMLHeadingElement | undefined>();
-
-  const selectedItem = $derived(items.find((item) => item.id === selectedItemId) ?? null);
-
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     return status === 'partial_extraction' ? 'partial' : status;
   }
 
   async function openInspector(item: ItemSummary): Promise<void> {
     await onSelect(item);
-    await tick();
-    inspectorHeading?.focus();
   }
 
   async function toggleResonance(item: ItemSummary): Promise<void> {
@@ -46,9 +39,12 @@
           aria-label={`Open Inspector for: ${item.title}`}
           onclick={() => void openInspector(item)}
         >
-          <p class="contract-label">
+          <p class="contract-label contract-feed-meta">
             <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
             · <span aria-label={`Extraction: ${item.extraction_status}`}>{extractionLabel(item.extraction_status)}</span>
+            {#if items.findIndex((candidate) => candidate.id === item.id) === 0}
+              <span class="contract-time-label">TODAY</span>
+            {/if}
             {#if item.external_surfaced_at}
               · <span aria-label="Externally surfaced by agent">agent:external</span>
             {/if}
@@ -68,10 +64,4 @@
       </article>
     {/each}
   </div>
-  {#if selectedItem}
-    <section class="contract-inline-inspector" aria-label="Opened Inspector focus target">
-      <h2 bind:this={inspectorHeading} tabindex="-1">{selectedItem.title}</h2>
-      <p class="contract-muted">why: fresh from configured source</p>
-    </section>
-  {/if}
 </section>

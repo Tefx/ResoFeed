@@ -14,6 +14,13 @@
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
+  type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'state';
+  type SteerFeedback =
+    | { kind: 'idle' }
+    | { kind: 'submitting' }
+    | { kind: 'receipt'; text: string }
+    | { kind: 'doctor'; text: string }
+    | { kind: 'error'; text: string };
 
   const tokenStorageKey = 'resofeed.ownerToken';
 
@@ -28,6 +35,10 @@
   let selectedItemDetail = $state<ItemDetail | null>(null);
   let inspectorState = $state<ApiLoadState>('idle');
   let inspectorError = $state<string | null>(null);
+  let steerCommand = $state('');
+  let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
+  let currentSurface = $state<Surface>('feed');
+  let isNarrow = $state(false);
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -59,6 +70,7 @@
       items = feedResponse.items;
       selectedItemId = feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
+      window.localStorage.setItem(tokenStorageKey, token);
       loadState = 'ready';
       if (selectedItemId) {
         await loadItemDetail(selectedItemId, token);
@@ -78,7 +90,18 @@
 
   function handleOwnerTokenAccepted(token: string): void {
     ownerToken = token;
+    promptState = 'submitting';
     void loadShellData(token);
+  }
+
+  async function refreshShellLists(): Promise<void> {
+    const [sourceResponse, feedResponse] = await Promise.all([apiClient().sources(), apiClient().today()]);
+    sources = sourceResponse.sources;
+    items = feedResponse.items;
+    if (selectedItemId && !feedResponse.items.some((item) => item.id === selectedItemId)) {
+      selectedItemId = feedResponse.items[0]?.id ?? null;
+      selectedItemDetail = null;
+    }
   }
 
   async function loadItemDetail(itemId: string, token = ownerToken): Promise<void> {
@@ -99,6 +122,37 @@
     selectedItemDetail = null;
     await apiClient().inspect(item.id);
     await loadItemDetail(item.id);
+    currentSurface = 'inspector';
+  }
+
+  function showSurface(surface: Surface): void {
+    currentSurface = surface;
+  }
+
+  async function submitSteer(): Promise<void> {
+    const command = steerCommand.trim();
+    if (!command || steerFeedback.kind === 'submitting') return;
+
+    steerFeedback = { kind: 'submitting' };
+    try {
+      if (command === '/doctor') {
+        const diagnostics = await apiClient().doctor();
+        steerFeedback = { kind: 'doctor', text: diagnostics };
+        return;
+      }
+
+      const response = await apiClient().steer(command);
+      steerCommand = '';
+      const changed = response.receipt.changed_rules.length;
+      const suffix = changed > 0 ? ` · rules:${changed}` : '';
+      steerFeedback = {
+        kind: 'receipt',
+        text: `applied: ${response.receipt.message}${suffix}`
+      };
+      await refreshShellLists();
+    } catch (error) {
+      steerFeedback = { kind: 'error', text: error instanceof Error ? error.message : 'err: could not apply' };
+    }
   }
 
   async function toggleResonance(item: ItemSummary, resonated: boolean): Promise<void> {
@@ -135,12 +189,22 @@
   }
 
   onMount(() => {
+    const media = window.matchMedia('(max-width: 760px)');
+    const updateMedia = () => {
+      isNarrow = media.matches;
+      if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
+    };
+    updateMedia();
+    media.addEventListener('change', updateMedia);
+
     const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {
       ownerToken = storedToken;
       promptState = 'accepted';
       void loadShellData(storedToken);
     }
+
+    return () => media.removeEventListener('change', updateMedia);
   });
 </script>
 
@@ -150,17 +214,48 @@
   {:else}
     <a class="skip-link" href="#today-feed">skip to feed</a>
     <header class="shell-command">
-      <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
-      <input
-        id="steer-input"
-        bind:this={steerInput}
-        class="steer-input"
-        type="text"
-        placeholder="Steer or paste RSS URL..."
-        autocomplete="off"
-      />
+      <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
+        <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
+        <span aria-hidden="true">&gt;</span>
+        <input
+          id="steer-input"
+          bind:this={steerInput}
+          bind:value={steerCommand}
+          class="steer-input"
+          type="text"
+          placeholder="Steer or paste RSS URL..."
+          autocomplete="off"
+          disabled={steerFeedback.kind === 'submitting'}
+          onkeydown={(event) => {
+            if (event.key === 'Escape') steerCommand = '';
+          }}
+        />
+        {#if steerCommand.trim().length > 0}
+          <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
+        {/if}
+      </form>
       <span class="contract-label">RESOFEED</span>
     </header>
+
+    <nav class="surface-nav" aria-label="Surfaces">
+      <button type="button" class:active-surface={currentSurface === 'feed'} onclick={() => showSurface('feed')}>TODAY</button>
+      <button type="button" class:active-surface={currentSurface === 'ledger'} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
+      <button type="button" class:active-surface={currentSurface === 'search'} onclick={() => showSurface('search')}>SEARCH</button>
+      <button type="button" class:active-surface={currentSurface === 'state'} onclick={() => showSurface('state')}>STATE</button>
+    </nav>
+
+    {#if steerFeedback.kind === 'receipt'}
+      <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>
+    {:else if steerFeedback.kind === 'error'}
+      <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>
+    {:else if steerFeedback.kind === 'doctor'}
+      <section class="contract-region doctor-surface" aria-labelledby="doctor-heading">
+        <h2 id="doctor-heading">/doctor</h2>
+        <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
+      </section>
+    {:else if steerFeedback.kind === 'submitting'}
+      <p class="contract-muted shell-status" role="status">applying</p>
+    {/if}
 
     {#if loadState === 'loading'}
       <p class="contract-muted shell-status" role="status">loading</p>
@@ -168,9 +263,8 @@
       <p class="contract-feedback-error shell-status" role="alert">{apiError}</p>
     {/if}
 
-    <div class="shell-grid">
-      <section id="today-feed" class="feed-pane" aria-labelledby="today-heading">
-        <h1 id="today-heading">TODAY</h1>
+    <div class="shell-grid" data-surface={currentSurface}>
+      <section id="today-feed" class="feed-pane" class:active-panel={currentSurface === 'feed'} aria-labelledby="feed-heading">
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
@@ -178,17 +272,29 @@
         {/if}
       </section>
 
-      <aside class="detail-pane" aria-label="INSPECTOR">
+      <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR">
+        {#if isNarrow}
+          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+        {/if}
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode="desktop-split" loading={inspectorState === 'loading'} error={inspectorError} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}
       </aside>
     </div>
 
-    <SourceLedger sources={sources} onDeleteSource={deleteSource} onImportOpml={importOpml} />
-    <StatePortability onExportState={exportState} onImportState={importState} />
-    <SearchRetrieval items={items} query="" onSearch={searchItems} />
+    <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label="SOURCE LEDGER surface">
+      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+      <SourceLedger sources={sources} onDeleteSource={deleteSource} onImportOpml={importOpml} />
+    </section>
+    <section class="utility-surface" class:active-panel={currentSurface === 'state'} aria-label="State surface">
+      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+      <StatePortability onExportState={exportState} onImportState={importState} />
+    </section>
+    <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
+      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+      <SearchRetrieval items={items} query="" onSearch={searchItems} />
+    </section>
   {/if}
 </main>

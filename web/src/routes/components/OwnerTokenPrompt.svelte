@@ -36,8 +36,7 @@
       return;
     }
 
-    window.localStorage.setItem('resofeed.ownerToken', token);
-    internalState = 'accepted';
+    internalState = 'submitting';
     onAccepted?.(token);
   }
 

@@ -26,6 +26,16 @@ button {
   background: var(--rf-color-primary);
 }
 
+select {
+  min-height: 44px;
+  border: 1px solid var(--rf-color-border);
+  border-radius: var(--rf-radius-sm);
+  padding: var(--rf-space-sm) var(--rf-space-md);
+  color: var(--rf-color-text);
+  background: var(--rf-color-background);
+  font: inherit;
+}
+
 button:disabled {
   border-color: var(--rf-color-border);
   color: var(--rf-color-muted);
@@ -106,10 +116,18 @@ a:focus-visible,
 
 .contract-token-prompt,
 .contract-empty,
-.contract-source-ledger,
-.contract-portability,
-.contract-search {
+  .contract-source-ledger,
+  .contract-portability,
+  .contract-search {
   padding: var(--rf-space-xl);
+}
+
+.contract-steering-receipt {
+  margin: 0;
+  padding: var(--rf-space-sm);
+  color: var(--rf-color-muted);
+  background: var(--rf-color-surface);
+  font: var(--rf-typography-chrome);
 }
 
 .contract-token-form {
@@ -147,6 +165,33 @@ a:focus-visible,
   padding: var(--rf-space-md);
 }
 
+.steer-form {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--rf-space-sm);
+  align-items: center;
+}
+
+.surface-nav {
+  display: flex;
+  gap: var(--rf-space-sm);
+  flex-wrap: wrap;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: var(--rf-space-sm) var(--rf-space-md);
+}
+
+.surface-nav button,
+.back-command {
+  border-color: var(--rf-color-border);
+  color: var(--rf-color-muted);
+  background: var(--rf-color-surface);
+}
+
+.surface-nav button.active-surface {
+  color: var(--rf-color-text);
+  background: var(--rf-color-surface-active);
+}
+
 .steer-input {
   width: 100%;
 }
@@ -169,6 +214,14 @@ a:focus-visible,
   font: var(--rf-typography-section-title);
 }
 
+.utility-surface {
+  display: none;
+}
+
+.utility-surface.active-panel {
+  display: block;
+}
+
 .detail-pane {
   min-height: 100%;
 }
@@ -187,11 +240,40 @@ a:focus-visible,
 
 .contract-feed-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-columns: 3px minmax(0, 1fr) 44px;
   gap: var(--rf-space-row);
   align-items: start;
   border-block-end: 1px solid var(--rf-color-border);
   padding: var(--rf-space-row) var(--rf-space-row) 11px 0;
+}
+
+.contract-feed-item::before {
+  content: '';
+  align-self: stretch;
+  width: 3px;
+  background: transparent;
+}
+
+.contract-feed-item[aria-current='true']::before {
+  background: var(--rf-color-focus);
+}
+
+.contract-feed-item[aria-current='true'] {
+  background: var(--rf-color-surface-active);
+}
+
+.contract-feed-open:hover {
+  background: var(--rf-color-surface);
+}
+
+.contract-feed-meta {
+  display: flex;
+  gap: var(--rf-space-xs);
+  align-items: baseline;
+}
+
+.contract-time-label {
+  margin-inline-start: auto;
 }
 
 .contract-feed-title {
@@ -206,6 +288,20 @@ a:focus-visible,
 .contract-resonate {
   min-width: 44px;
   min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border-color: var(--rf-color-border);
+  padding: 0 0 2px;
+  color: var(--rf-color-muted);
+  background: var(--rf-color-surface);
+  line-height: 1;
+  transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
+}
+
+.contract-resonate[aria-label='Remove resonance'] {
+  border-color: var(--rf-color-accent);
+  color: var(--rf-color-accent-contrast);
+  background: var(--rf-color-accent);
 }
 
 .contract-inspector {
@@ -226,18 +322,62 @@ a:focus-visible,
 }
 
 @media (max-width: 760px) {
+  .resofeed-shell {
+    min-height: 100dvh;
+  }
+
   .shell-command {
     position: sticky;
     z-index: 1;
     inset-block-end: 0;
     order: 2;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     background: var(--rf-color-background);
+  }
+
+  .steer-form {
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .shell-grid {
     grid-template-columns: 1fr;
-    gap: var(--rf-space-lg);
+    gap: 0;
     padding-inline: var(--rf-space-md);
+  }
+
+  .detail-pane,
+  .utility-surface {
+    display: none;
+  }
+
+  .shell-grid[data-surface='inspector'] .feed-pane,
+  .shell-grid[data-surface='feed'] .detail-pane {
+    display: none;
+  }
+
+  .detail-pane.active-panel,
+  .utility-surface.active-panel {
+    display: block;
+    position: fixed;
+    z-index: 3;
+    inset: 0;
+    overflow: auto;
+    padding: var(--rf-space-lg);
+    background: var(--rf-color-background);
+  }
+
+  .feed-pane.active-panel {
+    display: block;
+  }
+
+  .contract-feed-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .surface-nav {
+    padding-block: var(--rf-space-xs);
   }
 }

@@ -16,6 +16,22 @@ if (typeof window.localStorage?.getItem !== 'function') {
   });
 }
 
+if (typeof window.matchMedia !== 'function') {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      dispatchEvent: () => false
+    })
+  });
+}
+
 afterEach(() => {
   cleanup();
   if (typeof window.localStorage?.clear === 'function') {

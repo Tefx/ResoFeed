@@ -71,7 +71,7 @@
     {#if item.story_key || item.duplicate_of_item_id}
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}
-    {#if mode === 'mobile-route' || onResonanceToggle}
+    {#if mode === 'mobile-route' && onResonanceToggle}
       <button class="contract-resonate" type="button" disabled={pending} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
         {item.is_resonated ? '★' : '☆'}
       </button>

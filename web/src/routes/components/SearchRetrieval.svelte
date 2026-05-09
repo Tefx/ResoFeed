@@ -14,6 +14,7 @@
   let from = $state('');
   let to = $state('');
   let resonated = $state(false);
+  let limit = $state(50);
   let results = $state<ItemSummary[]>([]);
   let statusText = $state('');
 
@@ -30,7 +31,8 @@
         source: source || undefined,
         from: from || undefined,
         to: to || undefined,
-        resonated: resonated ? true : undefined
+        resonated: resonated ? true : undefined,
+        limit
       });
       results = response.items;
       statusText = `${response.items.length} results`;
@@ -55,11 +57,17 @@
       <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} />
       Resonated only
     </label>
+    <label for="search-limit">Result limit</label>
+    <select id="search-limit" name="limit" bind:value={limit}>
+      <option value={10}>10</option>
+      <option value={20}>20</option>
+      <option value={50}>50</option>
+      <option value={100}>100</option>
+    </select>
     <button type="submit">search</button>
   </form>
   <p id="search-status" role="status" aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
   <div role="region" aria-label="Search results">
-    <p class="contract-muted">{results.length} results</p>
     <ul class="contract-list">
       {#each results as item (item.id)}
         <li>
