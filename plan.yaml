@@ -4540,6 +4540,261 @@ phases:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     agent: golang-developer
+  - id: runtime-api-and-mcp-integration.runtime-blockers-retest
+    name: Runtime blockers retest
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+      verification_scope: phase-check protecting runtime gate and end-to-end integration
+
+
+      As an INDEPENDENT TESTER, rerun and prove closure for the failed runtime verification
+      cluster after `runtime-api-and-mcp-integration.fix-runtime-verification-blockers`.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to rubber-stamp the fix. This retest must
+      cover every blocker class from the failed liveness, spec-conformance, and wiring-audit
+      steps.
+
+
+      Rerun/prove all of the following through real runtime surfaces where applicable:
+
+      1. Documented web build and binary build complete successfully.
+
+      2. Static root `GET /` returns HTML/static UI content after documented web build,
+      with owner-token prompt/interactive content available and no SaaS/account concepts.
+
+      3. HTTP API liveness and owner-token auth behavior through public surfaces.
+
+      4. MCP real bound listener `/mcp` Streamable HTTP initialize/resources/tools,
+      including `steer` using the configured Gemini test double/proof.
+
+      5. MCP `tools/list` schemas expose documented required fields/defaults/limits.
+
+      6. Startup validation no-bind matrix for invalid addr/public-url/db/Gemini/token
+      cases.
+
+      7. First-run owner-token generation and reuse at process level.
+
+      8. `go test ./...` passes and no stale runtime expected-stub skip text remains.
+
+
+      This step is successful only if blocker closure is explicit with `verdict: PASS`,
+      `blockers: []`, and `gate_open_allowed: true`. Finding unresolved blockers is
+      still valuable evidence, but the runtime gate must remain blocked if any blocker
+      remains.'
+    verification: '- Evidence includes documented web build command/output and binary
+      build command/output.
+
+      - Evidence includes exact `GET /` status, content-type, and body excerpt proving
+      HTML/static UI and owner-token prompt/interactive surface.
+
+      - Evidence includes HTTP API liveness/auth commands and outputs.
+
+      - Evidence includes MCP real bound-listener initialize/resources/tools outputs,
+      including `steer` Gemini test double/proof.
+
+      - Evidence includes startup validation no-bind matrix with explicit outputs
+      for invalid addr/public-url/db/Gemini/token cases.
+
+      - Evidence includes process-level first-run owner-token generation/reuse outputs.
+
+      - Evidence includes `go test ./...` output and search/assertion proving no stale
+      runtime expected-stub skips remain.
+
+      - Closure summary MUST state `verdict: PASS`, `blockers: []`, and `gate_open_allowed:
+      true` for the runtime gate to proceed.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: runtime failed verification cluster retest
+
+      **Independence Level**: L1
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      ### Build Outputs
+
+      **Documented web build**:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+      **Binary build**:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+
+      ### Static Root HTML/UI Proof
+
+      **Request**: <exact command>
+
+      **Status / Content-Type**: <values>
+
+      **Actual output excerpt**:
+
+      ```
+
+      <paste HTML/static UI excerpt proving owner-token prompt/interactive content>
+
+      ```
+
+
+      ### HTTP API Liveness/Auth Proof
+
+      ```
+
+      <paste exact commands and outputs>
+
+      ```
+
+
+      ### MCP Bound Listener Proof
+
+      **Listener**: <real bound address>
+
+      **initialize/resources/tools outputs**:
+
+      ```
+
+      <paste outputs>
+
+      ```
+
+      **MCP steer Gemini proof**:
+
+      ```
+
+      <paste evidence showing configured Gemini/test double used>
+
+      ```
+
+
+      ### MCP tools/list Schema Proof
+
+      | Tool | Required fields present | Defaults present | Limits present | Status
+      |
+
+      |---|---|---|---|---|
+
+      | <tool> | <yes/no> | <yes/no> | <yes/no> | PASS/FAIL |
+
+
+      ### Startup Validation No-Bind Matrix
+
+      | Case | Command/config | Expected | Actual | Socket bound? | Status |
+
+      |---|---|---|---|---|---|
+
+      | invalid addr | <...> | fail before bind | <...> | no | PASS/FAIL |
+
+      | invalid public URL | <...> | fail before bind | <...> | no | PASS/FAIL |
+
+      | invalid DB | <...> | fail before bind | <...> | no | PASS/FAIL |
+
+      | invalid Gemini | <...> | fail before bind | <...> | no | PASS/FAIL |
+
+      | invalid/absent token | <...> | documented behavior | <...> | <yes/no> | PASS/FAIL
+      |
+
+
+      ### Owner Token Generation/Reuse Process Proof
+
+      ```
+
+      <paste exact commands and outputs>
+
+      ```
+
+
+      ### Test Suite and Stale Skip Proof
+
+      ```
+
+      go test ./...
+
+      <paste output>
+
+      ```
+
+      **Search/assertion for stale runtime expected-stub skips**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Blocker Closure Register
+
+      | Blocker | Status | Evidence ref |
+
+      |---|---|---|
+
+      | B1_static_ui_root_returns_plain_text_not_html | CLOSED/OPEN | <ref> |
+
+      | B2_mcp_tools_list_schemas_skeletal | CLOSED/OPEN | <ref> |
+
+      | B3_mcp_steer_drops_configured_gemini | CLOSED/OPEN | <ref> |
+
+      | B4_stale_expected_stub_debt_contract_tests | CLOSED/OPEN | <ref> |
+
+      | B5_startup_and_listener_runtime_proof_gaps | CLOSED/OPEN | <ref> |
+
+
+      ### Gate Decision Basis
+
+      verdict: PASS|FAIL
+
+      blockers: []
+
+      gate_open_allowed: true|false
+
+      unresolved_runtime_obligations: []
+
+
+      ### Headline
+
+      - [ ] PASS: all blockers closed, `blockers: []`, `gate_open_allowed: true`
+
+      - [ ] FAIL: one or more blockers/proof gaps remain'
+    depends_on:
+    - runtime-api-and-mcp-integration.fix-runtime-verification-blockers
+    agent: integration-verifier
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
