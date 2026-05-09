@@ -12485,14 +12485,19 @@ phases:
       risk_tags: integration,state,external_api,secret_runtime
 
 
-      Complete the implementation within the contract-locked boundaries from openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
-      and the expected-red tests from openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests.
+      Complete the implementation within the contract-locked boundaries from openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs,
+      the expected-red tests from openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests,
+      and the upstream runtime secret foundation from runtime-secret-env-config-foundation.secret-config-gate.
 
 
       UPSTREAM ARTIFACTS:
 
       - docs/ARCHITECTURE.md / docs/USAGE.md from lock-openrouter-contract-and-docs
-      — runtime flags and OpenRouter-only contract are AUTHORITATIVE.
+      — OpenRouter-only runtime contract and secret-source reuse are AUTHORITATIVE.
+
+      - Runtime secret resolver from runtime-secret-env-config-foundation.complete-runtime-secret-resolver
+      — env/.env precedence, parser limits, redaction, and non-persistence guarantees
+      are PROTECTED.
 
       - CLI/adapter expected-red tests from define-cli-adapter-docs-red-tests — assertions
       are PROTECTED.
@@ -12500,7 +12505,9 @@ phases:
 
       YOUR SCOPE: Replace Gemini runtime flag parsing and Gemini adapter behavior
       with OpenRouter-only CLI/runtime configuration and a small `internal/resofeed/openrouter.go`
-      adapter. Use direct construction and dependency passing only.
+      adapter. Reuse the runtime secret resolver for `OPENROUTER_KEY` and/or `OPENROUTER_API_KEY`;
+      do not require an API key on the command line. Use direct construction and dependency
+      passing only.
 
 
       Touch_paths:
@@ -12513,6 +12520,9 @@ phases:
       - existing Gemini adapter files: remove or replace references; do not keep compatibility
       flags.
 
+      - existing runtime secret resolver files from the foundation only as needed
+      to add OpenRouter key names without changing its safety contract.
+
       - related tests only as needed to make expected-red tests green after implementation.
 
 
@@ -12520,9 +12530,16 @@ phases:
 
       - `--gemini-api-key` and `--gemini-model` are removed/rejected.
 
-      - `--openrouter-api-key` is validated as required without printing the value.
+      - OpenRouter API key is resolved via env/.env contract; no required CLI secret
+      flag.
 
-      - `--openrouter-model` is optional; empty means account default.
+      - Lock and implement exact OpenRouter env names/alias precedence from the contract
+      step.
+
+      - OpenRouter key validation is required without printing the value.
+
+      - `--openrouter-model` is optional and non-secret if retained; empty means account
+      default.
 
       - No startup network model validation or model whitelist.
 
@@ -12545,16 +12562,19 @@ phases:
 
       - Network failure does not corrupt SQLite state.
 
-      - Partial/write failure does not persist runtime key/model.
+      - Partial/write failure does not persist runtime key/model/env source.
 
       - Legacy Gemini flag use fails clearly rather than silently falling back.
+
+      - `.env` OpenRouter key path never prints or exports the key.
 
 
       State semantics:
 
-      - runtime_secret: OpenRouter API key is last-process-runtime only, never persisted/exported.
+      - runtime_secret: OpenRouter API key is last-process-runtime only, never persisted/exported/logged.
 
-      - runtime_preference: OpenRouter model is runtime-only, never portable state.
+      - runtime_preference: OpenRouter model is runtime-only unless the contract explicitly
+      documents otherwise; never portable state.
 
       - model_outputs: only validated summaries/core insights/model_status may persist.
 
@@ -12563,7 +12583,7 @@ phases:
 
       - Do NOT add provider registries, Gemini compatibility, DI containers, service/repository
       layers, event buses, sidecar workers, sync/merge/history portability, vector
-      DBs, embeddings, or RAG.
+      DBs, embeddings, RAG, or command-line secret requirements.
 
 
       ## Completion Criteria (stub exclusion)
@@ -12577,9 +12597,10 @@ phases:
       If a contract artifact is wrong or incomplete, document a deviation record (type,
       what, why, impact) — do NOT silently rewrite.'
     verification: 'local-check protecting openrouter-llm-implementation. Main path:
-      CLI/adapter tests for OpenRouter pass. Failure path: tests cover missing key,
-      legacy Gemini flag rejection, 429/5xx retry, invalid JSON/error mapping, and
-      empty-model omission.'
+      CLI/adapter tests for OpenRouter env/.env key resolution pass without CLI API
+      key. Failure path: tests cover missing key, empty key, legacy Gemini flag rejection,
+      429/5xx retry, invalid JSON/error mapping, empty-model omission, and no secret
+      persistence/export/logging.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
