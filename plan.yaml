@@ -8192,7 +8192,7 @@ phases:
       \ false"
   - id: frontend-implementation.retest-frontend-gate-proof-artifacts
     name: Retest frontend gate proof artifacts
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -8342,6 +8342,8 @@ phases:
     depends_on:
     - frontend-implementation.fix-frontend-gate-proof-artifacts
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T10:50:06.105954+00:00'
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
