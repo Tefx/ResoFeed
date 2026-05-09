@@ -8426,7 +8426,7 @@ phases:
   steps:
   - id: end-to-end-integration.real-system-end-to-end-proof
     name: Real system end to end proof
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -8513,6 +8513,71 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T10:56:09.429652+00:00'
+    done_at: '2026-05-09T11:17:39.842401+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go deployable, one SQLite DB, owner token as
+      universal boundary, no direct vectl state edits by agents.
+
+      - docs/ARCHITECTURE.md — `resofeed serve` serves static UI, JSON HTTP, MCP `/mcp`,
+      SQLite migrations, ingest loop; API/MCP require owner token; state import replaces
+      portable state.
+
+      - docs/PRD.md — AC-12 auth rejection, AC-16 state portability, AC-17 raw `/doctor`;
+      no folders/settings/vector/RAG.
+
+      - docs/DESIGN.md — owner-token prompt before API calls; first-use/feed surfaces
+      use operational labels and terse text.
+
+      - docs/DESIGN_VISION.md — analyst workbench; no SaaS/onboarding/settings bloat.
+
+      - docs/USAGE.md — public build/run commands, owner-token behavior, HTTP and
+      MCP usage surfaces.
+
+
+      ## Seam-Level Integration Evidence
+
+      - Worker result: PASS_WITH_DEBT, semantic PASS, blockers: [], gate_open_allowed:
+      true, product implementation files modified: false.
+
+      - Worker commands: `npm --prefix web ci && npm --prefix web run build`, `mkdir
+      -p bin && go build -o ./bin/resofeed ./cmd/resofeed`, `go test ./...`, live
+      `./bin/resofeed serve ...` with curl/MCP/state probes, `node .audit-artifacts/ui_probe.mjs
+      ...`.
+
+      - Worker observed real path output: server startup `owner token explicit: stored
+      hash`, unauthorized HTTP 401, authorized feed/search/item/doctor/state responses,
+      MCP doctor/candidates/search/resonate idempotency, state replacement import/export,
+      UI probe `ok:true`.
+
+      - Worker artifacts: `.audit-artifacts/runtime/audit-owner-token-prompt.png`,
+      `audit-seeded-feed.png`, state JSON artifacts, runtime logs, `.audit-artifacts/seed_fixture.go`,
+      `.audit-artifacts/ui_probe.mjs`.
+
+      - Remaining mocks/uncertainty: no HTTP/MCP/UI/SQLite mocks; Gemini configured
+      with audit key and not invoked by seeded-data path; live RSS/Gemini outside
+      observed proof.
+
+
+      ## Mainline Final-State Verification
+
+      - Squash merged branch `vectl/step-end-to-end-integration.real-system-end-to-end-proof`
+      into main as commit `8ae1605`.
+
+      - Ran after merge in main: `npm --prefix web ci && npm --prefix web run build
+      && mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed && go test ./...
+      && python3 tests/repro/spec_verify_end_to_end_blackbox.py && node tests/repro/spec_verify_ui_blackbox.mjs`.
+
+      - Output: npm ci installed 150 packages; web build succeeded; Go build succeeded;
+      `go test ./...` passed (`cmd/resofeed [no test files]`, `internal/resofeed ok`);
+      Python black-box report returned `status: PASS`; UI black-box report returned
+      `status: PASS` with no failures.
+
+
+      ## Gaps/Notes
+
+      - Live RSS fetching and live Gemini calls were not exercised; seeded SQLite
+      data used for deterministic real API/MCP/UI proof.'
   - id: end-to-end-integration.black-box-acceptance-pass
     name: Black box acceptance pass
     status: done
