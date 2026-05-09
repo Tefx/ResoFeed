@@ -12959,6 +12959,121 @@ phases:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     agent: wiring-auditor
+  - id: openrouter-llm-implementation.serve-liveness-probe
+    name: serve-liveness-probe
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check protecting openrouter-llm-implementation.gate
+
+
+      As an INDEPENDENT TESTER, perform a local runnable-surface liveness probe for
+      the single `resofeed serve` binary using fake or local-safe OpenRouter configuration.
+      This is not the live OpenRouter smoke; do not read `.env` here.
+
+
+      Independence Level: L2. Tester may use repository code and public commands but
+      not implementation process notes.
+
+
+      Required runnable-surface proof:
+
+      - Build or run the real `cmd/resofeed` binary/entrypoint.
+
+      - Start `resofeed serve` with `--openrouter-api-key` using a fake redacted value
+      and optional empty model; no real key.
+
+      - Confirm process starts far enough to expose HTTP/UI/MCP surfaces or fails
+      only on intentionally fake upstream calls after startup, not during CLI parse/config
+      validation.
+
+      - Invoke `/api/doctor` or equivalent health/doctor path and confirm `openrouter:`
+      raw text with no secret output.
+
+      - Confirm legacy Gemini flags are rejected by command-line parsing.
+
+
+      Finding issues is a successful verifier outcome; evidence must classify blockers
+      vs non-blocking debt.'
+    verification: phase-check protecting openrouter-llm-implementation.gate. Entry
+      point starts, accepts at least one operation, proves OpenRouter CLI parse/doctor
+      path, and rejects Gemini flags. Handler-only evidence is insufficient.
+    evidence_template: '## Verification Report
+
+      **Tester**: blind-tester (independent)
+
+      **Scope**: local liveness for resofeed serve OpenRouter runtime
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ### Commands Executed
+
+      ```
+
+      <build/run/curl commands with fake key redacted>
+
+      ```
+
+
+      ### Actual Output
+
+      ```
+
+      <redacted stdout/stderr and HTTP snippets>
+
+      ```
+
+
+      ### Runnable Surface Evidence
+
+      - Entrypoint command:
+
+      - Startup result:
+
+      - Operation accepted:
+
+      - `/doctor` openrouter raw text:
+
+      - Gemini flag rejection:
+
+      - Secrets redacted:
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    depends_on:
+    - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+    - openrouter-llm-implementation.complete-ingest-steering-state-migration
+    - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    agent: blind-tester
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
