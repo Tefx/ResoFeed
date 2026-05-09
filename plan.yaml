@@ -18592,58 +18592,90 @@ phases:
   - id: manual-rss-fetch.backend-implementation
     name: Backend Implementation
     status: pending
-    description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
-      upstream_artifacts:\n  - path: internal/resofeed/types.go\n    from_step: manual-rss-fetch.backend-contract\n\
-      \    tier: contract\n  - path: internal/resofeed/ingest.go\n    from_step: manual-rss-fetch.backend-contract\n\
-      \    tier: contract\n  - path: internal/resofeed/http.go\n    from_step: manual-rss-fetch.backend-contract\n\
-      \    tier: contract\n  - path: internal/resofeed/*_test.go\n    from_step: manual-rss-fetch.backend-expected-red-tests\n\
-      \    tier: test\n\nFill in stub bodies and complete existing contract-bound\
-      \ backend behavior for Manual RSS Fetch.\n\nUPSTREAM ARTIFACTS (authoritative):\n\
-      - manual-rss-fetch.backend-contract — signatures, types, docstrings, route/handler\
-      \ anchors, and wire schemas are AUTHORITATIVE.\n- manual-rss-fetch.backend-expected-red-tests\
-      \ — expected-red tests are PROTECTED and define the behavioral gap to close.\n\
-      \nYOUR SCOPE: Replace stub markers (panic/TODO/zero-value stubs/NotImplemented-style\
-      \ errors) with working logic. Keep public signatures and JSON field names from\
-      \ the contract step. If a contract artifact is wrong or incomplete, document\
-      \ a deviation record (type, what, why, impact) — do NOT silently rewrite.\n\n\
-      Scope and files:\n- internal/resofeed/ingest.go — own the in-process ingest\
-      \ concurrency guard and all RSS/Atom fetch orchestration semantics.\n- internal/resofeed/http.go\
-      \ — add POST /api/ingest and POST /api/sources/{id}/fetch routing, request validation,\
-      \ owner-token enforcement, status-code mapping, and JSON serialization.\n- internal/resofeed/types.go\
-      \ only if contract-defined shared response structs require completion.\n- internal/resofeed/*_test.go\
-      \ — make the expected-red backend tests pass and add any focused regressions\
-      \ needed for failure paths.\n\nRequired behavior:\n- Permit at most one ingest/fetch\
-      \ operation at a time across background ingest, POST /api/ingest, and POST /api/sources/{id}/fetch.\n\
-      - HTTP manual triggers return 409 conflict when the guard is already held; do\
-      \ not enqueue, persist, retry, or create command/job/receipt rows.\n- Background\
-      \ ticks may be skipped while the guard is held.\n- POST /api/ingest with zero\
-      \ active sources returns HTTP 200 immediately with completed status, zero counts,\
-      \ and errors: [].\n- POST /api/sources/{id}/fetch returns 404 for missing, deleted,\
-      \ or inactive sources.\n- Operational RSS/source failures are request-level\
-      \ 200 results with source-level errors as specified, not generic transport failures.\n\
-      - Preserve the one-binary architecture and flat internal/resofeed boundaries.\
-      \ Do NOT introduce workers, queues, job tables, activity ledgers, sync coordinators,\
-      \ service/repository layers, DI containers, or event buses.\n\nFailure-mode\
-      \ checklist:\n- concurrent manual/manual and background/manual overlap\n- missing/deleted/inactive\
-      \ source lookup\n- zero active sources\n- source timeout / RSS fetch diagnostic\
-      \ mapping\n- JSON body must be exactly {} with no query params\n- stale guard\
-      \ release after error/panic path\n\nState/concurrency semantics:\n- The guard\
-      \ is process-local, last-writer does not create durable state, and failed attempts\
-      \ must not leave stale running state.\n- Concurrent access scenario must be\
-      \ described in evidence: two HTTP triggers and background tick overlap.\n- Cleanup/reset\
-      \ semantics must be explicit for tests and server restarts.\n- Bounded growth:\
-      \ no unbounded in-memory/durable collection may be introduced.\n- Isolation\
-      \ guarantee: manual fetch state for one source must not corrupt other sources\
-      \ or create cross-source queues.\n\n## Completion Criteria (stub exclusion)\n\
-      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each\
-      \ deliverable MUST contain substantive logic that processes its inputs and produces\
-      \ outputs that vary based on those inputs. Private stub classes or placeholder\
-      \ functions do not satisfy this requirement.\n\n## Gate Preview (what the gate\
-      \ WILL reject)\n1. Any durable queue, job table, command ledger, portable receipt,\
-      \ or sync/merge machinery.\n2. Handler-only endpoints that do not exercise the\
-      \ real ingest guard path.\n3. Generic 500/400 responses where the docs require\
-      \ 409 conflict, 404 not_found, or 200 source-level failure payloads.\n4. Concurrency\
-      \ guard that covers only manual endpoints but not background ingest."
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Implement the locked backend Manual RSS Fetch contracts.
+
+
+      Scope and files:
+
+      - internal/resofeed/ingest.go — own the in-process ingest concurrency guard
+      and all RSS/Atom fetch orchestration semantics.
+
+      - internal/resofeed/http.go — add POST /api/ingest and POST /api/sources/{id}/fetch
+      routing, request validation, owner-token enforcement, status-code mapping, and
+      JSON serialization.
+
+      - internal/resofeed/types.go only if shared response structs are genuinely needed
+      across boundaries.
+
+      - internal/resofeed/*test.go — add focused contract/runtime tests for the new
+      HTTP and ingest behavior.
+
+
+      Required behavior:
+
+      - Permit at most one ingest/fetch operation at a time across background ingest,
+      POST /api/ingest, and POST /api/sources/{id}/fetch.
+
+      - HTTP manual triggers return 409 conflict when the guard is already held; do
+      not enqueue, persist, retry, or create command/job/receipt rows.
+
+      - Background ticks may be skipped while the guard is held.
+
+      - POST /api/ingest with zero active sources returns HTTP 200 immediately with
+      completed status, zero counts, and errors: [].
+
+      - POST /api/sources/{id}/fetch returns 404 for missing, deleted, or inactive
+      sources.
+
+      - Operational RSS/source failures are request-level 200 results with source-level
+      errors as specified, not generic transport failures.
+
+      - Preserve the one-binary architecture and flat internal/resofeed boundaries.
+      Do NOT introduce workers, queues, job tables, activity ledgers, sync coordinators,
+      service/repository layers, DI containers, or event buses.
+
+
+      Failure-mode checklist:
+
+      - concurrent manual/manual and background/manual overlap
+
+      - missing/deleted/inactive source lookup
+
+      - zero active sources
+
+      - source timeout / RSS fetch diagnostic mapping
+
+      - JSON body must be exactly {} with no query params
+
+      - stale guard release after error/panic path
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or placeholder
+      functions do not satisfy this requirement.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any durable queue, job table, command ledger, portable receipt, or sync/merge
+      machinery.
+
+      2. Handler-only endpoints that do not exercise the real ingest guard path.
+
+      3. Generic 500/400 responses where the docs require 409 conflict, 404 not_found,
+      or 200 source-level failure payloads.
+
+      4. Concurrency guard that covers only manual endpoints but not background ingest.'
     verification: '- Main path: Go tests cover POST /api/ingest success, POST /api/sources/{id}/fetch
       success, and JSON schemas from docs/ARCHITECTURE.md.
 
@@ -18654,12 +18686,6 @@ phases:
       - Runtime path: evidence identifies the exact handler route and the ingest.go
       guard function exercised by tests.
 
-      - Expected-red closure: tests introduced by manual-rss-fetch.backend-expected-red-tests
-      now pass green without weakening assertions.
-
-      - Concurrency proof: evidence covers two simultaneous manual triggers and background/manual
-      overlap.
-
       - Downstream gates protected: manual-rss-fetch.integration-proof, manual-rss-fetch.spec-conformance,
       manual-rss-fetch.gate.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
@@ -18667,89 +18693,145 @@ phases:
 
       For each ref in this step:
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Implementation Evidence
+      ## Backend Implementation Evidence
 
-      - Upstream contract artifacts honored: <files/signatures>
 
-      - Expected-red tests now green: <commands/output>
+      **Files changed**:
 
-      - Main path proof: <POST /api/ingest and /api/sources/{id}/fetch tests>
+      - <list>
 
-      - Failure path proof: <409, 404, zero-source, source failure, stale guard release>
 
-      - Concurrency scenario and cleanup/reset semantics: <evidence>
+      **Concurrency guard proof**:
 
-      - Forbidden machinery search: queues/jobs/ledgers/sync/service layers absent
+      - Guard owner/function:
 
-      - Deviation records: <none or type/what/why/impact>'
-    refs:
-    - docs/ARCHITECTURE.md
-    depends_on:
-    - manual-rss-fetch.backend-contract
-    - manual-rss-fetch.backend-expected-red-tests
-    agent: golang-developer
+      - Background + manual + per-source coverage:
+
+
+      **Endpoint/schema tests run**:
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Failure paths covered**:
+
+      - 409 conflict:
+
+      - zero sources:
+
+      - missing/deleted/inactive source:
+
+      - source-level fetch failure:
+
+
+      **Forbidden architecture check**:
+
+      - queues/jobs/ledgers/sync/service layers introduced: YES/NO
+
+      '
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
     status: pending
-    description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
-      upstream_artifacts:\n  - path: web/src/lib/api-contract.ts\n    from_step: manual-rss-fetch.frontend-contract\n\
-      \    tier: contract\n  - path: web/src/lib/api-client.ts\n    from_step: manual-rss-fetch.frontend-contract\n\
-      \    tier: contract\n  - path: web/src/routes/components/SourceLedger.svelte\n\
-      \    from_step: manual-rss-fetch.frontend-contract\n    tier: contract\n  -\
-      \ path: web/src/routes/components/__tests__\n    from_step: manual-rss-fetch.frontend-expected-red-tests\n\
-      \    tier: test\n  - path: web/src/lib/*.test.ts\n    from_step: manual-rss-fetch.frontend-expected-red-tests\n\
-      \    tier: test\n\nFill in stub bodies and complete existing contract-bound\
-      \ frontend behavior for Manual RSS Fetch Source Ledger.\n\nUPSTREAM ARTIFACTS\
-      \ (authoritative):\n- manual-rss-fetch.frontend-contract — TypeScript API types,\
-      \ client method signatures, component prop/state anchors, Source Ledger labels/DOM\
-      \ roles, and design constraints are AUTHORITATIVE.\n- manual-rss-fetch.frontend-expected-red-tests\
-      \ — expected-red rendering/API tests are PROTECTED and define the visible/API\
-      \ gap to close.\n- manual-rss-fetch.backend-contract — backend endpoint paths\
-      \ and wire schemas are AUTHORITATIVE for frontend API calls.\n\nYOUR SCOPE:\
-      \ Replace stub markers (TODO/throw/empty callbacks/placeholder state) with working\
-      \ logic. Keep labels, class names, endpoint methods, and response fields from\
-      \ the contract step. If a contract artifact is wrong or incomplete, document\
-      \ a deviation record (type, what, why, impact) — do NOT silently rewrite.\n\n\
-      Scope and files:\n- web/src/routes/components/SourceLedger.svelte — complete\
-      \ manual Source Ledger controls and exact state rendering.\n- web/src/routes/+page.svelte\
-      \ — wire handlers and refresh source/feed state after fetch/ingest completion.\n\
-      - web/src/lib/api-client.ts and web/src/lib/api-contract.ts — complete client\
-      \ methods/types for POST /api/ingest and POST /api/sources/{id}/fetch using\
-      \ the documented wire schemas.\n- web/src/app.css / design token files only\
-      \ if needed to match docs/ui-preview.html exactly.\n- web/src/routes/components/__tests__\
-      \ and web/src/lib/*.test.ts — make expected-red tests pass and add focused regressions\
-      \ for visible states.\n\nRequired behavior:\n- Source Ledger header/action bar\
-      \ renders global [RUN INGEST].\n- Each source row renders [FETCH] on the same\
-      \ row as the source, with right-aligned action block.\n- Active global ingest\
-      \ replaces label with [INGESTING...], disabled, no spinner, no progress animation.\n\
-      - Active source fetch replaces label with [FETCHING...], disabled, no spinner,\
-      \ no progress animation.\n- Completion reverts labels and updates last_ingest\
-      \ or last_fetch as HH:MM:SS derived from RFC3339.\n- Error text is terse/truncated\
-      \ per DESIGN.md; no friendly SaaS copy.\n- Terminal bracket action styling must\
-      \ preserve bracket padding, hover inversion, uppercase labels, no shadows, no\
-      \ rounded SaaS buttons, no animations.\n- Frontend must handle 409 conflict\
-      \ and surface terse Source Ledger state without creating local fake jobs/queues.\n\
-      \n## Frontend Completion Criteria (rendering required)\nThis is a FRONTEND IMPLEMENTATION\
-      \ step. Completion requires BOTH:\n1. Logic correctness: API calls, state transitions,\
-      \ RFC3339-to-HH:MM:SS formatting, and error truncation work.\n2. Rendering completeness:\
-      \ Source Ledger produces visible DOM elements matching the design.\nA component\
-      \ that returns data objects instead of rendered elements does NOT satisfy this\
-      \ step. Evidence MUST include rendered output proof (DOM snapshot, screenshot,\
-      \ or test renderer output).\n\n## Completion Criteria (stub exclusion)\nThis\
-      \ is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each deliverable\
-      \ MUST contain substantive logic that processes its inputs and produces outputs\
-      \ that vary based on those inputs.\n\n## Gate Preview (what the gate WILL reject)\n\
-      1. SaaS-style spinners, shadows, animations, rounded pills/buttons, or friendly\
-      \ copy.\n2. Incorrect labels such as lowercase fetch/import/export text.\n3.\
-      \ State text that appears outside the bracket action replacement contract.\n\
-      4. RFC3339 timestamps displayed raw where DESIGN.md requires HH:MM:SS.\n5. Error\
-      \ strings that cause Source Ledger layout shifts instead of terse truncation."
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Implement the locked frontend Manual RSS Fetch behavior for the Source Ledger.
+
+
+      Scope and files:
+
+      - web/src/routes/components/SourceLedger.svelte — add manual Source Ledger controls
+      and exact state rendering.
+
+      - web/src/routes/+page.svelte — wire handlers and refresh source/feed state
+      after fetch/ingest completion.
+
+      - web/src/lib/api-client.ts and web/src/lib/api-contract.ts — add client methods/types
+      for POST /api/ingest and POST /api/sources/{id}/fetch using the documented wire
+      schemas.
+
+      - web/src/app.css / design token files only if needed to match docs/ui-preview.html
+      exactly.
+
+      - web/src/routes/components/__tests__ and web/src/lib/*.test.ts — add rendering/client
+      tests.
+
+
+      Required behavior:
+
+      - Source Ledger header/action bar renders global [RUN INGEST].
+
+      - Each source row renders [FETCH] on the same row as the source, with right-aligned
+      action block.
+
+      - Active global ingest replaces label with [INGESTING...], disabled, no spinner,
+      no progress animation.
+
+      - Active source fetch replaces label with [FETCHING...], disabled, no spinner,
+      no progress animation.
+
+      - Completion reverts labels and updates last_ingest or last_fetch as HH:MM:SS
+      derived from RFC3339.
+
+      - Error text is terse/truncated per DESIGN.md; no friendly SaaS copy.
+
+      - Terminal bracket action styling must preserve bracket padding, hover inversion,
+      uppercase labels, no shadows, no rounded SaaS buttons, no animations.
+
+      - Frontend must handle 409 conflict and surface terse Source Ledger state without
+      creating local fake jobs/queues.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: API calls, state transitions, RFC3339-to-HH:MM:SS formatting,
+      and error truncation work.
+
+      2. Rendering completeness: Source Ledger produces visible DOM elements matching
+      the design.
+
+      A component that returns data objects instead of rendered elements does NOT
+      satisfy this step. Evidence MUST include rendered output proof (DOM snapshot,
+      screenshot, or test renderer output).
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. SaaS-style spinners, shadows, animations, rounded pills/buttons, or friendly
+      copy.
+
+      2. Incorrect labels such as lowercase fetch/import/export text.
+
+      3. State text that appears outside the bracket action replacement contract.
+
+      4. RFC3339 timestamps displayed raw where DESIGN.md requires HH:MM:SS.
+
+      5. Error strings that cause Source Ledger layout shifts instead of terse truncation.'
     verification: '- Rendering tests prove [FETCH], [RUN INGEST], [FETCHING...], and
       [INGESTING...] visible in Source Ledger DOM.
 
@@ -18757,9 +18839,6 @@ phases:
       the exact endpoints and handle 200/409/404 payloads.
 
       - Time-format tests prove RFC3339 is rendered as HH:MM:SS.
-
-      - Expected-red closure: tests introduced by manual-rss-fetch.frontend-expected-red-tests
-      now pass green without weakening assertions.
 
       - Visual artifact evidence is produced for the Source Ledger default, source-fetch
       active, global-ingest active, error, and completion states.
@@ -18770,11 +18849,11 @@ phases:
 
       For each ref in this step:
 
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
       - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
@@ -18782,30 +18861,52 @@ phases:
 
       ## Frontend Implementation Evidence
 
-      - Upstream contract artifacts honored: <files/types/props>
 
-      - Expected-red rendering/API tests now green: <commands/output>
+      **Files changed**:
 
-      - Visible DOM proof: <DOM snapshot/test renderer output/screenshots>
+      - <list>
 
-      - API proof: <POST /api/ingest and /api/sources/{id}/fetch client calls including
-      200/404/409>
 
-      - Timestamp/error-state proof: <HH:MM:SS and err truncation evidence>
+      **Rendered states captured**:
 
-      - Forbidden UI concept search: no spinners/animations/shadows/friendly copy/fake
-      queues
+      - default Source Ledger:
 
-      - Deviation records: <none or type/what/why/impact>'
-    refs:
-    - docs/ARCHITECTURE.md
-    - docs/DESIGN.md
-    - docs/ui-preview.html
-    depends_on:
-    - manual-rss-fetch.backend-contract
-    - manual-rss-fetch.frontend-contract
-    - manual-rss-fetch.frontend-expected-red-tests
-    agent: frontend-engineer
+      - source fetch active:
+
+      - global ingest active:
+
+      - conflict/error:
+
+      - completion timestamp:
+
+
+      **Commands/tests run**:
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Exact UI text proof**:
+
+      - [FETCH]:
+
+      - [FETCHING...]:
+
+      - [RUN INGEST]:
+
+      - [INGESTING...]:
+
+      - HH:MM:SS example:
+
+
+      **Forbidden visual patterns check**:
+
+      - spinners/animations/shadows/SaaS button styling present: YES/NO
+
+      '
   - id: manual-rss-fetch.integration-proof
     name: Manual RSS Fetch Runtime Integration Proof
     status: pending
@@ -18929,17 +19030,9 @@ phases:
       **Justification for remaining mocks**: <why acceptable>
 
       '
-    refs:
-    - docs/ARCHITECTURE.md
-    - docs/DESIGN.md
     depends_on:
-    - manual-rss-fetch.backend-contract
-    - manual-rss-fetch.backend-expected-red-tests
-    - manual-rss-fetch.frontend-contract
-    - manual-rss-fetch.frontend-expected-red-tests
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
-    agent: integration-verifier
   - id: manual-rss-fetch.spec-conformance
     name: Manual RSS Fetch Spec Conformance
     status: pending
@@ -19347,44 +19440,62 @@ phases:
     - manual-rss-fetch.integration-proof
     - manual-rss-fetch.spec-conformance
     - manual-rss-fetch.uiux-audit
-  - id: manual-rss-fetch.backend-contract
-    name: Backend Contract (manual RSS fetch)
+  - id: backend-contract
+    name: Backend Contract Lock
     status: pending
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
-      \  - signatures\n  - type_defs\n  - interfaces\n  - stubs\nagent_source: project\n\
-      work_type: new_capability\n\nLock the backend Manual RSS Fetch HTTP/ingest contract\
-      \ before implementation.\n\nAuthoritative refs:\n- docs/ARCHITECTURE.md §5.1\
-      \ Ingestion: exactly one ingest/fetch operation may run at a time; HTTP manual\
-      \ triggers return 409 while guard is held; no queues/jobs/ledgers/schedulers.\n\
-      - docs/ARCHITECTURE.md §6 HTTP Surface: POST /api/ingest and POST /api/sources/{id}/fetch\
-      \ accept only JSON {}; no query params; response schemas are IngestRunResult,\
-      \ IngestErrorDetail, optional Source, and canonical ErrorBody with conflict\
-      \ details.\n- docs/ARCHITECTURE.md §9 Minimal File Shape: ingest.go owns orchestration/guard/outcomes;\
-      \ http.go owns routing, auth, validation, status mapping, JSON serialization.\n\
-      \nScope and allowed files:\n- internal/resofeed/types.go — add only acceptance-defining\
-      \ structs/types/constants for IngestErrorDetail, IngestRunResult, and any typed\
-      \ source-fetch result needed by HTTP/frontend contracts.\n- internal/resofeed/ingest.go\
-      \ — add only public/internal function signatures, docstrings, and stubs for\
-      \ manual global ingest and per-source fetch outcomes if needed.\n- internal/resofeed/http.go\
-      \ — add only route/handler signatures or stubs if needed to pin POST /api/ingest\
-      \ and POST /api/sources/{id}/fetch boundaries.\n\nContract constraints:\n- No\
-      \ runnable business logic, persistence logic, fetch execution, guard implementation,\
-      \ or completed HTTP request handling.\n- Do not introduce workers, queues, job\
-      \ tables, activity ledgers, command receipts, service/repository layers, DI\
-      \ containers, event buses, sync/merge machinery, or new deployables.\n- Pin\
-      \ the JSON wire fields exactly as docs/ARCHITECTURE.md §6: RFC3339 UTC timestamps,\
-      \ duration_ms integer, errors array always present, source_id nullable for global\
-      \ runs, conflict details scope always \"all\".\n\nCompletion boundary:\n- This\
-      \ contract step may leave stubs with panic(\"TODO\"), return zero values, or\
-      \ NotImplemented-style errors; that is expected here only.\n- The downstream\
-      \ backend implementation step must fill these stubs without changing pinned\
-      \ signatures/types unless it records an explicit deviation."
+      \  - HTTP endpoint contracts\n  - response schemas\n  - concurrency guard contract\n\
+      \  - acceptance-only test seams\nagent_source: project\nwork_type: new_capability\n\
+      \nLock the backend Manual RSS Fetch contract before implementation.\n\nAuthoritative\
+      \ refs:\n- docs/ARCHITECTURE.md — POST /api/ingest and POST /api/sources/{id}/fetch\
+      \ contracts, owner-token boundary, flat internal/resofeed ownership, no durable\
+      \ queue/job/ledger.\n- docs/PRD.md — Manual RSS Fetch product intent and user-visible\
+      \ operation semantics.\n- AGENTS.md — one binary, one SQLite DB, owner token,\
+      \ strict HTTP validation, no sync/merge machinery.\n\nRequired contract decisions\
+      \ to record in acceptance-only artifacts and/or test notes:\n- POST /api/ingest\
+      \ accepts exactly an empty JSON object `{}` and no query parameters.\n- POST\
+      \ /api/sources/{id}/fetch accepts exactly an empty JSON object `{}` and no query\
+      \ parameters.\n- Both endpoints require owner-token enforcement and reject unauthenticated\
+      \ requests per existing HTTP auth conventions.\n- Only one ingest/fetch operation\
+      \ may run at a time across background ingest, global manual ingest, and per-source\
+      \ manual fetch.\n- Concurrent manual/manual or background/manual overlap returns\
+      \ 409 conflict for manual HTTP triggers and never creates a durable queue, job,\
+      \ receipt, ledger, sync coordinator, service layer, repository layer, DI container,\
+      \ or event bus.\n- Zero active sources for global ingest returns request-level\
+      \ 200 with completed/zero-count result and errors: [].\n- Missing, deleted,\
+      \ or inactive source fetch returns 404 not_found.\n- Operational RSS/source\
+      \ failures return request-level 200 with source-level errors, not a generic\
+      \ transport failure.\n- Guard release semantics must cover normal completion,\
+      \ error, and panic/recover paths so stale guard state cannot block future manual\
+      \ fetches.\n\nContract purity constraints:\n- This step may add or update acceptance-defining\
+      \ types, constants, doc comments, stub declarations, or test-facing notes only.\n\
+      - Do NOT add runnable endpoint behavior, durable state, fetch orchestration,\
+      \ or completed request handling.\n- If the authoritative docs are insufficient\
+      \ or contradictory, record the exact conflict instead of inventing behavior.\n\
+      \n## Completion Criteria\n- Backend public/runtime contract is explicit enough\
+      \ for tests to be written without implementation judgment.\n- No product implementation\
+      \ logic is shipped by this step.\n- All forbidden architecture expansions are\
+      \ listed as non-goals in the contract artifacts."
+    verification: '- Contract artifacts pin endpoint paths, request shape, status
+      mapping, response schema obligations, auth, and concurrency guard semantics.
+
+      - Evidence identifies exact docs passages used for each contract decision.
+
+      - No handler implementation, ingest orchestration, durable queue/job/ledger,
+      or UI behavior is introduced.
+
+      - Downstream gates protected: manual-rss-fetch.integration-proof, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
@@ -19394,311 +19505,13 @@ phases:
 
       - Contract artifacts changed: <files>
 
-      - Pinned signatures/types: <list>
+      - Endpoint/request contract pinned: <summary>
 
-      - Explicit stubs only, no implementation logic: PASS/FAIL
+      - Status/response mapping pinned: <summary>
 
-      - Forbidden machinery absent: PASS/FAIL
+      - Concurrency guard contract pinned: <summary>
 
-      - Deviation records, if any: <type/what/why/impact or none>'
-    refs:
-    - docs/ARCHITECTURE.md
+      - Forbidden architecture expansions excluded: <summary>
+
+      - Implementation logic introduced: NONE required'
     agent: golang-developer
-  - id: manual-rss-fetch.backend-expected-red-tests
-    name: Backend Expected-Red Tests (manual RSS fetch)
-    status: pending
-    description: 'step_type: test
-
-      step_intent: test_define_red
-
-      expected_result: red
-
-      agent_source: project
-
-      work_type: new_capability
-
-
-      Define expected-red backend tests for the Manual RSS Fetch contract before backend
-      implementation exists.
-
-
-      Purpose:
-
-      - Expose the gap between the locked backend contract and current behavior without
-      modifying product implementation code.
-
-      - Red is expected before manual fetch implementation. Success means tests fail
-      for the intended missing endpoints/guard/result behavior and do not fail because
-      of malformed tests or unrelated setup errors.
-
-
-      Allowed scope:
-
-      - internal/resofeed/*_test.go and test fixtures/helpers only.
-
-      - No product-code implementation edits in internal/resofeed/*.go.
-
-
-      Required expected-red coverage:
-
-      - POST /api/ingest accepts exactly JSON {} with no query params and returns
-      documented IngestRunResult shape.
-
-      - POST /api/sources/{id}/fetch accepts exactly JSON {} with no query params
-      and returns documented { ingest, source } shape for an active source.
-
-      - 409 conflict when any manual/background ingest/fetch operation already holds
-      the single process guard; conflict body includes ingest_running:true, scope:"all",
-      retry_allowed:true.
-
-      - POST /api/ingest with zero active sources returns HTTP 200 completed with
-      zero counts and errors: [].
-
-      - POST /api/sources/{id}/fetch returns 404 not_found for missing, deleted, or
-      inactive sources.
-
-      - Operational RSS/source failure returns HTTP 200 with source-level errors,
-      not a generic transport failure.
-
-      - Guard release is covered after error path so a stale held guard is exposed.
-
-
-      Spec-Fixture Conformance (MANDATORY):
-
-      At least one request fixture MUST use the exact documented body `{}` and no
-      query parameters from docs/ARCHITECTURE.md §6. Do not include convenience fields
-      such as idempotency_key.
-
-
-      Evidence requirements:
-
-      - Identify the exact expected failing tests and failure messages.
-
-      - Name the exposed gaps and downstream owner: manual-rss-fetch.backend-implementation.
-
-      - Confirm modified files are limited to tests/fixtures/helpers and no product-code
-      implementation edits occurred.'
-    verification: '- Expected-red tests are added and intentionally fail before implementation
-      for the missing Manual RSS Fetch behavior.
-
-      - Failure output demonstrates the intended gap: missing routes, missing conflict
-      guard, missing response schemas, or missing failure-path mapping.
-
-      - No product implementation code is modified in this step.
-
-      - Downstream implementation owner: manual-rss-fetch.backend-implementation.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-
-      For each ref in this step:
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-
-      If no refs were provided, state: "No refs for this step."
-
-
-      ## Expected-Red Test Evidence
-
-      - Tests added/updated: <file::test names>
-
-      - Command run: <go test command>
-
-      - Expected failures / exposed_gaps: <paste relevant output>
-
-      - Confirmation: red is expected before manual-rss-fetch.backend-implementation
-
-      - Scope confirmation: only test/fixture/helper files changed; no product-code
-      implementation edits
-
-      - Spec-derived minimal fixtures: request body `{}` with no query params; idempotency_key
-      omitted'
-    depends_on:
-    - manual-rss-fetch.backend-contract
-    agent: golang-developer
-  - id: manual-rss-fetch.frontend-contract
-    name: Frontend Contract / Design Anchor (manual RSS fetch)
-    status: pending
-    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
-      \  - type_defs\n  - interfaces\n  - component_props\n  - design_anchor_stubs\n\
-      agent_source: project\nwork_type: new_capability\n\nLock the frontend Manual\
-      \ RSS Fetch contract and Source Ledger design anchor before frontend implementation.\n\
-      \nAuthoritative refs:\n- docs/ARCHITECTURE.md §6 HTTP Surface: frontend client\
-      \ must call POST /api/ingest and POST /api/sources/{id}/fetch with JSON {} and\
-      \ handle 200/404/409 documented payloads.\n- docs/ARCHITECTURE.md §8 Frontend\
-      \ Boundary: UI stays in web/, owner token sent on every /api/* request, flat\
-      \ Source Ledger only, no extra settings/diagnostics dashboards.\n- docs/DESIGN.md\
-      \ Source Ledger: this is the only location for manual ingestion controls; labels,\
-      \ states, timestamp display, raw error geometry, and DOM/CSS contracts are binding.\n\
-      - docs/ui-preview.html lines around the Source Ledger reference render global\
-      \ [RUN INGEST], per-source [FETCH], [FETCHING...], [INGESTING...], and error/status\
-      \ examples.\n\nScope and allowed files:\n- web/src/lib/api-contract.ts — add\
-      \ only acceptance-defining TypeScript types for IngestErrorDetail, IngestRunResult,\
-      \ ingest/source-fetch responses, and ApiResult/ResoFeedApiError conflict status\
-      \ coverage.\n- web/src/lib/api-client.ts — add only method signatures/stubs\
-      \ for runIngest() and fetchSource(id) if needed; no completed fetch logic.\n\
-      - web/src/routes/components/SourceLedger.svelte and/or small local type declarations\
-      \ — add only prop/interface/design-anchor scaffolding needed to pin state names\
-      \ and callbacks.\n- web/src/routes/+page.svelte — add only callback prop signature\
-      \ anchors if strictly needed; no runnable state transition implementation.\n\
-      \nContract constraints:\n- No product implementation logic, no finished API\
-      \ calls, no completed rendering/state transitions.\n- Do not introduce local\
-      \ fake jobs, queues, timers, progress animations, spinner states, SaaS button\
-      \ variants, folders/tags/settings surfaces, or alternate URL subscription fields.\n\
-      - Pin UI states exactly: [RUN INGEST], [INGESTING...], [FETCH], [FETCHING...],\
-      \ last_ingest/last_fetch as HH:MM:SS display-only values derived from RFC3339,\
-      \ and raw `err: <diagnostic>` text with accessible full diagnostic.\n\nCompletion\
-      \ boundary:\n- Stubs/type anchors are acceptable here only. The downstream frontend\
-      \ implementation step must complete behavior within these contracts without\
-      \ redesigning labels, DOM roles, or endpoint methods."
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-
-      For each ref in this step:
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
-
-      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
-
-
-      If no refs were provided, state: "No refs for this step."
-
-
-      ## Frontend Contract Evidence
-
-      - Contract/type/design-anchor artifacts changed: <files>
-
-      - Pinned API method names and wire response types: <list>
-
-      - Pinned Source Ledger states/labels/DOM roles: <list>
-
-      - Explicit stubs only, no implementation logic: PASS/FAIL
-
-      - Forbidden UI/product concepts absent: PASS/FAIL
-
-      - Deviation records, if any: <type/what/why/impact or none>'
-    depends_on:
-    - manual-rss-fetch.backend-contract
-    agent: frontend-engineer
-  - id: manual-rss-fetch.frontend-expected-red-tests
-    name: Frontend Expected-Red Rendering/API Tests (manual RSS fetch)
-    status: pending
-    description: 'step_type: test
-
-      step_intent: test_define_red
-
-      expected_result: red
-
-      agent_source: project
-
-      work_type: new_capability
-
-
-      Define expected-red frontend tests for Manual RSS Fetch Source Ledger behavior
-      before frontend implementation exists.
-
-
-      Purpose:
-
-      - Expose the gap between docs/DESIGN.md Source Ledger manual fetch controls
-      and current rendered behavior/API client methods without modifying product implementation
-      code.
-
-      - Red is expected before frontend implementation. Success means tests fail for
-      the intended missing controls, client methods, states, formatting, or error
-      handling—not because of malformed tests or fixture drift.
-
-
-      Allowed scope:
-
-      - web/src/**/*.test.ts, component test files, and test fixtures/helpers only.
-
-      - No product-code implementation edits in web/src/lib/*.ts, web/src/routes/**/*.svelte,
-      or CSS.
-
-
-      Required expected-red coverage:
-
-      - Source Ledger renders global [RUN INGEST] in the header/action bar and per-source
-      [FETCH] in each source row using bracket action buttons.
-
-      - Active global ingest renders disabled [INGESTING...] with no spinner/progress
-      animation; active source fetch renders disabled [FETCHING...] with no spinner/progress
-      animation.
-
-      - Completion states revert labels and display last_ingest / last_fetch as HH:MM:SS
-      derived from RFC3339, never persisted/sent as canonical state.
-
-      - Error/conflict/source failure states render terse `err: <diagnostic>` text
-      adjacent to the affected source/header without friendly copy.
-
-      - API client tests expect POST /api/ingest and POST /api/sources/{id}/fetch
-      with JSON {} body, Authorization header, no idempotency_key, and handling for
-      200, 404, and 409 canonical payloads.
-
-      - Rendering tests assert visible DOM output; view-model-only tests are insufficient.
-
-
-      Spec-Fixture Conformance (MANDATORY):
-
-      At least one test fixture MUST use exact documented API response formats from
-      docs/ARCHITECTURE.md §6 and exact Source Ledger DOM/label text from docs/DESIGN.md
-      / docs/ui-preview.html. Do not include convenience fields beyond the spec.
-
-
-      Evidence requirements:
-
-      - Identify expected failing tests and exact failure output.
-
-      - Name the exposed gaps and downstream owner: manual-rss-fetch.frontend-implementation.
-
-      - Confirm modified files are limited to tests/fixtures/helpers and no product-code
-      implementation edits occurred.'
-    verification: '- Expected-red tests are added and intentionally fail before implementation
-      for missing Source Ledger controls/API methods/rendered states.
-
-      - Failure output demonstrates intended gaps: missing [RUN INGEST]/[FETCH], missing
-      active disabled labels, missing HH:MM:SS formatting, missing API client methods,
-      or missing 409/404 handling.
-
-      - No product implementation code is modified in this step.
-
-      - Downstream implementation owner: manual-rss-fetch.frontend-implementation.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-
-      For each ref in this step:
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
-
-      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
-
-
-      If no refs were provided, state: "No refs for this step."
-
-
-      ## Expected-Red Rendering/API Test Evidence
-
-      - Tests added/updated: <file::test names>
-
-      - Command run: <frontend test command>
-
-      - Expected failures / exposed_gaps: <paste relevant output>
-
-      - Confirmation: red is expected before manual-rss-fetch.frontend-implementation
-
-      - Scope confirmation: only test/fixture/helper files changed; no product-code
-      implementation edits
-
-      - Rendered-output assertion confirmation: tests call render/mount and assert
-      visible DOM, not only data transforms
-
-      - Spec-derived fixtures: exact API payloads and Source Ledger labels/DOM text
-      cited'
-    depends_on:
-    - manual-rss-fetch.frontend-contract
-    agent: frontend-engineer
