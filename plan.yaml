@@ -9463,7 +9463,7 @@ phases:
       - No forbidden ResoFeed surfaces introduced per worker evidence.'
   - id: retest-end-to-end-blockers
     name: Retest end-to-end blockers
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -9629,6 +9629,8 @@ phases:
     - fix-end-to-end-blockers
     - uiux-audit-end-to-end-blockers
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T11:39:57.290862+00:00'
   - id: uiux-audit-end-to-end-blockers
     name: UI/UX audit end-to-end blocker remediation
     status: done
