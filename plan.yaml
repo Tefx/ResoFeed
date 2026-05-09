@@ -11124,67 +11124,58 @@ phases:
 
       For each ref in this step:
 
-      - .agents/instructions.md — key passage or "NOT READ: <reason>"
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
-
-      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+      - No refs for this step.
 
 
-      If no refs were provided, state: "No refs for this step."
+      ## Implementation Evidence
 
 
-      ## HTTP Idempotency Fix Evidence
-
-
-      **Blocker fixed**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY
+      **Blocker addressed**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY from `finalization-docs-and-deep-review.final-wiring-audit`
 
 
       **Files changed**:
 
-      - <list files>
+      - <list files and concise purpose>
 
 
-      **Persistence/replay design**:
-
-      - <summarize where HTTP idempotency key is stored/read/replayed>
-
-
-      **Mutation coverage**:
-
-      - inspect: <test/smoke evidence>
-
-      - resonance: <test/smoke evidence>
-
-      - steer: <test/smoke evidence>
-
-
-      **Commands executed**:
+      **Main path tests**:
 
       ```sh
 
-      go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer'' -count=1
+      <exact go test command(s) run>
 
       ```
 
 
-      **Actual output**:
+      **Replay/idempotency evidence**:
 
-      ```text
+      - inspect duplicate same-key result: <status/result/effect count>
 
-      <paste output>
+      - resonance duplicate same-key result: <status/result/effect count>
 
-      ```
+      - steer duplicate same-key result: <status/result/effect count>
 
 
-      **Forbidden scope check**:
+      **Incompatible reuse behavior**:
 
-      - No account system, sync/merge/history/activity ledger, sidecar worker, vector
-      DB, or RAG introduced: YES/NO
+      - <test name and observed behavior>
 
-      - Portable state scope unchanged: YES/NO'
+
+      **HTTP/MCP parity note**:
+
+      - <how HTTP persistence/replay now aligns with MCP receipt/replay without expanding
+      portable state>
+
+
+      **Architecture invariant check**:
+
+      - Single Go binary preserved: yes/no
+
+      - SQLite-only storage preserved: yes/no
+
+      - No account/per-agent registry/sync/merge/history scope added: yes/no
+
+      '
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
     agent: golang-developer
