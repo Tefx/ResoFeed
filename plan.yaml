@@ -19675,3 +19675,123 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-contract
     agent: frontend-engineer
+  - id: manual-rss-fetch.frontend-expected-red-tests
+    name: Frontend Expected-Red Rendering/API Tests (manual RSS fetch)
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Define expected-red frontend tests for Manual RSS Fetch Source Ledger behavior
+      before frontend implementation exists.
+
+
+      Purpose:
+
+      - Expose the gap between docs/DESIGN.md Source Ledger manual fetch controls
+      and current rendered behavior/API client methods without modifying product implementation
+      code.
+
+      - Red is expected before frontend implementation. Success means tests fail for
+      the intended missing controls, client methods, states, formatting, or error
+      handling—not because of malformed tests or fixture drift.
+
+
+      Allowed scope:
+
+      - web/src/**/*.test.ts, component test files, and test fixtures/helpers only.
+
+      - No product-code implementation edits in web/src/lib/*.ts, web/src/routes/**/*.svelte,
+      or CSS.
+
+
+      Required expected-red coverage:
+
+      - Source Ledger renders global [RUN INGEST] in the header/action bar and per-source
+      [FETCH] in each source row using bracket action buttons.
+
+      - Active global ingest renders disabled [INGESTING...] with no spinner/progress
+      animation; active source fetch renders disabled [FETCHING...] with no spinner/progress
+      animation.
+
+      - Completion states revert labels and display last_ingest / last_fetch as HH:MM:SS
+      derived from RFC3339, never persisted/sent as canonical state.
+
+      - Error/conflict/source failure states render terse `err: <diagnostic>` text
+      adjacent to the affected source/header without friendly copy.
+
+      - API client tests expect POST /api/ingest and POST /api/sources/{id}/fetch
+      with JSON {} body, Authorization header, no idempotency_key, and handling for
+      200, 404, and 409 canonical payloads.
+
+      - Rendering tests assert visible DOM output; view-model-only tests are insufficient.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      At least one test fixture MUST use exact documented API response formats from
+      docs/ARCHITECTURE.md §6 and exact Source Ledger DOM/label text from docs/DESIGN.md
+      / docs/ui-preview.html. Do not include convenience fields beyond the spec.
+
+
+      Evidence requirements:
+
+      - Identify expected failing tests and exact failure output.
+
+      - Name the exposed gaps and downstream owner: manual-rss-fetch.frontend-implementation.
+
+      - Confirm modified files are limited to tests/fixtures/helpers and no product-code
+      implementation edits occurred.'
+    verification: '- Expected-red tests are added and intentionally fail before implementation
+      for missing Source Ledger controls/API methods/rendered states.
+
+      - Failure output demonstrates intended gaps: missing [RUN INGEST]/[FETCH], missing
+      active disabled labels, missing HH:MM:SS formatting, missing API client methods,
+      or missing 409/404 handling.
+
+      - No product implementation code is modified in this step.
+
+      - Downstream implementation owner: manual-rss-fetch.frontend-implementation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Rendering/API Test Evidence
+
+      - Tests added/updated: <file::test names>
+
+      - Command run: <frontend test command>
+
+      - Expected failures / exposed_gaps: <paste relevant output>
+
+      - Confirmation: red is expected before manual-rss-fetch.frontend-implementation
+
+      - Scope confirmation: only test/fixture/helper files changed; no product-code
+      implementation edits
+
+      - Rendered-output assertion confirmation: tests call render/mount and assert
+      visible DOM, not only data transforms
+
+      - Spec-derived fixtures: exact API payloads and Source Ledger labels/DOM text
+      cited'
+    depends_on:
+    - manual-rss-fetch.frontend-contract
+    agent: frontend-engineer
