@@ -9055,7 +9055,7 @@ phases:
     agent: gate-reviewer
   - id: fix-end-to-end-blockers
     name: Fix end-to-end blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -9372,6 +9372,8 @@ phases:
     - end-to-end-integration.end-to-end-spec-conformance
     - end-to-end-integration.end-to-end-wiring-audit
     agent: python-senior
+    claimed_by: python-senior
+    claimed_at: '2026-05-09T11:24:19.037159+00:00'
   - id: retest-end-to-end-blockers
     name: Retest end-to-end blockers
     status: pending
