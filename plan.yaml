@@ -12157,3 +12157,10 @@ phases:
     acceptance surface without product implementation logic.
   depends_on:
   - finalization-docs-and-deep-review
+- id: openrouter-llm-implementation
+  name: OpenRouter LLM Backend Implementation
+  status: locked
+  gate: OpenRouter is wired as the sole LLM backend through CLI runtime, ingest, steering,
+    /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
+  depends_on:
+  - openrouter-llm-contract-and-red-tests
