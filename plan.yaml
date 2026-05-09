@@ -2227,7 +2227,7 @@ phases:
     agent: gate-reviewer
   - id: fix-core-domain-verification-blockers
     name: Fix core domain verification blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -2441,6 +2441,70 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T04:24:15.197649+00:00'
+    done_at: '2026-05-09T06:45:11.847605+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ enforced one Go binary, one SQLite+FTS5 store, flat `internal/resofeed/` domain\
+      \ files, no sync/merge, no per-agent registry; actor_id is provenance not authorization.\n\
+      - `docs/ARCHITECTURE.md`: core owns ingestion, search, steering, state backup/restore,\
+      \ diagnostics; state export `exported_at` is export creation time; `/doctor`\
+      \ must report RSS/Gemini/extraction failures as raw text; duplicate/story grouping\
+      \ preserves every original item.\n- `docs/PRD.md`: freshness before hoarding,\
+      \ Search is lexical, human steering supersedes delegated-agent steering, diagnostics\
+      \ expose RSS/model/extraction raw health.\n- `docs/DESIGN.md`: `/doctor` is\
+      \ text, not dashboard; State Portability excludes history/receipts; feed/search\
+      \ must show provenance.\n- `docs/DESIGN_VISION.md`: no folders/tags/settings,\
+      \ no cute error states, AI failures degrade to raw utility.\n- `docs/USAGE.md`:\
+      \ `serve` owns runtime later; search covers title/summary/source/provenance/extracted\
+      \ text; import replaces portable state; `/doctor` includes RSS/model/extraction/last\
+      \ ingestion lines.\n\n## Batched Core Remediation Evidence\n- Commit hash(es):\n\
+      \  - Worker branch: 23d600a8d9c16f2a62cdd4546c9439f080f16053\n  - Main squash\
+      \ merge: 3c1a657\n- Files changed:\n  - `internal/resofeed/backend_contract_test.go`\n\
+      \  - `internal/resofeed/core_blockers_test.go`\n  - `internal/resofeed/doctor.go`\n\
+      \  - `internal/resofeed/ingest.go`\n  - `internal/resofeed/ingest_gemini_test.go`\n\
+      \  - `internal/resofeed/migrations.go`\n  - `internal/resofeed/ranking.go`\n\
+      \  - `internal/resofeed/search.go`\n  - `internal/resofeed/state.go`\n  - `internal/resofeed/types.go`\n\
+      - Findings addressed:\n  - B1 doctor diagnostics: Implemented `WriteDoctor`,\
+      \ `ReadDoctorSnapshot`, RSS source diagnostics, Gemini/model status diagnostics,\
+      \ extraction status diagnostics, and ingest last-run lines.\n  - R3 exported_at:\
+      \ `ExportState` now always uses current export creation time; regression covers\
+      \ imported timestamp reuse prevention.\n  - R6 value tier persistence: Gemini\
+      \ `ValueTier` is stored in `items.value_tier` during ingest; regression verifies\
+      \ persistence.\n  - R10 steering affects ranking: Active steering rules now\
+      \ influence candidate scores while freshness/source/resonance guardrails remain\
+      \ intact.\n  - R11 FTS freshness/provenance: Ingest refreshes `search_fts`;\
+      \ import rebuilds FTS transactionally; provenance includes source/original/canonical/story/duplicate\
+      \ fields.\n  - R12 actor provenance/precedence: `steer_rules` records creator\
+      \ actor kind/id without a per-agent registry; delegated-agent steering is rejected\
+      \ when active human steering exists.\n  - R9 duplicate original retrievability:\
+      \ Added `ReadItemDetail` core detail/provenance path; duplicate originals remain\
+      \ retrievable by item id. HTTP/MCP item-detail exposure remains downstream runtime-owned.\n\
+      - Commands/tests executed:\n  - Worker branch: `gofmt -w internal/resofeed`\
+      \ — exit 0.\n  - Worker branch: `go test ./internal/resofeed` — exit 0.\n  -\
+      \ Worker branch: `go test ./...` — exit 0.\n  - Worker branch: `go test -race\
+      \ ./internal/resofeed` — exit 0.\n  - Worker branch: `golangci-lint run ./...`\
+      \ — exit 0, 0 issues.\n  - Worker branch: `go build ./cmd/resofeed` — exit 0.\n\
+      \  - Mainline final-state: `test -z \"$(gofmt -l internal/resofeed)\" && go\
+      \ test ./internal/resofeed && go test ./... && go test -race ./internal/resofeed\
+      \ && golangci-lint run ./... && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-core-fix-mainline-check\
+      \ ./cmd/resofeed` — exit 0; package tests passed, race tests passed, golangci-lint\
+      \ reported 0 issues, build passed.\n- Runtime-owned debt classification:\n \
+      \ - `cmd/resofeed`, `resofeed.Main`, `NewRouter`, `NewMCPHandler`, HTTP/MCP\
+      \ handlers, and serve lifecycle were not modified.\n  - `git diff -- cmd/resofeed\
+      \ internal/resofeed/http.go internal/resofeed/mcp.go` produced no diff in worker\
+      \ evidence.\n- Architecture guardrail scan:\n  - No vector/RAG/embedding implementation\
+      \ added.\n  - No sync coordinator, state merger, conflict resolver, activity\
+      \ ledger, account system, or per-agent registry added.\n  - Changes stay in\
+      \ flat `internal/resofeed/` core files/tests.\n- Deviations record:\n  - `(test_error)`\
+      \ `internal/resofeed/backend_contract_test.go`: HTTP/MCP router tests reclassified\
+      \ with `t.Skip` because this dispatch explicitly marks `NewRouter`/`NewMCPHandler`\
+      \ as EXPECTED_STUB_DEBT for runtime-api-and-mcp-integration.\n  - `(test_error)`\
+      \ `internal/resofeed/backend_contract_test.go`: exact fixture comparison for\
+      \ exported minimal state was replaced with semantic assertions because `exported_at`\
+      \ must be current creation time and cannot equal static fixture timestamp.\n\
+      - Gaps/Notes:\n  - Steering keyword scoring is intentionally minimal/lexical\
+      \ and guarded by freshness/source/resonance quotas.\n  - Downstream runtime\
+      \ must wire `ReadItemDetail` and `WriteDoctor` into HTTP/MCP routes.\n\n## Headline\n\
+      PASS_WITH_DEBT"
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
