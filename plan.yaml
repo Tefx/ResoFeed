@@ -7289,7 +7289,7 @@ phases:
     agent: gate-reviewer
   - id: fix-steer-diagnostics-and-mobile-ui-contract
     name: Fix steer diagnostics and mobile UI contract blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -7529,6 +7529,87 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T10:02:47.941864+00:00'
+    done_at: '2026-05-09T10:09:35.668341+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — Canonical docs\
+      \ are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; UI must be dense/legible,\
+      \ operationally labeled, and use Steer for RSS URL paste/correction.\n- docs/ARCHITECTURE.md\
+      \ — HTTP/MCP share product operations; `/api/doctor` returns `text/plain`; steering\
+      \ accepts natural-language/RSS URL commands and returns terse receipts; state\
+      \ import rejects unknown top-level fields.\n- docs/PRD.md — Steer examples include\
+      \ RSS URLs, natural-language correction, and `/doctor`; no accounts/onboarding/folders/tags/unread/archive/settings.\n\
+      - docs/DESIGN.md — Mobile Inspector is full-screen; desktop Inspector must not\
+      \ duplicate Resonate star; selected rows use a non-layout-shifting 3px marker;\
+      \ inactive star is muted and active accent is `#7A4600`.\n- docs/DESIGN_VISION.md\
+      \ — Desktop is split-pane; mobile is single-column feed with full-screen Inspector;\
+      \ `/doctor` renders raw text.\n- docs/USAGE.md — UI stores owner token as `resofeed.ownerToken`\
+      \ after use, `/api/steer` POST supports URL/policy commands, `/api/doctor` is\
+      \ plaintext, search supports `limit`.\n\n## Orchestrator Mainline Final-State\
+      \ Barrier\n- Worker branch status before merge: clean.\n- Worker branch plan\
+      \ local changes: none.\n- Squash merge commit on main: `0efcc54` (`[vectl] step-fix-steer-diagnostics-and-mobile-ui-contract\
+      \ completed`).\n- Mainline verification:\n  - `go test ./... -count=1` — PASS.\n\
+      \  - `npm --prefix web run check` — PASS; 0 errors, 0 warnings.\n  - `npm --prefix\
+      \ web run build` — PASS; adapter-static wrote site to `build`.\n  - `npm --prefix\
+      \ web run test` — PASS; 2 test files / 14 tests passed.\n\n## Frontend Remediation\
+      \ Evidence\n\n### Product blocker closure\n- B1 `/api/steer` wiring evidence:\
+      \ `web/src/routes/+page.svelte` now submits Steer form to `ResoFeedApiClient.steer(command)`\
+      \ for RSS URLs/natural language and renders `applied:` receipts/errors. Test\
+      \ `wires Steer to /api/steer and /doctor to raw text diagnostics` asserts POST\
+      \ `/api/steer` body includes `command: https://example.com/feed.xml`.\n- B2\
+      \ `/doctor` raw diagnostics evidence: `web/src/routes/+page.svelte` detects\
+      \ exact `/doctor`, calls `apiClient().doctor()`, and renders `<pre role=\"log\"\
+      \ aria-label=\"/doctor diagnostics\">`. Test asserts raw `rss: ok` text and\
+      \ `PRE` tag.\n- B3 desktop Inspector duplicate star removed: `web/src/routes/components/Inspector.svelte`\
+      \ only renders star when `mode === 'mobile-route'`; desktop test asserts no\
+      \ `Resonate item` button in desktop Inspector.\n- B5 owner token persistence-after-acceptance\
+      \ only: `OwnerTokenPrompt.svelte` no longer writes localStorage; `+page.svelte`\
+      \ writes `resofeed.ownerToken` only after `loadShellData()` succeeds. Test proves\
+      \ rejected bootstrap leaves localStorage null and accepted bootstrap persists.\n\
+      - U1 mobile full-screen route/state evidence: `+page.svelte` adds `currentSurface`\
+      \ route/state for `feed|inspector|ledger|search|state`; `app.css` makes active\
+      \ mobile Inspector/utility surfaces fixed full-screen and feed-first otherwise.\
+      \ Test asserts mobile Inspector route, back control, mobile star, and ledger\
+      \ active full-screen surface state.\n- U2 selected marker/no duplicate detail\
+      \ evidence: `Feed.svelte` removed inline duplicate Inspector/detail content;\
+      \ `app.css` uses always-reserved 3px grid marker with `aria-current=true` fill,\
+      \ avoiding layout shift. Test asserts old inline Inspector focus region absent.\n\
+      - U3 resonate styling evidence: `app.css` sets `.contract-resonate` inactive\
+      \ to muted `surface`/`muted`; active `[aria-label='Remove resonance']` uses\
+      \ `background: var(--rf-color-accent)` (`#7A4600`) and star glyph remains shape-changing.\n\
+      \n### Safe should-fix disposition\n- Search limit control: closed in `SearchRetrieval.svelte`\
+      \ with labelled `Result limit` select values `10/20/50/100`, submitted as API\
+      \ `limit`; test asserts visible value `50`.\n- OPML flattening proof/contract\
+      \ path: frontend surface remains `SourceLedger.svelte` → `+page.svelte importOpml()`\
+      \ → `api-client.importOpml()` → `/api/sources/import-opml`; docs/USAGE.md and\
+      \ docs/ARCHITECTURE.md define `folders_flattened: true`. No folder UI was added.\n\
+      - State import extra-field rejection proof/contract path: frontend `StatePortability.svelte`\
+      \ passes parsed JSON to `api-client.importState()` → `/api/state/import`; docs/ARCHITECTURE.md\
+      \ §5.5 owns unknown top-level field rejection. Frontend keeps raw failure line\
+      \ `err: import failed`.\n- Duplicate headings/counts/internal copy: closed by\
+      \ removing outer duplicate TODAY heading, making first-use heading visually\
+      \ hidden as `First use`, removing `Contract:` copy, and removing duplicate search-result\
+      \ count inside results region.\n\n### Verification commands\n```text\nnpm --prefix\
+      \ web ci\nExit Code: 0\nadded 147 packages, audited 148 packages\n\nnpm --prefix\
+      \ web run check\nExit Code: 0\nsvelte-check found 0 errors and 0 warnings\n\n\
+      npm --prefix web run build\nExit Code: 0\nvite build completed; adapter-static\
+      \ wrote site to \"build\"\n\nnpm --prefix web run test\nExit Code: 0\nTest Files\
+      \ 2 passed (2)\nTests 14 passed (14)\n```\n\n### Rendered artifacts / captures\n\
+      - Rendered DOM contract captures encoded in `web/src/routes/components/__tests__/rendering-expected-red.test.ts`:\
+      \ Steer receipt, raw `/doctor` PRE/log, desktop Inspector without star, mobile\
+      \ full-screen Inspector/ledger state, selected feed row, search limit, and first-use\
+      \ empty copy.\n\n## Implementation Evidence\nCommit hash(es): worker commit\
+      \ `e95ffe3d087e15e5430d9ef8b5ff951b1cbb4c8b`; merged main commit `0efcc54`.\n\
+      Files changed:\n- web/src/app.css\n- web/src/routes/+page.svelte\n- web/src/routes/components/Feed.svelte\n\
+      - web/src/routes/components/FirstUseEmptyState.svelte\n- web/src/routes/components/Inspector.svelte\n\
+      - web/src/routes/components/OwnerTokenPrompt.svelte\n- web/src/routes/components/SearchRetrieval.svelte\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n- web/src/test/setup.ts\n\
+      Verification: npm ci, check, build, and test all green; mainline go and frontend\
+      \ checks green.\nSpec link: docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,\
+      \ docs/DESIGN_VISION.md, docs/USAGE.md\nGaps/Notes: No browser screenshot server\
+      \ was launched by implementer; rendered-state evidence is via Testing Library\
+      \ DOM captures/assertions and will be independently retested.\n\n## Semantic\
+      \ Closure Fields\nstep_intent: implementation_fix\nexpected_result: green\n\
+      observed_result: green\nverdict: PASS\nblockers: []\nproduct_implementation_files_modified:\
+      \ true"
   - id: retest-frontend-contract-closure
     name: Retest frontend contract closure
     status: pending
