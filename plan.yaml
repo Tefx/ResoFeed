@@ -11068,7 +11068,7 @@ phases:
     agent: gate-reviewer
   - id: fix-http-idempotency-wiring
     name: Fix HTTP idempotency wiring
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -11246,6 +11246,92 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T12:20:09.977352+00:00'
+    done_at: '2026-05-09T12:26:50.630509+00:00'
+    evidence: '## Implementation Evidence
+
+
+      **Blocker addressed**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY from `finalization-docs-and-deep-review.final-wiring-audit`.
+
+
+      **Files changed**:
+
+      - `internal/resofeed/idempotency.go` — shared SQLite-backed idempotency/receipt
+      helper.
+
+      - `internal/resofeed/http.go` — HTTP inspect/resonance/steer handlers now persist/replay
+      idempotency results.
+
+      - `internal/resofeed/http_impl_test.go` — duplicate HTTP mutation/replay tests.
+
+      - `internal/resofeed/mcp.go` — reused shared helper for MCP receipt/replay semantics.
+
+      - `internal/resofeed/migrations.go` — migration adds request_fingerprint to
+      agent_receipts.
+
+      - `internal/resofeed/core_blockers_test.go` — lint-only response body close
+      fix surfaced by golangci-lint.
+
+
+      **Commit hash(es)**:
+
+      - Worker commits: `4ae6910fc1af380f5e853e19509538e1807f2bbf`, `2aa9a047d70590b3a956157a253f0106294c4dcb`.
+
+      - Main squash commit: `4c6e7e5`.
+
+
+      **Replay/idempotency evidence**:
+
+      - Inspect: duplicate same-key HTTP inspect returns same `human_inspected_at`
+      with `already_applied=true` and one receipt row.
+
+      - Resonance: duplicate same-key HTTP resonance returns `is_resonated=true` with
+      `already_applied=true` and one receipt row.
+
+      - Steer: duplicate same-key HTTP steer returns stored receipt and does not call
+      Gemini again.
+
+
+      **Incompatible reuse behavior**:
+
+      - Same idempotency_key with changed resonance target returns 400 bad_request
+      field=idempotency_key and leaves persisted resonance unchanged.
+
+      - Same idempotency_key with changed steer command returns 400 bad_request field=idempotency_key
+      and does not call Gemini again.
+
+
+      **HTTP/MCP parity note**:
+
+      - HTTP now uses the same runtime receipt/idempotency persistence concept as
+      MCP via shared helper; agent_receipts remain runtime-only and excluded from
+      portable state.
+
+
+      **Architecture invariant check**:
+
+      - Single Go binary preserved: yes.
+
+      - SQLite-only storage preserved: yes.
+
+      - No accounts, per-agent registry, sync/merge/history/activity ledger, sidecars,
+      service/repository layers, vector DB, or RAG added.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran after squash merge in main: `go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer''
+      -count=1 && go test ./internal/resofeed -count=1 && go test ./... -count=1 &&
+      go build ./cmd/resofeed && golangci-lint run ./...`.
+
+      - Output: targeted idempotency tests passed; internal tests passed; full Go
+      tests passed (`cmd/resofeed [no test files]`, `internal/resofeed ok`); Go build
+      passed; golangci-lint reported `0 issues.`
+
+
+      ## Gaps/Notes
+
+      - No vectl CLI or plan tools used by worker. HTTP idempotency contract implemented
+      rather than removed.'
   - id: retest-http-idempotency-wiring
     name: Retest HTTP idempotency wiring
     status: pending
