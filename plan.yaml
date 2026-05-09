@@ -8960,6 +8960,325 @@ phases:
     - end-to-end-integration.end-to-end-wiring-audit
     - end-to-end-integration.end-to-end-spec-conformance
     agent: gate-reviewer
+  - id: fix-end-to-end-blockers
+    name: Fix end-to-end blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      priority: HIGH
+
+
+      Fix ALL blocker-class and should-fix issues reported by the concurrent end-to-end
+      spec conformance and wiring audit reports. This is a batched remediation step;
+      address ALL items below, not just the first.
+
+
+      ## Failed reports that own the blocker evidence
+
+      - end-to-end-integration.end-to-end-spec-conformance: blockers B1, B2, B3; verdict
+      FAIL; gate_open_allowed=false; orchestrator_action_hint=DO_NOT_COMPLETE.
+
+      - end-to-end-integration.end-to-end-wiring-audit: blocker W1 plus should-fix/debt
+      seams; verdict FAIL; gate_open_allowed=false; orchestrator_action_hint=DO_NOT_COMPLETE.
+
+
+      ## Blockers to fix or close with explicit implementation evidence
+
+
+      ### B1: Top-level navigation surface drift
+
+      UI currently exposes SEARCH and STATE as top-level surface-nav buttons, conflicting
+      with PRD/Architecture/Design constraints against extra top-level tabs/settings-style
+      state surfaces.
+
+      Required remediation:
+
+      - Remove or demote SEARCH and STATE from top-level surface navigation.
+
+      - Preserve allowed product surfaces and labels from docs/DESIGN.md and docs/ARCHITECTURE.md.
+
+      - Route state backup/restore/import affordances only through allowed Source
+      Ledger footer or /doctor-style location, not a backup dashboard or top-level
+      tab.
+
+      - Ensure search, if present, does not become a fourth top-level product tab
+      or RAG/search-as-product-tab surface.
+
+      Expected artifacts:
+
+      - Frontend code diff showing surface-nav compliance.
+
+      - Rendered UI evidence or test output proving top-level nav contains only allowed
+      surfaces.
+
+
+      ### B2: Agent steering attribution not visible to human
+
+      Backend stores actor attribution on steering rules, but UI receipt text only
+      says `applied: ...`; no runtime proof covers MCP-agent receipt surfacing to
+      the human on next UI interaction.
+
+      Required remediation:
+
+      - Make delegated/MCP agent steering attribution visible to the human on the
+      next relevant UI interaction without introducing user accounts, per-agent auth,
+      or a portable activity feed.
+
+      - Preserve owner-token boundary: actor_id is provenance/idempotency only, not
+      authorization.
+
+      - Provide runtime evidence that an MCP/agent steering action results in a human-visible
+      attribution/receipt in the UI or permitted surface.
+
+      Expected artifacts:
+
+      - Backend/API/MCP/UI wiring changes if needed.
+
+      - Runtime proof showing agent-originated steering attribution visible to a human.
+
+
+      ### B3: System-level PRD acceptance criteria remain unproven
+
+      Several behavioral ACs remain unproven at system level, especially AC-4 strict
+      filter/boost execution, AC-5 controversial-inspection non-preference behavior,
+      MCP delivery/candidate resurfacing, and related HTTP/MCP/UI cross-surface behavior.
+
+      Required remediation:
+
+      - Add or repair system-level proof coverage for AC-4 strict filter/boost execution.
+
+      - Add or repair system-level proof coverage for AC-5 inspect/controversial-item
+      behavior proving inspection does not create a preference signal.
+
+      - Add or repair MCP delivery/candidate resurfacing cross-surface evidence.
+
+      - Ensure evidence exercises real runtime paths rather than mock-only tests.
+
+      Expected artifacts:
+
+      - Tests or scripts with real server/API/MCP/UI path evidence.
+
+      - Behavioral proof register entries for each AC with status PROVEN or explicit
+      closure path.
+
+
+      ### W1: `items.value_tier` is write-only in production scope
+
+      Schema declares items.value_tier; Gemini output writes Item.ValueTier; persistence
+      writes it. No production read path in ListTodayFeed, SearchItems, ReadItemDetail,
+      HTTP JSON types, MCP result types, or frontend API contract exposes/consumes
+      it.
+
+      Required remediation: choose and prove exactly one disposition:
+
+      - Implement intended consumption/exposure of value_tier through appropriate
+      production HTTP/MCP/UI behavior with tests, OR
+
+      - Remove it from implemented production scope, OR
+
+      - Provide authoritative non-scope justification with explicit evidence that
+      it does not intersect final gate.
+
+      If kept, it must be consumed/exposed by at least one real production read path
+      and covered by tests.
+
+      Expected artifacts:
+
+      - Static search evidence showing no blocker-class write-only field remains.
+
+      - Runtime/API/MCP/UI evidence if value_tier is exposed/consumed.
+
+
+      ## Should-fix / debt to disposition if intersecting final gate
+
+      - `SteerRule.SupersededBy` is read/exported but no production path sets non-null.
+      Disposition it: either set it in a real production supersession path, remove/export-suppress
+      it, or document non-intersection with final gate.
+
+      - Internal exports `ServeHTTPRuntime`, `RebuildSearchIndex`, `DeliveryReportRequest`
+      appear orphan/reserved. Disposition orphan/reserved status with static reachability
+      evidence; remove or justify only if they do not intersect final/deep-review
+      gates.
+
+      - Frontend state import path needs behavioral proof for `/api/state/import`
+      with auth and JSON. Add/repair real-path test evidence if it intersects final
+      gate.
+
+
+      ## Failure-mode and gate-intersection checklist
+
+      - Do not classify B1/B2/B3/W1 as pre-existing or out-of-scope; they intersect
+      end-to-end-gate and finalization/deep-review gates.
+
+      - Preserve ResoFeed invariants: one Go binary, one SQLite DB, no sync/merge
+      coordinator, no vector DB/RAG surface, no accounts/per-agent auth.
+
+      - Any non-fix disposition must explain why the issue does not intersect remaining
+      required gates and identify future ownership if that changes.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Top-level UI nav still contains SEARCH or STATE as peer product surfaces.
+
+      2. Agent-originated steering remains invisible to the human after the next interaction.
+
+      3. AC-4/AC-5/MCP resurfacing evidence is unit-only, mock-only, or missing runtime
+      proof.
+
+      4. `value_tier` remains computed/stored but unused by production read paths
+      without an explicit authoritative non-scope disposition.
+
+      5. Orphan/write-only seams are left as undocumented `pre-existing` debt without
+      gate-intersection analysis.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive logic or concrete proof artifacts
+      that process real inputs and produce outputs that vary based on those inputs.
+      Private stub classes (`_Runtime*`, `_Stub*`, `_Placeholder*`) are structurally
+      restricted from satisfying this requirement.'
+    verification: '- Main path: real runtime/API/MCP/UI evidence demonstrates B1,
+      B2, B3, and W1 are fixed or explicitly dispositioned with non-intersection proof.
+
+      - Failure path: static reachability/search evidence proves no blocker-class
+      write-only or orphan seam remains for value_tier and listed related seams.
+
+      - UI proof: rendered evidence or frontend test output shows top-level nav compliance
+      and human-visible steering attribution.
+
+      - Behavioral proof: AC-4 strict filter/boost, AC-5 inspect-not-preference, and
+      MCP delivery/candidate resurfacing have concrete system-level evidence.
+
+      - Invariant proof: no forbidden ResoFeed surfaces were introduced (accounts,
+      per-agent auth, sync/merge coordinator, vector/RAG product surface).'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Remediation Evidence
+
+
+      **Failed reports consumed**:
+
+      - end-to-end-integration.end-to-end-spec-conformance: <key blocker passages
+      used>
+
+      - end-to-end-integration.end-to-end-wiring-audit: <key blocker passages used>
+
+
+      **B1 top-level nav compliance**:
+
+      - Changed files:
+
+      - Allowed top-level nav evidence:
+
+      ```text
+
+      <paste rendered/test output showing allowed nav labels only>
+
+      ```
+
+
+      **B2 agent steering attribution visible to human**:
+
+      - Agent/MCP action exercised:
+
+      - Next human-visible UI/surface interaction:
+
+      ```text
+
+      <paste runtime output/receipt showing actor attribution>
+
+      ```
+
+
+      **B3 system-level AC proof**:
+
+      | Requirement | Runtime command/test/artifact | Status | Evidence ref |
+
+      | --- | --- | --- | --- |
+
+      | AC-4 strict filter/boost | <command/test> | PROVEN/OPEN | <output> |
+
+      | AC-5 inspect-not-preference | <command/test> | PROVEN/OPEN | <output> |
+
+      | MCP delivery/candidate resurfacing | <command/test> | PROVEN/OPEN | <output>
+      |
+
+
+      **W1 value_tier disposition**:
+
+      - Chosen disposition: expose/consume | remove | authoritative non-scope
+
+      - Production read path or removal evidence:
+
+      ```text
+
+      <paste static search and runtime/API/MCP/UI evidence>
+
+      ```
+
+
+      **Should-fix/debt disposition**:
+
+      | Seam | Disposition | Gate intersection? | Evidence |
+
+      | --- | --- | --- | --- |
+
+      | SteerRule.SupersededBy | <fix/remove/non-intersection> | yes/no | <evidence>
+      |
+
+      | ServeHTTPRuntime/RebuildSearchIndex/DeliveryReportRequest | <fix/remove/non-intersection>
+      | yes/no | <evidence> |
+
+      | /api/state/import frontend path | <tested/non-intersection> | yes/no | <evidence>
+      |
+
+
+      **Commands/artifacts produced**:
+
+      ```text
+
+      <paste exact commands/tests and relevant output>
+
+      ```
+
+
+      **Closure fields proposed for retest**:
+
+      - verdict: READY_FOR_RETEST | BLOCKERS_REMAIN
+
+      - blockers: [] or [remaining blocker ids]
+
+      - gate_open_allowed: true|false
+
+      - orchestrator_action_hint: READY_FOR_RETEST|DO_NOT_COMPLETE
+
+      '
+    depends_on:
+    - end-to-end-integration.end-to-end-spec-conformance
+    - end-to-end-integration.end-to-end-wiring-audit
+    agent: python-senior
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
