@@ -6010,7 +6010,7 @@ phases:
       product_implementation_files_modified: true"
   - id: runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     name: Retest runtime proof and production stub wiring
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       agent_source: default\nverification_scope: phase-check protecting runtime gate,\
       \ frontend gate intersection, end-to-end integration, and final deep-review\
@@ -6148,6 +6148,86 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T09:37:25.005740+00:00'
+    done_at: '2026-05-09T09:41:26.403079+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Canonical docs are law; one Go binary runs static assets, JSON HTTP, MCP,\
+      \ and background ingest; UI must avoid ContractStub-style forbidden SaaS/onboarding\
+      \ patterns.\n- docs/ARCHITECTURE.md — Startup order requires: start HTTP static/API\
+      \ server and MCP endpoint before starting background ingestion.\n- docs/DESIGN.md\
+      \ — Documents production UI surfaces including app shell, feed item, inspector\
+      \ pane, source ledger, state portability, owner token prompt.\n- docs/DESIGN_VISION.md\
+      \ — Core surfaces map Inspect, Resonate, Steer, Diagnostics, State Portability,\
+      \ Source Ledger; no onboarding/accounts/settings dashboards.\n- docs/USAGE.md\
+      \ — `serve` starts web UI, JSON HTTP API, MCP at `/mcp`, background ingestion,\
+      \ SQLite, and static assets; frontend build contract is `npm --prefix web run\
+      \ build`.\n\n## Orchestrator Mainline Final-State Barrier\n- Worker branch status\
+      \ before merge: clean.\n- Worker branch plan local changes: none.\n- Squash\
+      \ merge result: `Already up to date. (nothing to squash)`.\n- Mainline verification\
+      \ commands and outcomes:\n  - `go test ./... -run TestServeReadinessBeforeBackgroundIngest\
+      \ -count=1 -v` — PASS; ordered lifecycle proof logged.\n  - `go test ./... -count=1`\
+      \ — PASS.\n  - `npm --prefix web run check` — PASS; 0 errors, 0 warnings.\n\
+      \  - `npm --prefix web run build` — PASS; static site written.\n  - `npm --prefix\
+      \ web run test` — PASS; 2 files / 11 tests passed.\n  - `if grep -R \"ContractStub\"\
+      \ \"web/src/routes\" \"web/src/lib\" --include='*.svelte' --include='*.ts';\
+      \ then exit 1; else true; fi` — PASS with no output.\n\n## Retest Report\n**Tester**:\
+      \ integration-verifier (independent of remediation)\n**Scope**: R4 lifecycle\
+      \ proof + production UI ContractStub wiring closure\n**Independence Level**:\
+      \ L2\n\n### Commands Executed\n**Runtime lifecycle proof command**:\n```text\n\
+      go test -v ./internal/resofeed -run TestServeReadinessBeforeBackgroundIngest\
+      \ -count=1\n```\n**Runtime lifecycle proof output**:\n```text\n=== RUN   TestServeReadinessBeforeBackgroundIngest\n\
+      \    runtime_startup_test.go:160: ordered lifecycle proof: bind/listen ready\
+      \ -> HTTP/MCP readiness observable -> background ingest start\n--- PASS: TestServeReadinessBeforeBackgroundIngest\
+      \ (0.01s)\nPASS\nok  \tresofeed/internal/resofeed\t0.536s\n```\n\n**Stub scan\
+      \ command**:\n```text\ngrep -R \"ContractStub\" web/src/routes web/src/lib --include='*.svelte'\
+      \ --include='*.ts'\n```\n**Stub scan output**:\n```text\n<no output>\n```\n\n\
+      **Frontend build/test output**:\n```text\nInitial command: npm --prefix web\
+      \ run check && npm --prefix web run build && npm --prefix web run test\nInitial\
+      \ output: sh: svelte-kit: command not found\nFallback after verifying web/node_modules/.bin/svelte-kit\
+      \ was missing:\nnpm --prefix web ci && npm --prefix web run check && npm --prefix\
+      \ web run build && npm --prefix web run test\nOutput: added 147 packages; svelte-check\
+      \ found 0 errors and 0 warnings; build wrote site to build; vitest Test Files\
+      \ 2 passed (2), Tests 11 passed (11).\n```\n\n### Closure Analysis\n- R4 lifecycle\
+      \ ordering: PASS — runtime test observed ordered events: bind/listen ready ->\
+      \ HTTP/MCP readiness observable -> background ingest start.\n- Production UI\
+      \ stub dependency: PASS — exact grep over production route/lib Svelte/TS files\
+      \ returned no `ContractStub`.\n- Real UI API client wiring: PASS — `web/src/routes/+page.svelte`\
+      \ imports `ResoFeedApiClient` and calls real methods: `sources()`, `today()`,\
+      \ `item()`, `inspect()`, `resonance()`, `deleteSource()`, `importOpml()`, `exportState()`,\
+      \ `importState()`, `search()`.\n- why_previous_gate_missed_it present: yes —\
+      \ previous gate likely accepted static goroutine launch order; this retest required\
+      \ runtime-observable HTTP/API and MCP unauthorized readiness probes before ingest\
+      \ event.\n- reversal_risk present: yes — low/medium: regression risk remains\
+      \ if readiness proof is removed or bypassed; current targeted runtime test should\
+      \ catch reversed ordering.\n\n### Behavioral Proof Register\n- requirement_ref:\
+      \ R4 startup lifecycle order\n  behavior_claim: HTTP/MCP bind/readiness is observable\
+      \ before background ingest starts.\n  runtime_proof_expected: Ordered runtime\
+      \ events proving bind/listen readiness and HTTP/MCP readiness occur before ingest-start\
+      \ callback.\n  evidence_ref: `go test -v ./internal/resofeed -run TestServeReadinessBeforeBackgroundIngest\
+      \ -count=1`\n  status: PASS\n  closure_path:\n  gate_decision_basis: Targeted\
+      \ runtime test passed and logged concrete ordered events.\n\n- requirement_ref:\
+      \ Production UI no ContractStub wiring\n  behavior_claim: Production `+page.svelte`\
+      \ and routed component tree no longer import/render `*ContractStub` components\
+      \ for documented UI surfaces.\n  runtime_proof_expected: No `ContractStub` grep\
+      \ matches; frontend check/build/render tests pass; route uses real API client\
+      \ paths or real components.\n  evidence_ref: Exact grep returned `<no output>`;\
+      \ fallback frontend validation passed after dependency install with 2 files/11\
+      \ tests passing.\n  status: PASS\n  closure_path:\n  gate_decision_basis: Static\
+      \ wiring scan and production frontend build/test are green; `+page.svelte` uses\
+      \ real API client and concrete components.\n\n## Semantic Closure Fields\nheadline:\
+      \ PASS\nstep_intent: retest_green\nexpected_result: green\nobserved_result:\
+      \ green\nfailure_alignment: none\nverdict: PASS\nblockers: []\nproof_gap_status:\
+      \ NONE\nblocking_status: CLOSED\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nproduct_implementation_files_modified: false\n\n## Verification\
+      \ Run\n- `git status --short` -> 0, no output before verification.\n- `go test\
+      \ -v ./internal/resofeed -run TestServeReadinessBeforeBackgroundIngest -count=1`\
+      \ -> 0.\n- `grep -R \"ContractStub\" web/src/routes web/src/lib --include='*.svelte'\
+      \ --include='*.ts'` -> 1, no matches; interpreted as PASS for absence scan.\n\
+      - `npm --prefix web run check && npm --prefix web run build && npm --prefix\
+      \ web run test` -> failed initially because `svelte-kit` missing.\n- `npm --prefix\
+      \ web ci && npm --prefix web run check && npm --prefix web run build && npm\
+      \ --prefix web run test` -> 0.\n- final `git status --short` -> 0, no tracked\
+      \ modifications.\n\n## Artifacts Modified\n- None tracked. `git status --short`\
+      \ clean after verification."
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
