@@ -14193,7 +14193,7 @@ phases:
       \ contents were read, printed, or committed."
   - id: runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     name: define-runtime-secret-red-tests
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
       \ red\nagent_source: project\n\nDefine expected-red Go and docs/search tests\
       \ for runtime LLM secret resolution. Modified files must be limited to tests,\
@@ -14248,6 +14248,8 @@ phases:
     depends_on:
     - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T17:13:42.323229+00:00'
   - id: runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     name: complete-runtime-secret-resolver
     status: pending
