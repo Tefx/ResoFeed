@@ -207,7 +207,7 @@ func seedMCPCorpus(t *testing.T, ctx context.Context, db *sql.DB) {
 	if err != nil {
 		t.Fatalf("insert MCP item: %v", err)
 	}
-	if err := RebuildSearchIndex(ctx, db); err != nil {
+	if err := rebuildSearchIndex(ctx, db); err != nil {
 		t.Fatalf("rebuild MCP search index: %v", err)
 	}
 }

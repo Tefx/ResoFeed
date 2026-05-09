@@ -65,6 +65,175 @@ func TestIngestPersistsValueTierAndFreshSearchIndex(t *testing.T) {
 	if len(items) != 1 || items[0].SourceTitle != "Core Source" || items[0].Title != "SQLite Provenance" {
 		t.Fatalf("search items = %+v, want freshly indexed ingested item with source/title provenance", items)
 	}
+	if items[0].ValueTier == nil || *items[0].ValueTier != "high" {
+		t.Fatalf("search item value_tier = %v, want high exposed on production read path", items[0].ValueTier)
+	}
+	detail, err := ReadItemDetail(ctx, db, items[0].ID)
+	if err != nil {
+		t.Fatalf("ReadItemDetail returned error: %v", err)
+	}
+	if detail.ValueTier == nil || *detail.ValueTier != "high" {
+		t.Fatalf("detail value_tier = %v, want high exposed on production detail path", detail.ValueTier)
+	}
+}
+
+func TestValueTierExposedThroughHTTPAndMCPReadPaths(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_value", "https://value.example/feed.xml", "Value")
+	insertRankedItem(t, ctx, db, "item_value", "src_value", "Value tier story", now)
+	_, err := db.ExecContext(ctx, `update items set value_tier = 'high' where id = 'item_value'`)
+	if err != nil {
+		t.Fatalf("update value_tier: %v", err)
+	}
+
+	server := httptest.NewServer(NewRouter(HTTPServerConfig{DB: db, OwnerToken: "owner-token-value-tier-0123456789"}))
+	defer server.Close()
+	req, err := http.NewRequest(http.MethodGet, server.URL+"/api/feed/today?limit=10", nil)
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+	req.Header.Set("Authorization", "Bearer owner-token-value-tier-0123456789")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("http today: %v", err)
+	}
+	defer resp.Body.Close()
+	var today TodayFeedResponse
+	if err := json.NewDecoder(resp.Body).Decode(&today); err != nil {
+		t.Fatalf("decode today: %v", err)
+	}
+	if len(today.Items) != 1 || today.Items[0].ValueTier == nil || *today.Items[0].ValueTier != "high" {
+		t.Fatalf("HTTP today items = %+v, want value_tier high", today.Items)
+	}
+
+	mcp, err := ListCandidateItemsForMCP(ctx, db, MCPListCandidateItemsInput{Limit: 10})
+	if err != nil {
+		t.Fatalf("ListCandidateItemsForMCP returned error: %v", err)
+	}
+	if len(mcp.Items) != 1 || mcp.Items[0].ValueTier == nil || *mcp.Items[0].ValueTier != "high" {
+		t.Fatalf("MCP items = %+v, want value_tier high", mcp.Items)
+	}
+}
+
+func TestStrictFilterAndBoostSteeringExecuteOnRealFeedRanking(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_policy", "https://policy.example/feed.xml", "Policy")
+	insertRankedItem(t, ctx, db, "item_rust", "src_policy", "Rust compiler release", now.Add(-1*time.Hour))
+	insertRankedItem(t, ctx, db, "item_crypto", "src_policy", "Crypto token launch", now.Add(-30*time.Minute))
+	insertRankedItem(t, ctx, db, "item_sqlite_policy", "src_policy", "SQLite storage analysis", now.Add(-2*time.Hour))
+
+	if _, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Filter out crypto token coverage.", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "filter-crypto"}}); err != nil {
+		t.Fatalf("filter ApplySteering returned error: %v", err)
+	}
+	if _, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Push more sqlite storage analysis.", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "boost-sqlite"}}); err != nil {
+		t.Fatalf("boost ApplySteering returned error: %v", err)
+	}
+	items, err := ListTodayFeed(ctx, db, RankingOptions{Limit: 10, Now: now})
+	if err != nil {
+		t.Fatalf("ListTodayFeed returned error: %v", err)
+	}
+	if len(items) == 0 || items[0].ID != "item_sqlite_policy" {
+		t.Fatalf("ranked items = %+v, want boosted sqlite item first", items)
+	}
+	for _, item := range items {
+		if item.ID == "item_crypto" {
+			t.Fatalf("ranked items = %+v, filtered crypto item should not be returned", items)
+		}
+	}
+}
+
+func TestInspectionOfControversialItemDoesNotCreateDurablePreference(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_controversy", "https://controversy.example/feed.xml", "Controversy")
+	insertRankedItem(t, ctx, db, "item_old_opposing", "src_controversy", "Opposing controversial view inspected", now.Add(-24*time.Hour))
+	insertRankedItem(t, ctx, db, "item_new_neutral", "src_controversy", "Neutral policy update", now.Add(-30*time.Minute))
+	insertRankedItem(t, ctx, db, "item_new_opposing", "src_controversy", "Opposing controversial follow up", now.Add(-2*time.Hour))
+	if _, err := MarkItemInspected(ctx, db, "item_old_opposing", InspectRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "inspect-opposing"}}); err != nil {
+		t.Fatalf("MarkItemInspected returned error: %v", err)
+	}
+	items, err := ListTodayFeed(ctx, db, RankingOptions{Limit: 10, Now: now})
+	if err != nil {
+		t.Fatalf("ListTodayFeed returned error: %v", err)
+	}
+	if len(items) < 2 {
+		t.Fatalf("ranked items = %+v, want at least two candidates", items)
+	}
+	if items[0].ID == "item_new_opposing" {
+		t.Fatalf("ranked items = %+v, inspected opposing topic should not outrank fresher neutral item as durable preference", items)
+	}
+}
+
+func TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_mcp_delivery", "https://delivery.example/feed.xml", "Delivery")
+	story := "story_delivery"
+	insertRankedItem(t, ctx, db, "item_delivered", "src_mcp_delivery", "Delivery story original", now.Add(-72*time.Hour))
+	_, err := db.ExecContext(ctx, `update items set story_key = ? where id = 'item_delivered'`, story)
+	if err != nil {
+		t.Fatalf("set delivered story key: %v", err)
+	}
+	_, err = ReportDeliveryForMCP(ctx, db, MCPReportDeliveryInput{ItemID: "item_delivered", ActorID: "briefing-agent", DeliveredAt: now.Add(-30 * time.Minute), IdempotencyKey: "delivery-1"})
+	if err != nil {
+		t.Fatalf("ReportDeliveryForMCP returned error: %v", err)
+	}
+	withoutRelated, err := ListCandidateItemsForMCP(ctx, db, MCPListCandidateItemsInput{Limit: 10})
+	if err != nil {
+		t.Fatalf("ListCandidateItemsForMCP without related returned error: %v", err)
+	}
+	for _, item := range withoutRelated.Items {
+		if item.ID == "item_delivered" {
+			t.Fatalf("MCP candidates = %+v, delivered item should be suppressed without fresh related development", withoutRelated.Items)
+		}
+	}
+	insertRankedItem(t, ctx, db, "item_related", "src_mcp_delivery", "Delivery story related development", now.Add(30*time.Minute))
+	_, err = db.ExecContext(ctx, `update items set story_key = ? where id = 'item_related'`, story)
+	if err != nil {
+		t.Fatalf("set related story key: %v", err)
+	}
+	withRelated, err := ListCandidateItemsForMCP(ctx, db, MCPListCandidateItemsInput{Limit: 10})
+	if err != nil {
+		t.Fatalf("ListCandidateItemsForMCP with related returned error: %v", err)
+	}
+	seenDelivered := false
+	seenRelated := false
+	for _, item := range withRelated.Items {
+		seenDelivered = seenDelivered || item.ID == "item_delivered"
+		seenRelated = seenRelated || item.ID == "item_related"
+	}
+	if !seenDelivered || !seenRelated {
+		t.Fatalf("MCP candidates = %+v, want delivered item resurfaced with fresh related development", withRelated.Items)
+	}
+}
+
+func TestHumanSteeringSupersedesPriorAgentRuleWithSupersededBy(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Push more robotics briefings.", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: "briefing-agent", IdempotencyKey: "agent-robotics"}}); err != nil {
+		t.Fatalf("agent ApplySteering returned error: %v", err)
+	}
+	humanResult, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Push more climate analysis.", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "human-climate"}})
+	if err != nil {
+		t.Fatalf("human ApplySteering returned error: %v", err)
+	}
+	if len(humanResult.Receipt.ChangedRules) != 1 {
+		t.Fatalf("human receipt = %+v, want one changed rule", humanResult.Receipt)
+	}
+	var isActive bool
+	var supersededBy sql.NullString
+	if err := db.QueryRowContext(ctx, `select is_active, superseded_by from steer_rules where created_by_actor_kind = 'agent'`).Scan(&isActive, &supersededBy); err != nil {
+		t.Fatalf("read superseded agent rule: %v", err)
+	}
+	if isActive || !supersededBy.Valid || supersededBy.String != humanResult.Receipt.ChangedRules[0].ID {
+		t.Fatalf("agent rule active=%v superseded_by=%v, want inactive superseded by %s", isActive, supersededBy, humanResult.Receipt.ChangedRules[0].ID)
+	}
 }
 
 func TestImportRebuildsSearchIndexForRestoredResonatedProvenance(t *testing.T) {

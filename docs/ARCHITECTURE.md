@@ -580,6 +580,7 @@ Canonical JSON type rules:
 | `title` | string | Yes | No | item title |
 | `summary` | string | Yes | Yes | `null` when unavailable |
 | `core_insight` | string | Yes | Yes | `null` when unavailable |
+| `value_tier` | string | Yes | Yes | terse quality/value category, e.g. `high`; `null` when unavailable |
 | `published_at` | RFC3339 string | Yes | Yes | `null` when feed lacks date |
 | `extraction_status` | string enum | Yes | No | `full`, `partial_extraction`, `summary_unavailable`, `original_unavailable` |
 | `model_status` | string enum | Yes | No | `ok`, `summary_unavailable`, `model_latency_error` |
@@ -628,6 +629,8 @@ Canonical JSON type rules:
 | `is_active` | boolean | Yes | No | only active rules affect ranking |
 | `superseded_by` | string | Yes | Yes | replacement rule id or null |
 | `revision` | integer | Yes | No | monotonic local change value |
+| `created_by_actor_kind` | string | No | No | present when needed for inline provenance; `human` or `agent` |
+| `created_by_actor_id` | string | No | Yes | delegated agent name/id for concise correction receipts |
 
 `RestoreResult`:
 
@@ -748,6 +751,7 @@ Endpoint contracts:
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
 | `GET /api/search` | optional query params listed in the search query rules | `200` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` |
+| `GET /api/steer/active` | none | `200` | `{ "rules": [SteerRule] }`; intended for inline steering receipts only, not a rule-management UI |
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
 | `POST /api/state/import` | state bundle JSON, max `10 MiB` | `200` | restore result schema |
 | `GET /api/doctor` | none | `200` | `text/plain; charset=utf-8` raw diagnostic lines |

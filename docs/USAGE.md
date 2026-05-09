@@ -491,6 +491,8 @@ Do not treat inspection of opposing views as agreement.
 
 After a steering instruction is accepted, ResoFeed should return a terse receipt that explains what changed and leaves the correction path obvious.
 
+When a delegated agent submits steering through MCP, the next UI load may show a terse inline receipt such as `agent:briefing-agent steering active: ... · correct in Steer`. This is provenance, not a per-agent account system or activity ledger.
+
 Steer must not become a rule-management product. There is no manual rule builder, weight editor, per-rule CRUD dashboard, or complex policy document for the user to maintain.
 
 ## Reading the Feed

@@ -90,6 +90,7 @@ type ItemSummary struct {
 	Title              string     `json:"title"`
 	Summary            *string    `json:"summary"`
 	CoreInsight        *string    `json:"core_insight"`
+	ValueTier          *string    `json:"value_tier"`
 	PublishedAt        *time.Time `json:"published_at"`
 	ExtractionStatus   string     `json:"extraction_status"`
 	ModelStatus        string     `json:"model_status"`
@@ -111,6 +112,7 @@ type ItemDetail struct {
 	Title              string     `json:"title"`
 	Summary            *string    `json:"summary"`
 	CoreInsight        *string    `json:"core_insight"`
+	ValueTier          *string    `json:"value_tier"`
 	PublishedAt        *time.Time `json:"published_at"`
 	ExtractionStatus   string     `json:"extraction_status"`
 	ModelStatus        string     `json:"model_status"`
@@ -256,15 +258,6 @@ type RestoredCounts struct {
 	Sources        int `json:"sources"`
 	SteerRules     int `json:"steer_rules"`
 	ResonatedItems int `json:"resonated_items"`
-}
-
-// DeliveryReportRequest is the MCP report_delivery input. It marks external
-// surfacing only when the item was actually delivered to the human.
-type DeliveryReportRequest struct {
-	ItemID         string    `json:"item_id"`
-	ActorID        string    `json:"actor_id"`
-	DeliveredAt    time.Time `json:"delivered_at"`
-	IdempotencyKey string    `json:"idempotency_key"`
 }
 
 // DeliveryReportResult is the MCP report_delivery output.

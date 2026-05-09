@@ -193,6 +193,42 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(screen.getByRole('log', { name: '/doctor diagnostics' }).tagName).toBe('PRE');
   });
 
+  it('renders only allowed top-level surfaces and demotes search/state from product navigation', async () => {
+    window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
+      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
+      if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
+    }));
+
+    render(Page);
+    await screen.findByRole('navigation', { name: 'Surfaces' });
+    const nav = screen.getByRole('navigation', { name: 'Surfaces' });
+    expect(within(nav).getByRole('button', { name: 'TODAY' })).toBeVisible();
+    expect(within(nav).getByRole('button', { name: 'SOURCE LEDGER' })).toBeVisible();
+    expect(within(nav).queryByRole('button', { name: 'SEARCH' })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('button', { name: 'STATE' })).not.toBeInTheDocument();
+  });
+
+  it('surfaces active MCP agent steering attribution as an inline correction receipt', async () => {
+    window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
+      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [{ id: 'rule_agent', rule_text: 'Push more sqlite research.', is_active: true, superseded_by: null, revision: 1, created_by_actor_kind: 'agent', created_by_actor_id: 'briefing-agent' }] });
+      if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
+    }));
+
+    render(Page);
+    const receipt = await screen.findByRole('region', { name: 'Agent steering receipt' });
+    expect(receipt).toHaveTextContent('agent:briefing-agent steering active: Push more sqlite research. · correct in Steer');
+  });
+
   it('uses mobile feed-first full-screen surfaces instead of one stacked page', async () => {
     const user = userEvent.setup();
     Object.defineProperty(window, 'matchMedia', {

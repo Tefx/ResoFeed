@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { ItemDetail, ItemSummary, Source, StateBundleV1 } from '$lib/api-contract';
+  import type { ItemDetail, ItemSummary, Source, StateBundleV1, SteerRule } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -14,7 +14,7 @@
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
-  type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'state';
+  type Surface = 'feed' | 'inspector' | 'ledger' | 'search';
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -37,6 +37,7 @@
   let inspectorError = $state<string | null>(null);
   let steerCommand = $state('');
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
+  let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
 
@@ -68,6 +69,7 @@
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
+      agentSteeringRules = await loadAgentSteeringRules(client);
       selectedItemId = feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
@@ -95,12 +97,23 @@
   }
 
   async function refreshShellLists(): Promise<void> {
-    const [sourceResponse, feedResponse] = await Promise.all([apiClient().sources(), apiClient().today()]);
+    const client = apiClient();
+    const [sourceResponse, feedResponse] = await Promise.all([client.sources(), client.today()]);
     sources = sourceResponse.sources;
     items = feedResponse.items;
+    agentSteeringRules = await loadAgentSteeringRules(client);
     if (selectedItemId && !feedResponse.items.some((item) => item.id === selectedItemId)) {
       selectedItemId = feedResponse.items[0]?.id ?? null;
       selectedItemDetail = null;
+    }
+  }
+
+  async function loadAgentSteeringRules(client: ResoFeedApiClient): Promise<SteerRule[]> {
+    try {
+      const response = await client.activeRules();
+      return response.rules.filter((rule) => rule.created_by_actor_kind === 'agent' && rule.created_by_actor_id);
+    } catch {
+      return [];
     }
   }
 
@@ -135,6 +148,12 @@
 
     steerFeedback = { kind: 'submitting' };
     try {
+      if (command.toLowerCase().startsWith('search ')) {
+        currentSurface = 'search';
+        steerCommand = command.replace(/^search\s+/i, '');
+        steerFeedback = { kind: 'receipt', text: 'retrieval: lexical search' };
+        return;
+      }
       if (command === '/doctor') {
         const diagnostics = await apiClient().doctor();
         steerFeedback = { kind: 'doctor', text: diagnostics };
@@ -240,8 +259,6 @@
     <nav class="surface-nav" aria-label="Surfaces">
       <button type="button" class:active-surface={currentSurface === 'feed'} onclick={() => showSurface('feed')}>TODAY</button>
       <button type="button" class:active-surface={currentSurface === 'ledger'} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
-      <button type="button" class:active-surface={currentSurface === 'search'} onclick={() => showSurface('search')}>SEARCH</button>
-      <button type="button" class:active-surface={currentSurface === 'state'} onclick={() => showSurface('state')}>STATE</button>
     </nav>
 
     {#if steerFeedback.kind === 'receipt'}
@@ -255,6 +272,14 @@
       </section>
     {:else if steerFeedback.kind === 'submitting'}
       <p class="contract-muted shell-status" role="status">applying</p>
+    {/if}
+
+    {#if agentSteeringRules.length > 0}
+      <section class="contract-steering-receipt" aria-label="Agent steering receipt" aria-live="polite">
+        {#each agentSteeringRules as rule (rule.id)}
+          <p>agent:{rule.created_by_actor_id} steering active: {rule.rule_text} · correct in Steer</p>
+        {/each}
+      </section>
     {/if}
 
     {#if loadState === 'loading'}
@@ -287,14 +312,11 @@
     <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label="SOURCE LEDGER surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
       <SourceLedger sources={sources} onDeleteSource={deleteSource} onImportOpml={importOpml} />
-    </section>
-    <section class="utility-surface" class:active-panel={currentSurface === 'state'} aria-label="State surface">
-      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
       <StatePortability onExportState={exportState} onImportState={importState} />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
-      <SearchRetrieval items={items} query="" onSearch={searchItems} />
+      <SearchRetrieval items={items} query={steerCommand} onSearch={searchItems} />
     </section>
   {/if}
 </main>

@@ -57,7 +57,7 @@ func ListTodayFeed(ctx context.Context, db *sql.DB, opts RankingOptions) ([]Item
 
 	rows, err := db.QueryContext(ctx, `
 select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title,
-       i.summary, i.core_insight, i.published_at,
+       i.summary, i.core_insight, i.value_tier, i.published_at,
        i.extraction_status, i.model_status,
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
        i.story_key, i.duplicate_of_item_id, i.first_seen_at
@@ -184,13 +184,14 @@ on conflict(item_id) do update set
 
 func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCandidate, error) {
 	var item ItemSummary
-	var summary, coreInsight, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen sql.NullString
+	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen sql.NullString
 	var resonated bool
-	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &summary, &coreInsight, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &resonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen); err != nil {
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &resonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen); err != nil {
 		return rankedCandidate{}, fmt.Errorf("scan today feed row: %w", err)
 	}
 	item.Summary = stringPtrFromNull(summary)
 	item.CoreInsight = stringPtrFromNull(coreInsight)
+	item.ValueTier = stringPtrFromNull(valueTier)
 	item.PublishedAt = timePtrFromNull(publishedAt)
 	item.IsResonated = resonated
 	item.HumanInspectedAt = timePtrFromNull(inspectedAt)
@@ -199,7 +200,7 @@ func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCand
 	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
 	firstSeenAt := timePtrFromNull(firstSeen)
 	fresh := isFresh(item.PublishedAt, firstSeenAt, now)
-	textParts := []string{item.Title, item.SourceTitle, item.URL, stringValue(item.Summary), stringValue(item.CoreInsight)}
+	textParts := []string{item.Title, item.SourceTitle, item.URL, stringValue(item.Summary), stringValue(item.CoreInsight), stringValue(item.ValueTier)}
 	return rankedCandidate{item: item, firstSeen: firstSeenAt, text: strings.ToLower(strings.Join(textParts, " ")), fresh: fresh, memory: !fresh, ordinal: ordinal}, nil
 }
 
@@ -228,6 +229,9 @@ func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.T
 	eligible := make([]rankedCandidate, 0, len(candidates))
 	for _, candidate := range candidates {
 		if candidate.item.DuplicateOfItemID != nil {
+			continue
+		}
+		if steeringFiltersOut(candidate, rules) {
 			continue
 		}
 		if candidate.item.StoryKey != nil {
@@ -338,12 +342,15 @@ func steeringScore(candidate rankedCandidate, rules []SteerRule) int {
 	}
 	text := candidate.text
 	if text == "" {
-		parts := []string{candidate.item.Title, candidate.item.SourceTitle, candidate.item.URL, stringValue(candidate.item.Summary), stringValue(candidate.item.CoreInsight)}
+		parts := []string{candidate.item.Title, candidate.item.SourceTitle, candidate.item.URL, stringValue(candidate.item.Summary), stringValue(candidate.item.CoreInsight), stringValue(candidate.item.ValueTier)}
 		text = strings.ToLower(strings.Join(parts, " "))
 	}
 	score := 0
 	for _, rule := range rules {
 		if !rule.IsActive {
+			continue
+		}
+		if isFilterRule(rule.RuleText) {
 			continue
 		}
 		if steeringRuleMatches(text, rule.RuleText) {
@@ -355,6 +362,34 @@ func steeringScore(candidate rankedCandidate, rules []SteerRule) int {
 		}
 	}
 	return score
+}
+
+func steeringFiltersOut(candidate rankedCandidate, rules []SteerRule) bool {
+	if len(rules) == 0 {
+		return false
+	}
+	text := candidate.text
+	if text == "" {
+		parts := []string{candidate.item.Title, candidate.item.SourceTitle, candidate.item.URL, stringValue(candidate.item.Summary), stringValue(candidate.item.CoreInsight), stringValue(candidate.item.ValueTier)}
+		text = strings.ToLower(strings.Join(parts, " "))
+	}
+	for _, rule := range rules {
+		if rule.IsActive && isFilterRule(rule.RuleText) && steeringRuleMatches(text, rule.RuleText) {
+			return true
+		}
+	}
+	return false
+}
+
+func isFilterRule(ruleText string) bool {
+	lower := strings.ToLower(ruleText)
+	phrases := []string{"filter", "filter out", "hide", "suppress", "exclude", "reduce", "less", "downrank", "deprioritize"}
+	for _, phrase := range phrases {
+		if strings.Contains(lower, phrase) {
+			return true
+		}
+	}
+	return false
 }
 
 func steeringRuleMatches(itemText string, ruleText string) bool {
@@ -371,7 +406,7 @@ func steeringKeywords(ruleText string) []string {
 	words := strings.FieldsFunc(strings.ToLower(ruleText), func(r rune) bool {
 		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
 	})
-	stop := map[string]bool{"push": true, "more": true, "less": true, "about": true, "the": true, "and": true, "or": true, "for": true, "with": true, "from": true, "articles": true, "items": true, "coverage": true, "documents": true, "technical": true}
+	stop := map[string]bool{"push": true, "more": true, "less": true, "about": true, "the": true, "and": true, "or": true, "for": true, "with": true, "from": true, "articles": true, "items": true, "coverage": true, "documents": true, "technical": true, "filter": true, "hide": true, "suppress": true, "exclude": true, "reduce": true, "downrank": true, "deprioritize": true}
 	keywords := make([]string, 0, len(words))
 	for _, word := range words {
 		if len(word) < 4 || stop[word] {
@@ -463,6 +498,12 @@ func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteering
 			return SteerResult{}, fmt.Errorf("upsert steering rule: %w", err)
 		}
 		changed = append(changed, SteerRule{ID: id, RuleText: text, IsActive: true, Revision: 1, CreatedByActorKind: &kind, CreatedByActorID: nullableString(actorID)})
+	}
+	if actorKind == ActorKindHuman && len(changed) > 0 {
+		_, err := tx.ExecContext(ctx, `update steer_rules set is_active = 0, superseded_by = ?, revision = revision + 1 where is_active = 1 and created_by_actor_kind = ? and id <> ?`, changed[0].ID, string(ActorKindAgent), changed[0].ID)
+		if err != nil {
+			return SteerResult{}, fmt.Errorf("supersede agent steering rules: %w", err)
+		}
 	}
 	if err := tx.Commit(); err != nil {
 		return SteerResult{}, fmt.Errorf("commit steering transaction: %w", err)

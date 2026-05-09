@@ -8,6 +8,7 @@ export const expectedRedItem: ItemSummary = {
   title: 'SQLite FTS changes ranking contract',
   summary: 'Dense factual summary for a rendered feed row.',
   core_insight: 'Why this matters for retrieval.',
+  value_tier: 'high',
   published_at: '2026-05-09T00:00:00Z',
   extraction_status: 'partial_extraction',
   model_status: 'summary_unavailable',

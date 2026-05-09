@@ -25,6 +25,7 @@ export interface ItemSummary {
   title: string;
   summary: string | null;
   core_insight: string | null;
+  value_tier: string | null;
   published_at: Rfc3339UtcString | null;
   extraction_status: ExtractionStatus;
   model_status: ModelStatus;
@@ -67,6 +68,8 @@ export interface SteerRule {
   is_active: boolean;
   superseded_by: OpaqueId | null;
   revision: number;
+  created_by_actor_kind?: ActorKind;
+  created_by_actor_id?: string;
 }
 
 export interface SearchQueryEcho {
@@ -163,6 +166,10 @@ export interface SteerReceipt {
 
 export interface SteerResponse {
   receipt: SteerReceipt;
+}
+
+export interface RulesResponse {
+  rules: SteerRule[];
 }
 
 export interface DeleteSourceResponse {

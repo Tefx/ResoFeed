@@ -94,16 +94,6 @@ func staticUIHandler() http.Handler {
 	})
 }
 
-// ServeHTTPRuntime starts the HTTP/MCP/static server and exits on context
-// cancellation. It must not start a second deployable process.
-func ServeHTTPRuntime(ctx context.Context, cfg HTTPServerConfig) error {
-	listener, err := net.Listen("tcp", cfg.Addr)
-	if err != nil {
-		return fmt.Errorf("listen http runtime: %w", err)
-	}
-	return serveHTTPRuntimeOnListener(ctx, cfg, listener)
-}
-
 func ServeHTTPAndIngestRuntime(ctx context.Context, cfg HTTPServerConfig, runIngest func(context.Context) error) error {
 	listener, err := net.Listen("tcp", cfg.Addr)
 	if err != nil {
@@ -260,6 +250,8 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleStateImport(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/doctor":
 		h.handleDoctor(w, r)
+	case r.Method == http.MethodGet && r.URL.Path == "/api/steer/active":
+		h.handleActiveSteeringRules(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/steer":
 		h.handleSteer(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/items/"):
@@ -394,6 +386,15 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
+}
+
+func (h apiHandler) handleActiveSteeringRules(w http.ResponseWriter, r *http.Request) {
+	rules, err := loadActiveSteerRules(r.Context(), h.cfg.DB)
+	if err != nil {
+		writeInternal(w)
+		return
+	}
+	writeJSON(w, http.StatusOK, RulesResponse{Rules: rules})
 }
 
 func (h apiHandler) handleSources(w http.ResponseWriter, r *http.Request) {

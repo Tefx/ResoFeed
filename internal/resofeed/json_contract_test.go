@@ -36,7 +36,7 @@ func TestItemSummaryJSONExcludesDetailOnlyFields(t *testing.T) {
 			t.Fatalf("ItemSummary JSON includes detail-only key %q: %s", key, data)
 		}
 	}
-	for _, key := range []string{"summary", "core_insight", "human_inspected_at", "external_surfaced_at", "story_key", "duplicate_of_item_id"} {
+	for _, key := range []string{"summary", "core_insight", "value_tier", "human_inspected_at", "external_surfaced_at", "story_key", "duplicate_of_item_id"} {
 		assertPresentNull(t, fields, key)
 	}
 }

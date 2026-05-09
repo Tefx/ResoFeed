@@ -42,6 +42,9 @@
           <p class="contract-label contract-feed-meta">
             <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
             · <span aria-label={`Extraction: ${item.extraction_status}`}>{extractionLabel(item.extraction_status)}</span>
+            {#if item.value_tier}
+              · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
+            {/if}
             {#if items.findIndex((candidate) => candidate.id === item.id) === 0}
               <span class="contract-time-label">TODAY</span>
             {/if}

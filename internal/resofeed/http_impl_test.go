@@ -141,7 +141,7 @@ func seedHTTPHandlerCorpus(t *testing.T, ctx context.Context, db *sql.DB, now ti
 	if err != nil {
 		t.Fatalf("insert http item: %v", err)
 	}
-	if err := RebuildSearchIndex(ctx, db); err != nil {
+	if err := rebuildSearchIndex(ctx, db); err != nil {
 		t.Fatalf("rebuild search index: %v", err)
 	}
 }

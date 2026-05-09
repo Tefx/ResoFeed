@@ -57,6 +57,9 @@
     <p class="contract-muted">
       <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
       · <span aria-label={`Extraction: ${item.extraction_status}`}>{extractionLabel(item.extraction_status)}</span>
+      {#if item.value_tier}
+        · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
+      {/if}
       · <span aria-label={`Model status: ${item.model_status}`}>{item.model_status}</span>
     </p>
     <p><a href={item.url}>original link</a></p>

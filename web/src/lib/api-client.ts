@@ -11,6 +11,7 @@ import type {
   ResonanceRequest,
   ResonanceResponse,
   RestoreResult,
+  RulesResponse,
   SearchResponse,
   SourcesResponse,
   StateBundleV1,
@@ -126,6 +127,10 @@ export class ResoFeedApiClient {
         command
       } satisfies SteerRequest)
     });
+  }
+
+  async activeRules(): Promise<RulesResponse> {
+    return this.request<RulesResponse>('/api/steer/active');
   }
 
   async sources(): Promise<SourcesResponse> {
