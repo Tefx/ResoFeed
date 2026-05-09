@@ -13509,3 +13509,178 @@ phases:
     depends_on:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
     agent: uiux-auditor
+  - id: openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
+    name: live-openrouter-smoke-system-test
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: full-plan-check protecting final OpenRouter gate
+
+
+      Complete live/smoke system test using `.env` `OPENROUTER_KEY` or equivalent
+      environment injection. Do NOT read, print, commit, or expose the key. Evidence
+      must redact secrets and owner token values.
+
+
+      Independence Level: L3 black-box/public-interface oriented. Use the built binary
+      and public HTTP/MCP/UI surfaces rather than internal test hooks wherever possible.
+
+
+      Preconditions:
+
+      - If `OPENROUTER_KEY` is absent, mark this step BLOCKED with exact missing precondition;
+      do not fake live evidence.
+
+      - Source `.env` or equivalent in a way that does not echo values (for example
+      shell export without `set -x`).
+
+      - Use a temporary SQLite DB and temporary runtime directories.
+
+      - Use a non-secret test owner token value and redact it in evidence.
+
+
+      Required live smoke sequence:
+
+      1. Build the single `cmd/resofeed` binary.
+
+      2. Run `resofeed serve --openrouter-api-key "$OPENROUTER_KEY"` with `--openrouter-model`
+      omitted to exercise account default behavior; optionally run a second pass with
+      a non-secret configured model name if safe.
+
+      3. Exercise auth boundary: unauthenticated request rejected; owner-token request
+      accepted.
+
+      4. Exercise `/api/feed/today`.
+
+      5. Exercise `/api/search` with strict validation expectations.
+
+      6. Exercise `/api/doctor` and capture redacted `openrouter:` output including
+      configured/default/resolved model behavior where available.
+
+      7. Exercise `/api/state/export` and confirm no OpenRouter key/model/provider
+      config.
+
+      8. Exercise OPML import path without treating OPML as portable state restoration.
+
+      9. Exercise MCP initialize, tools/list, resources/list or equivalent resources
+      call, and steering tool/path; confirm MCP and HTTP expose equivalent product
+      operations.
+
+      10. Exercise UI smoke where possible: load page, confirm no broken blank page,
+      capture screenshot/DOM/rendered evidence if browser tooling is available.
+
+      11. Confirm no Gemini flags/output in live-visible paths.
+
+
+      Live smoke is allowed to make real OpenRouter calls but must keep prompt/input
+      minimal and safe. Never paste full request headers containing the key.'
+    verification: full-plan-check protecting final gate. PASS requires actual command/output
+      evidence for build, server startup, auth, feed, search, doctor, state export,
+      OPML import, MCP initialize/tools/resources/steer, and UI smoke where possible.
+      Handler-only or fake-provider evidence is insufficient for this live step.
+    evidence_template: '## Live OpenRouter Smoke Evidence
+
+      **Tester**: blind-tester
+
+      **Independence Level**: L3
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ### Secret Handling
+
+      - `.env`/OPENROUTER_KEY value was not printed:
+
+      - Owner token value redacted:
+
+      - Commands run without shell tracing secrets:
+
+
+      ### Commands Executed
+
+      ```
+
+      <build command>
+
+      <serve command with OPENROUTER_KEY and owner token redacted>
+
+      <curl/MCP/UI commands with secrets redacted>
+
+      ```
+
+
+      ### Actual Redacted Output
+
+      ```
+
+      <paste key stdout/stderr/HTTP/MCP snippets with secrets redacted>
+
+      ```
+
+
+      ### Smoke Matrix
+
+      | Surface | Operation | Expected | Observed | Status |
+
+      |---|---|---|---|---|
+
+      | Build | cmd/resofeed | binary builds | | |
+
+      | Server | resofeed serve | starts | | |
+
+      | Auth | unauth/auth | reject/accept | | |
+
+      | HTTP | /api/feed/today | works | | |
+
+      | HTTP | /api/search | works + strict validation | | |
+
+      | HTTP | /api/doctor | openrouter output | | |
+
+      | HTTP | /api/state/export | no OpenRouter key/model | | |
+
+      | OPML | import | works, not state restore | | |
+
+      | MCP | initialize | works | | |
+
+      | MCP | tools/resources | listed | | |
+
+      | MCP | steer | uses product operation | | |
+
+      | UI | smoke | page/render present if possible | | |
+
+
+      ### Live Model Evidence
+
+      - Account default model behavior observed or safely unobservable:
+
+      - Configured model behavior observed if second pass run:
+
+      - Resolved model captured when available:
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] BLOCKED: OPENROUTER_KEY missing or external service unavailable
+
+      - [ ] FAIL: blocking product issue found'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
+    agent: blind-tester
