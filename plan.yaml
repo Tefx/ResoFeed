@@ -12578,6 +12578,144 @@ phases:
 
       - Deviation records, if any:'
     agent: golang-developer
+  - id: openrouter-llm-implementation.complete-ingest-steering-state-migration
+    name: complete-ingest-steering-state-migration
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      risk_tags: integration,state,idempotency,secret_runtime
+
+
+      Complete product-operation migration to the OpenRouter-backed LLMClient boundary
+      after the CLI/adapter foundation is in place.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - Contract/docs from openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs.
+
+      - Product expected-red tests from openrouter-llm-contract-and-red-tests.define-product-integration-red-tests.
+
+      - Adapter/runtime foundation from openrouter-llm-implementation.complete-cli-and-openrouter-adapter.
+
+
+      YOUR SCOPE: Replace remaining Gemini-shaped product LLM usage with the shared
+      OpenRouter LLMClient path for ingest summaries/core insights and steering proposal
+      translation. Keep product validation and DB writes in Go/internal/resofeed,
+      not in OpenRouter.
+
+
+      Touch_paths:
+
+      - internal/resofeed/ingest.go and related summary/core insight persistence files.
+
+      - internal/resofeed/ranking.go, steering-related files, idempotency/receipt
+      handling files.
+
+      - internal/resofeed/state.go only for tests/guards proving no LLM config in
+      portable state; do not expand portable state.
+
+      - related Go tests.
+
+
+      Required behavior:
+
+      - Ingest persists summary/core insight from validated OpenRouter-shaped output.
+
+      - Model/provider failures record safe status and do not hide or drop feed items.
+
+      - HTTP and MCP steering both go through the same LLMClient/OpenRouter transformation
+      boundary.
+
+      - Idempotent retries do not re-call the model.
+
+      - Invalid proposals are rejected safely, preserving human-steering precedence
+      and product invariants.
+
+      - Portable backup/restore remains active sources, active steering rules, and
+      resonated items only.
+
+
+      Failure-mode checklist:
+
+      - Invalid/missing model output is rejected without DB corruption.
+
+      - Retry/idempotency path does not duplicate model calls.
+
+      - Explicit clear/null overwrite semantics of state export remain unchanged.
+
+      - No runtime key/model is inserted into durable or portable state.
+
+      - Gemini status names do not leak into persisted model_status or user-visible
+      receipts.
+
+
+      State semantics:
+
+      - Last-writer-wins behavior remains only for existing product state rules, not
+      LLM runtime config.
+
+      - Backward-compatible legacy behavior means existing feed/search/state APIs
+      still work with no new user/account concepts.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT add sync, merge conflict resolution, activity ledger, command history,
+      reading history, portable receipts, accounts/OAuth/RBAC, or per-agent auth/registry.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs. Hardcoded model outputs or discarded
+      proposal parameters do not satisfy this requirement.
+
+
+      If a contract artifact is wrong or incomplete, document a deviation record (type,
+      what, why, impact) — do NOT silently rewrite.'
+    verification: 'local-check protecting openrouter-llm-implementation. Main path:
+      ingest/steering expected-red tests now pass. Failure path: tests prove model
+      failure does not hide item, idempotent retry avoids duplicate model call, invalid
+      proposal is rejected, and state export excludes OpenRouter key/model.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Commands run:
+
+      ```
+
+      <go test targeted ingest/steering/state commands>
+
+      ```
+
+      - Main path proof:
+
+      - Highest-risk failure path proof:
+
+      - Idempotency evidence: model calls counted once on retry.
+
+      - State export evidence: no OpenRouter key/model/provider config present.
+
+      - Secret handling: no .env content read/printed.
+
+      - Deviation records, if any:'
+    depends_on:
+    - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+    agent: golang-developer
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
