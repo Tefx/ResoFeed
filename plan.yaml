@@ -6010,7 +6010,7 @@ phases:
       product_implementation_files_modified: true"
   - id: runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     name: Retest runtime proof and production stub wiring
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       agent_source: default\nverification_scope: phase-check protecting runtime gate,\
       \ frontend gate intersection, end-to-end integration, and final deep-review\
@@ -6146,6 +6146,8 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T09:37:25.005740+00:00'
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
