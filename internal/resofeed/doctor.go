@@ -14,10 +14,37 @@ import (
 // operational surface, not a dashboard, chart, friendly remediation wizard, or
 // settings page.
 func WriteDoctor(ctx context.Context, db *sql.DB, w io.Writer) error {
+	return WriteDoctorWithConfig(ctx, db, DoctorConfig{}, w)
+}
+
+// DoctorConfig carries non-secret runtime model labels into /doctor. It must not
+// include API keys, secret source metadata, .env paths, or raw provider config.
+type DoctorConfig struct {
+	ConfiguredOpenRouterModel string
+	ResolvedOpenRouterModel   string
+}
+
+type openRouterRuntimeStatus interface {
+	ConfiguredModel() string
+	ResolvedModel() string
+}
+
+func DoctorConfigFromLLM(llm LLMClient) DoctorConfig {
+	status, ok := llm.(openRouterRuntimeStatus)
+	if !ok || status == nil {
+		return DoctorConfig{}
+	}
+	return DoctorConfig{
+		ConfiguredOpenRouterModel: status.ConfiguredModel(),
+		ResolvedOpenRouterModel:   status.ResolvedModel(),
+	}
+}
+
+func WriteDoctorWithConfig(ctx context.Context, db *sql.DB, cfg DoctorConfig, w io.Writer) error {
 	if w == nil {
 		return fmt.Errorf("write doctor: writer required")
 	}
-	snapshot, err := ReadDoctorSnapshot(ctx, db)
+	snapshot, err := ReadDoctorSnapshotWithConfig(ctx, db, cfg)
 	if err != nil {
 		return err
 	}
@@ -41,6 +68,10 @@ type DoctorSnapshot struct {
 
 // ReadDoctorSnapshot gathers diagnostic lines without inventing a UI dashboard.
 func ReadDoctorSnapshot(ctx context.Context, db *sql.DB) (DoctorSnapshot, error) {
+	return ReadDoctorSnapshotWithConfig(ctx, db, DoctorConfig{})
+}
+
+func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorConfig) (DoctorSnapshot, error) {
 	if db == nil {
 		return DoctorSnapshot{}, fmt.Errorf("read doctor diagnostics: db required")
 	}
@@ -50,7 +81,7 @@ func ReadDoctorSnapshot(ctx context.Context, db *sql.DB) (DoctorSnapshot, error)
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, rssLines...)
-	lines = append(lines, "openrouter: configured_model=account_default")
+	lines = append(lines, openRouterDoctorLine(cfg))
 	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -67,6 +98,18 @@ func ReadDoctorSnapshot(ctx context.Context, db *sql.DB) (DoctorSnapshot, error)
 		lines = append(lines, "ingest: last_run=never")
 	}
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+func openRouterDoctorLine(cfg DoctorConfig) string {
+	configured := strings.TrimSpace(cfg.ConfiguredOpenRouterModel)
+	if configured == "" {
+		configured = "account_default"
+	}
+	resolved := strings.TrimSpace(cfg.ResolvedOpenRouterModel)
+	if resolved == "" {
+		resolved = "unknown"
+	}
+	return "openrouter: ok configured_model=" + configured + " resolved_model=" + resolved
 }
 
 func readRSSDiagnostics(ctx context.Context, db *sql.DB) ([]string, sql.NullString, error) {

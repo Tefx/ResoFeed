@@ -521,7 +521,7 @@ func (h apiHandler) handleStateImport(w http.ResponseWriter, r *http.Request) {
 func (h apiHandler) handleDoctor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	if err := WriteDoctor(r.Context(), h.cfg.DB, w); err != nil {
+	if err := WriteDoctorWithConfig(r.Context(), h.cfg.DB, DoctorConfigFromLLM(h.cfg.LLM), w); err != nil {
 		return
 	}
 }

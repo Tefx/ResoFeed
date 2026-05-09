@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -42,10 +43,38 @@ func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
 }
 
 type geminiHTTPClient struct {
-	apiKey   string
-	model    string
-	endpoint string
-	client   *http.Client
+	apiKey        string
+	model         string
+	endpoint      string
+	client        *http.Client
+	resolvedMu    sync.Mutex
+	resolvedModel string
+}
+
+func (c *geminiHTTPClient) ConfiguredModel() string {
+	if c == nil {
+		return ""
+	}
+	return strings.TrimSpace(c.model)
+}
+
+func (c *geminiHTTPClient) ResolvedModel() string {
+	if c == nil {
+		return ""
+	}
+	c.resolvedMu.Lock()
+	defer c.resolvedMu.Unlock()
+	return c.resolvedModel
+}
+
+func (c *geminiHTTPClient) setResolvedModel(model string) {
+	trimmed := strings.TrimSpace(model)
+	if c == nil || trimmed == "" {
+		return
+	}
+	c.resolvedMu.Lock()
+	c.resolvedModel = trimmed
+	c.resolvedMu.Unlock()
 }
 
 func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
@@ -180,6 +209,7 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 		if err := json.Unmarshal(body, &generated); err != nil {
 			return fmt.Errorf("decode response: %w", err)
 		}
+		c.setResolvedModel(generated.Model)
 		text := generated.firstText()
 		if text == "" {
 			return errors.New("empty response text")
@@ -212,6 +242,7 @@ type openRouterMessage struct {
 }
 
 type openRouterChatResponse struct {
+	Model   string `json:"model"`
 	Choices []struct {
 		Message openRouterMessage `json:"message"`
 	} `json:"choices"`

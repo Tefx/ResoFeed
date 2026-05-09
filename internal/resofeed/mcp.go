@@ -367,7 +367,7 @@ func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (
 	case "resofeed://system/doctor":
 		mimeType = "text/plain"
 		var buf bytes.Buffer
-		err = WriteDoctor(ctx, h.db, &buf)
+		err = WriteDoctorWithConfig(ctx, h.db, DoctorConfigFromLLM(h.llm), &buf)
 		payload = buf.Bytes()
 	case "resofeed://sources":
 		mimeType = "application/json"
