@@ -11045,6 +11045,7 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-spec-conformance-audit
     - retest-http-idempotency-wiring
+    - finalization-docs-and-deep-review.retest-http-query-validation-contract
     agent: blind-tester
   - id: finalization-docs-and-deep-review.final-deep-review-gate
     name: Final deep review gate
