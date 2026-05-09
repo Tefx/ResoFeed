@@ -2,11 +2,14 @@ package resofeed
 
 import (
 	"bytes"
+	"context"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 )
 
 func TestServeStartupValidationFailsBeforeSocketBind(t *testing.T) {
@@ -103,6 +106,97 @@ func TestServeFirstRunOwnerTokenGenerationAndReuseAtProcessLevel(t *testing.T) {
 	secondCode := Main([]string{"serve", "--addr", addr, "--db", dbPath, "--gemini-api-key", "test-key"}, &secondOut, &secondErr)
 	if secondCode != 1 || !strings.Contains(secondOut.String(), "owner token reused: stored hash") || !strings.Contains(secondErr.String(), "runtime_failed") {
 		t.Fatalf("second process startup code=%d stdout=%q stderr=%q", secondCode, secondOut.String(), secondErr.String())
+	}
+}
+
+func TestServeReadinessBeforeBackgroundIngest(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	db, err := OpenDB(ctx, filepath.Join(t.TempDir(), "resofeed.sqlite3"))
+	if err != nil {
+		t.Fatalf("OpenDB: %v", err)
+	}
+	defer func() { _ = db.Close() }()
+	if err := RunMigrations(ctx, db); err != nil {
+		t.Fatalf("RunMigrations: %v", err)
+	}
+
+	recorder := &testRuntimeLifecycleRecorder{events: make(chan RuntimeLifecycleEvent, 3)}
+	ingestStarted := make(chan struct{})
+	done := make(chan error, 1)
+	cfg := HTTPServerConfig{
+		Addr:       "127.0.0.1:0",
+		PublicURL:  "http://127.0.0.1",
+		DB:         db,
+		OwnerToken: contractOwnerToken,
+		Gemini:     nil,
+		Lifecycle:  recorder,
+	}
+
+	go func() {
+		done <- ServeHTTPAndIngestRuntime(ctx, cfg, func(runCtx context.Context) error {
+			close(ingestStarted)
+			<-runCtx.Done()
+			return nil
+		})
+	}()
+
+	ordered := make([]RuntimeLifecycleEvent, 0, 3)
+	for len(ordered) < 3 {
+		select {
+		case event := <-recorder.events:
+			ordered = append(ordered, event)
+		case <-time.After(3 * time.Second):
+			t.Fatalf("timed out waiting for lifecycle proof; got events %v", ordered)
+		}
+	}
+
+	assertRuntimeEventOrder(t, ordered, []RuntimeLifecycleEvent{
+		RuntimeLifecycleBindReady,
+		RuntimeLifecycleHTTPMCPReady,
+		RuntimeLifecycleIngestStart,
+	})
+	t.Logf("ordered lifecycle proof: %s -> %s -> %s", ordered[0], ordered[1], ordered[2])
+
+	select {
+	case <-ingestStarted:
+	case <-time.After(time.Second):
+		t.Fatalf("ingest did not start after readiness; events %v", ordered)
+	}
+	cancel()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("ServeHTTPAndIngestRuntime returned error: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatalf("runtime did not shut down after lifecycle proof")
+	}
+}
+
+type testRuntimeLifecycleRecorder struct {
+	mu     sync.Mutex
+	seen   []RuntimeLifecycleEvent
+	events chan RuntimeLifecycleEvent
+}
+
+func (r *testRuntimeLifecycleRecorder) RecordRuntimeLifecycleEvent(event RuntimeLifecycleEvent) {
+	r.mu.Lock()
+	r.seen = append(r.seen, event)
+	r.mu.Unlock()
+	r.events <- event
+}
+
+func assertRuntimeEventOrder(t *testing.T, got []RuntimeLifecycleEvent, want []RuntimeLifecycleEvent) {
+	t.Helper()
+	if len(got) != len(want) {
+		t.Fatalf("lifecycle events = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("lifecycle events = %v, want ordered %v", got, want)
+		}
 	}
 }
 

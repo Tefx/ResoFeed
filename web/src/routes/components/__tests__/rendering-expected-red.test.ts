@@ -1,14 +1,14 @@
-import { render, screen, within } from '@testing-library/svelte';
+import { render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import FeedContractStub from '../FeedContractStub.svelte';
+import Feed from '../Feed.svelte';
 import FirstUseEmptyState from '../FirstUseEmptyState.svelte';
-import InspectorContractStub from '../InspectorContractStub.svelte';
+import Inspector from '../Inspector.svelte';
 import OwnerTokenPrompt from '../OwnerTokenPrompt.svelte';
-import SearchRetrievalContractStub from '../SearchRetrievalContractStub.svelte';
-import SourceLedgerContractStub from '../SourceLedgerContractStub.svelte';
-import StatePortabilityContractStub from '../StatePortabilityContractStub.svelte';
+import SearchRetrieval from '../SearchRetrieval.svelte';
+import SourceLedger from '../SourceLedger.svelte';
+import StatePortability from '../StatePortability.svelte';
 import {
   expectedRedItem,
   expectedRedResonatedItem,
@@ -55,11 +55,17 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
   it('renders feed rows with visible provenance and exposes missing keyboard inspect plus star toggle behavior', async () => {
     const user = userEvent.setup();
-    render(FeedContractStub, {
-      props: { items: [expectedRedItem, expectedRedResonatedItem], selectedItemId: expectedRedItem.id }
+    const onResonanceToggle = vi.fn(async () => {});
+    render(Feed, {
+      props: {
+        items: [expectedRedItem, expectedRedResonatedItem],
+        selectedItemId: expectedRedItem.id,
+        onSelect: async () => {},
+        onResonanceToggle
+      }
     });
 
-    const feed = screen.getByRole('list', { name: 'Today feed contract items' });
+    const feed = screen.getByRole('list', { name: 'Today feed items' });
     expect(within(feed).getByText('SQLite FTS changes ranking contract')).toBeVisible();
     expect(within(feed).getAllByLabelText('Source: Example Source')[0]).toBeVisible();
     expect(within(feed).getAllByLabelText('Extraction: partial_extraction')[0]).toBeVisible();
@@ -74,12 +80,11 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const star = screen.getByRole('button', { name: 'Resonate item' });
     await user.click(star);
-    expect(star).toHaveAccessibleName('Remove resonance');
-    expect(star).toHaveTextContent('★');
+    expect(onResonanceToggle).toHaveBeenCalledWith(expectedRedItem, true);
   });
 
-  it('renders the inspector and exposes missing detail-focus/provenance completion', () => {
-    render(InspectorContractStub, { props: { item: expectedRedItem, mode: 'desktop-split' } });
+  it('renders the inspector and exposes missing detail-focus/provenance completion', async () => {
+    render(Inspector, { props: { item: expectedRedItem, mode: 'desktop-split' } });
 
     const inspector = screen.getByRole('complementary', { name: 'SQLite FTS changes ranking contract' });
     expect(within(inspector).getByText('INSPECTOR')).toBeVisible();
@@ -89,15 +94,15 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     );
     expect(within(inspector).getByText('partial')).toBeVisible();
     expect(within(inspector).getByText('why: fresh from configured source')).toBeVisible();
-    expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus();
+    await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());
   });
 
   it('renders the flat Source Ledger and exposes missing destructive confirmation behavior', async () => {
     const user = userEvent.setup();
-    render(SourceLedgerContractStub, { props: { sources: [expectedRedSource] } });
+    render(SourceLedger, { props: { sources: [expectedRedSource], onDeleteSource: async () => {}, onImportOpml: async () => {} } });
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(within(ledger).getByRole('button', { name: 'import OPML' })).toBeVisible();
+    expect(within(ledger).getByLabelText('import OPML')).toBeVisible();
     expect(within(ledger).getByText(expectedRedSource.url)).toBeVisible();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example Source' }));
@@ -106,7 +111,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
   it('renders state portability warning and exposes missing import/export live feedback', async () => {
     const user = userEvent.setup();
-    render(StatePortabilityContractStub, { props: { state: 'idle' } });
+    render(StatePortability, { props: { onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
 
     const portability = screen.getByRole('region', { name: 'State Portability' });
     expect(
@@ -121,7 +126,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
   });
 
   it('renders search/retrieval and exposes missing filters plus provenance-rich result anatomy', () => {
-    render(SearchRetrievalContractStub, { props: { items: [expectedRedItem], query: 'sqlite' } });
+    render(SearchRetrieval, { props: { items: [expectedRedItem], query: 'sqlite', onSearch: async () => ({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } }) } });
 
     const search = screen.getByRole('region', { name: 'Search and Retrieval' });
     expect(within(search).getByLabelText('Plain text query')).toHaveValue('sqlite');
@@ -129,7 +134,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(search).getByLabelText('From date')).toBeVisible();
     expect(within(search).getByLabelText('Resonated only')).toBeVisible();
     expect(within(search).getByRole('region', { name: 'Search results' })).toHaveTextContent('1 results');
-    expect(within(search).getByText('match: summary')).toBeVisible();
+    expect(within(search).getByText('match: lexical index')).toBeVisible();
     expect(within(search).getByText('src: Example Source')).toBeVisible();
   });
 });

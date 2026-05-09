@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -30,6 +31,19 @@ type HTTPServerConfig struct {
 	OwnerToken     string
 	OwnerTokenHash string
 	Gemini         GeminiClient
+	Lifecycle      RuntimeLifecycleRecorder
+}
+
+type RuntimeLifecycleEvent string
+
+const (
+	RuntimeLifecycleBindReady    RuntimeLifecycleEvent = "bind/listen ready"
+	RuntimeLifecycleHTTPMCPReady RuntimeLifecycleEvent = "HTTP/MCP readiness observable"
+	RuntimeLifecycleIngestStart  RuntimeLifecycleEvent = "background ingest start"
+)
+
+type RuntimeLifecycleRecorder interface {
+	RecordRuntimeLifecycleEvent(RuntimeLifecycleEvent)
 }
 
 // NewRouter returns the HTTP router for static assets, /api/* JSON, /api/doctor
@@ -83,10 +97,67 @@ func staticUIHandler() http.Handler {
 // ServeHTTPRuntime starts the HTTP/MCP/static server and exits on context
 // cancellation. It must not start a second deployable process.
 func ServeHTTPRuntime(ctx context.Context, cfg HTTPServerConfig) error {
-	server := &http.Server{Addr: cfg.Addr, Handler: NewRouter(cfg)}
-	errCh := make(chan error, 1)
+	listener, err := net.Listen("tcp", cfg.Addr)
+	if err != nil {
+		return fmt.Errorf("listen http runtime: %w", err)
+	}
+	return serveHTTPRuntimeOnListener(ctx, cfg, listener)
+}
+
+func ServeHTTPAndIngestRuntime(ctx context.Context, cfg HTTPServerConfig, runIngest func(context.Context) error) error {
+	listener, err := net.Listen("tcp", cfg.Addr)
+	if err != nil {
+		return fmt.Errorf("listen http runtime: %w", err)
+	}
+	return serveHTTPAndIngestRuntimeOnListener(ctx, cfg, listener, runIngest)
+}
+
+func serveHTTPAndIngestRuntimeOnListener(ctx context.Context, cfg HTTPServerConfig, listener net.Listener, runIngest func(context.Context) error) error {
+	if runIngest == nil {
+		return errors.New("run ingest function required")
+	}
+	runtimeCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	errCh := make(chan error, 2)
 	go func() {
-		errCh <- server.ListenAndServe()
+		errCh <- serveHTTPRuntimeOnListener(runtimeCtx, cfg, listener)
+	}()
+
+	if err := waitForHTTPMCPReadiness(runtimeCtx, listener.Addr().String()); err != nil {
+		cancel()
+		<-errCh
+		return err
+	}
+	recordRuntimeLifecycle(cfg, RuntimeLifecycleHTTPMCPReady)
+
+	go func() {
+		recordRuntimeLifecycle(cfg, RuntimeLifecycleIngestStart)
+		errCh <- runIngest(runtimeCtx)
+	}()
+
+	select {
+	case <-ctx.Done():
+		cancel()
+		firstErr := <-errCh
+		secondErr := <-errCh
+		if firstErr != nil {
+			return firstErr
+		}
+		return secondErr
+	case err := <-errCh:
+		cancel()
+		<-errCh
+		return err
+	}
+}
+
+func serveHTTPRuntimeOnListener(ctx context.Context, cfg HTTPServerConfig, listener net.Listener) error {
+	server := &http.Server{Handler: NewRouter(cfg)}
+	errCh := make(chan error, 1)
+	recordRuntimeLifecycle(cfg, RuntimeLifecycleBindReady)
+	go func() {
+		errCh <- server.Serve(listener)
 	}()
 
 	select {
@@ -107,6 +178,61 @@ func ServeHTTPRuntime(ctx context.Context, cfg HTTPServerConfig) error {
 		}
 		return nil
 	}
+}
+
+func recordRuntimeLifecycle(cfg HTTPServerConfig, event RuntimeLifecycleEvent) {
+	if cfg.Lifecycle != nil {
+		cfg.Lifecycle.RecordRuntimeLifecycleEvent(event)
+	}
+}
+
+func waitForHTTPMCPReadiness(ctx context.Context, addr string) error {
+	baseURL := "http://" + normalizeLocalHTTPAddr(addr)
+	client := &http.Client{Timeout: 50 * time.Millisecond}
+	deadline := time.NewTimer(2 * time.Second)
+	defer deadline.Stop()
+	ticker := time.NewTicker(10 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		apiReady := probeUnauthorized(ctx, client, baseURL+"/api/doctor")
+		mcpReady := probeUnauthorized(ctx, client, baseURL+"/mcp")
+		if apiReady && mcpReady {
+			return nil
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-deadline.C:
+			return errors.New("http/mcp readiness probe timed out")
+		case <-ticker.C:
+		}
+	}
+}
+
+func probeUnauthorized(ctx context.Context, client *http.Client, url string) bool {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return false
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer func() { _ = resp.Body.Close() }()
+	return resp.StatusCode == http.StatusUnauthorized
+}
+
+func normalizeLocalHTTPAddr(addr string) string {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return addr
+	}
+	if host == "" || host == "::" || host == "[::]" || host == "0.0.0.0" {
+		host = "127.0.0.1"
+	}
+	return net.JoinHostPort(host, port)
 }
 
 type apiHandler struct {

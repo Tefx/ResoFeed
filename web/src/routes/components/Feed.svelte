@@ -5,46 +5,41 @@
   interface Props {
     items: ItemSummary[];
     selectedItemId?: string | null;
+    onSelect: (item: ItemSummary) => Promise<void> | void;
+    onResonanceToggle: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
   }
 
-  let { items, selectedItemId = null }: Props = $props();
-
-  let localItems = $state<ItemSummary[]>([]);
-  let openItemId = $state<string | null>(null);
+  let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
+  let pendingResonanceId = $state<string | null>(null);
   let inspectorHeading = $state<HTMLHeadingElement | undefined>();
 
-  const openItem = $derived(localItems.find((item) => item.id === openItemId) ?? null);
-
-  $effect(() => {
-    localItems = items;
-  });
-
-  $effect(() => {
-    openItemId = selectedItemId;
-  });
+  const selectedItem = $derived(items.find((item) => item.id === selectedItemId) ?? null);
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     return status === 'partial_extraction' ? 'partial' : status;
   }
 
   async function openInspector(item: ItemSummary): Promise<void> {
-    openItemId = item.id;
+    await onSelect(item);
     await tick();
     inspectorHeading?.focus();
   }
 
-  function toggleResonance(itemId: string): void {
-    localItems = localItems.map((item) =>
-      item.id === itemId ? { ...item, is_resonated: !item.is_resonated } : item
-    );
+  async function toggleResonance(item: ItemSummary): Promise<void> {
+    pendingResonanceId = item.id;
+    try {
+      await onResonanceToggle(item, !item.is_resonated);
+    } finally {
+      pendingResonanceId = null;
+    }
   }
 </script>
 
 <section class="contract-region" aria-labelledby="feed-heading">
   <h2 id="feed-heading">TODAY</h2>
-  <div role="list" aria-label="Today feed contract items">
-    {#each localItems as item (item.id)}
-      <article class="contract-feed-item" role="listitem" aria-current={openItemId === item.id ? 'true' : undefined}>
+  <div role="list" aria-label="Today feed items">
+    {#each items as item (item.id)}
+      <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
         <button
           class="contract-feed-open"
           type="button"
@@ -65,20 +60,18 @@
           class="contract-resonate"
           type="button"
           aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
-          onclick={() => toggleResonance(item.id)}
+          disabled={pendingResonanceId === item.id}
+          onclick={() => void toggleResonance(item)}
         >
           {item.is_resonated ? '★' : '☆'}
         </button>
       </article>
     {/each}
   </div>
-  {#if openItem}
+  {#if selectedItem}
     <section class="contract-inline-inspector" aria-label="Opened Inspector focus target">
-      <h2 bind:this={inspectorHeading} tabindex="-1">{openItem.title}</h2>
+      <h2 bind:this={inspectorHeading} tabindex="-1">{selectedItem.title}</h2>
       <p class="contract-muted">why: fresh from configured source</p>
     </section>
   {/if}
-  <p class="contract-muted">
-    Enter or Space opens Inspector; star has a 44px target; no unseen state or counts.
-  </p>
 </section>

@@ -1,14 +1,15 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { ItemSummary, Source } from '$lib/api-contract';
+  import type { ItemDetail, ItemSummary, Source, StateBundleV1 } from '$lib/api-contract';
+  import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
-  import FeedContractStub from './components/FeedContractStub.svelte';
-  import InspectorContractStub from './components/InspectorContractStub.svelte';
-  import SourceLedgerContractStub from './components/SourceLedgerContractStub.svelte';
-  import StatePortabilityContractStub from './components/StatePortabilityContractStub.svelte';
-  import SearchRetrievalContractStub from './components/SearchRetrievalContractStub.svelte';
+  import Feed from './components/Feed.svelte';
+  import Inspector from './components/Inspector.svelte';
+  import SourceLedger from './components/SourceLedger.svelte';
+  import StatePortability from './components/StatePortability.svelte';
+  import SearchRetrieval from './components/SearchRetrieval.svelte';
 
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
@@ -23,6 +24,10 @@
   let steerInput = $state<HTMLInputElement | undefined>();
   let items = $state<ItemSummary[]>([]);
   let sources = $state<Source[]>([]);
+  let selectedItemId = $state<string | null>(null);
+  let selectedItemDetail = $state<ItemDetail | null>(null);
+  let inspectorState = $state<ApiLoadState>('idle');
+  let inspectorError = $state<string | null>(null);
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -33,20 +38,31 @@
         : 'feed-temporarily-empty'
   );
 
+  const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
+  const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
+
+  function apiClient(token = ownerToken): ResoFeedApiClient {
+    return new ResoFeedApiClient({ ownerToken: token });
+  }
+
   async function loadShellData(token: string): Promise<void> {
     loadState = 'loading';
     apiError = null;
 
     try {
-      const client = new ResoFeedApiClient({ ownerToken: token });
+      const client = apiClient(token);
       const [sourceResponse, feedResponse] = await Promise.all([
         client.sources(),
         client.today()
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
+      selectedItemId = feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       loadState = 'ready';
+      if (selectedItemId) {
+        await loadItemDetail(selectedItemId, token);
+      }
       await tick();
       steerInput?.focus();
     } catch (error) {
@@ -63,6 +79,59 @@
   function handleOwnerTokenAccepted(token: string): void {
     ownerToken = token;
     void loadShellData(token);
+  }
+
+  async function loadItemDetail(itemId: string, token = ownerToken): Promise<void> {
+    inspectorState = 'loading';
+    inspectorError = null;
+    try {
+      const response = await apiClient(token).item(itemId);
+      selectedItemDetail = response.item;
+      inspectorState = 'ready';
+    } catch (error) {
+      inspectorState = 'error';
+      inspectorError = error instanceof Error ? error.message : 'err: item unavailable';
+    }
+  }
+
+  async function selectItem(item: ItemSummary): Promise<void> {
+    selectedItemId = item.id;
+    selectedItemDetail = null;
+    await apiClient().inspect(item.id);
+    await loadItemDetail(item.id);
+  }
+
+  async function toggleResonance(item: ItemSummary, resonated: boolean): Promise<void> {
+    const response = await apiClient().resonance(item.id, resonated);
+    items = items.map((candidate) =>
+      candidate.id === item.id ? { ...candidate, is_resonated: response.is_resonated } : candidate
+    );
+    if (selectedItemDetail?.id === item.id) {
+      selectedItemDetail = { ...selectedItemDetail, is_resonated: response.is_resonated };
+    }
+  }
+
+  async function deleteSource(source: Source): Promise<void> {
+    await apiClient().deleteSource(source.id);
+    sources = sources.filter((candidate) => candidate.id !== source.id);
+  }
+
+  async function importOpml(opml: string): Promise<void> {
+    await apiClient().importOpml(opml);
+    sources = (await apiClient().sources()).sources;
+  }
+
+  async function exportState(): Promise<StateBundleV1> {
+    return apiClient().exportState();
+  }
+
+  async function importState(bundle: StateBundleV1): Promise<void> {
+    await apiClient().importState(bundle);
+    await loadShellData(ownerToken);
+  }
+
+  async function searchItems(params: SearchRequestParams) {
+    return apiClient().search(params);
   }
 
   onMount(() => {
@@ -105,21 +174,21 @@
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
-          <FeedContractStub items={items} selectedItemId={items[0]?.id} />
+          <Feed items={items} selectedItemId={selectedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
         {/if}
       </section>
 
       <aside class="detail-pane" aria-label="INSPECTOR">
-        {#if items[0]}
-          <InspectorContractStub item={items[0]} mode="desktop-split" />
+        {#if inspectorItem}
+          <Inspector item={inspectorItem} mode="desktop-split" loading={inspectorState === 'loading'} error={inspectorError} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}
       </aside>
     </div>
 
-    <SourceLedgerContractStub sources={sources} />
-    <StatePortabilityContractStub state="idle" />
-    <SearchRetrievalContractStub items={items} query="" />
+    <SourceLedger sources={sources} onDeleteSource={deleteSource} onImportOpml={importOpml} />
+    <StatePortability onExportState={exportState} onImportState={importState} />
+    <SearchRetrieval items={items} query="" onSearch={searchItems} />
   {/if}
 </main>

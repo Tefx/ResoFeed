@@ -189,23 +189,19 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, Gemini: gemini}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	errCh := make(chan error, 2)
-
+	errCh := make(chan error, 1)
 	go func() {
-		errCh <- ServeHTTPRuntime(runCtx, runtimeCfg)
-	}()
-	go func() {
-		errCh <- RunIngestLoop(runCtx, db, IngestConfig{Gemini: gemini})
+		errCh <- ServeHTTPAndIngestRuntime(runCtx, runtimeCfg, func(ctx context.Context) error {
+			return RunIngestLoop(ctx, db, IngestConfig{Gemini: gemini})
+		})
 	}()
 
 	_, _ = fmt.Fprintf(stdout, "serving ResoFeed on %s (public-url %s)\n", cfg.Addr, runtimeCfg.PublicURL)
 	select {
 	case <-ctx.Done():
 		cancel()
-		firstErr := <-errCh
-		secondErr := <-errCh
-		if firstErr != nil || secondErr != nil {
-			_, _ = fmt.Fprintf(stderr, "err: shutdown_failed: %v %v\n", firstErr, secondErr)
+		if err := <-errCh; err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: shutdown_failed: %v\n", err)
 			return 1
 		}
 		_, _ = io.WriteString(stdout, "shutdown complete\n")
@@ -214,10 +210,8 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		cancel()
 		if err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: runtime_failed: %v\n", err)
-			<-errCh
 			return 1
 		}
-		<-errCh
 		return 0
 	}
 }

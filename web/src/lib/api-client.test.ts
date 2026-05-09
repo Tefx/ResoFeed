@@ -3,10 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
 import type { ErrorBody, FeedTodayResponse, SearchResponse, SourcesResponse, StateBundleV1 } from '$lib/api-contract';
-import FeedContractStub from '../routes/components/FeedContractStub.svelte';
-import SearchRetrievalContractStub from '../routes/components/SearchRetrievalContractStub.svelte';
-import SourceLedgerContractStub from '../routes/components/SourceLedgerContractStub.svelte';
-import StatePortabilityContractStub from '../routes/components/StatePortabilityContractStub.svelte';
+import Feed from '../routes/components/Feed.svelte';
+import SearchRetrieval from '../routes/components/SearchRetrieval.svelte';
+import SourceLedger from '../routes/components/SourceLedger.svelte';
+import StatePortability from '../routes/components/StatePortability.svelte';
 import { expectedRedItem, expectedRedSource } from '../test/contract-fixtures';
 
 const feedFixture: FeedTodayResponse = { items: [expectedRedItem] };
@@ -57,11 +57,11 @@ describe('ResoFeed API client and rendered sinks', () => {
     const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
     const [sources, feed] = await Promise.all([client.sources(), client.today()]);
 
-    render(SourceLedgerContractStub, { props: { sources: sources.sources } });
+    render(SourceLedger, { props: { sources: sources.sources, onDeleteSource: async () => {}, onImportOpml: async () => {} } });
     expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent(expectedRedSource.url);
 
-    render(FeedContractStub, { props: { items: feed.items, selectedItemId: feed.items[0]?.id } });
-    const list = screen.getByRole('list', { name: 'Today feed contract items' });
+    render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
+    const list = screen.getByRole('list', { name: 'Today feed items' });
     expect(within(list).getByText(expectedRedItem.title)).toBeVisible();
     expect(within(list).getByLabelText('Extraction: partial_extraction')).toHaveTextContent('partial');
   });
@@ -83,12 +83,12 @@ describe('ResoFeed API client and rendered sinks', () => {
 
     expect(state.schema_version).toBe('resofeed.state.v1');
 
-    render(SearchRetrievalContractStub, { props: { items: search.items, query: search.query.q } });
+    render(SearchRetrieval, { props: { items: search.items, query: search.query.q, onSearch: async () => search } });
     const searchRegion = screen.getByRole('region', { name: 'Search and Retrieval' });
-    expect(within(searchRegion).getByText('match: summary')).toBeVisible();
+    expect(within(searchRegion).getByText('match: lexical index')).toBeVisible();
     expect(within(searchRegion).getByText('src: Example Source')).toBeVisible();
 
-    render(StatePortabilityContractStub, { props: { state: 'idle' } });
+    render(StatePortability, { props: { onExportState: async () => state, onImportState: async () => {} } });
     expect(screen.getByRole('region', { name: 'State Portability' })).toHaveTextContent(
       'import replaces active sources, rules, and stars'
     );
