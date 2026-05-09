@@ -13119,7 +13119,7 @@ phases:
   steps:
   - id: openrouter-llm-implementation.complete-cli-and-openrouter-adapter
     name: complete-cli-and-openrouter-adapter
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -13278,6 +13278,179 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T18:07:04.415997+00:00'
+    done_at: '2026-05-09T18:16:12.749894+00:00'
+    evidence: 'Implementation SUCCESS accepted after worktree-local and mainline verification.
+
+
+      ## refs Read Confirmation
+
+      - AGENTS.md — NOT READ: not tracked/present in isolated worktree (`git -C .vectl/worktrees/openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+      ls-files AGENTS.md` returned no match); repository-level instructions from session
+      context were followed.
+
+      - .agents/instructions.md — runtime-only LLM secrets must never be persisted/logged/printed;
+      OpenRouter must reuse runtime secret-source contract and lock `OPENROUTER_KEY`.
+
+      - docs/ARCHITECTURE.md — OpenRouter is the sole LLM backend; `OPENROUTER_KEY`
+      resolves OS env before `.env`; `--openrouter-model` is optional and empty means
+      account default.
+
+      - docs/USAGE.md — OpenRouter key is configured via OS env or local `.env`; `--openrouter-model`
+      is non-secret and passed unchanged when set.
+
+      - internal/resofeed/openrouter_cli_adapter_contract_test.go — legacy Gemini
+      flags must be rejected; OpenRouter requests must hit `/api/v1/chat/completions`,
+      include Bearer auth, JSON response mode, retry 429/5xx, and omit model when
+      empty.
+
+      - internal/resofeed/openrouter_product_integration_contract_test.go — ingest
+      must persist validated OpenRouter summary fields, keep items visible on model
+      failure, use shared LLM/OpenRouter injection surfaces, and keep state exports/imports
+      secret-free.
+
+
+      ## Implementation Evidence
+
+      - Worker commit: a601d48f7f8aa52183666131c308174620477b6a (`migrate runtime
+      LLM path to OpenRouter`)
+
+      - Main squash merge commit: 90b8522 (`[vectl] step-openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+      completed`)
+
+      - Files changed: internal/resofeed/db.go, runtime_secret.go, gemini.go, types.go,
+      ingest.go, http.go, mcp.go, ranking.go, doctor.go, and related internal/resofeed
+      tests.
+
+      - Spec link: openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+      plus upstream contract/test artifacts.
+
+
+      Main path proof:
+
+      - OpenRouter adapter posts to `/api/v1/chat/completions`, sends `Authorization:
+      Bearer <resolved-key>`, requests JSON mode, omits empty model, and passes explicit
+      model unchanged.
+
+      - `go test ./internal/resofeed -run ''TestOpenRouter'' -count=1` PASS on mainline.
+
+      - `go test ./internal/resofeed -count=1` PASS on mainline.
+
+      - `go test ./... -count=1` PASS on mainline.
+
+      - `go build ./cmd/resofeed` PASS on mainline.
+
+
+      Highest-risk failure path proof:
+
+      - Missing/empty OpenRouter key, legacy Gemini flag rejection, 429/5xx retry,
+      invalid JSON/provider error mapping, model failure visibility, and state secrecy
+      all covered by passing targeted tests.
+
+      - `go test -race ./internal/resofeed -run ''Test(OpenRouter|Serve|RuntimeSecret|OpenRouterClient)''
+      -count=1` PASS on mainline.
+
+      - `go test ./internal/resofeed -run ''TestState(ExportExcludesOpenRouterRuntimeConfigAndSecrets|ImportRejectsOpenRouterRuntimeConfigAndSecrets)''
+      -count=1` PASS on mainline.
+
+      - `go test ./internal/resofeed -run ''TestOpenRouterDocsRuntimeSecretContract''
+      -count=1` PASS on mainline.
+
+      - `golangci-lint run` PASS (`0 issues`).
+
+      - `git diff --check` passed in worker evidence.
+
+
+      CLI Surface Snapshot / Matrix:
+
+      | Command/Flag Surface | Surface Listed? | Handler Exists? | --help Works? |
+      Smoke Test | Status |
+
+      | resofeed root | Yes (`serve`) | `Main`, `printRootHelp` | Yes | `go run ./cmd/resofeed
+      --help` exit 0 | PASS |
+
+      | serve command | Yes | `parseServeFlags`, `runServe` | Yes | `go run ./cmd/resofeed
+      serve --help` exit 0 | PASS |
+
+      | --openrouter-model | Yes | `ServeConfig.OpenRouterModel`, `NewOpenRouterClient`
+      | Yes | fake-key smoke parsed model then failed deterministic `invalid_addr`
+      | PASS |
+
+      | --gemini-api-key | No | No registered flag | N/A | rejected unknown flag (`flag
+      provided but not defined`) | PASS |
+
+      | --gemini-model | No | No registered flag | N/A | covered by contract test
+      rejection | PASS |
+
+      | OPENROUTER_KEY env/.env | N/A | `ResolveOpenRouterRuntimeSecret` | N/A | contract
+      tests pass env and `.env` precedence | PASS |
+
+
+      Commands run on mainline after merge:
+
+      ```text
+
+      go test ./internal/resofeed -run ''TestOpenRouter'' -count=1 — PASS
+
+      go test ./internal/resofeed -count=1 — PASS
+
+      go test ./... -count=1 — PASS
+
+      go build ./cmd/resofeed — PASS
+
+      go test -race ./internal/resofeed -run ''Test(OpenRouter|Serve|RuntimeSecret|OpenRouterClient)''
+      -count=1 — PASS
+
+      golangci-lint run — PASS (0 issues)
+
+      go test ./internal/resofeed -run ''TestState(ExportExcludesOpenRouterRuntimeConfigAndSecrets|ImportRejectsOpenRouterRuntimeConfigAndSecrets)''
+      -count=1 — PASS
+
+      go test ./internal/resofeed -run ''TestOpenRouterDocsRuntimeSecretContract''
+      -count=1 — PASS
+
+      go run ./cmd/resofeed --help — PASS
+
+      go run ./cmd/resofeed serve --help — PASS
+
+      go run ./cmd/resofeed serve --gemini-api-key fake ... — rejected legacy flag
+
+      env OPENROUTER_KEY=<fake-redacted> go run ./cmd/resofeed serve --openrouter-model
+      openai/gpt-4.1-mini ... — parsed model flag then failed deterministic invalid_addr
+
+      CLI content checks for root help, serve help, Gemini flag absence, legacy rejection,
+      and OpenRouter model parse — PASS
+
+      ```
+
+
+      Confirmations:
+
+      - no `.env` content read, no OPENROUTER_KEY printed, no key persisted/exported.
+
+      - no Gemini compatibility flags retained.
+
+      - no provider registry/DI/service layer introduced.
+
+
+      Deviation records:
+
+      - type: test_error; artifact: internal/resofeed/openrouter_cli_adapter_contract_test.go;
+      changed: removed `assertOpenRouterContractOutputRedacted(t, gotAuth)` after
+      explicitly asserting `gotAuth == "Bearer "+fakeOpenRouterOSKey`; why: the test
+      required the fake key to be present in the Authorization header and then failed
+      because the same internal captured header contained that string; impact: preserves
+      request-contract assertion without false secrecy failure on internal fake-server
+      capture.
+
+      - type: contract_error; artifact: legacy Gemini runtime tests; changed: updated
+      affected tests to OpenRouter env/.env and `LLM` injection names; why: step contract
+      removes Gemini runtime surfaces; impact: tests now verify OpenRouter-only behavior.
+
+
+      Gaps/Notes:
+
+      - Doctor currently reports configured model as `account_default` from DB-only
+      diagnostic path.'
   - id: openrouter-llm-implementation.complete-ingest-steering-state-migration
     name: complete-ingest-steering-state-migration
     status: pending
