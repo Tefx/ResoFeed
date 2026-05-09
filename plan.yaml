@@ -10683,7 +10683,7 @@ phases:
     agent: spec-verifier
   - id: finalization-docs-and-deep-review.final-architecture-and-concurrency-review
     name: Final architecture and concurrency review
-    status: pending
+    status: claimed
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10752,6 +10752,8 @@ phases:
     - finalization-docs-and-deep-review.final-wiring-audit
     - retest-http-idempotency-wiring
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-09T12:30:03.028734+00:00'
   - id: finalization-docs-and-deep-review.final-design-contract-review
     name: Final DESIGN contract review
     status: done
