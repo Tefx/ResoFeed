@@ -11858,7 +11858,7 @@ phases:
       - No out-of-scope architecture changes introduced."
   - id: finalization-docs-and-deep-review.retest-http-query-validation-contract
     name: Retest HTTP query validation contract drift
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -11932,3 +11932,56 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T12:49:39.176550+00:00'
+    done_at: '2026-05-09T12:53:04.932559+00:00'
+    evidence: "status: SUCCESS\n\n**Headline**: PASS\n**Blocking Status**: CLOSED\n\
+      **Proof-Gap Status**: NONE\n**Verdict**: PASS\n**Blockers**: []\n**Orchestrator\
+      \ Action Hint**: COMPLETE\n\n## refs Read Confirmation (MANDATORY)\n\n- .agents/instructions.md\
+      \ — READ. Key passage: OPML is import-only for source intake, not export or\
+      \ state restoration; strict HTTP query validation rejects unknown/duplicate\
+      \ params with `400 bad_request`.\n- docs/ARCHITECTURE.md — READ. Key passage:\
+      \ query validation after auth and before backend reads; unknown/duplicate query\
+      \ params return `400 bad_request` with `details.field`; `/api/feed/today limit`\
+      \ is integer `1..100`; no-query endpoints are defined; OPML import is distinct\
+      \ from JSON state export.\n- docs/PRD.md — READ. Key passage: complete active-state\
+      \ portability is JSON state bundle and OPML remains source-ledger import-only,\
+      \ not export or complete restore.\n- docs/USAGE.md — READ. Key passage: OPML\
+      \ import/flattening only; OPML export is not part of current HTTP/UI contract\
+      \ and is not complete state portability.\n\n## Retest Report\n\n**Tester**:\
+      \ spec-verifier (independent of golang-developer)\n**Scope**: HTTP query validation\
+      \ contract drift and OPML wording closure\n**Independence Level**: L1\n\n###\
+      \ Targeted Go Tests (worker)\nCommands executed:\n```bash\ngo test ./internal/resofeed\
+      \ -run 'TestHTTP(QueryValidationRejectsUnknownAndDuplicateParameters|NoQueryEndpointsRejectUnknownAfterAuthBeforeBackend|AuthRunsBeforeQueryValidationDetails|FeedTodayRejectsEmptyLimit|MutationUnknownQueryRejectsBeforeStateWrite)$'\
+      \ -count=1 -v\ngo test ./...\n```\nActual output summary:\n- `TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters`\
+      \ PASS, including feed/search unknown and duplicate subtests.\n- `TestHTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend`\
+      \ PASS, covering sources, state export/import, doctor, active steering, item\
+      \ detail, inspect/resonance/steer mutations, OPML import, source delete.\n-\
+      \ `TestHTTPAuthRunsBeforeQueryValidationDetails` PASS.\n- `TestHTTPFeedTodayRejectsEmptyLimit`\
+      \ PASS.\n- `TestHTTPMutationUnknownQueryRejectsBeforeStateWrite` PASS.\n- `go\
+      \ test ./...` PASS (`resofeed/cmd/resofeed` no test files; `resofeed/internal/resofeed`\
+      \ ok).\n\n### Mainline Final-State Verification (orchestrator)\nCommands executed\
+      \ in main after worker success:\n```bash\ngo test ./internal/resofeed -run 'TestHTTP(QueryValidationRejectsUnknownAndDuplicateParameters|NoQueryEndpointsRejectUnknownAfterAuthBeforeBackend|AuthRunsBeforeQueryValidationDetails|FeedTodayRejectsEmptyLimit|MutationUnknownQueryRejectsBeforeStateWrite)$'\
+      \ -count=1 -v && go test ./...\n```\nActual output:\n- All targeted HTTP query\
+      \ validation tests PASS.\n- `?   \tresofeed/cmd/resofeed\t[no test files]`\n\
+      - `ok  \tresofeed/internal/resofeed\t(cached)` after targeted run.\n\nRequired\
+      \ coverage:\n- [x] Unknown query rejected for no-query endpoints\n- [x] `/api/feed/today?limit=`\
+      \ returns `400 bad_request` field=`limit`\n- [x] Auth-before-validation preserved\n\
+      - [x] Authenticated mutation/no-query backend read or write prevented before\
+      \ rejection where observable\n\n### OPML Wording Closure\n- .agents/instructions.md:\
+      \ PASS — states OPML import-only, not export/state restoration.\n- docs/ARCHITECTURE.md:\
+      \ PASS — defines OPML import endpoint and JSON state export bundle distinctly.\n\
+      - docs/PRD.md: PASS — states OPML import-only/non-export language.\n- docs/USAGE.md:\
+      \ PASS — states OPML export is not part of current HTTP/UI contract.\n- Remaining\
+      \ conflict: none found in required refs.\n\n### Spec Closure Fields\nstep_intent:\
+      \ retest_green\nexpected_result: green\nobserved_result: green\nfailure_alignment:\
+      \ none\nverdict: PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nproduct_implementation_files_modified: false\n\n### behavioral_proof_register\n\
+      - proof: targeted tests and full Go suite passed; code inspection by spec-verifier\
+      \ confirmed auth precedes query validation and query rejection precedes handler/backend\
+      \ calls.\n- uncertainty_sources: none blocking.\n- proof_gap_status: NONE\n\
+      - blocking_status: CLOSED\nheadline: PASS\n\n### Files changed\n- none. Worker\
+      \ reported `git status --short` produced no output; no commit was necessary.\n\
+      \n### Gaps/Notes\n- No blocker-class residual risk identified for scoped HTTP\
+      \ query validation or OPML wording closure.\n- Read-endpoint backend-read prevention\
+      \ is primarily proven by code ordering plus response tests, not side-effect\
+      \ counters for every read endpoint; accepted as non-blocking because implementation\
+      \ calls query rejection before no-query handlers."
