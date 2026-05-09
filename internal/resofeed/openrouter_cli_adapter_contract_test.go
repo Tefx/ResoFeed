@@ -1,5 +1,9 @@
 package resofeed
 
+// expected_result: red
+// OpenRouter CLI/adapter contract tests encode the intended migration surface
+// before the product runtime has fully removed legacy Gemini seams.
+
 import (
 	"bytes"
 	"context"

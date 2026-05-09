@@ -1,8 +1,13 @@
 package resofeed
 
+// expected_result: red
+// OpenRouter product integration contract tests encode expected migration
+// behavior before all runtime/product seams have been migrated.
+
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -184,6 +189,96 @@ func TestStateExportExcludesOpenRouterRuntimeConfigAndSecrets(t *testing.T) {
 	for _, forbidden := range []string{"openrouter", "OPENROUTER", "sk-or-fake-test-key", "fake-model", ".env", "owner_token", "runtime_metadata", "agent_receipts", "human_inspected_at", "external_surfaced_at"} {
 		if strings.Contains(exported.String(), forbidden) {
 			t.Fatalf("export leaked forbidden runtime/non-portable value %q: %s", forbidden, exported.String())
+		}
+	}
+}
+
+func TestStateImportRejectsOpenRouterRuntimeConfigAndSecrets(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	for _, kv := range []struct{ key, value string }{
+		{key: "owner_token_sha256", value: "preexisting-owner-token-hash"},
+		{key: "unrelated_runtime_setting", value: "preexisting-runtime-value"},
+	} {
+		if _, err := db.ExecContext(ctx, `insert or replace into runtime_metadata (key, value, updated_at) values (?, ?, ?)`, kv.key, kv.value, now.Unix()); err != nil {
+			t.Fatalf("insert preexisting runtime metadata %s: %v", kv.key, err)
+		}
+	}
+
+	maliciousBundle := `{
+		"schema_version":"resofeed.state.v1",
+		"exported_at":"2026-05-09T12:00:00Z",
+		"sources":[{"id":"src_import","url":"https://import.example/feed.xml","title":"Imported Source"}],
+		"steer_rules":[{"id":"rule_import","rule_text":"Prioritize imported systems research."}],
+		"resonated_items":[],
+		"openrouter_key":"sk-or-fake-import-secret",
+		"openrouter_model":"openrouter/fake-import-model",
+		"provider":"openrouter",
+		"secret_source":".env",
+		"runtime_config":{"endpoint":"https://openrouter.ai/api/v1/chat/completions"},
+		"runtime_metadata":[{"key":"openrouter_secret_source","value":".env"}]
+	}`
+	_, err := ImportState(ctx, db, strings.NewReader(maliciousBundle))
+	if err == nil {
+		t.Fatal("ImportState accepted OpenRouter runtime configuration in portable state bundle")
+	}
+	for _, forbidden := range []string{"sk-or-fake-import-secret", "openrouter/fake-import-model", "https://openrouter.ai", ".env"} {
+		if strings.Contains(err.Error(), forbidden) {
+			t.Fatalf("ImportState error leaked forbidden OpenRouter runtime value %q: %v", forbidden, err)
+		}
+	}
+
+	assertNoImportedOpenRouterRuntimeState(t, ctx, db)
+	var sourceCount int
+	if err := db.QueryRowContext(ctx, `select count(*) from sources where id = 'src_import'`).Scan(&sourceCount); err != nil {
+		t.Fatalf("count rejected import source: %v", err)
+	}
+	if sourceCount != 0 {
+		t.Fatalf("rejected import persisted %d OpenRouter-tainted source rows, want 0", sourceCount)
+	}
+
+	validBundle := `{
+		"schema_version":"resofeed.state.v1",
+		"exported_at":"2026-05-09T12:00:00Z",
+		"sources":[{"id":"src_clean_import","url":"https://clean.example/feed.xml","title":"Clean Import"}],
+		"steer_rules":[{"id":"rule_clean_import","rule_text":"Prioritize clean portable state."}],
+		"resonated_items":[]
+	}`
+	if _, err := ImportState(ctx, db, strings.NewReader(validBundle)); err != nil {
+		t.Fatalf("ImportState valid portable bundle returned error: %v", err)
+	}
+	assertNoImportedOpenRouterRuntimeState(t, ctx, db)
+}
+
+func assertNoImportedOpenRouterRuntimeState(t *testing.T, ctx context.Context, db *sql.DB) {
+	t.Helper()
+	for _, forbidden := range []string{
+		"openrouter_key",
+		"OPENROUTER_KEY",
+		"openrouter_model",
+		"openrouter_provider",
+		"provider",
+		"openrouter_secret_source",
+		"secret_source",
+		"openrouter_runtime_config",
+		"runtime_config",
+	} {
+		var count int
+		if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where lower(key) = lower(?) or lower(value) = lower(?)`, forbidden, forbidden).Scan(&count); err != nil {
+			t.Fatalf("query runtime metadata for %q: %v", forbidden, err)
+		}
+		if count != 0 {
+			t.Fatalf("state import persisted forbidden OpenRouter runtime metadata %q", forbidden)
+		}
+	}
+	for _, forbiddenValue := range []string{"sk-or-fake-import-secret", "openrouter/fake-import-model", "openrouter", ".env", "https://openrouter.ai/api/v1/chat/completions"} {
+		var count int
+		if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where value = ?`, forbiddenValue).Scan(&count); err != nil {
+			t.Fatalf("query runtime metadata value %q: %v", forbiddenValue, err)
+		}
+		if count != 0 {
+			t.Fatalf("state import persisted forbidden OpenRouter runtime metadata value %q", forbiddenValue)
 		}
 	}
 }
