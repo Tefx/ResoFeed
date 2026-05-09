@@ -241,22 +241,49 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodGet && r.URL.Path == "/api/search":
 		h.handleSearch(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/sources":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleSources(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/sources/import-opml":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleImportOPML(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/state/export":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleStateExport(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/state/import":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleStateImport(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/doctor":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleDoctor(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/steer/active":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleActiveSteeringRules(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/steer":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleSteer(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/items/"):
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleItemPath(w, r)
 	case r.Method == http.MethodDelete && strings.HasPrefix(r.URL.Path, "/api/sources/"):
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
 		h.handleDeleteSource(w, r)
 	default:
 		writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": r.URL.Path})
@@ -508,9 +535,9 @@ func parseLimitQuery(w http.ResponseWriter, r *http.Request, allowed map[string]
 		}
 	}
 	limit := defaultValue
-	if raw := values.Get("limit"); raw != "" {
-		parsed, err := strconv.Atoi(raw)
-		if err != nil || parsed < 1 || parsed > maxValue {
+	if vals, ok := values["limit"]; ok {
+		parsed, valid := parseBase10Limit(vals[0], maxValue)
+		if !valid {
 			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "limit"})
 			return 0, false
 		}
@@ -575,14 +602,38 @@ func parseSearchQuery(w http.ResponseWriter, r *http.Request) (SearchQuery, bool
 		}
 	}
 	if vals, ok := values["limit"]; ok {
-		parsed, err := strconv.Atoi(vals[0])
-		if err != nil || parsed < 1 || parsed > maxSearchLimit {
+		parsed, valid := parseBase10Limit(vals[0], maxSearchLimit)
+		if !valid {
 			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "limit"})
 			return SearchQuery{}, false
 		}
 		query.Limit = parsed
 	}
 	return query, true
+}
+
+func rejectUnexpectedQuery(w http.ResponseWriter, r *http.Request) bool {
+	for key := range r.URL.Query() {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": key})
+		return false
+	}
+	return true
+}
+
+func parseBase10Limit(raw string, maxValue int) (int, bool) {
+	if raw == "" {
+		return 0, false
+	}
+	for _, char := range raw {
+		if char < '0' || char > '9' {
+			return 0, false
+		}
+	}
+	parsed, err := strconv.Atoi(raw)
+	if err != nil || parsed < 1 || parsed > maxValue {
+		return 0, false
+	}
+	return parsed, true
 }
 
 func validDate(value string) bool {

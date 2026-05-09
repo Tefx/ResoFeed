@@ -14,7 +14,7 @@
 ## 3. State Portability (Strict No-Sync/No-Merge Rule)
 - **Minimal Definition**: "Portable state" means **only** active sources, active steering rules, and currently resonated items.
 - **JSON Backup/Restore Only**: `internal/resofeed/state.go` validates state bundles and performs atomic transactional backup/restore. 
-- **FORBIDDEN**: Do not build a sync coordinator, state merger, 409 conflict resolver, activity ledger, command history, reading history, or portable agent receipts. OPML is for import/export only, not state restoration.
+- **FORBIDDEN**: Do not build a sync coordinator, state merger, 409 conflict resolver, activity ledger, command history, reading history, or portable agent receipts. OPML is import-only for source intake, not export or state restoration.
 
 ## 4. Auth, Agent, and MCP Rules
 - **Owner Token Boundary**: A single owner token (`--owner-token`) is the universal delegation boundary. There is no multi-user OAuth, no accounts, and **no per-agent registry**. 

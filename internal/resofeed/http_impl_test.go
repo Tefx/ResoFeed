@@ -115,6 +115,80 @@ func TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters(t *testing.T) {
 	}
 }
 
+func TestHTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend(t *testing.T) {
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+
+	for _, tc := range []struct {
+		name   string
+		method string
+		path   string
+	}{
+		{name: "sources", method: http.MethodGet, path: "/api/sources?trace=1"},
+		{name: "state export", method: http.MethodGet, path: "/api/state/export?trace=1"},
+		{name: "doctor", method: http.MethodGet, path: "/api/doctor?trace=1"},
+		{name: "active steering", method: http.MethodGet, path: "/api/steer/active?trace=1"},
+		{name: "item detail", method: http.MethodGet, path: "/api/items/item_http_01?trace=1"},
+		{name: "inspect mutation", method: http.MethodPost, path: "/api/items/item_http_01/inspect?trace=1"},
+		{name: "resonance mutation", method: http.MethodPost, path: "/api/items/item_http_01/resonance?trace=1"},
+		{name: "steer mutation", method: http.MethodPost, path: "/api/steer?trace=1"},
+		{name: "opml import mutation", method: http.MethodPost, path: "/api/sources/import-opml?trace=1"},
+		{name: "state import mutation", method: http.MethodPost, path: "/api/state/import?trace=1"},
+		{name: "source delete mutation", method: http.MethodDelete, path: "/api/sources/src_http?trace=1"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, authorizedRequest(tc.method, tc.path, nil))
+
+			assertStatus(t, recorder, http.StatusBadRequest)
+			assertErrorField(t, recorder.Body.Bytes(), "trace")
+		})
+	}
+}
+
+func TestHTTPAuthRunsBeforeQueryValidationDetails(t *testing.T) {
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/api/sources?trace=1", nil))
+
+	assertStatus(t, recorder, http.StatusUnauthorized)
+	assertJSONFixture(t, recorder.Body.Bytes(), "error_unauthorized.json")
+}
+
+func TestHTTPFeedTodayRejectsEmptyLimit(t *testing.T) {
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/feed/today?limit=", nil))
+
+	assertStatus(t, recorder, http.StatusBadRequest)
+	assertErrorField(t, recorder.Body.Bytes(), "limit")
+}
+
+func TestHTTPMutationUnknownQueryRejectsBeforeStateWrite(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	seedHTTPHandlerCorpus(t, ctx, db, now)
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+	req := authorizedRequest(http.MethodPost, "/api/items/item_http_01/resonance?trace=1", bytes.NewReader([]byte(`{"resonated":true,"actor_kind":"human","actor_id":"owner","idempotency_key":"query-reject-001"}`)))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(recorder, req)
+
+	assertStatus(t, recorder, http.StatusBadRequest)
+	assertErrorField(t, recorder.Body.Bytes(), "trace")
+	var stateRows int
+	if err := db.QueryRowContext(ctx, `select count(*) from item_state where item_id = 'item_http_01'`).Scan(&stateRows); err != nil {
+		t.Fatalf("count item_state after rejected mutation: %v", err)
+	}
+	if stateRows != 0 {
+		t.Fatalf("item_state rows after rejected mutation = %d, want 0", stateRows)
+	}
+	assertReceiptCount(t, ctx, db, "query-reject-001", 0)
+}
+
 func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)

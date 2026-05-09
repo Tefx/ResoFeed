@@ -609,7 +609,7 @@ Rules:
 
 - export/import is current-state based;
 - no event-sourced activity ledger is created;
-- source OPML import/export remains flat and is not complete state portability;
+- source OPML import remains flat; OPML export is not part of the current HTTP/UI contract and is not complete state portability;
 - import should fail cleanly rather than partially corrupt state;
 - derived search indexes may be rebuilt after import.
 

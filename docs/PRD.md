@@ -154,7 +154,7 @@ The product is a single-user tool, not a multi-tenant SaaS. There is no account 
 
 ### 4.8 Complete State Portability
 
-The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML remains source-ledger import/export only and is not a complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
+The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML remains source-ledger import-only and is not an export or complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
 
 ## 5. Core Product Primitives
 
@@ -574,7 +574,7 @@ Given a new user imports or configures sources, when enough items are available,
 
 ### AC-16 State Portability
 
-Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML remains source-ledger-only and is not a complete state restore format.
+Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML remains source-ledger import-only and is not an export or complete state restore format.
 
 ### AC-17 Diagnostics Output
 
