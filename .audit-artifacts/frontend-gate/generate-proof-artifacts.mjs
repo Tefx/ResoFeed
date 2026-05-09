@@ -1,12 +1,22 @@
 import { chromium } from '../../web/node_modules/playwright/index.mjs';
 import { spawn } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), '../..');
 const outDir = resolve(root, '.audit-artifacts/frontend-gate');
 const ownerToken = 'rfeed_proof0123456789abcdefghijklmnopqrstuvwxyzABCDEFG';
 const baseURL = 'http://127.0.0.1:4177';
+const requiredClosureItemIds = ['B1', 'B2', 'B3', 'B5', 'U1', 'U2', 'U3'];
+const requiredClosureFields = [
+  'requirement_ref',
+  'behavior_claim',
+  'runtime_proof_expected',
+  'evidence_ref',
+  'status',
+  'closure_path',
+  'gate_decision_basis'
+];
 
 const source = {
   id: 'src_expected_red',
@@ -109,6 +119,48 @@ async function openApp(page) {
   await page.locator('.detail-pane .contract-inspector').waitFor({ state: 'attached' });
 }
 
+async function inspectClosureRegister() {
+  const registerPath = resolve(outDir, 'semantic-closure-register.yaml');
+  const register = await readFile(registerPath, 'utf8');
+  const sections = new Map();
+
+  for (const id of [...requiredClosureItemIds, 'safe-should-fix-dispositions']) {
+    const startMarker = `  - id: ${id}`;
+    const start = register.indexOf(startMarker);
+    if (start === -1) {
+      throw new Error(`Closure register missing item ${id}`);
+    }
+    const next = register.indexOf('\n  - id: ', start + startMarker.length);
+    sections.set(id, register.slice(start, next === -1 ? register.length : next));
+  }
+
+  const itemFieldPresence = Object.fromEntries(
+    requiredClosureItemIds.map((id) => {
+      const section = sections.get(id);
+      const missingFields = requiredClosureFields.filter((field) => !section.includes(`\n    ${field}:`));
+      if (missingFields.length > 0) {
+        throw new Error(`Closure register item ${id} missing required fields: ${missingFields.join(', ')}`);
+      }
+      return [id, { required_fields_present: true }];
+    })
+  );
+
+  const safeDispositionSection = sections.get('safe-should-fix-dispositions');
+  const safeDispositionPresent = safeDispositionSection.includes('status: safe_should_fix_non_blocking')
+    && safeDispositionSection.includes('safe should-fix')
+    && safeDispositionSection.includes('gate_decision_basis:');
+  if (!safeDispositionPresent) {
+    throw new Error('Closure register missing safe should-fix non-blocking disposition proof');
+  }
+
+  return {
+    path: '.audit-artifacts/frontend-gate/semantic-closure-register.yaml',
+    required_fields: requiredClosureFields,
+    required_items: itemFieldPresence,
+    safe_should_fix_disposition_present: true
+  };
+}
+
 async function main() {
   await mkdir(outDir, { recursive: true });
   const server = startDevServer();
@@ -165,6 +217,7 @@ async function main() {
     await mobile.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await mobile.getByRole('region', { name: 'SOURCE LEDGER surface' }).waitFor();
     await mobile.screenshot({ path: resolve(outDir, 'current-mobile-source-ledger.png'), fullPage: true });
+    const closureRegister = await inspectClosureRegister();
 
     const proof = {
       generated_at: new Date().toISOString(),
@@ -182,7 +235,8 @@ async function main() {
         mobile_route_inspector_resonate_button_count: mobileInspectorStarCount,
         mobile_route_back_to_today_visible: mobileBackVisible,
         source_fixture_title: source.title,
-        item_fixture_title: item.title
+        item_fixture_title: item.title,
+        closure_register: closureRegister
       }
     };
     await writeFile(resolve(outDir, 'render-proof.json'), `${JSON.stringify(proof, null, 2)}\n`);

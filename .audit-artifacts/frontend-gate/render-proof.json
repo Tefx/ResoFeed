@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T10:42:09.379Z",
+  "generated_at": "2026-05-09T10:47:41.778Z",
   "current_artifacts": {
     "desktop": ".audit-artifacts/frontend-gate/current-populated-desktop-full.png",
     "mobile_feed": ".audit-artifacts/frontend-gate/current-mobile-feed.png",
@@ -14,6 +14,42 @@
     "mobile_route_inspector_resonate_button_count": 1,
     "mobile_route_back_to_today_visible": true,
     "source_fixture_title": "Example Source",
-    "item_fixture_title": "SQLite FTS changes ranking contract"
+    "item_fixture_title": "SQLite FTS changes ranking contract",
+    "closure_register": {
+      "path": ".audit-artifacts/frontend-gate/semantic-closure-register.yaml",
+      "required_fields": [
+        "requirement_ref",
+        "behavior_claim",
+        "runtime_proof_expected",
+        "evidence_ref",
+        "status",
+        "closure_path",
+        "gate_decision_basis"
+      ],
+      "required_items": {
+        "B1": {
+          "required_fields_present": true
+        },
+        "B2": {
+          "required_fields_present": true
+        },
+        "B3": {
+          "required_fields_present": true
+        },
+        "B5": {
+          "required_fields_present": true
+        },
+        "U1": {
+          "required_fields_present": true
+        },
+        "U2": {
+          "required_fields_present": true
+        },
+        "U3": {
+          "required_fields_present": true
+        }
+      },
+      "safe_should_fix_disposition_present": true
+    }
   }
 }
