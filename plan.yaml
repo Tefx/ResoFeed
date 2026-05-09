@@ -20258,3 +20258,203 @@ phases:
 
       - Gaps/Notes: worker installed frontend dependencies inside isolated worktree
       after verifying `web/node_modules` missing; no package files changed.'
+  - id: remediate-verifier-blockers
+    name: Remediate Manual Fetch Verification Blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      priority: HIGH
+
+
+      Batched remediation for concurrent semantic FAIL results from manual-rss-fetch.integration-proof
+      and manual-rss-fetch.spec-conformance. Fix ALL blocker-class findings in one
+      implementation pass; do not create serial fix chains.
+
+
+      ## Blockers to Fix
+
+
+      ### B1: Backend/frontend success response schema divergence
+
+      - Runtime evidence: backend returns flat `ManualFetchResult` JSON for both source
+      fetch and global ingest, e.g. fields `operation`, `source_id`, `completed`,
+      `sources_total`, `sources_fetched`, `items_discovered`, `items_upserted`, and
+      `errors`.
+
+      - Locked backend contract: `internal/resofeed/manual_fetch_contract.go` flat
+      `ManualFetchResult`; HTTP writes the struct directly.
+
+      - Frontend drift: client/page/runtime handlers dereference nested `result.body.ingest`,
+      `result.body.source`, and `result.body.fetch` and tests/fixtures allowed nested
+      envelopes.
+
+      - Preferred remediation: align frontend contract/client/page/tests to consume
+      the backend flat `ManualFetchResult` unless authoritative docs require nested
+      envelopes.
+
+      - Contract-preserving deviation protocol: if changing frontend contract/tests
+      away from nested responses, document the correction as `contract_error` and/or
+      `test_error` in evidence; keep the backend flat contract authoritative unless
+      spec evidence explicitly demands changing it.
+
+      - Required tests: add/update integration or contract-faithful frontend tests
+      proving the frontend client/page consumes actual backend 200 payload shape for
+      `/api/ingest` and `/api/sources/{id}/fetch`; mock-only nested fixtures are not
+      sufficient.
+
+
+      ### B2: docs/ui-preview.html design-reference drift
+
+      - Spec conformance evidence: `docs/ui-preview.html` rendered Source Ledger reference
+      lacks manual fetch controls while implementation adds `[RUN INGEST]` and `[FETCH]`.
+
+      - Remediation: either update `docs/ui-preview.html` to include manual fetch
+      controls/states if they are now authoritative, or remove/relocate implementation
+      controls if the rendered reference remains authoritative. Preserve ResoFeed
+      DESIGN.md aesthetic: dense, archival, muted, bracket actions, no SaaS animations/spinners/shadows.
+
+      - Evidence must state which source is authoritative after the fix and how uiux-audit
+      can compare rendered implementation against the reference without ambiguity.
+
+
+      ### R9: SourceLedger import success copy partial drift
+
+      - Spec verifier observed import success copy `imported OPML` while DESIGN.md
+      expects `imported N sources; folders flattened` if still applicable.
+
+      - Disposition requirement: either fix the copy as part of this step if it intersects
+      Source Ledger/manual fetch UI gates, OR explicitly classify it as outside manual
+      RSS fetch scope with non-intersection evidence showing downstream manual-rss-fetch.uiux-audit
+      and manual-rss-fetch.gate will not rediscover it as blocker-class drift.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes real backend/manual-fetch
+      responses and produces outputs that vary based on those inputs. Test fixture
+      rewrites alone do not satisfy this step.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Frontend still expects nested success envelopes while backend emits flat
+      `ManualFetchResult`.
+
+      2. Tests pass only because fixtures keep the obsolete nested shape.
+
+      3. `docs/ui-preview.html` and live Source Ledger controls disagree, making strict
+      UI/UX audit ambiguous.
+
+      4. R9 is ignored without explicit non-intersection evidence or correction.
+
+      5. Any remediation introduces forbidden queues/jobs/receipts/sync layers or
+      changes the single-binary/SQLite architecture.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."'
+    verification: '- B1 main path: frontend contract/client/page/tests consume the
+      flat backend `ManualFetchResult` for both `/api/ingest` and `/api/sources/{id}/fetch`
+      200 responses.
+
+      - B1 failure path: obsolete nested response fixture/use sites are removed or
+      intentionally isolated with explanation; grep/search evidence covers `body.ingest`,
+      `body.fetch`, and `body.source` call sites.
+
+      - B2: `docs/ui-preview.html` and implementation agree on manual fetch controls/states,
+      or implementation is corrected to match the authoritative reference.
+
+      - R9: import success copy is corrected or explicitly disposed with non-intersection
+      evidence for manual-rss-fetch gates.
+
+      - Architecture guardrail: no durable manual fetch receipt/queue/job tables and
+      no sidecar worker/admin process are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
+
+
+      ## Remediation Evidence
+
+
+      **B1 schema disposition**: backend flat contract kept | backend changed due
+      authoritative spec | other (explain)
+
+
+      **Deviation records**:
+
+      - `contract_error`: <what frontend contract changed, why, impact>
+
+      - `test_error`: <what fixture/test assumption changed, why, impact>
+
+
+      **Live/contract payloads used by frontend tests**:
+
+      ```json
+
+      <paste actual or contract-faithful flat ManualFetchResult payloads for ingest
+      and source fetch>
+
+      ```
+
+
+      **Obsolete nested-shape search**:
+
+      ```
+
+      <search output for body.ingest/body.fetch/body.source or "none found outside
+      intentional compatibility tests">
+
+      ```
+
+
+      **B2 ui-preview closure**: <how docs/ui-preview.html and implementation now
+      align>
+
+
+      **R9 disposition**: fixed | outside manual RSS fetch scope with non-intersection
+      evidence
+
+
+      **Architecture guardrail evidence**: <no queues/jobs/receipts/sync layers introduced>
+
+
+      **Commands/checks run**:
+
+      ```
+
+      <paste commands and key output>
+
+      ```'
+    depends_on:
+    - manual-rss-fetch.integration-proof
+    - manual-rss-fetch.spec-conformance
+    agent: frontend-engineer
