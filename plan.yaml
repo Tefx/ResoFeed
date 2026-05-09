@@ -12704,6 +12704,213 @@ phases:
     depends_on:
     - openrouter-llm-contract-and-red-tests.contract-red-tests-gate
     agent: golang-developer
+  - id: openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps
+    name: retest-red-test-gate-gaps
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER, rerun the red-test gate checks for the
+      remediation from openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps.
+
+
+      step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+      priority: HIGH
+
+
+      This retest protects downstream OpenRouter implementation phases by ensuring
+      the contract-and-red-tests phase now has explicit red-intent metadata and import-side
+      state secrecy proof before implementation begins.
+
+
+      Required checks:
+
+      1. Grep for literal `expected_result: red` in `internal/resofeed/*openrouter*contract_test.go`.
+
+      2. Package compile check proves tests are syntactically/build valid.
+
+      3. Targeted expected-red test run proves red failures are intended OpenRouter/Gemini
+      product gaps, not syntax/build failures.
+
+      4. State import/export secrecy coverage is present; import coverage must prove
+      imports do not persist/import OpenRouter secrets, model, provider names, secret-source
+      metadata, or runtime config.
+
+      5. Docs/public contract remains clean and OpenRouter-only.
+
+      6. Secret safety remains intact: no actual `.env` file or real OpenRouter key
+      read/printed/committed.
+
+
+      Gate decision basis required:
+
+      - gate_open_allowed: true|false
+
+      - blocker_1_expected_result_red_metadata: PROVEN|UNPROVEN
+
+      - blocker_2_state_import_secrecy_coverage: PROVEN|UNPROVEN
+
+      - docs_public_contract_clean: PROVEN|UNPROVEN
+
+      - secret_safety: PROVEN|UNPROVEN
+
+      - downstream_openrouter_implementation_unblocked: true|false
+
+
+      Finding remaining issues is a successful retest outcome, but gate_open_allowed
+      must remain false unless all blocker-class obligations are PROVEN.'
+    verification: '- `expected_result: red` grep check returns OpenRouter expected-red
+      test artifact matches.
+
+      - Package compile check succeeds.
+
+      - Targeted expected-red test run exposes intended red failures and no syntax/build
+      failures.
+
+      - State import/export secrecy coverage is present, including import-side assertions
+      for OpenRouter secrets, model, provider names, secret-source metadata, and runtime
+      config.
+
+      - Docs/public contract test remains green and docs remain OpenRouter-only.
+
+      - Evidence includes explicit `gate_open_allowed` closure fields and downstream
+      block/unblock recommendation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/openrouter_product_integration_contract_test.go — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest / Gate Closure Report
+
+
+      **Reviewer**: gate-reviewer (independent of fix agent golang-developer)
+
+      **Scope**: openrouter-llm-contract-and-red-tests red-test gate blockers
+
+      **Independence Level**: L1
+
+
+      ### Commands and Actual Output
+
+
+      **Expected-red metadata grep**:
+
+      ```
+
+      <paste exact grep command and output for expected_result: red in internal/resofeed/*openrouter*contract_test.go>
+
+      ```
+
+
+      **Package compile check**:
+
+      ```
+
+      <paste exact command and output>
+
+      ```
+
+
+      **Targeted expected-red test run**:
+
+      ```
+
+      <paste exact command and output; distinguish intended red failures from syntax/build
+      failures>
+
+      ```
+
+
+      **Docs/public contract cleanliness check**:
+
+      ```
+
+      <paste exact command/output or inspection evidence>
+
+      ```
+
+
+      ### State Secrecy Coverage
+
+
+      **Import coverage present**: YES | NO
+
+      **Export coverage present**: YES | NO
+
+
+      Assertions verified for state import:
+
+      - [ ] OpenRouter secrets are not imported/persisted
+
+      - [ ] OpenRouter model is not imported/persisted
+
+      - [ ] OpenRouter provider names are not imported/persisted
+
+      - [ ] secret-source metadata is not imported/persisted
+
+      - [ ] runtime config is not imported/persisted
+
+
+      ### Secret-Safety Confirmation
+
+      - [ ] No `.env` file was read.
+
+      - [ ] No real OpenRouter key was read, printed, or committed.
+
+      - [ ] All secret-like values are fake placeholders.
+
+
+      ### Product Implementation Change Check
+
+      - [ ] Fix touched only OpenRouter expected-red test/contract artifacts.
+
+      - [ ] No product implementation files changed.
+
+
+      ### Closure Fields
+
+      - blocker_1_expected_result_red_metadata: PROVEN | UNPROVEN
+
+      - blocker_2_state_import_secrecy_coverage: PROVEN | UNPROVEN
+
+      - docs_public_contract_clean: PROVEN | UNPROVEN
+
+      - secret_safety: PROVEN | UNPROVEN
+
+      - targeted_red_failures_are_intended: PROVEN | UNPROVEN
+
+      - gate_open_allowed: true | false
+
+      - downstream_openrouter_implementation_unblocked: true | false
+
+      - remaining_blockers: <none or list>
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: all blocker-class obligations PROVEN
+
+      - [ ] BLOCKED: remaining blocker-class obligations listed above'
+    depends_on:
+    - openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps
+    agent: gate-reviewer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
