@@ -8414,7 +8414,7 @@ phases:
       \ false"
 - id: end-to-end-integration
   name: End to End Integration
-  status: pending
+  status: in_progress
   gate: Full vertical behavior works through real CLI/server/API/MCP/UI paths with
     no stubs and no mock-only seam evidence.
   context: System-level fan-in after backend/runtime/frontend phases. Verifies real
@@ -8513,7 +8513,7 @@ phases:
     agent: integration-verifier
   - id: end-to-end-integration.black-box-acceptance-pass
     name: Black box acceptance pass
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -8589,6 +8589,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-09T10:55:59.871558+00:00'
   - id: end-to-end-integration.end-to-end-wiring-audit
     name: End to end wiring audit
     status: pending
