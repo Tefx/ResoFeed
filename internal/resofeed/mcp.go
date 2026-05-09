@@ -18,15 +18,16 @@ import (
 // requires Authorization: Bearer <OWNER_TOKEN>; missing/invalid auth returns
 // HTTP 401 before tool/resource handling and creates no receipt or queue.
 type MCPConfig struct {
-	DB         *sql.DB
-	OwnerToken string
+	DB             *sql.DB
+	OwnerToken     string
+	OwnerTokenHash string
 }
 
 // NewMCPHandler returns the /mcp Streamable HTTP handler. MCP exposes the same
 // product concepts as HTTP/UI: inspect, resonate, steer, retrieve, and report
 // delivery. It must not add per-agent registries or MCP-only product concepts.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken}
+	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -227,8 +228,9 @@ on conflict(item_id) do update set
 }
 
 type mcpHandler struct {
-	db         *sql.DB
-	ownerToken string
+	db             *sql.DB
+	ownerToken     string
+	ownerTokenHash string
 }
 
 type mcpRequest struct {
@@ -288,11 +290,17 @@ func (h *mcpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h *mcpHandler) authorized(r *http.Request) bool {
 	header := r.Header.Get("Authorization")
-	if !strings.HasPrefix(header, "Bearer ") || h.ownerToken == "" {
+	if !strings.HasPrefix(header, "Bearer ") {
 		return false
 	}
 	token := strings.TrimPrefix(header, "Bearer ")
-	return subtle.ConstantTimeCompare([]byte(token), []byte(h.ownerToken)) == 1
+	if h.ownerToken != "" && subtle.ConstantTimeCompare([]byte(token), []byte(h.ownerToken)) == 1 {
+		return true
+	}
+	if h.ownerTokenHash != "" && subtle.ConstantTimeCompare([]byte(ownerTokenHash(token)), []byte(h.ownerTokenHash)) == 1 {
+		return true
+	}
+	return false
 }
 
 func (h *mcpHandler) dispatch(ctx context.Context, req mcpRequest) (any, *mcpError) {

@@ -8,10 +8,17 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
+	"net"
+	"net/url"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"syscall"
 	"unicode"
 	"unicode/utf8"
 
@@ -20,9 +27,206 @@ import (
 
 // Main is the CLI handoff for the single Go binary. It must recognize only the
 // `serve` command and must not add migrate, worker, doctor, admin, or sync
-// processes. Stubbed until runtime implementation.
+// processes.
 func Main(args []string, stdout io.Writer, stderr io.Writer) int {
-	panic("TODO contract stub: parse resofeed serve flags and start runtime")
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
+		printRootHelp(stdout)
+		return 0
+	}
+	if args[0] != "serve" {
+		_, _ = fmt.Fprintf(stderr, "err: unknown_command: %s\n", args[0])
+		return 2
+	}
+	cfg, exitCode, ok := parseServeFlags(args[1:], stdout, stderr)
+	if !ok {
+		return exitCode
+	}
+	if cfg.GeminiModel == "" {
+		cfg.GeminiModel = DefaultGeminiModel
+	}
+	if cfg.PublicURL == "" {
+		publicURL, err := derivePublicURL(cfg.Addr)
+		if err != nil {
+			_, _ = io.WriteString(stderr, "err: invalid_addr: expected HOST:PORT\n")
+			return 2
+		}
+		cfg.PublicURL = publicURL
+	}
+	if err := validateServeConfig(cfg); err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		return 2
+	}
+	return runServe(cfg, stdout, stderr)
+}
+
+func printRootHelp(w io.Writer) {
+	_, _ = io.WriteString(w, `Usage: resofeed <command>
+
+Commands:
+  serve    Start web UI, JSON HTTP API, MCP endpoint, SQLite, and background ingest.
+
+Run "resofeed serve --help" for serve flags.
+`)
+}
+
+func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeConfig, int, bool) {
+	cfg := ServeConfig{Addr: DefaultAddr, DBPath: DefaultDBPath, GeminiModel: DefaultGeminiModel}
+	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	fs.StringVar(&cfg.Addr, "addr", DefaultAddr, "bind address for web UI, HTTP API, and MCP endpoint")
+	fs.StringVar(&cfg.PublicURL, "public-url", "", "public base URL for external agents")
+	fs.StringVar(&cfg.DBPath, "db", DefaultDBPath, "SQLite database path")
+	fs.StringVar(&cfg.GeminiAPIKey, "gemini-api-key", "", "Gemini API key")
+	fs.StringVar(&cfg.GeminiModel, "gemini-model", DefaultGeminiModel, "Gemini model")
+	fs.StringVar(&cfg.OwnerToken, "owner-token", "", "explicit owner token")
+	fs.Usage = func() {
+		_, _ = io.WriteString(stdout, `Usage: resofeed serve [flags]
+
+Starts the single ResoFeed runtime: static UI, JSON HTTP API, MCP at /mcp,
+SQLite migrations, owner-token auth, and background ingest.
+
+Flags:
+`)
+		fs.SetOutput(stdout)
+		fs.PrintDefaults()
+		fs.SetOutput(stderr)
+	}
+	if err := fs.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return ServeConfig{}, 0, false
+		}
+		return ServeConfig{}, 2, false
+	}
+	if fs.NArg() != 0 {
+		_, _ = fmt.Fprintf(stderr, "err: unexpected_argument: %s\n", fs.Arg(0))
+		return ServeConfig{}, 2, false
+	}
+	return cfg, 0, true
+}
+
+func validateServeConfig(cfg ServeConfig) error {
+	if err := validateAddr(cfg.Addr); err != nil {
+		return err
+	}
+	if err := validatePublicURL(cfg.PublicURL); err != nil {
+		return err
+	}
+	if strings.TrimSpace(cfg.GeminiAPIKey) == "" {
+		return errors.New("invalid_gemini_api_key: value required")
+	}
+	if cfg.OwnerToken != "" {
+		if err := validateOwnerToken(cfg.OwnerToken); err != nil {
+			return fmt.Errorf("invalid_owner_token: expected at least 32 visible non-whitespace characters")
+		}
+	}
+	return nil
+}
+
+func validateAddr(addr string) error {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil || host == "" || port == "" {
+		return errors.New("invalid_addr: expected HOST:PORT")
+	}
+	portNumber, err := strconv.Atoi(port)
+	if err != nil || portNumber < 1 || portNumber > 65535 {
+		return errors.New("invalid_addr: expected HOST:PORT")
+	}
+	return nil
+}
+
+func derivePublicURL(addr string) (string, error) {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil || host == "" || port == "" {
+		return "", err
+	}
+	if host == "0.0.0.0" || host == "::" || host == "[::]" {
+		host = "127.0.0.1"
+	}
+	if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") {
+		host = "[" + host + "]"
+	}
+	return "http://" + net.JoinHostPort(strings.Trim(host, "[]"), port), nil
+}
+
+func validatePublicURL(raw string) error {
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed == nil || !parsed.IsAbs() || parsed.Host == "" || (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Path != "" && parsed.Path != "/") {
+		return errors.New("invalid_public_url: expected absolute http(s) URL without path/query/fragment")
+	}
+	return nil
+}
+
+func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	db, err := OpenDB(ctx, cfg.DBPath)
+	if err != nil {
+		_, _ = io.WriteString(stderr, "err: invalid_db: cannot open sqlite database\n")
+		return 2
+	}
+	defer func() { _ = db.Close() }()
+
+	if err := RunMigrations(ctx, db); err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: migration_failed: %v\n", err)
+		return 1
+	}
+
+	resolution, err := ResolveOwnerToken(ctx, db, cfg.OwnerToken)
+	if err != nil {
+		_, _ = io.WriteString(stderr, "err: invalid_owner_token: expected at least 32 visible non-whitespace characters\n")
+		return 2
+	}
+	if resolution.WasGenerated {
+		_, _ = fmt.Fprintf(stdout, "owner token generated: %s\n", resolution.GeneratedPlaintextToken)
+	} else if resolution.WasExplicit {
+		_, _ = io.WriteString(stdout, "owner token explicit: stored hash\n")
+	} else {
+		_, _ = io.WriteString(stdout, "owner token reused: stored hash\n")
+	}
+
+	gemini := NewGeminiClient(GeminiConfig{APIKey: cfg.GeminiAPIKey, Model: cfg.GeminiModel})
+	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, Gemini: gemini}
+	runCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	errCh := make(chan error, 2)
+
+	go func() {
+		errCh <- ServeHTTPRuntime(runCtx, runtimeCfg)
+	}()
+	go func() {
+		errCh <- RunIngestLoop(runCtx, db, IngestConfig{Gemini: gemini})
+	}()
+
+	_, _ = fmt.Fprintf(stdout, "serving ResoFeed on %s (public-url %s)\n", cfg.Addr, runtimeCfg.PublicURL)
+	select {
+	case <-ctx.Done():
+		cancel()
+		firstErr := <-errCh
+		secondErr := <-errCh
+		if firstErr != nil || secondErr != nil {
+			_, _ = fmt.Fprintf(stderr, "err: shutdown_failed: %v %v\n", firstErr, secondErr)
+			return 1
+		}
+		_, _ = io.WriteString(stdout, "shutdown complete\n")
+		return 0
+	case err := <-errCh:
+		cancel()
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: runtime_failed: %v\n", err)
+			<-errCh
+			return 1
+		}
+		<-errCh
+		return 0
+	}
+}
+
+func activePlaintextToken(cfg ServeConfig, resolution OwnerTokenResolution) string {
+	if cfg.OwnerToken != "" {
+		return cfg.OwnerToken
+	}
+	return resolution.GeneratedPlaintextToken
 }
 
 // OpenDB opens the one SQLite database file used for durable current state,

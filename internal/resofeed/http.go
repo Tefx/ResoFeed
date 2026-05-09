@@ -22,11 +22,12 @@ const maxImportBodyBytes = 10 << 20
 // Authorization: Bearer <OWNER_TOKEN> and returns the canonical JSON error body
 // on auth failure.
 type HTTPServerConfig struct {
-	Addr       string
-	PublicURL  string
-	DB         *sql.DB
-	OwnerToken string
-	Gemini     GeminiClient
+	Addr           string
+	PublicURL      string
+	DB             *sql.DB
+	OwnerToken     string
+	OwnerTokenHash string
+	Gemini         GeminiClient
 }
 
 // NewRouter returns the HTTP router for static assets, /api/* JSON, /api/doctor
@@ -36,9 +37,7 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api)
-	mux.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
-		writeAPIError(w, http.StatusNotImplemented, "internal", "mcp not implemented", nil)
-	})
+	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash}))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -116,16 +115,19 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h apiHandler) authorized(r *http.Request) bool {
-	if h.cfg.OwnerToken == "" {
-		return false
-	}
 	header := r.Header.Get("Authorization")
 	const prefix = "Bearer "
 	if !strings.HasPrefix(header, prefix) || len(header) == len(prefix) {
 		return false
 	}
 	token := strings.TrimPrefix(header, prefix)
-	return subtle.ConstantTimeCompare([]byte(token), []byte(h.cfg.OwnerToken)) == 1
+	if h.cfg.OwnerToken != "" && subtle.ConstantTimeCompare([]byte(token), []byte(h.cfg.OwnerToken)) == 1 {
+		return true
+	}
+	if h.cfg.OwnerTokenHash != "" && subtle.ConstantTimeCompare([]byte(ownerTokenHash(token)), []byte(h.cfg.OwnerTokenHash)) == 1 {
+		return true
+	}
+	return false
 }
 
 func (h apiHandler) handleToday(w http.ResponseWriter, r *http.Request) {
