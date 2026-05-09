@@ -16312,7 +16312,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.documentation-sync
     name: documentation-sync
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -16416,6 +16416,121 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-09T19:28:13.147991+00:00'
+    done_at: '2026-05-09T19:30:42.535175+00:00'
+    evidence: 'Documentation sync PASS accepted and artifact merged.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+
+      Worker commit: 7f33d89674c2be5e1b4ef7d820710d1d4ff49b76 (`docs: add OpenRouter
+      documentation sync audit`).
+
+      Main squash merge commit: d61d630 (`[vectl] step-openrouter-llm-verification-and-live-smoke.documentation-sync
+      completed`).
+
+      Artifact merged: `.audit-artifacts/openrouter_verification/documentation-sync.md`.
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: no tracked AGENTS.md exists at isolated worktree root.
+
+      - .agents/instructions.md — OpenRouter runtime-only secrets, OPENROUTER_KEY
+      OS/.env precedence, no CLI secret flags, owner-token boundary, HTTP/MCP parity.
+
+      - docs/ARCHITECTURE.md — OpenRouter sole LLM backend; optional non-secret model;
+      `/doctor` OpenRouter raw text with configured/resolved model; state export excludes
+      runtime config/secrets.
+
+      - docs/DESIGN.md — owner-token prompt, operational labels, Source Ledger state
+      portability, `/doctor` raw text, no dashboards/settings expansion.
+
+      - docs/USAGE.md — safe OpenRouter key configuration, `.env` placeholder only,
+      run command without API-key flag, optional model, `/doctor` example, MCP owner-token
+      usage.
+
+      - README.md — quick start uses redacted `.env` placeholder, optional `--openrouter-model`,
+      no CLI API-key flag.
+
+
+      Docs checked:
+
+      - README.md — PASS.
+
+      - docs/USAGE.md — PASS.
+
+      - docs/ARCHITECTURE.md — PASS.
+
+      - docs/DESIGN.md — PASS.
+
+      - .agents/instructions.md — PASS.
+
+
+      Search evidence:
+
+      ```text
+
+      rg forbidden Gemini/OpenRouter CLI secret/real key patterns in README.md docs/USAGE.md
+      docs/ARCHITECTURE.md docs/DESIGN.md .agents/instructions.md — NO_MATCHES
+
+      rg required OpenRouter contract patterns — expected docs present, including
+      README `.env is local-only`, docs/ARCHITECTURE `OPENROUTER_KEY`, `/doctor openrouter:`,
+      and MCP same-product-concepts language.
+
+      ```
+
+
+      Secret safety:
+
+      - No real OpenRouter key shown.
+
+      - Example keys are placeholders/redacted.
+
+      - `.env` docs local-only/not committed.
+
+
+      Architecture constraints:
+
+      - No forbidden concepts introduced.
+
+      - HTTP/MCP owner-token parity preserved in docs.
+
+      - No OpenRouter attribution headers/provider registry introduced.
+
+
+      Issues found: none.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-verification-and-live-smoke.final-openrouter-gate
     name: final-openrouter-gate
     status: pending
