@@ -3537,7 +3537,7 @@ phases:
       \ Vitest/jsdom.\n\n## Headline\nPASS"
   - id: frontend-implementation.frontend-green-retest
     name: Frontend green retest
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -3612,6 +3612,69 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T04:24:28.747182+00:00'
+    done_at: '2026-05-09T06:46:40.891135+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `.agents/instructions.md`:\
+      \ canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; owner token\
+      \ is the single auth boundary; UI must use functional labels including `RESOFEED`,\
+      \ `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`.\n- `docs/ARCHITECTURE.md`:\
+      \ one Go process serves static SvelteKit app and JSON HTTP; every `/api/*` route\
+      \ requires one owner token; no accounts/OAuth/RBAC.\n- `docs/PRD.md`: first-run\
+      \ has no onboarding wizards/account registration; core primitives are Inspect,\
+      \ Resonate, Steer; fallback states are raw/terse.\n- `docs/DESIGN.md`: owner-token\
+      \ prompt requires `Enter owner token`, `err: owner token rejected`, focus/live-region\
+      \ behavior; first-use copy requires `Paste RSS URL in Steer or import OPML.`,\
+      \ `Inspect opens the item.`, `Star preserves durable value.`, `Steer is optional\
+      \ correction.`; Source Ledger/State/Search/accessibility states specified.\n\
+      - `docs/DESIGN_VISION.md`: no account login/onboarding; token prompt is a terse\
+      \ local access gate; no numeric indicators/cute errors.\n- `docs/USAGE.md`:\
+      \ first open stores `resofeed.ownerToken` and sends `Authorization: Bearer <OWNER_TOKEN>`\
+      \ for `/api/*`.\n\n## Verification Report\n- Commit hash(es): none — read-only\
+      \ verification.\n- step_intent: retest_green\n- expected_result: green\n- observed_result:\
+      \ green with non-blocking proof debt\n- failure_alignment: no command failures;\
+      \ caveat that API boundary tests use mocked `fetcher` rather than live backend/server.\n\
+      - verdict: PASS_WITH_DEBT\n- blockers: []\n- product_implementation_files_modified:\
+      \ none\n- Commands executed:\n  - `pwd && git status --short --branch` — exit\
+      \ 0.\n  - `ls web` — exit 0.\n  - `npm --prefix web install && npm --prefix\
+      \ web run build && npm --prefix web test && npx @google/design.md lint docs/DESIGN.md`\
+      \ — exit 0.\n  - `npm --prefix web run test:render -- --reporter verbose` —\
+      \ exit 0.\n  - seam/static scans via read/grep tools; final `git status --short\
+      \ --branch` clean on `vectl/step-frontend-implementation.frontend-green-retest`.\n\
+      - Actual output:\n  - npm install: `added 147 packages`; `3 low severity vulnerabilities`.\n\
+      \  - build: SvelteKit static build completed and wrote site to `build`; warning\
+      \ about base config occurred before SvelteKit sync/build completed successfully.\n\
+      \  - svelte-check: `svelte-check found 0 errors and 0 warnings`.\n  - vitest:\
+      \ `Test Files 2 passed (2)`, `Tests 11 passed (11)`.\n  - design lint: `errors:\
+      \ 0`, `warnings: 0`, `infos: 1`.\n- Rendered states verified:\n  - Owner-token\
+      \ prompt: `RESOFEED`, heading `Enter owner token`, password input labelled `Owner\
+      \ token`, localStorage key `resofeed.ownerToken`.\n  - Rejected token: `err:\
+      \ owner token rejected`.\n  - First-use empty: required four static lines from\
+      \ DESIGN.md.\n  - Feed/Inspector: item title, provenance, extraction marker,\
+      \ agent marker, inspector link/status/why line.\n  - Source Ledger: `SOURCE\
+      \ LEDGER`, OPML import, source URL, delete confirmation.\n  - State Portability:\
+      \ warning `import replaces active sources, rules, and stars`, import file chooser,\
+      \ export status.\n  - Search/Retrieval: query/source/from/resonated controls,\
+      \ results region, provenance/match text.\n- Accessibility checks:\n  - Tests\
+      \ assert roles/names: headings, regions, list/listitem, buttons, links, status/alert\
+      \ regions.\n  - Live-region/static scan found `role=\"alert\" aria-live=\"assertive\"\
+      ` for owner-token rejection and `role=\"status\" aria-live=\"polite\"` for state\
+      \ export feedback.\n  - Tests assert focus for owner-token input and inspector\
+      \ detail heading.\n- Issues found:\n  - Non-blocking proof debt: API client\
+      \ tests inject mocked fetcher and fixture JSON; no live HTTP server or malformed\
+      \ JSON/503/latency behavior was exercised.\n  - Naming risk: production route\
+      \ imports components named `*ContractStub.svelte`; despite passing, this signals\
+      \ contract-stub implementation rather than mature feature implementation.\n\
+      \  - npm audit reports 3 low-severity vulnerabilities.\n- behavioral_proof_register:\n\
+      \  - build_artifact: `web/build` produced by SvelteKit adapter-static.\n  -\
+      \ render_tests: 11 visible DOM/accessibility assertions passed under jsdom.\n\
+      \  - auth_behavior: bearer header and canonical 400 error preservation verified\
+      \ with mocked fetcher.\n  - design_lint: 0 errors / 0 warnings.\n  - seam_scan:\
+      \ mocked fetcher found in `web/src/lib/api-client.test.ts`; no live backend\
+      \ probe performed because task scope was frontend retest/build/tests.\n- gate_open_allowed:\
+      \ true\n- orchestrator_action_hint: COMPLETE_WITH_DEBT\n- Coverage not tested\
+      \ and why:\n  - No browser screenshot/live SvelteKit preview probe; npm build/render\
+      \ tests were the requested smallest runtime surface.\n  - No live backend `/api/*`\
+      \ probe; no running Go server/token fixture was provided and task centered on\
+      \ frontend retest.\n\n## Headline\nPASS_WITH_DEBT"
   - id: frontend-implementation.native-ui-ux-implementation-audit
     name: Native UI UX implementation audit
     status: claimed
