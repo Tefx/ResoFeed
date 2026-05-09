@@ -4135,7 +4135,7 @@ phases:
     claimed_at: '2026-05-09T09:16:35.916978+00:00'
   - id: runtime-api-and-mcp-integration.runtime-wiring-audit
     name: Runtime wiring audit
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -4204,6 +4204,8 @@ phases:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     - runtime-api-and-mcp-integration.runtime-blockers-retest
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-09T09:16:39.467810+00:00'
   - id: runtime-api-and-mcp-integration.runtime-gate
     name: Runtime gate
     status: pending
