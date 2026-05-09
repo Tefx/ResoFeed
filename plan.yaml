@@ -7070,6 +7070,246 @@ phases:
     - frontend-implementation.native-ui-ux-implementation-audit
     - frontend-implementation.frontend-spec-conformance
     agent: gate-reviewer
+  - id: fix-steer-diagnostics-and-mobile-ui-contract
+    name: Fix steer diagnostics and mobile UI contract blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+
+      Batched frontend remediation for the parallel semantic FAIL reports from `frontend-implementation.frontend-spec-conformance`
+      and `frontend-implementation.native-ui-ux-implementation-audit`.
+
+
+      This step MUST cover ALL product blocker families and safe should-fix findings
+      below. Do not duplicate completed frontend implementation steps; patch the existing
+      frontend implementation to close the contract gaps.
+
+
+      ## Failure context to close
+
+      Spec conformance blockers:
+
+      - B1: Steer input is rendered but not wired to `/api/steer`; RSS URL subscription
+      and natural-language steering are unavailable from UI.
+
+      - B2: `/doctor` diagnostics output is not reachable/rendered from Steer; only
+      an unused API-client method exists.
+
+      - B3: Desktop split Inspector duplicates the Resonate star contrary to explicit
+      DESIGN.md contract.
+
+      - B5: Owner token is stored in localStorage before authenticated acceptance,
+      contrary to “after acceptance” wording.
+
+      - B4 environment note: future verification must run `npm --prefix web ci` before
+      check/build/test if dependencies are absent.
+
+
+      Native UI/UX audit blockers:
+
+      - U1: Mobile layout violates full-screen Inspector route/platform physics contract;
+      it renders one giant stacked page instead of mobile feed plus full-screen Inspector/ledger
+      routes.
+
+      - U2: Desktop selected-state/Inspector behavior duplicates detail content and
+      misses a non-layout-shifting selected marker.
+
+      - U3: Resonate button styling makes inactive stars primary black controls instead
+      of muted surface controls with scarce active accent.
+
+
+      Safe should-fix closure:
+
+      - Search lacks visible limit control; add the documented/user-relevant control
+      if supported by current API/client shape.
+
+      - Provide proof/contract path for OPML flattening and state import extra-field
+      rejection if frontend surfaces exercise those flows; otherwise record explicit
+      non-intersection for this phase.
+
+      - Remove duplicate TODAY headings/time grouping divergence, duplicate search
+      result counts, and internal “Contract:” copy in the first-use empty state.
+
+
+      ## Required product fixes
+
+      1. Steer form calls `/api/steer` through the frontend API client, supports both
+      RSS URL subscription and natural-language steering text, and renders terse receipt/error
+      feedback.
+
+      2. `/doctor` from Steer calls the doctor endpoint and renders raw text diagnostics,
+      not dashboard cards or decorative summaries.
+
+      3. Desktop split Inspector removes the duplicate star and uses the feed-only
+      Resonate control as the sole star affordance.
+
+      4. Owner token persistence occurs only after authenticated acceptance/bootstrap.
+      Evidence MUST include a regression test proving rejected/failed acceptance does
+      not persist the token and accepted bootstrap does persist it.
+
+      5. Mobile UX uses feed-first single column with full-screen Inspector route/state
+      and separate ledger/search/state surfaces per DESIGN.md. If true routing is
+      outside the current app shape, implement accessible route/state behavior satisfying
+      the full-screen contract without stacking all panes on one page.
+
+      6. Desktop selected marker is a non-layout-shifting 3px marker; selected-state
+      behavior must not duplicate detail content.
+
+      7. Inactive Resonate star is a muted surface control; active star uses scarce
+      accent `#7A4600`.
+
+      8. Remove duplicate TODAY headings, duplicate search result counts, and internal
+      “Contract:” copy.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      - A steer UI that renders but does not call `/api/steer` end-to-end.
+
+      - `/doctor` available only as an unused API-client method, or rendered as dashboard
+      cards instead of raw text diagnostics.
+
+      - Any desktop Inspector duplicate Resonate star or duplicate item detail content.
+
+      - Token persisted before authenticated acceptance/bootstrap.
+
+      - Mobile viewport showing one giant stacked page instead of feed-first plus
+      full-screen Inspector/ledger/search/state route/state surfaces.
+
+      - Inactive stars styled as primary black controls; active accent not `#7A4600`.
+
+      - Duplicate TODAY headings/counts or internal contract/provenance copy visible
+      to users.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive frontend logic that processes user input
+      and rendered state. Stub handlers, unused API methods, or CSS-only masking of
+      missing behavior are not acceptable.
+
+
+      ## Required commands / artifacts
+
+      Run or prepare evidence for:
+
+      - `npm --prefix web ci` when `node_modules`, `svelte-kit`, or `vite` are absent
+      or stale in the worktree.
+
+      - `npm --prefix web run check`
+
+      - `npm --prefix web run build`
+
+      - `npm --prefix web run test`
+
+      - rendered screenshots, DOM captures, or equivalent artifacts for desktop and
+      mobile states showing Steer, `/doctor`, selected item, Inspector, ledger/search/state
+      surfaces, inactive/active Resonate styling, and first-use empty state.'
+    verification: '- All listed blocker families B1, B2, B3, B5, U1, U2, and U3 have
+      direct code/test/artifact evidence.
+
+      - Owner-token persistence regression proves no persistence before failed acceptance
+      and persistence only after authenticated acceptance/bootstrap.
+
+      - Frontend check/build/test commands are green, with `npm --prefix web ci` run
+      first when dependencies are absent or stale.
+
+      - Rendered artifact evidence covers desktop and mobile contract states and confirms
+      removal of duplicate visible copy/counts/headings.
+
+      - Should-fix findings are either safely closed with evidence or given explicit
+      non-intersection rationale for this frontend phase.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Frontend Remediation Evidence
+
+
+      ### Product blocker closure
+
+      - B1 `/api/steer` wiring evidence: <files changed, tests, receipt/error screenshots
+      or DOM output>
+
+      - B2 `/doctor` raw diagnostics evidence: <endpoint call path and rendered raw
+      text artifact>
+
+      - B3 desktop Inspector duplicate star removed: <rendered artifact and component/CSS
+      evidence>
+
+      - B5 owner token persistence-after-acceptance only: <test name/output proving
+      rejected acceptance does not persist token>
+
+      - U1 mobile full-screen route/state contract: <mobile rendered artifact(s) and
+      navigation/state evidence>
+
+      - U2 selected-state/Inspector behavior: <3px marker evidence and duplicate-detail
+      removal evidence>
+
+      - U3 Resonate styling: <inactive muted surface and active #7A4600 artifact>
+
+
+      ### Safe should-fix disposition
+
+      - Search limit control: CLOSED with evidence or NON-INTERSECTING with rationale
+
+      - OPML flattening proof/contract path: CLOSED with evidence or NON-INTERSECTING
+      with rationale
+
+      - State import extra-field rejection proof/contract path: CLOSED with evidence
+      or NON-INTERSECTING with rationale
+
+      - Duplicate TODAY/counts/Contract copy: CLOSED with evidence
+
+
+      ### Commands
+
+      ```sh
+
+      npm --prefix web ci # when dependencies were absent/stale
+
+      npm --prefix web run check
+
+      npm --prefix web run build
+
+      npm --prefix web run test
+
+      ```
+
+
+      Paste actual command outputs or artifact paths, not summaries.
+
+
+      ### Rendered artifacts
+
+      List desktop and mobile screenshots/DOM captures/equivalent artifacts with state
+      labels.
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - frontend-implementation.frontend-spec-conformance
+    - frontend-implementation.native-ui-ux-implementation-audit
+    agent: frontend-engineer
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
