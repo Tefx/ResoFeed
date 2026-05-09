@@ -13037,7 +13037,8 @@ phases:
 
       As an INDEPENDENT TESTER, perform a local runnable-surface liveness probe for
       the single `resofeed serve` binary using fake or local-safe OpenRouter configuration.
-      This is not the live OpenRouter smoke; do not read `.env` here.
+      This is not the live OpenRouter smoke; use a temporary `.env` or controlled
+      OS environment with a fake key and do not print secret values.
 
 
       Independence Level: L2. Tester may use repository code and public commands but
@@ -13048,8 +13049,9 @@ phases:
 
       - Build or run the real `cmd/resofeed` binary/entrypoint.
 
-      - Start `resofeed serve` with `--openrouter-api-key` using a fake redacted value
-      and optional empty model; no real key.
+      - Start `resofeed serve` without any CLI API-key flag, using a temporary `.env`
+      or OS environment fake OpenRouter key per the locked secret contract; optional
+      model may be omitted or set to a non-secret value.
 
       - Confirm process starts far enough to expose HTTP/UI/MCP surfaces or fails
       only on intentionally fake upstream calls after startup, not during CLI parse/config
@@ -13060,12 +13062,15 @@ phases:
 
       - Confirm legacy Gemini flags are rejected by command-line parsing.
 
+      - Confirm stdout/stderr/logs do not contain the fake OpenRouter key.
+
 
       Finding issues is a successful verifier outcome; evidence must classify blockers
       vs non-blocking debt.'
     verification: phase-check protecting openrouter-llm-implementation.gate. Entry
-      point starts, accepts at least one operation, proves OpenRouter CLI parse/doctor
-      path, and rejects Gemini flags. Handler-only evidence is insufficient.
+      point starts without a CLI API-key flag, accepts at least one operation, proves
+      OpenRouter env/.env parse/doctor path, rejects Gemini flags, and does not leak
+      the fake key. Handler-only evidence is insufficient.
     evidence_template: '## Verification Report
 
       **Tester**: blind-tester (independent)
