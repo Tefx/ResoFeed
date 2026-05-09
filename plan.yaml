@@ -12296,6 +12296,51 @@ phases:
     depends_on:
     - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     agent: golang-developer
+  - id: openrouter-llm-contract-and-red-tests.define-product-integration-red-tests
+    name: define-product-integration-red-tests
+    status: pending
+    description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
+      \ red\nagent_source: project\n\nDefine expected-red Go/integration tests for\
+      \ product behavior that must migrate from Gemini-shaped assumptions to the shared\
+      \ LLMClient/OpenRouter path. Modified files must be limited to tests, fixtures,\
+      \ and minimal test helpers.\n\nSpec refs and touch_paths:\n- spec_refs: user\
+      \ architecture_basis product operations, transport boundary rules, state strata,\
+      \ AGENTS.md.\n- touch_paths: internal/resofeed/*_test.go, test fixtures for\
+      \ HTTP/MCP if present, docs test/search harness if present.\n- harness_refs:\
+      \ Go test harness, HTTP httptest server, MCP test harness, SQLite temp DB fixtures.\n\
+      - authoritative_interface: LLMClient boundary and product operation equivalence\
+      \ from architecture_basis.\n\nRequired expected-red coverage:\n1. Ingest:\n\
+      \   - summary/core insight are saved from an OpenRouter-shaped response after\
+      \ Go validation.\n   - model failure records safe model_status/receipt behavior\
+      \ and does not hide the item.\n2. Steering:\n   - HTTP and MCP steering use\
+      \ the same LLMClient/OpenRouter path.\n   - idempotent retries do not re-call\
+      \ the model.\n   - invalid model proposal is rejected safely and does not violate\
+      \ human-steering precedence.\n3. `/doctor`:\n   - raw text uses `openrouter:`\
+      \ prefix.\n   - distinguishes configured model from account default/resolved\
+      \ model when available.\n   - no `gemini:` text remains.\n4. State export/import:\n\
+      \   - portable JSON contains active sources, active steering rules, resonated\
+      \ items only.\n   - no OpenRouter API key, model, provider config, or secret-bearing\
+      \ runtime preference appears.\n5. Transport parity:\n   - HTTP and MCP expose\
+      \ the same Inspect, Resonate, Steer, Retrieve operations after migration.\n\n\
+      Expected result: red before implementation because product wiring and `/doctor`\
+      \ still reflect Gemini or incomplete OpenRouter behavior. Success means the\
+      \ tests expose gaps without product code changes."
+    verification: local-check protecting openrouter-llm-contract-and-red-tests.gate
+      and downstream implementation. Expected-red output must isolate product integration
+      gaps, not unrelated failures.
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\n## Expected-Red Product Test Evidence\n- Modified\
+      \ files limited to tests/fixtures/helpers:\n- Commands run:\n```\n<go test commands>\n\
+      ```\n- Expected failures or exposed_gaps:\n  - ingest summary/core insight:\n\
+      \  - steering HTTP/MCP/idempotency:\n  - doctor openrouter raw text:\n  - state\
+      \ export/import secret exclusion:\n  - transport parity:\n- Secret handling:\
+      \ no OPENROUTER_KEY read or printed; only fake keys/fixtures used.\n- Downstream\
+      \ implementation owner: openrouter-llm-implementation.*"
+    depends_on:
+    - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
+    agent: golang-developer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
