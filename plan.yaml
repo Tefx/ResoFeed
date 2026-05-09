@@ -9388,11 +9388,14 @@ phases:
 
 
       As an INDEPENDENT TESTER, rerun the affected spec-conformance and wiring-proof
-      closure after the batched remediation in fix-end-to-end-blockers.
+      closure after the batched remediation in fix-end-to-end-blockers and after the
+      independent UI/UX audit has passed.
 
 
       YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works. This retest succeeds
-      only when the proof artifacts can support gate opening.
+      only when the proof artifacts can support gate opening. The retest MUST NOT
+      report gate_open_allowed=true unless uiux-audit-end-to-end-blockers reports
+      verdict=PASS, blockers=[], should_fix=[], and gate_open_allowed=true.
 
 
       ## Required retest scope
@@ -9421,6 +9424,10 @@ phases:
       `ServeHTTPRuntime`, `RebuildSearchIndex`, `DeliveryReportRequest`, and `/api/state/import`
       frontend path for final-gate intersection.
 
+      8. UI/UX audit dependency closure: verify uiux-audit-end-to-end-blockers completed
+      successfully and its rendered evidence covers DESIGN.md contract adherence for
+      nav/search/state affordances, human-visible agent attribution, and accessibility/labels.
+
 
       ## Closure fields required in terminal evidence
 
@@ -9429,6 +9436,8 @@ phases:
       - verdict: PASS | FAIL
 
       - blockers: [] or [B1, B2, B3, W1, W2...]
+
+      - uiux_audit_verdict: PASS | FAIL
 
       - gate_open_allowed: true | false
 
@@ -9456,8 +9465,12 @@ phases:
 
       NEEDS_TEST, UNPROVEN, and UNCERTAIN_BLOCKING must include explicit remediation/retest
       ownership or explicit non-intersection evidence. Do not mark gate_open_allowed=true
-      while blocker-class behavioral obligations remain unresolved.'
+      while blocker-class behavioral obligations remain unresolved or while the UI/UX
+      audit has not passed.'
     verification: '- expected_result: green
+
+      - uiux-audit-end-to-end-blockers reports verdict=PASS, blockers=[], should_fix=[],
+      gate_open_allowed=true, with rendered evidence for DESIGN.md contract adherence.
 
       - Top-level nav compliance is proven with rendered UI/test evidence: SEARCH
       and STATE are not top-level nav buttons.
@@ -9477,8 +9490,8 @@ phases:
       - Static/runtime evidence shows no remaining blocker-class write-only/orphan
       seams that intersect end-to-end-gate or finalization/deep-review gates.
 
-      - Closure fields are present and gate_open_allowed=true only when blockers=[]
-      and verdict=PASS.'
+      - Closure fields are present and gate_open_allowed=true only when blockers=[],
+      uiux_audit_verdict=PASS, and verdict=PASS.'
     evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
       \ (independent of implementation)\n**Scope**: End-to-end blocker retest for\
       \ spec conformance and wiring audit failures\n**Independence Level**: L2\n**Timestamp**:\
@@ -9525,6 +9538,7 @@ phases:
       \ high/medium/low\n"
     depends_on:
     - fix-end-to-end-blockers
+    - uiux-audit-end-to-end-blockers
     agent: integration-verifier
   - id: uiux-audit-end-to-end-blockers
     name: UI/UX audit end-to-end blocker remediation
