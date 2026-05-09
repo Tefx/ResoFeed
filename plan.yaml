@@ -1854,7 +1854,7 @@ phases:
       ## Headline\nPASS_WITH_DEBT"
   - id: core-domain-implementation.core-wiring-audit
     name: Core wiring audit
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       agent_source: default
@@ -1998,8 +1998,6 @@ phases:
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     - fix-core-domain-verification-blockers
     agent: wiring-auditor
-    claimed_by: wiring-auditor
-    claimed_at: '2026-05-08T22:27:14.414357+00:00'
   - id: core-domain-implementation.core-spec-conformance
     name: Core spec conformance
     status: claimed
