@@ -6362,7 +6362,7 @@ phases:
       \ clean after verification."
 - id: frontend-implementation
   name: Frontend Implementation
-  status: in_progress
+  status: done
   gate: Svelte UI implements DESIGN.md surfaces, owner-token prompt, first-use state,
     feed/inspector/source/state/search flows, and passes rendered UI/UX audit.
   context: Implements responsive web/mobile UI from DESIGN.md against the documented
@@ -8192,7 +8192,7 @@ phases:
       \ false"
   - id: frontend-implementation.retest-frontend-gate-proof-artifacts
     name: Retest frontend gate proof artifacts
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -8344,9 +8344,77 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T10:50:06.105954+00:00'
+    done_at: '2026-05-09T10:54:12.531127+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Canonical docs are law; UI must use functional chrome and avoid folders/tags/unread/settings\
+      \ flows.\n- docs/ARCHITECTURE.md — ResoFeed is one Go process, one SQLite DB,\
+      \ thin HTTP/MCP transports, and no accounts/vector DB/sync services.\n- docs/DESIGN.md\
+      \ — Resonate button is a rare accent; Inspector/source ledger/state portability/token/empty\
+      \ states are contract surfaces.\n- docs/DESIGN_VISION.md — Desktop is split-pane\
+      \ with Inspector; mobile is single-column; Resonate appears on item cards plus\
+      \ mobile Inspector.\n- docs/USAGE.md — UI supports Inspect, Resonate, Steer,\
+      \ lexical retrieval, owner token, and Source Ledger without inbox-zero/settings-dashboard\
+      \ behavior.\n\n## Orchestrator Mainline Final-State Barrier\n- Worker branch\
+      \ status before merge: clean.\n- Squash merge commit on main: `2bb42de` (`[vectl]\
+      \ step-frontend-implementation.retest-frontend-gate-proof-artifacts completed`).\n\
+      - Mainline verification:\n  - `npm --prefix web ci` — PASS; installed 150 packages.\n\
+      \  - `node .audit-artifacts/frontend-gate/generate-proof-artifacts.mjs` — PASS;\
+      \ generated proof artifacts.\n  - `go test ./... -count=1` — PASS.\n  - `npm\
+      \ --prefix web run check` — PASS; 0 errors, 0 warnings.\n  - `npm --prefix web\
+      \ run build` — PASS; static site written.\n  - `npm --prefix web run test` —\
+      \ PASS; 2 files / 14 tests passed.\n\n## Frontend Gate Proof Artifact Retest\n\
+      **Reviewer**: gate-reviewer (independent of proof artifact/product implementation)\n\
+      **Retested gate**: frontend-implementation.frontend-gate\n**Proof artifact step**:\
+      \ frontend-implementation.fix-frontend-gate-proof-artifacts\n\n## Artifact Review\n\
+      - Semantic closure register path: `.audit-artifacts/frontend-gate/semantic-closure-register.yaml`\n\
+      - Desktop rendered artifact path: `.audit-artifacts/frontend-gate/current-populated-desktop-full.png`\n\
+      - Mobile rendered artifact path(s): `.audit-artifacts/frontend-gate/current-mobile-feed.png`,\
+      \ `.audit-artifacts/frontend-gate/current-mobile-inspector.png`, `.audit-artifacts/frontend-gate/current-mobile-source-ledger.png`\n\
+      - Stale artifact disposition: replaced/superseded per `semantic-closure-register.yaml`\
+      \ and `render-proof.json` current_artifacts. Legacy `.audit-artifacts/populated-desktop-full.png`\
+      \ and `.audit-artifacts/populated-mobile-full.png` now point to regenerated/superseding\
+      \ evidence.\n- Desktop proof: `render-proof.json` reports `desktop_split_inspector_resonate_button_count=0`\
+      \ and `desktop_feed_resonate_button_count=2`; screenshot shows no Inspector\
+      \ Resonate star in split-pane mode.\n- Mobile proof: `render-proof.json` reports\
+      \ `mobile_route_inspector_resonate_button_count=1` and `mobile_route_back_to_today_visible=true`;\
+      \ mobile screenshots cover feed, Inspector, and Source Ledger states.\n\n##\
+      \ Behavioral Proof Register Review\n| Item | requirement_ref present | all fields\
+      \ present | status | evidence_ref | verdict |\n|---|---|---|---|---|---|\n|\
+      \ B1 | yes | yes | closed | owner-token screenshots + render tests | PASS |\n\
+      | B2 | yes | yes | closed | first-use screenshots + render tests | PASS |\n\
+      | B3 | yes | yes | closed | current desktop/mobile screenshots + render-proof.json\
+      \ | PASS |\n| B5 | yes | yes | closed | current mobile Source Ledger + tests\
+      \ | PASS |\n| U1 | yes | yes | closed | current desktop/mobile screenshots +\
+      \ render-proof.json | PASS |\n| U2 | yes | yes | closed | current feed screenshots\
+      \ + render-proof.json + tests | PASS |\n| U3 | yes | yes | closed | Steer/doctor\
+      \ tests + desktop shell artifact | PASS |\n| safe-should-fix-dispositions |\
+      \ yes | yes | safe_should_fix_non_blocking | register + render-proof.json |\
+      \ PASS |\n\n## Command Evidence\n- `npm --prefix web ci` exit 0: installed 150\
+      \ packages; warning only: 3 low severity vulnerabilities.\n- `node .audit-artifacts/frontend-gate/generate-proof-artifacts.mjs`\
+      \ exit 0: regenerated proof artifacts.\n- `npm --prefix web run check` exit\
+      \ 0: svelte-check found 0 errors and 0 warnings.\n- `npm --prefix web run test`\
+      \ exit 0: 2 test files passed, 14 tests passed.\n- Field validation script exit\
+      \ 0: all B1/B2/B3/B5/U1/U2/U3 items present with no missing required fields;\
+      \ safe_should_fix_disposition present; required runtime counts match closure\
+      \ basis.\n- Worker committed scoped proof timestamp refresh as `0c8edf0`; merged\
+      \ as main `2bb42de`.\n\n## Gate Decision\nrecommendation: OPEN\nrationale: Durable\
+      \ non-plan proof artifacts exist and are current. The semantic closure register\
+      \ covers B1, B2, B3, B5, U1, U2, U3, and safe should-fix dispositions with all\
+      \ required fields. Runtime proof directly closes the stale desktop screenshot\
+      \ blocker by showing zero Inspector Resonate controls in desktop split-pane\
+      \ mode and acceptable mobile Inspector/feed/Source Ledger states. No blocker-class\
+      \ NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item remains.\n\n## Semantic Closure\
+      \ Fields\nheadline: PASS\nstep_intent: gate_review\nexpected_result: green\n\
+      observed_result: green\nverdict: PASS\nblockers: []\nwarnings:\n  - npm ci reported\
+      \ 3 low severity vulnerabilities; non-blocking for this proof-artifact gate.\n\
+      notes:\n  - Product implementation files were not modified.\n  - Scoped artifact\
+      \ modification committed: `.audit-artifacts/frontend-gate/render-proof.json`\
+      \ generated_at refresh.\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nproduct_implementation_files_modified:\
+      \ false"
 - id: end-to-end-integration
   name: End to End Integration
-  status: locked
+  status: pending
   gate: Full vertical behavior works through real CLI/server/API/MCP/UI paths with
     no stubs and no mock-only seam evidence.
   context: System-level fan-in after backend/runtime/frontend phases. Verifies real
