@@ -195,7 +195,7 @@ func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
 	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
 	seedHTTPHandlerCorpus(t, ctx, db, now)
 	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Prioritize replicated storage papers."}, Message: "gemini steering updated"}}
-	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: gemini})
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})
 
 	t.Run("inspect replay returns stored timestamp and no duplicate receipt", func(t *testing.T) {
 		body := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"http-inspect-001"}`

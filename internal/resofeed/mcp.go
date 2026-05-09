@@ -21,14 +21,14 @@ type MCPConfig struct {
 	DB             *sql.DB
 	OwnerToken     string
 	OwnerTokenHash string
-	Gemini         GeminiClient
+	LLM            LLMClient
 }
 
 // NewMCPHandler returns the /mcp Streamable HTTP handler. MCP exposes the same
 // product concepts as HTTP/UI: inspect, resonate, steer, retrieve, and report
 // delivery. It must not add per-agent registries or MCP-only product concepts.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, gemini: cfg.Gemini}
+	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -173,7 +173,7 @@ func ResonateItemForMCP(ctx context.Context, db *sql.DB, input MCPResonateItemIn
 
 // SteerForMCP applies natural-language steering with owner-token authority,
 // actor attribution, idempotency, and human-over-agent precedence.
-func SteerForMCP(ctx context.Context, db *sql.DB, gemini GeminiClient, input MCPSteerInput) (SteerResult, error) {
+func SteerForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPSteerInput) (SteerResult, error) {
 	if strings.TrimSpace(input.Command) == "" || len(input.Command) > 4000 {
 		return SteerResult{}, fieldError("command")
 	}
@@ -187,7 +187,7 @@ func SteerForMCP(ctx context.Context, db *sql.DB, gemini GeminiClient, input MCP
 		ActorKind ActorKind `json:"actor_kind"`
 		ActorID   string    `json:"actor_id"`
 	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
-		return ApplySteering(ctx, db, gemini, req)
+		return ApplySteering(ctx, db, llm, req)
 	})
 	if err != nil {
 		return SteerResult{}, err
@@ -247,7 +247,7 @@ type mcpHandler struct {
 	db             *sql.DB
 	ownerToken     string
 	ownerTokenHash string
-	gemini         GeminiClient
+	llm            LLMClient
 }
 
 type mcpRequest struct {
@@ -439,7 +439,7 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input MCPSteerInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = SteerForMCP(ctx, h.db, h.gemini, input)
+			result, err = SteerForMCP(ctx, h.db, h.llm, input)
 		}
 	case "report_delivery":
 		var input MCPReportDeliveryInput

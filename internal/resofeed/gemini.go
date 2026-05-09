@@ -12,29 +12,29 @@ import (
 	"time"
 )
 
-// GeminiClient is defined at the use boundary for the external JSON transformer.
-// Gemini never owns durable state, orchestration, or direct database writes.
-type GeminiClient interface {
+// LLMClient is defined at the use boundary for the external JSON transformer.
+// The model never owns durable state, orchestration, or direct database writes.
+type LLMClient interface {
 	SummarizeItem(ctx context.Context, input GeminiSummaryInput) (GeminiSummaryOutput, error)
 	TranslateSteering(ctx context.Context, input GeminiSteeringInput) (GeminiSteeringOutput, error)
 }
 
-// GeminiConfig contains Gemini request/response JSON transformer configuration.
-type GeminiConfig struct {
+// GeminiClient is retained as a source-compatible alias for model transform test
+// helpers. Runtime injection surfaces use LLMClient/OpenRouter names.
+type GeminiClient = LLMClient
+
+// OpenRouterConfig contains OpenRouter request/response JSON transformer configuration.
+type OpenRouterConfig struct {
 	APIKey string
 	Model  string
 }
 
-// NewGeminiClient constructs the Gemini JSON transformer client.
-func NewGeminiClient(cfg GeminiConfig) GeminiClient {
-	model := strings.TrimSpace(cfg.Model)
-	if model == "" {
-		model = DefaultGeminiModel
-	}
+// NewOpenRouterClient constructs the OpenRouter JSON transformer client.
+func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
 	return &geminiHTTPClient{
 		apiKey:   cfg.APIKey,
-		model:    model,
-		endpoint: "https://generativelanguage.googleapis.com/v1beta/models",
+		model:    cfg.Model,
+		endpoint: "https://openrouter.ai",
 		client: &http.Client{
 			Timeout: 45 * time.Second,
 		},
@@ -50,7 +50,7 @@ type geminiHTTPClient struct {
 
 func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummaryInput) (GeminiSummaryOutput, error) {
 	if strings.TrimSpace(input.AvailableText) == "" {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("gemini summarize: available_text required")
+		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: available_text required")
 	}
 	prompt := map[string]any{
 		"task": "summarize_rss_item",
@@ -63,7 +63,7 @@ func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummar
 	}
 	var out GeminiSummaryOutput
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
-		return GeminiSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("gemini summarize: %w", err)
+		return GeminiSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("openrouter summarize: %w", err)
 	}
 	out.Summary = strings.TrimSpace(out.Summary)
 	out.CoreInsight = strings.TrimSpace(out.CoreInsight)
@@ -73,17 +73,17 @@ func (c *geminiHTTPClient) SummarizeItem(ctx context.Context, input GeminiSummar
 		out.ModelStatus = "ok"
 	}
 	if out.ModelStatus != "ok" && out.ModelStatus != "summary_unavailable" && out.ModelStatus != "model_latency_error" {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("gemini summarize: invalid model_status %q", out.ModelStatus)
+		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
 	}
 	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
-		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("gemini summarize: summary and core_insight required")
+		return GeminiSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: summary and core_insight required")
 	}
 	return out, nil
 }
 
 func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSteeringInput) (GeminiSteeringOutput, error) {
 	if strings.TrimSpace(input.Command) == "" {
-		return GeminiSteeringOutput{}, errors.New("gemini steering: command required")
+		return GeminiSteeringOutput{}, errors.New("openrouter steering: command required")
 	}
 	prompt := map[string]any{
 		"task": "translate_steering",
@@ -96,7 +96,7 @@ func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSt
 	}
 	var out GeminiSteeringOutput
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
-		return GeminiSteeringOutput{}, fmt.Errorf("gemini steering: %w", err)
+		return GeminiSteeringOutput{}, fmt.Errorf("openrouter steering: %w", err)
 	}
 	out.InterpretedAs = strings.TrimSpace(out.InterpretedAs)
 	out.Message = strings.TrimSpace(out.Message)
@@ -104,14 +104,14 @@ func (c *geminiHTTPClient) TranslateSteering(ctx context.Context, input GeminiSt
 		out.RuleTexts[i] = strings.TrimSpace(out.RuleTexts[i])
 	}
 	if out.InterpretedAs == "" || out.Message == "" {
-		return GeminiSteeringOutput{}, errors.New("gemini steering: interpreted_as and message required")
+		return GeminiSteeringOutput{}, errors.New("openrouter steering: interpreted_as and message required")
 	}
 	return out, nil
 }
 
 func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst any) error {
 	if c == nil {
-		return errors.New("nil gemini client")
+		return errors.New("nil openrouter client")
 	}
 	if strings.TrimSpace(c.apiKey) == "" {
 		return errors.New("api key required")
@@ -124,12 +124,16 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 	if err != nil {
 		return fmt.Errorf("marshal prompt: %w", err)
 	}
-	reqBody, err := json.Marshal(geminiGenerateRequest{
-		Contents: []geminiContent{{Parts: []geminiPart{{Text: string(promptBytes)}}}},
-		GenerationConfig: geminiGenerationConfig{
-			ResponseMIMEType: "application/json",
+	reqPayload := openRouterChatRequest{
+		Messages: []openRouterMessage{{Role: "user", Content: string(promptBytes)}},
+		ResponseFormat: map[string]string{
+			"type": "json_object",
 		},
-	})
+	}
+	if strings.TrimSpace(c.model) != "" {
+		reqPayload.Model = strings.TrimSpace(c.model)
+	}
+	reqBody, err := json.Marshal(reqPayload)
 	if err != nil {
 		return fmt.Errorf("marshal request: %w", err)
 	}
@@ -141,6 +145,7 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 			return fmt.Errorf("create request: %w", err)
 		}
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(c.apiKey))
 		resp, err := client.Do(req)
 		if err != nil {
 			lastErr = err
@@ -158,16 +163,20 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 			return fmt.Errorf("close response: %w", closeErr)
 		}
 		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
-			lastErr = fmt.Errorf("status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+			lastErr = fmt.Errorf("status %d", resp.StatusCode)
 			if attempt == 0 {
 				continue
 			}
 			return lastErr
 		}
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
-			return fmt.Errorf("status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+			return fmt.Errorf("status %d", resp.StatusCode)
 		}
-		var generated geminiGenerateResponse
+		var providerErr openRouterErrorResponse
+		if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
+			return fmt.Errorf("provider error status %d", resp.StatusCode)
+		}
+		var generated openRouterChatResponse
 		if err := json.Unmarshal(body, &generated); err != nil {
 			return fmt.Errorf("decode response: %w", err)
 		}
@@ -185,16 +194,46 @@ func (c *geminiHTTPClient) generateJSON(ctx context.Context, payload any, dst an
 
 func (c *geminiHTTPClient) requestURL() string {
 	base := strings.TrimRight(c.endpoint, "/")
-	return fmt.Sprintf("%s/%s:generateContent?key=%s", base, c.model, c.apiKey)
+	if strings.HasSuffix(base, "/api/v1/chat/completions") {
+		return base
+	}
+	return base + "/api/v1/chat/completions"
 }
 
-type geminiGenerateRequest struct {
-	Contents         []geminiContent        `json:"contents"`
-	GenerationConfig geminiGenerationConfig `json:"generationConfig"`
+type openRouterChatRequest struct {
+	Model          string              `json:"model,omitempty"`
+	Messages       []openRouterMessage `json:"messages"`
+	ResponseFormat map[string]string   `json:"response_format"`
 }
 
-type geminiGenerationConfig struct {
-	ResponseMIMEType string `json:"responseMimeType"`
+type openRouterMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type openRouterChatResponse struct {
+	Choices []struct {
+		Message openRouterMessage `json:"message"`
+	} `json:"choices"`
+	Candidates []struct {
+		Content geminiContent `json:"content"`
+	} `json:"candidates"`
+}
+
+func (r openRouterChatResponse) firstText() string {
+	if len(r.Choices) > 0 {
+		return strings.TrimSpace(r.Choices[0].Message.Content)
+	}
+	if len(r.Candidates) > 0 && len(r.Candidates[0].Content.Parts) > 0 {
+		return strings.TrimSpace(r.Candidates[0].Content.Parts[0].Text)
+	}
+	return ""
+}
+
+type openRouterErrorResponse struct {
+	Error struct {
+		Message string `json:"message"`
+	} `json:"error"`
 }
 
 type geminiContent struct {
@@ -203,19 +242,6 @@ type geminiContent struct {
 
 type geminiPart struct {
 	Text string `json:"text"`
-}
-
-type geminiGenerateResponse struct {
-	Candidates []struct {
-		Content geminiContent `json:"content"`
-	} `json:"candidates"`
-}
-
-func (r geminiGenerateResponse) firstText() string {
-	if len(r.Candidates) == 0 || len(r.Candidates[0].Content.Parts) == 0 {
-		return ""
-	}
-	return strings.TrimSpace(r.Candidates[0].Content.Parts[0].Text)
 }
 
 func stripJSONFence(text string) string {

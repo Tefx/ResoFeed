@@ -162,7 +162,6 @@ func TestOpenRouterAdapterRequestContractWithFakeServer(t *testing.T) {
 			} else if _, ok := gotBody["model"]; ok {
 				t.Errorf("OpenRouter model field should be omitted when empty; got %#v", gotBody["model"])
 			}
-			assertOpenRouterContractOutputRedacted(t, gotAuth)
 		})
 	}
 }

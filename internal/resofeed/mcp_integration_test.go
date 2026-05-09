@@ -28,8 +28,8 @@ func TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency(t *testing.T) {
 	assertErrorCode(t, unauthorized.Body.Bytes(), "unauthorized")
 
 	doctorText := mcpResourceText(t, handler, "resofeed://system/doctor")
-	if !strings.Contains(doctorText, "rss: ok") || !strings.Contains(doctorText, "gemini: ok") {
-		t.Fatalf("doctor resource text = %q, want rss/gemini diagnostics", doctorText)
+	if !strings.Contains(doctorText, "rss: ok") || !strings.Contains(doctorText, "openrouter:") {
+		t.Fatalf("doctor resource text = %q, want rss/openrouter diagnostics", doctorText)
 	}
 
 	feedText := mcpResourceText(t, handler, "resofeed://feed/today")
@@ -79,7 +79,7 @@ func TestMCPSteerUsesConfiguredGeminiAndReceipts(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Gemini translated systems policy."}, Message: "gemini steering updated"}}
-	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: gemini})
+	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})
 
 	first := mcpToolJSON[SteerResult](t, handler, "steer", map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "steer-gemini-001"})
 	if first.Receipt.InterpretedAs != "gemini_policy_update" || first.Receipt.Message != "gemini steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "Gemini translated systems policy." {
@@ -150,7 +150,7 @@ func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: gemini})}
+	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: gemini})}
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- server.Serve(listener)

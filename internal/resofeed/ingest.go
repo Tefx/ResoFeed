@@ -31,11 +31,11 @@ const (
 
 // IngestConfig defines the background ingestion loop inside the single Go
 // process. Defaults are 15 minute loop interval, 20 second source timeout, and
-// Gemini limits owned by GeminiConfig.
+// LLM limits owned by OpenRouterConfig.
 type IngestConfig struct {
 	Interval           time.Duration
 	SourceFetchTimeout time.Duration
-	Gemini             GeminiClient
+	LLM                LLMClient
 }
 
 // RunIngestLoop fetches active sources independently until ctx is canceled. One
@@ -182,7 +182,7 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 		}
 	}
 	for _, entry := range feed.Items {
-		item, err := buildItem(ctx, source, entry, cfg.Gemini)
+		item, err := buildItem(ctx, source, entry, cfg.LLM)
 		if err != nil {
 			return err
 		}
@@ -296,7 +296,7 @@ func parseFeed(data []byte) (parsedFeed, error) {
 	}
 }
 
-func buildItem(ctx context.Context, source Source, entry feedEntry, gemini GeminiClient) (Item, error) {
+func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClient) (Item, error) {
 	if strings.TrimSpace(entry.URL) == "" {
 		entry.URL = source.URL + "#" + stableID("entry", entry.Title+entry.Description)
 	}
@@ -326,11 +326,11 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, gemini Gemin
 		item.ModelStatus = modelStatusSummaryNA
 		return item, nil
 	}
-	if gemini == nil {
+	if llm == nil {
 		item.ModelStatus = modelStatusSummaryNA
 		return item, nil
 	}
-	out, err := gemini.SummarizeItem(ctx, GeminiSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
+	out, err := llm.SummarizeItem(ctx, GeminiSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
 	if err != nil {
 		item.ModelStatus = modelStatusLatencyError
 		return item, nil

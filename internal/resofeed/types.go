@@ -7,9 +7,6 @@ const (
 	// admitted by the current contract.
 	StateSchemaVersionV1 = "resofeed.state.v1"
 
-	// DefaultGeminiModel is the documented default model for `resofeed serve`.
-	DefaultGeminiModel = "gemini-2.5-flash"
-
 	// DefaultAddr is the documented bind address for web UI, JSON HTTP, and MCP.
 	DefaultAddr = "127.0.0.1:8080"
 
@@ -18,15 +15,14 @@ const (
 )
 
 // ServeConfig is the CLI contract for `resofeed serve`. CLI flags are the
-// primary runtime configuration surface: --addr, --public-url, --db,
-// --gemini-api-key, --gemini-model, and optional --owner-token.
+// primary non-secret runtime configuration surface: --addr, --public-url,
+// --db, --openrouter-model, and optional --owner-token.
 type ServeConfig struct {
 	Addr            string
 	PublicURL       string
 	DBPath          string
-	GeminiAPIKey    string
-	GeminiAPIKeySet bool
-	GeminiModel     string
+	OpenRouterKey   string
+	OpenRouterModel string
 	OwnerToken      string
 }
 

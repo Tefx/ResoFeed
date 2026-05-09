@@ -50,7 +50,8 @@ func ReadDoctorSnapshot(ctx context.Context, db *sql.DB) (DoctorSnapshot, error)
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, rssLines...)
-	modelLines, err := readItemStatusDiagnostics(ctx, db, "gemini", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
+	lines = append(lines, "openrouter: configured_model=account_default")
+	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}

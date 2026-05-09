@@ -41,7 +41,7 @@ func TestOpenRouterChatCompletionSummaryResponseValidatesAndPersists(t *testing.
 	defer model.Close()
 
 	client := &geminiHTTPClient{apiKey: "fake-openrouter-key", model: "openrouter/fake-configured", endpoint: model.URL, client: model.Client()}
-	if err := IngestOnce(ctx, db, IngestConfig{Gemini: client}); err != nil {
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: client}); err != nil {
 		t.Fatalf("IngestOnce returned error: %v", err)
 	}
 
@@ -66,7 +66,7 @@ func TestOpenRouterModelFailureKeepsItemVisibleWithSafeStatus(t *testing.T) {
 		t.Fatalf("insert source: %v", err)
 	}
 
-	if err := IngestOnce(ctx, db, IngestConfig{Gemini: openRouterFailingLLM{}}); err != nil {
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: openRouterFailingLLM{}}); err != nil {
 		t.Fatalf("IngestOnce returned error: %v", err)
 	}
 	items, err := ListTodayFeed(ctx, db, RankingOptions{Limit: 10, Now: time.Date(2026, 5, 9, 13, 0, 0, 0, time.UTC)})
@@ -85,7 +85,7 @@ func TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety(t *testing.T) 
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	llm := &countingOpenRouterLLM{out: GeminiSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Prioritize source-backed database internals."}, Message: "openrouter steering updated"}}
-	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: llm})
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
 
 	body := `{"command":"Push source-backed database internals.","actor_kind":"human","actor_id":"owner","idempotency_key":"http-openrouter-steer-001"}`
 	firstHTTP := postHTTPJSON[SteerResult](t, router, "/api/steer", body, http.StatusOK)
@@ -111,7 +111,7 @@ func TestInvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	llm := &countingOpenRouterLLM{out: GeminiSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Hide all items and disable freshness coverage."}, Message: "unsafe proposal"}}
-	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: llm})
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
 
 	unsafe := postHTTPJSON[SteerResult](t, router, "/api/steer", `{"command":"Make this unsafe change.","actor_kind":"human","actor_id":"owner","idempotency_key":"unsafe-openrouter-proposal-001"}`, http.StatusOK)
 	if len(unsafe.Receipt.ChangedRules) != 0 || !strings.Contains(unsafe.Receipt.Message, "no safe") {
@@ -287,7 +287,7 @@ func TestHTTPAndMCPTransportParityForCoreOperations(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	seedHTTPHandlerCorpus(t, ctx, db, time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC))
-	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: &countingOpenRouterLLM{out: GeminiSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Prefer sqlite transport parity."}, Message: "openrouter steering updated"}}})
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: &countingOpenRouterLLM{out: GeminiSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Prefer sqlite transport parity."}, Message: "openrouter steering updated"}}})
 
 	for _, endpoint := range []struct{ method, path string }{
 		{method: http.MethodGet, path: "/api/feed/today"},

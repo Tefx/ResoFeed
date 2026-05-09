@@ -30,7 +30,7 @@ type HTTPServerConfig struct {
 	DB             *sql.DB
 	OwnerToken     string
 	OwnerTokenHash string
-	Gemini         GeminiClient
+	LLM            LLMClient
 	Lifecycle      RuntimeLifecycleRecorder
 }
 
@@ -53,7 +53,7 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api)
-	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, Gemini: cfg.Gemini}))
+	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM}))
 	mux.Handle("/", staticUIHandler())
 	return mux
 }
@@ -429,7 +429,7 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 		ActorKind ActorKind `json:"actor_kind"`
 		ActorID   string    `json:"actor_id"`
 	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
-		return ApplySteering(r.Context(), h.cfg.DB, h.cfg.Gemini, req)
+		return ApplySteering(r.Context(), h.cfg.DB, h.cfg.LLM, req)
 	})
 	if err != nil {
 		var fieldErr mcpFieldError

@@ -16,40 +16,32 @@ const (
 	fakeDotEnvSecret = "rfake_dotenv_secret_for_runtime_resolution_tests_only"
 )
 
-func TestGeminiRuntimeSecretResolutionFromOSEnvironment(t *testing.T) {
-	t.Setenv("GEMINI_API_KEY", fakeEnvSecret)
+func TestOpenRouterRuntimeSecretResolutionFromOSEnvironment(t *testing.T) {
+	t.Setenv("OPENROUTER_KEY", fakeEnvSecret)
 	stdout, stderr, code := runServeUntilBindFailure(t, nil)
 
 	if code != 1 || !strings.Contains(stderr, "runtime_failed") {
-		t.Fatalf("OS environment Gemini key should pass startup validation before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+		t.Fatalf("OS environment OpenRouter key should pass startup validation before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 	}
 	assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 }
 
-func TestGeminiRuntimeSecretResolutionFromLocalDotEnvFallback(t *testing.T) {
+func TestOpenRouterRuntimeSecretResolutionFromLocalDotEnvFallback(t *testing.T) {
 	withoutGeminiAPIKeyEnv(t)
-	writeLocalDotEnv(t, "# local runtime secret fallback\n\nGEMINI_API_KEY="+fakeDotEnvSecret+"\n")
+	withoutOpenRouterKeyEnv(t)
+	writeLocalDotEnv(t, "# local runtime secret fallback\n\nOPENROUTER_KEY="+fakeDotEnvSecret+"\n")
 
 	stdout, stderr, code := runServeUntilBindFailure(t, nil)
 	if code != 1 || !strings.Contains(stderr, "runtime_failed") {
-		t.Fatalf("local .env Gemini key should pass startup validation before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+		t.Fatalf("local .env OpenRouter key should pass startup validation before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 	}
 	assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 }
 
-func TestGeminiRuntimeSecretPrecedenceAndEmptyValues(t *testing.T) {
-	t.Run("CLI compatibility override beats OS environment", func(t *testing.T) {
-		t.Setenv("GEMINI_API_KEY", fakeEnvSecret)
-		stdout, stderr, code := runServeUntilBindFailure(t, []string{"--gemini-api-key", fakeCLISecret})
-		if code != 1 || !strings.Contains(stderr, "runtime_failed") {
-			t.Fatalf("CLI compatibility override should pass startup validation before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
-		}
-		assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
-	})
-
+func TestOpenRouterRuntimeSecretPrecedenceAndEmptyValues(t *testing.T) {
 	t.Run("OS environment beats local dotenv", func(t *testing.T) {
-		t.Setenv("GEMINI_API_KEY", fakeEnvSecret)
-		writeLocalDotEnv(t, "GEMINI_API_KEY="+fakeDotEnvSecret+"\n")
+		t.Setenv("OPENROUTER_KEY", fakeEnvSecret)
+		writeLocalDotEnv(t, "OPENROUTER_KEY="+fakeDotEnvSecret+"\n")
 		stdout, stderr, code := runServeUntilBindFailure(t, nil)
 		if code != 1 || !strings.Contains(stderr, "runtime_failed") {
 			t.Fatalf("OS environment should take precedence over local .env before bind failure: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
@@ -59,47 +51,44 @@ func TestGeminiRuntimeSecretPrecedenceAndEmptyValues(t *testing.T) {
 
 	for _, tc := range []struct {
 		name string
-		args []string
 		env  string
 		dot  string
 	}{
-		{name: "empty CLI", args: []string{"--gemini-api-key", ""}},
-		{name: "whitespace CLI", args: []string{"--gemini-api-key", " \t "}},
 		{name: "empty OS environment", env: ""},
 		{name: "whitespace OS environment", env: " \t "},
-		{name: "empty dotenv", dot: "GEMINI_API_KEY=\n"},
-		{name: "whitespace dotenv", dot: "GEMINI_API_KEY= \t \n"},
+		{name: "empty dotenv", dot: "OPENROUTER_KEY=\n"},
+		{name: "whitespace dotenv", dot: "OPENROUTER_KEY= \t \n"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			withoutGeminiAPIKeyEnv(t)
+			withoutOpenRouterKeyEnv(t)
 			if tc.env != "" || strings.Contains(tc.name, "empty OS") {
-				t.Setenv("GEMINI_API_KEY", tc.env)
+				t.Setenv("OPENROUTER_KEY", tc.env)
 			}
 			if tc.dot != "" {
 				writeLocalDotEnv(t, tc.dot)
 			}
-			stdout, stderr, code := runServeUntilBindFailure(t, tc.args)
-			if code != 2 || !strings.Contains(stderr, "invalid_gemini_api_key") {
-				t.Fatalf("empty/whitespace Gemini key should fail deterministically: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+			stdout, stderr, code := runServeUntilBindFailure(t, nil)
+			if code != 2 || !strings.Contains(stderr, "invalid_openrouter_key") {
+				t.Fatalf("empty/whitespace OpenRouter key should fail deterministically: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 			}
 			assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 		})
 	}
 }
 
-func TestGeminiRuntimeSecretMissingFailureIsDeterministicAndRedacted(t *testing.T) {
-	withoutGeminiAPIKeyEnv(t)
+func TestOpenRouterRuntimeSecretMissingFailureIsDeterministicAndRedacted(t *testing.T) {
+	withoutOpenRouterKeyEnv(t)
 	stdout, stderr, code := runServeUntilBindFailure(t, nil)
-	if code != 2 || !strings.Contains(stderr, "invalid_gemini_api_key: value required") {
-		t.Fatalf("missing Gemini key should fail with deterministic validation error: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+	if code != 2 || !strings.Contains(stderr, "invalid_openrouter_key: value required") {
+		t.Fatalf("missing OpenRouter key should fail with deterministic validation error: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 	}
 	assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 }
 
 func TestDotEnvParserSafetyContract(t *testing.T) {
 	t.Run("comments and blank lines ignored with minimal key value parsing", func(t *testing.T) {
-		withoutGeminiAPIKeyEnv(t)
-		writeLocalDotEnv(t, "\n# comment before key\n   # indented comment\nGEMINI_API_KEY="+fakeDotEnvSecret+"\n")
+		withoutOpenRouterKeyEnv(t)
+		writeLocalDotEnv(t, "\n# comment before key\n   # indented comment\nOPENROUTER_KEY="+fakeDotEnvSecret+"\n")
 		stdout, stderr, code := runServeUntilBindFailure(t, nil)
 		if code != 1 || !strings.Contains(stderr, "runtime_failed") {
 			t.Fatalf("minimal .env KEY=VALUE parser should accept comments and blank lines: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
@@ -108,9 +97,9 @@ func TestDotEnvParserSafetyContract(t *testing.T) {
 	})
 
 	t.Run("shell command substitution is not executed", func(t *testing.T) {
-		withoutGeminiAPIKeyEnv(t)
+		withoutOpenRouterKeyEnv(t)
 		sentinel := filepath.Join(t.TempDir(), "dotenv-command-substitution-sentinel")
-		writeLocalDotEnv(t, "GEMINI_API_KEY=$(touch "+sentinel+")\n")
+		writeLocalDotEnv(t, "OPENROUTER_KEY=$(touch "+sentinel+")\n")
 		stdout, stderr, code := runServeUntilBindFailure(t, nil)
 		if code != 1 || !strings.Contains(stderr, "runtime_failed") {
 			t.Fatalf(".env command substitution text should be treated without shell execution: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
@@ -124,11 +113,11 @@ func TestDotEnvParserSafetyContract(t *testing.T) {
 	})
 
 	t.Run("unsupported shell syntax does not set secret and does not leak value", func(t *testing.T) {
-		withoutGeminiAPIKeyEnv(t)
-		writeLocalDotEnv(t, "export GEMINI_API_KEY="+fakeDotEnvSecret+"\n")
+		withoutOpenRouterKeyEnv(t)
+		writeLocalDotEnv(t, "export OPENROUTER_KEY="+fakeDotEnvSecret+"\n")
 		stdout, stderr, code := runServeUntilBindFailure(t, nil)
-		if code != 2 || !strings.Contains(stderr, "invalid_gemini_api_key") {
-			t.Fatalf("unsupported .env shell syntax should not configure Gemini key: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+		if code != 2 || !strings.Contains(stderr, "invalid_openrouter_key") {
+			t.Fatalf("unsupported .env shell syntax should not configure OpenRouter key: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 		}
 		assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 	})

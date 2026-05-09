@@ -87,7 +87,7 @@ func TestIngestOnceIsolatesSourceFailuresAndMapsModelFailure(t *testing.T) {
 		}
 	})
 
-	err := IngestOnce(ctx, db, IngestConfig{Gemini: failingGemini{}})
+	err := IngestOnce(ctx, db, IngestConfig{LLM: failingGemini{}})
 	if err != nil {
 		t.Fatalf("IngestOnce returned error: %v", err)
 	}
@@ -105,37 +105,37 @@ func TestIngestOnceIsolatesSourceFailuresAndMapsModelFailure(t *testing.T) {
 	}
 }
 
-func TestGeminiClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
+func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 	t.Parallel()
 
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
-		if r.URL.Query().Get("key") != "test-key" {
-			t.Fatalf("missing key in request URL: %s", r.URL.String())
+		if r.URL.Path != "/api/v1/chat/completions" || r.Header.Get("Authorization") != "Bearer test-key" {
+			t.Fatalf("unexpected OpenRouter request path/auth: path=%s auth=%q", r.URL.Path, r.Header.Get("Authorization"))
 		}
-		var req geminiGenerateRequest
+		var req openRouterChatRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			t.Fatalf("decode request: %v", err)
 		}
-		if req.GenerationConfig.ResponseMIMEType != "application/json" || len(req.Contents) != 1 || len(req.Contents[0].Parts) != 1 {
-			t.Fatalf("unexpected gemini request: %+v", req)
+		if req.ResponseFormat["type"] != "json_object" || len(req.Messages) != 1 {
+			t.Fatalf("unexpected openrouter request: %+v", req)
 		}
 		if calls == 1 {
 			http.Error(w, "try again", http.StatusTooManyRequests)
 			return
 		}
 		text := `{"summary":"Dense factual summary.","core_insight":"Why this matters.","value_tier":"high","model_status":"ok"}`
-		if strings.Contains(req.Contents[0].Parts[0].Text, "translate_steering") {
+		if strings.Contains(req.Messages[0].Content, "translate_steering") {
 			text = `{"interpreted_as":"steering_policy_update","rule_texts":["Push more systems papers."],"message":"steering updated"}`
 		}
-		_ = json.NewEncoder(w).Encode(geminiGenerateResponse{Candidates: []struct {
-			Content geminiContent `json:"content"`
-		}{{Content: geminiContent{Parts: []geminiPart{{Text: text}}}}}})
+		_ = json.NewEncoder(w).Encode(openRouterChatResponse{Choices: []struct {
+			Message openRouterMessage `json:"message"`
+		}{{Message: openRouterMessage{Role: "assistant", Content: text}}}})
 	}))
 	defer server.Close()
 
-	client := &geminiHTTPClient{apiKey: "test-key", model: "gemini-test", endpoint: server.URL, client: server.Client()}
+	client := &geminiHTTPClient{apiKey: "test-key", model: "openrouter-test", endpoint: server.URL, client: server.Client()}
 	summary, err := client.SummarizeItem(context.Background(), GeminiSummaryInput{ItemID: "item_01", Title: "Title", SourceTitle: "Source", URL: "https://example.com", AvailableText: "body"})
 	if err != nil {
 		t.Fatalf("SummarizeItem returned error: %v", err)

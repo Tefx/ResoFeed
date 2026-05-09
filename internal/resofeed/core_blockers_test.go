@@ -48,7 +48,7 @@ func TestIngestPersistsValueTierAndFreshSearchIndex(t *testing.T) {
 	defer feed.Close()
 	insertSource(t, ctx, db, "src_ingest", feed.URL+"/feed.xml", "Old Source")
 
-	if err := IngestOnce(ctx, db, IngestConfig{Gemini: staticGemini{summary: "Dense sqlite summary", coreInsight: "Why sqlite matters", valueTier: "high"}}); err != nil {
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: staticGemini{summary: "Dense sqlite summary", coreInsight: "Why sqlite matters", valueTier: "high"}}); err != nil {
 		t.Fatalf("IngestOnce returned error: %v", err)
 	}
 	var valueTier string
@@ -296,7 +296,7 @@ func TestDoctorReportsRawRSSGeminiAndExtractionFailures(t *testing.T) {
 		t.Fatalf("WriteDoctor returned error: %v", err)
 	}
 	text := out.String()
-	for _, want := range []string{"rss: errors=1", "connection refused", "gemini: item=item_diag", "model_latency_error", "extraction: item=item_diag", "partial_extraction", "ingest: last_run=2026-05-09T12:00:00Z"} {
+	for _, want := range []string{"rss: errors=1", "connection refused", "openrouter: item=item_diag", "model_latency_error", "extraction: item=item_diag", "partial_extraction", "ingest: last_run=2026-05-09T12:00:00Z"} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("doctor output missing %q:\n%s", want, text)
 		}

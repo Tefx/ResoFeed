@@ -29,14 +29,14 @@ func TestDocsRuntimeSecretConfigurationGuidance(t *testing.T) {
 			want: []string{"only `KEY=VALUE` lines", "must not source shell scripts", "run commands", "command substitution"},
 		},
 		{
-			name: "architecture locks runtime secret precedence and portability",
+			name: "architecture locks OpenRouter runtime secret precedence and portability",
 			doc:  architecture,
-			want: []string{"explicit current `--gemini-api-key` value", "OS environment variable `GEMINI_API_KEY` overrides local `.env`", "State export/import must never include LLM secret values or secret-source metadata"},
+			want: []string{"OPENROUTER_KEY", "OS environment variable `OPENROUTER_KEY` first, then local `.env` fallback", "State export/import must never include LLM secret values"},
 		},
 		{
-			name: "architecture locks future OpenRouter away from CLI secrets",
+			name: "architecture locks OpenRouter away from CLI secrets",
 			doc:  architecture,
-			want: []string{"OpenRouter implementation must reuse this same runtime secret-source contract", "Future docs must not regress to examples that require CLI secret flags"},
+			want: []string{"CLI-passed API keys are forbidden for OpenRouter", "LLM API keys are runtime input only"},
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -49,7 +49,7 @@ func TestDocsRuntimeSecretConfigurationGuidance(t *testing.T) {
 	}
 }
 
-func TestDocsDoNotRequireCLIAPIKeysForGeminiOrOpenRouter(t *testing.T) {
+func TestDocsDoNotRequireCLIAPIKeysForOpenRouter(t *testing.T) {
 	root := projectRootForRuntimeSecretDocsTest(t)
 	for _, rel := range []string{"docs/USAGE.md", "docs/ARCHITECTURE.md"} {
 		t.Run(rel, func(t *testing.T) {
@@ -58,8 +58,8 @@ func TestDocsDoNotRequireCLIAPIKeysForGeminiOrOpenRouter(t *testing.T) {
 				if strings.Contains(strings.ToLower(block), "openrouter") && regexp.MustCompile(`--[^\s]*api-key`).MatchString(block) {
 					t.Fatalf("%s contains an OpenRouter code block requiring a CLI API-key flag", rel)
 				}
-				if strings.Contains(block, "--gemini-api-key") && !strings.Contains(strings.ToLower(block), "discouraged") {
-					t.Fatalf("%s contains a Gemini CLI API-key code block without discouraged transitional context", rel)
+				if strings.Contains(block, "--gemini-api-key") {
+					t.Fatalf("%s contains a removed Gemini CLI API-key code block", rel)
 				}
 			}
 		})

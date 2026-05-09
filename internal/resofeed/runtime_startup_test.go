@@ -23,25 +23,27 @@ func TestServeStartupValidationFailsBeforeSocketBind(t *testing.T) {
 			name: "invalid public url",
 			args: func(t *testing.T, addr string) []string {
 				t.Helper()
-				return []string{"serve", "--addr", addr, "--public-url", "http://127.0.0.1:8080/path", "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--gemini-api-key", "test-key", "--owner-token", contractOwnerToken}
+				t.Setenv("OPENROUTER_KEY", "test-key")
+				return []string{"serve", "--addr", addr, "--public-url", "http://127.0.0.1:8080/path", "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--owner-token", contractOwnerToken}
 			},
 			wantCode:   2,
 			wantStderr: "invalid_public_url",
 		},
 		{
-			name: "invalid gemini config",
+			name: "invalid openrouter config",
 			args: func(t *testing.T, addr string) []string {
 				t.Helper()
 				return []string{"serve", "--addr", addr, "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--owner-token", contractOwnerToken}
 			},
 			wantCode:   2,
-			wantStderr: "invalid_gemini_api_key",
+			wantStderr: "invalid_openrouter_key",
 		},
 		{
 			name: "invalid owner token",
 			args: func(t *testing.T, addr string) []string {
 				t.Helper()
-				return []string{"serve", "--addr", addr, "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--gemini-api-key", "test-key", "--owner-token", "short"}
+				t.Setenv("OPENROUTER_KEY", "test-key")
+				return []string{"serve", "--addr", addr, "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--owner-token", "short"}
 			},
 			wantCode:   2,
 			wantStderr: "invalid_owner_token",
@@ -54,7 +56,8 @@ func TestServeStartupValidationFailsBeforeSocketBind(t *testing.T) {
 				if err := os.WriteFile(parentFile, []byte("file"), 0o644); err != nil {
 					t.Fatalf("write db parent sentinel: %v", err)
 				}
-				return []string{"serve", "--addr", addr, "--db", filepath.Join(parentFile, "resofeed.sqlite3"), "--gemini-api-key", "test-key", "--owner-token", contractOwnerToken}
+				t.Setenv("OPENROUTER_KEY", "test-key")
+				return []string{"serve", "--addr", addr, "--db", filepath.Join(parentFile, "resofeed.sqlite3"), "--owner-token", contractOwnerToken}
 			},
 			wantCode:   2,
 			wantStderr: "invalid_db",
@@ -81,7 +84,8 @@ func TestServeStartupValidationFailsBeforeSocketBind(t *testing.T) {
 
 func TestServeStartupRejectsInvalidAddrBeforeDBAndSocket(t *testing.T) {
 	var stdout, stderr bytes.Buffer
-	code := Main([]string{"serve", "--addr", "127.0.0.1", "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--gemini-api-key", "test-key", "--owner-token", contractOwnerToken}, &stdout, &stderr)
+	t.Setenv("OPENROUTER_KEY", "test-key")
+	code := Main([]string{"serve", "--addr", "127.0.0.1", "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--owner-token", contractOwnerToken}, &stdout, &stderr)
 	if code != 2 || !strings.Contains(stderr.String(), "invalid_addr") {
 		t.Fatalf("invalid addr code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
 	}
@@ -97,13 +101,14 @@ func TestServeFirstRunOwnerTokenGenerationAndReuseAtProcessLevel(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "resofeed.sqlite3")
 
 	var firstOut, firstErr bytes.Buffer
-	firstCode := Main([]string{"serve", "--addr", addr, "--db", dbPath, "--gemini-api-key", "test-key"}, &firstOut, &firstErr)
+	t.Setenv("OPENROUTER_KEY", "test-key")
+	firstCode := Main([]string{"serve", "--addr", addr, "--db", dbPath}, &firstOut, &firstErr)
 	if firstCode != 1 || !strings.Contains(firstOut.String(), "owner token generated: rfeed_") || !strings.Contains(firstErr.String(), "runtime_failed") {
 		t.Fatalf("first process startup code=%d stdout=%q stderr=%q", firstCode, firstOut.String(), firstErr.String())
 	}
 
 	var secondOut, secondErr bytes.Buffer
-	secondCode := Main([]string{"serve", "--addr", addr, "--db", dbPath, "--gemini-api-key", "test-key"}, &secondOut, &secondErr)
+	secondCode := Main([]string{"serve", "--addr", addr, "--db", dbPath}, &secondOut, &secondErr)
 	if secondCode != 1 || !strings.Contains(secondOut.String(), "owner token reused: stored hash") || !strings.Contains(secondErr.String(), "runtime_failed") {
 		t.Fatalf("second process startup code=%d stdout=%q stderr=%q", secondCode, secondOut.String(), secondErr.String())
 	}
@@ -130,7 +135,7 @@ func TestServeReadinessBeforeBackgroundIngest(t *testing.T) {
 		PublicURL:  "http://127.0.0.1",
 		DB:         db,
 		OwnerToken: contractOwnerToken,
-		Gemini:     nil,
+		LLM:        nil,
 		Lifecycle:  recorder,
 	}
 

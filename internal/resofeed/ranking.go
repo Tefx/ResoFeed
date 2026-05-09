@@ -88,9 +88,9 @@ order by coalesce(i.published_at, i.first_seen_at) desc, i.id asc`)
 }
 
 // ApplySteering accepts natural-language steering and RSS URL subscription
-// commands. Gemini may propose structured changes, but Go validates and applies
+// commands. The LLM may propose structured changes, but Go validates and applies
 // them in one SQLite transaction.
-func ApplySteering(ctx context.Context, db *sql.DB, gemini GeminiClient, req SteerRequest) (SteerResult, error) {
+func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequest) (SteerResult, error) {
 	command := strings.TrimSpace(req.Command)
 	if command == "" {
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "empty", ChangedRules: []SteerRule{}, Message: "err: empty steering command"}}, nil
@@ -106,12 +106,12 @@ func ApplySteering(ctx context.Context, db *sql.DB, gemini GeminiClient, req Ste
 	}
 
 	proposal := GeminiSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
-	if gemini != nil {
+	if llm != nil {
 		active, err := loadActiveSteerRules(ctx, db)
 		if err != nil {
 			return SteerResult{}, err
 		}
-		translated, err := gemini.TranslateSteering(ctx, GeminiSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
+		translated, err := llm.TranslateSteering(ctx, GeminiSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
 		if err != nil {
 			return SteerResult{}, fmt.Errorf("translate steering: %w", err)
 		}

@@ -41,15 +41,12 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 	if !ok {
 		return exitCode
 	}
-	if cfg.GeminiModel == "" {
-		cfg.GeminiModel = DefaultGeminiModel
-	}
-	geminiAPIKey, err := ResolveGeminiRuntimeSecret(cfg)
+	openRouterKey, err := ResolveOpenRouterRuntimeSecret()
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 		return 2
 	}
-	cfg.GeminiAPIKey = geminiAPIKey
+	cfg.OpenRouterKey = openRouterKey
 	if cfg.PublicURL == "" {
 		publicURL, err := derivePublicURL(cfg.Addr)
 		if err != nil {
@@ -76,14 +73,13 @@ Run "resofeed serve --help" for serve flags.
 }
 
 func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeConfig, int, bool) {
-	cfg := ServeConfig{Addr: DefaultAddr, DBPath: DefaultDBPath, GeminiModel: DefaultGeminiModel}
+	cfg := ServeConfig{Addr: DefaultAddr, DBPath: DefaultDBPath}
 	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	fs.StringVar(&cfg.Addr, "addr", DefaultAddr, "bind address for web UI, HTTP API, and MCP endpoint")
 	fs.StringVar(&cfg.PublicURL, "public-url", "", "public base URL for external agents")
 	fs.StringVar(&cfg.DBPath, "db", DefaultDBPath, "SQLite database path")
-	fs.StringVar(&cfg.GeminiAPIKey, "gemini-api-key", "", "Gemini API key")
-	fs.StringVar(&cfg.GeminiModel, "gemini-model", DefaultGeminiModel, "Gemini model")
+	fs.StringVar(&cfg.OpenRouterModel, "openrouter-model", "", "optional OpenRouter model (empty uses account default)")
 	fs.StringVar(&cfg.OwnerToken, "owner-token", "", "explicit owner token")
 	fs.Usage = func() {
 		_, _ = io.WriteString(stdout, `Usage: resofeed serve [flags]
@@ -107,11 +103,6 @@ Flags:
 		_, _ = fmt.Fprintf(stderr, "err: unexpected_argument: %s\n", fs.Arg(0))
 		return ServeConfig{}, 2, false
 	}
-	fs.Visit(func(f *flag.Flag) {
-		if f.Name == "gemini-api-key" {
-			cfg.GeminiAPIKeySet = true
-		}
-	})
 	return cfg, 0, true
 }
 
@@ -122,8 +113,8 @@ func validateServeConfig(cfg ServeConfig) error {
 	if err := validatePublicURL(cfg.PublicURL); err != nil {
 		return err
 	}
-	if strings.TrimSpace(cfg.GeminiAPIKey) == "" {
-		return errors.New("invalid_gemini_api_key: value required")
+	if strings.TrimSpace(cfg.OpenRouterKey) == "" {
+		return errors.New("invalid_openrouter_key: value required")
 	}
 	if cfg.OwnerToken != "" {
 		if err := validateOwnerToken(cfg.OwnerToken); err != nil {
@@ -196,14 +187,14 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		_, _ = io.WriteString(stdout, "owner token reused: stored hash\n")
 	}
 
-	gemini := NewGeminiClient(GeminiConfig{APIKey: cfg.GeminiAPIKey, Model: cfg.GeminiModel})
-	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, Gemini: gemini}
+	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel})
+	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- ServeHTTPAndIngestRuntime(runCtx, runtimeCfg, func(ctx context.Context) error {
-			return RunIngestLoop(ctx, db, IngestConfig{Gemini: gemini})
+			return RunIngestLoop(ctx, db, IngestConfig{LLM: llm})
 		})
 	}()
 

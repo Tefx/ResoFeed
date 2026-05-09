@@ -8,33 +8,29 @@ import (
 	"strings"
 )
 
-const geminiAPIKeyEnvName = "GEMINI_API_KEY"
+const openRouterKeyEnvName = "OPENROUTER_KEY"
 
-// ResolveGeminiRuntimeSecret applies the documented runtime-only Gemini secret
-// precedence before provider construction: explicit compatibility CLI value,
-// OS environment, then local .env fallback. It never logs or returns source
-// metadata for persistence.
-func ResolveGeminiRuntimeSecret(cfg ServeConfig) (string, error) {
-	if cfg.GeminiAPIKeySet {
-		return requireRuntimeSecretValue(cfg.GeminiAPIKey)
-	}
-	if value, ok := os.LookupEnv(geminiAPIKeyEnvName); ok {
+// ResolveOpenRouterRuntimeSecret applies the documented runtime-only OpenRouter
+// secret precedence before provider construction: OS environment, then local
+// .env fallback. It never logs or returns source metadata for persistence.
+func ResolveOpenRouterRuntimeSecret() (string, error) {
+	if value, ok := os.LookupEnv(openRouterKeyEnvName); ok {
 		return requireRuntimeSecretValue(value)
 	}
 	values, err := readLocalDotEnvRuntimeSecrets(".env")
 	if err != nil {
 		return "", err
 	}
-	if value, ok := values[geminiAPIKeyEnvName]; ok {
+	if value, ok := values[openRouterKeyEnvName]; ok {
 		return requireRuntimeSecretValue(value)
 	}
-	return "", errors.New("invalid_gemini_api_key: value required")
+	return "", errors.New("invalid_openrouter_key: value required")
 }
 
 func requireRuntimeSecretValue(value string) (string, error) {
 	trimmed := strings.TrimSpace(value)
 	if trimmed == "" {
-		return "", errors.New("invalid_gemini_api_key: value required")
+		return "", errors.New("invalid_openrouter_key: value required")
 	}
 	return trimmed, nil
 }
