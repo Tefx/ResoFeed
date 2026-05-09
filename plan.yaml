@@ -4134,7 +4134,7 @@ phases:
       **Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**: COMPLETE"
   - id: runtime-api-and-mcp-integration.runtime-spec-conformance
     name: Runtime spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -4199,6 +4199,71 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T09:16:35.916978+00:00'
+    done_at: '2026-05-09T09:25:43.911359+00:00'
+    evidence: "## Spec Conformance Report\n\n**Semantic outcome:** FAIL report delivered;\
+      \ blocker-class issue was batched into remediation before completion.\n\n###\
+      \ Orchestrator Remediation Ownership\n- Parallel failure aggregation applied\
+      \ for `runtime-api-and-mcp-integration.runtime-spec-conformance` and `runtime-api-and-mcp-integration.runtime-wiring-audit`.\n\
+      - Planner created batched fix step: `runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring`.\n\
+      - Planner created retest step: `runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring`.\n\
+      - Planner updated runtime gate dependency to include the retest.\n\n### Orchestrator\
+      \ Mainline Final-State Barrier\n- Worker branch had no local modifications (`git\
+      \ status --short` clean).\n- Squash merge result: `Already up to date. (nothing\
+      \ to squash)`.\n- Mainline verification command: `go test ./...`\n```text\n\
+      ?   \tresofeed/cmd/resofeed\t[no test files]\nok  \tresofeed/internal/resofeed\t\
+      (cached)\n```\n\n### refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — READ. Key passage: single Go binary, one SQLite DB, owner token boundary,\
+      \ strict `/api/feed/today` and `/api/search` query validation, no vectl direct\
+      \ edits.\n- docs/ARCHITECTURE.md — READ. Key passage: authoritative runtime/API/MCP\
+      \ contract: `serve` flags/startup order, owner-token behavior, HTTP error/query/content\
+      \ contracts, state restore schema, MCP resources/tools.\n- docs/PRD.md — READ.\
+      \ Key passage: delegated agents must use owner-token/MCP-compatible workflows;\
+      \ state portability is architecture-defined JSON bundle; no folders/tags/RAG/multi-user\
+      \ surfaces.\n- docs/DESIGN.md — READ. Key passage: UI must expose owner-token\
+      \ prompt, `/doctor`, flat Source Ledger, terse state portability, no onboarding/settings/dashboard\
+      \ concepts.\n- docs/DESIGN_VISION.md — READ. Key passage: visual/interaction\
+      \ intent forbids accounts/onboarding, folders/tags, numeric indicators; owner\
+      \ token as terse local gate.\n- docs/USAGE.md — READ. Key passage: concrete\
+      \ usage surface confirms `resofeed serve`, owner token generation/reuse, protected\
+      \ HTTP endpoints, state import/export, MCP Streamable HTTP at `/mcp`.\n\n###\
+      \ Requirements Register Summary\n- CONFORMS: R1, R2, R5, R6, R7, R9, R10, R12,\
+      \ R13, R14, R15, R18, R19, R20.\n- PARTIAL: R8 full error matrix, R11 endpoint\
+      \ negative coverage, R16 MCP tool validation/report_delivery coverage, R17 full\
+      \ HTTP/MCP equivalence matrix.\n- NEEDS_TEST / blocker-class proof gap: R4 startup\
+      \ order/lifecycle.\n- DIVERGES: none found.\n- NOT_FOUND: none for scoped runtime/API/MCP\
+      \ surfaces.\n- AMBIGUOUS_SPEC: none blocking, but MCP limit overflow behavior\
+      \ should be clarified as reject-vs-clamp.\n\n### Blocking Finding\n- B1: Runtime\
+      \ lifecycle/startup-order is not behaviorally proven. Static code starts HTTP\
+      \ and ingest goroutines sequentially, but does not prove server socket is bound\
+      \ before ingest starts.\n- Source: `docs/ARCHITECTURE.md:136-145`, `internal/resofeed/db.go:159-199`.\n\
+      - Closure path: add deterministic lifecycle test with instrumented ingest hook\
+      \ or observable server readiness before ingest starts.\n\n### Evidence Table\n\
+      - Command run: `go test ./...` in isolated worktree. Output: `? resofeed/cmd/resofeed\
+      \ [no test files]`; `ok resofeed/internal/resofeed 0.525s`.\n- Command run:\
+      \ `git status --short` in isolated worktree. Output: no changes.\n- Implementation\
+      \ inspected: `cmd/resofeed/main.go`, `internal/resofeed/{db,http,mcp,state,ranking,search,ingest,gemini,migrations,types}.go`.\n\
+      - Test evidence inspected: `runtime_startup_test.go`, `http_impl_test.go`, `mcp_integration_test.go`,\
+      \ `backend_contract_test.go`, `core_blockers_test.go`, `json_contract_test.go`.\n\
+      \n### Suggested Tests\n- Add deterministic lifecycle test proving migrations/token/search\
+      \ prep complete, HTTP `/api/doctor` or `/mcp` is ready, then ingest loop starts.\n\
+      - Add table tests for full HTTP error matrix: malformed JSON, missing fields,\
+      \ missing idempotency_key, bad content type, 10 MiB body limit, not_found.\n\
+      - Add MCP `report_delivery` runtime test and invalid limit tests documenting\
+      \ reject vs clamp behavior.\n- Add migration-failure startup test asserting\
+      \ exit `1`, `err: migration_failed: <migration id>`, and no socket bind.\n\n\
+      ## Semantic Closure Fields\nHeadline: FAIL\nstep_intent: retest_green\nexpected_result:\
+      \ green\nobserved_result: red\nfailure_alignment: new blocker\nverdict: FAIL\n\
+      blockers:\n  - id: B1\n    requirement: R4 startup lifecycle order\n    reason:\
+      \ Behavioral proof absent for HTTP/MCP readiness before background ingest starts.\n\
+      \    closure_path: Add deterministic lifecycle runtime test or instrumentation\
+      \ proving bind/readiness precedes ingest start.\nproof_gap_status: BLOCKING\n\
+      blocking_status: OPEN\ngate_open_allowed: false\norchestrator_action_hint: DO_NOT_COMPLETE\n\
+      product_implementation_files_modified: false\nbehavioral_proof_register:\n \
+      \ - requirement: startup order and runtime lifecycle\n    status: NEEDS_TEST\n\
+      \    spec_citation: docs/ARCHITECTURE.md:136-145\n    implementation_citation:\
+      \ internal/resofeed/db.go:159-199\n    runtime_proof: NEEDS_TEST - add readiness-before-ingest\
+      \ lifecycle test\n    uncertainty: NEEDS_TEST - goroutine launch order is not\
+      \ sufficient behavioral proof"
   - id: runtime-api-and-mcp-integration.runtime-wiring-audit
     name: Runtime wiring audit
     status: claimed
