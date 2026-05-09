@@ -12341,6 +12341,97 @@ phases:
     depends_on:
     - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     agent: golang-developer
+  - id: openrouter-llm-contract-and-red-tests.contract-red-tests-gate
+    name: contract-red-tests-gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: phase-check protecting openrouter-llm-implementation
+
+
+      As an INDEPENDENT REVIEWER, assess whether the OpenRouter contract and expected-red
+      tests define the migration acceptance surface clearly before implementation
+      starts.
+
+
+      Review criteria:
+
+      1. Contract purity: contract/docs step did not ship runnable OpenRouter product
+      logic.
+
+      2. Expected-red clarity: tests declare `expected_result: red`, are test-only,
+      and expose Gemini removal/OpenRouter gaps.
+
+      3. Architecture constraints: no multi-provider registry, no Gemini compatibility
+      flags, no DI/service/repository layering, no secret persistence/export.
+
+      4. Runtime surface preservation: tests cover `resofeed serve`, CLI flags, HTTP/MCP
+      parity, ingest, steering, /doctor, state export/import, and docs.
+
+      5. Secret safety: no `.env` read and no real key printed.
+
+
+      review_depth: STANDARD
+
+      cross_cutting_focus:
+
+      - Gemini references must be intentionally removed, not retained behind compatibility
+      flags.
+
+      - OpenRouter model empty/default semantics must be test-defined before implementation.'
+    verification: phase-check protecting openrouter-llm-implementation. Gate decision
+      basis must map each blocker-class behavioral obligation to contract/test evidence
+      and return OPEN only when expected-red evidence is complete.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of contract/test authors)
+
+      **Phase**: openrouter-llm-contract-and-red-tests
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN: implementation may proceed
+
+      - [ ] BLOCKED: list blockers and required remediation
+
+
+      ## Secret Review
+
+      - Confirm no real OpenRouter key or .env content was read/printed:'
+    depends_on:
+    - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
+    - openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests
+    - openrouter-llm-contract-and-red-tests.define-product-integration-red-tests
+    agent: gate-reviewer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
