@@ -19838,7 +19838,7 @@ phases:
       workdir.'
   - id: frontend-expected-red-tests
     name: Frontend Expected-Red Client and Rendering Tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -19961,3 +19961,106 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T21:22:48.605017+00:00'
+    done_at: '2026-05-09T21:27:02.861330+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/DESIGN.md — Source Ledger is a flat source-management surface; row fields
+      include source name/URL/optional last fetch status, empty/error copy is terse,
+      and loading must use raw text with no skeleton/spinner/progress animation.
+
+      - docs/ui-preview.html — Source Ledger visual reference uses `.panel ledger`,
+      `SOURCE LEDGER`, flat `.ledger-row` structure, monospace operational text, and
+      terse text actions.
+
+      - docs/ARCHITECTURE.md — Frontend must send owner-token auth on `/api/*`; canonical
+      JSON timestamps are RFC3339 UTC; Source schema includes `last_fetch_at`/`last_fetch_status`;
+      common errors use terse envelopes.
+
+      - docs/PRD.md — Manual source entry remains Steer-only; Source Ledger is flat
+      and barebones; source failures must not block other sources.
+
+      - .agents/instructions.md — Canonical docs are DESIGN/ARCHITECTURE; UI must
+      stay dense, operational, and avoid friendly SaaS copy or forbidden source-management
+      affordances.
+
+      - web/src/lib/api-contract.ts — Upstream Manual RSS Fetch contract locks `/api/ingest`,
+      `/api/sources/{id}/fetch`, empty `{}` POST bodies, 409 conflict, render labels
+      `[RUN INGEST]`/`[FETCH]`, HH:MM:SS timestamps, and forbidden spinner/progress
+      patterns.
+
+      - web/src/lib/manual-rss-fetch-contract.test.ts — Existing contract tests pin
+      schema/types only and explicitly do not add live API-client methods, DOM transitions,
+      or styling.
+
+
+      ## Expected-Red Test Evidence
+
+      - step_intent: test_define_red
+
+      - expected_result: red
+
+      - observed_result: red via `npm --prefix web run test:render -- manual-rss-fetch`
+      exit 1 expected; type/Svelte check `npm --prefix web run check` exit 0.
+
+      - failure_alignment: red failures are exactly the missing Manual RSS Fetch frontend
+      gap: `ResoFeedApiClient.runIngest` / `fetchSource` are not implemented, and
+      Source Ledger does not render `[RUN INGEST]`, `[FETCH]`, active disabled labels,
+      HH:MM:SS manual fetch timestamps, or terse source-level manual fetch errors.
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - Test files changed: `web/src/lib/manual-rss-fetch-client.expected-red.test.ts`;
+      `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`;
+      `web/src/test/manual-rss-fetch-fixtures.ts`
+
+      - Production files changed: NONE
+
+      - Exact tests added: `POSTs /api/ingest with an empty JSON object body and no
+      query params`; `POSTs /api/sources/{id}/fetch with an encoded id, empty body,
+      and no query params`; `returns documented 200 source-level error payload without
+      treating it as a transport error`; `returns documented 409 conflict and 404
+      not_found envelopes for manual fetch routes`; `renders default manual fetch
+      actions as bracket uppercase native controls`; `renders active ingest/fetch
+      labels disabled with no spinner or progress animation affordance`; `renders
+      RFC3339 ingest and source fetch timestamps as HH:MM:SS`; `renders terse truncated
+      source-level errors without friendly SaaS copy or layout-shifting containers`;
+      `keeps the visual contract: bracket labels, ledger row shape, uppercase text,
+      and no animation affordance`.
+
+      - Spec-derived minimal fixtures and cited sections: `web/src/test/manual-rss-fetch-fixtures.ts`
+      cites `web/src/lib/api-contract.ts` Manual RSS Fetch frontend contract lock;
+      fixtures include only documented response/error fields for `RunIngestSuccessResponse`,
+      `FetchSourceSuccessResponse`, and `ManualRssFetchErrorBody`.
+
+      - Expected command: `npm --prefix web run test:render -- manual-rss-fetch`
+
+      - Expected failures / exposed gaps before implementation: missing `runIngest`;
+      missing `fetchSource`; missing `/api/ingest` and `/api/sources/{id}/fetch` empty-body/no-query
+      client behavior; missing 409/404 manual fetch result handling; missing Source
+      Ledger manual fetch controls/states/timestamps/errors/visual contract.
+
+      - Render/mount evidence included: Source Ledger was mounted; failure DOM snapshot
+      shows `<section class="contract-region contract-source-ledger">` with `SOURCE
+      LEDGER`, OPML input, source URL/status, delete button, export/import state links,
+      and no `[RUN INGEST]` / `[FETCH]` controls.
+
+      - Downstream implementation owner: `manual-rss-fetch.frontend-implementation`
+
+      - Worker commit: `ca88cd7`.
+
+      - Squash merge commit on main: `9249155 [vectl] step-frontend-expected-red-tests
+      completed`.
+
+      - Worker verification: `npm --prefix web run check` exit 0; `npm --prefix web
+      run test:render -- manual-rss-fetch` exit 1 expected red.
+
+      - Mainline final-state verification after merge: `npm --prefix web run check`
+      exit 0 (`svelte-check found 0 errors and 0 warnings`); `npm --prefix web run
+      test:render -- manual-rss-fetch` exit 1 expected red, with 9 failed tests for
+      missing client methods and missing Source Ledger manual fetch controls/states.
+
+      - Gaps/Notes: worker installed frontend dependencies inside isolated worktree
+      after verifying `web/node_modules` missing; no package files changed.'
