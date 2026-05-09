@@ -14780,7 +14780,7 @@ phases:
     agent: gate-reviewer
   - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
     name: fix-readme-secret-cli-regression
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       priority: HIGH
@@ -14914,6 +14914,8 @@ phases:
     depends_on:
     - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-09T17:28:51.893111+00:00'
   - id: runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
     name: retest-readme-secret-cli-regression
     status: pending
