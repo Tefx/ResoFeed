@@ -14067,3 +14067,60 @@ phases:
       - Files changed limited to docs/instructions/contracts; no runnable resolver
       logic shipped.'
     agent: doc-reviewer
+  - id: runtime-secret-env-config-foundation.define-runtime-secret-red-tests
+    name: define-runtime-secret-red-tests
+    status: pending
+    description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
+      \ red\nagent_source: project\n\nDefine expected-red Go and docs/search tests\
+      \ for runtime LLM secret resolution. Modified files must be limited to tests,\
+      \ fixtures, and minimal test helpers. Do not modify product implementation code\
+      \ in this step.\n\nSpec refs and touch_paths:\n- spec_refs: docs/ARCHITECTURE.md,\
+      \ docs/USAGE.md, AGENTS.md, and the contract from runtime-secret-env-config-foundation.lock-runtime-secret-source-policy.\n\
+      - touch_paths: cmd/resofeed/*_test.go if present, internal/resofeed/*_test.go,\
+      \ docs/search or grep test harness if present, state export/import tests.\n\
+      - harness_refs: Go test harness, temporary directory fixtures, fake `.env` files\
+      \ containing fake keys only, stdout/stderr capture, state backup/export/import\
+      \ harness.\n- authoritative_interface: runtime secret-source precedence and\
+      \ `.env` parser contract from the contract step.\n\nRequired expected-red coverage:\n\
+      1. CLI/runtime startup secret resolution:\n   - Current Gemini runtime can start\
+      \ without passing an API key on the command line when `GEMINI_API_KEY` exists\
+      \ in the OS environment.\n   - Current Gemini runtime can start without passing\
+      \ an API key on the command line when a local `.env` contains a fake `GEMINI_API_KEY`.\n\
+      \   - Precedence is deterministic and safe: current CLI flag value, if still\
+      \ supported, overrides OS env; OS env overrides `.env`; `.env` is fallback.\n\
+      \   - Empty or whitespace-only key values from CLI/env/.env are invalid.\n \
+      \  - Missing key failure is deterministic and does not include secret-like values.\n\
+      2. `.env` parser safety:\n   - Minimal `KEY=VALUE` parsing only.\n   - Blank/comment\
+      \ lines ignored.\n   - No shell expansion and no command substitution/command\
+      \ execution.\n   - Parser errors and logs redact values.\n3. Secret leakage\
+      \ checks:\n   - stdout/stderr from startup failure and success paths do not\
+      \ contain fake secret values.\n   - test logs do not print the fake key.\n4.\
+      \ State portability checks:\n   - State export/import backup bundles do not\
+      \ include LLM API keys, `.env` values, secret source paths, provider secret\
+      \ config, or transient env config.\n   - Portable state remains only active\
+      \ sources, active steering rules, and resonated items.\n5. Docs/search checks:\n\
+      \   - Usage docs prefer env/.env configuration and do not require putting API\
+      \ keys directly in shell history.\n   - Docs explicitly warn `.env` is local\
+      \ and must not be committed.\n   - Future OpenRouter docs/tests must not require\
+      \ CLI-passed API keys.\n\nExpected result: red before implementation because\
+      \ runtime secret resolver and `.env` fallback are not yet implemented. Success\
+      \ means the tests expose only the intended env/.env secret-configuration gaps\
+      \ without changing product code."
+    verification: local-check protecting runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases. Tests should run and fail for expected secret-source
+      gaps only; failures must not print fake secrets.
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\
+      \n\n## Expected-Red Test Evidence\n- Test files added/updated, limited to tests/fixtures/helpers:\
+      \ <list>\n- Fake secret fixture values used: REDACTED labels only, not the values.\n\
+      - Expected-red command(s):\n  ```\n  <go test/doc grep command output showing\
+      \ targeted failures>\n  ```\n- Exposed gaps:\n  - env var fallback gap: <yes/no>\n\
+      \  - .env fallback gap: <yes/no>\n  - precedence gap: <yes/no>\n  - empty/missing\
+      \ key handling gap: <yes/no>\n  - no secret leakage gap: <yes/no>\n  - state\
+      \ export/import non-portability gap: <yes/no>\n  - docs shell-history guidance\
+      \ gap: <yes/no>\n- Confirmation: no product implementation code modified."
+    depends_on:
+    - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+    agent: golang-developer
