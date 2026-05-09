@@ -12150,10 +12150,10 @@ phases:
       \ is primarily proven by code ordering plus response tests, not side-effect\
       \ counters for every read endpoint; accepted as non-blocking because implementation\
       \ calls query rejection before no-query handlers."
-- id: openrouter-llm-contract-and-tests
-  name: OpenRouter LLM Contract, Docs, and Expected-Red Tests
+- id: openrouter-llm-contract-and-red-tests
+  name: OpenRouter LLM Contract and Expected-Red Tests
   status: pending
-  gate: OpenRouter contract, documentation updates, and behavior-defining tests are
-    complete; tests are expected to expose Gemini-to-OpenRouter gaps before implementation.
+  gate: Contract artifacts and expected-red tests define the Gemini removal/OpenRouter
+    acceptance surface without product implementation logic.
   depends_on:
   - finalization-docs-and-deep-review
