@@ -9526,6 +9526,152 @@ phases:
     depends_on:
     - fix-end-to-end-blockers
     agent: integration-verifier
+  - id: uiux-audit-end-to-end-blockers
+    name: UI/UX audit end-to-end blocker remediation
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: default
+
+      verification_scope: phase-check protecting retest-end-to-end-blockers and end-to-end-integration.end-to-end-gate
+
+
+      As an INDEPENDENT UI/UX AUDITOR, perform a native multimodal implementation
+      audit of the remediation completed in fix-end-to-end-blockers. This step exists
+      because the remediation touches user-visible surfaces: top-level navigation,
+      search/state affordances, state portability controls, and human-visible agent
+      attribution.
+
+
+      Use docs/DESIGN.md as the authoritative visual/interaction contract, with docs/ARCHITECTURE.md
+      and docs/PRD.md as invariant backstops. Standard unit tests or DOM-only summaries
+      are insufficient: evidence MUST include rendered screenshots/images/terminal
+      captures or equivalent visual/spatial artifacts for the affected states.
+
+
+      Required audit checks:
+
+      1. Top-level surface navigation: SEARCH and STATE are not present as peer top-level
+      product surfaces; allowed labels/surfaces remain intact.
+
+      2. State portability affordances: backup/restore/import/export controls appear
+      only in allowed Source Ledger footer or /doctor-style locations, not as a top-level
+      state dashboard or settings-style product tab.
+
+      3. Search semantics: search is not presented as a RAG surface, AI-magic product
+      tab, vector/semantic search feature, or primary top-level product surface.
+
+      4. Agent attribution: delegated/MCP steering attribution is human-visible after
+      the next relevant UI interaction without introducing accounts, per-agent auth,
+      activity feeds, or portable agent receipts.
+
+      5. Accessibility and labels: functional labels, button/link names, focus/keyboard
+      reachability, and readable contrast remain intact for the changed surfaces.
+
+      6. ResoFeed invariant drift: no folders, tags, unread counts, onboarding wizard,
+      settings sliders, sync/merge UX, accounts, per-agent registry, vector DB, embeddings,
+      or RAG product framing were introduced.
+
+
+      Return a parseable PASS handoff only if all required checks pass. Finding issues
+      is a valid audit outcome; report blocker/should_fix findings with exact rendered
+      state and reproduction path.'
+    verification: '- Native multimodal rendered evidence is provided for affected
+      states (top-level navigation, allowed state affordance location, search presentation,
+      agent attribution receipt/interaction).
+
+      - DESIGN.md contract adherence is proven: no top-level SEARCH/STATE peer nav
+      surfaces; state portability affordances only in allowed locations; search is
+      not treated as RAG/product tab.
+
+      - Human-visible agent attribution is proven without accounts, per-agent auth,
+      activity feed, or portable receipts.
+
+      - Accessibility/labels evidence covers changed controls and labels.
+
+      - Parseable audit handoff reports verdict=PASS only when blocker=[] and should_fix=[]
+      for the required UI contract checks.'
+    evidence_template: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Rendered Evidence
+
+      - Top-level navigation artifact: <screenshot/image/terminal capture path or
+      inline output>
+
+      - State portability affordance artifact: <screenshot/image/terminal capture
+      path or inline output>
+
+      - Search presentation artifact: <screenshot/image/terminal capture path or inline
+      output>
+
+      - Agent attribution artifact: <screenshot/image/terminal capture path or inline
+      output>
+
+      - Accessibility/labels artifact: <axe output, role/name listing, keyboard path,
+      or equivalent>
+
+
+      ### Required Checks
+
+      | Check | Verdict | Evidence Ref | Notes |
+
+      | --- | --- | --- | --- |
+
+      | No top-level SEARCH/STATE peer nav | PASS/FAIL | <ref> | <notes> |
+
+      | State affordances only in allowed locations | PASS/FAIL | <ref> | <notes>
+      |
+
+      | Search not RAG/product tab | PASS/FAIL | <ref> | <notes> |
+
+      | Human-visible agent attribution without accounts/activity feed | PASS/FAIL
+      | <ref> | <notes> |
+
+      | Accessibility/labels intact | PASS/FAIL | <ref> | <notes> |
+
+      | No forbidden invariant drift | PASS/FAIL | <ref> | <notes> |
+
+
+      ### Findings
+
+      | Severity | Description | Rendered State | Reproduction |
+
+      | --- | --- | --- | --- |
+
+      | blocker/should_fix/suggestion | <issue> | <artifact/ref> | <steps> |
+
+
+      ### Parseable Handoff
+
+      verdict: PASS | FAIL
+
+      blockers: []
+
+      should_fix: []
+
+      gate_open_allowed: true | false
+
+      orchestrator_action_hint: COMPLETE_RETEST | DO_NOT_COMPLETE
+
+      agent_notes: <brief rationale>'
+    depends_on:
+    - fix-end-to-end-blockers
+    agent: uiux-auditor
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
   status: locked
