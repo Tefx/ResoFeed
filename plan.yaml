@@ -19692,3 +19692,126 @@ phases:
 
       - Production UI behavior introduced: NONE required'
     agent: frontend-engineer
+  - id: frontend-expected-red-tests
+    name: Frontend Expected-Red Client and Rendering Tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+      work_type: new_capability
+
+
+      Define frontend tests that expose the Manual RSS Fetch client/rendering gap
+      before implementation.
+
+
+      Scope is limited to web tests, fixtures, and minimal test helpers. Do NOT add
+      production UI implementation, production styling, or live client behavior in
+      this step.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one test fixture MUST:
+
+      - Use the EXACT documented API payload/response shape from the authoritative
+      spec.
+
+      - NOT include convenience fields beyond what the spec documents.
+
+      - Cite the spec section the fixture was derived from.
+
+
+      Test obligations:
+
+      - API client tests prove POST /api/ingest and POST /api/sources/{id}/fetch use
+      exact endpoint paths, empty `{}` request bodies, and no query params.
+
+      - API client tests cover 200 success, 200 source-level error payload, 409 conflict,
+      and 404 not_found handling.
+
+      - Rendering tests prove Source Ledger default state includes `[RUN INGEST]`
+      and per-source `[FETCH]` visible in DOM.
+
+      - Rendering tests prove active states replace labels with `[INGESTING...]` and
+      `[FETCHING...]`, disabled, with no spinner/progress animation.
+
+      - Rendering/time tests prove RFC3339 values render as HH:MM:SS.
+
+      - Error rendering tests prove terse truncated copy and no layout-shifting friendly/SaaS
+      copy.
+
+      - Visual contract tests or snapshots assert bracket action labels, padding class/DOM
+      shape, uppercase text, and no disallowed spinner/animation affordance.
+
+
+      Expected-red semantics:
+
+      - Red is expected before manual-rss-fetch.frontend-implementation completes.
+
+      - Success for this step means tests expose the missing client/rendering behavior
+      without modifying production UI code.
+
+      - Evidence must list expected_failures or exposed_gaps and name manual-rss-fetch.frontend-implementation
+      as the downstream implementation owner.
+
+
+      ## Frontend rendering proof seed
+
+      Tests must actually render/mount the Source Ledger or a contract-faithful wrapper;
+      data-only view-model assertions are insufficient.'
+    verification: '- Modified files are limited to frontend tests/fixtures/helpers.
+
+      - Client tests cover exact endpoint paths, empty body/no query params, 200/409/404
+      behavior, and documented response schemas.
+
+      - Rendering tests cover visible DOM states for [RUN INGEST], [FETCH], [INGESTING...],
+      [FETCHING...], HH:MM:SS timestamps, terse errors, and no spinner/animation affordance.
+
+      - Evidence records expected red failures before implementation and does not
+      claim green until implementation/retest.
+
+      - Downstream gates protected: manual-rss-fetch.uiux-audit, manual-rss-fetch.spec-conformance,
+      manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files changed: <files>
+
+      - Production files changed: NONE required
+
+      - Exact tests added: <test names>
+
+      - Spec-derived minimal fixtures and cited sections: <list>
+
+      - Expected command: <frontend test command>
+
+      - Expected failures / exposed gaps before implementation: <list>
+
+      - Render/mount evidence included: <DOM snapshot/test renderer output>
+
+      - Downstream implementation owner: manual-rss-fetch.frontend-implementation'
+    depends_on:
+    - frontend-contract
+    agent: frontend-engineer
