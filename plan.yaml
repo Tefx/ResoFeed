@@ -13111,7 +13111,7 @@ phases:
       OpenRouter implementation is unblocked.'
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
-  status: in_progress
+  status: done
   gate: OpenRouter is wired as the sole LLM backend through CLI runtime, ingest, steering,
     /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
   depends_on:
@@ -14413,7 +14413,7 @@ phases:
       Headline: PASS.'
   - id: openrouter-llm-implementation.implementation-gate
     name: implementation-gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -14541,6 +14541,172 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T18:49:39.206552+00:00'
+    done_at: '2026-05-09T18:53:39.990896+00:00'
+    evidence: 'Implementation gate PASS_WITH_DEBT accepted: gate_open_allowed=true,
+      verdict=PASS, blockers=[], proof_gap_status=NONE, blocking_status=CLOSED, orchestrator_action_hint=COMPLETE.
+
+
+      Reviewer: gate-reviewer (independent of phase implementation)
+
+      Phase: openrouter-llm-implementation
+
+      Worker commit: 82fd881 (`audit openrouter implementation gate`)
+
+      Main squash merge commit: d5cbf7c (`[vectl] step-openrouter-llm-implementation.implementation-gate
+      completed`)
+
+      Artifact merged: `.audit-artifacts/openrouter_implementation_verification/implementation-gate.md`.
+
+
+      Refs read confirmation:
+
+      - AGENTS.md — NOT READ: absent in isolated worktree.
+
+      - .agents/instructions.md — one-binary/SQLite boundaries, runtime-only LLM secrets,
+      owner-token boundary, UI chrome rules; warning noted stale Gemini guidance remains.
+
+      - docs/ARCHITECTURE.md — one deployable, OpenRouter-only LLM backend, `OPENROUTER_KEY`
+      runtime secret, `/doctor` `openrouter:` text, no vector/RAG/OAuth/sync.
+
+      - docs/DESIGN.md — raw diagnostic output, functional labels, muted archival
+      voice, no SaaS/AI-magic tone.
+
+      - docs/USAGE.md — OpenRouter env/.env configuration, no CLI API key, `/api/doctor`,
+      owner-token auth.
+
+      - serve-liveness-probe.md — PASS with real `resofeed serve`, `/api/doctor`,
+      `/`, `/mcp`, Gemini flag rejection.
+
+      - uiux-doctor-diagnostics-audit-retest.md — PASS, one OpenRouter line, no secrets/Gemini
+      runtime text.
+
+      - wiring-audit-retest.md — PASS, W mapping and prior Gemini adapter blocker
+      closed.
+
+
+      Behavioral proof register summary:
+
+      - G1 expected-red CLI/adapter/product tests green: PASS (`go test ./...`).
+
+      - G2 wiring audit complete: PASS (W1-W8 passed).
+
+      - G3 real liveness: PASS (built `resofeed serve`, `/api/doctor` 200, `/` 200,
+      `/mcp` 401).
+
+      - G4 UIUX visible output: PASS (terse raw OpenRouter diagnostics).
+
+      - G5 Gemini removal: PASS_WITH_WARNING (runtime/CLI scans pass; stale `.agents`
+      wording warning is non-runtime).
+
+      - G6 secret handling: PASS.
+
+      - G7 architecture boundary: PASS.
+
+      - G8 HTTP/MCP parity/auth: PASS.
+
+
+      CLI Surface Preservation Matrix:
+
+      - root help: PASS.
+
+      - serve help: PASS.
+
+      - `--openrouter-model`: PASS.
+
+      - legacy `--gemini-api-key`: PASS rejected with exit_code=2 and value not echoed.
+
+
+      Runnable surface / liveness evidence excerpt:
+
+      ```text
+
+      doctor_status=200
+
+      doctor_content_type=text/plain; charset=utf-8
+
+      rss: ok
+
+      openrouter: ok configured_model=account_default resolved_model=unknown
+
+      extraction: ok
+
+      ingest: last_run=never
+
+      / status=200 text/html
+
+      /mcp status=401 application/json {"error":{"code":"unauthorized","message":"owner
+      token required","details":{}}}
+
+      ```
+
+
+      Real integration vs fixture:
+
+      - Real: required liveness artifact and reviewer probe use built `./bin/resofeed
+      serve`.
+
+      - Integration: runtime test exercises HTTP + MCP doctor after ingest through
+      OpenRouter client.
+
+      - Fixture: adapter tests use fake OpenRouter servers, balanced by real liveness
+      entrypoint evidence.
+
+
+      Escape hatch audit:
+
+      - No source `@invar:allow` annotations found in scoped product/docs/web scan.
+
+
+      Gate decision:
+
+      - OPEN. Blocker-class runtime, secret, state, Gemini-removal, UIUX, CLI surface,
+      liveness, architecture, and HTTP/MCP parity obligations are proven.
+
+      - PASS_WITH_DEBT warning: stale `.agents/instructions.md` Gemini wording. Gate-intersection
+      reasoning accepted as non-blocking because it is non-runtime/non-product-surface
+      guidance, product docs/runtime supersede it, all runtime scans/tests/liveness
+      passed, and it does not predictably fail the remaining live-smoke readiness
+      checks.
+
+
+      Commands run by gate reviewer:
+
+      ```text
+
+      go test ./... — PASS
+
+      mkdir -p ./bin && go build -o ./bin/resofeed ./cmd/resofeed — PASS
+
+      ./bin/resofeed --help — PASS
+
+      ./bin/resofeed serve --help — PASS
+
+      OPENROUTER_KEY=<redacted> ./bin/resofeed serve --gemini-api-key <redacted> ...
+      — exit_code=2 PASS
+
+      OPENROUTER_KEY=<redacted> ./bin/resofeed serve --addr 127.0.0.1:18118 ... —
+      PASS
+
+      rg scans for Gemini residue, escape hatches, boundary terms, secret terms —
+      PASS/WARN as described
+
+      ```
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```
+
+
+      Issues found:
+
+      - Warning: stale agent instruction text still describes Gemini secret precedence
+      and transitional Gemini CLI flag policy at `.agents/instructions.md:25-31`;
+      non-blocking for this gate.'
   - id: openrouter-llm-implementation.uiux-doctor-diagnostics-audit
     name: uiux-doctor-diagnostics-audit
     status: done
@@ -15049,7 +15215,7 @@ phases:
       production non-test runtime grep is clean.'
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
-  status: locked
+  status: pending
   gate: All local, integration, live smoke, UI/multimodal, docs, state-export, HTTP/MCP
     parity, and final gate evidence demonstrate the migration is complete and secrets
     remain redacted.
