@@ -12513,7 +12513,7 @@ phases:
       \ secrecy."
   - id: openrouter-llm-contract-and-red-tests.contract-red-tests-gate
     name: contract-red-tests-gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -12604,6 +12604,71 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T17:51:57.339105+00:00'
+    done_at: '2026-05-09T17:56:42.761257+00:00'
+    evidence: "status: SUCCESS_WITH_REMEDIATION\n\n[REJECT]\n\n## refs Read Confirmation\
+      \ (MANDATORY)\n- AGENTS.md — NOT READ: file is absent from isolated worktree\
+      \ root.\n- .agents/instructions.md — READ: lines 8-12 require one Go binary,\
+      \ SQLite-only, LLM utility boundary, and no DI/service/repository layering;\
+      \ lines 25-31 define runtime-only secret handling and OpenRouter secret naming\
+      \ constraints.\n- docs/ARCHITECTURE.md — READ: lines 11-18 define one deployable,\
+      \ runtime-only OpenRouter secrets, one SQLite DB, flat package shape, HTTP/MCP\
+      \ parity, and OpenRouter as sole LLM backend; lines 69-83 define OpenRouter\
+      \ runtime contract.\n- docs/DESIGN.md — READ: lines 247-263 define the ResoFeed\
+      \ workbench surfaces and operational chrome; lines 477-480 define terse state\
+      \ export/import surface without history/sync expansion.\n- docs/USAGE.md — READ:\
+      \ lines 33-58 define OpenRouter secret setup, `OPENROUTER_KEY`, no CLI secrets,\
+      \ `.env` safety; lines 664-672 define OpenRouter-only configuration contract.\n\
+      \n## Gate Review Report\n**Reviewer**: gate-reviewer (independent of contract/test\
+      \ authors)\n**Phase**: openrouter-llm-contract-and-red-tests\n\n## Behavioral\
+      \ Proof Register\n- contract-purity: PASS — reviewed changes were docs/tests\
+      \ only, no product implementation files.\n- expected-red-declaration: BLOCKER\
+      \ — no grep match for `expected_result:\\s*red` in `internal/resofeed/*openrouter*contract_test.go`.\n\
+      - expected-red-runtime: PASS — package compiles; targeted tests execute and\
+      \ fail against Gemini-shaped behavior, not syntax/build errors.\n- docs-no-gemini-public-contract:\
+      \ PASS — docs contract test green and public Gemini flag residue absent.\n-\
+      \ architecture-constraints: PASS — no multi-provider registry/DI/service/repository\
+      \ layering or secret persistence/export specified.\n- runtime-surface-preservation:\
+      \ BLOCKER — tests cover serve/CLI/docs/adapter, ingest, steering, doctor, state\
+      \ export, HTTP/MCP parity, but no OpenRouter-specific state import proof.\n\
+      - model-empty-default: PASS — omitted/empty OpenRouter model semantics are test-defined.\n\
+      - secret-safety: PASS — no tracked `.env`; fake sentinel secrets only; real\
+      \ `.env` not read.\n\n## Execution Review\n- lock-openrouter-contract-and-docs:\
+      \ reviewed; strong docs evidence; no blocking concern.\n- define-cli-adapter-docs-red-tests:\
+      \ reviewed; red tests isolate CLI/adapter/docs gaps; missing literal `expected_result:\
+      \ red` declaration.\n- define-product-integration-red-tests: reviewed; red tests\
+      \ cover ingest, steering, doctor, state export, HTTP/MCP parity; no OpenRouter-specific\
+      \ state import proof found.\n\n## Verification Run\n- `go test ./internal/resofeed\
+      \ -run '^$' -count=1` — exit 0; package compiles.\n- `go test ./internal/resofeed\
+      \ -run 'TestOpenRouter|TestDoctorUsesOpenRouter|TestStateExportExcludesOpenRouter|TestHTTPAndMCPTransportParity|TestSteeringHTTPAndMCP|TestInvalidOpenRouter'\
+      \ -count=1` — exit 1 expected red against current Gemini-shaped implementation.\n\
+      - `go test ./internal/resofeed -run 'TestOpenRouterDocsRuntimeSecretContract'\
+      \ -count=1` — exit 0.\n- `git diff --check 8669b5b^..0dcf08c` — exit 0.\n- `.env`\
+      \ tracked/status check — no tracked or modified `.env` reported.\n\n## Gate\
+      \ Decision\n- [ ] OPEN: implementation may proceed\n- [x] BLOCKED: remediation\
+      \ required before implementation.\n\n## Blockers / Remediation Ownership\n-\
+      \ B1: Missing required expected-red declaration. Required remediation: add explicit\
+      \ `expected_result: red` declaration/metadata to each OpenRouter expected-red\
+      \ test artifact and verify with grep.\n- B2: State import runtime-surface preservation\
+      \ proof gap. Required remediation: add OpenRouter-specific state import test\
+      \ evidence confirming import does not persist/import OpenRouter secrets, model,\
+      \ provider names, secret-source metadata, or runtime config.\n- Remediation\
+      \ steps created by planner:\n  - `openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps`\n\
+      \  - `openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps`\n\n##\
+      \ Secret Review\n- Confirmed no real OpenRouter key or `.env` content was read/printed;\
+      \ test fixtures use fake sentinel values only.\n\n### closure fields\nverdict:\
+      \ FAIL_WITH_REMEDIATION_CREATED\ngate_open_allowed: false\norchestrator_action_hint:\
+      \ COMPLETE_AFTER_FIX_RETEST_CREATED\nblockers:\n  - Missing required `expected_result:\
+      \ red` declaration in OpenRouter expected-red test artifacts.\n  - No OpenRouter-specific\
+      \ state import test evidence; only state export is covered.\nproof_gap_status:\
+      \ BLOCKING_REMEDIATION_CREATED\nblocking_status: OPEN_UNTIL_RETEST\nheadline:\
+      \ FAIL_WITH_REMEDIATION_CREATED\nproduct_implementation_files_modified: false\n\
+      \n## Files changed / Artifacts\n- Worker artifact commit: `305924b` (`audit:\
+      \ record openrouter red-test gate`)\n- Main salvage commit: `9fbaef9` (`[vectl]\
+      \ salvage gate evidence from openrouter-llm-contract-and-red-tests.contract-red-tests-gate`)\n\
+      - Artifact: `.audit-artifacts/openrouter_contract_red_tests_gate/gate-review.md`\n\
+      - Mainline artifact check: `git diff --check HEAD` passed.\n\n## Gaps/Notes\n\
+      - This gate report is accepted as completed with blocker ownership created;\
+      \ phase remains blocked until fix and independent retest complete."
   - id: openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps
     name: fix-red-test-gate-gaps
     status: pending
