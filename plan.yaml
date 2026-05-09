@@ -12604,6 +12604,106 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T17:51:57.339105+00:00'
+  - id: openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps
+    name: fix-red-test-gate-gaps
+    status: pending
+    description: 'Remediate ALL blockers from gate step openrouter-llm-contract-and-red-tests.contract-red-tests-gate.
+
+
+      step_type: implementation
+
+      priority: HIGH
+
+
+      Scope: update OpenRouter expected-red test artifacts only. Do NOT change product
+      implementation files, runtime behavior, docs contracts, .env handling, or real
+      secret loading.
+
+
+      Blockers to fix:
+
+      1. Expected-red metadata discoverability: add explicit expected-red declarations
+      discoverable by grep as the literal text `expected_result: red` in OpenRouter
+      expected-red test artifacts under `internal/resofeed/*openrouter*contract_test.go`.
+
+      2. OpenRouter-specific state import proof: add targeted state import coverage
+      proving imports do NOT persist/import OpenRouter secrets, model, provider names,
+      secret-source metadata, or runtime config. Existing export-only coverage around
+      `internal/resofeed/openrouter_product_integration_contract_test.go:147-189`
+      is insufficient; import coverage must be added.
+
+
+      Required guardrails:
+
+      - No product implementation changes; tests/contracts only.
+
+      - No actual `.env` file reads.
+
+      - No real OpenRouter API key reads, prints, commits, or assertions containing
+      real secrets.
+
+      - Preserve known green evidence: contract docs remain pure and OpenRouter-only;
+      docs/public contract test remains green; intended expected-red tests still fail
+      for real OpenRouter/Gemini implementation gaps rather than syntax/build errors.
+
+
+      Root Cause vs Symptom:
+
+      - Root cause: expected-red intent and import-side secrecy obligation were not
+      encoded as grep-discoverable proof obligations in the test artifacts.
+
+      - Symptom: gate could not find `expected_result: red` metadata and found only
+      state export coverage.
+
+      - Why this fix is not surface-level: it must add both machine-discoverable red
+      intent and import-side state secrecy coverage, not only comments near the existing
+      export test.
+
+
+      Completion Criteria (stub exclusion): This is a remediation implementation step
+      for tests/contracts. Completion requires substantive test assertions and metadata
+      declarations; comment-only completion is acceptable only for the required `expected_result:
+      red` metadata, not for the import secrecy coverage.'
+    verification: '- Grep proof: `expected_result: red` appears in the intended OpenRouter
+      expected-red contract test artifacts.
+
+      - State import proof: OpenRouter-specific import test coverage asserts imported
+      state does not persist/import OpenRouter secrets, model, provider names, secret-source
+      metadata, or runtime config.
+
+      - Product implementation guard: evidence identifies modified files and confirms
+      they are limited to expected-red test/contract artifacts.
+
+      - Secret safety: evidence confirms no `.env` read and no real OpenRouter key
+      read/printed/committed.
+
+      - Package compile remains valid; expected-red failures remain behavioral/product
+      gaps, not syntax/build failures.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- internal/resofeed/openrouter_product_integration_contract_test.go\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n## Remediation Evidence\n\n**Modified files**:\n\
+      ```\n<paste changed file list>\n```\n\n**No product implementation changes confirmation**:\n\
+      - [ ] Changes are limited to OpenRouter expected-red test/contract artifacts.\n\
+      - [ ] No runtime/product implementation files were modified.\n\n**Expected-red\
+      \ metadata proof**:\n```\n<paste grep command and output showing expected_result:\
+      \ red in internal/resofeed/*openrouter*contract_test.go>\n```\n\n**State import\
+      \ secrecy coverage proof**:\n- Test name(s): <paste exact test names>\n- Assertions\
+      \ prove imports do NOT persist/import:\n  - [ ] OpenRouter secrets\n  - [ ]\
+      \ model\n  - [ ] provider names\n  - [ ] secret-source metadata\n  - [ ] runtime\
+      \ config\n\n**Commands and output**:\n```\n<paste package compile / targeted\
+      \ command output>\n```\n\n**Expected-red behavior**:\n- Intended red failures\
+      \ exposed: <list>\n- Syntax/build failures: none | <explain>\n\n**Secret-safety\
+      \ confirmation**:\n- [ ] No `.env` file was read.\n- [ ] No real OpenRouter\
+      \ key was read, printed, or committed.\n- [ ] Test fixtures use fake placeholder\
+      \ values only.\n\n**Closure fields**:\n- blocker_1_expected_result_red_metadata:\
+      \ CLOSED | OPEN\n- blocker_2_state_import_secrecy_coverage: CLOSED | OPEN\n\
+      - gate_open_allowed_recommendation: READY_FOR_RETEST | NOT_READY\n- remaining_blockers:\
+      \ <none or list>"
+    depends_on:
+    - openrouter-llm-contract-and-red-tests.contract-red-tests-gate
+    agent: golang-developer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
