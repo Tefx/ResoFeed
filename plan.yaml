@@ -13111,7 +13111,7 @@ phases:
       OpenRouter implementation is unblocked.'
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
-  status: pending
+  status: in_progress
   gate: OpenRouter is wired as the sole LLM backend through CLI runtime, ingest, steering,
     /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
   depends_on:
@@ -13119,7 +13119,7 @@ phases:
   steps:
   - id: openrouter-llm-implementation.complete-cli-and-openrouter-adapter
     name: complete-cli-and-openrouter-adapter
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -13276,6 +13276,8 @@ phases:
 
       - Deviation records, if any:'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T18:07:04.415997+00:00'
   - id: openrouter-llm-implementation.complete-ingest-steering-state-migration
     name: complete-ingest-steering-state-migration
     status: pending
