@@ -12152,7 +12152,7 @@ phases:
       \ calls query rejection before no-query handlers."
 - id: openrouter-llm-contract-and-red-tests
   name: OpenRouter LLM Contract and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Contract artifacts and expected-red tests define the Gemini removal/OpenRouter
     acceptance surface without product implementation logic.
   context: OpenRouter migration is blocked behind the runtime secret env/.env foundation.
@@ -12163,7 +12163,7 @@ phases:
   steps:
   - id: openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     name: lock-openrouter-contract-and-docs
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -12281,6 +12281,8 @@ phases:
 
       - Any remaining ambiguity:'
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-09T17:41:57.618056+00:00'
   - id: openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests
     name: define-cli-adapter-docs-red-tests
     status: pending
