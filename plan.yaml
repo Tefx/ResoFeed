@@ -3460,7 +3460,7 @@ phases:
       ownership, vector/RAG, sync/merge, or activity ledger was added.'
   - id: runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     name: Complete serve runtime lifecycle
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -3609,6 +3609,203 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T07:21:25.942634+00:00'
+    done_at: '2026-05-09T07:28:16.819321+00:00'
+    evidence: '## Runtime Lifecycle Evidence
+
+
+      ### refs Read Confirmation
+
+      - `.agents/instructions.md`: single Go binary (`cmd/resofeed`) runs static assets,
+      JSON HTTP, MCP Streamable HTTP, and background ingest loop; owner token is universal
+      delegation boundary.
+
+      - `docs/ARCHITECTURE.md`: `resofeed serve` accepts `--addr`, `--public-url`,
+      `--db`, `--gemini-api-key`, `--gemini-model`, `--owner-token`; startup order
+      parses flags, opens SQLite, runs migrations, resolves owner token, starts HTTP/MCP/static,
+      then background ingest.
+
+      - `docs/PRD.md`: Today/freshness, Star/memory, Search/retrieval, Coverage/not
+      missing world; `/doctor` exposes raw RSS/model/extraction health.
+
+      - `docs/DESIGN.md`: owner-token prompt, first-use state, `/doctor`, source ledger,
+      search/retrieval, agent provenance; chrome uses RESOFEED/TODAY/SOURCE LEDGER/INSPECTOR/doctor.
+
+      - `docs/DESIGN_VISION.md`: `/doctor` plain text, no accounts/onboarding/cute
+      error states.
+
+      - `docs/USAGE.md`: documented `./bin/resofeed serve ...`; serve starts web UI,
+      JSON API, MCP `/mcp`, background ingestion, SQLite open/migrate, static assets.
+
+
+      ### CLI Surface Snapshot / Executability Matrix
+
+      - `./bin/resofeed --help` exit 0; commands shown: `serve`; no migrate/worker/doctor/admin/sync
+      commands shown.
+
+      - `./bin/resofeed serve --help` exit 0; flags shown: `--addr`, `--public-url`,
+      `--db`, `--gemini-api-key`, `--gemini-model`, `--owner-token`; runtime description
+      includes static UI, JSON HTTP API, MCP `/mcp`, SQLite migrations, owner-token
+      auth, background ingest.
+
+
+      | Command | Surface Listed? | Handler Exists? | --help Works? | Smoke Test |
+      Status |
+
+      |---|---|---|---|---|---|
+
+      | `resofeed` | root help lists only `serve` | `cmd/resofeed/main.go` calls `resofeed.Main`;
+      root help branch exists | yes, exit 0 | root help passed | PASS |
+
+      | `resofeed serve` | yes | `resofeed.Main` dispatches to `runServe` | yes, exit
+      0 | missing Gemini exits 2; full runtime starts/serves/shuts down | PASS |
+
+
+      Regression/dangling: no documented command removed; only registered command
+      is `serve`, with handler logic in `resofeed.Main`/`runServe`; `/mcp` is mounted
+      by `NewRouter`.
+
+
+      **Launch command**:
+
+      ```text
+
+      ./bin/resofeed serve --addr 127.0.0.1:18082 --public-url http://127.0.0.1:18082
+      --db <temp>/resofeed.sqlite3 --gemini-api-key test-key --gemini-model gemini-2.5-flash
+
+      ```
+
+
+      **Startup/shutdown output**:
+
+      ```text
+
+      owner token generated: rfeed_<redacted>
+
+      serving ResoFeed on 127.0.0.1:18082 (public-url http://127.0.0.1:18082)
+
+      shutdown complete
+
+      ```
+
+      Token reuse smoke: subsequent launch against same DB printed `owner token reused:
+      stored hash`, served, and shut down cleanly.
+
+
+      **Runtime paths wired**:
+
+      - CLI/main: `cmd/resofeed/main.go` → `resofeed.Main`; `serve` parses/validates
+      flags, opens SQLite, migrates, resolves token, starts runtime.
+
+      - HTTP API: `ServeHTTPRuntime` starts `http.Server`; `/api/feed/today` smoke
+      returned `200 {"items":[]}` with owner token.
+
+      - MCP: `NewRouter` mounts `NewMCPHandler`; `/mcp` `tools/list` smoke returned
+      documented tools.
+
+      - Static UI: `/` mounted through runtime entrypoint; smoke returned `200 text/plain
+      "RESOFEED\n"` using existing static placeholder.
+
+      - Background ingest: `runServe` starts `RunIngestLoop` after DB/migrations/token
+      setup; `/doctor` reported `ingest: last_run=never` for empty source set.
+
+      - /doctor core diagnostics: `/api/doctor` calls `WriteDoctor`; smoke returned
+      `rss: ok`, `gemini: ok`, `extraction: ok`, `ingest: last_run=never`.
+
+
+      **Remaining stubs**: none in runtime-owned Go stub markers (`TODO contract stub`
+      / `panic(` grep returned no matches in `cmd/resofeed` or `internal/resofeed`).
+      Frontend `ContractStub` components are out of scope.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: implementation
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: yes — `internal/resofeed/db.go`, `internal/resofeed/http.go`,
+      `internal/resofeed/mcp.go`
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Run
+
+      Subagent worktree:
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed` → exit 0
+
+      - `go test ./...` → exit 0
+
+      - `go test -race ./...` → exit 0
+
+      - `golangci-lint run` → exit 0, 0 issues
+
+      - `./bin/resofeed --help` and `./bin/resofeed serve --help` → exit 0
+
+      - Missing Gemini smoke → exit 2 with expected validation error
+
+      - Runtime smoke → exit 0; verified static `/`, `/api/doctor`, `/api/feed/today`,
+      `/mcp`, SIGTERM graceful shutdown, token reuse.
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle`
+      applied changes to `internal/resofeed/db.go`, `internal/resofeed/http.go`, `internal/resofeed/mcp.go`.
+
+      - Mainline `go test ./... && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-build
+      ./cmd/resofeed` → tests/build succeeded.
+
+      - Merge commit: `6876c1d` (`[vectl] step-runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+      completed`).
+
+
+      ## Commit hash(es)
+
+      - isolated branch commit: `b2afa801dfeffc7ebd5bd4845aa8006fd6008b15`
+
+      - main merge commit: `6876c1d`
+
+
+      ## Files changed
+
+      - `internal/resofeed/db.go`
+
+      - `internal/resofeed/http.go`
+
+      - `internal/resofeed/mcp.go`
+
+
+      ## Spec link
+
+      - `.agents/instructions.md` §§2,4,5
+
+      - `docs/ARCHITECTURE.md` §§1,3.1,3.3
+
+      - `docs/PRD.md` §§4.6,5.3,6.3
+
+      - `docs/DESIGN.md` overview/components
+
+      - `docs/DESIGN_VISION.md` §§10,13
+
+      - `docs/USAGE.md` Quick Start, owner token behavior, HTTP command reference
+
+
+      ## Gaps/Notes
+
+      No deviation records. Static root remains minimal runtime-mounted placeholder;
+      frontend rendering remains out of scope.'
   - id: runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     name: Early runtime vertical slice proof
     status: pending
