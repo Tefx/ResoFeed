@@ -7142,7 +7142,7 @@ phases:
       product_implementation_files_modified: false"
   - id: frontend-implementation.frontend-gate
     name: Frontend gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -7289,6 +7289,84 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T10:28:44.123465+00:00'
+    done_at: '2026-05-09T10:35:06.763621+00:00'
+    evidence: "## Frontend Gate Review Report\n\n**Semantic outcome:** FAIL report\
+      \ delivered; blocker-class proof-artifact gaps were batched into remediation\
+      \ before completion.\n\n### Orchestrator Remediation Ownership\n- Planner created\
+      \ proof-artifact remediation step: `frontend-implementation.fix-frontend-gate-proof-artifacts`.\n\
+      - Planner created dependent gate retest step: `frontend-implementation.retest-frontend-gate-proof-artifacts`.\n\
+      - Downstream phases remain blocked until proof-artifact retest passes.\n\n###\
+      \ Orchestrator Mainline Final-State Barrier\n- Worker branch status before merge:\
+      \ clean.\n- Squash merge result: `Already up to date. (nothing to squash)`.\n\
+      - Mainline verification:\n  - `go test ./... -count=1` — PASS.\n  - `npm --prefix\
+      \ web run check` — PASS; 0 errors, 0 warnings.\n  - `npm --prefix web run build`\
+      \ — PASS; static site written.\n  - `npm --prefix web run test` — PASS; 2 files\
+      \ / 14 tests passed.\n\n## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — ResoFeed is a single-tenant analyst workbench; docs/ARCHITECTURE.md and\
+      \ docs/DESIGN.md are law; friendly SaaS copy, onboarding wizards, folders/tags/unread/mark-all-read/settings\
+      \ bloat are forbidden.\n- docs/ARCHITECTURE.md — One Go process, SQLite/FTS5,\
+      \ thin transports, lexical retrieval only, single owner token; static UI public\
+      \ but every `/api/*` route owner-token protected.\n- docs/PRD.md — No onboarding/account\
+      \ flows; first session via OPML/Steer, Inspect, Resonate, optional Steer; single-tenant/no\
+      \ accounts and active-state portability.\n- docs/DESIGN.md — Owner Token Prompt\
+      \ and post-acceptance storage; state portability as active sources/rules/stars\
+      \ only with replacement warning; forbidden UI/product patterns.\n- docs/DESIGN_VISION.md\
+      \ — No paternalism, cute errors, account login/onboarding, numeric indicators,\
+      \ moderation/activity logs; Inspect/Resonate/Steer/Doctor/State Portability\
+      \ UI map.\n- docs/USAGE.md — One `serve` process and `/doctor` through Steer/GET\
+      \ API; `resofeed.ownerToken`; JSON state export/import; first useful session\
+      \ without folders/tags/settings.\n\n## Gate Findings\n- Required closure checks:\n\
+      \  - retest completed PASS/PASS_WITH_DEBT with no blockers: NO — `retest-frontend-contract-closure`\
+      \ completion existed in plan history, but no accessible semantic closure register\
+      \ artifact was found outside restricted plan state.\n  - B1 `/api/steer` UI\
+      \ path proven: YES.\n  - B2 `/doctor` raw diagnostics proven: YES.\n  - B3 desktop\
+      \ duplicate Inspector star removed: NO — source/test suggest closure, but committed\
+      \ `.audit-artifacts/populated-desktop-full.png` visibly shows a star inside\
+      \ desktop Inspector. Gate requires regenerated/current rendered artifact proving\
+      \ closure.\n  - B5 owner-token persistence after acceptance only: YES.\n  -\
+      \ U1 mobile full-screen route/state physics proven: YES.\n  - U2 selected marker/no\
+      \ duplicate detail proven: YES.\n  - U3 Resonate styling proven: YES.\n  - Safe\
+      \ should-fix dispositions accepted: NO — no non-plan semantic closure register\
+      \ artifact available.\n\n### Rendered evidence review\n- Reviewed `.audit-artifacts/owner-token-desktop.png`,\
+      \ `.audit-artifacts/owner-token-mobile.png`, `.audit-artifacts/invalid-token-error-desktop.png`,\
+      \ `.audit-artifacts/first-use-empty-desktop.png`, `.audit-artifacts/first-use-empty-mobile.png`,\
+      \ `.audit-artifacts/populated-desktop-full.png`, `.audit-artifacts/populated-mobile-full.png`.\n\
+      - `web/build/index.html` confirmed SSR-visible owner-token prompt before API\
+      \ calls.\n- Blocking concern: `.audit-artifacts/populated-desktop-full.png`\
+      \ is stale or failing because it shows a desktop Inspector star.\n\n### Accessibility/live-region\
+      \ behavior\n- PASS for reviewed source/tests: owner-token rejection uses assertive\
+      \ alert; Steer receipts use polite status and errors assertive alert; `/doctor`\
+      \ uses `role=\"log\"`; State Portability and Search statuses use polite live\
+      \ regions.\n\n### Forbidden-pattern scan\n- PASS_WITH_DEBT: Source scan of `web/**/*.svelte`\
+      \ found no user-facing account registration/profile/password-reset/onboarding\
+      \ wizard/folders/tags/unread/mark-all-read/archive/settings dashboard/sync/merge/activity-ledger\
+      \ copy. The token input password type is acceptable local owner-token masking.\n\
+      \n### Real integration vs fixture/test distinction\n- Automated tests are render/unit\
+      \ tests using mocked `fetch` and fixtures, not live Go end-to-end tests. They\
+      \ prove client endpoint wiring, DOM rendering, and accessibility states, but\
+      \ not real browser-to-Go-to-SQLite runtime. Build produced SSR/client bundles\
+      \ successfully. Screenshot artifacts provide rendered UI evidence but stale\
+      \ desktop artifact conflicts with B3 closure.\n\n### Behavioral Proof Register\n\
+      - Owner Token Prompt: PASS — source/tests prove token persistence after acceptance\
+      \ and assertive rejection.\n- Steer and Diagnostics: PASS — source/tests prove\
+      \ `/api/steer` and `/doctor` behavior.\n- Inspector no duplicate desktop star:\
+      \ DIVERGES — current source/test pass but stale rendered artifact contradicts\
+      \ closure.\n- State Portability: PASS — active-state copy/endpoints present.\n\
+      - Mobile layout: PASS — source/test prove full-screen active surfaces.\n- Resonate\
+      \ Button: PASS — active/inactive styling uses shape and active accent.\n- Gate\
+      \ semantic closure register: UNPROVEN — no non-plan artifact available for zero-trust\
+      \ citation.\n\n## Semantic Closure Fields\nheadline: FAIL\nstep_intent: gate_review\n\
+      expected_result: green\nobserved_result: blocked\nverdict: FAIL\nblockers:\n\
+      \  - id: GATE-BLOCKER-1\n    severity: blocker\n    evidence: No permitted non-plan\
+      \ `retest-frontend-contract-closure` semantic closure register artifact found.\n\
+      \    remediation: Provide/export retest semantic closure register as a non-plan\
+      \ artifact and include safe should-fix dispositions.\n  - id: GATE-BLOCKER-2\n\
+      \    severity: blocker\n    evidence: `.audit-artifacts/populated-desktop-full.png`\
+      \ shows a Resonate star inside desktop Inspector, conflicting with DESIGN.md\
+      \ and B3 closure.\n    remediation: Regenerate rendered desktop artifact from\
+      \ current implementation or fix UI if still present.\nproof_gap_status: BLOCKING\n\
+      blocking_status: OPEN\ngate_open_allowed: false\norchestrator_action_hint: DO_NOT_COMPLETE\n\
+      product_implementation_files_modified: false"
   - id: fix-steer-diagnostics-and-mobile-ui-contract
     name: Fix steer diagnostics and mobile UI contract blockers
     status: done
