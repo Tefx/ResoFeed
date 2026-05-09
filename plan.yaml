@@ -14458,6 +14458,11 @@ phases:
       diagnostic microcopy after `complete-runtime-doctor-http-mcp-wiring`.
 
 
+      RETEST AFTER BATCHED FIX: This audit must specifically verify remediation from
+      `openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status`
+      and compare against `.audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md`.
+
+
       As an INDEPENDENT UI/UX AUDITOR, verify `/doctor`, runtime diagnostic text,
       `ui_microcopy`, and CLI-like diagnostic output adhere to `docs/DESIGN.md` and
       ResoFeed project voice:
@@ -14477,6 +14482,10 @@ phases:
       - OpenRouter model status/default/account_default wording is clear, terse, and
       contract-compliant without inventing unsupported product concepts
 
+      - duplicate status retest: `/doctor` must not emit both `openrouter: ok configured_model=...
+      resolved_model=...` and a second bare `openrouter: ok`; status/model diagnostics
+      should be a single clear line or equivalent non-redundant output.
+
 
       Evidence should use screenshots, terminal captures, HTTP response excerpts,
       or DOM/output snippets only when safe and redacted. If visual screenshots are
@@ -14491,6 +14500,9 @@ phases:
 
       - Secret-bearing fields are redacted or absent in every captured artifact.
 
+      - The duplicate bare `openrouter: ok` UIUX debt from the salvaged audit artifact
+      is closed or explicitly reclassified with evidence.
+
       - Any visible-output drift is classified as blocker/should_fix/suggestion with
       a concrete reproduction path.
 
@@ -14499,8 +14511,9 @@ phases:
     verification: phase-check protecting openrouter-llm-implementation.implementation-gate.
       uiux-auditor must provide rendered or runtime-visible output evidence for `/doctor`
       and OpenRouter diagnostics, verify DESIGN.md voice compliance, prove no secrets
-      are exposed, and return a parseable PASS/PASS_WITH_DEBT/FAIL decision before
-      the implementation gate can open.
+      are exposed, verify the duplicate OpenRouter status fingerprint from `.audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md`
+      is closed, and return a parseable PASS/PASS_WITH_DEBT/FAIL decision before the
+      implementation gate can open.
     evidence_template: "## UI/UX Visible-Output Audit Report\n\n### refs Read Confirmation\
       \ (MANDATORY)\nFor each ref in this step:\n- docs/DESIGN.md — key passage or\
       \ \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
@@ -14520,6 +14533,8 @@ phases:
       \ | PASS_WITH_DEBT | FAIL"
     depends_on:
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    - openrouter-llm-implementation.serve-liveness-probe
+    - openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     agent: uiux-auditor
   - id: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
     name: fix-openrouter-runtime-naming-and-doctor-status
