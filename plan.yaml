@@ -15946,7 +15946,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     name: live-openrouter-smoke-system-test
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -16127,8 +16127,6 @@ phases:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
     - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     agent: blind-tester
-    claimed_by: blind-tester
-    claimed_at: '2026-05-09T19:18:33.200520+00:00'
   - id: openrouter-llm-verification-and-live-smoke.documentation-sync
     name: documentation-sync
     status: pending
