@@ -12157,6 +12157,104 @@ phases:
     acceptance surface without product implementation logic.
   depends_on:
   - finalization-docs-and-deep-review
+  steps:
+  - id: openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
+    name: lock-openrouter-contract-and-docs
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: docs, runtime contract notes, interface semantics, acceptance
+      checklist
+
+      agent_source: project
+
+
+      Lock the OpenRouter-only LLM backend contract before any product implementation
+      changes.
+
+
+      Authoritative architecture basis: the user-provided READY architecture_basis
+      in this planning request. Treat it as binding for module boundaries, runtime
+      contract, source-of-truth matrix, lifecycle ordering, and anti-registry/anti-DI
+      constraints.
+
+
+      Scope and touch_paths:
+
+      - docs/ARCHITECTURE.md and docs/USAGE.md or equivalent user-facing docs: replace
+      Gemini backend promises/flags with OpenRouter-only runtime configuration.
+
+      - internal/resofeed contract notes or existing comments only if needed to pin
+      the LLMClient boundary; no business logic.
+
+      - Do NOT add a multi-provider registry, provider plugin abstraction, DI container,
+      service/repository layer, sidecar worker, sync/merge/history portability, OAuth/accounts/RBAC,
+      vector DB, embeddings, or RAG search.
+
+
+      Contract to lock:
+
+      - Runtime command remains `resofeed serve` in the single `cmd/resofeed` binary.
+
+      - Remove flags: `--gemini-api-key`, `--gemini-model`.
+
+      - Add flags: `--openrouter-api-key`, `--openrouter-model`.
+
+      - OpenRouter API key is required for LLM-backed runtime paths and is runtime-only;
+      never persisted/exported.
+
+      - `--openrouter-model` is optional; empty means use the OpenRouter account default
+      and must not trigger startup network model validation.
+
+      - Adapter endpoint: `https://openrouter.ai/api/v1/chat/completions`.
+
+      - Adapter is JSON-in/JSON-out transformer only; OpenRouter may not own orchestration,
+      authorization, state, or DB writes.
+
+      - `/doctor` reports concrete raw text using `openrouter:` prefix and distinguishes
+      configured model from resolved model when available.
+
+      - HTTP and MCP product operations remain equivalent; no special agent-only concepts.
+
+      - Portable state remains only active sources, active steering rules, and resonated
+      items; no OpenRouter key/model.
+
+
+      This CONTRACT step may update docs/contracts/stubs only. It MUST NOT ship runnable
+      OpenRouter request logic or completed handler/runtime behavior.'
+    verification: local-check protecting openrouter-llm-contract-and-red-tests.gate
+      and downstream implementation.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Evidence
+
+      - Files touched (docs/contracts only):
+
+      - Gemini flags removed from documented runtime contract:
+
+      - OpenRouter flags documented:
+
+      - Optional model/default-account behavior documented:
+
+      - `/doctor` openrouter prefix and configured/resolved model behavior documented:
+
+      - Secret handling statement present; no key printed:
+
+      - Architecture minimalism preserved (no registry/DI/service layers):
+
+      - Any remaining ambiguity:'
+    agent: doc-reviewer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
