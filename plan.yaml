@@ -10996,3 +10996,190 @@ phases:
     - finalization-docs-and-deep-review.final-design-contract-review
     - finalization-docs-and-deep-review.final-black-box-verification
     agent: gate-reviewer
+  - id: fix-http-idempotency-wiring
+    name: Fix HTTP idempotency wiring
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      risk: persistence/idempotency/parity
+
+
+      Fix gate blocker HTTP_IDEMPOTENCY_KEY_WRITE_ONLY from finalization-docs-and-deep-review.final-wiring-audit.
+
+
+      ## Blocker evidence to address
+
+      - HTTP validation requires `idempotency_key` at `internal/resofeed/http.go:589-600`.
+
+      - `POST /api/items/{id}/inspect` validates then calls `MarkItemInspected` at
+      `internal/resofeed/http.go:321-330`.
+
+      - `POST /api/items/{id}/resonance` validates then calls `SetItemResonance` at
+      `internal/resofeed/http.go:337-345`.
+
+      - `POST /api/steer` validates then calls `ApplySteering` at `internal/resofeed/http.go:374-383`.
+
+      - `MarkItemInspected` persists item state only and has no idempotency key read/write
+      at `internal/resofeed/ranking.go:142-160`.
+
+      - `SetItemResonance` persists item state only and always returns `AlreadyApplied:
+      false` at `internal/resofeed/ranking.go:172-182`.
+
+      - `ApplySteering` uses command/actor but no idempotency replay/persistence at
+      `internal/resofeed/ranking.go:93-129` and `internal/resofeed/ranking.go:475-514`.
+
+      - MCP has receipt/replay helper at `internal/resofeed/mcp.go:485-508`; use this
+      as evidence that an idempotency persistence seam exists for MCP only.
+
+
+      ## Required remediation
+
+      Implement HTTP idempotency persistence/replay for all three HTTP mutations,
+      preserving HTTP/MCP parity and current documentation/validation semantics:
+
+      1. `POST /api/items/{id}/inspect`
+
+      2. `POST /api/items/{id}/resonance`
+
+      3. `POST /api/steer`
+
+
+      Preferred path is implementation, not contract removal, because current docs/validation
+      require `idempotency_key`.
+
+
+      ## Architecture invariants
+
+      - Preserve one Go binary and one SQLite DB.
+
+      - Do not add accounts, per-agent registries, sync/merge/history/activity-ledger
+      concepts, sidecar workers, service/repository layers, vector DBs, or RAG.
+
+      - Agent receipts may remain runtime provenance/idempotency only and non-portable.
+
+
+      ## Failure-mode checklist
+
+      - Same `idempotency_key` + same mutation body replays the prior result without
+      duplicating or altering effects.
+
+      - Same key reused with incompatible mutation semantics is rejected or handled
+      according to the existing idempotency contract; document the chosen behavior
+      in tests.
+
+      - Persistence survives handler retry within the same SQLite DB lifecycle.
+
+      - HTTP and MCP idempotency behavior do not diverge for equivalent product operations.
+
+      - No portable state backup/restore scope is expanded by receipt/idempotency
+      persistence.
+
+
+      ## Required tests
+
+      Add focused tests/smoke coverage proving repeated identical HTTP mutation with
+      the same `idempotency_key` replays the prior result and causes no duplicate
+      effect for:
+
+      - inspect
+
+      - resonance
+
+      - steer
+
+
+      Suggested targeted test command for the implementation evidence:
+
+      `go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer'' -count=1`
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      deliverable MUST contain substantive idempotency persistence/replay logic that
+      processes the HTTP mutation inputs and produces replay behavior that varies
+      based on persisted idempotency state.'
+    verification: '- Main path: targeted Go tests prove first HTTP mutation succeeds
+      for inspect, resonance, and steer.
+
+      - Replay path: targeted Go tests prove a repeated identical HTTP mutation with
+      the same `idempotency_key` replays the prior result and causes no duplicate
+      or altered effect for inspect, resonance, and steer.
+
+      - Parity path: evidence explains how HTTP idempotency persistence/replay aligns
+      with the existing MCP receipt/replay seam without adding forbidden portable
+      state or account/sync concepts.
+
+      - Regression path: incompatible key/body reuse behavior is covered or explicitly
+      documented with test evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## HTTP Idempotency Fix Evidence
+
+
+      **Blocker fixed**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY
+
+
+      **Files changed**:
+
+      - <list files>
+
+
+      **Persistence/replay design**:
+
+      - <summarize where HTTP idempotency key is stored/read/replayed>
+
+
+      **Mutation coverage**:
+
+      - inspect: <test/smoke evidence>
+
+      - resonance: <test/smoke evidence>
+
+      - steer: <test/smoke evidence>
+
+
+      **Commands executed**:
+
+      ```sh
+
+      go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer'' -count=1
+
+      ```
+
+
+      **Actual output**:
+
+      ```text
+
+      <paste output>
+
+      ```
+
+
+      **Forbidden scope check**:
+
+      - No account system, sync/merge/history/activity ledger, sidecar worker, vector
+      DB, or RAG introduced: YES/NO
+
+      - Portable state scope unchanged: YES/NO'
+    depends_on:
+    - finalization-docs-and-deep-review.final-wiring-audit
+    agent: golang-developer
