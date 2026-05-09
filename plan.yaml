@@ -19287,3 +19287,156 @@ phases:
     depends_on:
     - manual-rss-fetch.frontend-implementation
     - manual-rss-fetch.integration-proof
+  - id: manual-rss-fetch.gate
+    name: Gate Manual RSS Fetch
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER, assess whether the manual-rss-fetch phase meets
+      the quality bar for proceeding/release.
+
+
+      Review depth rationale:
+
+      - Phase touches backend runtime/API behavior, ingest concurrency, and user-visible
+      Source Ledger UI.
+
+      - Phase has integration-tagged runtime seams and strict design-token/visual
+      requirements.
+
+      - Gate must verify both runnable endpoint behavior and exact UI compliance.
+
+
+      Review criteria:
+
+      1. Backend completeness: ingest.go owns guard/orchestration; http.go owns endpoint/status/schema
+      translation; no queues/jobs/ledgers/sync/service layers introduced.
+
+      2. Runtime behavior: POST /api/ingest and POST /api/sources/{id}/fetch work
+      through real HTTP paths with documented 200/404/409 behavior.
+
+      3. Frontend completeness: Source Ledger renders [FETCH], [RUN INGEST], [FETCHING...],
+      [INGESTING...], terse errors, and HH:MM:SS timestamps.
+
+      4. Strict UI/UX audit: must have parseable PASS from uiux-auditor against docs/ui-preview.html.
+
+      5. Spec conformance: no unresolved DIVERGES/PARTIAL/NEEDS_TEST blocker-class
+      findings.
+
+      6. Evidence quality: refs confirmation present and specific for every step.
+
+
+      Gate decision basis must map requirement refs, evidence refs reviewed, unresolved
+      statuses, why each unresolved item blocks or does not intersect remaining release
+      gates, and final OPEN/BLOCK recommendation.
+
+
+      Handler-only completion, mock-only proof, or visual "close enough" is insufficient.'
+    verification: '- All phase steps completed successfully with complete evidence.
+
+      - Runtime endpoint proof includes exact launch/test command and real HTTP path
+      evidence.
+
+      - UI/UX audit PASS explicitly states exact visual compliance with docs/ui-preview.html.
+
+      - Spec conformance shows no blocker-class drift or includes explicit remediation
+      ownership before OPEN.
+
+      - Gate decision basis is complete and recommends OPEN only when blocker-class
+      behavioral and visual obligations are PROVEN.'
+    evidence_template: '## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: manual-rss-fetch
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | manual-rss-fetch.backend-implementation | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | manual-rss-fetch.frontend-implementation | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | manual-rss-fetch.integration-proof | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | manual-rss-fetch.spec-conformance | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | manual-rss-fetch.uiux-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+
+      ### Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_release? | rationale
+      | closure_path |
+
+      | --- | --- | --- | --- | --- | --- |
+
+
+      ### Issues Identified
+
+      | Severity | Description | Related Step | Blocking? |
+
+      | --- | --- | --- | --- |
+
+
+      ### Phase Assessment
+
+      - All steps completed: ✅/❌
+
+      - Backend runtime/API obligations proven: ✅/❌
+
+      - Strict visual audit passed exactly: ✅/❌
+
+      - Evidence quality acceptable: ✅/❌
+
+      - Blocking issues resolved: ✅/❌
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: Phase passes gate
+
+      - [ ] BLOCKED: Issues must be resolved before proceeding
+
+      '
+    depends_on:
+    - manual-rss-fetch.backend-implementation
+    - manual-rss-fetch.frontend-implementation
+    - manual-rss-fetch.integration-proof
+    - manual-rss-fetch.spec-conformance
+    - manual-rss-fetch.uiux-audit
