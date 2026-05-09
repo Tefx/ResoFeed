@@ -14193,7 +14193,7 @@ phases:
       \ contents were read, printed, or committed."
   - id: runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     name: define-runtime-secret-red-tests
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
       \ red\nagent_source: project\n\nDefine expected-red Go and docs/search tests\
       \ for runtime LLM secret resolution. Modified files must be limited to tests,\
@@ -14250,6 +14250,54 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T17:13:42.323229+00:00'
+    done_at: '2026-05-09T17:18:14.971378+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages: runtime LLM secrets are startup-only inputs; precedence\
+      \ is `--gemini-api-key` compatibility override > OS `GEMINI_API_KEY` > local\
+      \ `.env`; empty/whitespace values invalid; secrets must never be persisted/exported/logged;\
+      \ `.env` parser is minimal `KEY=VALUE` only with no shell execution.\n- docs/USAGE.md\
+      \ — READ. Key passages: prefer OS env or local `.env`; do not paste API keys\
+      \ into shell-history commands; `.env` is local only and must not be committed;\
+      \ parser must not source shell scripts or run command substitution.\n- AGENTS.md\
+      \ — NOT READ: absent in isolated worktree. `.agents/instructions.md` read instead:\
+      \ runtime-only LLM secrets must never be stored, logged, printed, committed,\
+      \ or included in state bundles; same Gemini precedence and `.env` parser contract\
+      \ confirmed.\n\n## Expected-Red Test Evidence\nstep_intent: test_define_red\n\
+      expected_result: red\nobserved_result: red\nfailure_alignment: Targeted failures\
+      \ match intended runtime secret-source gaps: current startup still requires\
+      \ explicit CLI Gemini key and does not resolve OS env or local `.env`.\nverdict:\
+      \ PASS\nblockers: []\nproduct_implementation_files_modified: false\n- Test files\
+      \ added/updated, limited to tests/fixtures/helpers:\n  - `internal/resofeed/runtime_secret_config_test.go`\n\
+      \  - `internal/resofeed/docs_runtime_secret_contract_test.go`\n- Fake secret\
+      \ fixture values used: REDACTED labels only, not the values.\n- Expected-red\
+      \ command(s):\n  ```bash\n  go test ./internal/resofeed -run 'TestGeminiRuntimeSecret|TestDotEnvParserSafety|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration|TestDocsRuntimeSecret'\n\
+      \  ```\n  Exit code: 1, expected red. Failing tests:\n  - `TestGeminiRuntimeSecretResolutionFromOSEnvironment`:\
+      \ `invalid_gemini_api_key`\n  - `TestGeminiRuntimeSecretResolutionFromLocalDotEnvFallback`:\
+      \ `invalid_gemini_api_key`\n  - `TestGeminiRuntimeSecretPrecedenceAndEmptyValues/OS_environment_beats_local_dotenv`:\
+      \ `invalid_gemini_api_key`\n  - `TestDotEnvParserSafetyContract/comments_and_blank_lines_ignored_with_minimal_key_value_parsing`:\
+      \ `invalid_gemini_api_key`\n  - `TestDotEnvParserSafetyContract/shell_command_substitution_is_not_executed`:\
+      \ `invalid_gemini_api_key`\n- Exposed gaps:\n  - env var fallback gap: yes\n\
+      \  - .env fallback gap: yes\n  - precedence gap: yes\n  - empty/missing key\
+      \ handling gap: yes\n  - no secret leakage gap: yes, tests assert stdout/stderr\
+      \ do not contain fake secret fixture values\n  - state export/import non-portability\
+      \ gap: no, added guard passes for current export shape\n  - docs shell-history\
+      \ guidance gap: no, added docs guards pass\n- Confirmation: no product implementation\
+      \ files changed.\n\n## Verification\n- Worker commands:\n  - `gofmt -w internal/resofeed/runtime_secret_config_test.go\
+      \ internal/resofeed/docs_runtime_secret_contract_test.go` — exit 0\n  - Targeted\
+      \ expected-red command — exit 1 for intended env/.env gaps only\n  - `go test\
+      \ ./internal/resofeed -run 'TestDocs|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration'`\
+      \ — exit 0\n  - `go test ./internal/resofeed` — exit 1 expected red from runtime\
+      \ secret tests only\n- Mainline verification after squash merge:\n  - Squash\
+      \ merged worker commit `40e8df3c630bc6217ff5dedffdcc5ade96c39d93` into main\
+      \ as `e885d57`.\n  - Re-ran targeted expected-red command; exit 1 for the same\
+      \ intended missing env/.env support.\n  - Re-ran docs/state guard command; exit\
+      \ 0.\n- Output summary: Failures are limited to missing OS env and `.env` runtime\
+      \ secret resolution; no fake secret fixture values appeared in command output.\n\
+      \n## Files changed\n- `internal/resofeed/runtime_secret_config_test.go`\n- `internal/resofeed/docs_runtime_secret_contract_test.go`\n\
+      \n## Commit hash(es)\n- Worker: `40e8df3c630bc6217ff5dedffdcc5ade96c39d93`\n\
+      - Main squash: `e885d57`\n\n## Gaps/Notes\n- Expected implementation follow-up\
+      \ should add runtime secret resolution and minimal `.env` parsing without persisting\
+      \ or logging secret values."
   - id: runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     name: complete-runtime-secret-resolver
     status: pending
