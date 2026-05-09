@@ -11334,7 +11334,7 @@ phases:
       rather than removed.'
   - id: retest-http-idempotency-wiring
     name: Retest HTTP idempotency wiring
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       agent_source: default\nverification_scope: full-plan-check\n\nRe-run the final\
       \ wiring audit closure path for blocker HTTP_IDEMPOTENCY_KEY_WRITE_ONLY and\
@@ -11467,3 +11467,96 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T12:27:05.985460+00:00'
+    done_at: '2026-05-09T12:29:49.929432+00:00'
+    evidence: '## Retest Evidence
+
+
+      **Verdict**: PASS
+
+      **Blockers**: []
+
+      **gate_open_allowed**: true
+
+      **orchestrator_action_hint**: proceed_to_final_gate
+
+
+      ## Required Evidence Fields
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: green
+
+      - failure_alignment: none; targeted checks passed and blocker closed.
+
+      - product_files_modified: []
+
+      - uncertainty_sources: []
+
+
+      ## Commands / Runtime Smoke
+
+      **Targeted automated tests**:
+
+      - Worker ran `go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer''
+      -count=1` → exit 0, `ok resofeed/internal/resofeed`.
+
+      - Worker ran `go test ./internal/resofeed -run ''^TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer$''
+      -count=1 -v` → PASS for inspect replay, resonance replay/incompatible reuse,
+      steer replay/no extra Gemini.
+
+
+      **Focused audit evidence**:
+
+      - HTTP inspect path: router -> handler -> validateMutationFields -> withIdempotencyReceipt
+      -> MarkItemInspected -> SQLite item_state + agent_receipts; wired.
+
+      - HTTP resonance path: router -> handler -> withIdempotencyReceipt -> SetItemResonance
+      -> SQLite item_state + agent_receipts; wired.
+
+      - HTTP steer path: router -> handleSteer -> withIdempotencyReceipt -> ApplySteering
+      or stored receipt replay; wired.
+
+      - Runtime replay semantics: existing key reads `agent_receipts.result_snapshot`
+      + `request_fingerprint`, rejects incompatible payload reuse, unmarshals prior
+      result, bypasses apply.
+
+
+      **Duplicate HTTP mutation smoke**:
+
+      | Endpoint | Same-key replay proven? | No duplicate/altered effect? | Evidence
+      |
+
+      | --- | --- | --- | --- |
+
+      | POST /api/items/{id}/inspect | yes | yes | same timestamp, `already_applied`,
+      receipt count 1 |
+
+      | POST /api/items/{id}/resonance | yes | yes | replayed `already_applied`; incompatible
+      false rejected 400; state remains true; receipt count 1 |
+
+      | POST /api/steer | yes | yes | replayed prior receipt; Gemini call count remains
+      1; incompatible command rejected 400 |
+
+
+      **HTTP/MCP parity and state portability**:
+
+      - HTTP and MCP both use runtime receipt/idempotency semantics; MCP parity tests
+      cover resources/tools/auth/resonance/steer replay.
+
+      - State export/import remains limited to active sources, active steer rules,
+      and resonated item state; receipts are excluded.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran after worker completion in main: `go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer''
+      -count=1 && go test ./... -count=1`.
+
+      - Output: targeted idempotency tests passed; full Go test suite passed.
+
+
+      ## Gaps/Notes
+
+      - No artifacts/product files modified by retest worker.'
