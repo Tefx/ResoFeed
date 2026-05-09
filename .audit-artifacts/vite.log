@@ -1,0 +1,8 @@
+
+> resofeed-web@0.0.0-contract dev
+> vite dev --host 127.0.0.1 --port 4174
+
+
+  VITE v6.4.2  ready in 368 ms
+
+  ➜  Local:   http://127.0.0.1:4174/

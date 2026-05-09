@@ -1,0 +1,674 @@
+[
+  {
+    "role": "main",
+    "tag": "main",
+    "name": "RESOFEED",
+    "text": "skip to feed Steer or paste RSS URL > apply RESOFEED TODAY SOURCE LEDGER retrieval: lexical search agent:briefing-agent steering active: Push more SQLite operational notes. · correct in Steer TODAY src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆ INSPECTOR SQLite FTS keeps retrieval lexical src: Example RSS · full · high · ok original link Full extracted text in the Inspector. Provenance and source-backed detail remain visible. Search retrieves source-backed items without RAG framing. why: fresh from configured source SOURCE LEDGER import OPML Example RSS https://example.com/feed.xml ok delete export state · import state State Portability import replaces active sources, rules, and stars export state import state Choose state JSON import replaces active sources, rules, and stars Search and Retrieval Plain text query Source filter From date To date Resonated only Result limit 102050100 search 1 results SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. match: lexical index src: Example RSS date: 2026-05-09T10:00:00Z · not resonated Lexical and metadata retrieval only; results stay source-backed.",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 1365,
+      "height": 924
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "a",
+    "tag": "a",
+    "name": "skip to feed",
+    "text": "skip to feed",
+    "disabled": false,
+    "rect": {
+      "x": 8,
+      "y": -24,
+      "width": 101,
+      "height": 20
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "form",
+    "tag": "form",
+    "name": "Steer",
+    "text": "Steer or paste RSS URL > apply",
+    "disabled": false,
+    "rect": {
+      "x": 16,
+      "y": 16,
+      "width": 1252,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "Steer or paste RSS URL",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 16,
+      "width": 1151,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "apply",
+    "text": "apply",
+    "disabled": false,
+    "rect": {
+      "x": 1191,
+      "y": 16,
+      "width": 76,
+      "height": 44
+    },
+    "color": "rgb(243, 240, 231)",
+    "backgroundColor": "rgb(36, 35, 30)",
+    "outline": "rgb(243, 240, 231) none 3px"
+  },
+  {
+    "role": "nav",
+    "tag": "nav",
+    "name": "Surfaces",
+    "text": "TODAY SOURCE LEDGER",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 77,
+      "width": 1365,
+      "height": 61
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "TODAY",
+    "text": "TODAY",
+    "disabled": false,
+    "rect": {
+      "x": 16,
+      "y": 85,
+      "width": 76,
+      "height": 44
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "SOURCE LEDGER",
+    "text": "SOURCE LEDGER",
+    "disabled": false,
+    "rect": {
+      "x": 100,
+      "y": 85,
+      "width": 144,
+      "height": 44
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "status",
+    "tag": "p",
+    "name": "retrieval: lexical search",
+    "text": "retrieval: lexical search",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 138,
+      "width": 1365,
+      "height": 36
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "Agent steering receipt",
+    "text": "agent:briefing-agent steering active: Push more SQLite operational notes. · correct in Steer",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 174,
+      "width": 1365,
+      "height": 64
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "feed-heading",
+    "text": "TODAY src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 238,
+      "width": 664,
+      "height": 169
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "feed-heading",
+    "text": "TODAY src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 238,
+      "width": 664,
+      "height": 169
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "list",
+    "tag": "div",
+    "name": "Today feed items",
+    "text": "src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆",
+    "disabled": false,
+    "rect": {
+      "x": 48,
+      "y": 282,
+      "width": 632,
+      "height": 108
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "listitem",
+    "tag": "article",
+    "name": "src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆",
+    "text": "src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. ☆",
+    "disabled": false,
+    "rect": {
+      "x": 48,
+      "y": 282,
+      "width": 632,
+      "height": 108
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(236, 230, 216)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "Open Inspector for: SQLite FTS keeps retrieval lexical",
+    "text": "src: Example RSS · full · high TODAY · agent:external SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable.",
+    "disabled": false,
+    "rect": {
+      "x": 63,
+      "y": 294,
+      "width": 549,
+      "height": 84
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "Resonate item",
+    "text": "☆",
+    "disabled": false,
+    "rect": {
+      "x": 624,
+      "y": 294,
+      "width": 44,
+      "height": 44
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "aside",
+    "tag": "aside",
+    "name": "INSPECTOR",
+    "text": "INSPECTOR SQLite FTS keeps retrieval lexical src: Example RSS · full · high · ok original link Full extracted text in the Inspector. Provenance and source-backed detail remain visible. Search retrieves source-backed items without RAG framing. why: fresh from configured source",
+    "disabled": false,
+    "rect": {
+      "x": 760,
+      "y": 238,
+      "width": 573,
+      "height": 289
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "aside",
+    "tag": "aside",
+    "name": "SQLite FTS keeps retrieval lexical",
+    "text": "INSPECTOR SQLite FTS keeps retrieval lexical src: Example RSS · full · high · ok original link Full extracted text in the Inspector. Provenance and source-backed detail remain visible. Search retrieves source-backed items without RAG framing. why: fresh from configured source",
+    "disabled": false,
+    "rect": {
+      "x": 760,
+      "y": 238,
+      "width": 573,
+      "height": 289
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(251, 248, 239)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "a",
+    "tag": "a",
+    "name": "original link",
+    "text": "original link",
+    "disabled": false,
+    "rect": {
+      "x": 792,
+      "y": 364,
+      "width": 110,
+      "height": 16
+    },
+    "color": "rgb(0, 0, 238)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(0, 0, 238) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "SOURCE LEDGER surface",
+    "text": "SOURCE LEDGER import OPML Example RSS https://example.com/feed.xml ok delete export state · import state State Portability import replaces active sources, rules, and stars export state import state Choose state JSON import replaces active sources, rules, and stars",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "source-ledger-heading",
+    "text": "SOURCE LEDGER import OPML Example RSS https://example.com/feed.xml ok delete export state · import state",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "import OPML",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "Delete source: Example RSS",
+    "text": "delete",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(243, 240, 231)",
+    "backgroundColor": "rgb(36, 35, 30)",
+    "outline": "rgb(243, 240, 231) none 3px"
+  },
+  {
+    "role": "a",
+    "tag": "a",
+    "name": "export state",
+    "text": "export state",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(0, 0, 238)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(0, 0, 238) none 3px"
+  },
+  {
+    "role": "a",
+    "tag": "a",
+    "name": "import state",
+    "text": "import state",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(0, 0, 238)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(0, 0, 238) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "state-portability-heading",
+    "text": "State Portability import replaces active sources, rules, and stars export state import state Choose state JSON import replaces active sources, rules, and stars",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "export state",
+    "text": "export state",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(243, 240, 231)",
+    "backgroundColor": "rgb(36, 35, 30)",
+    "outline": "rgb(243, 240, 231) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "import state",
+    "text": "import state",
+    "disabled": true,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgb(236, 230, 216)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "Choose state JSON",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "status",
+    "tag": "p",
+    "name": "import replaces active sources, rules, and stars",
+    "text": "import replaces active sources, rules, and stars",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "Search surface",
+    "text": "Search and Retrieval Plain text query Source filter From date To date Resonated only Result limit 102050100 search 1 results SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. match: lexical index src: Example RSS date: 2026-05-09T10:00:00Z · not resonated Lexical and metadata retrieval only; results stay source-backed.",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 527,
+      "width": 1365,
+      "height": 397
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "section",
+    "tag": "section",
+    "name": "search-heading",
+    "text": "Search and Retrieval Plain text query Source filter From date To date Resonated only Result limit 102050100 search 1 results SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. match: lexical index src: Example RSS date: 2026-05-09T10:00:00Z · not resonated Lexical and metadata retrieval only; results stay source-backed.",
+    "disabled": false,
+    "rect": {
+      "x": 0,
+      "y": 527,
+      "width": 1365,
+      "height": 397
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "form",
+    "tag": "form",
+    "name": "Search filters",
+    "text": "Plain text query Source filter From date To date Resonated only Result limit 102050100 search",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 587,
+      "width": 1301,
+      "height": 108
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "Plain text query",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 175,
+      "y": 607,
+      "width": 208,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "Source filter",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 510,
+      "y": 607,
+      "width": 208,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "From date",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 810,
+      "y": 607,
+      "width": 160,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "To date",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 1046,
+      "y": 607,
+      "width": 160,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "input",
+    "tag": "input",
+    "name": "Resonated only",
+    "text": "",
+    "disabled": false,
+    "rect": {
+      "x": 1219,
+      "y": 590,
+      "width": 13,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "select",
+    "tag": "select",
+    "name": "Result limit",
+    "text": "102050100",
+    "disabled": false,
+    "rect": {
+      "x": 184,
+      "y": 651,
+      "width": 80,
+      "height": 44
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgb(243, 240, 231)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  },
+  {
+    "role": "button",
+    "tag": "button",
+    "name": "search",
+    "text": "search",
+    "disabled": false,
+    "rect": {
+      "x": 272,
+      "y": 651,
+      "width": 85,
+      "height": 44
+    },
+    "color": "rgb(243, 240, 231)",
+    "backgroundColor": "rgb(36, 35, 30)",
+    "outline": "rgb(243, 240, 231) none 3px"
+  },
+  {
+    "role": "status",
+    "tag": "p",
+    "name": "1 results",
+    "text": "1 results",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 695,
+      "width": 1301,
+      "height": 20
+    },
+    "color": "rgb(104, 100, 91)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(104, 100, 91) none 3px"
+  },
+  {
+    "role": "region",
+    "tag": "div",
+    "name": "Search results",
+    "text": "SQLite FTS keeps retrieval lexical Dense factual summary describing how source-backed search stays verifiable. match: lexical index src: Example RSS date: 2026-05-09T10:00:00Z · not resonated",
+    "disabled": false,
+    "rect": {
+      "x": 32,
+      "y": 723,
+      "width": 1301,
+      "height": 132
+    },
+    "color": "rgb(36, 35, 30)",
+    "backgroundColor": "rgba(0, 0, 0, 0)",
+    "outline": "rgb(36, 35, 30) none 3px"
+  }
+]

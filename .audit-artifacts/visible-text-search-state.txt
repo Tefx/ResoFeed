@@ -1,0 +1,69 @@
+NAV:
+TODAY
+SOURCE LEDGER
+
+BODY:
+skip to feed
+Steer or paste RSS URL
+>
+apply
+RESOFEED
+TODAY
+SOURCE LEDGER
+
+retrieval: lexical search
+
+agent:briefing-agent steering active: Push more SQLite operational notes. · correct in Steer
+
+TODAY
+
+SRC: EXAMPLE RSS
+·
+FULL
+·
+HIGH
+TODAY
+·
+AGENT:EXTERNAL
+
+SQLite FTS keeps retrieval lexical
+
+Dense factual summary describing how source-backed search stays verifiable.
+
+☆
+
+INSPECTOR
+
+SQLite FTS keeps retrieval lexical
+
+src: Example RSS · full · high · ok
+
+original link
+
+Full extracted text in the Inspector. Provenance and source-backed detail remain visible.
+
+Search retrieves source-backed items without RAG framing.
+
+why: fresh from configured source
+
+Search and Retrieval
+Plain text query  Source filter  From date  To date   Resonated only Result limit 
+10
+20
+50
+100
+ search
+
+1 results
+
+SQLite FTS keeps retrieval lexical
+
+Dense factual summary describing how source-backed search stays verifiable.
+
+match: lexical index
+
+src: Example RSS
+
+date: 2026-05-09T10:00:00Z · not resonated
+
+Lexical and metadata retrieval only; results stay source-backed.
