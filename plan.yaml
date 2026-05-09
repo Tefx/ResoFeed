@@ -14713,3 +14713,139 @@ phases:
     - runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     agent: gate-reviewer
+  - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
+    name: fix-readme-secret-cli-regression
+    status: pending
+    description: 'step_type: implementation
+
+      priority: HIGH
+
+      agent_source: project
+
+      provenance: verification finding from runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+
+      disposition: blocking-now for runtime-secret-env-config-foundation.secret-config-gate
+      and downstream OpenRouter phases
+
+
+      Batched documentation remediation for the runtime secret-source policy regression
+      found by verification.
+
+
+      Issue to fix:
+
+      - README.md lines 14-20 currently show a runnable quick-start command with `--gemini-api-key
+      "<GEMINI_API_KEY>"`.
+
+      - This violates the runtime secret-source policy because public docs must not
+      require or recommend putting API keys in shell-history commands.
+
+
+      Scope:
+
+      - Update README.md and any adjacent public usage docs that contain runnable
+      examples for Gemini/OpenRouter/API keys.
+
+      - Replace CLI secret flag examples with safe OS environment variable and/or
+      local `.env` patterns.
+
+      - Make clear that `.env` is local-only/non-committed and that examples must
+      not print real secrets.
+
+      - Preserve the single-binary, SQLite-only, no-sync/no-accounts architecture
+      boundaries.
+
+
+      Scope guard:
+
+      - Documentation-only remediation.
+
+      - Do NOT modify product code, tests, config loaders, `.env` reading behavior,
+      or runtime secret resolution.
+
+      - Do NOT add real secrets, fake secrets that look production-like, or committed
+      `.env` files.
+
+      - Do NOT introduce new product concepts or onboarding flows.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Any README/USAGE/ARCHITECTURE runnable example that requires `--gemini-api-key`,
+      `--openrouter-api-key`, or any CLI flag carrying secret material.
+
+      2. Any shell command that embeds an API key placeholder as an argv value likely
+      to enter shell history.
+
+      3. Any doc language suggesting secrets are portable state, exported state, or
+      safe to commit.
+
+      4. Any product-code or `.env` parser changes in this doc remediation step.'
+    verification: Documentation-only remediation evidence shows README.md and adjacent
+      public docs no longer require CLI API key secret flags. Focused searches for
+      runnable CLI secret examples are clean or explicitly justified as non-runnable
+      historical/negative examples. No product code or `.env` files changed.
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - README.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Documentation Fix Evidence
+
+
+      **Files changed**:
+
+      ```
+
+      <list documentation files only>
+
+      ```
+
+
+      **Unsafe examples removed/replaced**:
+
+      ```
+
+      <before/after summary; do not include real secrets>
+
+      ```
+
+
+      **Commands/searches executed**:
+
+      ```
+
+      <markdown search commands and output>
+
+      ```
+
+
+      **Scope guard confirmation**:
+
+      - Product code changed: YES/NO (must be NO)
+
+      - `.env` or secrets committed: YES/NO (must be NO)
+
+      - New runtime behavior introduced: YES/NO (must be NO)
+
+
+      **Gate impact**:
+
+      - README shell-history regression addressed: YES/NO
+
+      - Remaining docs requiring CLI API key secrets: <none or list with rationale>
+
+      '
+    depends_on:
+    - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+    agent: doc-reviewer
