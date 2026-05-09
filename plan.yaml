@@ -7012,6 +7012,15 @@ phases:
 
       - No forbidden UI/product patterns introduced
 
+      - `retest-frontend-contract-closure` has rerun and closed BOTH failed semantic
+      checks: frontend spec conformance and native render-first UI/UX audit
+
+      - All blocker families B1, B2, B3, B5, U1, U2, and U3 are PROVEN closed or have
+      explicit accepted non-intersection evidence
+
+      - Safe should-fix findings from both failed audits have evidence-backed closure
+      or explicit accepted non-intersection disposition
+
 
       review_depth: THOROUGH
 
@@ -7025,37 +7034,90 @@ phases:
 
       - active-state portability and no backup dashboard
 
-      - no account/login/onboarding drift'
+      - no account/login/onboarding drift
+
+      - steer `/api/steer` and `/doctor` runtime reachability from UI
+
+      - mobile full-screen Inspector/ledger/search/state route/state contract
+
+      - owner-token persistence only after authenticated acceptance
+
+      - no duplicate desktop Inspector star, duplicate detail content, duplicate TODAY
+      headings/counts, or internal Contract copy
+
+      - inactive/active Resonate styling, including active scarce accent `#7A4600`
+
+
+      Gate decision basis MUST cite the semantic closure register from `retest-frontend-contract-closure`.
+      Gate may not OPEN if any blocker-class status remains NEEDS_TEST, UNPROVEN,
+      or open without accepted non-intersection evidence.'
     verification: phase-check protecting End to End Integration. Gate may OPEN only
       with rendered UI evidence, uiux-auditor PASS/PASS_WITH_DEBT without blockers,
-      spec conformance closure, and green frontend build/tests.
+      spec conformance closure, green frontend build/tests, and semantic closure from
+      `retest-frontend-contract-closure` for B1/B2/B3/B5/U1/U2/U3 plus safe should-fix
+      dispositions. Gate MUST BLOCK if the retest headline is FAIL, if any blocker-class
+      item remains NEEDS_TEST or UNPROVEN, or if rendered desktop/mobile artifacts
+      are missing.
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
       - .agents/instructions.md — key passage or "NOT READ: <reason>"
 
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
 
       - docs/USAGE.md — key passage or "NOT READ: <reason>"
 
 
       ## Gate Review Report
 
-      - Step evidence quality table:
 
-      - UI/UX audit decision basis:
+      **Reviewer**: gate-reviewer (independent of phase implementation)
 
-      - Issues identified:
-
-      - Gate Decision Basis:
-
-      - OPEN/BLOCK recommendation:
+      **Phase**: frontend-implementation
 
 
-      ## Headline
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ### Required closure checks
+
+      - `retest-frontend-contract-closure` completed with PASS/PASS_WITH_DEBT and
+      no blocker-class open items: YES/NO
+
+      - B1 `/api/steer` UI path proven: YES/NO
+
+      - B2 `/doctor` raw diagnostics proven: YES/NO
+
+      - B3 desktop duplicate Inspector star removed: YES/NO
+
+      - B5 owner-token persistence-after-acceptance only proven: YES/NO
+
+      - U1 mobile full-screen route/state contract proven: YES/NO
+
+      - U2 desktop 3px marker and no duplicate detail content proven: YES/NO
+
+      - U3 Resonate styling proven: YES/NO
+
+      - Safe should-fix dispositions evidence-backed: YES/NO
+
+      - Rendered desktop/mobile artifacts present: YES/NO
+
+      - Frontend check/build/test green: YES/NO
+
+
+      ### Gate Decision
 
       OPEN | BLOCKED'
     refs:
@@ -7069,6 +7131,7 @@ phases:
     - frontend-implementation.frontend-green-retest
     - frontend-implementation.native-ui-ux-implementation-audit
     - frontend-implementation.frontend-spec-conformance
+    - retest-frontend-contract-closure
     agent: gate-reviewer
   - id: fix-steer-diagnostics-and-mobile-ui-contract
     name: Fix steer diagnostics and mobile UI contract blockers
