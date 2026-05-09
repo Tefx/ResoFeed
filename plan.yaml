@@ -3119,7 +3119,7 @@ phases:
     claimed_at: '2026-05-09T07:12:12.005932+00:00'
   - id: runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     name: Complete MCP Streamable HTTP surface
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -3206,6 +3206,8 @@ phases:
     - docs/DESIGN_VISION.md
     - docs/USAGE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T07:12:15.574716+00:00'
   - id: runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     name: Complete serve runtime lifecycle
     status: pending
