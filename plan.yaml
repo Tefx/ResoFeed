@@ -3808,7 +3808,7 @@ phases:
       frontend rendering remains out of scope.'
   - id: runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     name: Early runtime vertical slice proof
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -3879,6 +3879,8 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T07:28:40.447756+00:00'
   - id: runtime-api-and-mcp-integration.runtime-liveness-probe
     name: Runtime liveness probe
     status: pending
