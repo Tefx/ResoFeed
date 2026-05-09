@@ -16262,7 +16262,7 @@ phases:
     agent: gate-reviewer
   - id: openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
     name: fix-startup-validation-order
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
       verification_scope: phase-check protecting final OpenRouter gate\n\nFix B1 startup\
       \ validation-order divergence reported by `openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit`\
@@ -16390,6 +16390,114 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T19:06:27.063182+00:00'
+    done_at: '2026-05-09T19:10:35.821387+00:00'
+    evidence: 'Startup validation-order fix SUCCESS accepted after mainline verification.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — startup/OpenRouter contract: OpenRouter key from `OPENROUTER_KEY`/`.env`,
+      no CLI key flag, no startup network model validation, secrets redacted, and
+      startup matrix lines 92-104 mapping invalid `--addr`, `--public-url`, OpenRouter
+      key, and `--owner-token`.
+
+      - .audit-artifacts/openrouter_verification/spec-doc-state-conformance-audit.md
+      — B1 blocker: missing OpenRouter key masked invalid `--addr`; remediation requested
+      deterministic local validation before OpenRouter secret resolution.
+
+      - .agents/instructions.md — stale Gemini guidance was present in runtime secret
+      handling; updated bounded wording to OpenRouter-only.
+
+      - docs/USAGE.md — user-facing OpenRouter behavior: `OPENROUTER_KEY` only, `.env`
+      fallback, `--openrouter-model` non-secret/no startup network validation, no
+      CLI API-key flag.
+
+      - internal/resofeed startup tests — read runtime_startup_test.go, runtime_secret_config_test.go,
+      openrouter_cli_adapter_contract_test.go, and openrouter_runtime_wiring_test.go.
+
+
+      ## B1 Startup Validation-Order Fix Evidence
+
+      - Worker commit: 4e8f65cc08928d5b8dad6ae0fc234d5412168695 (`fix startup validation
+      ordering for OpenRouter`)
+
+      - Main squash merge commit: 8e374e7 (`[vectl] step-openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
+      completed`).
+
+      - Files changed: .agents/instructions.md, internal/resofeed/db.go, internal/resofeed/runtime_startup_test.go.
+
+
+      Root cause vs symptom:
+
+      - Root cause: `Main` resolved the OpenRouter runtime secret before deriving/validating
+      local serve config.
+
+      - Symptom: `--addr bad` with no OpenRouter key returned `invalid_openrouter_key`
+      instead of `invalid_addr`.
+
+      - Why this fix is not surface-level: startup now validates derived public URL/local
+      config (`--addr`, `--public-url`, `--owner-token`) before secret resolution,
+      while keeping the existing OpenRouter resolver and secret behavior unchanged.
+
+
+      Regression tests added/updated:
+
+      - invalid `--addr` with no OpenRouter key -> `invalid_addr`: `TestServeStartupValidationOrdersLocalConfigBeforeMissingOpenRouterKey/invalid_addr_before_missing_openrouter_key`
+      PASS.
+
+      - `--public-url` ordering: `invalid_public_url_before_missing_openrouter_key`
+      PASS.
+
+      - `--owner-token` ordering: `invalid_owner_token_before_missing_openrouter_key`
+      PASS.
+
+      - missing OpenRouter key baseline: `missing_openrouter_key_baseline_after_valid_local_config`
+      PASS.
+
+
+      Mainline commands run after merge:
+
+      ```text
+
+      go test ./internal/resofeed -run ''TestServeStartupValidationOrdersLocalConfigBeforeMissingOpenRouterKey|TestOpenRouter''
+      -count=1 — PASS
+
+      go test ./... — PASS
+
+      go build ./cmd/resofeed — PASS
+
+      golangci-lint run — PASS (0 issues)
+
+      go test -race ./internal/resofeed — PASS
+
+      env -u OPENROUTER_KEY -u GEMINI_API_KEY go run ./cmd/resofeed serve --addr bad
+      --db /tmp/resofeed-b1-mainline.sqlite3 --owner-token <test-token> — nonzero
+      as expected; stderr contains `invalid_addr`
+
+      ```
+
+
+      Safety preservation:
+
+      - no secret printing: tests assert redaction; evidence contains no real OpenRouter
+      key values.
+
+      - no CLI API-key flag: no OpenRouter CLI secret flag added; existing contract
+      tests still reject legacy Gemini flags.
+
+      - no startup network model validation: unchanged; `--openrouter-model` path
+      remains pass-through and focused OpenRouter tests pass.
+
+      - existing OpenRouter tests: focused `TestOpenRouter*` and full suite passed.
+
+
+      Guidance drift disposition:
+
+      - `.agents/instructions.md` updated safely and narrowly from Gemini-era runtime-secret
+      wording to OpenRouter-only guidance matching canonical architecture.
+
+
+      Deviation records: none.'
 - id: runtime-secret-env-config-foundation
   name: Runtime Secret Env Config Foundation
   status: done
