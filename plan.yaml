@@ -6909,7 +6909,7 @@ phases:
     claimed_at: '2026-05-09T09:49:17.859132+00:00'
   - id: frontend-implementation.frontend-spec-conformance
     name: Frontend spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -6986,6 +6986,79 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-09T09:49:14.388996+00:00'
+    done_at: '2026-05-09T10:02:02.372719+00:00'
+    evidence: "## Frontend Spec Conformance Report\n\n**Semantic outcome:** FAIL report\
+      \ delivered; blocker-class issues were batched into remediation before completion.\n\
+      \n### Orchestrator Remediation Ownership\n- Parallel failure aggregation applied\
+      \ for `frontend-implementation.frontend-spec-conformance` and `frontend-implementation.native-ui-ux-implementation-audit`.\n\
+      - Planner created batched fix step: `fix-steer-diagnostics-and-mobile-ui-contract`.\n\
+      - Planner created retest step: `retest-frontend-contract-closure`.\n- Planner\
+      \ strengthened `frontend-implementation.frontend-gate` dependencies/criteria\
+      \ to require retest-based closure before opening.\n\n### Orchestrator Mainline\
+      \ Final-State Barrier\n- Worker branch status before merge: clean.\n- Squash\
+      \ merge result for report branches: spec branch already up to date; UI audit\
+      \ artifact branch committed separately as `0f654f6`.\n- Mainline verification\
+      \ after report artifact merge:\n  - `go test ./... -count=1` — PASS.\n  - `npm\
+      \ --prefix web run check` — PASS; 0 errors, 0 warnings.\n  - `npm --prefix web\
+      \ run build` — PASS; static site written.\n  - `npm --prefix web run test` —\
+      \ PASS; 2 files / 11 tests passed.\n\n## refs Read Confirmation (MANDATORY)\n\
+      - .agents/instructions.md — Read. Canonical docs are docs/ARCHITECTURE.md and\
+      \ docs/DESIGN.md; forbidden UI patterns include folders, tags, unread counts,\
+      \ mark-all-read, archive bins, settings sliders, drag-and-drop.\n- docs/ARCHITECTURE.md\
+      \ — Read. Frontend boundary requires owner-token prompt before /api calls, localStorage\
+      \ key resofeed.ownerToken, Authorization Bearer on every /api request, Steer\
+      \ as primary command surface, flat Source Ledger, terse state export/import,\
+      \ no extra dashboards.\n- docs/PRD.md — Read. First-run has no onboarding wizard\
+      \ and requires Steer URL subscription plus OPML import; search is lexical and\
+      \ not a fourth top-level primitive; state portability is architecture §5.5 only.\n\
+      - docs/DESIGN.md — Read. Owner Token Prompt must appear before app calls /api\
+      \ and store accepted token as resofeed.ownerToken after acceptance; First-Use\
+      \ Empty State exact copy; Source Ledger flat/delete/import/export only; State\
+      \ Portability excludes history/sync/receipts; desktop Inspector must not duplicate\
+      \ star.\n- docs/DESIGN_VISION.md — Read. No account login/onboarding, terse\
+      \ owner-token gate before feed API calls; Source Ledger flat list, no folders/tags/drag-and-drop.\n\
+      - docs/USAGE.md — Read. UI stores token as resofeed.ownerToken and sends Authorization\
+      \ Bearer for every /api request; /doctor through Steer is raw text, not dashboard;\
+      \ usage excludes settings dashboards, vector/RAG, folders/tags, unread counts.\n\
+      \n## Spec Conformance Findings\n- Requirements register covered owner-token\
+      \ gate/storage/header, first-use empty state, Steer primary command surface,\
+      \ feed rendering, Resonate semantics, Inspector behavior, Source Ledger, State\
+      \ Portability, API client contracts, Search/Retrieval, forbidden UI patterns,\
+      \ and rendered surface coverage.\n- Blocker divergences:\n  - B1: Steer input\
+      \ rendered but not wired to `/api/steer`; RSS URL subscription and natural-language\
+      \ steering unavailable from UI.\n  - B2: `/doctor` diagnostics output not reachable/rendered\
+      \ from Steer; only unused API-client method exists.\n  - B3: Desktop split Inspector\
+      \ duplicates the Resonate star contrary to DESIGN.md.\n  - B5: Owner token stored\
+      \ in localStorage before authenticated acceptance.\n- Verification environment\
+      \ note: B4 in original report observed missing `svelte-kit`/`vite` in isolated\
+      \ worktree; downstream fix/retest now requires `npm --prefix web ci` before\
+      \ check/build/test when dependencies are absent.\n- Additional should-fix findings:\
+      \ Search lacks visible limit control; OPML flattening/state import extra-field\
+      \ rejection need proof/contract path.\n\n### Behavioral Proof Register\n- R1\
+      \ Owner-token gate: PARTIAL — static gate exists, but localStorage write precedes\
+      \ backend acceptance and runtime proof was missing in the failed worktree.\n\
+      - R4 Steer primary command surface: DIVERGES — required behavior not wired.\n\
+      - R7 Inspector desktop no duplicate star: DIVERGES — static code rendered star\
+      \ in desktop split when callback passed.\n- R8 OPML import flattening: NEEDS_TEST\
+      \ — frontend sends OPML; flattening is backend behavior not proven by this frontend\
+      \ evidence.\n- R9 State portability active-state only: PARTIAL — type/UI copy\
+      \ align, but frontend schema rejection proof absent.\n- R10 API client error/header\
+      \ behavior: NEEDS_TEST — static implementation exists but authoritative runtime\
+      \ tests did not run in that worktree.\n- R13 Diagnostics rendered surface: DIVERGES\
+      \ — API method exists but no rendered diagnostic surface or Steer command path\
+      \ exists.\n\n## Semantic Closure Fields\nheadline: FAIL\nstep_intent: verification\n\
+      expected_result: green\nobserved_result: red\nverdict: FAIL\nblockers:\n  -\
+      \ B1: Steer input is rendered but not wired to `/api/steer`; RSS URL subscription\
+      \ and natural-language steering are unavailable from UI.\n  - B2: `/doctor`\
+      \ diagnostics output is not reachable/rendered from Steer; only an unused API-client\
+      \ method exists.\n  - B3: Desktop split Inspector duplicates the Resonate star\
+      \ contrary to explicit DESIGN.md contract.\n  - B4: Frontend tests/build could\
+      \ not run in the isolated report worktree because `svelte-kit` and `vite` were\
+      \ missing; downstream retest must run `npm --prefix web ci` first when needed.\n\
+      \  - B5: Owner token is stored in localStorage before authenticated acceptance,\
+      \ contrary to the after-acceptance wording.\nproof_gap_status: BLOCKING\nblocking_status:\
+      \ OPEN\ngate_open_allowed: false\norchestrator_action_hint: DO_NOT_COMPLETE\n\
+      product_implementation_files_modified: false"
   - id: frontend-implementation.frontend-gate
     name: Frontend gate
     status: pending
