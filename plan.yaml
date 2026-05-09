@@ -18583,7 +18583,7 @@ phases:
       - none.'
 - id: manual-rss-fetch
   name: Manual RSS Fetch
-  status: pending
+  status: in_progress
   gate: Manual RSS fetch backend, frontend, visual compliance, and runtime behavior
     are independently verified before release.
   depends_on:
@@ -19354,7 +19354,7 @@ phases:
     - manual-rss-fetch.uiux-audit
   - id: backend-contract
     name: Backend Contract Lock
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - HTTP endpoint contracts\n  - response schemas\n  - concurrency guard contract\n\
       \  - acceptance-only test seams\nagent_source: project\nwork_type: new_capability\n\
@@ -19427,6 +19427,8 @@ phases:
 
       - Implementation logic introduced: NONE required'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T21:18:12.809389+00:00'
   - id: backend-expected-red-tests
     name: Backend Expected-Red Contract Tests
     status: pending
