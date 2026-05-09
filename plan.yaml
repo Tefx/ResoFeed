@@ -13684,3 +13684,96 @@ phases:
     - openrouter-llm-verification-and-live-smoke.independent-regression-suite
     - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     agent: blind-tester
+  - id: openrouter-llm-verification-and-live-smoke.documentation-sync
+    name: documentation-sync
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check protecting final OpenRouter gate
+
+
+      Final documentation sync after implementation and live smoke. Update project
+      documentation to match implemented OpenRouter behavior without adding new architecture
+      or product concepts.
+
+
+      Required checks:
+
+      - README/USAGE/ARCHITECTURE commands and examples use `--openrouter-api-key`
+      and optional `--openrouter-model`.
+
+      - No docs promise `--gemini-api-key`, `--gemini-model`, Gemini backend configuration,
+      or Gemini compatibility mode.
+
+      - `/doctor` docs describe `openrouter:` raw text and configured/default/resolved
+      model distinction.
+
+      - State export docs confirm OpenRouter key/model are runtime-only and not portable
+      state.
+
+      - MCP/HTTP docs preserve same product operations and owner-token boundary.
+
+      - No documentation introduces OpenRouter attribution headers, provider registry,
+      multi-user auth, sync/merge/history, vector DB, embeddings, or RAG.
+
+
+      If live smoke found external-service caveats, document operational guidance
+      without printing secrets.'
+    verification: phase-check protecting final gate. Documentation must match implemented
+      behavior and canonical architecture. Docs must contain no Gemini flag promises
+      and no secret examples using real keys.
+    evidence_template: '## Documentation Sync Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ### Docs Updated/Checked
+
+      | File | Change/Check | Result |
+
+      |---|---|---|
+
+
+      ### Search Evidence
+
+      ```
+
+      <commands/output showing Gemini flag promises absent and OpenRouter docs present>
+
+      ```
+
+
+      ### Secret Safety
+
+      - No real OpenRouter key shown:
+
+      - Example keys are placeholders/redacted:
+
+
+      ### Architecture Constraints
+
+      - No forbidden concepts introduced:
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
+    - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
+    agent: doc-reviewer
