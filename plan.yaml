@@ -9055,7 +9055,7 @@ phases:
     agent: gate-reviewer
   - id: fix-end-to-end-blockers
     name: Fix end-to-end blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -9374,6 +9374,93 @@ phases:
     agent: python-senior
     claimed_by: python-senior
     claimed_at: '2026-05-09T11:24:19.037159+00:00'
+    done_at: '2026-05-09T11:34:23.848300+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — canonical docs authority; no accounts/vector DB/sync;
+      owner token is auth boundary; actor_id is provenance only.
+
+      - docs/ARCHITECTURE.md — one Go binary, SQLite+FTS5 only, HTTP/MCP share product
+      operations, state import/export current-state only, no settings/dashboard surfaces.
+
+      - docs/PRD.md — AC-4 strict filter/boost; AC-5 inspect is not agreement; AC-7/9
+      delivery vs evaluation; AC-11 agent steering receipt; search must not be a fourth
+      top-level tab.
+
+      - docs/DESIGN.md — Source Ledger is allowed state action location; steering
+      receipts show actor inline; feed may show value tier as terse metadata.
+
+      - docs/DESIGN_VISION.md — no left nav/settings panels, no activity logs, agent
+      handoffs stay inside unified feed/workbench.
+
+      - docs/USAGE.md — external agents use MCP with owner token; report_delivery
+      suppresses repeats; state import replaces active portable state.
+
+
+      ## Batched Remediation Evidence
+
+      - Worker commit: `bf837c66f77f7b75e068d55040506febba307a59` on branch `vectl/step-fix-end-to-end-blockers`.
+
+      - Main squash merge commit: `23d5501`.
+
+      - Files changed: docs/ARCHITECTURE.md, docs/USAGE.md, internal/resofeed/core_blockers_test.go,
+      http.go, http_impl_test.go, json_contract_test.go, mcp_integration_test.go,
+      ranking.go, search.go, types.go, web API contract/client, page and Feed/Inspector
+      components/tests/fixtures.
+
+
+      ## Blocker Closure Table
+
+      | ID | Status | Evidence |
+
+      | --- | --- | --- |
+
+      | B1 | CLOSED | Removed SEARCH and STATE top-level nav buttons; state portability
+      renders within Source Ledger; search reachable through Steer-style command flow;
+      UI render test asserts nav has TODAY and SOURCE LEDGER only. |
+
+      | B2 | CLOSED | Added `/api/steer/active`, reused active SteerRule actor metadata,
+      surfaced active agent steering in UI as `agent:<id> steering active: ... · correct
+      in Steer`; render test proves human-visible agent receipt. |
+
+      | B3 | CLOSED | Added real runtime/backend tests for AC-4 strict filter+boost,
+      AC-5 inspection-not-preference, and MCP delivery suppression/resurfacing. |
+
+      | W1 | CLOSED | Kept `items.value_tier` in production scope and exposed it through
+      ItemSummary/ItemDetail, HTTP today/search/detail, MCP candidates/read paths,
+      search indexing, and UI feed/Inspector metadata with tests. |
+
+
+      ## Should-Fix/Debt Disposition
+
+      - `SteerRule.SupersededBy`: fixed by setting it when human steering supersedes
+      active agent steering.
+
+      - Orphan/reserved exports: removed/de-exported; worker static grep confirmed
+      `ServeHTTPRuntime`, `RebuildSearchIndex`, and `DeliveryReportRequest` absent.
+
+      - State import proof: existing authorized JSON `/api/state/import` HTTP handler
+      roundtrip test covers the path; no new product surface added.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran after squash merge in main: `go test ./internal/resofeed && go test ./...
+      && npm --prefix web ci && npm --prefix web test && npm --prefix web run build
+      && mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed`.
+
+      - Output: `go test ./internal/resofeed` passed; `go test ./...` passed (`cmd/resofeed
+      [no test files]`, `internal/resofeed ok`); npm ci installed 150 packages; `npm
+      --prefix web test` passed with svelte-check 0 errors/0 warnings and vitest 2
+      files/16 tests passed; web production build succeeded; Go binary build succeeded.
+
+
+      ## Gaps/Notes
+
+      - Existing npm audit reported 3 low-severity dependency findings; outside blocker
+      scope and not introduced by this step.
+
+      - No forbidden ResoFeed surfaces introduced per worker evidence.'
   - id: retest-end-to-end-blockers
     name: Retest end-to-end blockers
     status: pending
