@@ -5707,7 +5707,7 @@ phases:
       public `serve` has no approved fake-Gemini injection flag.'
   - id: runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring
     name: Fix runtime proof and production stub wiring
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -5942,6 +5942,72 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T09:27:07.683088+00:00'
+    done_at: '2026-05-09T09:36:52.114809+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — canonical docs\
+      \ are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`; one Go binary serves static\
+      \ assets, JSON HTTP, MCP, and background ingest; UI must stay dense/archival\
+      \ with functional labels.\n- docs/ARCHITECTURE.md — startup order requires HTTP\
+      \ static/API server and MCP endpoint before background ingestion; Static UI\
+      \ must render DESIGN surfaces and call JSON HTTP endpoints.\n- docs/DESIGN.md\
+      \ — Source Ledger, State Portability, Search/Retrieval, Owner Token Prompt,\
+      \ `/doctor`, and archival UI constraints are specified; no SaaS/onboarding/folders/tags/unread/archive/settings\
+      \ inventions.\n- docs/DESIGN_VISION.md — Analyst workbench intent: high-density,\
+      \ typographic, no account/onboarding, no numeric indicators, flat Source Ledger,\
+      \ Inspect/Resonate/Steer primitives.\n- docs/USAGE.md — `serve` starts web UI,\
+      \ JSON HTTP API, MCP `/mcp`, background ingestion, SQLite, and static serving;\
+      \ UI uses owner token for `/api/*`.\n\n## Orchestrator Mainline Final-State\
+      \ Barrier\n- Worker branch status before merge: clean.\n- Worker branch plan\
+      \ local changes: none.\n- Squash merge commit on main: `f357245` (`[vectl] step-runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring\
+      \ completed`).\n- Mainline verification commands and outcomes:\n  - `go test\
+      \ ./... -run TestServeReadinessBeforeBackgroundIngest -count=1 -v` — PASS; log\
+      \ included `ordered lifecycle proof: bind/listen ready -> HTTP/MCP readiness\
+      \ observable -> background ingest start`.\n  - `go test ./... -count=1` — PASS.\n\
+      \  - `npm --prefix web run check` — PASS; `svelte-check found 0 errors and 0\
+      \ warnings`.\n  - `npm --prefix web run build` — PASS; adapter-static wrote\
+      \ site to `build`.\n  - `npm --prefix web run test` — PASS; `Test Files 2 passed\
+      \ (2)`, `Tests 11 passed (11)`.\n  - `if grep -R \"ContractStub\" \"web/src/routes\"\
+      \ \"web/src/lib\" --include='*.svelte' --include='*.ts'; then exit 1; else true;\
+      \ fi` — PASS with no output.\n\n## Batched Remediation Evidence\n\n### R4 Lifecycle\
+      \ Proof\n**Test name**: TestServeReadinessBeforeBackgroundIngest\n**Command\
+      \ executed**: go test ./... -run TestServeReadinessBeforeBackgroundIngest -count=1\
+      \ -v\n**Actual output**:\n```text\n?   \tresofeed/cmd/resofeed\t[no test files]\n\
+      === RUN   TestServeReadinessBeforeBackgroundIngest\n    runtime_startup_test.go:160:\
+      \ ordered lifecycle proof: bind/listen ready -> HTTP/MCP readiness observable\
+      \ -> background ingest start\n--- PASS: TestServeReadinessBeforeBackgroundIngest\
+      \ (0.01s)\nPASS\nok  \tresofeed/internal/resofeed\t0.496s\n```\n**Ordered lifecycle\
+      \ proof**: bind/listen ready -> HTTP/MCP readiness observable -> background\
+      \ ingest start\n**Why previous gate missed it**: prior checks accepted static\
+      \ goroutine launch order and liveness, but did not observe a real bound listener\
+      \ and successful HTTP/MCP readiness probes before allowing ingest to start.\n\
+      **Reversal risk**: without the runtime ordering gate, scheduler/startup timing\
+      \ variance could let ingest begin before HTTP/MCP is reachable, making downstream\
+      \ runtime/E2E readiness proof falsely green.\n\n### Production UI Stub-Wiring\
+      \ Closure\n**Files changed**:\n- web/src/routes/+page.svelte\n- web/src/routes/components/Feed.svelte\n\
+      - web/src/routes/components/Inspector.svelte\n- web/src/routes/components/SourceLedger.svelte\n\
+      - web/src/routes/components/StatePortability.svelte\n- web/src/routes/components/SearchRetrieval.svelte\n\
+      - web/src/lib/api-client.test.ts\n- web/src/routes/components/__tests__/rendering-expected-red.test.ts\n\
+      **Grep command/output**:\n```text\ngrep -R \"ContractStub\" \"web/src/routes\"\
+      \ \"web/src/lib\" --include='*.svelte' --include='*.ts' || true\n<no output>\n\
+      ```\n**Frontend build/test command/output**:\n```text\nnpm --prefix web run\
+      \ check\nsvelte-check found 0 errors and 0 warnings\n\nnpm --prefix web run\
+      \ build\n✓ built\nWrote site to \"build\"\n✔ done\n\nnpm --prefix web run test\n\
+      Test Files 2 passed (2)\nTests 11 passed (11)\n```\n**UI surface wiring trace**:\
+      \ Feed uses `client.today`, `client.item`, `client.inspect`, and `client.resonance`;\
+      \ Inspector renders real item detail/summary state; Source Ledger uses `client.sources`,\
+      \ `client.deleteSource`, and `client.importOpml`; State Portability uses `client.exportState`\
+      \ and `client.importState`; Search/Retrieval uses `client.search`.\n\n## Implementation\
+      \ Evidence\nCommit hash(es): worker commits `34fa9d416314cf1853b7b5b0003a1abe66dc0307`,\
+      \ `dd0f5a5`; merged main commit `f357245`.\nFiles changed:\n- internal/resofeed/db.go\n\
+      - internal/resofeed/http.go\n- internal/resofeed/runtime_startup_test.go\n-\
+      \ web/src/lib/api-client.test.ts\n- web/src/routes/+page.svelte\n- web/src/routes/components/Feed.svelte\n\
+      - web/src/routes/components/Inspector.svelte\n- web/src/routes/components/SearchRetrieval.svelte\n\
+      - web/src/routes/components/SourceLedger.svelte\n- web/src/routes/components/StatePortability.svelte\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n- deleted/renamed\
+      \ production `*ContractStub` components\nVerification: see mainline final-state\
+      \ barrier above.\nSpec link: docs/ARCHITECTURE.md, docs/DESIGN.md, docs/USAGE.md\n\
+      Gaps/Notes: none\n\n## Semantic Closure Fields\nstep_intent: implementation_fix\n\
+      expected_result: green\nobserved_result: green\nverdict: PASS\nblockers: []\n\
+      product_implementation_files_modified: true"
   - id: runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     name: Retest runtime proof and production stub wiring
     status: pending
