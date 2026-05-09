@@ -13977,7 +13977,7 @@ phases:
       as allowed by prior notes; no runtime-facing Gemini text was added.'
   - id: openrouter-llm-implementation.wiring-audit
     name: wiring-audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -14102,6 +14102,99 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-09T18:45:09.567023+00:00'
+    done_at: '2026-05-09T18:49:06.495015+00:00'
+    evidence: 'Wiring retest PASS accepted and audit artifact merged.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Refs read confirmation:
+
+      - .audit-artifacts/openrouter_implementation_verification/wiring-audit.md —
+      prior blocker was production Gemini residue: `NewOpenRouterClient` returning
+      `geminiHTTPClient` and `GeminiClient`/`geminiContent`/`geminiPart` symbols.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree root.
+
+      - .agents/instructions.md — one deployable Go binary, runtime-only LLM secrets,
+      OpenRouter reuse of runtime secret-source contract, no CLI key regression.
+
+      - docs/ARCHITECTURE.md — `OPENROUTER_KEY` only, OS env > `.env`, no CLI API-key
+      flag, OpenRouter endpoint/model semantics, `/doctor` `openrouter:` prefix.
+
+      - docs/USAGE.md — safe OpenRouter key setup via `OPENROUTER_KEY`, optional `--openrouter-model`,
+      endpoint `https://openrouter.ai/api/v1/chat/completions`.
+
+
+      Artifact merged:
+
+      - .audit-artifacts/openrouter_implementation_verification/wiring-audit-retest.md
+
+      Main squash merge commit: 43df26d (`[vectl] step-openrouter-llm-implementation.wiring-audit
+      completed`).
+
+
+      Static evidence:
+
+      - Export/reachability: `cmd/resofeed/main.go -> internal/resofeed/db.go Main
+      -> ResolveOpenRouterRuntimeSecret -> NewOpenRouterClient -> ServeHTTPAndIngestRuntime
+      -> RunIngestLoop -> SummarizeItem/TranslateSteering`.
+
+      - CLI/env registration: production parser registers `--addr`, `--public-url`,
+      `--db`, `--openrouter-model`, `--owner-token`; no production secret CLI or Gemini
+      flags.
+
+      - Config consumption: `OpenRouterKey/OpenRouterModel` consumed by `NewOpenRouterClient`;
+      state/export OpenRouter references are negative tests guarding exclusion, not
+      production persistence.
+
+      - Gemini runtime residue: production non-test `rg/git grep` for `GeminiClient|geminiHTTPClient|geminiContent|geminiPart|Gemini|gemini`
+      found none.
+
+      - Production stubs/placeholders: none found in production serve path.
+
+      - HTTP/MCP provider fact re-derivation: HTTP/MCP use shared `DoctorConfigFromLLM`,
+      `ApplySteering`, and `SteerForMCP` paths.
+
+
+      Behavioral proof register:
+
+      - static-entry-to-effect-trace — PASS.
+
+      - production-gemini-residue-fingerprint — PASS.
+
+      - scoped-artifact-commit — PASS; audit artifact only.
+
+
+      Mainline post-merge verification:
+
+      ```text
+
+      git grep production non-test Gemini residue — no matches (exit 1 expected)
+
+      go test ./... — PASS
+
+      ```
+
+
+      Headline: PASS.'
   - id: openrouter-llm-implementation.serve-liveness-probe
     name: serve-liveness-probe
     status: done
