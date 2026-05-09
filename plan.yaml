@@ -7142,7 +7142,7 @@ phases:
       product_implementation_files_modified: false"
   - id: frontend-implementation.frontend-gate
     name: Frontend gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -7287,6 +7287,8 @@ phases:
     - frontend-implementation.frontend-spec-conformance
     - retest-frontend-contract-closure
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T10:28:44.123465+00:00'
   - id: fix-steer-diagnostics-and-mobile-ui-contract
     name: Fix steer diagnostics and mobile UI contract blockers
     status: done
