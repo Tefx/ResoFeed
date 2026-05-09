@@ -2227,7 +2227,7 @@ phases:
     agent: gate-reviewer
   - id: fix-core-domain-verification-blockers
     name: Fix core domain verification blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -2439,6 +2439,8 @@ phases:
     - core-domain-implementation.complete-ingestion-and-gemini-transform-logic
     - core-domain-implementation.complete-ranking-search-and-steering-logic
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T04:24:15.197649+00:00'
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
   status: locked
