@@ -1,0 +1,13 @@
+{
+  "schema_version": "resofeed.state.v1",
+  "exported_at": "2026-05-09T12:55:23.801463Z",
+  "sources": [
+    {
+      "id": "src_1e33a47e627f516146190b0a41f3eeb7",
+      "url": "https://example.com/feed.xml",
+      "title": "example.com"
+    }
+  ],
+  "steer_rules": [],
+  "resonated_items": []
+}

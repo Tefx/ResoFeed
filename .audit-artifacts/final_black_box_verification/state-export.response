@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 09 May 2026 12:55:23 GMT
+Content-Length: 296
+
+{
+  "schema_version": "resofeed.state.v1",
+  "exported_at": "2026-05-09T12:55:23.795767Z",
+  "sources": [
+    {
+      "id": "src_1e33a47e627f516146190b0a41f3eeb7",
+      "url": "https://example.com/feed.xml",
+      "title": "example.com"
+    }
+  ],
+  "steer_rules": [],
+  "resonated_items": []
+}

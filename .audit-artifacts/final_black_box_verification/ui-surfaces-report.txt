@@ -1,0 +1,115 @@
+HOME
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+TODAY
+SOURCE LEDGER
+First use
+
+Paste RSS URL in Steer or import OPML.
+
+Inspect opens the item.
+
+Star preserves durable value.
+
+Steer is optional correction.
+
+INSPECTOR
+---
+SOURCE_LEDGER
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+TODAY
+SOURCE LEDGER
+First use
+
+Paste RSS URL in Steer or import OPML.
+
+Inspect opens the item.
+
+Star preserves durable value.
+
+Steer is optional correction.
+
+INSPECTOR
+
+SOURCE LEDGER
+import OPML 
+
+No sources. Paste RSS URL in Steer.
+
+export state · import state
+
+State Portability
+
+import replaces active sources, rules, and stars
+
+export state import state
+
+bundle contains active Source Ledger rows, active steering policy rules, and currently resonated items only
+---
+INPUTS
+[
+  {
+    "i": 0,
+    "placeholder": "Steer or paste RSS URL...",
+    "aria": null,
+    "type": "text",
+    "value": "",
+    "visible": true
+  },
+  {
+    "i": 1,
+    "placeholder": null,
+    "aria": null,
+    "type": "file",
+    "value": "",
+    "visible": true
+  },
+  {
+    "i": 2,
+    "placeholder": null,
+    "aria": null,
+    "type": null,
+    "value": "",
+    "visible": false
+  },
+  {
+    "i": 3,
+    "placeholder": null,
+    "aria": null,
+    "type": null,
+    "value": "",
+    "visible": false
+  },
+  {
+    "i": 4,
+    "placeholder": null,
+    "aria": null,
+    "type": "date",
+    "value": "",
+    "visible": false
+  },
+  {
+    "i": 5,
+    "placeholder": null,
+    "aria": null,
+    "type": "date",
+    "value": "",
+    "visible": false
+  },
+  {
+    "i": 6,
+    "placeholder": null,
+    "aria": null,
+    "type": "checkbox",
+    "value": "on",
+    "visible": false
+  }
+]
+---
+SEARCH
+NO_VISIBLE_SEARCH_FIELD_FOUND

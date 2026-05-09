@@ -1,0 +1,28 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 2396
+Content-Type: text/html; charset=utf-8
+Last-Modified: Sat, 09 May 2026 12:54:44 GMT
+Date: Sat, 09 May 2026 12:55:23 GMT
+RESOFEED
+Enter owner token
+Owner token
+submit
+Token stays in this browser as resofeed.ownerToken and is sent to local /api/* requests.
+{
+__sveltekit_cyvddr = {
+base: new URL(".", location).pathname.slice(0, -1)
+};
+const element = document.currentScript.parentElement;
+Promise.all([
+import("./_app/immutable/entry/start.DgYQbSJj.js"),
+import("./_app/immutable/entry/app.HD_R4nQO.js")
+]).then(([kit, app]) => {
+kit.start(app, element, {
+node_ids: [0, 2],
+data: [null,null],
+form: null,
+error: null
+});
+});
+}
