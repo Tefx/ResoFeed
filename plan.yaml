@@ -4284,7 +4284,7 @@ phases:
     agent: gate-reviewer
   - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     name: Fix runtime verification blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -4544,6 +4544,8 @@ phases:
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
     - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T08:41:33.241293+00:00'
   - id: runtime-api-and-mcp-integration.runtime-blockers-retest
     name: Runtime blockers retest
     status: pending
