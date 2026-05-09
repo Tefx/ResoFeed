@@ -19609,3 +19609,69 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-contract
     agent: golang-developer
+  - id: manual-rss-fetch.frontend-contract
+    name: Frontend Contract / Design Anchor (manual RSS fetch)
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - type_defs\n  - interfaces\n  - component_props\n  - design_anchor_stubs\n\
+      agent_source: project\nwork_type: new_capability\n\nLock the frontend Manual\
+      \ RSS Fetch contract and Source Ledger design anchor before frontend implementation.\n\
+      \nAuthoritative refs:\n- docs/ARCHITECTURE.md §6 HTTP Surface: frontend client\
+      \ must call POST /api/ingest and POST /api/sources/{id}/fetch with JSON {} and\
+      \ handle 200/404/409 documented payloads.\n- docs/ARCHITECTURE.md §8 Frontend\
+      \ Boundary: UI stays in web/, owner token sent on every /api/* request, flat\
+      \ Source Ledger only, no extra settings/diagnostics dashboards.\n- docs/DESIGN.md\
+      \ Source Ledger: this is the only location for manual ingestion controls; labels,\
+      \ states, timestamp display, raw error geometry, and DOM/CSS contracts are binding.\n\
+      - docs/ui-preview.html lines around the Source Ledger reference render global\
+      \ [RUN INGEST], per-source [FETCH], [FETCHING...], [INGESTING...], and error/status\
+      \ examples.\n\nScope and allowed files:\n- web/src/lib/api-contract.ts — add\
+      \ only acceptance-defining TypeScript types for IngestErrorDetail, IngestRunResult,\
+      \ ingest/source-fetch responses, and ApiResult/ResoFeedApiError conflict status\
+      \ coverage.\n- web/src/lib/api-client.ts — add only method signatures/stubs\
+      \ for runIngest() and fetchSource(id) if needed; no completed fetch logic.\n\
+      - web/src/routes/components/SourceLedger.svelte and/or small local type declarations\
+      \ — add only prop/interface/design-anchor scaffolding needed to pin state names\
+      \ and callbacks.\n- web/src/routes/+page.svelte — add only callback prop signature\
+      \ anchors if strictly needed; no runnable state transition implementation.\n\
+      \nContract constraints:\n- No product implementation logic, no finished API\
+      \ calls, no completed rendering/state transitions.\n- Do not introduce local\
+      \ fake jobs, queues, timers, progress animations, spinner states, SaaS button\
+      \ variants, folders/tags/settings surfaces, or alternate URL subscription fields.\n\
+      - Pin UI states exactly: [RUN INGEST], [INGESTING...], [FETCH], [FETCHING...],\
+      \ last_ingest/last_fetch as HH:MM:SS display-only values derived from RFC3339,\
+      \ and raw `err: <diagnostic>` text with accessible full diagnostic.\n\nCompletion\
+      \ boundary:\n- Stubs/type anchors are acceptable here only. The downstream frontend\
+      \ implementation step must complete behavior within these contracts without\
+      \ redesigning labels, DOM roles, or endpoint methods."
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Contract Evidence
+
+      - Contract/type/design-anchor artifacts changed: <files>
+
+      - Pinned API method names and wire response types: <list>
+
+      - Pinned Source Ledger states/labels/DOM roles: <list>
+
+      - Explicit stubs only, no implementation logic: PASS/FAIL
+
+      - Forbidden UI/product concepts absent: PASS/FAIL
+
+      - Deviation records, if any: <type/what/why/impact or none>'
+    depends_on:
+    - manual-rss-fetch.backend-contract
+    agent: frontend-engineer
