@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -28,6 +29,10 @@ const (
 	modelStatusSummaryNA       = "summary_unavailable"
 	modelStatusLatencyError    = "model_latency_error"
 )
+
+var ingestGuard sync.Mutex
+
+var errManualFetchConflict = errors.New("manual fetch conflict: ingest already running")
 
 // IngestConfig defines the background ingestion loop inside the single Go
 // process. Defaults are 15 minute loop interval, 20 second source timeout, and
@@ -65,12 +70,67 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 
 // IngestOnce performs one ingestion pass over active sources.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
+	release, acquired := tryAcquireIngestGuard(ctx)
+	if !acquired {
+		return nil
+	}
+	defer releaseGuardRecover(release, &retErr, "ingest once")
+	_, err := ingestOnceUnlocked(ctx, db, cfg)
+	return err
+}
+
+// ManualIngest triggers one user-requested ingestion pass. It shares the same
+// in-process guard as background ingestion and never creates durable queue/job
+// state when another operation is already running.
+func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret ManualFetchResult, retErr error) {
+	release, acquired := tryAcquireIngestGuard(ctx)
+	if !acquired {
+		return ManualFetchResult{}, errManualFetchConflict
+	}
+	defer releaseGuardRecover(release, &retErr, "manual ingest")
+	return ingestOnceUnlocked(ctx, db, cfg)
+}
+
+// ManualFetchSource triggers one user-requested source fetch for an active
+// source. Missing, deleted, and inactive sources are reported by the caller as
+// not_found; operational RSS failures are source-level result entries.
+func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
+	release, acquired := tryAcquireIngestGuard(ctx)
+	if !acquired {
+		return ManualFetchResult{}, errManualFetchConflict
+	}
+	defer releaseGuardRecover(release, &retErr, "manual source fetch")
+
+	source, err := loadActiveSource(ctx, db, sourceID)
+	if err != nil {
+		return ManualFetchResult{}, err
+	}
+	result := ManualFetchResult{Operation: ManualFetchOperationSourceFetch, SourceID: &source.ID, Completed: true, SourcesTotal: 1, Errors: []ManualFetchSourceError{}}
+	sourceResult, err := ingestSource(ctx, db, cfg, source)
+	if err != nil {
+		if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error()); updateErr != nil {
+			return ManualFetchResult{}, updateErr
+		}
+		result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: sourceStatusFetchError, Message: err.Error()})
+		return result, nil
+	}
+	if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, ""); err != nil {
+		return ManualFetchResult{}, err
+	}
+	result.SourcesFetched = 1
+	result.ItemsDiscovered = sourceResult.itemsDiscovered
+	result.ItemsUpserted = sourceResult.itemsUpserted
+	return result, nil
+}
+
+func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (result ManualFetchResult, retErr error) {
+	result = ManualFetchResult{Operation: ManualFetchOperationIngest, Completed: true, Errors: []ManualFetchSourceError{}}
 	if db == nil {
-		return errors.New("ingest once: db required")
+		return result, errors.New("ingest once: db required")
 	}
 	rows, err := db.QueryContext(ctx, `select id, url, title from sources where is_active = 1`)
 	if err != nil {
-		return fmt.Errorf("ingest once: query active sources: %w", err)
+		return result, fmt.Errorf("ingest once: query active sources: %w", err)
 	}
 	defer func() {
 		if closeErr := rows.Close(); closeErr != nil && retErr == nil {
@@ -82,26 +142,32 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 	for rows.Next() {
 		var source Source
 		if err := rows.Scan(&source.ID, &source.URL, &source.Title); err != nil {
-			return fmt.Errorf("ingest once: scan source: %w", err)
+			return result, fmt.Errorf("ingest once: scan source: %w", err)
 		}
 		sources = append(sources, source)
 	}
 	if err := rows.Err(); err != nil {
-		return fmt.Errorf("ingest once: source rows: %w", err)
+		return result, fmt.Errorf("ingest once: source rows: %w", err)
 	}
+	result.SourcesTotal = len(sources)
 
 	for _, source := range sources {
-		if err := ingestSource(ctx, db, cfg, source); err != nil {
+		sourceResult, err := ingestSource(ctx, db, cfg, source)
+		if err != nil {
 			if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error()); updateErr != nil {
-				return updateErr
+				return result, updateErr
 			}
+			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: sourceStatusFetchError, Message: err.Error()})
 			continue
 		}
 		if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, ""); err != nil {
-			return err
+			return result, err
 		}
+		result.SourcesFetched++
+		result.ItemsDiscovered += sourceResult.itemsDiscovered
+		result.ItemsUpserted += sourceResult.itemsUpserted
 	}
-	return nil
+	return result, nil
 }
 
 // ImportOPML imports source URLs into the flat Source Ledger. OPML folders are
@@ -165,7 +231,53 @@ func DeleteSource(ctx context.Context, db *sql.DB, sourceID string) (DeleteSourc
 	return DeleteSourceResult{SourceID: sourceID, Deleted: true, Revision: revision}, nil
 }
 
-func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) error {
+func tryAcquireIngestGuard(ctx context.Context) (func(), bool) {
+	select {
+	case <-ctx.Done():
+		return nil, false
+	default:
+	}
+	if !ingestGuard.TryLock() {
+		return nil, false
+	}
+	released := false
+	return func() {
+		if released {
+			return
+		}
+		released = true
+		ingestGuard.Unlock()
+	}, true
+}
+
+func releaseGuardRecover(release func(), retErr *error, label string) {
+	release()
+	if recovered := recover(); recovered != nil {
+		*retErr = fmt.Errorf("%s: recovered failure: %v", label, recovered)
+	}
+}
+
+func loadActiveSource(ctx context.Context, db *sql.DB, sourceID string) (Source, error) {
+	if db == nil {
+		return Source{}, errors.New("load active source: db required")
+	}
+	if strings.TrimSpace(sourceID) == "" || strings.Contains(sourceID, "/") {
+		return Source{}, sql.ErrNoRows
+	}
+	var source Source
+	err := db.QueryRowContext(ctx, `select id, url, title from sources where id = ? and is_active = 1`, sourceID).Scan(&source.ID, &source.URL, &source.Title)
+	if err != nil {
+		return Source{}, fmt.Errorf("load active source %q: %w", sourceID, err)
+	}
+	return source, nil
+}
+
+type ingestSourceResult struct {
+	itemsDiscovered int
+	itemsUpserted   int
+}
+
+func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
 	timeout := cfg.SourceFetchTimeout
 	if timeout <= 0 {
 		timeout = 20 * time.Second
@@ -174,23 +286,25 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	defer cancel()
 	feed, err := fetchFeed(sourceCtx, source.URL)
 	if err != nil {
-		return err
+		return ingestSourceResult{}, err
 	}
 	if feed.Title != "" && feed.Title != source.Title {
 		if _, err := db.ExecContext(ctx, `update sources set title = ? where id = ?`, feed.Title, source.ID); err != nil {
-			return fmt.Errorf("ingest source: update source title: %w", err)
+			return ingestSourceResult{}, fmt.Errorf("ingest source: update source title: %w", err)
 		}
 	}
+	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
 	for _, entry := range feed.Items {
 		item, err := buildItem(ctx, source, entry, cfg.LLM)
 		if err != nil {
-			return err
+			return result, err
 		}
 		if err := upsertIngestedItem(ctx, db, item); err != nil {
-			return err
+			return result, err
 		}
+		result.itemsUpserted++
 	}
-	return nil
+	return result, nil
 }
 
 type parsedFeed struct {

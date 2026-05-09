@@ -236,6 +236,11 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch {
+	case r.Method == http.MethodPost && r.URL.Path == ManualIngestHTTPPath:
+		if !rejectUnexpectedQuery(w, r) || !readManualFetchBody(w, r) {
+			return
+		}
+		h.handleManualIngest(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/feed/today":
 		h.handleToday(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/search":
@@ -280,6 +285,11 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleItemPath(w, r)
+	case r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/sources/") && strings.HasSuffix(r.URL.Path, "/fetch"):
+		if !rejectUnexpectedQuery(w, r) || !readManualFetchBody(w, r) {
+			return
+		}
+		h.handleManualSourceFetch(w, r)
 	case r.Method == http.MethodDelete && strings.HasPrefix(r.URL.Path, "/api/sources/"):
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -459,6 +469,30 @@ func (h apiHandler) handleSources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, SourcesResponse{Sources: sources})
+}
+
+func (h apiHandler) handleManualIngest(w http.ResponseWriter, r *http.Request) {
+	result, err := ManualIngest(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM})
+	if err != nil {
+		writeManualFetchError(w, "", err)
+		return
+	}
+	writeJSON(w, ManualFetchHTTPStatusOK, result)
+}
+
+func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Request) {
+	trimmed := strings.TrimPrefix(r.URL.Path, "/api/sources/")
+	sourceID := strings.TrimSuffix(trimmed, "/fetch")
+	if sourceID == "" || sourceID == trimmed || strings.Contains(sourceID, "/") {
+		writeAPIError(w, ManualFetchHTTPStatusNotFound, ManualFetchErrorCodeNotFound, "not found", map[string]any{"id": r.URL.Path})
+		return
+	}
+	result, err := ManualFetchSource(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM}, sourceID)
+	if err != nil {
+		writeManualFetchError(w, sourceID, err)
+		return
+	}
+	writeJSON(w, ManualFetchHTTPStatusOK, result)
 }
 
 func (h apiHandler) handleDeleteSource(w http.ResponseWriter, r *http.Request) {
@@ -665,6 +699,21 @@ func readJSONBody(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 
+func readManualFetchBody(w http.ResponseWriter, r *http.Request) bool {
+	if !requireContentType(w, r, map[string]bool{"application/json": true}) {
+		return false
+	}
+	body, ok := readLimitedBody(w, r, maxImportBodyBytes)
+	if !ok {
+		return false
+	}
+	if string(bytes.TrimSpace(body)) != ManualFetchRequestBody {
+		writeAPIError(w, ManualFetchHTTPStatusBadRequest, ManualFetchErrorCodeBadRequest, "bad request", map[string]any{"field": "body"})
+		return false
+	}
+	return true
+}
+
 func validateMutationFields(w http.ResponseWriter, fields MutationRequestFields) bool {
 	if fields.ActorKind != ActorKindHuman && fields.ActorKind != ActorKindAgent {
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "actor_kind"})
@@ -758,6 +807,18 @@ func writeMutationError(w http.ResponseWriter, id string, err error) {
 		return
 	}
 	writeNotFoundOrInternal(w, id, err)
+}
+
+func writeManualFetchError(w http.ResponseWriter, id string, err error) {
+	if errors.Is(err, errManualFetchConflict) {
+		writeAPIError(w, ManualFetchHTTPStatusConflict, ManualFetchErrorCodeConflict, "ingest already running", nil)
+		return
+	}
+	if errors.Is(err, sql.ErrNoRows) || strings.Contains(strings.ToLower(err.Error()), "no rows") {
+		writeAPIError(w, ManualFetchHTTPStatusNotFound, ManualFetchErrorCodeNotFound, "not found", map[string]any{"id": id})
+		return
+	}
+	writeInternal(w)
 }
 
 func writeInternal(w http.ResponseWriter) {
