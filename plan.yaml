@@ -18592,99 +18592,74 @@ phases:
   - id: manual-rss-fetch.backend-implementation
     name: Backend Implementation
     status: pending
-    description: 'step_type: implementation
+    description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
+      upstream_artifacts:\n  - path: internal/resofeed/*contract* or backend contract\
+      \ artifacts created by backend-contract\n    from_step: backend-contract\n \
+      \   tier: contract\n  - path: internal/resofeed/*test.go\n    from_step: backend-expected-red-tests\n\
+      \    tier: test\n\nComplete the backend Manual RSS Fetch implementation within\
+      \ the locked contracts from backend-contract and the protected expected-red\
+      \ tests from backend-expected-red-tests.\n\nUPSTREAM ARTIFACTS (authoritative):\n\
+      - backend-contract — endpoint paths, request shape, response/status mapping,\
+      \ owner-token enforcement, concurrency guard semantics, and forbidden architecture\
+      \ expansions are AUTHORITATIVE.\n- backend-expected-red-tests — Go test cases\
+      \ and assertions are PROTECTED; do not weaken or delete them to make implementation\
+      \ pass.\n\nYOUR SCOPE: Fill in stub bodies, replace missing route/guard behavior\
+      \ with working logic, and complete request handling within existing ResoFeed\
+      \ architecture. Use the existing flat internal/resofeed file shape.\n\nScope\
+      \ and files:\n- internal/resofeed/ingest.go — own the in-process ingest concurrency\
+      \ guard and all RSS/Atom fetch orchestration semantics.\n- internal/resofeed/http.go\
+      \ — add POST /api/ingest and POST /api/sources/{id}/fetch routing, request validation,\
+      \ owner-token enforcement, status-code mapping, and JSON serialization.\n- internal/resofeed/types.go\
+      \ only if shared response structs are genuinely needed across boundaries.\n\
+      - internal/resofeed/*test.go — preserve and satisfy the protected tests from\
+      \ backend-expected-red-tests.\n\nRequired behavior:\n- Permit at most one ingest/fetch\
+      \ operation at a time across background ingest, POST /api/ingest, and POST /api/sources/{id}/fetch.\n\
+      - HTTP manual triggers return 409 conflict when the guard is already held; do\
+      \ not enqueue, persist, retry, or create command/job/receipt rows.\n- Background\
+      \ ticks may be skipped while the guard is held.\n- POST /api/ingest with zero\
+      \ active sources returns HTTP 200 immediately with completed status, zero counts,\
+      \ and errors: [].\n- POST /api/sources/{id}/fetch returns 404 for missing, deleted,\
+      \ or inactive sources.\n- Operational RSS/source failures are request-level\
+      \ 200 results with source-level errors as specified, not generic transport failures.\n\
+      - Preserve the one-binary architecture and flat internal/resofeed boundaries.\
+      \ Do NOT introduce workers, queues, job tables, activity ledgers, sync coordinators,\
+      \ service/repository layers, DI containers, or event buses.\n\nFailure-mode\
+      \ checklist:\n- concurrent manual/manual and background/manual overlap\n- missing/deleted/inactive\
+      \ source lookup\n- zero active sources\n- source timeout / RSS fetch diagnostic\
+      \ mapping\n- JSON body must be exactly {} with no query params\n- stale guard\
+      \ release after error/panic path\n\nState/concurrency acceptance:\n- Concurrent\
+      \ access scenario: evidence must explain how two manual requests and a background\
+      \ tick interact with the same guard.\n- Cleanup/reset semantics: evidence must\
+      \ explain how the guard is released after success, error, and panic/recover-style\
+      \ failure.\n- Bounded growth: no queue/job/ledger/receipt accumulation is allowed.\n\
+      - Isolation guarantee: per-source fetch and global ingest must not corrupt source\
+      \ state or portable state definitions outside active sources/rules/resonated\
+      \ items.\n\nIf a contract artifact is wrong or incomplete, document a deviation\
+      \ record (type, what, why, impact) — do NOT silently rewrite the contract or\
+      \ weaken tests.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only completion is NOT acceptable. Each deliverable MUST contain\
+      \ substantive logic that processes its inputs and produces outputs that vary\
+      \ based on those inputs. Private stub classes or placeholder functions do not\
+      \ satisfy this requirement.\n\n## Gate Preview (what the gate WILL reject)\n\
+      1. Any durable queue, job table, command ledger, portable receipt, or sync/merge\
+      \ machinery.\n2. Handler-only endpoints that do not exercise the real ingest\
+      \ guard path.\n3. Generic 500/400 responses where the docs require 409 conflict,\
+      \ 404 not_found, or 200 source-level failure payloads.\n4. Concurrency guard\
+      \ that covers only manual endpoints but not background ingest.\n5. Weakened\
+      \ expected-red tests or contract drift from backend-contract."
+    verification: '- Main path: Go tests from backend-expected-red-tests now pass
+      for POST /api/ingest success, POST /api/sources/{id}/fetch success, and JSON
+      schemas from docs/ARCHITECTURE.md.
 
-      agent_source: project
-
-      work_type: new_capability
-
-
-      Implement the locked backend Manual RSS Fetch contracts.
-
-
-      Scope and files:
-
-      - internal/resofeed/ingest.go — own the in-process ingest concurrency guard
-      and all RSS/Atom fetch orchestration semantics.
-
-      - internal/resofeed/http.go — add POST /api/ingest and POST /api/sources/{id}/fetch
-      routing, request validation, owner-token enforcement, status-code mapping, and
-      JSON serialization.
-
-      - internal/resofeed/types.go only if shared response structs are genuinely needed
-      across boundaries.
-
-      - internal/resofeed/*test.go — add focused contract/runtime tests for the new
-      HTTP and ingest behavior.
-
-
-      Required behavior:
-
-      - Permit at most one ingest/fetch operation at a time across background ingest,
-      POST /api/ingest, and POST /api/sources/{id}/fetch.
-
-      - HTTP manual triggers return 409 conflict when the guard is already held; do
-      not enqueue, persist, retry, or create command/job/receipt rows.
-
-      - Background ticks may be skipped while the guard is held.
-
-      - POST /api/ingest with zero active sources returns HTTP 200 immediately with
-      completed status, zero counts, and errors: [].
-
-      - POST /api/sources/{id}/fetch returns 404 for missing, deleted, or inactive
-      sources.
-
-      - Operational RSS/source failures are request-level 200 results with source-level
-      errors as specified, not generic transport failures.
-
-      - Preserve the one-binary architecture and flat internal/resofeed boundaries.
-      Do NOT introduce workers, queues, job tables, activity ledgers, sync coordinators,
-      service/repository layers, DI containers, or event buses.
-
-
-      Failure-mode checklist:
-
-      - concurrent manual/manual and background/manual overlap
-
-      - missing/deleted/inactive source lookup
-
-      - zero active sources
-
-      - source timeout / RSS fetch diagnostic mapping
-
-      - JSON body must be exactly {} with no query params
-
-      - stale guard release after error/panic path
-
-
-      ## Completion Criteria (stub exclusion)
-
-      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
-      deliverable MUST contain substantive logic that processes its inputs and produces
-      outputs that vary based on those inputs. Private stub classes or placeholder
-      functions do not satisfy this requirement.
-
-
-      ## Gate Preview (what the gate WILL reject)
-
-      1. Any durable queue, job table, command ledger, portable receipt, or sync/merge
-      machinery.
-
-      2. Handler-only endpoints that do not exercise the real ingest guard path.
-
-      3. Generic 500/400 responses where the docs require 409 conflict, 404 not_found,
-      or 200 source-level failure payloads.
-
-      4. Concurrency guard that covers only manual endpoints but not background ingest.'
-    verification: '- Main path: Go tests cover POST /api/ingest success, POST /api/sources/{id}/fetch
-      success, and JSON schemas from docs/ARCHITECTURE.md.
-
-      - Failure path: focused regressions cover 409 guard conflict, zero-source global
-      ingest, missing/deleted/inactive source fetch, and source-level RSS failure
-      responses.
+      - Failure path: focused regressions pass for 409 guard conflict, stale guard
+      release after error/panic path, zero-source global ingest, missing/deleted/inactive
+      source fetch, owner-token enforcement, empty-body/no-query validation, and source-level
+      RSS failure responses.
 
       - Runtime path: evidence identifies the exact handler route and the ingest.go
       guard function exercised by tests.
+
+      - Proof: no queue/job/ledger/receipt/sync/service-layer pattern was introduced.
 
       - Downstream gates protected: manual-rss-fetch.integration-proof, manual-rss-fetch.spec-conformance,
       manual-rss-fetch.gate.'
@@ -18693,54 +18668,43 @@ phases:
 
       For each ref in this step:
 
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
       - docs/PRD.md — key passage or "NOT READ: <reason>"
 
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+      - AGENTS.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Backend Implementation Evidence
+      ## Implementation Evidence
 
+      - Contract step consumed: backend-contract
 
-      **Files changed**:
+      - Protected tests consumed: backend-expected-red-tests
 
-      - <list>
+      - Product files changed: <files>
 
+      - Tests preserved/updated only as contract-faithful: <summary>
 
-      **Concurrency guard proof**:
+      - Main path command/output: <paste>
 
-      - Guard owner/function:
+      - Highest-risk failure path command/output: <paste>
 
-      - Background + manual + per-source coverage:
+      - Guard release proof: <summary>
 
+      - Forbidden durable queue/job/ledger/sync artifacts introduced: NONE required
 
-      **Endpoint/schema tests run**:
-
-      ```
-
-      <paste commands and output>
-
-      ```
-
-
-      **Failure paths covered**:
-
-      - 409 conflict:
-
-      - zero sources:
-
-      - missing/deleted/inactive source:
-
-      - source-level fetch failure:
-
-
-      **Forbidden architecture check**:
-
-      - queues/jobs/ledgers/sync/service layers introduced: YES/NO
-
-      '
+      - Deviation records: <none or list>'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/PRD.md
+    - AGENTS.md
+    depends_on:
+    - backend-contract
+    - backend-expected-red-tests
+    agent: golang-developer
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
     status: pending
