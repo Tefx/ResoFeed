@@ -956,8 +956,10 @@ go test ./...
 
 First-run token generation check:
 
+Assumes `GEMINI_API_KEY` is already available from the OS environment, service manager, hosting secret, or local non-committed `.env`; do not include API-key values in the command line or captured evidence.
+
 ```bash
-GEMINI_API_KEY="<redacted>" ./bin/resofeed serve --db ./data/test.sqlite3
+./bin/resofeed serve --db ./data/test.sqlite3
 # expect startup log line: owner token generated: rfeed_...
 ```
 

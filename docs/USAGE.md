@@ -40,7 +40,8 @@ Safe options:
 - Create a local `.env` file with your editor or another secret-safe workflow:
 
 ```text
-GEMINI_API_KEY=<your Gemini API key>
+# .env is local-only; do not commit or print the real value.
+GEMINI_API_KEY=<redacted-local-value>
 ```
 
 The `.env` file is local runtime input only. Do not commit it, paste it into issue comments, include it in state exports, or print it in logs/evidence.
