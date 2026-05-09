@@ -5464,6 +5464,241 @@ phases:
       No public product flag was added. Configured Gemini proof uses contract-correct
       in-process runtime listener coverage via `NewRouter`/`HTTPServerConfig` because
       public `serve` has no approved fake-Gemini injection flag.'
+  - id: runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring
+    name: Fix runtime proof and production stub wiring
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      priority: HIGH
+
+
+      Batched remediation for two blocker-class semantic failures returned by parallel
+      runtime verification/audit. Fix ALL blocker families below, not just the first.
+
+
+      ## Blockers to Fix (ALL)
+
+
+      ### B1 — R4 startup lifecycle proof gap
+
+      Source failed step: `runtime-api-and-mcp-integration.runtime-spec-conformance`.
+
+      Issue: R4 lacks behavioral proof that HTTP/MCP readiness occurs before background
+      ingest starts. Static goroutine launch order is not sufficient.
+
+      Evidence cited by failed report: `docs/ARCHITECTURE.md:136-145`; `internal/resofeed/db.go:159-199`.
+
+      Required closure: add deterministic lifecycle runtime test or instrumentation
+      proving server bind/readiness occurs before ingest begins.
+
+
+      Required evidence from this fix:
+
+      - Exact test name added/updated, expected: `go test ./... -run TestServeReadinessBeforeBackgroundIngest
+      -count=1` or the nearest concrete equivalent if existing test naming differs.
+
+      - Captured output showing the lifecycle proof passed.
+
+      - Behavioral proof artifact showing ordered events: `bind/listen ready` -> `HTTP/MCP
+      readiness observable` -> `background ingest start`.
+
+      - Explain `why_previous_gate_missed_it`: prior checks accepted static launch
+      order/liveness without proving ordering.
+
+      - Explain `reversal_risk`: ingest may start before the server is reachable under
+      scheduler or startup timing variance, causing downstream runtime and E2E proof
+      to be falsely green.
+
+
+      ### B2 — production UI route renders ContractStub components
+
+      Source failed step: `runtime-api-and-mcp-integration.runtime-wiring-audit`.
+
+      Issue: production `web/src/routes/+page.svelte` imports/renders `*ContractStub`
+      components for documented UI surfaces with local-only behavior.
+
+      Evidence cited by failed report:
+
+      - `web/src/routes/+page.svelte:7-11` imports `FeedContractStub`, `InspectorContractStub`,
+      `SourceLedgerContractStub`, `StatePortabilityContractStub`, `SearchRetrievalContractStub`.
+
+      - Renders at `web/src/routes/+page.svelte:108,114,121-123`.
+
+      - Local-only behavior examples in `FeedContractStub.svelte:36-39`, `SourceLedgerContractStub.svelte:13-15,33-35`,
+      `StatePortabilityContractStub.svelte:17-24,30-34`, `SearchRetrievalContractStub.svelte:12-29`.
+
+      Required closure: remove, rename, or replace production `*ContractStub` route
+      dependencies so documented UI surfaces use real API client paths or are explicitly
+      governed by frontend phase contracts.
+
+
+      Required evidence from this fix:
+
+      - Grep proof that production route imports/renders no `*ContractStub` components:
+      `grep -R "ContractStub" web/src/routes web/src/lib --include=''*.svelte'' --include=''*.ts''`
+      with output showing no production route dependency or only justified non-production/contract-test
+      artifacts.
+
+      - Build/test proof for the frontend route after replacement, including the exact
+      command and output.
+
+      - Trace or explanation showing each documented UI surface now uses a real API
+      client path or a frontend phase contract-owned real component, not local-only
+      stub behavior.
+
+
+      ## Coordination and ownership
+
+      This is a single batched remediation step because both blockers intersect the
+      runtime gate and downstream E2E gates. If touching both Go runtime tests and
+      Svelte production wiring requires local coordination, perform it within this
+      single step and report the per-file ownership in evidence; do not create a second
+      serial fix/retest chain.
+
+
+      ## Gate Preview (what downstream gates WILL reject)
+
+      1. Static assertion of startup order without deterministic runtime proof.
+
+      2. A server that passes liveness while background ingest can start before HTTP/MCP
+      readiness.
+
+      3. Any production `web/src/routes/+page.svelte` dependency on `*ContractStub`
+      for documented UI surfaces.
+
+      4. Mock-only or local-only frontend behavior presented as production wiring.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive runtime or UI wiring logic that processes
+      real inputs and produces outputs that vary based on those inputs. Private stub
+      classes/components (`_Runtime*`, `_Stub*`, `_Placeholder*`, `*ContractStub`)
+      are structurally restricted from satisfying this requirement.'
+    verification: '- Main path: deterministic runtime lifecycle test passes and proves
+      HTTP/MCP bind/readiness before background ingest start.
+
+      - Failure path: test/instrumentation would fail if ingest starts before readiness;
+      evidence explains the controlled ordering assertion.
+
+      - UI wiring path: production Svelte route no longer imports/renders `*ContractStub`
+      components for documented surfaces.
+
+      - Frontend proof: grep/build/test output shows no production stub dependency
+      remains and replacement surfaces use real API client paths or frontend-contract-owned
+      real components.
+
+      - Closure notes include `why_previous_gate_missed_it` and `reversal_risk` for
+      the R4 lifecycle blocker.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Remediation Evidence
+
+
+      ### R4 Lifecycle Proof
+
+      **Test name**:
+
+      ```
+
+      <exact test name, expected TestServeReadinessBeforeBackgroundIngest or concrete
+      equivalent>
+
+      ```
+
+      **Command executed**:
+
+      ```
+
+      go test ./... -run TestServeReadinessBeforeBackgroundIngest -count=1
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Ordered lifecycle proof**:
+
+      ```
+
+      bind/listen ready -> HTTP/MCP readiness observable -> background ingest start
+
+      ```
+
+      **Why previous gate missed it**: <static/liveness checks did not prove ordering>
+
+      **Reversal risk**: <what would regress if readiness/ingest order flips>
+
+
+      ### Production UI Stub Wiring Closure
+
+      **Files changed**:
+
+      ```
+
+      <list>
+
+      ```
+
+      **ContractStub grep proof**:
+
+      ```
+
+      grep -R "ContractStub" web/src/routes web/src/lib --include=''*.svelte'' --include=''*.ts''
+
+      <actual output and justification for any remaining non-production hits>
+
+      ```
+
+      **Frontend build/test command and output**:
+
+      ```
+
+      <exact command>
+
+      <actual output>
+
+      ```
+
+      **Surface-to-real-path trace**:
+
+      | Surface | Replacement component/path | Real API/client path or frontend contract
+      owner | Status |
+
+      |---|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS: Both blocker families closed with behavioral proof and production
+      stub wiring removed.
+
+      - [ ] FAIL: Any blocker remains open.'
+    depends_on:
+    - runtime-api-and-mcp-integration.runtime-spec-conformance
+    - runtime-api-and-mcp-integration.runtime-wiring-audit
+    agent: frontend-engineer
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
