@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -141,6 +142,60 @@ func TestMCPRealBoundListenerInitializeResourcesAndTools(t *testing.T) {
 	}
 }
 
+func TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	gemini := &recordingSteeringGemini{out: GeminiSteeringOutput{InterpretedAs: "gemini_policy_update", RuleTexts: []string{"Gemini translated systems policy."}, Message: "gemini steering updated"}}
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, Gemini: gemini})}
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- server.Serve(listener)
+	}()
+	t.Cleanup(func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			t.Fatalf("shutdown bound MCP steer server: %v", err)
+		}
+		if err := <-errCh; err != nil && err != http.ErrServerClosed {
+			t.Fatalf("serve bound MCP steer server: %v", err)
+		}
+	})
+	baseURL := "http://" + listener.Addr().String() + "/mcp"
+	payload := map[string]any{"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": map[string]any{"name": "steer", "arguments": map[string]any{"command": "Push more systems papers.", "actor_id": "briefing-agent", "idempotency_key": "bound-steer-gemini-001"}}}
+
+	firstResp := mcpHTTPPost(t, baseURL, payload)
+	first := mcpToolResultJSON[SteerResult](t, firstResp, "steer")
+	if first.Receipt.InterpretedAs != "gemini_policy_update" || first.Receipt.Message != "gemini steering updated" || len(first.Receipt.ChangedRules) != 1 || first.Receipt.ChangedRules[0].RuleText != "Gemini translated systems policy." {
+		t.Fatalf("first bound steer receipt = %+v, want configured Gemini translated policy", first.Receipt)
+	}
+	if got := gemini.calls(); got != 1 {
+		t.Fatalf("Gemini TranslateSteering calls after first bound steer = %d, want 1", got)
+	}
+
+	secondResp := mcpHTTPPost(t, baseURL, payload)
+	second := mcpToolResultJSON[SteerResult](t, secondResp, "steer")
+	if second.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(second.Receipt.ChangedRules) != 1 || second.Receipt.ChangedRules[0].RuleText != first.Receipt.ChangedRules[0].RuleText {
+		t.Fatalf("idempotent bound steer receipt = %+v, want stored first receipt", second.Receipt)
+	}
+	if got := gemini.calls(); got != 1 {
+		t.Fatalf("Gemini TranslateSteering calls after bound retry = %d, want still 1", got)
+	}
+
+	unauthorized := mcpHTTPPostWithToken(t, baseURL, payload, "wrong-owner-token")
+	if unauthorized.status != http.StatusUnauthorized {
+		t.Fatalf("unauthorized bound steer status = %d, want 401; body=%s", unauthorized.status, unauthorized.body)
+	}
+	assertErrorCode(t, unauthorized.body, "unauthorized")
+	if got := gemini.calls(); got != 1 {
+		t.Fatalf("Gemini TranslateSteering calls after unauthorized bound steer = %d, want still 1", got)
+	}
+}
+
 func seedMCPCorpus(t *testing.T, ctx context.Context, db *sql.DB) {
 	t.Helper()
 	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
@@ -182,6 +237,14 @@ func mcpResourceText(t *testing.T, handler http.Handler, uri string) string {
 func mcpToolJSON[T any](t *testing.T, handler http.Handler, name string, args map[string]any) T {
 	t.Helper()
 	resp := mcpCall(t, handler, name, args)
+	if resp.Error != nil {
+		t.Fatalf("tools/call %s error: %+v", name, resp.Error)
+	}
+	return mcpToolResultJSON[T](t, resp, name)
+}
+
+func mcpToolResultJSON[T any](t *testing.T, resp mcpResponse, name string) T {
+	t.Helper()
 	if resp.Error != nil {
 		t.Fatalf("tools/call %s error: %+v", name, resp.Error)
 	}
@@ -230,6 +293,24 @@ func mcpRequestJSON(t *testing.T, handler http.Handler, payload map[string]any) 
 
 func mcpHTTPPost(t *testing.T, url string, payload map[string]any) mcpResponse {
 	t.Helper()
+	result := mcpHTTPPostWithToken(t, url, payload, contractOwnerToken)
+	if result.status != http.StatusOK {
+		t.Fatalf("MCP HTTP status = %d, want 200; body=%s", result.status, result.body)
+	}
+	var decoded mcpResponse
+	if err := json.Unmarshal(result.body, &decoded); err != nil {
+		t.Fatalf("decode MCP HTTP response: %v", err)
+	}
+	return decoded
+}
+
+type mcpHTTPResult struct {
+	status int
+	body   []byte
+}
+
+func mcpHTTPPostWithToken(t *testing.T, url string, payload map[string]any, token string) mcpHTTPResult {
+	t.Helper()
 	body, err := json.Marshal(payload)
 	if err != nil {
 		t.Fatalf("marshal MCP HTTP request: %v", err)
@@ -238,20 +319,18 @@ func mcpHTTPPost(t *testing.T, url string, payload map[string]any) mcpResponse {
 	if err != nil {
 		t.Fatalf("create MCP HTTP request: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer "+contractOwnerToken)
-	resp, err := http.DefaultClient.Do(req)
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{Transport: &http.Transport{Proxy: nil}}
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Fatalf("post MCP HTTP request: %v", err)
 	}
 	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("MCP HTTP status = %d, want 200", resp.StatusCode)
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read MCP HTTP response: %v", err)
 	}
-	var decoded mcpResponse
-	if err := json.NewDecoder(resp.Body).Decode(&decoded); err != nil {
-		t.Fatalf("decode MCP HTTP response: %v", err)
-	}
-	return decoded
+	return mcpHTTPResult{status: resp.StatusCode, body: data}
 }
 
 type recordingSteeringGemini struct {
