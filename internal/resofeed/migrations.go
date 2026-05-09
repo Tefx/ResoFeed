@@ -108,6 +108,8 @@ create table if not exists steer_rules (
   is_active integer not null default 1 check (is_active in (0, 1)),
   superseded_by text,
   created_at text not null,
+  created_by_actor_kind text not null default 'human',
+  created_by_actor_id text,
   revision integer not null default 1
 );
 

@@ -173,6 +173,7 @@ type ingestFakeState struct {
 type ingestFakeItem struct {
 	extractionStatus string
 	modelStatus      string
+	valueTier        string
 }
 
 var registerIngestFakeDriverOnce sync.Once
@@ -228,9 +229,14 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 		c.state.sourceStatuses[sourceID] = status
 		return driver.RowsAffected(1), nil
 	case strings.HasPrefix(query, "insert into items"):
-		extractionStatus, _ := args[8].Value.(string)
-		modelStatus, _ := args[9].Value.(string)
-		c.state.items = append(c.state.items, ingestFakeItem{extractionStatus: extractionStatus, modelStatus: modelStatus})
+		valueTier, _ := args[7].Value.(string)
+		extractionStatus, _ := args[10].Value.(string)
+		modelStatus, _ := args[11].Value.(string)
+		c.state.items = append(c.state.items, ingestFakeItem{extractionStatus: extractionStatus, modelStatus: modelStatus, valueTier: valueTier})
+		return driver.RowsAffected(1), nil
+	case strings.HasPrefix(query, "delete from search_fts"):
+		return driver.RowsAffected(1), nil
+	case strings.HasPrefix(query, "insert into search_fts"):
 		return driver.RowsAffected(1), nil
 	default:
 		return driver.RowsAffected(0), nil

@@ -65,6 +65,7 @@ type Item struct {
 	Title              string
 	Summary            *string
 	CoreInsight        *string
+	ValueTier          *string
 	PublishedAt        *time.Time
 	ExtractionStatus   string
 	ModelStatus        string
@@ -147,11 +148,13 @@ type ItemState struct {
 // SteerRule is the current steering policy row. Only active rules affect
 // ranking; inactive/superseded rows are not a command history UI.
 type SteerRule struct {
-	ID           string  `json:"id"`
-	RuleText     string  `json:"rule_text"`
-	IsActive     bool    `json:"is_active"`
-	SupersededBy *string `json:"superseded_by"`
-	Revision     int64   `json:"revision"`
+	ID                 string  `json:"id"`
+	RuleText           string  `json:"rule_text"`
+	IsActive           bool    `json:"is_active"`
+	SupersededBy       *string `json:"superseded_by"`
+	Revision           int64   `json:"revision"`
+	CreatedByActorKind *string `json:"created_by_actor_kind,omitempty"`
+	CreatedByActorID   *string `json:"created_by_actor_id,omitempty"`
 }
 
 // SearchQueryEcho is the normalized HTTP search query echo. The API contract

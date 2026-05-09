@@ -20,6 +20,7 @@ const (
 type rankedCandidate struct {
 	item      ItemSummary
 	firstSeen *time.Time
+	text      string
 	fresh     bool
 	memory    bool
 	related   bool
@@ -47,6 +48,11 @@ func ListTodayFeed(ctx context.Context, db *sql.DB, opts RankingOptions) ([]Item
 	now := opts.Now
 	if now.IsZero() {
 		now = time.Now().UTC()
+	}
+
+	activeRules, err := loadActiveSteerRules(ctx, db)
+	if err != nil {
+		return nil, err
 	}
 
 	rows, err := db.QueryContext(ctx, `
@@ -78,7 +84,7 @@ order by coalesce(i.published_at, i.first_seen_at) desc, i.id asc`)
 		return nil, fmt.Errorf("iterate today feed rows: %w", err)
 	}
 
-	return rankCandidates(items, limit, now), nil
+	return rankCandidatesWithRules(items, limit, now, activeRules), nil
 }
 
 // ApplySteering accepts natural-language steering and RSS URL subscription
@@ -119,7 +125,7 @@ func ApplySteering(ctx context.Context, db *sql.DB, gemini GeminiClient, req Ste
 			proposal.Message = translated.Message
 		}
 	}
-	return applySteeringRules(ctx, db, proposal)
+	return applySteeringRules(ctx, db, proposal, req.ActorKind, req.ActorID)
 }
 
 // MarkItemInspected records deliberate human attention. Agent silent evaluation
@@ -193,10 +199,15 @@ func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCand
 	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
 	firstSeenAt := timePtrFromNull(firstSeen)
 	fresh := isFresh(item.PublishedAt, firstSeenAt, now)
-	return rankedCandidate{item: item, firstSeen: firstSeenAt, fresh: fresh, memory: !fresh, ordinal: ordinal}, nil
+	textParts := []string{item.Title, item.SourceTitle, item.URL, stringValue(item.Summary), stringValue(item.CoreInsight)}
+	return rankedCandidate{item: item, firstSeen: firstSeenAt, text: strings.ToLower(strings.Join(textParts, " ")), fresh: fresh, memory: !fresh, ordinal: ordinal}, nil
 }
 
 func rankCandidates(candidates []rankedCandidate, limit int, now time.Time) []ItemSummary {
+	return rankCandidatesWithRules(candidates, limit, now, nil)
+}
+
+func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.Time, rules []SteerRule) []ItemSummary {
 	storyHasFresh := map[string]bool{}
 	storyHasTouchedMemory := map[string]bool{}
 	freshSources := map[string]bool{}
@@ -226,7 +237,7 @@ func rankCandidates(candidates []rankedCandidate, limit int, now time.Time) []It
 		if candidate.item.ExternalSurfacedAt != nil && !candidate.related {
 			continue
 		}
-		candidate.score = scoreCandidate(candidate, now)
+		candidate.score = scoreCandidate(candidate, now, rules)
 		eligible = append(eligible, candidate)
 	}
 	sort.SliceStable(eligible, func(i, j int) bool {
@@ -298,7 +309,7 @@ func rankCandidates(candidates []rankedCandidate, limit int, now time.Time) []It
 	return result
 }
 
-func scoreCandidate(candidate rankedCandidate, now time.Time) int {
+func scoreCandidate(candidate rankedCandidate, now time.Time, rules []SteerRule) int {
 	score := 0
 	if candidate.fresh {
 		score += 1000
@@ -311,6 +322,7 @@ func scoreCandidate(candidate rankedCandidate, now time.Time) int {
 	if candidate.item.IsResonated {
 		score += 80
 	}
+	score += steeringScore(candidate, rules)
 	age := now.Sub(itemTime(candidate))
 	if age < 0 {
 		age = 0
@@ -318,6 +330,56 @@ func scoreCandidate(candidate rankedCandidate, now time.Time) int {
 	score -= int(age / time.Hour)
 	score -= candidate.ordinal
 	return score
+}
+
+func steeringScore(candidate rankedCandidate, rules []SteerRule) int {
+	if len(rules) == 0 {
+		return 0
+	}
+	text := candidate.text
+	if text == "" {
+		parts := []string{candidate.item.Title, candidate.item.SourceTitle, candidate.item.URL, stringValue(candidate.item.Summary), stringValue(candidate.item.CoreInsight)}
+		text = strings.ToLower(strings.Join(parts, " "))
+	}
+	score := 0
+	for _, rule := range rules {
+		if !rule.IsActive {
+			continue
+		}
+		if steeringRuleMatches(text, rule.RuleText) {
+			if rule.CreatedByActorKind != nil && *rule.CreatedByActorKind == string(ActorKindHuman) {
+				score += 240
+				continue
+			}
+			score += 120
+		}
+	}
+	return score
+}
+
+func steeringRuleMatches(itemText string, ruleText string) bool {
+	itemText = strings.ToLower(itemText)
+	for _, token := range steeringKeywords(ruleText) {
+		if strings.Contains(itemText, token) {
+			return true
+		}
+	}
+	return false
+}
+
+func steeringKeywords(ruleText string) []string {
+	words := strings.FieldsFunc(strings.ToLower(ruleText), func(r rune) bool {
+		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
+	})
+	stop := map[string]bool{"push": true, "more": true, "less": true, "about": true, "the": true, "and": true, "or": true, "for": true, "with": true, "from": true, "articles": true, "items": true, "coverage": true, "documents": true, "technical": true}
+	keywords := make([]string, 0, len(words))
+	for _, word := range words {
+		if len(word) < 4 || stop[word] {
+			continue
+		}
+		keywords = append(keywords, word)
+	}
+	return keywords
 }
 
 func isFresh(publishedAt *time.Time, firstSeenAt *time.Time, now time.Time) bool {
@@ -375,7 +437,7 @@ func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (
 	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added"}}, nil
 }
 
-func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteeringOutput) (SteerResult, error) {
+func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteeringOutput, actorKind ActorKind, actorID string) (SteerResult, error) {
 	if db == nil {
 		return SteerResult{}, errors.New("apply steering rules: db is nil")
 	}
@@ -392,11 +454,15 @@ func applySteeringRules(ctx context.Context, db *sql.DB, proposal GeminiSteering
 			continue
 		}
 		id := stableTextID("rule", text)
-		_, err := tx.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, revision) values (?, ?, 1, 1) on conflict(id) do update set rule_text = excluded.rule_text, is_active = 1, revision = steer_rules.revision + 1`, id, text)
+		kind := string(actorKind)
+		if kind == "" {
+			kind = string(ActorKindHuman)
+		}
+		_, err := tx.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, created_at, created_by_actor_kind, created_by_actor_id, revision) values (?, ?, 1, ?, ?, ?, 1) on conflict(id) do update set rule_text = excluded.rule_text, is_active = 1, created_by_actor_kind = excluded.created_by_actor_kind, created_by_actor_id = excluded.created_by_actor_id, revision = steer_rules.revision + 1`, id, text, time.Now().UTC().Format(time.RFC3339Nano), kind, actorID)
 		if err != nil {
 			return SteerResult{}, fmt.Errorf("upsert steering rule: %w", err)
 		}
-		changed = append(changed, SteerRule{ID: id, RuleText: text, IsActive: true, Revision: 1})
+		changed = append(changed, SteerRule{ID: id, RuleText: text, IsActive: true, Revision: 1, CreatedByActorKind: &kind, CreatedByActorID: nullableString(actorID)})
 	}
 	if err := tx.Commit(); err != nil {
 		return SteerResult{}, fmt.Errorf("commit steering transaction: %w", err)
@@ -411,7 +477,7 @@ func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) 
 	if db == nil {
 		return nil, nil
 	}
-	rows, err := db.QueryContext(ctx, `select id, rule_text, is_active, superseded_by, revision from steer_rules where is_active = 1 order by revision desc, id asc`)
+	rows, err := db.QueryContext(ctx, `select id, rule_text, is_active, superseded_by, revision, created_by_actor_kind, created_by_actor_id from steer_rules where is_active = 1 order by revision desc, id asc`)
 	if err != nil {
 		return nil, fmt.Errorf("load active steering rules: %w", err)
 	}
@@ -419,11 +485,13 @@ func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) 
 	var rules []SteerRule
 	for rows.Next() {
 		var rule SteerRule
-		var superseded sql.NullString
-		if err := rows.Scan(&rule.ID, &rule.RuleText, &rule.IsActive, &superseded, &rule.Revision); err != nil {
+		var superseded, actorKind, actorID sql.NullString
+		if err := rows.Scan(&rule.ID, &rule.RuleText, &rule.IsActive, &superseded, &rule.Revision, &actorKind, &actorID); err != nil {
 			return nil, fmt.Errorf("scan active steering rule: %w", err)
 		}
 		rule.SupersededBy = stringPtrFromNull(superseded)
+		rule.CreatedByActorKind = stringPtrFromNull(actorKind)
+		rule.CreatedByActorID = stringPtrFromNull(actorID)
 		rules = append(rules, rule)
 	}
 	if err := rows.Err(); err != nil {
@@ -434,5 +502,13 @@ func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) 
 
 func hasActiveHumanLikeRules(ctx context.Context, db *sql.DB) bool {
 	rules, err := loadActiveSteerRules(ctx, db)
-	return err == nil && len(rules) > 0
+	if err != nil {
+		return false
+	}
+	for _, rule := range rules {
+		if rule.CreatedByActorKind == nil || *rule.CreatedByActorKind == string(ActorKindHuman) {
+			return true
+		}
+	}
+	return false
 }

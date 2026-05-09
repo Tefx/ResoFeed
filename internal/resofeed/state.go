@@ -56,11 +56,6 @@ func ExportState(ctx context.Context, db *sql.DB, w io.Writer) error {
 	}
 
 	bundle := StateBundle{SchemaVersion: StateSchemaVersionV1, ExportedAt: time.Now().UTC(), Sources: []SourceState{}, SteerRules: []SteerRuleState{}, ResonatedItems: []ResonatedItemState{}}
-	if importedAt, ok, err := readLastImportedStateTime(ctx, db); err != nil {
-		return err
-	} else if ok {
-		bundle.ExportedAt = importedAt
-	}
 
 	rows, err := db.QueryContext(ctx, `select id, url, title from sources where is_active = 1 order by id`)
 	if err != nil {
@@ -178,9 +173,9 @@ func ImportState(ctx context.Context, db *sql.DB, r io.Reader) (RestoreResult, e
 	}
 
 	for _, rule := range bundle.SteerRules {
-		if _, err := tx.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, superseded_by, created_at, revision)
-			values (?, ?, 1, null, ?, 1)
-			on conflict(id) do update set rule_text = excluded.rule_text, is_active = 1, superseded_by = null, revision = steer_rules.revision + 1`, rule.ID, rule.RuleText, now); err != nil {
+		if _, err := tx.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, superseded_by, created_at, created_by_actor_kind, created_by_actor_id, revision)
+			values (?, ?, 1, null, ?, 'human', 'state_import', 1)
+			on conflict(id) do update set rule_text = excluded.rule_text, is_active = 1, superseded_by = null, created_by_actor_kind = excluded.created_by_actor_kind, created_by_actor_id = excluded.created_by_actor_id, revision = steer_rules.revision + 1`, rule.ID, rule.RuleText, now); err != nil {
 			return RestoreResult{}, fmt.Errorf("restore steer rule %q: %w", rule.ID, err)
 		}
 	}
@@ -205,12 +200,8 @@ func ImportState(ctx context.Context, db *sql.DB, r io.Reader) (RestoreResult, e
 		}
 	}
 
-	if _, err := tx.ExecContext(ctx, `insert into runtime_metadata (key, value, updated_at) values ('last_state_import_exported_at', ?, unixepoch())
-		on conflict(key) do update set value = excluded.value, updated_at = excluded.updated_at`, bundle.ExportedAt.UTC().Format(time.RFC3339)); err != nil {
-		return RestoreResult{}, fmt.Errorf("record state import timestamp: %w", err)
-	}
-	if _, err := tx.ExecContext(ctx, `delete from search_fts`); err != nil {
-		return RestoreResult{}, fmt.Errorf("clear search index after state import: %w", err)
+	if err := rebuildSearchIndexTx(ctx, tx); err != nil {
+		return RestoreResult{}, fmt.Errorf("rebuild search index after state import: %w", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return RestoreResult{}, fmt.Errorf("commit state import: %w", err)
@@ -336,20 +327,4 @@ func validateResonatedItemStates(items []ResonatedItemState) error {
 		}
 	}
 	return nil
-}
-
-func readLastImportedStateTime(ctx context.Context, db *sql.DB) (time.Time, bool, error) {
-	var value string
-	err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = 'last_state_import_exported_at'`).Scan(&value)
-	if err == sql.ErrNoRows {
-		return time.Time{}, false, nil
-	}
-	if err != nil {
-		return time.Time{}, false, fmt.Errorf("read state export timestamp metadata: %w", err)
-	}
-	parsed, err := time.Parse(time.RFC3339, value)
-	if err != nil {
-		return time.Time{}, false, fmt.Errorf("parse state export timestamp metadata: %w", err)
-	}
-	return parsed.UTC(), true, nil
 }

@@ -339,6 +339,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, gemini Gemin
 	if item.ModelStatus == modelStatusOK {
 		item.Summary = nullableString(out.Summary)
 		item.CoreInsight = nullableString(out.CoreInsight)
+		item.ValueTier = nullableString(out.ValueTier)
 	} else if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 		item.ExtractionStatus = extractionStatusSummaryNA
 	}
@@ -400,9 +401,25 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 }
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) error {
-	_, err := db.ExecContext(ctx, `insert into items (id, source_id, url, title, summary, core_insight, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do update set title = excluded.title, summary = excluded.summary, core_insight = excluded.core_insight, published_at = excluded.published_at, extraction_status = excluded.extraction_status, model_status = excluded.model_status, feed_excerpt = excluded.feed_excerpt, extracted_text = excluded.extracted_text`, item.ID, item.SourceID, item.URL, item.Title, item.Summary, item.CoreInsight, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
+	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do update set source_url = excluded.source_url, title = excluded.title, summary = excluded.summary, core_insight = excluded.core_insight, value_tier = excluded.value_tier, published_at = excluded.published_at, extraction_status = excluded.extraction_status, model_status = excluded.model_status, feed_excerpt = excluded.feed_excerpt, extracted_text = excluded.extracted_text, canonical_url = excluded.canonical_url, story_key = excluded.story_key, duplicate_of_item_id = excluded.duplicate_of_item_id`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return fmt.Errorf("ingest item %q: %w", item.ID, err)
+	}
+	if err := upsertSearchIndex(ctx, db, item); err != nil {
+		return err
+	}
+	return nil
+}
+
+func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
+	provenance := strings.Join([]string{item.Provenance.SourceURL, item.Provenance.OriginalURL, derefString(item.Provenance.CanonicalURL), derefString(item.StoryKey), derefString(item.DuplicateOfItemID)}, " ")
+	_, err := db.ExecContext(ctx, `delete from search_fts where item_id = ?`, item.ID)
+	if err != nil {
+		return fmt.Errorf("refresh search index %q: delete old row: %w", item.ID, err)
+	}
+	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_title, feed_excerpt, summary, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary), stringValue(item.ExtractedText), provenance)
+	if err != nil {
+		return fmt.Errorf("refresh search index %q: insert row: %w", item.ID, err)
 	}
 	return nil
 }
