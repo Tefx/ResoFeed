@@ -12163,7 +12163,7 @@ phases:
   steps:
   - id: openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     name: lock-openrouter-contract-and-docs
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -12283,6 +12283,57 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-09T17:41:57.618056+00:00'
+    done_at: '2026-05-09T17:46:07.406118+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- AGENTS.md\
+      \ — NOT READ as a file in the isolated worktree; `.agents/instructions.md` was\
+      \ read. Key passages: canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`;\
+      \ one Go binary; SQLite+FTS only; no provider registry/DI/service layers; runtime\
+      \ LLM secrets must not be persisted/exported/logged/printed.\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages: one deployable Go process, one SQLite database, thin\
+      \ HTTP/MCP transports, minimal file shape, state export excludes runtime credential\
+      \ metadata, `/doctor` is raw text.\n- docs/DESIGN.md — READ. Key passages: dense\
+      \ but legible workbench, operational labels only, `/doctor` raw text diagnostics,\
+      \ no friendly dashboard/settings/product chrome.\n- Additional refs read: README.md,\
+      \ docs/USAGE.md, docs/PRD.md, docs/DESIGN_VISION.md.\n\n## Contract Evidence\n\
+      - Files touched (docs/contracts only):\n  - `README.md`\n  - `docs/ARCHITECTURE.md`\n\
+      \  - `docs/USAGE.md`\n- Gemini flags removed from documented runtime contract:\n\
+      \  - Public docs now document `--openrouter-model` only for LLM runtime configuration.\n\
+      \  - Verification search over README.md and docs excluding audit/instruction\
+      \ artifacts found no `Gemini`, `gemini`, `GEMINI`, `--gemini-api-key`, `--gemini-model`,\
+      \ or `GEMINI_API_KEY`.\n- OpenRouter env secret names documented:\n  - `OPENROUTER_KEY`\
+      \ is the only documented/accepted OpenRouter API key name.\n  - OS env `OPENROUTER_KEY`\
+      \ has precedence over local `.env` fallback.\n- OpenRouter flags documented:\n\
+      \  - `--openrouter-model` only; optional and non-secret.\n  - No CLI API-key\
+      \ flag is documented.\n- Optional model/default-account behavior documented:\n\
+      \  - Empty/omitted `--openrouter-model` means OpenRouter account default.\n\
+      \  - `/doctor`/runtime status should report configured model as `account_default`\
+      \ when omitted.\n  - Provided model values pass through unchanged with no startup\
+      \ network model validation.\n- `/doctor` openrouter prefix and configured/resolved\
+      \ model behavior documented:\n  - `/doctor` must use `openrouter:` prefix.\n\
+      \  - Includes configured model and resolved model only when available.\n  -\
+      \ Never includes keys, secret source, `.env` path, or provider config.\n- Secret\
+      \ handling statement present; no key printed:\n  - Docs state LLM API keys are\
+      \ runtime input only and must never be written to SQLite, runtime metadata,\
+      \ migrations, state bundles, logs, `/doctor`, HTTP/MCP responses, frontend assets,\
+      \ fixtures, docs examples, or committed artifacts.\n- Architecture minimalism\
+      \ preserved (no registry/DI/service layers):\n  - No provider registry, plugin\
+      \ abstraction, DI, services/repositories, sidecars, sync/merge/history, accounts,\
+      \ vector DB, embeddings, or RAG added/documented.\n- OpenRouter attribution\
+      \ headers excluded for now:\n  - Docs explicitly state no OpenRouter attribution\
+      \ headers are sent for now.\n- Any remaining ambiguity: none in public runtime\
+      \ docs. Historical `.audit-artifacts` and `.agents/instructions.md` still mention\
+      \ the prior Gemini contract; left untouched because they are not the public\
+      \ runtime contract / not target paths.\n\n## Verification\n- Worker commands/searches:\n\
+      \  - `git diff --check` — passed\n  - forbidden public-doc term search for Gemini/CLI\
+      \ key/OpenRouter API key flag terms — passed with no output\n  - OpenRouter\
+      \ contract term search — confirmed `OPENROUTER_KEY`, `--openrouter-model`, `account_default`,\
+      \ `openrouter:`, endpoint URL, attribution-header exclusion, and state-export\
+      \ exclusion language\n- Mainline merge and verification:\n  - Squash merged\
+      \ worker commit `cfade746b1717d4890aeefdbadd8bbfacfd5eb4b` into main as `8669b5b`.\n\
+      \  - `git diff --check HEAD` passed.\n\n## Files changed\n- `README.md`\n- `docs/ARCHITECTURE.md`\n\
+      - `docs/USAGE.md`\n\n## Commit hash(es)\n- Worker: `cfade746b1717d4890aeefdbadd8bbfacfd5eb4b`\n\
+      - Main squash: `8669b5b`\n\n## Gaps/Notes\n- No runtime OpenRouter logic, tests,\
+      \ config loaders, provider construction, or `.env` contents were added/read/printed."
   - id: openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests
     name: define-cli-adapter-docs-red-tests
     status: pending
