@@ -7612,7 +7612,7 @@ phases:
       \ true"
   - id: retest-frontend-contract-closure
     name: Retest frontend contract closure
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -7814,6 +7814,8 @@ phases:
     depends_on:
     - fix-steer-diagnostics-and-mobile-ui-contract
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-09T10:10:10.340835+00:00'
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
