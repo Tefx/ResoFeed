@@ -19604,7 +19604,7 @@ phases:
     agent: golang-developer
   - id: frontend-contract
     name: Frontend API and UI Contract Lock
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - API client wire schemas\n  - Source Ledger rendering contract\n  - UI state\
       \ contract\n  - accessibility and design constraints\nagent_source: project\n\
@@ -19681,6 +19681,78 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T21:18:15.557157+00:00'
+    done_at: '2026-05-09T21:22:31.641826+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/DESIGN.md — Source Ledger is a flat source-management surface with title,
+      OPML import, flat rows, delete action, export/import state links; forbidden
+      folders/tags/pause toggles/drag ordering/settings sliders; dense-but-legible,
+      operational labels, no SaaS styling, no onboarding wizard.
+
+      - docs/ui-preview.html — Source Ledger visual reference uses a flat `.ledger`
+      panel, `Source Ledger` heading, `.ledger-row` grid with source URL and delete
+      button, text actions `import OPML`, `export state`, `import state`; preview
+      styling uses muted monospace, 1px rules, square controls, no shadows.
+
+      - docs/ARCHITECTURE.md — Every `/api/*` request requires `Authorization: Bearer
+      <OWNER_TOKEN>`; canonical timestamps are RFC3339 UTC; Source has `last_fetch_at`/`last_fetch_status`;
+      common error body is terse JSON. Conflict noted: §6 endpoint table does not
+      yet list `POST /api/ingest` or `POST /api/sources/{id}/fetch`, and common error
+      codes omit `conflict`; step description was followed for this contract.
+
+      - docs/PRD.md — Manual source entry stays in Steer, Source Ledger remains strictly
+      flat, no folders/tags/pause toggles/drag ordering/settings panels; RSS fetch
+      errors are raw operational truth, not elaborate UI degradation.
+
+      - .agents/instructions.md — Canonical docs are ARCHITECTURE/DESIGN; owner token
+      boundary is single-token auth; no folders/tags/unread/archive/settings/drag-and-drop;
+      do not edit plan state.
+
+
+      ## Contract Evidence
+
+      - Contract artifacts changed: `web/src/lib/api-contract.ts`, `web/src/lib/manual-rss-fetch-contract.test.ts`
+
+      - API client contract pinned: acceptance-only endpoint constants and wire types
+      for `POST /api/ingest` and `POST /api/sources/{id}/fetch`, exact empty `{}`
+      JSON body, no query params, 200 success/source-level error payloads, 409 conflict,
+      and 404 not_found. No live API-client methods were added.
+
+      - Source Ledger DOM states pinned: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,
+      `[FETCHING...]`, disabled active controls, native/named controls, and visible
+      keyboard focus.
+
+      - Timestamp/error formatting pinned: RFC3339 input timestamps render as `HH:MM:SS`
+      for `last_ingest`/`last_fetch`, with terse truncated non-layout-shifting errors.
+
+      - Visual/a11y forbidden patterns excluded: spinner, progress animation, box
+      shadow, rounded SaaS button, friendly copy, folders/tags/unread/archive/settings/drag-and-drop,
+      local fake jobs, client queues, client receipts, and optimistic durable state.
+
+      - Production UI behavior introduced: NONE required.
+
+      - Conflict/Deviation notes: docs/ui-preview.html and docs/DESIGN.md show/delete-only
+      Source Ledger controls and do not depict manual fetch controls; explicit `[RUN
+      INGEST]`/`[FETCH]` controls in this step were treated as authoritative contract
+      additions, not implemented UI behavior.
+
+      - Worker commit: `5b7de0f`.
+
+      - Squash merge commit on main: `f7bb6a0 [vectl] step-frontend-contract completed`.
+
+      - Worker verification: `npm run check` exit 0 after worker ran `npm ci`; `npm
+      run test:render -- manual-rss-fetch-contract.test.ts` exit 0 with 1 file/3 tests
+      passed.
+
+      - Mainline final-state verification after merge: root-level `npm run check`
+      was an invalid orchestrator command (no root package.json); corrected in `web/`:
+      `npm run check && npm run test:render -- manual-rss-fetch-contract.test.ts`
+      exit 0; output included `svelte-check found 0 errors and 0 warnings` and `Test
+      Files 1 passed`, `Tests 3 passed`.
+
+      - Gaps/Notes: none beyond documented contract additions and corrected verification
+      workdir.'
   - id: frontend-expected-red-tests
     name: Frontend Expected-Red Client and Rendering Tests
     status: pending
