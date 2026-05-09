@@ -4474,7 +4474,7 @@ phases:
       \ is considered served production surface, which static route evidence supports"
   - id: runtime-api-and-mcp-integration.runtime-gate
     name: Runtime gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: default
@@ -4595,6 +4595,8 @@ phases:
     - runtime-api-and-mcp-integration.runtime-wiring-audit
     - runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-09T09:41:55.704110+00:00'
   - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     name: Fix runtime verification blockers
     status: done
