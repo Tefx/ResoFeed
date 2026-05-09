@@ -3808,7 +3808,7 @@ phases:
       frontend rendering remains out of scope.'
   - id: runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
     name: Early runtime vertical slice proof
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -3881,6 +3881,112 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T07:28:40.447756+00:00'
+    done_at: '2026-05-09T07:34:12.884094+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: one Go binary runs static assets, JSON HTTP, MCP,
+      and ingest; SQLite only; owner token is universal boundary; strict feed/search
+      query validation.
+
+      - `docs/ARCHITECTURE.md`: `resofeed serve` is the runtime command; runs SQLite
+      migrations, HTTP API, MCP, ingest loop; `/api/*` uses owner-token auth; feed
+      returns JSON, doctor returns text/plain.
+
+      - `docs/PRD.md`: fresh surface + memory + steering; owner token delegation boundary;
+      `/doctor` raw system health.
+
+      - `docs/DESIGN.md`: owner-token prompt gates API access; `/doctor` raw text
+      status.
+
+      - `docs/DESIGN_VISION.md`: no account/onboarding; token prompt is local access
+      gate; raw diagnostics.
+
+      - `docs/USAGE.md`: build/run commands; bearer auth; `/api/feed/today?limit=20`
+      may return empty items; `/api/doctor` text/plain.
+
+
+      ## Vertical Slice Evidence
+
+      - Entry point: `./bin/resofeed serve`
+
+      - Command executed: `./bin/resofeed serve --addr 127.0.0.1:60872 --public-url
+      http://127.0.0.1:60872 --db <temp>/resofeed.sqlite3 --gemini-api-key test-key-no-external-call-empty-db
+      --owner-token <valid token>`.
+
+      - Layers traversed: CLI (`cmd/resofeed/main.go`, `internal/resofeed/db.go`)
+      → runtime startup/OpenDB/RunMigrations → HTTP server/router → owner-token auth
+      → `/api/feed/today` handler → `ListTodayFeed` ranking/core → SQLite DB → JSON
+      response; `/api/doctor` traversed HTTP auth → `WriteDoctor` → SQLite diagnostics
+      → text/plain response.
+
+      - Observable output: unauthorized feed request returned 401 canonical JSON;
+      authorized `/api/feed/today?limit=20` returned HTTP 200 `application/json` body
+      `{"items":[]}`; authorized `/api/doctor` returned HTTP 200 `text/plain` with
+      `rss: ok`, `gemini: ok`, `extraction: ok`, `ingest: last_run=never`.
+
+      - Stubs/mocks used at boundaries: none at runtime boundaries. Dummy Gemini API
+      key used only to satisfy startup validation; no Gemini network call occurred
+      because temp DB had no configured sources/items.
+
+      - Issues found: non-blocking notes only — skipped legacy contract tests still
+      label runtime debt, and empty corpus proves runtime traversal but not non-empty
+      ranking order.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: verification
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: no
+
+      - behavioral_proof_register: live binary built and started; real SQLite file
+      created; auth boundary observed; authorized HTTP JSON and doctor text responses
+      observed. Limitations: no live Gemini call and empty feed corpus.
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Commands and outputs
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed` → success.
+
+      - Vertical slice probe output included: root 200, unauthorized `/api/feed/today`
+      401 JSON, authorized `/api/feed/today?limit=20` 200 `{"items":[]}`, authorized
+      `/api/doctor` 200 text/plain diagnostics, server exit 0, DB exists.
+
+      - `go test -count=1 -v ./...` → passed; legacy runtime contract tests skipped
+      with expected-stub-debt labels.
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof`
+      → Already up to date; nothing to squash.
+
+      - Mainline `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok
+      resofeed/internal/resofeed (cached)`.
+
+
+      ## Commit hash(es)
+
+      - none — read-only verification
+
+
+      ## Files changed
+
+      - none'
   - id: runtime-api-and-mcp-integration.runtime-liveness-probe
     name: Runtime liveness probe
     status: claimed
