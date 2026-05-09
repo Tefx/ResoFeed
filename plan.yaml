@@ -18798,7 +18798,7 @@ phases:
       - Gaps/Notes: none'
   - id: manual-rss-fetch.frontend-implementation
     name: Frontend Implementation
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\nwork_type: new_capability\n\
       upstream_artifacts:\n  - path: web/src/lib/api-contract.ts or frontend contract\
       \ artifacts created by frontend-contract\n    from_step: frontend-contract\n\
@@ -18912,6 +18912,101 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-09T21:27:28.749169+00:00'
+    done_at: '2026-05-09T21:36:29.245754+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Source Ledger is flat, dense, terse; no folders/tags/settings;
+      raw error lines; no spinners/progress animation; keyboard-accessible named buttons.
+
+      - docs/ui-preview.html — Source Ledger visual reference uses bordered flat panel,
+      compact rows, monospace chrome, right-side delete/action block, no rounded SaaS
+      styling.
+
+      - docs/ARCHITECTURE.md — `/api/*` requires owner bearer token; Source includes
+      `last_fetch_at/status`; errors use terse envelopes; frontend must preserve flat
+      Source Ledger.
+
+      - docs/PRD.md — Manual source management remains Steer + flat ledger; source
+      failures isolated; no onboarding/settings/folders.
+
+      - .agents/instructions.md — Canonical docs are DESIGN/ARCHITECTURE; no vectl
+      plan edits; UI must remain dense/operational.
+
+      - web/src/lib/api-contract.ts — Manual RSS Fetch locks POST `/api/ingest`, POST
+      `/api/sources/{id}/fetch`, `{}` body, 200/409/404 result union, bracket labels,
+      HH:MM:SS timestamps.
+
+      - web/src/lib/manual-rss-fetch-contract.test.ts — Contract asserts endpoint
+      paths, source-level 200 error payloads, conflict/not_found shapes, forbidden
+      visual patterns.
+
+      - web/src/lib/manual-rss-fetch-client.expected-red.test.ts — Client must expose
+      `runIngest()` and `fetchSource(id)`, encode IDs, send `{}`, and return 200/409/404
+      envelopes.
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      — SourceLedger must render `[RUN INGEST]`, `[FETCH]`, active disabled labels,
+      HH:MM:SS, terse errors, and no spinner/progress affordance.
+
+      - web/src/test/manual-rss-fetch-fixtures.ts — Fixtures define documented 10:25:31
+      timestamps, source error, conflict, and not_found payloads.
+
+
+      ## Action Summary
+
+      - Implemented Manual RSS Fetch API client methods.
+
+      - Added Source Ledger manual controls, active disabled states, HH:MM:SS rendering,
+      and terse source errors.
+
+      - Wired page handlers to refresh sources/feed after ingest/fetch completion.
+
+
+      ## Implementation Evidence
+
+      - Contract step consumed: frontend-contract
+
+      - Protected tests consumed: frontend-expected-red-tests
+
+      - Product files changed: `web/src/lib/api-client.ts`, `web/src/routes/components/SourceLedger.svelte`,
+      `web/src/routes/+page.svelte`, `web/src/app.css`
+
+      - Tests preserved/updated only as contract-faithful: protected tests were not
+      modified.
+
+      - Client command/output: worker ran `npm --prefix web run test:render -- manual-rss-fetch`
+      exit 0; output `Test Files 3 passed (3); Tests 12 passed (12)`.
+
+      - Typecheck command/output: worker ran `npm --prefix web run check` exit 0;
+      output `svelte-check found 0 errors and 0 warnings`.
+
+      - Rendering command/output or DOM snapshot: generated SourceLedger DOM artifacts
+      with temporary Vitest render harness. Default snapshot includes `<button type="button"
+      class="manual-fetch-action" aria-label="[RUN INGEST]">[RUN INGEST]</button>`
+      and `<button type="button" class="manual-fetch-action" aria-label="Fetch Example">[FETCH]</button>`.
+
+      - Visual artifacts for required states: `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/manual-rss-fetch-artifacts/default.html`;
+      `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/manual-rss-fetch-artifacts/source-fetch-active.html`;
+      `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/manual-rss-fetch-artifacts/global-ingest-active.html`;
+      `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/manual-rss-fetch-artifacts/error-conflict.html`;
+      `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/manual-rss-fetch-artifacts/completion.html`.
+
+      - Forbidden spinner/animation/SaaS styling introduced: NONE
+
+      - Deviation records: none
+
+      - Worker commit: `e8242d514d1982873ea7e7f4b0cb673958070a8f`.
+
+      - Squash merge commit on main: `256cdcd [vectl] step-manual-rss-fetch.frontend-implementation
+      completed`.
+
+      - Mainline final-state verification after merge: `npm --prefix web run test:render
+      -- manual-rss-fetch && npm --prefix web run check && npm --prefix web run build`
+      exit 0; output included `Test Files 3 passed (3); Tests 12 passed (12)`, `svelte-check
+      found 0 errors and 0 warnings`, and Vite/SvelteKit production build success.
+
+      - Gaps/Notes: worker ran `npm --prefix web ci` because dependencies were absent
+      in isolated worktree; no dependency files changed.'
   - id: manual-rss-fetch.integration-proof
     name: Manual RSS Fetch Runtime Integration Proof
     status: pending
