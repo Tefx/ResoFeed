@@ -14780,7 +14780,7 @@ phases:
     agent: gate-reviewer
   - id: runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
     name: fix-readme-secret-cli-regression
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       priority: HIGH
@@ -14916,6 +14916,141 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-09T17:28:51.893111+00:00'
+    done_at: '2026-05-09T17:31:02.901835+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+
+      - README.md — READ. Key passage: quick start previously showed `./bin/resofeed
+      serve` with a CLI Gemini key flag; updated to local-only `.env`/runtime secret
+      guidance and no CLI secret argv.
+
+      - docs/ARCHITECTURE.md — READ. Key passage: LLM API keys are runtime input only;
+      must never be persisted, exported, logged, committed, or used in docs examples;
+      OpenRouter must reuse the same runtime secret-source contract.
+
+      - docs/DESIGN.md — READ. Key passage: product language remains the single-tenant
+      “ResoFeed Analyst Workbench System” with functional chrome and no onboarding
+      wizard/product-surface expansion.
+
+
+      ## Documentation Fix Evidence
+
+
+      **Files changed**:
+
+      ```text
+
+      README.md
+
+      docs/ARCHITECTURE.md
+
+      docs/USAGE.md
+
+      ```
+
+
+      **Unsafe examples removed/replaced**:
+
+      ```text
+
+      README.md:
+
+      - Removed runnable quick-start argv secret example: --gemini-api-key "<GEMINI_API_KEY>".
+
+      - Added runtime-only secret guidance using OS/service/hosting secret sources
+      or a local non-committed .env fallback.
+
+      - Added explicit warning not to paste real API keys into runnable commands,
+      shell history, logs, issue comments, or state exports.
+
+
+      docs/ARCHITECTURE.md:
+
+      - Replaced inline GEMINI_API_KEY assignment before `resofeed serve` verification
+      command with a command that assumes the key is already available from OS/service/hosting/.env
+      runtime sources.
+
+
+      docs/USAGE.md:
+
+      - Replaced `.env` placeholder wording with redacted-local-value plus a local-only/non-committed
+      warning.
+
+      ```
+
+
+      **Commands/searches executed**:
+
+      ```text
+
+      rg -n --glob ''*.md'' -- ''--gemini-api-key\s+["''"'']?<|--openrouter-api-key\s+["''"'']?<|GEMINI_API_KEY=.*resofeed
+      serve|OPENROUTER_(KEY|API_KEY)=.*resofeed serve'' README.md docs
+
+      Output: <no matches>
+
+
+      rg -n --glob ''*.md'' -- ''--gemini-api-key|--openrouter-api-key|GEMINI_API_KEY|OPENROUTER_KEY|OPENROUTER_API_KEY''
+      README.md docs
+
+      Output summary: remaining public-doc matches are policy/compatibility references,
+      redacted `.env` examples, or warnings; no README/docs runnable command requires
+      CLI API key argv secrets or inline env assignment before serve.
+
+      ```
+
+
+      **Scope guard confirmation**:
+
+      - Product code changed: NO
+
+      - `.env` or secrets committed: NO
+
+      - New runtime behavior introduced: NO
+
+
+      **Gate impact**:
+
+      - README shell-history regression addressed: YES
+
+      - Remaining docs requiring CLI API key secrets: none in README.md or docs/*.md.
+      Remaining `--gemini-api-key` mentions are compatibility/policy warnings, not
+      runnable secret examples.
+
+
+      ## Verification
+
+      - Worker commit: `dd78a67c0c0d82a72861ee2b2284f9c802f3a9d8`
+
+      - Main squash merge: `1ef639e` (`[vectl] step-runtime-secret-env-config-foundation.fix-readme-secret-cli-regression
+      completed`)
+
+      - Mainline check after merge: `git diff --check HEAD` passed.
+
+
+      ## Files changed
+
+      - `README.md`
+
+      - `docs/ARCHITECTURE.md`
+
+      - `docs/USAGE.md`
+
+
+      ## Commit hash(es)
+
+      - Worker: `dd78a67c0c0d82a72861ee2b2284f9c802f3a9d8`
+
+      - Main squash: `1ef639e`
+
+
+      ## Gaps/Notes
+
+      - Historical `.audit-artifacts/` markdown still contains prior verification
+      findings and smoke-command records with CLI key examples; these are audit records,
+      not current public runnable docs.'
   - id: runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
     name: retest-readme-secret-cli-regression
     status: pending
