@@ -12671,7 +12671,7 @@ phases:
       \ phase remains blocked until fix and independent retest complete."
   - id: openrouter-llm-contract-and-red-tests.fix-red-test-gate-gaps
     name: fix-red-test-gate-gaps
-    status: claimed
+    status: done
     description: 'Remediate ALL blockers from gate step openrouter-llm-contract-and-red-tests.contract-red-tests-gate.
 
 
@@ -12771,6 +12771,51 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T17:57:08.344505+00:00'
+    done_at: '2026-05-09T18:00:18.282608+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passage: OpenRouter API keys are runtime-only and must never be\
+      \ persisted/exported/imported; state export/import must never include LLM secrets,\
+      \ selected model, provider name, secret-source metadata, `.env` path, or provider\
+      \ config.\n- docs/DESIGN.md — READ. Key passage: State portability surface exists\
+      \ as a functional workbench component; no onboarding/settings expansion.\n-\
+      \ internal/resofeed/openrouter_product_integration_contract_test.go — READ.\
+      \ Key passage: existing `TestStateExportExcludesOpenRouterRuntimeConfigAndSecrets`\
+      \ covered export-only secrecy; import-side proof was added.\n- .agents/instructions.md\
+      \ — READ. Key passage: runtime-only LLM secrets must never be persisted, included\
+      \ in state bundles, exposed, logged, or committed.\n\n## Remediation Evidence\n\
+      \n**Modified files**:\n```text\ninternal/resofeed/openrouter_cli_adapter_contract_test.go\n\
+      internal/resofeed/openrouter_product_integration_contract_test.go\n```\n\n**No\
+      \ product implementation changes confirmation**:\n- [x] Changes are limited\
+      \ to OpenRouter expected-red test/contract artifacts.\n- [x] No runtime/product\
+      \ implementation files were modified.\n\n**Expected-red metadata proof**:\n\
+      ```text\nrg -n \"expected_result: red\" \"internal/resofeed\" --glob \"*openrouter*contract_test.go\"\
+      \ninternal/resofeed/openrouter_cli_adapter_contract_test.go:3:// expected_result:\
+      \ red\ninternal/resofeed/openrouter_product_integration_contract_test.go:3://\
+      \ expected_result: red\n```\n\n**State import secrecy coverage proof**:\n- Test\
+      \ name(s): `TestStateImportRejectsOpenRouterRuntimeConfigAndSecrets`\n- Assertions\
+      \ prove imports do NOT persist/import: OpenRouter secrets, model, provider names,\
+      \ secret-source metadata, runtime config.\n- Coverage added:\n  - Rejects an\
+      \ import bundle containing OpenRouter runtime/config top-level fields.\n  -\
+      \ Asserts rejected import does not persist portable rows from the tainted bundle.\n\
+      \  - Asserts runtime metadata has no imported OpenRouter secret/model/provider/source/config\
+      \ keys or values.\n  - Asserts a valid portable import still does not create\
+      \ OpenRouter runtime metadata.\n\n**Verification commands**:\n```text\ngofmt\
+      \ -w internal/resofeed/openrouter_cli_adapter_contract_test.go internal/resofeed/openrouter_product_integration_contract_test.go\
+      \ — exit 0\ngit diff --check — exit 0\ngo test ./internal/resofeed -run '^TestStateImportRejectsOpenRouterRuntimeConfigAndSecrets$'\
+      \ -count=1 — PASS\ngo test ./internal/resofeed -run '^TestState(ExportExcludesOpenRouterRuntimeConfigAndSecrets|ImportRejectsOpenRouterRuntimeConfigAndSecrets)$'\
+      \ -count=1 — PASS\ngo test ./internal/resofeed -run '^TestOpenRouter' -count=1\
+      \ — exit 1, expected-red behavioral/product gaps\n```\n\n**Mainline verification\
+      \ after merge**:\n```text\nrg -n \"expected_result: red\" \"internal/resofeed\"\
+      \ --glob \"*openrouter*contract_test.go\" — found both OpenRouter contract test\
+      \ files\ngo test ./internal/resofeed -run '^TestState(ExportExcludesOpenRouterRuntimeConfigAndSecrets|ImportRejectsOpenRouterRuntimeConfigAndSecrets)$'\
+      \ -count=1 — PASS\ngo test ./internal/resofeed -run '^TestOpenRouter' -count=1\
+      \ — exit 1, expected red for intended product migration gaps\n```\n\n**Secret\
+      \ safety**:\n- Actual .env read: NO\n- Real OpenRouter key read/printed/committed:\
+      \ NO\n- Only fake contract fixture values were used.\n\n## Files changed\n-\
+      \ `internal/resofeed/openrouter_cli_adapter_contract_test.go`\n- `internal/resofeed/openrouter_product_integration_contract_test.go`\n\
+      \n## Commit hash(es)\n- Worker: `ad8bdedab247379dc4359ad0a3f0f2da45de24cf`\n\
+      - Main squash: `4a70077`\n\n## Gaps/Notes\n- Existing expected-red OpenRouter\
+      \ failures are intentionally product migration gaps, not syntax/build failures."
   - id: openrouter-llm-contract-and-red-tests.retest-red-test-gate-gaps
     name: retest-red-test-gate-gaps
     status: pending
