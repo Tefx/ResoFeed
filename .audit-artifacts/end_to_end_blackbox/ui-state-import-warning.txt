@@ -1,0 +1,29 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+TODAY
+SOURCE LEDGER
+SEARCH
+STATE
+First use
+
+Paste RSS URL in Steer or import OPML.
+
+Inspect opens the item.
+
+Star preserves durable value.
+
+Steer is optional correction.
+
+INSPECTOR
+
+State Portability
+
+import replaces active sources, rules, and stars
+
+export state import state
+
+bundle contains active Source Ledger rows, active steering policy rules, and currently resonated items only
+
+untitled page

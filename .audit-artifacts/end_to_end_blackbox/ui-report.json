@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "failures": [],
+  "observations": {
+    "serve_command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/end-to-end-integration.black-box-acceptance-pass/bin/resofeed serve --addr 127.0.0.1:50409 --public-url http://127.0.0.1:50409 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/end-to-end-integration.black-box-acceptance-pass/.audit-artifacts/end_to_end_blackbox/ui-db-gwNGuc/resofeed.sqlite3 --gemini-api-key blackbox-fake-gemini-key --gemini-model gemini-2.5-flash --owner-token rfeed_blackbox_owner_token_0123456789ABCDEFG",
+    "server_ready": true,
+    "first_use_text_head": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nTODAY\nSOURCE LEDGER\nSEARCH\nSTATE\nFirst use\n\nPaste RSS URL in Steer or import OPML.\n\nInspect opens the item.\n\nStar preserves durable value.\n\nSteer is optional correction.\n\nINSPECTOR",
+    "ledger_text_head": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nTODAY\nSOURCE LEDGER\nSEARCH\nSTATE\nFirst use\n\nPaste RSS URL in Steer or import OPML.\n\nInspect opens the item.\n\nStar preserves durable value.\n\nSteer is optional correction.\n\nINSPECTOR\n\nSOURCE LEDGER\nimport OPML \n\nNo sources. Paste RSS URL in Steer.\n\nexport state · import state"
+  }
+}
