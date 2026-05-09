@@ -15553,7 +15553,7 @@ phases:
     claimed_at: '2026-05-09T18:58:25.049064+00:00'
   - id: openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     name: doctor-ui-multimodal-audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -15646,6 +15646,119 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-09T18:58:20.136994+00:00'
+    done_at: '2026-05-09T19:03:55.016740+00:00'
+    evidence: 'Native multimodal doctor/UI audit PASS accepted and artifacts merged.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matches expected
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+
+      Auditor: uiux-auditor
+
+      Scope: `/doctor`, terminal/API text, UI smoke surfaces
+
+      Worker commit: 13e961f (`audit: add doctor UI multimodal verification`)
+
+      Main squash merge commit: 0ec1966 (`[vectl] step-openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
+      completed`).
+
+
+      Refs read confirmation:
+
+      - docs/DESIGN.md — diagnostics are raw monospace text, not dashboard/cards;
+      product chrome must be terse operational labels; no AI-magic/SaaS styling.
+
+      - docs/ARCHITECTURE.md — `/doctor` must use `openrouter:` prefix, distinguish
+      configured/account-default/resolved model where available, and never expose
+      keys/source metadata.
+
+      - docs/USAGE.md — `/doctor` is plain text; example includes `openrouter: ok
+      configured_model=account_default resolved_model=unknown`; live-smoke evidence
+      must redact secrets.
+
+      - .agents/instructions.md — canonical docs are law; runtime LLM secrets require
+      redacted evidence only; stale Gemini guidance noted as non-runtime/non-product-doc
+      debt.
+
+
+      Artifacts merged:
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit.md
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/terminal-api-capture.md
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/terminal-api-capture.json
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/ui-owner-token-prompt-1280x800.png
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/ui-authenticated-empty-1280x800.png
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/ui-authenticated-body-text.txt
+
+      - .audit-artifacts/openrouter_verification/doctor-ui-multimodal-audit/ui-server.log
+
+
+      Findings:
+
+      - `/doctor` raw text: PASS — `openrouter: ok configured_model=account_default
+      resolved_model=unknown`; configured model variant shows `configured_model=openai/gpt-4.1-mini`.
+
+      - configured/default/resolved model: PASS — account default and explicit configured
+      model visibly distinct; resolved model honestly reports `unknown`.
+
+      - Gemini residue: PASS — no Gemini-facing text in terminal/API captures or screenshots.
+
+      - UI smoke: PASS — root loads; screenshots show token prompt and first-use shell;
+      provider/model status not visible by design.
+
+      - Secret redaction: PASS — retained artifacts contain no raw key/token/header
+      values.
+
+
+      Behavioral proof register:
+
+      - doctor_account_default_openrouter_prefix — PASS.
+
+      - doctor_configured_model_distinguishable — PASS.
+
+      - ui_owner_token_prompt_visual — PASS.
+
+      - ui_authenticated_empty_shell_visual — PASS.
+
+      - secret_redaction_terminal_visual — PASS.
+
+
+      Issues found: none.
+
+      Mainline post-merge verification:
+
+      ```text
+
+      go test ./... — PASS
+
+      ```'
   - id: openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     name: live-openrouter-smoke-system-test
     status: pending
