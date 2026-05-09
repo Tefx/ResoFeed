@@ -12164,3 +12164,11 @@ phases:
     /doctor, HTTP, MCP, and state boundaries, with no Gemini compatibility flags remaining.
   depends_on:
   - openrouter-llm-contract-and-red-tests
+- id: openrouter-llm-verification-and-live-smoke
+  name: OpenRouter Verification and Live Smoke
+  status: locked
+  gate: All local, integration, live smoke, UI/multimodal, docs, state-export, HTTP/MCP
+    parity, and final gate evidence demonstrate the migration is complete and secrets
+    remain redacted.
+  depends_on:
+  - openrouter-llm-implementation
