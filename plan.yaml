@@ -19440,3 +19440,58 @@ phases:
     - manual-rss-fetch.integration-proof
     - manual-rss-fetch.spec-conformance
     - manual-rss-fetch.uiux-audit
+  - id: backend-contract
+    name: Backend Contract (manual RSS fetch)
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - signatures\n  - type_defs\n  - interfaces\n  - stubs\nagent_source: project\n\
+      work_type: new_capability\n\nLock the backend Manual RSS Fetch HTTP/ingest contract\
+      \ before implementation.\n\nAuthoritative refs:\n- docs/ARCHITECTURE.md §5.1\
+      \ Ingestion: exactly one ingest/fetch operation may run at a time; HTTP manual\
+      \ triggers return 409 while guard is held; no queues/jobs/ledgers/schedulers.\n\
+      - docs/ARCHITECTURE.md §6 HTTP Surface: POST /api/ingest and POST /api/sources/{id}/fetch\
+      \ accept only JSON {}; no query params; response schemas are IngestRunResult,\
+      \ IngestErrorDetail, optional Source, and canonical ErrorBody with conflict\
+      \ details.\n- docs/ARCHITECTURE.md §9 Minimal File Shape: ingest.go owns orchestration/guard/outcomes;\
+      \ http.go owns routing, auth, validation, status mapping, JSON serialization.\n\
+      \nScope and allowed files:\n- internal/resofeed/types.go — add only acceptance-defining\
+      \ structs/types/constants for IngestErrorDetail, IngestRunResult, and any typed\
+      \ source-fetch result needed by HTTP/frontend contracts.\n- internal/resofeed/ingest.go\
+      \ — add only public/internal function signatures, docstrings, and stubs for\
+      \ manual global ingest and per-source fetch outcomes if needed.\n- internal/resofeed/http.go\
+      \ — add only route/handler signatures or stubs if needed to pin POST /api/ingest\
+      \ and POST /api/sources/{id}/fetch boundaries.\n\nContract constraints:\n- No\
+      \ runnable business logic, persistence logic, fetch execution, guard implementation,\
+      \ or completed HTTP request handling.\n- Do not introduce workers, queues, job\
+      \ tables, activity ledgers, command receipts, service/repository layers, DI\
+      \ containers, event buses, sync/merge machinery, or new deployables.\n- Pin\
+      \ the JSON wire fields exactly as docs/ARCHITECTURE.md §6: RFC3339 UTC timestamps,\
+      \ duration_ms integer, errors array always present, source_id nullable for global\
+      \ runs, conflict details scope always \"all\".\n\nCompletion boundary:\n- This\
+      \ contract step may leave stubs with panic(\"TODO\"), return zero values, or\
+      \ NotImplemented-style errors; that is expected here only.\n- The downstream\
+      \ backend implementation step must fill these stubs without changing pinned\
+      \ signatures/types unless it records an explicit deviation."
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Evidence
+
+      - Contract artifacts changed: <files>
+
+      - Pinned signatures/types: <list>
+
+      - Explicit stubs only, no implementation logic: PASS/FAIL
+
+      - Forbidden machinery absent: PASS/FAIL
+
+      - Deviation records, if any: <type/what/why/impact or none>'
+    agent: golang-developer
