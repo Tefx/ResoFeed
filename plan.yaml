@@ -14012,7 +14012,7 @@ phases:
     agent: gate-reviewer
 - id: runtime-secret-env-config-foundation
   name: Runtime Secret Env Config Foundation
-  status: pending
+  status: in_progress
   gate: Runtime LLM secret resolution via environment variables and local .env files
     is contract-locked, implemented for the current Gemini path, verified secret-safe,
     and ready as the required foundation before OpenRouter migration.
@@ -14021,7 +14021,7 @@ phases:
   steps:
   - id: runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
     name: lock-runtime-secret-source-policy
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -14153,6 +14153,8 @@ phases:
       - Files changed limited to docs/instructions/contracts; no runnable resolver
       logic shipped.'
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-09T17:10:17.136515+00:00'
   - id: runtime-secret-env-config-foundation.define-runtime-secret-red-tests
     name: define-runtime-secret-red-tests
     status: pending
