@@ -4735,7 +4735,7 @@ phases:
       tree; not fixed because this remediation targeted runtime/static/MCP blockers.'
   - id: runtime-api-and-mcp-integration.runtime-blockers-retest
     name: Runtime blockers retest
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -5001,6 +5001,149 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T09:09:27.105612+00:00'
+    done_at: '2026-05-09T09:16:06.998192+00:00'
+    evidence: "## Verification Report\n\n**Tester**: integration-verifier (independent\
+      \ of implementation)\n**Scope**: runtime failed verification cluster retest\n\
+      **Independence Level**: L1\n**Timestamp**: 2026-05-09T00:00:00Z\n\n### Orchestrator\
+      \ Mainline Final-State Barrier\n- Worktree status before merge: clean.\n- Plan\
+      \ mutation check on worker branch: no plan.yaml changes.\n- Squash merge result:\
+      \ `Already up to date. (nothing to squash)`.\n- Mainline verification command:\
+      \ `go test ./...`\n```text\n?   \tresofeed/cmd/resofeed\t[no test files]\nok\
+      \  \tresofeed/internal/resofeed\t(cached)\n```\n\n### Action Summary\nRetested\
+      \ documented build, public binary HTTP/static/API/MCP liveness, contract-correct\
+      \ bound-listener MCP Gemini steer proof, startup validation, first-run token\
+      \ reuse, Go tests, and stale expected-stub skip search.\n\n### refs Read Confirmation\
+      \ (MANDATORY)\n- `.agents/instructions.md` — key passage: one deployable Go\
+      \ binary serves static assets, JSON HTTP, MCP Streamable HTTP, and ingest; Gemini\
+      \ is JSON transformer only; owner token is universal delegation boundary.\n\
+      - `docs/ARCHITECTURE.md` — key passage: `/mcp` requires owner token on every\
+      \ request; startup validation failures exit before binding; owner token generation/reuse\
+      \ behavior is process-level runtime metadata.\n- `docs/PRD.md` — key passage:\
+      \ ResoFeed is not SaaS or inbox-zero; core primitives are Inspect, Resonate,\
+      \ Steer; MCP over remote Streamable HTTP is required.\n- `docs/DESIGN.md` —\
+      \ key passage: Owner Token Prompt must say `Enter owner token`, avoid account/login/onboarding\
+      \ language, and use operational labels like `RESOFEED`.\n- `docs/DESIGN_VISION.md`\
+      \ — key passage: no account screens, no setup wizards; owner token is a terse\
+      \ local access gate.\n- `docs/USAGE.md` — key passage: documented build is `npm\
+      \ --prefix web install`, `npm --prefix web run build`, `go build -o ./bin/resofeed\
+      \ ./cmd/resofeed`; `/api/*` and MCP require `Authorization: Bearer <OWNER_TOKEN>`.\n\
+      \n### Build Outputs\n**Documented web build**:\n```text\n$ npm --prefix web\
+      \ install && npm --prefix web run build\nadded 147 packages, and audited 148\
+      \ packages in 1s\n3 low severity vulnerabilities\n> resofeed-web@0.0.0-contract\
+      \ build\n> vite build\nvite v6.4.2 building SSR bundle for production...\n✓\
+      \ 151 modules transformed.\nvite v6.4.2 building for production...\n✓ 163 modules\
+      \ transformed.\n> Using @sveltejs/adapter-static\n  Wrote site to \"build\"\n\
+      \  ✔ done\nExit: 0\n```\n\n**Binary build**:\n```text\n$ go build -o ./bin/resofeed\
+      \ ./cmd/resofeed\n<no stdout/stderr>\nExit: 0\n```\n\n### Static Root HTML/UI\
+      \ Proof\n**Request**: `GET http://127.0.0.1:18081/`\n**Status / Content-Type**:\
+      \ `200`, `text/html; charset=utf-8`\n**Actual output excerpt**:\n```html\n<main\
+      \ class=\"contract-shell resofeed-shell\" aria-label=\"RESOFEED\">\n<section\
+      \ class=\"contract-region contract-token-prompt\" aria-labelledby=\"owner-token-heading\"\
+      >\n<p class=\"contract-label\">RESOFEED</p>\n<h1 id=\"owner-token-heading\"\
+      >Enter owner token</h1>\n<form class=\"contract-token-form\"><label for=\"owner-token-input\"\
+      >Owner token</label>\n```\nSaaS/account forbidden-copy scan result:\n```text\n\
+      account/login/SaaS/profile copy present: []\n```\n\n### HTTP API Liveness/Auth\
+      \ Proof\n```text\nGET /api/feed/today without Authorization\nstatus: 401\nbody:\
+      \ {\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\"\
+      ,\"details\":{}}}\n\nGET /api/feed/today with Authorization: Bearer rfeed_...\n\
+      status: 200\ncontent-type: application/json; charset=utf-8\nbody: {\"items\"\
+      :[]}\n```\n\n### MCP Bound Listener Proof\nPublic binary `/mcp`:\n```text\n\
+      POST /mcp initialize with valid owner token\nstatus: 200\n{\"jsonrpc\":\"2.0\"\
+      ,\"id\":1,\"result\":{\"capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\"\
+      :\"2025-03-26\",\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"\
+      }}}\n\nPOST /mcp resources/list\nstatus: 200\n{\"resources\":[\n  {\"mimeType\"\
+      :\"application/json\",\"name\":\"Today feed\",\"uri\":\"resofeed://feed/today\"\
+      },\n  {\"mimeType\":\"application/json\",\"name\":\"Active steering rules\"\
+      ,\"uri\":\"resofeed://rules/active\"},\n  {\"mimeType\":\"text/plain\",\"name\"\
+      :\"Doctor diagnostics\",\"uri\":\"resofeed://system/doctor\"},\n  {\"mimeType\"\
+      :\"application/json\",\"name\":\"Sources\",\"uri\":\"resofeed://sources\"}\n\
+      ]}\n\nPOST /mcp tools/list\nstatus: 200\nschemas include:\n- list_candidate_items:\
+      \ limit default 20 max 50\n- search_items: required [\"query\"], limit default\
+      \ 20 max 50\n- read_item: required [\"item_id\"]\n- mark_inspected: required\
+      \ [\"item_id\",\"actor_id\",\"idempotency_key\"], actor_id max 128, key max\
+      \ 200\n- resonate_item: required [\"item_id\",\"resonated\",\"actor_id\",\"\
+      idempotency_key\"]\n- steer: required [\"command\",\"actor_id\",\"idempotency_key\"\
+      ], command maxLength 4000\n- report_delivery: required [\"item_id\",\"actor_id\"\
+      ,\"delivered_at\",\"idempotency_key\"]\n```\n\nUnauthorized MCP:\n```text\n\
+      POST /mcp initialize without Authorization\nstatus: 401\nbody: {\"error\":{\"\
+      code\":\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n\
+      ```\n\n### MCP Steer Gemini Proof\n- Listener mode: contract-correct in-process\
+      \ bound listener using `NewRouter` with configured recording Gemini test double.\
+      \ Reason: the public binary constructs the real Gemini HTTP client and exposes\
+      \ no documented Gemini endpoint/test-double override; this proof still binds\
+      \ a real TCP listener and exercises `/mcp` over HTTP.\n\n```text\nlistener_mode:\
+      \ contract-correct in-process bound listener using NewRouter with configured\
+      \ recording Gemini\nurl: http://127.0.0.1:54308/mcp\n```\n\nSuccessful steer\
+      \ receipt:\n```text\nsteer_first status=200 gemini_calls=1\n{\"receipt\":{\"\
+      interpreted_as\":\"gemini_policy_update\",\"changed_rules\":[{\"rule_text\"\
+      :\"Gemini translated systems policy.\",\"is_active\":true,\"revision\":1,\"\
+      created_by_actor_kind\":\"agent\",\"created_by_actor_id\":\"briefing-agent\"\
+      }],\"message\":\"gemini steering updated\"}}\n```\n\nIdempotent replay proof\
+      \ without second Gemini call:\n```text\nsteer_replay status=200 gemini_calls=1\n\
+      {\"receipt\":{\"interpreted_as\":\"gemini_policy_update\",\"changed_rules\"\
+      :[{\"rule_text\":\"Gemini translated systems policy.\",\"is_active\":true,\"\
+      revision\":1,\"created_by_actor_kind\":\"agent\",\"created_by_actor_id\":\"\
+      briefing-agent\"}],\"message\":\"gemini steering updated\"}}\n```\n\nUnauthorized\
+      \ steer proof without Gemini call:\n```text\nsteer_unauthorized status=401 gemini_calls=1\n\
+      {\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\",\"\
+      details\":{}}}\n```\n\n### Startup Validation No-Bind Matrix\n```text\ncase=invalid_addr\
+      \ exit=2\nstderr='err: invalid_addr: expected HOST:PORT\\n'\n\ncase=invalid_public_url\
+      \ addr=127.0.0.1:54330 exit=2\nstderr='err: invalid_public_url: expected absolute\
+      \ http(s) URL without path/query/fragment\\n'\ncan_bind_after=True\n\ncase=invalid_gemini_api_key\
+      \ addr=127.0.0.1:54331 exit=2\nstderr='err: invalid_gemini_api_key: value required\\\
+      n'\ncan_bind_after=True\n\ncase=invalid_owner_token addr=127.0.0.1:54332 exit=2\n\
+      stderr='err: invalid_owner_token: expected at least 32 visible non-whitespace\
+      \ characters\\n'\ncan_bind_after=True\n\ncase=invalid_db addr=127.0.0.1:54333\
+      \ exit=2\nstderr='err: invalid_db: cannot open sqlite database\\n'\ncan_bind_after=True\n\
+      ```\n\n### First-Run Owner Token Proof\n```text\noccupied_addr: 127.0.0.1:54343\n\
+      \nfirst_exit: 1\nfirst_stdout: 'owner token generated: rfeed_iy44H01QcZ3DWa9Gqdc63R9fWL8YOTVuBJXLehWRLL4\\\
+      nserving ResoFeed on 127.0.0.1:54343 (public-url http://127.0.0.1:54343)\\n'\n\
+      first_stderr: 'err: runtime_failed: serve http runtime: listen tcp 127.0.0.1:54343:\
+      \ bind: address already in use\\n'\n\nsecond_exit: 1\nsecond_stdout: 'owner\
+      \ token reused: stored hash\\nserving ResoFeed on 127.0.0.1:54343 (public-url\
+      \ http://127.0.0.1:54343)\\n'\nsecond_stderr: 'err: runtime_failed: serve http\
+      \ runtime: listen tcp 127.0.0.1:54343: bind: address already in use\\n'\n```\n\
+      \n### Go Test and Stale Skip Search\n```text\n$ go test ./...\n?   \tresofeed/cmd/resofeed\t\
+      [no test files]\nok  \tresofeed/internal/resofeed\t0.502s\nExit: 0\n```\n\n\
+      Stale runtime expected-stub skip search, excluding plan/state/temp files:\n\
+      ```text\nexpected-stub excluding plan/state/temp: 0 matches\nexpected stub excluding\
+      \ plan/state/temp: 0 matches\nruntime expected-stub excluding plan/state/temp:\
+      \ 0 matches\n```\n\n### Verification Run (Command + Exit Code)\n- `npm --prefix\
+      \ web install && npm --prefix web run build` — Exit 0\n- `go build -o ./bin/resofeed\
+      \ ./cmd/resofeed` — Exit 0\n- Public binary HTTP/static/API/MCP probe — Exit\
+      \ 0\n- Contract-correct bound-listener MCP Gemini steer probe — Exit 0\n- Startup\
+      \ validation no-bind matrix — Exit 0\n- First-run token generation/reuse probe\
+      \ — Exit 0, with expected runtime bind failure after token resolution\n- `go\
+      \ test ./...` — Exit 0\n- stale expected-stub search — Exit 0\n\n### Artifacts\
+      \ Modified\n- Product implementation files modified: false\n- Temporary runtime\
+      \ artifacts created under `.verify-runtime/` and build artifact `bin/resofeed`\
+      \ were removed before handoff.\n- Final git status: clean isolated worktree.\n\
+      \n### Semantic Closure Fields\nstep_intent: retest_green\nexpected_result: green\n\
+      observed_result: green\nfailure_alignment: none\nverdict: PASS\nblockers: []\n\
+      behavioral_proof_register:\n  - claim: Documented web and binary builds complete.\n\
+      \    proof: npm build and go build exited 0.\n    uncertainty: NONE\n  - claim:\
+      \ Static root serves HTML UI with owner-token prompt and no SaaS/account concepts.\n\
+      \    proof: GET / returned 200 text/html and HTML excerpt with RESOFEED + Enter\
+      \ owner token; forbidden copy scan empty.\n    uncertainty: NONE\n  - claim:\
+      \ HTTP API enforces owner-token auth and is live.\n    proof: unauthorized /api/feed/today\
+      \ 401; authorized /api/feed/today 200 {\"items\":[]}.\n    uncertainty: NONE\n\
+      \  - claim: MCP bound listener initializes and exposes resources/tools.\n  \
+      \  proof: /mcp initialize, resources/list, tools/list returned 200 JSON-RPC\
+      \ responses.\n    uncertainty: NONE\n  - claim: MCP steer uses configured Gemini\
+      \ and idempotent replay does not call Gemini twice.\n    proof: bound listener\
+      \ steer_first gemini_calls=1; steer_replay gemini_calls=1 with same receipt.\n\
+      \    uncertainty: NONE\n  - claim: Unauthorized MCP steer does not call Gemini.\n\
+      \    proof: unauthorized steer returned 401 and gemini_calls remained 1.\n \
+      \   uncertainty: NONE\n  - claim: Startup invalid addr/public-url/db/Gemini/token\
+      \ validation fails before binding.\n    proof: all invalid cases exited 2 with\
+      \ expected errors; bindable addr cases reported can_bind_after=True.\n    uncertainty:\
+      \ NONE\n  - claim: First-run owner-token generation and reuse works at process\
+      \ level.\n    proof: first occupied-port run generated rfeed_ token; second\
+      \ reused stored hash.\n    uncertainty: NONE\n  - claim: Go tests pass and stale\
+      \ expected-stub skip text is absent from code/docs runtime surfaces.\n    proof:\
+      \ go test ./... exit 0; expected-stub search excluding plan/state/temp returned\
+      \ 0.\n    uncertainty: NONE\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nproduct_implementation_files_modified: false"
   - id: runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     name: Fix MCP steer Gemini proof
     status: done
