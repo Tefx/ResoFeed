@@ -3989,7 +3989,7 @@ phases:
       - none'
   - id: runtime-api-and-mcp-integration.runtime-liveness-probe
     name: Runtime liveness probe
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: default
@@ -4066,6 +4066,72 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-09T09:16:33.088370+00:00'
+    done_at: '2026-05-09T09:21:45.201663+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ one Go binary serves static assets, JSON HTTP, MCP Streamable HTTP, and ingest;\
+      \ owner token is the universal delegation boundary.\n- docs/ARCHITECTURE.md\
+      \ — `resofeed serve` must bind web/API/MCP, `/api/*` and `/mcp` require `Authorization:\
+      \ Bearer <OWNER_TOKEN>`, `/api/doctor` is text/plain, MCP exposes `resofeed://system/doctor`\
+      \ and `list_candidate_items`.\n- docs/PRD.md — external agents must use authorized\
+      \ MCP Streamable HTTP; unauthorized agent actions must fail at auth boundary\
+      \ without creating queues.\n- docs/DESIGN.md — static UI should load publicly\
+      \ and present terse Owner Token Prompt before API calls.\n- docs/DESIGN_VISION.md\
+      \ — single-tenant local access gate; no account/login/onboarding surface.\n\
+      - docs/USAGE.md — documented build/run commands, HTTP examples, `/mcp` endpoint,\
+      \ resource/tool examples.\n\n## Orchestrator Mainline Final-State Barrier\n\
+      - Worktree status before merge: clean.\n- Plan mutation check on worker branch:\
+      \ no plan.yaml changes.\n- Squash merge result: `Already up to date. (nothing\
+      \ to squash)`.\n- Mainline verification command: `go test ./...`\n```text\n\
+      ?   \tresofeed/cmd/resofeed\t[no test files]\nok  \tresofeed/internal/resofeed\t\
+      (cached)\n```\n\n## Liveness Probe Evidence\n- Launch command:\n    npm --prefix\
+      \ web install\n    npm --prefix web run build\n    go build -o ./bin/resofeed\
+      \ ./cmd/resofeed\n    ./bin/resofeed serve --addr 127.0.0.1:18080 --public-url\
+      \ http://127.0.0.1:18080 --db .runtime-liveness/resofeed.sqlite3 --gemini-api-key\
+      \ dummy-gemini-key-for-liveness --gemini-model gemini-2.5-flash --owner-token\
+      \ rfeed_liveness_token_0123456789abcdefXYZ\n- Process/liveness observation:\n\
+      \    PROCESS_ALIVE=yes\n    lsof showed: resofeed PID listening on TCP 127.0.0.1:18080\
+      \ (LISTEN)\n- HTTP command/output:\n    curl -i http://127.0.0.1:18080/api/feed/today\n\
+      \    -> HTTP/1.1 401 Unauthorized\n    -> {\"error\":{\"code\":\"unauthorized\"\
+      ,\"message\":\"owner token required\",\"details\":{}}}\n\n    curl -i http://127.0.0.1:18080/api/doctor\
+      \ -H \"Authorization: Bearer <token>\"\n    -> HTTP/1.1 200 OK\n    -> Content-Type:\
+      \ text/plain; charset=utf-8\n    -> rss: ok\n       gemini: ok\n       extraction:\
+      \ ok\n       ingest: last_run=never\n\n    curl -i http://127.0.0.1:18080/api/feed/today?limit=20\
+      \ -H \"Authorization: Bearer <token>\"\n    -> HTTP/1.1 200 OK\n    -> {\"items\"\
+      :[]}\n- MCP command/harness output:\n    Unauthorized initialize POST /mcp returned\
+      \ HTTP 401 with canonical unauthorized JSON.\n    Authorized initialize POST\
+      \ /mcp returned HTTP 200 JSON-RPC result with serverInfo name \"resofeed\".\n\
+      \    resources/list returned resources including resofeed://system/doctor.\n\
+      \    resources/read resofeed://system/doctor returned text/plain diagnostics.\n\
+      \    tools/call list_candidate_items with {\"limit\":20} returned {\"items\"\
+      :[]}.\n- Static asset observation:\n    curl -i http://127.0.0.1:18080/ returned\
+      \ HTTP 200 text/html and rendered Owner Token Prompt HTML containing RESOFEED,\
+      \ Enter owner token, token input, and submit button.\n- Issues found:\n    None\
+      \ blocking. Build emitted a non-blocking Svelte/Vite warning: Cannot find base\
+      \ config file \"./.svelte-kit/tsconfig.json\"; build still completed and runtime\
+      \ served assets.\n- Headline: PASS\n\n## Completion Receipt\n1. Surface Area\
+      \ Tested: documented build, `resofeed serve`, TCP port binding, `/api/feed/today`,\
+      \ `/api/doctor`, `/`, `/mcp` initialize/resources/read/tools/call.\n2. Vulnerabilities\
+      \ Triggered: none; no 500s, crashes, or unhandled errors observed.\n3. The Blind\
+      \ Verdict: PASS\n4. Programmatic Handoff: this YAML document.\n\n## Semantic\
+      \ Closure Fields\nstep_intent: retest_green\nexpected_result: green\nobserved_result:\
+      \ green\nfailure_alignment: none\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nproduct_implementation_files_modified:\
+      \ false\nbehavioral_proof_register:\n  - claim: Entry point starts and stays\
+      \ alive long enough for requests.\n    proof: PID remained alive after 3 seconds;\
+      \ lsof showed TCP 127.0.0.1:18080 LISTEN.\n    uncertainty: NONE\n  - claim:\
+      \ Owner-token behavior works for HTTP.\n    proof: unauthenticated /api/feed/today\
+      \ returned 401; authenticated /api/doctor and /api/feed/today returned 200.\n\
+      \    uncertainty: NONE\n  - claim: At least one documented HTTP request reaches\
+      \ real entrypoint path.\n    proof: authenticated GET /api/doctor returned text/plain\
+      \ diagnostics; GET /api/feed/today?limit=20 returned JSON items array.\n   \
+      \ uncertainty: NONE\n  - claim: MCP endpoint accepts documented resource/tool\
+      \ operations.\n    proof: /mcp initialize, resources/list, resources/read resofeed://system/doctor,\
+      \ and tools/call list_candidate_items all returned HTTP 200 JSON-RPC results\
+      \ under owner-token auth.\n    uncertainty: NONE\n  - claim: Static UI asset\
+      \ serving works.\n    proof: GET / returned HTTP 200 text/html with rendered\
+      \ Owner Token Prompt and interactive form elements.\n    uncertainty: NONE\n\
+      \n**Headline**: PASS\n**Blocking Status**: CLOSED\n**Proof-Gap Status**: NONE\n\
+      **Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**: COMPLETE"
   - id: runtime-api-and-mcp-integration.runtime-spec-conformance
     name: Runtime spec conformance
     status: claimed
