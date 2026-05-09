@@ -5707,7 +5707,7 @@ phases:
       public `serve` has no approved fake-Gemini injection flag.'
   - id: runtime-api-and-mcp-integration.fix-runtime-proof-and-production-stub-wiring
     name: Fix runtime proof and production stub wiring
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -5940,6 +5940,8 @@ phases:
     - runtime-api-and-mcp-integration.runtime-spec-conformance
     - runtime-api-and-mcp-integration.runtime-wiring-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-09T09:27:07.683088+00:00'
   - id: runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     name: Retest runtime proof and production stub wiring
     status: pending
