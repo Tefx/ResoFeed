@@ -13777,3 +13777,150 @@ phases:
     - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
     agent: doc-reviewer
+  - id: openrouter-llm-verification-and-live-smoke.final-openrouter-gate
+    name: final-openrouter-gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: full-plan-check final OpenRouter migration gate
+
+
+      As an INDEPENDENT REVIEWER, perform the final OpenRouter migration gate. Your
+      job is to BLOCK progress if the backend migration is incomplete, unsafe, undocumented,
+      or insufficiently proven.
+
+
+      Independence: gate-reviewer is independent from golang-developer implementation
+      and independent verification agents.
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - External LLM backend migration affects runtime startup, ingest, steering,
+      HTTP, MCP, /doctor, docs, and live smoke.
+
+      - Secret handling and state portability are blocker-class architecture invariants.
+
+      - User explicitly requested live/smoke proof using OPENROUTER_KEY with redacted
+      evidence.
+
+
+      Final gate criteria:
+
+      1. Contract/docs and expected-red tests existed before implementation and were
+      not bypassed.
+
+      2. Local regression suite covers CLI flags, adapter httptest, ingest, steering,
+      /doctor, docs/search, and state export/import.
+
+      3. Spec conformance audit has no unresolved blocker-class divergence.
+
+      4. Multimodal/terminal audit proves visible provider output uses `openrouter:`
+      and no `gemini:` remains.
+
+      5. Live smoke uses real binary/server and real OpenRouter key from environment
+      without printing it; all required HTTP/MCP/UI smoke surfaces are exercised or
+      blocked with external-service proof.
+
+      6. State export/import excludes OpenRouter key/model and all LLM config.
+
+      7. No Gemini compatibility flags, provider registry, DI container, sidecar,
+      service/repository layers, event bus, OAuth/accounts/RBAC, sync/merge/history
+      portability, vector DB, embeddings, or RAG.
+
+      8. HTTP and MCP expose the same product operations and owner token remains universal
+      delegation boundary.
+
+      9. Documentation matches implemented behavior.
+
+
+      Gate Decision Basis required: map every NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      item to remediation/retest or explicit non-intersection. Do not OPEN if live
+      smoke is missing solely because it was skipped without external-service/precondition
+      evidence.'
+    verification: full-plan-check final gate. OPEN only if all blocker-class behavioral
+      obligations are PROVEN or have explicit non-intersection evidence. BLOCK if
+      secrets appear in evidence, live smoke is faked/skipped without valid blocker
+      disposition, Gemini runtime compatibility remains, or architecture minimalism
+      is violated.
+    evidence_template: '## Final OpenRouter Gate Review Report
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: openrouter-llm-verification-and-live-smoke
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Evidence Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Blocking Invariant Checklist
+
+      - [ ] No Gemini flags/output/compatibility path remains.
+
+      - [ ] OpenRouter key/model runtime-only; not persisted/exported.
+
+      - [ ] No secrets printed in evidence.
+
+      - [ ] Single Go binary deployability preserved.
+
+      - [ ] SQLite/FTS only; no vector/embedding/RAG added.
+
+      - [ ] No accounts/OAuth/RBAC/per-agent registry.
+
+      - [ ] No sync/merge/activity/history portability.
+
+      - [ ] Flat internal/resofeed shape preserved.
+
+      - [ ] HTTP/MCP operation parity preserved.
+
+      - [ ] Live smoke evidence is real and redacted.
+
+
+      ## Issues Identified
+
+      | Severity | Description | Related Step | Blocking? |
+
+      |---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN: OpenRouter migration complete
+
+      - [ ] BLOCKED: required remediation/retest listed below
+
+
+      Required remediation if blocked:'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    - openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
+    - openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
+    - openrouter-llm-verification-and-live-smoke.live-openrouter-smoke-system-test
+    - openrouter-llm-verification-and-live-smoke.documentation-sync
+    agent: gate-reviewer
