@@ -4735,7 +4735,7 @@ phases:
       tree; not fixed because this remediation targeted runtime/static/MCP blockers.'
   - id: runtime-api-and-mcp-integration.runtime-blockers-retest
     name: Runtime blockers retest
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -4988,6 +4988,8 @@ phases:
     depends_on:
     - runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-09T08:53:34.783120+00:00'
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
