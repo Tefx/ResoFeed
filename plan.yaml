@@ -4127,6 +4127,7 @@ phases:
     - runtime-api-and-mcp-integration.complete-http-api-handlers
     - runtime-api-and-mcp-integration.complete-mcp-streamable-http-surface
     - runtime-api-and-mcp-integration.complete-serve-runtime-lifecycle
+    - runtime-api-and-mcp-integration.runtime-blockers-retest
     agent: spec-verifier
   - id: runtime-api-and-mcp-integration.runtime-wiring-audit
     name: Runtime wiring audit
