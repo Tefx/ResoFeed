@@ -14383,3 +14383,107 @@ phases:
     depends_on:
     - runtime-secret-env-config-foundation.complete-runtime-secret-resolver
     agent: integration-verifier
+  - id: runtime-secret-env-config-foundation.secret-config-gate
+    name: secret-config-gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: phase-check protecting all downstream OpenRouter phases
+
+
+      As an INDEPENDENT REVIEWER, assess whether the runtime secret env/.env foundation
+      is complete and safe enough to unlock OpenRouter migration.
+
+
+      YOU ARE THE QUALITY GATE. BLOCK progress if any blocker remains or if evidence
+      is vague.
+
+
+      Review criteria:
+
+      1. Contract completeness: docs/instructions define precedence, `.env` limits,
+      current Gemini compatibility behavior, redaction, and non-persistence/non-export
+      guarantees.
+
+      2. Expected-red quality: tests covered env var fallback, `.env` fallback, precedence,
+      empty values, missing key failure, no secret leakage, state export/import non-portability,
+      and docs/search shell-history safety.
+
+      3. Implementation quality: minimal flat `internal/resofeed/` resolver, direct
+      provider construction, no DI/container/registry/service/sidecar/product-scope
+      expansion.
+
+      4. Runtime proof: server startup works with temporary `.env` fake key and no
+      CLI API key; stdout/stderr/logs/export do not contain the fake key.
+
+      5. OpenRouter sequencing: OpenRouter contract/implementation/live-smoke steps
+      must not start unless this gate is open, and those steps must reuse the secret-source
+      contract with redacted `.env`/env evidence.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches secret configuration, CLI/runtime startup, `.env` parsing, logs/errors,
+      and state export/import boundaries.
+
+      - A regression could leak credentials or allow unsafe CLI-history practices.
+
+
+      cross_cutting_focus:
+
+      - Secret redaction across ALL output paths.
+
+      - No secret persistence/export in SQLite/state bundles.
+
+      - `.env` parser is not shell sourcing.
+
+      - OpenRouter migration cannot require CLI-passed API keys after this foundation.
+
+
+      Gate decision basis required: map each behavioral/runtime obligation to evidence,
+      unresolved statuses, blocker/non-intersection rationale, and OPEN/BLOCK recommendation.'
+    verification: phase-check protecting OpenRouter migration phases. PASS/OPEN requires
+      complete evidence for contract, tests, implementation, smoke startup, redaction,
+      state non-portability, docs safety, and explicit OpenRouter dependency reuse.
+      BLOCK if any secret leakage, persistence/export, shell execution, architecture
+      expansion, or CLI-secret regression remains.
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: runtime-secret-env-config-foundation\n\
+      **Timestamp**: <ISO 8601>\n\n## refs Read Confirmation (MANDATORY)\n\nFor each\
+      \ ref in this step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/USAGE.md — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key\
+      \ passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No\
+      \ refs for this step.\"\n\n## Execution Review\n| Step ID | Status | Evidence\
+      \ Quality | Concerns |\n| --- | --- | --- | --- |\n| runtime-secret-env-config-foundation.lock-runtime-secret-source-policy\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| runtime-secret-env-config-foundation.define-runtime-secret-red-tests\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| runtime-secret-env-config-foundation.complete-runtime-secret-resolver\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| runtime-secret-env-config-foundation.verify-runtime-secret-env-config\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n## Required\
+      \ Gate Checks\n- [ ] Precedence documented and implemented safely.\n- [ ] `.env`\
+      \ parser is minimal and non-executing.\n- [ ] No secrets printed/logged/exported/persisted.\n\
+      - [ ] Startup smoke used temporary `.env` with fake key and no CLI API key.\n\
+      - [ ] State export/import remains free of secret config.\n- [ ] Docs avoid shell-history\
+      \ API key examples and warn `.env` is local/non-committed.\n- [ ] OpenRouter\
+      \ phases depend on this gate and reuse env/.env contract.\n\n## Gate Decision\
+      \ Basis\n| requirement_ref | artifact/evidence_refs_reviewed | unresolved_status\
+      \ | blocks_or_non_intersection | final_basis |\n| --- | --- | --- | --- | ---\
+      \ |\n| secret-source-contract | <refs> | PROVEN/NEEDS_TEST/UNPROVEN | <why blocks\
+      \ or not> | <basis> |\n| no-secret-leakage | <refs> | PROVEN/NEEDS_TEST/UNPROVEN\
+      \ | <why blocks or not> | <basis> |\n| state-nonportability | <refs> | PROVEN/NEEDS_TEST/UNPROVEN\
+      \ | <why blocks or not> | <basis> |\n| openrouter-sequencing | <refs> | PROVEN/NEEDS_TEST/UNPROVEN\
+      \ | <why blocks or not> | <basis> |\n\n## Issues Identified\n| Severity | Description\
+      \ | Related Step | Blocking? |\n| --- | --- | --- | --- |\n| blocker/should_fix/suggestion/tech_debt\
+      \ | <issue or none> | <step_id> | YES/NO |\n\n## Gate Decision\n- [ ] OPEN:\
+      \ Runtime secret env/.env foundation passes; OpenRouter migration may begin.\n\
+      - [ ] BLOCKED: Issues must be resolved before OpenRouter migration begins.\n\
+      \  - Blocking issues: <list>\n  - Required actions: <what needs to happen>"
+    depends_on:
+    - runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+    - runtime-secret-env-config-foundation.define-runtime-secret-red-tests
+    - runtime-secret-env-config-foundation.complete-runtime-secret-resolver
+    - runtime-secret-env-config-foundation.verify-runtime-secret-env-config
+    agent: gate-reviewer
