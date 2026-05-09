@@ -12388,7 +12388,7 @@ phases:
     claimed_at: '2026-05-09T17:46:31.990285+00:00'
   - id: openrouter-llm-contract-and-red-tests.define-product-integration-red-tests
     name: define-product-integration-red-tests
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
       \ red\nagent_source: project\n\nDefine expected-red Go/integration tests for\
       \ product behavior that must migrate from Gemini-shaped assumptions to the shared\
@@ -12431,6 +12431,8 @@ phases:
     depends_on:
     - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T17:46:37.444342+00:00'
   - id: openrouter-llm-contract-and-red-tests.contract-red-tests-gate
     name: contract-red-tests-gate
     status: pending
