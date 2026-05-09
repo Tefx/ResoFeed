@@ -13074,6 +13074,122 @@ phases:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     agent: blind-tester
+  - id: openrouter-llm-implementation.implementation-gate
+    name: implementation-gate
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: phase-check protecting openrouter-llm-verification-and-live-smoke
+
+
+      As an INDEPENDENT REVIEWER, assess whether the OpenRouter implementation phase
+      is complete enough for full independent verification and live smoke.
+
+
+      Independence: gate-reviewer is independent from golang-developer implementation
+      steps.
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase replaces an external LLM backend and runtime flags.
+
+      - Phase touches runnable `resofeed serve`, HTTP, MCP, ingest, steering, /doctor,
+      and state boundaries.
+
+      - Secret handling and state export non-persistence are blocker-class obligations.
+
+
+      Gate criteria:
+
+      1. All expected-red CLI/adapter/product tests are green after implementation.
+
+      2. Wiring audit is PASS or any debt has explicit non-intersection with remaining
+      gates.
+
+      3. Liveness probe proves the actual entrypoint starts through `resofeed serve`
+      and reaches `/doctor`/runtime path.
+
+      4. No Gemini compatibility flags or runtime `gemini:` output remain.
+
+      5. No secret printing/persistence/export.
+
+      6. No provider registry, DI container, sidecar worker, service/repository layer,
+      event bus, vector DB, embeddings, RAG, OAuth/RBAC/accounts, sync/merge/history
+      portability.
+
+      7. HTTP/MCP parity and owner-token boundary remain intact.
+
+
+      REALISM CHECK:
+
+      - Seam-level real path evidence must show actual commands/output, not only unit
+      assertions.
+
+      - Mock-heavy adapter/unit tests must be balanced by liveness evidence.'
+    verification: phase-check protecting openrouter-llm-verification-and-live-smoke.
+      Gate decision basis must map each unresolved behavioral/runtime obligation and
+      block if any OpenRouter runtime, secret, state, or Gemini-removal obligation
+      is UNPROVEN.
+    evidence_template: '## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: openrouter-llm-implementation
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN: proceed to independent verification/live smoke
+
+      - [ ] BLOCKED: list blockers and required remediation
+
+
+      ## Blocking Checks
+
+      - Gemini compatibility/text residue:
+
+      - Secret persistence/export/printing:
+
+      - Runnable surface evidence:
+
+      - Architecture minimalism:'
+    depends_on:
+    - openrouter-llm-implementation.complete-cli-and-openrouter-adapter
+    - openrouter-llm-implementation.complete-ingest-steering-state-migration
+    - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    - openrouter-llm-implementation.wiring-audit
+    - openrouter-llm-implementation.serve-liveness-probe
+    agent: gate-reviewer
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
