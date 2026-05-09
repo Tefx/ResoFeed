@@ -11672,7 +11672,7 @@ phases:
       - No artifacts/product files modified by retest worker.'
   - id: finalization-docs-and-deep-review.fix-http-query-validation-contract
     name: Fix HTTP query validation contract drift
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -11831,6 +11831,31 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T12:42:36.780699+00:00'
+    done_at: '2026-05-09T12:49:21.151323+00:00'
+    evidence: "status: SUCCESS\n\n## Implementation Summary\n- Closed B1 strict query\
+      \ validation drift for no-query HTTP endpoints and mutation endpoints so authenticated\
+      \ unknown query parameters return `400 bad_request` before backend reads/writes.\n\
+      - Closed B2 empty feed limit drift so `/api/feed/today?limit=` returns `400\
+      \ bad_request` with `field=limit` while preserving documented limit behavior.\n\
+      - Resolved OPML wording drift as documentation-only by clarifying import-only\
+      \ scope rather than implementing OPML export.\n\n## Commits / Merge\n- Worktree\
+      \ commit reported by execution agent: `054c2952ae51b9ca4a4fe5a89089f3aa0297db0b`\n\
+      - Main squash merge commit: `3258f70` (`[vectl] step-finalization-docs-and-deep-review.fix-http-query-validation-contract\
+      \ completed`)\n\n## Files Changed\n- `internal/resofeed/http.go`\n- `internal/resofeed/http_impl_test.go`\n\
+      - `.agents/instructions.md`\n- `docs/PRD.md`\n- `docs/USAGE.md`\n\n## Verification\n\
+      - Mainline final-state verification run after squash merge:\n  - Command: `go\
+      \ test ./...`\n  - Output:\n    - `?   \tresofeed/cmd/resofeed\t[no test files]`\n\
+      \    - `ok  \tresofeed/internal/resofeed\t0.643s`\n\n## Spec Link / Closure\n\
+      - Source blocker report: `finalization-docs-and-deep-review.final-spec-conformance-audit`\n\
+      - B1 closure: authenticated unknown query parameters are rejected for no-query\
+      \ endpoints/mutations before backend reads/writes; auth-before-validation preserved\
+      \ for unauthenticated requests.\n- B2 closure: empty `limit` is rejected as\
+      \ invalid base-10 integer/range input with `field=limit`.\n- OPML disposition:\
+      \ documentation clarified import-only scope; product scope not expanded.\n\n\
+      ## Gaps / Notes\n- `git status --porcelain` after merge showed pre-existing/unrelated\
+      \ audit artifact and binary dirt (`.audit-artifacts/...`, `.vectl/`, `bin/`,\
+      \ `resofeed`) but no `plan.yaml` dirt and no failure in mainline Go verification.\n\
+      - No out-of-scope architecture changes introduced."
   - id: finalization-docs-and-deep-review.retest-http-query-validation-contract
     name: Retest HTTP query validation contract drift
     status: pending
