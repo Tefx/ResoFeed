@@ -15053,7 +15053,7 @@ phases:
       not current public runnable docs.'
   - id: runtime-secret-env-config-foundation.retest-readme-secret-cli-regression
     name: retest-readme-secret-cli-regression
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -15221,3 +15221,177 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T17:31:18.725584+00:00'
+    done_at: '2026-05-09T17:34:27.373385+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+
+      - README.md — READ. Key passage: lines 14-31 direct Gemini API key setup to
+      OS env/service-manager/hosting secret/local `.env`, warn not to paste keys into
+      runnable commands/shell history/logs/state exports, and explicitly avoid showing
+      `--gemini-api-key` in quick start.
+
+      - docs/ARCHITECTURE.md — READ. Key passage: lines 12, 68-91, 959 define runtime-only
+      LLM secrets, env/`.env` precedence, no persistence/export/logging, no CLI-secret
+      examples for OpenRouter/Gemini, and first-run checks assume env/`.env` not command-line
+      key values.
+
+      - docs/DESIGN.md — READ. Key passage: lines 477-480 define state portability
+      as active sources/rules/resonated items only and forbid command history, sync
+      controls, portable receipts, and backup-management UI.
+
+      - docs/USAGE.md — READ. Key passage: lines 33-60 and 662-668 direct users to
+      OS env/local `.env`, warn against shell-history API keys, require redacted diagnostics
+      evidence, and forbid future OpenRouter CLI-secret examples.
+
+
+      ## Retest Report
+
+
+      **Tester**: integration-verifier (independent of doc-reviewer)
+
+      **Scope**: README/API-key shell-history regression plus focused runtime-secret
+      regression checks
+
+      **Independence Level**: L2
+
+
+      ### Commands Executed
+
+
+      **Markdown CLI-secret search**:
+
+      ```text
+
+      PUBLIC_DOC_FILES_SCANNED=README.md,docs/ARCHITECTURE.md,docs/DESIGN.md,docs/DESIGN_VISION.md,docs/PRD.md,docs/USAGE.md
+
+      RUNNABLE_FENCED_BLOCKS_WITH_SECRET_FLAGS: NONE
+
+      Remaining `--gemini-api-key` mentions are non-runnable compatibility/policy
+      mentions only; no runnable fenced bash block carries API key flags.
+
+      ```
+
+
+      **Focused runtime-secret checks rerun**:
+
+      ```bash
+
+      go test ./internal/resofeed -run ''TestDocsRuntimeSecretConfigurationGuidance|TestDocsDoNotRequireCLIAPIKeysForGeminiOrOpenRouter|TestGeminiRuntimeSecret|TestDotEnvParserSafetyContract|TestStatePortabilityExcludesRuntimeLLMSecretConfiguration''
+      -count=1
+
+      ```
+
+      Result: PASS on worker and mainline (`ok resofeed/internal/resofeed`).
+
+
+      **Temp `.env` smoke without CLI API key**:
+
+      ```text
+
+      COMMAND_USED=<tmp>/resofeed serve --addr 127.0.0.1:50569 --public-url http://127.0.0.1:50569
+      --db <tmp>/smoke.sqlite3 --gemini-model gemini-2.5-flash --owner-token <redacted>
+
+      CLI_SECRET_FLAG_PRESENT=False
+
+      GET / -> HTTP 200
+
+      GET /api/doctor -> HTTP 200
+
+      GET /api/state/export -> HTTP 200
+
+      STDOUT_TAIL=owner token explicit: stored hash; serving ResoFeed on 127.0.0.1:50569;
+      shutdown complete
+
+      STDERR_TAIL=<empty>
+
+      ```
+
+
+      **Secret leakage/state export searches**:
+
+      ```text
+
+      STATE_EXPORT_FORBIDDEN_TERMS=NONE
+
+      TRACKED_FILES_SCANNED=152
+
+      REDACTED_SECRET_PATTERN_FINDINGS=NONE
+
+      ```
+
+
+      ### Documentation Closure
+
+
+      - README runnable examples require CLI API key secrets: NO
+
+      - USAGE/ARCHITECTURE/DESIGN runnable examples require CLI API key secrets: NO
+
+      - Docs direct users to OS env/local `.env` safe pattern: YES
+
+      - Remaining mentions of `--gemini-api-key`/`--openrouter-api-key`: non-runnable
+      compatibility/policy mentions only; no runnable fenced bash block carries API
+      key flags.
+
+
+      ### Test-step semantic reporting
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: false
+
+
+      ### behavioral_proof_register
+
+      - proof: Public-doc search found zero runnable CLI-secret examples; focused
+      Go runtime-secret tests passed; live smoke started from temp `.env` without
+      CLI API key, returned HTTP 200 on `/`, `/api/doctor`, and `/api/state/export`,
+      and state export contained no forbidden secret terms.
+
+      - uncertainty_sources: none material for scoped retest; live Gemini external
+      API was not called because this check targets startup resolution, documentation
+      closure, and state/export leakage.
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      headline: PASS
+
+
+      ## Files changed
+
+      - none
+
+
+      ## Commit hash(es)
+
+      - none; no scoped artifacts or product/doc changes were needed to commit.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran focused runtime-secret/doc retest command in main after worker success;
+      PASS.
+
+
+      ## Gaps/Notes
+
+      - none.'
