@@ -10316,7 +10316,7 @@ phases:
       deterministic local smoke was sufficient for current gate scope.'
   - id: finalization-docs-and-deep-review.documentation-sync
     name: Documentation sync
-    status: claimed
+    status: done
     description: 'step_type: documentation
 
       agent_source: default
@@ -10399,6 +10399,70 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-09T12:03:23.429323+00:00'
+    done_at: '2026-05-09T12:11:26.455047+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — canonical docs are ARCHITECTURE/DESIGN; preserve
+      one Go binary, SQLite+FTS5 only, Gemini JSON transformer, owner-token auth,
+      flat Source Ledger, no forbidden UI/product patterns.
+
+      - docs/ARCHITECTURE.md — runtime contract is `resofeed serve` with web UI, JSON
+      HTTP, MCP `/mcp`, background ingest, SQLite migrations, and owner-token generation/reuse
+      in one process.
+
+      - docs/PRD.md — primitives remain Inspect, Resonate, Steer; acceptance criteria
+      require freshness protection, state portability, diagnostics, agent idempotency,
+      no inbox-zero/settings/dashboard creep.
+
+      - docs/DESIGN.md — UI contract requires owner-token prompt, first-use empty
+      state, dense feed, Inspector, Steer, flat Source Ledger, state export/import,
+      raw `/doctor`, lint-clean tokens/components.
+
+      - docs/DESIGN_VISION.md — rejects SaaS softness, folders/tags/counts/settings;
+      preserves archival high-density workbench semantics.
+
+      - docs/USAGE.md — build/run, owner token, HTTP API, state portability, `/doctor`,
+      MCP, forbidden boundaries.
+
+
+      ## Doc Sync Report
+
+      - Docs updated: README.md, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/USAGE.md.
+
+      - Behavior/docs mismatches fixed: README populated; USAGE no longer says still
+      implementing; build examples include `mkdir -p ./bin`; owner-token wording matches
+      runtime length validation; ARCHITECTURE notes implemented `/doctor` Steer behavior;
+      DESIGN clarifies state export/import implemented via Source Ledger footer rather
+      than `/doctor` shortcut.
+
+      - Commands/examples checked by worker: `go run ./cmd/resofeed --help`, `go run
+      ./cmd/resofeed serve --help`, `mkdir -p ./bin && go build -o ./bin/resofeed
+      ./cmd/resofeed && ./bin/resofeed --help && ./bin/resofeed serve --help`.
+
+      - Scope preservation: no product scope expansion; single binary, SQLite-only,
+      Gemini JSON-transform, active-state backup/restore, owner-token delegation,
+      lexical search, flat Source Ledger, forbidden UI/product boundaries preserved.
+
+      - Remaining doc debt: no blocker-class documentation mismatch found; npm audit
+      3 low-severity findings are outside documentation scope.
+
+      - Worker commit: `c4894dab3f05e53e581af00fe52cfad7aeb35698`; main squash commit:
+      `35a81aa`.
+
+
+      ## Mainline Final-State Verification
+
+      - Ran after squash merge in main: `npx @google/design.md lint docs/DESIGN.md
+      && go test ./... && npm --prefix web ci && npm --prefix web run lint && npm
+      --prefix web run build`.
+
+      - Output: DESIGN lint 0 errors/0 warnings/1 info; Go tests passed; npm ci installed
+      150 packages; svelte-check 0 errors/0 warnings; web production build succeeded.
+
+
+      ## Headline
+
+      PASS'
   - id: finalization-docs-and-deep-review.final-wiring-audit
     name: Final wiring audit
     status: claimed
