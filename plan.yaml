@@ -19757,7 +19757,7 @@ phases:
       workdir.'
   - id: frontend-expected-red-tests
     name: Frontend Expected-Red Client and Rendering Tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -19878,3 +19878,5 @@ phases:
     depends_on:
     - frontend-contract
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-09T21:22:48.605017+00:00'
