@@ -11068,7 +11068,7 @@ phases:
     agent: gate-reviewer
   - id: fix-http-idempotency-wiring
     name: Fix HTTP idempotency wiring
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -11244,6 +11244,8 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-09T12:20:09.977352+00:00'
   - id: retest-http-idempotency-wiring
     name: Retest HTTP idempotency wiring
     status: pending
