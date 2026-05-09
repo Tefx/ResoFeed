@@ -12174,20 +12174,29 @@ phases:
       agent_source: project
 
 
-      Lock the OpenRouter-only LLM backend contract before any product implementation
-      changes.
+      Lock the OpenRouter-only LLM backend contract after the runtime secret env/.env
+      foundation gate is OPEN. This step is protected by the phase dependency `openrouter-llm-contract-and-red-tests
+      -> runtime-secret-env-config-foundation`; do not claim it until `runtime-secret-env-config-foundation.secret-config-gate`
+      is OPEN.
+
+
+      Authoritative upstream foundation: runtime-secret-env-config-foundation.lock-runtime-secret-source-policy
+      and runtime-secret-env-config-foundation.secret-config-gate. Treat the secret-source
+      precedence, `.env` parser limits, redaction rules, and non-persistence/non-export
+      guarantees as binding. Do not regress to requiring CLI-passed API keys.
 
 
       Authoritative architecture basis: the user-provided READY architecture_basis
-      in this planning request. Treat it as binding for module boundaries, runtime
-      contract, source-of-truth matrix, lifecycle ordering, and anti-registry/anti-DI
-      constraints.
+      in the OpenRouter planning request plus the inserted secret-foundation requirement.
+      Treat it as binding for module boundaries, runtime contract, source-of-truth
+      matrix, lifecycle ordering, and anti-registry/anti-DI constraints.
 
 
       Scope and touch_paths:
 
       - docs/ARCHITECTURE.md and docs/USAGE.md or equivalent user-facing docs: replace
-      Gemini backend promises/flags with OpenRouter-only runtime configuration.
+      Gemini backend promises/flags with OpenRouter-only runtime configuration that
+      reuses env/.env secret resolution.
 
       - internal/resofeed contract notes or existing comments only if needed to pin
       the LLMClient boundary; no business logic.
@@ -12203,13 +12212,18 @@ phases:
 
       - Remove flags: `--gemini-api-key`, `--gemini-model`.
 
-      - Add flags: `--openrouter-api-key`, `--openrouter-model`.
+      - Do NOT require an OpenRouter API key to be passed on the command line. Prefer
+      OS environment and local `.env` per the upstream secret-source contract.
+
+      - Lock exact OpenRouter env names before implementation: `OPENROUTER_KEY` and/or
+      `OPENROUTER_API_KEY`, including precedence between aliases if both are supported.
 
       - OpenRouter API key is required for LLM-backed runtime paths and is runtime-only;
-      never persisted/exported.
+      never persisted/exported/logged.
 
-      - `--openrouter-model` is optional; empty means use the OpenRouter account default
-      and must not trigger startup network model validation.
+      - `--openrouter-model` may remain a non-secret optional CLI/runtime setting
+      if the contract needs it; empty means use the OpenRouter account default and
+      must not trigger startup network model validation.
 
       - Adapter endpoint: `https://openrouter.ai/api/v1/chat/completions`.
 
@@ -12217,18 +12231,27 @@ phases:
       authorization, state, or DB writes.
 
       - `/doctor` reports concrete raw text using `openrouter:` prefix and distinguishes
-      configured model from resolved model when available.
+      configured model from resolved model when available without printing keys.
 
       - HTTP and MCP product operations remain equivalent; no special agent-only concepts.
 
       - Portable state remains only active sources, active steering rules, and resonated
-      items; no OpenRouter key/model.
+      items; no OpenRouter key, env source, `.env` path, model secret config, or provider
+      secret config.
+
+      - Future live smoke must use `.env` or OS environment with redacted evidence
+      only.
+
+      - Docs must avoid shell-history API key examples and must not regress to CLI
+      secret flags.
 
 
       This CONTRACT step may update docs/contracts/stubs only. It MUST NOT ship runnable
       OpenRouter request logic or completed handler/runtime behavior.'
     verification: local-check protecting openrouter-llm-contract-and-red-tests.gate
-      and downstream implementation.
+      and downstream implementation. Verify the OpenRouter contract reuses the runtime
+      secret env/.env foundation, locks OpenRouter env var names, forbids secret persistence/export/logging,
+      and does not require CLI-passed API keys.
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
