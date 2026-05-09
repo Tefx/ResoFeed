@@ -4294,6 +4294,9 @@ phases:
 
       - Spec conformance and wiring audit have no unresolved blocker-class findings
 
+      - New retest evidence closes R4 startup lifecycle proof and production UI `*ContractStub`
+      wiring blockers
+
       - No handler-only completion for deployability-bearing surfaces
 
 
@@ -4303,17 +4306,23 @@ phases:
 
       - runnable-surface evidence
 
+      - R4 proof that HTTP/MCP readiness occurs before background ingest starts
+
+      - production UI route has no documented-surface `*ContractStub` dependencies
+
       - owner-token auth/delegation
 
       - HTTP/MCP parity
 
       - state import/export JSON-only active-state model
 
-      - no stubs/placeholders in entrypoint'
+      - no stubs/placeholders in entrypoint or served production UI'
     verification: phase-check protecting End to End Integration. Gate may OPEN only
-      with real startup, liveness, HTTP/MCP path evidence, and no blocker-class runtime/spec/wiring
+      with real startup, liveness, HTTP/MCP path evidence, closed R4 lifecycle ordering
+      proof, production UI stub-wiring closure, and no blocker-class runtime/spec/wiring
       issues.
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -4321,25 +4330,56 @@ phases:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
       - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
 
 
       ## Gate Review Report
 
-      - Step evidence quality table:
 
-      - Runnable surface decision basis:
+      **Reviewer**: gate-reviewer (independent of phase implementation)
 
-      - Issues identified:
-
-      - Gate Decision Basis:
-
-      - OPEN/BLOCK recommendation:
+      **Phase**: runtime-api-and-mcp-integration
 
 
-      ## Headline
+      ### Execution Review
 
-      OPEN | BLOCKED'
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ### Required Blocker Closure Review
+
+      - R4 lifecycle proof retest reviewed: PASS/FAIL
+
+      - Production UI ContractStub wiring retest reviewed: PASS/FAIL
+
+      - Any unresolved `NEEDS_TEST`, `UNPROVEN`, `DIVERGES`, or `PARTIAL` item with
+      gate intersection: <list or none>
+
+
+      ### Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates
+      | decision_basis |
+
+      |---|---|---|---|---|
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: Phase passes gate, proceed to next phase
+
+      - [ ] BLOCKED: Issues must be resolved before proceeding'
     refs:
     - .agents/instructions.md
     - docs/ARCHITECTURE.md
@@ -4353,6 +4393,7 @@ phases:
     - runtime-api-and-mcp-integration.runtime-liveness-probe
     - runtime-api-and-mcp-integration.runtime-spec-conformance
     - runtime-api-and-mcp-integration.runtime-wiring-audit
+    - runtime-api-and-mcp-integration.retest-runtime-proof-and-production-stub-wiring
     agent: gate-reviewer
   - id: runtime-api-and-mcp-integration.fix-runtime-verification-blockers
     name: Fix runtime verification blockers
