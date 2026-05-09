@@ -13303,3 +13303,116 @@ phases:
 
       - [ ] FAIL'
     agent: integration-verifier
+  - id: openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
+    name: spec-doc-state-conformance-audit
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check protecting final OpenRouter gate
+
+
+      Spec conformance verification via adversarial divergence hunting. This is NOT
+      "do tests pass" — it is "does the implementation match what the authoritative
+      docs and architecture_basis say."
+
+
+      SCOPE:
+
+      - OpenRouter runtime flags and model semantics.
+
+      - External LLM adapter responsibility.
+
+      - Product operation ownership and transport parity.
+
+      - `/doctor` provider/model reporting.
+
+      - Secret/state strata and portable state export/import.
+
+      - Documentation promises in ARCHITECTURE/USAGE/DESIGN-adjacent microcopy.
+
+
+      FOCUS AREAS:
+
+      - Naming & format semantics: `openrouter:` prefix, no `gemini:` runtime output,
+      exact flag names.
+
+      - Boundary values & defaults: empty model means account default; no whitelist;
+      no startup network check.
+
+      - Omission drift: OpenRouter key/model must not enter SQLite portable state
+      JSON.
+
+      - Contract surface drift: HTTP and MCP expose same product operations and owner
+      token remains universal boundary.
+
+
+      For EACH requirement, cite spec section AND implementation file:line. Behavioral
+      precedence claims MUST be flagged as NEEDS_TEST with concrete test suggestion
+      if not proven by runtime evidence.'
+    verification: phase-check protecting final gate. Requirement register must have
+      no DIVERGES/PARTIAL/NOT_FOUND blocker-class items unless an explicit remediation
+      path is recorded before final gate.
+    evidence_template: '## Spec Conformance Report
+
+      **Phase**: openrouter-llm-verification-and-live-smoke
+
+      **Spec source**: AGENTS.md, docs/ARCHITECTURE.md, docs/DESIGN.md, user architecture_basis
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+      |---|---|---|---|---|
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      |---|---|---|---|---|---|
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+
+      ## Coverage Summary
+
+      - Total requirements:
+
+      - CONFORMS:
+
+      - DIVERGES/PARTIAL:
+
+      - NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC:
+
+      - Unchecked sections:
+
+
+      ## Top Risks
+
+
+      ## Suggested Tests for NEEDS_TEST
+
+
+      ## Secret/State Confirmation
+
+      - OpenRouter key/model absent from portable state:
+
+      - No secret values printed:'
+    depends_on:
+    - openrouter-llm-verification-and-live-smoke.independent-regression-suite
+    agent: spec-verifier
