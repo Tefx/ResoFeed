@@ -18929,9 +18929,17 @@ phases:
       **Justification for remaining mocks**: <why acceptable>
 
       '
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     depends_on:
+    - manual-rss-fetch.backend-contract
+    - manual-rss-fetch.backend-expected-red-tests
+    - manual-rss-fetch.frontend-contract
+    - manual-rss-fetch.frontend-expected-red-tests
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+    agent: integration-verifier
   - id: manual-rss-fetch.spec-conformance
     name: Manual RSS Fetch Spec Conformance
     status: pending
