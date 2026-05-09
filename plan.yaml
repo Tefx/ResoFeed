@@ -1178,7 +1178,7 @@ phases:
       \ on distinct summary/detail JSON contracts.\n\n## Headline\nPASS"
 - id: core-domain-implementation
   name: Core Domain Implementation
-  status: in_progress
+  status: done
   gate: Core domain behavior is implemented with unit/contract tests green, spec conformance
     checked, and wiring audited before runtime/API work.
   depends_on:
@@ -2465,7 +2465,7 @@ phases:
       exists.'
   - id: core-domain-implementation.core-domain-gate
     name: Core domain gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -2567,6 +2567,176 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T07:06:11.521693+00:00'
+    done_at: '2026-05-09T07:10:50.736272+00:00'
+    evidence: '## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent)
+
+      **Phase**: core-domain-implementation
+
+
+      ### refs Read Confirmation
+
+      - `.agents/instructions.md` — one Go binary, one SQLite+FTS5 DB, Gemini JSON
+      transformer only, no vector/RAG/accounts/per-agent registry, portable state
+      only active sources/rules/resonated items.
+
+      - `docs/ARCHITECTURE.md` — product core in `internal/resofeed`; SQLite/FTS5
+      source of truth; no sync/event/repository layers; state export/import excludes
+      runtime metadata/receipts/search index.
+
+      - `docs/PRD.md` — state portability scope; human steering priority over agents;
+      `/doctor` RSS/model diagnostics; duplicate provenance accessible.
+
+      - `docs/DESIGN.md` — terse current-state JSON export/import; `/doctor` raw operational
+      text; grouped duplicates preserve source provenance.
+
+      - `docs/DESIGN_VISION.md` — diagnostics plain text, no accounts/onboarding/cute
+      errors, no settings dashboard.
+
+      - `docs/USAGE.md` — `serve` owns web/API/MCP/ingest/migrations; no separate
+      migrate/worker/doctor/admin/sync; state portability follows architecture scope.
+
+
+      ### Gate decision
+
+      - headline: PASS_WITH_DEBT
+
+      - proof_gap_status: NON_BLOCKING
+
+      - blocking_status: CLOSED
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ### Core blocker closure matrix
+
+      - doctor diagnostics: PROVEN — `doctor.go` plus core blocker test for raw RSS/Gemini/extraction/last-run
+      output.
+
+      - exported_at: PROVEN — `state.go` creates current export timestamp; test proves
+      imported timestamp is not reused.
+
+      - value_tier: PROVEN — schema, Gemini output, ingest persistence, and search
+      freshness covered.
+
+      - duplicate provenance: PROVEN — detail read returns original URL/story/duplicate
+      pointer.
+
+      - steering precedence: PROVEN — human steering scores higher and active human-like
+      rules reject agent steering.
+
+      - FTS freshness/provenance: PROVEN — ingest refreshes FTS row; import rebuilds
+      FTS.
+
+
+      ### Wiring audit results (W1-W8 equivalent)
+
+      - Dead exports/orphan surfaces: PASS_WITH_DEBT; core functions covered by tests;
+      runtime stubs isolated to HTTP/MCP/Main.
+
+      - Schema field trace: PASS; value tier/provenance/story/status/FTS fields exist
+      and are consumed.
+
+      - Config consumption: PASS_WITH_DEBT; core consumes ingest/Gemini config; HTTP/MCP/Main
+      config is runtime debt.
+
+      - Escape hatch scan: PASS_WITH_DEBT; no `@invar:allow`, `NEEDS_TEST`, or `UNPROVEN`;
+      skipped tests explicitly label runtime expected-stub debt.
+
+      - Dependency/import alignment: PASS; direct package functions + SQLite, no service/repository
+      layer or alternate storage.
+
+      - Core/runtime stub classification: PASS_WITH_DEBT; stubs are runtime/API/MCP
+      surfaces, not core behavior blockers.
+
+      - Forbidden architecture scan: PASS; no vector/RAG, sync server, state merger,
+      conflict resolver, account system, per-agent registry, repository/service layer.
+
+      - Regression check: PASS; Go tests passed and worktree clean.
+
+
+      ### Runtime/API expected stub debt
+
+      - `resofeed.Main`/serve lifecycle → runtime API/MCP integration phase; core
+      helpers implemented/tested.
+
+      - `NewRouter`/`ServeHTTPRuntime` → HTTP handler step; core operations implemented/tested.
+
+      - `NewMCPHandler`/MCP wrappers → MCP surface step; core primitives implemented/tested.
+
+      - Runtime HTTP/MCP skipped tests → runtime integration phase; skips explicitly
+      expected and non-intersecting with core behavior.
+
+
+      ### Real integration vs fixture-injected tests
+
+      In-process SQLite/migrations and core blocker tests cover core persistence.
+      Ingest value-tier test uses real httptest feed/article servers and SQLite; Gemini
+      is a test double. Gemini protocol uses HTTP test server. Some unit isolation
+      uses fake SQL/Gemini fixtures, which is acceptable for non-full-DB unit scope.
+
+
+      ### Liveness/smoke applicability
+
+      Core phase delivers library/domain functions, not a runnable server surface.
+      Runtime liveness is NOT_APPLICABLE here and mapped to downstream runtime integration
+      steps.
+
+
+      ### Behavioral proof / uncertainty
+
+      - step_intent: gate
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - product_implementation_files_modified: no
+
+      - NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING items: none
+
+
+      ### Verification commands
+
+      Subagent worktree:
+
+      - `go test ./internal/resofeed` → ok
+
+      - `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed`
+
+      - `go test -v ./internal/resofeed` → core blocker tests PASS; runtime HTTP/MCP
+      tests SKIP with explicit expected-stub-debt messages.
+
+      - `git status --short` and `git diff --stat` → no output.
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-core-domain-implementation.core-domain-gate`
+      → Already up to date; nothing to squash.
+
+      - `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed
+      (cached)`
+
+
+      ### Commit hash(es)
+
+      - none — read-only gate review
+
+
+      ### Files changed
+
+      - none'
   - id: fix-core-domain-verification-blockers
     name: Fix core domain verification blockers
     status: done
@@ -2849,7 +3019,7 @@ phases:
       PASS_WITH_DEBT"
 - id: runtime-api-and-mcp-integration
   name: Runtime API and MCP Integration
-  status: locked
+  status: pending
   gate: The runnable `resofeed serve` binary starts HTTP static/API, MCP Streamable
     HTTP, and background ingest loop with real entrypoint/liveness evidence.
   depends_on:
