@@ -15438,7 +15438,7 @@ phases:
       ```'
   - id: openrouter-llm-verification-and-live-smoke.spec-doc-state-conformance-audit
     name: spec-doc-state-conformance-audit
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -15618,6 +15618,8 @@ phases:
     - openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     - openrouter-llm-verification-and-live-smoke.fix-startup-validation-order
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T19:11:05.101498+00:00'
   - id: openrouter-llm-verification-and-live-smoke.doctor-ui-multimodal-audit
     name: doctor-ui-multimodal-audit
     status: done
