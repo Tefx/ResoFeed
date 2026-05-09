@@ -7612,7 +7612,7 @@ phases:
       \ true"
   - id: retest-frontend-contract-closure
     name: Retest frontend contract closure
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -7816,6 +7816,84 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-09T10:10:10.340835+00:00'
+    done_at: '2026-05-09T10:28:07.430152+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md —\
+      \ Canonical docs are law; UI aesthetic must be dense but legible archival index\
+      \ with muted colors and rare accents, operational labels only, and no SaaS/onboarding\
+      \ extras.\n- docs/ARCHITECTURE.md — One Go deployable, one SQLite DB, owner-token\
+      \ boundary for every `/api/*`, OPML folders discarded on import, state bundle\
+      \ rejects unknown top-level fields, strict `/api/search` and `/api/feed/today`\
+      \ query validation.\n- docs/PRD.md — Core loop is Today / Inspect / Resonate\
+      \ / Steer; no inbox-zero, folders, unread mechanics, or onboarding wizard; `/doctor`\
+      \ is raw operational truth.\n- docs/DESIGN.md — Responsive web/mobile target;\
+      \ desktop split Inspector at 420–560px, mobile full-screen detail below 1080px;\
+      \ desktop Inspector must not duplicate Resonate star; active Resonate uses accent;\
+      \ owner token stored only after acceptance; Source Ledger flat; Search results\
+      \ may show plain count, not badges.\n- docs/DESIGN_VISION.md — Analyst’s Workbench:\
+      \ archival, high-density, typographic, low-fatigue; desktop split pane, mobile\
+      \ single-column/full-screen detail; whitespace over border maze; no cute error\
+      \ states or AI-slop.\n- docs/USAGE.md — Browser stores accepted owner token\
+      \ as `resofeed.ownerToken`; `/api/steer`, `/api/doctor`, `/api/search`, OPML\
+      \ import, and state import/export contracts match Architecture.\n\n## Orchestrator\
+      \ Mainline Final-State Barrier\n- Worker branch status before merge: clean.\n\
+      - Worker branch plan local changes: none.\n- Squash merge result: `Already up\
+      \ to date. (nothing to squash)`.\n- Mainline verification:\n  - `go test ./...\
+      \ -count=1` — PASS.\n  - `npm --prefix web run check` — PASS; 0 errors, 0 warnings.\n\
+      \  - `npm --prefix web run build` — PASS; static site written.\n  - `npm --prefix\
+      \ web run test` — PASS; 2 files / 14 tests passed.\n\n## Frontend Contract Closure\
+      \ Retest\n**Tester**: uiux-auditor (independent of frontend-engineer implementation)\n\
+      **Scope**: frontend spec conformance + native rendered UI/UX audit\n\n### Commands\n\
+      ```sh\nnpm --prefix web ci # run because web/node_modules was absent/stale-marker-absent\n\
+      npm --prefix web run check\nnpm --prefix web run build\nnpm --prefix web run\
+      \ test\n```\nActual outputs:\n- Dependency check: `node_modules missing-or-stale-marker-absent`\n\
+      - `npm --prefix web ci`: added 147 packages; audit reported 3 low-severity vulnerabilities.\n\
+      - `npm --prefix web run check`: `svelte-check found 0 errors and 0 warnings`.\n\
+      - `npm --prefix web run build`: Vite/SvelteKit production build completed; static\
+      \ adapter wrote site to `build`; `✔ done`.\n- `npm --prefix web run test`: nested\
+      \ `check` green; Vitest `2 passed (2)` test files, `14 passed (14)` tests. Runtime\
+      \ notes: Node experimental localStorage warning and jsdom navigation not implemented;\
+      \ neither failed tests.\n- `git status --short`: no tracked or untracked product-file\
+      \ changes reported.\n\n### Rendered artifacts reviewed\n| Artifact | Viewport/state\
+      \ | Requirement refs | Verdict |\n|---|---|---|---|\n| `web/src/routes/components/__tests__/rendering-expected-red.test.ts`\
+      \ + Vitest jsdom rendering | owner-token prompt, rejected/accepted token bootstrap,\
+      \ first-use empty state, feed, Inspector, Steer, `/doctor`, mobile route, Source\
+      \ Ledger, State Portability, Search | DESIGN owner-token, feed, Inspector, mobile,\
+      \ Source Ledger, Search, State Portability | PROVEN via rendered DOM assertions\
+      \ |\n| `web/src/lib/api-client.test.ts` + Vitest jsdom rendering | API client\
+      \ sinks for Source Ledger/feed/search/state and canonical errors | ARCHITECTURE/USAGE\
+      \ HTTP contract | PROVEN via rendered DOM/API assertions |\n| Fresh SSR HTML\
+      \ from `http://127.0.0.1:5177` via `webfetch` | initial owner-token gate before\
+      \ API calls | DESIGN owner-token prompt; USAGE owner-token storage | PROVEN\
+      \ for initial gate rendering |\n| `web/src/app.css` responsive rules reviewed\
+      \ as spatial support only | desktop split grid; mobile fixed full-screen surfaces;\
+      \ 44px targets; selected marker; active star styling | DESIGN desktop/mobile\
+      \ layout, touch target, selected state, Resonate states | SUPPORTING DIAGNOSIS;\
+      \ not sole proof |\n\n### Semantic Closure Register\n- B1 `/api/steer`: PROVEN\
+      \ — rendered DOM interaction posts to `/api/steer` with RSS URL command and\
+      \ renders terse receipt.\n- B2 `/doctor`: PROVEN — Steer `/doctor` calls `/api/doctor`\
+      \ and renders raw diagnostic text in labelled PRE/log region.\n- B3 duplicate\
+      \ desktop Inspector star: PROVEN — desktop split Inspector has no `Resonate\
+      \ item` button; feed star remains desktop control.\n- B5 owner token persistence-after-acceptance\
+      \ only: PROVEN — prompt submit alone does not persist token; rejected bootstrap\
+      \ clears storage; accepted bootstrap persists.\n- U1 mobile full-screen route/state\
+      \ physics: PROVEN — mobile route model hides feed for Inspector, provides back\
+      \ control, duplicates star only in mobile detail, and utility surfaces become\
+      \ active full-screen panels.\n- U2 selected marker/no duplicate detail: PROVEN\
+      \ — selected feed row uses non-layout-shifting 3px marker; no hidden duplicate\
+      \ Inspector focus target rendered.\n- U3 inactive/active Resonate styling: PROVEN\
+      \ — inactive star muted; active star uses accent background and contrast text\
+      \ with glyph/label changes.\n- Search limit control: PROVEN — visible Result\
+      \ limit control with valid choices.\n- OPML flattening proof/contract path:\
+      \ PROVEN — frontend routes OPML through Source Ledger endpoint; backend contract\
+      \ owns folders_flattened proof path.\n- State import extra-field rejection path:\
+      \ PROVEN — frontend imports via `/api/state/import`; backend validation rejects\
+      \ unknown top-level fields.\n- Duplicate TODAY headings/time grouping: PROVEN\
+      \ closed.\n- Extra `Contract:` copy: PROVEN absent.\n- Duplicate search result\
+      \ counts: PROVEN closed.\n\n## Semantic Closure Fields\nheadline: PASS_WITH_DEBT\n\
+      step_intent: retest_green\nexpected_result: green\nobserved_result: green\n\
+      verdict: PASS\nblockers: []\nproof_gap_status: NON_BLOCKING\nblocking_status:\
+      \ CLOSED\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\nproduct_implementation_files_modified:\
+      \ false"
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
