@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-05-09T10:42:09.379Z",
+  "current_artifacts": {
+    "desktop": ".audit-artifacts/frontend-gate/current-populated-desktop-full.png",
+    "mobile_feed": ".audit-artifacts/frontend-gate/current-mobile-feed.png",
+    "mobile_inspector": ".audit-artifacts/frontend-gate/current-mobile-inspector.png",
+    "mobile_source_ledger": ".audit-artifacts/frontend-gate/current-mobile-source-ledger.png",
+    "superseding_legacy_desktop": ".audit-artifacts/populated-desktop-full.png",
+    "superseding_legacy_mobile": ".audit-artifacts/populated-mobile-full.png"
+  },
+  "runtime_assertions": {
+    "desktop_split_inspector_resonate_button_count": 0,
+    "desktop_feed_resonate_button_count": 2,
+    "mobile_route_inspector_resonate_button_count": 1,
+    "mobile_route_back_to_today_visible": true,
+    "source_fixture_title": "Example Source",
+    "item_fixture_title": "SQLite FTS changes ranking contract"
+  }
+}

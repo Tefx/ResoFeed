@@ -1,0 +1,126 @@
+artifact_kind: semantic_closure_register
+step_id: frontend-implementation.fix-frontend-gate-proof-artifacts
+scope: retest-frontend-contract-closure
+generated_at: "2026-05-09T10:42:09Z"
+source_contracts:
+  - docs/ARCHITECTURE.md
+  - docs/DESIGN.md
+  - docs/DESIGN_VISION.md
+  - docs/USAGE.md
+current_render_artifacts:
+  desktop_split_populated: .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+  mobile_feed: .audit-artifacts/frontend-gate/current-mobile-feed.png
+  mobile_inspector: .audit-artifacts/frontend-gate/current-mobile-inspector.png
+  mobile_source_ledger: .audit-artifacts/frontend-gate/current-mobile-source-ledger.png
+  runtime_assertions: .audit-artifacts/frontend-gate/render-proof.json
+superseded_stale_artifacts:
+  - path: .audit-artifacts/populated-desktop-full.png
+    disposition: replaced_with_current_capture
+    current_replacement: .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+    reason: previous desktop proof was stale for B3; current regenerated screenshot and runtime assertion show no Resonate control inside the desktop split-pane Inspector.
+  - path: .audit-artifacts/populated-mobile-full.png
+    disposition: replaced_with_current_mobile_inspector_capture
+    current_replacement: .audit-artifacts/frontend-gate/current-mobile-inspector.png
+    reason: legacy populated mobile capture is superseded by current feed, Inspector, and Source Ledger mobile states.
+product_code_delta:
+  product_implementation_files_modified: false
+  reason: regenerated current render evidence satisfied closure claims; no completed product implementation step required alteration.
+required_fields_contract:
+  - requirement_ref
+  - behavior_claim
+  - runtime_proof_expected
+  - evidence_ref
+  - status
+  - closure_path
+  - gate_decision_basis
+items:
+  - id: B1
+    requirement_ref: "docs/DESIGN.md:371-380 Owner Token Prompt; docs/ARCHITECTURE.md:529-534 auth boundary; docs/USAGE.md:89-96 UI token storage contract"
+    behavior_claim: Owner token is a terse local access gate before protected API use, stores accepted token only after authenticated bootstrap, keeps rejected state focused, and does not introduce account/onboarding language.
+    runtime_proof_expected: Rendered token prompt/error states plus component test coverage for empty, accepted, rejected, focus, aria-live, and localStorage behavior.
+    evidence_ref:
+      - .audit-artifacts/owner-token-desktop.png
+      - .audit-artifacts/owner-token-mobile.png
+      - .audit-artifacts/invalid-token-error-desktop.png
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts::owner-token prompt tests
+    status: closed
+    closure_path: Existing non-plan screenshots remain current for token gate states; npm render tests were rerun successfully in this worktree.
+    gate_decision_basis: Non-plan artifact paths and passing runtime tests cover the required semantic state outside plan completion evidence.
+  - id: B2
+    requirement_ref: "docs/DESIGN.md:381-389 First-Use Empty State; docs/DESIGN.md:263 product copy rule; docs/DESIGN_VISION.md:63-69 anti-slop guardrails"
+    behavior_claim: First-use empty state uses the exact required loop copy inside the normal shell and avoids wizard, progress, friendly SaaS, or internal-positioning copy.
+    runtime_proof_expected: Desktop/mobile rendered empty states and DOM test assertions for the four required lines and absence of placeholder/progress copy.
+    evidence_ref:
+      - .audit-artifacts/first-use-empty-desktop.png
+      - .audit-artifacts/first-use-empty-mobile.png
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts::first-use empty state test
+    status: closed
+    closure_path: Existing durable screenshots plus rerun render test close the semantic copy/state gap outside plan state.
+    gate_decision_basis: Required text is visible in non-plan artifacts and verified by component render assertions.
+  - id: B3
+    requirement_ref: "docs/DESIGN.md:451-458 Inspector Pane note on Resonate Action; docs/DESIGN_VISION.md:34-37 desktop split-pane and mobile route layout"
+    behavior_claim: Desktop split-pane Inspector duplicates no Resonate star; the selected feed row retains the visible star at left, while mobile full-screen Inspector exposes its own star.
+    runtime_proof_expected: Current desktop populated split-pane screenshot plus runtime selector proof that desktop Inspector star count is 0 and feed star count is 2; current mobile Inspector proof that mobile route star count is 1.
+    evidence_ref:
+      - .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+      - .audit-artifacts/frontend-gate/current-mobile-inspector.png
+      - .audit-artifacts/frontend-gate/render-proof.json
+      - .audit-artifacts/populated-desktop-full.png
+    status: closed
+    closure_path: Regenerated artifacts from current implementation replaced/superseded stale populated desktop evidence and preserved B3 runtime assertions.
+    gate_decision_basis: render-proof.json reports desktop_split_inspector_resonate_button_count=0, desktop_feed_resonate_button_count=2, and mobile_route_inspector_resonate_button_count=1; screenshot visually shows no star in the desktop Inspector pane.
+  - id: B5
+    requirement_ref: "docs/DESIGN.md:463-482 Source Ledger and State Portability; docs/ARCHITECTURE.md:418-524 portable state bundle; docs/USAGE.md:360-400 export/import usage"
+    behavior_claim: Source Ledger remains flat and state portability remains terse active-state export/import, with no folders, settings dashboard, sync, merge, receipts, or activity ledger.
+    runtime_proof_expected: Rendered ledger/mobile utility surface, existing state portability render tests, and API-client/render tests for export/import fixture shape and warning text.
+    evidence_ref:
+      - .audit-artifacts/frontend-gate/current-mobile-source-ledger.png
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts::state portability warning test
+      - web/src/lib/api-client.test.ts::search and state portability fixtures test
+    status: closed
+    closure_path: Current mobile ledger screenshot plus rerun tests preserve the closure claim without product-code changes.
+    gate_decision_basis: Non-plan artifact proves mobile ledger surface; tests assert warning `import replaces active sources, rules, and stars` and export result shape.
+  - id: U1
+    requirement_ref: "docs/DESIGN.md:314-331 layout and mobile requirements; docs/DESIGN_VISION.md:34-38 desktop/mobile surfaces"
+    behavior_claim: Desktop uses a split-pane feed/Inspector layout; mobile uses feed-first single-column flow with full-screen Inspector navigation and back behavior.
+    runtime_proof_expected: Current desktop screenshot, current mobile feed screenshot, current mobile Inspector screenshot, and runtime proof that `back to TODAY` is visible on mobile Inspector.
+    evidence_ref:
+      - .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+      - .audit-artifacts/frontend-gate/current-mobile-feed.png
+      - .audit-artifacts/frontend-gate/current-mobile-inspector.png
+      - .audit-artifacts/frontend-gate/render-proof.json
+    status: closed
+    closure_path: Regenerated responsive artifacts show the current implementation in desktop and mobile viewports.
+    gate_decision_basis: Screenshots and render-proof.json mobile_route_back_to_today_visible=true provide current runtime evidence outside plan state.
+  - id: U2
+    requirement_ref: "docs/DESIGN.md:411-449 Feed Item and Resonate Button; docs/USAGE.md:429-457 Inspect/Resonate primitives"
+    behavior_claim: Feed rows expose source/provenance markers, keyboard-openable Inspect controls, and independent 44px Resonate buttons with star shape state.
+    runtime_proof_expected: Current populated desktop/mobile feed renders visible source/extraction/agent markers and independent feed stars; tests exercise keyboard inspect and star toggle callbacks.
+    evidence_ref:
+      - .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+      - .audit-artifacts/frontend-gate/current-mobile-feed.png
+      - .audit-artifacts/frontend-gate/render-proof.json
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts::feed rows test
+    status: closed
+    closure_path: Current render artifacts and rerun tests close the behavior claim.
+    gate_decision_basis: render-proof.json reports desktop_feed_resonate_button_count=2; screenshots show `src`, `partial`, `agent:external`, `☆`, and `★` in feed rows.
+  - id: U3
+    requirement_ref: "docs/DESIGN.md:390-410 Steer Input and Steering Receipt; docs/DESIGN.md:483-489 Diagnostics Output; docs/USAGE.md:459-494 Steer primitive"
+    behavior_claim: Steer accepts RSS URLs and `/doctor`, returns terse receipts/raw diagnostics, and does not become a chat transcript or rule-management UI.
+    runtime_proof_expected: Render tests wire Steer to `/api/steer` and `/doctor`, assert `applied:` receipt and labelled `<pre role=log>` diagnostics.
+    evidence_ref:
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts::Steer and doctor test
+      - .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+    status: closed
+    closure_path: Current shell screenshot shows the Steer command surface; rerun tests verify command/diagnostic behavior.
+    gate_decision_basis: Behavior is verified in current test run and remains constrained by non-plan artifact evidence and source contracts.
+  - id: safe-should-fix-dispositions
+    requirement_ref: "docs/DESIGN.md:536-545 motion/no layout shift; docs/DESIGN.md:574-580 contract self-critique; task scope safe should-fix disposition requirement"
+    behavior_claim: Non-blocking improvement candidates are recorded as safe should-fix rather than blocking closure when current runtime proof satisfies B1/B2/B3/B5/U1/U2/U3.
+    runtime_proof_expected: Register explicitly lists safe should-fix disposition and documents no product-code delta unless render proof fails.
+    evidence_ref:
+      - .audit-artifacts/frontend-gate/semantic-closure-register.yaml
+      - .audit-artifacts/frontend-gate/render-proof.json
+    status: safe_should_fix_non_blocking
+    closure_path: No current blocker found. Safe should-fix items, if later prioritized, should be handled in a separate implementation step with fresh render evidence.
+    gate_decision_basis: Required closure items are closed by durable artifacts; no failing render evidence required a product-code fix in this remediation step.
