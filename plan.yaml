@@ -14512,7 +14512,7 @@ phases:
       - Main squash: `a3a6874`\n\n## Gaps/Notes\n- None."
   - id: runtime-secret-env-config-foundation.verify-runtime-secret-env-config
     name: verify-runtime-secret-env-config
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -14609,6 +14609,69 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-09T17:22:41.711478+00:00'
+    done_at: '2026-05-09T17:28:32.213449+00:00'
+    evidence: "status: SUCCESS_WITH_REMEDIATION\n\n## Verification Report\n\n**Tester**:\
+      \ integration-verifier (independent of implementation)\n**Scope**: runtime secret\
+      \ env/.env foundation\n**Independence Level**: L2\n**Timestamp**: 2026-05-09T17:25:01Z\n\
+      \n## refs Read Confirmation (MANDATORY)\n\n- docs/ARCHITECTURE.md — READ. Key\
+      \ passage: LLM secrets are runtime inputs; Gemini/future provider keys must\
+      \ be resolved from runtime-only secret sources and never persisted/exported/logged/committed;\
+      \ current precedence is CLI compatibility override > OS `GEMINI_API_KEY` > local\
+      \ `.env`; OpenRouter must reuse this contract and avoid CLI secret examples.\n\
+      - docs/USAGE.md — READ. Key passage: prefer OS environment or local `.env`;\
+      \ do not paste real API keys into shell-history commands; `.env` is local runtime\
+      \ input only and must not be committed/exported/logged; OpenRouter setup/live-smoke\
+      \ docs must use env/`.env` with redacted evidence.\n- AGENTS.md — NOT READ:\
+      \ absent in isolated worktree. `.agents/instructions.md` read instead; key passage:\
+      \ runtime-only LLM secrets must not be stored/exported/logged, `.env` parser\
+      \ is minimal, redacted evidence only, and OpenRouter must reuse this contract.\n\
+      \n## Test Execution\n- Commands executed:\n  ```text\n  go test -v ./internal/resofeed\
+      \ -run 'Test(GeminiRuntimeSecret|DotEnvParserSafetyContract|StatePortabilityExcludesRuntimeLLMSecretConfiguration|DocsRuntimeSecret|DocsDoNotRequireCLIAPIKeys|RuntimeStartup|ExportState|ImportState)'\n\
+      \  go build -o .audit-artifacts/runtime_secret_env_config/resofeed-smoke ./cmd/resofeed\n\
+      \  python3 <smoke harness: temp .env fake GEMINI_API_KEY; no --gemini-api-key;\
+      \ probes /, /api/doctor, /api/state/export; searches logs/export>\n  python3\
+      \ <markdown search: scans *.md for CLI API-key flags/examples>\n  ```\n- `.env`\
+      \ smoke setup: temporary fake `.env` used; contents NOT printed; transient `.env`,\
+      \ DB, logs, export, and binary removed before commit.\n- Startup proof without\
+      \ CLI API key:\n  ```text\n  command_redacted: resofeed-smoke serve --addr 127.0.0.1:49829\
+      \ --public-url http://127.0.0.1:49829 --db <audit-smoke-db> --owner-token <redacted-owner-token>\n\
+      \  passed_no_cli_gemini_api_key: true\n  root_http_status: 200\n  doctor_http_status:\
+      \ 200\n  state_export_http_status: 200\n  stdout_redacted_excerpt: owner token\
+      \ explicit: stored hash; serving ResoFeed on 127.0.0.1:49829; shutdown complete\n\
+      \  stderr_redacted_excerpt: <empty>\n  ```\n- Secret leakage search:\n  ```text\n\
+      \  targets: stdout, stderr, state_export\n  fake_key_leak_found_in_targets:\
+      \ []\n  state_export_forbidden_terms_found: []\n  ```\n- State export proof:\n\
+      \  ```json\n  {\"schema_version\":\"resofeed.state.v1\",\"sources\":[],\"steer_rules\"\
+      :[],\"resonated_items\":[]}\n  ```\n- Docs/OpenRouter dependency proof: ARCHITECTURE\
+      \ and USAGE require OpenRouter implementation to reuse env/.env secret-source\
+      \ contract and redacted live-smoke evidence.\n\n### Test-step semantic reporting\n\
+      step_intent: retest_green\nexpected_result: green\nobserved_result: red\nfailure_alignment:\
+      \ Runtime implementation and live `.env` smoke are green, but repository markdown\
+      \ search found a README quick-start command still requiring `--gemini-api-key\
+      \ \"<GEMINI_API_KEY>\"`, contradicting the shell-history regression guard.\n\
+      verdict: FAIL_WITH_REMEDIATION_CREATED\nblockers:\n  - README.md lines 14-20\
+      \ contain a runnable quick-start command with `--gemini-api-key \"<GEMINI_API_KEY>\"\
+      `.\ngate_open_allowed: false\norchestrator_action_hint: COMPLETE_AFTER_FIX_RETEST_CREATED\n\
+      product_implementation_files_modified: false\n\n### behavioral_proof_register\n\
+      - proof: Focused runtime-secret tests passed; smoke server started from local\
+      \ `.env` fake key without `--gemini-api-key`; HTTP root/doctor/state export\
+      \ worked; redacted search found no fake key in stdout/stderr/state export.\n\
+      - uncertainty_sources: Docs test scope did not include README; independent markdown\
+      \ search found README regression.\n- proof_gap_status: BLOCKING_REMEDIATION_CREATED\n\
+      - blocking_status: OPEN_UNTIL_RETEST\nheadline: FAIL_WITH_REMEDIATION_CREATED\n\
+      \n## Broad Verifier Disposition Pass\n- README CLI-secret regression: `batched_fix`\
+      \ via newly created steps:\n  - `runtime-secret-env-config-foundation.fix-readme-secret-cli-regression`\n\
+      \  - `runtime-secret-env-config-foundation.retest-readme-secret-cli-regression`\n\
+      - Runtime implementation, live `.env` smoke, secret leakage, and state export\
+      \ checks: PASS.\n\n## Artifacts Modified / Merge\n- Worker artifact commit:\
+      \ `dd3aa0e` (`audit runtime secret env config`)\n- Main salvage commit: `6e3aa29`\
+      \ (`[vectl] salvage verification evidence from runtime-secret-env-config-foundation.verify-runtime-secret-env-config`)\n\
+      - Files changed:\n  - `.audit-artifacts/runtime_secret_env_config/smoke-result.redacted.json`\n\
+      \  - `.audit-artifacts/runtime_secret_env_config/verification-report.md`\n-\
+      \ Mainline check after artifact salvage: `git diff --check HEAD` passed.\n\n\
+      ## Gaps/Notes\n- This verifier report is accepted as a completed verification\
+      \ report with blocker ownership created; the phase gate remains blocked until\
+      \ README fix and independent retest complete."
   - id: runtime-secret-env-config-foundation.secret-config-gate
     name: secret-config-gate
     status: pending
