@@ -10401,7 +10401,7 @@ phases:
     claimed_at: '2026-05-09T12:03:23.429323+00:00'
   - id: finalization-docs-and-deep-review.final-wiring-audit
     name: Final wiring audit
-    status: pending
+    status: claimed
     description: 'step_type: deep_review
 
       agent_source: default
@@ -10467,6 +10467,8 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.full-plan-verification-sweep
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-09T12:03:29.210455+00:00'
   - id: finalization-docs-and-deep-review.final-spec-conformance-audit
     name: Final spec conformance audit
     status: pending
