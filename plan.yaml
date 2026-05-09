@@ -20458,3 +20458,198 @@ phases:
     - manual-rss-fetch.integration-proof
     - manual-rss-fetch.spec-conformance
     agent: frontend-engineer
+  - id: verification-retest-after-remediation
+    name: Verification Retest After Remediation
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an INDEPENDENT TESTER, re-run the failed semantic proof scope after `remediate-verifier-blockers`.
+
+
+      This single retest intentionally covers BOTH concurrent failure surfaces:
+
+      1. Runtime integration proof from `manual-rss-fetch.integration-proof`.
+
+      2. Spec/design conformance proof from `manual-rss-fetch.spec-conformance`.
+
+
+      Required scope:
+
+      - Start the real single `cmd/resofeed` binary path and exercise authenticated
+      HTTP manual fetch endpoints.
+
+      - Prove `/api/ingest` and `/api/sources/{id}/fetch` 200 responses are compatible
+      with the frontend contract/client/page code using the flat `ManualFetchResult`
+      shape unless authoritative evidence changed the backend contract.
+
+      - Prove 409 conflict behavior remains correct and no durable manual fetch receipt/queue/job
+      tables were introduced.
+
+      - Re-check frontend response handling so live/contract-faithful flat backend
+      payloads update Source Ledger UI state.
+
+      - Re-check `docs/ui-preview.html` against DESIGN.md and implementation so strict
+      UI/UX audit has a non-ambiguous rendered reference for `[RUN INGEST]`, `[FETCH]`,
+      busy states, completion timestamps, and terse errors.
+
+      - Re-check R9 disposition: import success copy is fixed if it intersects this
+      phase, or non-intersection evidence prevents rediscovery by manual-rss-fetch.uiux-audit/gate.
+
+
+      Behavioral proof register is required for every reopened blocker/proof gap with
+      fields: requirement_ref, behavior_claim, runtime_proof_expected, evidence_ref,
+      status, closure_path, and gate_decision_basis.
+
+
+      Finding issues is a successful verification outcome, but the phase remains blocked
+      unless every blocker-class item is PROVEN or explicitly non-intersecting with
+      remaining gates.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."'
+    verification: '- Live backend response compatibility: real or contract-faithful
+      HTTP 200 payloads for `/api/ingest` and `/api/sources/{id}/fetch` are flat `ManualFetchResult`
+      and frontend client/page consumes them without nested-envelope assumptions.
+
+      - Runtime proof: exact launch/test command starts the single binary path; authenticated
+      source fetch and global ingest return 200; concurrent source fetch returns 409
+      conflict; no queue/job/receipt persistence artifacts exist.
+
+      - UI/design reference proof: `docs/ui-preview.html`, DESIGN.md, and rendered
+      Source Ledger controls/states are aligned enough for strict uiux-auditor comparison.
+
+      - R9 proof: import success copy is corrected or has explicit non-intersection
+      closure path.
+
+      - Spec proof: requirements register has no unresolved DIVERGES/PARTIAL/NEEDS_TEST
+      blocker-class entries for B1/B2/R9.
+
+      - This phase-check protects manual-rss-fetch.uiux-audit and manual-rss-fetch.gate;
+      downstream gates must not open without PASS/PASS_WITH_DEBT limited to non-blocking
+      debt.'
+    evidence_template: '## Verification Retest Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: manual-rss-fetch integration + spec/design conformance retest
+
+      **Independence Level**: L2
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
+
+
+      ### Runtime Execution
+
+      **Exact launch/test command**:
+
+      ```
+
+      <paste command>
+
+      ```
+
+
+      **HTTP response samples**:
+
+      ```json
+
+      <flat ManualFetchResult payloads and conflict payload>
+
+      ```
+
+
+      ### Frontend Contract Compatibility
+
+      - Evidence that frontend no longer dereferences obsolete nested success envelopes:
+
+      ```
+
+      <search/test output>
+
+      ```
+
+      - Evidence frontend state updates from flat payloads:
+
+      ```
+
+      <test/runtime output>
+
+      ```
+
+
+      ### Spec/UI Reference Closure
+
+      - B2 ui-preview/design/implementation alignment: <PASS/FAIL with evidence>
+
+      - R9 disposition: <fixed or non-intersecting with evidence>
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 | <claim> | <proof> | <evidence> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
+      basis |
+
+      | B2 | <claim> | <proof> | <evidence> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
+      basis |
+
+      | R9 | <claim> | <proof/non-intersection> | <evidence> | PROVEN/NON_INTERSECTING/UNPROVEN
+      | <path> | OPEN/BLOCK basis |
+
+
+      ### Headline
+
+      - [ ] PASS: All blocker-class items PROVEN or explicitly non-intersecting
+
+      - [ ] FAIL: Blocking issue or proof gap remains
+
+      '
+    depends_on:
+    - remediate-verifier-blockers
+    agent: integration-verifier
