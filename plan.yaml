@@ -4277,6 +4277,7 @@ phases:
     - docs/USAGE.md
     depends_on:
     - runtime-api-and-mcp-integration.early-runtime-vertical-slice-proof
+    - runtime-api-and-mcp-integration.runtime-blockers-retest
     - runtime-api-and-mcp-integration.runtime-liveness-probe
     - runtime-api-and-mcp-integration.runtime-spec-conformance
     - runtime-api-and-mcp-integration.runtime-wiring-audit
