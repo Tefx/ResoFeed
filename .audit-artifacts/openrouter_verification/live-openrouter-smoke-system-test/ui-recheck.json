@@ -1,0 +1,13 @@
+{
+  "documented_routes_checked": [
+    "/"
+  ],
+  "root_status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "connect_error": "",
+  "visible_text_sample": "RESOFEED RESOFEED Enter owner token Paste RSS URL in Steer or import OPML. Inspect opens the item. Star preserves durable value. Steer is optional correction.",
+  "visible_text_len": 158,
+  "interactive_count": 1,
+  "status": "PASS",
+  "note": "/doctor is a Steer command and /api/doctor endpoint per docs, not a documented frontend route; root UI is the documented URL."
+}
