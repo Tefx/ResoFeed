@@ -19033,3 +19033,127 @@ phases:
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+  - id: manual-rss-fetch.spec-conformance
+    name: Manual RSS Fetch Spec Conformance
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+
+      Spec conformance verification via adversarial divergence hunting.
+
+
+      This is NOT "do tests pass" — it is "does the implementation match what the
+      locked specs say."
+
+
+      Scope:
+
+      - docs/ARCHITECTURE.md manual ingest/fetch contracts, response schemas, conflict
+      semantics, and module ownership.
+
+      - docs/DESIGN.md Source Ledger manual controls, states, labels, timestamp format,
+      and forbidden visual patterns.
+
+      - docs/ui-preview.html rendered Source Ledger reference.
+
+      - docs/PRD.md Manual RSS Fetch product intent.
+
+
+      Focus areas:
+
+      - Character-exact endpoint paths, HTTP statuses, error codes, and response field
+      names.
+
+      - Boundary/default behavior: zero sources, inactive/missing source, conflict,
+      source-level RSS failures.
+
+      - Omission drift: any MUST requirement missing from backend or frontend.
+
+      - Contract surface drift: extra request fields, idempotency keys, queues/jobs/receipts,
+      or UI concepts not documented.
+
+
+      For each requirement, cite the spec section and implementation file/line. Behavioral
+      precedence claims must be flagged as NEEDS_TEST with a concrete test suggestion
+      if runtime proof is absent.'
+    verification: '- Requirements register covers all touched Manual RSS Fetch backend
+      and Source Ledger UI requirements.
+
+      - Evidence table maps each requirement to implementation file/line and verdict.
+
+      - Any DIVERGES/PARTIAL/NEEDS_TEST blocker has closure_path before gate.
+
+      - This phase-check protects manual-rss-fetch.gate by preventing spec-code/design
+      drift from reaching release.'
+    evidence_template: '## Spec Conformance Report
+
+      **Phase**: manual-rss-fetch
+
+      **Spec sources**: docs/PRD.md, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+      | --- | --- | --- | --- | --- |
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+
+      ## Coverage Summary
+
+      - Total requirements: N
+
+      - CONFORMS: N | DIVERGES: N | PARTIAL: N
+
+      - NEEDS_TEST: N | NOT_FOUND: N | AMBIGUOUS_SPEC: N
+
+      - Unchecked sections: [list]
+
+
+      ## Top Risks
+
+      [DIVERGES items ranked by severity]
+
+
+      ## Suggested Tests (for NEEDS_TEST items)
+
+      '
+    depends_on:
+    - manual-rss-fetch.backend-implementation
+    - manual-rss-fetch.frontend-implementation
