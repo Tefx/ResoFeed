@@ -10169,7 +10169,7 @@ phases:
       - None for required UI/UX audit checks.'
 - id: finalization-docs-and-deep-review
   name: Finalization Docs and Deep Review
-  status: in_progress
+  status: done
   gate: Full-plan verification, doc sync, and independent deep-review audits are complete
     with final gate OPEN.
   depends_on:
@@ -11158,7 +11158,7 @@ phases:
       \ and UI screenshots)\n\n## Gaps/Notes\n- No product implementation files modified."
   - id: finalization-docs-and-deep-review.final-deep-review-gate
     name: Final deep review gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: default
@@ -11256,6 +11256,91 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-09T13:00:22.293311+00:00'
+    done_at: '2026-05-09T13:06:26.805984+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- .agents/instructions.md\
+      \ — READ. Key passage: one Go binary, one SQLite DB, no vector/RAG, no sync/merge/history\
+      \ portability, no account/per-agent registry.\n- docs/ARCHITECTURE.md — READ.\
+      \ Key passage: `resofeed serve` is the single runtime; serves UI, HTTP, MCP\
+      \ `/mcp`, SQLite, owner-token auth, ingest.\n- docs/PRD.md — READ. Key passage:\
+      \ acceptance criteria AC-1..AC-17 cover freshness, steering, agent safety, state\
+      \ portability, diagnostics.\n- docs/DESIGN.md — READ. Key passage: owner-token\
+      \ prompt, first-use state, compact feed, Inspector, flat Source Ledger, terse\
+      \ state import/export, no dashboard/RAG/account UI.\n- docs/DESIGN_VISION.md\
+      \ — READ. Key passage: archival/high-density/typographic/low-fatigue; no numeric\
+      \ indicators, cute errors, onboarding/account screens.\n- docs/USAGE.md — READ.\
+      \ Key passage: implemented build/run, CLI flags, HTTP, state, `/doctor`, and\
+      \ MCP usage contract.\n\n## Final Gate Review Report\n- Evidence quality table:\n\
+      \  - Fresh gates: PASS_WITH_WARNINGS.\n  - Prior full-plan sweep: PASS_WITH_WARNINGS,\
+      \ blockers none.\n  - Prior final black-box: PASS_WITH_DEBT, blockers none,\
+      \ gate_open_allowed true.\n  - Prior UI/UX audit: PASS, blockers none.\n- Wiring\
+      \ audit results (W1-W8):\n  - W1 CLI entry: PASS (`cmd/resofeed/main.go`, `internal/resofeed/db.go`).\n\
+      \  - W2 CLI flags: PASS (`--addr`, `--public-url`, `--db`, `--gemini-api-key`,\
+      \ `--gemini-model`, `--owner-token`).\n  - W3 startup lifecycle: PASS (DB, migrations,\
+      \ token, Gemini, HTTP/MCP/ingest).\n  - W4 HTTP auth/routes/query validation:\
+      \ PASS.\n  - W5 MCP parity/resources/tools: PASS.\n  - W6 state portability:\
+      \ PASS.\n  - W7 UI/static build/design surfaces: PASS.\n  - W8 ingest/ranking/idempotency:\
+      \ PASS_WITH_NON_BLOCKING_DEBT; covered by tests/fixtures, not fully re-proven\
+      \ with live Gemini corpus.\n- Escape hatch audit results:\n  - `@invar:allow|invar:allow`\
+      \ scan in `internal/`, `cmd/`, `web/`, `docs/`: no files found.\n  - No production\
+      \ `unimplemented`, `TODO`, `FIXME`, or escape-hatch findings.\n- Runnable surface\
+      \ smoke/liveness evidence:\n  - `npm --prefix web ci`: exit 0.\n  - `go test\
+      \ ./...`: exit 0.\n  - `npm --prefix web run build`: exit 0.\n  - `go build\
+      \ -o ./bin/resofeed ./cmd/resofeed`: exit 0.\n  - `go vet ./...`: exit 0.\n\
+      \  - `npm --prefix web test`: exit 0; 2 files / 16 tests passed.\n  - Runtime\
+      \ smoke: server alive on `127.0.0.1:18180`; unauth feed 401; auth doctor 200\
+      \ text/plain; duplicate query 400; unauth MCP 401; auth MCP `tools/list` 200.\n\
+      - Integration proof quality:\n  - Real integration: binary startup, TCP liveness,\
+      \ HTTP auth/query/doctor, MCP auth/tools-list, static UI build, prior OPML/state\
+      \ black-box roundtrip.\n  - Fixture-backed: ranking guardrails, HTTP idempotency,\
+      \ MCP tools/resources, Gemini ingestion behavior.\n  - Non-blocking proof debt:\
+      \ no real Gemini key/live populated duplicate-ranking corpus in this final smoke.\n\
+      - CLI surface snapshot and executability matrix:\n  - `resofeed --help`: surface\
+      \ listed yes; handler exists yes; help exits 0; lists only `serve`; PASS.\n\
+      \  - `resofeed serve --help`: surface listed yes; handler exists yes; help exits\
+      \ 0; lists all documented flags; PASS.\n  - `resofeed serve`: surface listed\
+      \ yes; handler exists yes; runtime smoke alive; HTTP/MCP responded; PASS.\n\
+      \  - `resofeed doctor --help`: not listed; rejected by unknown-command guard\
+      \ with exit 2; no sidecar command; PASS.\n  - Regression check: no listed commands\
+      \ removed or broken; no dangling documented command without handler.\n- Unresolved\
+      \ issue disposition:\n  - npm audit 3 low vulnerabilities: warning, non-blocking.\n\
+      \  - Vite first-build generated tsconfig warning: warning, non-blocking; build\
+      \ and svelte-check pass.\n  - Live Gemini/corpus proof debt: warning, non-blocking.\n\
+      - Behavioral/runtime proof basis:\n  behavioral_proof_register:\n    - build_and_tests:\
+      \ all final automated commands exit 0 after dependency restoration.\n    - runtime_surfaces:\
+      \ CLI, HTTP, MCP, UI build verified.\n    - docs_sync: USAGE aligns with architecture\
+      \ and public surfaces.\n    - ui_design: prior UI/UX and black-box artifacts\
+      \ validate design contract surfaces.\n  gate_open_allowed: true\n  orchestrator_action_hint:\
+      \ COMPLETE\n  uncertainty_sources:\n    - no real Gemini key in final smoke\n\
+      \    - no live populated multi-source ranking/duplicate corpus in final smoke\n\
+      \    - fixture-injected tests cover those paths\n- Scope-drift audit:\n  - PASS:\
+      \ no vector/RAG, account/OAuth/RBAC/per-agent registry, sync/merge/history portability,\
+      \ settings dashboard, folders/tags/unread/archive, service/repository/DI/event-bus\
+      \ sidecar architecture detected.\n- Blocker classification:\n  - Blockers: []\n\
+      \  - Warnings: low npm vulnerabilities; Vite generated-tsconfig warning; live\
+      \ corpus/Gemini proof debt.\n  - Notes: first `npm run build` failed before\
+      \ dependency restoration (`vite: command not found`); rerun after `npm ci` passed.\n\
+      - Final decision: OPEN\n- Required remediation if BLOCKED: None.\n\n## Headline\n\
+      OPEN\n\n### closure fields\nverdict: PASS\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nblockers: []\nproof_gap_status: NON_BLOCKING\nblocking_status: CLOSED\n\
+      headline: PASS_WITH_DEBT\nproduct_implementation_files_modified: false\n\n##\
+      \ Terminal Handoff Evidence\n- Action Summary: Final independent gate review\
+      \ completed; scoped audit artifact committed.\n- Worker verification: `go test\
+      \ ./...`, `go vet ./...`, `npm --prefix web run build`, `npm --prefix web test`,\
+      \ `go build`, CLI help/smoke, HTTP/MCP smoke; final successful exits 0.\n- Worker\
+      \ artifact: `.audit-artifacts/final_deep_review_gate/final-gate-review.md`\n\
+      - Worker commit: `9b67851` (`audit final deep review gate`)\n- Main squash merge\
+      \ commit: `3df2960` (`[vectl] step-finalization-docs-and-deep-review.final-deep-review-gate\
+      \ completed`)\n\n## Mainline Final-State Verification\nExecuted after squash\
+      \ merge in main:\n```bash\ngo test ./... && go vet ./... && npm --prefix web\
+      \ run build && npm --prefix web test\n```\nResult: PASS.\n- `go test ./...`:\
+      \ `resofeed/cmd/resofeed` no test files; `resofeed/internal/resofeed` ok.\n\
+      - `go vet ./...`: exit 0.\n- `npm --prefix web run build`: Vite/SvelteKit build\
+      \ completed.\n- `npm --prefix web test`: `svelte-check` 0 errors/0 warnings;\
+      \ Vitest 2 files / 16 tests passed.\n\n## Files Changed\n- `.audit-artifacts/final_deep_review_gate/final-gate-review.md`\n\
+      \n## Gaps/Notes\n- No product implementation files modified.\n- Remaining proof\
+      \ debt is explicitly non-blocking at final gate: no live Gemini key/populated\
+      \ corpus in final smoke, but fixture-backed tests cover those paths and no blocker-class\
+      \ acceptance failure remains."
   - id: fix-http-idempotency-wiring
     name: Fix HTTP idempotency wiring
     status: done
