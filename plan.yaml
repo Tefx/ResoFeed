@@ -7310,6 +7310,210 @@ phases:
     - frontend-implementation.frontend-spec-conformance
     - frontend-implementation.native-ui-ux-implementation-audit
     agent: frontend-engineer
+  - id: retest-frontend-contract-closure
+    name: Retest frontend contract closure
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+
+      As an independent retest/audit step, rerun BOTH failed frontend checks after
+      `fix-steer-diagnostics-and-mobile-ui-contract`:
+
+      1. Frontend spec conformance closure for DESIGN.md / ARCHITECTURE.md / USAGE.md
+      frontend obligations.
+
+      2. Native screenshot/render-first UI/UX audit closure for desktop and mobile
+      rendered states.
+
+
+      This retest is a phase-check protecting `frontend-implementation.frontend-gate`
+      and End to End Integration. It MUST produce a semantic closure register; command
+      success alone is insufficient.
+
+
+      ## Required rerun scope
+
+      - Spec conformance blockers: B1 `/api/steer`, B2 `/doctor`, B3 duplicate desktop
+      Inspector star, B5 owner token persistence-after-acceptance only.
+
+      - UI/UX blockers: U1 mobile full-screen Inspector/ledger/search/state route/state
+      physics, U2 desktop selected marker and no duplicate detail content, U3 inactive/active
+      Resonate styling.
+
+      - Should-fix findings: search limit control, OPML flattening proof/contract
+      path, state import extra-field rejection proof/contract path, duplicate TODAY
+      headings/time grouping divergence, extra “Contract:” copy, duplicate search
+      result counts.
+
+
+      ## Required commands and dependency handling
+
+      If frontend dependencies are missing or stale in the retest worktree, run:
+
+      - `npm --prefix web ci`
+
+      Then run:
+
+      - `npm --prefix web run check`
+
+      - `npm --prefix web run build`
+
+      - `npm --prefix web run test`
+
+
+      ## Render-first audit requirement
+
+      Collect or review rendered screenshots, DOM captures, or equivalent visual/spatial
+      artifacts for required desktop and mobile states. Standard tests, type checks,
+      and API-client-only evidence do not replace rendered artifact review.
+
+
+      ## Semantic closure fields
+
+      Evidence MUST include for every blocker/should-fix item:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status: PROVEN | NEEDS_TEST | UNPROVEN | NON_INTERSECTING
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      Gate may OPEN only when all blocker-class items are PROVEN or have explicit
+      non-intersection evidence accepted by the reviewer.'
+    verification: '- `npm --prefix web run check`, `npm --prefix web run build`, and
+      `npm --prefix web run test` are green; `npm --prefix web ci` is run first when
+      dependencies are absent/stale.
+
+      - Spec conformance retest closes B1/B2/B3/B5 and records status for all should-fix
+      findings.
+
+      - Render-first native UI/UX audit closes U1/U2/U3 using desktop and mobile artifacts.
+
+      - Semantic closure register contains requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for each listed
+      item.
+
+      - Headline is PASS or PASS_WITH_DEBT with no blocker-class open items; FAIL
+      means frontend-gate remains blocked.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      ## Frontend Contract Closure Retest
+
+
+      **Tester**: uiux-auditor (independent of frontend-engineer implementation)
+
+      **Scope**: frontend spec conformance + native rendered UI/UX audit
+
+
+      ### Commands
+
+      ```sh
+
+      npm --prefix web ci # when dependencies were absent/stale
+
+      npm --prefix web run check
+
+      npm --prefix web run build
+
+      npm --prefix web run test
+
+      ```
+
+
+      Paste actual outputs.
+
+
+      ### Rendered artifacts reviewed
+
+      | Artifact | Viewport/state | Requirement refs | Verdict |
+
+      |---|---|---|---|
+
+
+      ### Semantic closure register
+
+      | ID | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref
+      | status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|---|
+
+      | B1 | | `/api/steer` supports RSS URL + natural-language steering from UI with
+      terse receipt/error | Real UI/API-client path exercised | | PROVEN/NEEDS_TEST/UNPROVEN/NON_INTERSECTING
+      | | |
+
+      | B2 | | `/doctor` reachable from Steer and renders raw diagnostics text | Real
+      endpoint/client/render path exercised | | | | |
+
+      | B3 | | Desktop Inspector has no duplicate star | Desktop rendered artifact
+      | | | | |
+
+      | B5 | | Owner token persists only after authenticated acceptance/bootstrap
+      | Regression test plus runtime proof | | | | |
+
+      | U1 | | Mobile uses feed-first single column plus full-screen Inspector/ledger/search/state
+      route/state surfaces | Mobile rendered artifacts | | | | |
+
+      | U2 | | Desktop selected marker is non-layout-shifting 3px marker and no duplicate
+      detail content | Desktop rendered artifact | | | | |
+
+      | U3 | | Inactive star is muted surface and active star uses #7A4600 | Rendered
+      artifact/CSS evidence | | | | |
+
+      | SF-search-limit | | Search limit control disposition | Runtime proof or non-intersection
+      | | | | |
+
+      | SF-opml-flattening | | OPML flattening proof/contract disposition | Runtime
+      proof or non-intersection | | | | |
+
+      | SF-state-extra-fields | | State import extra-field rejection disposition |
+      Runtime proof or non-intersection | | | | |
+
+      | SF-duplicates-copy | | Duplicate TODAY/headings/counts and Contract copy removed
+      | Rendered artifact | | | | |
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL
+
+
+      ### Gate recommendation
+
+      OPEN | BLOCKED'
+    depends_on:
+    - fix-steer-diagnostics-and-mobile-ui-contract
+    agent: uiux-auditor
 - id: end-to-end-integration
   name: End to End Integration
   status: locked
