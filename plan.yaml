@@ -13702,7 +13702,7 @@ phases:
       now use OpenRouter-named types.'
   - id: openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     name: complete-runtime-doctor-http-mcp-wiring
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags: integration
@@ -13839,6 +13839,142 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T18:23:14.124328+00:00'
+    done_at: '2026-05-09T18:29:29.718769+00:00'
+    evidence: 'Implementation SUCCESS accepted after worktree-local and mainline verification.
+
+
+      ## Integration Evidence
+
+
+      ### refs Read Confirmation
+
+      - AGENTS.md — NOT READ: file not present in isolated worktree root.
+
+      - .agents/instructions.md — single Go binary; runtime LLM secrets never persisted/logged/printed;
+      HTTP/MCP expose same product operations.
+
+      - docs/ARCHITECTURE.md — OpenRouter is sole LLM backend; `/doctor` must use
+      `openrouter:` with configured model `account_default` when omitted and no secrets/source
+      metadata.
+
+      - docs/DESIGN.md — `/doctor` is raw terse diagnostic text, not dashboard/remediation
+      UI; operational labels only.
+
+      - docs/USAGE.md — runtime uses `OPENROUTER_KEY`, optional `--openrouter-model`;
+      diagnostics example includes `openrouter: ... configured_model=account_default`.
+
+      - internal/resofeed/openrouter_product_integration_contract_test.go — protected
+      tests assert OpenRouter ingest/steering, HTTP/MCP parity, doctor no Gemini text,
+      state secrecy.
+
+      - internal/resofeed/openrouter_cli_adapter_contract_test.go — protected tests
+      assert OpenRouter secret resolution, legacy Gemini flag rejection, adapter request/retry
+      contract.
+
+
+      - Worker commit: eb82649f5dc488a7f1ce42671cdf141a9178e128 (`wire OpenRouter
+      runtime doctor status`)
+
+      - Main squash merge commit: 4692336 (`[vectl] step-openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+      completed`)
+
+      - Files changed: internal/resofeed/doctor.go, gemini.go, http.go, mcp.go, openrouter_runtime_wiring_test.go.
+
+      - Spec link: openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+      plus upstream artifacts.
+
+
+      Command/test exercising full path:
+
+      ```text
+
+      go test -run TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor -v ./internal/resofeed
+      — PASS
+
+      ```
+
+
+      Actual redacted output excerpt from mainline verification:
+
+      ```text
+
+      HTTP /api/doctor output:
+
+      rss: ok
+
+      openrouter: ok configured_model=openrouter/configured-runtime resolved_model=openrouter/resolved-runtime
+
+      openrouter: ok
+
+      extraction: failures=1
+
+      extraction: item=item_c05df2fd5649c597fbdf237789f0c24c source=src_runtime_openrouter
+      status=partial_extraction title=Runtime OpenRouter Item
+
+      ingest: last_run=2026-05-09T18:29:12Z
+
+
+      MCP resofeed://system/doctor output:
+
+      rss: ok
+
+      openrouter: ok configured_model=openrouter/configured-runtime resolved_model=openrouter/resolved-runtime
+
+      openrouter: ok
+
+      extraction: failures=1
+
+      extraction: item=item_c05df2fd5649c597fbdf237789f0c24c source=src_runtime_openrouter
+      status=partial_extraction title=Runtime OpenRouter Item
+
+      ingest: last_run=2026-05-09T18:29:12Z
+
+      ```
+
+
+      Path exercised: CLI/runtime config construction remains in `runServe`; test
+      exercises runtime config -> OpenRouter client -> ingest -> HTTP/MCP `/doctor`
+      presenters.
+
+
+      Checks:
+
+      - `openrouter:` doctor output present: yes.
+
+      - configured vs default/resolved model behavior shown: yes; explicit configured/resolved
+      in runtime proof, account-default behavior preserved in existing contract tests.
+
+      - `gemini:` absent: yes.
+
+      - HTTP/MCP operation parity preserved: yes; MCP doctor resource uses same doctor
+      config path.
+
+      - No secrets printed: yes; fake key absent from doctor/test output.
+
+      - No provider registry/DI/service layer introduced: yes.
+
+
+      Mainline commands run after merge:
+
+      ```text
+
+      go test -run TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor -v ./internal/resofeed
+      — PASS
+
+      go test ./... — PASS
+
+      go test -race ./internal/resofeed — PASS
+
+      go build ./cmd/resofeed — PASS
+
+      ```
+
+
+      Deviation records: none.
+
+
+      Gaps/Notes: `geminiHTTPClient` name remains source-compatible internal alias
+      as allowed by prior notes; no runtime-facing Gemini text was added.'
   - id: openrouter-llm-implementation.wiring-audit
     name: wiring-audit
     status: pending
