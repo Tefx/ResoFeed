@@ -5001,7 +5001,7 @@ phases:
     agent: integration-verifier
   - id: runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
     name: Fix MCP steer Gemini proof
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -5098,6 +5098,155 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-09T09:01:28.760254+00:00'
+    done_at: '2026-05-09T09:06:56.764446+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary, one SQLite DB, Gemini JSON transformer,
+      owner-token boundary, HTTP/MCP uniformity, no direct vectl edits.
+
+      - docs/ARCHITECTURE.md — one deployable Go process serves static UI, JSON HTTP,
+      MCP `/mcp`, background ingest; steering uses Gemini when needed and Go validates/applies;
+      every `/mcp` request authenticates before tool handling and `steer` maps to
+      HTTP Steer semantics.
+
+      - docs/PRD.md — natural-language Steer, safe retry/idempotency for agent mutations,
+      authorized MCP Streamable HTTP capability.
+
+      - docs/DESIGN.md — Steer input/receipt remains lightweight; no rule-management
+      UI, accounts, dashboards, folders, or activity ledgers.
+
+      - docs/DESIGN_VISION.md — primitives are Inspect, Resonate, Steer; no account/onboarding;
+      AI failures degrade plainly.
+
+      - docs/USAGE.md — `serve` starts web UI, JSON HTTP API, MCP Streamable HTTP
+      at `/mcp`, background ingestion, SQLite migrations/static serving; mutating
+      MCP tools require idempotency keys.
+
+
+      ## Root Cause Record
+
+      - why_previous_fix_failed: current implementation wiring already passed configured
+      `h.gemini` through `SteerForMCP` to `ApplySteering`; missing piece was deterministic
+      proof coverage, because existing proof was handler-only rather than a real bound
+      `/mcp` listener path.
+
+      - why_previous_retest_failed: retest used public `resofeed serve` with `--gemini-api-key
+      test-key-via-proxy`; bound `/mcp` returned JSON-RPC `internal error`, and proxy
+      captured repeated CONNECTs to `generativelanguage.googleapis.com:443`, proving
+      real runtime Gemini was attempted but no successful configured test-double path
+      existed.
+
+      - reversal_risk: added bound-listener test uses `NewRouter(HTTPServerConfig{Gemini:
+      fake})` and proves HTTP listener → `/mcp` → auth → JSON-RPC dispatch → `SteerForMCP`
+      → `ApplySteering` → configured Gemini fake → persisted receipt. Static grep
+      verifies no `ApplySteering(..., nil, ...)` in `mcp.go`.
+
+
+      ## MCP Steer Gemini Proof
+
+      - Bound listener proof path: `TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency`
+      opens `net.Listen("tcp", "127.0.0.1:0")`, serves `NewRouter`, and posts real
+      HTTP JSON-RPC `tools/call` to `/mcp`.
+
+      - Configured Gemini test double/proof: `recordingSteeringGemini` injected through
+      `HTTPServerConfig.Gemini`; first successful steer increments `TranslateSteering`
+      call count to exactly 1.
+
+      - Successful receipt output: test asserts `interpreted_as=gemini_policy_update`,
+      `message=gemini steering updated`, changed rule text `Gemini translated systems
+      policy.`
+
+      - Idempotent replay proof: second identical `idempotency_key=bound-steer-gemini-001`
+      returns stored receipt and Gemini call count remains 1.
+
+      - Unauthorized no-Gemini-call proof: wrong bearer token returns HTTP 401 `unauthorized`;
+      Gemini call count remains 1.
+
+      - Static nil-Gemini regression proof: grep for `ApplySteering(... nil ...)`
+      in `internal/resofeed/mcp.go` found no files.
+
+
+      ## Non-regression Proof
+
+      - Static root/UI unchanged; full Go suite remained green.
+
+      - MCP schemas covered by full suite.
+
+      - Startup/token tests covered by full suite.
+
+      - Stale skip cleanup: search for expected-stub/stale runtime expected-stub/t.Skip/Skip
+      found no stale runtime skip text; only `result.Skipped++` in OPML import logic.
+
+
+      ## Behavioral proof / closure
+
+      - step_intent: implementation
+
+      - expected_result: green
+
+      - observed_result: PASS
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: no; tests only: `internal/resofeed/mcp_integration_test.go`
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Run
+
+      Subagent worktree:
+
+      - `gofmt -w internal/resofeed/mcp_integration_test.go && go test ./internal/resofeed
+      -run ''TestMCPRealBoundListenerSteerUsesConfiguredGeminiAndIdempotency|TestMCPRealBoundListenerInitializeResourcesAndTools|TestMCPSteerUsesConfiguredGeminiAndReceipts''
+      -count=1` → exit 0
+
+      - grep nil-Gemini MCP steer regression → no files found
+
+      - grep stale skip text → only `result.Skipped++` in OPML import logic
+
+      - `go test ./...` → exit 0
+
+      - `go test -race ./internal/resofeed` → exit 0
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed` → exit 0
+
+
+      Mainline final-state verification:
+
+      - `git merge --squash vectl/step-runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof`
+      applied changes to `internal/resofeed/mcp_integration_test.go`.
+
+      - `go test ./... && go test -race ./internal/resofeed && go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-mcp-steer-proof-build
+      ./cmd/resofeed` → all succeeded.
+
+      - Merge commit: `2e4037d` (`[vectl] step-runtime-api-and-mcp-integration.fix-mcp-steer-gemini-proof
+      completed`).
+
+
+      ## Commit hash(es)
+
+      - isolated branch commit: `3580467fe39a4a3b0df98830846b6dc6975d3395`
+
+      - main merge commit: `2e4037d`
+
+
+      ## Files changed
+
+      - `internal/resofeed/mcp_integration_test.go`
+
+
+      ## Gaps/Notes
+
+      No public product flag was added. Configured Gemini proof uses contract-correct
+      in-process runtime listener coverage via `NewRouter`/`HTTPServerConfig` because
+      public `serve` has no approved fake-Gemini injection flag.'
 - id: frontend-implementation
   name: Frontend Implementation
   status: in_progress
