@@ -3625,7 +3625,7 @@ phases:
     agent: uiux-auditor
   - id: frontend-implementation.frontend-spec-conformance
     name: Frontend spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: default
@@ -3700,6 +3700,8 @@ phases:
     - frontend-implementation.complete-web-shell-owner-token-and-first-use-ui
     - frontend-implementation.complete-feed-inspector-source-state-and-search-ui
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-09T04:24:33.324086+00:00'
   - id: frontend-implementation.frontend-gate
     name: Frontend gate
     status: pending
