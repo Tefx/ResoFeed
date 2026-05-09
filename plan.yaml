@@ -14508,6 +14508,150 @@ phases:
     depends_on:
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     agent: uiux-auditor
+  - id: openrouter-llm-implementation.fix-openrouter-runtime-naming-and-doctor-status
+    name: fix-openrouter-runtime-naming-and-doctor-status
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      priority: HIGH
+
+
+      Batched remediation after salvaged audit artifacts:
+
+      - `.audit-artifacts/openrouter_implementation_verification/wiring-audit.md`
+
+      - `.audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md`
+
+
+      Fix ALL findings in this one step, not just the first.
+
+
+      ## Findings to Remediate
+
+
+      ### B1 Wiring audit BLOCKER: Gemini-named production runtime adapter/types remain
+
+      Exact error fingerprints from the audit:
+
+      - Production serve path still constructs Gemini-named adapter `geminiHTTPClient`
+      via `NewOpenRouterClient`.
+
+      - Gemini symbols remain in non-test runtime files: `GeminiClient` alias, `geminiHTTPClient`,
+      `geminiContent` / `geminiPart` fallback types.
+
+      - Other wiring checks already passed and must remain green: OpenRouter startup
+      reachability, CLI/env registration, config consumption, state exclusion, HTTP/MCP
+      shared logic, secret resolver reuse.
+
+
+      Required remediation:
+
+      - Rename or eliminate Gemini-named production adapter/types in non-test runtime
+      files while preserving OpenRouter behavior.
+
+      - Source-compatible Gemini-named aliases/helpers may remain only if they are
+      truly test-only; no Gemini-named production runtime construction path may remain.
+
+      - Preserve the OpenRouter-only CLI/runtime contract: no Gemini compatibility
+      flags, no `gemini:` user-visible runtime output, no provider registry/DI/service
+      layer.
+
+
+      ### U1 UIUX audit SHOULD_FIX: duplicate `/doctor` OpenRouter status line
+
+      Exact error fingerprint from the audit:
+
+      - `/doctor` emits both `openrouter: ok configured_model=... resolved_model=...`
+      and a second bare `openrouter: ok`.
+
+
+      Required remediation:
+
+      - Collapse duplicate `/doctor` `openrouter: ok` output into a single clear model/status
+      diagnostic line, or otherwise satisfy the UIUX debt with evidence that the redundant
+      bare status is gone.
+
+      - Preserve DESIGN.md voice: dense, archival, functional diagnostic text only.
+
+      - Preserve secret redaction: no OpenRouter secret values, fake keys, bearer
+      tokens, account identifiers, or raw authorization headers in doctor/log/user-visible
+      output.
+
+
+      ## Invariants to Preserve
+
+      - OpenRouter-only CLI/runtime contract.
+
+      - HTTP/MCP parity: shared product logic; no surface re-derives provider facts
+      independently.
+
+      - Runtime secret resolver reuse; no duplicate parser/ad hoc secret path.
+
+      - State secrecy: OpenRouter key/model runtime fields are not persisted/exported/logged.
+
+      - ResoFeed architecture boundaries: one Go binary, SQLite only, no provider
+      registry, no DI container, no service/repository layer, no sidecar worker, no
+      sync/merge machinery.
+
+
+      ## Gate Preview (what the audits WILL reject)
+
+      1. Any Gemini-named production runtime construction symbol or fallback type
+      in non-test runtime files (`GeminiClient`, `geminiHTTPClient`, `geminiContent`,
+      `geminiPart`).
+
+      2. A production serve path that still constructs `geminiHTTPClient` via `NewOpenRouterClient`.
+
+      3. Duplicate `/doctor` OpenRouter success lines, especially a bare second `openrouter:
+      ok` after the model diagnostic.
+
+      4. Any secret leakage, Gemini-visible runtime text, provider registry/DI/service
+      layer, or loss of HTTP/MCP parity.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or placeholder
+      runtime paths do not satisfy this requirement.'
+    verification: '- Main path: `resofeed serve` runtime construction uses OpenRouter-named
+      production adapter/types with no Gemini-named production runtime construction
+      path remaining.
+
+      - Failure path: focused search of non-test runtime files finds no `GeminiClient`,
+      `geminiHTTPClient`, `geminiContent`, or `geminiPart` production symbols; any
+      remaining Gemini-named compatibility is demonstrably test-only.
+
+      - UIUX path: `/doctor` output contains one clear OpenRouter model/status diagnostic
+      line and no redundant bare second `openrouter: ok`.
+
+      - Preservation proof: secret redaction, OpenRouter-only CLI/runtime contract,
+      HTTP/MCP parity, state secrecy, and no provider registry/DI/service layer remain
+      intact.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- .audit-artifacts/openrouter_implementation_verification/wiring-audit.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- .audit-artifacts/openrouter_implementation_verification/uiux-doctor-diagnostics-audit.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n\n## Batched Fix Evidence\n\n**Wiring blocker fixed**:\n- Production symbols\
+      \ renamed/eliminated:\n  ```\n  <grep/import-trace output for GeminiClient|geminiHTTPClient|geminiContent|geminiPart\
+      \ in non-test runtime files>\n  ```\n- Runtime OpenRouter construction path:\n\
+      \  ```\n  <file:line evidence showing OpenRouter-named adapter construction>\n\
+      \  ```\n\n**/doctor duplicate status fixed**:\n- Exact command/request:\n  ```\n\
+      \  <command or HTTP request used to capture /doctor>\n  ```\n- Redacted actual\
+      \ output:\n  ```\n  <single OpenRouter status/model diagnostic line; no second\
+      \ bare openrouter: ok>\n  ```\n\n**Invariant preservation**:\n- Secret redaction\
+      \ proof: <evidence>\n- OpenRouter-only CLI/runtime proof: <evidence>\n- HTTP/MCP\
+      \ parity proof: <evidence>\n- State secrecy proof: <evidence>\n- No provider\
+      \ registry/DI/service layer proof: <evidence>\n\n**Headline**: PASS | PASS_WITH_DEBT\
+      \ | FAIL"
+    depends_on:
+    - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
+    - openrouter-llm-implementation.serve-liveness-probe
+    agent: golang-developer
 - id: openrouter-llm-verification-and-live-smoke
   name: OpenRouter Verification and Live Smoke
   status: locked
