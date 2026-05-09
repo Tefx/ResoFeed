@@ -11183,3 +11183,85 @@ phases:
     depends_on:
     - finalization-docs-and-deep-review.final-wiring-audit
     agent: golang-developer
+  - id: retest-http-idempotency-wiring
+    name: Retest HTTP idempotency wiring
+    status: pending
+    description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
+      agent_source: default\nverification_scope: full-plan-check\n\nRe-run the final\
+      \ wiring audit closure path for blocker HTTP_IDEMPOTENCY_KEY_WRITE_ONLY and\
+      \ perform targeted runtime idempotency smoke after `fix-http-idempotency-wiring`.\n\
+      \nThis retest protects the finalization gate and downstream final deep review\
+      \ decision. It must verify that the blocker is closed, not merely that tests\
+      \ compile.\n\n## Required closure fields\nThe evidence MUST include these machine-readable\
+      \ fields:\n- verdict: PASS | FAIL\n- blockers: [] or list of remaining blocker\
+      \ IDs\n- gate_open_allowed: true | false\n- orchestrator_action_hint: proceed_to_final_gate\
+      \ | create_followup_fix | escalate_spec_conflict\n\n## Required audit/smoke\
+      \ coverage\n- Re-run final wiring audit checks relevant to HTTP mutation idempotency\
+      \ and write-only fields.\n- Confirm `idempotency_key` is consumed for persistence/replay\
+      \ semantics, not only validated.\n- Confirm repeated identical HTTP mutations\
+      \ with the same `idempotency_key` replay the prior result and cause no duplicate\
+      \ or altered effect for:\n  1. `POST /api/items/{id}/inspect`\n  2. `POST /api/items/{id}/resonance`\n\
+      \  3. `POST /api/steer`\n- Confirm the implementation preserves HTTP/MCP parity\
+      \ and does not expand portable state beyond active sources, active steering\
+      \ rules, and currently resonated items.\n\n## Specific commands / smoke examples\n\
+      Run the targeted automated test command added or updated by the fix:\n```sh\n\
+      go test ./internal/resofeed -run 'Idempotency|Inspect|Resonance|Steer' -count=1\n\
+      ```\n\nIf the repo exposes an executable HTTP smoke harness, also run duplicate-mutation\
+      \ smoke equivalent to:\n```sh\n# Start test server/binary with a temporary SQLite\
+      \ DB and owner token.\n# Then send each mutation twice with the same idempotency_key\
+      \ and identical body.\ncurl -sS -X POST \"$BASE_URL/api/items/$ITEM_ID/inspect\"\
+      \ \\\n  -H \"Authorization: Bearer $OWNER_TOKEN\" \\\n  -H \"Content-Type: application/json\"\
+      \ \\\n  -d '{\"idempotency_key\":\"idem-inspect-1\"}'\ncurl -sS -X POST \"$BASE_URL/api/items/$ITEM_ID/inspect\"\
+      \ \\\n  -H \"Authorization: Bearer $OWNER_TOKEN\" \\\n  -H \"Content-Type: application/json\"\
+      \ \\\n  -d '{\"idempotency_key\":\"idem-inspect-1\"}'\n\ncurl -sS -X POST \"\
+      $BASE_URL/api/items/$ITEM_ID/resonance\" \\\n  -H \"Authorization: Bearer $OWNER_TOKEN\"\
+      \ \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"idempotency_key\"\
+      :\"idem-resonance-1\",\"resonated\":true}'\ncurl -sS -X POST \"$BASE_URL/api/items/$ITEM_ID/resonance\"\
+      \ \\\n  -H \"Authorization: Bearer $OWNER_TOKEN\" \\\n  -H \"Content-Type: application/json\"\
+      \ \\\n  -d '{\"idempotency_key\":\"idem-resonance-1\",\"resonated\":true}'\n\
+      \ncurl -sS -X POST \"$BASE_URL/api/steer\" \\\n  -H \"Authorization: Bearer\
+      \ $OWNER_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"idempotency_key\"\
+      :\"idem-steer-1\",\"actor_id\":\"smoke\",\"command\":\"<valid steering command\
+      \ from docs>\"}'\ncurl -sS -X POST \"$BASE_URL/api/steer\" \\\n  -H \"Authorization:\
+      \ Bearer $OWNER_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d\
+      \ '{\"idempotency_key\":\"idem-steer-1\",\"actor_id\":\"smoke\",\"command\"\
+      :\"<same valid steering command from docs>\"}'\n```\n\nRecord actual response\
+      \ bodies/statuses for first and replayed calls; the replayed call must show\
+      \ prior-result replay/no duplicate effect under the implemented contract."
+    verification: '- `go test ./internal/resofeed -run ''Idempotency|Inspect|Resonance|Steer''
+      -count=1` passes after the fix.
+
+      - Duplicate HTTP mutation smoke for inspect, resonance, and steer shows same-key
+      replay/no duplicate or altered effect.
+
+      - Final wiring audit closure fields report `verdict: PASS`, `blockers: []`,
+      `gate_open_allowed: true`, and `orchestrator_action_hint: proceed_to_final_gate`.
+
+      - If any blocker remains, evidence reports `verdict: FAIL`, non-empty `blockers`,
+      `gate_open_allowed: false`, and `orchestrator_action_hint: create_followup_fix`
+      with exact remaining blocker IDs.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this\
+      \ step.\"\n\n## Retest Closure Fields\n\n```yaml\nverdict: PASS|FAIL\nblockers:\n\
+      \  - <remaining blocker id, or omit when none>\ngate_open_allowed: true|false\n\
+      orchestrator_action_hint: proceed_to_final_gate|create_followup_fix|escalate_spec_conflict\n\
+      ```\n\n## Final Wiring Audit Retest\n\n**Blocker under retest**: HTTP_IDEMPOTENCY_KEY_WRITE_ONLY\n\
+      \n**Wiring audit result**:\n- idempotency_key validation location: <file:line>\n\
+      - idempotency_key consumption/persistence location: <file:line>\n- replay lookup/write\
+      \ location: <file:line>\n\n## Runtime / Targeted Smoke Evidence\n\n**Automated\
+      \ command executed**:\n```sh\ngo test ./internal/resofeed -run 'Idempotency|Inspect|Resonance|Steer'\
+      \ -count=1\n```\n\n**Actual output**:\n```text\n<paste output>\n```\n\n**Duplicate\
+      \ HTTP mutation smoke**:\n| Mutation | First response | Replay response | Duplicate/altered\
+      \ effect? | PASS/FAIL |\n| --- | --- | --- | --- | --- |\n| inspect | <status/body>\
+      \ | <status/body> | <none or details> | <PASS/FAIL> |\n| resonance | <status/body>\
+      \ | <status/body> | <none or details> | <PASS/FAIL> |\n| steer | <status/body>\
+      \ | <status/body> | <none or details> | <PASS/FAIL> |\n\n**Architecture invariant\
+      \ check**:\n- One Go binary / one SQLite DB preserved: YES/NO\n- No account\
+      \ system, sync/merge/history/activity ledger, sidecar worker, vector DB, or\
+      \ RAG introduced: YES/NO\n- Portable state scope unchanged: YES/NO"
+    depends_on:
+    - fix-http-idempotency-wiring
+    agent: wiring-auditor
