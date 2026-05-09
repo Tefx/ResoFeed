@@ -13977,7 +13977,7 @@ phases:
       as allowed by prior notes; no runtime-facing Gemini text was added.'
   - id: openrouter-llm-implementation.wiring-audit
     name: wiring-audit
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       agent_source: project
@@ -14087,8 +14087,6 @@ phases:
     - openrouter-llm-implementation.complete-ingest-steering-state-migration
     - openrouter-llm-implementation.complete-runtime-doctor-http-mcp-wiring
     agent: wiring-auditor
-    claimed_by: wiring-auditor
-    claimed_at: '2026-05-09T18:30:04.333631+00:00'
   - id: openrouter-llm-implementation.serve-liveness-probe
     name: serve-liveness-probe
     status: done
