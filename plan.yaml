@@ -12255,6 +12255,47 @@ phases:
 
       - Any remaining ambiguity:'
     agent: doc-reviewer
+  - id: openrouter-llm-contract-and-red-tests.define-cli-adapter-docs-red-tests
+    name: define-cli-adapter-docs-red-tests
+    status: pending
+    description: "step_type: test\nstep_intent: test_define_red\nexpected_result:\
+      \ red\nagent_source: project\n\nDefine expected-red Go tests for CLI/runtime\
+      \ docs and the OpenRouter adapter contract. Modified files must be limited to\
+      \ tests, fixtures, and minimal test helpers.\n\nSpec refs and touch_paths:\n\
+      - spec_refs: user architecture_basis runtime_contract, docs/ARCHITECTURE.md,\
+      \ AGENTS.md.\n- touch_paths: internal/resofeed/*_test.go, cmd/resofeed/*_test.go\
+      \ if present, docs test/search harness if present.\n- harness_refs: Go test\
+      \ harness, httptest fake OpenRouter server, docs grep/search test harness.\n\
+      - authoritative_interface: runtime flags and OpenRouter endpoint from architecture_basis.\n\
+      \nRequired expected-red coverage:\n1. CLI/runtime flags:\n   - `--gemini-api-key`\
+      \ and `--gemini-model` are rejected/unknown.\n   - `--openrouter-api-key` is\
+      \ required for serve/runtime LLM setup.\n   - `--openrouter-model` is optional;\
+      \ empty means account default.\n   - No startup network model validation occurs\
+      \ for explicit or empty model.\n2. Adapter httptest fake OpenRouter:\n   - POST\
+      \ path equivalent to `/api/v1/chat/completions`.\n   - Authorization bearer\
+      \ header uses configured key but tests never print the key.\n   - JSON request\
+      \ includes `response_format` JSON mode.\n   - `model` omitted when empty and\
+      \ passed unchanged when set.\n   - 429 and 5xx retry behavior is specified.\n\
+      \   - invalid JSON and OpenRouter error responses map to safe Go errors/model_status\
+      \ without panics.\n3. Docs/search tests:\n   - ARCHITECTURE/USAGE docs no longer\
+      \ promise Gemini flags.\n   - OpenRouter flags and optional model semantics\
+      \ are present.\n\nExpected result: red before implementation because Gemini\
+      \ flags/adapter behavior are not yet migrated. Success means the tests expose\
+      \ the gap without product code changes."
+    verification: local-check protecting openrouter-llm-contract-and-red-tests.gate
+      and downstream openrouter-llm-implementation. Tests should run and fail for
+      the expected OpenRouter/Gemini gaps only.
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red Test Evidence\n\
+      - Modified files limited to tests/fixtures/helpers:\n- Commands run:\n```\n\
+      <go test / docs search commands>\n```\n- Expected failures or exposed_gaps:\n\
+      \  - CLI flag gap:\n  - adapter contract gap:\n  - docs Gemini residue gap:\n\
+      - Secret handling: confirm no real OpenRouter key printed; test keys are fake/redacted.\n\
+      - Downstream implementation owner: openrouter-llm-implementation.*"
+    depends_on:
+    - openrouter-llm-contract-and-red-tests.lock-openrouter-contract-and-docs
+    agent: golang-developer
 - id: openrouter-llm-implementation
   name: OpenRouter LLM Backend Implementation
   status: locked
