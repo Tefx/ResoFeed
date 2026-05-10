@@ -32429,3 +32429,17 @@ phases:
     - integration-verification
     - spec-architecture-drift-review
     agent: gate-reviewer
+- id: full-ui-design-conformance-remediation
+  name: Full UI Design Conformance Remediation
+  status: pending
+  gate: All 52 audit findings from docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+    are closed or have explicit accepted non-blocking/non-intersection rationale;
+    P0/P1 findings have browser or DOM/behavior evidence; Feed/Search share anatomy;
+    SourceLedger/StatePortability use canonical bracket action and DOM contracts;
+    Inspector reading path is free of raw boilerplate/debug/model diagnostics and
+    original link navigates normally; responsive breakpoint below 1080px is honored;
+    /doctor and Search do not crop/break on narrow viewport; docs/ui-preview.html
+    is cleaned after live UI contracts stabilize; no forbidden product concepts or
+    runtime surfaces are introduced.
+  depends_on:
+  - prd-inspector-preview-conformance-remediation
