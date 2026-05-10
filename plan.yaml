@@ -30875,3 +30875,145 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.contract-audit-acceptance
     agent: frontend-engineer
+  - id: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
+    name: Complete PRD Inspector fields and preview visual parity
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete the existing Inspector/feed UI and, only if required, minimal existing
+      Go JSON/API data exposure so the app satisfies the contract from prd-inspector-preview-conformance-remediation.contract-audit-acceptance
+      and the expected-red tests from prd-inspector-preview-conformance-remediation.expected-red-browser-regressions.
+
+
+      UPSTREAM ARTIFACTS (authoritative):
+
+      - prd-inspector-preview-conformance-remediation.contract-audit-acceptance —
+      PRD/Inspect field register and visual delta register are AUTHORITATIVE.
+
+      - prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
+      — browser regression tests and screenshot/layout assertions are PROTECTED.
+
+      - docs/PRD.md, docs/DESIGN.md, docs/ui-preview.html, AGENTS.md — source-of-truth
+      refs.
+
+
+      YOUR SCOPE:
+
+      - Surface PRD-required item-understanding outputs visibly in Inspector/Inspect/feed
+      as required by the contract: objective quality assessment / 质量评估, value tier
+      / 优先级, concise core insight / 核心见解, dense factual summary / 密集事实摘要, source and
+      extraction provenance / 来源与提取溯源, why this appeared / 为什么展示给你, searchable text
+      / 可检索文本.
+
+      - Align the live rendered UI to docs/ui-preview.html and DESIGN.md for the reported
+      preview mismatch: large RESOFEED masthead, SOURCE LEDGER / DOCTOR / INSPECTOR
+      top line, prompt box at top, card-like bordered content area, margins/alignments,
+      row/star alignment, star button/sidebar proportions, typography scale, and Inspector
+      field hierarchy.
+
+      - Use existing ResoFeed product concepts only. Do not invent folders, tags,
+      unread/archive flows, onboarding wizard, vector/RAG concepts, sync/merge, per-agent
+      auth, or new deployables.
+
+      - Preserve architecture constraints: one Go binary, SQLite only, static assets/JSON
+      HTTP/MCP/background ingest in cmd/resofeed; keep domain logic flat in internal/resofeed
+      and avoid Java-style layers/DI/event buses.
+
+      - If data/API fields are missing, complete the existing JSON response path narrowly
+      so the frontend can render the PRD fields; do not introduce a parallel API or
+      sidecar.
+
+
+      If an upstream contract artifact is wrong or incomplete, document a deviation
+      record (type, what, why, impact) and keep the change minimal; do NOT silently
+      rewrite the acceptance criteria.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Hardcoded placeholder labels or static
+      PRD text without real item data do not satisfy this step.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. PRD fields hidden, absent, mislabeled, or only present in raw JSON/source.
+
+      2. Screenshot evidence showing live UI still materially differs from docs/ui-preview.html
+      for masthead, top nav, prompt placement, card geometry, margins, row/star alignment,
+      typography, or Inspector hierarchy.
+
+      3. Raw-source regression: primary Inspector body again exposes raw JavaScript/CSS/JSON-LD/provenance
+      garbage instead of readable content.
+
+      4. Architecture/design drift: forbidden product concepts or new deployable/storage/orchestration
+      surfaces.'
+    verification: 'phase-check protecting independent retest, UI/UX audit, and final
+      gate.
+
+      - Main path: affected browser/UI tests move from expected-red to green with
+      rendered app screenshots/artifacts.
+
+      - PRD path: visible Inspector/Inspect output shows all required item-understanding
+      fields with real item-specific content or documented valid empty states.
+
+      - Layout path: live UI satisfies bounded parity assertions for masthead, nav,
+      prompt placement, cards/borders, margins, row/star alignment, typography scale,
+      and Inspector hierarchy.
+
+      - Regression path: Inspector primary readable body does not regress to raw JS/CSS/JSON-LD/provenance
+      garbage.
+
+      - Architecture path: no forbidden product concepts, no sidecar/extra storage/sync/merge
+      additions.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Files changed: <paths>
+
+      - PRD fields surfaced: <field -> UI/API/data source mapping>
+
+      - Preview parity changes: <visual delta -> change made>
+
+      - Screenshots/artifacts generated during self-check: <paths>
+
+      - Raw-source regression guard: <how readable body remains clean>
+
+      - Architecture/design guardrail confirmation: <no forbidden concepts/deployables/storage>
+
+
+      ## Behavioral Proof Register
+
+      - requirement_ref: <PRD/DESIGN/ui-preview ref>
+
+      - behavior_claim: <implemented behavior>
+
+      - runtime_proof_expected: <browser/test/screenshot proof for retest/audit>
+
+      - evidence_ref: <artifact path or test>
+
+      - status: PROVEN | NEEDS_RETEST | UNPROVEN
+
+      - closure_path: independent retest and uiux-audit before final gate
+
+      - gate_decision_basis: <why this should OPEN or BLOCK>
+
+      '
+    depends_on:
+    - prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
+    agent: frontend-engineer
