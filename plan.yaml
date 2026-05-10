@@ -30796,7 +30796,7 @@ phases:
       final gate. Evidence confirms clean isolated worktree and no product changes.'
   - id: prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     name: Expected-red browser regressions for Inspector PRD fields and preview parity
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -30897,6 +30897,8 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.contract-audit-acceptance
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T15:35:46.542608+00:00'
   - id: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
     name: Complete PRD Inspector fields and preview visual parity
     status: pending
