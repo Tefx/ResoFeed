@@ -24536,7 +24536,7 @@ phases:
     - expected-red-design-artifact-negative-ux-tests
     agent: frontend-engineer
   - id: playwright-repair-verification
-    name: Deterministic Playwright and interaction verification
+    name: Comprehensive deterministic Playwright UI regression verification
     status: pending
     description: 'step_type: test
 
@@ -24546,135 +24546,74 @@ phases:
 
       verification_scope: phase-check
 
+      agent_source: project
+
 
       As an INDEPENDENT TESTER, validate the repaired UI from a fresh browser perspective
-      after implementation.
+      after implementation. This verification protects the phase gate by proving every
+      expected-red UI regression category now passes with real browser artifacts.
 
 
-      Run the targeted repair tests and a minimal related browser smoke to prove:
+      Required green coverage:
 
-      - SOURCE LEDGER navigation opens the ledger surface by actual click/key interaction.
+      - Real pointer hit-target / clickability for `SOURCE LEDGER`, `TODAY`, Steer
+      submit, star/resonate, Inspector links, `/doctor`, OPML import, and source fetch
+      buttons where present; include obstruction diagnostics when relevant.
 
-      - Selected feed row remains distinguishable and low-noise when hovered/focused.
+      - Keyboard/a11y activation: tab order, focus visibility, Enter/Space activation,
+      roles/labels, and active/selected state semantics.
 
-      - Inspector primary detail view is structured/readable and raw JSON-LD/extracted
-      metadata is absent from the primary content area.
+      - Interaction state matrix screenshots/assertions: normal, hover, selected,
+      selected+hover, focus, selected+focus.
 
-      - Keyboard/focus basics remain intact for the affected controls: Source Ledger
-      control, feed item open action, Inspector heading/interactive elements.
+      - Inspector hierarchy with dirty real-content corpus: default primary area remains
+      readable; raw JSON/JSON-LD/extracted metadata/provenance is not primary content
+      by default.
 
-
-      This check protects the phase gate and the final completed-plan UI confidence
-      boundary. If it finds issues, that is successful verification output and should
-      create fix/retest follow-up ownership.'
-    verification: '- Run `cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"`
-      and require green result.
-
-      - Run or document a focused related smoke from `web/tests/e2e/real-server-ui.spec.ts`
-      that exercises real server UI navigation.
-
-      - Verify screenshot/trace artifacts are captured for Source Ledger, selected+hover
-      feed row, and Inspector default detail view.
-
-      - Verify keyboard/focus basics for the affected controls; record any blockers
-      with reproduction steps.
-
-      - Structured behavioral proof register is included with PROVEN / NEEDS_TEST
-      / UNPROVEN statuses for the three user-reported obligations.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - <filename> — key passage or "NOT READ: <reason>"
+      - Design artifact generation and negative UX assertions: all required screenshot
+      names exist; no banned raw blobs, forbidden RSS-reader concepts, mascot/SaaS/AI-magic
+      copy, or wrong-panel nav activation.
 
 
-      If no refs were provided, state: "No refs for this step."
+      Document ALL findings. A test that discovers issues is successful verification
+      output and should create fix/retest follow-up ownership; it is not a reason
+      to hide the finding.'
+    verification: '- Run the exact targeted UI regression test command(s), requiring
+      green result.
 
+      - Run `cd web && npm run check` or cite implementation evidence if already run
+      and unchanged.
 
-      ## Deterministic Browser Verification Report
+      - Verify screenshot/trace artifacts are captured for all required design artifact
+      names and interaction matrix states.
 
-      **Tester**: integration-verifier (independent of implementation)
-
-      **Scope**: UI navigation, selected+hover state, Inspector hierarchy
-
-      **Independence Level**: L1
-
-
-      ### Commands executed
-
-      ```
-
-      cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"
-
-      <related smoke command, if run>
-
-      ```
-
-
-      ### Actual output
-
-      ```
-
-      <paste stdout/stderr, not a summary>
-
-      ```
-
-
-      ### Screenshots/traces
-
-      - Source Ledger click path: <artifact path>
-
-      - Selected+hover state: <artifact path>
-
-      - Inspector hierarchy: <artifact path>
-
-
-      ### Behavioral Proof Register
-
-      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
-      status | closure_path | gate_decision_basis |
-
-      | --- | --- | --- | --- | --- | --- | --- |
-
-      | SOURCE LEDGER clickability | <claim> | real click/key opens panel | <artifact>
-      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis> |
-
-      | selected+hover clarity | <claim> | screenshot/style proof | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN
-      | <path> | <OPEN/BLOCK basis> |
-
-      | Inspector hierarchy | <claim> | DOM/text proof excludes raw dump from primary
-      area | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis>
-      |
-
-
-      ### Accessibility/basic interaction checks
-
-      - Source Ledger control reachable/clickable: ✅/❌
-
-      - Feed item open action keyboard path: ✅/❌
-
-      - Inspector heading/readable hierarchy: ✅/❌
-
-
-      ### Issues Found
-
-      | Severity | Description | Location | Reproduction |
-
-      | --- | --- | --- | --- |
-
-      | <blocker/should_fix/suggestion> | <issue> | <file:line/control> | <steps>
-      |
-
-
-      ### Headline
-
-      - [ ] PASS
-
-      - [ ] PASS_WITH_DEBT
-
-      - [ ] FAIL
-
-      '
+      - Verify structured behavioral proof register has PROVEN/NEEDS_TEST/UNPROVEN
+      status for every category and explicit remediation path for any blocker-class
+      gap.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Comprehensive Playwright\
+      \ Verification Evidence\n- Exact commands:\n```sh\ncd web && npm run check\n\
+      cd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair|hit-target|keyboard|a11y|state\
+      \ matrix|dirty corpus|design artifact|negative UX\"\n```\n- Runner output:\n\
+      ```text\n<paste output>\n```\n- Artifact manifest:\n  | Artifact | Path | State/viewport\
+      \ | Reviewed? |\n  | --- | --- | --- | --- |\n- Coverage table:\n  | Category\
+      \ | Tests | Status | Evidence ref | Gap/remediation |\n  | --- | --- | --- |\
+      \ --- | --- |\n- Browser trace paths: <paths>\n- Issues found:\n  | Severity\
+      \ | Description | Reproduction | Suggested owner |\n  | --- | --- | --- | ---\
+      \ |\n\n## Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n\n## Closure Fields\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN\
+      \ with notes>\norchestrator_action_hint: proceed_to_blind_runtime_verification\
+      \ | create_fix_retest_loop"
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
+    - web/src/routes/+page.svelte
+    - web/src/routes/components/Feed.svelte
+    - web/src/routes/components/Inspector.svelte
     depends_on:
     - implementation-repair
     agent: integration-verifier
