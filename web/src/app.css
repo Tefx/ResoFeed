@@ -94,29 +94,6 @@ a:focus,
   color: var(--rf-component-app-shell-text-color);
 }
 
-.shell-masthead {
-  display: flex;
-  gap: var(--rf-space-lg);
-  align-items: baseline;
-  justify-content: space-between;
-  border-block-end: 1px solid var(--rf-color-border);
-  padding: var(--rf-space-md) var(--rf-space-md) var(--rf-space-md);
-}
-
-.shell-masthead h1 {
-  margin: 0;
-  font: var(--rf-typography-display);
-  letter-spacing: -0.02em;
-}
-
-.shell-masthead .subtitle {
-  margin: 0;
-  color: var(--rf-color-muted);
-  font: var(--rf-typography-metadata);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .contract-region {
   border-block-end: 1px solid var(--rf-color-border);
   padding: var(--rf-space-md);
@@ -301,9 +278,9 @@ a:focus,
 
 .contract-token-prompt,
 .contract-empty,
-  .contract-source-ledger,
-  .contract-portability,
-  .contract-search {
+.contract-source-ledger,
+.contract-portability,
+.contract-search {
   padding: var(--rf-space-xl);
 }
 
@@ -357,27 +334,10 @@ a:focus,
   align-items: center;
 }
 
-.surface-nav {
-  display: flex;
-  gap: var(--rf-space-sm);
-  flex-wrap: wrap;
-  border-block-end: 1px solid var(--rf-color-border);
-  padding: var(--rf-space-sm) var(--rf-space-md);
-}
-
-.surface-nav button,
 .back-command {
   border-color: var(--rf-color-border);
   color: var(--rf-color-muted);
   background: transparent;
-}
-
-.surface-nav button.active-surface {
-  color: var(--rf-color-text);
-  background: transparent;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
 }
 
 .steer-input {
@@ -571,7 +531,9 @@ a:focus,
 }
 
 .contract-diagnostics {
+  max-width: 100%;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
   background: var(--rf-component-diagnostic-output-background-color);
   color: var(--rf-component-diagnostic-output-text-color);
   padding: var(--rf-space-md);
@@ -579,7 +541,8 @@ a:focus,
 
 @media (min-width: 1080px) {
   .shell-grid[data-surface='ledger'],
-  .shell-grid[data-surface='search'] {
+  .shell-grid[data-surface='search'],
+  .shell-grid[data-surface='doctor'] {
     display: none;
   }
 }
@@ -596,10 +559,6 @@ a:focus,
     min-height: 100dvh;
   }
 
-  .shell-masthead {
-    padding: var(--rf-space-md);
-  }
-
   .shell-command {
     position: sticky;
     z-index: 1;
@@ -607,6 +566,10 @@ a:focus,
     order: 2;
     grid-template-columns: minmax(0, 1fr);
     background: var(--rf-color-background);
+  }
+
+  .shell-command > .contract-label {
+    display: none;
   }
 
   .steer-form {
@@ -654,7 +617,4 @@ a:focus,
     -webkit-line-clamp: 1;
   }
 
-  .surface-nav {
-    padding-block: var(--rf-space-xs);
-  }
 }

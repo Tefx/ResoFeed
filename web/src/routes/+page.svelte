@@ -14,7 +14,7 @@
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
-  type Surface = 'feed' | 'inspector' | 'ledger' | 'search';
+  type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
   type ManualFetchState = {
     readonly ingesting: boolean;
     readonly fetchingSourceIds: readonly string[];
@@ -158,22 +158,24 @@
     currentSurface = surface;
   }
 
-  async function showDoctorSurface(): Promise<void> {
-    currentSurface = 'feed';
-    steerFeedback = { kind: 'submitting' };
-    try {
-      steerFeedback = { kind: 'doctor', text: await apiClient().doctor() };
-    } catch (error) {
-      steerFeedback = { kind: 'error', text: error instanceof Error ? error.message : 'err: doctor unavailable' };
-    }
-  }
-
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
 
     steerFeedback = { kind: 'submitting' };
     try {
+      if (command.toLowerCase() === 'source ledger' || command.toLowerCase() === 'ledger') {
+        currentSurface = 'ledger';
+        steerCommand = '';
+        steerFeedback = { kind: 'receipt', text: 'source ledger' };
+        return;
+      }
+      if (command.toLowerCase() === 'today') {
+        currentSurface = 'feed';
+        steerCommand = '';
+        steerFeedback = { kind: 'receipt', text: 'today' };
+        return;
+      }
       if (command.toLowerCase().startsWith('search ')) {
         currentSurface = 'search';
         steerCommand = command.replace(/^search\s+/i, '');
@@ -182,6 +184,8 @@
       }
       if (command === '/doctor') {
         const diagnostics = await apiClient().doctor();
+        currentSurface = 'doctor';
+        steerCommand = '';
         steerFeedback = { kind: 'doctor', text: diagnostics };
         return;
       }
@@ -343,10 +347,6 @@
     <OwnerTokenPrompt state={promptState} onAccepted={handleOwnerTokenAccepted} />
   {:else}
     <a class="skip-link" href="#today-feed">skip to feed</a>
-    <header class="shell-masthead">
-      <h1>RESOFEED</h1>
-      <p class="subtitle">SOURCE LEDGER / DOCTOR / INSPECTOR</p>
-    </header>
     <header class="shell-command">
       <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
         <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
@@ -371,22 +371,10 @@
       <span class="contract-label">RESOFEED</span>
     </header>
 
-    <nav class="surface-nav" aria-label="Surfaces">
-      <button type="button" class:active-surface={currentSurface === 'feed'} aria-current={currentSurface === 'feed' ? 'true' : undefined} onclick={() => showSurface('feed')}>TODAY</button>
-      <button type="button" class:active-surface={currentSurface === 'ledger'} aria-current={currentSurface === 'ledger' ? 'true' : undefined} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
-      <button type="button" onclick={() => void showDoctorSurface()}>/doctor</button>
-      <button type="button" class:active-surface={currentSurface === 'inspector'} aria-current={currentSurface === 'inspector' ? 'true' : undefined} onclick={() => showSurface('inspector')}>INSPECTOR</button>
-    </nav>
-
     {#if steerFeedback.kind === 'receipt'}
       <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>
     {:else if steerFeedback.kind === 'error'}
       <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>
-    {:else if steerFeedback.kind === 'doctor'}
-      <section class="contract-region doctor-surface" aria-labelledby="doctor-heading">
-        <h2 id="doctor-heading">/doctor</h2>
-        <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
-      </section>
     {:else if steerFeedback.kind === 'submitting'}
       <p class="contract-muted shell-status" role="status">applying</p>
     {/if}
@@ -442,5 +430,14 @@
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
       <SearchRetrieval items={items} query={steerCommand} onSearch={searchItems} />
     </section>
+    {#if steerFeedback.kind === 'doctor'}
+      <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
+        {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+        <div class="contract-region">
+          <h2 id="doctor-heading">/doctor</h2>
+          <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
+        </div>
+      </section>
+    {/if}
   {/if}
 </main>

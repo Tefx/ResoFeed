@@ -49,7 +49,7 @@
   <p class="contract-label">RESOFEED</p>
   <h1 id="owner-token-heading">Enter owner token</h1>
   <form class="contract-token-form" onsubmit={(event) => { event.preventDefault(); submitOwnerToken(); }}>
-  <label for="owner-token-input">Owner token</label>
+  <label class="visually-hidden" for="owner-token-input">Owner token</label>
   <input
     id="owner-token-input"
     use:focusOnMount
@@ -59,16 +59,13 @@
     type="password"
     autocomplete="off"
     disabled={displayedState === 'submitting' || displayedState === 'accepted'}
-    aria-describedby="owner-token-error owner-token-accessibility-note"
+    aria-describedby="owner-token-error"
   />
-  <button type="submit" disabled={!canSubmit}>
-    submit
+  <button type="submit" disabled={!canSubmit} aria-label="submit">
+    [submit]
   </button>
   </form>
   {#if displayedState === 'rejected'}
     <p id="owner-token-error" class="contract-feedback-error" role="alert" aria-live="assertive">err: owner token rejected</p>
   {/if}
-  <p id="owner-token-accessibility-note" class="contract-muted">
-    Token stays in this browser as resofeed.ownerToken and is sent to local /api/* requests.
-  </p>
 </section>

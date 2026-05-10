@@ -245,9 +245,11 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await user.click(screen.getByRole('button', { name: 'apply' }));
     await waitFor(() => expect(screen.getByRole('log', { name: '/doctor diagnostics' })).toHaveTextContent('rss: ok'));
     expect(screen.getByRole('log', { name: '/doctor diagnostics' }).tagName).toBe('PRE');
+    expect(screen.getByRole('region', { name: '/doctor' })).toHaveClass('active-panel');
+    expect(document.querySelector('.shell-grid')).toHaveAttribute('data-surface', 'doctor');
   });
 
-  it('renders only allowed top-level surfaces and demotes search/state from product navigation', async () => {
+  it('does not render persistent product surface navigation outside Steer', async () => {
     window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
@@ -259,12 +261,13 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     }));
 
     render(Page);
-    await screen.findByRole('navigation', { name: 'Surfaces' });
-    const nav = screen.getByRole('navigation', { name: 'Surfaces' });
-    expect(within(nav).getByRole('button', { name: 'TODAY' })).toBeVisible();
-    expect(within(nav).getByRole('button', { name: 'SOURCE LEDGER' })).toBeVisible();
-    expect(within(nav).queryByRole('button', { name: 'SEARCH' })).not.toBeInTheDocument();
-    expect(within(nav).queryByRole('button', { name: 'STATE' })).not.toBeInTheDocument();
+    await screen.findByLabelText('Steer or paste RSS URL');
+
+    expect(screen.queryByRole('navigation', { name: 'Surfaces' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'TODAY' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'SOURCE LEDGER' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'SEARCH' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'STATE' })).not.toBeInTheDocument();
   });
 
   it('surfaces active MCP agent steering attribution as an inline correction receipt', async () => {
@@ -316,7 +319,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toHaveTextContent('Full extracted text shown only in Inspector.');
     expect(screen.getAllByRole('button', { name: 'Resonate item' }).length).toBeGreaterThan(1);
 
-    await user.click(screen.getByRole('button', { name: 'SOURCE LEDGER' }));
+    const steer = screen.getByLabelText('Steer or paste RSS URL');
+    await user.type(steer, 'source ledger');
+    await user.click(screen.getByRole('button', { name: 'apply' }));
     expect(screen.getByRole('region', { name: 'SOURCE LEDGER surface' })).toHaveClass('active-panel');
   });
 
