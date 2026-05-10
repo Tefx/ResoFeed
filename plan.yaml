@@ -28404,7 +28404,7 @@ phases:
       required command passed. No vectl tools or plan files were used or modified.'
   - id: ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
     name: retest-gate-keyboard-a11y-full-targeted
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -28510,6 +28510,242 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T13:14:23.658276+00:00'
+    done_at: '2026-05-10T13:20:10.042532+00:00'
+    evidence: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer implementation
+      fix)
+
+      **Scope**: B-GATE-001 full targeted Playwright retest
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - `docs/DESIGN.md` — touch targets must be at least 44 CSS px; keyboard navigation
+      is required for every action; focus rings must be visible independent of accent/selected
+      state; selected feed rows must not shift layout and should remain marker-led.
+
+      - `web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts`
+      — covers SOURCE LEDGER/TODAY active surface transitions, unobstructed nav hit
+      targets, restrained selected-row hover, clean Inspector JSON-LD handling, and
+      forbidden UX copy checks.
+
+      - `web/tests/e2e/hit-target-clickability.spec.ts` — real pointer-center hit-target
+      diagnostics check SOURCE LEDGER, TODAY, Steer submit, star, Inspector links,
+      /doctor, OPML import, and fetch controls with obstruction diagnostics.
+
+      - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts` — keyboard tests cover
+      Tab order, Space/Enter activation, focus visibility/layout stability, active
+      surface semantics, star state/glyph, OPML/state controls, and attached role/ARIA
+      snapshots.
+
+      - `web/tests/e2e/feed-row-state-matrix.expected-red.spec.ts` — verifies normal/hover/selected/focus/selected-focus
+      feed row states, selected marker visibility, no layout shift, and no full-row
+      selected-hover block.
+
+      - `web/tests/e2e/inspector-dirty-corpus.spec.ts` — starts a dirty corpus server,
+      imports OPML, ingests, then asserts feed/Inspector primary copy does not expose
+      raw JSON-LD/script/style/provenance payloads.
+
+      - `web/tests/e2e/design-artifact-negative-ux.spec.ts` — requires design artifact
+      screenshots/manifest across owner-token, first-use, feed, ledger, inspector,
+      search, and mobile states; also rejects forbidden UX copy and raw payload leakage.
+
+      - `web/tests/e2e/keyboard-a11y-helpers.ts` — helper `focusAndAudit` checks visible
+      focus indicator and stable layout; `expectActiveState` requires aria/data/class
+      active-state proof; coverage attachment enumerates keyboard/a11y surfaces.
+
+
+      ### Dependency Bootstrap / Retry Note
+
+      First attempt ran the required command without worktree dependencies and failed
+      before Playwright: `sh: svelte-kit: command not found`. This was classified
+      as infrastructure/bootstrap failure. Retry ran:
+
+      ```sh
+
+      npm --prefix web ci
+
+      ```
+
+      ```text
+
+      added 150 packages, and audited 151 packages in 2s
+
+      3 low severity vulnerabilities
+
+      ```
+
+
+      ### Required Command
+
+      ```sh
+
+      npm --prefix web run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      ui-navigation-hover-inspector-repair.expected-red.spec.ts hit-target-clickability.spec.ts
+      keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts
+
+      ```
+
+
+      ### Runner Output
+
+      ```text
+
+      svelte-check found 0 errors and 0 warnings
+
+      Running 15 tests using 1 worker
+
+      ✓ design artifact manifest captures required ResoFeed UI contract states
+
+      ✓ negative UX assertions reject raw payload copy and active-panel drift
+
+      ✓ dirty corpus inspector primary hierarchy hides raw feed payloads and provenance
+
+      ✓ expected-red keyboard a11y primary nav tab order and active surface semantics
+
+      ✓ expected-red keyboard a11y feed row star inspector activation and selected
+      state
+
+      ✓ expected-red keyboard a11y Steer submit doctor log and Inspector original
+      link
+
+      ✓ expected-red keyboard a11y Source Ledger OPML state and fetch controls
+
+      ✓ state matrix: normal hover selected selected-hover focus and selected-focus
+      keep selected state readable without layout shift
+
+      ✓ hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspector
+      links, /doctor, OPML import, and source fetch controls
+
+      ✓ ui-navigation-hover-inspector-repair hit-target diagnostics: nav clicks never
+      leave the wrong panel active
+
+      ✓ SOURCE LEDGER real click opens ledger with active-state proof and obstruction
+      diagnostics
+
+      ✓ TODAY click after another panel restores Today as the only active primary
+      surface
+
+      ✓ selected feed row hover remains restrained instead of stacking ambiguous active
+      hover blocks
+
+      ✓ default Inspector primary area is structured reading content, not raw JSON-LD/extracted
+      metadata
+
+      ✓ primary visible copy avoids forbidden RSS-reader/SaaS/onboarding language
+
+      15 passed (19.0s)
+
+      ```
+
+
+      ### Artifact Manifest / Trace Paths
+
+      - `.test-artifacts/playwright/results/results.json`
+
+      - `.test-artifacts/playwright/results/junit.xml`
+
+      - `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/manifest.json`
+
+      - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-d7ad7-ML-state-and-fetch-controls-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-ec492-tivation-and-selected-state-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-2edfb-nd-active-surface-semantics-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/design-artifact-negative-u-22d7b-copy-and-active-panel-drift-chromium-ci-safe/trace.zip`
+
+      - `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/trace.zip`
+
+
+      ### Assertions Integrity
+
+      - Keyboard/focus assertions weakened/skipped? no.
+
+      - JSON-LD/mobile/provenance regressions observed? no.
+
+      - Product implementation files modified? no.
+
+
+      ### Action Summary
+
+      - Bootstrapped missing web dependencies with `npm --prefix web ci`.
+
+      - Ran the exact required full targeted command.
+
+      - Committed generated retest evidence artifacts only: worktree `8db6cda test:
+      record B-GATE-001 targeted retest evidence`.
+
+      - Main squash merge committed as `5463c77 [vectl] step-ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
+      completed`.
+
+
+      ### Mainline post-merge verification
+
+      ```sh
+
+      git diff --name-only HEAD^ HEAD
+
+      npm --prefix web run check
+
+      ```
+
+      Output confirmed the merge was `.test-artifacts` evidence-only and `svelte-check
+      found 0 errors and 0 warnings`.
+
+
+      ### Behavioral Proof Register
+
+      | Claim | Status |
+
+      | --- | --- |
+
+      | Full targeted Playwright command deterministic green | PROVEN |
+
+      | Keyboard/focus assertions remain meaningful and not skipped/weakened | PROVEN
+      |
+
+      | JSON-LD/mobile/provenance repairs did not regress in covered suite | PROVEN
+      |
+
+      | Hit-target/navigation/Inspector active-panel repairs | PROVEN |
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      orchestrator_action_hint: COMPLETE
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: retry after dependency bootstrap passed exact required command;
+      `svelte-check` clean; Playwright 15/15 passed.
+
+      failure_alignment: initial failure was infrastructure/dependency bootstrap;
+      retry resolved it and no product/test blocker remains.
+
+      product_implementation_files_modified: false.'
   - id: ui-navigation-hover-inspector-repair.final-gate-keyboard-a11y-remediation
     name: final-gate-keyboard-a11y-remediation
     status: pending
