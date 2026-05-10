@@ -24181,3 +24181,82 @@ phases:
     visually audited, and gate-reviewed.'
   depends_on:
   - playwright-comprehensive-e2e
+  steps:
+  - id: contract-design-audit
+    name: Contract/design audit for UI repair targets
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: acceptance criteria, design-state contract, browser-test selectors/observables
+
+
+      Read the authoritative design and UI implementation refs, then define the exact
+      intended behavior for the three reported defects without implementing product
+      changes.
+
+
+      Scope and required outputs:
+
+      - SOURCE LEDGER navigation: define how the existing `SOURCE LEDGER` control
+      must be reachable/clickable, how it exposes the ledger panel, and which ARIA/visible
+      state proves the panel is active.
+
+      - Feed selected+hover states: decide the design-conformant treatment for an
+      already-selected feed row under pointer hover/focus. Preserve the low-noise
+      archival-index direction from DESIGN.md: selected state must remain distinguishable,
+      non-layout-shifting, and must not stack a noisy hover block on top of active
+      state.
+
+      - Inspector hierarchy: define the default readable hierarchy for item detail:
+      provenance/source header, title/link/extraction status, summary/reading payload,
+      and demoted/collapsed raw/provenance payload when present. Raw JSON-LD/extracted
+      metadata must not appear as the primary reading body.
+
+      - Identify exact selectors, routes, or accessible names that tests should use;
+      avoid brittle pixel-only assertions where semantic checks are available.
+
+
+      Authoritative interface / source anchors:
+
+      - docs/DESIGN.md §§Feed Items, Inspector Pane, Source Ledger, motion/state rules.
+
+      - docs/ui-preview.html selected item, Inspector, and Source Ledger preview blocks.
+
+      - docs/DESIGN_VISION.md interaction model for Inspect and Source Ledger.
+
+      - web/src/routes/+page.svelte nav/surface state.
+
+      - web/src/routes/components/Feed.svelte selected row control.
+
+      - web/src/routes/components/Inspector.svelte detail rendering.
+
+
+      Output is a contract/design note in repo-local test or audit artifacts only
+      if needed by the downstream test step. Do not modify product UI behavior in
+      this step.'
+    verification: '- Contract explicitly resolves all three user-reported issues into
+      testable expected behavior.
+
+      - Contract cites exact DESIGN.md/ui-preview passages and relevant UI source
+      locations.
+
+      - Contract does not implement product behavior or weaken ResoFeed UI constraints.
+
+      - Contract records any ambiguity as a SPEC QUESTION only if docs conflict; ordinary
+      implementation choices are resolved from docs.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Contract / Design Audit\
+      \ Evidence\n- User-reported issue mapping:\n  - SOURCE LEDGER clickability:\
+      \ <intended behavior + selector/accessibility proof>\n  - Selected+hover row\
+      \ state: <design-conformant rule + what visual stacking is forbidden>\n  - Inspector\
+      \ hierarchy: <primary reading hierarchy + raw/provenance demotion rule>\n- Exact\
+      \ downstream test selectors/observables:\n  ```\n  <selectors, roles, accessible\
+      \ names, screenshots to capture>\n  ```\n- Before/after baseline notes expected\
+      \ for implementation:\n  - Before: <what is currently suspected or observed>\n\
+      \  - After target: <contract-compliant state>\n- Blocker/closure fields:\n \
+      \ - blockers_found: <none/list>\n  - closure_path: <how downstream tests/implementation\
+      \ close each issue>\n  - unresolved_ambiguity: <none/list>\n"
+    agent: uiux-auditor
