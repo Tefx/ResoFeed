@@ -24260,3 +24260,72 @@ phases:
       \ - blockers_found: <none/list>\n  - closure_path: <how downstream tests/implementation\
       \ close each issue>\n  - unresolved_ambiguity: <none/list>\n"
     agent: uiux-auditor
+  - id: expected-red-browser-tests
+    name: Expected-red browser tests for nav, hover, and Inspector hierarchy
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Create Playwright/browser tests that expose the three user-reported gaps before
+      implementation. This is a pre-implementation test-definition step: product UI
+      source must not be modified except test harness selectors/fixtures if strictly
+      necessary.
+
+
+      Tests to add/update:
+
+      1. SOURCE LEDGER clickability: clicking the `SOURCE LEDGER` tab/button opens
+      the Source Ledger panel/surface and exposes the `SOURCE LEDGER` heading or ledger
+      region with active state.
+
+      2. Selected feed item hover treatment: with an item selected/open in the Inspector,
+      hovering that same feed row must not stack a noisy/ambiguous hover state over
+      selected state; selected remains visually and semantically distinguishable.
+      Use screenshots plus stable computed-style/DOM assertions derived from the contract
+      step.
+
+      3. Inspector hierarchy: default Inspector view shows structured readable content
+      and does not dump raw JSON-LD/extracted metadata into the primary reading area.
+      Raw/provenance content may be available only behind a labeled secondary/collapsed
+      region if the contract allows or implementation adds a minimal conformant pattern.
+
+
+      Spec-Fixture Conformance (MANDATORY): any mock/feed fixture used for Inspector
+      raw metadata must be derived from documented item/detail shapes and include
+      a minimal case with JSON-LD or extracted metadata that would reveal an accidental
+      raw dump.
+
+
+      Expected result before implementation: red. Success means the tests expose the
+      gaps and produce actionable failure output without changing product behavior.'
+    verification: '- Modified files are limited to Playwright/browser test files,
+      fixtures, or test artifact helpers.
+
+      - Run expected-red command before implementation: `cd web && npm run test:e2e
+      -- --grep "ui-navigation-hover-inspector-repair"`.
+
+      - Evidence records failing assertions for all feasible cases and links each
+      failure to the contract/design audit.
+
+      - No product UI implementation files are modified in this step.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Test Evidence\n\
+      - Test file(s) changed:\n  ```\n  <paths>\n  ```\n- Exact command executed before\
+      \ implementation:\n  ```\n  cd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair\"\
+      \n  ```\n- Actual red output / exposed gaps:\n  ```\n  <paste failure summary\
+      \ for SOURCE LEDGER, selected+hover, Inspector hierarchy>\n  ```\n- Screenshots/traces\
+      \ captured:\n  - <artifact path or NOT CAPTURED: reason>\n- Spec fixture conformance:\n\
+      \  - Fixture source section(s): <docs/API/design refs>\n  - Minimal raw metadata/JSON-LD\
+      \ fixture included: yes/no + path\n- Product-code modification check:\n  - Product\
+      \ UI files modified: <none/list + reason>\n- Downstream owner: ui-navigation-hover-inspector-repair.implementation-repair\n\
+      - Blocker/closure fields:\n  - blockers_found: <none/list>\n  - closure_path:\
+      \ failing tests are expected to turn green after implementation step\n  - unresolved_ambiguity:\
+      \ <none/list>\n"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
