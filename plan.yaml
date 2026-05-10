@@ -29824,7 +29824,7 @@ phases:
       contamination and targeted desktop Chromium Inspector coverage.'
   - id: generalize-inspector-primary-body-sanitation
     name: Generalize Inspector primary-body sanitation
-    status: pending
+    status: claimed
     description: 'Residual remediation for PASS_WITH_DEBT from `inspector-readable-content-gate`.
 
 
@@ -29913,6 +29913,8 @@ phases:
     depends_on:
     - inspector-readable-content-gate
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T14:43:23.922088+00:00'
   - id: retest-generalized-inspector-primary-body-sanitation
     name: Retest generalized Inspector primary-body sanitation
     status: pending
