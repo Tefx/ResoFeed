@@ -22575,3 +22575,101 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.harness-fixtures-env
     agent: frontend-engineer
+  - id: playwright-comprehensive-e2e.llm-live-smoke-boundary
+    name: LLM Live Smoke Boundary and Skip Semantics
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      tags: ["integration", "browser-e2e", "llm", "live-smoke"]
+
+
+      Add a live OpenRouter smoke path that is clearly separated from deterministic
+      CI-safe Playwright E2E.
+
+
+      Required behavior:
+
+      - If `OPENROUTER_KEY` is absent, the live smoke test must skip or mark live-only
+      without failing deterministic CI.
+
+      - If `OPENROUTER_KEY` is present at runtime, the test may execute one minimal
+      LLM-backed product flow through the real server/browser path and must redact
+      key material from logs/artifacts.
+
+      - Evidence must distinguish: skipped because no key, failed because invalid
+      key/service error, or passed with a real key.
+
+      - The live smoke must not be required for normal no-secret CI acceptance; deterministic
+      missing/invalid-key coverage from the prior step remains mandatory.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a TEST step. Live smoke completion requires explicit skip/pass/fail
+      semantics and artifact sanitization, not a hidden dependency on a developer
+      machine secret.'
+    verification: '- Planned live command/filter is documented separately from default
+      deterministic E2E, for example `npm --prefix web run test:e2e -- --grep @llm-live`.
+
+      - Without `OPENROUTER_KEY`, live smoke skips or reports live-only without failing
+      CI.
+
+      - With `OPENROUTER_KEY`, live smoke drives one real browser/server LLM-backed
+      flow and redacts secrets in artifacts.
+
+      - Evidence records sanitized env notes and server stdout/stderr for skip/pass/fail
+      disposition.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Live LLM Smoke Evidence
+
+      **Exact live command/filter**:
+
+      ```
+
+      <npm --prefix web run test:e2e -- --grep @llm-live or equivalent>
+
+      ```
+
+
+      **Disposition**: SKIPPED_NO_KEY | PASS_WITH_REAL_KEY | FAIL_INVALID_KEY_OR_SERVICE
+
+
+      **Actual output**:
+
+      ```
+
+      <paste runner output with secrets redacted>
+
+      ```
+
+
+      **Sanitization proof**:
+
+      - Key source present/absent:
+
+      - Logs/artifacts checked for secret leakage:
+
+      - Server stdout/stderr:
+
+      - Trace/screenshot/video:
+
+      - DB fixture path:'
+    depends_on:
+    - playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    agent: integration-verifier
