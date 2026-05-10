@@ -29577,3 +29577,147 @@ phases:
     - clean-inspector-primary-body-implementation
     - retest-clean-inspector-primary-body
     agent: gate-reviewer
+  - id: uiux-audit-clean-inspector-primary-body
+    name: UI/UX audit clean Inspector primary body
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+
+      As a native multimodal UI/UX implementation auditor, validate the rendered Inspector
+      output after the clean-primary-body retest. This is a downstream UI/UX audit
+      for the Inspector rendering change and protects inspector-readable-content-gate.
+
+
+      Scope:
+
+      - Compare real rendered Inspector artifacts against docs/DESIGN.md.
+
+      - Focus on primary body legibility: readable article copy or controlled fallback
+      is visible, dense but legible, and not replaced by raw source text.
+
+      - Verify metadata/provenance separation: source/provenance/diagnostic details
+      may exist only in their approved supporting areas, not in primary article copy.
+
+      - Reject raw source garbage in primary article copy, including JavaScript, CSS/custom
+      properties, JSON-LD, script/style bodies, navigation/menu boilerplate, extraction
+      diagnostics, or model diagnostics such as `model_latency_error`.
+
+      - Check layout and tone non-regression: Inspector remains aligned with the archival
+      index aesthetic, functional labels, muted palette, and no friendly SaaS/AI-magic
+      copy.
+
+      - Reject unapproved design invention: do not approve new flows, visual vocabulary,
+      onboarding concepts, folders/tags/unread/archive affordances, or other product
+      concepts absent from DESIGN.md.
+
+
+      Required rendered evidence:
+
+      - Inspect browser-rendered Inspector output from the implemented app/test harness,
+      not mocked component state only.
+
+      - Review screenshots, DOM/text captures, or equivalent visual/spatial artifacts
+      for the affected Inspector states.
+
+      - Produce a parseable PASS / PASS_WITH_DEBT / FAIL handoff with concrete artifact
+      references.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a VERIFICATION step. Stub-only or mock-only evidence is NOT acceptable.
+      Evidence must come from rendered UI artifacts that exercise the real Inspector
+      path after implementation and retest.'
+    verification: 'Verification scope: phase-check protecting inspector-readable-content-gate.
+
+      - Rendered Inspector artifacts are reviewed against docs/DESIGN.md.
+
+      - Primary body is legible article copy or controlled fallback, with no raw JavaScript/CSS/JSON-LD/navigation/provenance/diagnostic
+      garbage in primary article copy.
+
+      - Metadata, provenance, and diagnostics are visually/semantically separated
+      from primary reading text.
+
+      - Layout, density, labels, palette/tone, and interaction expectations do not
+      regress from DESIGN.md or prior UI repair intent.
+
+      - No unapproved product/design invention is introduced.
+
+      - Audit output includes parseable headline: PASS, PASS_WITH_DEBT, or FAIL; any
+      blocker-class issue has explicit closure path.'
+    evidence_template: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Rendered artifacts reviewed**:
+
+      - <screenshot/DOM/text capture paths or artifact refs>
+
+
+      **Inspector states reviewed**:
+
+      - <state/fixture/route, viewport, interaction path>
+
+
+      **Primary body legibility verdict**: PASS | PASS_WITH_DEBT | FAIL
+
+      - Evidence: <what rendered body shows>
+
+
+      **Raw source garbage audit**:
+
+      - JavaScript/script bodies: PASS | FAIL
+
+      - CSS/style/custom property text: PASS | FAIL
+
+      - JSON-LD/provenance/diagnostic text in primary body: PASS | FAIL
+
+      - navigation/menu boilerplate in primary body: PASS | FAIL
+
+      - `model_latency_error` in primary body: PASS | FAIL
+
+
+      **Metadata/provenance separation**:
+
+      - <where metadata/provenance appears and why it is separate from primary copy>
+
+
+      **DESIGN.md conformance**:
+
+      - Dense-but-legible Inspector: PASS | FAIL
+
+      - Functional labels / no friendly SaaS or AI-magic copy: PASS | FAIL
+
+      - Muted archival aesthetic and no layout/tone regression: PASS | FAIL
+
+      - No unapproved design invention: PASS | FAIL
+
+
+      **Findings**:
+
+      | Severity | Description | Artifact | Closure path |
+
+      | --- | --- | --- | --- |
+
+      | blocker/should_fix/suggestion | <finding> | <ref> | <path> |
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - retest-clean-inspector-primary-body
+    agent: uiux-auditor
