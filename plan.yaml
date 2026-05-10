@@ -30388,3 +30388,149 @@ phases:
     depends_on:
     - retest-generalized-inspector-primary-body-sanitation
     agent: frontend-engineer
+  - id: retest-remove-inspector-screenshot-family-guard-literals
+    name: Retest removal of Inspector screenshot-family guard literals
+    status: pending
+    description: 'Independent post-fix retest for blocker B1 from `retest-generalized-inspector-primary-body-sanitation`.
+
+
+      Scope:
+
+      - Validate the new fix from `remove-inspector-screenshot-family-guard-literals`.
+
+      - Confirm runtime behavior stays green for Inspector readable body.
+
+      - Confirm static semantic guard-removal proof is now green.
+
+
+      Required commands/evidence:
+
+      1. `npm --prefix web run check`
+
+      2. `npm --prefix web run build`
+
+      3. Targeted Playwright 3-spec suite covering Inspector readable-content/sanitation
+      behavior.
+
+      4. Static search proving `web/src/routes/components/Inspector.svelte` contains
+      no exact guard literals `model_latency_error`, `Skip to main content`, or `The
+      homepage The Verge` as sanitation criteria; any occurrence must be confined
+      to tests/comments with explicit non-product context.
+
+
+      This is a post-implementation retest. step_type: test. step_intent: retest_green.
+      expected_result: green.
+
+
+      ## Behavioral Proof Register Required
+
+      Evidence must include requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for:
+
+      - original user bug: raw source/screenshot-family garbage must not appear in
+      Inspector primary body
+
+      - residual B1: product code must not use exact screenshot-family guard literals
+      as sanitation criteria'
+    verification: '- `npm --prefix web run check` passes.
+
+      - `npm --prefix web run build` passes.
+
+      - Targeted Playwright 3-spec Inspector suite passes and evidence names the exact
+      spec files/tests run.
+
+      - Static search output proves `web/src/routes/components/Inspector.svelte` contains
+      no exact guard literals `model_latency_error`, `Skip to main content`, or `The
+      homepage The Verge` as sanitation criteria; any occurrence must be tests/comments
+      with explicit non-product context.
+
+      - Product-code review confirms sanitation is category/pattern-based and does
+      not use fixture/screenshot-family exact-string guards.
+
+      - Runtime/test evidence proves raw source leaks and screenshot-family forbidden
+      content still cannot appear in Inspector primary body.
+
+      - Behavioral proof register closes both the original user bug and residual B1
+      with status PROVEN and gate_open_allowed true, or explicitly BLOCKS with concrete
+      remaining gaps.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Inspector screenshot-family guard literal removal and raw-source
+      leak protection
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Required Command Evidence
+
+      Paste full command/output summaries for:
+
+      ```sh
+
+      npm --prefix web run check
+
+      npm --prefix web run build
+
+      <targeted Playwright 3-spec suite command>
+
+      ```
+
+
+      ### Static Guard-Removal Proof
+
+      Paste exact search output for `web/src/routes/components/Inspector.svelte` proving
+      these are absent from product sanitation criteria:
+
+      ```text
+
+      model_latency_error
+
+      Skip to main content
+
+      The homepage The Verge
+
+      ```
+
+      If any occurrence remains, classify it as tests/comments with explicit non-product
+      context, or mark BLOCKING.
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | original user bug | Inspector primary body excludes raw source/screenshot-family
+      garbage | targeted Playwright + rendered behavior | <evidence> | PROVEN/UNPROVEN
+      | <closure> | OPEN/BLOCK |
+
+      | residual B1 | product sanitation criteria use category/pattern logic, not
+      exact screenshot-family literals | static search + code review | <evidence>
+      | PROVEN/UNPROVEN | <closure> | OPEN/BLOCK |
+
+
+      ### Headline
+
+      - [ ] PASS: runtime and static semantic proof are green
+
+      - [ ] FAIL: blocker remains'
+    depends_on:
+    - remove-inspector-screenshot-family-guard-literals
+    agent: integration-verifier
