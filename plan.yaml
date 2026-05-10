@@ -35743,7 +35743,7 @@ phases:
       None.'
   - id: fuidcr-software-architect-conformance-review
     name: Review architecture and product-boundary conformance
-    status: claimed
+    status: done
     description: 'step_type: review
 
       verification_scope: phase-check
@@ -35891,6 +35891,121 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-10T20:03:05.329695+00:00'
+    done_at: '2026-05-10T20:12:55.971435+00:00'
+    evidence: '## Architecture Conformance Review
+
+
+      **Reviewer**: software-architect
+
+      **Scope**: Full UI design conformance remediation
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — READ: authoritative
+      substitute contains findings 1-52 exactly once; guardrails forbid sidecars,
+      vector/RAG, accounts/OAuth, sync/merge, service/repository/DI/event-bus layers;
+      P0/P1 require browser DOM/behavior evidence, not prose-only.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree; matrix substitute was used.
+
+      - docs/DESIGN.md — READ: UI contract requires operational labels only, no product-positioning
+      copy, no left nav, Inspector route below 1080px, terse owner-token prompt, flat
+      Source Ledger, lexical search, raw /doctor.
+
+      - docs/ARCHITECTURE.md — READ: one Go binary, one SQLite+FTS5 DB, thin HTTP/MCP
+      transports, no accounts/OAuth, no sidecar admin/worker/sync, no vector/RAG,
+      no service/repository/DI/event-bus layers.
+
+      - AGENTS.md — NOT READ: file absent in isolated worktree; AGENTS excerpt supplied
+      by orchestrator was used.
+
+      - docs/ui-preview.html — READ: preview currently uses DESIGN tokens, Source
+      Ledger bracket actions, 28px/32px mobile detail title, `last_ingest`/`last_fetch`,
+      and no `#fffdf5` token drift observed.
+
+
+      ### Review Metadata
+
+      step_intent: architecture_conformance_review
+
+      expected_result: green_review_or_blocking_findings
+
+      observed_result: FAIL
+
+      failure_alignment: matched_architecture/product drift
+
+      verdict: FAIL
+
+      headline: FAIL
+
+      orchestrator_action_hint: DO_NOT_COMPLETE until remediation ownership exists
+
+      product_implementation_files_modified: no in this review; worktree status clean
+
+      Commit hash(es): none; read-only audit, no review artifact created or modified
+
+
+      ### Blocker Findings
+
+      - BLOCKER-1: No objective closure register maps authoritative matrix findings
+      1-52 to exact closure/non-intersection evidence. Existing test artifacts enumerate
+      F1-F52 but several IDs do not match matrix semantics, including F4 and F48-F52
+      remapping.
+
+      - BLOCKER-2: P0/P1 closure evidence is insufficient. Latest Playwright JUnit
+      artifact reports only 3 inspector/preview-focused tests and does not prove browser/DOM/visual
+      behavior for all 13 P0 and 19 P1 obligations.
+
+      - BLOCKER-3: Finding 2 product drift remains unresolved. Matrix says no persistent
+      dashboard/tab nav strip is rendered for TODAY/SOURCE LEDGER/doctor/INSPECTOR,
+      while current artifacts accept TODAY and SOURCE LEDGER peer nav buttons.
+
+
+      ### Architecture Basis Checklist Summary
+
+      - Backend/API/DTO boundary: PASS. DTO additions observed are narrow/source-backed/item-display-only
+      (`display_excerpt`, `first_seen_at`).
+
+      - Forbidden concepts: PASS for accounts/OAuth, sync/merge/activity ledger, vector/RAG,
+      settings-heavy UI, admin/sidecar process, and service/repository/DI/event-bus
+      layers.
+
+      - Preview cleanup ordering: PASS_WITH_DEBT; current preview appears cleaned
+      for F48-F52, but final closure report must prove it remains canonical after
+      live UI repairs.
+
+
+      ### Finding Closure / Non-Intersection Register
+
+      - Findings 1-52 were reviewed against `web/tests/contracts/ui-remediation-contract-matrix.json`.
+
+      - F19 and F48-F52 had direct closure evidence.
+
+      - F2 was classified DRIFT.
+
+      - Remaining P0/P1/P2 findings were classified UNPROVEN or PARTIAL because definitions/static
+      evidence were not equivalent to full closure artifacts.
+
+
+      ### Remediation Ownership Created
+
+      Planner remediation was applied after this review, creating:
+
+      - `fuidcr-batched-architecture-blocker-remediation`
+
+      - `fuidcr-architecture-blocker-retest`
+
+
+      Planner also updated `fuidcr-final-design-conformance-gate` dependencies so
+      the final gate cannot run before the batched remediation and retest complete.
+
+
+      This review step is complete as a blocker-finding review; the phase remains
+      blocked until the created remediation path closes the findings.'
   - id: fuidcr-final-design-conformance-gate
     name: Final gate for full UI design conformance remediation
     status: pending
