@@ -21244,7 +21244,7 @@ phases:
       were used by worker.'
   - id: visual-parity-retest
     name: Visual Parity Retest
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -21342,3 +21342,5 @@ phases:
     depends_on:
     - visual-parity-remediation
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-10T08:41:06.836091+00:00'
