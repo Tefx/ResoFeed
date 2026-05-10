@@ -34050,3 +34050,130 @@ phases:
     - fuidcr-screenshot-first-uiux-audit
     - fuidcr-ui-preview-cleanup
     agent: software-architect
+  - id: fuidcr-final-design-conformance-gate
+    name: Final gate for full UI design conformance remediation
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches every user-visible UI surface and known output/formatting/focus
+      rework patterns.
+
+      - Phase includes integration-tagged shared Feed/Search and SourceLedger/StatePortability
+      repairs.
+
+      - Phase closes 52 audit findings including 13 P0 and 19 P1 obligations.
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the full-ui-design-conformance-remediation
+      phase meets the quality bar for completion.
+
+
+      YOU ARE THE QUALITY GATE. BLOCK progress if quality is insufficient.
+
+
+      FINAL ACCEPTANCE CRITERIA:
+
+      - All 52 audit findings are closed or have explicit non-blocking/non-intersection
+      rationale accepted by design/architecture review.
+
+      - P0/P1 findings have browser or DOM/behavior evidence, not prose-only closure.
+
+      - Feed/Search share feed-item anatomy where applicable.
+
+      - SourceLedger/StatePortability use canonical bracket action and DOM contracts.
+
+      - Inspector primary reading path is free of raw boilerplate/debug/model diagnostics
+      and original link navigates normally.
+
+      - Responsive breakpoint below 1080px is honored.
+
+      - /doctor and Search do not crop/break on narrow viewport.
+
+      - docs/ui-preview.html is cleaned after live UI contracts stabilize.
+
+      - No forbidden product concepts or runtime surfaces are introduced.
+
+
+      GATE MUST REVIEW:
+
+      1. fuidcr-contract-matrix-lock covers findings 1-52 exactly once.
+
+      2. fuidcr-expected-red-ui-tests exposed the pre-implementation gaps and were
+      converted to green by implementation evidence.
+
+      3. All implementation clusters provide rendered DOM/screenshot evidence and
+      preserve architecture constraints.
+
+      4. fuidcr-browser-regression-proof provides desktop/narrow screenshots, DOM/behavior
+      tests, responsive tests, and keyboard/focus checks.
+
+      5. fuidcr-screenshot-first-uiux-audit provides screenshot-first PASS/PASS_WITH_DEBT/FAIL
+      evidence.
+
+      6. fuidcr-software-architect-conformance-review verifies architecture basis
+      and no forbidden concepts.
+
+
+      Gate may OPEN only when each blocker-class behavioral obligation is PROVEN or
+      has explicit non-intersection evidence recorded in the proof register.'
+    verification: '- All phase steps completed with specific, verifiable evidence.
+
+      - Findings 1-52 are closed or have explicit accepted non-blocking/non-intersection
+      rationale.
+
+      - P0/P1 findings include browser/DOM/behavior or screenshot evidence.
+
+      - Browser regression proof and screenshot-first UIUX audit are PASS or PASS_WITH_DEBT
+      with no blocker-class debt.
+
+      - Software-architect review is OPEN/PASS and confirms no architecture/product-boundary
+      drift.
+
+      - No forbidden concepts or runtime surfaces were introduced.'
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: full-ui-design-conformance-remediation\n\
+      **Review depth**: THOROUGH\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
+      \ <reason>\"\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html\
+      \ — key passage or \"NOT READ: <reason>\"\n\n### Execution Review\n| Step ID\
+      \ | Status | Evidence Quality | Concerns |\n|---|---|---|---|\n\n### Finding\
+      \ Closure Register\n| Finding ID | Severity | Closure evidence | Browser/DOM/screenshot\
+      \ present? | Status |\n|---:|---|---|---|---|\n\n### Behavioral Proof Register\n\
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |\
+      \ status | closure_path | gate_decision_basis |\n|---|---|---|---|---|---|---|\n\
+      \n### Acceptance Criteria Checklist\n- [ ] All 52 findings closed or accepted\
+      \ non-blocking/non-intersecting.\n- [ ] P0/P1 closures have browser/DOM/behavior\
+      \ evidence.\n- [ ] Feed/Search share feed-item anatomy.\n- [ ] SourceLedger/StatePortability\
+      \ use canonical bracket action and DOM contracts.\n- [ ] Inspector primary reading\
+      \ path is free of raw boilerplate/debug/model diagnostics.\n- [ ] Original link\
+      \ navigates normally.\n- [ ] <1080px responsive breakpoint honored.\n- [ ] /doctor\
+      \ and Search do not crop/break on narrow viewport.\n- [ ] docs/ui-preview.html\
+      \ cleaned after live UI contracts stabilized.\n- [ ] No forbidden product concepts\
+      \ or runtime surfaces introduced.\n\n### Issues Identified\n| Severity | Description\
+      \ | Related Step | Blocking? |\n|---|---|---|---|\n\n### Gate Decision\n- [\
+      \ ] OPEN: Phase passes gate\n- [ ] BLOCKED: Issues must be resolved before proceeding\n\
+      \  - Blocking issues: <list>\n  - Required actions: <what needs to happen>\n"
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    - fuidcr-api-dto-escalation-guard
+    - fuidcr-style-breakpoint-foundation
+    - fuidcr-feed-search-anatomy
+    - fuidcr-inspector-reading-contract
+    - fuidcr-source-ledger-state-portability
+    - fuidcr-shell-owner-doctor-surfaces
+    - fuidcr-ui-preview-cleanup
+    - fuidcr-browser-regression-proof
+    - fuidcr-screenshot-first-uiux-audit
+    - fuidcr-software-architect-conformance-review
+    agent: gate-reviewer
