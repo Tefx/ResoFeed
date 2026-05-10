@@ -1,0 +1,88 @@
+{
+  "checks": [
+    {
+      "body": "{\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/ingest",
+      "status": 401
+    },
+    {
+      "body": "{\"error\":{\"code\":\"bad_request\",\"message\":\"bad request\",\"details\":{\"field\":\"unexpected\"}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/ingest?unexpected=1",
+      "status": 400
+    },
+    {
+      "body": "{\"error\":{\"code\":\"bad_request\",\"message\":\"bad request\",\"details\":{\"field\":\"body\"}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/ingest",
+      "status": 400
+    },
+    {
+      "body": "{\"operation\":\"ingest\",\"source_id\":null,\"completed\":true,\"sources_total\":0,\"sources_fetched\":0,\"items_discovered\":0,\"items_upserted\":0,\"errors\":[]}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/ingest",
+      "status": 200
+    },
+    {
+      "body": "{\"error\":{\"code\":\"not_found\",\"message\":\"not found\",\"details\":{\"id\":\"00000000-0000-0000-0000-000000000000\"}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/sources/00000000-0000-0000-0000-000000000000/fetch",
+      "status": 404
+    },
+    {
+      "body": "{\"imported\":1,\"skipped\":0,\"folders_flattened\":true}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/sources/import-opml",
+      "status": 200
+    },
+    {
+      "body": "{\"sources\":[{\"id\":\"src_c25a25125145dca88c8e4a62e5594868\",\"url\":\"http://127.0.0.1:58647/feed.xml\",\"title\":\"127.0.0.1:58647\",\"last_fetch_at\":null,\"last_fetch_status\":\"not_fetched\",\"is_active\":true,\"revision\":1}]}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "GET",
+      "path": "/api/sources",
+      "status": 200
+    },
+    {
+      "body": "{\"operation\":\"source_fetch\",\"source_id\":\"src_c25a25125145dca88c8e4a62e5594868\",\"completed\":true,\"sources_total\":1,\"sources_fetched\":1,\"items_discovered\":1,\"items_upserted\":1,\"errors\":[]}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/sources/src_c25a25125145dca88c8e4a62e5594868/fetch",
+      "status": 200
+    },
+    {
+      "body": "{\"error\":{\"code\":\"bad_request\",\"message\":\"bad request\",\"details\":{\"field\":\"unexpected\"}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/sources/src_c25a25125145dca88c8e4a62e5594868/fetch?unexpected=1",
+      "status": 400
+    },
+    {
+      "body": "{\"error\":{\"code\":\"bad_request\",\"message\":\"bad request\",\"details\":{\"field\":\"body\"}}}\n",
+      "content_type": "application/json; charset=utf-8",
+      "method": "POST",
+      "path": "/api/sources/src_c25a25125145dca88c8e4a62e5594868/fetch",
+      "status": 400
+    }
+  ],
+  "startup": {
+    "app_port": 58646,
+    "cmd": ".audit-artifacts/manual-rss-fetch/blind-liveness/resofeed-liveness-bin serve --addr 127.0.0.1:58646 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/manual-rss-fetch.blind-liveness/.audit-artifacts/manual-rss-fetch/blind-liveness/probe.sqlite3 --owner-token rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG",
+    "lsof_status": 0,
+    "lsof_stderr": "",
+    "lsof_stdout": "COMMAND     PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\nresofeed- 99083 tefx    6u  IPv4 0xb184ae411e7c9a90      0t0  TCP 127.0.0.1:58646 (LISTEN)\n",
+    "port_bound": true,
+    "process_exit_before_probe": null,
+    "rss_port": 58647,
+    "server_exit_after_terminate": 0,
+    "server_stderr": "",
+    "server_stdout": "owner token explicit: stored hash\nserving ResoFeed on 127.0.0.1:58646 (public-url http://127.0.0.1:58646)\nshutdown complete\n",
+    "source_id": "src_c25a25125145dca88c8e4a62e5594868"
+  }
+}
