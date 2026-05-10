@@ -32433,7 +32433,7 @@ phases:
     agent: gate-reviewer
 - id: full-ui-design-conformance-remediation
   name: Full UI Design Conformance Remediation
-  status: pending
+  status: in_progress
   gate: All 52 audit findings from docs/audits/full-ui-design-conformance-audit-2026-05-11.md
     are closed or have explicit accepted non-blocking/non-intersection rationale;
     P0/P1 findings have browser or DOM/behavior evidence; Feed/Search share anatomy;
@@ -32448,7 +32448,7 @@ phases:
   steps:
   - id: fuidcr-contract-matrix-lock
     name: Lock UI audit contract matrix for findings 1-52
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -32563,6 +32563,8 @@ phases:
 
       '
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T17:20:09.117381+00:00'
   - id: fuidcr-expected-red-ui-tests
     name: Add expected-red browser and DOM tests for all audit findings
     status: pending
