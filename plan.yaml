@@ -29078,7 +29078,7 @@ phases:
       step.'
   - id: clean-inspector-primary-body-implementation
     name: Clean Inspector primary body content path
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -29276,6 +29276,8 @@ phases:
     depends_on:
     - expected-red-inspector-readable-body-regression
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T14:12:34.753527+00:00'
   - id: retest-clean-inspector-primary-body
     name: Retest clean Inspector primary body regression
     status: pending
