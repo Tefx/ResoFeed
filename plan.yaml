@@ -29892,3 +29892,106 @@ phases:
     depends_on:
     - inspector-readable-content-gate
     agent: frontend-engineer
+  - id: retest-generalized-inspector-primary-body-sanitation
+    name: Retest generalized Inspector primary-body sanitation
+    status: pending
+    description: 'Independent retest for residual Inspector primary-body sanitation
+      remediation.
+
+
+      Issue context:
+
+      - `inspector-readable-content-gate` reported semantic PASS_WITH_DEBT because
+      `web/src/routes/components/Inspector.svelte:112-114` used fixture-specific guards.
+
+      - The fix step must remove or generalize those guards while preserving the original
+      user bug closure: screenshot-family forbidden strings and other garbage must
+      not appear in the Inspector primary body.
+
+
+      Retest scope:
+
+      - Rerun the web check/build required for this Svelte/frontend change.
+
+      - Rerun the targeted Playwright suite that covers Inspector readable body behavior.
+
+      - Run Go tests only if backend files were touched by the fix.
+
+      - Inspect product code/diff to prove the fixture-specific guard was removed
+      or generalized.
+
+
+      This is a post-implementation retest. expected_result: green.'
+    verification: '- Web check/build is rerun and passes for the frontend change.
+
+      - Targeted Playwright Inspector readable-content suite is rerun and passes.
+
+      - If backend files were touched, relevant Go tests are rerun and pass; if not,
+      evidence explicitly states backend untouched and Go tests not required.
+
+      - Code/diff evidence shows no fixture-specific product-code guard remains for
+      the screenshot-family strings reported by `inspector-readable-content-gate`.
+
+      - Runtime/test evidence proves screenshot-family forbidden strings still cannot
+      appear in Inspector primary body.
+
+      - Behavioral proof register includes requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for the original
+      user bug and this residual debt.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Retest Closure Fields
+
+      - issue_source: `inspector-readable-content-gate` PASS_WITH_DEBT fixture-specific
+      guard warning
+
+      - fix_step_reviewed: `generalize-inspector-primary-body-sanitation`
+
+      - changed_files: <list>
+
+      - backend_touched: YES/NO
+
+      - web_check_build_command: <exact command>
+
+      - web_check_build_result: PASS/FAIL with output excerpt
+
+      - go_test_command_if_backend_touched: <exact command or NOT RUN: backend untouched>
+
+      - playwright_command: <exact targeted Playwright command>
+
+      - playwright_result: PASS/FAIL with output excerpt
+
+      - fixture_specific_guard_absent: YES/NO with grep/search evidence
+
+      - screenshot_family_forbidden_strings_absent_from_primary_body: YES/NO with
+      runtime/test evidence
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | original user bug / inspector readable primary body | Primary body excludes
+      raw screenshot-family garbage and remains readable | Targeted Playwright evidence
+      | <artifact/command> | PROVEN/UNPROVEN | <if unresolved, remediation path> |
+      <OPEN/BLOCK basis> |
+
+      | residual gate debt | Product code uses generalized sanitation, not fixture-specific
+      string guards | Code/diff search plus targeted runtime proof | <artifact/command>
+      | PROVEN/UNPROVEN | <if unresolved, remediation path> | <OPEN/BLOCK basis> |
+
+      '
+    depends_on:
+    - generalize-inspector-primary-body-sanitation
+    agent: integration-verifier
