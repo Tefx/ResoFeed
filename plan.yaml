@@ -32806,7 +32806,7 @@ phases:
       - none; no files changed.'
   - id: final-gate
     name: Final gate for owner-token offline reset
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -32928,6 +32928,8 @@ phases:
     - integration-verification
     - spec-architecture-drift-review
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-10T18:28:18.380423+00:00'
 - id: full-ui-design-conformance-remediation
   name: Full UI Design Conformance Remediation
   status: in_progress
