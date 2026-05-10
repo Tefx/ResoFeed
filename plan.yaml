@@ -25229,6 +25229,7 @@ phases:
     depends_on:
     - playwright-repair-verification
     - blind-runtime-browser-ux-verification
+    - retest-blind-dirty-jsonld-inspector
     agent: uiux-auditor
   - id: gate
     name: Gate complete UI regression test plan and repair phase
