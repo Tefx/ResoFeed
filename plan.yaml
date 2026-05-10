@@ -32167,3 +32167,141 @@ phases:
     depends_on:
     - complete-cli-reset
     agent: integration-verifier
+  - id: spec-architecture-drift-review
+    name: Spec and architecture drift review for owner-token reset
+    status: pending
+    description: 'step_type: review
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As software-architect, perform the final spec/architecture review before the
+      gate. This is read-only review of the completed implementation and evidence.
+
+
+      Review objectives:
+
+      - Confirm implementation preserves the architecture direction from commit ab5526b
+      and does not reinterpret the offline reset as an online/admin/settings feature.
+
+      - Confirm the single deployable remains one Go binary (`cmd/resofeed`) with
+      no sidecar worker/admin process.
+
+      - Confirm minimal flat-file shape remains intact; no service/repository/DI/event-bus
+      layering was introduced.
+
+      - Confirm reset is CLI-only and offline, deletes only `runtime_metadata.key=''owner_token_sha256''`,
+      and does not start server, bind HTTP/MCP, run UI, resolve LLM secrets, or generate/print/accept/store
+      replacement plaintext.
+
+      - Confirm replacement token remains exclusively owned by existing `serve` startup
+      paths.
+
+      - Confirm no accounts/OAuth/per-agent registry/sync/settings-heavy flow was
+      added.
+
+      - Confirm browser localStorage clearing remains client-local only and cannot
+      mutate SQLite.
+
+
+      Gate decision basis required:
+
+      - Map each acceptance criterion to implementation evidence and integration evidence.
+
+      - Mark unresolved behavioral obligations as PROVEN, NEEDS_TEST, UNPROVEN, or
+      explicit non-intersection.
+
+      - A gate may open only when blocker-class obligations are PROVEN or have explicit
+      non-intersection evidence.
+
+
+      spec_refs: docs/ARCHITECTURE.md lines 12-19, 69-86, 111-135, 160-186, 329-359,
+      1056-1057, 1092-1106; docs/USAGE.md lines 118-143; AGENTS.md sections 1-7; .agents/instructions.md
+      sections 1-7.
+
+      touch_paths: review cmd/resofeed/main.go, internal/resofeed/db.go, internal/resofeed/http.go,
+      internal/resofeed/mcp.go, web localStorage owner-token code, added tests.
+
+      harness_refs: evidence from owner-token-offline-reset.cli-liveness-probe and
+      owner-token-offline-reset.integration-verification.
+
+      agent_source: project'
+    verification: 'phase-check protecting final gate: software-architect verifies
+      no architecture drift, no forbidden surfaces, no runtime/deployability regression,
+      and a complete gate decision basis for the CLI/auth boundary.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec / Architecture Drift Review
+
+      **Reviewer**: software-architect
+
+
+      ### Acceptance Mapping
+
+      | AC | Evidence reviewed | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | 1 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 2 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 3 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 4 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 5 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 6 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 7 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+      | 8 |  | PROVEN/NEEDS_TEST/UNPROVEN |  |
+
+
+      ### Architecture Drift Checklist
+
+      - One Go binary preserved:
+
+      - One SQLite DB preserved:
+
+      - Minimal flat-file shape preserved:
+
+      - No HTTP/MCP/UI reset surface:
+
+      - No `serve --reset-owner-token` flag:
+
+      - No accounts/OAuth/per-agent registry/sync/settings-heavy flow:
+
+      - Reset does not resolve LLM secrets or start runtime:
+
+
+      ### Gate Decision Basis
+
+      - OPEN/BLOCK recommendation:
+
+      - Blocking unresolved obligations:
+
+      - Non-intersection evidence for any unresolved non-blockers:'
+    depends_on:
+    - complete-cli-reset
+    - cli-liveness-probe
+    - integration-verification
+    agent: software-architect
