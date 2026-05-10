@@ -32305,3 +32305,127 @@ phases:
     - cli-liveness-probe
     - integration-verification
     agent: software-architect
+  - id: final-gate
+    name: Final gate for owner-token offline reset
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches CLI/auth boundary and SQLite runtime credential metadata.
+
+      - Phase introduces a runnable CLI subcommand and must prove CLI executability.
+
+      - Architecture forbids online/admin/settings reset surfaces and layered service
+      drift.
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the owner-token-offline-reset
+      phase meets the quality bar for release.
+
+
+      YOU ARE THE QUALITY GATE. Block progress if evidence is incomplete, if reset
+      can mutate any state beyond `runtime_metadata.owner_token_sha256`, if reset
+      prints/generates/accepts replacement plaintext, if forbidden HTTP/MCP/UI/serve
+      reset surfaces exist, or if the implementation drifts from ResoFeed''s single-binary/minimal-flat-file
+      architecture.
+
+
+      Required review criteria:
+
+      1. All phase steps completed and evidence is specific/verifiable.
+
+      2. Contract-first sequence was followed: contract lock → expected-red tests
+      → implementation → independent verification/review.
+
+      3. CLI executability evidence is present from black-box liveness probe.
+
+      4. Integration evidence proves all eight acceptance criteria.
+
+      5. Software-architect review maps acceptance criteria to evidence and reports
+      no blocking drift.
+
+      6. No unresolved behavioral/runtime proof obligations remain without explicit
+      non-intersection evidence.
+
+      7. Docs remain the authoritative source; implementation matches docs/ARCHITECTURE.md
+      and docs/USAGE.md.
+
+
+      Gate decision basis MUST include:
+
+      - requirement/proof-obligation refs;
+
+      - evidence refs reviewed;
+
+      - unresolved statuses (`NEEDS_TEST`, `UNPROVEN`, `UNCERTAIN_BLOCKING`);
+
+      - why each unresolved item blocks or does not intersect remaining release gates;
+
+      - final OPEN/BLOCK recommendation.
+
+
+      spec_refs: docs/ARCHITECTURE.md owner-token reset contract; docs/USAGE.md owner
+      token reset; AGENTS.md and .agents/instructions.md invariants.
+
+      touch_paths: read-only review of all phase outputs and evidence.
+
+      harness_refs: expected-red tests, CLI liveness probe, integration verification,
+      spec/architecture drift review.
+
+      agent_source: project'
+    verification: 'phase-check gate protecting release readiness:
+
+      - All phase steps have complete refs-confirmed evidence.
+
+      - Reset CLI removes only `runtime_metadata.owner_token_sha256` and leaves all
+      other state unchanged.
+
+      - Missing confirmation and invalid DB paths are safe/non-mutating.
+
+      - Reset output contains no generated replacement token and no `rfeed_`.
+
+      - Existing post-reset serve auto-generation and explicit-token paths are proven
+      unchanged.
+
+      - No HTTP route, MCP reset tool/resource, Settings/UI reset control, or `serve
+      --reset-owner-token` exists.
+
+      - Browser localStorage clearing remains client-local only.
+
+      - CLI executability evidence includes exact command, exit code, stdout/stderr,
+      and SQLite before/after proof.
+
+      - Architecture drift checks pass for single binary, one SQLite DB, no sidecar/admin
+      process, and minimal flat-file shape.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/USAGE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n- .agents/instructions.md — key passage or \"NOT READ: <reason>\"\
+      \n\nIf no refs were provided, state: \"No refs for this step.\"\n\n## Gate Review\
+      \ Report\n**Reviewer**: gate-reviewer (independent of phase implementation)\n\
+      **Phase**: owner-token-offline-reset\n\n### Execution Review\n| Step ID | Status\
+      \ | Evidence Quality | Concerns |\n| --- | --- | --- | --- |\n| contract-lock\
+      \ |  |  |  |\n| expected-red-tests |  |  |  |\n| complete-cli-reset |  |  |\
+      \  |\n| cli-liveness-probe |  |  |  |\n| integration-verification |  |  |  |\n\
+      | spec-architecture-drift-review |  |  |  |\n\n### Acceptance Criteria Decision\
+      \ Basis\n| AC | Requirement ref | Evidence ref | Status | Blocks? | Notes |\n\
+      | --- | --- | --- | --- | --- | --- |\n\n### Architecture / Forbidden Surface\
+      \ Check\n- Single binary / no sidecar:\n- One SQLite DB / no sync or service\
+      \ layer:\n- CLI-only offline reset:\n- No HTTP/MCP/UI reset surface:\n- No `serve\
+      \ --reset-owner-token`:\n- No replacement plaintext in reset path:\n\n### Gate\
+      \ Decision\n- [ ] OPEN: Phase passes gate, proceed to release handling\n- [\
+      \ ] BLOCKED: Issues must be resolved before proceeding\n  - Blocking issues:\n\
+      \  - Required actions:"
+    depends_on:
+    - contract-lock
+    - expected-red-tests
+    - complete-cli-reset
+    - cli-liveness-probe
+    - integration-verification
+    - spec-architecture-drift-review
+    agent: gate-reviewer
