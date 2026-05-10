@@ -31705,7 +31705,7 @@ phases:
       the not-implemented stub and leaves seeded hash unchanged.'
   - id: expected-red-tests
     name: Add expected-red tests for offline reset contract
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -31823,6 +31823,44 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-10T17:26:35.554294+00:00'
+    done_at: '2026-05-10T17:34:18.290359+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — Read\
+      \ owner-token reset contract: CLI-only `resofeed owner-token reset --db PATH\
+      \ --confirm-reset`, deletes only `runtime_metadata.key='owner_token_sha256'`,\
+      \ no replacement token, no HTTP/MCP/UI reset surface.\n- docs/USAGE.md — Read\
+      \ usage covering lost-token recovery, exact reset command shape, no generated\
+      \ replacement during reset, and browser `localStorage['resofeed.ownerToken']`\
+      \ clearing as client-local only.\n- AGENTS.md — NOT READ: absent from isolated\
+      \ worktree at `.vectl/worktrees/expected-red-tests/AGENTS.md`; equivalent project\
+      \ instructions were present in dispatch context and `.agents/instructions.md`\
+      \ was read.\n- .agents/instructions.md — Read sections 2 and 4: one Go binary/one\
+      \ SQLite/minimal flat files, single owner-token boundary, no accounts/per-agent\
+      \ registry.\n\n## Expected-Red Test Evidence\nstep_intent: test_define_red\n\
+      expected_result: red\nobserved_result: red\nfailure_alignment: matches documented\
+      \ missing behavior; failures expose contract stub `owner_token_reset_not_implemented`\
+      \ instead of deleting only the owner-token hash, validating DB paths, and enabling\
+      \ subsequent serve startup token resolution.\nverdict: PASS\nblockers: []\n\
+      product_implementation_files_modified: false\n- Test files changed:\n  - internal/resofeed/owner_token_reset_expected_red_test.go\n\
+      - Product files changed, if any (must be contract stubs only):\n  - none\n-\
+      \ Commands run:\n  - Subagent: `gofmt -w internal/resofeed/owner_token_reset_expected_red_test.go`\
+      \ — exit 0\n  - Subagent: `go test ./internal/resofeed -run 'TestExpectedRedOwnerTokenReset|TestExpectedRedServeAfterReset|TestExpectedRedBrowser|TestExpectedRedNo|TestExpectedRedMCP'`\
+      \ — exit 1 expected red\n  - Orchestrator mainline expected-red verification\
+      \ after squash merge: same `go test` command — exit 1 expected red; failures\
+      \ are `owner_token_reset_not_implemented` for reset deletion/invalid DB/serve-after-reset\
+      \ cases.\n- Expected failures / exposed gaps:\n  - `TestExpectedRedOwnerTokenResetDeletesOnlyOwnerTokenHash`:\
+      \ reset exits 1 with `owner_token_reset_not_implemented`, expected success and\
+      \ deletion of only `owner_token_sha256`.\n  - `TestExpectedRedOwnerTokenResetInvalidDBPathDoesNotCreateProductState`:\
+      \ reset returns stub error instead of terse `invalid_db`.\n  - `TestExpectedRedServeAfterResetWithoutOwnerTokenGeneratesAndStoresNewHash`:\
+      \ reset stub prevents exercising next-start auto-generation.\n  - `TestExpectedRedServeAfterResetWithExplicitOwnerTokenStoresExplicitHash`:\
+      \ reset stub prevents explicit replacement startup flow.\n- Confirmation at\
+      \ least one fixture uses exact documented CLI format:\n  - yes: `Main([]string{\"\
+      owner-token\", \"reset\", \"--db\", dbPath, \"--confirm-reset\"}, ...)`\n- Downstream\
+      \ implementation owner: owner-token-offline-reset.complete-cli-reset\n\n## Files\
+      \ changed\n- internal/resofeed/owner_token_reset_expected_red_test.go\n\n##\
+      \ Commit hash(es)\n- Worktree commit: 447d40fb1c04f3ddac935f05aa8583412dd4adc0\n\
+      - Mainline squash commit: 2bcab27 [vectl] step-expected-red-tests completed\n\
+      \n## Gaps/Notes\n- Expected red accepted: product implementation files were\
+      \ not modified, and the red failures match the declared pre-implementation gap."
   - id: complete-cli-reset
     name: Complete CLI-only offline reset implementation
     status: pending
