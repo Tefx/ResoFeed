@@ -22782,3 +22782,102 @@ phases:
     - playwright-comprehensive-e2e.core-feed-browser-flows
     - playwright-comprehensive-e2e.llm-deterministic-failure-flows
     agent: integration-verifier
+  - id: playwright-comprehensive-e2e.visual-ux-artifact-audit
+    name: Visual and UX Invariant Audit from Playwright Artifacts
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      Independence Level: L1
+
+
+      As an independent UI/UX auditor, review Playwright artifacts from the browser
+      E2E flows against docs/DESIGN.md and docs/ui-preview.html.
+
+
+      Required checks:
+
+      - Functional labels such as RESOFEED, TODAY, SOURCE LEDGER, INSPECTOR, and /doctor
+      remain aligned with the design sources where applicable.
+
+      - First-use empty state and owner token prompt match the defined UX direction;
+      no onboarding wizard or SaaS/mascot/AI-magic palette is introduced.
+
+      - Dense but legible archival-index visual character is preserved.
+
+      - Source Ledger, manual fetch controls, today/feed, inspect/retrieve/search,
+      and LLM failure/success states have screenshots or trace snapshots.
+
+      - Evidence must include rendered browser artifacts, not only DOM assertions
+      or unit test output.
+
+
+      Downstream gate protected: playwright-comprehensive-e2e.gate. Findings are valuable;
+      blockers must be explicit with artifact refs.'
+    verification: '- Review uses Playwright screenshots/videos/traces from real browser
+      runs.
+
+      - Visual/UX invariants from DESIGN.md and ui-preview are mapped to artifact
+      refs.
+
+      - Report distinguishes blockers from non-blocking suggestions and includes a
+      PASS/PASS_WITH_DEBT/FAIL headline.
+
+      - Missing artifact coverage for required states is a blocker-class gap for the
+      phase gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Native Multimodal UI/UX Audit Evidence
+
+      **Artifacts reviewed**:
+
+      - Screenshots:
+
+      - Videos:
+
+      - Traces:
+
+
+      **State coverage**:
+
+      - First-use empty state / owner token:
+
+      - Source Ledger:
+
+      - Manual ingest/fetch controls:
+
+      - Today/feed:
+
+      - Inspector/retrieve/search:
+
+      - LLM failure/success/skip:
+
+
+      **Invariant assessment**:
+
+      | Invariant | Artifact ref | Verdict | Notes |
+
+      |---|---|---|---|
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - playwright-comprehensive-e2e.core-feed-browser-flows
+    - playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    - playwright-comprehensive-e2e.llm-live-smoke-boundary
+    - playwright-comprehensive-e2e.api-mcp-parity-probes
+    agent: uiux-auditor
