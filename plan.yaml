@@ -37787,3 +37787,212 @@ phases:
     depends_on:
     - fuidcr-batched-architecture-blocker-remediation
     agent: software-architect
+  - id: fuidcr-post-remediation-screenshot-uiux-audit
+    name: Post-remediation screenshot-first UIUX conformance audit
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      Independence Level: L2
+
+      refs:
+
+      - docs/DESIGN.md
+
+      - docs/ui-preview.html
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json
+
+      - <closure register produced by fuidcr-batched-architecture-blocker-remediation>
+
+      - <browser/DOM/visual artifacts produced by fuidcr-batched-architecture-blocker-remediation>
+
+      spec_refs:
+
+      - docs/DESIGN.md — canonical UI/design contract and visual/product-surface authority
+
+      - docs/ui-preview.html — canonical preview reference that must remain aligned
+      after remediation
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — authoritative findings
+      1-52 matrix substitute for this remediation loop
+
+      touch_paths:
+
+      - read-only review of docs/DESIGN.md
+
+      - read-only review of docs/ui-preview.html
+
+      - read-only review of closure register and archived browser/DOM/visual artifacts
+
+      - optional generated audit artifacts under web/test-results/** or Playwright
+      artifact output
+
+
+      As uiux-auditor, perform a downstream native multimodal screenshot-first UI/UX
+      conformance audit AFTER fuidcr-batched-architecture-blocker-remediation.
+
+
+      This audit exists because the previous fuidcr-screenshot-first-uiux-audit completed
+      before the new architecture-blocker remediation. Its evidence cannot validate
+      post-remediation UI, docs/ui-preview.html, or closure-register changes.
+
+
+      SCOPE:
+
+      - Compare the post-remediation rendered UI against docs/DESIGN.md.
+
+      - Compare docs/ui-preview.html against the post-remediation live UI contracts
+      and closure register.
+
+      - Verify the closure register''s UI/UX claims are supported by actual screenshots/images/terminal
+      captures or equivalent visual/spatial artifacts.
+
+      - Focus on all matrix findings affected by fuidcr-batched-architecture-blocker-remediation,
+      including F2, F4, F48-F52, all P0/P1 rows, and any finding whose evidence path
+      was changed.
+
+
+      REQUIRED VISUAL/ARTIFACT STATES:
+
+      - Shell/chrome/peer navigation evidence proving no forbidden persistent dashboard/tab/sidebar
+      surface drift unless an explicit accepted amendment/non-intersection is recorded.
+
+      - Desktop and narrow/mobile rendered evidence for Feed/Search anatomy, Inspector
+      reading path, Source Ledger/State Portability actions, Owner Token Prompt, /doctor,
+      focus/accent/button leakage, and preview parity.
+
+      - Closure-register rows for all P0/P1 findings cross-checked against concrete
+      visual/browser/DOM artifacts.
+
+      - docs/ui-preview.html F48-F52 proof cross-checked against current live UI contracts
+      after remediation.
+
+
+      AUDIT DECISION RULE:
+
+      - P0/P1 findings require screenshot/browser/DOM evidence or explicit accepted
+      non-intersection/amendment evidence to close.
+
+      - PASS is allowed only if post-remediation visual evidence supports the closure
+      register and no UI/UX blocker remains.
+
+      - PASS_WITH_DEBT is allowed only for non-blocking debt with explicit non-intersection
+      against fuidcr-final-design-conformance-gate.
+
+      - FAIL must include blocker_id, affected matrix IDs, screenshot/artifact path
+      or missing-artifact note, selector/state, and required remediation.
+
+
+      Gate decision basis is mandatory: every NEEDS_TEST, UNPROVEN, UNCERTAIN_BLOCKING,
+      or BLOCKED UI/UX obligation must state whether it blocks fuidcr-final-design-conformance-gate
+      and why.'
+    verification: '- Screenshot-first audit runs after fuidcr-batched-architecture-blocker-remediation
+      and reviews post-remediation artifacts, not pre-remediation evidence only.
+
+      - Audit compares rendered screenshots/images/terminal captures or equivalent
+      visual/spatial artifacts against docs/DESIGN.md, docs/ui-preview.html, and the
+      closure register.
+
+      - All P0/P1 UI/UX claims in the closure register have concrete browser/DOM/visual
+      evidence or explicit accepted non-intersection/amendment authority.
+
+      - F2, F4, and F48-F52 are explicitly checked for post-remediation semantic alignment
+      and preview parity.
+
+      - Auditor emits parseable PASS, PASS_WITH_DEBT, or FAIL headline.
+
+      - Any unresolved UI/UX behavioral/runtime evidence has explicit remediation/retest
+      or non-intersection closure path before the final gate.'
+    evidence_template: '## Post-Remediation UIUX Audit Report
+
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Post-remediation screenshot-first UIUX conformance
+
+      **Independence Level**: L2
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — key passage or "NOT
+      READ: <reason>"
+
+      - <closure register produced by fuidcr-batched-architecture-blocker-remediation>
+      — key passage or "NOT READ: <reason>"
+
+      - <browser/DOM/visual artifacts produced by fuidcr-batched-architecture-blocker-remediation>
+      — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Artifact Register
+
+      | Surface / Finding Range | Viewport / State | Artifact Path | Closure Register
+      Rows Checked | Verdict |
+
+      | --- | --- | --- | --- | --- |
+
+      | <surface> | <state> | <path> | <IDs> | PASS/PASS_WITH_DEBT/FAIL |
+
+
+      ## Design Conformance Findings
+
+      | Finding ID | Design / Preview Requirement | Evidence Path | Verdict | Notes
+      |
+
+      | --- | --- | --- | --- | --- |
+
+
+      ## Required Explicit Checks
+
+      - F2 product-surface/navigation drift: PASS/PASS_WITH_DEBT/FAIL with evidence
+      or accepted authority.
+
+      - F4 responsive breakpoint semantics: PASS/PASS_WITH_DEBT/FAIL with evidence.
+
+      - F48-F52 docs/ui-preview.html parity: PASS/PASS_WITH_DEBT/FAIL with evidence.
+
+      - P0/P1 visual evidence coverage: <covered>/<total>, with gaps listed.
+
+
+      ## Gate Decision Basis
+
+      | Obligation | Status | Evidence Ref | Closure Path | Blocks fuidcr-final-design-conformance-gate?
+      |
+
+      | --- | --- | --- | --- | --- |
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL
+
+
+      ## Blockers if FAIL
+
+      | Blocker ID | Affected Finding IDs | Missing / Contradictory Evidence | Required
+      Remediation |
+
+      | --- | --- | --- | --- |
+
+      '
+    depends_on:
+    - fuidcr-batched-architecture-blocker-remediation
+    agent: uiux-auditor
