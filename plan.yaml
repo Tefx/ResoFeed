@@ -29429,3 +29429,129 @@ phases:
     depends_on:
     - clean-inspector-primary-body-implementation
     agent: integration-verifier
+  - id: inspector-readable-content-gate
+    name: Gate clean Inspector readable content remediation
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - User-reported post-completion UI regression with screenshot evidence.
+
+      - Phase touches visible Inspector reading copy and prior dirty-content protections.
+
+      - Gate must adversarially reject raw source/diagnostic leaks in primary body.
+
+
+      As an INDEPENDENT REVIEWER, assess whether the Inspector readable-content remediation
+      meets the quality bar for closing the user-reported bug.
+
+
+      Gate focus:
+
+      1. Clean primary body: the exact screenshot-family strings and sibling raw source/boilerplate
+      cannot appear in Inspector primary reading copy.
+
+      2. Controlled fallback: if extraction cannot produce clean readable text, primary
+      body shows controlled fallback copy such as `summary unavailable`, not raw page
+      source.
+
+      3. Diagnostic isolation: `model_latency_error`, provenance, JSON-LD, and extraction
+      diagnostics do not render as article body text.
+
+      4. DESIGN.md compliance: right Inspector panel remains dense, legible, functional,
+      and does not use AI-magic/friendly SaaS copy or broad redesign.
+
+      5. Architecture compliance: no vector DB, embeddings, RAG, extra services, sidecar
+      workers, sync/merge concepts, or new product concepts were introduced.
+
+      6. Prior UI repair non-regression: SOURCE LEDGER clickability, hover/selected
+      state, keyboard/a11y repair, and existing dirty JSON-LD Inspector protections
+      remain covered.
+
+
+      Gate Preview (blocking conditions):
+
+      - Any occurrence of `function OptanonWrapper()`, CSS variable/custom property
+      text, `<script`/`<style` body text, obvious navigation/menu boilerplate, or
+      `model_latency_error` inside Inspector primary body.
+
+      - Evidence that only checks a mock/view model but not real rendered browser
+      text.
+
+      - Missing web check/build or targeted Playwright evidence without explicit non-intersection.
+
+      - Any unresolved behavioral proof register item with status NEEDS_TEST, UNPROVEN,
+      or UNCERTAIN_BLOCKING and no closure path.
+
+      - UI copy/layout that violates DESIGN.md tone or prior repair expectations.
+
+
+      This gate covers the required downstream UI/UX audit for this minimal remediation:
+      it must review rendered browser artifacts or screenshots/test artifacts and
+      explicitly compare them to DESIGN.md Inspector expectations.'
+    verification: 'Verification scope: phase-check gate protecting completion of inspector-readable-content-remediation.
+
+      - All phase steps completed and evidence includes refs read confirmation.
+
+      - The expected-red/regression test captures the screenshot bug with polluted
+      fixture content.
+
+      - Retest evidence includes web check/build and targeted Playwright output, plus
+      rendered Inspector primary body sample.
+
+      - Adversarial string audit proves `function OptanonWrapper()`, CSS variables/custom
+      properties, script/style bodies, navigation boilerplate, and `model_latency_error`
+      are absent from primary body.
+
+      - DESIGN.md compliance is explicitly reviewed against rendered artifacts for
+      the Inspector panel.
+
+      - Prior UI repair coverage did not regress or any not-run item has explicit
+      non-intersection accepted by the gate.
+
+      - Gate decision basis maps all blocker-class behavioral obligations to PROVEN
+      or explicit non-intersection; otherwise BLOCK.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n## Gate Review Report\n\n**Reviewer**: gate-reviewer\
+      \ (independent of implementation)\n**Phase**: inspector-readable-content-remediation\n\
+      **Timestamp**: <ISO 8601>\n\n### Step Evidence Review\n| Step ID | Status |\
+      \ Evidence Quality | Concerns |\n| --- | --- | --- | --- |\n| expected-red-inspector-readable-body-regression\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| clean-inspector-primary-body-implementation\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| retest-clean-inspector-primary-body\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n### Adversarial\
+      \ Primary Body String Audit\n| Forbidden content | Evidence reviewed | In primary\
+      \ body? | Gate result |\n| --- | --- | --- | --- |\n| `function OptanonWrapper()`\
+      \ | <artifact/ref> | YES/NO | PASS/BLOCK |\n| CSS variables/custom properties\
+      \ | <artifact/ref> | YES/NO | PASS/BLOCK |\n| script/style body text | <artifact/ref>\
+      \ | YES/NO | PASS/BLOCK |\n| navigation/menu boilerplate | <artifact/ref> |\
+      \ YES/NO | PASS/BLOCK |\n| `model_latency_error` | <artifact/ref> | YES/NO |\
+      \ PASS/BLOCK |\n\n### DESIGN.md / UI Evidence\n- Rendered artifact(s) reviewed:\
+      \ <screenshot/trace/output paths>\n- Dense but legible Inspector reading copy:\
+      \ PASS/FAIL\n- Controlled fallback acceptable and non-magical: PASS/FAIL\n-\
+      \ Diagnostics/provenance visually isolated from primary text: PASS/FAIL\n\n\
+      ### Architecture Guardrail Review\n- No vector DB / embeddings / RAG / extra\
+      \ service / sidecar: PASS/FAIL\n- No broad redesign or forbidden product concepts:\
+      \ PASS/FAIL\n\n### Prior UI Repair Non-Regression\n- SOURCE LEDGER clickability:\
+      \ PASS/FAIL/NOT RUN + accepted reason\n- Hover/selected state: PASS/FAIL/NOT\
+      \ RUN + accepted reason\n- Keyboard/a11y repair: PASS/FAIL/NOT RUN + accepted\
+      \ reason\n- Existing dirty JSON-LD Inspector protection: PASS/FAIL/NOT RUN +\
+      \ accepted reason\n\n### Gate Decision Basis\n| requirement_ref | evidence_ref\
+      \ | unresolved_status | blocks_remaining_work? | rationale |\n| --- | --- |\
+      \ --- | --- | --- |\n| <ref> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | YES/NO | <why> |\n\n### Gate Decision\n- [ ] OPEN: Bug remediation is complete\
+      \ and no blocker-class evidence gaps remain.\n- [ ] BLOCKED: Required fixes/retests\
+      \ before closure:\n  - <list blockers>\n"
+    depends_on:
+    - expected-red-inspector-readable-body-regression
+    - clean-inspector-primary-body-implementation
+    - retest-clean-inspector-primary-body
+    agent: gate-reviewer
