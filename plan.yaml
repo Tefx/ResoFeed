@@ -31550,7 +31550,7 @@ phases:
       \ blocker, should-fix, NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item remains."
 - id: owner-token-offline-reset
   name: Owner Token Offline Reset
-  status: in_progress
+  status: done
   gate: CLI-only offline owner-token reset satisfies docs/ARCHITECTURE.md and docs/USAGE.md
     without introducing HTTP/MCP/UI reset surfaces or changing serve token replacement
     semantics.
@@ -32806,7 +32806,7 @@ phases:
       - none; no files changed.'
   - id: final-gate
     name: Final gate for owner-token offline reset
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -32930,6 +32930,189 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T18:28:18.380423+00:00'
+    done_at: '2026-05-10T18:35:54.327358+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — READ. Key insight: owner-token reset is CLI-only, offline,
+      requires `--db` and `--confirm-reset`, deletes only `runtime_metadata.key=''owner_token_sha256''`,
+      must not generate/print/accept replacement plaintext, and must not expose HTTP/MCP/UI/`serve
+      --reset-owner-token` surfaces.
+
+      - docs/USAGE.md — READ. Key insight: user contract repeats lost-token recovery
+      flow and states browser `localStorage[''resofeed.ownerToken'']` deletion is
+      client-local only.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree at `.vectl/worktrees/final-gate/AGENTS.md`.
+
+      - .agents/instructions.md — READ. Key insight: preserve one binary, one SQLite
+      DB, owner-token boundary, flat `internal/resofeed` shape, and no vectl direct
+      edits.
+
+
+      ## Gate Review Report
+
+      Headline: PASS. Blocking Status: CLOSED. Proof-Gap Status: NONE.
+
+
+      Independent review basis:
+
+      - Reviewed implementation, tests, HTTP/MCP/frontend surfaces, and required docs
+      directly.
+
+      - Verified reset implementation at `internal/resofeed/db.go:65-70`, `96-149`,
+      `152-178`.
+
+      - Verified serve replacement path remains in `ResolveOwnerToken` at `internal/resofeed/db.go:386-418`.
+
+      - Verified HTTP router has no reset route in `internal/resofeed/http.go:238-300`.
+
+      - Verified MCP tools/resources list contains only expected operations in `internal/resofeed/mcp.go:608-661`.
+
+      - Verified frontend localStorage handling is client-local in `web/src/routes/+page.svelte:31`,
+      `88-100`; API client has no reset method/path in `web/src/lib/api-client.ts:96-207`.
+
+
+      ### Wiring audit
+
+      - W1 CLI root dispatch: PASS. `Main` recognizes only `serve` and `owner-token`
+      (`internal/resofeed/db.go:31-74`).
+
+      - W2 parser/grammar: PASS. `owner-token reset` requires `--db` and `--confirm-reset`;
+      extra args rejected (`internal/resofeed/db.go:96-140`).
+
+      - W3 handler: PASS. `runOwnerTokenReset` calls only `resetOwnerTokenHash` and
+      returns no stdout (`internal/resofeed/db.go:143-149`).
+
+      - W4 SQLite mutation: PASS. SQL is exactly `delete from runtime_metadata where
+      key = ''owner_token_sha256''` (`internal/resofeed/db.go:175`).
+
+      - W5 invalid/missing confirmation safety: PASS. Parser rejects missing confirmation
+      before DB helper; invalid DB path errors before creating missing DB in black-box
+      smoke.
+
+      - W6 serve replacement paths: PASS. Existing serve startup handles generated
+      or explicit token in `ResolveOwnerToken`; reset path does not generate/accept/store
+      plaintext.
+
+      - W7 forbidden HTTP/MCP/UI/serve surfaces: PASS. Production scans found no frontend
+      reset path; HTTP route probe tests and reviewed router return 404; MCP tool/resource
+      lists have no reset; `serve --reset-owner-token` exits 2.
+
+      - W8 architecture shape: PASS. Single entrypoint `cmd/resofeed/main.go`; implementation
+      in existing flat Go files; no sidecar/admin/sync/migrate process added.
+
+
+      ### CLI Surface Snapshot / Executability Matrix
+
+      Root help lists `serve` and `owner-token reset --db PATH --confirm-reset`; reset
+      help lists `-db` and `-confirm-reset` only; serve help lists expected serve
+      flags and no `--reset-owner-token`.
+
+
+      | Command | Surface Listed? | Handler Exists? | --help Works? | Smoke Test |
+      Status |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | `resofeed --help` | Yes | Yes: `printRootHelp` | Yes, exit 0 | N/A | PASS
+      |
+
+      | `resofeed serve --help` | Yes | Yes: `parseServeFlags`/`runServe` | Yes, exit
+      0 | forbidden `serve --reset-owner-token` exit 2 | PASS |
+
+      | `resofeed owner-token reset --help` | Yes | Yes: `parseOwnerTokenResetFlags`/`runOwnerTokenReset`/`resetOwnerTokenHash`
+      | Yes, exit 0 | SQLite reset exit 0; no stdout/stderr; only hash removed | PASS
+      |
+
+
+      Regression check: no expected command removed or broken; `serve --reset-owner-token`
+      is not accepted; no dangling registered CLI surface found.
+
+
+      Escape hatch audit: `@invar:allow` scan over `cmd`, `internal`, and `web/src`:
+      none found.
+
+
+      Evidence distinguishing real integration from fixture-only tests: built binary
+      and real SQLite file were used under final-gate audit; before/after SQLite proved
+      only `owner_token_sha256` was removed while sentinel metadata and source row
+      remained. Missing confirmation and invalid DB were exercised through binary.
+
+
+      ## Behavioral Proof Register
+
+      - Reset CLI removes only `runtime_metadata.owner_token_sha256`: PROVEN.
+
+      - Missing confirmation is safe/non-mutating: PROVEN.
+
+      - Invalid DB path is safe/non-creating: PROVEN.
+
+      - Reset output contains no generated replacement token and no `rfeed_`: PROVEN.
+
+      - Existing post-reset serve auto-generation unchanged: PROVEN.
+
+      - Existing explicit-token path unchanged: PROVEN.
+
+      - No HTTP reset route: PROVEN.
+
+      - No MCP reset tool/resource: PROVEN.
+
+      - No Settings/UI/browser reset control: PROVEN.
+
+      - Browser localStorage clearing remains client-local: PROVEN.
+
+      - Architecture drift checks: PROVEN for single binary, one SQLite DB, no sidecar/admin
+      reset process, flat-file implementation.
+
+
+      ## Gate Decision Fields
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Files changed
+
+      None. Worktree clean after review; branch diff vs main empty.
+
+
+      ## Verification
+
+      - `go test ./internal/resofeed -run ''OwnerTokenReset|ExpectedRedOwnerTokenReset|ExpectedRedServeAfterReset|ExpectedRedNoHTTPResetRoute|ExpectedRedMCPLists|ExpectedRedBrowserOwnerTokenClearing|ExpectedRedNoSettingsReset|ExpectedRedNoURL''`
+      — exit 0; internal package ok.
+
+      - `go test ./...` — exit 0; all Go tests passed.
+
+      - `go build ./cmd/resofeed` — exit 0.
+
+      - `golangci-lint run ./...` — exit 0; 0 issues.
+
+      - Built audit binary and verified `--help`, `owner-token reset --help`, `serve
+      --help`, successful SQLite reset, missing confirmation, invalid DB, and forbidden
+      `serve --reset-owner-token` behavior.
+
+      - Final `git status --short` — clean.
+
+
+      ## Gaps/Notes
+
+      None blocking. Minor note: final auditor did not inspect or mutate vectl plan
+      state per dispatch policy; phase completion assessment relies on supplied objective
+      orchestrator evidence plus direct artifact verification.'
 - id: full-ui-design-conformance-remediation
   name: Full UI Design Conformance Remediation
   status: in_progress
