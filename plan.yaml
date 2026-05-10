@@ -36204,7 +36204,7 @@ phases:
       `go test ./...`.'
   - id: fuidcr-ledger-reachability-proof-path-fix
     name: Reconcile Source Ledger reachability and browser proof path
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: default\nrefs:\n- docs/DESIGN.md\n\
       - docs/ARCHITECTURE.md\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\n\
       - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n- web/tests/e2e/real-server-ui.spec.ts\n\
@@ -36366,6 +36366,78 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T19:01:35.290754+00:00'
+    done_at: '2026-05-10T19:12:26.561344+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation\n- docs/DESIGN.md — Read.\
+      \ Key insight: Source Ledger is a flat source management surface reachable from\
+      \ Steer/source commands, with canonical labels `SOURCE LEDGER`, `[IMPORT OPML]`,\
+      \ `[RUN INGEST]`, `[FETCH]`, `[DELETE]`, `[EXPORT STATE]`, `[IMPORT STATE]`;\
+      \ shell must have no persistent left navigation and no dashboard/tab navigation.\n\
+      - docs/ARCHITECTURE.md — Read. Key insight: one deployable Go process, one SQLite\
+      \ DB, HTTP/MCP share operations; Source Ledger rows are durable state, OPML\
+      \ folders are discarded, and no accounts/sync/vector/admin layers are allowed.\n\
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file\
+      \ absent in this worktree.\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ — Read. Key insight: stale helper clicked persistent `SOURCE LEDGER` / `TODAY`\
+      \ buttons; test already rejects `nav[aria-label*=\"primary\"]`, side nav, `.tab-nav`,\
+      \ and `[role=\"tablist\"]`.\n- web/tests/e2e/real-server-ui.spec.ts — Read.\
+      \ Key insight: browser proof imported OPML through UI, then expected stale persistent\
+      \ navigation buttons before proving feed, Inspector, MCP/API parity, and search.\n\
+      - web/src/routes/+page.svelte — Read. Key insight: accepted product contract\
+      \ already supports Steer commands `source ledger`, `ledger`, and `today` to\
+      \ switch `currentSurface`; no persistent nav is rendered.\n- web/src/routes/components/SourceLedger.svelte\
+      \ — Read. Key insight: canonical bracket actions are visible; `[FETCH]` has\
+      \ accessible name `Fetch <source>` and `[DELETE]` has accessible name `Delete\
+      \ source: <name>`.\n- web/src/routes/components/StatePortability.svelte — Read.\
+      \ Key insight: state actions live in Source Ledger footer with `[EXPORT STATE]`,\
+      \ `[IMPORT STATE]`, and warning `import replaces active sources, rules, and\
+      \ stars`.\n\n## Source Ledger Reachability Reconciliation\n- Chosen contract:\
+      \ stale-test update.\n- Why this does not reintroduce persistent dashboard/tab\
+      \ navigation: product code already exposes Source Ledger through Steer command\
+      \ language; tests now submit `source ledger` / `today` through the real Steer\
+      \ input instead of clicking a forbidden always-visible nav button.\n- Activation\
+      \ path after owner-token acceptance: focus/fill Steer input with `source ledger`,\
+      \ press Enter, observe receipt `source ledger`, then heading `SOURCE LEDGER`.\n\
+      \n## Fix Evidence\n- Product changes: none.\n- Test/helper changes:\n  - Added\
+      \ non-persistent Steer-command helpers in `full-ui-design-conformance.expected-red.spec.ts`\
+      \ and `real-server-ui.spec.ts`.\n  - Replaced stale `getByRole('button', { name:\
+      \ 'SOURCE LEDGER' })` / `TODAY` navigation clicks with Steer activation.\n \
+      \ - Updated ledger timestamp expectations to canonical `last_fetch` / `last_ingest`.\n\
+      \  - Added real State Portability export/import round-trip proof through Source\
+      \ Ledger footer.\n  - Kept `[FETCH]` proof aligned with current accessibility\
+      \ contract: visible text `[FETCH]`, accessible name `Fetch <source>`.\n- User-visible\
+      \ proof path: owner token → Steer `source ledger` → `[IMPORT OPML]` file input\
+      \ → `[RUN INGEST]` → source row with `[FETCH]`/`[DELETE]` → `[EXPORT STATE]`/`[IMPORT\
+      \ STATE]` → Steer `today` → feed/Inspector/Search.\n\n## Browser Proof\nWorker\
+      \ verification:\n- `npm ci` — PASS; installed missing web dependencies.\n- `npm\
+      \ run check` — PASS; svelte-check found 0 errors and 0 warnings.\n- `npx playwright\
+      \ test --config ./playwright.config.ts tests/e2e/real-server-ui.spec.ts -g \"\
+      ci-safe browser-led source import|browser-led API/MCP parity\"` — PASS; 2 tests\
+      \ passed.\n- `npx playwright test --config ./playwright.config.ts tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ -g \"real app\"` — FAIL only on newly exposed residual F7/F13; Source Ledger\
+      \ stale navigation blockers cleared.\nMainline final-state verification after\
+      \ squash merge:\n- `npm --prefix web run check` — PASS; svelte-check found 0\
+      \ errors and 0 warnings.\n- `npm --prefix web run test:e2e -- tests/e2e/real-server-ui.spec.ts\
+      \ -g \"ci-safe browser-led source import|browser-led API/MCP parity\" --project=chromium-ci-safe`\
+      \ — PASS; 2 tests passed.\n- `npm --prefix web run test:e2e -- tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ -g \"real app\" --project=chromium-ci-safe` — FAIL with only residual blockers\
+      \ F7 and F13:\n  - `F7 Owner Token Prompt: owner token submit action is generic/non-bracket:\
+      \ [submit]`\n  - `F13 Feed/Search: feed row height does not preserve 24px rhythm:\
+      \ 60px`\n  These are now owned by `fuidcr-browser-conformance-residual-f7-f13-fix`.\n\
+      \n## Residual blocker ownership\nA planner-created batched remediation step\
+      \ now owns newly exposed F7/F13:\n- `fuidcr-browser-conformance-residual-f7-f13-fix`\n\
+      The browser regression proof and final design gate were updated to depend on\
+      \ it.\n\n## Commit hash(es)\n- Worker branch: 9379aee9a850cd23e410c12e4b7387017394df66\n\
+      - Main squash commit: be48de9 (`[vectl] step-fuidcr-ledger-reachability-proof-path-fix\
+      \ completed`)\n\n## Files changed\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n\
+      - web/tests/e2e/real-server-ui.spec.ts\n\n## Guardrails\n- Persistent dashboard/tab\
+      \ navigation reintroduced: NO.\n- Backend/API/storage changed: NO.\n- New routes/auth/sync/accounts/vector/admin/service\
+      \ layers added: NO.\n\n## Deviations\n- test_error: Stale browser tests expected\
+      \ persistent Source Ledger/TODAY nav buttons despite the accepted non-persistent\
+      \ Steer-driven activation contract. Updated tests to exercise the real accepted\
+      \ user path.\n\n## Gaps/Notes\n- No product UI file was changed because accepted\
+      \ Steer command activation already existed and browser proof now exercises it\
+      \ directly.\n- F7/F13 remain as separate, newly exposed blocker-class issues\
+      \ with explicit remediation ownership."
   - id: fuidcr-browser-conformance-residual-f7-f13-fix
     name: Fix residual browser conformance blockers F7 and F13
     status: pending
