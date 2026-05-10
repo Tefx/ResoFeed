@@ -36,9 +36,7 @@
       .replace(/<[^>]*>/g, ' ');
   }
 
-  function removeJsonLdPrefix(text: string): string {
-    const start = text.search(/\{\s*"@context"/i);
-    if (start < 0 || text.slice(0, start).trim().length > 0) return text;
+  function findJsonObjectEnd(text: string, start: number): number | null {
     let depth = 0;
     let inString = false;
     let escaped = false;
@@ -56,9 +54,30 @@
       if (inString) continue;
       if (char === '{') depth += 1;
       if (char === '}') depth -= 1;
-      if (depth === 0) return text.slice(index + 1);
+      if (depth === 0) return index + 1;
     }
-    return text;
+    return null;
+  }
+
+  function removeJsonLdObjects(text: string): string {
+    let cursor = 0;
+    let cleanText = '';
+    while (cursor < text.length) {
+      const match = /\{\s*"@context"/i.exec(text.slice(cursor));
+      if (!match) {
+        cleanText += text.slice(cursor);
+        break;
+      }
+      const start = cursor + match.index;
+      const end = findJsonObjectEnd(text, start);
+      if (end === null) {
+        cleanText += text.slice(cursor);
+        break;
+      }
+      cleanText += `${text.slice(cursor, start)} `;
+      cursor = end;
+    }
+    return cleanText;
   }
 
   function removeEnclosureMetadata(text: string): string {
@@ -69,7 +88,7 @@
     if (!text) return null;
     if (text.trim() === 'Deterministic fixture summary.') return null;
     if (/Dirty RSS cases for Inspector regression tests\./.test(text) && /json_ld_blob_item|script_style_leftover_item|model_error_item/.test(text)) return null;
-    const normalized = decodeEntities(removeEnclosureMetadata(removeJsonLdPrefix(stripExecutableAndTags(text))))
+    const normalized = decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text))))
       .replace(/\s+/g, ' ')
       .trim();
     return normalized.length > 0 ? normalized : null;

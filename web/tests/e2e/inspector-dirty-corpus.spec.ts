@@ -63,6 +63,9 @@ async function inspectDirtyItem(page: Page, item: DirtyCorpusItem): Promise<read
   await expect(inspector.getByRole('link', { name: 'original link' })).toBeVisible();
   await expect(inspector.getByLabel(/Extraction:/)).toBeVisible();
   await expect(inspector.getByLabel(/Model status:/)).toBeVisible();
+  if (item.readablePrimaryExpected[0]) {
+    await inspector.getByText(item.readablePrimaryExpected[0]).waitFor({ state: 'visible', timeout: 5_000 }).catch(() => undefined);
+  }
 
   const primaryText = await primaryInspectorText(inspector);
   for (const expected of item.readablePrimaryExpected) {
@@ -96,6 +99,13 @@ test('dirty corpus inspector primary hierarchy hides raw feed payloads and prove
     const violations: string[] = [];
     for (const item of dirtyCorpusItems) {
       violations.push(...await inspectDirtyItem(page, item));
+      if (item.id === 'inline_json_ld_runtime_item') {
+        const screenshotDir = path.join(runInfo.artifactRoot, 'screenshots');
+        fs.mkdirSync(screenshotDir, { recursive: true });
+        const screenshotPath = path.join(screenshotDir, 'inline-json-ld-inspector-fixed.png');
+        await page.screenshot({ path: screenshotPath, fullPage: true });
+        await testInfo.attach('inline-json-ld-inspector-fixed.png', { path: screenshotPath, contentType: 'image/png' });
+      }
     }
     await testInfo.attach('dirty-corpus-negative-assertions.txt', {
       body: violations.length === 0 ? 'No dirty Inspector violations detected.' : violations.join('\n'),

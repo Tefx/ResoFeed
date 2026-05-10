@@ -33,6 +33,16 @@ export const dirtyCorpusItems: readonly DirtyCorpusItem[] = [
     readablePrimaryExpected: ['Readable article lead']
   },
   {
+    id: 'inline_json_ld_runtime_item',
+    title: 'Readable dirty-content article',
+    linkPath: '/article/inline-json-ld-runtime',
+    pubDate: 'Sun, 10 May 2026 10:07:30 GMT',
+    description: 'Readable deterministic summary from dirty feed.',
+    articleHtml: '<article><p>Readable lead paragraph that should remain primary. { "@context":"https://schema.org", "@type":"NewsArticle", "tracking":"huge raw payload should not be primary" } More readable body after dirty payload.</p></article>',
+    rawPrimaryForbidden: ['{ "@context"', '"@context":"https://schema.org"', '"@type":"NewsArticle"', '"tracking"'],
+    readablePrimaryExpected: ['Readable lead paragraph that should remain primary.', 'More readable body after dirty payload.']
+  },
+  {
     id: 'long_description_item',
     title: 'Long description should stay readable in Inspector',
     linkPath: '/article/long-description',
