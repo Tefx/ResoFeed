@@ -16,7 +16,7 @@ Contract baseline: these decisions are anchored in the current product/design do
 6. **Thin transports.** HTTP and MCP validate auth/payloads and call the same product operations. Rationale: humans and agents must share Inspect, Resonate, Steer, search, and retrieval semantics. Fails if MCP gets product concepts unavailable to humans.
 7. **OpenRouter as the sole LLM backend.** LLM calls use OpenRouter chat completions for summaries and steering translation at `https://openrouter.ai/api/v1/chat/completions`. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes; Go validates every structured output before applying or saving it. Rationale: the user explicitly chose an OpenRouter-only migration while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
 8. **Lexical retrieval only.** Search uses SQLite FTS5 and metadata filters. No embeddings, vector DB, built-in RAG, or semantic answer engine. Rationale: explicitly forbidden by product constraints. Fails only by explicit product reversal.
-9. **Single owner token with auto-generation.** Static web assets are public to load, but every `/api/*` route and every `/mcp` request requires one owner token. If `--owner-token` is omitted, ResoFeed reuses a stored token hash or generates a token, stores its hash, and prints the token once on first startup. No accounts, OAuth, roles, teams, or registration flow. Rationale: single-tenant tool with low-friction first run and no ambiguous public API reads. Fails if shared/team use becomes product scope.
+9. **Single owner token with auto-generation and CLI-only offline reset.** Static web assets are public to load, but every `/api/*` route and every `/mcp` request requires one owner token. If `--owner-token` is omitted, ResoFeed reuses a stored token hash or generates a token, stores its hash, and prints the token once on first startup. If the plaintext token is lost and only the hash remains, recovery is impossible; reset is an offline DB command that deletes only the stored hash so the next `serve` startup can generate or accept a replacement. No accounts, OAuth, roles, teams, registration flow, HTTP reset endpoint, MCP reset tool, or Settings/UI reset control. Rationale: single-tenant tool with low-friction first run, clear offline credential recovery, and no ambiguous public API reads. Fails if shared/team use or online credential administration becomes product scope.
 
 ## 2. System Boundary
 
@@ -66,6 +66,25 @@ When `--openrouter-model` is omitted or empty, diagnostics and startup/runtime s
 
 `serve` runs SQLite migrations during startup and then starts the web UI, HTTP API, MCP endpoint, and ingestion loop. No separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process is part of the architecture.
 
+Offline owner-token reset command contract:
+
+```bash
+resofeed owner-token reset \
+  --db ./data/resofeed.sqlite3 \
+  --confirm-reset
+```
+
+Rules:
+
+- the command is CLI-only and must run while `serve` is stopped for that SQLite database;
+- `--db` selects the SQLite database file and `--confirm-reset` is required;
+- it deletes only `runtime_metadata.key='owner_token_sha256'`;
+- it does not generate, print, accept, validate, or store a plaintext replacement token;
+- after reset, the next `resofeed serve --db PATH` without `--owner-token` follows the existing first-run path: generate a new token, store only its hash, and print the plaintext once;
+- alternatively, the next `resofeed serve --db PATH --owner-token TOKEN` sets an explicit replacement token through the existing startup path;
+- do not add `serve --reset-owner-token`; reset must not be easy to persist accidentally in service startup arguments;
+- do not expose reset through HTTP, MCP, Settings, or any browser UI.
+
 Runtime OpenRouter LLM contract:
 
 - OpenRouter is the only LLM backend after this migration. Do not preserve prior provider runtime flags in the future runtime contract.
@@ -110,6 +129,9 @@ Owner token behavior:
 - if `--owner-token` is passed, validate the token, hash it, and store the hash;
 - if omitted and a stored token hash exists, reuse it for verification;
 - if omitted and no token hash exists, generate a random token, store only its hash in SQLite runtime metadata, and print the plaintext token once in startup logs;
+- if a known explicit plaintext token should be rotated, pass a new valid `--owner-token` on `serve` startup;
+- if the plaintext token is lost and only `owner_token_sha256` remains, the plaintext cannot be recovered from SQLite; use `resofeed owner-token reset --db PATH --confirm-reset` offline to remove the hash, then start `serve` to generate or set a replacement;
+- deleting `localStorage['resofeed.ownerToken']` only forgets the browser-local copy and does not rotate, delete, or reset the server-side verifier;
 - owner token runtime metadata is not part of Source Ledger/state export and is not an activity ledger.
 
 In scope:
@@ -328,6 +350,9 @@ Owner token contract:
 - token hash comparison must avoid timing leaks;
 - passing `--owner-token` replaces the stored `owner_token_sha256` value;
 - if no stored token hash exists and `--owner-token` is omitted, startup generates a token, stores its hash, and prints the plaintext token once;
+- `resofeed owner-token reset --db PATH --confirm-reset` deletes only `owner_token_sha256` while offline and leaves replacement generation or explicit setting to the next `serve` startup;
+- browser-local token deletion, including clearing `localStorage['resofeed.ownerToken']`, changes only the browser client state and must not change SQLite runtime metadata;
+- no HTTP endpoint, MCP tool/resource, Settings page, or UI action may reset the owner token;
 - this table must never be included in Source Ledger/state export.
 
 ## 5. Operation Contracts

@@ -105,7 +105,7 @@ The generated owner token is runtime credential state. It is not part of Source 
 
 Explicit `--owner-token` values must be at least 32 visible non-whitespace characters. Tokens are not trimmed; leading or trailing whitespace makes the token invalid.
 
-To rotate or recover the token, start ResoFeed once with a new explicit token:
+If you still know a valid plaintext token and want to rotate it, start ResoFeed once with a new explicit token:
 
 ```bash
 ./bin/resofeed serve \
@@ -115,6 +115,23 @@ To rotate or recover the token, start ResoFeed once with a new explicit token:
 
 This example assumes `OPENROUTER_KEY` is already available through the OS environment or local `.env` fallback.
 
+If the plaintext token is lost and only the SQLite hash remains, it cannot be recovered. Stop `serve`, delete only the server-side verifier with the offline reset command, then start `serve` again:
+
+```bash
+./bin/resofeed owner-token reset \
+  --db ./data/resofeed.sqlite3 \
+  --confirm-reset
+```
+
+The reset command is CLI-only and operates on the offline SQLite database. It deletes only `runtime_metadata.key='owner_token_sha256'`. It does not generate, print, accept, or store a replacement plaintext token.
+
+After reset, either:
+
+- run `./bin/resofeed serve --db ./data/resofeed.sqlite3` without `--owner-token` to let startup generate a new token and print it once; or
+- run `serve` with a new explicit `--owner-token` to set the replacement through the normal startup path.
+
+There is intentionally no HTTP API, MCP tool, Settings screen, or browser UI action for server-side token reset. Do not use or persist a `serve --reset-owner-token` style startup flag.
+
 ### 5. Open the UI
 
 ```text
@@ -122,6 +139,8 @@ http://127.0.0.1:8080
 ```
 
 On first open, paste the owner token printed at startup or supplied with `--owner-token`. The browser stores it locally as `resofeed.ownerToken` and sends it as `Authorization: Bearer <OWNER_TOKEN>` for every `/api/*` request.
+
+Deleting `localStorage['resofeed.ownerToken']` or clearing browser storage only forgets the browser-local copy. It does not rotate or reset the server-side owner token stored as a SQLite hash. If the browser has a stale token, the UI should prompt for the current owner token again after `401 unauthorized`.
 
 ### 6. Add sources
 
