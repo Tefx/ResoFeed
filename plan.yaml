@@ -24184,7 +24184,7 @@ phases:
   steps:
   - id: contract-design-audit
     name: Contract and design audit for complete UI regression class
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -24315,6 +24315,114 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T11:27:22.228994+00:00'
+    done_at: '2026-05-10T11:30:20.106590+00:00'
+    evidence: 'status: SUCCESS
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Defines ResoFeed as a dense but legible analyst workbench
+      with operational labels only; anchors include Feed Item states, Resonate 44px/non-color
+      semantics, Inspector hierarchy, Source Ledger flat management, owner-token/first-use
+      behavior, and no-layout-shift motion rules.
+
+      - docs/ui-preview.html — Visual/state reference for selected feed item with
+      left marker, Inspector hierarchy, Source Ledger rows with fetch/delete controls,
+      OPML/state actions, `/doctor` raw output, and mobile feed/detail previews.
+
+      - docs/DESIGN_VISION.md — Establishes Inspect/Resonate/Steer primitives, flat
+      Source Ledger, no inbox-zero concepts, anti-slop guardrails, and hover/focus/no-layout-shift
+      interaction expectations.
+
+      - web/src/routes/+page.svelte — Shell state/navigation implementation: `currentSurface`,
+      `surface-nav`, Steer submit/doctor handling, feed/detail/ledger/search active
+      panels, owner-token state, manual ingest/source fetch callbacks.
+
+      - web/src/routes/components/Feed.svelte — Feed row selectors and behavior: `.contract-feed-item`,
+      `.contract-feed-open`, `.contract-resonate`, `aria-current`, labelled metadata,
+      selected item id, row open and star toggle handlers.
+
+      - web/src/routes/components/Inspector.svelte — Inspector rendering selectors
+      and hierarchy: `.contract-inspector`, heading focus, source/extraction/model
+      metadata, original link, partial warning, detail text fallback, provenance line,
+      and mobile-route star.
+
+
+      ## Contract/Design Audit Evidence
+
+      - Contract artifact path(s): `docs/UI_REGRESSION_CONTRACT.md`
+
+      - Hit-target coverage list: `TODAY`, `SOURCE LEDGER`, Steer submit, feed row
+      Inspect/open, star/resonate, Inspector original links, `/doctor`, OPML import,
+      source fetch/run ingest, delete, state export/import. Contract requires real
+      pointer hit testing via bounding boxes, viewport intersection, `elementFromPoint`,
+      computed `pointer-events`, disabled/visibility checks, and active-panel proof
+      rather than synthetic handler calls only.
+
+      - Keyboard/a11y coverage list: owner-token, Steer, surface nav, feed row open,
+      star/resonate, Inspector link, Source Ledger rows/delete, OPML import, state
+      import/export, `/doctor` output. Contract covers tab order, focus visibility,
+      Enter/Space activation, roles/names, live regions, selected/current/active semantics
+      via `aria-current`, `aria-selected`/equivalent, `data-surface`, and active panel
+      observables.
+
+      - State matrix definition: feed row normal, hover, selected, selected+hover,
+      focus, selected+focus. Selected must remain distinguishable with a non-layout-shifting
+      marker/current state; hover/focus may only add restrained tonal/outline states
+      and must not shift bounds, translate rows, hide selection, or stack noisy active
+      styling.
+
+      - Inspector hierarchy rule: primary reading hierarchy is `INSPECTOR` label,
+      source/provenance metadata, title heading/focus target, original link, extraction
+      warning, summary/full text, then why/provenance metadata. Raw JSON, JSON-LD,
+      extracted metadata, media/enclosure, grouped provenance, parser diagnostics,
+      and receipts may appear only in labelled collapsed disclosures, secondary diagnostics/provenance
+      blocks, or `/doctor`; never as primary feed/Inspector text.
+
+      - Dirty corpus fixture inventory: `json_ld_blob_item`, `long_description_item`,
+      `html_fragment_item`, `script_style_leftover_item`, `missing_summary_date_author_item`,
+      `very_long_url_title_item`, `escaped_entities_item`, `media_enclosure_metadata_item`,
+      `partial_extraction_item`, `model_error_item`.
+
+      - Screenshot manifest: `owner-token`, `first-use`, `today-list`, `source-ledger`,
+      `selected-item`, `selected-hover`, `selected-focus`, `inspector-clean`, `inspector-raw-expanded-provenance`,
+      `llm-error`, `search`, `doctor`, `mobile-feed`, `mobile-inspector`.
+
+      - Negative UX bans: primary text containing `{ "@context"`, `"@type"`, huge
+      raw JSON, raw parser dumps, `<script>`, `<style>`; nav clicks leaving wrong/multiple
+      panels active; inert or obstructed controls; undersized touch/action targets;
+      hover/focus/selected/loading/error layout shift; skeleton/shimmer/bounce/noisy
+      shadows; folders/tags/unread/mark-all-read/archive/settings/source hierarchy/drag
+      ordering/activity ledger concepts; mascot/SaaS/AI-magic copy; internal design-positioning
+      phrases; fake metrics/testimonials/placeholders presented as real.
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: NONE
+
+      orchestrator_action_hint: COMPLETE
+
+      uncertainty_sources: []
+
+
+      ## Implementation evidence
+
+      - Commit hash(es): worktree `8bfc8ee`; merged to main as squash commit `57a315e`.
+
+      - Files changed: `docs/UI_REGRESSION_CONTRACT.md`
+
+      - Mainline final-state verification: `git diff --check HEAD~1..HEAD` exit 0;
+      `test -f docs/UI_REGRESSION_CONTRACT.md` exit 0.
+
+      - Gaps/Notes: Acceptance-only contract artifact added. No product UI behavior
+      modified. No vectl tools or plan/orchestrator state files were used or changed
+      by the subagent.'
   - id: expected-red-browser-tests
     name: Expected-red core UI regression browser tests
     status: pending
