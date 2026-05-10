@@ -27403,6 +27403,12 @@ phases:
       - Expanded raw/provenance primary-flow dump: NO / <details>
 
       - Navigation/state/Inspector regressions: NONE / <details>'
+    refs:
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/ui-preview.html
     depends_on:
     - remediate-visual-ux-debt-and-proof-gap
     agent: uiux-auditor
