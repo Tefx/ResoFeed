@@ -22461,3 +22461,117 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.harness-fixtures-env
     agent: frontend-engineer
+  - id: playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    name: LLM Deterministic, Missing-Key, and Invalid-Key E2E Flows
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      tags: ["integration", "browser-e2e", "llm"]
+
+
+      Add Playwright E2E coverage for OpenRouter/LLM-backed product flows in a CI-safe
+      way.
+
+
+      Required deterministic coverage:
+
+      - Runtime secret handling reads `OPENROUTER_KEY` / `.env` from environment only;
+      no secrets are committed or logged.
+
+      - Missing key path: the UI/API-visible LLM-backed flow fails gracefully or disables
+      itself per product contract, with a terse user-visible error/receipt and no
+      crash.
+
+      - Invalid key path: server/browser evidence shows graceful failure and sanitized
+      diagnostics.
+
+      - Deterministic mock/stub transport is allowed only as a test harness substitute
+      for the external OpenRouter service; it must not introduce a new product concept
+      or bypass the real server/UI path.
+
+      - Cover steering/summary or other LLM-backed flows currently exposed by the
+      product.
+
+
+      Out-of-scope guardrail: do not make Gemini/OpenRouter an orchestrator, persistent
+      state owner, database writer, or source of product authority.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a TEST step. Tests must drive a real browser-led product path and cannot
+      pass solely by invoking isolated LLM helpers.'
+    verification: '- Planned deterministic command: `npm --prefix web run test:e2e
+      -- --grep @llm-deterministic` or equivalent locked Playwright filter.
+
+      - Missing and invalid `OPENROUTER_KEY` cases are covered without committed secrets.
+
+      - LLM-backed steering/summary flow is exercised through browser-visible product
+      behavior when exposed.
+
+      - Server logs and browser artifacts show sanitized failure diagnostics with
+      no secret leakage.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## LLM Deterministic/Failure E2E Evidence
+
+      **Exact command executed**:
+
+      ```
+
+      <npm --prefix web run test:e2e -- --grep @llm-deterministic or equivalent>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste runner output>
+
+      ```
+
+
+      **Secret handling**:
+
+      - Runtime source checked (`OPENROUTER_KEY`/`.env`):
+
+      - Secrets redacted from logs/artifacts:
+
+      - Missing-key behavior:
+
+      - Invalid-key behavior:
+
+
+      **Browser/server artifacts**:
+
+      - Trace:
+
+      - Screenshot/video:
+
+      - Server stdout/stderr:
+
+      - DB fixture path:
+
+      - Sanitized env notes:'
+    depends_on:
+    - playwright-comprehensive-e2e.harness-fixtures-env
+    agent: frontend-engineer
