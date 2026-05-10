@@ -87,7 +87,7 @@ select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title,
        i.summary, i.core_insight, i.value_tier, i.published_at,
        i.extraction_status, i.model_status,
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
-       i.story_key, i.duplicate_of_item_id
+       i.story_key, i.duplicate_of_item_id, i.first_seen_at, i.feed_excerpt
 from items i
 join sources s on s.id = i.source_id
 left join item_state st on st.item_id = i.id
@@ -178,19 +178,35 @@ left join sources s on s.id = i.source_id`)
 
 func scanItemSummary(rows *sql.Rows) (ItemSummary, error) {
 	var item ItemSummary
-	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf sql.NullString
-	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf); err != nil {
+	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
 		return ItemSummary{}, fmt.Errorf("scan item summary: %w", err)
 	}
 	item.Summary = stringPtrFromNull(summary)
 	item.CoreInsight = stringPtrFromNull(coreInsight)
+	item.DisplayExcerpt = displayExcerptFallback(item.Summary, item.CoreInsight, feedExcerpt)
 	item.ValueTier = stringPtrFromNull(valueTier)
 	item.PublishedAt = timePtrFromNull(publishedAt)
+	item.FirstSeenAt = firstSeenFallback(item.PublishedAt, firstSeen)
 	item.HumanInspectedAt = timePtrFromNull(inspectedAt)
 	item.ExternalSurfacedAt = timePtrFromNull(surfacedAt)
 	item.StoryKey = stringPtrFromNull(storyKey)
 	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
 	return item, nil
+}
+
+func displayExcerptFallback(summary *string, coreInsight *string, feedExcerpt sql.NullString) *string {
+	if summary != nil || coreInsight != nil || !feedExcerpt.Valid {
+		return nil
+	}
+	return &feedExcerpt.String
+}
+
+func firstSeenFallback(publishedAt *time.Time, firstSeen sql.NullString) *time.Time {
+	if publishedAt != nil {
+		return nil
+	}
+	return timePtrFromNull(firstSeen)
 }
 
 func normalizeLimit(value int, defaultValue int, maxValue int) int {

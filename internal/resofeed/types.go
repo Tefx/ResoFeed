@@ -77,8 +77,9 @@ type Item struct {
 }
 
 // ItemSummary is the canonical HTTP/MCP list, search, and candidate item shape.
-// It intentionally excludes feed_excerpt, extracted_text, and provenance; those
-// fields belong only on ItemDetail.
+// It intentionally excludes raw feed_excerpt, extracted_text, and provenance;
+// those fields belong only on ItemDetail. Display fallback fields are derived
+// from canonical item columns for compact list/search rendering.
 type ItemSummary struct {
 	ID                 string     `json:"id"`
 	SourceID           string     `json:"source_id"`
@@ -87,8 +88,10 @@ type ItemSummary struct {
 	Title              string     `json:"title"`
 	Summary            *string    `json:"summary"`
 	CoreInsight        *string    `json:"core_insight"`
+	DisplayExcerpt     *string    `json:"display_excerpt,omitempty"`
 	ValueTier          *string    `json:"value_tier"`
 	PublishedAt        *time.Time `json:"published_at"`
+	FirstSeenAt        *time.Time `json:"first_seen_at,omitempty"`
 	ExtractionStatus   string     `json:"extraction_status"`
 	ModelStatus        string     `json:"model_status"`
 	IsResonated        bool       `json:"is_resonated"`

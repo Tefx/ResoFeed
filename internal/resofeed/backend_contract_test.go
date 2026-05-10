@@ -215,6 +215,51 @@ func TestRankingGuardrailsProtectFreshnessCoverageAndResonance(t *testing.T) {
 	}
 }
 
+func TestFeedAndSearchDTOsExposeSourceBackedFallbacks(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	firstSeen := now.Add(-30 * time.Minute)
+	published := now.Add(-2 * time.Hour)
+	db := newContractDB(t, ctx)
+
+	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values ('src_fallback', 'https://fallback.example/feed.xml', 'Fallback Source', ?, 'ok', 1, 1)`, now.Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("insert fallback source: %v", err)
+	}
+	_, err = db.ExecContext(ctx, `insert into items (id, source_id, url, title, summary, core_insight, published_at, first_seen_at, extraction_status, model_status, feed_excerpt) values (?, 'src_fallback', ?, ?, ?, ?, ?, ?, 'partial_extraction', 'summary_unavailable', ?)`, "fallback_item", "https://fallback.example/item", "Fallback Item", nil, nil, nil, firstSeen.Format(time.RFC3339), "source-backed fallback excerpt")
+	if err != nil {
+		t.Fatalf("insert fallback item: %v", err)
+	}
+	_, err = db.ExecContext(ctx, `insert into items (id, source_id, url, title, summary, core_insight, published_at, first_seen_at, extraction_status, model_status, feed_excerpt) values (?, 'src_fallback', ?, ?, ?, ?, ?, ?, 'full', 'ok', ?)`, "normal_item", "https://fallback.example/normal", "Normal Item", "curated summary", "curated insight", published.Format(time.RFC3339), firstSeen.Format(time.RFC3339), "unused normal feed excerpt")
+	if err != nil {
+		t.Fatalf("insert normal item: %v", err)
+	}
+	if err := rebuildSearchIndex(ctx, db); err != nil {
+		t.Fatalf("rebuild search index: %v", err)
+	}
+
+	feedItems, err := listTodayFeed(t, ctx, db, RankingOptions{Limit: 10, Now: now})
+	if err != nil {
+		t.Fatalf("ListTodayFeed returned error: %v", err)
+	}
+	assertItemSummaryFallbacks(t, findSummaryItem(t, feedItems, "fallback_item"), firstSeen)
+	assertItemSummaryNormalPublishedAndSummary(t, findSummaryItem(t, feedItems, "normal_item"), published)
+
+	searchItems, _, err := SearchItems(ctx, db, SearchQuery{Q: "fallback excerpt", Limit: 10})
+	if err != nil {
+		t.Fatalf("SearchItems fallback query returned error: %v", err)
+	}
+	assertItemSummaryFallbacks(t, findSummaryItem(t, searchItems, "fallback_item"), firstSeen)
+
+	searchItems, _, err = SearchItems(ctx, db, SearchQuery{Q: "curated", Limit: 10})
+	if err != nil {
+		t.Fatalf("SearchItems normal query returned error: %v", err)
+	}
+	assertItemSummaryNormalPublishedAndSummary(t, findSummaryItem(t, searchItems, "normal_item"), published)
+}
+
 func TestSteeringConflictReceiptsDoNotDisableInvariants(t *testing.T) {
 	t.Parallel()
 
@@ -512,6 +557,55 @@ func seedRankingCorpus(t *testing.T, ctx context.Context, db *sql.DB, now time.T
 	insertItem("old_story_context", "src_01", old, true, true, &story, nil)
 	insertItem("fresh_story_update", "src_02", fresh, false, false, &story, nil)
 	insertItem("direct_duplicate", "src_03", fresh, false, false, nil, ptr("fresh_01"))
+}
+
+func findSummaryItem(t *testing.T, items []ItemSummary, id string) ItemSummary {
+	t.Helper()
+
+	for _, item := range items {
+		if item.ID == id {
+			return item
+		}
+	}
+	t.Fatalf("item %q not found in %+v", id, items)
+	return ItemSummary{}
+}
+
+func assertItemSummaryFallbacks(t *testing.T, item ItemSummary, firstSeen time.Time) {
+	t.Helper()
+
+	if item.PublishedAt != nil {
+		t.Fatalf("%s PublishedAt = %s, want nil to preserve source missing date", item.ID, item.PublishedAt.Format(time.RFC3339))
+	}
+	if item.FirstSeenAt == nil || !item.FirstSeenAt.Equal(firstSeen) {
+		t.Fatalf("%s FirstSeenAt = %v, want %s", item.ID, item.FirstSeenAt, firstSeen.Format(time.RFC3339))
+	}
+	if item.Summary != nil || item.CoreInsight != nil {
+		t.Fatalf("%s summary/core_insight = %v/%v, want nil fallbacks", item.ID, item.Summary, item.CoreInsight)
+	}
+	if item.DisplayExcerpt == nil || *item.DisplayExcerpt != "source-backed fallback excerpt" {
+		t.Fatalf("%s DisplayExcerpt = %v, want source-backed fallback excerpt", item.ID, item.DisplayExcerpt)
+	}
+}
+
+func assertItemSummaryNormalPublishedAndSummary(t *testing.T, item ItemSummary, published time.Time) {
+	t.Helper()
+
+	if item.PublishedAt == nil || !item.PublishedAt.Equal(published) {
+		t.Fatalf("%s PublishedAt = %v, want %s", item.ID, item.PublishedAt, published.Format(time.RFC3339))
+	}
+	if item.FirstSeenAt != nil {
+		t.Fatalf("%s FirstSeenAt = %s, want nil when published_at is present", item.ID, item.FirstSeenAt.Format(time.RFC3339))
+	}
+	if item.Summary == nil || *item.Summary != "curated summary" {
+		t.Fatalf("%s Summary = %v, want curated summary", item.ID, item.Summary)
+	}
+	if item.CoreInsight == nil || *item.CoreInsight != "curated insight" {
+		t.Fatalf("%s CoreInsight = %v, want curated insight", item.ID, item.CoreInsight)
+	}
+	if item.DisplayExcerpt != nil {
+		t.Fatalf("%s DisplayExcerpt = %q, want nil when summary/core_insight are present", item.ID, *item.DisplayExcerpt)
+	}
 }
 
 func assertStatus(t *testing.T, recorder *httptest.ResponseRecorder, want int) {
