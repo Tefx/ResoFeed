@@ -33045,3 +33045,142 @@ phases:
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+  - id: fuidcr-inspector-reading-contract
+    name: Repair Inspector reading and diagnostic boundary
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
+      tests
+
+
+      Complete Inspector repairs so the primary reading path is editorial and diagnostic
+      material is removed from the visible header/body.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - fuidcr-contract-matrix-lock — findings 17-23 acceptance is AUTHORITATIVE.
+
+      - fuidcr-expected-red-ui-tests — Inspector tests and screenshot states are PROTECTED.
+
+      - fuidcr-api-dto-escalation-guard — DTO source mapping/gap decision is AUTHORITATIVE.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - web/src/routes/components/Inspector.svelte
+
+      - Existing frontend helper/formatter files only if required for cleaned reading
+      payload, with no new backend/storage by default.
+
+      - Tests/fixtures needed to turn Inspector expected-red tests green.
+
+
+      FINDINGS TO CLOSE:
+
+      - 17: quiet heading focus treatment.
+
+      - 18: no visible model status in primary header.
+
+      - 19: primary reading payload removes raw site boilerplate/ads where frontend
+      has enough source text to clean/present.
+
+      - 20: primary information hierarchy is reading-first, not model/debug report.
+
+      - 21: original link navigates normally; no click/key suppression or `/#original-link`
+      substitution.
+
+      - 22: mobile Inspector Resonate star/action is near the header/top action row.
+
+      - 23: provenance disclosure copy is calm and raw diagnostics are not in the
+      main reading path.
+
+
+      CONSTRAINTS:
+
+      - Preserve source-backed provenance; do not invent article content.
+
+      - Raw diagnostics may remain in a secondary disclosure/debug surface if DESIGN.md
+      permits, but primary reading flow must not expose debug/model boilerplate.
+
+      - No new routes, auth model, storage, sync, accounts, or service layers.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Inspector
+      rendering must vary based on selected item content, link, provenance, viewport,
+      keyboard focus, and resonated state.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Evidence MUST include rendered Inspector output for desktop and mobile/narrow
+      states.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Visible `model_latency_error` or similar diagnostics in the primary header.
+
+      2. Original link still suppressed or rewritten to an in-app placeholder.
+
+      3. Mobile Resonate action below long article content.
+
+      4. Raw boilerplate/ads dominating the primary reading body.
+
+      5. Heavy focus ring on programmatically focused heading.'
+    verification: '- Focused tests for findings 17-23 pass green.
+
+      - Browser/DOM evidence proves original link navigation behavior and top mobile
+      action placement.
+
+      - Desktop and mobile screenshots show reading-first Inspector without primary-path
+      diagnostics.
+
+      - Main path: selected item renders title, provenance, useful summary/body, original
+      link.
+
+      - Failure path: boilerplate-heavy source text is cleaned or relegated outside
+      primary reading path without inventing content.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+
+      ## Inspector Evidence
+
+      - Closed findings: 17,18,19,20,21,22,23
+
+      - Original link behavior proof: <DOM/event/browser evidence>
+
+      - Desktop screenshot refs: <paths>
+
+      - Mobile/narrow screenshot refs: <paths>
+
+      - Diagnostic fields removed from primary path: <list>
+
+      - Raw content handling rationale: <source-backed, no invented content>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    - fuidcr-api-dto-escalation-guard
+    - fuidcr-style-breakpoint-foundation
+    agent: frontend-engineer
