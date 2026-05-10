@@ -28874,7 +28874,7 @@ phases:
       No blocking semantic signals remain.'
 - id: inspector-readable-content-remediation
   name: Inspector Readable Content Remediation
-  status: in_progress
+  status: done
   gate: 'Inspector primary body must render readable article copy only: no raw JavaScript,
     CSS, JSON-LD/provenance garbage, navigation boilerplate, or model diagnostics
     in the primary reading text. Controlled fallback copy such as `summary unavailable`
@@ -30070,7 +30070,7 @@ phases:
       implementation files modified by retest; no commit created.'
   - id: residual-inspector-readable-content-gate
     name: Final residual gate for Inspector readable content
-    status: claimed
+    status: done
     description: 'Final residual gate for the Inspector readable-content remediation
       after B1 static semantic proof failure.
 
@@ -30198,6 +30198,29 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T15:10:11.903455+00:00'
+    done_at: '2026-05-10T15:15:16.073242+00:00'
+    evidence: 'Residual final gate evidence accepted from gate-reviewer. Gate artifact
+      committed on branch as `0b820c0b28f104ce928498388f3a8d314ee42724`, squash-merged
+      to main as `67d2c6a` at `.audit-artifacts/residual-inspector-readable-content-gate.md`;
+      no product code changed. refs Read Confirmation present for docs/DESIGN.md and
+      docs/ARCHITECTURE.md. Required Evidence Review covers new fix, retest, and residual
+      UI/UX audit. Gate Decision Basis marks all requirements PROVEN/OPEN: exact screenshot-family
+      guard literals absent from product sanitation criteria; raw source/screenshot
+      garbage absent from primary body at runtime; residual UI/UX audit downstream
+      and PASS; architecture/design constraints intact. Wiring audit W1-W8 present
+      and all PASS. Escape hatch audit: scoped source/test scan reports `NO_INVAR_ALLOW_IN_SCOPED_SOURCE_TESTS`;
+      broader grep only found audit prose. Smoke/liveness evidence: after dependency
+      bootstrap, `npm --prefix web run check` passed, `npm --prefix web run build`
+      passed, targeted 3-spec Playwright passed 7/7, static literal search printed
+      `NO_FORBIDDEN_GUARD_LITERALS_IN_INSPECTOR`, attachment decoder confirmed primary
+      body readable and dirty corpus no violations. Integration-vs-fixture distinction
+      present. UI/UX audit review confirms Inspector remains readable/editorial with
+      raw diagnostics/provenance secondary, no forbidden product/design/architecture
+      drift. Behavioral proof register present with all status PASS. Gate closure
+      fields: headline PASS, verdict PASS, blockers [], gate_open_allowed true, proof_gap_status
+      NONE, blocking_status CLOSED, orchestrator_action_hint COMPLETE. Mainline final-state
+      verification after squash merge: `npm --prefix web run check` passed with 0
+      errors/warnings.'
   - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     name: residual-uiux-audit-generalized-inspector-primary-body
     status: done
