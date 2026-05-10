@@ -29254,3 +29254,178 @@ phases:
     depends_on:
     - expected-red-inspector-readable-body-regression
     agent: frontend-engineer
+  - id: retest-clean-inspector-primary-body
+    name: Retest clean Inspector primary body regression
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER, verify the Inspector readable-content remediation
+      after implementation.
+
+
+      Scope:
+
+      - Run targeted web validation/build checks for the changed Svelte/frontend surface.
+
+      - Run the new/affected Playwright tests for Inspector readable content and the
+      prior Inspector dirty-corpus/UI repair coverage.
+
+      - Use rendered browser text from the real Inspector panel, not mocked component
+      state.
+
+
+      Target checks (use the project’s exact package scripts if names differ):
+
+      - Web check/build: `npm --prefix web run check` and/or `npm --prefix web run
+      build`
+
+      - Targeted Playwright: the new Inspector readable-content regression spec plus
+      `web/tests/e2e/inspector-dirty-corpus.spec.ts` and relevant prior UI repair
+      specs.
+
+
+      Behavioral proof register requirement:
+
+      For each proof obligation, record:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      Proof obligations:
+
+      1. Polluted page content does not place raw JS/CSS/navigation/provenance garbage
+      in Inspector primary body.
+
+      2. `model_latency_error` does not appear in Inspector primary body.
+
+      3. Clean summary/excerpt/article copy or controlled fallback is visible.
+
+      4. Prior UI navigation/hover/Inspector repair coverage did not regress.
+
+
+      Independence Level: L1 independent runtime verification.'
+    verification: 'Verification scope: phase-check protecting inspector-readable-content-remediation.gate.
+
+      - Web check/build command(s) complete successfully or failures are documented
+      as unrelated with evidence and non-intersection.
+
+      - New Inspector readable-content regression test passes green.
+
+      - Existing Inspector dirty-corpus and relevant UI repair Playwright coverage
+      passes green.
+
+      - Runtime proof shows the exact screenshot-family raw strings are absent from
+      Inspector primary body and the positive clean/fallback state is visible.
+
+      - Findings, if any, are classified with explicit closure paths; unresolved blocker-class
+      issues block the gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts —
+      key passage or "NOT READ: <reason>"
+
+      - web/playwright.config.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Evidence
+
+
+      **Commands executed**:
+
+      ```
+
+      <paste exact web check/build and Playwright commands>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste output, not just summary>
+
+      ```
+
+
+      **Rendered primary body sample**:
+
+      ```
+
+      <paste Inspector primary body text excerpt after remediation>
+
+      ```
+
+
+      **Forbidden screenshot strings check**:
+
+      | String family | Present in primary body? | Evidence |
+
+      | --- | --- | --- |
+
+      | `function OptanonWrapper()` | YES/NO | <locator/assertion/output> |
+
+      | CSS variable/custom property text | YES/NO | <locator/assertion/output> |
+
+      | script/style markers or bodies | YES/NO | <locator/assertion/output> |
+
+      | navigation/menu boilerplate | YES/NO | <locator/assertion/output> |
+
+      | `model_latency_error` | YES/NO | <locator/assertion/output> |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | <ref> | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN | <path>
+      | OPEN/BLOCK basis |
+
+
+      **Prior UI repair regression status**:
+
+      - SOURCE LEDGER clickability: PASS/FAIL/NOT RUN + reason
+
+      - Hover/selected state: PASS/FAIL/NOT RUN + reason
+
+      - Keyboard/a11y repair: PASS/FAIL/NOT RUN + reason
+
+      - Existing dirty JSON-LD Inspector protection: PASS/FAIL/NOT RUN + reason
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - clean-inspector-primary-body-implementation
+    agent: integration-verifier
