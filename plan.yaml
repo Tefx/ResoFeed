@@ -31234,3 +31234,105 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     agent: uiux-auditor
+  - id: prd-inspector-preview-conformance-remediation.final-prd-preview-gate
+    name: Final gate for PRD Inspector and preview conformance
+    status: pending
+    description: 'step_type: gate
+
+
+      As an INDEPENDENT GATE REVIEWER, decide whether this post-completion remediation
+      can close. This gate exists because the user reported two quality gaps in Chinese:
+
+      1. PRD conformance concern: current Inspector/feed implementation appears not
+      to expose required item-understanding outputs — objective quality assessment
+      / 质量评估, value tier / 优先级, concise core insight / 核心见解, dense factual summary
+      / 密集事实摘要, source and extraction provenance / 来源与提取溯源, why this appeared / 为什么展示给你,
+      searchable text / 可检索文本 — and asked “现在的实现符合PRD了？为什么我没看到这些？”
+
+      2. UI/UX preview mismatch concern: docs/ui-preview.html vs live 127.0.0.1 differ
+      in masthead, nav, prompt placement, card geometry, margins/alignment, row/star/sidebar
+      proportions, typography, and Inspector hierarchy; user instructed that UI/UX
+      audit must use visual ability and compare screenshots including alignment/margins,
+      not code-only review.
+
+
+      Gate requirements:
+
+      - PRD conformance proof: every required Inspector/Inspect/feed item-understanding
+      output is visibly present with source-cited semantics or has an explicit PRD-valid
+      empty-state/non-intersection disposition.
+
+      - Visual audit PASS: prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
+      must provide screenshot-first evidence and PASS, or identify only non-blocking/non-intersecting
+      residual deltas with clear gate basis.
+
+      - Retest proof: web check/build, browser tests, screenshots/artifacts, and relevant
+      Go tests if data/API touched are present and green.
+
+      - No raw-source regression: Inspector primary readable body remains free of
+      raw JavaScript, CSS, JSON-LD/provenance garbage, navigation boilerplate, and
+      model diagnostics.
+
+      - No architecture/design drift: changes preserve ResoFeed constraints from AGENTS.md/docs/ARCHITECTURE.md/DESIGN.md
+      and do not add forbidden product concepts.
+
+
+      BLOCK if any PRD-required visible field is absent, if screenshot-first audit
+      is missing/code-only, if preview/live parity evidence omits alignment/margins/type/card/star/prompt/masthead
+      details, if raw-source content regressed, or if architecture/design drift is
+      observed.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - User reported post-completion PRD conformance and visual mismatch gaps.
+
+      - Phase touches frontend visible layout and Inspector semantics.
+
+      - Screenshot-first audit is mandatory before closure.'
+    verification: 'full-plan-check protecting completion closure.
+
+      - All phase steps completed with evidence.
+
+      - PRD conformance proof register has no blocker-class UNPROVEN / NEEDS_TEST
+      / UNCERTAIN_BLOCKING item without explicit non-intersection closure.
+
+      - Screenshot-first UI/UX audit is PASS or only records non-blocking/non-intersecting
+      residuals with artifact-backed basis.
+
+      - Browser regression tests and relevant Go/web checks are green with screenshots/artifacts.
+
+      - No raw-source readable-body regression.
+
+      - No architecture/design drift or forbidden product concepts.
+
+      - Final decision basis explicitly maps OPEN/BLOCK to evidence refs.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/ui-preview.html — key passage or \"NOT READ:\
+      \ <reason>\"\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Gate\
+      \ Decision Basis\n| Requirement / Risk | Evidence reviewed | Status | Blocks?\
+      \ | Rationale |\n| --- | --- | --- | --- | --- |\n| PRD Inspector fields | <refs>\
+      \ | PROVEN/UNPROVEN/... | YES/NO | <why> |\n| Preview/live visual parity | <refs>\
+      \ | PROVEN/UNPROVEN/... | YES/NO | <why> |\n| Screenshot-first audit | <refs>\
+      \ | PASS/FAIL | YES/NO | <why> |\n| Raw-source regression | <refs> | PROVEN/UNPROVEN\
+      \ | YES/NO | <why> |\n| Architecture/design drift | <refs> | PROVEN/UNPROVEN\
+      \ | YES/NO | <why> |\n\n## Behavioral Proof Register\n- requirement_ref: <PRD/DESIGN/ui-preview/architecture\
+      \ ref>\n- behavior_claim: <claim reviewed>\n- runtime_proof_expected: <artifact/test/audit\
+      \ proof required>\n- evidence_ref: <artifact or step evidence>\n- status: PROVEN\
+      \ | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING | NON_INTERSECTING\n- closure_path:\
+      \ <OPEN, remediation step needed, or explicit non-intersection>\n- gate_decision_basis:\
+      \ <why final gate opens or blocks>\n\n## Gate Decision\n- [ ] OPEN: PRD conformance\
+      \ and visual parity are proven; no blocker remains.\n- [ ] BLOCKED: issues must\
+      \ be remediated before closure.\n  - Blocking issues: <list>\n  - Required actions:\
+      \ <list>\n"
+    depends_on:
+    - prd-inspector-preview-conformance-remediation.contract-audit-acceptance
+    - prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
+    - prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
+    - prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
+    - prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
+    agent: gate-reviewer
