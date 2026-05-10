@@ -106,8 +106,11 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(ledger).toHaveClass('contract-source-ledger');
     expect(ledger.querySelector('ul')).toHaveClass('contract-list');
+    expect(ledger.querySelector('.source-ledger-row')).toHaveClass('source-ledger-row');
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveTextContent(/^\[[A-Z\s]+\]$/);
     expect(within(ledger).getByText('[FETCH]')).toHaveTextContent(/^\[[A-Z]+\]$/);
+    expect(within(ledger).getByText('x')).toHaveClass('source-ledger-delete');
+    expect(within(ledger).getByText('imported 3 sources; folders flattened')).toBeVisible();
     expect(ledger.querySelector('[class*="spinner"], [class*="progress"], [class*="animate"]')).toBeNull();
   });
 });

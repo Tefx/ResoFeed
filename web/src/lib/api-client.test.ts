@@ -58,7 +58,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     const [sources, feed] = await Promise.all([client.sources(), client.today()]);
 
     render(SourceLedger, { props: { sources: sources.sources, onDeleteSource: async () => {}, onImportOpml: async () => {} } });
-    expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent(expectedRedSource.url);
+    expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent('example.com/feed.xml');
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });

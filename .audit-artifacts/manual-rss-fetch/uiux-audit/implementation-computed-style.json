@@ -3,74 +3,74 @@
   "buttonStyles": [
     {
       "text": "[RUN INGEST]",
-      "padding": "8px 12px 8px 12px",
+      "padding": "0px 10px 0px 10px",
       "minHeight": "44px",
       "borderRadius": "0px",
       "boxShadow": "none",
       "animationName": "none",
       "transitionProperty": "all",
       "textTransform": "uppercase",
-      "letterSpacing": "1.12px",
-      "backgroundColor": "rgb(251, 248, 239)",
-      "color": "rgb(36, 35, 30)"
+      "letterSpacing": "0.96px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "color": "rgb(47, 111, 126)"
     },
     {
       "text": "[FETCH]",
-      "padding": "8px 12px 8px 12px",
+      "padding": "0px 10px 0px 10px",
       "minHeight": "44px",
       "borderRadius": "0px",
       "boxShadow": "none",
       "animationName": "none",
       "transitionProperty": "all",
       "textTransform": "uppercase",
-      "letterSpacing": "1.12px",
-      "backgroundColor": "rgb(251, 248, 239)",
-      "color": "rgb(36, 35, 30)"
+      "letterSpacing": "0.96px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "color": "rgb(47, 111, 126)"
     },
     {
       "text": "[FETCH]",
-      "padding": "8px 12px 8px 12px",
+      "padding": "0px 10px 0px 10px",
       "minHeight": "44px",
       "borderRadius": "0px",
       "boxShadow": "none",
       "animationName": "none",
       "transitionProperty": "all",
       "textTransform": "uppercase",
-      "letterSpacing": "1.12px",
-      "backgroundColor": "rgb(251, 248, 239)",
-      "color": "rgb(36, 35, 30)"
+      "letterSpacing": "0.96px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "color": "rgb(47, 111, 126)"
     },
     {
       "text": "[FETCH]",
-      "padding": "8px 12px 8px 12px",
+      "padding": "0px 10px 0px 10px",
       "minHeight": "44px",
       "borderRadius": "0px",
       "boxShadow": "none",
       "animationName": "none",
       "transitionProperty": "all",
       "textTransform": "uppercase",
-      "letterSpacing": "1.12px",
-      "backgroundColor": "rgb(251, 248, 239)",
-      "color": "rgb(36, 35, 30)"
+      "letterSpacing": "0.96px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "color": "rgb(47, 111, 126)"
     }
   ],
   "rows": [
     {
       "minHeight": "44px",
-      "padding": "4px 4px",
-      "display": "flex",
+      "padding": "0px 0px",
+      "display": "grid",
       "borderTop": "1px"
     },
     {
       "minHeight": "44px",
-      "padding": "4px 4px",
-      "display": "flex",
+      "padding": "0px 0px",
+      "display": "grid",
       "borderTop": "1px"
     },
     {
       "minHeight": "44px",
-      "padding": "4px 4px",
-      "display": "flex",
+      "padding": "0px 0px",
+      "display": "grid",
       "borderTop": "1px"
     }
   ]
