@@ -29942,7 +29942,7 @@ phases:
       --project chromium-ci-safe` passed with 7/7 tests.'
   - id: retest-generalized-inspector-primary-body-sanitation
     name: Retest generalized Inspector primary-body sanitation
-    status: claimed
+    status: done
     description: 'Independent retest for residual Inspector primary-body sanitation
       remediation.
 
@@ -30045,6 +30045,29 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T14:49:03.941095+00:00'
+    done_at: '2026-05-10T14:53:57.666998+00:00'
+    evidence: 'Retest executed and found blocker B1; remediation ownership created
+      before completion. Evidence from integration-verifier: refs confirmation present
+      for docs/ARCHITECTURE.md, docs/DESIGN.md, gate artifact, Inspector.svelte, inspector-readable-content-regression,
+      inspector-dirty-corpus, UI repair spec, and project instructions. Web check/build
+      passed after dependency bootstrap: `npm --prefix web run check` passed with
+      `svelte-check found 0 errors and 0 warnings`; `npm --prefix web run build` passed;
+      backend untouched so Go tests not required. Runtime proof passed: targeted Playwright
+      command `npm --prefix web exec playwright test -- --config web/playwright.config.ts
+      web/tests/e2e/inspector-readable-content-regression.spec.ts web/tests/e2e/inspector-dirty-corpus.spec.ts
+      web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts --project
+      chromium-ci-safe` passed with 7/7; primary body attachment contained readable
+      copy and no forbidden runtime tokens. Static semantic proof failed: `web/src/routes/components/Inspector.svelte`
+      still contained exact screenshot-family/product guard literals: `model_latency_error`,
+      `Skip to main content`, `The homepage The Verge`, plus fixture/test harness
+      filtering language. Closure fields from retest: headline FAIL, verdict FAIL,
+      blockers [B1: fixture-specific screenshot-family literal guards remain in Inspector
+      product code], gate_open_allowed false, proof_gap_status BLOCKING, blocking_status
+      OPEN, orchestrator_action_hint DO_NOT_COMPLETE. Orchestrator created one batched
+      fix chain before completing this verification-report step: `remove-inspector-screenshot-family-guard-literals`
+      and `retest-remove-inspector-screenshot-family-guard-literals`, with downstream
+      residual UI/UX audit and final residual gate dependencies updated. No product
+      implementation files modified by retest; no commit created.'
   - id: residual-inspector-readable-content-gate
     name: Final residual gate for Inspector readable content
     status: pending
