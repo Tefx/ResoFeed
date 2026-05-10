@@ -30198,7 +30198,7 @@ phases:
     agent: gate-reviewer
   - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     name: residual-uiux-audit-generalized-inspector-primary-body
-    status: pending
+    status: claimed
     description: 'Focused residual UI/UX audit downstream of `retest-remove-inspector-screenshot-family-guard-literals`.
 
 
@@ -30298,6 +30298,8 @@ phases:
     depends_on:
     - retest-remove-inspector-screenshot-family-guard-literals
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-10T15:04:14.821234+00:00'
   - id: remove-inspector-screenshot-family-guard-literals
     name: Remove Inspector screenshot-family guard literals
     status: done
