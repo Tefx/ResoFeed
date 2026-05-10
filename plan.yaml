@@ -32443,3 +32443,121 @@ phases:
     runtime surfaces are introduced.
   depends_on:
   - prd-inspector-preview-conformance-remediation
+  steps:
+  - id: fuidcr-contract-matrix-lock
+    name: Lock UI audit contract matrix for findings 1-52
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: findings matrix, acceptance selectors, test fixture inventory,
+      no product implementation
+
+      agent_source: project
+
+
+      Lock the authoritative UI remediation contract before implementation.
+
+
+      SCOPE / touch_paths:
+
+      - Create or update frontend test/contract artifacts only (for example web/tests
+      or web/src test fixture files). Do NOT edit production Svelte/CSS in this step.
+
+      - Authoritative refs: docs/audits/full-ui-design-conformance-audit-2026-05-11.md,
+      docs/DESIGN.md, docs/ARCHITECTURE.md, AGENTS.md, docs/ui-preview.html.
+
+
+      REQUIRED MATRIX COVERAGE:
+
+      - Shell / Chrome findings: 1, 2, 3, 4, 5.
+
+      - Owner Token Prompt findings: 6, 7.
+
+      - Feed/Search shared anatomy findings: 8, 9, 10, 11, 12, 13, 14, 15, 16, 40,
+      41, 42, 43, 44.
+
+      - Inspector findings: 17, 18, 19, 20, 21, 22, 23.
+
+      - Source Ledger / State Portability findings: 24, 25, 26, 27, 28, 29, 30, 31,
+      32, 33, 34, 35, 36.
+
+      - /doctor findings: 37, 38, 39.
+
+      - Global styling/token findings: 45, 46, 47.
+
+      - docs/ui-preview.html findings: 48, 49, 50, 51, 52.
+
+
+      ARCHITECTURE BASIS TO PRESERVE:
+
+      - One deployable Go binary; one SQLite DB; no vector DB/RAG; no accounts/OAuth/sync/admin
+      process.
+
+      - api_runtime unchanged by default; no new product APIs unless existing DTO
+      demonstrably lacks item-display-only source-backed fields.
+
+      - Component composition only; no DI/event bus/service/repository layers.
+
+      - Shared abstractions allowed: feed-item anatomy / metadata formatter shared
+      by Feed and Search; bracket-action visual contract shared by SourceLedger/StatePortability/action
+      surfaces.
+
+
+      OUTPUT REQUIREMENTS:
+
+      - A machine-readable findings-to-tests/acceptance matrix listing every finding
+      1-52 exactly once.
+
+      - For every P0/P1, define required browser or DOM/behavior evidence, not prose-only
+      acceptance.
+
+      - Identify screenshot states required for desktop >=1080px and narrow/mobile
+      <1080px.
+
+      - Identify keyboard/focus checks for Inspector, bracket actions, search form,
+      owner token prompt, and original link behavior.
+
+      - If a required display datum may be absent from existing DTOs, record it as
+      a DTO-gap candidate only; do not authorize backend/storage changes here.'
+    verification: '- Matrix artifact exists and lists findings 1-52 exactly once.
+
+      - P0/P1 entries require browser/DOM/behavior evidence.
+
+      - Architecture constraints from AGENTS.md and docs/ARCHITECTURE.md are copied
+      into acceptance guardrails.
+
+      - No production Svelte/CSS/Go implementation logic is changed in this contract
+      step.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Matrix Evidence
+
+      - Matrix path(s): <paths>
+
+      - Findings covered exactly once: 1-52 = YES/NO
+
+      - P0/P1 evidence requirement summary: <paste table or link>
+
+      - DTO-gap candidates, if any: <none or list source-backed item-display-only
+      fields>
+
+      - Production files changed: <must be none>
+
+      '
+    agent: frontend-engineer
