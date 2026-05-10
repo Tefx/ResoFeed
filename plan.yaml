@@ -34931,3 +34931,157 @@ phases:
     depends_on:
     - fuidcr-api-dto-escalation-guard
     agent: golang-developer
+  - id: fuidcr-feed-search-client-dto-contract
+    name: Update Feed/Search frontend DTO contract for display fallbacks
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: [integration]
+
+      refs:
+
+      - docs/DESIGN.md
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-api-dto-escalation-guard; tier: proof; paths: DTO gap findings
+      9,11,15,16,42,43,44
+
+      - from_step: fuidcr-feed-search-dto-source-fields; tier: implementation; paths:
+      existing Feed/Search JSON DTO fields
+
+
+      Update the frontend Feed/Search client DTO contract only as needed to consume
+      the narrow source-backed item-display fields added by fuidcr-feed-search-dto-source-fields.
+
+
+      SCOPE / touch_paths:
+
+      - Existing frontend API type/client files for Feed/Search item DTOs.
+
+      - Existing Feed/Search test fixtures that model JSON HTTP responses.
+
+      - Do not change visual anatomy components here except minimal fixture/type updates
+      required to unblock fuidcr-feed-search-anatomy.
+
+
+      REQUIRED BEHAVIOR:
+
+      - Frontend types or client response handling recognize the added source-backed
+      timestamp fallback field(s) for Feed and Search items.
+
+      - Frontend types or client response handling recognize the added source-backed
+      excerpt fallback field(s) for Feed and Search items.
+
+      - Test fixtures include at least one item with null published_at and source-backed
+      first_seen_at/display timestamp fallback.
+
+      - Test fixtures include at least one item with null summary/core_insight and
+      source-backed feed_excerpt/display_excerpt fallback.
+
+
+      STRICT PRODUCT/ARCHITECTURE GUARDRAILS:
+
+      - Do NOT add new API concepts beyond the existing Feed/Search item DTO fields
+      from fuidcr-feed-search-dto-source-fields.
+
+      - Do NOT add routes, storage, auth, sync, accounts, vector/RAG, admin surfaces,
+      or service/repository/DI/event-bus abstractions.
+
+      - Keep this step item-display-only and source-backed.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Client/type
+      behavior must vary based on actual DTO fallback fields.
+
+
+      ## Frontend Completion Criteria (rendering deferred)
+
+      This is a frontend contract/client support step, not the visual anatomy implementation.
+      Rendering proof remains owned by fuidcr-feed-search-anatomy; this step must
+      provide type/client/fixture evidence that the anatomy step can consume the fallback
+      fields.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Frontend anatomy forced to infer unavailable data because DTO fallback fields
+      are not typed or fixture-backed.
+
+      2. Convenience-only fixtures that omit null published_at or null summary/core_insight
+      fallback cases.
+
+      3. New API/storage/product concepts beyond the source-backed DTO additions.'
+    verification: '- Frontend type/client contract compiles with the new Feed/Search
+      item-display fallback fields.
+
+      - Fixtures cover null published_at with source-backed first_seen_at/display
+      timestamp fallback.
+
+      - Fixtures cover null summary/core_insight with source-backed feed_excerpt/display_excerpt
+      fallback.
+
+      - Command evidence required if frontend types/client touched: npm --prefix web
+      run check.
+
+      - Command evidence required after backend DTO dependency is present: go test
+      ./... may be cited from fuidcr-feed-search-dto-source-fields if unchanged by
+      this step.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend DTO Contract Evidence
+
+
+      **Types/client paths updated**:
+
+      - <path>: <change summary>
+
+
+      **Fixtures updated**:
+
+      - <fixture/test path>: null published_at + first_seen/display timestamp fallback
+      covered
+
+      - <fixture/test path>: null summary/core_insight + feed/display excerpt fallback
+      covered
+
+
+      **Commands**:
+
+      ```
+
+      <paste npm --prefix web run check output if frontend types/client touched>
+
+      <paste or cite go test ./... output from fuidcr-feed-search-dto-source-fields
+      if this step did not alter Go>
+
+      ```
+
+
+      **Guardrail confirmation**:
+
+      - Added only existing Feed/Search item-display DTO contract fields: YES/NO
+
+      - Added new route/storage/auth/sync/account/vector/admin/service abstraction:
+      NO'
+    depends_on:
+    - fuidcr-feed-search-dto-source-fields
+    agent: frontend-engineer
