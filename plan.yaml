@@ -25399,7 +25399,7 @@ phases:
     agent: frontend-engineer
   - id: expected-red-inspector-dirty-corpus-tests
     name: Expected-red Inspector hierarchy and dirty content corpus tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25474,6 +25474,113 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:31:13.769303+00:00'
+    done_at: '2026-05-10T11:43:32.437429+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — Inspector primary hierarchy must show readable
+      content; raw JSON/JSON-LD/media/parser/model payloads may only appear in labelled
+      collapsed/secondary raw/provenance/diagnostic regions; dirty content corpus
+      requirements include JSON-LD, long descriptions, HTML fragments, script/style
+      leftovers, missing fields, long URL/title, escaped entities, media/enclosure,
+      partial extraction, model error.
+
+      - `docs/DESIGN.md` — Inspector anatomy includes source/provenance header, title,
+      original link, extraction status, dense summary, full text/excerpt, why-this-appeared
+      line; hostile RSS strings must wrap/truncate deterministically.
+
+      - `docs/ui-preview.html` — Inspector preview uses operational `INSPECTOR` label,
+      source metadata, title, original link, and readable payload area.
+
+      - `web/src/routes/components/Inspector.svelte` — current detail rendering path
+      selects extracted_text/feed_excerpt before summary/core insight and renders
+      unlabelled primary paragraph.
+
+
+      ## Expected-Red Inspector Dirty Corpus Evidence
+
+      - Files changed: `web/tests/e2e/dirty-corpus-fixtures.ts`, `web/tests/e2e/inspector-dirty-corpus.spec.ts`.
+
+      - Product UI source modified: NONE.
+
+      - Worktree commit: `43439c5`; merged to main as squash commit `ff0dd31`.
+
+      - Worktree command: `cd web && npm run test:e2e -- --grep "inspector|dirty corpus|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline verification command: `npm --prefix web run test:e2e -- --grep "inspector|dirty
+      corpus|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline result: exit code 1 accepted as expected red; 8 tests run, 4 passed,
+      4 expected-red failures including this step''s dirty corpus failure and prior
+      expected-red failures.
+
+
+      Fixture inventory:
+
+      - `json_ld_blob_item` — JSON-LD blob with `{ "@context"`.
+
+      - `long_description_item` — long RSS description and extracted text.
+
+      - `html_fragment_item` — HTML tags/fragments/escaped ampersand.
+
+      - `script_style_leftover_item` — script/style/tracking leftovers.
+
+      - `missing_summary_date_author_item` — missing description/date/source article
+      metadata.
+
+      - `very_long_url_title_item` — long title and URL/path pressure.
+
+      - `escaped_entities_item` — ampersand, quote entity, Unicode, malformed entity.
+
+      - `media_enclosure_metadata_item` — enclosure URL/MIME/length/poster metadata.
+
+      - `partial_extraction_item` — partial extraction with feed excerpt only.
+
+      - `model_error_item` — unavailable original/summary fallback.
+
+
+      Expected-red negative assertion results:
+
+      - `json_ld_blob_item` primary Inspector text exposed `{ "@context"`, `"@type"`,
+      `publisher`; no labelled secondary/collapsed raw disclosure.
+
+      - `long_description_item` missing readable primary long-form/extracted marker
+      text.
+
+      - `script_style_leftover_item` exposed `window.__tracker` and `.tracking`; no
+      labelled raw disclosure.
+
+      - `missing_summary_date_author_item` missing `summary unavailable` fallback.
+
+      - `escaped_entities_item` missing decoded quote text and exposed raw `&#x27;`;
+      no labelled raw disclosure.
+
+      - `media_enclosure_metadata_item` exposed `enclosure:`, `audio/mpeg`, `length=123456`,
+      `poster.jpg`; no labelled raw disclosure.
+
+      - `model_error_item` missing `summary unavailable` fallback.
+
+
+      Artifacts:
+
+      - Failure screenshot/video/trace/error context under `.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/`.
+
+      - Test attachments: `dirty-corpus-fixture-inventory.txt`, `dirty-corpus-negative-assertions.txt`.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — dirty corpus fixtures expose raw payload/readability
+      gaps in Inspector primary hierarchy.
+
+      orchestrator_action_hint: COMPLETE'
   - id: expected-red-design-artifact-negative-ux-tests
     name: Expected-red design artifact and negative UX assertion tests
     status: done
