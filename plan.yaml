@@ -22285,7 +22285,7 @@ phases:
       this contract step.'
   - id: playwright-comprehensive-e2e.harness-fixtures-env
     name: Playwright Harness, Fixtures, and Environment Setup
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags: ["integration"]
@@ -22405,6 +22405,129 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T09:49:22.371448+00:00'
+    done_at: '2026-05-10T09:58:14.557686+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md — real harness must build/launch `./cmd/resofeed`,
+      use isolated SQLite DB, deterministic owner token, sanitized env, captured stdout/stderr,
+      artifact outputs, and live OpenRouter tests separated/skipped without runtime
+      key.
+
+      - web/src/lib/playwright-e2e-harness-contract.ts — contract pins `go build -o
+      ./.test-artifacts/bin/resofeed ./cmd/resofeed`, preferred `npm --prefix web
+      run test:e2e`, required artifacts/redactions, run classes `ci-safe` and `live-openrouter`.
+
+      - web/src/lib/playwright-e2e-harness-contract.test.ts — tests enforce real binary
+      launch strings, all required flow categories, live OpenRouter separation, and
+      trace/screenshot/server-log/DB/env evidence.
+
+      - docs/ARCHITECTURE.md — ResoFeed is one Go binary with one SQLite DB; `OPENROUTER_KEY`
+      is runtime-only and never persisted/logged/committed; static UI is public but
+      `/api/*` requires owner token.
+
+      - docs/DESIGN.md — owner-token prompt, first-use empty state, dense archival
+      UI, Source Ledger, Inspector, `/doctor`, 44px controls, focus/keyboard states,
+      and no accounts/folders/settings/skeletons.
+
+      - docs/ui-preview.html — preview confirms RESOFEED chrome, Steer bar, Source
+      Ledger, `[RUN INGEST]`, `[FETCH]`, Inspector, mobile split, 44px star/actions,
+      flat archival styling.
+
+      - web/package.json — existing scripts had build/check/test/render only; added
+      `test:e2e`.
+
+      - existing web test setup/config files — `web/vite.config.ts` uses SvelteKit
+      + Vitest jsdom setup; `web/tsconfig.json` is strict; no prior Playwright config/tests
+      existed.
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      go build ./cmd/resofeed
+
+      npm --prefix web run check
+
+      npm --prefix web run test:e2e
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      Worker: go build exit 0; npm check exit 0; npm --prefix web run test:e2e exit
+      0 with 3 passed, 1 skipped.
+
+      Mainline: go build + npm check + npm --prefix web run test:e2e exit 0 with 3
+      passed, 1 skipped.
+
+      ```
+
+      **Path exercised**: Playwright global setup → `npm --prefix web run build` →
+      `go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed` → built `cmd/resofeed`
+      binary → sanitized env/temp SQLite DB → browser `baseURL` → owner-token prompt/API
+      auth.
+
+
+      ## Harness Artifact Configuration
+
+      - Trace path: `.test-artifacts/playwright/test-output/**/trace.zip` on retained
+      failures via `trace: retain-on-failure`
+
+      - Screenshot/video path: `.test-artifacts/playwright/test-output/**` via `screenshot:
+      only-on-failure`, `video: retain-on-failure`
+
+      - Server stdout/stderr path: `.test-artifacts/playwright/server-logs/server.stdout.log`,
+      `.test-artifacts/playwright/server-logs/server.stderr.log`
+
+      - DB fixture path: `.test-artifacts/playwright/fixtures/resofeed-e2e-<timestamp>-<pid>.sqlite3`
+
+      - Sanitized environment notes: `.test-artifacts/playwright/sanitized-environment.md`;
+      allows only PATH, HOME, TMPDIR, RESOFEED_E2E, OPENROUTER_KEY; owner token and
+      OpenRouter values redacted.
+
+      - CI-safe/live-only LLM separation: default Chromium project grep-inverts `@live-openrouter`;
+      live project greps `@live-openrouter` and skips deterministically when `OPENROUTER_KEY`
+      is absent.
+
+
+      ## Verification
+
+      - Worker commands: `npm --prefix web install` (no package-lock diff), `go build
+      ./cmd/resofeed`, `npm --prefix web run check`, `npm --prefix web run test:e2e`
+      exit 0.
+
+      - Mainline verification initially failed because child process used repo root
+      as cwd, so local `.env` made missing `OPENROUTER_KEY` not truly missing; it
+      then attempted to bind `127.0.0.1:1` and exited status 1 instead of CLI validation
+      status 2. Focused retry fixed the test to run missing/invalid key child processes
+      from an artifact cwd without `.env` fallback, preserving exit 2 and sanitized
+      diagnostic assertions.
+
+      - Mainline final-state verification after fix: `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-e2e-harness
+      ./cmd/resofeed && npm --prefix web run check && npm --prefix web run test:e2e`
+      exit 0; output included `svelte-check found 0 errors and 0 warnings` and Playwright
+      `1 skipped`, `3 passed`.
+
+      - Files changed: `web/package.json`, `web/playwright.config.ts`, `web/tests/e2e/e2e-contract.ts`,
+      `web/tests/e2e/fixtures.ts`, `web/tests/e2e/global-setup.ts`, `web/tests/e2e/global-teardown.ts`,
+      `web/tests/e2e/real-server-ui.spec.ts`.
+
+      - Product/code/docs modified: web test harness/config/script only; no product
+      behavior or docs changed.
+
+      - Deviation records: none.
+
+      - Worker commit: `66aec5fb03bd4bcc3002ee9ee12536a529e11f2e`; focused fix commit:
+      `049e487`; main merge commits: `32c02c2 [vectl] step-playwright-comprehensive-e2e.harness-fixtures-env
+      completed` and `b6bea58 [vectl] fix playwright e2e harness startup validation`.
+
+      - Gaps/Notes: generated `.test-artifacts/` and local build output were removed
+      or untracked-only and are produced when harness runs.'
   - id: playwright-comprehensive-e2e.core-feed-browser-flows
     name: Core Browser Feed and Source E2E Flows
     status: pending
