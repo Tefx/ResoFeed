@@ -34422,6 +34422,8 @@ phases:
       '
     depends_on:
     - fuidcr-style-breakpoint-foundation
+    - fuidcr-feed-search-dto-source-fields
+    - fuidcr-feed-search-client-dto-contract
     - fuidcr-feed-search-anatomy
     - fuidcr-inspector-reading-contract
     - fuidcr-source-ledger-state-portability
