@@ -31559,7 +31559,7 @@ phases:
   steps:
   - id: contract-lock
     name: Lock owner-token offline reset contract
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - CLI grammar and help contract\n  - exact acceptance rules\n  - internal\
       \ stub signatures only if needed\n\nPin the authoritative CLI contract from\
@@ -31618,6 +31618,91 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-10T17:20:03.160513+00:00'
+    done_at: '2026-05-10T17:25:38.009350+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read owner-token reset contract: CLI-only `resofeed
+      owner-token reset --db PATH --confirm-reset`, deletes only `runtime_metadata.key=''owner_token_sha256''`,
+      no plaintext replacement behavior or HTTP/MCP/UI reset surfaces.
+
+      - docs/USAGE.md — Read user-facing reset usage: stop `serve`, run offline reset
+      with required `--db` and `--confirm-reset`, then replacement happens only through
+      normal `serve` startup.
+
+      - AGENTS.md — NOT READ: subagent reported file not present in isolated worktree
+      `.vectl/worktrees/contract-lock`; `.agents/instructions.md` read instead and
+      contains relevant boundaries.
+
+      - .agents/instructions.md — Read boundaries: one deployable, one SQLite DB,
+      single owner token, no accounts/OAuth/per-agent registry, do not mutate plan
+      state.
+
+
+      ## Contract Evidence
+
+      - Authoritative CLI grammar pinned: `resofeed owner-token reset --db PATH --confirm-reset`
+      in parser/help/tests.
+
+      - Required flags pinned: `--db` and `--confirm-reset` both reject omission with
+      safe errors.
+
+      - Forbidden surfaces pinned: `serve --reset-owner-token` rejected; reset help
+      states no serve/HTTP/MCP/UI/runtime startup behavior.
+
+      - Replacement-token semantics pinned: help/tests assert no generate/print/accept/store
+      plaintext replacement token; replacement remains in `serve` startup paths.
+
+      - Stub-only outputs, if any: `OwnerTokenResetConfig`, parser, and `owner_token_reset_not_implemented`
+      stub.
+
+      - Confirmation that no deletion/runtime behavior was added in this contract
+      step: valid grammar returns stub error and test confirms seeded `owner_token_sha256`
+      remains unchanged.
+
+
+      ## Files changed
+
+      - internal/resofeed/db.go
+
+      - internal/resofeed/owner_token_reset_contract_test.go
+
+
+      ## Verification
+
+      - Subagent: `gofmt -w internal/resofeed/db.go internal/resofeed/owner_token_reset_contract_test.go`
+      — exit 0.
+
+      - Subagent: `go test ./internal/resofeed` — exit 0; `ok resofeed/internal/resofeed
+      0.716s`.
+
+      - Subagent: `go test ./...` — exit 0; cmd no tests; internal package ok.
+
+      - Subagent: `go build ./cmd/resofeed` — exit 0.
+
+      - Subagent: `golangci-lint run` — exit 0; `0 issues.`
+
+      - Subagent: `go test -race ./internal/resofeed` — exit 0; `ok resofeed/internal/resofeed
+      2.715s`.
+
+      - Orchestrator mainline verification after squash merge: `go test ./... && go
+      build ./cmd/resofeed` — exit 0; `resofeed/cmd/resofeed` no test files; `resofeed/internal/resofeed`
+      ok.
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: 1bc89a92b7aab20103254e2622ed7a8ee3109479
+
+      - Mainline squash commit: cc6a1cb [vectl] step-contract-lock completed
+
+
+      ## Gaps/Notes
+
+      - `AGENTS.md` was absent in the isolated worktree; `.agents/instructions.md`
+      was read and contains relevant constraints.
+
+      - No functional SQLite deletion logic was implemented; the valid grammar returns
+      the not-implemented stub and leaves seeded hash unchanged.'
   - id: expected-red-tests
     name: Add expected-red tests for offline reset contract
     status: pending
