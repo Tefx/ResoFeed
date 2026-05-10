@@ -27636,7 +27636,7 @@ phases:
       as final-state verification evidence.'
   - id: retest-visual-ux-debt-and-proof-gap
     name: Retest visual UX debt and proof gap closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -27780,3 +27780,182 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T12:55:22.080091+00:00'
+    done_at: '2026-05-10T12:57:54.978676+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `AGENTS.md` — NOT READ by executor: not present in isolated worktree; root-session
+      AGENTS guidance was available in prompt.
+
+      - `docs/ARCHITECTURE.md` — frontend must preserve `docs/DESIGN.md`, render dense-but-legible
+      feed/Inspector, show fallback/status labels plainly, avoid extra dashboard/settings
+      surfaces; architecture requires accessible item provenance in `ItemDetail`.
+
+      - `docs/DESIGN.md` — mobile metadata must remain a flat inline monospace line;
+      hostile RSS strings may ellipsize after one line; feed rows are triage surfaces;
+      full raw excerpt/body belongs in Inspector; provenance/raw data may be exposed
+      plainly but must remain labelled and secondary.
+
+      - `docs/DESIGN_VISION.md` — archival, high-density, typographic, low-fatigue;
+      no paternalism, cute error states, numeric anxiety; whitespace/rules over border-box
+      maze.
+
+      - `docs/ui-preview.html` — flat feed metadata with separators, 44px star targets,
+      selected marker/focus treatment, Inspector provenance header, mobile compact
+      feed/detail split.
+
+      - `mobile-feed.png` artifact — 390px mobile feed shows hostile metadata as one
+      flat inline row: `SRC: RESOFEE… · ORIGINAL… TODAY`; truncates with ellipses
+      and does not wrap into stacked words.
+
+      - `inspector-raw-expanded-provenance.png` artifact — expanded `raw provenance
+      diagnostics` appears below primary Inspector title/link/summary/why content,
+      labelled by disclosure text, then a separated monospace JSON block.
+
+      - `manifest.json` — `inspector-raw-expanded/provenance` points to `inspector-raw-expanded-provenance.png`
+      with note: expanded labelled raw/provenance disclosure remains secondary below
+      the Inspector reading flow; `mobile-feed` entry is 390x760. Non-blocking caveat:
+      manifest screenshot paths reference sibling remediation worktree, while required
+      images also exist and were directly read in this retest worktree.
+
+
+      ## Independent UI/UX Retest Report
+
+
+      **behavioral_proof_register**:
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | UX-DEBT-001 | Mobile metadata remains flat/scannable under hostile long metadata
+      | Mobile screenshot/proof with long metadata | `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-feed.png`
+      | PROVEN | Closed by one-line truncation/ellipsis and inline separators; no
+      stacked metadata words observed. | OPEN: visual proof meets DESIGN.md mobile
+      metadata rule. |
+
+      | PROOF-GAP-001 | Expanded raw/provenance state is visually proven and secondary/labeled
+      | Expanded provenance screenshot/proof | `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-raw-expanded-provenance.png`
+      | PROVEN | Closed by expanded labelled disclosure and separated monospace JSON
+      below primary Inspector content. | OPEN: artifact exists and shows secondary/labeled
+      treatment. |
+
+      | NAV-REGRESSION | Navigation remains visually clickable and selected/focus
+      states are clear | State artifacts for Today and Source Ledger | `today-list.png`,
+      `source-ledger.png`, `selected-item.png`, `selected-hover.png` | PROVEN | Visual
+      controls remain bordered, labelled, focus-visible, and route state is reflected.
+      | OPEN: no visual regression found. |
+
+      | INSPECTOR-HIERARCHY | Inspector primary reading hierarchy remains dominant
+      | Inspector selected/expanded screenshots | `selected-item.png`, `inspector-raw-expanded-provenance.png`
+      | PROVEN | Title, link, summary, and why line precede raw/provenance disclosure.
+      | OPEN: raw provenance not promoted into primary reading text. |
+
+      | DIRTY-CONTENT | Dirty/unavailable content remains raw and honest | Error/fallback
+      screenshots | `llm-error.png`, `inspector-raw-expanded-provenance.png` | PROVEN
+      | `summary unavailable` and raw provenance are shown plainly with no cute/fake
+      content. | OPEN: aligns with DESIGN.md raw fallback rules. |
+
+
+      ### Evidence Matrix
+
+      | State / Viewport | Required by DESIGN.md | Visual Evidence | Verdict |
+
+      | --- | --- | --- | --- |
+
+      | Mobile feed / 390px | Flat inline metadata, no bordered mobile metadata pills,
+      deterministic wrap/truncate | `mobile-feed.png` | PASS |
+
+      | Expanded Inspector provenance / desktop | Raw provenance plainly exposed,
+      labelled, secondary to reading flow | `inspector-raw-expanded-provenance.png`
+      | PASS |
+
+      | Selected/hover state | Non-layout-shifting selected marker/focus clarity |
+      `selected-item.png`, `selected-hover.png` | PASS |
+
+      | Navigation / Source Ledger | Operational labels and clickable visual affordances
+      | `today-list.png`, `source-ledger.png` | PASS |
+
+      | Dirty fallback content | Raw fallback strings, no cute/AI-slop states | `llm-error.png`
+      | PASS |
+
+
+      ### Findings
+
+      | ID | Severity | Type | Evidence | User Impact | Required Fix |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | INFO-001 | Info | Artifact hygiene | `manifest.json` absolute screenshot paths
+      reference `worktrees/remediate-visual-ux-debt-and-proof-gap`, while direct images
+      exist under this retest worktree and were read successfully. | Low; direct visual
+      proof is available, but manifest portability is weaker. | Future artifact generation
+      should write worktree-local or relative paths. |
+
+
+      ### Verified Conformance
+
+      - DESIGN.md mobile layout: mobile feed metadata remains flat and inline; `mobile-feed.png`
+      shows a single-line metadata row with ellipsis, not stacked words.
+
+      - DESIGN.md typography: hostile strings may ellipsize after one line; `mobile-feed.png`
+      shows `RESOFEE…` / `ORIGINAL…` truncation.
+
+      - DESIGN.md Inspector: provenance/raw detail is exposed plainly; `inspector-raw-expanded-provenance.png`
+      shows labelled `raw provenance diagnostics` below primary title/link/summary/why.
+
+      - DESIGN.md motion/state: selected/focus artifacts show stable row geometry
+      and clear focus/selected treatment; no layout-shift evidence observed.
+
+      - DESIGN.md negative UX bans: no folders/tags/unread counts/AI trust gradients/cute
+      errors observed in retest artifacts.
+
+
+      ### Unverifiable / Missing Evidence
+
+      - Actual pointer-event click mechanics cannot be proven from static screenshots
+      alone; route/state artifacts support that navigation states were reached during
+      artifact generation.
+
+      - Motion timing/reduced-motion behavior was not covered by supplied visual stills;
+      no motion regression was in the two closure criteria.
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: NONE
+
+      orchestrator_action_hint: COMPLETE
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: PASS — UX-DEBT-001 and PROOF-GAP-001 are visually closed by
+      supplied retest artifacts.
+
+      failure_alignment: no blocker; no remaining proof gap for scoped remediation;
+      one non-blocking artifact-manifest hygiene note.
+
+      product_implementation_files_modified: false
+
+      audit_report_artifact_created: false
+
+      commit_hashes: none — read-only retest; git status showed no tracked or untracked
+      changes in isolated worktree.
+
+      uncertainty_sources:
+
+      - Static images prove visual geometry/hierarchy but not live click event handlers
+      or motion timing.
+
+      - Manifest contains stale absolute paths, but direct worktree-local image files
+      were read and used as visual evidence.'
