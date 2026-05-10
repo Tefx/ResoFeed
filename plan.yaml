@@ -28089,3 +28089,109 @@ phases:
     depends_on:
     - gate
     agent: frontend-engineer
+  - id: ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
+    name: retest-gate-keyboard-a11y-full-targeted
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      priority: HIGH
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER, retest B-GATE-001 after `fix-gate-keyboard-a11y-flake`
+      from a fresh perspective. This retest must prove deterministic green for the
+      full targeted Playwright command, not only the single previously failing test.
+
+
+      Required command (run exactly):
+
+      `npm --prefix web run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      ui-navigation-hover-inspector-repair.expected-red.spec.ts hit-target-clickability.spec.ts
+      keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts`
+
+
+      Retest obligations:
+
+      - Run the full targeted command exactly as above and require exit 0.
+
+      - Treat a passing single-test rerun as insufficient.
+
+      - If it fails, include failure artifacts, screenshots, videos, error-context,
+      and trace paths.
+
+      - If it passes, include full runner output and trace/artifact paths or the artifact
+      manifest proving the run covered the full suite.
+
+      - Confirm keyboard/focus assertions remain meaningful and were not weakened/skipped.
+
+      - Confirm existing successful JSON-LD/mobile/provenance repairs did not regress
+      in the covered suite.
+
+      - Include closure fields: verdict, blockers, gate_open_allowed, proof_gap_status,
+      blocking_status, orchestrator_action_hint.
+
+
+      Finding issues is a successful retest outcome, but the phase must remain blocked
+      unless the comprehensive targeted command is green and closure fields support
+      reopening the gate.
+
+
+      Independence Level: L1 independent runtime verification; retest agent must not
+      be the implementation fix agent.'
+    verification: '- Required command is run exactly: `npm --prefix web run check
+      && npm --prefix web run test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts`.
+
+      - Command exits 0 for PASS; any non-zero exit keeps blocker B-GATE-001 OPEN.
+
+      - Evidence includes full runner output, not a summary.
+
+      - If failed, evidence includes failure artifact paths for screenshot/video/error-context/trace.
+
+      - If passed, evidence includes trace/artifact manifest or confirms where Playwright
+      artifacts are stored.
+
+      - Closure fields are present: verdict, blockers, gate_open_allowed, proof_gap_status,
+      blocking_status, orchestrator_action_hint.
+
+      - Keyboard/focus assertions remain meaningful and are not skipped/weakened.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of frontend-engineer implementation fix)\n**Scope**: B-GATE-001\
+      \ full targeted Playwright retest\n**Independence Level**: L1\n**Timestamp**:\
+      \ <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/hit-target-clickability.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/feed-row-state-matrix.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/design-artifact-negative-ux.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n### Required Command\n```\nnpm --prefix web\
+      \ run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts\n```\n\n\
+      ### Test Execution\n- Exit code: <0/non-zero>\n- Full runner output:\n```\n\
+      <paste full output>\n```\n\n### Artifact / Trace Paths\n- Passing run artifact\
+      \ manifest or trace paths:\n  - <path>\n- If failed, failure artifacts:\n  -\
+      \ screenshot: <path>\n  - video: <path>\n  - error-context: <path>\n  - trace:\
+      \ <path>\n\n### Assertions Integrity\n- Single-test-only proof rejected: YES\n\
+      - Keyboard/focus assertions weakened/skipped: NO/YES with details\n- JSON-LD/mobile/provenance\
+      \ covered repairs regressed: NO/YES with details\n\n### Closure Fields\nverdict:\
+      \ PASS|FAIL\nblockers:\n  - <none or B-GATE-001 remains open>\ngate_open_allowed:\
+      \ true|false\nproof_gap_status: CLOSED|BLOCKING\nblocking_status: CLOSED|OPEN\n\
+      orchestrator_action_hint: <complete retest and run final gate | create another\
+      \ fix loop | keep phase blocked>\n\n### Headline\n- [ ] PASS: Full targeted\
+      \ command exited 0 and B-GATE-001 is closed.\n- [ ] FAIL: Full targeted command\
+      \ failed or proof remains nondeterministic/incomplete."
+    depends_on:
+    - ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
+    agent: integration-verifier
