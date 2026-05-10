@@ -24876,7 +24876,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: playwright-repair-verification
     name: Comprehensive deterministic Playwright UI regression verification
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -24958,6 +24958,179 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T12:14:28.035722+00:00'
+    done_at: '2026-05-10T12:24:19.742897+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `docs/DESIGN.md` — Key constraints: operational labels only (`RESOFEED`, `TODAY`,
+      `SOURCE LEDGER`, `INSPECTOR`, `/doctor`); touch targets must be at least 44
+      CSS px; feed selected state must be non-layout-shifting; raw/provenance belongs
+      in Inspector/disclosure, not primary feed copy; forbidden UX includes folders/tags/settings/unread/mascots/SaaS/AI-magic
+      copy.
+
+      - `docs/ui-preview.html` — Reference behavior includes 44px star/fetch/delete
+      targets, flat `SOURCE LEDGER`, `/doctor` raw text block, selected feed marker,
+      mobile feed/mobile Inspector screenshots, and OPML/import/export text actions.
+
+      - `docs/DESIGN_VISION.md` — Core vibe: archival, high-density, typographic,
+      low-fatigue; rejects inbox-zero anxiety, folders, numeric indicators, cute errors,
+      account/onboarding flows, and settings panels.
+
+      - `web/src/routes/+page.svelte` — Public wiring surface: owner token gate, Steer
+      form, TODAY/SOURCE LEDGER nav, `/doctor`, Feed, Inspector, SourceLedger, StatePortability,
+      Search surfaces, manual ingest/fetch handlers.
+
+      - `web/src/routes/components/Feed.svelte` — Feed rows are button-openable, list
+      semantics are present, selected state uses `aria-current`, star uses `aria-pressed`,
+      `Resonate item`/`Remove resonance` labels, and dirty text is sanitized from
+      summaries.
+
+      - `web/src/routes/components/Inspector.svelte` — Inspector focuses heading on
+      open, suppresses original-link navigation in-test, keeps raw payload in `details.contract-raw-provenance`,
+      and maps dirty corpus titles to readable primary text.
+
+
+      ## Comprehensive Playwright Verification Evidence
+
+
+      - Worktree commands:
+
+      ```sh
+
+      cd web && npm run check
+
+      cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair|hit-target|keyboard|a11y|state
+      matrix|dirty corpus|design artifact|negative UX"
+
+      ```
+
+      - Worktree setup note: initial `npm run check` failed because `svelte-kit` was
+      missing; agent ran `cd web && npm ci`, which added 150 packages and reported
+      3 low-severity vulnerabilities.
+
+      - Worktree runner output: `svelte-check found 0 errors and 0 warnings`; targeted
+      Playwright run passed 15/15 tests in 21.1s.
+
+      - Mainline final-state verification after squash merge:
+
+      ```sh
+
+      npm --prefix web run check
+
+      npm --prefix web run test:e2e -- --grep "ui-navigation-hover-inspector-repair|hit-target|keyboard|a11y|state
+      matrix|dirty corpus|design artifact|negative UX"
+
+      ```
+
+      Mainline output: `svelte-check found 0 errors and 0 warnings`; targeted Playwright
+      run passed 15/15 tests in 13.3s.
+
+      - Artifact manifest: generated Playwright evidence committed under `.test-artifacts/playwright/`,
+      including `.test-artifacts/playwright/results/results.json`, `.test-artifacts/playwright/html-report/index.html`,
+      design artifacts, screenshots, traces, and server logs.
+
+      - Browser trace paths include `.test-artifacts/playwright/test-output/.../trace.zip`
+      for design artifact, negative UX, dirty corpus, keyboard/a11y, and state-matrix
+      tests.
+
+
+      ## Coverage table
+
+      | Category | Tests | Status | Evidence ref | Gap/remediation |
+
+      | --- | --- | --- | --- | --- |
+
+      | Real pointer hit-target/clickability | `hit-target-clickability.spec.ts`,
+      nav repair tests | PROVEN | 15/15 pass; traces committed | none |
+
+      | Keyboard/a11y activation | `keyboard-a11y.expected-red.spec.ts` | PROVEN |
+      4 keyboard/a11y tests passed | none |
+
+      | Interaction state matrix | `feed-row-state-matrix.expected-red.spec.ts` |
+      PROVEN | screenshots/style dump attached in Playwright output | none |
+
+      | Dirty corpus Inspector hierarchy | `inspector-dirty-corpus.spec.ts` | PROVEN
+      | dirty corpus test passed with trace | none |
+
+      | Design artifact generation | `design-artifact-negative-ux.spec.ts`; manifest
+      | PROVEN | all 12 required screenshot names present | none |
+
+      | Negative UX assertions | `design-artifact-negative-ux.spec.ts` | PROVEN |
+      negative UX copy/raw payload test passed | none |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | hit-target | SOURCE LEDGER, TODAY, Steer submit, star, Inspector links, `/doctor`,
+      OPML import, source fetch buttons are clickable/unobstructed | Real Chromium
+      clicks plus obstruction diagnostics | `hit-target-clickability.spec.ts`; 15/15
+      pass | PROVEN | none | pass |
+
+      | keyboard-a11y | Tab order, focus visibility, Enter/Space activation, labels/roles,
+      active/selected semantics work | Real browser keyboard tests | `keyboard-a11y.expected-red.spec.ts`;
+      4 tests pass | PROVEN | none | pass |
+
+      | state-matrix | normal, hover, selected, selected+hover, focus, selected+focus
+      remain readable/stable | Screenshots plus computed style assertions | `feed-row-state-matrix.expected-red.spec.ts`;
+      artifacts committed | PROVEN | none | pass |
+
+      | inspector-dirty-corpus | Dirty raw JSON/JSON-LD/metadata/provenance does not
+      become primary content | Dirty corpus browser test | `inspector-dirty-corpus.spec.ts`;
+      pass | PROVEN | none | pass |
+
+      | design-artifacts | Required screenshot names exist | Manifest with 12 required
+      artifact names and PNG paths | `design-artifacts/manifest.json` | PROVEN | none
+      | pass |
+
+      | negative-ux | No banned raw blobs, forbidden RSS-reader concepts, mascot/SaaS/AI-magic
+      copy, wrong-panel nav activation | Browser DOM text and active panel assertions
+      | `design-artifact-negative-ux.spec.ts`; 2 tests pass | PROVEN | none | pass
+      |
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: worktree and mainline `npm run check` green; targeted Playwright
+      green (15 passed / 0 failed) after merge.
+
+      failure_alignment: no product blocker observed in deterministic Playwright verification;
+      only bootstrap dependency gap and low-severity dependency/tooling warnings reported.
+
+      product_implementation_files_modified: false
+
+      commit_hashes:
+
+      - worktree: `2bc7657 test: capture playwright repair verification evidence`
+
+      - main: `46eed1f [vectl] step-playwright-repair-verification completed`
+
+
+      gaps_or_notes:
+
+      - Subagent reported low-severity npm audit findings and Node `[DEP0205] module.register()`
+      deprecation warnings as non-blocking tooling/dependency maintenance notes.
+
+      - Orchestrator stashed pre-existing untracked `.test-artifacts` before merge
+      to avoid artifact collision; branch evidence was merged and mainline verification
+      passed.'
   - id: visual-ux-audit
     name: Native multimodal UI/UX audit for complete regression artifact set
     status: pending
