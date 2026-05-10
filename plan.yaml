@@ -31550,7 +31550,7 @@ phases:
       \ blocker, should-fix, NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item remains."
 - id: owner-token-offline-reset
   name: Owner Token Offline Reset
-  status: pending
+  status: in_progress
   gate: CLI-only offline owner-token reset satisfies docs/ARCHITECTURE.md and docs/USAGE.md
     without introducing HTTP/MCP/UI reset surfaces or changing serve token replacement
     semantics.
@@ -31559,7 +31559,7 @@ phases:
   steps:
   - id: contract-lock
     name: Lock owner-token offline reset contract
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - CLI grammar and help contract\n  - exact acceptance rules\n  - internal\
       \ stub signatures only if needed\n\nPin the authoritative CLI contract from\
@@ -31616,6 +31616,8 @@ phases:
       - Confirmation that no deletion/runtime behavior was added in this contract
       step:'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-10T17:20:03.160513+00:00'
   - id: expected-red-tests
     name: Add expected-red tests for offline reset contract
     status: pending
