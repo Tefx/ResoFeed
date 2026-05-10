@@ -33144,7 +33144,7 @@ phases:
       \ artifacts; only the test spec was committed."
   - id: fuidcr-api-dto-escalation-guard
     name: Confirm no backend API or storage changes are needed by default
-    status: claimed
+    status: done
     description: 'step_type: planning
 
       agent_source: project
@@ -33219,6 +33219,48 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-10T17:26:47.531053+00:00'
+    done_at: '2026-05-10T17:50:29.153118+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
+      \ — NOT READ: file absent in isolated worktree; relevant finding groups were\
+      \ supplied by orchestrator prompt for this retry.\n- docs/ARCHITECTURE.md —\
+      \ Read: one binary, one SQLite DB, thin transports, no vector/RAG/accounts/sync/layers;\
+      \ HTTP §6 defines ItemSummary, ItemDetail, Source, SearchResponse, state bundle.\n\
+      - AGENTS.md — NOT READ: file absent in isolated worktree.\n\n## DTO Escalation\
+      \ Guard Evidence\n- Display needs checked: findings 9, 11, 15, 16, 18-23, 24-36,\
+      \ 42-44\n- Existing DTO/source mapping:\n  - Source label: `GET /api/feed/today`,\
+      \ `GET /api/search`, `ItemSummary.source_title/source_id` from `sources.title`,\
+      \ `items.source_id` — presentation-only.\n  - Inspect/Resonate affordances:\
+      \ `ItemSummary.id/is_resonated` plus existing inspect/resonance POST paths from\
+      \ `item_state.is_resonated`, `human_inspected_at` — presentation-only.\n  -\
+      \ Inspector readable path/provenance: `GET /api/items/{id}` `ItemDetail.feed_excerpt/extracted_text/provenance`\
+      \ from existing item/source fields — presentation-only cleaning/layout.\n  -\
+      \ Source Ledger: `GET /api/sources` `Source.id/url/title/last_fetch_at/last_fetch_status/is_active/revision`\
+      \ from `sources.*` — presentation-only.\n  - State portability: existing `StateBundleV1`\
+      \ export/import schemas from sources, steer_rules, resonated item_state subset\
+      \ — presentation-only DOM/action/label corrections.\n- DTO gaps:\n  - `GET /api/feed/today`\
+      \ item objects: `first_seen_at` or display timestamp fallback when `published_at`\
+      \ is null; source `items.first_seen_at`; findings 9,15,16,43.\n  - `GET /api/search`\
+      \ item objects: `first_seen_at` or display timestamp fallback when `published_at`\
+      \ is null; source `items.first_seen_at`; findings 43,44.\n  - `GET /api/feed/today`\
+      \ item objects: `feed_excerpt` or display_excerpt fallback when `summary/core_insight`\
+      \ are null; source `items.feed_excerpt`; findings 11,42.\n  - `GET /api/search`\
+      \ item objects: `feed_excerpt` or display_excerpt fallback for useful result\
+      \ text when `summary/core_insight` are null; source `items.feed_excerpt`; finding\
+      \ 44.\n- Architecture forbidden concepts introduced: none.\n\n## Files changed\n\
+      - none\n\n## Verification\n- Read-only inspection in isolated worktree only;\
+      \ no files changed.\n- No plan files inspected and no broad repository search\
+      \ performed in retry.\n- Targeted refs/files inspected: docs/ARCHITECTURE.md,\
+      \ internal/resofeed/types.go, http.go, search.go, ranking.go, migrations.go,\
+      \ state.go, web/src/lib/api-contract.ts, api-client.ts, web/src/routes/+page.svelte,\
+      \ Feed.svelte, Inspector.svelte, SearchRetrieval.svelte, SourceLedger.svelte,\
+      \ StatePortability.svelte.\n\n## Commit hash(es)\n- none; no files changed\n\
+      \n## Gaps/Notes\n- Most audit display needs are satisfied by formatting/presentation\
+      \ over existing DTOs.\n- Narrow DTO additions are justified only for existing\
+      \ current-state item fields already stored in SQLite: `items.first_seen_at`\
+      \ and `items.feed_excerpt` on feed/search list DTOs, or backend-computed `display_*`\
+      \ equivalents derived from those fields.\n- Do not add new routes, auth models,\
+      \ persistence tables, sync/merge/accounts/vector/RAG/admin process, or service/repository/DI\
+      \ layers."
   - id: fuidcr-style-breakpoint-foundation
     name: Repair global style and responsive breakpoint foundation
     status: claimed
