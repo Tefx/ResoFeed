@@ -20568,7 +20568,7 @@ phases:
       preserved outside the remediation commit.'
   - id: verification-retest-after-remediation
     name: Verification Retest After Remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -20776,3 +20776,5 @@ phases:
     depends_on:
     - remediate-verifier-blockers
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T08:14:30.523497+00:00'
