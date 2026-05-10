@@ -33507,3 +33507,97 @@ phases:
     - fuidcr-expected-red-ui-tests
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+  - id: fuidcr-ui-preview-cleanup
+    name: Clean docs/ui-preview.html after live UI contracts stabilize
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: preview drift
+      tests
+
+
+      Clean the preview reference artifact only after live UI contract repairs have
+      stabilized.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - docs/ui-preview.html
+
+      - No production Svelte/CSS/Go changes in this step.
+
+
+      FINDINGS TO CLOSE:
+
+      - 48: replace non-token hard-coded surface color with defined design tokens.
+
+      - 49: mobile Inspector title size aligns with typography.inspector-title 28px/32px.
+
+      - 50: mobile preview explanatory labels are removed from golden visual state
+      or clearly marked preview-only so they cannot be mistaken for product chrome.
+
+      - 51: feed marker/padding model aligns with DESIGN.md component token geometry.
+
+      - 52: Source Ledger heading level aligns with the required DOM contract or records
+      the accepted heading-level decision consistently with implementation and design.
+
+
+      CONSTRAINTS:
+
+      - Do not change docs/DESIGN.md authority in this step unless a prior explicit
+      design review authorizes it.
+
+      - Preview follows live UI contract; it does not invent new product chrome or
+      surfaces.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step for a documentation preview artifact. Stub-only
+      or placeholder-only edits are NOT acceptable; the preview must render the corrected
+      token/DOM/geometry states.'
+    verification: '- Preview drift checks for findings 48-52 pass green.
+
+      - docs/ui-preview.html no longer contains the audited non-token color, off-token
+      mobile title size, misleading mobile product labels, off-token feed marker/padding,
+      or inconsistent Source Ledger heading contract.
+
+      - No production code changed in this step.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Preview Cleanup Evidence
+
+      - Closed findings: 48,49,50,51,52
+
+      - Preview file changed: docs/ui-preview.html = YES/NO
+
+      - Production files changed: <must be none>
+
+      - Rendered preview check/screenshot refs: <paths>
+
+      - Heading-level decision for finding 52: <accepted rationale>
+
+      '
+    depends_on:
+    - fuidcr-feed-search-anatomy
+    - fuidcr-inspector-reading-contract
+    - fuidcr-source-ledger-state-portability
+    - fuidcr-shell-owner-doctor-surfaces
+    agent: frontend-engineer
