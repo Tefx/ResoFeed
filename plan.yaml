@@ -31556,3 +31556,63 @@ phases:
     semantics.
   depends_on:
   - prd-inspector-preview-conformance-remediation
+  steps:
+  - id: contract-lock
+    name: Lock owner-token offline reset contract
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - CLI grammar and help contract\n  - exact acceptance rules\n  - internal\
+      \ stub signatures only if needed\n\nPin the authoritative CLI contract from\
+      \ docs without shipping behavior.\n\nAUTHORITATIVE PUBLIC SURFACE:\n- `resofeed\
+      \ owner-token reset --db PATH --confirm-reset`\n- `--db` is required for the\
+      \ offline SQLite database path.\n- `--confirm-reset` is required; omission fails\
+      \ safely and leaves the stored hash unchanged.\n- The command deletes only `runtime_metadata.key='owner_token_sha256'`.\n\
+      - The command must not start `serve`, bind HTTP/MCP, run UI, generate/print/accept/store\
+      \ a replacement plaintext token, add `serve --reset-owner-token`, or expose\
+      \ HTTP/MCP/UI reset controls.\n- Replacement token behavior remains exclusively\
+      \ in existing `serve` startup paths.\n\nScope: define the CLI/parser/help contract\
+      \ and any Go stubs needed for downstream tests. Do not add deletion logic, migrations,\
+      \ server startup, HTTP/MCP handlers, UI controls, services, repositories, DI\
+      \ containers, sidecars, accounts, OAuth, per-agent registries, sync, or settings-heavy\
+      \ flows.\n\nauthoritative_interface: `resofeed owner-token reset --db PATH --confirm-reset`\
+      \ from docs/ARCHITECTURE.md Offline owner-token reset command contract and docs/USAGE.md\
+      \ Owner token reset.\nspec_refs: docs/ARCHITECTURE.md lines 69-86, 129-135,\
+      \ 329-359; docs/USAGE.md lines 118-133; AGENTS.md sections 2, 4, 7; .agents/instructions.md\
+      \ sections 2, 4, 7.\ntouch_paths: cmd/resofeed/main.go, internal/resofeed/db.go,\
+      \ internal/resofeed/*owner_token_reset*_test.go\nagent_source: project"
+    verification: 'local-check protecting owner-token-offline-reset.expected-red-tests
+      and downstream implementation: contract artifacts pin the CLI command, required
+      confirmation, allowed SQLite mutation, forbidden output/surfaces, and replacement-token
+      semantics without functional deletion logic.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Evidence
+
+      - Authoritative CLI grammar pinned:
+
+      - Required flags pinned:
+
+      - Forbidden surfaces pinned:
+
+      - Replacement-token semantics pinned:
+
+      - Stub-only outputs, if any:
+
+      - Confirmation that no deletion/runtime behavior was added in this contract
+      step:'
+    agent: golang-developer
