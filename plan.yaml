@@ -20970,7 +20970,7 @@ phases:
       No blocker remains.'
   - id: visual-parity-remediation
     name: Visual Parity Remediation
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -21124,6 +21124,124 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T08:33:32.138490+00:00'
+    done_at: '2026-05-10T08:40:37.174190+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Source Ledger must stay flat/terse, with source rows as list
+      items, delete confirmation, OPML import, state export/import links, no folders/tags/settings,
+      raw progress/error lines, visible keyboard actions, and no shadows/skeletons/layout
+      shift.
+
+      - docs/ui-preview.html — Source Ledger reference uses `.manual-fetch-action`
+      padding `0 10px`, transparent background, focus color text, grid `.ledger-row`,
+      red `x` delete affordance, and inline footer text: `import OPML`, `imported
+      3 sources; folders flattened`, `export state`, `import state`.
+
+      - .audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json
+      — prior drift showed `[RUN INGEST]`/`[FETCH]` padding `8px 12px`, surface fill,
+      primary text, and rows as `display: flex` with `4px` vertical padding.
+
+      - .audit-artifacts/manual-rss-fetch/uiux-audit/uiux-audit-report.md — blocking
+      differences were bracket action drift, list/bullet row density drift, filled
+      `delete` buttons, native file input chrome, and missing default imported-status
+      copy.
+
+      - .audit-artifacts/manual-rss-fetch/uiux-audit/rendered-artifacts.json — required
+      rendered states were default, source-fetch-active, global-ingest-active, completion,
+      error-conflict, and hover-focus screenshots.
+
+      - web/src/routes/components/SourceLedger.svelte — component previously rendered
+      a native file input near the top, URL/status as long inline copy, filled `delete`
+      text button, and only conditional import status.
+
+      - web/src/app.css — previous Source Ledger styles used list indentation, flex
+      rows, `8px 12px` manual-fetch action padding, surface-filled controls, and primary-color
+      action treatment.
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      — contract tests preserve labels `[RUN INGEST]`, `[FETCH]`, `[INGESTING...]`,
+      `[FETCHING...]`, HH:MM:SS timestamps, terse `err:` text, and no spinner/progress
+      animation affordance.
+
+
+      ## Visual Remediation Evidence
+
+      **Files changed**:
+
+      `web/src/routes/components/SourceLedger.svelte`; `web/src/app.css`; `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`;
+      `web/src/routes/components/__tests__/rendering-expected-red.test.ts`; `web/src/lib/api-client.test.ts`;
+      `.audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json`;
+      refreshed implementation screenshots for default, source-fetch-active, global-ingest-active,
+      completion, error-conflict, and hover-focus.
+
+
+      **Blocker closure checklist**:
+
+      - [x] B1 bracket controls match reference padding/color/background/hover/focus.
+
+      - [x] B2 Source Ledger rows are compact grid rows with no bullets/indentation
+      and correct URL density/truncation/delete affordance.
+
+      - [x] B3 default footer/import/status presentation matches reference, including
+      default inline imported-status text and R9 copy.
+
+      - [x] No spinner/shadow/gradient/animation/SaaS pill styling introduced.
+
+
+      **Rendered artifacts / computed style proof**:
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-default.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-source-fetch-active.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-global-ingest-active.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-completion.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-error-conflict.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/screenshots/impl-hover-focus.png`
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json`:
+      bracket actions now show `padding: 0px 10px 0px 10px`, `backgroundColor: rgba(0,
+      0, 0, 0)`, `color: rgb(47, 111, 126)`, `borderRadius: 0px`, `boxShadow: none`,
+      `animationName: none`; rows now show `display: grid`, `padding: 0px 0px`, `minHeight:
+      44px`, `borderTop: 1px`.
+
+
+      ## Verification
+
+      - Worker commands: `npm ci && npm run test` exit 0 (`svelte-check found 0 errors
+      and 0 warnings`; Vitest `5 passed`, `28 passed`); `node .audit-artifacts/manual-rss-fetch/uiux-audit/capture-source-ledger-visuals.mjs`
+      exit 0; `npm run build` exit 0; commit `1e8b3e7`.
+
+      - Mainline final-state verification after merge: `npm --prefix web run test
+      && node .audit-artifacts/manual-rss-fetch/uiux-audit/capture-source-ledger-visuals.mjs
+      && npm --prefix web run build` exit 0; output included `Test Files 5 passed
+      (5); Tests 28 passed (28)`, generated six visual-state screenshots, and Vite/SvelteKit
+      production build success. The verification command transiently refreshed the
+      reference screenshot in the dirty main worktree and it was restored to the committed
+      version before completion.
+
+      - Files changed in merge commit: `web/src/routes/components/SourceLedger.svelte`;
+      `web/src/app.css`; `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`;
+      `web/src/routes/components/__tests__/rendering-expected-red.test.ts`; `web/src/lib/api-client.test.ts`;
+      `.audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json`;
+      implementation screenshots.
+
+      - Product/code/docs modified: SourceLedger component, app CSS, tests, and audit
+      artifacts only.
+
+      - Deviation records: none.
+
+      - Worker commit: `1e8b3e7`.
+
+      - Squash merge commit on main: `a5cdbf4 [vectl] step-visual-parity-remediation
+      completed`.
+
+      - Gaps/Notes: Vitest emitted existing jsdom warning `Not implemented: navigation
+      to another Document`; tests still passed. No vectl tools or vectl CLI commands
+      were used by worker.'
   - id: visual-parity-retest
     name: Visual Parity Retest
     status: pending
