@@ -22124,3 +22124,13 @@ phases:
       Vite/SvelteKit production build success.
 
       - Gaps/Notes: none'
+- id: playwright-comprehensive-e2e
+  name: Playwright Comprehensive E2E
+  status: pending
+  gate: Comprehensive browser-led Playwright E2E proves ResoFeed boots through the
+    real cmd/resofeed binary, exercises feed/source operations, covers LLM success/failure/live-smoke
+    boundaries without committing secrets, checks API/MCP parity where human-visible
+    operations intersect, and preserves visual/UX invariants with trace/screenshot/video/log
+    evidence.
+  depends_on:
+  - manual-rss-fetch
