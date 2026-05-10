@@ -37255,7 +37255,7 @@ phases:
       this step.'
   - id: fuidcr-batched-architecture-blocker-remediation
     name: Batched architecture blocker remediation for UI design closure evidence
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -37565,6 +37565,8 @@ phases:
     depends_on:
     - fuidcr-software-architect-conformance-review
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T20:15:06.703807+00:00'
   - id: fuidcr-architecture-blocker-retest
     name: Retest architecture blocker closure after batched remediation
     status: pending
