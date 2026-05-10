@@ -35560,6 +35560,10 @@ phases:
 
       - Phase closes 52 audit findings including 13 P0 and 19 P1 obligations.
 
+      - Added fuidcr-ledger-reachability-proof-path-fix to close the Source Ledger
+      reachability/browser proof blocker without reintroducing forbidden persistent
+      dashboard/tab navigation.
+
 
       As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the full-ui-design-conformance-remediation
       phase meets the quality bar for completion.
@@ -35577,7 +35581,9 @@ phases:
 
       - Feed/Search share feed-item anatomy where applicable.
 
-      - SourceLedger/StatePortability use canonical bracket action and DOM contracts.
+      - SourceLedger/StatePortability use canonical bracket action and DOM contracts
+      and are reachable through the accepted non-persistent contract after owner-token
+      acceptance.
 
       - Inspector primary reading path is free of raw boilerplate/debug/model diagnostics
       and original link navigates normally.
@@ -35590,6 +35596,9 @@ phases:
 
       - No forbidden product concepts or runtime surfaces are introduced.
 
+      - No persistent dashboard/tab-style surface navigation, Surfaces nav, or persistent
+      left/sidebar product nav is introduced by the Source Ledger reachability fix.
+
 
       GATE MUST REVIEW:
 
@@ -35601,24 +35610,33 @@ phases:
       3. All implementation clusters provide rendered DOM/screenshot evidence and
       preserve architecture constraints.
 
-      4. fuidcr-browser-regression-proof provides desktop/narrow screenshots, DOM/behavior
-      tests, responsive tests, and keyboard/focus checks.
+      4. fuidcr-ledger-reachability-proof-path-fix reconciles Source Ledger reachability
+      versus stale test contract and preserves the no-persistent-nav decision.
 
-      5. fuidcr-screenshot-first-uiux-audit provides screenshot-first PASS/PASS_WITH_DEBT/FAIL
+      5. fuidcr-browser-regression-proof provides desktop/narrow screenshots, DOM/behavior
+      tests, responsive tests, keyboard/focus checks, OPML import, Source Ledger action
+      proof, Feed/Search/Inspector proof, original link proof, and forbidden-navigation
+      proof.
+
+      6. fuidcr-screenshot-first-uiux-audit provides screenshot-first PASS/PASS_WITH_DEBT/FAIL
       evidence.
 
-      6. fuidcr-software-architect-conformance-review verifies architecture basis
+      7. fuidcr-software-architect-conformance-review verifies architecture basis
       and no forbidden concepts.
 
 
       Gate may OPEN only when each blocker-class behavioral obligation is PROVEN or
       has explicit non-intersection evidence recorded in the proof register.'
-    verification: '- All phase steps completed with specific, verifiable evidence.
+    verification: '- All phase steps completed with specific, verifiable evidence,
+      including fuidcr-ledger-reachability-proof-path-fix.
 
       - Findings 1-52 are closed or have explicit accepted non-blocking/non-intersection
       rationale.
 
       - P0/P1 findings include browser/DOM/behavior or screenshot evidence.
+
+      - Source Ledger reachability is proven without persistent dashboard/tab/Surfaces
+      navigation drift.
 
       - Browser regression proof and screenshot-first UIUX audit are PASS or PASS_WITH_DEBT
       with no blocker-class debt.
@@ -35629,29 +35647,22 @@ phases:
       - No forbidden concepts or runtime surfaces were introduced.'
     evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
       \ of phase implementation)\n**Phase**: full-ui-design-conformance-remediation\n\
-      **Review depth**: THOROUGH\n\n### refs Read Confirmation (MANDATORY)\nFor each\
-      \ ref in this step:\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
-      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
-      \ \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
-      \ <reason>\"\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
       \ — key passage or \"NOT READ: <reason>\"\n\n### Execution Review\n| Step ID\
-      \ | Status | Evidence Quality | Concerns |\n|---|---|---|---|\n\n### Finding\
-      \ Closure Register\n| Finding ID | Severity | Closure evidence | Browser/DOM/screenshot\
-      \ present? | Status |\n|---:|---|---|---|---|\n\n### Behavioral Proof Register\n\
-      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |\
-      \ status | closure_path | gate_decision_basis |\n|---|---|---|---|---|---|---|\n\
-      \n### Acceptance Criteria Checklist\n- [ ] All 52 findings closed or accepted\
-      \ non-blocking/non-intersecting.\n- [ ] P0/P1 closures have browser/DOM/behavior\
-      \ evidence.\n- [ ] Feed/Search share feed-item anatomy.\n- [ ] SourceLedger/StatePortability\
-      \ use canonical bracket action and DOM contracts.\n- [ ] Inspector primary reading\
-      \ path is free of raw boilerplate/debug/model diagnostics.\n- [ ] Original link\
-      \ navigates normally.\n- [ ] <1080px responsive breakpoint honored.\n- [ ] /doctor\
-      \ and Search do not crop/break on narrow viewport.\n- [ ] docs/ui-preview.html\
-      \ cleaned after live UI contracts stabilized.\n- [ ] No forbidden product concepts\
-      \ or runtime surfaces introduced.\n\n### Issues Identified\n| Severity | Description\
-      \ | Related Step | Blocking? |\n|---|---|---|---|\n\n### Gate Decision\n- [\
-      \ ] OPEN: Phase passes gate\n- [ ] BLOCKED: Issues must be resolved before proceeding\n\
-      \  - Blocking issues: <list>\n  - Required actions: <what needs to happen>\n"
+      \ | Status | Evidence Quality | Concerns |\n| --- | --- | --- | --- |\n| fuidcr-ledger-reachability-proof-path-fix\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| fuidcr-browser-regression-proof\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n### Source\
+      \ Ledger Reachability Gate Check\n- Accepted activation contract:\n- Proof after\
+      \ owner-token acceptance:\n- Forbidden persistent nav absent:\n- Canonical bracket\
+      \ actions proven:\n- Feed/Search/Inspector path proven:\n\n### Issues Identified\n\
+      | Severity | Description | Related Step | Blocking? |\n| --- | --- | --- | ---\
+      \ |\n\n### Gate Decision Basis\n| requirement_ref | evidence_ref | unresolved_status\
+      \ | blocking_or_non_intersection_rationale | OPEN/BLOCK basis |\n| --- | ---\
+      \ | --- | --- | --- |\n\n### Gate Decision\n- [ ] OPEN: Phase passes gate, proceed\
+      \ to next phase\n- [ ] BLOCKED: Issues must be resolved before proceeding\n\
+      \  - Blocking issues: <list>\n  - Required actions: <what needs to happen>"
     depends_on:
     - fuidcr-contract-matrix-lock
     - fuidcr-expected-red-ui-tests
@@ -35664,6 +35675,7 @@ phases:
     - fuidcr-source-ledger-state-portability
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-ui-preview-cleanup
+    - fuidcr-ledger-reachability-proof-path-fix
     - fuidcr-browser-regression-proof
     - fuidcr-screenshot-first-uiux-audit
     - fuidcr-software-architect-conformance-review
