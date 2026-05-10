@@ -24425,7 +24425,7 @@ phases:
       by the subagent.'
   - id: expected-red-browser-tests
     name: Expected-red core UI regression browser tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -24506,6 +24506,88 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:30:52.293636+00:00'
+    done_at: '2026-05-10T11:40:45.059903+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — hit-target proof, active-panel observables,
+      selected+hover matrix, Inspector raw payload ban, negative UX assertions.
+
+      - `docs/DESIGN.md` — primary surfaces, operational labels, feed hover/focus/selected
+      semantics, Inspector hierarchy, flat Source Ledger, no-layout-shift transitions.
+
+      - `docs/ui-preview.html` — selected row/feed/Inspector hierarchy, Source Ledger
+      actions, mobile/detail behavior.
+
+      - `docs/DESIGN_VISION.md` — split-pane desktop, single-column mobile, flat Source
+      Ledger, no cute states/settings bloat/no-layout-shift hover/focus.
+
+      - `web/src/routes/+page.svelte` — TODAY/SOURCE LEDGER nav controls, `data-surface`,
+      active panels, selected item/detail state.
+
+      - `web/src/routes/components/Feed.svelte` — `.contract-feed-item`, `.contract-feed-open`,
+      `.contract-feed-title`, `.contract-feed-summary`, `.contract-resonate`, `aria-current`.
+
+      - `web/src/routes/components/Inspector.svelte` — Inspector metadata/title/link/body/provenance
+      selectors and raw detail rendering path.
+
+
+      ## Expected-Red Core Browser Evidence
+
+      - Files changed: `web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts`
+      only.
+
+      - Product files modified: NONE (`web/src/**` untouched).
+
+      - Worktree commit: `3cc574b`; merged to main as squash commit `b2f701f`.
+
+      - Exact command in worktree: `cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"`.
+
+      - Exact mainline verification command: `npm --prefix web run test:e2e -- --grep
+      "ui-navigation-hover-inspector-repair"`.
+
+      - Mainline observed result: exit code 1 accepted as expected red; 5 tests run,
+      3 passed, 2 failed intentionally.
+
+
+      Expected failures/exposed gaps:
+
+      - SOURCE LEDGER clickability: installed and currently PASS; real pointer opens
+      ledger with active-state proof and obstruction diagnostics.
+
+      - TODAY panel correctness: installed and currently PASS; clicking TODAY restores
+      feed as only active primary surface.
+
+      - selected+hover state: EXPECTED RED; selected row hover uses full-row `rgb(236,
+      230, 216)` background instead of restrained marker-led transparent state.
+
+      - Inspector hierarchy: EXPECTED RED; default primary Inspector paragraphs expose
+      raw JSON-LD/schema metadata (`@context`, `@type`, `schema.org`).
+
+      - negative UX guard: installed and currently PASS for forbidden RSS-reader/SaaS/onboarding
+      language.
+
+
+      Artifacts:
+
+      - selected+hover screenshot/video/trace under `.test-artifacts/playwright/test-output/ui-navigation-hover-inspec-f9fd9-biguous-active-hover-blocks-chromium-ci-safe/`.
+
+      - Inspector raw JSON-LD screenshot/video/trace under `.test-artifacts/playwright/test-output/ui-navigation-hover-inspec-364c4--JSON-LD-extracted-metadata-chromium-ci-safe/`.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — selected+hover visual noise and Inspector primary
+      raw JSON-LD dump are reproducible; nav/copy guards are installed.
+
+      orchestrator_action_hint: COMPLETE'
   - id: implementation-repair
     name: Complete UI regression-class repairs within existing surfaces
     status: pending
