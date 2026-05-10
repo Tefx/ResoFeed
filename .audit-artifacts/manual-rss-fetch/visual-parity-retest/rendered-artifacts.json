@@ -1,0 +1,26 @@
+[
+  {
+    "state": "default",
+    "file": "screenshots/impl-default.png"
+  },
+  {
+    "state": "source-fetch-active",
+    "file": "screenshots/impl-source-fetch-active.png"
+  },
+  {
+    "state": "global-ingest-active",
+    "file": "screenshots/impl-global-ingest-active.png"
+  },
+  {
+    "state": "completion",
+    "file": "screenshots/impl-completion.png"
+  },
+  {
+    "state": "error-conflict",
+    "file": "screenshots/impl-error-conflict.png"
+  },
+  {
+    "state": "hover-focus",
+    "file": "screenshots/impl-hover-focus.png"
+  }
+]
