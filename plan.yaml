@@ -24984,3 +24984,62 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: expected-red-keyboard-a11y-tests
+    name: Expected-red keyboard and accessibility activation tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create pre-implementation browser tests for keyboard and accessibility activation
+      across the same UI class. These tests must prove that controls are reachable
+      and operable without a pointer and expose semantic state to assistive technology.
+
+
+      Required coverage:
+
+      - Tab order reaches primary navigation, feed row/action controls, star/resonate,
+      Steer submit, Inspector links, Source Ledger controls, `/doctor`, OPML import,
+      and source fetch buttons where present.
+
+      - Focus visibility is visually detectable and non-layout-shifting.
+
+      - Enter/Space activation works for nav/actions/tabs/buttons according to role.
+
+      - Roles, labels, and selected/active state are present: `button`, `tab`, `link`,
+      `aria-selected`, `aria-current`, or equivalent contract-approved state.
+
+      - Nav/action activation must not leave the wrong panel active.
+
+
+      This is a pre-implementation test-definition step. Do not modify product UI
+      source beyond tests/fixtures/helpers.'
+    verification: '- Test coverage includes Tab order, focus visibility, Enter/Space
+      activation, and roles/active-state semantics for the required controls.
+
+      - Expected-red run exposes keyboard/a11y gaps where current UI is incomplete.
+
+      - Evidence includes exact command, runner output, focus trace or screenshot
+      paths, and role/ARIA assertion output.
+
+      - Product UI implementation files remain unchanged.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Keyboard/A11y\
+      \ Evidence\n- Files changed: <test/fixture/helper paths only>\n- Exact command:\n\
+      ```sh\ncd web && npm run test:e2e -- --grep \"keyboard|a11y|ui-navigation-hover-inspector-repair\"\
+      \n```\n- Runner output:\n```text\n<paste output>\n```\n- Focus/activation coverage:\n\
+      \  | Control | Tab reachable | Focus visible artifact | Enter | Space | Role/state\
+      \ assertion | Red status |\n  | --- | --- | --- | --- | --- | --- | --- |\n\
+      - Artifact paths: <focus screenshots/traces>\n\n## Closure Fields\nverdict:\
+      \ EXPECTED_RED_PASS | INCOMPLETE | FAIL\nblockers: []\ngate_open_allowed: false\n\
+      proof_gap_status: <exposed_gaps|missing_coverage with details>\norchestrator_action_hint:\
+      \ proceed_to_implementation_after_all_expected_red | expand_a11y_tests_first"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
