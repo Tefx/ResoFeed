@@ -20565,15 +20565,16 @@ phases:
       - Spec proof: requirements register has no unresolved DIVERGES/PARTIAL/NEEDS_TEST
       blocker-class entries for B1/B2/R9.
 
-      - This phase-check protects manual-rss-fetch.uiux-audit and manual-rss-fetch.gate;
+      - This phase-check protects `manual-rss-fetch.uiux-audit` and `manual-rss-fetch.gate`;
       downstream gates must not open without PASS/PASS_WITH_DEBT limited to non-blocking
       debt.'
-    evidence_template: '## Verification Retest Report
+    evidence_template: '## Verification Report
 
 
       **Tester**: integration-verifier (independent of implementation)
 
-      **Scope**: manual-rss-fetch integration + spec/design conformance retest
+      **Scope**: Manual RSS fetch remediation retest for live runtime + spec/design
+      conformance
 
       **Independence Level**: L2
 
@@ -20595,50 +20596,62 @@ phases:
       - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
 
 
-      ### Runtime Execution
-
-      **Exact launch/test command**:
-
-      ```
-
-      <paste command>
-
-      ```
+      If no refs were provided, state: "No refs for this step."
 
 
-      **HTTP response samples**:
+      ### Live Runtime Proof
 
-      ```json
-
-      <flat ManualFetchResult payloads and conflict payload>
+      - Exact command(s):
 
       ```
 
-
-      ### Frontend Contract Compatibility
-
-      - Evidence that frontend no longer dereferences obsolete nested success envelopes:
+      <paste launch/test commands>
 
       ```
 
-      <search/test output>
+      - `/api/ingest` 200 body:
 
       ```
 
-      - Evidence frontend state updates from flat payloads:
+      <paste actual body>
 
       ```
 
-      <test/runtime output>
+      - `/api/sources/{id}/fetch` 200 body:
+
+      ```
+
+      <paste actual body>
+
+      ```
+
+      - Concurrent conflict 409 body:
+
+      ```
+
+      <paste actual body>
 
       ```
 
 
-      ### Spec/UI Reference Closure
+      ### Frontend Compatibility Proof
 
-      - B2 ui-preview/design/implementation alignment: <PASS/FAIL with evidence>
+      - Evidence that frontend client/page consumes flat `ManualFetchResult` without
+      nested `body.ingest`/`body.fetch`/`body.source` assumptions:
 
-      - R9 disposition: <fixed or non-intersecting with evidence>
+      ```
+
+      <paste tests/search/probe output>
+
+      ```
+
+
+      ### UI Preview / Design Closure
+
+      - `docs/ui-preview.html` vs implementation alignment for manual fetch controls/states:
+      <PASS/FAIL + evidence refs>
+
+      - R9 disposition and proof: <FIXED or NON_INTERSECTING + evidence refs>
 
 
       ### Behavioral Proof Register
@@ -20646,25 +20659,27 @@ phases:
       | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
       status | closure_path | gate_decision_basis |
 
-      | --- | --- | --- | --- | --- | --- | --- |
+      |---|---|---|---|---|---|---|
 
-      | B1 | <claim> | <proof> | <evidence> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
-      basis |
+      | B1 | <claim> | <proof> | <ref> | PROVEN/UNPROVEN | <path> | <basis> |
 
-      | B2 | <claim> | <proof> | <evidence> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
-      basis |
+      | B2 | <claim> | <proof> | <ref> | PROVEN/UNPROVEN | <path> | <basis> |
 
-      | R9 | <claim> | <proof/non-intersection> | <evidence> | PROVEN/NON_INTERSECTING/UNPROVEN
-      | <path> | OPEN/BLOCK basis |
+      | R9 | <claim> | <proof/non-intersection> | <ref> | PROVEN/NON_INTERSECTING/UNPROVEN
+      | <path> | <basis> |
 
 
       ### Headline
 
-      - [ ] PASS: All blocker-class items PROVEN or explicitly non-intersecting
+      - [ ] PASS: all blocker-class items PROVEN or explicitly non-intersecting
 
-      - [ ] FAIL: Blocking issue or proof gap remains
-
-      '
+      - [ ] FAIL: blocker-class proof gap remains'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/PRD.md
+    - internal/resofeed/manual_fetch_contract.go
     depends_on:
     - remediate-verifier-blockers
     agent: integration-verifier
