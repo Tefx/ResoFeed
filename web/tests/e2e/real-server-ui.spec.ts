@@ -75,6 +75,77 @@ async function enterOwnerToken(page: import('playwright/test').Page, ownerToken:
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 }
 
+type ItemSummary = {
+  id: string;
+  title: string;
+  source_title: string;
+  is_resonated: boolean;
+  human_inspected_at: string | null;
+  external_surfaced_at: string | null;
+};
+
+type ItemDetail = ItemSummary & {
+  provenance: {
+    source_url: string;
+    original_url: string;
+  };
+};
+
+type JsonRpcResponse = {
+  result?: unknown;
+  error?: { code: number; message: string; data?: Record<string, unknown> };
+};
+
+async function authorizedGet<T>(request: import('playwright/test').APIRequestContext, runInfo: { baseURL: string }, ownerToken: string, pathName: string): Promise<T> {
+  const response = await request.get(`${runInfo.baseURL}${pathName}`, {
+    headers: { Authorization: `Bearer ${ownerToken}` }
+  });
+  expect(response.status(), `GET ${pathName}`).toBe(200);
+  return await response.json() as T;
+}
+
+async function mcpPost(request: import('playwright/test').APIRequestContext, runInfo: { baseURL: string }, ownerToken: string, payload: Record<string, unknown>): Promise<{ status: number; body: JsonRpcResponse | { error: { code: string; message: string; details: Record<string, unknown> } } }> {
+  const response = await request.post(`${runInfo.baseURL}/mcp`, {
+    headers: { Authorization: `Bearer ${ownerToken}` },
+    data: payload
+  });
+  return { status: response.status(), body: await response.json() };
+}
+
+async function mcpTool<T>(request: import('playwright/test').APIRequestContext, runInfo: { baseURL: string }, ownerToken: string, name: string, args: Record<string, unknown>): Promise<T> {
+  const response = await mcpPost(request, runInfo, ownerToken, {
+    jsonrpc: '2.0',
+    id: `${name}-${Date.now()}`,
+    method: 'tools/call',
+    params: { name, arguments: args }
+  });
+  expect(response.status, `MCP tool ${name} HTTP status`).toBe(200);
+  const body = response.body as JsonRpcResponse;
+  expect(body.error, `MCP tool ${name} JSON-RPC error`).toBeFalsy();
+  const content = (body.result as { content: Array<{ type: string; text: string }> }).content;
+  expect(content).toHaveLength(1);
+  return JSON.parse(content[0].text) as T;
+}
+
+async function mcpResource<T>(request: import('playwright/test').APIRequestContext, runInfo: { baseURL: string }, ownerToken: string, uri: string): Promise<T> {
+  const response = await mcpPost(request, runInfo, ownerToken, {
+    jsonrpc: '2.0',
+    id: `resource-${Date.now()}`,
+    method: 'resources/read',
+    params: { uri }
+  });
+  expect(response.status, `MCP resource ${uri} HTTP status`).toBe(200);
+  const body = response.body as JsonRpcResponse;
+  expect(body.error, `MCP resource ${uri} JSON-RPC error`).toBeFalsy();
+  const contents = (body.result as { contents: Array<{ uri: string; mimeType: string; text: string }> }).contents;
+  expect(contents).toHaveLength(1);
+  return JSON.parse(contents[0].text) as T;
+}
+
+function itemIds(items: ItemSummary[]): string[] {
+  return items.map((item) => item.id);
+}
+
 test('ci-safe real server/UI boot uses the Go binary and owner-token gate', async ({ page, request, runInfo, ownerToken }) => {
   const unauthorized = await request.get(`${runInfo.baseURL}/api/feed/today`);
   expect(unauthorized.status()).toBe(401);
@@ -168,6 +239,106 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
+});
+
+test('@parity browser-led API/MCP parity probes share one real server fixture', async ({
+  page,
+  request,
+  runInfo,
+  ownerToken
+}) => {
+  const unauthorizedAPI = await request.get(`${runInfo.baseURL}/api/feed/today`);
+  expect(unauthorizedAPI.status(), 'API rejects missing owner token before reads').toBe(401);
+  expect(await unauthorizedAPI.json()).toMatchObject({ error: { code: 'unauthorized', details: {} } });
+
+  const unauthorizedMCP = await request.post(`${runInfo.baseURL}/mcp`, {
+    data: { jsonrpc: '2.0', id: 'unauth', method: 'tools/list' }
+  });
+  expect(unauthorizedMCP.status(), 'MCP rejects missing owner token before tool handling').toBe(401);
+  expect(await unauthorizedMCP.json()).toMatchObject({ error: { code: 'unauthorized', details: {} } });
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Enter owner token' })).toBeVisible();
+  await page.locator('#owner-token-input').fill('wrong-token-with-at-least-thirty-two-chars');
+  await page.getByRole('button', { name: 'submit' }).click();
+  await expect(page.getByText('err: owner token rejected')).toBeVisible();
+  await page.locator('#owner-token-input').fill(ownerToken);
+  await page.getByRole('button', { name: 'submit' }).click();
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: 'TODAY' }).click();
+  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
+
+  const apiFeed = await authorizedGet<{ items: ItemSummary[] }>(request, runInfo, ownerToken, '/api/feed/today?limit=20');
+  const mcpFeed = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'list_candidate_items', { limit: 20 });
+  const mcpFeedResource = await mcpResource<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'resofeed://feed/today');
+  expect(apiFeed.items).toHaveLength(1);
+  expect(apiFeed.items[0]).toMatchObject({ title: 'Local fixture item one', source_title: 'ResoFeed E2E Local Source' });
+  expect(itemIds(mcpFeed.items)).toEqual(itemIds(apiFeed.items));
+  expect(itemIds(mcpFeedResource.items)).toContain(apiFeed.items[0].id);
+  const itemID = apiFeed.items[0].id;
+
+  await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
+  await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
+  await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('why: fresh from configured source');
+  await expect.poll(async () => {
+    const detail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
+    return detail.item.human_inspected_at;
+  }).not.toBeNull();
+  const apiDetail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
+  const mcpDetail = await mcpTool<{ item: ItemDetail }>(request, runInfo, ownerToken, 'read_item', { item_id: itemID });
+  expect(mcpDetail.item).toMatchObject({ id: apiDetail.item.id, title: apiDetail.item.title, provenance: apiDetail.item.provenance });
+  expect(mcpDetail.item.human_inspected_at).toBe(apiDetail.item.human_inspected_at);
+
+  await page.getByRole('button', { name: 'Resonate item' }).click();
+  await expect(page.getByRole('button', { name: 'Remove resonance' })).toBeVisible();
+  await expect.poll(async () => {
+    const detail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
+    return detail.item.is_resonated;
+  }).toBe(true);
+  const mcpResonatedSearch = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'search_items', { query: 'Local fixture', resonated: true, limit: 20 });
+  expect(itemIds(mcpResonatedSearch.items)).toContain(itemID);
+
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill('search Local fixture');
+  await page.getByRole('button', { name: 'apply' }).click();
+  await expect(page.getByText('retrieval: lexical search')).toBeVisible();
+  await page.getByRole('button', { name: 'search' }).click();
+  await expect(page.locator('#search-status')).toContainText('1 results');
+  const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, runInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
+  const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });
+  expect(apiSearch.query).toMatchObject({ q: 'Local fixture', limit: 20 });
+  expect(itemIds(apiSearch.items)).toContain(itemID);
+  expect(itemIds(mcpSearch.items)).toEqual(itemIds(apiSearch.items));
+
+  await steer.fill('Push more parity fixture documents.');
+  await page.getByRole('button', { name: 'apply' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'applied: steering updated · rules:1' })).toBeVisible();
+  const apiRules = await authorizedGet<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, runInfo, ownerToken, '/api/steer/active');
+  const mcpRules = await mcpResource<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, runInfo, ownerToken, 'resofeed://rules/active');
+  expect(apiRules.rules.map((rule) => rule.rule_text)).toContain('Push more deterministic llm fixtures.');
+  expect(mcpRules.rules.map((rule) => rule.rule_text)).toEqual(apiRules.rules.map((rule) => rule.rule_text));
+
+  const toolsList = await mcpPost(request, runInfo, ownerToken, { jsonrpc: '2.0', id: 'tools', method: 'tools/list' });
+  expect(toolsList.status).toBe(200);
+  const toolNames = (((toolsList.body as JsonRpcResponse).result as { tools: Array<{ name: string }> }).tools).map((tool) => tool.name).sort();
+  expect(toolNames).toEqual(['list_candidate_items', 'mark_inspected', 'read_item', 'report_delivery', 'resonate_item', 'search_items', 'steer']);
+  expect(toolNames.join(' ')).not.toMatch(/telegram|slack|email|account|folder|tag|archive|semantic|rag/i);
+
+  const missingMCPKey = await mcpPost(request, runInfo, ownerToken, {
+    jsonrpc: '2.0',
+    id: 'missing-key',
+    method: 'tools/call',
+    params: { name: 'resonate_item', arguments: { item_id: itemID, resonated: false, actor_id: 'parity-agent' } }
+  });
+  expect(missingMCPKey.status).toBe(200);
+  expect((missingMCPKey.body as JsonRpcResponse).error).toMatchObject({ code: -32602, data: { field: 'idempotency_key' } });
 });
 
 test('@llm-deterministic ci-safe missing and invalid OPENROUTER_KEY startup paths exit before browser binding', async ({ runInfo }) => {
