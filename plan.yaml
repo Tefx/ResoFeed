@@ -22530,7 +22530,7 @@ phases:
       or untracked-only and are produced when harness runs.'
   - id: playwright-comprehensive-e2e.core-feed-browser-flows
     name: Core Browser Feed and Source E2E Flows
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -22667,6 +22667,90 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T10:00:52.748813+00:00'
+    done_at: '2026-05-10T10:10:02.121422+00:00'
+    evidence: 'status: SUCCESS
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - .agents/instructions.md — Read. Key passages: one deployable Go binary; one
+      SQLite DB; owner token boundary; UI must use Owner Token Prompt and First-Use
+      Empty State; no folders/tags/unread/settings surfaces.
+
+      - docs/ARCHITECTURE.md — Read. Key passages: `resofeed serve` starts static
+      UI/API/MCP/background ingest; static assets are public but `/api/*` requires
+      owner token; OPML import accepts XML and flattens folders; frontend stores `resofeed.ownerToken`;
+      HTTP operations include sources, ingest, feed today, item detail, search.
+
+      - docs/PRD.md — Read. Key passages: first useful session imports/adds sources,
+      sees Today, inspects and resonates; OPML folders flattened; source addition
+      via Steer; Search is lexical/metadata, not RAG/vector.
+
+      - docs/DESIGN.md — Read. Key passages: Owner Token Prompt exact local gate;
+      First-Use Empty State lines; Source Ledger flat with OPML import, `[RUN INGEST]`
+      / `[FETCH]` controls; Inspector exposes source/provenance/detail; Search and
+      Retrieval is source-backed.
+
+      - docs/DESIGN_VISION.md — Read. Key passages: Analyst Workbench, no account/onboarding,
+      Source Ledger is flat, Inspect/Resonate/Steer core primitives, diagnostics raw.
+
+      - docs/USAGE.md — Read. Key passages: build/run with `resofeed serve`; owner
+      token stored in local storage; add sources via Steer or OPML; `/doctor`; search
+      command via Steer.
+
+      - docs/ui-preview.html — Read. Key passages: preview shows `[RUN INGEST]`, per-source
+      `[FETCH]`, source status rows, Source Ledger import OPML, Today feed, Inspector,
+      `/doctor`.
+
+      - AGENTS.md — NOT READ: file was not present in isolated worktree root (`File
+      not found` from read tool).
+
+
+      ## Seam-Level Integration Evidence
+
+      Changed seam path: real binary server → browser UI → SQLite fixture → feed/source
+      operations
+
+      Exact command executed in worktree: `RESOFEED_E2E_PRESERVE_DB=1 npm --prefix
+      web run test:e2e`
+
+      Exit Code: 0
+
+      Actual output summary: Playwright ran 5 tests: 4 passed, 1 live-openrouter opt-in
+      skipped. Passing tests included real server/UI boot, artifact path checks, browser-led
+      source import/manual fetch/feed/inspect/retrieve/search, and missing/invalid
+      key startup paths.
+
+      Artifacts: trace `.test-artifacts/playwright/test-output/real-server-ui-ci-safe-bro-eab46-inspect-retrieve-and-search-chromium-ci-safe/trace.zip`;
+      screenshot `.test-artifacts/playwright/test-output/real-server-ui-ci-safe-bro-eab46-inspect-retrieve-and-search-chromium-ci-safe/test-finished-1.png`;
+      HTML report `.test-artifacts/playwright/html-report/index.html`; server logs
+      `.test-artifacts/playwright/server-logs/server.stdout.log` and `.test-artifacts/playwright/server-logs/server.stderr.log`;
+      DB `.test-artifacts/playwright/fixtures/resofeed-e2e-1778407656046-28610.sqlite3`;
+      sanitized env notes `.test-artifacts/playwright/sanitized-environment.md`.
+
+      Flow coverage: real cmd/resofeed launch, first-use owner token, OPML/source
+      addition with documented xmlUrl OPML, Source Ledger, manual global ingest, per-source
+      fetch, Today/feed rendering, Inspector/retrieve/search.
+
+      Test semantic reporting: step_intent retest_green; expected_result green; observed_result
+      green; verdict PASS; blockers []; product implementation files modified: no.
+
+      Implementation evidence: commits `72ecc0d test: expand real server feed browser
+      e2e`, `495dcaa test: retain browser e2e artifacts`; files changed `web/tests/e2e/e2e-contract.ts`,
+      `web/tests/e2e/global-setup.ts`, `web/tests/e2e/global-teardown.ts`, `web/tests/e2e/real-server-ui.spec.ts`;
+      gaps: `.test-artifacts/` untracked; `npm --prefix web install` run because `web/node_modules/.bin`
+      was missing, no dependency files changed.
+
+
+      ## Mainline final-state verification
+
+      Merged to main as squash commit `791cda8`.
+
+      Command executed in main: `RESOFEED_E2E_PRESERVE_DB=1 npm --prefix web run test:e2e`
+
+      Exit Code: 0
+
+      Actual output summary: build succeeded; Playwright ran 5 tests with 4 passed
+      and 1 live-openrouter opt-in skipped.'
   - id: playwright-comprehensive-e2e.llm-deterministic-failure-flows
     name: LLM Deterministic, Missing-Key, and Invalid-Key E2E Flows
     status: claimed
