@@ -20970,7 +20970,7 @@ phases:
       No blocker remains.'
   - id: visual-parity-remediation
     name: Visual Parity Remediation
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -21122,6 +21122,8 @@ phases:
     - manual-rss-fetch.frontend-implementation
     - verification-retest-after-remediation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T08:33:32.138490+00:00'
   - id: visual-parity-retest
     name: Visual Parity Retest
     status: pending
