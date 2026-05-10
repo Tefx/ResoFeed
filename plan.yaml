@@ -19377,7 +19377,7 @@ phases:
     skipped_reason: superseded
   - id: manual-rss-fetch.gate
     name: Gate Manual RSS Fetch
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -19534,6 +19534,8 @@ phases:
     - manual-rss-fetch.row-parity-remediation
     - manual-rss-fetch.row-parity-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-10T09:01:37.679984+00:00'
   - id: backend-contract
     name: Backend Contract Lock
     status: done
