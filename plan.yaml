@@ -34985,7 +34985,8 @@ phases:
       preview drift test. Pre-existing unrelated dirty files outside this task remain
       unmodified.'
   - id: fuidcr-browser-regression-proof
-    name: Run independent browser regression and responsive behavior proof
+    name: Rerun independent browser regression and responsive behavior proof after
+      Source Ledger fix
     status: claimed
     description: 'step_type: verification
 
@@ -34999,18 +35000,41 @@ phases:
 
       Independence Level: L2
 
+      refs:
 
-      As an INDEPENDENT TESTER (integration-verifier), validate the full UI remediation
-      from a fresh browser perspective. This phase-check protects the final UIUX audit,
-      software-architect review, and final gate.
+      - docs/DESIGN.md
+
+      - docs/ARCHITECTURE.md
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/real-server-ui.spec.ts
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun the browser regression
+      and responsive behavior proof after fuidcr-ledger-reachability-proof-path-fix.
+      This phase-check protects the final UIUX audit, software-architect review, and
+      final gate.
 
 
       YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works.
 
 
-      SCOPE:
+      ## Prior blocking failure to retest
 
-      - Live/browser-rendered ResoFeed UI after implementation clusters.
+      The previous run failed because browser tests waited for getByRole(''button'',
+      { name: ''SOURCE LEDGER'' }) and no such visible persistent nav button existed
+      after owner-token acceptance. Manual proof showed sourceLedgerButtonCount: 0
+      and no visible SOURCE LEDGER, [IMPORT OPML], [FETCH], or [DELETE]. The retest
+      must verify the accepted Source Ledger reachability contract after the fix,
+      not blindly require forbidden persistent dashboard/tab navigation.
+
+
+      ## Scope
+
+      - Live/browser-rendered ResoFeed UI after implementation clusters and fuidcr-ledger-reachability-proof-path-fix.
 
       - Desktop >=1080px and narrow/mobile <1080px screenshots.
 
@@ -35018,7 +35042,7 @@ phases:
       behavior.
 
 
-      MUST VERIFY ALL FINDING CLUSTERS:
+      ## Must verify all finding clusters
 
       - 1-7 Shell and Owner Token Prompt.
 
@@ -35036,7 +35060,28 @@ phases:
       applicable, but live UI browser proof is required for live surfaces.
 
 
-      REQUIRED EVIDENCE:
+      ## Source Ledger retest requirements
+
+      - Verify Source Ledger is reachable after owner-token acceptance through the
+      accepted non-persistent contract. If the contract is Steer-driven, use the documented
+      Steer command path. Do NOT require or reward a persistent dashboard/tab SOURCE
+      LEDGER nav button unless the design/architecture authority explicitly accepted
+      it.
+
+      - Verify OPML import through the visible/label-reachable [IMPORT OPML] control
+      using the fixture OPML.
+
+      - Verify source rows and actions: source URL, last_fetch, last_ingest, [RUN
+      INGEST], [FETCH], [DELETE], [EXPORT STATE], [IMPORT STATE], import warning copy,
+      hidden-but-label-reachable file input, disabled bracket action styling, and
+      stable action baselines.
+
+      - Verify the imported fixture drives TODAY feed rows, Inspector item detail,
+      original link navigation, Inspect/Resonate behavior, populated lexical Search
+      result, keyboard/focus behavior, and responsive behavior.
+
+
+      ## Required evidence
 
       - Exact commands executed and actual output.
 
@@ -35047,12 +35092,15 @@ phases:
       - DOM selector proof for Source Ledger required classes and canonical bracket
       labels.
 
-      - Behavior proof for original link navigation, Inspect/Resonate affordances,
-      owner-token prompt action, file-input accessibility, keyboard focus, and /doctor
-      wrapping.
+      - Behavior proof for OPML import, source row actions, original link navigation,
+      Inspect/Resonate affordances, owner-token prompt action, file-input accessibility,
+      keyboard focus, populated Search, and /doctor wrapping.
 
       - Responsive proof that below 1080px Inspector is no longer an active split-pane
       desktop layout.
+
+      - Explicit forbidden-navigation check proving no persistent Surfaces navigation,
+      tablist, or left/sidebar product nav was introduced.
 
 
       FINDINGS ARE SUCCESSFUL OUTPUT:
@@ -35060,7 +35108,14 @@ phases:
       - If issues are found, report them mapped to finding IDs and severity. The verification
       step is complete when evidence is specific enough for planner remediation; finding
       problems is valuable.'
-    verification: '- Green browser/DOM behavior evidence exists for P0/P1 findings.
+    verification: '- Green browser/DOM behavior evidence exists for P0/P1 findings
+      after fuidcr-ledger-reachability-proof-path-fix.
+
+      - Source Ledger reachability is proven through the accepted non-persistent activation
+      contract after owner-token acceptance.
+
+      - OPML import, source rows/actions, Feed, Inspector, original link, Inspect/Resonate,
+      and populated Search are exercised end-to-end through the real browser UI.
 
       - Desktop and narrow/mobile screenshots are attached or referenced.
 
@@ -35070,6 +35125,8 @@ phases:
 
       - /doctor and Search do not crop/break on narrow viewport.
 
+      - Forbidden persistent dashboard/tab/Surfaces navigation remains absent.
+
       - Any remaining issue has a finding ID, severity, reproduction, and remediation
       owner.'
     evidence_template: '## Verification Report
@@ -35077,82 +35134,126 @@ phases:
 
       **Tester**: integration-verifier (independent of implementation)
 
-      **Scope**: Full UI design conformance phase-check
+      **Scope**: full-ui-design-conformance-remediation browser retest after fuidcr-ledger-reachability-proof-path-fix
 
       **Independence Level**: L2
+
+      **Timestamp**: <ISO 8601>
 
 
       ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
       - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
       "NOT READ: <reason>"
 
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
 
-      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+      - web/tests/e2e/real-server-ui.spec.ts — key passage or "NOT READ: <reason>"
 
 
       ### Test Execution
 
       - Commands executed:
 
-      ```
+      ```text
 
-      <actual commands>
+      <paste exact browser commands>
 
       ```
 
       - Actual output:
 
+      ```text
+
+      <paste output, not summary only>
+
       ```
 
-      <paste output>
 
-      ```
+      ### Source Ledger Reachability Contract
+
+      - Accepted activation path used after owner-token acceptance:
+
+      - Persistent nav/tab/Surfaces nav absent proof:
+
+      - SOURCE LEDGER heading/region proof:
+
+      - [IMPORT OPML] label/file-input proof:
+
+      - Source row/action proof ([RUN INGEST], [FETCH], [DELETE], URL, last_fetch,
+      last_ingest):
+
+      - State Portability proof ([EXPORT STATE], [IMPORT STATE], warning copy):
 
 
-      ### Screenshot Evidence
+      ### End-to-End Imported Fixture Path
 
-      - Desktop >=1080px: <paths>
+      - OPML import result:
 
-      - Narrow/mobile <1080px: <paths>
+      - Manual ingest/fetch result:
 
-      - /doctor narrow: <paths>
+      - TODAY feed row proof:
 
-      - Search narrow: <paths>
+      - Inspector detail proof:
 
-      - Inspector mobile: <paths>
+      - Original link proof:
+
+      - Inspect/Resonate proof:
+
+      - Populated Search proof:
 
 
-      ### Requirement / Behavior Proof Register
+      ### Responsive / Focus Proof
 
-      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
-      status | closure_path | gate_decision_basis |
+      - Desktop screenshot refs:
 
-      |---|---|---|---|---|---|---|
+      - Narrow/mobile screenshot refs:
 
-      | audit finding <id> | <claim> | <browser/DOM proof> | <path/output> | PROVEN/NEEDS_TEST/UNPROVEN
-      | <fix/retest or non-intersection> | <OPEN/BLOCK basis> |
+      - Keyboard/focus evidence:
+
+      - <1080px Inspector route/detail evidence:
+
+      - /doctor and Search narrow no-crop evidence:
 
 
       ### Issues Found
 
-      | Severity | Finding ID | Description | Location | Reproduction |
+      | Severity | Finding IDs | Description | Location | Reproduction |
 
-      |---|---:|---|---|---|
+      | --- | --- | --- | --- | --- |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
 
 
       ### Headline
 
-      - [ ] PASS: No blocking issues found and coverage justified
+      - [ ] PASS: No blocking issues found (coverage justified above)
 
       - [ ] PASS_WITH_DEBT: Only explicit non-blocking/non-intersecting debt remains
 
-      - [ ] FAIL: Blocking issues or proof gaps remain
+      - [ ] FAIL: Blocking issues or blocking proof gaps remain
 
-      '
+
+      **Confidence**: high/medium/low'
+    refs:
+    - docs/DESIGN.md
+    - docs/ARCHITECTURE.md
+    - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+    - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+    - web/tests/e2e/real-server-ui.spec.ts
     depends_on:
     - fuidcr-style-breakpoint-foundation
     - fuidcr-feed-search-dto-source-fields
@@ -35162,6 +35263,7 @@ phases:
     - fuidcr-source-ledger-state-portability
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-ui-preview-cleanup
+    - fuidcr-ledger-reachability-proof-path-fix
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T18:53:39.252229+00:00'
