@@ -24422,3 +24422,146 @@ phases:
     - contract-design-audit
     - expected-red-browser-tests
     agent: frontend-engineer
+  - id: playwright-repair-verification
+    name: Deterministic Playwright and interaction verification
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+
+      As an INDEPENDENT TESTER, validate the repaired UI from a fresh browser perspective
+      after implementation.
+
+
+      Run the targeted repair tests and a minimal related browser smoke to prove:
+
+      - SOURCE LEDGER navigation opens the ledger surface by actual click/key interaction.
+
+      - Selected feed row remains distinguishable and low-noise when hovered/focused.
+
+      - Inspector primary detail view is structured/readable and raw JSON-LD/extracted
+      metadata is absent from the primary content area.
+
+      - Keyboard/focus basics remain intact for the affected controls: Source Ledger
+      control, feed item open action, Inspector heading/interactive elements.
+
+
+      This check protects the phase gate and the final completed-plan UI confidence
+      boundary. If it finds issues, that is successful verification output and should
+      create fix/retest follow-up ownership.'
+    verification: '- Run `cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"`
+      and require green result.
+
+      - Run or document a focused related smoke from `web/tests/e2e/real-server-ui.spec.ts`
+      that exercises real server UI navigation.
+
+      - Verify screenshot/trace artifacts are captured for Source Ledger, selected+hover
+      feed row, and Inspector default detail view.
+
+      - Verify keyboard/focus basics for the affected controls; record any blockers
+      with reproduction steps.
+
+      - Structured behavioral proof register is included with PROVEN / NEEDS_TEST
+      / UNPROVEN statuses for the three user-reported obligations.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Deterministic Browser Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: UI navigation, selected+hover state, Inspector hierarchy
+
+      **Independence Level**: L1
+
+
+      ### Commands executed
+
+      ```
+
+      cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"
+
+      <related smoke command, if run>
+
+      ```
+
+
+      ### Actual output
+
+      ```
+
+      <paste stdout/stderr, not a summary>
+
+      ```
+
+
+      ### Screenshots/traces
+
+      - Source Ledger click path: <artifact path>
+
+      - Selected+hover state: <artifact path>
+
+      - Inspector hierarchy: <artifact path>
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | SOURCE LEDGER clickability | <claim> | real click/key opens panel | <artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis> |
+
+      | selected+hover clarity | <claim> | screenshot/style proof | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> | <OPEN/BLOCK basis> |
+
+      | Inspector hierarchy | <claim> | DOM/text proof excludes raw dump from primary
+      area | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis>
+      |
+
+
+      ### Accessibility/basic interaction checks
+
+      - Source Ledger control reachable/clickable: ✅/❌
+
+      - Feed item open action keyboard path: ✅/❌
+
+      - Inspector heading/readable hierarchy: ✅/❌
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      | --- | --- | --- | --- |
+
+      | <blocker/should_fix/suggestion> | <issue> | <file:line/control> | <steps>
+      |
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL
+
+      '
+    depends_on:
+    - implementation-repair
+    agent: integration-verifier
