@@ -20455,8 +20455,8 @@ phases:
 
       ```'
     depends_on:
-    - manual-rss-fetch.integration-proof
-    - manual-rss-fetch.spec-conformance
+    - manual-rss-fetch.backend-implementation
+    - manual-rss-fetch.frontend-implementation
     agent: frontend-engineer
   - id: verification-retest-after-remediation
     name: Verification Retest After Remediation
