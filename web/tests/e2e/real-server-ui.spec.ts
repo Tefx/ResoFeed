@@ -36,6 +36,9 @@ test('ci-safe harness records required artifact paths and sanitized runtime note
 });
 
 test('ci-safe missing and invalid OPENROUTER_KEY startup paths exit before browser binding', async ({ runInfo }) => {
+  const runtimeCwd = path.join(runInfo.artifactRoot, 'runtime-cwd-without-dotenv');
+  fs.mkdirSync(runtimeCwd, { recursive: true });
+
   const commonArgs = [
     'serve',
     '--addr', '127.0.0.1:1',
@@ -45,20 +48,22 @@ test('ci-safe missing and invalid OPENROUTER_KEY startup paths exit before brows
   ];
 
   const missing = spawnSync(runInfo.binaryPath, commonArgs, {
-    cwd: path.resolve(runInfo.artifactRoot, '..', '..'),
+    cwd: runtimeCwd,
     env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', RESOFEED_E2E: '1' },
     encoding: 'utf8'
   });
   expect(missing.status).toBe(2);
   expect(missing.stderr).toContain('invalid_openrouter_key: value required');
+  expect(missing.stdout).not.toContain('serving ResoFeed on');
 
   const invalid = spawnSync(runInfo.binaryPath, commonArgs, {
-    cwd: path.resolve(runInfo.artifactRoot, '..', '..'),
+    cwd: runtimeCwd,
     env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', RESOFEED_E2E: '1', OPENROUTER_KEY: '   ' },
     encoding: 'utf8'
   });
   expect(invalid.status).toBe(2);
   expect(invalid.stderr).toContain('invalid_openrouter_key: value required');
+  expect(invalid.stdout).not.toContain('serving ResoFeed on');
 });
 
 test('@live-openrouter live OpenRouter smoke is opt-in and skipped without runtime key', async ({ runInfo }) => {
