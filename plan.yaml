@@ -25421,7 +25421,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: expected-red-state-matrix-screenshot-tests
     name: Expected-red interaction state matrix screenshot tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25496,6 +25496,115 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:44:42.924708+00:00'
+    done_at: '2026-05-10T11:50:03.301782+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — normal/hover/selected/selected+hover/focus/selected+focus
+      coverage, selected marker persistence, no noisy active stacking, no layout shift,
+      and stable screenshots including today-list/selected-item/selected-hover/selected-focus.
+
+      - `docs/DESIGN.md` — Feed Item semantics: hover/focus tonal/outline only, selected
+      3px marker, selected means current Inspector item, no dimension changes; color/border-only
+      transitions and no layout shift.
+
+      - `docs/ui-preview.html` — selected feed row + Inspector split-pane layout.
+
+      - `docs/DESIGN_VISION.md` — hover without layout shift, strict focus outline,
+      non-bouncy Resonate.
+
+      - `web/src/routes/components/Feed.svelte` — `.contract-feed-item`, `.contract-feed-open`,
+      `.contract-feed-title`, `.contract-feed-summary`, `.contract-resonate`, `aria-current`
+      selected state.
+
+      - Existing expected-red specs reviewed: core browser and keyboard/a11y expected-red
+      specs.
+
+
+      ## Expected-Red State Matrix Evidence
+
+      - Files changed: `web/tests/e2e/feed-row-state-matrix.expected-red.spec.ts`.
+
+      - Product UI files modified: NONE.
+
+      - Worktree commit: `376cee9`; merged to main as squash commit `eedf602`.
+
+      - Worktree command: `cd web && npm run test:e2e -- --grep "state matrix|selected-hover|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline verification command: `npm --prefix web run test:e2e -- --grep "state
+      matrix|selected-hover|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline result: exit code 1 accepted as expected red; 7 tests run, 3 passed,
+      4 expected-red failures including this step''s state matrix failure and previously
+      merged expected-red failures.
+
+
+      State coverage table:
+
+      - normal: aria-current absent, neutral row/open backgrounds captured, screenshot
+      `today-list.png`, baseline box captured.
+
+      - hover: normal row remains non-current, hover open background captured, width/height/x
+      compared against normal.
+
+      - selected: aria-current=true, selected marker `::before` visible, screenshot
+      `selected-item.png`, baseline selected box captured.
+
+      - selected+hover: aria-current remains true, selected marker remains visible,
+      EXPECTED RED catches full-row active block `rgb(236, 230, 216)`, screenshot
+      `selected-hover.png`, width/height/x compared against selected.
+
+      - focus: focused `.contract-feed-open` inspected, EXPECTED RED catches missing
+      visible focus indicator, screenshot `focus-feed-row.png`, layout stable.
+
+      - selected+focus: aria-current remains true, selected marker visible, EXPECTED
+      RED catches missing focus ring independent of selected marker, screenshot `selected-focus.png`,
+      layout stable.
+
+
+      Semantic/computed-style checks:
+
+      - aria-current selected/current state.
+
+      - `::before` selected marker background visibility.
+
+      - row/open computed backgrounds for active stacking detection.
+
+      - outline/box-shadow computed focus visibility.
+
+      - row bounding box x/width/height stability across states.
+
+
+      Artifacts:
+
+      - Playwright results attachments include `today-list.png`, `selected-item.png`,
+      `selected-hover.png`, `focus-feed-row.png`, `selected-focus.png`, `feed-row-state-matrix-style-dump.json`.
+
+      - Failure screenshot/trace/error context under `.test-artifacts/playwright/test-output/feed-row-state-matrix.expe-fd2c4-adable-without-layout-shift-chromium-ci-safe/`.
+
+
+      Layout-shift evidence:
+
+      - Tests compare row x/width/height with `toBeCloseTo(..., 0)` for hover, selected-hover,
+      focus, selected-focus.
+
+      - No layout-shift assertion failed; failures are visual-state/focus ambiguity
+      only.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — selected+hover, focus, and selected+focus ambiguity/noise
+      are reproducible with named artifacts and semantic/computed-style checks.
+
+      orchestrator_action_hint: COMPLETE'
   - id: expected-red-inspector-dirty-corpus-tests
     name: Expected-red Inspector hierarchy and dirty content corpus tests
     status: done
