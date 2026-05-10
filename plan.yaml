@@ -20268,8 +20268,8 @@ phases:
       priority: HIGH
 
 
-      Batched remediation for concurrent semantic FAIL results from manual-rss-fetch.integration-proof
-      and manual-rss-fetch.spec-conformance. Fix ALL blocker-class findings in one
+      Batched remediation for the concurrent semantic FAIL results from `manual-rss-fetch.integration-proof`
+      and `manual-rss-fetch.spec-conformance`. Fix ALL blocker-class findings in one
       implementation pass; do not create serial fix chains.
 
 
@@ -20278,16 +20278,20 @@ phases:
 
       ### B1: Backend/frontend success response schema divergence
 
-      - Runtime evidence: backend returns flat `ManualFetchResult` JSON for both source
-      fetch and global ingest, e.g. fields `operation`, `source_id`, `completed`,
-      `sources_total`, `sources_fetched`, `items_discovered`, `items_upserted`, and
-      `errors`.
+      - Runtime evidence: live `cmd/resofeed` authenticated HTTP probe returned flat
+      `ManualFetchResult` JSON for both source fetch and global ingest: fields include
+      `operation`, `source_id`, `completed`, `sources_total`, `sources_fetched`, `items_discovered`,
+      `items_upserted`, and `errors`.
+
+      - Runtime evidence: concurrent source fetch correctly returned 409 `{"error":{"code":"conflict","message":"ingest
+      already running","details":{}}}` and no durable manual fetch receipt/queue/job
+      tables were found.
 
       - Locked backend contract: `internal/resofeed/manual_fetch_contract.go` flat
-      `ManualFetchResult`; HTTP writes the struct directly.
+      `ManualFetchResult`; backend HTTP writes that struct directly.
 
       - Frontend drift: client/page/runtime handlers dereference nested `result.body.ingest`,
-      `result.body.source`, and `result.body.fetch` and tests/fixtures allowed nested
+      `result.body.source`, and `result.body.fetch`; tests/fixtures allowed nested
       envelopes.
 
       - Preferred remediation: align frontend contract/client/page/tests to consume
@@ -20315,7 +20319,7 @@ phases:
       controls if the rendered reference remains authoritative. Preserve ResoFeed
       DESIGN.md aesthetic: dense, archival, muted, bracket actions, no SaaS animations/spinners/shadows.
 
-      - Evidence must state which source is authoritative after the fix and how uiux-audit
+      - Evidence must state which source is authoritative after the fix and how `manual-rss-fetch.uiux-audit`
       can compare rendered implementation against the reference without ambiguity.
 
 
@@ -20326,8 +20330,8 @@ phases:
 
       - Disposition requirement: either fix the copy as part of this step if it intersects
       Source Ledger/manual fetch UI gates, OR explicitly classify it as outside manual
-      RSS fetch scope with non-intersection evidence showing downstream manual-rss-fetch.uiux-audit
-      and manual-rss-fetch.gate will not rediscover it as blocker-class drift.
+      RSS fetch scope with non-intersection evidence showing downstream `manual-rss-fetch.uiux-audit`
+      and `manual-rss-fetch.gate` will not rediscover it as blocker-class drift.
 
 
       ## Completion Criteria (stub exclusion)
@@ -20402,61 +20406,72 @@ phases:
       - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
 
 
-      ## Remediation Evidence
+      If no refs were provided, state: "No refs for this step."
 
 
-      **B1 schema disposition**: backend flat contract kept | backend changed due
-      authoritative spec | other (explain)
+      ## Batched Remediation Evidence
 
 
-      **Deviation records**:
+      **B1 backend/frontend schema divergence**:
 
-      - `contract_error`: <what frontend contract changed, why, impact>
+      - Chosen authoritative success schema: <flat ManualFetchResult or justified
+      alternative>
 
-      - `test_error`: <what fixture/test assumption changed, why, impact>
+      - Contract-preserving deviation record: <contract_error/test_error/none, what,
+      why, impact>
 
+      - Obsolete nested access search results for `body.ingest`, `body.fetch`, `body.source`:
 
-      **Live/contract payloads used by frontend tests**:
+      ```
 
-      ```json
+      <paste grep/search output or "none remains">
 
-      <paste actual or contract-faithful flat ManualFetchResult payloads for ingest
-      and source fetch>
+      ```
+
+      - Frontend tests using live/contract-faithful flat payloads for `/api/ingest`
+      and `/api/sources/{id}/fetch`:
+
+      ```
+
+      <test names and output>
 
       ```
 
 
-      **Obsolete nested-shape search**:
+      **B2 ui-preview/design reference closure**:
 
-      ```
+      - Authoritative rendered Source Ledger reference after fix: <docs/ui-preview.html
+      or implementation corrected to match>
 
-      <search output for body.ingest/body.fetch/body.source or "none found outside
-      intentional compatibility tests">
-
-      ```
+      - Manual fetch controls/states alignment evidence: <summary + file refs>
 
 
-      **B2 ui-preview closure**: <how docs/ui-preview.html and implementation now
-      align>
+      **R9 disposition**:
+
+      - Disposition: FIXED | NON_INTERSECTING
+
+      - Evidence: <copy update or non-intersection proof for manual-rss-fetch.uiux-audit/gate>
 
 
-      **R9 disposition**: fixed | outside manual RSS fetch scope with non-intersection
-      evidence
+      **Architecture guardrail**:
+
+      - Queue/job/receipt table search result: <none or explanation>
+
+      - Sidecar/worker/admin process check: <none or explanation>
 
 
-      **Architecture guardrail evidence**: <no queues/jobs/receipts/sync layers introduced>
-
-
-      **Commands/checks run**:
-
-      ```
-
-      <paste commands and key output>
-
-      ```'
+      **Headline**: PASS | FAIL'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/PRD.md
+    - internal/resofeed/manual_fetch_contract.go
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
+    - backend-contract
+    - frontend-contract
     agent: frontend-engineer
   - id: verification-retest-after-remediation
     name: Verification Retest After Remediation
