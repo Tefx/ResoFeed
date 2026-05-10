@@ -27259,6 +27259,12 @@ phases:
       **Residual gaps**:
 
       <none or list explicit non-blocking gaps with rationale>'
+    refs:
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/DESIGN_VISION.md
+    - docs/ui-preview.html
     depends_on:
     - visual-ux-audit
     agent: frontend-engineer
