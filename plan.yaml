@@ -35562,7 +35562,7 @@ phases:
       completed'
   - id: fuidcr-feed-search-client-dto-contract
     name: Update Feed/Search frontend DTO contract for display fallbacks
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -35716,3 +35716,137 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T18:28:40.669582+00:00'
+    done_at: '2026-05-10T18:37:01.680712+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — Feed Item contract requires raw fallback: “raw fallback:
+      show feed excerpt when AI summary is unavailable”; Search results use feed-item
+      anatomy and provenance.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree; docs/audits contained only inspector-readable-content-remediation-residual-uiux-audit.md.
+
+
+      ## Frontend DTO Contract Evidence
+
+      **Types/client paths updated**:
+
+      - web/src/lib/api-contract.ts: added optional `display_excerpt` and `first_seen_at`
+      to `ItemSummary`; added `itemDisplayExcerpt` and `itemDisplayTimestamp` helpers
+      exposing source-backed fallback behavior.
+
+
+      **Fixtures/tests updated**:
+
+      - web/src/test/contract-fixtures.ts: added `expectedRedFallbackItem` with `published_at:
+      null` + source-backed `first_seen_at`, and `summary: null` / `core_insight:
+      null` + `display_excerpt`.
+
+      - web/src/lib/api-client.test.ts: Feed and Search client fixtures include fallback
+      item and assert DTO/helper behavior without relying on visual component anatomy
+      changes.
+
+
+      **Commands**:
+
+      Worker verification:
+
+      - Initial `npm --prefix web run check` failed because frontend node_modules
+      were absent in isolated worktree.
+
+      - `npm --prefix web ci` — PASS; installed locked frontend dependencies in isolated
+      worktree.
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run test:render -- src/lib/api-client.test.ts` — PASS after
+      singleton query repair; 3 tests passed.
+
+      - Scope repair verification: `npm --prefix web run check` PASS; focused api-client
+      test PASS; `git diff --name-only main...HEAD` excluded visual Feed/Search components.
+
+      Mainline final-state gate after squash merge:
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run test:render -- src/lib/api-client.test.ts` — PASS; 1
+      file / 3 tests passed.
+
+      - `npm --prefix web run build` — PASS; production build completed.
+
+
+      **Guardrail confirmation**:
+
+      - Added only existing Feed/Search item-display DTO contract fields: YES.
+
+      - Added new routes/storage/auth/sync/accounts/vector/admin/service layers: NO.
+
+      - Go backend changed: NO.
+
+      - Visual Feed/Search anatomy components changed: NO after scope repair.
+
+
+      ## Commit hash(es)
+
+      - Worker branch: d878dd56ec879f89a7549cf1c3de8ad246ed031e (`Update feed search
+      DTO fallbacks`)
+
+      - Worker branch: b79bc2515862716e392b598ad005d06eb7618dc6 (`Restrict DTO fallback
+      changes to contract layer`)
+
+      - Main squash commit: 1a5450a (`[vectl] step-fuidcr-feed-search-client-dto-contract
+      completed`)
+
+
+      ## Files changed
+
+      - web/src/lib/api-client.test.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/test/contract-fixtures.ts
+
+
+      ## Scope repair disposition
+
+      The initial worker output overreached into `web/src/routes/components/Feed.svelte`
+      and `web/src/routes/components/SearchRetrieval.svelte`. The same worker repaired
+      scope by reverting those visual component changes. Final branch diff excludes
+      Feed/Search visual components; no deviation needed.
+
+
+      ## Final diff scope check
+
+      Final worker `git diff --name-only main...HEAD`:
+
+      - web/src/lib/api-client.test.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/test/contract-fixtures.ts
+
+      Mainline staged/committed files matched these three paths only.
+
+
+      ## Spec link
+
+      - docs/DESIGN.md
+
+      - upstream steps: fuidcr-api-dto-escalation-guard, fuidcr-feed-search-dto-source-fields
+
+
+      ## Deviations
+
+      none
+
+
+      ## Gaps/Notes
+
+      - Required audit file was absent in the isolated worktree.
+
+      - Go tests were not run for this step because Go backend was not touched; prior
+      upstream `fuidcr-feed-search-dto-source-fields` evidence cited and mainline-verified
+      `go test ./...`.'
