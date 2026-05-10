@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head><title>PRD Inspector Conformance OPML</title></head>
+  <body><outline text="PRD Inspector Fixture Source" title="PRD Inspector Fixture Source" type="rss" xmlUrl="http://127.0.0.1:57905/prd-inspector-conformance.xml" /></body>
+</opml>

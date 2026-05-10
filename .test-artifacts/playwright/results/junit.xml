@@ -1,9 +1,9 @@
-<testsuites id="" name="" tests="7" failures="0" skipped="0" errors="0" time="8.113598">
-<testsuite name="inspector-dirty-corpus.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="2.469" errors="0">
-<testcase name="dirty corpus inspector primary hierarchy hides raw feed payloads and provenance" classname="inspector-dirty-corpus.spec.ts" time="2.469">
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="13.176255999999999">
+<testsuite name="inspector-dirty-corpus.spec.ts" timestamp="2026-05-10T16:07:07.730Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="3.409" errors="0">
+<testcase name="dirty corpus inspector primary hierarchy hides raw feed payloads and provenance" classname="inspector-dirty-corpus.spec.ts" time="3.409">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-10427d78a6b6132e4075b8800205bf50c1eb090f.png]]
+[[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-c8dd0cebe39b8bcdf850d117edcc92b0daff2552.png]]
 
 [[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/test-finished-1.png]]
 
@@ -12,8 +12,8 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="inspector-readable-content-regression.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="0.564" errors="0">
-<testcase name="Inspector primary body hides screenshot-family raw source, navigation, and diagnostic garbage" classname="inspector-readable-content-regression.spec.ts" time="0.564">
+<testsuite name="inspector-readable-content-regression.spec.ts" timestamp="2026-05-10T16:07:07.730Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="0.849" errors="0">
+<testcase name="Inspector primary body hides screenshot-family raw source, navigation, and diagnostic garbage" classname="inspector-readable-content-regression.spec.ts" time="0.849">
 <system-out>
 <![CDATA[
 [[ATTACHMENT|../test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/test-finished-1.png]]
@@ -23,16 +23,21 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="ui-navigation-hover-inspector-repair.expected-red.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="5" failures="0" skipped="0" time="1.398" errors="0">
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.246">
-</testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.263">
-</testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: selected feed row hover remains restrained instead of stacking ambiguous active hover blocks" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.284">
-</testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: default Inspector primary area is structured reading content, not raw JSON-LD/extracted metadata" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.327">
-</testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: primary visible copy avoids forbidden RSS-reader/SaaS/onboarding language" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.278">
+<testsuite name="prd-inspector-preview-conformance.expected-red.spec.ts" timestamp="2026-05-10T16:07:07.730Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="1.417" errors="0">
+<testcase name="expected-red PRD Inspector fields and ui-preview desktop parity are visible in the real rendered app" classname="prd-inspector-preview-conformance.expected-red.spec.ts" time="1.417">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/attachments/prd-inspector-preview-baseline-png-310a88443b5aada14b416cd3a3a70b56dd2cb0ac.png]]
+
+[[ATTACHMENT|../test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/attachments/prd-inspector-live-app-expected-red-png-2962619b862012861d0c4cdfefb69313ef108b2b.png]]
+
+[[ATTACHMENT|../test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/test-finished-2.png]]
+
+[[ATTACHMENT|../test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
 </testcase>
 </testsuite>
 </testsuites>

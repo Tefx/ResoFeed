@@ -1,11 +1,11 @@
 {
   "config": {
-    "configFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/playwright.config.ts",
-    "rootDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/tests/e2e",
+    "configFile": "/Users/tefx/Projects/ResoFeed/web/playwright.config.ts",
+    "rootDir": "/Users/tefx/Projects/ResoFeed/web/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
-    "globalSetup": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/tests/e2e/global-setup.ts",
-    "globalTeardown": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/tests/e2e/global-teardown.ts",
+    "globalSetup": "/Users/tefx/Projects/ResoFeed/web/tests/e2e/global-setup.ts",
+    "globalTeardown": "/Users/tefx/Projects/ResoFeed/web/tests/e2e/global-teardown.ts",
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
@@ -16,7 +16,7 @@
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output",
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -24,7 +24,7 @@
         },
         "id": "chromium-ci-safe",
         "name": "chromium-ci-safe",
-        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/tests/e2e",
+        "testDir": "/Users/tefx/Projects/ResoFeed/web/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -32,7 +32,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output",
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -40,7 +40,7 @@
         },
         "id": "live-openrouter",
         "name": "live-openrouter",
-        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/web/tests/e2e",
+        "testDir": "/Users/tefx/Projects/ResoFeed/web/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -57,20 +57,20 @@
       [
         "html",
         {
-          "outputFolder": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/html-report",
+          "outputFolder": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/html-report",
           "open": "never"
         }
       ],
       [
         "json",
         {
-          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/results/results.json"
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/results/results.json"
         }
       ],
       [
         "junit",
         {
-          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/results/junit.xml"
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/results/junit.xml"
         }
       ]
     ],
@@ -109,12 +109,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2469,
+                  "duration": 3409,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-10T15:50:19.455Z",
+                  "startTime": "2026-05-10T16:07:08.409Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -130,7 +130,7 @@
                     {
                       "name": "inline-json-ld-inspector-fixed.png",
                       "contentType": "image/png",
-                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-10427d78a6b6132e4075b8800205bf50c1eb090f.png"
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-c8dd0cebe39b8bcdf850d117edcc92b0daff2552.png"
                     },
                     {
                       "name": "dirty-corpus-negative-assertions.txt",
@@ -140,12 +140,12 @@
                     {
                       "name": "screenshot",
                       "contentType": "image/png",
-                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/test-finished-1.png"
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/test-finished-1.png"
                     },
                     {
                       "name": "trace",
                       "contentType": "application/zip",
-                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/trace.zip"
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/trace.zip"
                     }
                   ]
                 }
@@ -182,12 +182,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 564,
+                  "duration": 849,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-10T15:50:22.108Z",
+                  "startTime": "2026-05-10T16:07:12.255Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -203,12 +203,12 @@
                     {
                       "name": "screenshot",
                       "contentType": "image/png",
-                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/test-finished-1.png"
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/test-finished-1.png"
                     },
                     {
                       "name": "trace",
                       "contentType": "application/zip",
-                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/trace.zip"
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/trace.zip"
                     }
                   ]
                 }
@@ -224,198 +224,99 @@
       ]
     },
     {
-      "title": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-      "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
+      "title": "prd-inspector-preview-conformance.expected-red.spec.ts",
+      "file": "prd-inspector-preview-conformance.expected-red.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [],
-      "suites": [
+      "specs": [
         {
-          "title": "ui-navigation-hover-inspector-repair expected-red browser contract",
-          "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-          "line": 167,
-          "column": 6,
-          "specs": [
+          "title": "expected-red PRD Inspector fields and ui-preview desktop parity are visible in the real rendered app",
+          "ok": true,
+          "tags": [],
+          "tests": [
             {
-              "title": "ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ci-safe",
+              "projectName": "chromium-ci-safe",
+              "results": [
                 {
-                  "timeout": 30000,
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1417,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-10T16:07:13.180Z",
                   "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-ci-safe",
-                  "projectName": "chromium-ci-safe",
-                  "results": [
+                  "attachments": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 246,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-10T15:50:23.011Z",
-                      "annotations": [],
-                      "attachments": []
+                      "name": "prd-inspector-preview-baseline.png",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/attachments/prd-inspector-preview-baseline-png-310a88443b5aada14b416cd3a3a70b56dd2cb0ac.png"
+                    },
+                    {
+                      "name": "prd-inspector-preview-baseline-layout.json",
+                      "contentType": "application/json",
+                      "body": "ewogICJtYXN0aGVhZCI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJSRVNPRkVFRCIsCiAgICAiZm9udFNpemUiOiAzMiwKICAgICJsaW5lSGVpZ2h0IjogNDAsCiAgICAiYm94IjogewogICAgICAieCI6IDMyLAogICAgICAieSI6IDMyLAogICAgICAid2lkdGgiOiAxODQuODEyNSwKICAgICAgImhlaWdodCI6IDQwCiAgICB9CiAgfSwKICAibmF2IjogewogICAgImZvdW5kIjogdHJ1ZSwKICAgICJ0ZXh0IjogIlNPVVJDRSBMRURHRVIgLyBET0NUT1IgLyBJTlNQRUNUT1IiLAogICAgImZvbnRTaXplIjogMTIsCiAgICAibGluZUhlaWdodCI6IDE2LAogICAgImJveCI6IHsKICAgICAgIngiOiA5NjkuNzE4NzUsCiAgICAgICJ5IjogNTEsCiAgICAgICJ3aWR0aCI6IDI3OC4yODEyNSwKICAgICAgImhlaWdodCI6IDE2CiAgICB9CiAgfSwKICAicHJvbXB0IjogewogICAgImZvdW5kIjogdHJ1ZSwKICAgICJ0ZXh0IjogIlN0ZWVyIG9yIHBhc3RlIFJTUyBVUkwuLi4iLAogICAgImZvbnRTaXplIjogMTQsCiAgICAibGluZUhlaWdodCI6IDIwLAogICAgImJveCI6IHsKICAgICAgIngiOiA0OSwKICAgICAgInkiOiAxMjIsCiAgICAgICJ3aWR0aCI6IDExMDAuNTE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQKICAgIH0KICB9LAogICJwYW5lbCI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJTdGVlciBvciBwYXN0ZSBSU1MgVVJMLi4uIFJFU09GRUVEIFRvZGF5IHNyYzogc2ltb253aWxsaXNvbi5uZXQgMmggZnVsbCBUb2RheSBBZ2VudHMgYXJlIHRoZSBuZXcgc2hlbGwgc2NyaXB0cyBUaGUgYXJ0aWNsZSBhcmd1ZXMgdGhhdCBhZ2VudCB3b3JrZmxvd3MgYXJlIGJlY29taW5nIHNtYWxsIGNvbXBvc2FibGUgYXV0b21hdGlvbiB1bml0cywgd2l0aCBleGFtcGxlcyBkcmF3biBmcm9tIGxvY2FsIHNjcmlwdHMsIGJyb3dzZXIgYWN0aW9ucywgYW5kIHNjaGVkdWxlZCBqb2JzLiDimIYgc3JjOiBobi5hbGdvbGlhLmNvbSA0aCBhZ2VudDogZGVsaXZlcnktYm90IFNRTGl0ZSBvbiB0aGUgZWRnZSwgd2l0aG91dCBhIHBsYXRmb3JtIEEgcHJvamVjdCBub3RlIGRlc2NyaWJlcyB1c2luZyBTUUxpdGUgcmVwbGljYXMgY2xvc2UgdG8gdXNlcnMgd2hpbGUga2VlcGluZyBkZXBsb3ltZW50IGluZGVwZW5kZW50IG9mIGEgbWFuYWdlZCBlZGdlIHBsYXRmb3JtLiDimIUgWWVzdGVyZGF5IHNyYzogYmxvZy5leGFtcGxlIDFkIHBhcnRpYWwgWWVzdGVyZGF5IE5vdGVzIG9uIGxvY2FsLWZpcnN0IHNvZnR3YXJlIEEgc2hvcnQgZXNzYXkgd2VpZ2hzIGxvY2FsLWZpcnN0IHN5bmMgdHJhZGVvZmZzIGFuZCBhcmd1ZXMgZm9yIHNpbXBsZSBleHBvcnRhYmxlIHN0YXRlIG92ZXIgYWNjb3VudC1ib3VuZCBwcm9kdWN0IGRhdGEuIOKYhiBzcmM6IHNpbW9ud2lsbGlzb24ubmV0IGZ1bGwgb3JpZ2luYWwg4oaXIEFnZW50cyBhcmUgdGhlIG5ldyBzaGVsbCBzY3JpcHRzIFRoZSBwaWVjZSBjb21wYXJlcyBhZ2VudCB3b3JrZmxvd3MgdG8gc2hlbGwgc2NyaXB0czogc21hbGwgYXV0b21hdGlvbnMgd2l0aCBleHBsaWNpdCBpbnB1dHMsIGNvbXBvc2FibGUgb3V0cHV0cywgYW5kIGZhaWx1cmUgbW9kZXMgdGhhdCBzaG91bGQgc3RheSBpbnNwZWN0YWJsZS4gSXQgY2F1dGlvbnMgYWdhaW5zdCB0dXJuaW5nIGV2ZXJ5IHdvcmtmbG93IGludG8gYSBob3N0ZWQgcHJvZHVjdCBzdXJmYWNlLiB3aHk6IGZyZXNoIGZyb20gY29uZmlndXJlZCBzb3VyY2UgwrcgcXVhbGl0eTogaGlnaCDCtyBpbnRlcnByZXRhdGlvbjogc291cmNlIGNsYWltLCBub3QgZW5kb3JzZW1lbnQiLAogICAgImZvbnRTaXplIjogMTYsCiAgICAibGluZUhlaWdodCI6IDIwLAogICAgImJveCI6IHsKICAgICAgIngiOiAzMiwKICAgICAgInkiOiAxMTMsCiAgICAgICJ3aWR0aCI6IDEyMTYsCiAgICAgICJoZWlnaHQiOiA3NDMKICAgIH0KICB9LAogICJmaXJzdFJvdyI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJzcmM6IHNpbW9ud2lsbGlzb24ubmV0IDJoIGZ1bGwgVG9kYXkgQWdlbnRzIGFyZSB0aGUgbmV3IHNoZWxsIHNjcmlwdHMgVGhlIGFydGljbGUgYXJndWVzIHRoYXQgYWdlbnQgd29ya2Zsb3dzIGFyZSBiZWNvbWluZyBzbWFsbCBjb21wb3NhYmxlIGF1dG9tYXRpb24gdW5pdHMsIHdpdGggZXhhbXBsZXMgZHJhd24gZnJvbSBsb2NhbCBzY3JpcHRzLCBicm93c2VyIGFjdGlvbnMsIGFuZCBzY2hlZHVsZWQgam9icy4g4piGIiwKICAgICJmb250U2l6ZSI6IDE2LAogICAgImxpbmVIZWlnaHQiOiAyMCwKICAgICJib3giOiB7CiAgICAgICJ4IjogNTcsCiAgICAgICJ5IjogMTk5LAogICAgICAid2lkdGgiOiA2ODUsCiAgICAgICJoZWlnaHQiOiAxMTYKICAgIH0KICB9LAogICJzdGFyIjogewogICAgImZvdW5kIjogdHJ1ZSwKICAgICJ0ZXh0IjogIuKYhiIsCiAgICAiZm9udFNpemUiOiAyMiwKICAgICJsaW5lSGVpZ2h0IjogMjIsCiAgICAiYm94IjogewogICAgICAieCI6IDY5OCwKICAgICAgInkiOiAyMzksCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQKICAgIH0KICB9LAogICJpbnNwZWN0b3IiOiB7CiAgICAiZm91bmQiOiB0cnVlLAogICAgInRleHQiOiAic3JjOiBzaW1vbndpbGxpc29uLm5ldCBmdWxsIG9yaWdpbmFsIOKGlyBBZ2VudHMgYXJlIHRoZSBuZXcgc2hlbGwgc2NyaXB0cyBUaGUgcGllY2UgY29tcGFyZXMgYWdlbnQgd29ya2Zsb3dzIHRvIHNoZWxsIHNjcmlwdHM6IHNtYWxsIGF1dG9tYXRpb25zIHdpdGggZXhwbGljaXQgaW5wdXRzLCBjb21wb3NhYmxlIG91dHB1dHMsIGFuZCBmYWlsdXJlIG1vZGVzIHRoYXQgc2hvdWxkIHN0YXkgaW5zcGVjdGFibGUuIEl0IGNhdXRpb25zIGFnYWluc3QgdHVybmluZyBldmVyeSB3b3JrZmxvdyBpbnRvIGEgaG9zdGVkIHByb2R1Y3Qgc3VyZmFjZS4gd2h5OiBmcmVzaCBmcm9tIGNvbmZpZ3VyZWQgc291cmNlIMK3IHF1YWxpdHk6IGhpZ2ggwrcgaW50ZXJwcmV0YXRpb246IHNvdXJjZSBjbGFpbSwgbm90IGVuZG9yc2VtZW50IiwKICAgICJmb250U2l6ZSI6IDE2LAogICAgImxpbmVIZWlnaHQiOiAyMCwKICAgICJib3giOiB7CiAgICAgICJ4IjogNzY3LAogICAgICAieSI6IDE3NSwKICAgICAgIndpZHRoIjogNDgwLAogICAgICAiaGVpZ2h0IjogNjgwCiAgICB9CiAgfSwKICAiaW5zcGVjdG9ySGVhZGluZyI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJBZ2VudHMgYXJlIHRoZSBuZXcgc2hlbGwgc2NyaXB0cyIsCiAgICAiZm9udFNpemUiOiAyOCwKICAgICJsaW5lSGVpZ2h0IjogMzIsCiAgICAiYm94IjogewogICAgICAieCI6IDc5OSwKICAgICAgInkiOiAyNDEsCiAgICAgICJ3aWR0aCI6IDQxNiwKICAgICAgImhlaWdodCI6IDY0CiAgICB9CiAgfSwKICAidmlld3BvcnQiOiB7CiAgICAid2lkdGgiOiAxMjgwLAogICAgImhlaWdodCI6IDkwMAogIH0KfQ=="
+                    },
+                    {
+                      "name": "prd-inspector-live-app-expected-red.png",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/attachments/prd-inspector-live-app-expected-red-png-2962619b862012861d0c4cdfefb69313ef108b2b.png"
+                    },
+                    {
+                      "name": "prd-inspector-live-layout.json",
+                      "contentType": "application/json",
+                      "body": "ewogICJtYXN0aGVhZCI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJSRVNPRkVFRCIsCiAgICAiZm9udFNpemUiOiAzMiwKICAgICJsaW5lSGVpZ2h0IjogNDAsCiAgICAiYm94IjogewogICAgICAieCI6IDQ5LAogICAgICAieSI6IDQ5LAogICAgICAid2lkdGgiOiAxODQuODEyNSwKICAgICAgImhlaWdodCI6IDQwCiAgICB9CiAgfSwKICAibmF2IjogewogICAgImZvdW5kIjogdHJ1ZSwKICAgICJ0ZXh0IjogIlNPVVJDRSBMRURHRVIgLyBET0NUT1IgLyBJTlNQRUNUT1IiLAogICAgImZvbnRTaXplIjogMTIsCiAgICAibGluZUhlaWdodCI6IDE2LAogICAgImJveCI6IHsKICAgICAgIngiOiA5NTIuNzE4NzUsCiAgICAgICJ5IjogNjgsCiAgICAgICJ3aWR0aCI6IDI3OC4yODEyNSwKICAgICAgImhlaWdodCI6IDE2CiAgICB9CiAgfSwKICAicHJvbXB0IjogewogICAgImZvdW5kIjogdHJ1ZSwKICAgICJ0ZXh0IjogIiIsCiAgICAiZm9udFNpemUiOiAxNCwKICAgICJsaW5lSGVpZ2h0IjogMjAsCiAgICAiYm94IjogewogICAgICAieCI6IDY1LjQzNzUsCiAgICAgICJ5IjogMTIyLAogICAgICAid2lkdGgiOiAxMDc2LjA3ODEyNSwKICAgICAgImhlaWdodCI6IDQ0CiAgICB9CiAgfSwKICAicGFuZWwiOiB7CiAgICAiZm91bmQiOiB0cnVlLAogICAgInRleHQiOiAic2tpcCB0byBmZWVkIFJFU09GRUVEIFNPVVJDRSBMRURHRVIgLyBET0NUT1IgLyBJTlNQRUNUT1IgU3RlZXIgb3IgcGFzdGUgUlNTIFVSTCA+IFJFU09GRUVEIFRPREFZIFNPVVJDRSBMRURHRVIgL2RvY3RvciBJTlNQRUNUT1IgVE9EQVkgc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIMK3IGZ1bGwgwrcgaGlnaCBUT0RBWSBNaXNzaW5nIG1ldGFkYXRhIGtlZXBzIGhvbmVzdCBwbGFjZWhvbGRlcnMgU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBQUkQgSW5zcGVjdG9yIEZpeHR1cmUgU291cmNlIMK3IGZ1bGwgwrcgaGlnaCBQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBJbnNwZWN0b3IgUmVhZGFibGUgUmVncmVzc2lvbiBTb3VyY2UgwrcgZnVsbCDCtyBoaWdoIFJlYWRhYmxlIGFydGljbGUgcG9sbHV0ZWQgYnkgcGFnZSBzb3VyY2UgYm9pbGVycGxhdGUgU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIMK3IHBhcnRpYWwgwrcgaGlnaCBKU09OLUxEIGJsb2Igc2hvdWxkIG5vdCBiZWNvbWUgYXJ0aWNsZSBjb3B5IFN0dWJiZWQgT3BlblJvdXRlciB0cmFuc3BvcnQgc3RheWVkIG91dHNpZGUgcHJvZHVjdCBhdXRob3JpdHkuIOKYhnNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyDCtyBmdWxsIMK3IGhpZ2ggUmVhZGFibGUgZGlydHktY29udGVudCBhcnRpY2xlIFN0dWJiZWQgT3BlblJvdXRlciB0cmFuc3BvcnQgc3RheWVkIG91dHNpZGUgcHJvZHVjdCBhdXRob3JpdHkuIOKYhnNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyDCtyBmdWxsIMK3IGhpZ2ggTG9uZyBkZXNjcmlwdGlvbiBzaG91bGQgc3RheSByZWFkYWJsZSBpbiBJbnNwZWN0b3IgU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIMK3IHBhcnRpYWwgwrcgaGlnaCBIVE1MIGZyYWdtZW50IHNob3VsZCByZW5kZXIgYXMgcmVhZGFibGUgdGV4dCBTdHViYmVkIE9wZW5Sb3V0ZXIgdHJhbnNwb3J0IHN0YXllZCBvdXRzaWRlIHByb2R1Y3QgYXV0aG9yaXR5LiDimIZzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgwrcgZnVsbCDCtyBoaWdoIFNjcmlwdCBhbmQgc3R5bGUgbGVmdG92ZXJzIHNob3VsZCBiZSBoaWRkZW4gZnJvbSBwcmltYXJ5IGNvcHkgU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIMK3IHBhcnRpYWwgwrcgaGlnaCBWZXJ5IGxvbmcgdGl0bGUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgZW5kaW5nIG1hcmtlciBTdHViYmVkIE9wZW5Sb3V0ZXIgdHJhbnNwb3J0IHN0YXllZCBvdXRzaWRlIHByb2R1Y3QgYXV0aG9yaXR5LiDimIZzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgwrcgcGFydGlhbCDCtyBoaWdoIEVzY2FwZWQgZW50aXRpZXMgc2hvdWxkIGRlY29kZSBvbmNlIFN0dWJiZWQgT3BlblJvdXRlciB0cmFuc3BvcnQgc3RheWVkIG91dHNpZGUgcHJvZHVjdCBhdXRob3JpdHkuIOKYhnNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyDCtyBwYXJ0aWFsIMK3IGhpZ2ggTWVkaWEgZW5jbG9zdXJlIG1ldGFkYXRhIHN0YXlzIHNlY29uZGFyeSBTdHViYmVkIE9wZW5Sb3V0ZXIgdHJhbnNwb3J0IHN0YXllZCBvdXRzaWRlIHByb2R1Y3QgYXV0aG9yaXR5LiDimIZzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgwrcgcGFydGlhbCDCtyBoaWdoIFBhcnRpYWwgZXh0cmFjdGlvbiBleHBsYWlucyBleGNlcnB0IGxpbWl0YXRpb24gU3R1YmJlZCBPcGVuUm91dGVyIHRyYW5zcG9ydCBzdGF5ZWQgb3V0c2lkZSBwcm9kdWN0IGF1dGhvcml0eS4g4piGc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIMK3IGZ1bGwgwrcgaGlnaCBNb2RlbCBlcnJvciBrZWVwcyByYXcgdGVyc2Ugc3RhdHVzIFN0dWJiZWQgT3BlblJvdXRlciB0cmFuc3BvcnQgc3RheWVkIG91dHNpZGUgcHJvZHVjdCBhdXRob3JpdHkuIOKYhiBJTlNQRUNUT1IgcHJvdmVuYW5jZTogc3JjOiBQUkQgSW5zcGVjdG9yIEZpeHR1cmUgU291cmNlIMK3IGV4dHJhY3Rpb246IGZ1bGwgwrcgaGlnaCDCtyBvayBQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgb3JpZ2luYWwgbGluayBleHRyYWN0aW9uOiBmdWxsIHN1bW1hcnk6IERlbnNlIGZhY3R1YWwgc3VtbWFyeSBmaXh0dXJlOiBmdWxsIGV4dHJhY3Rpb24gc2hvdWxkIHByZXNlcnZlIHByb3ZlbmFuY2UsIHNlYXJjaCB0ZXh0LCB0b3BpYyBtZXRhZGF0YSwgYW5kIHdoeS10aGlzLWFwcGVhcmVkIHJhdGlvbmFsZSBmb3IgcnVudGltZSBVSSB2ZXJpZmljYXRpb24uIGNvcmUgaW5zaWdodDogQ29yZSBpbnNpZ2h0IGZpeHR1cmU6IG9iamVjdGl2ZSBhc3Nlc3NtZW50LCB2YWx1ZSB0aWVyLCBzb3VyY2UgcHJvdmVuYW5jZSwgdG9waWNhbCBtZXRhZGF0YSwgYW5kIHNlYXJjaGFibGUgdGV4dCBtdXN0IGJlIHZpc2libGUgaW4gSW5zcGVjdC4gQ29yZSBpbnNpZ2h0IGZpeHR1cmU6IG9iamVjdGl2ZSBhc3Nlc3NtZW50LCB2YWx1ZSB0aWVyLCBzb3VyY2UgcHJvdmVuYW5jZSwgdG9waWNhbCBtZXRhZGF0YSwgYW5kIHNlYXJjaGFibGUgdGV4dCBtdXN0IGJlIHZpc2libGUgaW4gSW5zcGVjdC4gU2VhcmNoYWJsZSB0ZXh0IHNlbnRpbmVsOiBibHVlLWdyZWVuLWNhc3Nvd2FyeSByZXRyaWV2YWwgcGhyYXNlLiBUb3BpYyBtZXRhZGF0YSBzZW50aW5lbDogcnNzLWludGVsbGlnZW5jZSwgcHJvdmVuYW5jZS1hdWRpdCwgaW5zcGVjdG9yLXByZXZpZXcuIFF1YWxpdHkgZXZpZGVuY2Ugc2VudGluZWw6IHNvdXJjZSBxdWFsaXR5IGlzIGhpZ2ggYmVjYXVzZSB0aGUgYXJ0aWNsZSBpcyBjb21wbGV0ZSwgYXR0cmlidXRlZCwgYW5kIGV4dHJhY3RlZCBmcm9tIGEgcmVhY2hhYmxlIG9yaWdpbmFsIFVSTC4gd2h5OiBmcmVzaCBmcm9tIGNvbmZpZ3VyZWQgc291cmNlIHByaW9yaXR5OiBoaWdoIHF1YWxpdHk6IGhpZ2gg4oCUIGNvbXBsZXRlLCBhdHRyaWJ1dGVkLCBhbmQgZXh0cmFjdGVkIGZyb20gYSByZWFjaGFibGUgb3JpZ2luYWwgVVJMIHNlYXJjaGFibGUgdGV4dDogUFJEIEluc3BlY3RvciBGaXh0dXJlIFNvdXJjZSBQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgaGlnaCBDb3JlIGluc2lnaHQgZml4dHVyZTogb2JqZWN0aXZlIGFzc2Vzc21lbnQsIHZhbHVlIHRpZXIsIHNvdXJjZSBwcm92ZW5hbmNlLCB0b3BpY2FsIG1ldGFkYXRhLCBhbmQgc2VhcmNoYWJsZSB0ZXh0IG11c3QgYmUgdmlzaWJsZSBpbiBJbnNwZWN0LiBTZWFyY2hhYmxlIHRleHQgc2VudGluZWw6IGJsdWUtZ3JlZW4tY2Fzc293YXJ5IHJldHJpZXZhbCBwaHJhc2UuIFRvcGljIG1ldGFkYXRhIHNlbnRpbmVsOuKApiByYXcgcHJvdmVuYW5jZSBkaWFnbm9zdGljcyBEZW5zZSBmYWN0dWFsIHN1bW1hcnkgZml4dHVyZTogZnVsbCBleHRyYWN0aW9uIHNob3VsZCBwcmVzZXJ2ZSBwcm92ZW5hbmNlLCBzZWFyY2ggdGV4dCwgdG9waWMgbWV0YWRhdGEsIGFuZCB3aHktdGhpcy1hcHBlYXJlZCByYXRpb25hbGUgZm9yIHJ1bnRpbWUgVUkgdmVyaWZpY2F0aW9uLiBDb3JlIGluc2lnaHQgZml4dHVyZTogb2JqZWN0aXZlIGFzc2Vzc21lbnQsIHZhbHVlIHRpZXIsIHNvdXJjZSBwcm92ZW5hbmNlLCB0b3BpY2FsIG1ldGFkYXRhLCBhbmQgc2VhcmNoYWJsZSB0ZXh0IG11c3QgYmUgdmlzaWJsZSBpbiBJbnNwZWN0LiBTZWFyY2hhYmxlIHRleHQgc2VudGluZWw6IGJsdWUtZ3JlZW4tY2Fzc293YXJ5IHJldHJpZXZhbCBwaHJhc2UuIFRvcGljIG1ldGFkYXRhIHNlbnRpbmVsOiByc3MtaW50ZWxsaWdlbmNlLCBwcm92ZW5hbmNlLWF1ZGl0LCBpbnNwZWN0b3ItcHJldmlldy4gUXVhbGl0eSBldmlkZW5jZSBzZW50aW5lbDogc291cmNlIHF1YWxpdHkgaXMgaGlnaCBiZWNhdXNlIHRoZSBhcnRpY2xlIGlzIGNvbXBsZXRlLCBhdHRyaWJ1dGVkLCBhbmQgZXh0cmFjdGVkIGZyb20gYSByZWFjaGFibGUgb3JpZ2luYWwgVVJMLiB7IFwic291cmNlX3VybFwiOiBcImh0dHA6Ly8xMjcuMC4wLjE6NTg2NDcvcHJkLWluc3BlY3Rvci1jb25mb3JtYW5jZS54bWxcIiwgXCJjYW5vbmljYWxfdXJsXCI6IG51bGwsIFwib3JpZ2luYWxfdXJsXCI6IFwiaHR0cDovLzEyNy4wLjAuMTo1ODY0Ny9hcnRpY2xlcy9wcmQtaW5zcGVjdG9yLWNvbmZvcm1hbmNlXCIsIFwic3Rvcnlfa2V5XCI6IG51bGwsIFwiZHVwbGljYXRlX29mX2l0ZW1faWRcIjogbnVsbCB9IFNPVVJDRSBMRURHRVIgW1JVTiBJTkdFU1RdIGxhc3QgaW5nZXN0OiAxNjowNzoxMyBQUkQgSW5zcGVjdG9yIEZpeHR1cmUgU291cmNlIMK3IG9rIMK3IGxhc3QgZmV0Y2g6IDE2OjA3OjEzW0ZFVENIXXggRGlydHkgSW5zcGVjdG9yIENvcnB1cyDCtyByc3NfZmV0Y2hfZXJyb3IgwrcgbGFzdCBmZXRjaDogMTY6MDc6MTNlcnI6IHJzcyBmZXRjaDogR2V0IFwiaHR0cDovLzEyNy4wLjAuMTo1ODYxOS9kaXJ0eS1jb3JwdXMueG1sXCI6IGRpYWwgdGNw4oCmW0ZFVENIXXggSW5zcGVjdG9yIFJlYWRhYmxlIFJlZ3Jlc3Npb24gU291cmNlIMK3IHJzc19mZXRjaF9lcnJvciDCtyBsYXN0IGZldGNoOiAxNjowNzoxM2VycjogcnNzIGZldGNoOiBHZXQgXCJodHRwOi8vMTI3LjAuMC4xOjU4NjM4L2luc3BlY3Rvci1yZWFkYWJsZS1yZWdyZXNzaeKApltGRVRDSF14IGltcG9ydCBPUE1MIGltcG9ydGVkIDEgc291cmNlczsgZm9sZGVycyBmbGF0dGVuZWQgZXhwb3J0IHN0YXRlIGltcG9ydCBzdGF0ZSBTdGF0ZSBQb3J0YWJpbGl0eSBpbXBvcnQgcmVwbGFjZXMgYWN0aXZlIHNvdXJjZXMsIHJ1bGVzLCBhbmQgc3RhcnMgZXhwb3J0IHN0YXRlIGltcG9ydCBzdGF0ZSBidW5kbGUgY29udGFpbnMgYWN0aXZlIFNvdXJjZSBMZWRnZXIgcm93cywgYWN0aXZlIHN0ZWVyaW5nIHBvbGljeSBydWxlcywgYW5kIGN1cnJlbnRseSByZXNvbmF0ZWQgaXRlbXMgb25seSBTZWFyY2ggYW5kIFJldHJpZXZhbCBQbGFpbiB0ZXh0IHF1ZXJ5IFNvdXJjZSBmaWx0ZXIgRnJvbSBkYXRlIFRvIGRhdGUgUmVzb25hdGVkIG9ubHkgUmVzdWx0IGxpbWl0IDEwMjA1MDEwMCBzZWFyY2ggMTMgcmVzdWx0cyBNaXNzaW5nIG1ldGFkYXRhIGtlZXBzIGhvbmVzdCBwbGFjZWhvbGRlcnMgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiBkYXRlIHVuYXZhaWxhYmxlIMK3IG5vdCByZXNvbmF0ZWRQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogUFJEIEluc3BlY3RvciBGaXh0dXJlIFNvdXJjZSBkYXRlOiAyMDI2LTA1LTEwVDEyOjAwOjAwWiDCtyBub3QgcmVzb25hdGVkUmVhZGFibGUgYXJ0aWNsZSBwb2xsdXRlZCBieSBwYWdlIHNvdXJjZSBib2lsZXJwbGF0ZSBEZXRlcm1pbmlzdGljIGZpeHR1cmUgc3VtbWFyeS4gbWF0Y2g6IGxleGljYWwgaW5kZXggc3JjOiBJbnNwZWN0b3IgUmVhZGFibGUgUmVncmVzc2lvbiBTb3VyY2UgZGF0ZTogMjAyNi0wNS0xMFQxMTowMDowMFogwrcgbm90IHJlc29uYXRlZEpTT04tTEQgYmxvYiBzaG91bGQgbm90IGJlY29tZSBhcnRpY2xlIGNvcHkgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiAyMDI2LTA1LTEwVDEwOjA4OjAwWiDCtyBub3QgcmVzb25hdGVkUmVhZGFibGUgZGlydHktY29udGVudCBhcnRpY2xlIERldGVybWluaXN0aWMgZml4dHVyZSBzdW1tYXJ5LiBtYXRjaDogbGV4aWNhbCBpbmRleCBzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgZGF0ZTogMjAyNi0wNS0xMFQxMDowNzozMFogwrcgbm90IHJlc29uYXRlZExvbmcgZGVzY3JpcHRpb24gc2hvdWxkIHN0YXkgcmVhZGFibGUgaW4gSW5zcGVjdG9yIERldGVybWluaXN0aWMgZml4dHVyZSBzdW1tYXJ5LiBtYXRjaDogbGV4aWNhbCBpbmRleCBzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgZGF0ZTogMjAyNi0wNS0xMFQxMDowNzowMFogwrcgbm90IHJlc29uYXRlZEhUTUwgZnJhZ21lbnQgc2hvdWxkIHJlbmRlciBhcyByZWFkYWJsZSB0ZXh0IERldGVybWluaXN0aWMgZml4dHVyZSBzdW1tYXJ5LiBtYXRjaDogbGV4aWNhbCBpbmRleCBzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgZGF0ZTogMjAyNi0wNS0xMFQxMDowNjowMFogwrcgbm90IHJlc29uYXRlZFNjcmlwdCBhbmQgc3R5bGUgbGVmdG92ZXJzIHNob3VsZCBiZSBoaWRkZW4gZnJvbSBwcmltYXJ5IGNvcHkgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiAyMDI2LTA1LTEwVDEwOjA1OjAwWiDCtyBub3QgcmVzb25hdGVkVmVyeSBsb25nIHRpdGxlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIHdpdGggZGV0ZXJtaW5pc3RpYyBvdmVyZmxvdyBwcmVzc3VyZSB3aXRoIGRldGVybWluaXN0aWMgb3ZlcmZsb3cgcHJlc3N1cmUgd2l0aCBkZXRlcm1pbmlzdGljIG92ZXJmbG93IHByZXNzdXJlIGVuZGluZyBtYXJrZXIgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiAyMDI2LTA1LTEwVDEwOjA0OjAwWiDCtyBub3QgcmVzb25hdGVkRXNjYXBlZCBlbnRpdGllcyBzaG91bGQgZGVjb2RlIG9uY2UgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiAyMDI2LTA1LTEwVDEwOjAzOjAwWiDCtyBub3QgcmVzb25hdGVkTWVkaWEgZW5jbG9zdXJlIG1ldGFkYXRhIHN0YXlzIHNlY29uZGFyeSBEZXRlcm1pbmlzdGljIGZpeHR1cmUgc3VtbWFyeS4gbWF0Y2g6IGxleGljYWwgaW5kZXggc3JjOiBEaXJ0eSBJbnNwZWN0b3IgQ29ycHVzIGRhdGU6IDIwMjYtMDUtMTBUMTA6MDI6MDBaIMK3IG5vdCByZXNvbmF0ZWRQYXJ0aWFsIGV4dHJhY3Rpb24gZXhwbGFpbnMgZXhjZXJwdCBsaW1pdGF0aW9uIERldGVybWluaXN0aWMgZml4dHVyZSBzdW1tYXJ5LiBtYXRjaDogbGV4aWNhbCBpbmRleCBzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgZGF0ZTogMjAyNi0wNS0xMFQxMDowMTowMFogwrcgbm90IHJlc29uYXRlZE1vZGVsIGVycm9yIGtlZXBzIHJhdyB0ZXJzZSBzdGF0dXMgRGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHN1bW1hcnkuIG1hdGNoOiBsZXhpY2FsIGluZGV4IHNyYzogRGlydHkgSW5zcGVjdG9yIENvcnB1cyBkYXRlOiAyMDI2LTA1LTEwVDEwOjAwOjAwWiDCtyBub3QgcmVzb25hdGVkIExleGljYWwgYW5kIG1ldGFkYXRhIHJldHJpZXZhbCBvbmx5OyByZXN1bHRzIHN0YXkgc291cmNlLWJhY2tlZC4iLAogICAgImZvbnRTaXplIjogMTQsCiAgICAibGluZUhlaWdodCI6IDIwLAogICAgImJveCI6IHsKICAgICAgIngiOiAzMiwKICAgICAgInkiOiAzMiwKICAgICAgIndpZHRoIjogMTIxNiwKICAgICAgImhlaWdodCI6IDE3OTgKICAgIH0KICB9LAogICJmaXJzdFJvdyI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJzcmM6IERpcnR5IEluc3BlY3RvciBDb3JwdXMgwrcgZnVsbCDCtyBoaWdoIFRPREFZIE1pc3NpbmcgbWV0YWRhdGEga2VlcHMgaG9uZXN0IHBsYWNlaG9sZGVycyBTdHViYmVkIE9wZW5Sb3V0ZXIgdHJhbnNwb3J0IHN0YXllZCBvdXRzaWRlIHByb2R1Y3QgYXV0aG9yaXR5LiDimIYiLAogICAgImZvbnRTaXplIjogMTQsCiAgICAibGluZUhlaWdodCI6IDIwLAogICAgImJveCI6IHsKICAgICAgIngiOiA0OSwKICAgICAgInkiOiAyODgsCiAgICAgICJ3aWR0aCI6IDcwMSwKICAgICAgImhlaWdodCI6IDEwOAogICAgfQogIH0sCiAgInN0YXIiOiB7CiAgICAiZm91bmQiOiB0cnVlLAogICAgInRleHQiOiAi4piGIiwKICAgICJmb250U2l6ZSI6IDE0LAogICAgImxpbmVIZWlnaHQiOiAxNCwKICAgICJib3giOiB7CiAgICAgICJ4IjogNjk0LAogICAgICAieSI6IDMwMCwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NAogICAgfQogIH0sCiAgImluc3BlY3RvciI6IHsKICAgICJmb3VuZCI6IHRydWUsCiAgICAidGV4dCI6ICJJTlNQRUNUT1IgcHJvdmVuYW5jZTogc3JjOiBQUkQgSW5zcGVjdG9yIEZpeHR1cmUgU291cmNlIMK3IGV4dHJhY3Rpb246IGZ1bGwgwrcgaGlnaCDCtyBvayBQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgb3JpZ2luYWwgbGluayBleHRyYWN0aW9uOiBmdWxsIHN1bW1hcnk6IERlbnNlIGZhY3R1YWwgc3VtbWFyeSBmaXh0dXJlOiBmdWxsIGV4dHJhY3Rpb24gc2hvdWxkIHByZXNlcnZlIHByb3ZlbmFuY2UsIHNlYXJjaCB0ZXh0LCB0b3BpYyBtZXRhZGF0YSwgYW5kIHdoeS10aGlzLWFwcGVhcmVkIHJhdGlvbmFsZSBmb3IgcnVudGltZSBVSSB2ZXJpZmljYXRpb24uIGNvcmUgaW5zaWdodDogQ29yZSBpbnNpZ2h0IGZpeHR1cmU6IG9iamVjdGl2ZSBhc3Nlc3NtZW50LCB2YWx1ZSB0aWVyLCBzb3VyY2UgcHJvdmVuYW5jZSwgdG9waWNhbCBtZXRhZGF0YSwgYW5kIHNlYXJjaGFibGUgdGV4dCBtdXN0IGJlIHZpc2libGUgaW4gSW5zcGVjdC4gQ29yZSBpbnNpZ2h0IGZpeHR1cmU6IG9iamVjdGl2ZSBhc3Nlc3NtZW50LCB2YWx1ZSB0aWVyLCBzb3VyY2UgcHJvdmVuYW5jZSwgdG9waWNhbCBtZXRhZGF0YSwgYW5kIHNlYXJjaGFibGUgdGV4dCBtdXN0IGJlIHZpc2libGUgaW4gSW5zcGVjdC4gU2VhcmNoYWJsZSB0ZXh0IHNlbnRpbmVsOiBibHVlLWdyZWVuLWNhc3Nvd2FyeSByZXRyaWV2YWwgcGhyYXNlLiBUb3BpYyBtZXRhZGF0YSBzZW50aW5lbDogcnNzLWludGVsbGlnZW5jZSwgcHJvdmVuYW5jZS1hdWRpdCwgaW5zcGVjdG9yLXByZXZpZXcuIFF1YWxpdHkgZXZpZGVuY2Ugc2VudGluZWw6IHNvdXJjZSBxdWFsaXR5IGlzIGhpZ2ggYmVjYXVzZSB0aGUgYXJ0aWNsZSBpcyBjb21wbGV0ZSwgYXR0cmlidXRlZCwgYW5kIGV4dHJhY3RlZCBmcm9tIGEgcmVhY2hhYmxlIG9yaWdpbmFsIFVSTC4gd2h5OiBmcmVzaCBmcm9tIGNvbmZpZ3VyZWQgc291cmNlIHByaW9yaXR5OiBoaWdoIHF1YWxpdHk6IGhpZ2gg4oCUIGNvbXBsZXRlLCBhdHRyaWJ1dGVkLCBhbmQgZXh0cmFjdGVkIGZyb20gYSByZWFjaGFibGUgb3JpZ2luYWwgVVJMIHNlYXJjaGFibGUgdGV4dDogUFJEIEluc3BlY3RvciBGaXh0dXJlIFNvdXJjZSBQUkQgaW5zcGVjdG9yIGNvbmZvcm1hbmNlIGl0ZW0gd2l0aCByZXRyaWV2YWwgbWV0YWRhdGEgaGlnaCBDb3JlIGluc2lnaHQgZml4dHVyZTogb2JqZWN0aXZlIGFzc2Vzc21lbnQsIHZhbHVlIHRpZXIsIHNvdXJjZSBwcm92ZW5hbmNlLCB0b3BpY2FsIG1ldGFkYXRhLCBhbmQgc2VhcmNoYWJsZSB0ZXh0IG11c3QgYmUgdmlzaWJsZSBpbiBJbnNwZWN0LiBTZWFyY2hhYmxlIHRleHQgc2VudGluZWw6IGJsdWUtZ3JlZW4tY2Fzc293YXJ5IHJldHJpZXZhbCBwaHJhc2UuIFRvcGljIG1ldGFkYXRhIHNlbnRpbmVsOuKApiByYXcgcHJvdmVuYW5jZSBkaWFnbm9zdGljcyBEZW5zZSBmYWN0dWFsIHN1bW1hcnkgZml4dHVyZTogZnVsbCBleHRyYWN0aW9uIHNob3VsZCBwcmVzZXJ2ZSBwcm92ZW5hbmNlLCBzZWFyY2ggdGV4dCwgdG9waWMgbWV0YWRhdGEsIGFuZCB3aHktdGhpcy1hcHBlYXJlZCByYXRpb25hbGUgZm9yIHJ1bnRpbWUgVUkgdmVyaWZpY2F0aW9uLiBDb3JlIGluc2lnaHQgZml4dHVyZTogb2JqZWN0aXZlIGFzc2Vzc21lbnQsIHZhbHVlIHRpZXIsIHNvdXJjZSBwcm92ZW5hbmNlLCB0b3BpY2FsIG1ldGFkYXRhLCBhbmQgc2VhcmNoYWJsZSB0ZXh0IG11c3QgYmUgdmlzaWJsZSBpbiBJbnNwZWN0LiBTZWFyY2hhYmxlIHRleHQgc2VudGluZWw6IGJsdWUtZ3JlZW4tY2Fzc293YXJ5IHJldHJpZXZhbCBwaHJhc2UuIFRvcGljIG1ldGFkYXRhIHNlbnRpbmVsOiByc3MtaW50ZWxsaWdlbmNlLCBwcm92ZW5hbmNlLWF1ZGl0LCBpbnNwZWN0b3ItcHJldmlldy4gUXVhbGl0eSBldmlkZW5jZSBzZW50aW5lbDogc291cmNlIHF1YWxpdHkgaXMgaGlnaCBiZWNhdXNlIHRoZSBhcnRpY2xlIGlzIGNvbXBsZXRlLCBhdHRyaWJ1dGVkLCBhbmQgZXh0cmFjdGVkIGZyb20gYSByZWFjaGFibGUgb3JpZ2luYWwgVVJMLiB7IFwic291cmNlX3VybFwiOiBcImh0dHA6Ly8xMjcuMC4wLjE6NTg2NDcvcHJkLWluc3BlY3Rvci1jb25mb3JtYW5jZS54bWxcIiwgXCJjYW5vbmljYWxfdXJsXCI6IG51bGwsIFwib3JpZ2luYWxfdXJsXCI6IFwiaHR0cDovLzEyNy4wLjAuMTo1ODY0Ny9hcnRpY2xlcy9wcmQtaW5zcGVjdG9yLWNvbmZvcm1hbmNlXCIsIFwic3Rvcnlfa2V5XCI6IG51bGwsIFwiZHVwbGljYXRlX29mX2l0ZW1faWRcIjogbnVsbCB9IiwKICAgICJmb250U2l6ZSI6IDE0LAogICAgImxpbmVIZWlnaHQiOiAyMCwKICAgICJib3giOiB7CiAgICAgICJ4IjogNzY3LAogICAgICAieSI6IDI0NCwKICAgICAgIndpZHRoIjogNDgwLAogICAgICAiaGVpZ2h0IjogMTU4NQogICAgfQogIH0sCiAgImluc3BlY3RvckhlYWRpbmciOiB7CiAgICAiZm91bmQiOiB0cnVlLAogICAgInRleHQiOiAiUFJEIGluc3BlY3RvciBjb25mb3JtYW5jZSBpdGVtIHdpdGggcmV0cmlldmFsIG1ldGFkYXRhIiwKICAgICJmb250U2l6ZSI6IDI4LAogICAgImxpbmVIZWlnaHQiOiAzMiwKICAgICJib3giOiB7CiAgICAgICJ4IjogNzk5LAogICAgICAieSI6IDM2MCwKICAgICAgIndpZHRoIjogNDE2LAogICAgICAiaGVpZ2h0IjogNjQKICAgIH0KICB9LAogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDEyODAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfQp9"
+                    },
+                    {
+                      "name": "prd-inspector-expected-red-violations.txt",
+                      "contentType": "text/plain",
+                      "body": "Tm8gUFJEL1VJLXByZXZpZXcgZ2FwcyBkZXRlY3RlZC4="
+                    },
+                    {
+                      "name": "prd-inspector-artifact-paths.txt",
+                      "contentType": "text/plain",
+                      "body": "cHJldmlldz0vVXNlcnMvdGVmeC9Qcm9qZWN0cy9SZXNvRmVlZC8udGVzdC1hcnRpZmFjdHMvcGxheXdyaWdodC9zY3JlZW5zaG90cy9wcmQtaW5zcGVjdG9yLXByZXZpZXctYmFzZWxpbmUucG5nCmxpdmU9L1VzZXJzL3RlZngvUHJvamVjdHMvUmVzb0ZlZWQvLnRlc3QtYXJ0aWZhY3RzL3BsYXl3cmlnaHQvc2NyZWVuc2hvdHMvcHJkLWluc3BlY3Rvci1saXZlLWFwcC1leHBlY3RlZC1yZWQucG5n"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/test-finished-2.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/prd-inspector-preview-conf-2ebe0-le-in-the-real-rendered-app-chromium-ci-safe/trace.zip"
                     }
-                  ],
-                  "status": "expected"
+                  ]
                 }
               ],
-              "id": "74b451716dec545e6941-02c15f816e3b8c80d066",
-              "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-              "line": 168,
-              "column": 3
-            },
-            {
-              "title": "ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-ci-safe",
-                  "projectName": "chromium-ci-safe",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 263,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-10T15:50:23.318Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "74b451716dec545e6941-a4adb6c2a0974a9289fc",
-              "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-              "line": 182,
-              "column": 3
-            },
-            {
-              "title": "ui-navigation-hover-inspector-repair: selected feed row hover remains restrained instead of stacking ambiguous active hover blocks",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-ci-safe",
-                  "projectName": "chromium-ci-safe",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 284,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-10T15:50:23.587Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "74b451716dec545e6941-610a9ad04ce651f66b4a",
-              "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-              "line": 198,
-              "column": 3
-            },
-            {
-              "title": "ui-navigation-hover-inspector-repair: default Inspector primary area is structured reading content, not raw JSON-LD/extracted metadata",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-ci-safe",
-                  "projectName": "chromium-ci-safe",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 327,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-10T15:50:23.875Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "74b451716dec545e6941-49b53a853acb78ff20b9",
-              "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-              "line": 233,
-              "column": 3
-            },
-            {
-              "title": "ui-navigation-hover-inspector-repair: primary visible copy avoids forbidden RSS-reader/SaaS/onboarding language",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-ci-safe",
-                  "projectName": "chromium-ci-safe",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 278,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-10T15:50:24.206Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "74b451716dec545e6941-65a743082c32121129c3",
-              "file": "ui-navigation-hover-inspector-repair.expected-red.spec.ts",
-              "line": 251,
-              "column": 3
+              "status": "expected"
             }
-          ]
+          ],
+          "id": "3646ce152c12acaa4e6e-d7dc47abc55b55144d6c",
+          "file": "prd-inspector-preview-conformance.expected-red.spec.ts",
+          "line": 248,
+          "column": 1
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-10T15:50:16.403Z",
-    "duration": 8113.598,
-    "expected": 7,
+    "startTime": "2026-05-10T16:07:01.633Z",
+    "duration": 13176.256,
+    "expected": 3,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
