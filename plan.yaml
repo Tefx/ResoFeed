@@ -33902,3 +33902,151 @@ phases:
     depends_on:
     - fuidcr-browser-regression-proof
     agent: uiux-auditor
+  - id: fuidcr-software-architect-conformance-review
+    name: Review architecture and product-boundary conformance
+    status: pending
+    description: 'step_type: review
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      Independence Level: L2
+
+
+      As software-architect, review the completed UI remediation plan outputs and
+      evidence for architecture-basis conformance before the final gate.
+
+
+      ARCHITECTURE BASIS TO CHECK:
+
+      - system_layers: docs_contract (docs/DESIGN.md, docs/ui-preview.html, audit
+      doc), frontend_surfaces (Shell, Feed, Inspector, SourceLedger, StatePortability,
+      Search, Doctor), api_runtime existing JSON HTTP only, persistence unchanged
+      SQLite/FTS5.
+
+      - source_of_truth_matrix: visual_contract docs/DESIGN.md; preview_reference
+      docs/ui-preview.html after cleanup; issue_register audit doc; implementation
+      web/src/routes/components/* and app.css.
+
+      - runtime_contract: no new routes required by default; no new storage; no new
+      auth model.
+
+      - state_strata: persisted_state unchanged; browser_state existing owner token/local
+      UI state only; visual_state selected/hover/focus/responsive states tested.
+
+      - transport_boundary_rules: HTTP/MCP unchanged unless proven DTO gap; any DTO
+      extension is item-display-only and source-backed.
+
+      - cross_cutting_governance: component composition; no DI/event bus/service/repository
+      layers.
+
+      - shared_abstractions: Feed/Search shared anatomy/metadata formatter; bracket-action
+      visual contract shared by SourceLedger/StatePortability/action surfaces.
+
+      - module_split_recommendations: Feed/Search together; SourceLedger/StatePortability
+      together; Inspector separate; preview cleanup last.
+
+
+      REVIEW OBLIGATIONS:
+
+      - Verify every audit finding 1-52 has either closure evidence or explicit non-blocking/non-intersection
+      rationale accepted by design review evidence.
+
+      - Verify P0/P1 closures are not prose-only and include browser/DOM/visual behavior
+      evidence.
+
+      - Verify no forbidden product concepts or runtime surfaces are introduced: accounts/OAuth,
+      sync/merge, vector/RAG, settings-heavy UI, admin process, service/repository/DI/event-bus
+      layers.
+
+      - Verify any backend/API DTO change, if present, is source-backed, item-display-only,
+      and does not alter auth/storage/runtime semantics.
+
+      - Verify docs/ui-preview.html cleanup occurs after live UI contract repairs.
+
+
+      If blockers remain, produce exact findings and remediation instructions for
+      planner repair; finding problems is a successful review outcome.'
+    verification: '- Architecture review report maps all findings 1-52 to closure/non-intersection
+      status.
+
+      - Review explicitly checks architecture basis bullets and forbidden-concept
+      list.
+
+      - Any DTO/backend changes are confirmed absent or narrow/source-backed/item-display-only.
+
+      - Report emits PASS/PASS_WITH_DEBT/FAIL and blocks final gate on unresolved
+      architecture/product drift.'
+    evidence_template: '## Architecture Conformance Review
+
+
+      **Reviewer**: software-architect
+
+      **Scope**: Full UI design conformance remediation
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ### Architecture Basis Checklist
+
+      | Basis item | Verdict | Evidence ref | Notes |
+
+      |---|---|---|---|
+
+
+      ### Finding Closure / Non-Intersection Register
+
+      | Finding ID | Severity | Status | Evidence ref | Non-intersection rationale
+      if not closed |
+
+      |---:|---|---|---|---|
+
+
+      ### Forbidden Concepts Check
+
+      - Accounts/OAuth: PASS/FAIL
+
+      - Sync/merge/conflict resolver/activity ledger: PASS/FAIL
+
+      - Vector/RAG: PASS/FAIL
+
+      - Settings-heavy UI: PASS/FAIL
+
+      - Admin process/sidecar: PASS/FAIL
+
+      - Service/repository/DI/event-bus layers: PASS/FAIL
+
+
+      ### Gate Decision Basis
+
+      - [ ] OPEN: architecture/product boundaries preserved
+
+      - [ ] BLOCK: remediation required
+
+
+      ### Required Planner Repairs if BLOCK
+
+      <exact finding IDs and step/cluster recommendations>
+
+      '
+    depends_on:
+    - fuidcr-screenshot-first-uiux-audit
+    - fuidcr-ui-preview-cleanup
+    agent: software-architect
