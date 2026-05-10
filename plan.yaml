@@ -31017,3 +31017,77 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     agent: frontend-engineer
+  - id: prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
+    name: Independent retest for PRD fields and preview parity
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+
+      As an INDEPENDENT TESTER, retest the completed PRD Inspector field exposure
+      and docs/ui-preview.html visual parity from a fresh perspective. Your goal is
+      to find problems, not rubber-stamp the implementation.
+
+
+      Use the rendered ResoFeed web app, not mock state. Run the web check/build and
+      the new/affected browser regression tests. If the implementation touched Go
+      data/API/backend paths, also run the relevant Go tests for those paths.
+
+
+      Required proof:
+
+      - Browser evidence that Inspector/Inspect visibly exposes PRD-required item-understanding
+      outputs: objective quality assessment / 质量评估, value tier / 优先级, concise core
+      insight / 核心见解, dense factual summary / 密集事实摘要, source and extraction provenance
+      / 来源与提取溯源, why this appeared / 为什么展示给你, searchable text / 可检索文本.
+
+      - Screenshot/artifact capture for live rendered app and preview/baseline comparison.
+
+      - Bounded layout evidence for masthead, nav placement, prompt placement, item
+      card/border geometry, left/right margins, row/star alignment, typography scale,
+      and Inspector field labels.
+
+      - Regression evidence that the Inspector primary readable body remains clean
+      and does not expose raw JavaScript, CSS, JSON-LD/provenance garbage, navigation
+      boilerplate, or model diagnostics.
+
+
+      Independence Level: L1 independent verification; upgrade scrutiny for UI screenshot
+      evidence per user instruction.'
+    verification: 'phase-check protecting screenshot-first UI/UX audit and final gate.
+
+      - Web check/build passes.
+
+      - New/affected browser tests pass green against rendered app.
+
+      - Relevant Go tests pass if data/API/backend paths changed; otherwise evidence
+      states not touched.
+
+      - Screenshots/artifacts are attached and show PRD fields plus bounded preview
+      parity.
+
+      - Raw-source readable-body regression remains closed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html — key passage\
+      \ or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\
+      \n\n## Retest Execution\n- Web check/build command(s):\n  ```\n  <commands and\
+      \ output>\n  ```\n- Browser regression command(s):\n  ```\n  <commands and output>\n\
+      \  ```\n- Go test command(s) if data/API touched, or \"not touched\":\n  ```\n\
+      \  <commands and output>\n  ```\n- Screenshot/artifact paths: <paths>\n\n##\
+      \ Behavioral Proof Register\n- requirement_ref: <PRD/DESIGN/ui-preview ref>\n\
+      - behavior_claim: <runtime claim verified>\n- runtime_proof_expected: <browser/screenshot/test\
+      \ proof>\n- evidence_ref: <artifact/test output path>\n- status: PROVEN | NEEDS_TEST\
+      \ | UNPROVEN | UNCERTAIN_BLOCKING\n- closure_path: uiux-audit or final-gate\
+      \ action\n- gate_decision_basis: <OPEN/BLOCK basis>\n\n## Findings\n| Severity\
+      \ | Description | Location/Artifact | Reproduction |\n| --- | --- | --- | ---\
+      \ |\n| blocker/should_fix/suggestion/tech_debt | <issue> | <where> | <steps>\
+      \ |\n\n## Headline\n- [ ] PASS: no blocking issues found\n- [ ] PASS_WITH_DEBT:\
+      \ only explicit non-blocking debt remains\n- [ ] FAIL: blocking issues or proof\
+      \ gaps remain\n"
+    depends_on:
+    - prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
+    agent: integration-verifier
