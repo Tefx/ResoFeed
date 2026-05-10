@@ -30772,3 +30772,106 @@ phases:
 
       '
     agent: spec-verifier
+  - id: prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
+    name: Expected-red browser regressions for Inspector PRD fields and preview parity
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Define expected-red browser/UI regression tests from prd-inspector-preview-conformance-remediation.contract-audit-acceptance.
+      This step must not implement product code.
+
+
+      The tests MUST use the rendered app, not mock state. They must load a realistic
+      app route/state through the running ResoFeed web UI and capture screenshots/artifacts.
+      If the test harness requires fixtures, fixtures must be production-format data
+      and must not bypass the app rendering path.
+
+
+      Required coverage:
+
+      - Inspector/Inspect visibly exposes PRD-required item-understanding outputs:
+      质量评估/objective quality assessment, 优先级/value tier, 核心见解/concise core insight,
+      密集事实摘要/dense factual summary, 来源与提取溯源/source and extraction provenance, 为什么展示给你/why
+      this appeared, 可检索文本/searchable text.
+
+      - Layout parity against docs/ui-preview.html or a documented preview baseline.
+      Exact pixel diff may be too brittle; bounded visual/layout assertions are acceptable
+      and required for: large RESOFEED masthead presence/scale, SOURCE LEDGER / DOCTOR
+      / INSPECTOR top nav placement, prompt box at top, item card/border geometry,
+      left/right margins, row/star alignment, typography scale, and Inspector field
+      label hierarchy.
+
+      - Screenshots/artifacts must be captured for both the preview/baseline and live
+      rendered app.
+
+
+      Expected result before implementation: RED because the user reports these fields
+      and visual details are not visible in the live app.
+
+
+      Scope guardrail: modified files limited to tests, browser fixtures, and test
+      artifacts/baseline documentation. Do not modify Go/frontend product implementation
+      in this step.'
+    verification: 'local-check protecting implementation and final gate.
+
+      - Expected-red browser tests exist and run against rendered app, not mock state.
+
+      - Red result exposes missing PRD fields and/or preview/live layout deltas.
+
+      - Test evidence includes screenshot/artifact paths and bounded layout assertions.
+
+      - Modified files are limited to tests/fixtures/artifact baseline docs, not product
+      implementation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/changed: <paths>
+
+      - Rendered app route/state used: <route/state>
+
+      - Preview/baseline artifact path: <path>
+
+      - Live app screenshot/artifact path: <path>
+
+      - Expected failures / exposed gaps: <list>
+
+      - Downstream implementation owner: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
+
+
+      ## Behavioral Proof Register
+
+      - requirement_ref: <PRD/DESIGN/ui-preview ref>
+
+      - behavior_claim: <claim under test>
+
+      - runtime_proof_expected: <browser assertion/screenshot/layout measurement>
+
+      - evidence_ref: <test/artifact path>
+
+      - status: NEEDS_TEST | UNPROVEN | PROVEN
+
+      - closure_path: implementation then independent retest
+
+      - gate_decision_basis: <why unresolved items should block final gate>
+
+      '
+    depends_on:
+    - prd-inspector-preview-conformance-remediation.contract-audit-acceptance
+    agent: frontend-engineer
