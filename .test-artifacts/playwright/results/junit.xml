@@ -1,63 +1,9 @@
-<testsuites id="" name="" tests="15" failures="0" skipped="0" errors="0" time="27.004946">
-<testsuite name="design-artifact-negative-ux.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="2" failures="0" skipped="0" time="3.154" errors="0">
-<testcase name="design artifact manifest captures required ResoFeed UI contract states" classname="design-artifact-negative-ux.spec.ts" time="2.273">
+<testsuites id="" name="" tests="7" failures="0" skipped="0" errors="0" time="8.113598">
+<testsuite name="inspector-dirty-corpus.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="2.469" errors="0">
+<testcase name="dirty corpus inspector primary hierarchy hides raw feed payloads and provenance" classname="inspector-dirty-corpus.spec.ts" time="2.469">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/owner-token-50f6b1676461d81d29757031bcc0be4fdef764da.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/first-use-e7e36673a83ace6afc1ff5cf0140b31c9627d53e.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/source-ledger-668354d0d803715b29a60058b0186f0f02e14b03.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/today-list-c02e9aa0721319b7494034e2266c8ea2ba2eb3c2.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/selected-item-11d1a65764edfa86ddbcfe6b0ee0d261b263c6d3.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/inspector-clean-36b417230d3a2c2b11a5ef1438c7dc73ebb05bf9.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/llm-error-124749b6dccf83338750f0ea6da081e192327e11.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/selected-hover-268a8c1c214766405003085acd8646a0faa5e95e.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/inspector-raw-expanded-provenance-59daebd62fc0962b9cedf151753349bded484165.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/search-c705376e8031e58b6630c2556947e14c4ec1d61c.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/mobile-feed-14d8eab2d111ecb672b686bc554c1915fff48254.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/attachments/mobile-inspector-e1f84568ff3772ad6ddfc1aef3483581e2dcd8e9.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="negative UX assertions reject raw payload copy and active-panel drift" classname="design-artifact-negative-ux.spec.ts" time="0.881">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/design-artifact-negative-u-22d7b-copy-and-active-panel-drift-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/design-artifact-negative-u-22d7b-copy-and-active-panel-drift-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-</testsuite>
-<testsuite name="feed-row-state-matrix.expected-red.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="0.967" errors="0">
-<testcase name="expected-red feed row state matrix screenshot contract › state matrix: normal hover selected selected-hover focus and selected-focus keep selected state readable without layout shift" classname="feed-row-state-matrix.expected-red.spec.ts" time="0.967">
-</testcase>
-</testsuite>
-<testsuite name="hit-target-clickability.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="2" failures="0" skipped="0" time="2.705" errors="0">
-<testcase name="hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspector links, /doctor, OPML import, and source fetch controls" classname="hit-target-clickability.spec.ts" time="1.752">
-</testcase>
-<testcase name="ui-navigation-hover-inspector-repair hit-target diagnostics: nav clicks never leave the wrong panel active" classname="hit-target-clickability.spec.ts" time="0.953">
-</testcase>
-</testsuite>
-<testsuite name="inspector-dirty-corpus.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="2.207" errors="0">
-<testcase name="dirty corpus inspector primary hierarchy hides raw feed payloads and provenance" classname="inspector-dirty-corpus.spec.ts" time="2.207">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-79c59cdca7d59b03fbd523d57dbfcf82c0f877ce.png]]
+[[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/attachments/inline-json-ld-inspector-fixed-png-10427d78a6b6132e4075b8800205bf50c1eb090f.png]]
 
 [[ATTACHMENT|../test-output/inspector-dirty-corpus-dir-d2a72-eed-payloads-and-provenance-chromium-ci-safe/test-finished-1.png]]
 
@@ -66,54 +12,27 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="keyboard-a11y.expected-red.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="4" failures="0" skipped="0" time="3.667" errors="0">
-<testcase name="expected-red keyboard a11y primary nav tab order and active surface semantics" classname="keyboard-a11y.expected-red.spec.ts" time="0.682">
+<testsuite name="inspector-readable-content-regression.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="1" failures="0" skipped="0" time="0.564" errors="0">
+<testcase name="Inspector primary body hides screenshot-family raw source, navigation, and diagnostic garbage" classname="inspector-readable-content-regression.spec.ts" time="0.564">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-2edfb-nd-active-surface-semantics-chromium-ci-safe/test-finished-1.png]]
+[[ATTACHMENT|../test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/test-finished-1.png]]
 
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-2edfb-nd-active-surface-semantics-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="expected-red keyboard a11y feed row star inspector activation and selected state" classname="keyboard-a11y.expected-red.spec.ts" time="1.094">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-ec492-tivation-and-selected-state-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-ec492-tivation-and-selected-state-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="expected-red keyboard a11y Steer submit doctor log and Inspector original link" classname="keyboard-a11y.expected-red.spec.ts" time="1.032">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="expected-red keyboard a11y Source Ledger OPML state and fetch controls" classname="keyboard-a11y.expected-red.spec.ts" time="0.859">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-d7ad7-ML-state-and-fetch-controls-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/keyboard-a11y.expected-red-d7ad7-ML-state-and-fetch-controls-chromium-ci-safe/trace.zip]]
+[[ATTACHMENT|../test-output/inspector-readable-content-ce8e8-tion-and-diagnostic-garbage-chromium-ci-safe/trace.zip]]
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="ui-navigation-hover-inspector-repair.expected-red.spec.ts" timestamp="2026-05-10T13:23:23.233Z" hostname="chromium-ci-safe" tests="5" failures="0" skipped="0" time="2.777" errors="0">
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.564">
+<testsuite name="ui-navigation-hover-inspector-repair.expected-red.spec.ts" timestamp="2026-05-10T15:50:19.152Z" hostname="chromium-ci-safe" tests="5" failures="0" skipped="0" time="1.398" errors="0">
+<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.246">
 </testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.573">
+<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.263">
 </testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: selected feed row hover remains restrained instead of stacking ambiguous active hover blocks" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.541">
+<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: selected feed row hover remains restrained instead of stacking ambiguous active hover blocks" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.284">
 </testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: default Inspector primary area is structured reading content, not raw JSON-LD/extracted metadata" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.522">
+<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: default Inspector primary area is structured reading content, not raw JSON-LD/extracted metadata" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.327">
 </testcase>
-<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: primary visible copy avoids forbidden RSS-reader/SaaS/onboarding language" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.577">
+<testcase name="ui-navigation-hover-inspector-repair expected-red browser contract › ui-navigation-hover-inspector-repair: primary visible copy avoids forbidden RSS-reader/SaaS/onboarding language" classname="ui-navigation-hover-inspector-repair.expected-red.spec.ts" time="0.278">
 </testcase>
 </testsuite>
 </testsuites>

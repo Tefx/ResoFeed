@@ -1,1 +1,1 @@
-cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.final-gate-keyboard-a11y-remediation/.test-artifacts/playwright/fixtures/resofeed-e2e-1778419402123-59534.sqlite3
+cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/prd-inspector-preview-conformance-remediation.independent-retest-prd-preview/.test-artifacts/playwright/fixtures/resofeed-e2e-1778428218689-35987.sqlite3
