@@ -32549,7 +32549,7 @@ phases:
       - none; no files changed, so no commit needed."
   - id: spec-architecture-drift-review
     name: Spec and architecture drift review for owner-token reset
-    status: claimed
+    status: done
     description: 'step_type: review
 
       verification_scope: phase-check
@@ -32687,6 +32687,123 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-10T17:57:55.371403+00:00'
+    done_at: '2026-05-10T18:03:42.830159+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read: one Go process, no sidecar/admin/sync process;
+      offline reset contract; localStorage deletion is browser-local only.
+
+      - docs/USAGE.md — Read: owner-token reset command usage and no `serve --reset-owner-token`
+      style flag.
+
+      - AGENTS.md — NOT READ: file not present in isolated worktree.
+
+      - .agents/instructions.md — Read: single deployable, one SQLite DB, owner-token
+      boundary, no settings-dashboard/UI reset expansion.
+
+
+      ## Spec / Architecture Drift Review
+
+      **Reviewer**: software-architect
+
+
+      ### Acceptance Mapping
+
+      | AC | Evidence reviewed | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | One Go binary/no sidecar/admin process | `cmd/resofeed/main.go`, `internal/resofeed/db.go`,
+      docs/ARCHITECTURE.md | PROVEN | Single binary entrypoint delegates to `resofeed.Main`;
+      no migrate/worker/doctor/admin/sync process. |
+
+      | Flat internal/resofeed shape/no layers | docs/ARCHITECTURE.md and glob checks
+      | PROVEN | No service/repository/registry files introduced. |
+
+      | Reset CLI-only/offline/delete-only | `internal/resofeed/db.go`, reset tests
+      | PROVEN | `runOwnerTokenReset` executes only delete from runtime_metadata where
+      key=''owner_token_sha256''. |
+
+      | Reset does not start server/bind HTTP/MCP/run UI/handle replacement plaintext
+      | db.go help and tests | PROVEN | Reset path calls reset helper, not `runServe`;
+      tests forbid generated/explicit/rfeed output. |
+
+      | Replacement token remains serve startup behavior | `ResolveOwnerToken`, expected-red
+      tests | PROVEN | Post-reset serve generates or stores explicit replacement through
+      serve path. |
+
+      | No accounts/OAuth/agent registry/sync/settings-heavy flow | docs + surface
+      tests | PROVEN | No forbidden flows/surfaces added. |
+
+      | Browser localStorage clearing client-local only | docs, `+page.svelte`, api-client
+      | PROVEN | localStorage removal on 401 prompt path only; no owner-token reset
+      API method. |
+
+
+      ### Architecture Drift Checklist
+
+      - one_deployable: PASS
+
+      - one_sqlite_db: PASS
+
+      - flat_internal_resofeed: PASS
+
+      - no_service_repository_di_event_bus: PASS
+
+      - reset_cli_only: PASS
+
+      - reset_offline_no_server_start: PASS
+
+      - reset_deletes_only_runtime_metadata_owner_token_sha256: PASS
+
+      - no_plaintext_replacement_in_reset: PASS
+
+      - no_http_reset_endpoint: PASS
+
+      - no_mcp_reset_tool_or_resource: PASS
+
+      - no_browser_ui_reset_control: PASS
+
+      - no_accounts_oauth_agent_registry_sync: PASS
+
+      - localstorage_client_local_only: PASS
+
+
+      ## Behavioral Proof Register
+
+      - objective_files_reviewed: `cmd/resofeed/main.go`, `internal/resofeed/db.go`,
+      `internal/resofeed/http.go`, `internal/resofeed/mcp.go`, `web/src/routes/+page.svelte`,
+      `OwnerTokenPrompt.svelte`, `api-client.ts`, owner-token reset tests.
+
+      - commands_run: `go test ./internal/resofeed -run ''OwnerTokenReset|owner-token
+      reset|TestOwnerTokenReset''` — PASS; `git status --short` — clean/no output.
+
+
+      ## Gate Decision Fields
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Files changed / artifacts
+
+      - none
+
+
+      ## Commit hash(es)
+
+      - none; no files changed.'
   - id: final-gate
     name: Final gate for owner-token offline reset
     status: pending
