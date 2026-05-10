@@ -1,0 +1,77 @@
+{
+  "runIngest": "",
+  "buttonStyles": [
+    {
+      "text": "[RUN INGEST]",
+      "padding": "8px 12px 8px 12px",
+      "minHeight": "44px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "animationName": "none",
+      "transitionProperty": "all",
+      "textTransform": "uppercase",
+      "letterSpacing": "1.12px",
+      "backgroundColor": "rgb(251, 248, 239)",
+      "color": "rgb(36, 35, 30)"
+    },
+    {
+      "text": "[FETCH]",
+      "padding": "8px 12px 8px 12px",
+      "minHeight": "44px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "animationName": "none",
+      "transitionProperty": "all",
+      "textTransform": "uppercase",
+      "letterSpacing": "1.12px",
+      "backgroundColor": "rgb(251, 248, 239)",
+      "color": "rgb(36, 35, 30)"
+    },
+    {
+      "text": "[FETCH]",
+      "padding": "8px 12px 8px 12px",
+      "minHeight": "44px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "animationName": "none",
+      "transitionProperty": "all",
+      "textTransform": "uppercase",
+      "letterSpacing": "1.12px",
+      "backgroundColor": "rgb(251, 248, 239)",
+      "color": "rgb(36, 35, 30)"
+    },
+    {
+      "text": "[FETCH]",
+      "padding": "8px 12px 8px 12px",
+      "minHeight": "44px",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "animationName": "none",
+      "transitionProperty": "all",
+      "textTransform": "uppercase",
+      "letterSpacing": "1.12px",
+      "backgroundColor": "rgb(251, 248, 239)",
+      "color": "rgb(36, 35, 30)"
+    }
+  ],
+  "rows": [
+    {
+      "minHeight": "44px",
+      "padding": "4px 4px",
+      "display": "flex",
+      "borderTop": "1px"
+    },
+    {
+      "minHeight": "44px",
+      "padding": "4px 4px",
+      "display": "flex",
+      "borderTop": "1px"
+    },
+    {
+      "minHeight": "44px",
+      "padding": "4px 4px",
+      "display": "flex",
+      "borderTop": "1px"
+    }
+  ]
+}
