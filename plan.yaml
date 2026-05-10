@@ -30300,7 +30300,7 @@ phases:
     agent: uiux-auditor
   - id: remove-inspector-screenshot-family-guard-literals
     name: Remove Inspector screenshot-family guard literals
-    status: claimed
+    status: done
     description: 'Fix blocker B1 from `retest-generalized-inspector-primary-body-sanitation`.
 
 
@@ -30423,6 +30423,32 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T14:54:39.864013+00:00'
+    done_at: '2026-05-10T15:00:01.527602+00:00'
+    evidence: 'Implementation evidence accepted from frontend-engineer. Files changed:
+      `web/src/routes/components/Inspector.svelte`; worker commit `dfefbb9f747e55727541594111e57ff04ec405fb`,
+      squash-merged to main as `3583771`. Refs confirmation present for project instructions,
+      docs/DESIGN.md, docs/ARCHITECTURE.md, `.audit-artifacts/inspector-readable-content-gate.md`,
+      Inspector.svelte, and inspector-readable-content-regression. Blocker B1 fixed:
+      exact screenshot-family guard literals removed from Inspector product sanitation
+      logic. Worker static search `rg -n "model_latency_error|Skip to main content|The
+      homepage The Verge" web/src/routes/components/Inspector.svelte || true` produced
+      no output. Root cause: exact fixture literals remained in product sanitation
+      criteria; fix replaces them with category/pattern rules covering snake_case
+      operational status/diagnostic context, model/OpenRouter/LLM transport notices,
+      short placeholder summaries, inventory-like source dumps with machine tokens,
+      generic skip-link/navigation clusters, while preserving script/style/JSON-LD/CSS/function
+      stripping. Worker verification: after `npm --prefix web ci`, `npm --prefix web
+      run check` passed; `npm --prefix web run build` passed; first targeted Playwright
+      run exposed over-filtering, then fix adjusted category-based placeholder/transport
+      handling; final targeted Playwright command passed 7/7; final worktree status
+      clean. Mainline final-state verification after squash merge: `npm --prefix web
+      run check` passed; `npm --prefix web run build` passed; `npm --prefix web exec
+      playwright test -- --config web/playwright.config.ts web/tests/e2e/inspector-readable-content-regression.spec.ts
+      web/tests/e2e/inspector-dirty-corpus.spec.ts web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      --project chromium-ci-safe` passed with 7/7 tests; Python static check confirmed
+      `NO_FORBIDDEN_GUARD_LITERALS_IN_INSPECTOR` for `model_latency_error`, `Skip
+      to main content`, and `The homepage The Verge`. No architecture/design boundary
+      changes introduced.'
   - id: retest-remove-inspector-screenshot-family-guard-literals
     name: Retest removal of Inspector screenshot-family guard literals
     status: pending
