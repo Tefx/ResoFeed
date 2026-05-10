@@ -24717,7 +24717,7 @@ phases:
     - blind-runtime-browser-ux-verification
     agent: uiux-auditor
   - id: gate
-    name: Gate UI navigation, hover, and Inspector repair
+    name: Gate complete UI regression test plan and repair phase
     status: pending
     description: 'step_type: gate
 
@@ -24725,61 +24725,82 @@ phases:
 
       review_depth: THOROUGH
 
+      agent_source: project
+
       review_depth_rationale:
 
       - Phase repairs user-visible navigation and Inspector rendering after final
       completion.
 
-      - Phase touches hover/selected visual states, a known high-rework UI class.
+      - Phase touches clickability, keyboard/a11y, hover/selected visual states, raw-content
+      hierarchy, and design artifact drift.
 
-      - Gate must review contract-first sequence, expected-red coverage, green browser
-      verification, and native visual audit artifacts.
+      - Gate must review contract-first sequence, expected-red coverage, implementation
+      evidence, green browser verification, blind runtime verification, and native
+      multimodal audit artifacts.
 
 
       As an INDEPENDENT REVIEWER, assess whether the repair phase meets the quality
-      bar for reopening completed-plan confidence.
+      bar for reopening completed-plan UI confidence. Do not accept vague summaries
+      such as "Playwright passed"; gate evidence must contain exact commands, runner
+      output, screenshot/trace paths, before/after notes, and closure fields.
 
 
       Review criteria:
 
-      1. Contract/design audit read the authoritative design docs and resolved all
-      three reported issues into testable expected behavior.
+      1. Contract/design audit read authoritative design docs and resolved the full
+      UI regression class into testable expected behavior.
 
-      2. Expected-red browser tests were authored before implementation and exposed
-      the intended gaps where feasible.
+      2. Expected-red tests were authored before implementation and explicitly covered:
+      real hit-target/clickability, keyboard/a11y activation, interaction state matrix,
+      Inspector hierarchy/dirty corpus, design artifact generation, and negative UX
+      assertions.
 
       3. Implementation evidence shows design-conformant fixes without new forbidden
       product concepts.
 
-      4. Deterministic Playwright/browser verification is green and includes exact
-      commands/output/traces.
+      4. Comprehensive Playwright verification is green and includes exact commands/output/traces/artifact
+      manifest.
 
-      5. Native multimodal UI/UX audit reviewed screenshots for Source Ledger, selected+hover
-      state, and Inspector hierarchy and returned PASS or an explicit non-blocking
-      disposition.
+      5. Blind runtime browser verification independently exercised public UI behavior
+      and reported artifacts/reproduction steps.
 
-      6. Structured behavioral proof register has no unresolved blocker-class NEEDS_TEST,
-      UNPROVEN, or UNCERTAIN_BLOCKING item.
+      6. Native multimodal UI/UX audit reviewed the required artifact set and returned
+      PASS or PASS_WITH_DEBT with explicit non-blocking disposition.
+
+      7. Structured behavioral proof registers have no unresolved blocker-class NEEDS_TEST,
+      UNPROVEN, or UNCERTAIN_BLOCKING items.
 
 
-      Gate must BLOCK if SOURCE LEDGER is still not clickable, selected+hover states
-      remain ambiguous/noisy, or Inspector still dumps raw JSON-LD/extracted metadata
-      into the primary reading area.'
+      Gate must BLOCK if any required control remains inert, keyboard/focus activation
+      is absent for key nav/actions, selected+hover states remain ambiguous/noisy,
+      Inspector default view dumps raw JSON/JSON-LD/metadata into the primary reading
+      area, required artifacts are missing, negative UX bans are violated, or evidence
+      lacks exact commands/artifact paths/closure fields.'
     verification: '- All phase steps are complete with evidence.
 
-      - Evidence templates include refs read confirmation, exact commands/output,
-      screenshots/traces, before/after notes, and blocker/closure fields.
+      - Every evidence template includes refs read confirmation, exact commands/output,
+      screenshots/traces, before/after notes where applicable, and closure fields:
+      verdict, blockers, gate_open_allowed, proof_gap_status, orchestrator_action_hint.
 
-      - Expected-red tests preceded implementation and are green after implementation.
+      - Expected-red tests preceded implementation and all required categories are
+      represented explicitly.
 
-      - Playwright repair verification and UI/UX audit are PASS or PASS_WITH_DEBT
-      with explicit non-blocking disposition.
+      - Implementation evidence does not weaken tests or introduce forbidden product
+      concepts.
 
-      - No unresolved blocker-class behavioral proof remains.
+      - Playwright verification and blind runtime verification include command/output
+      and artifact paths, not only pass summaries.
 
-      - Final gate decision basis maps each user-reported issue to evidence and OPEN/BLOCK
-      recommendation.'
+      - Native multimodal audit reviews rendered artifacts for the full screenshot
+      manifest and returns PASS or PASS_WITH_DEBT with explicit non-blocking disposition.
+
+      - Final gate decision basis maps each UI regression category to evidence and
+      OPEN/BLOCK recommendation.
+
+      - No unresolved blocker-class behavioral proof remains.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -24791,83 +24812,88 @@ phases:
 
       ## Gate Review Report
 
-      **Reviewer**: gate-reviewer (independent of phase implementation)
+      - Phase: ui-navigation-hover-inspector-repair
 
-      **Phase**: ui-navigation-hover-inspector-repair
+      - Reviewer: gate-reviewer
 
 
-      ### Execution Review
+      ### Step Evidence Review
 
-      | Step ID | Status | Evidence Quality | Concerns |
+      | Step ID | Status | Evidence Quality | Exact Commands Present | Artifact Paths
+      Present | Closure Fields Present | Concerns |
 
-      | --- | --- | --- | --- |
+      | --- | --- | --- | --- | --- | --- | --- |
 
-      | contract-design-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing |
-      <notes> |
 
-      | expected-red-browser-tests | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      ### Category Coverage Review
 
-      | implementation-repair | ✅/⚠️/❌ | excellent/adequate/insufficient/missing |
-      <notes> |
+      | Category | Contract ref | Expected-red test ref | Implementation evidence
+      | Verification/audit evidence | Status | Closure path |
 
-      | playwright-repair-verification | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      | --- | --- | --- | --- | --- | --- | --- |
 
-      | visual-ux-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes>
-      |
+      | Real pointer hit-target/clickability | | | | | | |
+
+      | Keyboard/a11y activation | | | | | | |
+
+      | Interaction state matrix | | | | | | |
+
+      | Inspector hierarchy | | | | | | |
+
+      | Dirty real-content corpus | | | | | | |
+
+      | Design artifact screenshots | | | | | | |
+
+      | Negative UX assertions | | | | | | |
+
+      | Native multimodal audit | | | | | | |
+
+
+      ### Blocking Issues
+
+      | Severity | Description | Related Step | Blocking? | Required Action |
+
+      | --- | --- | --- | --- | --- |
 
 
       ### Gate Decision Basis
 
-      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates?
-      | rationale | final_disposition |
+      - Exact commands reviewed: <list>
 
-      | --- | --- | --- | --- | --- | --- |
+      - Screenshot/trace artifacts reviewed: <list>
 
-      | SOURCE LEDGER clickability | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN
-      | yes/no | <why> | OPEN/BLOCK |
+      - Behavioral proof register status: <summary>
 
-      | selected+hover clarity | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN | yes/no
-      | <why> | OPEN/BLOCK |
-
-      | Inspector hierarchy/raw demotion | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN
-      | yes/no | <why> | OPEN/BLOCK |
+      - Unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING: <none or list with closure
+      path>
 
 
-      ### Issues Identified
+      ## Closure Fields
 
-      | Severity | Description | Related Step | Blocking? | Closure Path |
+      verdict: OPEN | BLOCKED
 
-      | --- | --- | --- | --- | --- |
+      blockers: []
 
-      | <blocker/should_fix/suggestion> | <issue> | <step_id> | YES/NO | <required
-      follow-up or none> |
+      gate_open_allowed: true|false
 
+      proof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN with notes>
 
-      ### Final Decision
-
-      - [ ] OPEN: repair phase passes gate
-
-      - [ ] BLOCKED: follow-up fix/retest required
-
-
-      ### Blocker/closure fields
-
-      - blockers_found: <none/list>
-
-      - acceptance_gaps_closed: <list>
-
-      - still_ambiguous: <none/list>
-
-      - closure_path: <none or required follow-up>
-
-      '
+      orchestrator_action_hint: close_phase | create_fix_retest_loop'
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
     depends_on:
     - contract-design-audit
     - expected-red-browser-tests
+    - expected-red-hit-target-clickability-tests
+    - expected-red-keyboard-a11y-tests
+    - expected-red-state-matrix-screenshot-tests
+    - expected-red-inspector-dirty-corpus-tests
+    - expected-red-design-artifact-negative-ux-tests
     - implementation-repair
     - playwright-repair-verification
+    - blind-runtime-browser-ux-verification
     - visual-ux-audit
     agent: gate-reviewer
   - id: expected-red-hit-target-clickability-tests
