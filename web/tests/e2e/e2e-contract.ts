@@ -46,6 +46,12 @@ export interface E2ERunInfo {
     readonly stdoutPath: string;
     readonly stderrPath: string;
   };
+  readonly openRouterStub: {
+    readonly endpoint: string;
+    readonly pid: number;
+    readonly stdoutPath: string;
+    readonly stderrPath: string;
+  };
   readonly sanitizedEnvironment: {
     readonly allowedVariables: readonly string[];
     readonly openRouterKey: 'ci-safe-fake-key' | 'live-redacted' | 'absent';

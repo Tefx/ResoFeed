@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
@@ -34,7 +34,7 @@ function sanitizedToolEnv(): NodeJS.ProcessEnv {
   };
 }
 
-function sanitizedRuntimeEnv(): NodeJS.ProcessEnv {
+function sanitizedRuntimeEnv(openRouterEndpoint: string): NodeJS.ProcessEnv {
   const liveRequested = isLiveOpenRouterRun();
   const liveKey = process.env.OPENROUTER_KEY?.trim();
   return {
@@ -42,6 +42,7 @@ function sanitizedRuntimeEnv(): NodeJS.ProcessEnv {
     HOME: process.env.HOME ?? '',
     TMPDIR: process.env.TMPDIR ?? '/tmp',
     RESOFEED_E2E: '1',
+    RESOFEED_E2E_OPENROUTER_ENDPOINT: openRouterEndpoint,
     OPENROUTER_KEY: liveRequested && liveKey ? liveKey : E2E_FAKE_OPENROUTER_KEY
   };
 }
@@ -142,6 +143,65 @@ async function startFixtureServer(logsDir: string): Promise<E2ERunInfo['fixtureS
   return { pid: child.pid ?? -1, url, stdoutPath, stderrPath };
 }
 
+async function waitForOpenRouterStub(endpoint: string): Promise<void> {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${endpoint}/healthz`);
+      if (response.ok) return;
+    } catch {
+      // Retry until the deterministic test harness transport has bound.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`OpenRouter stub did not become ready at ${endpoint}`);
+}
+
+function startOpenRouterStub(port: number, stdoutPath: string, stderrPath: string): ChildProcess {
+  const script = String.raw`
+const http = require('node:http');
+const port = Number(process.argv[1]);
+const successKey = 'Bearer resofeed_e2e_non_secret_openrouter_key';
+http.createServer((req, res) => {
+  if (req.url === '/healthz') {
+    res.writeHead(200, { 'content-type': 'text/plain' });
+    res.end('ok');
+    return;
+  }
+  if (req.method !== 'POST' || req.url !== '/api/v1/chat/completions') {
+    res.writeHead(404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ error: { message: 'not found' } }));
+    return;
+  }
+  let body = '';
+  req.on('data', (chunk) => { body += chunk; });
+  req.on('end', () => {
+    if (req.headers.authorization !== successKey) {
+      res.writeHead(401, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'invalid api key' } }));
+      return;
+    }
+    const payload = JSON.parse(body);
+    const prompt = JSON.parse(payload.messages[0].content);
+    const content = prompt.task === 'translate_steering'
+      ? { interpreted_as: 'steering_policy_update', rule_texts: ['Push more deterministic llm fixtures.'], message: 'steering updated' }
+      : { summary: 'Deterministic fixture summary.', core_insight: 'Stubbed OpenRouter transport stayed outside product authority.', value_tier: 'high', model_status: 'ok' };
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ id: 'e2e-chatcmpl', model: 'openrouter/e2e-deterministic', choices: [{ message: { role: 'assistant', content: JSON.stringify(content) } }] }));
+  });
+}).listen(port, '127.0.0.1', () => console.log('openrouter stub listening'));
+`;
+  const stdout = fs.openSync(stdoutPath, 'w');
+  const stderr = fs.openSync(stderrPath, 'w');
+  const child = spawn(process.execPath, ['-e', script, String(port)], {
+    cwd: repoRoot,
+    env: sanitizedToolEnv(),
+    stdio: ['ignore', stdout, stderr]
+  });
+  child.unref();
+  return child;
+}
+
 export default async function globalSetup(): Promise<void> {
   const logsDir = path.join(artifactRoot, 'server-logs');
   const fixturesDir = path.join(artifactRoot, 'fixtures');
@@ -159,10 +219,16 @@ export default async function globalSetup(): Promise<void> {
   run('go', ['build', '-o', binaryPath, './cmd/resofeed'], repoRoot);
 
   const port = await reservePort();
+  const stubPort = await reservePort();
   const baseURL = `http://127.0.0.1:${port}`;
+  const openRouterEndpoint = `http://127.0.0.1:${stubPort}`;
   const dbPath = path.join(fixturesDir, `resofeed-e2e-${Date.now()}-${process.pid}.sqlite3`);
   const stdoutPath = path.join(logsDir, 'server.stdout.log');
   const stderrPath = path.join(logsDir, 'server.stderr.log');
+  const stubStdoutPath = path.join(logsDir, 'openrouter-stub.stdout.log');
+  const stubStderrPath = path.join(logsDir, 'openrouter-stub.stderr.log');
+  const stub = startOpenRouterStub(stubPort, stubStdoutPath, stubStderrPath);
+  await waitForOpenRouterStub(openRouterEndpoint);
   const stdout = fs.openSync(stdoutPath, 'w');
   const stderr = fs.openSync(stderrPath, 'w');
   const child = spawn(binaryPath, [
@@ -173,7 +239,7 @@ export default async function globalSetup(): Promise<void> {
     '--owner-token', E2E_OWNER_TOKEN
   ], {
     cwd: repoRoot,
-    env: sanitizedRuntimeEnv(),
+    env: sanitizedRuntimeEnv(openRouterEndpoint),
     stdio: ['ignore', stdout, stderr]
   });
 
@@ -181,6 +247,8 @@ export default async function globalSetup(): Promise<void> {
   await waitForServer(baseURL);
   redactLogFile(stdoutPath);
   redactLogFile(stderrPath);
+  redactLogFile(stubStdoutPath);
+  redactLogFile(stubStderrPath);
 
   const envNotesPath = path.join(artifactRoot, 'sanitized-environment.md');
   const liveRequested = isLiveOpenRouterRun() && Boolean(process.env.OPENROUTER_KEY?.trim());
@@ -189,8 +257,9 @@ export default async function globalSetup(): Promise<void> {
     [
       '# ResoFeed E2E sanitized environment',
       '',
-      '- Allowed variables: PATH, HOME, TMPDIR, RESOFEED_E2E, OPENROUTER_KEY.',
+      '- Allowed variables: PATH, HOME, TMPDIR, RESOFEED_E2E, RESOFEED_E2E_OPENROUTER_ENDPOINT, OPENROUTER_KEY.',
       `- OPENROUTER_KEY: ${liveRequested ? '<redacted>; source=os_env' : '<redacted non-secret sentinel>; ambient OS value not forwarded'}.`,
+      '- OpenRouter endpoint: deterministic local test transport; no external secret or provider call.',
       '- Owner token: supplied by --owner-token and redacted from logs/artifacts.',
       `- OPML fixture feed URL: ${fixtureServer.url}`,
       `- Fixture feed server stdout: ${fixtureServer.stdoutPath}`,
@@ -209,8 +278,9 @@ export default async function globalSetup(): Promise<void> {
     artifactRoot,
     server: { pid: child.pid ?? -1, stdoutPath, stderrPath },
     fixtureServer,
+    openRouterStub: { endpoint: openRouterEndpoint, pid: stub.pid ?? -1, stdoutPath: stubStdoutPath, stderrPath: stubStderrPath },
     sanitizedEnvironment: {
-      allowedVariables: ['PATH', 'HOME', 'TMPDIR', 'RESOFEED_E2E', 'OPENROUTER_KEY'],
+      allowedVariables: ['PATH', 'HOME', 'TMPDIR', 'RESOFEED_E2E', 'RESOFEED_E2E_OPENROUTER_ENDPOINT', 'OPENROUTER_KEY'],
       openRouterKey: liveRequested ? 'live-redacted' : 'ci-safe-fake-key',
       notesPath: envNotesPath
     }

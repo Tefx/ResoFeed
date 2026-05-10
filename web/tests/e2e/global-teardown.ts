@@ -27,6 +27,14 @@ export default async function globalTeardown(): Promise<void> {
     }
   }
 
+  if (info.openRouterStub.pid > 0) {
+    try {
+      process.kill(info.openRouterStub.pid, 'SIGTERM');
+    } catch {
+      // Process already exited; artifacts remain useful.
+    }
+  }
+
   const cleanupNote = `${info.artifactRoot}/db-fixture-preservation.txt`;
   const preserve = process.env.RESOFEED_E2E_PRESERVE_DB === '1';
   if (!preserve && fs.existsSync(info.dbPath)) {

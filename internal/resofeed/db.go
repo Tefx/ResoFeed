@@ -198,7 +198,7 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		_, _ = io.WriteString(stdout, "owner token reused: stored hash\n")
 	}
 
-	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel})
+	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
 	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -227,6 +227,13 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		}
 		return 0
 	}
+}
+
+func deterministicOpenRouterEndpointForE2E() string {
+	if os.Getenv("RESOFEED_E2E") != "1" {
+		return ""
+	}
+	return strings.TrimSpace(os.Getenv("RESOFEED_E2E_OPENROUTER_ENDPOINT"))
 }
 
 func activePlaintextToken(cfg ServeConfig, resolution OwnerTokenResolution) string {

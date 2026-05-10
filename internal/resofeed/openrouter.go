@@ -24,14 +24,22 @@ type LLMClient interface {
 type OpenRouterConfig struct {
 	APIKey string
 	Model  string
+	// Endpoint is only set by test harnesses that replace the external
+	// OpenRouter transport with a deterministic local HTTP server. Production
+	// runtime leaves this empty and uses the canonical OpenRouter endpoint.
+	Endpoint string
 }
 
 // NewOpenRouterClient constructs the OpenRouter JSON transformer client.
 func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
+	endpoint := strings.TrimSpace(cfg.Endpoint)
+	if endpoint == "" {
+		endpoint = "https://openrouter.ai"
+	}
 	return &openRouterHTTPClient{
 		apiKey:   cfg.APIKey,
 		model:    cfg.Model,
-		endpoint: "https://openrouter.ai",
+		endpoint: endpoint,
 		client: &http.Client{
 			Timeout: 45 * time.Second,
 		},
