@@ -21682,7 +21682,7 @@ phases:
       proving the required 3-column shape and fixed `[FETCH]`/`x` columns.'
   - id: manual-rss-fetch.row-parity-retest
     name: Focused Source Ledger Row Parity Retest
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -21834,3 +21834,135 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T08:55:03.272721+00:00'
+    done_at: '2026-05-10T09:01:02.738897+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ui-preview.html — Source Ledger reference rows render single primary
+      source/status strings such as `simonwillison.net/feed.xml · ok · last fetch:
+      10:25:31` followed by `[FETCH]` and `x`; CSS defines `.ledger-row { display:
+      grid; grid-template-columns: minmax(0, 1fr) auto 44px; gap: 12px; min-height:
+      44px; }`.
+
+      - docs/DESIGN.md — Source Ledger constraints require flat source rows with row
+      fields `source name, URL, optional last fetch status`, delete-only management,
+      no folders/tags/pause/resume/drag/scoring; raw loading text and no layout shift.
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/retest-report.md —
+      prior retest failed B2/R9 because implementation used two columns and duplicated
+      source title plus compact URL, while B1 controls, B3 footer/import, and negative
+      constraints passed.
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/computed-style-retest.json
+      — prior mismatch values showed reference rows as 3-column grids (`454.859px
+      79.1406px 44px`) and implementation rows as 2-column grids (`746.859px 135.141px`)
+      with duplicated text.
+
+      - web/src/routes/components/SourceLedger.svelte — current implementation derives
+      `sourceLedgerLabel` as title-or-URL and `sourceLedgerSummary` as `[sourceLedgerLabel,
+      status, last fetch]`; renders direct row children as copy, `[FETCH]`, and `x`.
+
+      - web/src/app.css — current styles define `.source-ledger-row` as grid with
+      `grid-template-columns: minmax(0, 1fr) auto 44px`, 12px column/row gap, 44px
+      minimum height, and top border; bracket control styling and disabled state preserved.
+
+
+      ## Focused Row Parity Retest Report
+
+      **Tester**: uiux-auditor (independent of implementation)
+
+      **Scope**: B2/R9 Source Ledger row shape/copy plus B1/negative/footer regression
+      checks only
+
+      **Independence Level**: L2
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      uncertainty_sources: none
+
+
+      ### Requirement Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B2/R9 `docs/ui-preview.html` Source Ledger row | Implementation row now uses
+      one primary source/status string, no duplicate title+compact URL, and direct
+      3-column source/status + `[FETCH]` + compact `x` structure compatible with reference.
+      | rendered row screenshot/DOM + computed grid columns | `.audit-artifacts/manual-rss-fetch/row-parity-retest/row-parity-runtime-evidence.json`;
+      screenshots `reference-source-ledger.png` and `implementation-source-ledger.png`
+      | PROVEN | none | Reference first row text and implementation first row text
+      match; both compute three grid columns with 44px delete column; implementation
+      direct children are copy, fetch button, delete button with no action-wrapper/flex
+      grouping. |
+
+
+      ### behavioral_proof_register
+
+      - requirement_ref: B2/R9 Source Ledger row parity; behavior: single primary
+      source/status string without duplicated compact URL; proof_status: PROVEN; evidence:
+      runtime evidence JSON shows implementation rows `simonwillison.net/feed.xml
+      · ok · last fetch: 10:25:31[FETCH]x`, `hn.algolia.com/rss · ok · last fetch:
+      10:25:31[FETCH]x`, and `blog.example/feed · rss_fetch_error[FETCH]x`.
+
+      - requirement_ref: B2/R9 3-column grid; behavior: source/status column, manual
+      fetch action column, compact delete column; proof_status: PROVEN; evidence:
+      runtime evidence JSON shows implementation grid columns `1068.86px 79.1406px
+      44px`; direct children are copy div, fetch button, delete button.
+
+      - requirement_ref: B1 busy state regression; behavior: source fetch busy state
+      remains bracketed and disabled; proof_status: PROVEN; evidence: runtime evidence
+      JSON shows `busyText: "[FETCHING...]"` and `busyDisabled: true`.
+
+      - requirement_ref: negative visual constraints; behavior: no spinner/progressbar,
+      gradients, shadows, or animations detected in focused surface; proof_status:
+      PROVEN; evidence: runtime evidence JSON counts are all 0.
+
+
+      ### Focused Evidence
+
+      - Reference row text: `simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x`
+
+      - Implementation row text: `simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x`
+
+      - Reference grid columns: `634.859px 79.1406px 44px`
+
+      - Implementation grid columns: `1068.86px 79.1406px 44px`
+
+      - DOM children / nested flex evidence: implementation direct children are `div.source-ledger-copy`,
+      `button.manual-fetch-action`, `button.source-ledger-delete`; no nested flex
+      action grouping or wrapper appears in the rendered row.
+
+      - Regression checks: B1 bracket controls pass (`[RUN INGEST]`/`[FETCH]`, 44px
+      height, 0px 10px padding, muted disabled busy state); negative constraints pass
+      (`spinnerCount=0`, `gradientCount=0`, `shadowCount=0`, `animationCount=0`);
+      footer/import presentation remains passing with `import OPML`, `imported 3 sources;
+      folders flattened`, `export state`, `import state`.
+
+
+      ## Artifact/Commit Evidence
+
+      - Audit artifacts changed: `.audit-artifacts/manual-rss-fetch/row-parity-retest/collect-row-parity-evidence.mjs`,
+      `retest-report.md`, `row-parity-runtime-evidence.json`, `screenshots/reference-source-ledger.png`,
+      `screenshots/implementation-source-ledger.png`
+
+      - Product/code/docs modified: NONE
+
+      - Worker commit: `7885650`.
+
+      - Squash merge commit on main: `d1abf2f [vectl] step-manual-rss-fetch.row-parity-retest
+      completed`.
+
+      - Mainline final-state verification after merge: `npm --prefix web run test
+      && npm --prefix web run build` exit 0; output included `svelte-check found 0
+      errors and 0 warnings`, `Test Files 5 passed (5); Tests 29 passed (29)`, and
+      Vite/SvelteKit production build success.
+
+      - Gaps/Notes: none'
