@@ -57,6 +57,17 @@
     }
   }
 
+  function sourceLedgerLabel(source: Source): string {
+    const title = source.title.trim();
+    return title || compactSourceUrl(source.url);
+  }
+
+  function sourceLedgerSummary(source: Source, lastFetch: string | null): string {
+    const parts = [sourceLedgerLabel(source), source.last_fetch_status];
+    if (lastFetch) parts.push(`last fetch: ${lastFetch}`);
+    return parts.join(' · ');
+  }
+
 
   async function importSelectedFile(): Promise<void> {
     const file = importInput?.files?.[0];
@@ -117,33 +128,18 @@
         {@const fetching = fetchingSourceIds.has(source.id)}
         {@const sourceError = truncateTerse(manualFetchState.sourceErrors?.[source.id])}
         {@const lastFetch = formatTime(source.last_fetch_at)}
+        {@const sourceLabel = sourceLedgerLabel(source)}
+        {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
         <li class="source-ledger-row">
-          <div class="source-ledger-copy">
-            <span>{source.title}</span>
-            <span class="source-ledger-separator">·</span>
-            <span>{compactSourceUrl(source.url)}</span>
-            <span class="source-ledger-separator">·</span>
-            <span>{source.last_fetch_status}</span>
-            {#if lastFetch}
-              <span class="source-ledger-separator">·</span>
-              <span>last fetch: {lastFetch}</span>
-            {/if}
-            {#if sourceError}
-              <span class="source-error">{sourceError}</span>
-            {/if}
-          </div>
-          <div class="source-ledger-actions">
-            <button
-              type="button"
-              class="manual-fetch-action"
-              aria-label={fetching ? `Fetching ${source.title}` : `Fetch ${source.title}`}
-              disabled={fetching}
-              onclick={() => void fetchSource(source)}
-            >{fetching ? '[FETCHING...]' : '[FETCH]'}</button>
-            <button type="button" class="source-ledger-delete" aria-label={`Delete source: ${source.title}`} onclick={() => (confirmingSourceId = source.id)}>x</button>
-          </div>
+          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><button
+            type="button"
+            class="manual-fetch-action"
+            aria-label={fetching ? `Fetching ${sourceLabel}` : `Fetch ${sourceLabel}`}
+            disabled={fetching}
+            onclick={() => void fetchSource(source)}
+          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>x</button>
           {#if confirmingSourceId === source.id}
-            <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${source.title}`} onclick={() => void confirmDelete(source)}>confirm delete</button>
+            <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>confirm delete</button>
           {/if}
         </li>
       {/each}

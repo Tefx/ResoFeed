@@ -43,6 +43,21 @@ function renderLedger(props?: Partial<ManualFetchSourceLedgerProps>): void {
   });
 }
 
+function renderCanonicalLedger(): HTMLElement {
+  renderLedger({
+    sources: [
+      {
+        ...sourceWithFetchTime,
+        id: 'simon',
+        url: 'https://simonwillison.net/atom/everything',
+        title: 'simonwillison.net/feed.xml'
+      }
+    ]
+  });
+
+  return screen.getByRole('region', { name: 'SOURCE LEDGER' });
+}
+
 describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () => {
   it('renders default manual fetch actions as bracket uppercase native controls', () => {
     renderLedger();
@@ -78,7 +93,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('last ingest: 10:25:31')).toBeVisible();
-    expect(within(ledger).getByText('last fetch: 10:25:31')).toBeVisible();
+    expect(ledger.querySelector('.source-ledger-copy')).toHaveTextContent('last fetch: 10:25:31');
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
   });
 
@@ -112,5 +127,19 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(within(ledger).getByText('x')).toHaveClass('source-ledger-delete');
     expect(within(ledger).getByText('imported 3 sources; folders flattened')).toBeVisible();
     expect(ledger.querySelector('[class*="spinner"], [class*="progress"], [class*="animate"]')).toBeNull();
+  });
+
+  it('matches the Source Ledger preview row copy with one primary source string and direct action columns', () => {
+    const ledger = renderCanonicalLedger();
+    const row = ledger.querySelector('.source-ledger-row');
+
+    expect(row).toBeInstanceOf(HTMLLIElement);
+    expect(row).toHaveTextContent('simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x');
+    expect(row).not.toHaveTextContent('simonwillison.net/atom/everything');
+    expect(row?.querySelector('.source-ledger-actions')).toBeNull();
+    expect(row?.children).toHaveLength(3);
+    expect(row?.children[0]).toHaveClass('source-ledger-copy');
+    expect(row?.children[1]).toHaveClass('manual-fetch-action');
+    expect(row?.children[2]).toHaveClass('source-ledger-delete');
   });
 });

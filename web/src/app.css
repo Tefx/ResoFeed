@@ -115,8 +115,7 @@ a:focus-visible,
   list-style: none;
 }
 
-.source-ledger-head,
-.source-ledger-actions {
+.source-ledger-head {
   display: flex;
   gap: var(--rf-space-row);
   align-items: center;
@@ -129,8 +128,9 @@ a:focus-visible,
 
 .source-ledger-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto 44px;
   column-gap: var(--rf-space-row);
+  row-gap: var(--rf-space-row);
   align-items: center;
   min-height: 44px;
   border-block-start: 1px solid var(--rf-color-border);
@@ -215,6 +215,7 @@ a:focus-visible,
 }
 
 .source-ledger-confirm {
+  grid-column: 1 / -1;
   min-height: 44px;
   border-color: var(--rf-color-border);
   padding: 0 10px;

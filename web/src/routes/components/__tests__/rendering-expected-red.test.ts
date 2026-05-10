@@ -272,7 +272,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('import OPML')).toBeVisible();
-    expect(within(ledger).getByText('example.com/feed.xml')).toBeVisible();
+    expect(within(ledger).getByText(/Example Source · ok/)).toBeVisible();
     expect(within(ledger).getByText('imported 3 sources; folders flattened')).toBeVisible();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example Source' }));
