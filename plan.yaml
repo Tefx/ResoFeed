@@ -28082,7 +28082,7 @@ phases:
       were read and used as visual evidence.'
   - id: ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
     name: fix-gate-keyboard-a11y-flake
-    status: claimed
+    status: done
     description: "step_type: implementation\npriority: HIGH\nagent_source: project\n\
       known_blocker_id: B-GATE-001\n\nFix ALL gate blockers from the failed `ui-navigation-hover-inspector-repair.gate`\
       \ review. This is a batched implementation fix step; currently the batch contains\
@@ -28210,6 +28210,198 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T13:07:51.145220+00:00'
+    done_at: '2026-05-10T13:14:05.277282+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `docs/ARCHITECTURE.md` — frontend lives in `web/` and must preserve `docs/DESIGN.md`;
+      one deployable/SQLite/current-state invariants; frontend must render dense feed
+      + Inspector and preserve owner-token/API boundaries.
+
+      - `docs/DESIGN.md` — Inspector opening moves focus to detail heading; original
+      links must be screen-reader readable; focus rings must be visible and layout-stable;
+      keyboard navigation required for every action.
+
+      - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts` — line 78 test clicks `Open
+      Inspector for: Local fixture item one`, asserts `original link` href, then calls
+      `focusAndAudit(originalLink, ''Inspector original link'')`.
+
+      - `web/tests/e2e/keyboard-a11y-helpers.ts` — line 55 requires `await expect(locator).toBeFocused()`
+      after `locator.focus()`, preserving meaningful focus assertion.
+
+      - failing `error-context.md` — NOT READ by executor: file was not present in
+      isolated worktree.
+
+
+      ## Fix Evidence
+
+
+      **Blocker addressed**: B-GATE-001
+
+
+      **Root cause vs symptom**:
+
+      - Root cause: Inspector heading autofocus was tied to reactive `item && focusHeading`.
+      Opening the Inspector for an already-selected/summary item could allow the test
+      to focus the original link while async inspect/detail load was still completing;
+      when `selectedItemDetail` replaced the summary, the Inspector effect ran again
+      and stole focus back to the heading. That made original-link focus assertion
+      order-dependent under the comprehensive suite.
+
+      - Symptom: `keyboard-a11y.expected-red.spec.ts:78` failed in the comprehensive
+      targeted suite because `focusAndAudit` expected the `original link` locator
+      to be focused, but `document.activeElement` became inactive/another element
+      after async Inspector detail hydration.
+
+      - Why this fix is not surface-level: focus assertions were not weakened. UI
+      now models Inspector heading focus as a one-shot open request (`focusRequestId`)
+      instead of a side effect of every item/detail data refresh. Inspector still
+      moves focus to detail heading on open per DESIGN.md, but later async detail
+      hydration no longer steals focus from keyboard users/tests focusing original
+      link.
+
+
+      **Action Summary**:
+
+      - Added one-shot Inspector focus request id in `+page.svelte`.
+
+      - Moved `currentSurface = ''inspector''` before async inspect/detail work so
+      opening behavior is immediate and deterministic.
+
+      - Updated `Inspector.svelte` to consume each focus request once, preserving
+      heading autofocus on open without refocusing on every item/detail update.
+
+
+      **Files changed**:
+
+      - `web/src/routes/+page.svelte` — tracks `inspectorFocusRequestId`, increments
+      it on feed item selection, opens Inspector before async detail loading, passes
+      focus request to Inspector.
+
+      - `web/src/routes/components/Inspector.svelte` — focuses heading only once per
+      explicit focus request.
+
+
+      **Sibling search performed**:
+
+      ```text
+
+      grep/search equivalent for: original link|Open Inspector for|detail-pane|shell-grid|aria-current|focus\(|tick\(
+
+      ```
+
+      Key findings:
+
+      - `web/src/routes/components/Inspector.svelte` had heading autofocus and original
+      link handlers.
+
+      - `web/src/routes/+page.svelte` selected items, loaded detail asynchronously,
+      then set `currentSurface = ''inspector''`.
+
+      - Sibling tests also exercise Inspector links, hit targets, selected row state,
+      Source Ledger nav, and JSON-LD/provenance paths.
+
+
+      **Assertions preserved**:
+
+      - Keyboard/focus assertions were not weakened/skipped: YES.
+
+      - Existing JSON-LD/mobile/provenance fixes preserved: YES.
+
+
+      **Executor verification**:
+
+      ```sh
+
+      npm --prefix web install
+
+      npm --prefix web run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      ui-navigation-hover-inspector-repair.expected-red.spec.ts hit-target-clickability.spec.ts
+      keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts
+
+      ```
+
+      ```text
+
+      svelte-check found 0 errors and 0 warnings.
+
+      Running 15 tests using 1 worker.
+
+      keyboard-a11y.expected-red.spec.ts:78 passed; all remaining targeted tests passed.
+
+      15 passed (23.0s).
+
+      ```
+
+
+      **Mainline final-state verification after squash merge**:
+
+      ```sh
+
+      npm --prefix web run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      ui-navigation-hover-inspector-repair.expected-red.spec.ts hit-target-clickability.spec.ts
+      keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts
+
+      ```
+
+      ```text
+
+      svelte-check found 0 errors and 0 warnings.
+
+      Running 15 tests using 1 worker.
+
+      keyboard-a11y.expected-red.spec.ts:78 passed.
+
+      15 passed (26.0s).
+
+      ```
+
+
+      **Artifacts**:
+
+      - Executor passing artifact path from required failing case: `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/test-finished-1.png`.
+
+      - Executor passing trace path: `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/trace.zip`.
+
+      - Mainline verification artifact churn was stashed by the orchestrator after
+      command success to preserve committed artifact corpus while retaining final-state
+      command output.
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Implementation evidence completeness:
+
+      - Commit hash(es): worktree `25483f7eb7c5134bb5d6118a332962eec7194004`; main
+      `8bd81f8 [vectl] step-ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
+      completed`.
+
+      - Files changed: `web/src/routes/+page.svelte`, `web/src/routes/components/Inspector.svelte`.
+
+      - Verification: executor and mainline required full targeted command passed
+      15/15; `svelte-check` clean.
+
+      - Spec link: `docs/DESIGN.md` Inspector Pane keyboard/accessibility contract;
+      `docs/ARCHITECTURE.md` frontend boundary.
+
+      - Gaps/Notes: initial executor command failed before dependency bootstrap because
+      `svelte-kit` was missing; executor ran `npm --prefix web install`, then exact
+      required command passed. No vectl tools or plan files were used or modified.'
   - id: ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
     name: retest-gate-keyboard-a11y-full-targeted
     status: pending
