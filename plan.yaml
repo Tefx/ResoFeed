@@ -34788,7 +34788,7 @@ phases:
       \ nav and verify Steer-driven SOURCE LEDGER activation.\n\n## Gaps/Notes\nnone"
   - id: fuidcr-ui-preview-cleanup
     name: Clean docs/ui-preview.html after live UI contracts stabilize
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -34880,6 +34880,8 @@ phases:
     - fuidcr-source-ledger-state-portability
     - fuidcr-shell-owner-doctor-surfaces
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T18:46:44.296891+00:00'
   - id: fuidcr-browser-regression-proof
     name: Run independent browser regression and responsive behavior proof
     status: pending
