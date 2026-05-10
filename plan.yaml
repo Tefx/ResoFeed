@@ -24183,82 +24183,135 @@ phases:
   - playwright-comprehensive-e2e
   steps:
   - id: contract-design-audit
-    name: Contract/design audit for UI repair targets
+    name: Contract and design audit for complete UI regression class
     status: pending
     description: 'step_type: contract
 
       contract_purity: ENFORCED
 
-      contract_outputs: acceptance criteria, design-state contract, browser-test selectors/observables
+      contract_outputs: acceptance criteria, design-state contract, browser-test selectors/observables,
+      screenshot manifest, negative UX rules
+
+      agent_source: project
 
 
-      Read the authoritative design and UI implementation refs, then define the exact
-      intended behavior for the three reported defects without implementing product
-      changes.
+      Read the authoritative design and UI implementation refs, then define the testable
+      contract for the full class of UI regressions represented by the user findings:
+      inert controls, pointer obstruction, keyboard/a11y activation gaps, noisy interaction
+      states, raw payload dumps, and design drift.
 
 
       Scope and required outputs:
 
-      - SOURCE LEDGER navigation: define how the existing `SOURCE LEDGER` control
-      must be reachable/clickable, how it exposes the ledger panel, and which ARIA/visible
-      state proves the panel is active.
+      - Real hit-target contract: define clickability and active-state proof for `SOURCE
+      LEDGER`, `TODAY`, Steer submit, star/resonate, Inspector links, `/doctor`, OPML
+      import, and source fetch buttons. Contract must require detection of overlay/z-index/pointer-events/layout
+      obstruction, not only synthetic handler calls.
 
-      - Feed selected+hover states: decide the design-conformant treatment for an
-      already-selected feed row under pointer hover/focus. Preserve the low-noise
-      archival-index direction from DESIGN.md: selected state must remain distinguishable,
-      non-layout-shifting, and must not stack a noisy hover block on top of active
-      state.
+      - Keyboard/a11y contract: define tab order, focus visibility, Enter/Space activation,
+      roles, labels, and `aria-selected` or equivalent state for navigation/actions/tabs/buttons.
 
-      - Inspector hierarchy: define the default readable hierarchy for item detail:
-      provenance/source header, title/link/extraction status, summary/reading payload,
-      and demoted/collapsed raw/provenance payload when present. Raw JSON-LD/extracted
-      metadata must not appear as the primary reading body.
+      - Interaction state matrix: define visual/semantic expectations for feed row
+      normal, hover, selected, selected+hover, focus, and selected+focus. Selected
+      must remain distinguishable; hover/focus must not stack noisy active styling
+      or shift layout.
 
-      - Identify exact selectors, routes, or accessible names that tests should use;
-      avoid brittle pixel-only assertions where semantic checks are available.
+      - Inspector hierarchy: define default readable hierarchy for title/source/time/link/summary/content,
+      and define where raw JSON, JSON-LD, extracted metadata, media/enclosure/provenance
+      may appear. Raw/provenance payloads must be secondary, labeled, collapsed, or
+      explicitly separated from primary reading content.
+
+      - Dirty content corpus: define fixture requirements for JSON-LD blobs, long
+      descriptions, HTML fragments, script/style leftovers, missing summary/date/author,
+      very long URL/title, escaped entities, and media/enclosure metadata.
+
+      - Design artifact manifest: name required screenshots/artifacts: owner-token,
+      first-use, today-list, source-ledger, selected-item, selected-hover, inspector-clean,
+      inspector-raw-expanded/provenance, llm-error, search, and mobile view if applicable.
+
+      - Negative UX assertions: ban primary text containing `{ "@context"`, huge raw
+      JSON blobs, unread/folder/tag/settings concepts, mascot/SaaS/AI-magic copy,
+      and nav clicks that leave the wrong panel active.
 
 
-      Authoritative interface / source anchors:
+      Authoritative source anchors:
 
-      - docs/DESIGN.md §§Feed Items, Inspector Pane, Source Ledger, motion/state rules.
+      - docs/DESIGN.md: Feed Items, Inspector Pane, Source Ledger, first-use, owner-token,
+      motion/state rules.
 
-      - docs/ui-preview.html selected item, Inspector, and Source Ledger preview blocks.
+      - docs/ui-preview.html: selected item, Inspector, Source Ledger, search/error/state
+      previews.
 
-      - docs/DESIGN_VISION.md interaction model for Inspect and Source Ledger.
+      - docs/DESIGN_VISION.md: interaction model for Inspect, Source Ledger, archival
+      workbench tone.
 
-      - web/src/routes/+page.svelte nav/surface state.
+      - web/src/routes/+page.svelte navigation/surface state.
 
-      - web/src/routes/components/Feed.svelte selected row control.
+      - web/src/routes/components/Feed.svelte row state and action controls.
 
       - web/src/routes/components/Inspector.svelte detail rendering.
 
 
-      Output is a contract/design note in repo-local test or audit artifacts only
-      if needed by the downstream test step. Do not modify product UI behavior in
-      this step.'
-    verification: '- Contract explicitly resolves all three user-reported issues into
-      testable expected behavior.
+      Do not implement product behavior in this step. If docs conflict, record a SPEC
+      QUESTION; otherwise resolve ordinary test-contract choices from the design sources.'
+    verification: '- Contract maps every required test category to selectors/observable
+      states and screenshot/artifact names.
 
-      - Contract cites exact DESIGN.md/ui-preview passages and relevant UI source
-      locations.
+      - Contract cites exact design/source passages for hit-target, keyboard/a11y,
+      state matrix, Inspector hierarchy, dirty corpus, design screenshots, and negative
+      UX assertions.
 
-      - Contract does not implement product behavior or weaken ResoFeed UI constraints.
+      - Contract remains acceptance-only and does not modify product UI behavior.
 
-      - Contract records any ambiguity as a SPEC QUESTION only if docs conflict; ordinary
-      implementation choices are resolved from docs.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
-      \ were provided, state: \"No refs for this step.\"\n\n## Contract / Design Audit\
-      \ Evidence\n- User-reported issue mapping:\n  - SOURCE LEDGER clickability:\
-      \ <intended behavior + selector/accessibility proof>\n  - Selected+hover row\
-      \ state: <design-conformant rule + what visual stacking is forbidden>\n  - Inspector\
-      \ hierarchy: <primary reading hierarchy + raw/provenance demotion rule>\n- Exact\
-      \ downstream test selectors/observables:\n  ```\n  <selectors, roles, accessible\
-      \ names, screenshots to capture>\n  ```\n- Before/after baseline notes expected\
-      \ for implementation:\n  - Before: <what is currently suspected or observed>\n\
-      \  - After target: <contract-compliant state>\n- Blocker/closure fields:\n \
-      \ - blockers_found: <none/list>\n  - closure_path: <how downstream tests/implementation\
-      \ close each issue>\n  - unresolved_ambiguity: <none/list>\n"
+      - Any ambiguity is captured as SPEC QUESTION only when authoritative docs conflict.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract/Design Audit Evidence
+
+      - Contract artifact path(s): <path or inline summary>
+
+      - Hit-target coverage list: <controls and expected active proof>
+
+      - Keyboard/a11y coverage list: <controls, tab/focus/Enter/Space/roles>
+
+      - State matrix definition: <normal/hover/selected/selected+hover/focus/selected+focus>
+
+      - Inspector hierarchy rule: <primary vs raw/provenance placement>
+
+      - Dirty corpus fixture inventory: <fixture names and mess class>
+
+      - Screenshot manifest: <required named screenshots>
+
+      - Negative UX bans: <assertions to encode>
+
+
+      ## Closure Fields
+
+      verdict: PASS | PASS_WITH_DEBT | FAIL
+
+      blockers: []
+
+      gate_open_allowed: false
+
+      proof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN with notes>
+
+      orchestrator_action_hint: proceed_to_expected_red_tests | repair_contract_first'
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
+    - web/src/routes/+page.svelte
+    - web/src/routes/components/Feed.svelte
+    - web/src/routes/components/Inspector.svelte
     agent: uiux-auditor
   - id: expected-red-browser-tests
     name: Expected-red browser tests for nav, hover, and Inspector hierarchy
