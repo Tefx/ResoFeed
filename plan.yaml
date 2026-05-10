@@ -34045,7 +34045,7 @@ phases:
       none'
   - id: fuidcr-source-ledger-state-portability
     name: Repair Source Ledger and State Portability action contracts
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -34221,6 +34221,71 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:57:50.861937+00:00'
+    done_at: '2026-05-10T18:27:10.514442+00:00'
+    evidence: "status: SUCCESS\n\n## Summary\nMerged and mainline-verified Source\
+      \ Ledger / State Portability action-contract repairs. The final branch was reconciled\
+      \ with current main and scoped only to the Source Ledger / State Portability\
+      \ implementation and tests. Source Ledger now exposes stable DOM hooks, canonical\
+      \ bracket action labels, accessible delete semantics, URL/timestamp labels,\
+      \ visually hidden OPML/state inputs, and terse footer/group State Portability\
+      \ semantics without a standalone settings-like section.\n\n## Commit hash(es)\n\
+      - Worker branch: 0890432 (`align portability API client test`)\n- Worker branch:\
+      \ caeec52 (`fix source ledger portability action contracts`)\n- Main squash\
+      \ commit: d805e14 (`[vectl] step-fuidcr-source-ledger-state-portability completed`)\n\
+      \n## Files changed\n- web/src/app.css\n- web/src/lib/api-client.test.ts\n- web/src/routes/components/SourceLedger.svelte\n\
+      - web/src/routes/components/StatePortability.svelte\n- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n\n## Verification\n\
+      Mainline final-state gate after squash merge:\n- `npm --prefix web test` → PASS;\
+      \ svelte-check 0 errors/0 warnings; Vitest 6 files / 35 tests passed.\n- `npm\
+      \ --prefix web run build` → PASS; production build completed.\n- `npm --prefix\
+      \ web run test:e2e -- --list` → PASS; Playwright config lists 28 tests in 10\
+      \ files.\nWorker verification also reported:\n- `npm run check` from web → PASS.\n\
+      - `npm run test:render -- SourceLedger StatePortability manual-rss-fetch-source-ledger\
+      \ rendering-expected-red` from web → PASS; 2 test files / 21 tests passed.\n\
+      - Temporary Playwright browser proof against the real app → PASS; covered Source\
+      \ Ledger open, OPML/source presence, run ingest pending `[INGESTING...]`, per-source\
+      \ fetch pending `[FETCHING...]`, state import pending `[IMPORTING...]`, state\
+      \ export status, and delete confirmation `[CONFIRM DELETE]`.\n- Temporary DOM\
+      \ proof → PASS; printed `SOURCE_LEDGER_PORTABILITY_DOM_PROOF`.\n\n## Rendered\
+      \ Source Ledger / State Portability evidence\nWorker DOM proof:\n`{\"ledgerClass\"\
+      :\"contract-region contract-source-ledger source-ledger\",\"rowClass\":\"source-ledger-row\
+      \ source-row\",\"rowText\":\"Example Source · ok · last_fetch: 10:25:31https://example.com/feed.xml[FETCH][DELETE]\
+      \ \",\"labels\":[\"[RUN INGEST]\",\"[FETCH]\",\"[DELETE]\",\"[IMPORT OPML]\"\
+      ,\"[EXPORT STATE]\",\"[IMPORT STATE]\"],\"opmlInputClass\":\"source-ledger-file\
+      \ visually-hidden\",\"stateInputClass\":\"state-portability-file visually-hidden\"\
+      ,\"stateGroupRole\":\"idle\",\"noStandaloneStateHeading\":true,\"noDefaultImportedStatus\"\
+      :true}`\nBrowser proof covered import/export/delete/fetch/run-ingest pending\
+      \ states, hidden file inputs, URL column, timestamp labels, and no standalone\
+      \ State Portability heading.\n\n## Mainline failure disposition\n- Initial mainline\
+      \ `npm --prefix web test` caught stale `src/lib/api-client.test.ts` expectation\
+      \ for `role=\"region\"` / `State Portability`.\n- Fixed by updating the test\
+      \ to the canonical footer `role=\"group\"` / `State portability` semantics required\
+      \ by findings 34-36, without changing product behavior.\n\n## Final diff scope\
+      \ check\nWorker confirmed `git diff --name-only main...HEAD` included only:\n\
+      - web/src/app.css\n- web/src/lib/api-client.test.ts\n- web/src/routes/components/SourceLedger.svelte\n\
+      - web/src/routes/components/StatePortability.svelte\n- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts\nNo plan.yaml,\
+      \ backend files, Inspector, shell/doctor, or orchestrator state files were included.\n\
+      \n## Spec link\n- docs/DESIGN.md\n- AGENTS.md\n- upstream steps: fuidcr-contract-matrix-lock,\
+      \ fuidcr-expected-red-ui-tests, fuidcr-api-dto-escalation-guard\n\n## Deviations\n\
+      - type: test_error\n  artifact: web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\n\
+      \  what changed: Updated assertions from old spaced labels/default imported\
+      \ status/`x` delete/no URL-column expectations to canonical bracket labels,\
+      \ `last_fetch`/`last_ingest`, URL column, and no false default imported status.\n\
+      \  why: Findings 24-36 are authoritative and supersede stale expected-red assertions.\n\
+      \  impact: Test now verifies current contract.\n- type: test_error\n  artifact:\
+      \ web/src/routes/components/__tests__/rendering-expected-red.test.ts\n  what\
+      \ changed: Updated Source Ledger and State Portability assertions to bracket\
+      \ labels, group footer semantics, hidden state input, and no default imported\
+      \ status.\n  why: Findings 27, 34, 35, and 36 require canonical bracket/action\
+      \ footer behavior and forbid standalone settings-like State Portability.\n \
+      \ impact: Test now verifies current contract.\n- type: test_error\n  artifact:\
+      \ web/src/lib/api-client.test.ts\n  what changed: Replaced stale standalone\
+      \ `region` / `State Portability` expectation with footer `group` / `State portability`\
+      \ expectation.\n  why: Findings 34-36 make State Portability a terse Source\
+      \ Ledger footer action group and forbid standalone settings-like section semantics.\n\
+      \  impact: Test now verifies the canonical contract without changing product\
+      \ behavior.\n\n## Gaps/Notes\nnone"
   - id: fuidcr-shell-owner-doctor-surfaces
     name: Repair Shell, Owner Token Prompt, and /doctor surfaces
     status: done
