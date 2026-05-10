@@ -30677,7 +30677,7 @@ phases:
   steps:
   - id: prd-inspector-preview-conformance-remediation.contract-audit-acceptance
     name: Contract audit for PRD Inspector fields and preview/live deltas
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -30774,6 +30774,26 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-10T15:31:24.638668+00:00'
+    done_at: '2026-05-10T15:35:14.428343+00:00'
+    evidence: 'Contract audit accepted from spec-verifier. Contract-only step; no
+      product implementation changed; no tracked changes/commit required. refs Read
+      Confirmation present for docs/PRD.md, docs/DESIGN.md, docs/ui-preview.html,
+      and project instructions. PRD/Inspect field register produced with citations
+      and executable acceptance criteria for: objective quality assessment, value
+      tier/priority, concise core insight, dense factual summary, source/extraction
+      provenance, why-this-appeared, searchable text, and topical metadata. Key findings:
+      `value_tier`, `core_insight`, `summary`, extraction/provenance fields exist
+      in current API/components, but distinct quality assessment/topical metadata
+      and runtime proof for searchable text/why variants need tests; current Inspector
+      `why` is hardcoded. Preview/live visual delta register produced with acceptance
+      criteria for masthead scale, SOURCE LEDGER/DOCTOR/INSPECTOR nav placement, desktop
+      prompt placement inside bordered panel, item card/border geometry, left/right
+      margins, row/star alignment, typography scale, and Inspector hierarchy. Runtime
+      artifact plan defined for preview/live screenshots, DOM/bbox snapshots, accessibility
+      snapshots, and bounded layout assertions. Contract closure fields mark PRD field
+      visibility and visual parity as NEEDS_TEST with downstream closure path via
+      expected-red tests, implementation, retest, screenshot-first UI/UX audit, and
+      final gate. Evidence confirms clean isolated worktree and no product changes.'
   - id: prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     name: Expected-red browser regressions for Inspector PRD fields and preview parity
     status: pending
