@@ -35916,6 +35916,11 @@ phases:
       reachability/browser proof blocker without reintroducing forbidden persistent
       dashboard/tab navigation.
 
+      - Added fuidcr-batched-architecture-blocker-remediation and fuidcr-architecture-blocker-retest
+      because fuidcr-software-architect-conformance-review returned semantic FAIL
+      / DO_NOT_COMPLETE and blocker-class UI closure obligations intersect this final
+      gate.
+
 
       As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the full-ui-design-conformance-remediation
       phase meets the quality bar for completion.
@@ -35929,7 +35934,19 @@ phases:
       - All 52 audit findings are closed or have explicit non-blocking/non-intersection
       rationale accepted by design/architecture review.
 
-      - P0/P1 findings have browser or DOM/behavior evidence, not prose-only closure.
+      - A machine-readable closure register maps every matrix finding ID 1-52 exactly
+      once to exact matrix title/severity/status, evidence paths, and accepted non-intersection/amendment
+      rationale where applicable.
+
+      - F<n> tests or successor artifacts preserve exact matrix semantics for finding
+      <n>; no semantic remapping remains.
+
+      - P0/P1 findings have browser or DOM/behavior evidence, not prose-only closure,
+      covering all 13 P0 and 19 P1 obligations.
+
+      - Matrix F2 product drift is explicitly resolved by implementation removal of
+      persistent peer-nav drift or by a recorded design-review amendment/non-intersection
+      authority.
 
       - Feed/Search share feed-item anatomy where applicable.
 
@@ -35944,12 +35961,14 @@ phases:
 
       - /doctor and Search do not crop/break on narrow viewport.
 
-      - docs/ui-preview.html is cleaned after live UI contracts stabilize.
+      - docs/ui-preview.html is cleaned after live UI contracts stabilize and final
+      preview parity/static checks prove canonicality for F48-F52.
 
       - No forbidden product concepts or runtime surfaces are introduced.
 
       - No persistent dashboard/tab-style surface navigation, Surfaces nav, or persistent
-      left/sidebar product nav is introduced by the Source Ledger reachability fix.
+      left/sidebar product nav is introduced by the Source Ledger reachability fix
+      unless explicitly superseded by design-review amendment/non-intersection authority.
 
 
       GATE MUST REVIEW:
@@ -35965,36 +35984,57 @@ phases:
       4. fuidcr-ledger-reachability-proof-path-fix reconciles Source Ledger reachability
       versus stale test contract and preserves the no-persistent-nav decision.
 
-      5. fuidcr-browser-regression-proof provides desktop/narrow screenshots, DOM/behavior
+      5. fuidcr-batched-architecture-blocker-remediation produced matrix-exact closure
+      evidence for blocker families B1-B5.
+
+      6. fuidcr-architecture-blocker-retest emitted PASS, or if FAIL, this gate MUST
+      remain BLOCKED.
+
+      7. fuidcr-browser-regression-proof provides desktop/narrow screenshots, DOM/behavior
       tests, responsive tests, keyboard/focus checks, OPML import, Source Ledger action
       proof, Feed/Search/Inspector proof, original link proof, and forbidden-navigation
       proof.
 
-      6. fuidcr-screenshot-first-uiux-audit provides screenshot-first PASS/PASS_WITH_DEBT/FAIL
+      8. fuidcr-screenshot-first-uiux-audit provides screenshot-first PASS/PASS_WITH_DEBT/FAIL
       evidence.
 
-      7. fuidcr-software-architect-conformance-review verifies architecture basis
-      and no forbidden concepts.
+      9. fuidcr-software-architect-conformance-review and fuidcr-architecture-blocker-retest
+      verify architecture basis and no forbidden concepts.
 
 
       Gate may OPEN only when each blocker-class behavioral obligation is PROVEN or
       has explicit non-intersection evidence recorded in the proof register.'
     verification: '- All phase steps completed with specific, verifiable evidence,
-      including fuidcr-ledger-reachability-proof-path-fix.
+      including fuidcr-ledger-reachability-proof-path-fix, fuidcr-batched-architecture-blocker-remediation,
+      and fuidcr-architecture-blocker-retest.
 
       - Findings 1-52 are closed or have explicit accepted non-blocking/non-intersection
-      rationale.
+      rationale in a machine-readable closure register with exact matrix title/severity/status
+      and direct evidence paths.
 
-      - P0/P1 findings include browser/DOM/behavior or screenshot evidence.
+      - F<n> expected-red/e2e artifacts align one-to-one with exact matrix finding
+      <n>; no semantic remapping remains.
+
+      - P0/P1 findings include browser/DOM/behavior or screenshot evidence for all
+      13 P0 and 19 P1 obligations.
+
+      - Matrix F2 product drift is fixed or explicitly superseded by design-review
+      amendment/non-intersection authority.
 
       - Source Ledger reachability is proven without persistent dashboard/tab/Surfaces
-      navigation drift.
+      navigation drift unless explicitly accepted by amendment/non-intersection authority.
+
+      - Preview parity/static evidence proves docs/ui-preview.html remains canonical
+      after live UI repairs for F48-F52.
 
       - Browser regression proof and screenshot-first UIUX audit are PASS or PASS_WITH_DEBT
       with no blocker-class debt.
 
-      - Software-architect review is OPEN/PASS and confirms no architecture/product-boundary
-      drift.
+      - fuidcr-architecture-blocker-retest is PASS; if it is FAIL or lacks a blocker
+      register for remaining issues, this gate is BLOCKED.
+
+      - Software-architect review confirms no architecture/product-boundary drift
+      and backend/API/DTO changes remain narrow/source-backed.
 
       - No forbidden concepts or runtime surfaces were introduced.'
     evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
@@ -36032,6 +36072,8 @@ phases:
     - fuidcr-browser-regression-proof
     - fuidcr-screenshot-first-uiux-audit
     - fuidcr-software-architect-conformance-review
+    - fuidcr-batched-architecture-blocker-remediation
+    - fuidcr-architecture-blocker-retest
     agent: gate-reviewer
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
