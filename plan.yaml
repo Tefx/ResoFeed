@@ -32038,7 +32038,7 @@ phases:
       \ flat Go files and uses the existing single-binary CLI path."
   - id: cli-liveness-probe
     name: Black-box CLI liveness probe for reset command
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -32152,6 +32152,146 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-10T17:42:35.783653+00:00'
+    done_at: '2026-05-10T17:46:08.621942+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read. Key passage: offline reset is `resofeed owner-token
+      reset --db ./data/resofeed.sqlite3 --confirm-reset`; it deletes only `runtime_metadata.key=''owner_token_sha256''`,
+      must not generate/print/store plaintext, and must not add `serve --reset-owner-token`.
+
+      - docs/USAGE.md — Read. Key passage: reset command deletes only the stored verifier,
+      does not generate/print/accept/store a replacement plaintext token, and there
+      is no `serve --reset-owner-token` startup flag.
+
+      - AGENTS.md — NOT READ: file absent from isolated worktree root; `.agents/instructions.md`
+      present and read.
+
+      - .agents/instructions.md — Read. Key passage: one deployable Go binary, one
+      SQLite DB, single owner token boundary, no account/per-agent registry, no direct
+      plan edits.
+
+
+      ## CLI Liveness Evidence
+
+      step_intent: verify_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Mode**: black-box CLI / Mode D
+
+
+      **Exact command(s) executed**:
+
+      - `go build -o .audit-cli-liveness/bin/resofeed ./cmd/resofeed`
+
+      - `.audit-cli-liveness/bin/resofeed --help`
+
+      - `.audit-cli-liveness/bin/resofeed owner-token reset --help`
+
+      - `.audit-cli-liveness/bin/resofeed serve --help`
+
+      - SQLite fixture setup with `runtime_metadata.owner_token_sha256`, `sentinel_key`,
+      and `sources` row
+
+      - `.audit-cli-liveness/bin/resofeed owner-token reset --db .audit-cli-liveness/db/confirm.sqlite3
+      --confirm-reset`
+
+      - `.audit-cli-liveness/bin/resofeed owner-token reset --db .audit-cli-liveness/db/no-confirm.sqlite3`
+
+      - `.audit-cli-liveness/bin/resofeed owner-token reset --db .audit-cli-liveness/db/notadir/blocked.sqlite3
+      --confirm-reset`
+
+
+      **Actual stdout/stderr and exit codes**:
+
+      - CLI help listed `owner-token reset --db PATH --confirm-reset` and did not
+      list `serve --reset-owner-token`.
+
+      - owner-token reset help documented delete-only offline behavior and no replacement
+      plaintext.
+
+      - Confirmed reset exit=0 with no stdout/stderr.
+
+      - Missing confirm: `err: invalid_owner_token_reset: --confirm-reset is required`,
+      exit=2.
+
+      - Invalid/unopenable DB: `err: invalid_db: cannot open sqlite database`, exit=2.
+
+
+      **SQLite before/after proof**:
+
+      - Before confirmed reset: `owner_token_sha256|aaaaaaaa...|1111111111` and `sentinel_key|sentinel_value|2222222222`;
+      source row `src_unchanged|https://example.com/feed.xml|Example Feed`.
+
+      - After confirmed reset: only `sentinel_key|sentinel_value|2222222222` remains
+      in runtime_metadata; source row unchanged.
+
+      - Missing-confirm before/after both retained `owner_token_sha256|bbbb...|3333333333`
+      and `sentinel_key|sentinel_value|4444444444`.
+
+
+      **Forbidden output proof**:
+
+      - `owner token generated:` present in reset output? no
+
+      - `rfeed_` present in reset output? no
+
+      - `serve --reset-owner-token` present in serve help? no
+
+
+      behavioral_proof_register:
+
+      - confirmed_reset_exits_zero: PROVEN
+
+      - confirmed_reset_deletes_only_owner_token_sha256: PROVEN
+
+      - confirmed_reset_preserves_other_runtime_metadata: PROVEN
+
+      - confirmed_reset_preserves_unrelated_sources_row: PROVEN
+
+      - missing_confirm_exits_nonzero: PROVEN
+
+      - missing_confirm_leaves_hash_unchanged: PROVEN
+
+      - invalid_unopenable_db_exits_nonzero: PROVEN
+
+      - invalid_unopenable_db_does_not_create_blocked_db_file: PROVEN
+
+      - reset_output_contains_no_plaintext_replacement_token: PROVEN
+
+      - help_surface_excludes_serve_reset_owner_token: PROVEN
+
+
+      **Headline**: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Files changed / artifacts
+
+      - none; temporary `.audit-cli-liveness` build/DB artifacts were removed, and
+      worktree was clean.
+
+
+      ## Commit hash(es)
+
+      - none; no files changed, so no commit was needed.'
   - id: integration-verification
     name: Independent integration verification for reset and serve replacement paths
     status: claimed
