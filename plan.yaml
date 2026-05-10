@@ -24590,7 +24590,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: implementation-repair
     name: Complete UI regression-class repairs within existing surfaces
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -24729,6 +24729,8 @@ phases:
     - expected-red-inspector-dirty-corpus-tests
     - expected-red-design-artifact-negative-ux-tests
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T11:50:30.051055+00:00'
   - id: playwright-repair-verification
     name: Comprehensive deterministic Playwright UI regression verification
     status: pending
