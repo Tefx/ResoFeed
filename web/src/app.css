@@ -55,6 +55,7 @@ input {
 .contract-feed-open {
   appearance: none;
   display: block;
+  min-width: 0;
   width: 100%;
   border: 0;
   padding: 0;
@@ -428,9 +429,21 @@ a:focus,
   display: flex;
   gap: var(--rf-space-xs);
   align-items: baseline;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.contract-feed-meta span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .contract-time-label {
+  flex: 0 0 auto;
   margin-inline-start: auto;
 }
 

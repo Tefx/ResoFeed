@@ -150,6 +150,25 @@ async function assertForbiddenUxCopyAbsent(page: Page): Promise<void> {
   );
 }
 
+async function assertMobileMetadataStaysFlat(page: Page): Promise<void> {
+  const metadataLine = page.locator('.feed-pane.active-panel .contract-feed-meta').first();
+  await expect(metadataLine, 'mobile metadata line must be visible before artifact capture').toBeVisible();
+  const metrics = await metadataLine.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    const lineHeight = Number.parseFloat(style.lineHeight);
+    const rect = element.getBoundingClientRect();
+    return {
+      height: rect.height,
+      lineHeight,
+      whiteSpace: style.whiteSpace,
+      overflow: style.overflowX
+    };
+  });
+  expect(metrics.whiteSpace, 'mobile metadata must use deterministic one-line treatment').toBe('nowrap');
+  expect(metrics.overflow, 'mobile metadata overflow must be clipped for ellipsis').toBe('hidden');
+  expect(metrics.height, 'mobile metadata must not wrap into stacked words').toBeLessThanOrEqual(metrics.lineHeight + 2);
+}
+
 test('design artifact manifest captures required ResoFeed UI contract states', async ({ page, runInfo, ownerToken }, testInfo) => {
   const manifest: DesignArtifactRecord[] = [];
   await testInfo.attach('assertion-table.md', { body: assertionTable, contentType: 'text/markdown' });
@@ -184,7 +203,11 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
 
   await fixtureFeedItem.hover();
   await captureArtifact(page, testInfo, manifest, 'selected-hover', 'Selected feed row under hover; marker/bounds context captured.');
-  await captureArtifact(page, testInfo, manifest, 'inspector-raw-expanded/provenance', 'Expected-red context: no labelled raw/provenance disclosure is currently expandable.');
+  const rawProvenanceDisclosure = page.locator('details.contract-raw-provenance').first();
+  await expect(rawProvenanceDisclosure, 'raw/provenance must remain a labelled secondary disclosure').toBeVisible();
+  await rawProvenanceDisclosure.locator('summary').click();
+  await expect(rawProvenanceDisclosure, 'expanded raw/provenance proof requires the disclosure to be open').toHaveAttribute('open', '');
+  await captureArtifact(page, testInfo, manifest, 'inspector-raw-expanded/provenance', 'Expanded labelled raw/provenance disclosure remains secondary below the Inspector reading flow.');
 
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
   await steer.fill('search Local fixture');
@@ -197,6 +220,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await page.setViewportSize({ width: 390, height: 760 });
   await page.getByRole('button', { name: 'back to TODAY' }).click();
   await assertSurface(page, 'feed');
+  await assertMobileMetadataStaysFlat(page);
   await captureArtifact(page, testInfo, manifest, 'mobile-feed', 'Narrow/mobile feed with touch-safe star and clamped summary.');
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   await assertSurface(page, 'inspector');
