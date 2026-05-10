@@ -34833,7 +34833,7 @@ phases:
     agent: gate-reviewer
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -34997,6 +34997,8 @@ phases:
     depends_on:
     - fuidcr-api-dto-escalation-guard
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-10T17:57:33.630230+00:00'
   - id: fuidcr-feed-search-client-dto-contract
     name: Update Feed/Search frontend DTO contract for display fallbacks
     status: pending
