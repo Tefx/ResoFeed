@@ -22324,3 +22324,140 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.harness-contract-lock
     agent: frontend-engineer
+  - id: playwright-comprehensive-e2e.core-feed-browser-flows
+    name: Core Browser Feed and Source E2E Flows
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      tags: ["integration", "browser-e2e"]
+
+
+      Add comprehensive Playwright browser-led E2E specs for feed/source operations
+      against the real ResoFeed server from the harness.
+
+
+      Required flows:
+
+      1. Server/UI boot through the real `cmd/resofeed` binary path, with server stdout/stderr
+      captured.
+
+      2. First-use empty state and owner token entry exactly as the product defines
+      it.
+
+      3. OPML import or source addition using a deterministic fixture.
+
+      4. Source Ledger rendering and source status visibility.
+
+      5. Manual global ingest and per-source fetch controls.
+
+      6. Today/feed rendering after fixture ingest.
+
+      7. Inspect/retrieve/search behavior where currently exposed by the human UI.
+
+
+      The tests must be browser-led and must not become pure API unit tests. API setup
+      is allowed only as fixture support when the user-visible journey is still exercised
+      in the browser.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one feed/source fixture MUST use the exact documented external format
+      from the authoritative spec or UI contract. Do not rely only on convenience
+      fields not present in real OPML/source input.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a TEST step. Passing with mocked UI state only is NOT acceptable; evidence
+      must show the browser reaches the real server path.'
+    verification: '- Planned command: `npm --prefix web run test:e2e` or the locked
+      `npx playwright test` command.
+
+      - E2E exercises real server launch, owner token entry, source/feed operations,
+      manual global ingest, per-source fetch, today/feed rendering, and inspect/retrieve/search
+      where exposed.
+
+      - Evidence includes Playwright trace, screenshots/videos/logs, server stdout/stderr,
+      DB fixture path, and sanitized env notes.
+
+      - Failure path: test report captures a meaningful browser/server diagnostic
+      if ingest or fetch fails.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Seam-Level Integration Evidence
+
+      **Changed seam path**: real binary server → browser UI → SQLite fixture → feed/source
+      operations
+
+
+      **Exact command executed**:
+
+      ```
+
+      <npm --prefix web run test:e2e or locked npx playwright test command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste runner output, not summary>
+
+      ```
+
+
+      **Artifacts**:
+
+      - Trace:
+
+      - Screenshots/videos/logs:
+
+      - Server stdout/stderr:
+
+      - DB fixture path:
+
+      - Sanitized env notes:
+
+
+      **Flow coverage checklist**:
+
+      - Real cmd/resofeed launch:
+
+      - First-use owner token:
+
+      - OPML/source addition:
+
+      - Source Ledger:
+
+      - Manual global ingest:
+
+      - Per-source fetch:
+
+      - Today/feed rendering:
+
+      - Inspect/retrieve/search:'
+    depends_on:
+    - playwright-comprehensive-e2e.harness-fixtures-env
+    agent: frontend-engineer
