@@ -25010,7 +25010,7 @@ phases:
     agent: gate-reviewer
   - id: expected-red-hit-target-clickability-tests
     name: Expected-red real hit-target and clickability tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25085,6 +25085,8 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T11:31:07.200601+00:00'
   - id: expected-red-keyboard-a11y-tests
     name: Expected-red keyboard and accessibility activation tests
     status: pending
