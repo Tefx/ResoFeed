@@ -31193,7 +31193,7 @@ phases:
       after squash merge: `npm --prefix web run check` passed with 0 errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
     name: Screenshot-first UI/UX audit against ui-preview
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
 
@@ -31334,6 +31334,8 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-10T15:54:09.379835+00:00'
   - id: prd-inspector-preview-conformance-remediation.final-prd-preview-gate
     name: Final gate for PRD Inspector and preview conformance
     status: pending
