@@ -25118,3 +25118,78 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: expected-red-inspector-dirty-corpus-tests
+    name: Expected-red Inspector hierarchy and dirty content corpus tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create pre-implementation browser tests and fixtures for dirty real-content
+      Inspector cases. The goal is to catch raw payload dumping and unreadable detail
+      hierarchy before UI implementation changes.
+
+
+      Required fixture mess classes:
+
+      - JSON-LD blobs with `{ "@context"` and nested data.
+
+      - Long RSS descriptions and long extracted text.
+
+      - HTML fragments with escaped entities.
+
+      - script/style leftovers.
+
+      - missing summary/date/author.
+
+      - very long URL and very long title.
+
+      - media/enclosure metadata.
+
+
+      Required UI assertions:
+
+      - Default Inspector primary area shows readable title/source/time/link/summary
+      or content hierarchy when available.
+
+      - Raw JSON, JSON-LD, extracted metadata, original feed payloads, and media/enclosure
+      provenance are not primary content by default.
+
+      - If raw/provenance is exposed, it is clearly labeled secondary/collapsed/provenance/raw
+      and can be expanded intentionally.
+
+      - Primary surfaces do not display huge unformatted blobs or literal `{ "@context"`.
+
+
+      This is a pre-implementation test-definition step. Product UI source must not
+      be modified.'
+    verification: '- Test fixtures cover all required dirty content classes or explicitly
+      justify any non-applicable class.
+
+      - Expected-red run exposes raw dump/readability gaps where current UI is incomplete.
+
+      - Evidence includes exact command, runner output, fixture names, and Inspector
+      screenshot/trace artifact paths.
+
+      - Product UI implementation files remain unchanged.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Inspector\
+      \ Dirty Corpus Evidence\n- Files changed: <test/fixture/helper paths only>\n\
+      - Fixture inventory:\n  | Fixture | Mess class | Source/format rationale | Test\
+      \ name |\n  | --- | --- | --- | --- |\n- Exact command:\n```sh\ncd web && npm\
+      \ run test:e2e -- --grep \"inspector|dirty corpus|ui-navigation-hover-inspector-repair\"\
+      \n```\n- Runner output:\n```text\n<paste output>\n```\n- Inspector artifact\
+      \ paths: <screenshots/traces>\n- Raw-primary negative assertions: <assertion\
+      \ names/results>\n\n## Closure Fields\nverdict: EXPECTED_RED_PASS | INCOMPLETE\
+      \ | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status: <exposed_gaps|missing_coverage\
+      \ with details>\norchestrator_action_hint: proceed_to_implementation_after_all_expected_red\
+      \ | expand_dirty_corpus_first"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
