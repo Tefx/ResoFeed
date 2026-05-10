@@ -28195,3 +28195,111 @@ phases:
     depends_on:
     - ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
     agent: integration-verifier
+  - id: ui-navigation-hover-inspector-repair.final-gate-keyboard-a11y-remediation
+    name: final-gate-keyboard-a11y-remediation
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      priority: HIGH
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Prior gate found blocker B-GATE-001 from fresh comprehensive targeted Playwright
+      verification.
+
+      - The single-test rerun passed, but the comprehensive targeted command failed,
+      so this must be evaluated as nondeterministic/flaky or state-order-dependent
+      until fixed/proven.
+
+      - Phase can reopen only after independent retest proves deterministic green
+      for the full targeted command.
+
+
+      As an INDEPENDENT REVIEWER, re-evaluate `ui-navigation-hover-inspector-repair`
+      after the B-GATE-001 remediation retest. This final gate must not pass if the
+      comprehensive targeted command is not green.
+
+
+      Gate criteria:
+
+      1. `fix-gate-keyboard-a11y-flake` completed and includes root-cause evidence
+      for the Inspector original link keyboard focus nondeterminism/order-dependence.
+
+      2. `retest-gate-keyboard-a11y-full-targeted` ran the required full targeted
+      command exactly and exited 0.
+
+      3. Retest evidence includes full runner output and trace/artifact paths or artifact
+      manifest.
+
+      4. Keyboard/focus assertions remain meaningful and were not skipped, lowered,
+      or marked non-blocking.
+
+      5. Existing JSON-LD/mobile/provenance fixes remain covered by the comprehensive
+      targeted suite.
+
+      6. Closure fields from the retest support reopening: verdict PASS, blockers
+      empty/none, gate_open_allowed true, proof_gap_status CLOSED, blocking_status
+      CLOSED.
+
+
+      BLOCK if the comprehensive targeted command is missing, altered, single-test-only,
+      non-zero, flaky/nondeterministic, or if proof fields are absent/inconsistent.'
+    verification: '- Final gate reviews the fix and retest evidence after B-GATE-001
+      remediation.
+
+      - Must verify the exact required command was run and exited 0: `npm --prefix
+      web run check && npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      ui-navigation-hover-inspector-repair.expected-red.spec.ts hit-target-clickability.spec.ts
+      keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts`.
+
+      - Must block if only the single failing test was rerun or if full targeted proof
+      is absent.
+
+      - Must block if keyboard/focus assertions were weakened/skipped or if nondeterminism
+      remains.
+
+      - Must require closure fields: verdict, blockers, gate_open_allowed, proof_gap_status,
+      blocking_status, orchestrator_action_hint.
+
+      - Gate may OPEN only when B-GATE-001 is closed and the comprehensive targeted
+      command is green.'
+    evidence_template: "## Final Gate Review Report\n\n**Reviewer**: gate-reviewer\
+      \ (independent of frontend-engineer implementation fix)\n**Phase**: ui-navigation-hover-inspector-repair\n\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/hit-target-clickability.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/feed-row-state-matrix.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/design-artifact-negative-ux.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n### Execution Review\n| Step ID | Status | Evidence\
+      \ Quality | Concerns |\n| ------- | ------ | ---------------- | -------- |\n\
+      | ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake | ✅/⚠️/❌\
+      \ | excellent/adequate/insufficient/missing | <notes> |\n| ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n### Required\
+      \ Command Evidence\n```\nnpm --prefix web run check && npm --prefix web run\
+      \ test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts\n```\n\
+      - Command present exactly: YES/NO\n- Exit code: <0/non-zero/missing>\n- Full\
+      \ runner output reviewed: YES/NO\n- Artifact/trace paths reviewed: YES/NO\n\n\
+      ### Blocker Register\n| ID | Status | Decision Basis |\n| -- | ------ | --------------\
+      \ |\n| B-GATE-001 | CLOSED/OPEN | <evidence refs> |\n\n### Closure Fields\n\
+      verdict: PASS|FAIL\nblockers:\n  - <none or open blocker list>\ngate_open_allowed:\
+      \ true|false\nproof_gap_status: CLOSED|BLOCKING\nblocking_status: CLOSED|OPEN\n\
+      orchestrator_action_hint: <complete final gate and proceed | create another\
+      \ fix/retest loop | keep phase blocked>\n\n### Gate Decision\n- [ ] OPEN: B-GATE-001\
+      \ closed, comprehensive targeted command green, proof gaps closed.\n- [ ] BLOCKED:\
+      \ Required command/evidence missing, non-zero, flaky, or blocker remains open."
+    depends_on:
+    - ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
+    agent: gate-reviewer
