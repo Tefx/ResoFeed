@@ -25193,3 +25193,96 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: expected-red-design-artifact-negative-ux-tests
+    name: Expected-red design artifact and negative UX assertion tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create pre-implementation browser tests that generate the design-contract artifact
+      set and encode negative UX assertions for the full class of drift risks discussed
+      by the user.
+
+
+      Required named screenshots/artifacts:
+
+      - owner-token
+
+      - first-use
+
+      - today-list
+
+      - source-ledger
+
+      - selected-item
+
+      - selected-hover
+
+      - inspector-clean
+
+      - inspector-raw-expanded/provenance
+
+      - llm-error
+
+      - search
+
+      - mobile view if applicable to the current responsive contract
+
+
+      Required design refs for audit comparison:
+
+      - docs/DESIGN.md
+
+      - docs/ui-preview.html
+
+      - docs/DESIGN_VISION.md
+
+
+      Required negative UX assertions:
+
+      - Default primary text must not contain `{ "@context"` or huge raw JSON blobs.
+
+      - UI must not introduce unread/folder/tag/settings concepts, onboarding wizard
+      copy, mascot/SaaS/AI-magic copy, or AI-magic trust palette language.
+
+      - Nav clicks must not leave the wrong panel active.
+
+      - Artifacts must include enough screenshot/trace context for uiux-auditor and
+      gate-reviewer to review without rerunning tests.
+
+
+      This is a pre-implementation test-definition step. Product UI source must not
+      be modified.'
+    verification: '- Test suite generates or defines generation of every required
+      named artifact, with any non-applicable mobile artifact explicitly justified
+      by the contract.
+
+      - Expected-red run exposes missing artifacts or negative UX violations where
+      current UI is incomplete.
+
+      - Evidence includes exact command, runner output, artifact manifest, and negative
+      assertion results.
+
+      - Product UI implementation files remain unchanged.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Design\
+      \ Artifact / Negative UX Evidence\n- Files changed: <test/fixture/helper paths\
+      \ only>\n- Exact command:\n```sh\ncd web && npm run test:e2e -- --grep \"design\
+      \ artifact|negative UX|ui-navigation-hover-inspector-repair\"\n```\n- Runner\
+      \ output:\n```text\n<paste output>\n```\n- Artifact manifest:\n  | Artifact\
+      \ name | Path | Viewport/state | Design ref |\n  | --- | --- | --- | --- |\n\
+      - Negative UX assertions:\n  | Assertion | Test name | Result | Failure evidence\
+      \ |\n  | --- | --- | --- | --- |\n\n## Closure Fields\nverdict: EXPECTED_RED_PASS\
+      \ | INCOMPLETE | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status:\
+      \ <exposed_gaps|missing_coverage with details>\norchestrator_action_hint: proceed_to_implementation_after_all_expected_red\
+      \ | expand_design_artifact_tests_first"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
