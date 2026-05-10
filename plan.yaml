@@ -33601,3 +33601,180 @@ phases:
     - fuidcr-source-ledger-state-portability
     - fuidcr-shell-owner-doctor-surfaces
     agent: frontend-engineer
+  - id: fuidcr-browser-regression-proof
+    name: Run independent browser regression and responsive behavior proof
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      Independence Level: L2
+
+
+      As an INDEPENDENT TESTER (integration-verifier), validate the full UI remediation
+      from a fresh browser perspective. This phase-check protects the final UIUX audit,
+      software-architect review, and final gate.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works.
+
+
+      SCOPE:
+
+      - Live/browser-rendered ResoFeed UI after implementation clusters.
+
+      - Desktop >=1080px and narrow/mobile <1080px screenshots.
+
+      - DOM/behavior tests, responsive tests, keyboard/focus checks, and link/action
+      behavior.
+
+
+      MUST VERIFY ALL FINDING CLUSTERS:
+
+      - 1-7 Shell and Owner Token Prompt.
+
+      - 8-16 Feed/Search shared anatomy, plus 40-44 Search narrow/result behavior.
+
+      - 17-23 Inspector reading and diagnostic boundary.
+
+      - 24-36 Source Ledger and State Portability DOM/action contract.
+
+      - 37-39 /doctor narrow/wrapping surface.
+
+      - 45-47 global styling/focus/accent leakage.
+
+      - 48-52 preview cleanup evidence may be checked via DOM/static artifact where
+      applicable, but live UI browser proof is required for live surfaces.
+
+
+      REQUIRED EVIDENCE:
+
+      - Exact commands executed and actual output.
+
+      - Desktop screenshot refs.
+
+      - Narrow/mobile screenshot refs.
+
+      - DOM selector proof for Source Ledger required classes and canonical bracket
+      labels.
+
+      - Behavior proof for original link navigation, Inspect/Resonate affordances,
+      owner-token prompt action, file-input accessibility, keyboard focus, and /doctor
+      wrapping.
+
+      - Responsive proof that below 1080px Inspector is no longer an active split-pane
+      desktop layout.
+
+
+      FINDINGS ARE SUCCESSFUL OUTPUT:
+
+      - If issues are found, report them mapped to finding IDs and severity. The verification
+      step is complete when evidence is specific enough for planner remediation; finding
+      problems is valuable.'
+    verification: '- Green browser/DOM behavior evidence exists for P0/P1 findings.
+
+      - Desktop and narrow/mobile screenshots are attached or referenced.
+
+      - Responsive breakpoint below 1080px is verified.
+
+      - Keyboard/focus checks pass or produce mapped findings.
+
+      - /doctor and Search do not crop/break on narrow viewport.
+
+      - Any remaining issue has a finding ID, severity, reproduction, and remediation
+      owner.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Full UI design conformance phase-check
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <actual commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Screenshot Evidence
+
+      - Desktop >=1080px: <paths>
+
+      - Narrow/mobile <1080px: <paths>
+
+      - /doctor narrow: <paths>
+
+      - Search narrow: <paths>
+
+      - Inspector mobile: <paths>
+
+
+      ### Requirement / Behavior Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | audit finding <id> | <claim> | <browser/DOM proof> | <path/output> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <fix/retest or non-intersection> | <OPEN/BLOCK basis> |
+
+
+      ### Issues Found
+
+      | Severity | Finding ID | Description | Location | Reproduction |
+
+      |---|---:|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS: No blocking issues found and coverage justified
+
+      - [ ] PASS_WITH_DEBT: Only explicit non-blocking/non-intersecting debt remains
+
+      - [ ] FAIL: Blocking issues or proof gaps remain
+
+      '
+    depends_on:
+    - fuidcr-style-breakpoint-foundation
+    - fuidcr-feed-search-anatomy
+    - fuidcr-inspector-reading-contract
+    - fuidcr-source-ledger-state-portability
+    - fuidcr-shell-owner-doctor-surfaces
+    - fuidcr-ui-preview-cleanup
+    agent: integration-verifier
