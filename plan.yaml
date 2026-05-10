@@ -21526,3 +21526,155 @@ phases:
     depends_on:
     - visual-parity-remediation
     agent: frontend-engineer
+  - id: manual-rss-fetch.row-parity-retest
+    name: Focused Source Ledger Row Parity Retest
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an INDEPENDENT UI/UX AUDITOR, retest ONLY the remaining B2/R9 Source Ledger
+      row parity blocker after `manual-rss-fetch.row-parity-remediation`.
+
+
+      Focused scope:
+
+      1. Compare the running implementation to `docs/ui-preview.html` for the Source
+      Ledger row DOM/copy and layout.
+
+      2. Verify the canonical row uses one primary source string matching the reference,
+      not duplicate title plus compact URL.
+
+      3. Verify row layout uses a 3-column grid compatible with the reference: source/status
+      text column, manual fetch action column, compact delete `x` column.
+
+      4. Verify nested flex action grouping is absent or non-interfering with reference
+      row parity.
+
+
+      Regression checks only:
+
+      - B1 bracket controls and busy states still pass.
+
+      - Negative style constraints still pass.
+
+      - Footer/import presentation remains visually passing except for any Source
+      Ledger row copy assertion directly tied to B2/R9.
+
+
+      Do NOT perform another broad visual pass. Finding a remaining B2/R9 row mismatch
+      is valid retest output and must block the gate; unrelated new findings should
+      be reported separately only if they intersect `manual-rss-fetch.gate`.
+
+
+      ## Gate Decision Basis Requirement
+
+      Evidence must include a structured behavioral/visual proof register for B2/R9
+      with requirement_ref, behavior_claim, runtime_proof_expected, evidence_ref,
+      status, closure_path, and gate_decision_basis. `manual-rss-fetch.gate` may open
+      only if B2/R9 is PROVEN and regression checks do not reopen prior blockers.'
+    verification: '- B2/R9 row parity proof includes reference vs implementation row
+      text and computed grid columns.
+
+      - Implementation row no longer duplicates title plus compact URL and matches
+      the reference single primary source/status text.
+
+      - Implementation row uses a 3-column source/status, [FETCH], and compact `x`
+      structure compatible with `docs/ui-preview.html`.
+
+      - Regression checks confirm B1 bracket controls/busy states, negative constraints,
+      and footer/import presentation remain passing.
+
+      - Result is parseable PASS only if the focused B2/R9 blocker is closed and prior-pass
+      regressions are absent.
+
+      - Downstream gate protected: manual-rss-fetch.gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/ — key passage/artifact
+      summary or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Focused Row Parity Retest Report
+
+
+      **Tester**: uiux-auditor (independent of implementation)
+
+      **Scope**: B2/R9 Source Ledger row shape/copy plus B1/negative/footer regression
+      checks only
+
+      **Independence Level**: L2
+
+
+      ### Requirement Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B2/R9 `docs/ui-preview.html` Source Ledger row | <claim> | rendered row screenshot/DOM
+      + computed grid columns | <artifact> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
+      basis |
+
+
+      ### Row Copy/Layout Comparison
+
+      ```
+
+      Reference row text: <paste>
+
+      Implementation row text: <paste>
+
+      Reference gridTemplateColumns: <paste>
+
+      Implementation gridTemplateColumns: <paste>
+
+      ```
+
+
+      ### DOM/Visual Artifacts
+
+      - Screenshot/DOM artifact for default Source Ledger row: <path>
+
+      - Computed style artifact: <path>
+
+      - Three-column proof: <path or excerpt>
+
+
+      ### Regression Checks
+
+      - B1 bracket controls and busy states: PASS/FAIL with evidence
+
+      - Negative constraints: PASS/FAIL with evidence
+
+      - Footer/import presentation: PASS/FAIL with evidence
+
+
+      ### Headline
+
+      - [ ] PASS: B2/R9 row parity proven and prior-pass regressions absent
+
+      - [ ] FAIL: B2/R9 remains open or prior-pass blocker regressed'
+    depends_on:
+    - manual-rss-fetch.row-parity-remediation
+    agent: uiux-auditor
