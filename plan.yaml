@@ -34986,7 +34986,7 @@ phases:
       unmodified.'
   - id: fuidcr-browser-regression-proof
     name: Run independent browser regression and responsive behavior proof
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -35163,6 +35163,8 @@ phases:
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-ui-preview-cleanup
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T18:53:39.252229+00:00'
   - id: fuidcr-screenshot-first-uiux-audit
     name: Run screenshot-first native UIUX design conformance audit
     status: pending
