@@ -32561,3 +32561,118 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: fuidcr-expected-red-ui-tests
+    name: Add expected-red browser and DOM tests for all audit findings
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Add pre-implementation tests that expose the current UI/design conformance gaps
+      without modifying production code.
+
+
+      YOUR SCOPE:
+
+      - Test files, fixtures, test helpers, and screenshot-baseline harness only.
+
+      - Do NOT change web/src/routes/**/*.svelte or web/src/app.css in this step.
+
+
+      REQUIRED TEST COVERAGE BY FINDING:
+
+      - Shell/Chrome: findings 1-5, including no masthead/tab-nav drift, compact mobile
+      chrome, breakpoint below 1080px.
+
+      - Owner Token Prompt: findings 6-7, terse prompt copy and non-generic bracket/text
+      action treatment.
+
+      - Feed/Search: findings 8-16 and 40-44, including shared feed-item anatomy,
+      metadata age/time, lower-case prefixes, summary fallback, clamps, row rhythm,
+      time groups, narrow search layout, Inspect/Resonate affordances, compact date
+      formatting.
+
+      - Inspector: findings 17-23, including quiet focus, no visible model diagnostics
+      in header, cleaned primary reading body, normal original-link navigation, mobile
+      star near header, calm provenance disclosure.
+
+      - SourceLedger/StatePortability: findings 24-36, including required DOM contract/classes,
+      canonical bracket labels [RUN INGEST]/[FETCH]/[DELETE]/[IMPORT OPML]/[EXPORT
+      STATE]/[IMPORT STATE], no false default import status, URL column, last_fetch/last_ingest
+      labels, hidden file input with no visual artifact, transparent disabled bracket
+      actions, stable action baseline, no settings-like standalone State Portability
+      section.
+
+      - /doctor: findings 37-39, including narrow wrapping/no crop, clean operational
+      surface boundary, readable raw IDs.
+
+      - Styling/tokens: findings 45-47, including no global filled button leakage,
+      accessible but restrained focus, scarce accent use.
+
+      - Preview drift: findings 48-52, represented as contract expectations for the
+      later docs/ui-preview.html cleanup step.
+
+
+      EXPECTED-RED SEMANTICS:
+
+      - Red is expected before implementation.
+
+      - Success for this step means tests expose the gaps and document expected failures
+      without changing product code.
+
+      - Evidence must list expected_failures/exposed_gaps and map them back to findings
+      1-52.
+
+
+      Spec-Fixture Conformance:
+
+      - Fixtures must use exact documented external formats/classes/copy from docs/DESIGN.md
+      and audit sections.
+
+      - Do not rely on convenience-only fixtures that would mask production divergence.'
+    verification: '- Tests/harness cover all findings 1-52 by ID.
+
+      - Modified files are limited to tests/fixtures/helpers/screenshot harness artifacts.
+
+      - Running the focused UI conformance tests before implementation produces expected
+      red failures for current gaps.
+
+      - Evidence includes expected_failures/exposed_gaps and downstream owner steps
+      for each cluster.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/updated: <paths>
+
+      - Production files changed: <must be none>
+
+      - Findings covered: <1-52 checklist>
+
+      - Expected failures / exposed gaps: <paste failure summary mapped to finding
+      IDs>
+
+      - Screenshot states defined: desktop >=1080, narrow/mobile <1080, /doctor narrow,
+      Search narrow, Inspector mobile
+
+      - Downstream implementation owners: <cluster step IDs>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    agent: frontend-engineer
