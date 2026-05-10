@@ -1,1 +1,1 @@
-cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/fixtures/resofeed-e2e-1778415383160-10862.sqlite3
+cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/fixtures/resofeed-e2e-1778415814539-15620.sqlite3
