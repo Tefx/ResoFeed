@@ -25421,7 +25421,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: expected-red-state-matrix-screenshot-tests
     name: Expected-red interaction state matrix screenshot tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25494,6 +25494,8 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T11:44:42.924708+00:00'
   - id: expected-red-inspector-dirty-corpus-tests
     name: Expected-red Inspector hierarchy and dirty content corpus tests
     status: done
