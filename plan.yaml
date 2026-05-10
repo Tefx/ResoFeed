@@ -30796,7 +30796,7 @@ phases:
       final gate. Evidence confirms clean isolated worktree and no product changes.'
   - id: prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     name: Expected-red browser regressions for Inspector PRD fields and preview parity
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -30899,6 +30899,33 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T15:35:46.542608+00:00'
+    done_at: '2026-05-10T15:41:10.321834+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED: Added rendered-browser expected-red regression
+      `web/tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts`; worker
+      commit `fe70dfabb5590b4439d8d9cdae2bd2d2e92d36df`, squash-merged to main as
+      `9a724d9`. refs Read Confirmation present for project instructions, docs/PRD.md,
+      docs/DESIGN.md, and docs/ui-preview.html. Test uses real running ResoFeed UI
+      at `/`, owner-token gate, production-format OPML import, local RSS fixture server,
+      `[RUN INGEST]`, TODAY feed, and clicking a real feed item to open INSPECTOR;
+      no product implementation files modified. Coverage includes PRD Inspect fields
+      (quality assessment, value tier, core insight, dense summary, source/extraction
+      provenance, why-this-appeared, searchable text/topical metadata) and bounded
+      visual/layout parity against docs/ui-preview.html (masthead, top nav, prompt/panel,
+      margins/geometry, star alignment, typography, Inspector hierarchy). Worker verification:
+      after dependency bootstrap, `npm --prefix web run test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe` exited 1 as expected red and captured preview/live
+      screenshots; `npm --prefix web run check` passed. Mainline verification after
+      squash merge: `npm --prefix web run check` passed; `npm --prefix web run test:e2e
+      -- prd-inspector-preview-conformance.expected-red.spec.ts --project=chromium-ci-safe`
+      exited 1 as expected red (`EXPECTED_RED_EXIT=1`). Mainline expected-red exposed
+      intended violations: missing visible Inspector field `质量评估/objective quality
+      assessment`; missing large RESOFEED masthead; masthead scale 0px; missing top
+      `SOURCE LEDGER / DOCTOR / INSPECTOR` nav placement (observed `TODAY SOURCE LEDGER`);
+      desktop panel geometry/margins drift (`x=0,width=1280`). Playwright attached
+      preview baseline and live app screenshots plus violations/artifact paths. Semantic
+      fields: step_intent test_define_red, expected_result red, observed_result red,
+      failure_alignment matches user-reported PRD/UI preview gaps, verdict PASS, blockers
+      [], product implementation files modified no.'
   - id: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
     name: Complete PRD Inspector fields and preview visual parity
     status: pending
