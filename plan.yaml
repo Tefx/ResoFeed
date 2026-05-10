@@ -31193,7 +31193,7 @@ phases:
       after squash merge: `npm --prefix web run check` passed with 0 errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
     name: Screenshot-first UI/UX audit against ui-preview
-    status: claimed
+    status: done
     description: 'step_type: verification
 
 
@@ -31336,6 +31336,32 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T15:54:09.379835+00:00'
+    done_at: '2026-05-10T15:59:32.962028+00:00'
+    evidence: 'Screenshot-first UI/UX audit accepted from uiux-auditor. Audit artifacts
+      committed on branch as `fcc3b9f`, squash-merged to main as `d873183`: `.audit-artifacts/prd-inspector-screenshot-first-uiux-audit.md`
+      and `.audit-artifacts/prd-inspector-side-by-side.png`. refs Read Confirmation
+      present for project instructions, docs/PRD.md, docs/DESIGN.md, docs/ui-preview.html,
+      and PRD preview conformance test. Audit used screenshots/visual artifacts, not
+      code-only review: live screenshot `.test-artifacts/playwright/screenshots/prd-inspector-live-app-expected-red.png`,
+      preview baseline `.test-artifacts/playwright/screenshots/prd-inspector-preview-baseline.png`,
+      generated side-by-side artifact `.audit-artifacts/prd-inspector-side-by-side.png`,
+      Chromium 1280x900 desktop split Inspector state, native screenshot inspection,
+      side-by-side comparison, fresh Playwright layout metrics, visible text assertions.
+      Visual delta table marks PASS for masthead (32px/40px top-left), top nav (`SOURCE
+      LEDGER / DOCTOR / INSPECTOR` top-right), prompt placement (top y=122,h=44),
+      panel/card geometry (x=32,w=1216, Inspector w=480), margins/grid, row/star alignment
+      (44x44), typography hierarchy, and Inspector hierarchy/fields. PRD field visibility
+      audit marks PASS for objective quality assessment, value tier, core insight,
+      dense summary, source/extraction provenance, why-this-appeared, and searchable
+      text. Raw-source regression audit PASS: primary body readable; raw JSON/provenance
+      only in collapsed diagnostics. Behavioral proof register all PASS. Closure fields:
+      headline PASS, verdict PASS, blockers [], gate_open_allowed true, proof_gap_status
+      NONE, blocking_status CLOSED, orchestrator_action_hint COMPLETE. Note: audit
+      reports an extra nav button row versus static preview, but classifies it non-blocking
+      because required top line, prompt placement, shell geometry, Inspector hierarchy,
+      PRD fields, and raw-source regression constraints are satisfied. Mainline final-state
+      verification after squash merge: `npm --prefix web run check` passed with 0
+      errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.final-prd-preview-gate
     name: Final gate for PRD Inspector and preview conformance
     status: pending
