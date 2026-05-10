@@ -25384,7 +25384,7 @@ phases:
     claimed_at: '2026-05-10T11:31:13.769303+00:00'
   - id: expected-red-design-artifact-negative-ux-tests
     name: Expected-red design artifact and negative UX assertion tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25477,6 +25477,81 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:31:00.311120+00:00'
+    done_at: '2026-05-10T11:41:46.313488+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — required screenshot manifest artifacts,
+      negative UX assertions, and nav click active-panel contract.
+
+      - `docs/DESIGN.md` — owner token/first-use state copy, feed row/Resonate state
+      and accessibility rules, Inspector/Source Ledger hierarchy, and forbidden folders/tags/unread/settings/SaaS/onboarding
+      copy.
+
+      - `docs/DESIGN_VISION.md` — anti-slop, no cute errors, no layout shift.
+
+      - `docs/ui-preview.html` — selected feed, Inspector, Ledger, doctor, and mobile
+      visual anchors.
+
+
+      ## Expected-Red Design Artifact / Negative UX Evidence
+
+      - Files changed: `web/tests/e2e/design-artifact-negative-ux.spec.ts` only.
+
+      - Product UI source files modified: NONE.
+
+      - Worktree commit: `61ea60b`; merged to main as squash commit `55e1be4`.
+
+      - Exact worktree command: `cd web && npm run test:e2e -- --grep "design artifact|negative
+      UX|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline verification command: `npm --prefix web run test:e2e -- --grep "design
+      artifact|negative UX|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline result: exit code 1 accepted as expected red; 7 tests run, 4 passed,
+      3 expected-red failures after including previously merged core expected-red
+      tests.
+
+
+      Artifact manifest:
+
+      - Manifest path generated during test: `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/manifest.json`.
+
+      - Named artifacts covered: owner-token, first-use, today-list, source-ledger,
+      selected-item, selected-hover, inspector-clean, inspector-raw-expanded/provenance,
+      llm-error, search, mobile-feed, mobile-inspector.
+
+      - Attachments in mainline failure output include owner-token, first-use, source-ledger,
+      today-list, selected-item, inspector-clean, llm-error, selected-hover, inspector-raw-expanded/provenance,
+      search, mobile-feed, mobile-inspector screenshots plus trace/video/error-context.
+
+
+      Negative UX assertions:
+
+      - Passing test: `negative UX assertions reject raw payload copy and active-panel
+      drift`.
+
+      - Expected failing test: `design artifact manifest captures required ResoFeed
+      UI contract states`.
+
+      - Failure evidence: raw/provenance artifact requires a labelled expandable or
+      expanded secondary disclosure; locator `details, [aria-expanded="true"]` with
+      raw/provenance/diagnostics text was not visible.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — raw/provenance secondary disclosure artifact
+      gap is reproducible; required design artifact generation is installed.
+
+      orchestrator_action_hint: COMPLETE'
   - id: blind-runtime-browser-ux-verification
     name: Blind runtime browser UX verification
     status: pending
