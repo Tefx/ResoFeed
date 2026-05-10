@@ -21682,7 +21682,7 @@ phases:
       proving the required 3-column shape and fixed `[FETCH]`/`x` columns.'
   - id: manual-rss-fetch.row-parity-retest
     name: Focused Source Ledger Row Parity Retest
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -21832,3 +21832,5 @@ phases:
     depends_on:
     - manual-rss-fetch.row-parity-remediation
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-10T08:55:03.272721+00:00'
