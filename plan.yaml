@@ -26352,3 +26352,167 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-10T12:14:11.461093+00:00'
+  - id: fix-blind-dirty-jsonld-inspector
+    name: Fix blind dirty JSON-LD Inspector blocker
+    status: pending
+    description: 'step_type: implementation
+
+      priority: HIGH
+
+      agent_source: project
+
+      verification_scope: local-check
+
+      work_type: defect_repair
+
+
+      Batched implementation fix for ALL blocker-class findings returned by `blind-runtime-browser-ux-verification`
+      after deterministic Playwright verification was green. This step covers the
+      full blocker set from the blind audit; do not split into sibling fixes.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+      - ID: B1
+
+      - Severity: BLOCKER
+
+      - Description: Inspector primary reading area displays dirty raw JSON-LD payload
+      inline in the article body: `{ "@context":"https://schema.org", "@type":"NewsArticle",
+      ... }`.
+
+      - Contract expectation: raw JSON/JSON-LD/extracted metadata/provenance must
+      be demoted/labeled/collapsed/secondary diagnostic material, not primary reading
+      text.
+
+      - Reproduction: Launch app, accept owner token, import `.audit-artifacts/blind-runtime-browser-ux/blind-dirty.opml`,
+      fetch source, click TODAY, open `Readable dirty-content article` in Inspector.
+
+      - Artifacts: `.audit-artifacts/blind-runtime-browser-ux/09-feed-row-selected-inspector.png`;
+      `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`
+      lines 103-128.
+
+      - Blind audit closure fields: `verdict: FAIL`, `blockers: [B1]`, `gate_open_allowed:
+      false`, `orchestrator_action_hint: DO_NOT_COMPLETE`.
+
+
+      ## Required Scope
+
+      - Preserve ResoFeed architecture/design constraints from `AGENTS.md`, `docs/ARCHITECTURE.md`,
+      `docs/DESIGN.md`, and `docs/DESIGN_VISION.md`.
+
+      - Diagnose why deterministic Playwright dirty-corpus tests passed while the
+      blind real-content dirty item still exposed JSON-LD as primary text.
+
+      - Complete a minimal UI/content rendering correction within existing ResoFeed
+      surfaces; do not add forbidden RSS-reader concepts, accounts, sync, vector DB,
+      service layers, or design drift.
+
+      - Expected touch paths: `web/src/routes/components/Inspector.svelte`, dirty-content
+      sanitizer/rendering helpers if already present, and targeted Playwright/browser
+      fixture tests only as needed.
+
+      - Out of scope: product concept expansion, new persistence models, new service
+      layers, API/MCP contract redesign, or changing the owner-token/auth model.
+
+
+      ## Root Cause vs Symptom
+
+      - Root cause to prove: real-runtime imported dirty content contains JSON-LD
+      in a path not covered by the deterministic dirty-corpus fixture or not passed
+      through the same primary-text demotion logic.
+
+      - Symptom: the Inspector primary reading area displays `{ "@context":"https://schema.org",
+      "@type":"NewsArticle", ... }` as article body text.
+
+      - Why this fix must not be surface-level: evidence must identify the missed
+      content path/fixture gap and show the corrected primary reading content varies
+      with readable inputs while raw payloads are demoted/labeled/collapsed.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires BOTH:
+
+      1. Logic correctness: dirty JSON/JSON-LD/provenance detection routes raw payloads
+      away from the primary reading area.
+
+      2. Rendering completeness: the Inspector renders visible readable content and
+      keeps raw/provenance material secondary, labeled, or collapsed.
+
+
+      A component that only changes test data or returns a computed object without
+      visible DOM behavior does NOT satisfy this step. Evidence must include rendered
+      output artifacts.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION fix step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive logic that processes its inputs and
+      produces outputs that vary based on those inputs.
+
+
+      ## Known Risks / Gate Preview (what the gate WILL reject)
+
+      1. Deterministic-test-only repair: gate will reject a change that passes existing
+      Playwright tests but does not replay the blind dirty-content scenario or equivalent
+      real-runtime OPML fixture.
+
+      2. Raw-payload leakage: gate will reject `{ "@context"`, `"@type":"NewsArticle"`,
+      extracted metadata, or provenance displayed as primary reading body text.
+
+      3. Design drift: gate will reject new folders/tags/unread/settings/account/sync/vector/RAG/service-layer
+      concepts or SaaS/AI-magic copy.
+
+      4. Evidence gap: gate will reject no explanation for why the earlier 15/15 deterministic
+      Playwright run missed B1.'
+    verification: '- Main path: blind dirty-content reproduction or equivalent real-runtime
+      OPML fixture no longer shows raw JSON/JSON-LD/provenance as primary Inspector
+      reading text.
+
+      - Failure path: targeted deterministic dirty-corpus/negative-UX test is added
+      or updated so the previously missed real-content path would fail before the
+      fix and passes after the fix.
+
+      - Diagnostic proof: evidence explains why `npm --prefix web run check` and prior
+      targeted Playwright 15/15 passed while B1 remained visible in the blind scenario.
+
+      - Design/architecture proof: no forbidden ResoFeed concepts or architecture
+      drift introduced; raw/provenance content is demoted/labeled/collapsed/secondary
+      diagnostic material.
+
+      - Artifact proof: evidence includes commands/output and screenshot/trace/artifact
+      paths for the fixed Inspector state.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- `AGENTS.md` — key passage or \"NOT READ: <reason>\"\n- `docs/ARCHITECTURE.md`\
+      \ — key passage or \"NOT READ: <reason>\"\n- `docs/DESIGN.md` — key passage\
+      \ or \"NOT READ: <reason>\"\n- `docs/DESIGN_VISION.md` — key passage or \"NOT\
+      \ READ: <reason>\"\n- `docs/ui-preview.html` — key passage or \"NOT READ: <reason>\"\
+      \n- `web/src/routes/components/Inspector.svelte` — key passage or \"NOT READ:\
+      \ <reason>\"\n- `web/src/routes/+page.svelte` — key passage or \"NOT READ: <reason>\"\
+      \n\n## B1 Fix Evidence\n\n**Blocker fixed**: B1 — Inspector primary reading\
+      \ area displayed dirty raw JSON-LD payload inline in article body.\n\n**Root-cause\
+      \ diagnosis**:\n- Why deterministic Playwright dirty-corpus tests passed:\n\
+      - Why blind real-content dirty item still exposed JSON-LD:\n- Missed fixture/path/renderer\
+      \ branch:\n\n**Files changed**:\n```\n<list files and one-line purpose for each>\n\
+      ```\n\n**Commands executed and actual output**:\n```sh\n<npm --prefix web run\
+      \ check and targeted deterministic test command(s), with output>\n```\n\n**Blind\
+      \ reproduction or equivalent real-runtime dirty-content proof**:\n- Scenario\
+      \ source: `.audit-artifacts/blind-runtime-browser-ux/blind-dirty.opml` or equivalent\
+      \ fixture\n- Steps: accept owner token → import dirty OPML → fetch source →\
+      \ TODAY → open `Readable dirty-content article`\n- Before artifact(s): `.audit-artifacts/blind-runtime-browser-ux/09-feed-row-selected-inspector.png`;\
+      \ `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`\
+      \ lines 103-128\n- After artifact paths:\n  - screenshot/trace:\n  - browser\
+      \ log:\n\n**Rendered Inspector result**:\n- Primary reading text shown:\n- Raw\
+      \ JSON/JSON-LD/provenance placement: demoted/labeled/collapsed/secondary diagnostic\
+      \ material\n- Assertion that `{ \"@context\"` / `\"@type\":\"NewsArticle\"`\
+      \ is not primary body text:\n\n**Architecture/design drift check**:\n- Forbidden\
+      \ concepts introduced: none / list and justify\n- Service/storage/auth/sync/vector/RAG\
+      \ drift: none / list and justify\n\n**Closure fields**:\nverdict: PASS | FAIL\n\
+      blockers: []\ngate_open_allowed: true | false\norchestrator_action_hint: COMPLETE\
+      \ | DO_NOT_COMPLETE\n"
+    depends_on:
+    - blind-runtime-browser-ux-verification
+    - playwright-repair-verification
+    agent: frontend-engineer
