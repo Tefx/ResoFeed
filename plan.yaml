@@ -23069,7 +23069,7 @@ phases:
     agent: integration-verifier
   - id: playwright-comprehensive-e2e.api-mcp-parity-probes
     name: Browser-Led API/MCP Parity Probes
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -23176,6 +23176,8 @@ phases:
     - playwright-comprehensive-e2e.core-feed-browser-flows
     - playwright-comprehensive-e2e.llm-deterministic-failure-flows
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T10:14:36.593016+00:00'
   - id: playwright-comprehensive-e2e.visual-ux-artifact-audit
     name: Visual and UX Invariant Audit from Playwright Artifacts
     status: pending
