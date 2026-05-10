@@ -34765,3 +34765,169 @@ phases:
     - fuidcr-screenshot-first-uiux-audit
     - fuidcr-software-architect-conformance-review
     agent: gate-reviewer
+  - id: fuidcr-feed-search-dto-source-fields
+    name: Surface source-backed Feed/Search DTO display fields
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: [integration]
+
+      refs:
+
+      - docs/ARCHITECTURE.md
+
+      - docs/DESIGN.md
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-api-dto-escalation-guard; tier: proof; paths: DTO gap findings
+      9,11,15,16,42,43,44
+
+
+      Complete the narrow, source-backed JSON HTTP DTO additions required before Feed/Search
+      anatomy remediation.
+
+
+      SCOPE / touch_paths:
+
+      - Existing Go JSON HTTP DTO code for GET /api/feed/today and GET /api/search
+      only.
+
+      - Existing Go tests covering feed/search JSON DTO serialization and query behavior.
+
+      - Existing SQLite item fields only: items.first_seen_at and items.feed_excerpt.
+
+
+      REQUIRED BEHAVIOR:
+
+      - GET /api/feed/today item objects expose either first_seen_at or a backend-computed
+      display timestamp fallback when published_at is null, sourced only from items.first_seen_at.
+      This closes guard findings 9,15,16,43.
+
+      - GET /api/search item objects expose either first_seen_at or a backend-computed
+      display timestamp fallback when published_at is null, sourced only from items.first_seen_at.
+      This closes guard findings 43,44.
+
+      - GET /api/feed/today item objects expose either feed_excerpt or a backend-computed
+      display_excerpt fallback when summary/core_insight are null, sourced only from
+      items.feed_excerpt. This closes guard findings 11,42.
+
+      - GET /api/search item objects expose either feed_excerpt or display_excerpt
+      fallback for useful result text when summary/core_insight are null, sourced
+      only from items.feed_excerpt. This closes guard finding 44.
+
+
+      STRICT PRODUCT/ARCHITECTURE GUARDRAILS:
+
+      - Do NOT add new routes, storage tables, auth models, sync, accounts, vector/RAG,
+      admin processes, service/repository/DI/event-bus layers, or any non-item-display
+      product concept.
+
+      - Do NOT change query validation semantics except as directly necessary to include
+      the existing source fields in existing item DTOs.
+
+      - Do NOT invent data. Values must come from existing item columns or be deterministic
+      display fields derived from those columns.
+
+      - Preserve the single Go binary and flat internal/resofeed shape from docs/ARCHITECTURE.md.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. DTO
+      output must vary based on actual item.published_at, item.first_seen_at, summary/core_insight,
+      and item.feed_excerpt values.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Adding any unplanned route, table, auth/sync/account/vector/admin/service
+      layer surface.
+
+      2. Display fallback values not sourced from items.first_seen_at or items.feed_excerpt.
+
+      3. Only Feed or only Search updated; both existing item DTO surfaces must be
+      covered.
+
+      4. Tests that use convenience data only and never cover published_at null or
+      summary/core_insight null fallback cases.'
+    verification: '- Go DTO tests cover GET /api/feed/today item timestamp fallback
+      from items.first_seen_at when published_at is null.
+
+      - Go DTO tests cover GET /api/search item timestamp fallback from items.first_seen_at
+      when published_at is null.
+
+      - Go DTO tests cover Feed and Search excerpt fallback from items.feed_excerpt
+      when summary/core_insight are null.
+
+      - Main path: normal published_at and summary/core_insight DTO behavior remains
+      unchanged.
+
+      - Failure path: null published_at and null summary/core_insight produce source-backed
+      display data instead of blank/unavailable UI-only gaps.
+
+      - Command evidence required: go test ./...'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## DTO Support Evidence
+
+
+      **Fields added or derived**:
+
+      - Feed timestamp fallback: <field name and source expression>
+
+      - Search timestamp fallback: <field name and source expression>
+
+      - Feed excerpt fallback: <field name and source expression>
+
+      - Search excerpt fallback: <field name and source expression>
+
+
+      **Guardrail confirmation**:
+
+      - New routes/tables/auth/sync/accounts/vector/admin/service layers added: NO
+
+      - Existing source columns used only: YES/NO with explanation
+
+
+      **Tests/commands**:
+
+      ```
+
+      <paste go test ./... output and focused test names>
+
+      ```
+
+
+      **Fallback cases proven**:
+
+      - published_at null -> first_seen_at/display timestamp present for Feed: PASS/FAIL
+
+      - published_at null -> first_seen_at/display timestamp present for Search: PASS/FAIL
+
+      - summary/core_insight null -> feed_excerpt/display_excerpt present for Feed:
+      PASS/FAIL
+
+      - summary/core_insight null -> feed_excerpt/display_excerpt present for Search:
+      PASS/FAIL'
+    depends_on:
+    - fuidcr-api-dto-escalation-guard
+    agent: golang-developer
