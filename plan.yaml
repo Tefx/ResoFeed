@@ -23071,7 +23071,7 @@ phases:
     claimed_at: '2026-05-10T10:14:40.494851+00:00'
   - id: playwright-comprehensive-e2e.api-mcp-parity-probes
     name: Browser-Led API/MCP Parity Probes
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -23180,6 +23180,55 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T10:14:36.593016+00:00'
+    done_at: '2026-05-10T10:20:12.731525+00:00'
+    evidence: 'status: SUCCESS
+
+      ## refs Read Confirmation (MANDATORY)
+
+      Read .agents/instructions.md, docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,
+      docs/DESIGN_VISION.md, docs/USAGE.md. AGENTS.md NOT READ: absent in isolated
+      worktree.
+
+
+      ## API/MCP Parity Evidence
+
+      Exact command in worktree: `npm --prefix web run test:e2e -- --grep @parity`
+
+      Final output: build succeeded; 1 @parity Playwright test passed in 3.9s. Initial
+      run failed with missing `playwright`; `npm --prefix web install` repaired missing
+      web deps; rerun passed.
+
+      Shared fixture: server logs `.test-artifacts/playwright/server-logs/server.stdout.log`
+      and `.test-artifacts/playwright/server-logs/server.stderr.log`; DB `.test-artifacts/playwright/fixtures/resofeed-e2e-1778408254174-36775.sqlite3`;
+      results `.test-artifacts/playwright/results/results.json`; HTML report `.test-artifacts/playwright/html-report`.
+
+      Behavioral Proof Register: owner-token boundary PROVEN; feed parity PROVEN;
+      inspect parity PROVEN; resonate parity PROVEN; search/retrieve/feed parity PROVEN;
+      steer parity PROVEN; MCP no special product concepts PROVEN; MCP idempotency
+      negative path PROVEN; report_delivery browser intersection NON_INTERSECTING/non-blocking.
+
+      Closure fields: verdict PASS; blockers []; gate_open_allowed true; orchestrator_action_hint
+      COMPLETE; uncertainty_sources: AGENTS.md absent, DB fixture cleaned but run
+      artifacts remain.
+
+      Test semantic: retest_green expected green observed green; product implementation
+      files modified no.
+
+      Implementation evidence: commit `0346e4bb83803bde98362e20f699eaf8008d4296`;
+      changed `web/tests/e2e/real-server-ui.spec.ts`; untracked `.test-artifacts/`
+      only.
+
+
+      ## Mainline final-state verification
+
+      Merged to main as squash commit `2aad4a3`.
+
+      Command executed in main: `npm --prefix web run test:e2e -- --grep @parity`
+
+      Exit Code: 0
+
+      Actual output summary: build succeeded; Playwright ran 1 @parity test and it
+      passed.'
   - id: playwright-comprehensive-e2e.visual-ux-artifact-audit
     name: Visual and UX Invariant Audit from Playwright Artifacts
     status: pending
