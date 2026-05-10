@@ -36440,7 +36440,7 @@ phases:
       \ with explicit remediation ownership."
   - id: fuidcr-browser-conformance-residual-f7-f13-fix
     name: Fix residual browser conformance blockers F7 and F13
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -36614,3 +36614,131 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T19:12:44.125660+00:00'
+    done_at: '2026-05-10T19:16:52.647023+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — Read. Key insight: Owner Token Prompt requires terse `Enter
+      owner token`, keyboard-reachable submit, no account/login language; Feed rhythm
+      requires 12px top, 11px bottom, 1px separator, metadata/title/summary dense
+      anatomy, and no persistent left nav.
+
+      - docs/ARCHITECTURE.md — Read. Key insight: frontend must render DESIGN.md surfaces,
+      store owner token locally as `resofeed.ownerToken`, no accounts/settings dashboards/vector/RAG
+      surfaces, and Source Ledger remains flat.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read. Key
+      insight: F7 checks owner-token submit textContent is `[SUBMIT]` or `[ENTER]`;
+      F13 checks `[aria-label^="Open Inspector for:"]` row height preserves 24px rhythm.
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte — Read. Key insight: submit
+      affordance rendered `[submit]` with generic `aria-label="submit"`, causing F7.
+
+      - web/src/routes/+page.svelte — Read. Key insight: accepted owner-token flow
+      moves focus to Steer only if active element text was `submit`; needed to preserve
+      focus after bracket label change.
+
+
+      ## Residual F7/F13 Fix Evidence
+
+      **Files changed**:
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte
+
+      - web/src/routes/+page.svelte
+
+      - web/src/app.css
+
+
+      **F7 owner-token prompt proof**:
+
+      - Before: generic/non-bracket `[submit]`.
+
+      - After: submit button renders visible bracket action `[SUBMIT]` using existing
+      `bracket-action` styling; accessible name derives from visible text, and accepted
+      focus transfer recognizes `[SUBMIT]`.
+
+
+      **F13 feed/search rhythm proof**:
+
+      - Before: 60px measured row height.
+
+      - After: restored selector specificity for `.contract-feed-item .contract-feed-title`
+      and `.contract-feed-item .contract-feed-summary`, so metadata-to-title 8px and
+      title-to-summary 4px gaps apply; conformance matrix no longer reports F13 for
+      `[aria-label^="Open Inspector for:"]`.
+
+
+      **Conformance matrix command**:
+
+      Worker:
+
+      - Initial `npm --prefix web run test:e2e -- tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      -g "real app" --project=chromium-ci-safe` failed with exit 127 because Playwright
+      was missing in worktree.
+
+      - `npm --prefix web install` — PASS.
+
+      - Final `npm --prefix web run test:e2e -- tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      -g "real app" --project=chromium-ci-safe` — PASS; 1 test passed; expected-red
+      violations array empty, including no F7/F13.
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      Mainline final-state gate:
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run test:e2e -- tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      -g "real app" --project=chromium-ci-safe` — PASS; 1 test passed.
+
+      - `npm --prefix web run build` — PASS; production build completed.
+
+
+      ## Regression/Guardrail Proof
+
+      - Source Ledger Steer activation preserved: no changes to `submitSteer()` ledger/today
+      routing; no persistent ledger nav added.
+
+      - Forbidden nav absent: no nav, tablist, sidebar, Surfaces nav, or persistent
+      Source Ledger navigation introduced.
+
+      - Backend/API/storage changed: NO.
+
+
+      ## Commit hash(es)
+
+      - Worker branch: b2a0d97 (`fix residual UI conformance blockers`)
+
+      - Main squash commit: fce28d0 (`[vectl] step-fuidcr-browser-conformance-residual-f7-f13-fix
+      completed`)
+
+
+      ## Files changed
+
+      - web/src/app.css
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte
+
+
+      ## Deviations
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md was absent in the
+      isolated worktree.
+
+      - Worker ran `npm --prefix web install` only after verifying Playwright was
+      missing; no dependency files were committed.
+
+
+      ## Gaps/Notes
+
+      Test-generated `.test-artifacts` changes were restored/cleaned before worker
+      commit; mainline still has pre-existing unrelated dirty artifact files outside
+      this step.'
