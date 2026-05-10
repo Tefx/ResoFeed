@@ -24172,3 +24172,12 @@ phases:
 
       - Verification Run: initial command failed until `npm --prefix web ci`; final
       `npm --prefix web run test:e2e` passed with 7 passed, 2 skipped.'
+- id: ui-navigation-hover-inspector-repair
+  name: UI Navigation, Hover, and Inspector Repair
+  status: pending
+  gate: 'Repair user-reported UI regressions after final completion: SOURCE LEDGER
+    clickability, selected/hover feed state clarity, and structured Inspector content
+    must be contract-defined, expected-red tested, implemented, browser-verified,
+    visually audited, and gate-reviewed.'
+  depends_on:
+  - playwright-comprehensive-e2e
