@@ -31973,3 +31973,197 @@ phases:
     depends_on:
     - complete-cli-reset
     agent: blind-tester
+  - id: integration-verification
+    name: Independent integration verification for reset and serve replacement paths
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an INDEPENDENT TESTER (integration-verifier), validate the full DB/CLI/startup
+      interaction from a fresh perspective. Your goal is to find problems, not to
+      confirm it works.
+
+
+      Changed seams require real path evidence:
+
+      - CLI reset seam: invoke `Main` or the built CLI through the documented `owner-token
+      reset` path.
+
+      - SQLite seam: inspect `runtime_metadata` and representative product tables
+      before/after reset.
+
+      - Serve replacement seam: after reset, verify both existing serve startup replacement
+      paths remain authoritative.
+
+
+      Required checks:
+
+      1. Reset against DB with existing owner hash plus other runtime metadata/product
+      state deletes only `owner_token_sha256`.
+
+      2. Missing `--confirm-reset` leaves hash unchanged and exits non-zero with terse
+      error.
+
+      3. Invalid/unopenable DB path exits non-zero and does not create unrelated product
+      state.
+
+      4. Reset output never contains `owner token generated:` or `rfeed_`.
+
+      5. After reset, `serve --db PATH` without `--owner-token` uses existing auto-generation
+      to store a new hash and print plaintext once.
+
+      6. After reset, `serve --db PATH --owner-token TOKEN` stores the SHA-256 hash
+      for TOKEN via existing explicit-token startup path.
+
+      7. No HTTP route, MCP reset tool/resource, Settings/UI reset control, or `serve
+      --reset-owner-token` flag exists.
+
+      8. Browser localStorage clearing remains client-local only and has no path that
+      mutates SQLite.
+
+
+      Behavioral proof register required for gate decision:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      spec_refs: docs/ARCHITECTURE.md lines 69-86, 111-135, 329-359, 1056-1057; docs/USAGE.md
+      lines 118-143; AGENTS.md sections 2, 4; .agents/instructions.md sections 2,
+      4.
+
+      touch_paths: read/verify cmd/resofeed/main.go, internal/resofeed/db.go, internal/resofeed/http.go,
+      internal/resofeed/mcp.go, web source localStorage usage, tests only if adding
+      verifier-owned regression harness.
+
+      harness_refs: Main(args, stdout, stderr), built CLI, SQLite temp DB, occupied-port
+      serve startup pattern.
+
+      agent_source: project'
+    verification: 'phase-check protecting final gate and any downstream release decision:
+
+      - Main path: reset command deletes only `runtime_metadata.owner_token_sha256`.
+
+      - Failure paths: missing confirmation and invalid/unopenable DB path are proven
+      non-mutating.
+
+      - Replacement paths: post-reset generated-token and explicit-token serve startups
+      are both proven through existing serve path.
+
+      - Surface guard: forbidden HTTP/MCP/UI/serve flag surfaces are absent.
+
+      - Behavioral proof register has no unresolved blocker-class obligations except
+      items with explicit non-intersection evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Integration Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: offline reset CLI + SQLite + serve replacement paths
+
+      **Independence Level**: L2
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <actual commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <stdout/stderr/test output>
+
+      ```
+
+
+      ### SQLite Mutation Proof
+
+      - Before reset rows:
+
+      ```
+
+      <query output>
+
+      ```
+
+      - After reset rows:
+
+      ```
+
+      <query output proving only owner_token_sha256 was removed>
+
+      ```
+
+
+      ### Serve Replacement Proof
+
+      - No-owner-token serve after reset output/hash proof:
+
+      - Explicit-token serve after reset output/hash proof:
+
+
+      ### Forbidden Surface Scan
+
+      - HTTP route reset surface:
+
+      - MCP reset tool/resource:
+
+      - Settings/UI reset control:
+
+      - `serve --reset-owner-token` flag:
+
+      - localStorage clearing DB mutation path:
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - complete-cli-reset
+    agent: integration-verifier
