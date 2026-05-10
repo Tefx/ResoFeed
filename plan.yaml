@@ -25409,6 +25409,8 @@ phases:
     - implementation-repair
     - playwright-repair-verification
     - blind-runtime-browser-ux-verification
+    - fix-blind-dirty-jsonld-inspector
+    - retest-blind-dirty-jsonld-inspector
     - visual-ux-audit
     agent: gate-reviewer
   - id: expected-red-hit-target-clickability-tests
