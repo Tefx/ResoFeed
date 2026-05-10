@@ -20568,7 +20568,7 @@ phases:
       preserved outside the remediation commit.'
   - id: verification-retest-after-remediation
     name: Verification Retest After Remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -20778,3 +20778,180 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T08:14:30.523497+00:00'
+    done_at: '2026-05-10T08:21:34.388195+00:00'
+    evidence: '## Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Manual RSS fetch remediation retest for live runtime + spec/design
+      conformance
+
+      **Independence Level**: L2
+
+      **Timestamp**: 2026-05-10T16:18:08Z
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — one Go process serves static UI, JSON HTTP API, MCP,
+      and background ingest; one SQLite DB; source fetch failures isolate to the source;
+      source fetch timeout is 20s.
+
+      - docs/DESIGN.md — Source Ledger is flat, no folders/tags/settings; states include
+      `imported N sources; folders flattened`; status uses terse text labels.
+
+      - docs/ui-preview.html — Source Ledger preview includes `[RUN INGEST]`, `[FETCH]`,
+      `[FETCHING...]`, last ingest/fetch times, `rss_fetch_error`, and `imported 3
+      sources; folders flattened`.
+
+      - docs/PRD.md — source management is Steer + flat ledger; OPML folders ignored/flattened;
+      source failures detected without blocking other sources.
+
+      - internal/resofeed/manual_fetch_contract.go — `ManualFetchResult` is flat with
+      `operation`, `source_id`, counts, and `errors`; conflict returns 409 and no
+      queue/job/receipt.
+
+      - internal/resofeed/http.go — routes `POST /api/ingest` and `POST /api/sources/{id}/fetch`
+      require auth, no query, exact `{}` body.
+
+      - internal/resofeed/ingest.go — `ManualIngest` and `ManualFetchSource` share
+      in-process guard and return source-level errors in flat result.
+
+      - web/src/lib/api-contract.ts — frontend declares flat `ManualFetchResult` and
+      `RunIngestSuccessResponse = ManualFetchResult`.
+
+      - web/src/lib/api-client.ts — `runIngest()` and `fetchSource()` POST `{}` and
+      return 200 flat body or 404/409 envelope.
+
+      - web/src/routes/+page.svelte — runtime handlers consume `result.body.errors`,
+      `result.body.completed`, and refresh source/feed lists without nested envelope
+      access.
+
+      - web/src/routes/components/SourceLedger.svelte — renders bracket controls,
+      disabled busy labels, HH:MM:SS timestamps, terse errors, and fixed import success
+      copy.
+
+      - web/src/test/manual-rss-fetch-fixtures.ts — fixtures intentionally include
+      only flat backend fields and no nested ingest/fetch envelopes.
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: pass
+
+      failure_alignment: n/a
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ### Live Runtime Proof
+
+      - Exact commands included `go test ./internal/resofeed -run ''TestManualRSSFetch''
+      -count=1 -v`, `go test ./...`, `npm ci`, `npm test`, `npm run test:render --
+      manual-rss-fetch`, and a Python harness that built/started `cmd/resofeed`, imported
+      a local slow RSS source, and called authenticated endpoints.
+
+      - `/api/ingest` 200 body: `{"operation":"ingest","source_id":null,"completed":true,"sources_total":1,"sources_fetched":0,"items_discovered":0,"items_upserted":0,"errors":[{"source_id":"src_d80db186a8f29b45d9e4609746a4ed51","code":"rss_fetch_error","message":"rss
+      fetch: status 503"}]}`
+
+      - `/api/sources/{id}/fetch` 200 body: `{"operation":"source_fetch","source_id":"src_d80db186a8f29b45d9e4609746a4ed51","completed":true,"sources_total":1,"sources_fetched":0,"items_discovered":0,"items_upserted":0,"errors":[{"source_id":"src_d80db186a8f29b45d9e4609746a4ed51","code":"rss_fetch_error","message":"rss
+      fetch: status 503"}]}`
+
+      - Concurrent conflict 409 body: `{"error":{"code":"conflict","message":"ingest
+      already running","details":{}}}`
+
+      - Durable queue/job/receipt artifact check: SQLite tables were `agent_receipts`,
+      `item_state`, `items`, `runtime_metadata`, `schema_migrations`, `search_fts*`,
+      `sources`, `steer_rules`; no manual_fetch, queue, or job table exists. `agent_receipts`
+      is pre-existing architecture state, and Go test confirmed zero manual-fetch
+      receipts.
+
+
+      ### Frontend Compatibility Proof
+
+      - Flat payload compatibility evidence: `npm test` passed with svelte-check 0
+      errors/0 warnings and 5 test files, 28 tests passed. `npm run test:render --
+      manual-rss-fetch` passed with 3 test files, 12 tests.
+
+      - Obsolete nested access search: no matches for `.ingest`, `.fetch`, `body.ingest`,
+      `body.source`, or `result.body.(ingest|fetch|source)` in `web/src`.
+
+      - Source Ledger UI update proof: SourceLedger DOM tests prove `[RUN INGEST]`,
+      `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`, disabled busy states, HH:MM:SS
+      timestamps, terse errors, no spinner/progress, and import success copy.
+
+
+      ### Spec/Design Closure Proof
+
+      - B1 closure: PROVEN by live single-binary HTTP runtime proof and Go manual
+      fetch tests.
+
+      - B2 closure: PROVEN by flat contract/client/page consumption, Source Ledger
+      tests, and ui-preview alignment.
+
+      - R9 closure: PROVEN; import success copy is `imported N sources; folders flattened`
+      in implementation, tests, and ui-preview.
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 runtime integration | Real `cmd/resofeed` serves authenticated manual fetch
+      endpoints with flat 200 payloads and 409 overlap conflict | build/start single
+      binary, POST `/api/ingest`, POST `/api/sources/{id}/fetch`, concurrent POST
+      | live harness output + artifact commit 83872b8 | PROVEN | retest | 200 flat
+      bodies and 409 conflict observed |
+
+      | B1 durable-state guard | Manual fetch creates no queue/job/manual receipt
+      persistence | inspect SQLite tables and receipt-specific test | live SQLITE_TABLES;
+      manual fetch shared guard test pass | PROVEN | retest | no manual_fetch/queue/job
+      table; zero manual fetch receipts |
+
+      | B2 frontend contract | Frontend consumes flat `ManualFetchResult` without
+      nested envelope assumptions | client/render tests and nested-access search |
+      `npm test`; `npm run test:render -- manual-rss-fetch`; grep no matches | PROVEN
+      | retest | flat fixtures and page handlers pass |
+
+      | B2 UI/design reference | Source Ledger controls/states align with DESIGN and
+      ui-preview | rendered component tests + required file review | SourceLedger
+      tests; ui-preview lines with controls/copy | PROVEN | retest | strict UI audit
+      can compare unambiguous reference |
+
+      | R9 import success copy | Import success copy fixed or non-intersecting | implementation/test/ui-preview
+      use canonical copy | SourceLedger `imported ${result.imported} sources; folders
+      flattened`; ui-preview `imported 3 sources; folders flattened` | PROVEN | retest
+      | no rediscovery blocker for uiux/gate |
+
+
+      ## Artifact/Commit Evidence
+
+      - Verification artifacts changed: `.audit-artifacts/manual-rss-fetch/remediation-retest/verification-retest-after-remediation.md`
+
+      - Product/code/docs modified: NONE
+
+      - Worker commit: `83872b8 audit: record manual fetch remediation retest`
+
+      - Squash merge commit on main: `51e154a [vectl] step-verification-retest-after-remediation
+      completed`.
+
+      - Mainline final-state verification after merge: `go test ./internal/resofeed
+      -run ''TestManualRSSFetch'' -count=1 && go test ./... && npm --prefix web run
+      test && npm --prefix web run test:render -- manual-rss-fetch` exit 0; output
+      included `ok resofeed/internal/resofeed`, `Test Files 5 passed (5); Tests 28
+      passed (28)`, and `Test Files 3 passed (3); Tests 12 passed (12)`.
+
+      - Gaps/Notes: Initial worker `npm test` failed before `npm ci` because frontend
+      dependencies were absent; after dependency install, frontend checks passed.
+      No blocker remains.'
