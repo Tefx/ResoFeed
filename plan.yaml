@@ -31548,3 +31548,11 @@ phases:
       \ subagent treated as non-blocking for this PRD/UI gate because no security-sensitive\
       \ dependency change was made and all required checks passed.\n- No unresolved\
       \ blocker, should-fix, NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item remains."
+- id: owner-token-offline-reset
+  name: Owner Token Offline Reset
+  status: pending
+  gate: CLI-only offline owner-token reset satisfies docs/ARCHITECTURE.md and docs/USAGE.md
+    without introducing HTTP/MCP/UI reset surfaces or changing serve token replacement
+    semantics.
+  depends_on:
+  - prd-inspector-preview-conformance-remediation
