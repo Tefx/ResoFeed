@@ -13,6 +13,7 @@
       --text: #24231e;
       --muted: #68645b;
       --border: #d7d0c0;
+      --border-dark: #3b3e37;
       --accent: #7a4600;
       --accent-contrast: #fff2d0;
       --focus: #2f6f7e;
@@ -126,7 +127,7 @@
 
     .inspector {
       padding: 32px;
-      background: #fffdf5;
+      background: var(--surface);
     }
 
     .section-label {
@@ -134,18 +135,36 @@
     }
 
     .item {
-      padding: 12px 0 11px 12px;
+      display: grid;
+      grid-template-columns: 3px minmax(0, 1fr);
+      column-gap: 12px;
+      align-items: start;
+      padding: 12px 12px 11px 0;
       margin-bottom: 0;
       border-bottom: 1px solid var(--border);
-      border-left: 3px solid transparent;
+    }
+
+    .item::before {
+      content: "";
+      grid-row: 1 / span 2;
+      width: 3px;
+      align-self: stretch;
+      background: transparent;
     }
 
     .item.selected {
       background: transparent;
       color: var(--text);
-      padding: 12px 0 11px 12px;
       outline: none;
-      border-left-color: var(--focus);
+    }
+
+    .item.selected::before {
+      background: var(--border-dark);
+    }
+
+    .item > .meta-row,
+    .item > .item-head {
+      grid-column: 2;
     }
 
     .item.selected .item-title,
@@ -297,6 +316,21 @@
       line-height: 16px;
     }
 
+    .inspector-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .inspector-meta {
+      margin: 0;
+    }
+
+    .inspector-title {
+      margin-top: 0;
+    }
+
     .secondary-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
@@ -308,7 +342,7 @@
       padding: 24px;
     }
 
-    .ledger h2, .doctor h2 {
+    .doctor h2 {
       font-family: var(--chrome);
       font-size: 14px;
       line-height: 20px;
@@ -317,88 +351,116 @@
       margin-bottom: 16px;
     }
 
-    .ledger-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-
-    .ledger-head h2 { margin-bottom: 0; }
-
-    .manual-fetch-action {
-      appearance: none;
-      min-height: 44px;
-      padding: 0 10px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--focus);
+    .source-ledger {
+      background: var(--surface);
+      color: var(--text);
       font-family: var(--chrome);
-      font-size: 12px;
-      line-height: 16px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
+      font-size: 14px;
+      line-height: 20px;
+      font-variant-numeric: tabular-nums;
     }
 
-    .manual-fetch-action:hover,
-    .manual-fetch-action:focus-visible {
-      background: var(--primary);
-      color: var(--surface);
+    .source-ledger__header {
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto auto;
+      align-items: baseline;
+      gap: 16px;
+      padding: 0 0 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .source-ledger__title {
+      margin: 0;
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .source-ledger__tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .source-ledger__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .source-ledger__row {
+      display: grid;
+      grid-template-columns: 124px minmax(180px, 1fr) 190px minmax(176px, auto);
+      align-items: baseline;
+      gap: 16px;
+      min-height: 44px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .source-ledger__row:last-child { border-bottom: 0; }
+
+    .source-ledger__url,
+    .source-ledger__status {
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-ledger__status--error { color: var(--danger); }
+
+    .source-ledger__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      min-width: 176px;
+      white-space: nowrap;
+    }
+
+    .bracket-action {
+      appearance: none;
+      min-height: 20px;
+      padding: 0.5rem;
+      margin: -0.5rem;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      box-shadow: none;
+      transform: none;
+      transition: none;
+    }
+
+    .bracket-action:hover,
+    .bracket-action:focus {
+      background: var(--text);
+      color: var(--background);
+    }
+
+    .bracket-action:focus-visible {
       outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
 
-    .manual-fetch-action:disabled {
+    .bracket-action[disabled] {
+      background: transparent;
       color: var(--muted);
-      background: var(--surface-active);
       cursor: default;
     }
 
-    .ledger-time,
-    .source-error {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 16px;
-      margin-bottom: 8px;
-    }
-
-    .source-error {
-      color: var(--danger);
-      margin-left: 8px;
-    }
-
-    .ledger-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto 44px;
-      gap: 12px;
-      align-items: center;
-      min-height: 44px;
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-    }
-
-    .delete {
-      appearance: none;
-      width: 44px;
-      height: 44px;
-      display: grid;
-      place-items: center;
-      color: var(--danger);
+    .bracket-action[disabled]:hover,
+    .bracket-action[disabled]:focus {
       background: transparent;
-      border: 0;
-      padding: 0;
-      font-family: var(--chrome);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .text-action {
-      color: var(--focus);
-      margin-right: 18px;
-      font-size: 14px;
-      line-height: 20px;
+      color: var(--muted);
     }
 
     .doctor pre {
@@ -446,7 +508,7 @@
     }
 
     .mobile-feed .item {
-      padding: 12px 0 11px 8px;
+      padding: 12px 12px 11px 0;
     }
 
     .mobile-feed .item-title {
@@ -480,10 +542,21 @@
 
     .mobile-detail h2 {
       font-family: var(--payload);
-      font-size: 24px;
+      font-size: 28px;
       line-height: 32px;
       letter-spacing: -0.02em;
       margin: 8px 0 24px;
+    }
+
+    .mobile-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .star.flush {
+      margin: 0;
     }
 
     .mobile-detail .reading {
@@ -495,7 +568,7 @@
     .mobile-steer {
       border-top: 1px solid var(--border);
       padding: 12px;
-      background: #fffdf5;
+      background: var(--surface);
     }
 
     .mobile-steer .steer { width: 100%; }
@@ -506,6 +579,9 @@
       .feed { border-right: 0; border-bottom: 1px solid var(--border); display: block; }
       .inspector { display: none; } /* Inspector becomes a separate route on narrow screens */
       .secondary-grid { grid-template-columns: 1fr; }
+      .source-ledger__header,
+      .source-ledger__row { grid-template-columns: 1fr; gap: 4px; }
+      .source-ledger__actions { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -525,14 +601,14 @@
       </div>
       <div class="desktop">
         <section class="feed" aria-label="Feed preview">
-          <div class="section-label">Today</div>
+          <div class="section-label">TODAY</div>
 
           <article class="item selected">
             <div class="meta-row">
               <span class="pill">src: simonwillison.net</span>
               <span class="pill">2h</span>
               <span class="pill">full</span>
-              <span class="group-badge">Today</span>
+              <span class="group-badge">TODAY</span>
             </div>
             <div class="item-head">
               <div>
@@ -558,13 +634,13 @@
             </div>
           </article>
 
-          <div class="section-label">Yesterday</div>
+          <div class="section-label">YESTERDAY</div>
           <article class="item">
             <div class="meta-row">
               <span class="pill">src: blog.example</span>
               <span class="pill">1d</span>
               <span class="pill warning">partial</span>
-              <span class="group-badge">Yesterday</span>
+              <span class="group-badge">YESTERDAY</span>
             </div>
             <div class="item-head">
               <div>
@@ -577,14 +653,14 @@
         </section>
 
         <aside class="inspector" aria-label="Inspector preview">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <div class="meta-row" style="margin: 0;">
+          <div class="inspector-top">
+            <div class="meta-row inspector-meta">
               <span class="pill">src: simonwillison.net</span>
               <span class="pill">full</span>
               <span class="pill">original ↗</span>
             </div>
           </div>
-          <h2 style="margin-top: 0px;">Agents are the new shell scripts</h2>
+          <h2 class="inspector-title">Agents are the new shell scripts</h2>
           <div class="rule"></div>
           <p class="reading">The piece compares agent workflows to shell scripts: small automations with explicit inputs, composable outputs, and failure modes that should stay inspectable. It cautions against turning every workflow into a hosted product surface.</p>
           <p class="why">why: fresh from configured source · quality: high · interpretation: source claim, not endorsement</p>
@@ -593,22 +669,51 @@
     </section>
 
     <section class="secondary-grid">
-      <div class="panel ledger">
-        <div class="ledger-head">
-          <h2>Source Ledger</h2>
-          <button type="button" class="manual-fetch-action" aria-label="[RUN INGEST]">[RUN INGEST]</button>
+      <section class="panel ledger source-ledger" aria-labelledby="source-ledger-title">
+        <header class="source-ledger__header">
+          <h2 class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER</h2>
+          <span class="source-ledger__status" aria-live="polite">last_ingest: 14:00:00</span>
+          <button class="bracket-action bracket-action--run-ingest" type="button" aria-label="Run ingest for all sources">[RUN INGEST]</button>
+        </header>
+
+        <div class="source-ledger__tools" aria-label="Ledger actions">
+          <button class="bracket-action" type="button">[IMPORT OPML]</button>
+          <button class="bracket-action" type="button">[EXPORT STATE]</button>
+          <button class="bracket-action" type="button">[IMPORT STATE]</button>
         </div>
-        <p class="ledger-time">last ingest: 10:25:31</p>
-        <div class="ledger-row"><span>simonwillison.net/feed.xml · ok · last fetch: 10:25:31</span><button type="button" class="manual-fetch-action" aria-label="Fetch simonwillison.net">[FETCH]</button><button type="button" class="delete" aria-label="Delete source: simonwillison.net">x</button></div>
-        <div class="ledger-row"><span>hn.algolia.com/rss · ok · last fetch: 10:25:31</span><button type="button" class="manual-fetch-action" aria-label="Fetch hn.algolia.com">[FETCH]</button><button type="button" class="delete" aria-label="Delete source: hn.algolia.com">x</button></div>
-        <div class="ledger-row"><span>blog.example/feed · rss_fetch_error<span class="source-error">err: fetch failed</span></span><button type="button" class="manual-fetch-action" aria-label="Fetching blog.example" disabled>[FETCHING...]</button><button type="button" class="delete" aria-label="Delete source: blog.example">x</button></div>
-        <div style="margin-top:20px">
-          <span class="text-action">import OPML</span>
-          <span class="text-action">imported 3 sources; folders flattened</span>
-          <span class="text-action">export state</span>
-          <span class="text-action">import state</span>
-        </div>
-      </div>
+
+        <ul class="source-ledger__list">
+          <li class="source-ledger__row">
+            <span class="source-ledger__name">src: simonwillison</span>
+            <span class="source-ledger__url">https://simonwillison.net/feed.xml</span>
+            <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
+            <span class="source-ledger__actions">
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Simon Willison">[FETCH]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Simon Willison">[DELETE]</button>
+            </span>
+          </li>
+          <li class="source-ledger__row">
+            <span class="source-ledger__name">src: hn</span>
+            <span class="source-ledger__url">https://hn.algolia.com/rss</span>
+            <span class="source-ledger__status" aria-live="polite">last_fetch: 12:00:11</span>
+            <span class="source-ledger__actions">
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Hacker News" disabled>[FETCHING...]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Hacker News">[DELETE]</button>
+            </span>
+          </li>
+          <li class="source-ledger__row">
+            <span class="source-ledger__name">src: wires</span>
+            <span class="source-ledger__url">https://example.org/wire.xml</span>
+            <span class="source-ledger__status source-ledger__status--error" aria-live="polite">err: timeout</span>
+            <span class="source-ledger__actions">
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Wires">[FETCH]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Wires">[DELETE]</button>
+            </span>
+          </li>
+        </ul>
+
+        <p class="why">active global ingest state: <button class="bracket-action bracket-action--run-ingest" type="button" aria-label="Global ingest currently running" disabled>[INGESTING...]</button></p>
+      </section>
 
       <div class="panel doctor">
         <h2>/doctor</h2>
@@ -622,9 +727,9 @@ extraction_failures: see source rows</pre>
 
     <section class="mobile-wrap">
       <div class="mobile-card" aria-label="Mobile preview">
-        <div class="mobile-header"><span>RESOFEED</span><span>mobile feed</span></div>
+        <div class="mobile-header"><span>RESOFEED</span><span>TODAY</span></div>
         <div class="mobile-feed">
-          <div class="section-label">Today</div>
+          <div class="section-label">TODAY</div>
           <article class="item">
             <div class="meta-row"><span class="pill">src: nytimes.com</span><span class="pill">2h</span><span class="pill">full</span></div>
             <div class="item-head">
@@ -650,18 +755,18 @@ extraction_failures: see source rows</pre>
       </div>
 
       <div class="mobile-card" aria-label="Mobile Inspector preview">
-        <div class="mobile-header"><span>RESOFEED</span><span>mobile inspector</span></div>
+        <div class="mobile-header"><span>RESOFEED</span><span>INSPECTOR</span></div>
         <article class="mobile-detail">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div class="mobile-detail-head">
             <button type="button" class="back-action">← feed</button>
-            <button type="button" class="star" aria-label="Resonate item" style="margin: 0;">☆</button>
+            <button type="button" class="star flush" aria-label="Resonate item">☆</button>
           </div>
           <div class="meta-row">
             <span class="pill">src: nytimes.com</span>
             <span class="pill">full</span>
             <span class="pill">original ↗</span>
           </div>
-          <h2 style="margin-top: 8px;">Main headline here</h2>
+          <h2>Main headline here</h2>
           <div class="rule"></div>
           <p class="reading">Mobile detail restores reading density after the compact feed: larger serif headline, comfortable body line-height, visible provenance, and no extra recommendation chrome.</p>
           <p class="why">why: fresh from configured source · interpretation: source claim</p>
