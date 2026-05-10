@@ -33816,7 +33816,7 @@ phases:
     agent: frontend-engineer
   - id: fuidcr-inspector-reading-contract
     name: Repair Inspector reading and diagnostic boundary
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -33955,6 +33955,94 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:57:40.183482+00:00'
+    done_at: '2026-05-10T18:11:55.791542+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## Summary
+
+      Merged and mainline-verified the Inspector reading/diagnostic boundary repair.
+      The implementation keeps Inspector reading-first, removes primary-path diagnostics/model
+      status, preserves normal original-link behavior, places mobile Resonate action
+      near the top row, and repairs the focused rendering contract failure around
+      exact `partial` extraction text.
+
+
+      ## Commit hash(es)
+
+      - Worker branch: ddd2a89ce35e1d979b504144e10c3e53667e8320 (`fix inspector reading
+      boundary`)
+
+      - Main squash commit: 855cc67 (`[vectl] step-fuidcr-inspector-reading-contract
+      completed`)
+
+
+      ## Files changed
+
+      - web/src/app.css
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - web/vite.config.ts
+
+
+      ## Verification
+
+      Mainline final-state gate after squash merge:
+
+      - `npm --prefix web test` → PASS; svelte-check 0 errors/0 warnings; Vitest 6
+      files / 35 tests passed.
+
+      - `npm --prefix web run build` → PASS; production build completed.
+
+      - `npm --prefix web run test:e2e -- --list` → PASS; Playwright config lists
+      28 e2e tests in 10 files.
+
+      Worker verification also reported:
+
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/rendering-expected-red.test.ts`
+      → PASS; 15 tests passed.
+
+      - Rendered desktop/mobile Inspector evidence generated at `.test-artifacts/playwright/inspector-desktop-reading.png`
+      and `.test-artifacts/playwright/inspector-mobile-reading.png` in the isolated
+      worktree.
+
+      - Original link evidence: `href=https://example.com/render-evidence-article`,
+      `target=_blank`.
+
+      - Mobile placement evidence: Resonate star y=136, heading y=212.
+
+
+      ## Mainline failure disposition
+
+      - `getByText(''partial'')` failure fixed by rendering a dedicated visible `partial`
+      span in the extraction disclosure while preserving calm extraction copy.
+
+      - Playwright-under-Vitest import errors fixed by excluding `tests/e2e/**` from
+      Vitest; Playwright e2e discovery remains intact (`npm --prefix web run test:e2e
+      -- --list` passed).
+
+
+      ## Spec link
+
+      - docs/DESIGN.md
+
+      - AGENTS.md
+
+      - upstream steps: fuidcr-contract-matrix-lock, fuidcr-expected-red-ui-tests,
+      fuidcr-api-dto-escalation-guard
+
+
+      ## Deviations
+
+      none
+
+
+      ## Gaps/Notes
+
+      none'
   - id: fuidcr-source-ledger-state-portability
     name: Repair Source Ledger and State Portability action contracts
     status: claimed
