@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { ItemDetail, ItemSummary, Source, StateBundleV1, SteerRule } from '$lib/api-contract';
+  import type { ImportOpmlResponse, ItemDetail, ItemSummary, Source, StateBundleV1, SteerRule } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -201,9 +201,14 @@
     sources = sources.filter((candidate) => candidate.id !== source.id);
   }
 
-  async function importOpml(opml: string): Promise<void> {
-    await apiClient().importOpml(opml);
+  async function importOpml(opml: string): Promise<ImportOpmlResponse> {
+    const response = await apiClient().importOpml(opml);
     sources = (await apiClient().sources()).sources;
+    return response;
+  }
+
+  function formatManualSourceError(message: string): string {
+    return message.startsWith('err:') ? message : `err: ${message}`;
   }
 
   async function runManualIngest(): Promise<void> {
@@ -213,13 +218,11 @@
       const result = await apiClient().runIngest();
       if (result.ok) {
         const sourceErrors = Object.fromEntries(
-          result.body.ingest.sources
-            .filter((source) => source.message)
-            .map((source) => [source.source_id, source.message as string])
+          result.body.errors.map((sourceError) => [sourceError.source_id, formatManualSourceError(sourceError.message)])
         );
         manualFetchState = {
           ...manualFetchState,
-          lastIngestAt: result.body.ingest.last_ingest_at,
+          lastIngestAt: result.body.completed ? new Date().toISOString() : manualFetchState.lastIngestAt,
           sourceErrors
         };
         await refreshShellLists();
@@ -244,13 +247,13 @@
       if (result.ok) {
         const remainingErrors: Record<string, string> = { ...manualFetchState.sourceErrors };
         delete remainingErrors[source.id];
+        const sourceError = result.body.errors.find((errorEntry) => errorEntry.source_id === source.id);
         manualFetchState = {
           ...manualFetchState,
-          sourceErrors: result.body.fetch.message
-            ? { ...remainingErrors, [source.id]: result.body.fetch.message }
+          sourceErrors: sourceError
+            ? { ...remainingErrors, [source.id]: formatManualSourceError(sourceError.message) }
             : remainingErrors
         };
-        sources = sources.map((candidate) => (candidate.id === source.id ? result.body.source : candidate));
         await refreshShellLists();
         return;
       }

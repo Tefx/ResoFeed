@@ -73,7 +73,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
 
   it('renders RFC3339 ingest and source fetch timestamps as HH:MM:SS', () => {
     renderLedger({
-      manualFetchState: { lastIngestAt: documentedRunIngestSourceError.ingest.last_ingest_at }
+      manualFetchState: { lastIngestAt: '2026-05-09T10:25:31Z' }
     });
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });

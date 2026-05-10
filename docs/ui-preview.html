@@ -317,9 +317,61 @@
       margin-bottom: 16px;
     }
 
+    .ledger-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .ledger-head h2 { margin-bottom: 0; }
+
+    .manual-fetch-action {
+      appearance: none;
+      min-height: 44px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--focus);
+      font-family: var(--chrome);
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .manual-fetch-action:hover,
+    .manual-fetch-action:focus-visible {
+      background: var(--primary);
+      color: var(--surface);
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .manual-fetch-action:disabled {
+      color: var(--muted);
+      background: var(--surface-active);
+      cursor: default;
+    }
+
+    .ledger-time,
+    .source-error {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+      margin-bottom: 8px;
+    }
+
+    .source-error {
+      color: var(--danger);
+      margin-left: 8px;
+    }
+
     .ledger-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 44px;
+      grid-template-columns: minmax(0, 1fr) auto 44px;
       gap: 12px;
       align-items: center;
       min-height: 44px;
@@ -542,12 +594,17 @@
 
     <section class="secondary-grid">
       <div class="panel ledger">
-        <h2>Source Ledger</h2>
-        <div class="ledger-row"><span>simonwillison.net/feed.xml</span><button type="button" class="delete" aria-label="Delete source: simonwillison.net">x</button></div>
-        <div class="ledger-row"><span>hn.algolia.com/rss</span><button type="button" class="delete" aria-label="Delete source: hn.algolia.com">x</button></div>
-        <div class="ledger-row"><span>blog.example/feed</span><button type="button" class="delete" aria-label="Delete source: blog.example">x</button></div>
+        <div class="ledger-head">
+          <h2>Source Ledger</h2>
+          <button type="button" class="manual-fetch-action" aria-label="[RUN INGEST]">[RUN INGEST]</button>
+        </div>
+        <p class="ledger-time">last ingest: 10:25:31</p>
+        <div class="ledger-row"><span>simonwillison.net/feed.xml · ok · last fetch: 10:25:31</span><button type="button" class="manual-fetch-action" aria-label="Fetch simonwillison.net">[FETCH]</button><button type="button" class="delete" aria-label="Delete source: simonwillison.net">x</button></div>
+        <div class="ledger-row"><span>hn.algolia.com/rss · ok · last fetch: 10:25:31</span><button type="button" class="manual-fetch-action" aria-label="Fetch hn.algolia.com">[FETCH]</button><button type="button" class="delete" aria-label="Delete source: hn.algolia.com">x</button></div>
+        <div class="ledger-row"><span>blog.example/feed · rss_fetch_error<span class="source-error">err: fetch failed</span></span><button type="button" class="manual-fetch-action" aria-label="Fetching blog.example" disabled>[FETCHING...]</button><button type="button" class="delete" aria-label="Delete source: blog.example">x</button></div>
         <div style="margin-top:20px">
           <span class="text-action">import OPML</span>
+          <span class="text-action">imported 3 sources; folders flattened</span>
           <span class="text-action">export state</span>
           <span class="text-action">import state</span>
         </div>

@@ -28,39 +28,28 @@ describe('manual RSS fetch acceptance contract lock', () => {
       ok: true,
       status: 200,
       body: {
-        ingest: {
-          last_ingest_at: '2026-05-09T10:25:31Z',
-          status: 'source_errors',
-          sources: [
-            {
-              source_id: 'src_error',
-              last_fetch_at: '2026-05-09T10:25:31Z',
-              status: 'rss_fetch_error',
-              message: 'err: fetch failed'
-            }
-          ]
-        }
+        operation: 'ingest',
+        source_id: null,
+        completed: true,
+        sources_total: 1,
+        sources_fetched: 0,
+        items_discovered: 0,
+        items_upserted: 0,
+        errors: [{ source_id: 'src_error', code: 'rss_fetch_error', message: 'err: fetch failed' }]
       }
     };
     const sourceSuccess: ManualRssFetchApiResult<FetchSourceSuccessResponse> = {
       ok: true,
       status: 200,
       body: {
-        source: {
-          id: 'src_ok',
-          url: 'https://example.com/feed.xml',
-          title: 'Example',
-          last_fetch_at: '2026-05-09T10:25:31Z',
-          last_fetch_status: 'ok',
-          is_active: true,
-          revision: 2
-        },
-        fetch: {
-          source_id: 'src_ok',
-          last_fetch_at: '2026-05-09T10:25:31Z',
-          status: 'ok',
-          message: null
-        }
+        operation: 'source_fetch',
+        source_id: 'src_ok',
+        completed: true,
+        sources_total: 1,
+        sources_fetched: 1,
+        items_discovered: 1,
+        items_upserted: 1,
+        errors: []
       }
     };
     const conflict: ManualRssFetchApiResult<RunIngestSuccessResponse> = {
@@ -74,8 +63,8 @@ describe('manual RSS fetch acceptance contract lock', () => {
       body: { error: { code: 'not_found', message: 'source not found', details: { id: 'src_missing' } } }
     };
 
-    expect(ingestWithSourceError.body.ingest.status).toBe('source_errors');
-    expect(sourceSuccess.body.fetch.status).toBe('ok');
+    expect(ingestWithSourceError.body.errors[0]?.code).toBe('rss_fetch_error');
+    expect(sourceSuccess.body.operation).toBe('source_fetch');
     expect(conflict.body.error.code).toBe('conflict');
     expect(notFound.body.error.code).toBe('not_found');
   });

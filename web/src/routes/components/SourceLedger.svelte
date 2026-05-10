@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Source } from '$lib/api-contract';
+  import type { ImportOpmlResponse, Source } from '$lib/api-contract';
 
   interface Props {
     sources: Source[];
     onDeleteSource: (source: Source) => Promise<void> | void;
-    onImportOpml: (opml: string) => Promise<void> | void;
+    onImportOpml: (opml: string) => Promise<ImportOpmlResponse | void> | ImportOpmlResponse | void;
     onRunIngest?: () => Promise<unknown> | unknown;
     onFetchSource?: (source: Source) => Promise<unknown> | unknown;
     manualFetchState?: {
@@ -53,8 +53,10 @@
     if (!file) return;
     statusText = 'importing OPML';
     try {
-      await onImportOpml(await file.text());
-      statusText = 'imported OPML';
+      const result = await onImportOpml(await file.text());
+      statusText = result
+        ? `imported ${result.imported} sources; folders flattened`
+        : 'imported sources; folders flattened';
       if (importInput) importInput.value = '';
     } catch (error) {
       statusText = error instanceof Error ? error.message : 'err: import failed';

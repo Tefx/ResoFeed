@@ -222,25 +222,26 @@ export interface ManualRssFetchErrorBody {
 
 export type ManualFetchStatus = 'idle' | 'fetching' | 'ok' | 'rss_fetch_error' | 'not_found';
 
-export interface ManualFetchSourceResult {
+export interface ManualFetchSourceError {
   source_id: OpaqueId;
-  last_fetch_at: Rfc3339UtcString | null;
-  status: ManualFetchStatus;
-  message: string | null;
+  code: string;
+  message: string;
 }
 
-export interface RunIngestSuccessResponse {
-  ingest: {
-    last_ingest_at: Rfc3339UtcString;
-    status: 'ok' | 'source_errors';
-    sources: ManualFetchSourceResult[];
-  };
+export interface ManualFetchResult {
+  operation: 'ingest' | 'source_fetch';
+  source_id: OpaqueId | null;
+  completed: boolean;
+  sources_total: number;
+  sources_fetched: number;
+  items_discovered: number;
+  items_upserted: number;
+  errors: ManualFetchSourceError[];
 }
 
-export interface FetchSourceSuccessResponse {
-  source: Source;
-  fetch: ManualFetchSourceResult;
-}
+export type RunIngestSuccessResponse = ManualFetchResult;
+
+export type FetchSourceSuccessResponse = ManualFetchResult;
 
 export type ManualRssFetchApiResult<T> =
   | { ok: true; status: 200; body: T }
