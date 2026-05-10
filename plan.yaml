@@ -25263,7 +25263,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: expected-red-keyboard-a11y-tests
     name: Expected-red keyboard and accessibility activation tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25322,6 +25322,103 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:31:24.076608+00:00'
+    done_at: '2026-05-10T11:44:24.836936+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — requires Tab reachability, focus visibility,
+      Enter/Space activation, active semantic state, labelled landmarks, and per-control
+      role/name/state observables.
+
+      - `docs/DESIGN.md` — owner-token focus, Steer Enter/Escape/live receipt behavior,
+      feed row keyboard opening, `aria-current`/equivalent selection, Resonate 44px
+      target/glyph+label state/Enter/Space toggle, Inspector link reachability, Source
+      Ledger list/delete/import/export keyboard behavior, `/doctor` labelled log output,
+      no layout shift.
+
+      - `docs/ui-preview.html` — selected feed row, star buttons, metadata, Inspector
+      hierarchy, Source Ledger fetch/OPML/state actions, and `/doctor` anchors.
+
+      - `web/src/routes/+page.svelte`, `Feed.svelte`, `Inspector.svelte` — implementation
+      selectors and observables.
+
+
+      ## Expected-Red Keyboard/A11y Evidence
+
+      - Files changed: `web/tests/e2e/keyboard-a11y-helpers.ts`, `web/tests/e2e/keyboard-a11y.expected-red.spec.ts`.
+
+      - Product UI source modified: NONE.
+
+      - Worktree commit: `79bc1fd`; merged to main as squash commit `ba80828`.
+
+      - Worktree command: `cd web && npm run test:e2e -- --grep "keyboard|a11y|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline verification command: `npm --prefix web run test:e2e -- --grep "keyboard|a11y|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline result: exit code 1 accepted as expected red; 10 tests run, 4 passed,
+      6 expected-red failures including this step''s keyboard/a11y failures and prior
+      expected-red failures.
+
+
+      Focus/activation coverage:
+
+      - Primary nav: Tab reaches TODAY/SOURCE LEDGER, Space/Enter activation, active
+      panel mismatch checks, role/ARIA snapshot.
+
+      - Feed row/action controls: focus audit on Open Inspector button, Space activation,
+      Inspector active, row `aria-current` selected.
+
+      - Star/Resonate: 44px target checks, Enter activation, glyph/label state, active-state
+      ARIA/equivalent assertion.
+
+      - Steer submit: labelled textbox, Enter submits `/doctor`, live/log output asserted.
+
+      - Inspector links: original link role/name/href and focus visibility.
+
+      - Source Ledger controls: Source Ledger activation, run ingest, source fetch/delete
+      focus and keyboard activation.
+
+      - OPML import: import input focus/target-size assertion and import status.
+
+      - State portability: export/import state button focus and import file focus
+      handoff.
+
+
+      Expected-red failures exposed:
+
+      - Feed row Open Inspector button focus indicator not detectable.
+
+      - Active Resonate star lacks aria-current/aria-selected/aria-pressed/aria-expanded/data/class
+      equivalent state.
+
+      - Inspector original link href is `about:blank`, not http(s), in fixture path.
+
+      - OPML import keyboard hit box is 1x1 instead of >=44px.
+
+
+      Artifacts:
+
+      - Results manifest `.test-artifacts/playwright/results/results.json`.
+
+      - Attachments: `keyboard-a11y-focus-activation-coverage.json`, role/ARIA snapshots
+      for primary nav, feed row/star, Source Ledger/OPML.
+
+      - Failure screenshots/traces under `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-*/`.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — focus visibility, active state semantics, original-link
+      fixture href, and OPML keyboard hit box issues are reproducible.
+
+      orchestrator_action_hint: COMPLETE'
   - id: expected-red-state-matrix-screenshot-tests
     name: Expected-red interaction state matrix screenshot tests
     status: pending
