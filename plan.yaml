@@ -29054,3 +29054,203 @@ phases:
 
       **Downstream implementation owner**: inspector-readable-content-remediation.clean-inspector-primary-body-implementation'
     agent: frontend-engineer
+  - id: clean-inspector-primary-body-implementation
+    name: Clean Inspector primary body content path
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the implementation within existing ResoFeed surfaces to prevent raw
+      page source / JavaScript / CSS / navigation boilerplate / diagnostics from appearing
+      in the Inspector primary reading body.
+
+
+      UPSTREAM ARTIFACTS (from test step):
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts or web/tests/e2e/inspector-dirty-corpus.spec.ts
+      — screenshot-regression assertions are PROTECTED.
+
+
+      YOUR SCOPE:
+
+      - Fix the existing content extraction/rendering path only; do not redesign the
+      Inspector layout or add new product concepts.
+
+      - Likely touch paths: web/src/routes/components/Inspector.svelte, web/tests/e2e/inspector-readable-content-regression.spec.ts,
+      web/tests/e2e/inspector-dirty-corpus.spec.ts, and only if the real source of
+      contaminated body text is backend shaping, the narrow internal/resofeed feed/item
+      shaping path that supplies the Inspector payload.
+
+      - Ensure Inspector primary body chooses clean summary/excerpt/article text when
+      available, otherwise a controlled fallback such as `summary unavailable`.
+
+      - Ensure provenance, `model_latency_error`, extraction diagnostics, JSON-LD/source
+      text, and raw source garbage are isolated from primary body copy. If diagnostics
+      are displayed, they must be clearly outside the primary reading text.
+
+
+      ARCHITECTURE / DESIGN GUARDRAILS:
+
+      - Preserve the single Go binary + Svelte frontend architecture.
+
+      - Do NOT add a vector DB, embeddings, RAG semantic search, background sidecar,
+      extra service, AI-magic UI copy, onboarding wizard, tags/folders/unread flows,
+      or a broad redesign.
+
+      - Keep the ResoFeed design tone: dense, legible, functional labels; no friendly
+      SaaS copy or trust-palette theatrics.
+
+
+      Failure-mode checklist:
+
+      - Raw JavaScript: `function OptanonWrapper() {}` and sibling script snippets
+      must be stripped or excluded from primary text.
+
+      - Raw CSS: CSS variables/custom properties and `<style>` content must be stripped
+      or excluded from primary text.
+
+      - Navigation boilerplate: menu/header/footer link runs must not dominate primary
+      body.
+
+      - Diagnostic/provenance leak: `model_latency_error` and similar metadata must
+      not render as article body text.
+
+      - Fallback semantics: when no clean text remains, show controlled fallback copy
+      rather than raw source.
+
+      - Regression boundary: preserve prior SOURCE LEDGER clickability, feed row hover/selected
+      state, keyboard/a11y, and existing dirty JSON-LD Inspector protections.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: dirty input is filtered or routed to fallback/diagnostics
+      as specified.
+
+      2. Rendering completeness: the Inspector renders visible, clean primary body
+      content or controlled fallback in the browser.
+
+      Evidence MUST include rendered output proof from the targeted browser test.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. A fix that only hides the exact `function OptanonWrapper() {}` string while
+      leaving other script/style/nav garbage.
+
+      2. A fix that moves diagnostics into visually primary article copy.
+
+      3. A fix that relies on LLM/Gemini success or `model_latency_error` absence
+      instead of deterministic rendering safeguards.
+
+      4. A fix that regresses previous UI repair coverage or violates DESIGN.md tone/layout.'
+    verification: 'Verification scope: local-check protecting inspector-readable-content-remediation.retest-clean-inspector-primary-body
+      and inspector-readable-content-remediation.gate.
+
+      - Targeted Inspector regression test now passes with rendered browser evidence.
+
+      - Exact screenshot-family raw strings (`function OptanonWrapper() {}`, CSS variable
+      text, script/style markers, nav boilerplate, `model_latency_error`) are absent
+      from Inspector primary body.
+
+      - Positive content path is present: clean summary/excerpt/article copy OR controlled
+      fallback copy.
+
+      - Prior UI repair tests remain compatible; no broad redesign or forbidden architecture
+      changes were introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts —
+      key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+
+      **Files changed**:
+
+      - <path>
+
+
+      **Content path fixed**:
+
+      - Source field(s) inspected: <fields>
+
+      - Primary body selection/filter/fallback rule: <rule>
+
+      - Diagnostics/provenance isolation rule: <rule>
+
+
+      **Forbidden strings checked against primary body**:
+
+      - [ ] `function OptanonWrapper()`
+
+      - [ ] CSS variable/custom property text
+
+      - [ ] `<script` / script body text
+
+      - [ ] `<style` / style body text
+
+      - [ ] navigation/menu boilerplate
+
+      - [ ] `model_latency_error`
+
+
+      **Rendered evidence command**:
+
+      ```
+
+      <paste targeted command>
+
+      ```
+
+
+      **Actual output / screenshot artifact path**:
+
+      ```
+
+      <paste output and artifact path>
+
+      ```
+
+
+      **Architecture guardrail confirmation**:
+
+      - No vector DB / embeddings / RAG / extra services: YES
+
+      - No broad redesign or AI-magic UI copy: YES
+
+      - Prior UI repair coverage considered: YES
+
+
+      **Deviation record**:
+
+      - <type, what, why, impact> or NONE'
+    depends_on:
+    - expected-red-inspector-readable-body-regression
+    agent: frontend-engineer
