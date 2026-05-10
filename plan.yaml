@@ -18583,7 +18583,7 @@ phases:
       - none.'
 - id: manual-rss-fetch
   name: Manual RSS Fetch
-  status: in_progress
+  status: done
   gate: Manual RSS fetch backend, frontend, visual compliance, and runtime behavior
     are independently verified before release.
   depends_on:
@@ -19377,7 +19377,7 @@ phases:
     skipped_reason: superseded
   - id: manual-rss-fetch.gate
     name: Gate Manual RSS Fetch
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -19536,6 +19536,162 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T09:01:37.679984+00:00'
+    done_at: '2026-05-10T09:10:39.337761+00:00'
+    evidence: '## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: manual-rss-fetch
+
+      **Timestamp**: 2026-05-10T17:04:00Z
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — lines 11-19 require one Go process, one SQLite DB,
+      thin transports, owner token; lines 169-175 forbid queues/event buses/service
+      layers.
+
+      - docs/DESIGN.md — lines 135-140 define Source Ledger surface tokens; lines
+      183-194 define terse raw/feedback error styling.
+
+      - docs/ui-preview.html — lines 597-604 show Source Ledger `[RUN INGEST]`, `last
+      ingest: HH:MM:SS`, row `[FETCH]`, disabled `[FETCHING...]`, terse `err: fetch
+      failed`.
+
+      - docs/PRD.md — lines 67-78 require utilitarian first-run and no onboarding;
+      lines 97-109 forbid inbox/folders/settings complexity; lines 142-149 include
+      RSS fetch error transparency and no cute loaders.
+
+      - internal/resofeed/manual_fetch_contract.go — lines 4-16 define POST `/api/ingest`
+      and `/api/sources/{id}/fetch`; lines 50-72 define flat `ManualFetchResult`;
+      lines 84-99 define memory-only guard/no queue.
+
+      - .audit-artifacts/manual-rss-fetch/remediation-retest/verification-retest-after-remediation.md
+      — lines 14-23 show build exit 0, real HTTP 200/409 bodies, no queue/job table;
+      lines 34-49 show Go/npm/render pass.
+
+      - .audit-artifacts/manual-rss-fetch/row-parity-retest/retest-report.md — lines
+      7-19 report PASS and B2/R9 closure with row copy/direct children/negative constraints.
+
+      - .audit-artifacts/manual-rss-fetch/row-parity-retest/row-parity-runtime-evidence.json
+      — lines 179-208 and 352-358 show implementation row children and zero spinner/gradient/shadow/animation
+      counts.
+
+      - internal/resofeed/ingest.go — lines 82-123 implement ManualIngest/ManualFetchSource
+      with shared guard; lines 234-258 implement TryLock/release/recover guard.
+
+      - internal/resofeed/http.go — lines 238-292 route manual endpoints; lines 702-715
+      enforce exact `{}` body; lines 649-655 reject query params.
+
+      - web/src/lib/api-client.ts — lines 165-172 expose runIngest/fetchSource; lines
+      225-258 POST `{}` and handle 200/404/409.
+
+      - web/src/routes/+page.svelte — lines 214-278 wire page handlers to api-client
+      and source error state; lines 397-403 pass handlers/state to SourceLedger.
+
+      - web/src/routes/components/SourceLedger.svelte — lines 112-121 render `[RUN
+      INGEST]`/`[INGESTING...]` and last ingest; lines 133-140 render source copy,
+      `[FETCH]`/`[FETCHING...]`, delete.
+
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_decision: OPEN
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ### Remediation Closure Review
+
+      | Blocker | Evidence reviewed | Status | Gate impact |
+
+      | --- | --- | --- | --- |
+
+      | B1 backend/frontend schema | remediation retest lines 18-22; api-contract.ts
+      lines 231-248; api-client.ts lines 225-258 | PROVEN | OPEN |
+
+      | B2 ui-preview/row parity | row-parity retest lines 7-19; runtime evidence
+      lines 179-208, 352-358 | PROVEN | OPEN |
+
+      | R9 import/copy drift | ui-preview lines 602-604; SourceLedger.svelte lines
+      133-140; row-parity retest lines 13-17 | FIXED | OPEN |
+
+
+      ### Gate Evidence Completeness
+
+      - Wiring audit W1-W8: W1 HTTP auth/route PASS; W2 exact body/query validation
+      PASS; W3 backend guard/orchestration ownership PASS; W4 no queue/job/ledger/service
+      expansion PASS; W5 frontend client schema/path PASS; W6 page handler wiring
+      PASS; W7 SourceLedger DOM/copy/state PASS; W8 visual negative constraints PASS.
+
+      - Escape hatch audit: none found in scoped `internal/resofeed`, `cmd`, or `web/src`
+      scans for `@invar:allow|invar:allow`.
+
+      - Smoke/liveness evidence from gate-reviewer: `go test ./internal/resofeed -run
+      ''TestManualRSSFetch'' -count=1 -v` exit 0; `go test ./...` exit 0; `npm test
+      -- --run ...` from web exit 0; `npm run test:render -- --run manual-rss-fetch`
+      from web exit 0; live HTTP smoke via built `cmd/resofeed` exit 0 with `/api/ingest`
+      200 flat result and missing source fetch 404.
+
+      - Blind-tester Mode D liveness proof (orchestrator-required for runnable surfaces):
+      PASS. Public HTTP behavior exercised through runtime/server boundaries only;
+      `go run ./cmd/resofeed --help` and `serve --help` passed; built and started
+      `cmd/resofeed serve`; unauthorized `POST /api/ingest` returned 401; bad query/body
+      returned 400; exact `POST /api/ingest {}` returned 200 flat ManualFetchResult
+      with zero counts/errors; missing source fetch returned 404; OPML import through
+      public HTTP returned 200; `GET /api/sources` produced a source id; exact `POST
+      /api/sources/{id}/fetch {}` returned 200 flat ManualFetchResult; no queue/job/receipt
+      public concept appeared. Blind artifacts committed as `a5eded9 [vectl] blind
+      liveness proof for manual-rss-fetch gate`.
+
+      - Real integration vs fixture distinction: Go httptest tests use in-memory router
+      and local httptest RSS servers; reviewer live smoke built and launched the binary
+      over real HTTP for 200/404; remediation retest records real binary/local RSS
+      proof for 200/409; blind-tester proof separately exercised public HTTP only.
+      Frontend client tests are fixture-injected and treated as contract/unit proof,
+      not runtime proof.
+
+      - UI/UX proof reviewed: row-parity retest provides parseable PASS against docs/ui-preview.html,
+      matching row copy/direct children and preserving negative constraints.
+
+
+      ### Gate Decision Basis
+
+      Requirements 1-6 are satisfied by reviewed code, runtime evidence, row-parity
+      retest, blind liveness proof, and rerun tests. No unresolved DIVERGES/PARTIAL/NEEDS_TEST
+      blocker-class findings were found in manual-rss-fetch audit artifacts. Remaining
+      notes are non-blocking: initial reviewer npm command was run from repo root
+      and failed ENOENT, then corrected from `web/`; an initial live smoke using port
+      0 failed, then corrected with a fixed temp port. Neither indicates product failure.
+
+
+      ## Artifact/Commit Evidence
+
+      - Gate artifacts changed: `.audit-artifacts/manual-rss-fetch/gate/gate-review-report.md`
+
+      - Product/code/docs modified: NONE
+
+      - Gate-reviewer worker commit: `d5e8cd49da0c71b0e3d5f4406fa0f542fd8c11cc`.
+
+      - Blind liveness merge commit: `a5eded9 [vectl] blind liveness proof for manual-rss-fetch
+      gate`.
+
+      - Squash merge commit on main: `4e04215 [vectl] step-manual-rss-fetch.gate completed`.
+
+      - Mainline final-state verification after merge: `go test ./... && npm --prefix
+      web run test && npm --prefix web run build` exit 0; output included `ok resofeed/internal/resofeed`,
+      `svelte-check found 0 errors and 0 warnings`, `Test Files 5 passed (5); Tests
+      29 passed (29)`, and Vite/SvelteKit production build success.
+
+      - Gaps/Notes: no gate blockers; no vectl tools used by reviewer; plan/orchestrator
+      state not modified.'
   - id: backend-contract
     name: Backend Contract Lock
     status: done
