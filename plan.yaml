@@ -37255,7 +37255,7 @@ phases:
       this step.'
   - id: fuidcr-batched-architecture-blocker-remediation
     name: Batched architecture blocker remediation for UI design closure evidence
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -37567,6 +37567,68 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T20:15:06.703807+00:00'
+    done_at: '2026-05-10T20:24:30.858681+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- web/tests/contracts/ui-remediation-contract-matrix.json\
+      \ — Authoritative 1-52 findings matrix; P0/P1 require browser DOM/behavior evidence,\
+      \ and F2 explicitly rejects persistent TODAY/SOURCE LEDGER/doctor/INSPECTOR\
+      \ peer nav.\n- docs/ARCHITECTURE.md — Confirms one Go binary, one SQLite DB,\
+      \ lexical search only, owner-token boundary, no settings/dashboard/sync/vector\
+      \ surfaces.\n- docs/DESIGN.md — Confirms dense analyst workbench UI, no persistent\
+      \ left nav, below 1080px Inspector route, operational labels only, flat Source\
+      \ Ledger, SEARCH/lexical retrieval semantics.\n- docs/ui-preview.html — Preview\
+      \ is canonical token/reference artifact; mobile/narrow preview labels and Source\
+      \ Ledger heading/static styles are checked by F48-F52.\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ — Existing F<n> artifact had semantic drift; updated so F<n> expectations\
+      \ align to matrix finding <n> exactly.\n\n## Batched Architecture Blocker Remediation\
+      \ Evidence\n\n### Closure Register\n- Register path: docs/ui-remediation-closure-register.json\n\
+      - Total rows: 52\n- IDs present: 1-52 exactly once\n- Schema fields present:\
+      \ finding_id, matrix_title, severity, priority, status, evidence_paths, non_intersection_rationale,\
+      \ authority_basis, notes\n- Validation: rows=52 ids_exact=True p0=13 p1=19 missing_evidence=0\
+      \ preview=canonical\n\n### Matrix/Test Alignment\n- Test artifact path(s): web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n\
+      - Proof: expectation titles now match web/tests/contracts/ui-remediation-contract-matrix.json\
+      \ exactly for F1-F52.\n- Explicit F4 check: F4 now checks responsive breakpoint\
+      \ semantics below 1080px, not mobile chrome.\n- Explicit F48-F52 check: preview\
+      \ tests now cover #fffdf5 token drift, mobile Inspector 28px/32px, explanatory\
+      \ mobile labels, feed padding/marker model, and Source Ledger h2 contract.\n\
+      \n### P0/P1 Browser/DOM/Visual Evidence\n- P0 count covered: 13/13\n- P1 count\
+      \ covered: 19/19\n- Artifact root(s): web/test-results/ui-remediation/\n- Commands\
+      \ run and outputs:\n  - Worktree: `npm --prefix web run check` — exit 0; svelte-check\
+      \ found 0 errors and 0 warnings\n  - Worktree: `npm --prefix web run test:render`\
+      \ — exit 0; 6 files passed, 37 tests passed\n  - Worktree: `npm --prefix web\
+      \ run test:e2e -- full-ui-design-conformance.expected-red.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; 2 tests passed\n  - Worktree: closure-register validation — exit\
+      \ 0; rows=52 ids_exact=True p0=13 p1=19 missing_evidence=0 preview=canonical\n\
+      \n### F2 Resolution\n- Resolution path: implementation removal/proof\n- Authority/evidence\
+      \ path: docs/ui-remediation-closure-register.json; web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts;\
+      \ web/test-results/ui-remediation/playwright-results/results.json\n- Result:\
+      \ no nav.surface-nav/tablist/side nav selectors are rendered; surfaces remain\
+      \ command/routed operational surfaces.\n\n### Preview Canonicality\n- Preview\
+      \ parity/static command(s): `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts\
+      \ --project=chromium-ci-safe`\n- F48-F52 evidence paths: docs/ui-preview.html;\
+      \ web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip\n\
+      - Result: canonical\n\n### Contract Deviations\n- test_error, web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts,\
+      \ remapped F<n> expectations/assertions back to exact matrix finding IDs, required\
+      \ because prior artifact drifted from authoritative matrix semantics, impact:\
+      \ restored one-to-one ID closure.\n- test_error, web/src/**/__tests__ and web/src/lib/api-client.test.ts,\
+      \ updated stale accessible names from \"submit\"/\"Search and Retrieval\" to\
+      \ \"[SUBMIT]\"/\"SEARCH\", required by DESIGN.md and matrix F7/F41, impact:\
+      \ render tests now match product contract.\n- contract_gap, docs/ui-preview.html,\
+      \ changed preview-only aria labels from Mobile/Mobile Inspector to Narrow/Narrow\
+      \ detail, required by matrix F50, impact: preview remains canonical without\
+      \ explanatory product-chrome labels.\n\n### Files changed\n- docs/ui-preview.html\n\
+      - docs/ui-remediation-closure-register.json\n- web/src/app.css\n- web/src/lib/api-client.test.ts\n\
+      - web/src/routes/+page.svelte\n- web/src/routes/components/SearchRetrieval.svelte\n\
+      - web/src/routes/components/SourceLedger.svelte\n- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n\
+      - web/test-results/ui-remediation/**\n\n### Mainline Final-State Verification\n\
+      - `npm --prefix web run check` — exit 0; svelte-check found 0 errors and 0 warnings\n\
+      - `npm --prefix web run test:render` — exit 0; 6 files passed, 37 tests passed\n\
+      - `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0; 2 tests passed\n- `python3` closure-register\
+      \ validation — exit 0; `closure register ok: rows=52 ids_exact=True p0=13 p1=19\
+      \ missing_p0p1_evidence=0`\n\n### Commit hash(es)\n- Worktree commit: e82300018ad81e2e4d609db355fd439b1125b7cb\n\
+      - Mainline squash commit: e4a210c [vectl] step-fuidcr-batched-architecture-blocker-remediation\
+      \ completed\n\n### Gaps/Notes\n- none"
   - id: fuidcr-architecture-blocker-retest
     name: Retest architecture blocker closure after batched remediation
     status: pending
