@@ -36088,3 +36088,165 @@ phases:
       - Go tests were not run for this step because Go backend was not touched; prior
       upstream `fuidcr-feed-search-dto-source-fields` evidence cited and mainline-verified
       `go test ./...`.'
+  - id: fuidcr-ledger-reachability-proof-path-fix
+    name: Reconcile Source Ledger reachability and browser proof path
+    status: pending
+    description: "step_type: implementation\nagent_source: default\nrefs:\n- docs/DESIGN.md\n\
+      - docs/ARCHITECTURE.md\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\n\
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n- web/tests/e2e/real-server-ui.spec.ts\n\
+      - web/src/routes/+page.svelte\n- web/src/routes/components/SourceLedger.svelte\n\
+      - web/src/routes/components/StatePortability.svelte\n\nFix ALL blockers from\
+      \ the failed fuidcr-browser-regression-proof run in one batched remediation.\
+      \ This step owns the Source Ledger entrypoint/reachability versus stale-test-contract\
+      \ reconciliation and the downstream proof path that was blocked by that reachability\
+      \ failure.\n\n## Blockers to close\n- B1 / F24-F36 P1: after owner-token acceptance,\
+      \ Source Ledger/import path is unreachable by the current browser proof. Manual\
+      \ evidence showed sourceLedgerButtonCount: 0 and no visible SOURCE LEDGER /\
+      \ [IMPORT OPML] / [FETCH] / [DELETE] controls.\n- B2 / F8-F23 / F40 / F43 /\
+      \ F44 / F45-F47 P1: feed import, live feed rows, Inspector item detail, original\
+      \ link, Inspect/Resonate, populated Search behavior, focus, and responsive evidence\
+      \ are unproven only because the ledger/import path blocks fixture setup.\n\n\
+      ## Required reconciliation decision\nUse docs/DESIGN.md and the prior accepted\
+      \ fuidcr-shell-owner-doctor-surfaces decision as the authority:\n1. Do NOT reintroduce\
+      \ persistent dashboard/tab-style surface navigation, side navigation, or a Surfaces\
+      \ tablist. Finding 2 forbids that persistent navigation drift.\n2. Preserve\
+      \ terse operational labels and canonical Source Ledger / State Portability bracket\
+      \ actions: SOURCE LEDGER, [IMPORT OPML], [RUN INGEST], [FETCH], [DELETE], [EXPORT\
+      \ STATE], [IMPORT STATE].\n3. Reconcile the browser proof path by doing exactly\
+      \ the compliant minimum:\n   - If Source Ledger is already intentionally activated\
+      \ through Steer command language (for example `source ledger`) and users can\
+      \ reach it, update stale Playwright helpers/tests to use that accepted activation\
+      \ contract instead of clicking a persistent SOURCE LEDGER nav button.\n   -\
+      \ If no user-reachable Source Ledger activation exists after owner-token acceptance,\
+      \ add a compliant terse action/command affordance that is not persistent dashboard/tab\
+      \ navigation and does not add forbidden product concepts.\n   - If both are\
+      \ required, update the product reachability seam and then update browser tests/helpers\
+      \ to use the canonical reachability contract.\n\n## Product/UI scope\nTouch\
+      \ only the smallest necessary UI/test seams:\n- web/src/routes/+page.svelte\
+      \ for Source Ledger surface activation/command handling if the accepted route\
+      \ is missing.\n- web/src/routes/components/SourceLedger.svelte and StatePortability.svelte\
+      \ only if canonical bracket actions, accessible labels, or DOM contracts are\
+      \ unreachable or mismatched.\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ and web/tests/e2e/real-server-ui.spec.ts for stale activation helpers and\
+      \ browser proof path.\n- CSS only if keyboard/focus/responsive behavior of the\
+      \ compliant ledger reachability seam is broken.\n\n## Gate Preview (what the\
+      \ gate WILL reject)\n1. Persistent dashboard/tab navigation, left nav, Surfaces\
+      \ nav, or always-visible SOURCE LEDGER nav button reintroduced as the solution.\n\
+      2. A test-only workaround that skips real OPML import or bypasses Source Ledger/State\
+      \ Portability canonical bracket actions.\n3. Browser proof that imports data\
+      \ through API/MCP instead of user-visible UI controls.\n4. Missing proof for\
+      \ [IMPORT OPML], [RUN INGEST], [FETCH], [DELETE], [EXPORT STATE], [IMPORT STATE],\
+      \ source rows, feed rows, Inspector, original link, Inspect/Resonate, populated\
+      \ Search, keyboard/focus, and narrow/mobile behavior.\n5. Lowercase/non-canonical\
+      \ bracket labels or hidden file inputs that are not label-reachable.\n\n## Frontend\
+      \ Completion Criteria (rendering required)\nCompletion requires BOTH:\n1. Logic\
+      \ correctness: the accepted Source Ledger activation path changes the actual\
+      \ active surface and allows fixture import/fetch/ingest.\n2. Rendering completeness:\
+      \ Source Ledger, Source rows/actions, State Portability footer actions, Feed,\
+      \ Inspector, and Search produce visible DOM elements in the real app.\nA component\
+      \ that only updates state without rendered user reachability does NOT satisfy\
+      \ this step.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only or test-only completion is NOT acceptable. Each deliverable\
+      \ MUST contain substantive UI/test contract logic that processes actual user\
+      \ interactions and produces observable rendered output that varies based on\
+      \ real app state."
+    verification: '- Main path: targeted browser proof reaches Source Ledger after
+      owner-token acceptance through the accepted non-persistent activation contract
+      and performs OPML import, [RUN INGEST], per-source [FETCH], source row/action
+      visibility, [DELETE] visibility, [EXPORT STATE], and [IMPORT STATE].
+
+      - Downstream path: imported fixture produces TODAY feed rows, Inspector detail,
+      original link, Inspect/Resonate behavior, populated lexical Search result, and
+      source-backed metadata.
+
+      - Failure path: stale Playwright click on persistent SOURCE LEDGER nav button
+      is removed or replaced with the accepted contract; tests still fail if ledger/import
+      is genuinely unreachable.
+
+      - Responsive/focus path: keyboard focus and narrow/mobile behavior remain compliant;
+      below 1080px Inspector is route/full-screen detail and Source Ledger remains
+      reachable without dashboard/tab nav.
+
+      - Regression proof: no nav[aria-label*="Surfaces"], tablist, persistent left
+      nav, or forbidden dashboard/tab navigation is introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/tests/e2e/real-server-ui.spec.ts — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/components/StatePortability.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Source Ledger Reachability Reconciliation
+
+      - Chosen contract: product fix | stale-test update | both
+
+      - Why this does not reintroduce persistent dashboard/tab navigation:
+
+      - Activation path after owner-token acceptance:
+
+      - Product files changed:
+
+      - Test/helper files changed:
+
+
+      ## Browser Proof Evidence From Implementation Step
+
+      - Exact command(s) run:
+
+      ```text
+
+      <paste command and output>
+
+      ```
+
+      - OPML import path proof:
+
+      - Source rows/actions proof ([IMPORT OPML], [RUN INGEST], [FETCH], [DELETE],
+      [EXPORT STATE], [IMPORT STATE]):
+
+      - Feed/Search/Inspector proof:
+
+      - Original link proof:
+
+      - Inspect/Resonate proof:
+
+      - Keyboard/focus proof:
+
+      - Responsive proof desktop and <1080px:
+
+      - Forbidden nav scan proof:
+
+
+      ## Residual Risk
+
+      - Remaining gaps, if any:
+
+      - Why remaining gaps do or do not intersect fuidcr-browser-regression-proof:'
+    depends_on:
+    - fuidcr-source-ledger-state-portability
+    - fuidcr-shell-owner-doctor-surfaces
+    - fuidcr-feed-search-anatomy
+    - fuidcr-inspector-reading-contract
+    - fuidcr-feed-search-dto-source-fields
+    - fuidcr-feed-search-client-dto-contract
+    - fuidcr-ui-preview-cleanup
+    agent: frontend-engineer
