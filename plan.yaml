@@ -22881,3 +22881,161 @@ phases:
     - playwright-comprehensive-e2e.llm-live-smoke-boundary
     - playwright-comprehensive-e2e.api-mcp-parity-probes
     agent: uiux-auditor
+  - id: playwright-comprehensive-e2e.final-playwright-report
+    name: Final Playwright Runtime Report and Full-Plan E2E Check
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      Independence Level: L1
+
+
+      As an independent runtime verifier, consolidate and, when authorized by the
+      worker execution environment, run the comprehensive Playwright report command
+      against the current app.
+
+
+      Required command family:
+
+      - Backend build/server: `go build ./cmd/resofeed` followed by harness-managed
+      launch of the built binary with temp SQLite DB, owner token, and sanitized env.
+
+      - Browser E2E: `npm --prefix web run test:e2e` or the locked explicit `npx playwright
+      test` command.
+
+      - Live LLM smoke remains separated; default report must include deterministic
+      missing/invalid-key LLM coverage and note live-smoke SKIPPED_NO_KEY/PASS_WITH_REAL_KEY/FAIL
+      disposition separately.
+
+
+      Required report contents:
+
+      - Server stdout/stderr and exact launch command.
+
+      - Playwright traces, screenshots, videos/logs.
+
+      - DB fixture path.
+
+      - Sanitized environment notes.
+
+      - Feed/source operation coverage summary.
+
+      - LLM deterministic failure coverage and live-smoke disposition.
+
+      - API/MCP parity probe proof register summary.
+
+      - UI/UX audit headline.
+
+
+      Disposition path: any missing real server launch, missing browser artifacts,
+      missing feed operation coverage, or missing LLM success/failure/skip disposition
+      blocks the gate and requires remediation before plan completion.'
+    verification: '- Full-plan E2E report protects the final gate and any release/review
+      decision.
+
+      - Evidence includes exact commands, runner output, real server launch proof,
+      browser artifacts, DB fixture path, sanitized env notes, and LLM deterministic/live
+      disposition.
+
+      - `NEEDS_TEST`, `UNPROVEN`, or `UNCERTAIN_BLOCKING` entries in the proof register
+      must have remediation/retest closure paths or explicit non-intersection evidence.
+
+      - Default no-secret CI remains green-capable via deterministic LLM failure/mock
+      paths; live-smoke absence is not a failure when recorded as SKIPPED_NO_KEY.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Playwright Runtime Report
+
+      **Backend build command**:
+
+      ```
+
+      go build ./cmd/resofeed
+
+      ```
+
+
+      **Server launch command**:
+
+      ```
+
+      <paste exact harness-managed command with secrets redacted>
+
+      ```
+
+
+      **Browser E2E command**:
+
+      ```
+
+      npm --prefix web run test:e2e
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste runner output>
+
+      ```
+
+
+      **Artifacts**:
+
+      - Trace(s):
+
+      - Screenshots:
+
+      - Videos/logs:
+
+      - Server stdout/stderr:
+
+      - DB fixture path:
+
+      - Sanitized environment notes:
+
+
+      **Coverage summary**:
+
+      - Feed/source operations:
+
+      - LLM deterministic missing/invalid key:
+
+      - LLM live smoke disposition:
+
+      - API/MCP parity:
+
+      - Visual/UX audit headline:
+
+
+      ## Behavioral Proof Register Summary
+
+      | requirement_ref | behavior_claim | evidence_ref | status | closure_path |
+      gate_decision_basis |
+
+      |---|---|---|---|---|---|'
+    depends_on:
+    - playwright-comprehensive-e2e.core-feed-browser-flows
+    - playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    - playwright-comprehensive-e2e.llm-live-smoke-boundary
+    - playwright-comprehensive-e2e.api-mcp-parity-probes
+    - playwright-comprehensive-e2e.visual-ux-artifact-audit
+    agent: blind-tester
