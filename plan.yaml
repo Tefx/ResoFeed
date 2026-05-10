@@ -31616,3 +31616,121 @@ phases:
       - Confirmation that no deletion/runtime behavior was added in this contract
       step:'
     agent: golang-developer
+  - id: expected-red-tests
+    name: Add expected-red tests for offline reset contract
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add behavior-defining tests before product implementation exists. Red is expected
+      before the reset command is completed; success for this step means the tests
+      expose the missing behavior without modifying product implementation code beyond
+      test fixtures/helpers.
+
+
+      Test-only scope:
+
+      - Add focused Go tests under internal/resofeed, using temporary SQLite DB files
+      and existing migration/test helpers.
+
+      - Do not modify CLI/runtime implementation except contract stubs created by
+      owner-token-offline-reset.contract-lock.
+
+
+      Required expected-red coverage:
+
+      1. A DB containing `runtime_metadata.key=''owner_token_sha256''` plus other
+      runtime metadata/product state: `Main([]string{"owner-token", "reset", "--db",
+      PATH, "--confirm-reset"}, ...)` removes only the owner-token key and leaves
+      other rows/state unchanged.
+
+      2. Omitting `--confirm-reset` returns a terse non-zero CLI error and leaves
+      the hash unchanged.
+
+      3. Invalid/unopenable DB path returns a terse non-zero CLI error and does not
+      create unrelated product state or a new ResoFeed DB in a sentinel path.
+
+      4. Reset stdout/stderr never contains `owner token generated:` or an `rfeed_`
+      replacement token line.
+
+      5. After reset, `serve --db PATH` without `--owner-token` uses the existing
+      startup auto-generation path to store a new hash and print plaintext once; structure
+      this with the current occupied-port pattern from runtime_startup_test.go so
+      startup can exercise token resolution without a long-running server.
+
+      6. After reset, `serve --db PATH --owner-token TOKEN` stores the SHA-256 hash
+      for explicit TOKEN through the existing startup path.
+
+      7. Negative surface assertions prove no HTTP route, MCP reset tool/resource,
+      Settings/UI reset control, or `serve --reset-owner-token` flag is introduced.
+
+      8. Browser `localStorage[''resofeed.ownerToken'']` clearing remains client-local
+      only and has no SQLite mutation path; test with static/source assertions or
+      existing UI harness boundaries, not by adding UI reset behavior.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one CLI fixture MUST use the exact documented command shape: `resofeed
+      owner-token reset --db PATH --confirm-reset`. Do not use convenience aliases
+      or undocumented flags.
+
+
+      spec_refs: docs/ARCHITECTURE.md lines 69-86, 111-135, 329-359, 1056-1057; docs/USAGE.md
+      lines 118-143; AGENTS.md sections 2 and 4; .agents/instructions.md sections
+      2 and 4.
+
+      touch_paths: internal/resofeed/owner_token_reset_expected_red_test.go, internal/resofeed/runtime_startup_test.go,
+      cmd/resofeed/main.go only if contract stubs require compile support
+
+      harness_refs: existing Main(args, stdout, stderr) harness; runtime_startup_test.go
+      occupied-port serve startup pattern; SQLite runtime_metadata migration table.
+
+      agent_source: project'
+    verification: 'local-check protecting implementation and phase gate: expected-red
+      Go tests expose the documented reset gap while product code remains unimplemented;
+      evidence lists expected failures/exposed gaps and confirms changed files are
+      limited to tests plus any prior contract stubs.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files changed:
+
+      - Product files changed, if any (must be contract stubs only):
+
+      - Commands run:
+
+      ```
+
+      <go test command(s)>
+
+      ```
+
+      - Expected failures / exposed gaps:
+
+      - Confirmation at least one fixture uses exact documented CLI format:
+
+      - Downstream implementation owner: owner-token-offline-reset.complete-cli-reset'
+    depends_on:
+    - contract-lock
+    agent: golang-developer
