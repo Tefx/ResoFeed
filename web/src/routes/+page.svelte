@@ -158,6 +158,16 @@
     currentSurface = surface;
   }
 
+  async function showDoctorSurface(): Promise<void> {
+    currentSurface = 'feed';
+    steerFeedback = { kind: 'submitting' };
+    try {
+      steerFeedback = { kind: 'doctor', text: await apiClient().doctor() };
+    } catch (error) {
+      steerFeedback = { kind: 'error', text: error instanceof Error ? error.message : 'err: doctor unavailable' };
+    }
+  }
+
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
@@ -323,6 +333,10 @@
     <OwnerTokenPrompt state={promptState} onAccepted={handleOwnerTokenAccepted} />
   {:else}
     <a class="skip-link" href="#today-feed">skip to feed</a>
+    <header class="shell-masthead">
+      <h1>RESOFEED</h1>
+      <p class="subtitle">SOURCE LEDGER / DOCTOR / INSPECTOR</p>
+    </header>
     <header class="shell-command">
       <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
         <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
@@ -350,6 +364,8 @@
     <nav class="surface-nav" aria-label="Surfaces">
       <button type="button" class:active-surface={currentSurface === 'feed'} aria-current={currentSurface === 'feed' ? 'true' : undefined} onclick={() => showSurface('feed')}>TODAY</button>
       <button type="button" class:active-surface={currentSurface === 'ledger'} aria-current={currentSurface === 'ledger' ? 'true' : undefined} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
+      <button type="button" onclick={() => void showDoctorSurface()}>/doctor</button>
+      <button type="button" class:active-surface={currentSurface === 'inspector'} aria-current={currentSurface === 'inspector' ? 'true' : undefined} onclick={() => showSurface('inspector')}>INSPECTOR</button>
     </nav>
 
     {#if steerFeedback.kind === 'receipt'}

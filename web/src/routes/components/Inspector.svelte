@@ -159,12 +159,48 @@
   }
 
   function summaryText(value: InspectableItem): string | null {
-    return readableText(value.summary);
+    return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null);
   }
 
   function coreInsightText(value: InspectableItem): string | null {
     const coreInsight = readableText(value.core_insight);
-    return coreInsight && coreInsight !== summaryText(value) ? coreInsight : null;
+    if (coreInsight && coreInsight !== summaryText(value)) return coreInsight;
+    return firstSentence(detailText(value));
+  }
+
+  function firstSentence(text: string): string {
+    const sentence = text.match(/^[^.!?]+[.!?]/u)?.[0] ?? text;
+    return sentence.trim();
+  }
+
+  function conciseExcerpt(text: string, maxLength: number): string {
+    if (text.length <= maxLength) return text;
+    const candidate = text.slice(0, maxLength).replace(/\s+\S*$/u, '').trim();
+    return `${candidate || text.slice(0, maxLength).trim()}…`;
+  }
+
+  function denseSummaryText(value: InspectableItem): string {
+    return summaryText(value) ?? conciseExcerpt(detailText(value), 240);
+  }
+
+  function priorityText(value: InspectableItem): string {
+    return value.value_tier ?? (value.extraction_status === 'full' ? 'standard · full source' : 'standard · limited source');
+  }
+
+  function qualityText(value: InspectableItem): string {
+    if (value.extraction_status === 'full') return 'high — complete, attributed, and extracted from a reachable original URL';
+    if (value.extraction_status === 'partial_extraction') return 'partial — excerpt only; verify original';
+    if (value.extraction_status === 'original_unavailable') return 'original unavailable — verify source before relying on summary';
+    return 'summary unavailable — inspect source text directly';
+  }
+
+  function searchableText(value: InspectableItem): string {
+    const topicParts = [value.source_title, value.title, stringOrNull(value.value_tier), detailText(value)].join(' ');
+    return conciseExcerpt(topicParts.replace(/\s+/g, ' ').trim(), 320);
+  }
+
+  function stringOrNull(value: string | null): string {
+    return value ?? '';
   }
 
   function originalHref(value: InspectableItem): string {
@@ -185,6 +221,13 @@
       'provenance' in value ? JSON.stringify(value.provenance, null, 2) : null
     ].filter((chunk): chunk is string => Boolean(chunk));
     return chunks.length > 0 ? chunks.join('\n\n') : 'raw provenance unavailable';
+  }
+
+  function extractionDisclosure(value: InspectableItem): string {
+    if (value.extraction_status === 'partial_extraction') return 'partial: excerpt only';
+    if (value.extraction_status === 'original_unavailable') return 'original unavailable';
+    if (value.extraction_status === 'summary_unavailable') return 'summary unavailable';
+    return 'full';
   }
 
   function keepOriginalLinkInApp(event: FocusEvent): void {
@@ -229,27 +272,24 @@
     <p class="contract-feedback-error" role="alert">{error}</p>
   {/if}
   {#if item}
-    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p class="contract-muted">
-      <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
-      · <span aria-label={`Extraction: ${item.extraction_status}`}>{extractionLabel(item.extraction_status)}</span>
+      <span aria-label={`Source: ${item.source_title}`}>provenance: src: {item.source_title}</span>
+      · <span aria-label={`Extraction: ${item.extraction_status}`}>extraction: {extractionLabel(item.extraction_status)}</span>
       {#if item.value_tier}
         · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
       {/if}
       · <span aria-label={`Model status: ${item.model_status}`}>{item.model_status}</span>
     </p>
+    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p><a href={originalHref(item)} onfocus={keepOriginalLinkInApp} onclick={suppressOriginalNavigation} onmousedown={suppressOriginalNavigation} onkeydown={suppressOriginalNavigationKey} onkeyup={suppressOriginalNavigationKey}>original link</a></p>
-    {#if item.extraction_status === 'partial_extraction'}
-      <p class="contract-warning">partial: excerpt only</p>
-    {/if}
-    {#if summaryText(item)}
-      <p>{summaryText(item)}</p>
-    {/if}
-    {#if coreInsightText(item)}
-      <p>{coreInsightText(item)}</p>
-    {/if}
+    <p class:contract-warning={item.extraction_status !== 'full'}>extraction: {extractionDisclosure(item)}</p>
+    <p><strong>summary:</strong> {denseSummaryText(item)}</p>
+    <p><strong>core insight:</strong> {coreInsightText(item)}</p>
     <p>{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>
+    <p class="contract-muted">priority: {priorityText(item)}</p>
+    <p class="contract-muted">quality: {qualityText(item)}</p>
+    <p class="contract-muted">searchable text: {searchableText(item)}</p>
     {#if item.story_key || item.duplicate_of_item_id}
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}

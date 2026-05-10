@@ -6,6 +6,10 @@
   background: var(--rf-color-background);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -77,9 +81,37 @@ a:focus,
 }
 
 .contract-shell {
+  box-sizing: border-box;
+  width: calc(100% - 64px);
+  max-width: 1216px;
   min-height: 100vh;
+  margin: var(--rf-space-xl) auto;
+  border: 1px solid var(--rf-color-border);
   background: var(--rf-component-app-shell-background-color);
   color: var(--rf-component-app-shell-text-color);
+}
+
+.shell-masthead {
+  display: flex;
+  gap: var(--rf-space-lg);
+  align-items: baseline;
+  justify-content: space-between;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: var(--rf-space-md) var(--rf-space-md) var(--rf-space-md);
+}
+
+.shell-masthead h1 {
+  margin: 0;
+  font: var(--rf-typography-display);
+  letter-spacing: -0.02em;
+}
+
+.shell-masthead .subtitle {
+  margin: 0;
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .contract-region {
@@ -353,10 +385,13 @@ a:focus,
 
 .shell-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 42vw);
-  gap: var(--rf-space-column);
+  grid-template-columns: minmax(0, 1fr) 480px;
+  gap: 0;
   align-items: start;
-  padding-inline: var(--rf-space-xl);
+}
+
+.feed-pane {
+  border-inline-end: 1px solid var(--rf-color-border);
 }
 
 .shell-grid[data-surface='ledger'],
@@ -457,6 +492,8 @@ a:focus,
 }
 
 .contract-resonate {
+  width: 44px;
+  height: 44px;
   min-width: 44px;
   min-height: 44px;
   display: inline-grid;
@@ -519,8 +556,19 @@ a:focus,
 }
 
 @media (max-width: 760px) {
+  .contract-shell {
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    border: 0;
+  }
+
   .resofeed-shell {
     min-height: 100dvh;
+  }
+
+  .shell-masthead {
+    padding: var(--rf-space-md);
   }
 
   .shell-command {
@@ -539,7 +587,10 @@ a:focus,
   .shell-grid {
     grid-template-columns: 1fr;
     gap: 0;
-    padding-inline: var(--rf-space-md);
+  }
+
+  .feed-pane {
+    border-inline-end: 0;
   }
 
   .detail-pane,
