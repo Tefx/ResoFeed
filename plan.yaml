@@ -24174,7 +24174,7 @@ phases:
       `npm --prefix web run test:e2e` passed with 7 passed, 2 skipped.'
 - id: ui-navigation-hover-inspector-repair
   name: UI Navigation, Hover, and Inspector Repair
-  status: in_progress
+  status: done
   gate: 'Repair user-reported UI regressions after final completion: SOURCE LEDGER
     clickability, selected/hover feed state clarity, and structured Inspector content
     must be contract-defined, expected-red tested, implemented, browser-verified,
@@ -28748,7 +28748,7 @@ phases:
       product_implementation_files_modified: false.'
   - id: ui-navigation-hover-inspector-repair.final-gate-keyboard-a11y-remediation
     name: final-gate-keyboard-a11y-remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -28856,3 +28856,19 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T13:20:39.532061+00:00'
+    done_at: '2026-05-10T13:31:44.919619+00:00'
+    evidence: 'Gate evidence accepted from committed artifact `.audit-artifacts/final-gate-keyboard-a11y-remediation.md`
+      in commit ae51249. Final gate semantic closure fields: verdict PASS, headline
+      PASS, blockers [], gate_open_allowed true, proof_gap_status NONE, blocking_status
+      CLOSED, orchestrator_action_hint COMPLETE. refs Read Confirmation present for
+      docs/tests/artifacts; wiring audit W1-W8 present; escape hatch audit present;
+      smoke/liveness evidence present; integration-vs-fixture distinction present;
+      CLI matrix present. Gate report verifies exact targeted command ultimately exited
+      0 after dependency bootstrap: `npm --prefix web ci && npm --prefix web run check
+      && npm --prefix web run test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts
+      inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts`; evidence
+      reports `svelte-check found 0 errors and 0 warnings` and `15 passed (27.0s)`.
+      Orchestrator mainline final-state verification after squash merge: `npm --prefix
+      "web" run check` exited 0 with `svelte-check found 0 errors and 0 warnings`.
+      No blocking semantic signals remain.'
