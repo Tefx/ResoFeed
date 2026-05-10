@@ -30163,17 +30163,20 @@ phases:
   - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     name: residual-uiux-audit-generalized-inspector-primary-body
     status: pending
-    description: 'Focused residual UI/UX audit downstream of `retest-generalized-inspector-primary-body-sanitation`.
+    description: 'Focused residual UI/UX audit downstream of `retest-remove-inspector-screenshot-family-guard-literals`.
 
 
       Context:
 
-      - The previous `uiux-audit-clean-inspector-primary-body` step happened before
-      the residual generalized sanitation implementation and is not downstream of
-      that new change.
+      - `retest-generalized-inspector-primary-body-sanitation` found B1: runtime behavior
+      was green, but static semantic proof failed because exact screenshot-family
+      guard literals remained in `web/src/routes/components/Inspector.svelte`.
 
-      - This audit exists specifically to validate the UI/UX impact of removing fixture-specific
-      guards from the Inspector primary-body sanitation path.
+      - `remove-inspector-screenshot-family-guard-literals` and its retest are now
+      the authoritative residual repair path before this audit.
+
+      - This audit validates the UI/UX impact of replacing exact fixture/screenshot-family
+      guard literals with generalized category/pattern-based sanitation.
 
 
       Audit focus:
@@ -30196,8 +30199,8 @@ phases:
 
       This is a native multimodal UI/UX implementation audit. Evidence must include
       rendered Inspector artifacts (screenshot, DOM capture, or equivalent visual/spatial
-      proof) from the post-retest implementation state, not only unit-test output
-      or code review.'
+      proof) from the post-`retest-remove-inspector-screenshot-family-guard-literals`
+      implementation state, not only unit-test output or code review.'
     verification: '- Rendered Inspector evidence from the residual post-retest state
       is reviewed by `uiux-auditor`.
 
@@ -30215,8 +30218,10 @@ phases:
 
       - Audit produces a parseable PASS/BLOCK handoff and lists any UI/UX blockers
       for gate review.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+    evidence_template: '## UI/UX Audit Report
 
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -30228,42 +30233,34 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Residual UI/UX Audit Report
-
-
-      **Auditor**: uiux-auditor
-
-      **Scope**: Inspector primary-body rendering after generalized sanitation residual
-      fix
-
-
       ### Rendered Evidence
 
-      - Screenshot/DOM capture/visual artifact path(s): <paths or pasted capture summary>
-
-      - View/state exercised: <Inspector state and content fixture/source used>
+      - Screenshot, DOM capture, or equivalent visual/spatial proof from after `retest-remove-inspector-screenshot-family-guard-literals`.
 
 
-      ### Design Conformance
+      ### Audit Findings
 
-      - Primary-body legibility: PASS | BLOCK — <notes>
+      - Inspector primary-body legibility: PASS/BLOCK
 
-      - Metadata/provenance separation: PASS | BLOCK — <notes>
+      - Metadata/provenance separation: PASS/BLOCK
 
-      - Raw source garbage absent: PASS | BLOCK — <notes>
+      - Raw source garbage exclusion: PASS/BLOCK
 
-      - No product/design invention: PASS | BLOCK — <notes>
+      - Screenshot-family forbidden strings absent from rendered primary body: PASS/BLOCK
+
+      - Product/design invention absent: PASS/BLOCK
 
 
       ### Handoff
 
       Headline: PASS | BLOCK
 
-      Blocking findings: <none or list with reproduction and affected requirement>
-
-      '
+      Blockers, if any: <list>'
+    refs:
+    - docs/DESIGN.md
+    - docs/ARCHITECTURE.md
     depends_on:
-    - retest-generalized-inspector-primary-body-sanitation
+    - retest-remove-inspector-screenshot-family-guard-literals
     agent: uiux-auditor
   - id: remove-inspector-screenshot-family-guard-literals
     name: Remove Inspector screenshot-family guard literals
