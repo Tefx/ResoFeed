@@ -25,45 +25,53 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// Main is the CLI handoff for the single Go binary. It must recognize only the
-// `serve` command and must not add migrate, worker, doctor, admin, or sync
-// processes.
+// Main is the CLI handoff for the single Go binary. It recognizes the runtime
+// `serve` command plus the documented offline owner-token reset grammar. It
+// must not add migrate, worker, doctor, admin, or sync processes.
 func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
 		printRootHelp(stdout)
 		return 0
 	}
-	if args[0] != "serve" {
+	switch args[0] {
+	case "serve":
+		cfg, exitCode, ok := parseServeFlags(args[1:], stdout, stderr)
+		if !ok {
+			return exitCode
+		}
+		if cfg.PublicURL == "" {
+			publicURL, err := derivePublicURL(cfg.Addr)
+			if err != nil {
+				_, _ = io.WriteString(stderr, "err: invalid_addr: expected HOST:PORT\n")
+				return 2
+			}
+			cfg.PublicURL = publicURL
+		}
+		if err := validateServeConfigBeforeSecret(cfg); err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+			return 2
+		}
+		openRouterKey, err := ResolveOpenRouterRuntimeSecret()
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+			return 2
+		}
+		cfg.OpenRouterKey = openRouterKey
+		if err := validateServeConfig(cfg); err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+			return 2
+		}
+		return runServe(cfg, stdout, stderr)
+	case "owner-token":
+		cfg, exitCode, ok := parseOwnerTokenResetFlags(args[1:], stdout, stderr)
+		if !ok {
+			return exitCode
+		}
+		return runOwnerTokenResetContractStub(cfg, stderr)
+	default:
 		_, _ = fmt.Fprintf(stderr, "err: unknown_command: %s\n", args[0])
 		return 2
 	}
-	cfg, exitCode, ok := parseServeFlags(args[1:], stdout, stderr)
-	if !ok {
-		return exitCode
-	}
-	if cfg.PublicURL == "" {
-		publicURL, err := derivePublicURL(cfg.Addr)
-		if err != nil {
-			_, _ = io.WriteString(stderr, "err: invalid_addr: expected HOST:PORT\n")
-			return 2
-		}
-		cfg.PublicURL = publicURL
-	}
-	if err := validateServeConfigBeforeSecret(cfg); err != nil {
-		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
-		return 2
-	}
-	openRouterKey, err := ResolveOpenRouterRuntimeSecret()
-	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
-		return 2
-	}
-	cfg.OpenRouterKey = openRouterKey
-	if err := validateServeConfig(cfg); err != nil {
-		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
-		return 2
-	}
-	return runServe(cfg, stdout, stderr)
 }
 
 func printRootHelp(w io.Writer) {
@@ -71,9 +79,73 @@ func printRootHelp(w io.Writer) {
 
 Commands:
   serve    Start web UI, JSON HTTP API, MCP endpoint, SQLite, and background ingest.
+  owner-token reset --db PATH --confirm-reset
+           Offline contract stub for deleting only the stored owner-token hash.
 
-Run "resofeed serve --help" for serve flags.
+Run "resofeed serve --help" or "resofeed owner-token reset --help" for flags.
 `)
+}
+
+// OwnerTokenResetConfig pins the offline CLI grammar for the downstream reset
+// implementation. The contract allows deleting only runtime_metadata key
+// owner_token_sha256 from the selected offline SQLite DB; this step intentionally
+// does not implement that deletion or any replacement-token behavior.
+type OwnerTokenResetConfig struct {
+	DBPath       string
+	ConfirmReset bool
+}
+
+func parseOwnerTokenResetFlags(args []string, stdout io.Writer, stderr io.Writer) (OwnerTokenResetConfig, int, bool) {
+	if len(args) == 0 || args[0] != "reset" {
+		_, _ = io.WriteString(stderr, "err: unknown_command: expected owner-token reset\n")
+		return OwnerTokenResetConfig{}, 2, false
+	}
+	cfg := OwnerTokenResetConfig{}
+	fs := flag.NewFlagSet("owner-token reset", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	fs.StringVar(&cfg.DBPath, "db", "", "required offline SQLite database path")
+	fs.BoolVar(&cfg.ConfirmReset, "confirm-reset", false, "required confirmation for deleting only owner_token_sha256")
+	fs.Usage = func() {
+		_, _ = io.WriteString(stdout, `Usage: resofeed owner-token reset --db PATH --confirm-reset
+
+Pins the documented offline owner-token reset contract. The eventual command
+deletes only runtime_metadata.key='owner_token_sha256' while serve is stopped.
+
+It must not start serve, bind HTTP/MCP, run UI, generate, print, accept, or
+store a replacement plaintext token. Replacement token setup remains solely in
+the existing serve startup paths.
+
+Flags:
+`)
+		fs.SetOutput(stdout)
+		fs.PrintDefaults()
+		fs.SetOutput(stderr)
+	}
+	if err := fs.Parse(args[1:]); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return OwnerTokenResetConfig{}, 0, false
+		}
+		return OwnerTokenResetConfig{}, 2, false
+	}
+	if fs.NArg() != 0 {
+		_, _ = fmt.Fprintf(stderr, "err: unexpected_argument: %s\n", fs.Arg(0))
+		return OwnerTokenResetConfig{}, 2, false
+	}
+	if cfg.DBPath == "" {
+		_, _ = io.WriteString(stderr, "err: invalid_owner_token_reset: --db is required\n")
+		return OwnerTokenResetConfig{}, 2, false
+	}
+	if !cfg.ConfirmReset {
+		_, _ = io.WriteString(stderr, "err: invalid_owner_token_reset: --confirm-reset is required\n")
+		return OwnerTokenResetConfig{}, 2, false
+	}
+	return cfg, 0, true
+}
+
+func runOwnerTokenResetContractStub(cfg OwnerTokenResetConfig, stderr io.Writer) int {
+	_ = cfg
+	_, _ = io.WriteString(stderr, "err: owner_token_reset_not_implemented: contract stub only; no database changes made\n")
+	return 1
 }
 
 func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeConfig, int, bool) {
