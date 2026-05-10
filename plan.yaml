@@ -31863,7 +31863,7 @@ phases:
       \ not modified, and the red failures match the declared pre-implementation gap."
   - id: complete-cli-reset
     name: Complete CLI-only offline reset implementation
-    status: pending
+    status: claimed
     description: "step_type: implementation\n\nFill in stub bodies and command dispatch\
       \ in the existing single-binary CLI path per the contract from owner-token-offline-reset.contract-lock\
       \ and tests from owner-token-offline-reset.expected-red-tests.\n\nUPSTREAM ARTIFACTS\
@@ -31986,6 +31986,8 @@ phases:
     - contract-lock
     - expected-red-tests
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-10T17:35:46.763345+00:00'
   - id: cli-liveness-probe
     name: Black-box CLI liveness probe for reset command
     status: pending
