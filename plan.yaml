@@ -29078,7 +29078,7 @@ phases:
       step.'
   - id: clean-inspector-primary-body-implementation
     name: Clean Inspector primary body content path
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -29278,6 +29278,28 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T14:12:34.753527+00:00'
+    done_at: '2026-05-10T14:22:39.691578+00:00'
+    evidence: 'Implementation evidence accepted from frontend-engineer. Files changed:
+      `internal/resofeed/ingest.go`, `web/src/routes/+page.svelte`, `web/src/routes/components/Inspector.svelte`;
+      worker commit `841dc87`, squash-merged to main as `d592339`. Refs confirmation
+      present for docs/DESIGN.md, docs/ARCHITECTURE.md, Inspector.svelte, inspector-readable-content
+      regression test, inspector-dirty-corpus, ui-navigation-hover-inspector-repair
+      test, and project instructions. Content path fixed: backend HTML text extraction
+      and frontend primary body selection now clean dirty source content; primary
+      body preference uses cleaned extracted/feed/summary/core text or controlled
+      fallback `summary unavailable`; diagnostics/provenance remain in collapsed raw
+      diagnostics rather than primary copy. Forbidden screenshot-family strings checked
+      absent from primary body: `function OptanonWrapper()`, CSS custom-property text,
+      `<script`/script body, navigation/menu boilerplate, and `model_latency_error`.
+      No deviation records. Worker verification: `npm --prefix web run check` exit
+      0; `go test ./internal/resofeed` exit 0; targeted Playwright command covering
+      inspector-readable-content-regression, inspector-dirty-corpus, and ui-navigation-hover-inspector-repair
+      exited 0 with 7 passed. Mainline final-state verification after squash merge:
+      `npm --prefix web run check` passed with 0 errors/warnings; `npm --prefix web
+      run build` passed; `go test ./internal/resofeed` passed; `npm --prefix web exec
+      playwright test -- --config web/playwright.config.ts web/tests/e2e/inspector-readable-content-regression.spec.ts
+      web/tests/e2e/inspector-dirty-corpus.spec.ts web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      --project chromium-ci-safe` passed with 7/7 tests.'
   - id: retest-clean-inspector-primary-body
     name: Retest clean Inspector primary body regression
     status: pending
