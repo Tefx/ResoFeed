@@ -20228,7 +20228,7 @@ phases:
       after verifying `web/node_modules` missing; no package files changed.'
   - id: remediate-verifier-blockers
     name: Remediate Manual Fetch Verification Blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -20443,6 +20443,129 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T08:03:59.374486+00:00'
+    done_at: '2026-05-10T08:13:57.377215+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — one Go binary, one SQLite DB, flat `internal/resofeed`
+      boundaries; no sidecar/admin/sync processes or queues.
+
+      - docs/DESIGN.md — Source Ledger is flat, terse, dense; states require `imported
+      N sources; folders flattened`, square controls, raw text loading/errors, no
+      spinners/shadows/friendly copy.
+
+      - docs/ui-preview.html — Source Ledger preview was stale: only OPML/export/import/delete
+      rows, no `[RUN INGEST]` or `[FETCH]` controls/states.
+
+      - docs/PRD.md — source failures must not block other sources; source management
+      is Steer + flat Ledger; OPML folders flatten; no folders/tags/settings.
+
+      - internal/resofeed/manual_fetch_contract.go — authoritative flat `ManualFetchResult`
+      fields: `operation`, `source_id`, `completed`, counts, `errors`; source failures
+      remain 200 source-level errors.
+
+      - web/src/lib/api-contract.ts — frontend had nested `ingest`, `source`, and
+      `fetch` success response types; corrected to flat `ManualFetchResult`.
+
+      - web/src/lib/api-client.ts — client POSTs `{}` to `/api/ingest` and `/api/sources/{id}/fetch`;
+      generic parsing already preserves 200 body, now typed flat.
+
+      - web/src/routes/+page.svelte — runtime handlers dereferenced obsolete `result.body.ingest`,
+      `result.body.fetch`, and `result.body.source`; corrected to flat `errors` and
+      refresh source lists after fetch.
+
+      - web/src/routes/components/SourceLedger.svelte — manual controls existed with
+      bracket labels, HH:MM:SS formatting, disabled active states; import success
+      copy was `imported OPML`.
+
+      - web/src/lib/manual-rss-fetch-client.expected-red.test.ts — client tests assert
+      POST shape and preserve fixture body; fixtures updated flat contract-faithfully.
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      — rendering tests protect bracket controls, disabled active state, HH:MM:SS,
+      no spinner/friendly copy.
+
+
+      ## Batched Remediation Evidence
+
+      **B1 backend/frontend schema divergence**:
+
+      - Chosen authoritative success schema: flat `ManualFetchResult` from `internal/resofeed/manual_fetch_contract.go`.
+
+      - Contract-preserving deviation record: contract_error/test_error — `web/src/lib/api-contract.ts`,
+      `web/src/test/manual-rss-fetch-fixtures.ts`, and manual fetch tests had stale
+      nested success envelopes. Changed minimally to flat backend fields; impact:
+      frontend runtime/tests now consume actual 200 payload shape for both endpoints.
+
+      - Obsolete nested access search results for `body.ingest`, `body.fetch`, `body.source`:
+      worker reported none remains; mainline verification also ran `git grep -n "body\.\(ingest\|fetch\|source\)"
+      HEAD -- web/src` and treated any match as failure; no matches found.
+
+      - Frontend tests using live/contract-faithful flat payloads: `manual-rss-fetch-client.expected-red.test.ts`,
+      `manual-rss-fetch-contract.test.ts`, `manual-rss-fetch-source-ledger.expected-red.test.ts`;
+      targeted run passed 3 files / 12 tests.
+
+
+      **B2 ui-preview design-reference drift**:
+
+      - Authoritative visual source after fix: `docs/DESIGN.md` Source Ledger constraints
+      plus implementation’s existing bracket manual fetch controls.
+
+      - docs/ui-preview.html updated: preview now shows `[RUN INGEST]`, `[FETCH]`,
+      disabled `[FETCHING...]`, `last ingest: HH:MM:SS`, `last fetch: HH:MM:SS`, and
+      terse source error text in committed remediation.
+
+      - UI/UX audit ambiguity removed: committed preview and implementation now agree
+      on manual fetch controls/states without spinners, shadows, rounded SaaS styling,
+      or layout-shifting diagnostics.
+
+
+      **R9 import copy disposition**:
+
+      - Corrected: `SourceLedger.svelte` now renders `imported N sources; folders
+      flattened` when `ImportOpmlResponse` is returned, with fallback `imported sources;
+      folders flattened`.
+
+
+      ## Verification
+
+      - Worker commands: `npm ci` exit 0; `npm run test:render -- manual-rss-fetch`
+      exit 0 (3 files passed, 12 tests passed); `npm run check` exit 0; `npm run test`
+      exit 0 (5 files passed, 28 tests passed); targeted searches found no obsolete
+      nested dereferences.
+
+      - Conflict-resolution merge: initial squash merge was blocked by pre-existing
+      local `docs/ui-preview.html` edits. `conflict-resolver` integrated branch `vectl/step-remediate-verifier-blockers`
+      into main as commit `172a0ba6ebcf14c598e76e47e191cfc2f059951b`, preserving/restoring
+      pre-existing dirty worktree edits outside the remediation commit.
+
+      - Mainline final-state verification after resolver commit: `npm --prefix web
+      run check && npm --prefix web run test:render -- manual-rss-fetch && npm --prefix
+      web run test` exit 0; output included `svelte-check found 0 errors and 0 warnings`,
+      `Test Files 3 passed (3); Tests 12 passed (12)`, and `Test Files 5 passed (5);
+      Tests 28 passed (28)`. Also verified HEAD has no obsolete nested dereferences
+      and committed `docs/ui-preview.html` contains `[RUN INGEST]`.
+
+      - Files changed in remediation commit: `docs/ui-preview.html`; `web/src/lib/api-contract.ts`;
+      `web/src/lib/manual-rss-fetch-contract.test.ts`; `web/src/routes/+page.svelte`;
+      `web/src/routes/components/SourceLedger.svelte`; `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`;
+      `web/src/test/manual-rss-fetch-fixtures.ts`.
+
+      - Product/code/docs modified: same as files changed.
+
+      - Forbidden durable queue/job/ledger/sync artifacts introduced: NONE.
+
+      - Deviation records: contract_error (frontend manual RSS fetch success contract
+      was nested while backend contract is flat); test_error (protected manual RSS
+      fetch fixtures/tests encoded stale nested envelope).
+
+      - Worker commit: `375bc8aae05a62e855741e171dde950d13e67648`.
+
+      - Main merge/resolution commit: `172a0ba6ebcf14c598e76e47e191cfc2f059951b`.
+
+      - Gaps/Notes: Browser visual inspection was not run; Svelte render tests and
+      committed `docs/ui-preview.html` alignment cover requested manual fetch UI states.
+      The main worktree remains dirty with pre-existing unrelated edits intentionally
+      preserved outside the remediation commit.'
   - id: verification-retest-after-remediation
     name: Verification Retest After Remediation
     status: pending
