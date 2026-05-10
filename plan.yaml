@@ -24425,7 +24425,7 @@ phases:
       by the subagent.'
   - id: expected-red-browser-tests
     name: Expected-red core UI regression browser tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -24504,6 +24504,8 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T11:30:52.293636+00:00'
   - id: implementation-repair
     name: Complete UI regression-class repairs within existing surfaces
     status: pending
