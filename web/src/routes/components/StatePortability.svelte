@@ -10,16 +10,14 @@
 
   let { onExportState, onImportState }: Props = $props();
   let portabilityState = $state<PortabilityState>('idle');
-  let showImportInput = $state(false);
-  let statusText = $state('bundle contains active Source Ledger rows, active steering policy rules, and currently resonated items only');
+  let statusText = $state('');
   let stateInput = $state<HTMLInputElement | undefined>();
 
   async function startImport(): Promise<void> {
-    showImportInput = true;
     portabilityState = 'importing';
     statusText = 'import replaces active sources, rules, and stars';
     await Promise.resolve();
-    stateInput?.focus();
+    stateInput?.click();
   }
 
   async function importSelectedFile(): Promise<void> {
@@ -31,6 +29,7 @@
       await onImportState(bundle);
       portabilityState = 'import-complete';
       statusText = 'import complete';
+      if (stateInput) stateInput.value = '';
     } catch {
       portabilityState = 'import-failed';
       statusText = 'err: import failed';
@@ -57,14 +56,13 @@
   }
 </script>
 
-<section class="contract-region contract-portability" aria-labelledby="state-portability-heading" data-state={portabilityState}>
-  <h2 id="state-portability-heading">State Portability</h2>
-  <p class="contract-warning">import replaces active sources, rules, and stars</p>
-  <button id="state-export" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>export state</button>
-  <button id="state-import" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>import state</button>
-  {#if showImportInput}
-    <label for="state-json-file">Choose state JSON</label>
-    <input id="state-json-file" bind:this={stateInput} type="file" accept="application/json,.json" onchange={() => void importSelectedFile()} />
+<div class="source-ledger-footer state-portability-footer contract-portability" role="group" aria-label="State portability" data-state={portabilityState}>
+  <button id="state-export" class="bracket-action" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? '[EXPORTING...]' : '[EXPORT STATE]'}</button>
+  <button id="state-import" class="bracket-action" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>{portabilityState === 'importing' ? '[IMPORTING...]' : '[IMPORT STATE]'}</button>
+  <label class="visually-hidden" for="state-json-file">import state JSON</label>
+  <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" onchange={() => void importSelectedFile()} />
+  <span class="contract-warning state-portability-warning">import replaces active sources, rules, and stars</span>
+  {#if statusText}
+    <span role="status" aria-live="polite" class="contract-muted state-portability-status">{statusText}</span>
   {/if}
-  <p role="status" aria-live="polite" class="contract-muted">{statusText}</p>
-</section>
+</div>

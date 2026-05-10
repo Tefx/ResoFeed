@@ -330,9 +330,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(SourceLedger, { props: { sources: [expectedRedSource], onDeleteSource: async () => {}, onImportOpml: async () => {} } });
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(within(ledger).getByText('import OPML')).toBeVisible();
+    expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
     expect(within(ledger).getByText(/Example Source · ok/)).toBeVisible();
-    expect(within(ledger).getByText('imported 3 sources; folders flattened')).toBeVisible();
+    expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example Source' }));
     expect(within(ledger).getByRole('button', { name: 'confirm delete source: Example Source' })).toBeVisible();
@@ -342,15 +342,15 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const user = userEvent.setup();
     render(StatePortability, { props: { onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
 
-    const portability = screen.getByRole('region', { name: 'State Portability' });
+    const portability = screen.getByRole('group', { name: 'State portability' });
     expect(
       within(portability).getByText('import replaces active sources, rules, and stars')
     ).toBeVisible();
 
-    await user.click(within(portability).getByRole('button', { name: 'import state' }));
-    expect(within(portability).getByLabelText('Choose state JSON')).toBeVisible();
+    await user.click(within(portability).getByRole('button', { name: '[IMPORT STATE]' }));
+    expect(within(portability).getByLabelText('import state JSON')).toHaveClass('visually-hidden');
 
-    await user.click(within(portability).getByRole('button', { name: 'export state' }));
+    await user.click(within(portability).getByRole('button', { name: '[EXPORT STATE]' }));
     expect(within(portability).getByRole('status')).toHaveTextContent('exported state.json');
   });
 

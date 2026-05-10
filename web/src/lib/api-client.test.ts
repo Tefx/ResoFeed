@@ -89,7 +89,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(within(searchRegion).getByText('src: Example Source')).toBeVisible();
 
     render(StatePortability, { props: { onExportState: async () => state, onImportState: async () => {} } });
-    expect(screen.getByRole('region', { name: 'State Portability' })).toHaveTextContent(
+    expect(screen.getByRole('group', { name: 'State portability' })).toHaveTextContent(
       'import replaces active sources, rules, and stars'
     );
   });

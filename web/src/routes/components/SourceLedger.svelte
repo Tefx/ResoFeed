@@ -24,7 +24,7 @@
     manualFetchState = {}
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
-  let statusText = $state('imported 3 sources; folders flattened');
+  let statusText = $state('');
   let importInput = $state<HTMLInputElement | undefined>();
 
   const fetchingSourceIds = $derived(new Set(manualFetchState.fetchingSourceIds ?? []));
@@ -64,7 +64,7 @@
 
   function sourceLedgerSummary(source: Source, lastFetch: string | null): string {
     const parts = [sourceLedgerLabel(source), source.last_fetch_status];
-    if (lastFetch) parts.push(`last fetch: ${lastFetch}`);
+    if (lastFetch) parts.push(`last_fetch: ${lastFetch}`);
     return parts.join(' · ');
   }
 
@@ -106,7 +106,7 @@
   }
 </script>
 
-<section class="contract-region contract-source-ledger" aria-labelledby="source-ledger-heading">
+<section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-heading">
   <div class="source-ledger-head">
     <h2 id="source-ledger-heading">SOURCE LEDGER</h2>
     <button
@@ -118,7 +118,7 @@
     >{manualFetchState.ingesting ? '[INGESTING...]' : '[RUN INGEST]'}</button>
   </div>
   {#if formatTime(manualFetchState.lastIngestAt)}
-    <p class="contract-muted ledger-time">last ingest: {formatTime(manualFetchState.lastIngestAt)}</p>
+    <p class="contract-muted ledger-time">last_ingest: {formatTime(manualFetchState.lastIngestAt)}</p>
   {/if}
   {#if sources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
@@ -130,26 +130,26 @@
         {@const lastFetch = formatTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
-        <li class="source-ledger-row">
-          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><button
+        <li class="source-ledger-row source-row" data-testid="source-row">
+          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><div class="source-ledger-url" title={source.url}>{source.url}</div><button
             type="button"
             class="manual-fetch-action"
             aria-label={fetching ? `Fetching ${sourceLabel}` : `Fetch ${sourceLabel}`}
             disabled={fetching}
             onclick={() => void fetchSource(source)}
-          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>x</button>
+          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
           {#if confirmingSourceId === source.id}
-            <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>confirm delete</button>
+            <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
           {/if}
         </li>
       {/each}
     </ul>
   {/if}
   <div class="source-ledger-footer">
-    <label class="text-action" for="opml-file">import OPML</label>
+    <label class="bracket-action" for="opml-file">[IMPORT OPML]</label>
     <input
       id="opml-file"
-      class="source-ledger-file"
+      class="source-ledger-file visually-hidden"
       bind:this={importInput}
       type="file"
       accept=".opml,.xml,text/xml,application/xml"
@@ -157,9 +157,7 @@
       onchange={() => void importSelectedFile()}
     />
     {#if statusText}
-      <span role="status" class="text-action imported-status">{statusText}</span>
+      <span role="status" class="ledger-status imported-status">{statusText}</span>
     {/if}
-    <a class="text-action" href="#state-export">export state</a>
-    <a class="text-action" href="#state-import">import state</a>
   </div>
 </section>

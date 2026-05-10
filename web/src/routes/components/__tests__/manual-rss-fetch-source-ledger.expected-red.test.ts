@@ -92,8 +92,8 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     });
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(within(ledger).getByText('last ingest: 10:25:31')).toBeVisible();
-    expect(ledger.querySelector('.source-ledger-copy')).toHaveTextContent('last fetch: 10:25:31');
+    expect(within(ledger).getByText('last_ingest: 10:25:31')).toBeVisible();
+    expect(ledger.querySelector('.source-ledger-copy')).toHaveTextContent('last_fetch: 10:25:31');
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
   });
 
@@ -124,8 +124,8 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(ledger.querySelector('.source-ledger-row')).toHaveClass('source-ledger-row');
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveTextContent(/^\[[A-Z\s]+\]$/);
     expect(within(ledger).getByText('[FETCH]')).toHaveTextContent(/^\[[A-Z]+\]$/);
-    expect(within(ledger).getByText('x')).toHaveClass('source-ledger-delete');
-    expect(within(ledger).getByText('imported 3 sources; folders flattened')).toBeVisible();
+    expect(within(ledger).getByText('[DELETE]')).toHaveClass('source-ledger-delete');
+    expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
     expect(ledger.querySelector('[class*="spinner"], [class*="progress"], [class*="animate"]')).toBeNull();
   });
 
@@ -134,12 +134,12 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     const row = ledger.querySelector('.source-ledger-row');
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent('simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x');
-    expect(row).not.toHaveTextContent('simonwillison.net/atom/everything');
+    expect(row).toHaveTextContent('simonwillison.net/feed.xml · ok · last_fetch: 10:25:31https://simonwillison.net/atom/everything[FETCH][DELETE]');
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
-    expect(row?.children).toHaveLength(3);
+    expect(row?.children).toHaveLength(4);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');
-    expect(row?.children[1]).toHaveClass('manual-fetch-action');
-    expect(row?.children[2]).toHaveClass('source-ledger-delete');
+    expect(row?.children[1]).toHaveClass('source-ledger-url');
+    expect(row?.children[2]).toHaveClass('manual-fetch-action');
+    expect(row?.children[3]).toHaveClass('source-ledger-delete');
   });
 });
