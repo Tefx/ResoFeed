@@ -25310,10 +25310,21 @@ phases:
       and artifact paths, not only pass summaries.
 
       - Native multimodal audit reviews rendered artifacts for the full screenshot
-      manifest and returns PASS or PASS_WITH_DEBT with explicit non-blocking disposition.
+      manifest and returns PASS or PASS_WITH_DEBT with explicit disposition.
 
-      - Final gate decision basis maps each UI regression category to evidence and
-      OPEN/BLOCK recommendation.
+      - PASS_WITH_DEBT involving UX debt or proof gaps is not gate-closable unless
+      `remediate-visual-ux-debt-and-proof-gap` and `retest-visual-ux-debt-and-proof-gap`
+      prove remediation ownership and closure.
+
+      - UX-DEBT-001 closure evidence includes a mobile metadata screenshot/proof showing
+      hostile long metadata remains flat, inline, and scannable.
+
+      - PROOF-GAP-001 closure evidence includes expanded raw/provenance screenshot/proof
+      when expanded payload is supported/required, with provenance remaining secondary/labeled
+      rather than primary reading text.
+
+      - Final gate decision basis maps each UI regression category and both remediation
+      findings to evidence and OPEN/BLOCK recommendation.
 
       - No unresolved blocker-class behavioral proof remains.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
@@ -25414,6 +25425,8 @@ phases:
     - fix-blind-dirty-jsonld-inspector
     - retest-blind-dirty-jsonld-inspector
     - visual-ux-audit
+    - remediate-visual-ux-debt-and-proof-gap
+    - retest-visual-ux-debt-and-proof-gap
     agent: gate-reviewer
   - id: expected-red-hit-target-clickability-tests
     name: Expected-red real hit-target and clickability tests
