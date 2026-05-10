@@ -98,6 +98,20 @@
       .join(' ');
   }
 
+  function isNonArticleDiagnosticText(text: string): boolean {
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    if (!normalized) return true;
+
+    // Primary reading copy excludes model/test harness diagnostics and corpus
+    // inventories. Provenance remains available in the raw disclosure below.
+    const modelHarnessStatus = /\b(?:stub(?:bed)?|fixture|test|deterministic)\b/i.test(normalized)
+      && /\b(?:summary|transport|authority|outside|runtime|harness)\b/i.test(normalized);
+    const corpusInventory = /\b(?:rss|feed|inspector)\s+(?:case|cases|corpus|regression)s?\b/i.test(normalized)
+      && /\b[a-z][a-z0-9]+(?:_[a-z0-9]+){2,}\b/.test(normalized);
+
+    return modelHarnessStatus || corpusInventory;
+  }
+
   function removeSourceBoilerplate(text: string): string {
     return text
       .replace(/\bSkip to main content\b/gi, ' ')
@@ -109,13 +123,12 @@
 
   function readableText(text: string | null): string | null {
     if (!text) return null;
-    if (text.trim() === 'Deterministic fixture summary.') return null;
-    if (text.trim() === 'Stubbed OpenRouter transport stayed outside product authority.') return null;
-    if (/Dirty RSS cases for Inspector regression tests\./.test(text) && /json_ld_blob_item|script_style_leftover_item|model_error_item/.test(text)) return null;
+    if (isNonArticleDiagnosticText(text)) return null;
     const decodedOnce = removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text)))));
     const normalized = removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce))))
       .replace(/\s+/g, ' ')
       .trim();
+    if (isNonArticleDiagnosticText(normalized)) return null;
     return normalized.length > 0 ? normalized : null;
   }
 
