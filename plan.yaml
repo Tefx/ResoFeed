@@ -36202,7 +36202,7 @@ phases:
       `go test ./...`.'
   - id: fuidcr-ledger-reachability-proof-path-fix
     name: Reconcile Source Ledger reachability and browser proof path
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: default\nrefs:\n- docs/DESIGN.md\n\
       - docs/ARCHITECTURE.md\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\n\
       - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n- web/tests/e2e/real-server-ui.spec.ts\n\
@@ -36362,3 +36362,5 @@ phases:
     - fuidcr-feed-search-client-dto-contract
     - fuidcr-ui-preview-cleanup
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T19:01:35.290754+00:00'
