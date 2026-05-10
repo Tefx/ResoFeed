@@ -32868,3 +32868,180 @@ phases:
     - fuidcr-contract-matrix-lock
     - fuidcr-expected-red-ui-tests
     agent: frontend-engineer
+  - id: fuidcr-feed-search-anatomy
+    name: Repair shared Feed and Search item anatomy
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: [integration]
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
+      tests
+
+
+      Complete the shared Feed/Search anatomy repairs using existing frontend surfaces
+      and source-backed item data.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - fuidcr-contract-matrix-lock — findings 8-16 and 40-44 acceptance is AUTHORITATIVE.
+
+      - fuidcr-expected-red-ui-tests — expected-red tests and screenshot states are
+      PROTECTED.
+
+      - fuidcr-api-dto-escalation-guard — DTO source mapping/gap decision is AUTHORITATIVE.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - shared frontend formatter/helper files only if already existing or tightly
+      scoped under web/src/routes/components/ for feed-item anatomy.
+
+      - Tests/fixtures needed to update expected-red tests to green.
+
+
+      FINDINGS TO CLOSE:
+
+      - Feed 8,9,10,11,12,13,14,15,16.
+
+      - Search 40,41,42,43,44.
+
+
+      REQUIRED BEHAVIOR:
+
+      - Remove standalone visible TODAY feed heading; use inline time-group labels
+      only.
+
+      - Feed rows show compact lower-case metadata including source, age/time, extraction
+      status, and agent/provenance when available.
+
+      - Summaries use useful summary/core insight/clean excerpt fallback instead of
+      repeated `summary unavailable` when detail text exists.
+
+      - Desktop summary clamps to two lines; narrow/mobile clamps to one line.
+
+      - Feed title-summary gap and row rhythm match DESIGN.md.
+
+      - Time groups include TODAY, YESTERDAY, and EARLIER group-leading rows from
+      timestamps.
+
+      - Search results reuse feed-item anatomy and add match/provenance line without
+      a separate visual grammar.
+
+      - Search form stacks cleanly on narrow/mobile.
+
+      - Search results expose Inspect/Resonate affordances and compact metadata dates.
+
+
+      DTO ESCALATION:
+
+      - Do not change backend/API/storage unless fuidcr-api-dto-escalation-guard proves
+      an existing DTO gap.
+
+      - If a DTO gap is proven, stop with a deviation/escalation record rather than
+      silently adding APIs.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Feed/Search
+      output must vary based on actual item timestamps, summaries, source metadata,
+      search matches, selected state, and viewport.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires BOTH logic correctness and rendering completeness. Evidence
+      MUST include rendered DOM/screenshot proof for feed rows and search results.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Feed and Search maintaining separate row grammars where DESIGN.md requires
+      shared anatomy.
+
+      2. Any P0/P1 finding in 8-16 or 40-44 closed only by prose without DOM/browser
+      evidence.
+
+      3. Raw RFC3339 dates in Search metadata.
+
+      4. `summary unavailable` displayed when source-backed detail/excerpt text exists.
+
+      5. Narrow Search layout with colliding labels or cropped controls.'
+    verification: '- Focused tests for findings 8-16 and 40-44 pass green.
+
+      - Rendered evidence shows Feed and Search sharing anatomy with required metadata,
+      actions, clamps, and responsive behavior.
+
+      - Main path: desktop Feed/Search behavior matches contract.
+
+      - Failure path: missing summary uses cleaned fallback without repeating unavailable
+      lines when data exists.
+
+      - No backend/API/storage changes unless backed by DTO escalation evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Feed.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SearchRetrieval.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact browser/DOM test command>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Path exercised**: item DTO/frontend state → shared feed-item anatomy → Feed/Search
+      rendered DOM
+
+
+      ## Finding Closure
+
+      - Closed findings: 8,9,10,11,12,13,14,15,16,40,41,42,43,44
+
+      - Desktop screenshot refs: <paths>
+
+      - Narrow/mobile screenshot refs: <paths>
+
+      - DTO escalation used: <none or record>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    - fuidcr-api-dto-escalation-guard
+    - fuidcr-style-breakpoint-foundation
+    agent: frontend-engineer
