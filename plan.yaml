@@ -35379,7 +35379,7 @@ phases:
       completed'
   - id: fuidcr-feed-search-client-dto-contract
     name: Update Feed/Search frontend DTO contract for display fallbacks
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -35531,3 +35531,5 @@ phases:
     depends_on:
     - fuidcr-feed-search-dto-source-fields
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T18:28:40.669582+00:00'
