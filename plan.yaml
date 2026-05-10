@@ -37407,3 +37407,226 @@ phases:
     depends_on:
     - fuidcr-software-architect-conformance-review
     agent: frontend-engineer
+  - id: fuidcr-architecture-blocker-retest
+    name: Retest architecture blocker closure after batched remediation
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      refs:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json
+
+      - docs/ARCHITECTURE.md
+
+      - docs/DESIGN.md
+
+      - docs/ui-preview.html
+
+      - <closure register produced by fuidcr-batched-architecture-blocker-remediation>
+
+      spec_refs:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — authoritative findings
+      1-52 matrix substitute for this retest
+
+      - docs/ARCHITECTURE.md — product-boundary invariants
+
+      - docs/DESIGN.md — UI/design authority
+
+      touch_paths:
+
+      - read-only review of closure register, browser/DOM/visual artifacts, docs/ui-preview.html,
+      and aligned F<n> tests
+
+
+      As an INDEPENDENT ARCHITECTURE REVIEWER (software-architect), rerun the conformance
+      review specifically against the blocker families from fuidcr-software-architect-conformance-review
+      after the batched remediation step.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works.
+
+
+      Retest scope:
+
+      1. Closure register maps authoritative matrix findings 1-52 exactly once to
+      exact matrix title/severity/status, evidence paths, and accepted non-intersection/amendment
+      rationale where applicable.
+
+      2. F<n> expectations in web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      or successor artifacts match exact matrix finding <n>; no semantic remapping
+      remains.
+
+      3. P0/P1 closure evidence covers all 13 P0 and all 19 P1 obligations with browser/DOM/visual
+      artifact paths, not only the prior 3-test JUnit artifact.
+
+      4. F2 product drift is explicitly fixed or superseded by recorded design-review
+      amendment/non-intersection authority.
+
+      5. docs/ui-preview.html has final preview parity/static evidence proving canonicality
+      after live UI repairs.
+
+      6. Backend/API/DTO boundary remains passed: DTO changes, if any, remain narrow/source-backed/item-display-only
+      and no forbidden product concepts are introduced.
+
+
+      Emit an explicit verdict: PASS or FAIL. If FAIL, include a blocker register
+      with blocker_id, affected matrix IDs, evidence gap, severity, and required remediation.
+
+
+      Independence Level: L2 semi-blind retest. Review the evidence and artifacts
+      from a fresh architecture/product-boundary perspective; do not reuse the failed
+      review''s conclusion without rechecking the produced closure register and artifact
+      paths.
+
+
+      Gate decision basis is mandatory: each unresolved NEEDS_TEST, UNPROVEN, UNCERTAIN_BLOCKING,
+      or BLOCKED obligation must state whether it blocks fuidcr-final-design-conformance-gate
+      and why.'
+    verification: '- Review emits explicit PASS or FAIL verdict.
+
+      - PASS requires B1-B5 all PROVEN, FIXED_WITH_EVIDENCE, ACCEPTED_AMENDMENT, or
+      ACCEPTED_NON_INTERSECTION with evidence paths and authority basis.
+
+      - FAIL requires a blocker register mapping each remaining blocker to matrix
+      IDs and required remediation.
+
+      - Closure register integrity is verified: 52 rows, IDs 1-52 exactly once, exact
+      matrix semantics, no F<n> remapping.
+
+      - P0/P1 browser/DOM/visual evidence coverage is verified for all 13 P0 and 19
+      P1 obligations.
+
+      - F2 resolution authority is verified as implementation fix or explicit design-review
+      amendment/non-intersection.
+
+      - Preview parity/static proof for docs/ui-preview.html is verified for F48-F52.
+
+      - Backend/API/DTO boundary remains source-backed and no forbidden concepts are
+      introduced.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: software-architect (independent architecture/product-boundary retest)
+
+      **Scope**: blocker families B1-B5 from fuidcr-software-architect-conformance-review
+      after fuidcr-batched-architecture-blocker-remediation
+
+      **Independence Level**: L2
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — key passage or "NOT
+      READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - <closure register produced by fuidcr-batched-architecture-blocker-remediation>
+      — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Architecture Blocker Retest Register
+
+
+      | Blocker | Matrix IDs | Status | Evidence reviewed | Gate impact |
+
+      |---------|------------|--------|-------------------|-------------|
+
+      | B1 closure register | <ids> | PROVEN/BLOCKED | <paths> | blocks/does not block
+      |
+
+      | B2 F<n> alignment | <ids> | PROVEN/BLOCKED | <paths> | blocks/does not block
+      |
+
+      | B3 P0/P1 proof | <ids> | PROVEN/BLOCKED | <paths> | blocks/does not block
+      |
+
+      | B4 F2 product drift | F2 | PROVEN/BLOCKED | <paths> | blocks/does not block
+      |
+
+      | B5 preview canonicality | F48-F52 | PROVEN/BLOCKED | <paths> | blocks/does
+      not block |
+
+
+      ## Closure Register Integrity
+
+      - Register path: <path>
+
+      - Row count: <must be 52>
+
+      - IDs 1-52 exactly once: YES/NO
+
+      - Exact matrix title/severity/status preserved: YES/NO
+
+      - Semantic remapping found: YES/NO with details
+
+
+      ## P0/P1 Evidence Coverage
+
+      - P0 rows covered: <13/13 required>
+
+      - P1 rows covered: <19/19 required>
+
+      - Browser/DOM/visual artifact paths reviewed: <paths>
+
+
+      ## F2 Authority Review
+
+      - Resolution mode: FIXED | ACCEPTED_AMENDMENT | ACCEPTED_NON_INTERSECTION |
+      BLOCKED
+
+      - Authority/evidence path: <path>
+
+      - Architectural decision: <why acceptable or blocking>
+
+
+      ## Preview Parity Review
+
+      - docs/ui-preview.html canonical status: CANONICAL | AMENDED | BLOCKED
+
+      - F48-F52 evidence reviewed: <paths>
+
+
+      ## Blocker Register (required if FAIL)
+
+      | blocker_id | affected_matrix_ids | evidence_gap | severity | required_remediation
+      |
+
+      |------------|---------------------|--------------|----------|----------------------|
+
+
+      ## Gate Decision Basis
+
+      - Unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING/BLOCKED obligations: <none
+      or list>
+
+      - For each unresolved item, why it blocks or does not intersect fuidcr-final-design-conformance-gate:
+      <basis>
+
+
+      ## Verdict
+
+      PASS | FAIL'
+    depends_on:
+    - fuidcr-batched-architecture-blocker-remediation
+    agent: software-architect
