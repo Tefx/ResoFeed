@@ -25043,3 +25043,78 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: expected-red-state-matrix-screenshot-tests
+    name: Expected-red interaction state matrix screenshot tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create pre-implementation screenshot and semantic tests for the feed-row interaction
+      state matrix. The goal is to catch the class of visual-state regressions where
+      hover/focus/selected styles overlap, become noisy, or erase active-state clarity.
+
+
+      Required matrix states:
+
+      - feed row normal
+
+      - hover
+
+      - selected
+
+      - selected + hover
+
+      - focus
+
+      - selected + focus
+
+
+      Required assertions:
+
+      - Selected state remains distinguishable in every combined state.
+
+      - Hover/focus affordance does not stack a noisy active block on top of selected
+      state.
+
+      - No state changes cause layout shift.
+
+      - Screenshot names are stable and match the contract manifest, including at
+      least: `today-list`, `selected-item`, `selected-hover`, and selected-focus/focus
+      artifacts.
+
+      - Tests include semantic/class/computed-style checks where possible so screenshot
+      review is not the only signal.
+
+
+      This is a pre-implementation test-definition step. Do not modify product UI
+      source.'
+    verification: '- Test suite covers all six required interaction states.
+
+      - Expected-red run exposes selected+hover or selected+focus ambiguity/noise
+      where current UI is incomplete.
+
+      - Evidence includes exact command, runner output, and named screenshot artifact
+      paths for each state.
+
+      - Product UI implementation files remain unchanged.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red State\
+      \ Matrix Evidence\n- Files changed: <test/fixture/helper paths only>\n- Exact\
+      \ command:\n```sh\ncd web && npm run test:e2e -- --grep \"state matrix|selected-hover|ui-navigation-hover-inspector-repair\"\
+      \n```\n- Runner output:\n```text\n<paste output>\n```\n- State coverage table:\n\
+      \  | State | Test name | Screenshot path | Semantic/style assertion | Red status\
+      \ |\n  | --- | --- | --- | --- | --- |\n- Layout shift evidence: <before/after\
+      \ dimensions or trace note>\n\n## Closure Fields\nverdict: EXPECTED_RED_PASS\
+      \ | INCOMPLETE | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status:\
+      \ <exposed_gaps|missing_coverage with details>\norchestrator_action_hint: proceed_to_implementation_after_all_expected_red\
+      \ | expand_state_matrix_first"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
