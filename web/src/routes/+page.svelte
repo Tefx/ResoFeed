@@ -91,7 +91,8 @@
         await loadItemDetail(selectedItemId, token);
       }
       await tick();
-      if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || document.activeElement?.textContent?.trim() === 'submit') {
+      const activeText = document.activeElement?.textContent?.trim();
+      if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
         steerInput?.focus();
       }
     } catch (error) {

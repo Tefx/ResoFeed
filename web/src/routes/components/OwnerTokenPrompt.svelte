@@ -61,8 +61,8 @@
     disabled={displayedState === 'submitting' || displayedState === 'accepted'}
     aria-describedby="owner-token-error"
   />
-  <button type="submit" disabled={!canSubmit} aria-label="submit">
-    [submit]
+  <button class="bracket-action" type="submit" disabled={!canSubmit}>
+    [SUBMIT]
   </button>
   </form>
   {#if displayedState === 'rejected'}

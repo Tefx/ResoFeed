@@ -467,7 +467,7 @@ a:focus,
   margin-inline-start: auto;
 }
 
-.contract-feed-title {
+.contract-feed-item .contract-feed-title {
   display: -webkit-box;
   overflow: hidden;
   font: var(--rf-typography-feed-title);
@@ -476,7 +476,7 @@ a:focus,
   margin-block-start: var(--rf-space-sm);
 }
 
-.contract-feed-summary {
+.contract-feed-item .contract-feed-summary {
   display: -webkit-box;
   overflow: hidden;
   font: var(--rf-typography-feed-summary);
@@ -662,7 +662,7 @@ a:focus,
     display: block;
   }
 
-  .contract-feed-summary {
+  .contract-feed-item .contract-feed-summary {
     -webkit-line-clamp: 1;
   }
 
