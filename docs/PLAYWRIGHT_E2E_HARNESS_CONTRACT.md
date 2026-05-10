@@ -79,12 +79,12 @@ These cases must run without live LLM credentials and must explicitly clear `OPE
 
 ## Live OpenRouter Smoke Boundary
 
-Live LLM checks are opt-in only and must be separated from deterministic CI-safe cases by a Playwright project, grep, or tag such as `@live-openrouter`.
+Live LLM checks are opt-in only and must be separated from deterministic CI-safe cases by a Playwright project, grep, or tag such as `@llm-live` / `@live-openrouter`.
 
 Locked live command:
 
 ```bash
-OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web exec playwright test -- --config web/playwright.config.ts --grep @live-openrouter
+OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web run test:e2e -- --grep @llm-live
 ```
 
 Live smoke requirements:

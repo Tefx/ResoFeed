@@ -431,3 +431,40 @@ test('@live-openrouter live OpenRouter smoke is opt-in and skipped without runti
   test.skip(!process.env.OPENROUTER_KEY?.trim(), 'OPENROUTER_KEY absent; live OpenRouter smoke skipped deterministically');
   expect(runInfo.sanitizedEnvironment.openRouterKey).toBe('live-redacted');
 });
+
+test('@llm-live @live-openrouter live OpenRouter browser steering flow redacts runtime key material', async ({ page, request, runInfo, ownerToken }, testInfo) => {
+  const liveKey = process.env.OPENROUTER_KEY?.trim();
+  test.skip(!liveKey, 'OPENROUTER_KEY absent; live OpenRouter smoke skipped deterministically');
+
+  expect(runInfo.sanitizedEnvironment.openRouterKey).toBe('live-redacted');
+  expect(fs.readFileSync(runInfo.sanitizedEnvironment.notesPath, 'utf8')).toContain('OPENROUTER_KEY: <redacted>; source=os_env');
+
+  await enterOwnerToken(page, ownerToken);
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill('Prefer concise primary-source database systems research in future summaries.');
+  await page.getByRole('button', { name: 'apply' }).click();
+
+  const status = page.getByRole('status');
+  const alert = page.getByRole('alert');
+  await expect(status.or(alert)).toBeVisible({ timeout: 60_000 });
+  if (await alert.isVisible()) {
+    const message = await alert.textContent();
+    throw new Error(`FAIL_INVALID_KEY_OR_SERVICE: live OpenRouter-backed steer returned UI error: ${message ?? '<empty alert>'}`);
+  }
+  await expect(status).toContainText(/applied:/, { timeout: 60_000 });
+
+  const rulesResponse = await request.get(`${runInfo.baseURL}/api/steer/active`, {
+    headers: { Authorization: `Bearer ${ownerToken}` }
+  });
+  expect(rulesResponse.status()).toBe(200);
+  const rulesBody = await rulesResponse.json() as { rules: Array<{ rule_text: string }> };
+  expect(rulesBody.rules.length).toBeGreaterThan(0);
+
+  for (const logPath of [runInfo.server.stdoutPath, runInfo.server.stderrPath, runInfo.sanitizedEnvironment.notesPath]) {
+    const body = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8') : '';
+    expect(body).not.toContain(liveKey);
+    expect(body).not.toContain(ownerToken);
+    expect(body).not.toContain('Authorization: Bearer');
+    await testInfo.attach(path.basename(logPath), { body, contentType: 'text/plain' });
+  }
+});

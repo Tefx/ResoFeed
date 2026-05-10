@@ -30,12 +30,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium-ci-safe',
-      grepInvert: /@live-openrouter/,
+      grepInvert: /@(?:live-openrouter|llm-live)/,
       use: { ...devices['Desktop Chrome'] }
     },
     {
       name: 'live-openrouter',
-      grep: /@live-openrouter/,
+      grep: /@(?:live-openrouter|llm-live)/,
       use: { ...devices['Desktop Chrome'] }
     }
   ],

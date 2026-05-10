@@ -37,18 +37,22 @@ function sanitizedToolEnv(): NodeJS.ProcessEnv {
 function sanitizedRuntimeEnv(openRouterEndpoint: string): NodeJS.ProcessEnv {
   const liveRequested = isLiveOpenRouterRun();
   const liveKey = process.env.OPENROUTER_KEY?.trim();
-  return {
+  const env: NodeJS.ProcessEnv = {
     PATH: process.env.PATH ?? '',
     HOME: process.env.HOME ?? '',
     TMPDIR: process.env.TMPDIR ?? '/tmp',
     RESOFEED_E2E: '1',
-    RESOFEED_E2E_OPENROUTER_ENDPOINT: openRouterEndpoint,
     OPENROUTER_KEY: liveRequested && liveKey ? liveKey : E2E_FAKE_OPENROUTER_KEY
   };
+  if (!(liveRequested && liveKey)) {
+    env.RESOFEED_E2E_OPENROUTER_ENDPOINT = openRouterEndpoint;
+  }
+  return env;
 }
 
 function isLiveOpenRouterRun(): boolean {
-  return process.env.RESOFEED_E2E_LIVE_OPENROUTER === '1' || process.argv.join(' ').includes('@live-openrouter');
+  const argv = process.argv.join(' ');
+  return process.env.RESOFEED_E2E_LIVE_OPENROUTER === '1' || argv.includes('@live-openrouter') || argv.includes('@llm-live');
 }
 
 async function reservePort(): Promise<number> {
@@ -69,10 +73,12 @@ async function reservePort(): Promise<number> {
 
 function redactLogFile(filePath: string): void {
   if (!fs.existsSync(filePath)) return;
+  const liveKey = process.env.OPENROUTER_KEY?.trim();
   const redacted = fs
     .readFileSync(filePath, 'utf8')
     .replaceAll(E2E_OWNER_TOKEN, '<redacted-owner-token>')
     .replaceAll(E2E_FAKE_OPENROUTER_KEY, '<redacted-openrouter-key>')
+    .replaceAll(liveKey ? liveKey : '__no_live_key_to_redact__', '<redacted-openrouter-key>')
     .replace(/OPENROUTER_KEY=\S+/g, 'OPENROUTER_KEY=<redacted>')
     .replace(/Authorization:\s*Bearer\s+\S+/gi, 'Authorization: Bearer <redacted>');
   fs.writeFileSync(filePath, redacted);
@@ -259,7 +265,7 @@ export default async function globalSetup(): Promise<void> {
       '',
       '- Allowed variables: PATH, HOME, TMPDIR, RESOFEED_E2E, RESOFEED_E2E_OPENROUTER_ENDPOINT, OPENROUTER_KEY.',
       `- OPENROUTER_KEY: ${liveRequested ? '<redacted>; source=os_env' : '<redacted non-secret sentinel>; ambient OS value not forwarded'}.`,
-      '- OpenRouter endpoint: deterministic local test transport; no external secret or provider call.',
+      `- OpenRouter endpoint: ${liveRequested ? 'canonical external OpenRouter endpoint; live-secret smoke only' : 'deterministic local test transport; no external secret or provider call'}.`,
       '- Owner token: supplied by --owner-token and redacted from logs/artifacts.',
       `- OPML fixture feed URL: ${fixtureServer.url}`,
       `- Fixture feed server stdout: ${fixtureServer.stdoutPath}`,
