@@ -28082,7 +28082,7 @@ phases:
       were read and used as visual evidence.'
   - id: ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
     name: fix-gate-keyboard-a11y-flake
-    status: pending
+    status: claimed
     description: "step_type: implementation\npriority: HIGH\nagent_source: project\n\
       known_blocker_id: B-GATE-001\n\nFix ALL gate blockers from the failed `ui-navigation-hover-inspector-repair.gate`\
       \ review. This is a batched implementation fix step; currently the batch contains\
@@ -28208,6 +28208,8 @@ phases:
     depends_on:
     - gate
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T13:07:51.145220+00:00'
   - id: ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted
     name: retest-gate-keyboard-a11y-full-targeted
     status: pending
