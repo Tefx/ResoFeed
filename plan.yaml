@@ -35675,6 +35675,7 @@ phases:
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-ui-preview-cleanup
     - fuidcr-ledger-reachability-proof-path-fix
+    - fuidcr-browser-conformance-residual-f7-f13-fix
     - fuidcr-browser-regression-proof
     - fuidcr-screenshot-first-uiux-audit
     - fuidcr-software-architect-conformance-review
