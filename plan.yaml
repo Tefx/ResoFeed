@@ -30674,3 +30674,101 @@ phases:
     with screenshot-first proof.
   depends_on:
   - inspector-readable-content-remediation
+  steps:
+  - id: prd-inspector-preview-conformance-remediation.contract-audit-acceptance
+    name: Contract audit for PRD Inspector fields and preview/live deltas
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+
+      User-reported issue context (Chinese): user asks whether the current implementation
+      conforms to the PRD and why they cannot see these item-understanding outputs:
+      objective quality assessment / 质量评估, value tier / 优先级, concise core insight
+      / 核心见解, dense factual summary / 密集事实摘要, source and extraction provenance / 来源与提取溯源,
+      why this appeared / 为什么展示给你, and searchable text / 可检索文本. User also reports
+      that docs/ui-preview.html and the live app at 127.0.0.1 differ significantly:
+      preview has a large RESOFEED header, top line with SOURCE LEDGER / DOCTOR /
+      INSPECTOR, prompt box at top, card-like bordered content area, specific margins/alignments;
+      live app shows tabs at top, missing masthead, search/prompt at bottom, item
+      spacing/width/alignment differs, and star/sidebar proportions differ.
+
+
+      Contract-only task: read docs/PRD.md, docs/DESIGN.md, docs/ui-preview.html,
+      and the current rendered UI behavior. Produce executable acceptance criteria
+      for BOTH concerns without implementing product code.
+
+
+      Required acceptance inventory:
+
+      - PRD/Inspect field register: exact labels/semantics for 质量评估, 优先级/value tier,
+      核心见解, 密集事实摘要, 来源与提取溯源, 为什么展示给你, 可检索文本, and any PRD wording that maps to them.
+
+      - Preview/live visual delta register: masthead presence and scale, SOURCE LEDGER
+      / DOCTOR / INSPECTOR nav placement, prompt placement, item card/border geometry,
+      left/right margins, row/star alignment, typography scale, and Inspector field
+      hierarchy.
+
+      - Runtime artifact plan: which browser routes/states must be captured, what
+      screenshots/DOM snapshots are required, and which criteria can be bounded layout
+      assertions instead of exact pixel diff.
+
+
+      Do NOT implement. Do NOT invent new product concepts. Preserve ResoFeed architecture:
+      single Go binary, SQLite only, no sync/merge/server sidecars, no onboarding
+      wizard, no folders/tags/unread/archive flows.'
+    verification: 'local-check protecting the downstream expected-red tests and final
+      gate.
+
+      - Evidence includes PRD/Inspect field register with source citations.
+
+      - Evidence includes visual delta register from docs/ui-preview.html vs current
+      rendered app.
+
+      - Evidence defines executable acceptance criteria and screenshot/artifact requirements.
+
+      - Evidence confirms no product implementation was changed.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Audit Closure Fields
+
+      - requirement_ref: <PRD/DESIGN/ui-preview section or DOM/source anchor>
+
+      - behavior_claim: <visible/runtime claim to enforce>
+
+      - runtime_proof_expected: <screenshot, DOM snapshot, browser check, API proof,
+      or layout measurement>
+
+      - evidence_ref: <artifact path or report section>
+
+      - status: PROVEN | NEEDS_TEST | UNPROVEN | AMBIGUOUS_SPEC
+
+      - closure_path: <test/implementation/retest/gate step that will close it>
+
+      - gate_decision_basis: <why this should OPEN or BLOCK the final gate>
+
+
+      ## Acceptance Inventory
+
+      - PRD/Inspect field register: <table>
+
+      - Preview/live visual delta register: <table>
+
+      - Screenshot/browser artifact plan: <routes, states, viewport sizes>
+
+      - Non-goals / architecture guardrails: <confirm no forbidden product concepts>
+
+      '
+    agent: spec-verifier
