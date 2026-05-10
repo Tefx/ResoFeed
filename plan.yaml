@@ -28872,3 +28872,12 @@ phases:
       Orchestrator mainline final-state verification after squash merge: `npm --prefix
       "web" run check` exited 0 with `svelte-check found 0 errors and 0 warnings`.
       No blocking semantic signals remain.'
+- id: inspector-readable-content-remediation
+  name: Inspector Readable Content Remediation
+  status: pending
+  gate: 'Inspector primary body must render readable article copy only: no raw JavaScript,
+    CSS, JSON-LD/provenance garbage, navigation boilerplate, or model diagnostics
+    in the primary reading text. Controlled fallback copy such as `summary unavailable`
+    is acceptable when extraction cannot produce clean content.'
+  depends_on:
+  - ui-navigation-hover-inspector-repair
