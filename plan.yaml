@@ -29502,7 +29502,7 @@ phases:
       --project chromium-ci-safe` passed with 7/7 tests.'
   - id: inspector-readable-content-gate
     name: Gate clean Inspector readable content remediation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -29627,6 +29627,8 @@ phases:
     - retest-clean-inspector-primary-body
     - uiux-audit-clean-inspector-primary-body
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-10T14:32:23.520960+00:00'
   - id: uiux-audit-clean-inspector-primary-body
     name: UI/UX audit clean Inspector primary body
     status: done
