@@ -33263,7 +33263,7 @@ phases:
       \ layers."
   - id: fuidcr-style-breakpoint-foundation
     name: Repair global style and responsive breakpoint foundation
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -33380,6 +33380,82 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:35:52.356257+00:00'
+    done_at: '2026-05-10T17:54:25.497082+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree.
+
+      - docs/DESIGN.md — Read key passage: below 1080px Inspector becomes route/full-screen;
+      focus rings visible independent of accent; accent reserved for active Resonate.
+
+      - web/src/app.css — Read key passage: global buttons/disabled are transparent;
+      programmatic `[tabindex=''-1'']` heading focus is quiet; `.contract-resonate:focus`
+      has explicit 2px focus outline.
+
+      - web/src/routes/+page.svelte — Read key passage: breakpoint matchMedia is `(max-width:
+      1079px)`; mousedown default on buttons is prevented to preserve keyboard focus-visible
+      modality for expected-red `star.focus()` condition.
+
+
+      ## Implementation Evidence
+
+      - Findings closed: 4,45,46,47 = YES
+
+      - Files changed: web/src/app.css, web/src/routes/+page.svelte
+
+      - Breakpoint proof: `grep "760px|760\)|max-width: 760|max-width\:760" web/src`
+      returned no files; broad expected-red output no longer contains F4 after preserving
+      1079px breakpoint and narrow shell-grid measurability.
+
+      - Focus proof: expected-red F46 detection uses `await star.focus()` then `metric(page,
+      ''button[aria-label="Resonate item"]:focus-visible, button[aria-label="Remove
+      resonance"]:focus-visible'')`; broad expected-red output no longer contains
+      F46.
+
+      - Button leakage proof: broad expected-red output no longer contains F45; global
+      button/disabled backgrounds remain transparent and non-star action fills are
+      not reported.
+
+      - Forbidden concepts introduced: none
+
+      - Deviation records from upstream contract/tests: none
+
+
+      ## Verification
+
+      - Subagent: `npm run check` — exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+      - Subagent: grep for 760px breakpoint in `web/src` — no files found.
+
+      - Subagent: focused temporary Playwright verification — exit 0; 1 passed; temp
+      spec removed before commit.
+
+      - Subagent retry: broad expected-red matrix — exit 1 due out-of-scope findings
+      only; output did not contain F4, F45, F46, or F47.
+
+      - Orchestrator mainline final-state verification after squash merge: `npm --prefix
+      web run check` — exit 0; svelte-check 0 errors/0 warnings.
+
+      - Orchestrator mainline final-state verification after squash merge: `npm --prefix
+      web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts --project=chromium-ci-safe`
+      — exit 1 as expected for remaining out-of-scope findings; output did not contain
+      F4, F45, F46, or F47. Remaining failures were F7, F13, F14, F24, F26-F29, F31-F32,
+      F35, F37, F44, and preview drift F48/F50/F52, all owned by downstream steps.
+
+
+      ## Commit hash(es)
+
+      - Worktree commits: 35b866d, 7150a19, 34751df
+
+      - Mainline squash commit: b68892a [vectl] step-fuidcr-style-breakpoint-foundation
+      completed
+
+
+      ## Gaps/Notes
+
+      - Broad matrix remains red only for downstream/out-of-scope findings listed
+      above and docs/ui-preview drift; the foundation step''s finding set is closed.'
   - id: fuidcr-feed-search-anatomy
     name: Repair shared Feed and Search item anatomy
     status: pending
