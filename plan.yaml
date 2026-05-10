@@ -29942,7 +29942,7 @@ phases:
       --project chromium-ci-safe` passed with 7/7 tests.'
   - id: retest-generalized-inspector-primary-body-sanitation
     name: Retest generalized Inspector primary-body sanitation
-    status: pending
+    status: claimed
     description: 'Independent retest for residual Inspector primary-body sanitation
       remediation.
 
@@ -30043,6 +30043,8 @@ phases:
     depends_on:
     - generalize-inspector-primary-body-sanitation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T14:49:03.941095+00:00'
   - id: residual-inspector-readable-content-gate
     name: Final residual gate for Inspector readable content
     status: pending
