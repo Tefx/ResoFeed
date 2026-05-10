@@ -33184,3 +33184,179 @@ phases:
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+  - id: fuidcr-source-ledger-state-portability
+    name: Repair Source Ledger and State Portability action contracts
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: [integration]
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
+      tests
+
+
+      Complete Source Ledger and State Portability repairs using the canonical DOM
+      and bracket-action contracts.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - fuidcr-contract-matrix-lock — findings 24-36 acceptance is AUTHORITATIVE.
+
+      - fuidcr-expected-red-ui-tests — SourceLedger/StatePortability tests are PROTECTED.
+
+      - fuidcr-api-dto-escalation-guard — DTO/source mapping is AUTHORITATIVE.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/StatePortability.svelte
+
+      - web/src/routes/+page.svelte only for removing/relocating standalone State
+      Portability section composition.
+
+      - web/src/app.css only for shared bracket-action styling if needed.
+
+
+      FINDINGS TO CLOSE:
+
+      - 24 required Source Ledger DOM contract/classes.
+
+      - 25 transparent bracket-action treatment for manual ingest actions.
+
+      - 26 `[DELETE]` label with accessible `Delete source: <name>` semantics.
+
+      - 27 `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]` exact bracket labels.
+
+      - 28 no false default imported status.
+
+      - 29 stable URL column.
+
+      - 30 exact `last_fetch:` / `last_ingest:` labels.
+
+      - 31 accessible hidden file input with no visible/occupied artifact.
+
+      - 32 disabled/active bracket actions remain transparent and suppress hover/focus
+      inversion.
+
+      - 33 stable header/row action baseline.
+
+      - 34 State Portability is not a separate settings-like section; expose terse
+      actions from Source Ledger action cluster/footer.
+
+      - 35 state actions use canonical bracket labels and transparent treatment.
+
+      - 36 default copy is terse; only required import warning/completion/error feedback
+      remains.
+
+
+      CONSTRAINTS:
+
+      - Do not add sync/merge/conflict resolver/activity ledger/portable receipts/settings
+      UI.
+
+      - JSON backup/restore remains the existing State Portability capability only.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Source
+      Ledger and State Portability behavior must vary based on sources, import/export
+      action state, disabled/active state, and file input selection.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Evidence MUST include rendered DOM/screenshot proof for the required Source
+      Ledger DOM classes and bracket actions.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any lower-case non-bracket action labels for import/export/delete/fetch/run
+      ingest.
+
+      2. A standalone settings-like State Portability panel.
+
+      3. Visible `Choose...`/file input artifact.
+
+      4. Missing URL column or non-canonical `last fetch`/`last ingest` labels.
+
+      5. Filled disabled backgrounds on bracket actions.'
+    verification: '- Focused tests for findings 24-36 pass green.
+
+      - DOM proof shows required Source Ledger class contract and canonical bracket
+      labels.
+
+      - Browser evidence shows import/export/delete/fetch/run ingest action states,
+      hidden file input, and no false default status.
+
+      - No sync/merge/settings-heavy/product-forbidden surface is introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/components/StatePortability.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact browser/DOM test command>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Path exercised**: source/state frontend data → SourceLedger action cluster
+      → bracket-action rendered DOM
+
+
+      ## Finding Closure
+
+      - Closed findings: 24,25,26,27,28,29,30,31,32,33,34,35,36
+
+      - DOM contract proof: <selector output>
+
+      - Screenshot refs: <paths>
+
+      - Forbidden concepts introduced: <must be none>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    - fuidcr-api-dto-escalation-guard
+    - fuidcr-style-breakpoint-foundation
+    agent: frontend-engineer
