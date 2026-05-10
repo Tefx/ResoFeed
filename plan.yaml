@@ -30265,3 +30265,126 @@ phases:
     depends_on:
     - retest-generalized-inspector-primary-body-sanitation
     agent: uiux-auditor
+  - id: remove-inspector-screenshot-family-guard-literals
+    name: Remove Inspector screenshot-family guard literals
+    status: pending
+    description: 'Fix blocker B1 from `retest-generalized-inspector-primary-body-sanitation`.
+
+
+      Scope:
+
+      - File: `web/src/routes/components/Inspector.svelte`
+
+      - Remove or generalize remaining exact screenshot-family product-code guard
+      literals used as sanitation criteria, including `model_latency_error`, `Skip
+      to main content`, and `The homepage The Verge`.
+
+      - Replace exact fixture/screenshot literal criteria with category/pattern-based
+      sanitation that rejects raw source leaks, model diagnostics, navigation boilerplate,
+      script/CSS/JSON-LD artifacts, and non-article garbage without hardcoding screenshot-family
+      strings.
+
+      - Preserve the runtime-green behavior from the failed retest: Inspector primary
+      body must remain readable and must not reintroduce raw source leaks.
+
+      - Do not alter completed plan steps or broaden product concepts.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any exact screenshot-family guard literal remaining in product code as sanitation
+      logic: `model_latency_error`, `Skip to main content`, `The homepage The Verge`.
+
+      2. Fixture/test/deterministic harness language in product sanitation criteria
+      instead of general category/pattern rules.
+
+      3. Raw source leakage into Inspector primary body after removing exact literals.
+
+      4. Over-sanitized blank/empty primary body when readable article copy exists.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION fix step. Stub-only completion is NOT acceptable.
+      The sanitation logic must process its inputs and produce outputs that vary based
+      on content categories/patterns, while avoiding exact fixture-literal criteria.
+
+
+      ## Refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."'
+    verification: '- Product-code search of `web/src/routes/components/Inspector.svelte`
+      shows no exact sanitation guard literals `model_latency_error`, `Skip to main
+      content`, or `The homepage The Verge`; any occurrence must be only tests/comments
+      with explicit non-product context.
+
+      - Sanitation logic is category/pattern-based and does not use fixture/screenshot-specific
+      exact-string criteria.
+
+      - The original raw source leak closure remains protected: scripts, CSS, JSON-LD,
+      navigation boilerplate, model diagnostics, and source garbage cannot appear
+      in Inspector primary body.
+
+      - Inspector primary body still renders readable article copy when clean content
+      is available.
+
+      - Evidence identifies modified lines and explains why the change is root-cause
+      cleanup rather than another fixture-specific guard.'
+    evidence_template: '## Fix Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Blocker Fixed
+
+      - B1: Remaining exact screenshot-family guard literals in `web/src/routes/components/Inspector.svelte`.
+
+
+      ### Static Product-Code Search
+
+      Paste search output proving no product-code sanitation criteria contain:
+
+      - `model_latency_error`
+
+      - `Skip to main content`
+
+      - `The homepage The Verge`
+
+
+      ### Root Cause vs Symptom
+
+      - Root cause: <why exact fixture literals remained in product sanitation logic>
+
+      - Symptom: static semantic guard-removal proof failed despite green runtime
+      tests
+
+      - Why this fix is not surface-level: <how category/pattern sanitation replaces
+      literal guards>
+
+
+      ### Runtime Leak Protection
+
+      - Explain how raw source leaks remain blocked without exact screenshot-family
+      literals.
+
+      - List manual or automated checks performed before handoff.'
+    depends_on:
+    - retest-generalized-inspector-primary-body-sanitation
+    agent: frontend-engineer
