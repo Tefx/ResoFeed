@@ -30300,7 +30300,7 @@ phases:
     agent: uiux-auditor
   - id: remove-inspector-screenshot-family-guard-literals
     name: Remove Inspector screenshot-family guard literals
-    status: pending
+    status: claimed
     description: 'Fix blocker B1 from `retest-generalized-inspector-primary-body-sanitation`.
 
 
@@ -30421,6 +30421,8 @@ phases:
     depends_on:
     - retest-generalized-inspector-primary-body-sanitation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T14:54:39.864013+00:00'
   - id: retest-remove-inspector-screenshot-family-guard-literals
     name: Retest removal of Inspector screenshot-family guard literals
     status: pending
