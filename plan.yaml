@@ -33778,3 +33778,127 @@ phases:
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-ui-preview-cleanup
     agent: integration-verifier
+  - id: fuidcr-screenshot-first-uiux-audit
+    name: Run screenshot-first native UIUX design conformance audit
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      Independence Level: L2
+
+
+      As uiux-auditor, perform a native multimodal screenshot-first implementation
+      audit after implementation and browser integration verification.
+
+
+      SCOPE:
+
+      - Compare real rendered artifacts against docs/DESIGN.md and the locked findings
+      matrix.
+
+      - Use screenshots/images/terminal captures or equivalent visual/spatial artifacts
+      for required states and viewports.
+
+      - This is not replaceable by standard tests, DOM snapshots alone, or prose review.
+
+
+      REQUIRED VISUAL STATES:
+
+      - Shell/Steer command row desktop and narrow/mobile: findings 1-5.
+
+      - Owner Token Prompt: findings 6-7.
+
+      - Feed rows and Search results: findings 8-16 and 40-44.
+
+      - Inspector desktop and mobile route/detail: findings 17-23.
+
+      - Source Ledger / State Portability action cluster: findings 24-36.
+
+      - /doctor narrow and desktop operational surface: findings 37-39.
+
+      - Focus/accent/button leakage states: findings 45-47.
+
+      - Preview reference visual checks for findings 48-52 after cleanup.
+
+
+      AUDIT DECISION RULE:
+
+      - P0/P1 findings require visual/browser evidence to close.
+
+      - If a finding remains open, provide exact screenshot coordinates/selector/state
+      and closure recommendation.
+
+      - Any assertion that a finding is non-blocking must include non-intersection
+      rationale and design-review acceptance path.'
+    verification: '- Screenshot-first audit covers all findings 1-52 by ID.
+
+      - P0/P1 findings have visual/browser evidence or explicit BLOCK findings.
+
+      - Auditor provides parseable PASS/PASS_WITH_DEBT/FAIL headline.
+
+      - Any unresolved behavioral/runtime evidence has explicit remediation/retest
+      or non-intersection closure path.'
+    evidence_template: '## UIUX Screenshot-First Audit Report
+
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Full UI design conformance remediation
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ### Visual Artifact Register
+
+      | Surface | Viewport/state | Screenshot/artifact | Findings covered |
+
+      |---|---|---|---|
+
+
+      ### Finding Closure Register
+
+      | Finding ID | Severity | Visual verdict | Evidence ref | Closure status | Notes
+      |
+
+      |---:|---|---|---|---|---|
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS: all blocker-class visual obligations proven
+
+      - [ ] PASS_WITH_DEBT: only explicit non-blocking/non-intersecting debt remains
+
+      - [ ] FAIL: one or more blocker-class findings remain open
+
+      '
+    depends_on:
+    - fuidcr-browser-regression-proof
+    agent: uiux-auditor
