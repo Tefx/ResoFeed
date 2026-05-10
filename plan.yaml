@@ -30451,7 +30451,7 @@ phases:
       changes introduced.'
   - id: retest-remove-inspector-screenshot-family-guard-literals
     name: Retest removal of Inspector screenshot-family guard literals
-    status: claimed
+    status: done
     description: 'Independent post-fix retest for blocker B1 from `retest-generalized-inspector-primary-body-sanitation`.
 
 
@@ -30597,3 +30597,25 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T15:00:20.848383+00:00'
+    done_at: '2026-05-10T15:03:52.270683+00:00'
+    evidence: 'Retest evidence accepted from integration-verifier. Verify-only step;
+      no tracked files changed and no commit created. Refs confirmation present for
+      docs/DESIGN.md, docs/ARCHITECTURE.md, Inspector.svelte, inspector-readable-content-regression,
+      inspector-dirty-corpus, UI repair spec, and project instructions. Required command
+      evidence: after dependency bootstrap, `npm --prefix web run check` passed with
+      `svelte-check found 0 errors and 0 warnings`; `npm --prefix web run build` passed;
+      `npm --prefix web run test:e2e -- inspector-readable-content-regression.spec.ts
+      inspector-dirty-corpus.spec.ts ui-navigation-hover-inspector-repair.expected-red.spec.ts`
+      passed with 7/7 tests. Static guard-removal proof: Python search of `web/src/routes/components/Inspector.svelte`
+      found `model_latency_error: 0 occurrence(s)`, `Skip to main content: 0 occurrence(s)`,
+      `The homepage The Verge: 0 occurrence(s)`, so exact screenshot-family guard
+      literals are absent from product sanitation criteria. Runtime leak protection:
+      rendered primary body sample contains readable article copy; Playwright `leakedTokens`
+      assertion passed as empty; dirty corpus negative assertions reported no dirty
+      Inspector violations. Behavioral proof register marks original user bug and
+      residual B1 as PASS/PROVEN. Closure fields: step_intent retest_green, expected_result
+      green, observed_result green, verdict PASS, blockers [], gate_open_allowed true,
+      proof_gap_status NONE, blocking_status CLOSED, orchestrator_action_hint COMPLETE,
+      product implementation files modified no. Mainline had already passed the same
+      check/build/targeted Playwright/static guard verification after the fix squash
+      merge; no retest branch changes required merging.'
