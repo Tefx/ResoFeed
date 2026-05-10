@@ -10,7 +10,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "npm run check",
     "test": "npm run check && npm run test:render",
-    "test:render": "vitest run"
+    "test:render": "vitest run",
+    "test:e2e": "playwright test --config ./playwright.config.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
