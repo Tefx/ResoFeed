@@ -22971,7 +22971,7 @@ phases:
       full E2E ran 7 tests with 6 passed and 1 live-openrouter opt-in skipped.'
   - id: playwright-comprehensive-e2e.llm-live-smoke-boundary
     name: LLM Live Smoke Boundary and Skip Semantics
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -23067,6 +23067,8 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.llm-deterministic-failure-flows
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T10:14:40.494851+00:00'
   - id: playwright-comprehensive-e2e.api-mcp-parity-probes
     name: Browser-Led API/MCP Parity Probes
     status: claimed
