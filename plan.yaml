@@ -21354,7 +21354,7 @@ phases:
     skipped_reason: superseded
   - id: manual-rss-fetch.row-parity-remediation
     name: Source Ledger Row Parity Remediation
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -21534,6 +21534,8 @@ phases:
     depends_on:
     - visual-parity-remediation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T08:47:19.431930+00:00'
   - id: manual-rss-fetch.row-parity-retest
     name: Focused Source Ledger Row Parity Retest
     status: pending
