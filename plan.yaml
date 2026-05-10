@@ -34014,7 +34014,7 @@ phases:
     agent: frontend-engineer
   - id: fuidcr-shell-owner-doctor-surfaces
     name: Repair Shell, Owner Token Prompt, and /doctor surfaces
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -34159,6 +34159,8 @@ phases:
     - fuidcr-expected-red-ui-tests
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T17:57:45.184185+00:00'
   - id: fuidcr-ui-preview-cleanup
     name: Clean docs/ui-preview.html after live UI contracts stabilize
     status: pending
