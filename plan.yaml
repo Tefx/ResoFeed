@@ -37631,7 +37631,7 @@ phases:
       \ completed\n\n### Gaps/Notes\n- none"
   - id: fuidcr-architecture-blocker-retest
     name: Retest architecture blocker closure after batched remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -37854,6 +37854,149 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-10T20:24:50.838514+00:00'
+    done_at: '2026-05-10T20:30:14.240460+00:00'
+    evidence: '## Verification Report
+
+      **Tester**: software-architect (independent architecture/product-boundary retest)
+
+      **Scope**: blocker families B1-B5 after batched remediation
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — Read. Matrix declares
+      52 findings and guardrails forbidding sidecars, vector DB/RAG, account systems,
+      extra API/product concepts, and broad backend layering.
+
+      - docs/ARCHITECTURE.md — Read. One Go binary, one SQLite DB, thin HTTP/MCP transports,
+      lexical retrieval only, no accounts/OAuth/roles, no sync/merge/activity ledger.
+
+      - docs/DESIGN.md — Read. UI remains dense/legible workbench with operational
+      labels, no SaaS chrome, no persistent nav, flat Source Ledger, and terse state
+      portability.
+
+      - docs/ui-preview.html — Read. Preview now uses tokenized surface colors, mobile
+      detail h2 28px/32px, source ledger h2#source-ledger-title, and no “mobile feed/mobile
+      inspector” product-chrome labels.
+
+      - docs/ui-remediation-closure-register.json — Read. row_count=52, ids_present=1-52,
+      p0_covered=13, p1_covered=19, preview_canonicality=canonical, all findings status
+      PROVEN.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read. Expectations
+      enumerate F1-F52 in order and test F1-F47 against browser/DOM behavior plus
+      F48-F52 static preview drift.
+
+      - web/test-results/ui-remediation/playwright-results/results.json — Read. 2
+      expected tests passed, unexpected=0, with screenshot/trace attachments for F1-F47
+      and trace for F48-F52.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: PASS
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+
+      ## Architecture Blocker Retest Register
+
+      - B1 closure register integrity: PROVEN for F1-F52; 52 rows, IDs 1-52 exactly
+      once, exact title/severity match, accepted statuses only.
+
+      - B2 F<n> semantic mapping: PROVEN for F1-F52; machine-checked expectation titles
+      against matrix titles; no semantic remapping found.
+
+      - B3 P0/P1 evidence coverage: PROVEN for 13 P0 and 19 P1; each P0/P1 row includes
+      results JSON, visual PNG, and trace evidence.
+
+      - B4 F2 product drift: FIXED_WITH_EVIDENCE; persistent nav absence is implemented/proven,
+      not merely amended.
+
+      - B5 preview parity/static canonicality: PROVEN for F48-F52; static preview
+      checks passed and closure register marks preview canonical.
+
+
+      ## Behavioral Proof Register
+
+      - B1: PROVEN — closure register exactness validated against matrix.
+
+      - B2: PROVEN — F1-F52 expectations match exact matrix finding titles.
+
+      - B3: PROVEN — all 13 P0 and 19 P1 obligations have browser/DOM/visual evidence
+      classes.
+
+      - B4/F2: FIXED_WITH_EVIDENCE — no persistent nav/tab/side-nav selectors in conformance
+      test; closure notes implementation removal/proof.
+
+      - B5/F48-F52: PROVEN — preview static contract passes.
+
+      - NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING/BLOCKED: none observed; no unresolved
+      obligation blocks fuidcr-final-design-conformance-gate.
+
+
+      ## Backend/API/DTO and Forbidden Concepts Check
+
+      PASS. No product/backend/API/DTO drift in retest branch before committing audit
+      artifact. Closure notes for F11/F44 state DTO-gap candidates were reviewed and
+      UI derives source-backed fallback from existing ItemSummary/ItemDetail fields
+      without backend/API expansion. No forbidden accounts, sync, vector/RAG, settings,
+      service/repository/DI concepts were introduced by this retest.
+
+
+      ## Verification Commands / Inspections
+
+      - Read all seven required references.
+
+      - Ran Python integrity checks for matrix/register ID coverage, exact title/severity
+      match, accepted statuses, F expectation mapping, P0/P1 evidence classes, preview
+      static assertions, and Playwright result status.
+
+      - Targeted retest in worker: `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe --reporter=list,json --output=../web/test-results/ui-remediation-retest/playwright-test-output`
+      — result: 2 passed.
+
+
+      ## Mainline Final-State Verification
+
+      - `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe` — exit 0; 2 passed.
+
+      - `python3` closure register validation — exit 0; `architecture retest mainline
+      verification ok: e2e passed; closure register ids/p0/p1 valid`.
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: 9cc6e0623d09bd5c401b41a07e582c71f114b6f1
+
+      - Mainline squash commit: 033303d [vectl] step-fuidcr-architecture-blocker-retest
+      completed
+
+
+      ## Gaps/Notes
+
+      - Existing committed `results.json` attachment absolute paths reference the
+      prior remediation worktree root, but relative closure evidence paths exist in
+      this worktree and the isolated targeted retest passed.'
   - id: fuidcr-post-remediation-screenshot-uiux-audit
     name: Post-remediation screenshot-first UIUX conformance audit
     status: claimed
