@@ -32154,7 +32154,7 @@ phases:
     claimed_at: '2026-05-10T17:42:35.783653+00:00'
   - id: integration-verification
     name: Independent integration verification for reset and serve replacement paths
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -32346,6 +32346,8 @@ phases:
     depends_on:
     - complete-cli-reset
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T17:42:40.059393+00:00'
   - id: spec-architecture-drift-review
     name: Spec and architecture drift review for owner-token reset
     status: pending
