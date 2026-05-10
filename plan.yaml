@@ -33360,3 +33360,150 @@ phases:
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+  - id: fuidcr-shell-owner-doctor-surfaces
+    name: Repair Shell, Owner Token Prompt, and /doctor surfaces
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
+      tests
+
+
+      Complete the remaining shell/chrome, owner-token prompt, and /doctor repairs.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - fuidcr-contract-matrix-lock — findings 1-7 and 37-39 acceptance is AUTHORITATIVE.
+
+      - fuidcr-expected-red-ui-tests — shell/prompt/doctor tests and screenshot states
+      are PROTECTED.
+
+      - fuidcr-style-breakpoint-foundation — 1080px responsive foundation is AUTHORITATIVE.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte
+
+      - web/src/app.css
+
+      - Existing /doctor rendering component/surface code if separate.
+
+
+      FINDINGS TO CLOSE:
+
+      - 1: remove extra masthead chrome above workbench.
+
+      - 2: remove persistent dashboard/tab-style surface navigation not in design
+      model.
+
+      - 3: narrow/mobile shell avoids desktop chrome and preserves compact triage
+      space.
+
+      - 5: redundant mobile `RESOFEED` footer-like label removed/repositioned.
+
+      - 6: Owner Token Prompt visible copy is terse; no extra explanatory login/help
+      copy.
+
+      - 7: Owner Token Prompt submit/action uses workbench text/bracket action language
+      while preserving accessibility and hit targets.
+
+      - 37: /doctor long lines wrap and do not crop on narrow viewport.
+
+      - 38: /doctor behaves as clean operational surface boundary, not awkward diagnostic
+      block inserted above feed.
+
+      - 39: /doctor raw IDs remain raw but wrap/group readably.
+
+
+      CONSTRAINTS:
+
+      - Do not add friendly SaaS copy, accounts/OAuth/login flows, onboarding wizard,
+      admin process, or new route family.
+
+      - /doctor remains raw operational text, not a dashboard.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Shell/prompt/doctor
+      rendering must vary based on auth/token state, active operational surface, viewport,
+      and diagnostic output length.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Evidence MUST include rendered desktop and narrow/mobile screenshots for shell,
+      owner-token prompt, and /doctor.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Masthead/subtitle/tab nav still visible as persistent app chrome.
+
+      2. Mobile retaining desktop chrome that crowds feed triage.
+
+      3. Owner-token prompt reading like a login/help screen or generic filled form
+      button.
+
+      4. /doctor cropping long lines or mixing unclearly with feed content on narrow
+      viewport.
+
+      5. Any new account/OAuth/admin/onboarding product concept.'
+    verification: '- Focused tests for findings 1-7 and 37-39 pass green.
+
+      - Browser evidence includes desktop and <1080px screenshots of shell, owner-token
+      prompt, and /doctor.
+
+      - /doctor narrow proof shows long diagnostic lines wrap without crop.
+
+      - No forbidden product concepts or runtime surfaces are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/app.css — key passage or "NOT READ: <reason>"
+
+
+      ## Finding Closure
+
+      - Closed findings: 1,2,3,5,6,7,37,38,39
+
+      - Desktop screenshot refs: <paths>
+
+      - Narrow/mobile screenshot refs: <paths>
+
+      - /doctor wrap proof: <screenshot/test output>
+
+      - Forbidden concepts introduced: <must be none>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    - fuidcr-style-breakpoint-foundation
+    agent: frontend-engineer
