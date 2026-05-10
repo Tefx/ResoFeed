@@ -32751,3 +32751,120 @@ phases:
     depends_on:
     - fuidcr-contract-matrix-lock
     agent: software-architect
+  - id: fuidcr-style-breakpoint-foundation
+    name: Repair global style and responsive breakpoint foundation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      upstream_artifacts:
+
+      - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
+      matrix
+
+      - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
+      tests
+
+
+      Complete the style and breakpoint foundation within existing frontend surfaces.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - fuidcr-contract-matrix-lock — findings 4, 45, 46, 47 acceptance is AUTHORITATIVE.
+
+      - fuidcr-expected-red-ui-tests — test cases and screenshot states are PROTECTED.
+
+
+      YOUR SCOPE / touch_paths:
+
+      - web/src/app.css
+
+      - web/src/routes/+page.svelte only if breakpoint detection state is centralized
+      there.
+
+      - Shared style utilities used by bracket actions/focus, if already present.
+
+
+      FINDINGS TO CLOSE:
+
+      - 4: responsive breakpoint below 1080px, not 760px.
+
+      - 45: global button styling must not leak filled button defaults into component
+      contracts.
+
+      - 46: global focus rule must remain accessible but no longer broad/heavy on
+      programmatic headings.
+
+      - 47: accent/focus color must be scarce and disciplined.
+
+
+      CONSTRAINTS:
+
+      - Preserve DESIGN.md visual tokens and rare accent rule.
+
+      - Do not introduce theme systems, settings sliders, new routes, new runtime
+      surfaces, or architecture layers.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive frontend/CSS logic that processes real
+      viewport/focus/action states and produces output that varies based on those
+      states.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any remaining 760px breakpoint for Inspector/shell contract behavior.
+
+      2. Global button or disabled styling that still forces filled boxes onto bracket-action
+      surfaces.
+
+      3. Heavy focus rings on programmatically focused Inspector headings.
+
+      4. Decorative overuse of the accent/focus color outside active Resonate and
+      accessible focus needs.'
+    verification: '- Focused tests for findings 4,45,46,47 pass green after this step.
+
+      - Browser evidence shows layout switches below 1080px.
+
+      - CSS evidence shows bracket actions no longer inherit global filled button/disabled
+      backgrounds.
+
+      - Keyboard/focus checks show visible but restrained focus treatment.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/src/app.css — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Findings closed: 4,45,46,47 = YES/NO
+
+      - Files changed: <paths>
+
+      - Breakpoint proof: <test/screenshot refs for 1079px and >=1080px>
+
+      - Focus proof: <keyboard/focus output or screenshot refs>
+
+      - Button leakage proof: <selectors/classes checked>
+
+      - Forbidden concepts introduced: <must be none>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    - fuidcr-expected-red-ui-tests
+    agent: frontend-engineer
