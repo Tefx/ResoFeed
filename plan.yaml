@@ -34788,7 +34788,7 @@ phases:
       \ nav and verify Steer-driven SOURCE LEDGER activation.\n\n## Gaps/Notes\nnone"
   - id: fuidcr-ui-preview-cleanup
     name: Clean docs/ui-preview.html after live UI contracts stabilize
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -34882,6 +34882,108 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T18:46:44.296891+00:00'
+    done_at: '2026-05-10T18:53:23.461471+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree at required path.
+
+      - docs/DESIGN.md — Read: surface/background tokens, inspector-title 28px/32px,
+      feed row padding 12px 12px 11px 0 with non-layout-shifting marker, uppercase
+      operational labels only.
+
+      - docs/ui-preview.html — Read: preview contained #fffdf5, mobile Inspector h2
+      24px, explanatory mobile labels, off-token item padding, inline styles, and
+      mixed Source Ledger heading/timestamp/action labels.
+
+
+      ## Preview Cleanup Evidence
+
+      - Closed findings: 48,49,50,51,52.
+
+      - Preview file changed: docs/ui-preview.html = YES.
+
+      - Production files changed: none.
+
+      - Rendered preview check/screenshot refs: Playwright render DOM excerpt from
+      worker showed mobileTitleFont=28px/32px, mobileItemPadding=12px 12px 11px 0px,
+      inspectorBackground=rgb(251,248,239), ledgerHeading=`H2 SOURCE LEDGER`, mobileHeaders=[`RESOFEEDTODAY`,`RESOFEEDINSPECTOR`].
+
+      - Heading-level decision for finding 52: accepted live implementation contract
+      uses `h2#source-ledger-heading` with accessible name SOURCE LEDGER; preview
+      now matches that DOM contract.
+
+
+      ## Merge resolution / mainline integration
+
+      Initial `git merge --squash vectl/step-fuidcr-ui-preview-cleanup` was blocked
+      by pre-existing dirty main changes in `docs/ui-preview.html`. A conflict-resolver
+      reconciled dirty-main Source Ledger preview improvements with incoming cleanup
+      intent from branch `ad903b7`, preserving compatible improvements and ensuring
+      findings 48-52 remained closed. Resolver changed only `docs/ui-preview.html`,
+      staged nothing, and did not commit. Orchestrator then ran mainline verification
+      and committed the resolved preview.
+
+
+      ## Verification
+
+      Worker verification:
+
+      - `npm --prefix web ci` — PASS; installed web deps for verification.
+
+      - `npm --prefix web run test:e2e -- --grep "docs/ui-preview.html drift contract"`
+      — PASS; 1 test passed.
+
+      - Node static preview assertions — PASS for no `#fffdf5`, mobile 28/32, no mobile
+      explanatory labels, token padding, no selected padding override, Source Ledger
+      h2, no inline styles, canonical actions/timestamps/time groups.
+
+      - Playwright rendered DOM style check — PASS; computed style/DOM excerpt listed
+      above.
+
+      - `git status --short --branch` in worker — clean after commit.
+
+      Resolver verification:
+
+      - grep checks for conflict markers, `#fffdf5`, old mobile labels, and `font-size:
+      24px` — no matches.
+
+      - `npm --prefix web run test:e2e -- --grep "docs/ui-preview.html drift contract"`
+      — PASS; 1 test passed.
+
+      Mainline final-state gate:
+
+      - `npm --prefix web run test:e2e -- --grep "docs/ui-preview.html drift contract"`
+      — PASS; 1 test passed. Playwright webServer build also completed successfully.
+
+
+      ## Commit hash(es)
+
+      - Worker branch: ad903b7 (`fix ui preview contract drift`)
+
+      - Main squash/resolution commit: b87972e (`[vectl] step-fuidcr-ui-preview-cleanup
+      completed`)
+
+
+      ## Files changed
+
+      - docs/ui-preview.html
+
+
+      ## Deviations
+
+      none
+
+
+      ## Gaps/Notes
+
+      Required audit markdown was absent in the isolated worktree; finding details
+      were validated against docs/DESIGN.md, docs/ui-preview.html, and the targeted
+      preview drift test. Pre-existing unrelated dirty files outside this task remain
+      unmodified.'
   - id: fuidcr-browser-regression-proof
     name: Run independent browser regression and responsive behavior proof
     status: pending
