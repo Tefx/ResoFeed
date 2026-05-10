@@ -36440,7 +36440,7 @@ phases:
       \ with explicit remediation ownership."
   - id: fuidcr-browser-conformance-residual-f7-f13-fix
     name: Fix residual browser conformance blockers F7 and F13
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -36612,3 +36612,5 @@ phases:
     - fuidcr-shell-owner-doctor-surfaces
     - fuidcr-feed-search-anatomy
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T19:12:44.125660+00:00'
