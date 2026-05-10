@@ -22126,7 +22126,7 @@ phases:
       - Gaps/Notes: none'
 - id: playwright-comprehensive-e2e
   name: Playwright Comprehensive E2E
-  status: in_progress
+  status: done
   gate: Comprehensive browser-led Playwright E2E proves ResoFeed boots through the
     real cmd/resofeed binary, exercises feed/source operations, covers LLM success/failure/live-smoke
     boundaries without committing secrets, checks API/MCP parity where human-visible
@@ -23884,7 +23884,7 @@ phases:
       becomes required.'
   - id: playwright-comprehensive-e2e.gate
     name: Gate Playwright Comprehensive E2E
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: full-plan-check
@@ -23971,3 +23971,204 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T10:35:28.262845+00:00'
+    done_at: '2026-05-10T10:39:38.856563+00:00'
+    evidence: 'status: SUCCESS
+
+      Headline: PASS_WITH_DEBT
+
+      Gate Decision: OPEN
+
+      Blocking Status: CLOSED
+
+      Proof-Gap Status: NON_BLOCKING
+
+      Verdict: PASS
+
+      Blockers: []
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - `.agents/instructions.md` — READ: canonical docs; one `cmd/resofeed` deployable;
+      one SQLite DB; OpenRouter runtime-only secrets; no accounts/sync/vector/RAG;
+      HTTP/MCP same product operations.
+
+      - `docs/ARCHITECTURE.md` — READ: one Go binary serves static UI, JSON HTTP,
+      MCP `/mcp`, and ingestion; `OPENROUTER_KEY` runtime-only/redacted; `/api/*`
+      and `/mcp` require owner token; no forbidden architecture drift.
+
+      - `docs/DESIGN.md` — READ: owner-token prompt, first-use empty state, Steer,
+      Today feed, Inspector, flat Source Ledger, `/doctor`, lexical search/retrieval;
+      no onboarding/folders/tags/unread/archive/settings/decorative AI styling.
+
+      - `docs/ui-preview.html` — READ: muted palette, dense feed, 44px controls, Source
+      Ledger `[RUN INGEST]`/`[FETCH]`, `/doctor`, desktop split Inspector and mobile
+      Inspector route.
+
+      - `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md` — READ: harness builds/launches
+      real `cmd/resofeed`, captures stdout/stderr, isolated DB, sanitized env, traces/screenshots/logs,
+      deterministic CI matrix, tagged live OpenRouter boundary.
+
+      - `AGENTS.md` — NOT READ: absent in isolated worktree; `.agents/instructions.md`
+      read as equivalent guidance.
+
+
+      ## Gate Review Report
+
+      Reviewer: gate-reviewer (independent of phase implementation)
+
+      Phase: playwright-comprehensive-e2e
+
+
+      Evidence Review:
+
+      - core-feed-browser-flows: PASS; current E2E source import/manual fetch/feed/inspect/retrieve/search
+      passed.
+
+      - llm-deterministic-failure-flows: PASS; current `@llm-deterministic` tests
+      passed for missing/invalid startup, deterministic transport, runtime sanitization.
+
+      - api-mcp-parity-probes: PASS; current `@parity` passed against isolated real
+      server fixture and checks forbidden MCP tool names absent.
+
+      - llm-live-smoke-boundary: PASS; live OpenRouter project skipped deterministically
+      with absent key; live success not proven without real key but skip is contract-accepted.
+
+      - visual-ux-artifact-audit: PASS_WITH_DEBT; visual artifacts reviewed; debt:
+      generic artifact names.
+
+      - final-playwright-report/current verification: PASS; `npm --prefix web run
+      test:e2e` had 9 tests, 7 passed, 2 skipped, 0 failures.
+
+
+      Required Artifact Checklist:
+
+      - Real cmd/resofeed launch command and stdout/stderr: PASS.
+
+      - Playwright traces: PASS.
+
+      - Screenshots/videos/logs: PASS (videos absent because no failures and config
+      retains video on failure).
+
+      - DB fixture path: PASS.
+
+      - Sanitized environment notes: PASS.
+
+      - Feed/source operation coverage: PASS.
+
+      - LLM deterministic missing/invalid-key coverage: PASS.
+
+      - LLM live-smoke skip/pass/fail disposition: PASS.
+
+      - API/MCP parity proof register: PASS.
+
+      - Visual/UX artifact audit: PASS_WITH_DEBT.
+
+      - Secret/architecture drift check: PASS.
+
+
+      Wiring Audit (W1-W8):
+
+      - W1 real binary path: PASS (`global-setup.ts` builds `.test-artifacts/bin/resofeed`
+      from `./cmd/resofeed`).
+
+      - W2 no Vite/mock product runtime: PASS (Playwright baseURL is Go server; fixtures
+      only RSS/OpenRouter test transport).
+
+      - W3 isolated DB: PASS.
+
+      - W4 auth/owner-token control: PASS.
+
+      - W5 artifact capture: PASS.
+
+      - W6 LLM boundary: PASS.
+
+      - W7 parity/control-flow: PASS.
+
+      - W8 cleanup/redaction: PASS_WITH_DEBT (logs redacted; generated artifacts uncommitted).
+
+
+      Escape Hatch Audit:
+
+      - Scoped source scan for `@invar:allow` in `cmd/`, `internal/`, `web/`, and
+      `docs/`: PASS, no files found.
+
+
+      Smoke/Liveness Evidence:
+
+      - Command: `npm --prefix web run test:e2e`.
+
+      - Exit code: 0.
+
+      - Output: 9 tests run; 7 passed; 2 skipped; 0 failed.
+
+      - Server stdout: owner token hash stored; serving on 127.0.0.1; shutdown complete.
+
+      - JUnit: `.test-artifacts/playwright/results/junit.xml` reports tests=9, failures=0,
+      skipped=2, errors=0.
+
+
+      Real Integration vs Fixture-Injection Assessment:
+
+      - Real integration: browser hits real `cmd/resofeed` binary, imports OPML through
+      UI, triggers real ingest/fetch/API paths, opens Inspector, toggles resonance,
+      probes `/doctor`, lexical search, HTTP API, and MCP on same product server.
+
+      - Fixture injection: deterministic RSS feed server and local OpenRouter test
+      transport only; they do not replace the product API/server.
+
+      - Live OpenRouter: absent key led to deterministic skip, satisfying no-secret
+      boundary.
+
+
+      Gate Decision Basis:
+
+      - Requirements 1,3,5,8: PASS/OPEN with no unresolved status.
+
+      - Requirement 2: PASS/OPEN; videos absent because no failures; optional preserve
+      happy-path videos.
+
+      - Requirement 4: PASS/OPEN; no live-key success proof because key absent; closure
+      path is opt-in `OPENROUTER_KEY=<redacted> npm --prefix web run test:e2e -- --grep
+      @live-openrouter` when key available.
+
+      - Requirement 6: PASS_WITH_DEBT/OPEN; optional semantic screenshot naming.
+
+      - Requirement 7: PASS/OPEN; generated artifacts uncommitted by policy.
+
+
+      Should-fix / non-blocking debt:
+
+      - Keep/archive generated `.test-artifacts/playwright/` outside git; do not commit
+      it.
+
+      - Optionally name happy-path screenshots by semantic UI state.
+
+      - `npm ci` reported 3 low-severity vulnerabilities; not release-confidence blocking
+      for this E2E gate.
+
+
+      Closure fields:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - proof_gap_status: NON_BLOCKING
+
+      - uncertainty_sources: live OpenRouter success path not exercised because `OPENROUTER_KEY`
+      absent; videos not emitted because no Playwright failures occurred.
+
+
+      Implementation evidence:
+
+      - Commit hash(es): none — gate review only; no product/docs/tests changes committed.
+
+      - Files changed: none committed.
+
+      - Verification Run: initial command failed until `npm --prefix web ci`; final
+      `npm --prefix web run test:e2e` passed with 7 passed, 2 skipped.'
