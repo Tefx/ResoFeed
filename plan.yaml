@@ -32294,7 +32294,7 @@ phases:
       - none; no files changed, so no commit was needed.'
   - id: integration-verification
     name: Independent integration verification for reset and serve replacement paths
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -32488,6 +32488,65 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T17:42:40.059393+00:00'
+    done_at: '2026-05-10T17:46:21.883342+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — Read:\
+      \ single owner token with auto-generation and CLI-only offline reset; reset\
+      \ deletes only `runtime_metadata.key='owner_token_sha256'`; no HTTP/MCP/Settings/UI\
+      \ reset; serve replacement paths generate or accept explicit replacement.\n\
+      - docs/USAGE.md — Read: owner-token reset command is CLI-only, deletes only\
+      \ stored hash, does not generate/print/store replacement token; after reset\
+      \ serve can generate or set explicit token; localStorage deletion is client-local\
+      \ only.\n- AGENTS.md — NOT READ: file absent in isolated worktree at `.vectl/worktrees/integration-verification/AGENTS.md`.\n\
+      - .agents/instructions.md — Read: canonical docs are law; single Go binary,\
+      \ one SQLite DB, owner-token boundary, no settings-dashboard/UI reset expansion.\n\
+      \n## Integration Verification Report\nstep_intent: verify_green\nexpected_result:\
+      \ green\nobserved_result: green\nfailure_alignment: none\nverdict: PASS\nblockers:\
+      \ []\n**Tester**: integration-verifier (independent of implementation)\n**Scope**:\
+      \ offline reset CLI + SQLite + serve replacement paths\n**Independence Level**:\
+      \ L2\n\n### Test Execution\n- Commands executed included:\n  - `go build -o\
+      \ ./.audit-artifacts/iv.4H1V4C/resofeed ./cmd/resofeed`\n  - reset with `--confirm-reset`\n\
+      \  - reset missing `--confirm-reset`\n  - reset invalid DB path\n  - serve after\
+      \ reset without `--owner-token`\n  - reset again then serve with explicit `--owner-token`\n\
+      \  - `serve --help`\n  - production scan of `internal/resofeed/http.go`, `internal/resofeed/mcp.go`,\
+      \ and `web/src` for reset HTTP/MCP/UI/serve-flag surfaces.\n- Actual output\
+      \ summary:\n  - build_exit=0\n  - reset_exit=0; reset_stdout=''; reset_stderr=''\n\
+      \  - missing_confirm_exit=2; stderr='err: invalid_owner_token_reset: --confirm-reset\
+      \ is required\\n'; unchanged=True\n  - invalid_db_exit=2; stderr='err: invalid_db:\
+      \ cannot open sqlite database\\n'; invalid_db_path_exists_after=False; parent_exists_after=False\n\
+      \  - reset_output_forbidden_strings={'owner token generated:': False, 'rfeed_':\
+      \ False}\n  - serve_help_has_reset_owner_token=False\n  - HTTP/MCP/UI reset\
+      \ surface scan: no reset hits; only unrelated `settings-slider` forbidden-pattern\
+      \ constants in `web/src/lib/api-contract.ts`.\n\n### SQLite Mutation Proof\n\
+      - Before reset rows:\n  `{\"agent_receipts\": 1, \"item_state\": 1, \"items\"\
+      : 1, \"runtime_metadata\": [[\"other_runtime_key\", \"preserve-me\", 222], [\"\
+      owner_token_sha256\", \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\
+      , 111]], \"sources\": 1, \"steer_rules\": 1}`\n- After reset rows:\n  `{\"agent_receipts\"\
+      : 1, \"item_state\": 1, \"items\": 1, \"runtime_metadata\": [[\"other_runtime_key\"\
+      , \"preserve-me\", 222]], \"sources\": 1, \"steer_rules\": 1}`\n  This proves\
+      \ only `runtime_metadata.owner_token_sha256` was removed; other runtime metadata\
+      \ and representative product tables remained.\n\n### Serve Replacement Proof\n\
+      - No-owner-token serve after reset output/hash:\n  stdout=`owner token generated:\
+      \ rfeed_JdUSSe3Mf_IHnxaG2Tk_xEarcTaAPHk6I6Pwm6r_tio\\nserving ResoFeed on 127.0.0.1:51898\
+      \ (public-url http://127.0.0.1:51898)\\nshutdown complete\\n`\n  hash=`e63909c6711b6b00489e8bbeace1920339ffd46a406e1d6763f6a572f7f686a7`;\
+      \ exit after terminate=0; ready_hash_observed=True.\n- Explicit-token serve\
+      \ after reset output/hash:\n  stdout=`owner token explicit: stored hash\\nserving\
+      \ ResoFeed on 127.0.0.1:51901 (public-url http://127.0.0.1:51901)\\nshutdown\
+      \ complete\\n`\n  stored hash=`7345a7c8bebb3aa310e9cb210ba19527ddeec524541d90301ee638d19aa5daea`\n\
+      \  expected SHA-256=`7345a7c8bebb3aa310e9cb210ba19527ddeec524541d90301ee638d19aa5daea`\n\
+      \  explicit_hash_matches=True.\n\n### Behavioral Proof Register\n- reset-deletes-only-owner-token-hash:\
+      \ PROVEN via before/after SQLite snapshots.\n- missing-confirm-nonmutating:\
+      \ PROVEN via exit=2 and unchanged snapshot.\n- invalid-db-nonmutating: PROVEN\
+      \ via exit=2 and no target/parent created.\n- reset-output-no-token: PROVEN\
+      \ via stdout/stderr forbidden string scan.\n- serve-generated-replacement: PROVEN\
+      \ via generated-token startup and persisted 64-char hash.\n- serve-explicit-replacement:\
+      \ PROVEN via stored hash exactly matching SHA-256 of explicit token.\n- forbidden-reset-surfaces-absent:\
+      \ PROVEN via serve help and HTTP/MCP/UI scans.\n- browser-localstorage-client-local:\
+      \ PROVEN via frontend localStorage lines showing no SQLite mutation path.\n\n\
+      ## Gate Decision Fields\nheadline: PASS\nproof_gap_status: NONE\nblocking_status:\
+      \ CLOSED\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\n##\
+      \ Files changed / artifacts\n- none; temporary `.audit-artifacts/iv.*` probe\
+      \ directory was removed by trap; final worktree clean.\n\n## Commit hash(es)\n\
+      - none; no files changed, so no commit needed."
   - id: spec-architecture-drift-review
     name: Spec and architecture drift review for owner-token reset
     status: pending
