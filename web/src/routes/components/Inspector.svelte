@@ -94,28 +94,44 @@
   function removeDiagnosticSentences(text: string): string {
     return text
       .split(/(?<=[.!?])\s+/)
-      .filter((sentence) => !/\b(?:model_latency_error|summary_unavailable|partial_extraction|original_unavailable)\b/i.test(sentence))
+      .filter((sentence) => !hasOperationalStatusLeak(sentence) && !isOperationalTransportNotice(sentence))
       .join(' ');
+  }
+
+  function hasOperationalStatusLeak(text: string): boolean {
+    const snakeCaseStatus = /\b(?:[a-z]+_)+(?:error|unavailable|extraction|timeout|failed|failure|status|diagnostic|latency)\b/i;
+    const diagnosticContext = /\b(?:model|summary|extraction|original|openrouter|diagnostic|status)\b/i;
+    return snakeCaseStatus.test(text) && diagnosticContext.test(text);
+  }
+
+  function isOperationalTransportNotice(text: string): boolean {
+    return /\b(?:openrouter|model|llm)\b/i.test(text)
+      && /\b(?:transport|authority|runtime|diagnostic|status)\b/i.test(text);
+  }
+
+  function isPlaceholderSummary(text: string): boolean {
+    const words = text.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? [];
+    return words.length > 0 && words.length <= 4 && /\bsummary\b/i.test(text);
   }
 
   function isNonArticleDiagnosticText(text: string): boolean {
     const normalized = text.replace(/\s+/g, ' ').trim();
     if (!normalized) return true;
 
-    // Primary reading copy excludes model/test harness diagnostics and corpus
-    // inventories. Provenance remains available in the raw disclosure below.
-    const modelHarnessStatus = /\b(?:stub(?:bed)?|fixture|test|deterministic)\b/i.test(normalized)
-      && /\b(?:summary|transport|authority|outside|runtime|harness)\b/i.test(normalized);
-    const corpusInventory = /\b(?:rss|feed|inspector)\s+(?:case|cases|corpus|regression)s?\b/i.test(normalized)
+    // Primary reading copy excludes operational diagnostics and inventory-like
+    // source dumps. Provenance remains available in the raw disclosure below.
+    const operationalDiagnostic = /\b(?:summary|transport|authority|runtime|diagnostic|status|model|extraction)\b/i.test(normalized)
+      && hasOperationalStatusLeak(normalized);
+    const sourceInventory = /\b(?:rss|feed|inspector|article|source)\s+(?:case|cases|corpus|regression|inventory|dump|payload)s?\b/i.test(normalized)
       && /\b[a-z][a-z0-9]+(?:_[a-z0-9]+){2,}\b/.test(normalized);
 
-    return modelHarnessStatus || corpusInventory;
+    return operationalDiagnostic || sourceInventory || isOperationalTransportNotice(normalized) || isPlaceholderSummary(normalized);
   }
 
   function removeSourceBoilerplate(text: string): string {
     return text
-      .replace(/\bSkip to main content\b/gi, ' ')
-      .replace(/\bThe homepage The Verge(?:\s+Reviews\s+Podcasts\s+Newsletters)?\b/gi, ' ')
+      .replace(/\bskip\s+to\s+(?:main\s+)?(?:content|article|navigation|menu)\b/gi, ' ')
+      .replace(/\b(?:the\s+)?(?:homepage|home\s+page)\b(?:\s+[A-Z][\w&'-]*){1,10}(?=\s+(?:reviews|podcasts|newsletters|news|videos|sections|menu)\b)(?:\s+\w+){0,8}/g, ' ')
       .replace(/(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?/gi, ' ')
       .replace(/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{[^}]*\}/g, ' ')
       .replace(/\bhistory\.scrollRestoration\s*=\s*['"][^'"]+['"];?/g, ' ');
