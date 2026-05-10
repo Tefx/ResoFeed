@@ -24395,42 +24395,75 @@ phases:
     - contract-design-audit
     agent: frontend-engineer
   - id: implementation-repair
-    name: Implement design-conformant UI repairs
+    name: Complete UI regression-class repairs within existing surfaces
     status: pending
     description: 'step_type: implementation
 
+      agent_source: project
+
 
       Complete the UI repair within existing ResoFeed surfaces and design constraints
-      from the contract/design audit and expected-red tests.
+      from the contract/design audit and the expected-red tests. This is not a narrow
+      three-bug patch: repair the class of issues covering real clickability, keyboard/a11y
+      activation, interaction-state clarity, Inspector hierarchy, dirty content handling,
+      artifact generation, and negative UX drift.
 
 
       UPSTREAM ARTIFACTS (authoritative):
 
-      - contract-design-audit — intended behavior for SOURCE LEDGER clickability,
-      selected+hover state treatment, and Inspector hierarchy.
+      - contract-design-audit — intended behavior and selectors/observables for the
+      full UI regression class.
 
-      - expected-red-browser-tests — protected Playwright/browser tests that expose
-      the reported gaps.
+      - expected-red-browser-tests — protected core browser regressions.
+
+      - expected-red-hit-target-clickability-tests — protected real click/obstruction
+      tests.
+
+      - expected-red-keyboard-a11y-tests — protected keyboard/a11y activation tests.
+
+      - expected-red-state-matrix-screenshot-tests — protected interaction-state matrix
+      tests.
+
+      - expected-red-inspector-dirty-corpus-tests — protected dirty real-content Inspector
+      fixtures/tests.
+
+      - expected-red-design-artifact-negative-ux-tests — protected artifact and negative
+      UX tests.
 
 
       YOUR SCOPE:
 
-      - Fix the existing `SOURCE LEDGER` navigation/control so it opens the Source
-      Ledger panel/surface reliably on desktop and supported responsive layouts.
+      - Fix the existing `SOURCE LEDGER` and related navigation/control clickability
+      so each required visible control is operable by real pointer hit-targets: `SOURCE
+      LEDGER`, `TODAY`, Steer submit, star/resonate, Inspector links, `/doctor`, OPML
+      import, and source fetch buttons where present.
 
-      - Adjust feed row selected+hover/focus styling so selected state remains clear
-      and low-noise; do not stack a noisy hover highlight over selected state; preserve
-      non-layout-shifting state treatment.
+      - Remove or correct overlay/z-index/pointer-events/layout obstruction patterns
+      that make controls visually present but inert.
 
-      - Refactor Inspector rendering so the primary detail view is structured and
-      readable. Raw original text, JSON-LD, extracted metadata, or provenance payloads
-      must be demoted to a labeled secondary/collapsed region or otherwise clearly
-      separated per the contract.
+      - Ensure keyboard operation: tab order, focus visibility, Enter/Space activation,
+      roles/labels, and active state semantics for nav/actions/tabs/buttons.
+
+      - Adjust feed row normal/hover/selected/selected+hover/focus/selected+focus
+      styling so selected remains clear and low-noise; hover/focus must not stack
+      noisy active styling or shift layout.
+
+      - Refactor Inspector rendering so default detail view is readable and structured:
+      title/source/time/link/summary/content first; raw original text, JSON-LD, extracted
+      metadata, media/enclosure, and provenance payloads demoted to labeled secondary/collapsed/provenance/raw
+      regions.
+
+      - Support dirty real-content fixtures without dumping raw payload into primary
+      surfaces.
+
+      - Produce/enable required named screenshot artifacts for design audit: owner-token,
+      first-use, today-list, source-ledger, selected-item, selected-hover, inspector-clean,
+      inspector-raw-expanded/provenance, llm-error, search, and mobile view if applicable.
 
       - Keep behavior within existing product concepts: Inspect, Resonate, Steer,
       Retrieve, Source Ledger. Do not introduce folders, tags, unread counts, onboarding
       wizards, settings sliders, drag-and-drop ordering, recommendation modules, SaaS/magic
-      copy, or new top-level product concepts.
+      copy, mascot copy, or new top-level concepts.
 
 
       UI/UX constraints:
@@ -24450,42 +24483,57 @@ phases:
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
       UI must process actual item/source data and produce visible DOM output that
-      varies based on inputs. Empty placeholders, hidden controls, or raw dumps relabeled
-      as structured content do not satisfy this step.
+      varies based on inputs. Empty placeholders, hidden controls, inert hitboxes,
+      raw dumps relabeled as structured content, or screenshots without working interaction
+      paths do not satisfy this step.
 
 
-      If a contract artifact is wrong or incomplete, document a deviation record (type,
-      what, why, impact) — do NOT silently rewrite the contract or tests.'
+      If a contract or test artifact is wrong or incomplete, document a deviation
+      record (type, what, why, impact) — do NOT silently rewrite the contract or weaken
+      protected tests.'
     verification: '- `cd web && npm run check` passes after implementation.
 
-      - `cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"`
-      now passes locally for the three repair cases.
+      - All protected expected-red suites now pass green with exact commands/output
+      captured.
 
-      - Evidence includes before/after notes for clickability, selected+hover state,
-      and Inspector hierarchy.
+      - Evidence includes before/after notes for pointer clickability, keyboard/a11y,
+      state matrix, Inspector hierarchy, dirty content corpus, artifact generation,
+      and negative UX assertions.
 
       - Evidence includes artifact paths for screenshots/traces used to compare before/after
       states.
 
       - No forbidden ResoFeed UI/product concepts are introduced.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
       \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
-      - Files changed:\n  ```\n  <paths>\n  ```\n- Exact commands executed:\n  ```\n\
-      \  cd web && npm run check\n  cd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair\"\
-      \n  ```\n- Actual command output:\n  ```\n  <paste relevant stdout/stderr>\n\
-      \  ```\n- Before/after notes:\n  - SOURCE LEDGER clickability: <before -> after>\n\
-      \  - Selected+hover state: <before -> after>\n  - Inspector hierarchy/raw payload\
-      \ demotion: <before -> after>\n- Screenshots/traces:\n  - before: <artifact\
-      \ path or NOT AVAILABLE: reason>\n  - after: <artifact path>\n- Design constraint\
-      \ checklist:\n  - muted/archival preserved: yes/no + notes\n  - functional labels\
-      \ only: yes/no + notes\n  - no forbidden concepts introduced: yes/no + notes\n\
-      - Deviation records:\n  - <none or type/what/why/impact>\n- Blocker/closure\
-      \ fields:\n  - blockers_found: <none/list>\n  - closure_path: <tests/verification/audit\
-      \ that close each issue>\n  - unresolved_ambiguity: <none/list>\n"
+      - Product files changed: <paths>\n- Protected test files preserved/updated only\
+      \ with deviation records: <paths or NONE>\n- Exact commands:\n```sh\ncd web\
+      \ && npm run check\ncd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair|hit-target|keyboard|a11y|state\
+      \ matrix|dirty corpus|design artifact|negative UX\"\n```\n- Runner output:\n\
+      ```text\n<paste output>\n```\n- Before/after notes:\n  - Pointer hit-targets/clickability:\
+      \ <notes>\n  - Keyboard/a11y activation: <notes>\n  - Interaction state matrix:\
+      \ <notes>\n  - Inspector hierarchy/dirty corpus: <notes>\n  - Design artifacts/negative\
+      \ UX: <notes>\n- Artifact paths: <screenshots/traces>\n- Deviation records:\
+      \ <none or list>\n\n## Closure Fields\nverdict: PASS | PASS_WITH_DEBT | FAIL\n\
+      blockers: []\ngate_open_allowed: false\nproof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN\
+      \ with notes>\norchestrator_action_hint: proceed_to_independent_verification\
+      \ | create_fix_step"
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
+    - web/src/routes/+page.svelte
+    - web/src/routes/components/Feed.svelte
+    - web/src/routes/components/Inspector.svelte
     depends_on:
     - contract-design-audit
     - expected-red-browser-tests
+    - expected-red-hit-target-clickability-tests
+    - expected-red-keyboard-a11y-tests
+    - expected-red-state-matrix-screenshot-tests
+    - expected-red-inspector-dirty-corpus-tests
+    - expected-red-design-artifact-negative-ux-tests
     agent: frontend-engineer
   - id: playwright-repair-verification
     name: Deterministic Playwright and interaction verification
