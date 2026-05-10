@@ -19282,10 +19282,12 @@ phases:
       Native multimodal implementation audit for Manual RSS Fetch Source Ledger states.
 
 
-      CRITICAL: Compare the rendered implementation against `docs/ui-preview.html`.
-      If the visual effect deviates in ANY way (e.g., incorrect bracket padding, missing
-      terminal hover inversion, presence of SaaS animations/spinners/shadows, layout
-      shifts), this step MUST BE REJECTED/FAILED. Only exact visual compliance passes.
+      CRITICAL: This step is blocked until `verification-retest-after-remediation`
+      proves B1/B2/R9 closure or explicit non-intersection. Compare the rendered implementation
+      against the post-remediation `docs/ui-preview.html`. If the visual effect deviates
+      in ANY way (e.g., incorrect bracket padding, missing terminal hover inversion,
+      presence of SaaS animations/spinners/shadows, layout shifts), this step MUST
+      BE REJECTED/FAILED. Only exact visual compliance passes.
 
 
       Required rendered states/artifacts:
@@ -19315,7 +19317,10 @@ phases:
       this gate.
 
       - Any SaaS animation, spinner, shadow, friendly copy, pill rounding drift, or
-      bracket-label/padding drift is blocking.'
+      bracket-label/padding drift is blocking.
+
+      - Treat unresolved B2 design-reference drift or unresolved R9 Source Ledger
+      copy intersection as BLOCKING.'
     verification: '- Strict visual comparison artifacts are attached for all required
       states.
 
@@ -19323,15 +19328,16 @@ phases:
       inversion, no spinners/animations/shadows, no layout shifts, and exact Source
       Ledger density.
 
+      - Audit explicitly cites `verification-retest-after-remediation` PASS/PASS_WITH_DEBT
+      evidence for B1/B2/R9 closure before evaluating visuals.
+
       - Result must be parseable PASS only if every visual requirement exactly matches
       docs/ui-preview.html; otherwise REJECTED/FAILED with blocker findings.
 
       - This phase-check protects manual-rss-fetch.gate and is mandatory for UI/UX
       implementation acceptance.'
-    evidence_template: '## Strict UI/UX Audit Report
+    evidence_template: '## refs Read Confirmation (MANDATORY)
 
-
-      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -19343,56 +19349,27 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Visual Comparison Artifacts
-
-      | State | Rendered artifact | ui-preview reference | Verdict | Notes |
-
-      | --- | --- | --- | --- | --- |
-
-      | default ledger | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
-
-      | source fetching | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
-
-      | global ingesting | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
-
-      | completion HH:MM:SS | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
-
-      | error/conflict | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
-
-      | hover/focus inversion | <path/link> | docs/ui-preview.html | PASS/FAIL | <notes>
-      |
+      ## UI/UX Audit Evidence
 
 
-      ## Mandatory rejection checklist
+      **Remediation retest dependency reviewed**: <PASS/PASS_WITH_DEBT evidence ref>
 
-      - Incorrect bracket padding: YES/NO
+      **Rendered artifacts**: <screenshots/DOM snapshots/captures>
 
-      - Missing terminal hover inversion: YES/NO
+      **docs/ui-preview.html comparison**: <PASS/FAIL with differences>
 
-      - SaaS animations/spinners/shadows present: YES/NO
+      **B2 ambiguity status**: CLOSED | OPEN
 
-      - Layout shifts present: YES/NO
+      **R9 Source Ledger copy intersection**: FIXED | NON_INTERSECTING | BLOCKING
 
-      - Lowercase or non-canonical labels present: YES/NO
-
-      - Raw RFC3339 shown where HH:MM:SS required: YES/NO
-
-
-      ## Headline
-
-      - [ ] PASS: Exact visual compliance with docs/ui-preview.html
-
-      - [ ] REJECTED/FAILED: Any visual deviation found
-
-      '
+      **Headline**: PASS | FAIL'
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
     depends_on:
     - manual-rss-fetch.frontend-implementation
-    - manual-rss-fetch.integration-proof
+    - verification-retest-after-remediation
+    agent: uiux-auditor
   - id: manual-rss-fetch.gate
     name: Gate Manual RSS Fetch
     status: pending
