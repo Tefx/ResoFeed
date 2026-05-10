@@ -29629,7 +29629,7 @@ phases:
     agent: gate-reviewer
   - id: uiux-audit-clean-inspector-primary-body
     name: UI/UX audit clean Inspector primary body
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -29773,3 +29773,29 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T14:26:57.893985+00:00'
+    done_at: '2026-05-10T14:31:59.013172+00:00'
+    evidence: 'UI/UX audit evidence accepted from uiux-auditor. Audit artifact committed
+      on branch as `c7bad9db7aae69d38ba1f479cf6fd579149ee542`, squash-merged to main
+      as `e70dc8d` at `.audit-artifacts/uiux-audit-clean-inspector-primary-body.md`;
+      no product code changed. Refs confirmation present for docs/DESIGN.md, inspector-readable-content-regression,
+      inspector-dirty-corpus, ui-navigation-hover-inspector-repair, and project instructions.
+      Rendered artifacts reviewed include Playwright screenshots, trace, and `results.json`
+      attachments for inspector-readable-content and dirty-corpus states. Primary
+      body legibility verdict PASS: rendered Inspector primary copy shows readable
+      article text or controlled fallback, including `Readable article lead that should
+      be safe for primary Inspector reading copy.` Raw source garbage audit PASS for
+      JavaScript/script bodies, CSS/style/custom property text, JSON-LD/provenance/diagnostic
+      text, navigation/menu boilerplate, and `model_latency_error`. Metadata/provenance
+      separation verified in supporting monospace areas (`src`, `original link`, `why`,
+      collapsed raw provenance diagnostics), visually/semantically separate from article
+      title/body. DESIGN.md conformance PASS for dense/legible Inspector, functional
+      labels/tone, muted archival aesthetic/no SaaS magic, and no unapproved product/design
+      invention. Behavioral proof register entries all PASS. Closure fields: headline
+      PASS, verdict PASS, blockers [], gate_open_allowed true, proof_gap_status NONE,
+      blocking_status CLOSED, orchestrator_action_hint COMPLETE. Commands run by auditor:
+      dependency bootstrap, `npm --prefix web run check` passed, single regression
+      Playwright passed, 3-spec targeted Playwright passed 7/7. Mainline final-state
+      verification after squash merge: `npm --prefix web run check` passed with 0
+      errors/warnings. Note: mobile/narrow states were not rerun; accepted as non-blocking
+      because this phase gate scope is the reported desktop/right Inspector primary-body
+      contamination and targeted desktop Chromium Inspector coverage.'
