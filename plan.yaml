@@ -31863,7 +31863,7 @@ phases:
       \ not modified, and the red failures match the declared pre-implementation gap."
   - id: complete-cli-reset
     name: Complete CLI-only offline reset implementation
-    status: claimed
+    status: done
     description: "step_type: implementation\n\nFill in stub bodies and command dispatch\
       \ in the existing single-binary CLI path per the contract from owner-token-offline-reset.contract-lock\
       \ and tests from owner-token-offline-reset.expected-red-tests.\n\nUPSTREAM ARTIFACTS\
@@ -31988,6 +31988,54 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-10T17:35:46.763345+00:00'
+    done_at: '2026-05-10T17:42:05.995541+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — Read;\
+      \ key passage: one deployable, one SQLite DB, owner-token reset is CLI-only\
+      \ and deletes only `runtime_metadata.key='owner_token_sha256'`.\n- docs/USAGE.md\
+      \ — Read; key passage: offline reset command does not generate, print, accept,\
+      \ or store replacement plaintext token.\n- AGENTS.md — NOT READ: subagent reported\
+      \ file not present in isolated worktree; `**/AGENTS.md` returned no files.\n\
+      - .agents/instructions.md — Read; key passage: keep flat `internal/resofeed/`\
+      \ shape, no sidecars, no HTTP/MCP/UI reset surface.\n\n## Implementation Evidence\n\
+      - Files changed:\n  - `internal/resofeed/db.go`\n  - `internal/resofeed/owner_token_reset_contract_test.go`\n\
+      \  - `internal/resofeed/owner_token_reset_expected_red_test.go`\n- Stub markers\
+      \ replaced:\n  - Replaced `runOwnerTokenResetContractStub` dispatch with working\
+      \ `runOwnerTokenReset`.\n  - Added existing-file SQLite open path and targeted\
+      \ reset helper.\n- Exact command/test runs:\n  - Subagent: `gofmt -w internal/resofeed/db.go\
+      \ internal/resofeed/owner_token_reset_contract_test.go` — exit 0.\n  - Subagent:\
+      \ `go test ./internal/resofeed -run 'Test(ExpectedRedOwnerTokenReset|ExpectedRedServeAfterReset|ExpectedRedMCP|ExpectedRedNo|OwnerTokenReset)'`\
+      \ — exit 0.\n  - Subagent: `go test ./...` — exit 0.\n  - Subagent: `go build\
+      \ -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-complete-cli-reset\
+      \ ./cmd/resofeed` — exit 0.\n  - Subagent: `golangci-lint run` — exit 0 (`0\
+      \ issues.`).\n  - Subagent: `go test -race ./internal/resofeed -run 'Test(ExpectedRedOwnerTokenReset|ExpectedRedServeAfterReset|ExpectedRedMCP|ExpectedRedNo|OwnerTokenReset)'`\
+      \ — exit 0.\n  - Orchestrator mainline final-state verification: `go test ./...\
+      \ && go build ./cmd/resofeed` — exit 0; cmd no tests; internal package ok.\n\
+      - Confirmed delete-only SQL mutation:\n  - Implementation executes exactly `delete\
+      \ from runtime_metadata where key = 'owner_token_sha256'`.\n  - Tests verify\
+      \ other runtime metadata and product tables remain unchanged.\n- Confirmed missing-confirmation\
+      \ failure path:\n  - Existing parser rejects missing `--confirm-reset` with\
+      \ non-zero exit before reset helper runs.\n- Confirmed invalid/unopenable DB\
+      \ path behavior:\n  - Reset path `os.Stat`s DB path first and opens only the\
+      \ specified existing SQLite path; invalid path returns `err: invalid_db: cannot\
+      \ open sqlite database`.\n- Confirmed reset output contains no `owner token\
+      \ generated:` or `rfeed_`:\n  - Expected-red and contract tests assert reset\
+      \ stdout/stderr contain no generated-token/replacement-token output.\n- Confirmed\
+      \ no forbidden HTTP/MCP/UI/serve flag surfaces:\n  - Expected-red surface tests\
+      \ passed for no HTTP reset route, no MCP reset tool/resource, no UI reset control,\
+      \ and no `serve --reset-owner-token`.\n- Deviation records from upstream contract/tests:\n\
+      \  - type: contract_error/test_error; artifact: `internal/resofeed/owner_token_reset_contract_test.go`;\
+      \ changed stub-only success test into implemented delete-only behavior test;\
+      \ why: implementation step supersedes prior contract-lock stub expectation;\
+      \ impact: preserves grammar and verifies delete-only mutation.\n  - type: test_error;\
+      \ artifact: `internal/resofeed/owner_token_reset_expected_red_test.go`; changed\
+      \ invalid child-path absence assertion to accept platform `not a directory`\
+      \ stat errors; why: Darwin returns ENOTDIR when a parent component is a file;\
+      \ impact: keeps invalid-path no-creation assertion portable without changing\
+      \ product behavior.\n\n## Commit hash(es)\n- Worktree commit: 0a3512498e44fb9bf043c0c60f672eece2463286\n\
+      - Mainline squash commit: 839aaf4 [vectl] step-complete-cli-reset completed\n\
+      \n## Gaps/Notes\n- No forbidden HTTP/MCP/UI/Settings reset surface or `serve\
+      \ --reset-owner-token` flag introduced.\n- Implementation remains in existing\
+      \ flat Go files and uses the existing single-binary CLI path."
   - id: cli-liveness-probe
     name: Black-box CLI liveness probe for reset command
     status: pending
