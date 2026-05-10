@@ -37856,7 +37856,7 @@ phases:
     claimed_at: '2026-05-10T20:24:50.838514+00:00'
   - id: fuidcr-post-remediation-screenshot-uiux-audit
     name: Post-remediation screenshot-first UIUX conformance audit
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -38063,3 +38063,5 @@ phases:
     depends_on:
     - fuidcr-batched-architecture-blocker-remediation
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-10T20:25:02.814957+00:00'
