@@ -34987,7 +34987,7 @@ phases:
   - id: fuidcr-browser-regression-proof
     name: Rerun independent browser regression and responsive behavior proof after
       Source Ledger fix
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -35265,8 +35265,6 @@ phases:
     - fuidcr-ui-preview-cleanup
     - fuidcr-ledger-reachability-proof-path-fix
     agent: integration-verifier
-    claimed_by: integration-verifier
-    claimed_at: '2026-05-10T18:53:39.252229+00:00'
   - id: fuidcr-screenshot-first-uiux-audit
     name: Run screenshot-first native UIUX design conformance audit
     status: pending
