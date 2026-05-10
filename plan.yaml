@@ -24329,3 +24329,96 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: implementation-repair
+    name: Implement design-conformant UI repairs
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete the UI repair within existing ResoFeed surfaces and design constraints
+      from the contract/design audit and expected-red tests.
+
+
+      UPSTREAM ARTIFACTS (authoritative):
+
+      - contract-design-audit — intended behavior for SOURCE LEDGER clickability,
+      selected+hover state treatment, and Inspector hierarchy.
+
+      - expected-red-browser-tests — protected Playwright/browser tests that expose
+      the reported gaps.
+
+
+      YOUR SCOPE:
+
+      - Fix the existing `SOURCE LEDGER` navigation/control so it opens the Source
+      Ledger panel/surface reliably on desktop and supported responsive layouts.
+
+      - Adjust feed row selected+hover/focus styling so selected state remains clear
+      and low-noise; do not stack a noisy hover highlight over selected state; preserve
+      non-layout-shifting state treatment.
+
+      - Refactor Inspector rendering so the primary detail view is structured and
+      readable. Raw original text, JSON-LD, extracted metadata, or provenance payloads
+      must be demoted to a labeled secondary/collapsed region or otherwise clearly
+      separated per the contract.
+
+      - Keep behavior within existing product concepts: Inspect, Resonate, Steer,
+      Retrieve, Source Ledger. Do not introduce folders, tags, unread counts, onboarding
+      wizards, settings sliders, drag-and-drop ordering, recommendation modules, SaaS/magic
+      copy, or new top-level product concepts.
+
+
+      UI/UX constraints:
+
+      - Muted/archival, dense but legible, functional labels only (`RESOFEED`, `TODAY`,
+      `SOURCE LEDGER`, `INSPECTOR`, `/doctor`).
+
+      - No decorative gradients, mascots, friendly SaaS copy, or AI-trust palette.
+
+      - Hover/focus/selected/loading/error states must not shift layout.
+
+      - Feed rows remain triage surfaces; full body/raw payload belongs in Inspector
+      structure, not left-feed cards.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      UI must process actual item/source data and produce visible DOM output that
+      varies based on inputs. Empty placeholders, hidden controls, or raw dumps relabeled
+      as structured content do not satisfy this step.
+
+
+      If a contract artifact is wrong or incomplete, document a deviation record (type,
+      what, why, impact) — do NOT silently rewrite the contract or tests.'
+    verification: '- `cd web && npm run check` passes after implementation.
+
+      - `cd web && npm run test:e2e -- --grep "ui-navigation-hover-inspector-repair"`
+      now passes locally for the three repair cases.
+
+      - Evidence includes before/after notes for clickability, selected+hover state,
+      and Inspector hierarchy.
+
+      - Evidence includes artifact paths for screenshots/traces used to compare before/after
+      states.
+
+      - No forbidden ResoFeed UI/product concepts are introduced.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Files changed:\n  ```\n  <paths>\n  ```\n- Exact commands executed:\n  ```\n\
+      \  cd web && npm run check\n  cd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair\"\
+      \n  ```\n- Actual command output:\n  ```\n  <paste relevant stdout/stderr>\n\
+      \  ```\n- Before/after notes:\n  - SOURCE LEDGER clickability: <before -> after>\n\
+      \  - Selected+hover state: <before -> after>\n  - Inspector hierarchy/raw payload\
+      \ demotion: <before -> after>\n- Screenshots/traces:\n  - before: <artifact\
+      \ path or NOT AVAILABLE: reason>\n  - after: <artifact path>\n- Design constraint\
+      \ checklist:\n  - muted/archival preserved: yes/no + notes\n  - functional labels\
+      \ only: yes/no + notes\n  - no forbidden concepts introduced: yes/no + notes\n\
+      - Deviation records:\n  - <none or type/what/why/impact>\n- Blocker/closure\
+      \ fields:\n  - blockers_found: <none/list>\n  - closure_path: <tests/verification/audit\
+      \ that close each issue>\n  - unresolved_ambiguity: <none/list>\n"
+    depends_on:
+    - contract-design-audit
+    - expected-red-browser-tests
+    agent: frontend-engineer
