@@ -31859,3 +31859,117 @@ phases:
     - contract-lock
     - expected-red-tests
     agent: golang-developer
+  - id: cli-liveness-probe
+    name: Black-box CLI liveness probe for reset command
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      independence_level: L3
+
+
+      As a BLACK-BOX TESTER (blind-tester Mode D), validate the new CLI subcommand
+      from documented public behavior, not implementation assumptions.
+
+
+      CLI executability evidence is mandatory because this phase delivers a runnable
+      CLI surface. Use the built binary or `go run ./cmd/resofeed` equivalent from
+      a fresh checkout state.
+
+
+      Required black-box probes:
+
+      - `resofeed owner-token reset --db PATH --confirm-reset` exits successfully
+      against a prepared SQLite DB and removes only `runtime_metadata.owner_token_sha256`.
+
+      - `resofeed owner-token reset --db PATH` exits non-zero, prints a terse error,
+      and leaves the stored hash unchanged.
+
+      - Invalid/unopenable `--db` path exits non-zero and does not create unrelated
+      product state.
+
+      - Reset output contains no `owner token generated:` and no `rfeed_` token.
+
+      - Help/flag surface does not include `serve --reset-owner-token`.
+
+
+      Do not inspect code unless needed to build/run public CLI. Do not add implementation
+      changes.
+
+
+      spec_refs: docs/ARCHITECTURE.md lines 69-86; docs/USAGE.md lines 118-133; AGENTS.md
+      owner-token boundary.
+
+      touch_paths: read-only black-box CLI execution; no product modifications.
+
+      harness_refs: built `cmd/resofeed` binary or `go run ./cmd/resofeed`; temporary
+      SQLite DB fixture.
+
+      agent_source: project'
+    verification: 'phase-check protecting final gate: entry point starts as a CLI
+      process, accepts the documented reset operation, returns expected exit codes,
+      mutates only the owner-token verifier row, and produces expected terse output
+      without replacement plaintext.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## CLI Liveness Evidence
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Mode**: black-box CLI / Mode D
+
+
+      **Exact command(s) executed**:
+
+      ```
+
+      <paste exact CLI commands>
+
+      ```
+
+
+      **Actual stdout/stderr and exit codes**:
+
+      ```
+
+      <paste output, not summary>
+
+      ```
+
+
+      **SQLite before/after proof**:
+
+      ```
+
+      <query output proving only owner_token_sha256 changed>
+
+      ```
+
+
+      **Forbidden output proof**:
+
+      - `owner token generated:` present in reset output? yes/no
+
+      - `rfeed_` present in reset output? yes/no
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - complete-cli-reset
+    agent: blind-tester
