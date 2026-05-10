@@ -32810,7 +32810,7 @@ phases:
     agent: frontend-engineer
   - id: fuidcr-api-dto-escalation-guard
     name: Confirm no backend API or storage changes are needed by default
-    status: pending
+    status: claimed
     description: 'step_type: planning
 
       agent_source: project
@@ -32883,6 +32883,8 @@ phases:
     depends_on:
     - fuidcr-contract-matrix-lock
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-10T17:26:47.531053+00:00'
   - id: fuidcr-style-breakpoint-foundation
     name: Repair global style and responsive breakpoint foundation
     status: pending
