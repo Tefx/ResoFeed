@@ -36008,7 +36008,7 @@ phases:
       blocked until the created remediation path closes the findings.'
   - id: fuidcr-final-design-conformance-gate
     name: Final gate for full UI design conformance remediation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -36191,6 +36191,8 @@ phases:
     - fuidcr-architecture-blocker-retest
     - fuidcr-post-remediation-screenshot-uiux-audit
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-10T20:31:36.687089+00:00'
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
     status: done
