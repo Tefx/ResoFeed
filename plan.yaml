@@ -29576,6 +29576,7 @@ phases:
     - expected-red-inspector-readable-body-regression
     - clean-inspector-primary-body-implementation
     - retest-clean-inspector-primary-body
+    - uiux-audit-clean-inspector-primary-body
     agent: gate-reviewer
   - id: uiux-audit-clean-inspector-primary-body
     name: UI/UX audit clean Inspector primary body
