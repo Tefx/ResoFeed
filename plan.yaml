@@ -31097,7 +31097,7 @@ phases:
       regression Playwright passed 7/7.'
   - id: prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     name: Independent retest for PRD fields and preview parity
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -31171,6 +31171,26 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T15:47:35.412960+00:00'
+    done_at: '2026-05-10T15:53:39.002298+00:00'
+    evidence: 'Independent retest evidence accepted from integration-verifier. Retest
+      artifact commit `cb3da6b702dcaad42201b344659d269bc8e8ecad`, squash-merged to
+      main as `5aa010b`; verifier modified only `.test-artifacts/**` evidence artifacts
+      and no product code/docs. refs Read Confirmation present for docs/PRD.md, docs/DESIGN.md,
+      docs/ui-preview.html, protected PRD preview conformance test, and project instructions.
+      Implementation commit reviewed touched only Svelte/frontend files (`web/src/app.css`,
+      `web/src/routes/+page.svelte`, `web/src/routes/components/Inspector.svelte`),
+      no Go/API files, so Go tests not required. Verification in isolated worktree
+      after dependency bootstrap: `npm --prefix web run check` passed with 0 errors/warnings;
+      `npm --prefix web run build` passed; `npm --prefix web run test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe` passed 1/1; targeted Inspector readable-content/dirty-corpus/UI
+      repair Playwright command passed 7/7. Screenshots/artifacts captured: `.test-artifacts/playwright/screenshots/prd-inspector-preview-baseline.png`,
+      `.test-artifacts/playwright/screenshots/prd-inspector-live-app-expected-red.png`,
+      results/junit/html-report artifacts, dirty/readable Inspector screenshots. Behavioral
+      proof register marks PRD fields, preview parity, and readable-body cleanliness
+      as PROVEN. Closure fields: observed_result green, verdict PASS, blockers [],
+      gate_open_allowed true, proof_gap_status NONE, blocking_status CLOSED, orchestrator_action_hint
+      COMPLETE, product implementation files modified no. Mainline final-state verification
+      after squash merge: `npm --prefix web run check` passed with 0 errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
     name: Screenshot-first UI/UX audit against ui-preview
     status: pending
