@@ -23039,3 +23039,90 @@ phases:
     - playwright-comprehensive-e2e.api-mcp-parity-probes
     - playwright-comprehensive-e2e.visual-ux-artifact-audit
     agent: blind-tester
+  - id: playwright-comprehensive-e2e.gate
+    name: Gate Playwright Comprehensive E2E
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: full-plan-check
+
+      review_depth: THOROUGH
+
+
+      As an independent gate reviewer, decide whether the Playwright Comprehensive
+      E2E phase is complete enough to protect release confidence.
+
+
+      Gate MUST BLOCK if any of the following are missing or inadequate:
+
+      1. Real server launch through the single `cmd/resofeed` binary path, with exact
+      command and server stdout/stderr.
+
+      2. Browser artifacts: Playwright traces plus screenshots/videos/logs for required
+      states.
+
+      3. Feed/source operations: first-use owner token, OPML/source addition, Source
+      Ledger, manual global ingest, per-source fetch, today/feed, inspect/retrieve/search
+      where exposed.
+
+      4. LLM coverage: deterministic missing/invalid-key behavior, sanitized runtime
+      secret handling via `OPENROUTER_KEY`/`.env`, and live-smoke skip/pass/fail disposition
+      when a real key is absent/present.
+
+      5. API/MCP parity probes where they intersect human-visible operations, with
+      no special agent-only product concepts.
+
+      6. Visual/UX invariants from docs/DESIGN.md and docs/ui-preview.html reviewed
+      with rendered artifacts.
+
+      7. Evidence artifacts: traces, screenshots, videos/logs, server stdout/stderr,
+      DB fixture path, sanitized environment notes.
+
+      8. No committed secrets and no forbidden architecture drift: accounts, sync/merge
+      machinery, vector DB/RAG, queues/jobs, sidecar workers, or new product concepts.
+
+
+      Gate Decision Basis must map requirement/proof-obligation refs, evidence refs
+      reviewed, unresolved statuses, and OPEN/BLOCK recommendation. Finding issues
+      is valuable; blockers require remediation before proceeding.'
+    verification: '- All phase steps completed successfully with evidence.
+
+      - Gate evidence includes exact commands and artifacts, not summaries only.
+
+      - Real server launch, browser feed/source operations, LLM deterministic/live-smoke
+      boundary, API/MCP parity probes, and visual/UX artifacts are all present.
+
+      - Gate Decision Basis explicitly records OPEN/BLOCK and closure paths for unresolved
+      behavioral obligations.
+
+      - Any missing real server launch, missing browser artifacts, missing feed operation
+      coverage, or missing LLM success/failure/skip coverage is BLOCKING.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html — key passage\
+      \ or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\
+      \n\nIf no refs were provided, state: \"No refs for this step.\"\n\n## Gate Review\
+      \ Report\n**Reviewer**: gate-reviewer (independent of phase implementation)\n\
+      **Phase**: playwright-comprehensive-e2e\n\n### Evidence Review\n| Step ID |\
+      \ Status | Evidence Quality | Concerns |\n|---|---|---|---|\n\n### Required\
+      \ Artifact Checklist\n- Real cmd/resofeed launch command and stdout/stderr:\
+      \ PASS/FAIL\n- Playwright traces: PASS/FAIL\n- Screenshots/videos/logs: PASS/FAIL\n\
+      - DB fixture path: PASS/FAIL\n- Sanitized environment notes: PASS/FAIL\n- Feed/source\
+      \ operation coverage: PASS/FAIL\n- LLM deterministic missing/invalid-key coverage:\
+      \ PASS/FAIL\n- LLM live-smoke disposition: PASS/FAIL\n- API/MCP parity proof\
+      \ register: PASS/FAIL\n- Visual/UX invariant audit: PASS/FAIL\n- No secrets/forbidden\
+      \ product concepts: PASS/FAIL\n\n### Gate Decision Basis\n| requirement_ref\
+      \ | evidence_ref | unresolved_status | blocks_remaining_gates | closure_path\
+      \ | decision_basis |\n|---|---|---|---|---|---|\n\n### Gate Decision\n- [ ]\
+      \ OPEN: Phase passes gate\n- [ ] BLOCKED: Required remediation before proceeding\n\
+      \  - Blocking issues:\n  - Required actions:"
+    depends_on:
+    - playwright-comprehensive-e2e.harness-contract-lock
+    - playwright-comprehensive-e2e.harness-fixtures-env
+    - playwright-comprehensive-e2e.core-feed-browser-flows
+    - playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    - playwright-comprehensive-e2e.llm-live-smoke-boundary
+    - playwright-comprehensive-e2e.api-mcp-parity-probes
+    - playwright-comprehensive-e2e.visual-ux-artifact-audit
+    - playwright-comprehensive-e2e.final-playwright-report
+    agent: gate-reviewer
