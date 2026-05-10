@@ -33465,6 +33465,12 @@ phases:
 
       tags: [integration]
 
+      refs:
+
+      - docs/DESIGN.md
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+
       upstream_artifacts:
 
       - from_step: fuidcr-contract-matrix-lock; tier: contract; paths: UI findings
@@ -33473,9 +33479,18 @@ phases:
       - from_step: fuidcr-expected-red-ui-tests; tier: test; paths: UI conformance
       tests
 
+      - from_step: fuidcr-api-dto-escalation-guard; tier: proof; paths: DTO source
+      mapping/gap decision
+
+      - from_step: fuidcr-feed-search-dto-source-fields; tier: implementation; paths:
+      source-backed Feed/Search JSON DTO fallbacks
+
+      - from_step: fuidcr-feed-search-client-dto-contract; tier: implementation; paths:
+      frontend DTO type/client fallback contract
+
 
       Complete the shared Feed/Search anatomy repairs using existing frontend surfaces
-      and source-backed item data.
+      and the now-owned source-backed item-display DTO fields.
 
 
       UPSTREAM ARTIFACTS:
@@ -33486,6 +33501,12 @@ phases:
       PROTECTED.
 
       - fuidcr-api-dto-escalation-guard — DTO source mapping/gap decision is AUTHORITATIVE.
+
+      - fuidcr-feed-search-dto-source-fields — known Feed/Search timestamp and excerpt
+      DTO gaps are owned upstream.
+
+      - fuidcr-feed-search-client-dto-contract — frontend type/client fixtures for
+      DTO fallback fields are owned upstream.
 
 
       YOUR SCOPE / touch_paths:
@@ -33532,21 +33553,31 @@ phases:
 
       - Search results expose Inspect/Resonate affordances and compact metadata dates.
 
+      - Consume the source-backed first_seen_at/display timestamp fallback and feed_excerpt/display_excerpt
+      fallback fields provided by the upstream DTO steps when published_at, summary,
+      or core_insight are null.
 
-      DTO ESCALATION:
 
-      - Do not change backend/API/storage unless fuidcr-api-dto-escalation-guard proves
-      an existing DTO gap.
+      DTO / PRODUCT GUARDRAILS:
 
-      - If a DTO gap is proven, stop with a deviation/escalation record rather than
-      silently adding APIs.
+      - The known DTO gaps from fuidcr-api-dto-escalation-guard are no longer a stop
+      condition; they are owned by fuidcr-feed-search-dto-source-fields and fuidcr-feed-search-client-dto-contract
+      before this step runs.
+
+      - Do NOT add unplanned backend/API/storage changes in this frontend anatomy
+      step.
+
+      - If a new, different DTO gap is discovered beyond the already-owned source-backed
+      item-display fields, record a deviation/escalation instead of adding new routes,
+      storage, auth, sync, accounts, vector/RAG, admin surfaces, or service/repository/DI/event-bus
+      layers.
 
 
       ## Completion Criteria (stub exclusion)
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Feed/Search
-      output must vary based on actual item timestamps, summaries, source metadata,
-      search matches, selected state, and viewport.
+      output must vary based on actual item timestamps, DTO fallback fields, summaries,
+      source metadata, search matches, selected state, and viewport.
 
 
       ## Frontend Completion Criteria (rendering required)
@@ -33567,71 +33598,102 @@ phases:
 
       4. `summary unavailable` displayed when source-backed detail/excerpt text exists.
 
-      5. Narrow Search layout with colliding labels or cropped controls.'
+      5. Narrow Search layout with colliding labels or cropped controls.
+
+      6. Reintroducing a stop/escalation on the known source-backed DTO gaps instead
+      of consuming the upstream DTO support fields.'
     verification: '- Focused tests for findings 8-16 and 40-44 pass green.
 
       - Rendered evidence shows Feed and Search sharing anatomy with required metadata,
-      actions, clamps, and responsive behavior.
+      actions, clamps, fallback display text, and responsive behavior.
 
-      - Main path: desktop Feed/Search behavior matches contract.
+      - Main path: desktop Feed/Search behavior matches contract when published_at
+      and summary/core_insight are present.
 
-      - Failure path: missing summary uses cleaned fallback without repeating unavailable
-      lines when data exists.
+      - Failure path: missing published_at consumes first_seen_at/display timestamp
+      fallback; missing summary/core_insight consumes feed_excerpt/display_excerpt
+      fallback without repeating unavailable lines when source-backed data exists.
 
-      - No backend/API/storage changes unless backed by DTO escalation evidence.'
+      - No backend/API/storage changes are made in this frontend anatomy step; any
+      newly discovered DTO gap beyond the already-owned item-display fields is recorded
+      as a deviation/escalation.
+
+      - Command evidence required after frontend changes: npm --prefix web run check.
+
+      - Command evidence required for full backend/frontend confidence: go test ./...
+      may be cited from fuidcr-feed-search-dto-source-fields if unchanged by this
+      step.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
+
       For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
       - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
       "NOT READ: <reason>"
 
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-      - web/src/routes/components/Feed.svelte — key passage or "NOT READ: <reason>"
-
-      - web/src/routes/components/SearchRetrieval.svelte — key passage or "NOT READ:
-      <reason>"
+      If no refs were provided, state: "No refs for this step."
 
 
-      ## Integration Evidence
+      ## Feed/Search Anatomy Evidence
 
-      **Command or test exercising the full path**:
+
+      **Upstream DTO fields consumed**:
+
+      - Timestamp fallback field(s): <field names and UI usage>
+
+      - Excerpt fallback field(s): <field names and UI usage>
+
+
+      **Rendered proof**:
+
+      - Feed desktop DOM/screenshot artifact: <path or pasted excerpt>
+
+      - Feed narrow/mobile DOM/screenshot artifact: <path or pasted excerpt>
+
+      - Search desktop DOM/screenshot artifact: <path or pasted excerpt>
+
+      - Search narrow/mobile DOM/screenshot artifact: <path or pasted excerpt>
+
+
+      **Findings closed**:
+
+      - Feed 8-16: <status list>
+
+      - Search 40-44: <status list>
+
+
+      **Commands**:
 
       ```
 
-      <exact browser/DOM test command>
+      <paste npm --prefix web run check output>
+
+      <paste or cite go test ./... output>
 
       ```
 
-      **Actual output**:
 
-      ```
+      **Guardrail confirmation**:
 
-      <paste output>
+      - No backend/API/storage changes in this step: YES/NO
 
-      ```
+      - No new route/storage/auth/sync/account/vector/admin/service abstraction: YES/NO
 
-      **Path exercised**: item DTO/frontend state → shared feed-item anatomy → Feed/Search
-      rendered DOM
-
-
-      ## Finding Closure
-
-      - Closed findings: 8,9,10,11,12,13,14,15,16,40,41,42,43,44
-
-      - Desktop screenshot refs: <paths>
-
-      - Narrow/mobile screenshot refs: <paths>
-
-      - DTO escalation used: <none or record>
-
-      '
+      - New DTO gaps discovered beyond owned item-display fields: NONE or <deviation
+      record>'
+    refs:
+    - docs/DESIGN.md
+    - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
     depends_on:
     - fuidcr-contract-matrix-lock
     - fuidcr-expected-red-ui-tests
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
+    - fuidcr-feed-search-dto-source-fields
+    - fuidcr-feed-search-client-dto-contract
     agent: frontend-engineer
   - id: fuidcr-inspector-reading-contract
     name: Repair Inspector reading and diagnostic boundary
