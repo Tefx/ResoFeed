@@ -36364,3 +36364,177 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T19:01:35.290754+00:00'
+  - id: fuidcr-browser-conformance-residual-f7-f13-fix
+    name: Fix residual browser conformance blockers F7 and F13
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      refs:
+
+      - docs/DESIGN.md
+
+      - docs/ARCHITECTURE.md
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte
+
+      - web/src/routes/+page.svelte
+
+
+      Batched residual remediation for newly exposed browser conformance blockers
+      after fuidcr-ledger-reachability-proof-path-fix cleared the stale Source Ledger
+      reachability proof path.
+
+
+      ## Blockers to fix
+
+      - F7 Owner Token Prompt: owner token submit action is generic/non-bracket: [submit].
+      Repair the real rendered owner-token prompt action to use the accepted bracket-label/action
+      contract required by docs/DESIGN.md and the conformance matrix.
+
+      - F13 Feed/Search: feed row height does not preserve 24px rhythm: measured 60px.
+      Repair the minimal Feed/Search anatomy or CSS seam needed to restore the documented
+      24px rhythm while preserving readable dense-row anatomy and existing source-backed
+      DTO display behavior.
+
+
+      ## Scope and guardrails
+
+      - Touch the smallest necessary UI/test seams only.
+
+      - Expected primary files: web/src/routes/components/OwnerTokenPrompt.svelte
+      and Feed/Search anatomy/CSS/test paths as needed; web/src/routes/+page.svelte
+      only if the prompt/action is owned there.
+
+      - Do NOT disturb or reinterpret the accepted non-persistent Source Ledger activation
+      contract from fuidcr-ledger-reachability-proof-path-fix.
+
+      - Do NOT reintroduce persistent SOURCE LEDGER navigation, Surfaces nav, tablists,
+      left/sidebar product nav, or any forbidden product concept.
+
+      - Do NOT make test-only expectation changes unless the real rendered UI also
+      conforms.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. F7 remains reported as generic/non-bracket `[submit]` in the real app conformance
+      matrix.
+
+      2. F13 remains reported with feed row height off the 24px rhythm.
+
+      3. Any fix changes Source Ledger reachability away from the accepted Steer-driven/non-persistent
+      activation contract.
+
+      4. Any fix weakens Feed/Search shared anatomy, source-backed display fallbacks,
+      keyboard focus, or responsive behavior.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires real rendered UI conformance: the owner-token submit affordance
+      must expose the bracket-action label expected by the design contract, and Feed/Search
+      rows must visually/DOM-measurably preserve the 24px rhythm in the real app.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only or test-only completion is NOT acceptable.
+      Deliverables MUST contain substantive Svelte/CSS/test-contract logic that changes
+      observable rendered output and causes the browser conformance matrix to stop
+      reporting F7/F13.'
+    verification: '- Main path: run the focused browser conformance matrix command
+      that previously exposed F7/F13, for example `cd web && npx playwright test tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      -g "real app"` or the repository-equivalent Playwright invocation.
+
+      - Required proof: output shows the expected-red conformance violations array
+      is empty or, at minimum, no longer includes F7 Owner Token Prompt generic/non-bracket
+      submit or F13 Feed/Search 24px rhythm failures.
+
+      - Regression proof: Source Ledger remains reachable only through the accepted
+      non-persistent activation contract; no persistent dashboard/tab/Surfaces navigation
+      appears.
+
+      - Visual/DOM proof: include selector or screenshot evidence for the repaired
+      owner-token bracket action and Feed/Search row rhythm.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/src/routes/components/OwnerTokenPrompt.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+
+      ## Residual F7/F13 Fix Evidence
+
+
+      **Files changed**:
+
+      - <paths>
+
+
+      **F7 owner-token prompt proof**:
+
+      - Before: generic/non-bracket [submit]
+
+      - After: <bracket action label / accessible name evidence>
+
+
+      **F13 feed/search rhythm proof**:
+
+      - Before: 60px measured row height
+
+      - After: <24px rhythm evidence / selector measurement>
+
+
+      **Conformance matrix command**:
+
+      ```sh
+
+      <exact command>
+
+      ```
+
+
+      **Actual output showing F7/F13 cleared**:
+
+      ```text
+
+      <paste output>
+
+      ```
+
+
+      **Source Ledger contract regression check**:
+
+      - Accepted non-persistent activation preserved: yes/no with evidence
+
+      - Persistent dashboard/tab/Surfaces nav absent: yes/no with evidence
+
+
+      **Remaining gaps**:
+
+      - <none or list>'
+    depends_on:
+    - fuidcr-ledger-reachability-proof-path-fix
+    - fuidcr-shell-owner-doctor-surfaces
+    - fuidcr-feed-search-anatomy
+    agent: frontend-engineer
