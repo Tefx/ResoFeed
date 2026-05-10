@@ -30928,7 +30928,7 @@ phases:
       [], product implementation files modified no.'
   - id: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
     name: Complete PRD Inspector fields and preview visual parity
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -31068,6 +31068,8 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T15:41:40.633244+00:00'
   - id: prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     name: Independent retest for PRD fields and preview parity
     status: pending
