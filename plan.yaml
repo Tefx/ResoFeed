@@ -31364,7 +31364,7 @@ phases:
       errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.final-prd-preview-gate
     name: Final gate for PRD Inspector and preview conformance
-    status: claimed
+    status: pending
     description: 'step_type: gate
 
 
@@ -31464,5 +31464,3 @@ phases:
     - prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     - prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
     agent: gate-reviewer
-    claimed_by: gate-reviewer
-    claimed_at: '2026-05-10T16:00:04.624121+00:00'
