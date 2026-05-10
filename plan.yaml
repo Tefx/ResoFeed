@@ -31091,3 +31091,146 @@ phases:
     depends_on:
     - prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
     agent: integration-verifier
+  - id: prd-inspector-preview-conformance-remediation.screenshot-first-uiux-audit
+    name: Screenshot-first UI/UX audit against ui-preview
+    status: pending
+    description: 'step_type: verification
+
+
+      As an INDEPENDENT UI/UX AUDITOR, perform a screenshot-first visual audit. User
+      explicitly instructed in Chinese: “uiux audit用视觉能力逐项对比，包括对齐边距等细节，不要只看代码 要看截图。”
+      Use visual artifacts, screenshots, rendered DOM, and measurements; do not rely
+      on code inspection alone.
+
+
+      Compare the live rendered ResoFeed app against docs/ui-preview.html / documented
+      preview baseline and docs/DESIGN.md. The audit must include side-by-side visual
+      comparison and bounded layout checks for:
+
+      - Large RESOFEED masthead presence, scale, placement, and spacing.
+
+      - Top line placement/content for SOURCE LEDGER / DOCTOR / INSPECTOR.
+
+      - Prompt/search box placement at the top, not drifting to the bottom unless
+      DESIGN explicitly permits it.
+
+      - Card-like bordered content area, item spacing, width, border geometry, and
+      alignment.
+
+      - Left/right margins and page grid alignment.
+
+      - Row/star alignment, star button proportions, and sidebar proportions.
+
+      - Typography scale and hierarchy.
+
+      - Inspector field label hierarchy and visible PRD fields: objective quality
+      assessment / 质量评估, value tier / 优先级, concise core insight / 核心见解, dense factual
+      summary / 密集事实摘要, source and extraction provenance / 来源与提取溯源, why this appeared
+      / 为什么展示给你, searchable text / 可检索文本.
+
+
+      Also verify the primary Inspector readable body has not regressed into raw JavaScript/CSS/JSON-LD/provenance
+      garbage.
+
+
+      Finding visual mismatches is a successful audit outcome. The final gate may
+      open only if this audit returns PASS or if every residual mismatch has explicit
+      non-intersection evidence and the user-facing PRD/DESIGN contract is still satisfied.'
+    verification: 'phase-check protecting final gate.
+
+      - Audit uses screenshots/visual artifacts, not code-only review.
+
+      - Visual comparison covers masthead, nav, prompt placement, card/border geometry,
+      margins, row/star alignment, typography scale, sidebar/star proportions, and
+      Inspector hierarchy.
+
+      - Audit explicitly rates each required PRD/DESIGN/ui-preview item PASS / FAIL
+      / PARTIAL / NON_INTERSECTING.
+
+      - Audit includes live screenshot/artifact paths and baseline/preview artifact
+      paths.
+
+      - Audit verifies no raw-source readable-body regression.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Screenshot-First UI/UX Audit Report
+
+      - Live screenshot/artifact paths: <paths>
+
+      - Preview/baseline screenshot/artifact paths: <paths>
+
+      - Viewports/states audited: <list>
+
+      - Visual comparison method: <side-by-side, measurements, DOM snapshot, etc.>
+
+
+      ## Visual Delta Table
+
+      | Area | Expected from docs/ui-preview.html/DESIGN | Live observation | Verdict
+      | Evidence ref |
+
+      | --- | --- | --- | --- | --- |
+
+      | Masthead | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact> |
+
+      | Top nav | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact> |
+
+      | Prompt placement | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+      | Card/border geometry | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+      | Margins/grid alignment | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+      | Row/star alignment | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+      | Typography scale | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+      | Inspector hierarchy | <expected> | <actual> | PASS/FAIL/PARTIAL | <artifact>
+      |
+
+
+      ## Behavioral Proof Register
+
+      - requirement_ref: <PRD/DESIGN/ui-preview ref>
+
+      - behavior_claim: <visual/runtime claim>
+
+      - runtime_proof_expected: <screenshot/layout artifact>
+
+      - evidence_ref: <artifact path>
+
+      - status: PROVEN | UNPROVEN | UNCERTAIN_BLOCKING | NON_INTERSECTING
+
+      - closure_path: <final gate or remediation>
+
+      - gate_decision_basis: <OPEN/BLOCK basis>
+
+
+      ## Headline
+
+      - [ ] PASS: visual and PRD field conformance proven
+
+      - [ ] PASS_WITH_DEBT: only explicit non-blocking/non-intersecting debt remains
+
+      - [ ] FAIL: blocking visual mismatch, missing PRD fields, or proof gaps remain
+
+      '
+    depends_on:
+    - prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
+    agent: uiux-auditor
