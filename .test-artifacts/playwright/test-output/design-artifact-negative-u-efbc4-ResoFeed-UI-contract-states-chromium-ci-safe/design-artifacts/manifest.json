@@ -16,7 +16,7 @@
   "artifacts": [
     {
       "name": "owner-token",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/owner-token.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/owner-token.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -25,7 +25,7 @@
     },
     {
       "name": "first-use",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/first-use.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/first-use.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -34,7 +34,7 @@
     },
     {
       "name": "source-ledger",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/source-ledger.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/source-ledger.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -43,7 +43,7 @@
     },
     {
       "name": "today-list",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/today-list.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/today-list.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -52,7 +52,7 @@
     },
     {
       "name": "selected-item",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/selected-item.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/selected-item.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -61,7 +61,7 @@
     },
     {
       "name": "inspector-clean",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-clean.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-clean.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -70,7 +70,7 @@
     },
     {
       "name": "llm-error",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/llm-error.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/llm-error.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -79,7 +79,7 @@
     },
     {
       "name": "selected-hover",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/selected-hover.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/selected-hover.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -88,7 +88,7 @@
     },
     {
       "name": "inspector-raw-expanded/provenance",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-raw-expanded-provenance.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-raw-expanded-provenance.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -97,7 +97,7 @@
     },
     {
       "name": "search",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/search.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/search.png",
       "viewport": {
         "width": 1280,
         "height": 720
@@ -106,7 +106,7 @@
     },
     {
       "name": "mobile-feed",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-feed.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-feed.png",
       "viewport": {
         "width": 390,
         "height": 760
@@ -115,7 +115,7 @@
     },
     {
       "name": "mobile-inspector",
-      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/remediate-visual-ux-debt-and-proof-gap/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-inspector.png",
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-navigation-hover-inspector-repair.retest-gate-keyboard-a11y-full-targeted/.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-inspector.png",
       "viewport": {
         "width": 390,
         "height": 760

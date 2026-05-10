@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head><title>Dirty Inspector Corpus OPML</title></head>
+  <body><outline text="Dirty Inspector Corpus" title="Dirty Inspector Corpus" type="rss" xmlUrl="http://127.0.0.1:55502/dirty-corpus.xml" /></body>
+</opml>
