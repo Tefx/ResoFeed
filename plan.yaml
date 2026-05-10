@@ -19396,6 +19396,10 @@ phases:
 
       - Gate must verify both runnable endpoint behavior and exact UI compliance.
 
+      - Gate must treat `verification-retest-after-remediation` as the authoritative
+      closure proof for the concurrent semantic failures from `manual-rss-fetch.integration-proof`
+      and `manual-rss-fetch.spec-conformance`.
+
 
       Review criteria:
 
@@ -19406,12 +19410,16 @@ phases:
       through real HTTP paths with documented 200/404/409 behavior.
 
       3. Frontend completeness: Source Ledger renders [FETCH], [RUN INGEST], [FETCHING...],
-      [INGESTING...], terse errors, and HH:MM:SS timestamps.
+      [INGESTING...], terse errors, and HH:MM:SS timestamps while consuming the backend-compatible
+      flat `ManualFetchResult` schema unless an authoritative deviation record proves
+      otherwise.
 
-      4. Strict UI/UX audit: must have parseable PASS from uiux-auditor against docs/ui-preview.html.
+      4. Strict UI/UX audit: must have parseable PASS from uiux-auditor against docs/ui-preview.html
+      after B2 design-reference ambiguity is closed.
 
       5. Spec conformance: no unresolved DIVERGES/PARTIAL/NEEDS_TEST blocker-class
-      findings.
+      findings for B1/B2/R9; any non-intersection disposition must explain why remaining
+      release gates cannot rediscover it.
 
       6. Evidence quality: refs confirmation present and specific for every step.
 
@@ -19421,16 +19429,22 @@ phases:
       gates, and final OPEN/BLOCK recommendation.
 
 
-      Handler-only completion, mock-only proof, or visual "close enough" is insufficient.'
-    verification: '- All phase steps completed successfully with complete evidence.
+      Handler-only completion, mock-only proof, visual "close enough", or unresolved
+      frontend/backend response-schema mismatch is insufficient.'
+    verification: '- All required phase steps completed successfully with complete
+      evidence, including the batched remediation implementation and remediation retest.
 
       - Runtime endpoint proof includes exact launch/test command and real HTTP path
-      evidence.
+      evidence for 200 source fetch, 200 global ingest, and 409 concurrent conflict.
 
-      - UI/UX audit PASS explicitly states exact visual compliance with docs/ui-preview.html.
+      - Retest evidence proves frontend/backend schema compatibility using flat `ManualFetchResult`
+      or documents an authoritative deviation record.
 
-      - Spec conformance shows no blocker-class drift or includes explicit remediation
-      ownership before OPEN.
+      - UI/UX audit PASS explicitly states exact visual compliance with post-remediation
+      docs/ui-preview.html.
+
+      - Spec conformance shows no blocker-class drift for B1/B2/R9 or includes explicit
+      non-intersection closure for R9 before OPEN.
 
       - Gate decision basis is complete and recommends OPEN only when blocker-class
       behavioral and visual obligations are PROVEN.'
@@ -19448,81 +19462,58 @@ phases:
 
       For each ref in this step:
 
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
-
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
       - docs/ui-preview.html — key passage or "NOT READ: <reason>"
 
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/manual_fetch_contract.go — key passage or "NOT READ: <reason>"
+
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ### Execution Review
+      ### Remediation Closure Review
 
-      | Step ID | Status | Evidence Quality | Concerns |
+      | Blocker | Evidence reviewed | Status | Gate impact |
 
-      | --- | --- | --- | --- |
+      |---|---|---|---|
 
-      | manual-rss-fetch.backend-implementation | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      | B1 backend/frontend schema | <retest evidence ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
 
-      | manual-rss-fetch.frontend-implementation | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      | B2 ui-preview drift | <uiux/retest evidence ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
 
-      | manual-rss-fetch.integration-proof | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
-
-      | manual-rss-fetch.spec-conformance | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
-
-      | manual-rss-fetch.uiux-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
-
-
-      ### Gate Decision Basis
-
-      | requirement_ref | evidence_ref | unresolved_status | blocks_release? | rationale
-      | closure_path |
-
-      | --- | --- | --- | --- | --- | --- |
-
-
-      ### Issues Identified
-
-      | Severity | Description | Related Step | Blocking? |
-
-      | --- | --- | --- | --- |
-
-
-      ### Phase Assessment
-
-      - All steps completed: ✅/❌
-
-      - Backend runtime/API obligations proven: ✅/❌
-
-      - Strict visual audit passed exactly: ✅/❌
-
-      - Evidence quality acceptable: ✅/❌
-
-      - Blocking issues resolved: ✅/❌
+      | R9 import copy drift | <evidence ref> | FIXED/NON_INTERSECTING/UNPROVEN |
+      OPEN/BLOCK |
 
 
       ### Gate Decision
 
-      - [ ] OPEN: Phase passes gate
+      - [ ] OPEN: blocker-class behavioral and visual obligations are PROVEN or explicitly
+      non-intersecting
 
-      - [ ] BLOCKED: Issues must be resolved before proceeding
+      - [ ] BLOCKED: blocker-class proof gap remains
 
-      '
+
+      **Decision basis**: <requirement refs + evidence refs + unresolved status disposition>'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/PRD.md
+    - internal/resofeed/manual_fetch_contract.go
     depends_on:
     - manual-rss-fetch.backend-implementation
     - manual-rss-fetch.frontend-implementation
-    - manual-rss-fetch.integration-proof
-    - manual-rss-fetch.spec-conformance
+    - remediate-verifier-blockers
+    - verification-retest-after-remediation
     - manual-rss-fetch.uiux-audit
+    agent: gate-reviewer
   - id: backend-contract
     name: Backend Contract Lock
     status: done
