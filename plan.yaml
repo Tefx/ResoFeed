@@ -33838,7 +33838,7 @@ phases:
     claimed_at: '2026-05-10T17:57:40.183482+00:00'
   - id: fuidcr-source-ledger-state-portability
     name: Repair Source Ledger and State Portability action contracts
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -34012,6 +34012,8 @@ phases:
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T17:57:50.861937+00:00'
   - id: fuidcr-shell-owner-doctor-surfaces
     name: Repair Shell, Owner Token Prompt, and /doctor surfaces
     status: claimed
