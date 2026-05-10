@@ -27082,3 +27082,170 @@ phases:
       closure.
 
       - Commit hash(es): worktree `153696b`; main `aff3ff5`.'
+  - id: remediate-visual-ux-debt-and-proof-gap
+    name: Remediate visual UX debt and proof gap
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      risk_profile: UI/UX artifact repair
+
+
+      Batched remediation for all non-blocking-but-gate-relevant findings from `visual-ux-audit`.
+      Preserve ResoFeed architecture/design constraints from `AGENTS.md`, `docs/ARCHITECTURE.md`,
+      `docs/DESIGN.md`, and `docs/DESIGN_VISION.md`.
+
+
+      Scope is limited to minimal UI/CSS/test-artifact generation changes. Do not
+      introduce forbidden RSS-reader concepts, accounts, sync, vector DB, service
+      layers, settings, SaaS/AI-magic copy, AI-trust palettes, folders, tags, unread-count
+      flows, archive bins, onboarding wizards, or design drift.
+
+
+      ## Findings to remediate
+
+
+      ### UX-DEBT-001
+
+      - Severity: Minor but UX-affecting, therefore must be remediated before gate.
+
+      - Type: Mobile scanability.
+
+      - Evidence: `mobile-feed.png` in design artifact set.
+
+      - Spec reference: DESIGN Layout & Spacing mobile metadata must remain flat inline;
+      hostile strings wrap/truncate deterministically.
+
+      - User impact: source metadata wraps into stacked words, slowing triage on mobile.
+
+      - Required fix: ellipsize/truncate long metadata segments or compress separators
+      so the metadata line remains scannable.
+
+
+      ### PROOF-GAP-001
+
+      - Severity: Minor but proof/evidence-affecting, therefore must be closed before
+      gate.
+
+      - Type: Artifact gap.
+
+      - Evidence: `inspector-raw-expanded-provenance.png` and manifest note.
+
+      - Spec reference: DESIGN Inspector may expose provenance plainly; audit requested
+      raw-expanded/provenance.
+
+      - User impact: collapsed provenance is proven, but expanded raw/provenance visual
+      treatment is not.
+
+      - Required fix: add/update screenshot/test artifact generation with disclosure
+      expanded if expanded payload is supported/required.
+
+
+      ## Required implementation/artifact outputs
+
+      1. Mobile metadata treatment remains flat and scannable under hostile long source/time/metadata
+      strings, using truncation/ellipsis or compressed separators consistent with
+      the design language.
+
+      2. Screenshot/test artifact generation includes a proof artifact for expanded
+      raw/provenance state when that expanded payload is supported/required.
+
+      3. Expanded provenance remains secondary/labeled; it must not become primary
+      reading text or dump raw payloads into the main reading flow.
+
+      4. Existing successful navigation, hover/selected, Inspector hierarchy, and
+      dirty-content repairs must not regress.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Mobile metadata still wrapping into stacked words under hostile strings.
+
+      2. Missing `inspector-raw-expanded-provenance` or equivalent expanded provenance
+      artifact when the UI supports/needs that state.
+
+      3. Expanded raw/provenance promoted into the primary reading surface.
+
+      4. Any forbidden product/design drift from AGENTS.md or DESIGN documents.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive UI/CSS/test-artifact logic that processes
+      the hostile state and produces proof artifacts that vary based on the test inputs.'
+    verification: '- Mobile metadata proof: updated screenshot/test artifact demonstrates
+      a hostile long metadata line remains flat, inline, and scannable on mobile.
+
+      - Expanded provenance proof: updated screenshot/test artifact demonstrates expanded
+      raw/provenance state exists when supported/required and remains secondary/labeled.
+
+      - Regression guard: no forbidden ResoFeed product concepts, service layers,
+      accounts/sync/vector DB, settings, SaaS/AI-magic copy, or design drift introduced.
+
+      - Evidence includes exact commands or artifact-generation steps plus artifact
+      paths for mobile metadata and expanded provenance screenshots/proofs.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Visual Debt Remediation Evidence
+
+
+      **UX-DEBT-001 fix summary**:
+
+      <what changed and why it keeps mobile metadata flat/scannable>
+
+
+      **PROOF-GAP-001 artifact summary**:
+
+      <what artifact generation changed and why expanded raw/provenance is now proven>
+
+
+      **Exact command(s) or artifact-generation steps**:
+
+      ```
+
+      <paste commands/steps>
+
+      ```
+
+
+      **Artifacts produced/updated**:
+
+      - Mobile hostile metadata proof: <path>
+
+      - Expanded raw/provenance proof: <path>
+
+
+      **Design/architecture drift check**:
+
+      - Forbidden concepts introduced: NONE / <explain>
+
+      - Expanded provenance remains secondary/labeled: YES / NO
+
+      - Primary reading flow avoids raw payload dump: YES / NO
+
+
+      **Residual gaps**:
+
+      <none or list explicit non-blocking gaps with rationale>'
+    depends_on:
+    - visual-ux-audit
+    agent: frontend-engineer
