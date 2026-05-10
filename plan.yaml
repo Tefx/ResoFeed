@@ -21354,7 +21354,7 @@ phases:
     skipped_reason: superseded
   - id: manual-rss-fetch.row-parity-remediation
     name: Source Ledger Row Parity Remediation
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -21536,6 +21536,150 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T08:47:19.431930+00:00'
+    done_at: '2026-05-10T08:54:45.593830+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ui-preview.html — Source Ledger reference rows are direct 3-child grid
+      rows, e.g. `simonwillison.net/feed.xml · ok · last fetch: 10:25:31` + `[FETCH]`
+      + `x`.
+
+      - docs/DESIGN.md — Source Ledger is flat source management; rows are list items,
+      delete is named, forbidden folders/tags/pause/drag/settings; design tokens require
+      flat square ledger styling.
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/retest-report.md —
+      B1 bracket controls PASS, B3 footer/import PASS, negative constraints PASS;
+      blocker is B2/R9 duplicate source copy and 2-column nested action layout.
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/computed-style-retest.json
+      — Reference first row text/grid were `simonwillison.net/feed.xml · ok · last
+      fetch: 10:25:31[FETCH]x` and `454.859px 79.1406px 44px`; implementation was
+      duplicate title+URL and `746.859px 135.141px`.
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/screenshots/ — reviewed
+      reference and all seven implementation screenshots; they show already-passing
+      bracket controls, busy states, footer/import text, and failed duplicated/truncated
+      row copy.
+
+      - web/src/routes/components/SourceLedger.svelte — rows rendered `source.title
+      · compactSourceUrl(source.url) · status...` inside `.source-ledger-copy`, then
+      nested `.source-ledger-actions`.
+
+      - web/src/app.css — `.source-ledger-row` used 2 columns `minmax(0, 1fr) auto`;
+      `.source-ledger-actions` flex controlled fetch/delete grouping.
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      — tests already guarded bracket controls, busy states, timestamps, terse errors,
+      footer/import, and negative spinner/progress constraints.
+
+
+      ## Focused Row Parity Remediation Evidence
+
+      **why_previous_fix_failed**: The prior broad remediation fixed bracket/footer/negative
+      styling but left the row data model and DOM shape unchanged: `SourceLedger.svelte`
+      still rendered both `source.title` and `compactSourceUrl(source.url)` and wrapped
+      `[FETCH]` + `x` in a nested flex `.source-ledger-actions`, so CSS computed only
+      2 grid columns.
+
+
+      **Scope confirmation**:
+
+      - B2/R9 row parity only: YES
+
+      - Unrelated visual pass avoided: YES
+
+
+      **Before/after row text**:
+
+      ```
+
+      Reference: simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x
+
+      Before: simonwillison.net/feed.xml · simonwillison.net/atom/everything · ok
+      · last fetch: 10:25:31 [FETCH] x
+
+      After: simonwillison.net/feed.xml · ok · last fetch: 10:25:31[FETCH]x
+
+      ```
+
+
+      **Row layout proof**:
+
+      ```
+
+      Reference gridTemplateColumns: 454.859px 79.1406px 44px
+
+      Implementation gridTemplateColumns after fix: 1068.86px 79.1406px 44px at 1280px
+      viewport; CSS template is minmax(0, 1fr) auto 44px
+
+      ```
+
+
+      **DOM structure proof**:
+
+      - Single primary source/status text column: Playwright row evidence `copyText:
+      "simonwillison.net/feed.xml · ok · last fetch: 10:25:31"` and no `simonwillison.net/atom/everything`.
+
+      - Manual fetch action column: child 2 is `button.manual-fetch-action`, text
+      `[FETCH]`.
+
+      - Compact delete x column: child 3 is `button.source-ledger-delete`, text `x`,
+      fixed CSS column `44px`.
+
+      - No nested flex action grouping controlling row shape: Playwright evidence
+      `nestedActions: false`; `.source-ledger-actions` wrapper removed.
+
+
+      **Regression guard**:
+
+      - B1 bracket controls preserved: focused test still asserts `[RUN INGEST]`,
+      `[FETCH]`, `[INGESTING...]`, `[FETCHING...]`, disabled busy state, and no progressbar/spinner.
+
+      - Busy states preserved: `manualFetchState.ingesting` and `fetchingSourceIds`
+      paths unchanged except labels now use the single source label.
+
+      - Footer/import presentation preserved: tests still assert `import OPML`, hidden
+      file input behavior, `imported 3 sources; folders flattened`, `export state`,
+      `import state`.
+
+      - Negative constraints preserved: tests still assert no spinner/progress/animate
+      selectors; CSS changes added no shadows, gradients, animations, pills, or SaaS
+      copy.
+
+
+      ## Verification
+
+      - Worker commands: `npm ci`; `npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`
+      exit 0 (`1 passed`, `6 passed`); `npm test` exit 0 (`svelte-check found 0 errors
+      and 0 warnings`, `5 passed`, `29 passed`); Playwright/Vite browser evidence
+      command exit 0, row JSON showed `display: grid`, `gridTemplateColumns: "1068.86px
+      79.1406px 44px"`, direct children `div.source-ledger-copy`, `button.manual-fetch-action`,
+      `button.source-ledger-delete`.
+
+      - Mainline final-state verification after merge: `npm --prefix web run test:render
+      -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      && npm --prefix web run test && npm --prefix web run build` exit 0; output included
+      `Test Files 1 passed (1); Tests 6 passed (6)`, `svelte-check found 0 errors
+      and 0 warnings`, `Test Files 5 passed (5); Tests 29 passed (29)`, and Vite/SvelteKit
+      production build success.
+
+      - Files changed: `web/src/routes/components/SourceLedger.svelte`, `web/src/app.css`,
+      `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`,
+      `web/src/routes/components/__tests__/rendering-expected-red.test.ts`, `web/src/lib/api-client.test.ts`.
+
+      - Product/code/docs modified: code/tests only; no docs or orchestrator state
+      files modified.
+
+      - Deviation records: none.
+
+      - Worker commit: `a42d8e18166b66a058744c80ba74d54aa1b8410c`.
+
+      - Squash merge commit on main: `7bad9f6 [vectl] step-manual-rss-fetch.row-parity-remediation
+      completed`.
+
+      - Gaps/Notes: Browser evidence was collected at a wider implementation viewport
+      than the reference screenshot, so the first column pixel width differs while
+      proving the required 3-column shape and fixed `[FETCH]`/`x` columns.'
   - id: manual-rss-fetch.row-parity-retest
     name: Focused Source Ledger Row Parity Retest
     status: pending
