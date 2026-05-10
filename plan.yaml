@@ -31734,3 +31734,128 @@ phases:
     depends_on:
     - contract-lock
     agent: golang-developer
+  - id: complete-cli-reset
+    name: Complete CLI-only offline reset implementation
+    status: pending
+    description: "step_type: implementation\n\nFill in stub bodies and command dispatch\
+      \ in the existing single-binary CLI path per the contract from owner-token-offline-reset.contract-lock\
+      \ and tests from owner-token-offline-reset.expected-red-tests.\n\nUPSTREAM ARTIFACTS\
+      \ (AUTHORITATIVE):\n- cmd/resofeed/main.go / internal/resofeed/db.go contract\
+      \ stubs from owner-token-offline-reset.contract-lock — command grammar, signatures,\
+      \ help text, and no-server boundary are AUTHORITATIVE.\n- internal/resofeed/owner_token_reset_expected_red_test.go\
+      \ and related tests from owner-token-offline-reset.expected-red-tests — test\
+      \ cases and assertions are PROTECTED.\n\nYOUR SCOPE: Replace stub markers (NotImplementedError-equivalent\
+      \ / placeholder errors / pass-through gaps) with working logic. Use existing\
+      \ flat files only. Complete the implementation within existing signatures; modify\
+      \ bodies and minimal CLI dispatch/help text only.\n\nDo NOT introduce new services,\
+      \ repositories, DI containers, event buses, sidecar/admin processes, accounts,\
+      \ OAuth, per-agent registries, sync, settings flows, HTTP reset endpoints, MCP\
+      \ tools/resources, Settings/UI reset controls, or `serve --reset-owner-token`.\n\
+      \nRequired behavior:\n- Recognize exactly `resofeed owner-token reset --db PATH\
+      \ --confirm-reset` as a CLI-only offline command.\n- Require `--confirm-reset`;\
+      \ omission must return a terse non-zero error and leave SQLite unchanged.\n\
+      - Open only the specified existing SQLite DB path for reset; invalid/unopenable\
+      \ paths must return a terse non-zero error and must not create unrelated product\
+      \ state.\n- Delete only `runtime_metadata.key='owner_token_sha256'` and leave\
+      \ other runtime metadata/product tables unchanged.\n- Do not run server startup,\
+      \ bind HTTP/MCP, run UI, resolve OpenRouter secrets, generate replacement tokens,\
+      \ print `owner token generated:`, print `rfeed_...`, accept replacement plaintext,\
+      \ validate replacement plaintext, or store replacement plaintext.\n- Preserve\
+      \ existing `serve --db PATH` and `serve --db PATH --owner-token TOKEN` replacement-token\
+      \ behavior without duplicating it in the reset command.\n\n## Completion Criteria\
+      \ (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only completion is\
+      \ NOT acceptable. Each deliverable MUST contain substantive logic that processes\
+      \ its inputs and produces outputs that vary based on those inputs. Private stub\
+      \ classes or placeholder functions do not satisfy this requirement.\n\n## Hardened\
+      \ persistence/state acceptance\nFailure-mode checklist:\n- Missing/invalid/unopenable\
+      \ DB path behavior: terse non-zero error, no unrelated DB/product state creation.\n\
+      - Explicit confirmation behavior: missing `--confirm-reset` does not delete\
+      \ `owner_token_sha256`.\n- Stale-definition vs new-state precedence: reset affects\
+      \ only the persisted owner-token hash; replacement semantics remain owned by\
+      \ subsequent serve startup.\n- Partial-write behavior: deletion is a single\
+      \ targeted SQLite mutation; no product-state table writes.\n- Relative vs absolute\
+      \ path behavior: `--db` paths are interpreted consistently with documented CLI\
+      \ DB paths.\nState semantics:\n- Last-writer-wins remains only in existing `serve\
+      \ --owner-token` path; reset is delete-only.\n- Preserve active sources, steering\
+      \ rules, resonated items, FTS state, agent receipts, other runtime_metadata\
+      \ keys, and schema migrations.\n- Backward-compatible behavior: existing serve\
+      \ auto-generation/reuse/explicit-token paths keep their current outputs and\
+      \ validation.\nOut-of-scope guardrail: call-site migration is limited to CLI\
+      \ dispatch/help needed for the new subcommand; no compatibility wrappers or\
+      \ alternate reset surfaces are included.\n\n## Gate Preview (what the gate WILL\
+      \ reject)\n1. Any token generation or `rfeed_` plaintext in reset output.\n\
+      2. Any HTTP/MCP/UI/Settings reset surface or `serve --reset-owner-token` flag.\n\
+      3. Any storage mutation beyond deleting `runtime_metadata.owner_token_sha256`.\n\
+      4. Any reset path that starts the server, binds sockets, or resolves LLM secrets.\n\
+      5. Any layered architecture drift against AGENTS.md minimal flat-file rules.\n\
+      \nspec_refs: docs/ARCHITECTURE.md lines 69-86, 111-135, 329-359; docs/USAGE.md\
+      \ lines 118-133; AGENTS.md sections 2 and 4; .agents/instructions.md sections\
+      \ 2, 4, 4A.\ntouch_paths: cmd/resofeed/main.go, internal/resofeed/db.go, internal/resofeed/owner_token_reset_expected_red_test.go,\
+      \ internal/resofeed/runtime_startup_test.go\nharness_refs: Main(args, stdout,\
+      \ stderr); SQLite runtime_metadata; runtime_startup_test.go occupied-port serve\
+      \ startup pattern.\nupstream_artifacts:\n  - path: cmd/resofeed/main.go\n  \
+      \  from_step: owner-token-offline-reset.contract-lock\n    tier: contract\n\
+      \  - path: internal/resofeed/db.go\n    from_step: owner-token-offline-reset.contract-lock\n\
+      \    tier: contract\n  - path: internal/resofeed/owner_token_reset_expected_red_test.go\n\
+      \    from_step: owner-token-offline-reset.expected-red-tests\n    tier: test\n\
+      agent_source: project"
+    verification: 'local-check protecting owner-token-offline-reset.integration-verification
+      and owner-token-offline-reset.final-gate:
+
+      - Main path: targeted Go tests for confirmed reset pass and prove only `owner_token_sha256`
+      is removed.
+
+      - Failure path: tests for missing confirmation and invalid/unopenable DB path
+      pass and prove no unrelated state creation/mutation.
+
+      - Output path: tests prove reset output contains no generated replacement token
+      and no `rfeed_` line.
+
+      - Surface guard: tests/static assertions prove no HTTP/MCP/UI reset surface
+      and no `serve --reset-owner-token` flag.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/USAGE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - .agents/instructions.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Stub markers replaced:
+
+      - Exact command/test runs:
+
+      ```
+
+      <commands and outputs>
+
+      ```
+
+      - Confirmed delete-only SQL mutation:
+
+      - Confirmed missing-confirmation failure path:
+
+      - Confirmed invalid/unopenable DB path behavior:
+
+      - Confirmed reset output contains no `owner token generated:` or `rfeed_`:
+
+      - Confirmed no forbidden HTTP/MCP/UI/serve flag surfaces:
+
+      - Deviation records from upstream contract/tests, if any:'
+    depends_on:
+    - contract-lock
+    - expected-red-tests
+    agent: golang-developer
