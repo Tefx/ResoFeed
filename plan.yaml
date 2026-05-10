@@ -20957,3 +20957,157 @@ phases:
       - Gaps/Notes: Initial worker `npm test` failed before `npm ci` because frontend
       dependencies were absent; after dependency install, frontend checks passed.
       No blocker remains.'
+  - id: visual-parity-remediation
+    name: Visual Parity Remediation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      work_type: defect_repair
+
+      verification_scope: local-check
+
+
+      Batched UI/UX visual remediation for the failed `manual-rss-fetch.uiux-audit`
+      artifacts salvaged in commit `742b925`. Do not broaden scope beyond exact visual
+      parity blockers against `docs/ui-preview.html` and `.audit-artifacts/manual-rss-fetch/uiux-audit/`.
+
+
+      Fix ALL blockers in one pass:
+
+      1. Bracket controls: make [FETCH], [RUN INGEST], active labels, hover, and focus
+      styling match the post-remediation `docs/ui-preview.html` exactly, including
+      compact terminal padding, color, border/background treatment, transparent/default
+      action surface, and focus-colored action treatment. The failed audit observed
+      computed `8px 12px`, primary border/text, and surface fill; these must be corrected.
+
+      2. Source Ledger rows: remove list bullets/indentation and align with compact
+      grid row shape from `docs/ui-preview.html`; preserve correct URL density/truncation;
+      use the compact red `x` delete affordance if the reference remains authoritative.
+
+      3. Default footer/import presentation: align file input/status/footer with `docs/ui-preview.html`,
+      including default inline imported-status text and R9 Source Ledger copy.
+
+      4. Preserve invariant visual constraints: no spinners, shadows, gradients, animations,
+      SaaS pill rounding, friendly copy, or layout-shift behavior.
+
+
+      Required artifact review before editing:
+
+      - `docs/ui-preview.html` is the authoritative target.
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json`
+      identifies computed-style drift to close.
+
+      - `.audit-artifacts/manual-rss-fetch/uiux-audit/` screenshots identify the failing
+      default, active, completion, error, and hover/focus state comparisons.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires visible rendered Source Ledger output, not only state/data
+      correctness. Evidence MUST include screenshots or equivalent rendered artifacts
+      plus computed-style proof for bracket controls and ledger rows.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive visual/rendering changes that produce outputs
+      matching the reference artifacts.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any remaining mismatch with `docs/ui-preview.html` for bracket padding/color/background/hover/focus.
+
+      2. Any Source Ledger row rendered as a list with bullets/indentation instead
+      of compact grid rows.
+
+      3. Native/default file input or missing default inline imported-status/R9 copy
+      where the reference shows the terminal-styled footer/import presentation.
+
+      4. Any spinner, shadow, gradient, animation, SaaS pill rounding, or visual "close
+      enough" claim without artifact comparison.'
+    verification: '- Main path: rendered Source Ledger default state matches `docs/ui-preview.html`
+      for bracket controls, ledger rows, footer/import presentation, and R9 copy.
+
+      - Failure paths: source fetch active, global ingest active, completion, error/conflict,
+      and hover/focus states remain visible and match the reference without spinners/shadows/animations/pill
+      styling.
+
+      - Proof: attach or cite screenshots/DOM snapshots and computed-style diffs showing
+      the failed audit blockers are closed.
+
+      - Downstream gate protected: manual-rss-fetch.gate via manual-rss-fetch.visual-parity-retest.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - .audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json
+      — key passage or "NOT READ: <reason>"
+
+      - .audit-artifacts/manual-rss-fetch/uiux-audit/ — key artifact(s) reviewed or
+      "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Visual Remediation Evidence
+
+
+      **Files changed**:
+
+      ```
+
+      <paths>
+
+      ```
+
+
+      **Blocker closure checklist**:
+
+      - [ ] B1 bracket controls match reference padding/color/background/hover/focus.
+
+      - [ ] B2 Source Ledger rows are compact grid rows with no bullets/indentation
+      and correct URL density/truncation/delete affordance.
+
+      - [ ] B3 default footer/import/status presentation matches reference, including
+      default inline imported-status text and R9 copy.
+
+      - [ ] Forbidden styling remains absent: spinners, shadows, gradients, animations,
+      SaaS pill rounding.
+
+
+      **Rendered artifacts produced**:
+
+      ```
+
+      <screenshots / DOM snapshots / computed style artifact paths>
+
+      ```
+
+
+      **Computed-style proof**:
+
+      ```
+
+      <paste key before/after values or diff summary for bracket controls and row
+      shape>
+
+      ```
+
+
+      **Scope guardrail**: Confirm no behavior beyond UI/UX visual parity blockers
+      was changed.'
+    depends_on:
+    - manual-rss-fetch.frontend-implementation
+    - verification-retest-after-remediation
+    agent: frontend-engineer
