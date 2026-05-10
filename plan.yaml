@@ -28884,7 +28884,7 @@ phases:
   steps:
   - id: expected-red-inspector-readable-body-regression
     name: Expected-red Inspector readable body regression test
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -29056,6 +29056,26 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T14:04:51.976882+00:00'
+    done_at: '2026-05-10T14:10:20.813276+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED: Added focused rendered-browser Playwright regression
+      test for Inspector primary body readability in `web/tests/e2e/inspector-readable-content-regression.spec.ts`;
+      branch commit 2458211, squash-merged to main as 37596bb. Refs confirmation present
+      for docs/DESIGN.md, docs/ARCHITECTURE.md, inspector-dirty-corpus, real-server-ui,
+      and project instructions. Fixture includes screenshot-family pollution: `function
+      OptanonWrapper() {}`, CSS variable/custom property text `--verge-font-body`,
+      script/style block text, navigation/menu boilerplate (`Skip to main content`,
+      `The homepage The Verge`), and `model_latency_error`. Test inspects rendered
+      browser Inspector primary body via `page.getByRole(''complementary'', { name:
+      ''INSPECTOR'' }).locator(''.contract-inspector'').locator(''h2, p:not(.contract-label):not(.contract-muted):not(.contract-warning)'')`.
+      Expected-red command in worktree exited 1 with intended failure: leaked tokens
+      included `function OptanonWrapper() {}`, `--verge-font-body`, `Skip to main
+      content`, `The homepage The Verge`, and `model_latency_error`; failure_alignment
+      matches reported screenshot bug; product implementation files modified: no.
+      Mainline final-state verification after squash merge: `npm --prefix web run
+      check` passed with `svelte-check found 0 errors and 0 warnings`; expected-red
+      Playwright command rerun on main exited 1 as intended and reproduced the same
+      forbidden-token failure (`EXPECTED_RED_EXIT=1`). No blockers for this test-definition
+      step.'
   - id: clean-inspector-primary-body-implementation
     name: Clean Inspector primary body content path
     status: pending
