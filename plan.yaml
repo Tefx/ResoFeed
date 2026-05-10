@@ -22673,3 +22673,112 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.llm-deterministic-failure-flows
     agent: integration-verifier
+  - id: playwright-comprehensive-e2e.api-mcp-parity-probes
+    name: Browser-Led API/MCP Parity Probes
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      tags: ["integration", "browser-e2e", "api", "mcp"]
+
+
+      Add E2E parity probes for API/MCP behavior where it intersects human-visible
+      operations, while keeping the phase browser-led.
+
+
+      Scope:
+
+      - Compare the browser-observed outcomes for Inspect, Resonate, Steer, and Retrieve/search/feed
+      operations with the JSON HTTP/MCP surfaces where those operations are currently
+      exposed.
+
+      - Use API/MCP calls as probes around the same isolated DB/server fixture, not
+      as pure unit tests.
+
+      - Verify owner-token boundary is respected consistently for browser/API/MCP
+      paths.
+
+      - Verify agents do not receive product concepts unavailable to humans and that
+      MCP/API do not bypass human-visible invariants.
+
+
+      Control-plane closure proof required:
+
+      For each parity obligation, evidence must include requirement_ref, behavior_claim,
+      runtime_proof_expected, evidence_ref, status, closure_path, and gate_decision_basis.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is a TEST step. Probes must hit the real running server and shared fixture
+      state; mock-only parity is not acceptable.'
+    verification: '- Planned command: `npm --prefix web run test:e2e -- --grep @parity`
+      or equivalent locked Playwright/API helper filter.
+
+      - Browser-visible source/feed/steering/retrieve/search outcomes are compared
+      with API/MCP results where surfaces exist.
+
+      - Owner-token behavior is checked consistently across browser/API/MCP probes.
+
+      - Evidence contains a structured behavioral proof register with closure paths
+      for unresolved or non-intersecting items.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## API/MCP Parity Evidence
+
+      **Exact command executed**:
+
+      ```
+
+      <npm --prefix web run test:e2e -- --grep @parity or equivalent>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste runner output>
+
+      ```
+
+
+      **Shared fixture**:
+
+      - Server stdout/stderr:
+
+      - DB fixture path:
+
+      - Browser trace/screenshots:
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | <ref> | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/NON_INTERSECTING
+      | <path> | <OPEN/BLOCK basis> |'
+    depends_on:
+    - playwright-comprehensive-e2e.core-feed-browser-flows
+    - playwright-comprehensive-e2e.llm-deterministic-failure-flows
+    agent: integration-verifier
