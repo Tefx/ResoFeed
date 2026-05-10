@@ -4,6 +4,8 @@ import path from 'node:path';
 
 import { test, expect } from './fixtures';
 
+test.use({ trace: 'on', screenshot: 'on' });
+
 test('ci-safe real server/UI boot uses the Go binary and owner-token gate', async ({ page, request, runInfo, ownerToken }) => {
   const unauthorized = await request.get(`${runInfo.baseURL}/api/feed/today`);
   expect(unauthorized.status()).toBe(401);
@@ -29,10 +31,75 @@ test('ci-safe harness records required artifact paths and sanitized runtime note
   expect(fs.existsSync(runInfo.binaryPath)).toBe(true);
   expect(fs.existsSync(runInfo.server.stdoutPath)).toBe(true);
   expect(fs.existsSync(runInfo.server.stderrPath)).toBe(true);
+  expect(fs.existsSync(runInfo.fixtureServer.stdoutPath)).toBe(true);
+  expect(fs.existsSync(runInfo.fixtureServer.stderrPath)).toBe(true);
   expect(fs.existsSync(runInfo.sanitizedEnvironment.notesPath)).toBe(true);
   expect(fs.existsSync(path.join(runInfo.artifactRoot, 'fixtures', 'local-feed.xml'))).toBe(true);
   expect(fs.existsSync(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'))).toBe(true);
   expect(runInfo.sanitizedEnvironment.openRouterKey).toBe('ci-safe-fake-key');
+});
+
+test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, and search', async ({
+  page,
+  runInfo,
+  ownerToken
+}) => {
+  await page.goto('/');
+  await page.locator('#owner-token-input').fill(ownerToken);
+  await page.getByRole('button', { name: 'submit' }).click();
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+  await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+  await expect(page.getByText('No sources. Paste RSS URL in Steer.')).toBeVisible();
+
+  await page
+    .getByLabel('import OPML')
+    .setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+  await expect(page.getByText(/127\.0\.0\.1:\d+ · not_fetched/)).toBeVisible();
+
+  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.getByRole('button', { name: '[INGESTING...]' })).toBeVisible();
+  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/last ingest:/)).toBeVisible();
+
+  await page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' }).click();
+  await expect(page.getByRole('button', { name: 'Fetching ResoFeed E2E Local Source' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' })).toBeVisible({ timeout: 15_000 });
+
+  await page.getByRole('button', { name: 'TODAY' }).click();
+  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  const fixtureFeedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
+  await expect(fixtureFeedItem).toBeVisible();
+  await expect(fixtureFeedItem).toContainText('src: ResoFeed E2E Local Source');
+  await expect(fixtureFeedItem.getByLabel('Extraction: original_unavailable')).toBeVisible();
+
+  await fixtureFeedItem.click();
+  await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
+  const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
+  await expect(inspector).toContainText('summary unavailable');
+  await expect(inspector).toContainText('why: fresh from configured source');
+
+  await page.getByRole('button', { name: 'Resonate item' }).click();
+  await expect(page.getByRole('button', { name: 'Remove resonance' })).toBeVisible();
+
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill('/doctor');
+  await page.getByRole('button', { name: 'apply' }).click();
+  await expect(page.getByRole('heading', { name: '/doctor' })).toBeVisible();
+  await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter:');
+
+  await steer.fill('search Local fixture');
+  await page.getByRole('button', { name: 'apply' }).click();
+  await expect(page.getByText('retrieval: lexical search')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Search and Retrieval' })).toBeVisible();
+  await expect(page.getByLabel('Plain text query')).toHaveValue('Local fixture');
+  await page.getByRole('button', { name: 'search' }).click();
+  await expect(page.locator('#search-status')).toContainText('1 results');
+  await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
+  await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
 });
 
 test('ci-safe missing and invalid OPENROUTER_KEY startup paths exit before browser binding', async ({ runInfo }) => {

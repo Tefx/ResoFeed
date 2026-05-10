@@ -19,6 +19,13 @@ export default async function globalTeardown(): Promise<void> {
       // Process already exited; artifacts remain useful.
     }
   }
+  if (info.fixtureServer.pid > 0) {
+    try {
+      process.kill(info.fixtureServer.pid, 'SIGTERM');
+    } catch {
+      // Process already exited; artifacts remain useful.
+    }
+  }
 
   const cleanupNote = `${info.artifactRoot}/db-fixture-preservation.txt`;
   const preserve = process.env.RESOFEED_E2E_PRESERVE_DB === '1';

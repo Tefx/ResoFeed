@@ -91,6 +91,57 @@ async function waitForServer(baseURL: string): Promise<void> {
   throw new Error(`server did not become ready at ${baseURL}`);
 }
 
+async function waitForHTTP(url: string): Promise<void> {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) return;
+    } catch {
+      // Retry until the deterministic feed fixture server is reachable.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`fixture server did not become ready at ${url}`);
+}
+
+async function startFixtureServer(logsDir: string): Promise<E2ERunInfo['fixtureServer']> {
+  const port = await reservePort();
+  const url = `http://127.0.0.1:${port}/e2e-feed.xml`;
+  const stdoutPath = path.join(logsDir, 'fixture-server.stdout.log');
+  const stderrPath = path.join(logsDir, 'fixture-server.stderr.log');
+  const scriptPath = path.join(artifactRoot, 'fixture-feed-server.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    [
+      "import http from 'node:http';",
+      `const feedXml = ${JSON.stringify(fixtureFeedXml)};`,
+      `const port = ${port};`,
+      "const server = http.createServer((request, response) => {",
+      "  if (request.url === '/e2e-feed.xml') {",
+      "    response.writeHead(200, { 'Content-Type': 'application/rss+xml; charset=utf-8' });",
+      "    response.end(feedXml);",
+      "    return;",
+      "  }",
+      "  response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });",
+      "  response.end('not found');",
+      "});",
+      "server.listen(port, '127.0.0.1', () => { console.log(`fixture feed server listening on ${port}`); });",
+      "process.on('SIGTERM', () => server.close(() => process.exit(0)));"
+    ].join('\n')
+  );
+  const stdout = fs.openSync(stdoutPath, 'w');
+  const stderr = fs.openSync(stderrPath, 'w');
+  const child = spawn(process.execPath, [scriptPath], {
+    cwd: repoRoot,
+    env: sanitizedToolEnv(),
+    stdio: ['ignore', stdout, stderr]
+  });
+  child.unref();
+  await waitForHTTP(url);
+  return { pid: child.pid ?? -1, url, stdoutPath, stderrPath };
+}
+
 export default async function globalSetup(): Promise<void> {
   const logsDir = path.join(artifactRoot, 'server-logs');
   const fixturesDir = path.join(artifactRoot, 'fixtures');
@@ -100,8 +151,9 @@ export default async function globalSetup(): Promise<void> {
   fs.mkdirSync(resultsDir, { recursive: true });
   fs.mkdirSync(binDir, { recursive: true });
 
+  const fixtureServer = await startFixtureServer(logsDir);
   fs.writeFileSync(path.join(fixturesDir, 'local-feed.xml'), fixtureFeedXml);
-  fs.writeFileSync(path.join(fixturesDir, 'flattened.opml'), fixtureOpml);
+  fs.writeFileSync(path.join(fixturesDir, 'flattened.opml'), fixtureOpml(fixtureServer.url));
 
   run('npm', ['--prefix', 'web', 'run', 'build'], repoRoot);
   run('go', ['build', '-o', binaryPath, './cmd/resofeed'], repoRoot);
@@ -140,6 +192,9 @@ export default async function globalSetup(): Promise<void> {
       '- Allowed variables: PATH, HOME, TMPDIR, RESOFEED_E2E, OPENROUTER_KEY.',
       `- OPENROUTER_KEY: ${liveRequested ? '<redacted>; source=os_env' : '<redacted non-secret sentinel>; ambient OS value not forwarded'}.`,
       '- Owner token: supplied by --owner-token and redacted from logs/artifacts.',
+      `- OPML fixture feed URL: ${fixtureServer.url}`,
+      `- Fixture feed server stdout: ${fixtureServer.stdoutPath}`,
+      `- Fixture feed server stderr: ${fixtureServer.stderrPath}`,
       `- Binary: ${binaryPath}`,
       `- Database fixture: ${dbPath}`,
       `- Base URL: ${baseURL}`
@@ -153,6 +208,7 @@ export default async function globalSetup(): Promise<void> {
     ownerToken: E2E_OWNER_TOKEN,
     artifactRoot,
     server: { pid: child.pid ?? -1, stdoutPath, stderrPath },
+    fixtureServer,
     sanitizedEnvironment: {
       allowedVariables: ['PATH', 'HOME', 'TMPDIR', 'RESOFEED_E2E', 'OPENROUTER_KEY'],
       openRouterKey: liveRequested ? 'live-redacted' : 'ci-safe-fake-key',
