@@ -22134,3 +22134,73 @@ phases:
     evidence.
   depends_on:
   - manual-rss-fetch
+  steps:
+  - id: playwright-comprehensive-e2e.harness-contract-lock
+    name: Harness Contract Lock
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - Playwright launch contract\n  - real-server command contract\n  - secret/live-smoke\
+      \ boundary contract\n\nLock the comprehensive Playwright E2E harness contract\
+      \ before browser tests are expanded.\n\nAuthoritative invariants:\n- Use the\
+      \ real single deployable path: build/run `cmd/resofeed`; do not add sidecar\
+      \ workers, queues/jobs, sync/merge machinery, accounts, vector DB/RAG, or new\
+      \ product concepts.\n- Tests must run against an isolated temporary SQLite DB\
+      \ fixture and sanitized environment.\n- LLM live cases must read `OPENROUTER_KEY`\
+      \ / `.env` from runtime environment only, never from committed files; absent/invalid\
+      \ keys must exercise deterministic skip/failure paths.\n- Evidence must include\
+      \ trace, screenshot/video where applicable, server stdout/stderr, DB fixture\
+      \ path, and sanitized environment notes.\n\nDefine the minimal test matrix and\
+      \ required commands without implementing product behavior:\n- Backend build/server\
+      \ launch: `go build ./cmd/resofeed` and a documented test launch command for\
+      \ the built binary using a temp DB and owner token.\n- Browser E2E command:\
+      \ prefer `npm --prefix web run test:e2e`; if no script exists, lock an explicit\
+      \ `npx playwright test` fallback to be wired by the harness step.\n- Live LLM\
+      \ smoke command/tag separation, e.g. Playwright grep/project/tag that can be\
+      \ skipped when `OPENROUTER_KEY` is absent.\n\n## Completion Criteria (stub exclusion)\n\
+      This is a CONTRACT step. Stubs/config placeholders are acceptable only when\
+      \ they are explicit acceptance anchors; they must not be presented as runtime\
+      \ implementation."
+    verification: '- Contract lists every E2E flow category: real server/UI boot,
+      first-use owner token, source/feed operations, manual global ingest, per-source
+      fetch, today/feed, inspect/retrieve/search, LLM failure/mock/live-smoke, API/MCP
+      parity probes, and visual/UX invariants.
+
+      - Contract explicitly separates deterministic CI-safe cases from live OpenRouter
+      smoke cases.
+
+      - Contract names the exact launch/test commands to be wired and the evidence
+      artifacts required.
+
+      - No product code behavior is implemented in this contract step.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Harness Contract Evidence
+
+      - Test matrix locked:
+
+      - Real server command locked:
+
+      - Browser command locked:
+
+      - CI-safe vs live-only LLM boundary:
+
+      - Required artifact list:
+
+      - Forbidden scope check: accounts/sync/vector DB/queues/new product concepts
+      not introduced.'
+    agent: frontend-engineer
