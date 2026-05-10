@@ -4,6 +4,7 @@ import net from 'node:net';
 import path from 'node:path';
 
 import { test, expect } from './fixtures';
+import { E2E_FAKE_OPENROUTER_KEY } from './e2e-contract';
 
 test.use({ trace: 'on', screenshot: 'on' });
 
@@ -242,16 +243,24 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
 });
 
 test('@parity browser-led API/MCP parity probes share one real server fixture', async ({
-  page,
+  browser,
   request,
   runInfo,
   ownerToken
 }) => {
-  const unauthorizedAPI = await request.get(`${runInfo.baseURL}/api/feed/today`);
+  const openRouterKey = runInfo.sanitizedEnvironment.openRouterKey === 'ci-safe-fake-key'
+    ? E2E_FAKE_OPENROUTER_KEY
+    : process.env.OPENROUTER_KEY ?? '';
+  const isolated = await startIsolatedServer(runInfo, openRouterKey);
+  const isolatedRunInfo = { ...runInfo, baseURL: isolated.baseURL };
+  const context = await browser.newContext({ baseURL: isolated.baseURL });
+  const page = await context.newPage();
+  try {
+  const unauthorizedAPI = await request.get(`${isolatedRunInfo.baseURL}/api/feed/today`);
   expect(unauthorizedAPI.status(), 'API rejects missing owner token before reads').toBe(401);
   expect(await unauthorizedAPI.json()).toMatchObject({ error: { code: 'unauthorized', details: {} } });
 
-  const unauthorizedMCP = await request.post(`${runInfo.baseURL}/mcp`, {
+  const unauthorizedMCP = await request.post(`${isolatedRunInfo.baseURL}/mcp`, {
     data: { jsonrpc: '2.0', id: 'unauth', method: 'tools/list' }
   });
   expect(unauthorizedMCP.status(), 'MCP rejects missing owner token before tool handling').toBe(401);
@@ -275,9 +284,9 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 
-  const apiFeed = await authorizedGet<{ items: ItemSummary[] }>(request, runInfo, ownerToken, '/api/feed/today?limit=20');
-  const mcpFeed = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'list_candidate_items', { limit: 20 });
-  const mcpFeedResource = await mcpResource<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'resofeed://feed/today');
+  const apiFeed = await authorizedGet<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, '/api/feed/today?limit=20');
+  const mcpFeed = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'list_candidate_items', { limit: 20 });
+  const mcpFeedResource = await mcpResource<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'resofeed://feed/today');
   expect(apiFeed.items).toHaveLength(1);
   expect(apiFeed.items[0]).toMatchObject({ title: 'Local fixture item one', source_title: 'ResoFeed E2E Local Source' });
   expect(itemIds(mcpFeed.items)).toEqual(itemIds(apiFeed.items));
@@ -288,21 +297,21 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
   await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('why: fresh from configured source');
   await expect.poll(async () => {
-    const detail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
+    const detail = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
     return detail.item.human_inspected_at;
   }).not.toBeNull();
-  const apiDetail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
-  const mcpDetail = await mcpTool<{ item: ItemDetail }>(request, runInfo, ownerToken, 'read_item', { item_id: itemID });
+  const apiDetail = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
+  const mcpDetail = await mcpTool<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, 'read_item', { item_id: itemID });
   expect(mcpDetail.item).toMatchObject({ id: apiDetail.item.id, title: apiDetail.item.title, provenance: apiDetail.item.provenance });
   expect(mcpDetail.item.human_inspected_at).toBe(apiDetail.item.human_inspected_at);
 
   await page.getByRole('button', { name: 'Resonate item' }).click();
   await expect(page.getByRole('button', { name: 'Remove resonance' })).toBeVisible();
   await expect.poll(async () => {
-    const detail = await authorizedGet<{ item: ItemDetail }>(request, runInfo, ownerToken, `/api/items/${itemID}`);
+    const detail = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
     return detail.item.is_resonated;
   }).toBe(true);
-  const mcpResonatedSearch = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'search_items', { query: 'Local fixture', resonated: true, limit: 20 });
+  const mcpResonatedSearch = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'search_items', { query: 'Local fixture', resonated: true, limit: 20 });
   expect(itemIds(mcpResonatedSearch.items)).toContain(itemID);
 
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
@@ -311,8 +320,8 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
   await page.getByRole('button', { name: 'search' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
-  const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, runInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
-  const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, runInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });
+  const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, isolatedRunInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
+  const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });
   expect(apiSearch.query).toMatchObject({ q: 'Local fixture', limit: 20 });
   expect(itemIds(apiSearch.items)).toContain(itemID);
   expect(itemIds(mcpSearch.items)).toEqual(itemIds(apiSearch.items));
@@ -320,18 +329,18 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await steer.fill('Push more parity fixture documents.');
   await page.getByRole('button', { name: 'apply' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'applied: steering updated · rules:1' })).toBeVisible();
-  const apiRules = await authorizedGet<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, runInfo, ownerToken, '/api/steer/active');
-  const mcpRules = await mcpResource<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, runInfo, ownerToken, 'resofeed://rules/active');
+  const apiRules = await authorizedGet<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, isolatedRunInfo, ownerToken, '/api/steer/active');
+  const mcpRules = await mcpResource<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, isolatedRunInfo, ownerToken, 'resofeed://rules/active');
   expect(apiRules.rules.map((rule) => rule.rule_text)).toContain('Push more deterministic llm fixtures.');
   expect(mcpRules.rules.map((rule) => rule.rule_text)).toEqual(apiRules.rules.map((rule) => rule.rule_text));
 
-  const toolsList = await mcpPost(request, runInfo, ownerToken, { jsonrpc: '2.0', id: 'tools', method: 'tools/list' });
+  const toolsList = await mcpPost(request, isolatedRunInfo, ownerToken, { jsonrpc: '2.0', id: 'tools', method: 'tools/list' });
   expect(toolsList.status).toBe(200);
   const toolNames = (((toolsList.body as JsonRpcResponse).result as { tools: Array<{ name: string }> }).tools).map((tool) => tool.name).sort();
   expect(toolNames).toEqual(['list_candidate_items', 'mark_inspected', 'read_item', 'report_delivery', 'resonate_item', 'search_items', 'steer']);
   expect(toolNames.join(' ')).not.toMatch(/telegram|slack|email|account|folder|tag|archive|semantic|rag/i);
 
-  const missingMCPKey = await mcpPost(request, runInfo, ownerToken, {
+  const missingMCPKey = await mcpPost(request, isolatedRunInfo, ownerToken, {
     jsonrpc: '2.0',
     id: 'missing-key',
     method: 'tools/call',
@@ -339,6 +348,16 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   });
   expect(missingMCPKey.status).toBe(200);
   expect((missingMCPKey.body as JsonRpcResponse).error).toMatchObject({ code: -32602, data: { field: 'idempotency_key' } });
+  } finally {
+    await context.close();
+    if (isolated.child.pid) {
+      try {
+        process.kill(isolated.child.pid, 'SIGTERM');
+      } catch {
+        // Process already exited; artifacts remain useful.
+      }
+    }
+  }
 });
 
 test('@llm-deterministic ci-safe missing and invalid OPENROUTER_KEY startup paths exit before browser binding', async ({ runInfo }) => {
