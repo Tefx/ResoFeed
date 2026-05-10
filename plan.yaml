@@ -29824,7 +29824,7 @@ phases:
       contamination and targeted desktop Chromium Inspector coverage.'
   - id: generalize-inspector-primary-body-sanitation
     name: Generalize Inspector primary-body sanitation
-    status: claimed
+    status: done
     description: 'Residual remediation for PASS_WITH_DEBT from `inspector-readable-content-gate`.
 
 
@@ -29915,6 +29915,31 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T14:43:23.922088+00:00'
+    done_at: '2026-05-10T14:48:44.529102+00:00'
+    evidence: 'Implementation evidence accepted from frontend-engineer. Files changed:
+      `web/src/routes/components/Inspector.svelte`; worker commit `91b5e38467dd66bbd3b9063696fad14d4e890dc3`,
+      squash-merged to main as `0b7fe81`. Refs confirmation present for docs/ARCHITECTURE.md,
+      docs/DESIGN.md, Inspector.svelte, `.audit-artifacts/inspector-readable-content-gate.md`,
+      inspector-readable-content-regression, and project instructions. Residual remediation
+      closure: issue source `inspector-readable-content-gate` PASS_WITH_DEBT warning;
+      affected location moved to successor sanitation code `Inspector.svelte:101-132`;
+      fixture-specific guard removed/generalized: YES — `Inspector.svelte:124-132`
+      now calls `isNonArticleDiagnosticText`; targeted search of `Inspector.svelte`
+      for gate-reported fixture literals and item IDs returned no matches. Generalized
+      rule: exclude product-level non-article diagnostic categories such as model/test
+      harness status text and corpus/inventory manifests while preserving script/CSS/JSON-LD/enclosure/navigation/model-status
+      cleanup. Clean-body behavior preserved: targeted Playwright Inspector suite
+      passed 7/7. Architecture/design constraints preserved: only localized Inspector
+      sanitation logic changed; no new backend/storage/auth/product concepts, UI surfaces,
+      layout redesign, SaaS copy, or forbidden flows introduced. Reported related
+      observation: `web/src/routes/components/Feed.svelte` still contains a fixture-specific
+      feed-summary guard; accepted as outside this Inspector primary-body sanitation
+      step with non-intersection to residual gate focus on `Inspector.svelte` screenshot-family
+      primary-body guards. Mainline final-state verification after squash merge: `npm
+      --prefix web run check` passed; `npm --prefix web run build` passed; `npm --prefix
+      web exec playwright test -- --config web/playwright.config.ts web/tests/e2e/inspector-readable-content-regression.spec.ts
+      web/tests/e2e/inspector-dirty-corpus.spec.ts web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      --project chromium-ci-safe` passed with 7/7 tests.'
   - id: retest-generalized-inspector-primary-body-sanitation
     name: Retest generalized Inspector primary-body sanitation
     status: pending
