@@ -34820,6 +34820,8 @@ phases:
     - fuidcr-expected-red-ui-tests
     - fuidcr-api-dto-escalation-guard
     - fuidcr-style-breakpoint-foundation
+    - fuidcr-feed-search-dto-source-fields
+    - fuidcr-feed-search-client-dto-contract
     - fuidcr-feed-search-anatomy
     - fuidcr-inspector-reading-contract
     - fuidcr-source-ledger-state-portability
