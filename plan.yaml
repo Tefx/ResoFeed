@@ -34223,7 +34223,7 @@ phases:
     claimed_at: '2026-05-10T17:57:50.861937+00:00'
   - id: fuidcr-shell-owner-doctor-surfaces
     name: Repair Shell, Owner Token Prompt, and /doctor surfaces
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -34370,6 +34370,40 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:57:45.184185+00:00'
+    done_at: '2026-05-10T18:17:14.867906+00:00'
+    evidence: "status: SUCCESS\n\n## Summary\nMerged and mainline-verified the shell,\
+      \ owner-token prompt, and /doctor surface repair. The branch was reconciled\
+      \ with current main, `/doctor` now behaves as an operational surface boundary\
+      \ instead of an inserted diagnostic block above the feed, and terse shell/owner-token\
+      \ prompt behavior was preserved.\n\n## Commit hash(es)\n- Worker branch: 0981c33539ce3e131d9378694eda019090161785\
+      \ (`fix doctor surface boundary`)\n- Worker branch merge-base reconciliation:\
+      \ 8e5971836e92e458172340e4fb87d4ed3bc1ed31 (`Merge branch 'main' into vectl/step-fuidcr-shell-owner-doctor-surfaces`)\n\
+      - Earlier worker commit: e7abb025e7d3a6d300a44c68eb40c599e911a4d2 (`fix shell\
+      \ owner token and doctor chrome`)\n- Main squash commit: d10a9a9 (`[vectl] step-fuidcr-shell-owner-doctor-surfaces\
+      \ completed`)\n\n## Files changed\n- web/src/routes/+page.svelte\n- web/src/app.css\n\
+      - web/src/routes/components/OwnerTokenPrompt.svelte\n- web/src/routes/components/__tests__/rendering-expected-red.test.ts\n\
+      \n## Verification\nMainline final-state gate after squash merge:\n- `npm --prefix\
+      \ web test` → PASS; svelte-check 0 errors/0 warnings; Vitest 6 files / 35 tests\
+      \ passed.\n- `npm --prefix web run build` → PASS; production build completed.\n\
+      - `npm --prefix web run test:e2e -- --list` → PASS; Playwright config lists\
+      \ 28 tests in 10 files.\nWorker verification also reported:\n- `npm run test:render`\
+      \ → PASS; 6 files / 35 tests passed.\n- `npm run check` → PASS; svelte-check\
+      \ 0 errors/0 warnings.\n- `npm run build` → PASS.\n- `npm run test` → PASS.\n\
+      - `git status --porcelain=v1` → clean.\n\n## Rendered shell/prompt/doctor evidence\n\
+      Worker captured Playwright screenshots under `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-shell-doctor-artifacts/`:\n\
+      - owner-token-desktop.png\n- owner-token-mobile.png\n- shell-desktop.png\n-\
+      \ shell-mobile.png\n- doctor-desktop.png\n- doctor-mobile.png\n/doctor wrap\
+      \ proof: desktop diagnostics pre clientWidth=1182 scrollWidth=1182; mobile diagnostics\
+      \ pre clientWidth=310 scrollWidth=310. Long raw source_id/item_id/story_key\
+      \ text wrapped without horizontal crop.\n\n## Spec link\n- docs/DESIGN.md\n\
+      - AGENTS.md\n- upstream steps: fuidcr-contract-matrix-lock, fuidcr-expected-red-ui-tests,\
+      \ fuidcr-style-breakpoint-foundation\n\n## Deviations\n- type: test_error\n\
+      \  artifact: web/src/routes/components/__tests__/rendering-expected-red.test.ts\n\
+      \  what changed: Updated assertions that expected persistent Surfaces navigation\
+      \ and a SOURCE LEDGER nav button.\n  why: Authoritative finding 2 requires removing\
+      \ persistent dashboard/tab-style surface navigation; ledger access is through\
+      \ Steer command language.\n  impact: Tests now protect absence of persistent\
+      \ nav and verify Steer-driven SOURCE LEDGER activation.\n\n## Gaps/Notes\nnone"
   - id: fuidcr-ui-preview-cleanup
     name: Clean docs/ui-preview.html after live UI contracts stabilize
     status: pending
