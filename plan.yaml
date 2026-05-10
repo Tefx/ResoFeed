@@ -24907,3 +24907,80 @@ phases:
     - playwright-repair-verification
     - visual-ux-audit
     agent: gate-reviewer
+  - id: expected-red-hit-target-clickability-tests
+    name: Expected-red real hit-target and clickability tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create Playwright tests that use real browser pointer interactions against visible
+      controls, not only synthetic handler calls. Tests must detect overlay/z-index/pointer-events/layout
+      obstruction for the complete clickable-control class.
+
+
+      Required controls:
+
+      - `SOURCE LEDGER`
+
+      - `TODAY`
+
+      - Steer submit
+
+      - star/resonate
+
+      - Inspector links
+
+      - `/doctor`
+
+      - OPML import
+
+      - source fetch buttons
+
+
+      Required method:
+
+      - Use real click coordinates or Playwright locator clickability checks where
+      useful.
+
+      - Capture obstruction evidence when a click fails: element bounding box, top
+      element at click point, computed `pointer-events`, z-index/positioning clues,
+      and active panel after click.
+
+      - Assert that successful clicks leave the intended panel/action active, never
+      the wrong panel.
+
+
+      This is a pre-implementation test-definition step. Do not modify product UI
+      source.'
+    verification: '- Test coverage explicitly includes every required control or records
+      a contract-backed reason a control is not applicable in this repo state.
+
+      - Expected-red run produces actionable failures for currently broken clickability/obstruction
+      cases.
+
+      - Evidence includes obstruction diagnostics: click point, bounding box, top
+      element, pointer-events/z-index clues, active panel/action result.
+
+      - Product UI implementation files remain unchanged.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Hit-Target\
+      \ Evidence\n- Files changed: <test/fixture/helper paths only>\n- Exact command:\n\
+      ```sh\ncd web && npm run test:e2e -- --grep \"hit-target|clickability|ui-navigation-hover-inspector-repair\"\
+      \n```\n- Runner output:\n```text\n<paste output>\n```\n- Control coverage table:\n\
+      \  | Control | Test name | Click method | Expected active proof | Failure/Red\
+      \ status |\n  | --- | --- | --- | --- | --- |\n- Obstruction diagnostics captured:\n\
+      \  | Control | click point | bounding box | top element | pointer-events/z-index\
+      \ clue |\n  | --- | --- | --- | --- | --- |\n\n## Closure Fields\nverdict: EXPECTED_RED_PASS\
+      \ | INCOMPLETE | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status:\
+      \ <exposed_gaps|missing_coverage with details>\norchestrator_action_hint: proceed_to_implementation_after_all_expected_red\
+      \ | expand_hit_target_tests_first"
+    depends_on:
+    - contract-design-audit
+    agent: frontend-engineer
