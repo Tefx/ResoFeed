@@ -23560,7 +23560,7 @@ phases:
       - Gaps/Notes: Product source/docs/tests were not modified.'
   - id: playwright-comprehensive-e2e.final-playwright-report
     name: Final Playwright Runtime Report and Full-Plan E2E Check
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -23718,6 +23718,170 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-10T10:31:38.277988+00:00'
+    done_at: '2026-05-10T10:35:09.425474+00:00'
+    evidence: 'status: SUCCESS
+
+      Headline: PASS_WITH_DEBT
+
+      Blocking Status: CLOSED
+
+      Proof-Gap Status: NON_BLOCKING
+
+      Verdict: PASS
+
+      Blockers: []
+
+      Orchestrator Action Hint: COMPLETE
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - .agents/instructions.md — READ: one Go binary serves static assets/JSON HTTP/MCP/background
+      ingest; one SQLite DB; OpenRouter runtime secrets only; owner token universal
+      delegation boundary; UI labels stay `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`,
+      `/doctor`.
+
+      - docs/ARCHITECTURE.md — READ: `resofeed serve` single runtime; flags `--addr`,
+      `--public-url`, `--db`, `--openrouter-model`, `--owner-token`; static UI public
+      but `/api/*` and `/mcp` require bearer token; HTTP/MCP expose same concepts;
+      OpenRouter key runtime only and never logged/exported.
+
+      - docs/DESIGN.md — READ: owner-token prompt, first-use empty state, dense feed,
+      Steer, Today, Inspector, Source Ledger, `/doctor`; no accounts/folders/tags/unread/archive/settings/dashboard/mascot/SaaS
+      copy.
+
+      - docs/ui-preview.html — READ: preview shows `RESOFEED`, Steer input, Today
+      feed, Inspector, Source Ledger, `[RUN INGEST]`, `[FETCH]`, `/doctor`, import/export
+      state, mobile feed/Inspector preview.
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md — READ: harness must build/launch
+      real `cmd/resofeed`, isolated temp SQLite DB, sanitized env; deterministic CI
+      matrix includes real server/UI boot, source/feed operations, LLM boundary, API/MCP
+      parity, visual/UX; live OpenRouter smoke opt-in/skipped when key absent.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; `.agents/instructions.md`
+      read as equivalent guidance.
+
+
+      ## Final Playwright Runtime Report
+
+      Backend build command: `go build ./cmd/resofeed`.
+
+      Server launch command (sanitized): `env -i PATH="$PATH" HOME="$HOME" TMPDIR="$TMPDIR"
+      RESOFEED_E2E=1 RESOFEED_E2E_OPENROUTER_ENDPOINT="http://127.0.0.1:50530" OPENROUTER_KEY="<redacted
+      non-secret sentinel>" ./.test-artifacts/bin/resofeed serve --addr 127.0.0.1:50529
+      --public-url http://127.0.0.1:50529 --db ".test-artifacts/playwright/fixtures/resofeed-e2e-1778409225032-49680.sqlite3"
+      --owner-token "<redacted>"`.
+
+      Browser E2E command: `npm --prefix web run test:e2e`.
+
+
+      Actual output summary:
+
+      - Initial `npm --prefix web run test:e2e` failed because `web/node_modules`
+      was absent (`playwright: command not found`).
+
+      - Remediation: `npm --prefix web ci`.
+
+      - Final run command: `go build ./cmd/resofeed && npm --prefix web run test:e2e`.
+
+      - Final output: build succeeded; Playwright ran 9 tests; 7 passed and 2 live
+      OpenRouter tests skipped.
+
+
+      Artifacts:
+
+      - Traces: `.test-artifacts/playwright/test-output/**/trace.zip`.
+
+      - Screenshots: `.test-artifacts/playwright/test-output/**/test-finished-1.png`,
+      `.test-artifacts/playwright/html-report/data/*.png`.
+
+      - Videos/logs: no video files observed; logs in `.test-artifacts/playwright/server-logs/`.
+
+      - Report/results: `.test-artifacts/playwright/html-report/index.html`, `.test-artifacts/playwright/results/results.json`,
+      `.test-artifacts/playwright/results/junit.xml`.
+
+      - Server stdout: `owner token explicit: stored hash`, `serving ResoFeed on 127.0.0.1:50529`,
+      `shutdown complete`.
+
+      - Server stderr: empty.
+
+      - DB fixture path: `.test-artifacts/playwright/fixtures/resofeed-e2e-1778409225032-49680.sqlite3`;
+      cleaned up per preservation note.
+
+      - Sanitized environment notes: `.test-artifacts/playwright/sanitized-environment.md`;
+      ambient OS key not forwarded; deterministic local OpenRouter transport used.
+
+
+      Coverage summary:
+
+      - Feed/source operations: PROVEN by passing browser-led source import, manual
+      fetch, feed, inspect, retrieve, and search test.
+
+      - LLM deterministic missing/invalid key: PROVEN by passing `@llm-deterministic`
+      startup/runtime invalid-key coverage.
+
+      - LLM live smoke disposition: SKIPPED_NO_KEY; skip reason recorded `OPENROUTER_KEY
+      absent; live OpenRouter smoke skipped deterministically`.
+
+      - API/MCP parity proof register: PROVEN by passing `@parity` probe.
+
+      - UI/UX audit headline: PROVEN at report level by screenshots/traces across
+      real server UI boot, source/feed/search, deterministic LLM receipt, and live-skip
+      paths.
+
+
+      Behavioral proof register:
+
+      - real_go_binary_launch: PROVEN.
+
+      - network_served_ui_from_go_binary: PROVEN.
+
+      - owner_token_gate: PROVEN.
+
+      - feed_source_import_manual_fetch_inspect_retrieve_search: PROVEN.
+
+      - deterministic_llm_missing_invalid_key_paths: PROVEN.
+
+      - live_llm_smoke_disposition: PROVEN_SKIP_DISPOSITION_SKIPPED_NO_KEY.
+
+      - api_mcp_parity_probe: PROVEN.
+
+      - browser_artifacts_emitted: PROVEN.
+
+      - sanitized_env_recorded: PROVEN.
+
+      - artifact_secret_redaction: NEEDS_TEST_NON_BLOCKING; run-info contains deterministic
+      test sentinel fields while logs/final evidence are redacted; artifacts uncommitted
+      and no real secret forwarded.
+
+
+      Proof closure fields:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - proof_gap_status: NON_BLOCKING
+
+      - uncertainty_sources: AGENTS.md absent in isolated worktree; no videos observed
+      but screenshots/traces/HTML/JSON/JUnit/server logs present.
+
+
+      Implementation evidence:
+
+      - Commit hash(es): none — verification-only report; generated `.test-artifacts/`
+      left uncommitted and root `resofeed` build binary removed.
+
+      - Files changed: none committed.
+
+      - Gaps/Notes: Do not commit `.test-artifacts/`; future cleanup can redact deterministic
+      sentinel fields in machine-readable `run-info.json` if artifact publication
+      becomes required.'
   - id: playwright-comprehensive-e2e.gate
     name: Gate Playwright Comprehensive E2E
     status: pending
