@@ -29502,7 +29502,7 @@ phases:
       --project chromium-ci-safe` passed with 7/7 tests.'
   - id: inspector-readable-content-gate
     name: Gate clean Inspector readable content remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -29629,6 +29629,27 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T14:32:23.520960+00:00'
+    done_at: '2026-05-10T14:41:27.848541+00:00'
+    evidence: 'Gate evidence accepted as PASS_WITH_DEBT after remediation ownership
+      was created. Gate artifact committed on branch `5eababd` and squash-merged to
+      main as `9ee2e67` at `.audit-artifacts/inspector-readable-content-gate.md`;
+      mainline `npm --prefix web run check` passed with 0 errors/warnings after merge.
+      Refs confirmation present for project instructions, docs/DESIGN.md, docs/ARCHITECTURE.md,
+      inspector-readable-content-regression, and UI/UX audit artifact. Step Evidence
+      Review covers all phase steps; wiring audit W1-W8 present; escape hatch audit
+      reports no `@invar:allow` in scoped source/test scans; smoke/liveness evidence
+      includes web check/build, `go test ./internal/resofeed`, and targeted Playwright
+      7/7; integration-vs-fixture distinction present; UI/UX audit and DESIGN.md compliance
+      reviewed. Behavioral proof register entries all PASS for screenshot-family raw
+      token exclusion, controlled fallback, diagnostics/provenance isolation, UI tone/layout,
+      and architecture boundaries. Gate closure fields: headline PASS_WITH_DEBT, verdict
+      PASS, blockers [], gate_open_allowed true, proof_gap_status NON_BLOCKING, blocking_status
+      CLOSED, orchestrator_action_hint COMPLETE. Debt was not purely cosmetic: gate
+      noted fixture-specific guards in `web/src/routes/components/Inspector.svelte:112-114`;
+      therefore orchestrator created a residual remediation chain before completing
+      this gate: `generalize-inspector-primary-body-sanitation`, `retest-generalized-inspector-primary-body-sanitation`,
+      and `residual-inspector-readable-content-gate`. Current gate is completed as
+      issue-detection gate with downstream remediation ownership established.'
   - id: uiux-audit-clean-inspector-primary-body
     name: UI/UX audit clean Inspector primary body
     status: done
