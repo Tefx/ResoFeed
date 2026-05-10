@@ -1,0 +1,36 @@
+{
+  "baseURL": "http://127.0.0.1:49585",
+  "binaryPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/bin/resofeed",
+  "dbPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/fixtures/resofeed-e2e-1778415383160-10862.sqlite3",
+  "ownerToken": "rfeed_e2e_owner_token_00000000000000000000000000000000",
+  "artifactRoot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright",
+  "server": {
+    "pid": 11024,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/server.stderr.log"
+  },
+  "fixtureServer": {
+    "pid": 10864,
+    "url": "http://127.0.0.1:49575/e2e-feed.xml",
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/fixture-server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/fixture-server.stderr.log"
+  },
+  "openRouterStub": {
+    "endpoint": "http://127.0.0.1:49586",
+    "pid": 11022,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/openrouter-stub.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/server-logs/openrouter-stub.stderr.log"
+  },
+  "sanitizedEnvironment": {
+    "allowedVariables": [
+      "PATH",
+      "HOME",
+      "TMPDIR",
+      "RESOFEED_E2E",
+      "RESOFEED_E2E_OPENROUTER_ENDPOINT",
+      "OPENROUTER_KEY"
+    ],
+    "openRouterKey": "ci-safe-fake-key",
+    "notesPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/playwright-repair-verification/.test-artifacts/playwright/sanitized-environment.md"
+  }
+}
