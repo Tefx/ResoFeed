@@ -30668,7 +30668,7 @@ phases:
       merge; no retest branch changes required merging.'
 - id: prd-inspector-preview-conformance-remediation
   name: PRD Inspector and Preview Conformance Remediation
-  status: pending
+  status: in_progress
   gate: Inspector/Inspect surfaces expose PRD-required item-understanding outputs
     and the live rendered UI visually conforms to docs/ui-preview.html and docs/DESIGN.md
     with screenshot-first proof.
@@ -30677,7 +30677,7 @@ phases:
   steps:
   - id: prd-inspector-preview-conformance-remediation.contract-audit-acceptance
     name: Contract audit for PRD Inspector fields and preview/live deltas
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -30772,6 +30772,8 @@ phases:
 
       '
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-10T15:31:24.638668+00:00'
   - id: prd-inspector-preview-conformance-remediation.expected-red-browser-regressions
     name: Expected-red browser regressions for Inspector PRD fields and preview parity
     status: pending
