@@ -25,8 +25,10 @@ export interface ItemSummary {
   title: string;
   summary: string | null;
   core_insight: string | null;
+  display_excerpt?: string | null;
   value_tier: string | null;
   published_at: Rfc3339UtcString | null;
+  first_seen_at?: Rfc3339UtcString | null;
   extraction_status: ExtractionStatus;
   model_status: ModelStatus;
   is_resonated: boolean;
@@ -48,6 +50,14 @@ export interface ItemDetail extends ItemSummary {
   feed_excerpt: string | null;
   extracted_text: string | null;
   provenance: Provenance;
+}
+
+export function itemDisplayTimestamp(item: ItemSummary): Rfc3339UtcString | null {
+  return item.published_at ?? item.first_seen_at ?? null;
+}
+
+export function itemDisplayExcerpt(item: ItemSummary): string | null {
+  return item.summary ?? item.core_insight ?? item.display_excerpt ?? null;
 }
 
 export type LastFetchStatus = 'ok' | 'rss_fetch_error' | 'not_fetched';

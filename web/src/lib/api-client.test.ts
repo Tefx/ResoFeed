@@ -2,17 +2,25 @@ import { render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
-import type { ErrorBody, FeedTodayResponse, SearchResponse, SourcesResponse, StateBundleV1 } from '$lib/api-contract';
+import {
+  itemDisplayExcerpt,
+  itemDisplayTimestamp,
+  type ErrorBody,
+  type FeedTodayResponse,
+  type SearchResponse,
+  type SourcesResponse,
+  type StateBundleV1
+} from '$lib/api-contract';
 import Feed from '../routes/components/Feed.svelte';
 import SearchRetrieval from '../routes/components/SearchRetrieval.svelte';
 import SourceLedger from '../routes/components/SourceLedger.svelte';
 import StatePortability from '../routes/components/StatePortability.svelte';
-import { expectedRedItem, expectedRedSource } from '../test/contract-fixtures';
+import { expectedRedFallbackItem, expectedRedItem, expectedRedSource } from '../test/contract-fixtures';
 
-const feedFixture: FeedTodayResponse = { items: [expectedRedItem] };
+const feedFixture: FeedTodayResponse = { items: [expectedRedItem, expectedRedFallbackItem] };
 const sourcesFixture: SourcesResponse = { sources: [expectedRedSource] };
 const searchFixture: SearchResponse = {
-  items: [expectedRedItem],
+  items: [expectedRedItem, expectedRedFallbackItem],
   query: {
     q: 'sqlite',
     source: 'Example Source',
@@ -56,6 +64,14 @@ describe('ResoFeed API client and rendered sinks', () => {
 
     const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
     const [sources, feed] = await Promise.all([client.sources(), client.today()]);
+    const fallbackItem = feed.items.find((item) => item.id === expectedRedFallbackItem.id);
+
+    expect(fallbackItem?.published_at).toBeNull();
+    expect(fallbackItem?.first_seen_at).toBe('2026-05-09T02:00:00Z');
+    expect(itemDisplayTimestamp(expectedRedFallbackItem)).toBe('2026-05-09T02:00:00Z');
+    expect(fallbackItem?.summary).toBeNull();
+    expect(fallbackItem?.core_insight).toBeNull();
+    expect(itemDisplayExcerpt(expectedRedFallbackItem)).toBe('Source-backed feed excerpt for list/search fallback.');
 
     render(SourceLedger, { props: { sources: sources.sources, onDeleteSource: async () => {}, onImportOpml: async () => {} } });
     expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent('Example Source · ok');
@@ -63,7 +79,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });
     expect(within(list).getByText(expectedRedItem.title)).toBeVisible();
-    expect(within(list).getByLabelText('Extraction: partial_extraction')).toHaveTextContent('partial');
+    expect(within(list).getAllByLabelText('Extraction: partial_extraction')[0]).toHaveTextContent('partial');
   });
 
   it('renders search and state portability fixtures from API client responses', async () => {
@@ -80,13 +96,20 @@ describe('ResoFeed API client and rendered sinks', () => {
       client.search({ q: 'sqlite', source: 'Example Source', from: '2026-01-01', to: '2026-12-31', resonated: false }),
       client.exportState()
     ]);
+    const searchFallbackItem = search.items.find((item) => item.id === expectedRedFallbackItem.id);
 
     expect(state.schema_version).toBe('resofeed.state.v1');
+    expect(searchFallbackItem?.published_at).toBeNull();
+    expect(searchFallbackItem?.first_seen_at).toBe('2026-05-09T02:00:00Z');
+    expect(searchFallbackItem?.summary).toBeNull();
+    expect(searchFallbackItem?.core_insight).toBeNull();
+    expect(itemDisplayTimestamp(expectedRedFallbackItem)).toBe('2026-05-09T02:00:00Z');
+    expect(itemDisplayExcerpt(expectedRedFallbackItem)).toBe('Source-backed feed excerpt for list/search fallback.');
 
     render(SearchRetrieval, { props: { items: search.items, query: search.query.q, onSearch: async () => search } });
     const searchRegion = screen.getByRole('region', { name: 'Search and Retrieval' });
-    expect(within(searchRegion).getByText('match: lexical index')).toBeVisible();
-    expect(within(searchRegion).getByText('src: Example Source')).toBeVisible();
+    expect(within(searchRegion).getAllByText('match: lexical index')[0]).toBeVisible();
+    expect(within(searchRegion).getAllByText('src: Example Source')[0]).toBeVisible();
 
     render(StatePortability, { props: { onExportState: async () => state, onImportState: async () => {} } });
     expect(screen.getByRole('group', { name: 'State portability' })).toHaveTextContent(
