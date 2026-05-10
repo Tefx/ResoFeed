@@ -28881,3 +28881,176 @@ phases:
     is acceptable when extraction cannot produce clean content.'
   depends_on:
   - ui-navigation-hover-inspector-repair
+  steps:
+  - id: expected-red-inspector-readable-body-regression
+    name: Expected-red Inspector readable body regression test
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create a focused Playwright regression test for the reported screenshot bug
+      in the Inspector panel.
+
+
+      SPEC_REFS:
+
+      - docs/DESIGN.md — Inspector primary reading copy must be dense but legible
+      and must not expose raw source/provenance garbage.
+
+      - docs/ARCHITECTURE.md — ResoFeed remains one Go binary with static assets and
+      JSON HTTP; no extra services or semantic/vector extraction layer.
+
+
+      TOUCH_PATHS:
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts (preferred new
+      focused test) or web/tests/e2e/inspector-dirty-corpus.spec.ts (extend only if
+      clearly the existing dirty-corpus harness fits)
+
+      - web/src/lib/playwright-e2e-harness-contract.ts only if a reusable fixture
+      helper is needed
+
+
+      Harness requirement:
+
+      - Use a deterministic fixture item whose source/content includes the screenshot-family
+      garbage: `function OptanonWrapper() {}`, CSS variables/custom properties, script/style
+      blocks, navigation/menu boilerplate, and a `model_latency_error` diagnostic-like
+      token.
+
+      - The test must open/select that item and inspect the actual right-side Inspector
+      primary body rendered in the browser.
+
+
+      Acceptance boundary:
+
+      - Test-only scope: do NOT modify product Svelte/Go implementation in this step.
+
+      - Before the implementation step, the test is expected to fail/red if the current
+      bug is present.
+
+      - The test must assert that Inspector primary body does NOT contain raw JS/CSS/navigation
+      boilerplate strings such as `function OptanonWrapper()`, CSS variable text,
+      `<script`, `<style`, navigation menu runs, or `model_latency_error`.
+
+      - The test must assert an acceptable positive outcome: either clean readable
+      article/excerpt text is shown OR a controlled fallback such as `summary unavailable`
+      is shown.
+
+      - Diagnostics/provenance may appear only in an explicitly separate metadata/diagnostic
+      area, never in the primary reading body.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      - Use the exact external feed/item shape already accepted by the real UI/server
+      harness; do not add convenience fields that production items would not have.
+
+      - Cite the fixture source/shape used in evidence.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Tests that only inspect mocked component state rather than rendered browser
+      text.
+
+      2. Tests that forbid one string but allow sibling raw script/style/nav strings.
+
+      3. Tests that allow `model_latency_error` or provenance diagnostics inside primary
+      article copy.
+
+      4. Product-code changes in this expected-red step.'
+    verification: 'Verification scope: local-check protecting inspector-readable-content-remediation.gate.
+
+      - A Playwright regression test exists for an item polluted with script/style/nav
+      boilerplate and `model_latency_error`.
+
+      - The test reads rendered Inspector primary body text from the browser, not
+      a mocked view model.
+
+      - Expected-red evidence names the failing assertion or, if the bug is already
+      fixed, explains why this is a regression-green addition without modifying product
+      code.
+
+      - Product files outside tests/fixtures remain untouched except narrowly scoped
+      reusable harness fixture helpers if required.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/real-server-ui.spec.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red / Regression Test Evidence
+
+
+      **Test file(s) changed**:
+
+      - <path>
+
+
+      **Fixture pollution included**:
+
+      - [ ] `function OptanonWrapper() {}`
+
+      - [ ] CSS variable/custom property text
+
+      - [ ] script/style block text
+
+      - [ ] navigation/menu boilerplate
+
+      - [ ] `model_latency_error`
+
+
+      **Primary body selector used**:
+
+      ```
+
+      <paste selector / locator>
+
+      ```
+
+
+      **Expected-red or regression-green command**:
+
+      ```
+
+      <paste command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste failing assertion or green regression output>
+
+      ```
+
+
+      **Scope confirmation**:
+
+      - Product implementation modified in this step: NO
+
+      - If any non-test helper changed, justify: <reason>
+
+
+      **Downstream implementation owner**: inspector-readable-content-remediation.clean-inspector-primary-body-implementation'
+    agent: frontend-engineer
