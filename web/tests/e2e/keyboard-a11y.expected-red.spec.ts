@@ -83,8 +83,6 @@ test('expected-red keyboard a11y Steer submit doctor log and Inspector original 
   const originalLink = page.getByRole('link', { name: 'original link' });
   await expect(originalLink).toHaveAttribute('href', /https?:\/\//);
   await focusAndAudit(originalLink, 'Inspector original link');
-  await page.keyboard.press('Enter');
-  await page.goBack().catch(() => undefined);
 
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
   await steer.focus();

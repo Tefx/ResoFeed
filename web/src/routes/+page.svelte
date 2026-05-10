@@ -90,7 +90,9 @@
         await loadItemDetail(selectedItemId, token);
       }
       await tick();
-      steerInput?.focus();
+      if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || document.activeElement?.textContent?.trim() === 'submit') {
+        steerInput?.focus();
+      }
     } catch (error) {
       if (error instanceof ResoFeedApiError && error.status === 401) {
         window.localStorage.removeItem(tokenStorageKey);
@@ -215,7 +217,11 @@
     if (manualFetchState.ingesting) return;
     manualFetchState = { ...manualFetchState, ingesting: true };
     try {
-      const result = await apiClient().runIngest();
+      let result = await apiClient().runIngest();
+      if (!result.ok && result.status === 409) {
+        await new Promise((resolve) => window.setTimeout(resolve, 1200));
+        result = await apiClient().runIngest();
+      }
       if (result.ok) {
         const sourceErrors = Object.fromEntries(
           result.body.errors.map((sourceError) => [sourceError.source_id, formatManualSourceError(sourceError.message)])
@@ -340,8 +346,8 @@
     </header>
 
     <nav class="surface-nav" aria-label="Surfaces">
-      <button type="button" class:active-surface={currentSurface === 'feed'} onclick={() => showSurface('feed')}>TODAY</button>
-      <button type="button" class:active-surface={currentSurface === 'ledger'} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
+      <button type="button" class:active-surface={currentSurface === 'feed'} aria-current={currentSurface === 'feed' ? 'true' : undefined} onclick={() => showSurface('feed')}>TODAY</button>
+      <button type="button" class:active-surface={currentSurface === 'ledger'} aria-current={currentSurface === 'ledger' ? 'true' : undefined} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
     </nav>
 
     {#if steerFeedback.kind === 'receipt'}
@@ -385,7 +391,7 @@
           <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {/if}
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}

@@ -12,6 +12,7 @@ export default defineConfig({
   globalTeardown: path.join(webRoot, 'tests', 'e2e', 'global-teardown.ts'),
   outputDir: path.join(artifactRoot, 'test-output'),
   fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: [
     ['list'],

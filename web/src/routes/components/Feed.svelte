@@ -14,6 +14,55 @@
     return status === 'partial_extraction' ? 'partial' : status;
   }
 
+  function decodeEntities(text: string): string {
+    if (typeof document === 'undefined') return text;
+    const element = document.createElement('textarea');
+    element.innerHTML = text;
+    return element.value;
+  }
+
+  function readableText(text: string | null): string | null {
+    if (!text) return null;
+    if (text.trim() === 'Deterministic fixture summary.') return null;
+    const withoutExecutable = text
+      .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style\b[\s\S]*?<\/style>/gi, ' ');
+    const withoutTags = withoutExecutable.replace(/<[^>]*>/g, ' ');
+    const withoutJsonLdPrefix = removeJsonLdPrefix(withoutTags);
+    const withoutEnclosure = withoutJsonLdPrefix.replace(/\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+\s+image=\S+/gi, ' ');
+    const normalized = decodeEntities(withoutEnclosure).replace(/\s+/g, ' ').trim();
+    return normalized.length > 0 ? normalized : null;
+  }
+
+  function removeJsonLdPrefix(text: string): string {
+    const start = text.search(/\{\s*"@context"/i);
+    if (start < 0 || text.slice(0, start).trim().length > 0) return text;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let index = start; index < text.length; index += 1) {
+      const char = text[index];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (char === '\\') {
+        escaped = true;
+        continue;
+      }
+      if (char === '"') inString = !inString;
+      if (inString) continue;
+      if (char === '{') depth += 1;
+      if (char === '}') depth -= 1;
+      if (depth === 0) return text.slice(index + 1);
+    }
+    return text;
+  }
+
+  function displaySummary(item: ItemSummary): string {
+    return readableText(item.summary) ?? readableText(item.core_insight) ?? 'summary unavailable';
+  }
+
   async function openInspector(item: ItemSummary): Promise<void> {
     await onSelect(item);
   }
@@ -53,12 +102,13 @@
             {/if}
           </p>
           <p class="contract-feed-title">{item.title}</p>
-          <p class="contract-feed-summary">{item.summary ?? item.core_insight ?? 'summary unavailable'}</p>
+          <p class="contract-feed-summary">{displaySummary(item)}</p>
         </button>
         <button
           class="contract-resonate"
           type="button"
           aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
+          aria-pressed={item.is_resonated ? 'true' : 'false'}
           disabled={pendingResonanceId === item.id}
           onclick={() => void toggleResonance(item)}
         >

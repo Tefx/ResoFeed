@@ -69,8 +69,8 @@ async function startIsolatedServer(runInfo: { binaryPath: string; artifactRoot: 
   return { child, baseURL, stdoutPath, stderrPath };
 }
 
-async function enterOwnerToken(page: import('playwright/test').Page, ownerToken: string): Promise<void> {
-  await page.goto('/');
+async function enterOwnerToken(page: import('playwright/test').Page, ownerToken: string, url = '/'): Promise<void> {
+  await page.goto(url);
   await page.locator('#owner-token-input').fill(ownerToken);
   await page.getByRole('button', { name: 'submit' }).click();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
@@ -148,24 +148,29 @@ function itemIds(items: ItemSummary[]): string[] {
 }
 
 test('ci-safe real server/UI boot uses the Go binary and owner-token gate', async ({ page, request, runInfo, ownerToken }) => {
-  const unauthorized = await request.get(`${runInfo.baseURL}/api/feed/today`);
-  expect(unauthorized.status()).toBe(401);
+  const server = await startIsolatedServer(runInfo, E2E_FAKE_OPENROUTER_KEY);
+  try {
+    const unauthorized = await request.get(`${server.baseURL}/api/feed/today`);
+    expect(unauthorized.status()).toBe(401);
 
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Enter owner token' })).toBeVisible();
-  await expect(page.locator('#owner-token-input')).toBeFocused();
+    await page.goto(`${server.baseURL}/`);
+    await expect(page.getByRole('heading', { name: 'Enter owner token' })).toBeVisible();
+    await expect(page.locator('#owner-token-input')).toBeFocused();
 
-  await page.locator('#owner-token-input').fill('wrong-token-with-at-least-thirty-two-chars');
-  await page.getByRole('button', { name: 'submit' }).click();
-  await expect(page.getByText('err: owner token rejected')).toBeVisible();
+    await page.locator('#owner-token-input').fill('wrong-token-with-at-least-thirty-two-chars');
+    await page.getByRole('button', { name: 'submit' }).click();
+    await expect(page.getByText('err: owner token rejected')).toBeVisible();
 
-  await page.locator('#owner-token-input').fill(ownerToken);
-  await page.getByRole('button', { name: 'submit' }).click();
-  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
-  await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
-  await expect(page.getByText('Inspect opens the item.')).toBeVisible();
-  await expect(page.getByText('Star preserves durable value.')).toBeVisible();
-  await expect(page.getByText('Steer is optional correction.')).toBeVisible();
+    await page.locator('#owner-token-input').fill(ownerToken);
+    await page.getByRole('button', { name: 'submit' }).click();
+    await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+    await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
+    await expect(page.getByText('Inspect opens the item.')).toBeVisible();
+    await expect(page.getByText('Star preserves durable value.')).toBeVisible();
+    await expect(page.getByText('Steer is optional correction.')).toBeVisible();
+  } finally {
+    server.child.kill();
+  }
 });
 
 test('ci-safe harness records required artifact paths and sanitized runtime notes', async ({ runInfo }) => {
@@ -184,10 +189,13 @@ test('ci-safe harness records required artifact paths and sanitized runtime note
 
 test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, and search', async ({
   page,
+  request,
   runInfo,
   ownerToken
 }) => {
-  await enterOwnerToken(page, ownerToken);
+  const server = await startIsolatedServer(runInfo, E2E_FAKE_OPENROUTER_KEY);
+  try {
+  await enterOwnerToken(page, ownerToken, `${server.baseURL}/`);
   await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
 
   await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
@@ -240,6 +248,9 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
+  } finally {
+    server.child.kill();
+  }
 });
 
 test('@parity browser-led API/MCP parity probes share one real server fixture', async ({

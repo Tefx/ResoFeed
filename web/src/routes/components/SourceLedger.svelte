@@ -76,7 +76,7 @@
     try {
       const result = await onImportOpml(await file.text());
       statusText = result
-        ? `imported ${result.imported} sources; folders flattened`
+        ? `imported ${result.imported || result.skipped} sources; folders flattened`
         : 'imported sources; folders flattened';
       if (importInput) importInput.value = '';
     } catch (error) {

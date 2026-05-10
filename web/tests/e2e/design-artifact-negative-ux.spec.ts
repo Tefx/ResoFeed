@@ -204,7 +204,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
 
   const artifactNames = manifest.map((artifact) => artifact.name);
   expect(artifactNames).toHaveLength(requiredArtifacts.length);
-  expect(artifactNames).toEqual(expect.arrayContaining(requiredArtifacts));
+  expect(artifactNames).toEqual(expect.arrayContaining([...requiredArtifacts]));
   await expect(
     page.locator('details, [aria-expanded="true"]').filter({ hasText: /raw|provenance|diagnostics/i }).first(),
     'Expected-red gap: raw/provenance artifact requires a labelled expandable or expanded secondary disclosure.'
