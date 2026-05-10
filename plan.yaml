@@ -25446,7 +25446,7 @@ phases:
       fresh manual browser interaction in this audit.'
   - id: gate
     name: Gate complete UI regression test plan and repair phase
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -25641,6 +25641,125 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T12:58:10.721566+00:00'
+    done_at: '2026-05-10T13:07:15.752359+00:00'
+    evidence: "[REJECT]\n\n## refs Read Confirmation (MANDATORY)\n\n- `docs/DESIGN.md`\
+      \ — dense-but-legible UI; touch targets ≥44 CSS px; no folders/tags/unread/settings/onboarding;\
+      \ feed hover/focus/selected must not shift layout; keyboard activation required\
+      \ for feed rows, stars, Steer, Source Ledger, Inspector links.\n- `docs/ui-preview.html`\
+      \ — reference preview uses 44px star/source controls, split desktop Inspector,\
+      \ flat metadata, mobile feed/detail patterns, Source Ledger controls, `/doctor`\
+      \ raw text.\n- `docs/DESIGN_VISION.md` — Analyst Workbench; Inspect/Resonate/Steer;\
+      \ no numeric indicators, folders, onboarding, activity logs, or SaaS/cute states.\n\
+      - `docs/ARCHITECTURE.md` — one Go binary, one SQLite DB, lexical search only,\
+      \ owner-token boundary, no accounts/sync/vector/RAG; frontend must preserve\
+      \ DESIGN.md and expose same product operations.\n- `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`\
+      \ — real Go binary launched, readiness observed, public UI exercised; prior\
+      \ B1 blocker recorded raw JSON-LD in Inspector primary text at lines 103 and\
+      \ 123-129.\n- `.audit-artifacts/retest-blind-dirty-jsonld-inspector.md` — focused\
+      \ retest claims dirty corpus and negative UX passed; after-state Inspector text\
+      \ excludes JSON-LD primary tokens and keeps raw provenance collapsed/labeled.\n\
+      - `.test-artifacts/playwright/results/results.json` — archived Playwright result\
+      \ reports 15 expected / 0 unexpected, including hit-target, keyboard/a11y, state\
+      \ matrix, dirty corpus, design artifact, and negative UX tests.\n- `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/manifest.json`\
+      \ — required screenshots listed for owner-token, first-use, today-list, source-ledger,\
+      \ selected-item, selected-hover, inspector-clean, inspector-raw-expanded/provenance,\
+      \ llm-error, search, mobile-feed, mobile-inspector. Warning: screenshot paths\
+      \ are absolute to remediation worktree, not gate worktree.\n\n## Gate Review\
+      \ Report\n- Phase: ui-navigation-hover-inspector-repair\n- Reviewer: gate-reviewer\n\
+      \n### Category Coverage Review Summary\n- Real pointer hit-target/clickability:\
+      \ category passed in archived/fresh evidence.\n- Keyboard/a11y activation: BLOCKED\
+      \ by fresh full targeted suite failure at Inspector original link focus.\n-\
+      \ Interaction state matrix: archived/fresh evidence passed.\n- Inspector hierarchy\
+      \ / dirty corpus: B1 closure accepted; fresh dirty corpus passed.\n- Design\
+      \ artifact generation: artifacts exist; stale absolute manifest path noted as\
+      \ warning.\n- Negative UX assertions: archived/fresh evidence passed.\n- UX-DEBT-001:\
+      \ closed by mobile flat/inline metadata proof.\n- PROOF-GAP-001: closed with\
+      \ warning; expanded provenance artifact exists, manifest path hygiene warning\
+      \ remains non-blocking.\n\n### Wiring Audit Results (W1-W8)\n| ID | User-visible\
+      \ action | Evidence | Result |\n| --- | --- | --- | --- |\n| W1 | Owner-token\
+      \ gate/app load | Blind log launched real Go binary and readiness probe `/api/feed/today`\
+      \ returned 401 without token | PASS |\n| W2 | TODAY nav | Fresh/archived Playwright\
+      \ tests assert TODAY click restores Today as only active surface | PASS |\n\
+      | W3 | SOURCE LEDGER nav | Blind log keyboard reached Source Ledger; network\
+      \ `/api/sources` 200; hit-target tests passed | PASS |\n| W4 | Run ingest/fetch\
+      \ | Blind log clicked `[RUN INGEST]`; `/api/ingest` 200; source fetch controls\
+      \ covered | PASS |\n| W5 | Feed row Inspect | Network `/api/items/{id}/inspect`\
+      \ and `/api/items/{id}` 200; Inspector opens | PASS |\n| W6 | Resonate star\
+      \ | Blind log star box 44x44, label changed `Resonate item` -> `Remove resonance`;\
+      \ `/api/items/{id}/resonance` 200 | PASS |\n| W7 | Steer and `/doctor` | Blind\
+      \ log `/api/steer` 200 and `/api/doctor` 200; raw diagnostic text shown | PASS\
+      \ |\n| W8 | Inspector original link keyboard focus | Fresh full gate run failed:\
+      \ `getByRole('link', { name: 'original link' })` expected focused, received\
+      \ inactive | BLOCKER |\n\n### Escape Hatch Audit Results\nScoped search over\
+      \ `cmd/`, `internal/`, `web/`, and `docs/` for `@invar:allow|invar:allow`: no\
+      \ files found.\n\n### Smoke/Liveness Evidence\n- Static artifact evidence: manifest\
+      \ lists required screenshots, including mobile and expanded provenance states.\n\
+      - Playwright fixture proof: archived `results.json` reports 15 expected, 0 unexpected.\n\
+      - Real runtime public UI proof: blind runtime log launched real built Go binary\
+      \ at `http://127.0.0.1:50129`, observed readiness, imported OPML, ran ingest,\
+      \ exercised UI controls, and captured network 200s.\n- Fresh gate liveness/check:\
+      \ `npm --prefix web run check` passed after dependency bootstrap; fresh targeted\
+      \ Playwright full command failed 1/15, so runtime verification is not deterministically\
+      \ green.\n\n### Integration-vs-Fixture Distinction\n- Real runtime public UI\
+      \ proof: `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`\
+      \ launched a real built Go binary with live browser interactions and HTTP API\
+      \ requests.\n- Playwright fixture proof: `.test-artifacts/playwright/results/results.json`\
+      \ and fresh test command exercise fixture-backed browser tests under `chromium-ci-safe`.\n\
+      - Static artifact proof: design artifact manifest/screenshots verify rendered\
+      \ contract states but are not by themselves runtime liveness proof.\n\n### CLI\
+      \ Executability Matrix\nCLI surface not touched by this UI repair phase: N/A.\n\
+      \n### Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n| DESIGN keyboard Inspector links | Original\
+      \ link is keyboard focusable | Full suite green with focus proof | Fresh command\
+      \ failure at `keyboard-a11y.expected-red.spec.ts:78`; helper `keyboard-a11y-helpers.ts:55`\
+      \ | BLOCKING | Fix or prove non-flaky deterministic focus behavior | Blocks\
+      \ gate |\n| DESIGN dirty content hierarchy | JSON-LD not primary Inspector text\
+      \ | Browser/test proof | Retest artifact; fresh dirty corpus pass | CLOSED |\
+      \ None | Supports eventual pass after blocker fixed |\n| DESIGN mobile metadata\
+      \ | Hostile metadata stays flat/inline | Screenshot/metric proof | design artifact\
+      \ test lines; fresh pass | CLOSED | None | Supports remediation closure |\n\
+      | DESIGN provenance | Raw/provenance stays secondary/labeled | Expanded disclosure\
+      \ proof | manifest raw-expanded/provenance entry; tests | CLOSED_WITH_WARNING\
+      \ | Repair stale absolute artifact paths if feasible | Non-blocking warning\
+      \ |\n| Negative UX bans | No forbidden concepts introduced | Negative assertions\
+      \ | Fresh negative UX pass | CLOSED | None | Supports pass after blocker fixed\
+      \ |\n\n## Gate Decision\nverdict: FAIL\nheadline: FAIL\nblockers:\n- id: B-GATE-001\n\
+      \  severity: BLOCKER\n  evidence: Fresh comprehensive targeted Playwright run\
+      \ exited 1: `keyboard-a11y.expected-red.spec.ts:78` failed because `getByRole('link',\
+      \ { name: 'original link' })` was expected focused but received inactive; helper\
+      \ assertion at `web/tests/e2e/keyboard-a11y-helpers.ts:55`.\n  why_it_matters:\
+      \ Gate criteria explicitly block if keyboard/focus activation is absent or verification\
+      \ is not deterministically green.\n  remediation: Stabilize Inspector original-link\
+      \ focusability and rerun the full targeted Playwright suite, not only the single\
+      \ test.\n  verification: `npm --prefix web run check && npm --prefix web run\
+      \ test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts` must exit\
+      \ 0.\ngate_open_allowed: false\nproof_gap_status: BLOCKING\nblocking_status:\
+      \ OPEN\norchestrator_action_hint: DO_NOT_COMPLETE_FOR_PHASE_GATE; remediation\
+      \ steps created and this gate finding is complete as a blocker artifact.\n\n\
+      ## Verification Run\n- Initial command: `npm --prefix web run check` → exit\
+      \ 127, `svelte-kit: command not found`.\n- Dependency bootstrap: `npm --prefix\
+      \ web ci` → exit 0, added 150 packages, 3 low severity vulnerabilities.\n- Main\
+      \ gate verification command: `npm --prefix web run check && npm --prefix web\
+      \ run test:e2e -- --project=chromium-ci-safe ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ hit-target-clickability.spec.ts keyboard-a11y.expected-red.spec.ts feed-row-state-matrix.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts design-artifact-negative-ux.spec.ts` → exit\
+      \ 1; `svelte-check found 0 errors and 0 warnings`; Playwright `14 passed`, `1\
+      \ failed`.\n- Failing artifact paths reported by runner:\n  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/test-failed-1.png`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/video.webm`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/error-context.md`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/trace.zip`\n\
+      - Single-test rerun: `npm --prefix web run test:e2e -- --project=chromium-ci-safe\
+      \ keyboard-a11y.expected-red.spec.ts:78` → exit 0, `1 passed`; does not clear\
+      \ blocker because required comprehensive gate command failed and demonstrates\
+      \ nondeterminism/flakiness.\n\n## Remediation ownership created before completion\n\
+      Planner created:\n- `fix-gate-keyboard-a11y-flake` — implementation fix for\
+      \ B-GATE-001.\n- `retest-gate-keyboard-a11y-full-targeted` — independent retest\
+      \ requiring the full targeted command exit 0.\n- `final-gate-keyboard-a11y-remediation`\
+      \ — final gate review after retest.\n\nArtifacts modified: none committed; gate\
+      \ report artifact not created.\nCommit hash(es): none."
   - id: expected-red-hit-target-clickability-tests
     name: Expected-red real hit-target and clickability tests
     status: done
