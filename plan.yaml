@@ -22204,3 +22204,123 @@ phases:
       - Forbidden scope check: accounts/sync/vector DB/queues/new product concepts
       not introduced.'
     agent: frontend-engineer
+  - id: playwright-comprehensive-e2e.harness-fixtures-env
+    name: Playwright Harness, Fixtures, and Environment Setup
+    status: pending
+    description: 'step_type: implementation
+
+      tags: ["integration"]
+
+
+      Fill in the test harness and fixture bodies required by the contract from step
+      playwright-comprehensive-e2e.harness-contract-lock.
+
+
+      UPSTREAM ARTIFACTS (from contract step):
+
+      - Playwright launch contract — commands, fixture boundaries, and artifact requirements
+      are AUTHORITATIVE.
+
+      - docs/ARCHITECTURE.md / AGENTS.md — single binary, single SQLite DB, no accounts/sync/vector
+      DB/queues/new product concepts.
+
+      - docs/DESIGN.md / docs/ui-preview.html — visual surfaces and functional labels
+      to preserve.
+
+
+      YOUR SCOPE:
+
+      - Add or update the minimal Playwright harness/config/script needed to run browser
+      E2E against the real `cmd/resofeed` binary path.
+
+      - Add deterministic fixtures for isolated SQLite DB path, owner token, local
+      feed/OPML source data, and sanitized runtime env.
+
+      - Wire artifact capture: Playwright trace, screenshots, videos/logs, server
+      stdout/stderr, DB fixture path, and sanitized environment notes.
+
+      - If `npm --prefix web run test:e2e` does not exist, add the minimal script
+      that invokes the chosen Playwright command; otherwise use the existing script.
+
+      - Ensure live LLM tests are tagged/project-separated and skipped when no runtime
+      key is present.
+
+
+      Out-of-scope guardrail: do not add product accounts, sync/merge machinery, queues/jobs,
+      vector DB/RAG, sidecar workers, or committed secrets.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Harness
+      code must actually launch or be able to launch the real binary in Playwright
+      setup and produce artifacts when tests run.'
+    verification: '- `go build ./cmd/resofeed` is the documented backend build prerequisite
+      for E2E.
+
+      - `npm --prefix web run test:e2e` or explicit `npx playwright test` command
+      is available and documented.
+
+      - Harness uses an isolated DB fixture path and sanitized environment, with no
+      committed secrets.
+
+      - Artifact collection paths for trace/screenshots/video/logs/server output are
+      configured.
+
+      - Main path and highest-risk failure path are represented: successful server
+      launch path and missing/invalid `OPENROUTER_KEY` path.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <go build ./cmd/resofeed and Playwright command prepared; do not paste secrets>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <setup/build output or explanation if not run by this step>
+
+      ```
+
+      **Path exercised**: Playwright global setup → built cmd/resofeed binary → temp
+      SQLite DB/env → browser baseURL
+
+
+      ## Harness Artifact Configuration
+
+      - Trace path:
+
+      - Screenshot/video path:
+
+      - Server stdout/stderr path:
+
+      - DB fixture path:
+
+      - Sanitized environment notes:
+
+      - CI-safe/live-only LLM separation:'
+    depends_on:
+    - playwright-comprehensive-e2e.harness-contract-lock
+    agent: frontend-engineer
