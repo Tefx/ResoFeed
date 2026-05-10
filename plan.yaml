@@ -27308,7 +27308,7 @@ phases:
       - Commit hash(es): worktree `153696b`; main `aff3ff5`.'
   - id: remediate-visual-ux-debt-and-proof-gap
     name: Remediate visual UX debt and proof gap
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -27481,6 +27481,159 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T12:49:53.871638+00:00'
+    done_at: '2026-05-10T12:55:06.380796+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `AGENTS.md` — NOT READ by executor: file was not present in the isolated worktree
+      root; runtime AGENTS guidance was followed.
+
+      - `docs/ARCHITECTURE.md` — one Go deployable, one SQLite DB, no accounts/sync/vector
+      DB/service layers; UI must render DESIGN surfaces only.
+
+      - `docs/DESIGN.md` — mobile metadata must remain flat inline; hostile RSS strings
+      truncate deterministically; raw provenance belongs in secondary labelled Inspector
+      disclosure.
+
+      - `docs/DESIGN_VISION.md` — high-density, low-fatigue archival feed; no folders/tags/settings/unread/onboarding/SaaS/AI
+      drift.
+
+      - `docs/ui-preview.html` — reference preview uses flat feed metadata with separators
+      and secondary Inspector provenance, not primary body payload.
+
+      - `.audit-artifacts/retest-blind-dirty-jsonld-inspector.md` — dirty JSON-LD
+      fix proved primary Inspector text clean with collapsed labelled `raw provenance
+      diagnostics`.
+
+      - `mobile-feed.png` artifact — prior artifact showed metadata wrapping into
+      stacked words on mobile.
+
+      - `inspector-raw-expanded-provenance.png` artifact — prior artifact showed collapsed
+      provenance despite expanded-proof filename.
+
+
+      ## Visual Debt Remediation Evidence
+
+
+      **UX-DEBT-001 fix summary**:
+
+      Added deterministic one-line overflow treatment to `.contract-feed-meta`: nowrap,
+      hidden overflow, ellipsis on metadata spans, and `min-width: 0` on the feed
+      button so hostile source/status strings compress instead of wrapping into stacked
+      words. Touch targets unchanged.
+
+
+      **PROOF-GAP-001 artifact summary**:
+
+      Updated Playwright artifact generation to open `details.contract-raw-provenance`
+      before capturing `inspector-raw-expanded-provenance.png`; manifest note now
+      documents expanded secondary/labeled provenance proof.
+
+
+      **Executor commands/output**:
+
+      ```sh
+
+      npm --prefix web ci
+
+      npm --prefix web run check
+
+      npm --prefix web run test:e2e -- design-artifact-negative-ux.spec.ts --project=chromium-ci-safe
+      --grep "design artifact manifest"
+
+      npm --prefix web run test:e2e -- design-artifact-negative-ux.spec.ts --project=chromium-ci-safe
+
+      git commit -m "fix mobile metadata and provenance proof artifacts"
+
+      ```
+
+      ```text
+
+      Initial check before npm ci failed: svelte-kit: command not found.
+
+      npm ci: added 150 packages.
+
+      npm run check: svelte-check found 0 errors and 0 warnings. Exit 0.
+
+      grep artifact Playwright: 1 passed. Exit 0.
+
+      full design negative Playwright: 2 passed. Exit 0.
+
+      Commit: b94f8d6c02c97f4226baa64b7a95d19c5de68ce6.
+
+      ```
+
+
+      **Mainline final-state verification after squash merge**:
+
+      ```sh
+
+      npm --prefix web run check
+
+      npm --prefix web run test:e2e -- design-artifact-negative-ux.spec.ts --project=chromium-ci-safe
+
+      ```
+
+      ```text
+
+      svelte-check found 0 errors and 0 warnings.
+
+      Playwright design artifact/negative UX: 2 passed (6.7s).
+
+      ```
+
+
+      **Artifacts produced/updated**:
+
+      - Mobile hostile metadata proof: `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/mobile-feed.png`
+
+      - Expanded raw/provenance proof: `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/inspector-raw-expanded-provenance.png`
+
+      - Manifest: `.test-artifacts/playwright/test-output/design-artifact-negative-u-efbc4-ResoFeed-UI-contract-states-chromium-ci-safe/design-artifacts/manifest.json`
+
+
+      **Design/architecture drift check**:
+
+      - Forbidden concepts introduced? no.
+
+      - Expanded raw/provenance placement: secondary labelled `details` disclosure
+      below Inspector reading flow.
+
+      - Mobile metadata behavior: single-line clipped/ellipsis metadata; Playwright
+      asserts nowrap, hidden overflow, and one-line height.
+
+      - Regressions/gaps: none observed in targeted checks.
+
+
+      ## Closure Fields
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: NONE
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Implementation evidence completeness:
+
+      - Commit hash(es): worktree `b94f8d6c02c97f4226baa64b7a95d19c5de68ce6`; main
+      `c03b2b3 [vectl] step-remediate-visual-ux-debt-and-proof-gap completed`.
+
+      - Files changed: `web/src/app.css`, `web/tests/e2e/design-artifact-negative-ux.spec.ts`,
+      updated mobile/provenance design artifacts and manifest.
+
+      - Verification: executor and mainline `npm --prefix web run check` passed; executor
+      and mainline design artifact/negative UX Playwright passed.
+
+      - Spec link: `docs/DESIGN.md` mobile metadata and Inspector provenance contract.
+
+      - Gaps/Notes: mainline verification artifact churn was stashed after verification
+      to preserve committed branch artifact corpus while retaining command output
+      as final-state verification evidence.'
   - id: retest-visual-ux-debt-and-proof-gap
     name: Retest visual UX debt and proof gap closure
     status: pending
