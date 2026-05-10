@@ -37999,7 +37999,7 @@ phases:
       this worktree and the isolated targeted retest passed.'
   - id: fuidcr-post-remediation-screenshot-uiux-audit
     name: Post-remediation screenshot-first UIUX conformance audit
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -38208,3 +38208,100 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T20:25:02.814957+00:00'
+    done_at: '2026-05-10T20:31:22.024974+00:00'
+    evidence: '## Post-Remediation UIUX Audit Report
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Post-remediation screenshot-first UIUX conformance
+
+      **Independence Level**: L2
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read. Confirmed design tokens, typography (Newsreader, IBM
+      Plex Mono), and single-tenant RSS architecture visual rules.
+
+      - docs/ui-preview.html — Read. Confirmed static DOM structure matches F48-F52
+      remediation notes and tokens.
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — Read. Confirmed
+      matrix holds P0/P1 assertions for layout and actions.
+
+      - docs/ui-remediation-closure-register.json — Read. Confirmed 52 findings closed
+      as PROVEN with explicit visual/DOM paths.
+
+      - web/test-results/ui-remediation/playwright-results/results.json — Read. Confirmed
+      test execution paths mapping to `chromium-ci-safe`.
+
+      - web/test-results/ui-remediation/playwright-test-output/ — Read. Inventoried
+      25+ visual artifacts including baseline states for narrow and desktop viewports.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: PASS
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): none (scratch file removed, worktree clean)
+
+
+      ## Artifact Register
+
+      - Feed/Search/Nav (F2, F4, F8), desktop & narrow: `desktop-authenticated-today-split-pane-1280x900.png`;
+      rows 2, 4, 8; PASS.
+
+      - Source Ledger / Actions (F24-F33), desktop & narrow: `desktop-source-ledger-with-actions-1280x900.png`;
+      rows 24,25,26,27,28,29,31,32,33; PASS.
+
+      - Inspector (F17-F22), desktop & narrow: `desktop-authenticated-feed-inspector-with-items-1280x900.png`;
+      rows 17,18,19,20,21,22; PASS.
+
+      - Mobile Breakpoints (F4), narrow: `narrow-authenticated-feed-390x844.png`;
+      row 4; PASS.
+
+      - Preview Parity (F48-F52), static HTML: `docs/ui-preview.html`; rows 48-52;
+      PASS.
+
+
+      ## Behavioral Proof Register
+
+      - F2 (Persistent surface navigation): PASS (verified missing in desktop/narrow
+      split-pane screenshots).
+
+      - F4 (Responsive breakpoint): PASS (verified narrow feed snapshot correctly
+      triggered).
+
+      - F48-F52 (Preview parity): PASS (verified via static-contract HTML evidence).
+
+      - All P0/P1 Findings: PASS (closed in register and mapped to visual artifacts).
+
+
+      ## Visual/Design Findings
+
+      PASS. Post-remediation screenshots demonstrate adherence to `docs/DESIGN.md`
+      visual tokens. Bracket actions (`[FETCH]`, `[DELETE]`) are implemented correctly
+      in the Source Ledger. No persistent side nav is present.
+
+
+      ## Gaps/Notes
+
+      none'
