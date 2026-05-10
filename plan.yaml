@@ -34987,7 +34987,7 @@ phases:
   - id: fuidcr-browser-regression-proof
     name: Rerun independent browser regression and responsive behavior proof after
       Source Ledger fix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -35268,6 +35268,202 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T19:17:12.027352+00:00'
+    done_at: '2026-05-10T19:19:41.495306+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: full-ui-design-conformance-remediation browser retest
+
+      **Independence Level**: L2
+
+      **Timestamp**: 2026-05-10T19:18:38Z
+
+
+      ### refs Read Confirmation
+
+      - docs/DESIGN.md — READ. Key passages: no persistent left nav; Source Ledger
+      reached as flat source management; owner token prompt uses terse local-token
+      copy; below 1080px Inspector becomes route/full-screen; `/doctor` raw text wraps;
+      State Portability lives in ledger footer.
+
+      - docs/ARCHITECTURE.md — READ. Key passages: one Go binary serves static/API/MCP/background
+      ingest; `/api/*` requires owner token; OPML import/state import-export contracts;
+      lexical search only; no dashboards/settings/folders/tags/RAG.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent at required path.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — READ. Key
+      passages: F1-F52 matrix; Source Ledger is opened via Steer `source ledger`;
+      checks canonical bracket labels, hidden file input, desktop/narrow screenshots,
+      no persistent nav/tablist/sidebar.
+
+      - web/tests/e2e/real-server-ui.spec.ts — READ. Key passages: tests start isolated
+      real Go server, verify owner-token gate, OPML import, run ingest/fetch, state
+      roundtrip, feed/Inspector/Search, API/MCP parity, sanitized OpenRouter behavior.
+
+
+      ### Test Execution
+
+      Commands executed:
+
+      - `pwd && git status --short --branch`
+
+      - `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      web/tests/e2e/real-server-ui.spec.ts` — initial run failed before execution
+      because `playwright: command not found`.
+
+      - `npm --prefix web ci` — PASS; added 150 packages; 3 low severity vulnerabilities.
+
+      - `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      web/tests/e2e/real-server-ui.spec.ts` — PASS; Vite/Svelte build completed; `Running
+      9 tests using 1 worker`; `9 passed (13.5s)`.
+
+      - `git status --short` — showed only generated local test artifacts and installed
+      dependencies; no product/docs source changes.
+
+
+      ### Source Ledger Reachability Contract Proof
+
+      - Test helper opens Source Ledger through accepted non-persistent Steer contract:
+      fill Steer with `source ledger`, press Enter, expect status receipt `source
+      ledger`, then heading `SOURCE LEDGER`.
+
+      - Explicit forbidden-navigation check passed: no `nav[aria-label*="primary"
+      i]`, `aside nav`, `.tab-nav`, `[role="tablist"]`, or sidebar nav was present.
+
+      - OPML import proof passed using visible/label-reachable `import OPML` file
+      input and fixture `.test-artifacts/playwright/fixtures/flattened.opml`.
+
+      - Source row/action proof passed for `[RUN INGEST]`, `[FETCH]`, `[DELETE]`,
+      `[EXPORT STATE]`, `[IMPORT STATE]`, URL display, `last_fetch`, `last_ingest`,
+      hidden file input, disabled transparent action styling, and stable action baselines.
+
+
+      ### Screenshot Evidence
+
+      - Desktop shell: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-1280-shell-empty-png-76989a60d7f9754e6e67e4e2ffe7c292a458c2a4.png`
+
+      - Desktop feed/Inspector: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-1280-feed-inspector-png-9b745743e2e339c40bd64629498110b2f0491f16.png`
+
+      - Narrow `/doctor`: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/doctor-narrow-390-png-fb2765e639bd8a069ab61a687fb601be7392730e.png`
+
+      - Narrow search: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/search-narrow-390-png-b59e5a05ee06efcf5909ddee28fabb512c54bc7e.png`
+
+      - Mobile feed: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/mobile-feed-390-png-6f89820d6b754199b9fb216df88451139e9c3f82.png`
+
+      - Mobile Inspector: `.test-artifacts/playwright/test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/mobile-inspector-390-png-80031f6d003fa1cd83892087b00a9c700eb05a08.png`
+
+
+      ### DOM/Behavior Proof
+
+      - Owner-token prompt: real browser verified heading `Enter owner token`, initial
+      token input focus, wrong-token rejection `err: owner token rejected`, accepted
+      token transitions to Steer.
+
+      - OPML import and ingest: real browser imported fixture OPML, showed `imported
+      1 sources; folders flattened`, ran `[RUN INGEST]`, and rendered local fixture
+      feed row.
+
+      - Source row actions: `[FETCH]` transitions through fetching state and returns
+      to `[FETCH]`; `[DELETE]` visible; State export/import roundtrip completed with
+      `import complete`.
+
+      - Feed/Inspector: imported fixture drives TODAY feed row; `Open Inspector for:
+      Local fixture item one` opens focused Inspector heading; Inspector shows `summary
+      unavailable` and `why: fresh from configured source`.
+
+      - Original navigation: conformance test requires normal accessible original
+      link in Inspector and passed.
+
+      - Resonate: feed star button toggled from `Resonate item` to `Remove resonance`;
+      API/MCP parity poll confirmed item `is_resonated: true`.
+
+      - Search: Steer `search Local fixture` opened Search and Retrieval; search returned
+      `1 results`, result contained `Local fixture item one` and `src: ResoFeed E2E
+      Local Source`.
+
+      - Keyboard/focus: owner input initially focused; Inspector heading focused after
+      open; Resonate focus-visible outline check passed.
+
+      - Responsive: at 390px viewport, test proved Inspector complementary split pane
+      not visible on TODAY feed; mobile Inspector route still exposes star action.
+
+      - `/doctor`: narrow 390px screenshot captured; test checked diagnostics region
+      avoids horizontal-only crop and remains raw text, not cards/charts.
+
+      - Forbidden navigation: test checked and passed absence of persistent primary
+      nav, tablist, left/sidebar product nav.
+
+
+      ### Requirement / Behavior Proof Register
+
+      | requirement_ref | behavior_claim | status | gate_decision_basis |
+
+      | --- | --- | --- | --- |
+
+      | F1-F7 | Shell and owner-token prompt conform | PROVEN | PASS |
+
+      | F8-F16, F40-F44 | Feed/Search shared anatomy and narrow behavior | PROVEN
+      | PASS |
+
+      | F17-F23 | Inspector reading/provenance/original-link boundary | PROVEN | PASS
+      |
+
+      | F24-F36 | Source Ledger and State Portability DOM/action contract | PROVEN
+      | PASS |
+
+      | F37-F39 | `/doctor` narrow/wrapping raw diagnostic surface | PROVEN | PASS
+      |
+
+      | F45-F47 | Global styling/focus/accent leakage | PROVEN | PASS |
+
+      | F48-F52 | Preview cleanup/static artifact drift | PROVEN | PASS |
+
+      | Source Ledger reachability | Non-persistent Steer-driven activation; no persistent
+      nav rewarded | PROVEN | PASS |
+
+      | Browser liveness | Real Go server + browser/API/MCP surface | PROVEN | PASS
+      |
+
+
+      ### Gate Decision Fields
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ### Files changed / artifacts
+
+      - Product code/docs modified: none.
+
+      - Branch diff vs main: empty.
+
+      - Generated/updated local test artifacts under `.test-artifacts/playwright/**`,
+      plus local `web/node_modules/`; no commit created because this was verification-only.
+
+
+      ### Gaps/Notes
+
+      The required audit markdown file was absent; verification relied on docs/DESIGN.md,
+      docs/ARCHITECTURE.md, and required e2e specs. First Playwright invocation failed
+      due missing node_modules; after dependency install, the same targeted suite
+      passed.'
   - id: fuidcr-screenshot-first-uiux-audit
     name: Run screenshot-first native UIUX design conformance audit
     status: pending
