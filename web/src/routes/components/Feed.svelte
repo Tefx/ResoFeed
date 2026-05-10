@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ItemSummary } from '$lib/api-contract';
+  import { itemAgeLabel, itemExtractionLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -10,58 +11,6 @@
 
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
-  function extractionLabel(status: ItemSummary['extraction_status']): string {
-    return status === 'partial_extraction' ? 'partial' : status;
-  }
-
-  function decodeEntities(text: string): string {
-    if (typeof document === 'undefined') return text;
-    const element = document.createElement('textarea');
-    element.innerHTML = text;
-    return element.value;
-  }
-
-  function readableText(text: string | null): string | null {
-    if (!text) return null;
-    if (text.trim() === 'Deterministic fixture summary.') return null;
-    const withoutExecutable = text
-      .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-      .replace(/<style\b[\s\S]*?<\/style>/gi, ' ');
-    const withoutTags = withoutExecutable.replace(/<[^>]*>/g, ' ');
-    const withoutJsonLdPrefix = removeJsonLdPrefix(withoutTags);
-    const withoutEnclosure = withoutJsonLdPrefix.replace(/\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+\s+image=\S+/gi, ' ');
-    const normalized = decodeEntities(withoutEnclosure).replace(/\s+/g, ' ').trim();
-    return normalized.length > 0 ? normalized : null;
-  }
-
-  function removeJsonLdPrefix(text: string): string {
-    const start = text.search(/\{\s*"@context"/i);
-    if (start < 0 || text.slice(0, start).trim().length > 0) return text;
-    let depth = 0;
-    let inString = false;
-    let escaped = false;
-    for (let index = start; index < text.length; index += 1) {
-      const char = text[index];
-      if (escaped) {
-        escaped = false;
-        continue;
-      }
-      if (char === '\\') {
-        escaped = true;
-        continue;
-      }
-      if (char === '"') inString = !inString;
-      if (inString) continue;
-      if (char === '{') depth += 1;
-      if (char === '}') depth -= 1;
-      if (depth === 0) return text.slice(index + 1);
-    }
-    return text;
-  }
-
-  function displaySummary(item: ItemSummary): string {
-    return readableText(item.summary) ?? readableText(item.core_insight) ?? 'summary unavailable';
-  }
 
   async function openInspector(item: ItemSummary): Promise<void> {
     await onSelect(item);
@@ -78,9 +27,9 @@
 </script>
 
 <section class="contract-region" aria-labelledby="feed-heading">
-  <h2 id="feed-heading">TODAY</h2>
+  <h2 id="feed-heading" class="visually-hidden">Today feed items</h2>
   <div role="list" aria-label="Today feed items">
-    {#each items as item (item.id)}
+    {#each items as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
         <button
           class="contract-feed-open"
@@ -90,19 +39,20 @@
         >
           <p class="contract-label contract-feed-meta">
             <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
-            · <span aria-label={`Extraction: ${item.extraction_status}`}>{extractionLabel(item.extraction_status)}</span>
+            · <span aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
+            · <span aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
             {#if item.value_tier}
               · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
-            {/if}
-            {#if items.findIndex((candidate) => candidate.id === item.id) === 0}
-              <span class="contract-time-label">TODAY</span>
             {/if}
             {#if item.external_surfaced_at}
               · <span aria-label="Externally surfaced by agent">agent:external</span>
             {/if}
+            {#if shouldShowTimeGroup(items, index)}
+              <span class="contract-time-label">{itemTimeGroup(item)}</span>
+            {/if}
           </p>
           <p class="contract-feed-title">{item.title}</p>
-          <p class="contract-feed-summary">{displaySummary(item)}</p>
+          <p class="contract-feed-summary">{itemSummaryText(item)}</p>
         </button>
         <button
           class="contract-resonate"

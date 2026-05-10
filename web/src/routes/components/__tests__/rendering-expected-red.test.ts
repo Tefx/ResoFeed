@@ -11,6 +11,7 @@ import SourceLedger from '../SourceLedger.svelte';
 import StatePortability from '../StatePortability.svelte';
 import Page from '../../+page.svelte';
 import {
+  expectedRedFallbackItem,
   expectedRedItem,
   expectedRedResonatedItem,
   expectedRedSource
@@ -144,6 +145,38 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await user.click(star);
     expect(onResonanceToggle).toHaveBeenCalledWith(expectedRedItem, true);
     expect(screen.queryByRole('region', { name: 'Opened Inspector focus target' })).not.toBeInTheDocument();
+  });
+
+  it('renders feed anatomy with timestamp groups and source-backed summary fallback', () => {
+    const now = new Date();
+    const todayItem = {
+      ...expectedRedFallbackItem,
+      id: 'item_today_group',
+      published_at: now.toISOString(),
+      first_seen_at: now.toISOString()
+    };
+    const yesterday = new Date(now.getTime() - 86_400_000).toISOString();
+    const earlier = new Date(now.getTime() - 3 * 86_400_000).toISOString();
+
+    render(Feed, {
+      props: {
+        items: [
+          todayItem,
+          { ...expectedRedItem, id: 'item_yesterday_group', published_at: yesterday, external_surfaced_at: null },
+          { ...expectedRedItem, id: 'item_earlier_group', title: 'Earlier feed item', published_at: earlier, external_surfaced_at: null }
+        ],
+        onSelect: async () => {},
+        onResonanceToggle: async () => {}
+      }
+    });
+
+    const feed = screen.getByRole('list', { name: 'Today feed items' });
+    expect(screen.queryByRole('heading', { name: 'TODAY' })).not.toBeInTheDocument();
+    expect(within(feed).getByText('TODAY')).toBeVisible();
+    expect(within(feed).getByText('YESTERDAY')).toBeVisible();
+    expect(within(feed).getByText('EARLIER')).toBeVisible();
+    expect(within(feed).getByText('Source-backed feed excerpt for list/search fallback.')).toBeVisible();
+    expect(within(feed).queryByText('summary unavailable')).not.toBeInTheDocument();
   });
 
   it('renders the inspector and exposes missing detail-focus/provenance completion', async () => {
@@ -366,5 +399,34 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(search).getByRole('status')).toHaveTextContent('1 results');
     expect(within(search).getByText('match: lexical index')).toBeVisible();
     expect(within(search).getByText('src: Example Source')).toBeVisible();
+  });
+
+  it('renders search results with shared feed anatomy, compact dates, fallback excerpts, and actions', async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn(async () => {});
+    const onResonanceToggle = vi.fn(async () => {});
+    render(SearchRetrieval, {
+      props: {
+        items: [expectedRedFallbackItem],
+        query: 'fallback',
+        onSearch: async () => ({ items: [expectedRedFallbackItem], query: { q: 'fallback', source: null, from: null, to: null, resonated: null, limit: 50 } }),
+        onSelect,
+        onResonanceToggle
+      }
+    });
+
+    const search = screen.getByRole('region', { name: 'Search and Retrieval' });
+    const result = within(search).getByRole('listitem');
+    expect(result).toHaveClass('contract-feed-item');
+    expect(within(result).getByText('Source-backed feed excerpt for list/search fallback.')).toBeVisible();
+    expect(within(result).queryByText('date unavailable')).not.toBeInTheDocument();
+    expect(within(result).queryByText(/T\d{2}:\d{2}:\d{2}Z/)).not.toBeInTheDocument();
+    expect(within(result).getByText('match: lexical index')).toBeVisible();
+    expect(within(result).getByText('provenance: source-backed')).toBeVisible();
+
+    await user.click(within(result).getByRole('button', { name: `Inspect search result: ${expectedRedFallbackItem.title}` }));
+    expect(onSelect).toHaveBeenCalledWith(expectedRedFallbackItem);
+    await user.click(within(result).getByRole('button', { name: 'Resonate item' }));
+    expect(onResonanceToggle).toHaveBeenCalledWith(expectedRedFallbackItem, true);
   });
 });
