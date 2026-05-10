@@ -22530,7 +22530,7 @@ phases:
       or untracked-only and are produced when harness runs.'
   - id: playwright-comprehensive-e2e.core-feed-browser-flows
     name: Core Browser Feed and Source E2E Flows
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -22665,6 +22665,8 @@ phases:
     depends_on:
     - playwright-comprehensive-e2e.harness-fixtures-env
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T10:00:52.748813+00:00'
   - id: playwright-comprehensive-e2e.llm-deterministic-failure-flows
     name: LLM Deterministic, Missing-Key, and Invalid-Key E2E Flows
     status: pending
