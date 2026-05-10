@@ -24618,127 +24618,103 @@ phases:
     - implementation-repair
     agent: integration-verifier
   - id: visual-ux-audit
-    name: Native multimodal UI/UX audit for repaired states
+    name: Native multimodal UI/UX audit for complete regression artifact set
     status: pending
     description: 'step_type: verification
 
       verification_scope: phase-check
 
+      independence_level: L1
+
+      agent_source: project
+
 
       As an INDEPENDENT UI/UX AUDITOR, perform a native multimodal implementation
       audit using rendered screenshots/traces from the repaired browser UI. This audit
       is required for user-visible UI changes and is not replaceable by DOM assertions
-      alone.
+      or "Playwright passed" alone.
+
+
+      Audit required artifact set:
+
+      - owner-token
+
+      - first-use
+
+      - today-list
+
+      - source-ledger
+
+      - selected-item
+
+      - selected-hover
+
+      - inspector-clean
+
+      - inspector-raw-expanded/provenance
+
+      - llm-error
+
+      - search
+
+      - mobile view if applicable
 
 
       Audit focus:
 
-      - SOURCE LEDGER: the visible navigation/control clearly opens the Source Ledger
-      surface without hidden/inert hitbox behavior.
+      - Hit-target/clickability: visible controls are not hidden/inert/obstructed;
+      artifacts and traces support real pointer and keyboard operability.
 
-      - Selected+hover feed state: selected item remains distinguishable from hover/focus
-      with low-noise archival-index treatment; no large noisy color block or ambiguous
-      selected/hover stacking.
+      - State matrix: normal/hover/selected/selected+hover/focus/selected+focus remain
+      legible; selected remains distinguishable; hover/focus does not stack noisy
+      active styling or shift layout.
 
-      - Inspector hierarchy: primary area presents a readable hierarchy; raw JSON-LD/original
-      metadata/provenance payloads are demoted/collapsed/labeled outside the main
-      reading flow.
+      - Inspector hierarchy: default primary area presents readable title/source/time/link/summary/content
+      hierarchy; raw JSON-LD/original metadata/provenance/media payloads are demoted/collapsed/labeled
+      outside the main reading flow.
 
-      - Visual constraints: muted palette, rare accent only where appropriate, dense
-      but legible rhythm, functional labels, no SaaS/AI-magic copy, no forbidden concepts.
+      - Dirty content: real-content mess remains readable and does not dump raw payloads
+      into primary surfaces.
 
+      - Negative UX: no unread/folder/tag/settings concepts, mascot/SaaS/AI-magic
+      copy, or AI-trust palette; nav clicks do not leave wrong panel active.
 
-      Require screenshots or equivalent visual/spatial artifacts for default desktop
-      split view and the affected interactive states. If responsive/mobile behavior
-      is materially affected, include the narrow Inspector/Source Ledger route evidence
-      too.'
-    verification: '- Audit rendered screenshots/traces for all three repaired states;
-      DOM-only evidence is insufficient.
-
-      - Produce parseable PASS / PASS_WITH_DEBT / FAIL handoff.
-
-      - Block if selected+hover remains visually ambiguous, SOURCE LEDGER remains
-      inert, or Inspector primary reading flow still dumps raw JSON-LD/metadata.
-
-      - Block if new UI copy/concepts violate ResoFeed design/product constraints.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - <filename> — key passage or "NOT READ: <reason>"
+      - Design conformance: compare rendered artifacts against `docs/DESIGN.md`, `docs/ui-preview.html`,
+      and `docs/DESIGN_VISION.md`.
 
 
-      If no refs were provided, state: "No refs for this step."
+      Produce a parseable PASS / PASS_WITH_DEBT / FAIL handoff with blockers, proof
+      gaps, and gate recommendation.'
+    verification: '- Audit rendered screenshots/traces for the full required artifact
+      set; DOM-only evidence is insufficient.
 
+      - Verify design conformance for hit-targets, keyboard/focus visibility, interaction
+      state matrix, Inspector hierarchy, dirty content handling, and negative UX bans.
 
-      ## Native Multimodal UI/UX Audit
+      - Produce parseable PASS / PASS_WITH_DEBT / FAIL handoff with artifact paths
+      and closure fields.
 
-      **Auditor**: uiux-auditor
-
-      **Scope**: SOURCE LEDGER navigation, selected+hover feed state, Inspector hierarchy
-
-
-      ### Artifacts reviewed
-
-      - SOURCE LEDGER opened state screenshot/trace: <path>
-
-      - Selected feed row normal state: <path>
-
-      - Selected feed row hovered/focused state: <path>
-
-      - Inspector default structured view: <path>
-
-      - Raw/provenance secondary/collapsed region, if present: <path>
-
-
-      ### Before/after notes
-
-      - SOURCE LEDGER clickability: <before -> after>
-
-      - Selected+hover clarity: <before -> after>
-
-      - Inspector hierarchy: <before -> after>
-
-
-      ### Design conformance checklist
-
-      - Muted/archival, low-fatigue direction preserved: PASS/FAIL + notes
-
-      - Functional labels only, no SaaS/AI-magic copy: PASS/FAIL + notes
-
-      - No forbidden folders/tags/unread/settings concepts: PASS/FAIL + notes
-
-      - No layout-shifting hover/focus/selected state: PASS/FAIL + notes
-
-      - Inspector raw/provenance payload demoted/clearly separated: PASS/FAIL + notes
-
-
-      ### Findings
-
-      | Severity | Finding | Screenshot/evidence | Closure needed |
-
-      | --- | --- | --- | --- |
-
-      | <blocker/should_fix/suggestion> | <finding> | <path> | <fix/retest or none>
-      |
-
-
-      ### Headline
-
-      PASS | PASS_WITH_DEBT | FAIL
-
-
-      ### Blocker/closure fields
-
-      - blockers_found: <none/list>
-
-      - closure_path: <none or required follow-up>
-
-      - unresolved_ambiguity: <none/list>
-
-      '
+      - Block if selected+hover remains visually ambiguous, controls remain inert,
+      Inspector primary flow dumps raw payloads, artifacts are missing, or forbidden
+      concepts/copy are introduced.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Native Multimodal UI/UX\
+      \ Audit Evidence\n- Reviewed artifact manifest:\n  | Artifact | Path | Design\
+      \ ref | Verdict | Notes |\n  | --- | --- | --- | --- | --- |\n- Interaction/state\
+      \ audit:\n  | State/control | Evidence ref | Verdict | Notes |\n  | --- | ---\
+      \ | --- | --- |\n- Inspector hierarchy audit: <notes and artifact refs>\n- Dirty\
+      \ content audit: <notes and artifact refs>\n- Negative UX audit: <notes>\n-\
+      \ Before/after design notes: <notes>\n\n## Closure Fields\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN\
+      \ with notes>\norchestrator_action_hint: proceed_to_gate | create_fix_retest_loop"
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
     depends_on:
     - playwright-repair-verification
+    - blind-runtime-browser-ux-verification
     agent: uiux-auditor
   - id: gate
     name: Gate UI navigation, hover, and Inspector repair
