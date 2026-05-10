@@ -21111,3 +21111,103 @@ phases:
     - manual-rss-fetch.frontend-implementation
     - verification-retest-after-remediation
     agent: frontend-engineer
+  - id: visual-parity-retest
+    name: Visual Parity Retest
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an INDEPENDENT UI/UX AUDITOR, retest the post-remediation Manual RSS Fetch
+      Source Ledger against `docs/ui-preview.html` using rendered screenshots/images/DOM
+      snapshots and computed styles.
+
+
+      This step supersedes the semantic FAIL from `manual-rss-fetch.uiux-audit` for
+      gate decision purposes. It must explicitly re-check the previous blockers from
+      `.audit-artifacts/manual-rss-fetch/uiux-audit/`:
+
+      1. B1 bracket controls: exact padding/color/background/border/hover/focus parity
+      with `docs/ui-preview.html`.
+
+      2. B2 Source Ledger rows: compact grid rows, no list bullets/indentation, correct
+      URL density/truncation, delete affordance as compact red `x` if reference remains
+      authoritative.
+
+      3. B3 default footer/import presentation: default inline imported-status text,
+      file input/status/footer parity, and R9 Source Ledger copy.
+
+      4. Required states: default, source fetch active, global ingest active, completion,
+      error/conflict, and hover/focus.
+
+      5. Negative style constraints: no spinners, shadows, gradients, animations,
+      SaaS pill rounding, friendly copy, or layout shift.
+
+
+      Audit rules:
+
+      - Compare the running implementation to `docs/ui-preview.html`, not to memory
+      or prose.
+
+      - Use screenshots or equivalent visual/spatial artifacts plus `getComputedStyle`
+      or equivalent computed-style evidence.
+
+      - A parseable PASS is allowed only when all previous blockers are closed and
+      the required states match the reference exactly.
+
+      - PASS_WITH_DEBT is not sufficient for gate opening if any previous blocker
+      remains open or R9 Source Ledger copy still intersects the release gate.'
+    verification: '- Strict visual comparison artifacts are attached for default,
+      source fetch active, global ingest active, completion, error/conflict, and hover/focus
+      states.
+
+      - Retest explicitly reports PASS/FAIL for B1 bracket controls, B2 ledger row
+      shape, B3 footer/import presentation, R9 Source Ledger copy, and negative style
+      constraints.
+
+      - Computed-style evidence proves bracket padding/color/background/hover/focus
+      and row density/shape match `docs/ui-preview.html`.
+
+      - Result is parseable PASS only if all previous blocker-class visual findings
+      are closed.
+
+      - Downstream gate protected: manual-rss-fetch.gate.'
+    evidence_template: "## Verification Report\n\n**Tester**: uiux-auditor (independent\
+      \ of implementation)\n**Scope**: Manual RSS Fetch Source Ledger visual parity\
+      \ retest\n**Independence Level**: L2\n**Timestamp**: <ISO 8601>\n\n### refs\
+      \ Read Confirmation (MANDATORY)\nFor each ref in this step:\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html — key passage\
+      \ or \"NOT READ: <reason>\"\n- .audit-artifacts/manual-rss-fetch/uiux-audit/implementation-computed-style.json\
+      \ — key passage or \"NOT READ: <reason>\"\n- .audit-artifacts/manual-rss-fetch/uiux-audit/\
+      \ — key artifact(s) reviewed or \"NOT READ: <reason>\"\n\nIf no refs were provided,\
+      \ state: \"No refs for this step.\"\n\n### Retest Artifacts\n- Screenshots/images/DOM\
+      \ snapshots:\n  ```\n  <artifact paths>\n  ```\n- Computed style output:\n \
+      \ ```\n  <artifact paths or pasted values>\n  ```\n\n### Previous Blocker Recheck\n\
+      | Blocker | Requirement | Verdict | Evidence Ref | Notes |\n| ------- | -----------\
+      \ | ------- | ------------ | ----- |\n| B1 | Bracket controls exact styling/parity\
+      \ | PASS/FAIL | <artifact> | <notes> |\n| B2 | Ledger compact grid rows/no bullets/correct\
+      \ URL/delete affordance | PASS/FAIL | <artifact> | <notes> |\n| B3 | Footer/import/default\
+      \ imported-status/R9 copy parity | PASS/FAIL | <artifact> | <notes> |\n\n###\
+      \ Required State Recheck\n| State | Verdict | Evidence Ref | Notes |\n| -----\
+      \ | ------- | ------------ | ----- |\n| default | PASS/FAIL | <artifact> | <notes>\
+      \ |\n| source fetch active | PASS/FAIL | <artifact> | <notes> |\n| global ingest\
+      \ active | PASS/FAIL | <artifact> | <notes> |\n| completion | PASS/FAIL | <artifact>\
+      \ | <notes> |\n| error/conflict | PASS/FAIL | <artifact> | <notes> |\n| hover/focus\
+      \ | PASS/FAIL | <artifact> | <notes> |\n\n### Negative Style Constraints\n-\
+      \ Spinners: absent/present\n- Shadows: absent/present\n- Gradients: absent/present\n\
+      - Animations: absent/present\n- SaaS pill rounding: absent/present\n- Friendly\
+      \ copy/layout shift: absent/present\n\n### Headline\n- [ ] **PASS**: all blocker-class\
+      \ visual parity obligations are closed\n- [ ] **FAIL**: blocker-class visual\
+      \ drift remains\n\n**Gate open allowed**: true/false\n**Confidence**: high/medium/low"
+    depends_on:
+    - visual-parity-remediation
+    agent: uiux-auditor
