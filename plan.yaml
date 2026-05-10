@@ -30048,50 +30048,61 @@ phases:
   - id: residual-inspector-readable-content-gate
     name: Final residual gate for Inspector readable content
     status: pending
-    description: 'Final residual gate for the Inspector readable-content PASS_WITH_DEBT
-      remediation.
+    description: 'Final residual gate for the Inspector readable-content remediation
+      after B1 static semantic proof failure.
 
 
       Issue context:
 
-      - `inspector-readable-content-gate` remains the issue-detection gate that surfaced
-      semantic PASS_WITH_DEBT.
+      - `inspector-readable-content-gate` surfaced semantic PASS_WITH_DEBT from fixture-specific
+      guards.
 
-      - The residual debt was implementation logic debt: fixture-specific guards in
-      `web/src/routes/components/Inspector.svelte:112-114` or successor sanitation
-      code.
+      - `retest-generalized-inspector-primary-body-sanitation` returned semantic FAIL
+      for blocker B1: runtime behavior was green, but product code still contained
+      exact screenshot-family guard literals in `web/src/routes/components/Inspector.svelte`.
 
-      - This gate is now the terminal residual gate for the phase by dependency: it
-      must review the fix and retest evidence before the phase can close.
+      - `remove-inspector-screenshot-family-guard-literals` and `retest-remove-inspector-screenshot-family-guard-literals`
+      are now the required residual repair and retest path before this gate.
+
+      - `inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body`
+      must audit the post-retest UI/UX state.
 
 
       Gate focus:
 
-      1. No fixture-specific product-code guard remains for screenshot-family strings.
+      1. No exact screenshot-family product-code guard literals remain as sanitation
+      criteria: `model_latency_error`, `Skip to main content`, `The homepage The Verge`.
 
-      2. Generalized sanitation still closes the original user bug: forbidden screenshot-family/raw
-      content strings cannot appear in Inspector primary body.
+      2. Generalized category/pattern-based sanitation still closes the original user
+      bug: forbidden screenshot-family/raw content strings cannot appear in Inspector
+      primary body.
 
-      3. Retest evidence includes web check/build, targeted Playwright proof, Go tests
-      if backend touched, and code/diff search evidence.
+      3. Retest evidence includes `npm --prefix web run check`, `npm --prefix web
+      run build`, targeted Playwright 3-spec suite, and static search proof.
 
-      4. Architecture/design constraints remain intact.
+      4. Residual UI/UX audit evidence is downstream of the new retest and includes
+      rendered Inspector proof.
+
+      5. Architecture/design constraints remain intact.
 
 
-      As an independent gate reviewer, BLOCK if evidence is vague, if any fixture-literal
-      guard remains in product code, or if runtime proof no longer covers the original
-      user bug.'
-    verification: '- Retest step completed with green web check/build and targeted
-      Playwright evidence.
+      As an independent gate reviewer, BLOCK if evidence is vague, if any exact screenshot-family
+      fixture-literal guard remains in product sanitation code, if runtime proof no
+      longer covers the original user bug, or if UI/UX audit evidence is not downstream
+      of the new retest.'
+    verification: '- New retest step completed with green `npm --prefix web run check`,
+      `npm --prefix web run build`, and targeted Playwright 3-spec evidence.
 
-      - Residual UI/UX audit completed downstream of the generalized sanitation retest
+      - Static search evidence confirms `web/src/routes/components/Inspector.svelte`
+      contains no exact guard literals `model_latency_error`, `Skip to main content`,
+      or `The homepage The Verge` as sanitation criteria; any occurrence is confined
+      to tests/comments with explicit non-product context.
+
+      - Product-code review confirms sanitation is category/pattern-based rather than
+      fixture/screenshot-family exact-string based.
+
+      - Residual UI/UX audit completed downstream of `retest-remove-inspector-screenshot-family-guard-literals`
       with rendered Inspector evidence and PASS/BLOCK handoff.
-
-      - If backend files were touched, Go test evidence is present and green; if not,
-      backend untouched is explicitly evidenced.
-
-      - Code/diff/search evidence confirms fixture-specific guards from `Inspector.svelte:112-114`
-      were removed or generalized and no successor product-code fixture guard remains.
 
       - Runtime/test evidence confirms screenshot-family forbidden strings and raw
       non-article garbage still cannot appear in Inspector primary body.
@@ -30103,60 +30114,62 @@ phases:
       - Gate decision basis explicitly maps unresolved items, if any, to BLOCK or
       documented non-intersection; no implementation logic debt remains unowned.
 
-      - Original user bug remains closed under generalized sanitation.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      - Original user bug and residual B1 are both closed under generalized sanitation.'
+    evidence_template: '## Gate Review Report
 
+
+      **Reviewer**: gate-reviewer (independent of implementation)
+
+      **Phase**: inspector-readable-content-remediation
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-
-      ## Final Residual Gate Closure
-
-      - issue_detection_gate: `inspector-readable-content-gate`
-
-      - fix_step: `generalize-inspector-primary-body-sanitation`
-
-      - retest_step: `retest-generalized-inspector-primary-body-sanitation`
-
-      - fixture_specific_product_guard_remaining: YES/NO with file:line or search
-      evidence
-
-      - original_user_bug_closed: YES/NO with runtime/test evidence
-
-      - screenshot_family_forbidden_strings_absent_from_primary_body: YES/NO with
-      evidence
-
-      - architecture_design_constraints_preserved: YES/NO with cited rationale
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
 
-      ## Gate Decision Basis
-
-      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gate
-      | rationale | final_decision |
-
-      | --- | --- | --- | --- | --- | --- |
-
-      | PASS_WITH_DEBT residual implementation logic debt | <fix/retest evidence>
-      | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <why> | OPEN/BLOCK |
-
-      | original Inspector readable body user bug | <runtime/test evidence> | PROVEN/UNPROVEN/NEEDS_TEST
-      | YES/NO | <why> | OPEN/BLOCK |
+      If no refs were provided, state: "No refs for this step."
 
 
-      ## Headline
+      ### Required Evidence Review
 
-      - [ ] OPEN: residual debt remediated and original bug remains closed
+      - New fix evidence from `remove-inspector-screenshot-family-guard-literals`
 
-      - [ ] BLOCK: fixture-specific guard remains, runtime proof is missing, or original
-      bug regressed
+      - New retest evidence from `retest-remove-inspector-screenshot-family-guard-literals`
 
-      '
+      - Residual UI/UX audit evidence downstream of the new retest
+
+
+      ### Gate Decision Basis
+
+      | Requirement | Evidence reviewed | Status | Decision |
+
+      | --- | --- | --- | --- |
+
+      | Exact screenshot-family guard literals absent from product sanitation criteria
+      | <static search/code evidence> | PROVEN/UNPROVEN | OPEN/BLOCK |
+
+      | Raw source/screenshot-family garbage absent from Inspector primary body |
+      <Playwright/runtime evidence> | PROVEN/UNPROVEN | OPEN/BLOCK |
+
+      | Inspector primary-body UI/UX remains legible and design-compliant | <rendered
+      audit evidence> | PROVEN/UNPROVEN | OPEN/BLOCK |
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: residual repair passes gate
+
+      - [ ] BLOCKED: list blocking issues and required actions'
+    refs:
+    - docs/DESIGN.md
+    - docs/ARCHITECTURE.md
     depends_on:
-    - retest-generalized-inspector-primary-body-sanitation
+    - retest-remove-inspector-screenshot-family-guard-literals
     - uiux-audit-clean-inspector-primary-body
     - inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     agent: gate-reviewer
