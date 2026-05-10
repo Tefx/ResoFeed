@@ -15,10 +15,10 @@
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
   }
 
-  let { item, mode, loading = false, error = null, focusHeading = false, focusRequestId = 0, onResonanceToggle }: Props = $props();
+  let { item, mode, loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
-  let handledFocusRequestId = $state(0);
+  let handledFocusRequestId = $state(-1);
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     return status === 'partial_extraction' ? 'partial' : status;
@@ -119,7 +119,7 @@
     if (!normalized) return true;
 
     // Primary reading copy excludes operational diagnostics and inventory-like
-    // source dumps. Provenance remains available in the raw disclosure below.
+    // source dumps. Calm source details remain available outside the main path.
     const operationalDiagnostic = /\b(?:summary|transport|authority|runtime|diagnostic|status|model|extraction)\b/i.test(normalized)
       && hasOperationalStatusLeak(normalized);
     const sourceInventory = /\b(?:rss|feed|inspector|article|source)\s+(?:case|cases|corpus|regression|inventory|dump|payload)s?\b/i.test(normalized)
@@ -131,6 +131,8 @@
   function removeSourceBoilerplate(text: string): string {
     return text
       .replace(/\bskip\s+to\s+(?:main\s+)?(?:content|article|navigation|menu)\b/gi, ' ')
+      .replace(/\b(?:related|most\s+popular|advertiser\s+content|advertisement|sponsored\s+content|commerce|shopping|newsletter\s+sign\s*up|subscribe\s+now)\b(?:\s+[^.!?]{0,160})?[.!?]?/gi, ' ')
+      .replace(/\b(?:share|follow|sign\s+up|log\s+in|read\s+more)\b\s+(?:on\s+)?(?:facebook|twitter|x|instagram|linkedin|email|newsletter)\b[^.!?]*[.!?]?/gi, ' ')
       .replace(/\b(?:the\s+)?(?:homepage|home\s+page)\b(?:\s+[A-Z][\w&'-]*){1,10}(?=\s+(?:reviews|podcasts|newsletters|news|videos|sections|menu)\b)(?:\s+\w+){0,8}/g, ' ')
       .replace(/(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?/gi, ' ')
       .replace(/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{[^}]*\}/g, ' ')
@@ -139,7 +141,6 @@
 
   function readableText(text: string | null): string | null {
     if (!text) return null;
-    if (isNonArticleDiagnosticText(text)) return null;
     const decodedOnce = removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text)))));
     const normalized = removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce))))
       .replace(/\s+/g, ' ')
@@ -183,28 +184,7 @@
     return summaryText(value) ?? conciseExcerpt(detailText(value), 240);
   }
 
-  function priorityText(value: InspectableItem): string {
-    return value.value_tier ?? (value.extraction_status === 'full' ? 'standard · full source' : 'standard · limited source');
-  }
-
-  function qualityText(value: InspectableItem): string {
-    if (value.extraction_status === 'full') return 'high — complete, attributed, and extracted from a reachable original URL';
-    if (value.extraction_status === 'partial_extraction') return 'partial — excerpt only; verify original';
-    if (value.extraction_status === 'original_unavailable') return 'original unavailable — verify source before relying on summary';
-    return 'summary unavailable — inspect source text directly';
-  }
-
-  function searchableText(value: InspectableItem): string {
-    const topicParts = [value.source_title, value.title, stringOrNull(value.value_tier), detailText(value)].join(' ');
-    return conciseExcerpt(topicParts.replace(/\s+/g, ' ').trim(), 320);
-  }
-
-  function stringOrNull(value: string | null): string {
-    return value ?? '';
-  }
-
   function originalHref(value: InspectableItem): string {
-    if (value.title === 'Local fixture item one' && typeof window !== 'undefined') return `${window.location.origin}/#original-link`;
     const candidates = [
       value.url,
       'provenance' in value ? value.provenance.original_url : null,
@@ -214,13 +194,16 @@
     return candidates.find((candidate): candidate is string => Boolean(candidate?.match(/^https?:\/\//))) ?? 'https://example.invalid/unavailable';
   }
 
-  function rawPayload(value: InspectableItem): string {
-    const chunks = [
-      'feed_excerpt' in value ? value.feed_excerpt : null,
-      'extracted_text' in value ? value.extracted_text : null,
-      'provenance' in value ? JSON.stringify(value.provenance, null, 2) : null
-    ].filter((chunk): chunk is string => Boolean(chunk));
-    return chunks.length > 0 ? chunks.join('\n\n') : 'raw provenance unavailable';
+  function sourceDetailsPayload(value: InspectableItem): string {
+    const lines = [
+      `source: ${value.source_title}`,
+      `original: ${originalHref(value)}`,
+      'provenance' in value && value.provenance.canonical_url ? `canonical: ${value.provenance.canonical_url}` : '',
+      'provenance' in value && value.provenance.source_url ? `feed: ${value.provenance.source_url}` : '',
+      value.story_key ? `story: ${value.story_key}` : '',
+      value.duplicate_of_item_id ? `duplicate: ${value.duplicate_of_item_id}` : ''
+    ].filter((line) => line.length > 0);
+    return lines.join('\n');
   }
 
   function extractionDisclosure(value: InspectableItem): string {
@@ -228,21 +211,6 @@
     if (value.extraction_status === 'original_unavailable') return 'original unavailable';
     if (value.extraction_status === 'summary_unavailable') return 'summary unavailable';
     return 'full';
-  }
-
-  function keepOriginalLinkInApp(event: FocusEvent): void {
-    if (event.currentTarget instanceof HTMLAnchorElement && typeof window !== 'undefined') {
-      event.currentTarget.href = `${window.location.origin}/#original-link`;
-    }
-  }
-
-  function suppressOriginalNavigation(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  function suppressOriginalNavigationKey(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') suppressOriginalNavigation(event);
   }
 
   $effect(() => {
@@ -272,36 +240,38 @@
     <p class="contract-feedback-error" role="alert">{error}</p>
   {/if}
   {#if item}
-    <p class="contract-muted">
-      <span aria-label={`Source: ${item.source_title}`}>provenance: src: {item.source_title}</span>
-      · <span aria-label={`Extraction: ${item.extraction_status}`}>extraction: {extractionLabel(item.extraction_status)}</span>
-      {#if item.value_tier}
-        · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
+    <div class="inspector-header-row">
+      <p class="contract-muted inspector-provenance">
+        <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
+        · <span aria-label={`Extraction: ${item.extraction_status}`}>extraction: {extractionLabel(item.extraction_status)}</span>
+        {#if item.value_tier}
+          · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
+        {/if}
+      </p>
+      {#if mode === 'mobile-route' && onResonanceToggle}
+        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
+          {item.is_resonated ? '★' : '☆'}
+        </button>
       {/if}
-      · <span aria-label={`Model status: ${item.model_status}`}>{item.model_status}</span>
-    </p>
+    </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a href={originalHref(item)} onfocus={keepOriginalLinkInApp} onclick={suppressOriginalNavigation} onmousedown={suppressOriginalNavigation} onkeydown={suppressOriginalNavigationKey} onkeyup={suppressOriginalNavigationKey}>original link</a></p>
-    <p class:contract-warning={item.extraction_status !== 'full'}>extraction: {extractionDisclosure(item)}</p>
+    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener">original link</a></p>
+    <p class:contract-warning={item.extraction_status !== 'full'}>
+      <span>{extractionLabel(item.extraction_status)}</span>
+      <span aria-hidden="true"> · </span>
+      <span>{extractionDisclosure(item)}</span>
+    </p>
     <p><strong>summary:</strong> {denseSummaryText(item)}</p>
     <p><strong>core insight:</strong> {coreInsightText(item)}</p>
-    <p>{detailText(item)}</p>
+    <p class="inspector-reading">{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>
-    <p class="contract-muted">priority: {priorityText(item)}</p>
-    <p class="contract-muted">quality: {qualityText(item)}</p>
-    <p class="contract-muted">searchable text: {searchableText(item)}</p>
     {#if item.story_key || item.duplicate_of_item_id}
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}
-    <details class="contract-raw-provenance">
-      <summary>raw provenance diagnostics</summary>
-      <pre>{rawPayload(item)}</pre>
+    <details class="contract-source-details">
+      <summary>source details</summary>
+      <pre>{sourceDetailsPayload(item)}</pre>
     </details>
-    {#if mode === 'mobile-route' && onResonanceToggle}
-      <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
-        {item.is_resonated ? '★' : '☆'}
-      </button>
-    {/if}
   {:else}
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">No item selected</h2>
   {/if}

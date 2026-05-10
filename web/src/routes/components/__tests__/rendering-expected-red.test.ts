@@ -161,6 +161,60 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());
   });
 
+  it('keeps Inspector primary reading editorial while preserving calm provenance and normal original-link behavior', () => {
+    const dirtyDetail: ItemDetail = {
+      ...expectedRedItem,
+      id: 'item_dirty_inspector_contract',
+      title: 'Clean fixture item with JSON-LD metadata',
+      summary: 'model_status summary_unavailable diagnostic payload',
+      core_insight: 'Readable core insight remains in the primary path.',
+      extraction_status: 'full',
+      model_status: 'summary_unavailable',
+      feed_excerpt: 'Readable fallback excerpt for the primary Inspector reading path.',
+      extracted_text: `<script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle"}</script>
+        Skip to main content. Advertisement newsletter sign up.
+        Readable article paragraph after the metadata blob.
+        OpenRouter model transport diagnostic status: model_latency_error.`,
+      provenance: {
+        source_url: expectedRedSource.url,
+        canonical_url: expectedRedItem.url,
+        original_url: expectedRedItem.url,
+        story_key: 'story-json-ld',
+        duplicate_of_item_id: null
+      }
+    };
+
+    render(Inspector, { props: { item: dirtyDetail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
+    expect(within(inspector).getByRole('heading', { name: dirtyDetail.title })).toBeVisible();
+    expect(within(inspector).getByLabelText('Source: Example Source')).toBeVisible();
+    expect(within(inspector).queryByLabelText(/Model status:/)).not.toBeInTheDocument();
+    expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
+    expect(within(inspector).getByText(/Readable article paragraph after the metadata blob/)).toBeVisible();
+
+    const primaryText = within(inspector).getByText(/Readable article paragraph after the metadata blob/).textContent ?? '';
+    expect(primaryText).not.toMatch(/@context|schema\.org|Advertisement|model_latency_error|OpenRouter/i);
+
+    const originalLink = within(inspector).getByRole('link', { name: 'original link' });
+    expect(originalLink).toHaveAttribute('href', expectedRedItem.url);
+    expect(originalLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))).toBe(true);
+  });
+
+  it('places the mobile Inspector Resonate action in the top header row without duplicating debug status', () => {
+    const onResonanceToggle = vi.fn(async () => {});
+    render(Inspector, { props: { item: expectedRedItem, mode: 'mobile-route', onResonanceToggle } });
+
+    const inspector = screen.getByRole('complementary', { name: expectedRedItem.title });
+    const headerRow = inspector.querySelector('.inspector-header-row');
+    const heading = within(inspector).getByRole('heading', { name: expectedRedItem.title });
+    const star = within(inspector).getByRole('button', { name: 'Resonate item' });
+
+    expect(headerRow).toContainElement(star);
+    expect(Boolean(star.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    expect(within(inspector).queryByText(expectedRedItem.model_status)).not.toBeInTheDocument();
+  });
+
   it('wires Steer to /api/steer and /doctor to raw text diagnostics', async () => {
     const user = userEvent.setup();
     window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');

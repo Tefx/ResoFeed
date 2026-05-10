@@ -528,25 +528,41 @@ a:focus,
   font: var(--rf-typography-inspector-title);
 }
 
+.contract-inspector h2:focus {
+  outline: 0;
+}
+
+.inspector-header-row {
+  display: flex;
+  gap: var(--rf-space-row);
+  align-items: start;
+  justify-content: space-between;
+  margin-block-end: var(--rf-space-sm);
+}
+
+.inspector-provenance {
+  min-width: 0;
+}
+
 .contract-inspector p:not(.contract-muted):not(.contract-warning) {
   max-width: 68ch;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
 }
 
-.contract-raw-provenance {
+.contract-source-details {
   margin-block-start: var(--rf-space-lg);
   color: var(--rf-color-muted);
   font: var(--rf-typography-metadata);
 }
 
-.contract-raw-provenance summary {
+.contract-source-details summary {
   min-height: 44px;
   cursor: pointer;
   color: var(--rf-color-text);
 }
 
-.contract-raw-provenance pre {
+.contract-source-details pre {
   max-width: 100%;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
