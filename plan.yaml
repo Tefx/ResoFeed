@@ -25133,7 +25133,7 @@ phases:
       passed.'
   - id: visual-ux-audit
     name: Native multimodal UI/UX audit for complete regression artifact set
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -25233,6 +25233,217 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T12:43:46.191463+00:00'
+    done_at: '2026-05-10T12:49:29.856632+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `docs/DESIGN.md` — dense but legible analyst workbench; operational labels
+      only; feed selected state must be non-layout-shifting 3px marker; raw/full body
+      belongs in Inspector; Inspector provenance must be demoted/plain; no folders/tags/settings/unread/AI-magic
+      visuals; touch targets >=44 CSS px on mobile.
+
+      - `docs/ui-preview.html` — stone-paper palette, flat metadata in feed, 44px
+      stars/buttons, desktop split feed/Inspector, mobile full-screen Inspector route,
+      source ledger flat rows.
+
+      - `docs/DESIGN_VISION.md` — “Analyst’s Workbench,” high-density/low-fatigue,
+      AI as raw utility, no cute errors, no folders/tags/numeric indicators, whitespace/rules
+      over border-box maze, hover/focus no layout shift.
+
+      - `.audit-artifacts/retest-blind-dirty-jsonld-inspector.md` — after-state screenshot
+      removes visible JSON-LD tokens from primary Inspector text and demotes raw/provenance
+      to labelled collapsed “raw provenance diagnostics.”
+
+      - `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`
+      — prior B1 failure recorded BLOCKER because Inspector primary reading exposed
+      raw JSON-LD in `09-feed-row-selected-inspector.png`; also included pointer boxes,
+      keyboard nav, and negative UX observations.
+
+
+      ## Native Multimodal UI/UX Audit Evidence
+
+      - DESIGN.md Authority: docs/DESIGN.md sections Overview, Colors, Typography,
+      Layout & Spacing, Owner Token Prompt, First-Use Empty State, Feed Item, Resonate
+      Button, Inspector Pane, Source Ledger, Search and Retrieval, Do''s and Don''ts,
+      Micro-interactions & Motion.
+
+      - Implementation Evidence: screenshots and result artifacts listed in audit.
+
+      - Source/DOM Evidence Used for Diagnosis: `.test-artifacts/playwright/results/results.json`;
+      `.test-artifacts/playwright/html-report/index.html`; manifest.json. These were
+      not used as sole visual proof.
+
+
+      Reviewed artifact manifest summary:
+
+      | Artifact | Verdict | Notes |
+
+      | --- | --- | --- |
+
+      | owner-token | PASS | Terse local gate, focused input visible, no account/login/password-reset
+      copy. |
+
+      | first-use | PASS | Required first-use lines present in normal shell, no wizard/art.
+      |
+
+      | today-list | PASS | Desktop split-pane, flat metadata, 44px star, selected
+      marker visible. |
+
+      | source-ledger | PASS | Flat source row, OPML flattened receipt, import/export
+      state actions; no folders/tags UI. |
+
+      | selected-item | PASS | 3px left marker, stable desktop row, Inspector open.
+      |
+
+      | selected-hover | PASS_WITH_DEBT | Selected remains distinguishable and no
+      layout shift visible; hover tonal delta is very subtle/nearly indistinguishable.
+      |
+
+      | inspector-clean | PASS | Title/source/original link/summary/why/raw provenance
+      label are readable and ordered. |
+
+      | inspector-raw-expanded/provenance | PASS_WITH_DEBT | Labelled collapsed raw
+      provenance is visible, but artifact does not prove expanded provenance payload
+      styling. |
+
+      | llm-error | PASS | “summary unavailable” is raw/terse; no cute apology or
+      mascot. |
+
+      | search | PASS | Lexical retrieval surface, source-backed result, no RAG/chat
+      semantics. |
+
+      | mobile-feed | PASS_WITH_DEBT | Touch-safe star and visible feed, but metadata
+      wraps into stacked words, reducing archival scanability. |
+
+      | mobile-inspector | PASS | Full-screen detail route, back action, readable
+      title/body, visible mobile star. |
+
+      | retest fixed screenshot | PASS | JSON-LD no longer dumped into primary reading
+      flow. |
+
+      | prior failure screenshot | USED_AS_BEFORE | Shows old raw JSON-LD dump; fixed
+      screenshot materially improves it. |
+
+
+      Findings:
+
+      | ID | Severity | Type | Evidence | User Impact | Required Fix |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | UX-DEBT-001 | Minor (orchestrator-treated as remediation-required before gate)
+      | Mobile scanability | `mobile-feed.png` | Source metadata wraps into stacked
+      words, slowing triage on mobile. | Ellipsize/truncate long metadata segments
+      or compress separators so metadata line remains scannable. |
+
+      | PROOF-GAP-001 | Minor (orchestrator-treated as remediation-required before
+      gate) | Artifact gap | `inspector-raw-expanded-provenance.png` + manifest note
+      | Collapsed provenance is proven, but expanded raw/provenance visual treatment
+      is not. | Add screenshot with disclosure expanded if expanded payload is supported/required.
+      |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | DESIGN Owner Token Prompt | Local token gate before app API use, focused input,
+      no account semantics | Screenshot + keyboard focus | owner-token.png | PROVEN
+      | none | Pass visual/a11y intent. |
+
+      | DESIGN First-Use Empty State | Required first-use copy appears inside normal
+      shell | Screenshot | first-use.png | PROVEN | none | Pass. |
+
+      | DESIGN Feed Item / Micro-interactions | Selected, hover, focus, selected+hover/focus
+      stable and legible | Screenshots + state-matrix results | selected-item.png,
+      selected-hover.png, results.json | PROVEN_WITH_DEBT | UX-DEBT only for subtle
+      hover | Gate can open only after remediation ownership; selected remains clear.
+      |
+
+      | DESIGN Resonate Button | Star is visible, 44px, non-color glyph semantics,
+      keyboard/pointer toggles | Screenshot + Playwright runtime | today-list.png,
+      mobile-feed.png, results.json | PROVEN | none | Pass. |
+
+      | DESIGN Inspector Pane | Primary Inspector flow does not dump raw JSON-LD |
+      Before/after screenshots + retest report | inline-json-ld-inspector-fixed.png;
+      retest report | PROVEN | none | Prior B1 blocker closed. |
+
+      | DESIGN Inspector Provenance | Raw/provenance is demoted/collapsed/labeled
+      outside main flow | Screenshot | inspector-clean.png, inspector-raw-expanded-provenance.png
+      | PROVEN_WITH_PROOF_GAP | Add expanded disclosure screenshot | Must close proof
+      gap before final gate. |
+
+      | DESIGN Source Ledger | Flat source ledger, no folders/tags/settings | Screenshot
+      | source-ledger.png | PROVEN | none | Pass. |
+
+      | DESIGN Search and Retrieval | Lexical/source-backed search, not RAG/chat |
+      Screenshot | search.png | PROVEN | none | Pass. |
+
+      | DESIGN Mobile Layout | Single-column feed/detail with touch-safe controls
+      | Screenshots | mobile-feed.png, mobile-inspector.png | PROVEN_WITH_DEBT | Fix
+      mobile metadata wrapping | Must remediate UX debt before final gate. |
+
+      | Negative UX bans | No forbidden unread/folder/tag/settings/SaaS/AI-magic concepts
+      introduced | Screenshots + results negative UX assertions | all listed screenshots,
+      results.json | PROVEN | none | Pass. |
+
+
+      ## Remediation ownership created before completion
+
+      Planner created:
+
+      - `ui-navigation-hover-inspector-repair.remediate-visual-ux-debt-and-proof-gap`
+      — batched fix for UX-DEBT-001 and PROOF-GAP-001.
+
+      - `ui-navigation-hover-inspector-repair.retest-visual-ux-debt-and-proof-gap`
+      — independent retest/audit for the remediation.
+
+      - Downstream `gate` now depends on both remediation steps and blocks PASS_WITH_DEBT
+      involving UX debt/proof gaps unless closure is proven.
+
+
+      ## Closure Fields
+
+      verdict: PASS_WITH_DEBT
+
+      blockers: []
+
+      gate_open_allowed: true only after remediation ownership created; final phase
+      gate remains blocked until remediation/retest complete.
+
+      proof_gap_status: NON_BLOCKING in audit report; orchestrator disposition: remediation-required
+      before gate because the debt involves UX/proof coverage.
+
+      orchestrator_action_hint: COMPLETE_AUDIT_FINDINGS_AND_CONTINUE_REMEDIATION
+
+
+      step_intent: verification
+
+      expected_result: pass with all blocker-class issues closed or explicitly non-blocking
+
+      observed_result: PASS_WITH_DEBT; prior dirty JSON-LD Inspector blocker closed;
+      two remediation-required debts recorded.
+
+      failure_alignment: no immediate product blocker, but UX debt/proof gap intersect
+      final gate and have remediation ownership.
+
+      product_implementation_files_modified: false
+
+      audit_report_artifact_created: false
+
+      commit_hashes: none — read-only audit produced no tracked changes to commit.
+
+      uncertainty_sources:
+
+      - Motion timing/reduced-motion behavior was not directly evidenced by video.
+
+      - Expanded raw/provenance disclosure styling was not visually proven.
+
+      - Some keyboard behavior was supported by Playwright JSON/results rather than
+      fresh manual browser interaction in this audit.'
   - id: gate
     name: Gate complete UI regression test plan and repair phase
     status: pending
