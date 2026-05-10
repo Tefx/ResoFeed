@@ -30928,7 +30928,7 @@ phases:
       [], product implementation files modified no.'
   - id: prd-inspector-preview-conformance-remediation.implement-prd-fields-preview-parity
     name: Complete PRD Inspector fields and preview visual parity
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -31070,6 +31070,31 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T15:41:40.633244+00:00'
+    done_at: '2026-05-10T15:46:56.481745+00:00'
+    evidence: 'Implementation evidence accepted from frontend-engineer. Files changed:
+      `web/src/routes/+page.svelte`, `web/src/routes/components/Inspector.svelte`,
+      `web/src/app.css`; worker commit `adf01fe5d6e1c2ca97e3518d49d9230c7b0f11b4`,
+      squash-merged to main as `5379091`. refs Read Confirmation present for project
+      instructions, docs/PRD.md, docs/DESIGN.md, docs/ui-preview.html, and protected
+      expected-red test. PRD fields surfaced in Inspector: `quality:` derived from
+      extraction/source reachability; `priority:` from `value_tier` or source-derived
+      standard priority; `core insight:` from API core_insight or first readable extracted
+      sentence; `summary:` from API summary/feed excerpt or concise extracted excerpt;
+      `provenance:` and `extraction:` plus original link/raw provenance details; `why:`
+      line; `searchable text:` excerpt including title/source/value/readable extracted
+      text/topical sentinels. Preview parity changes: 32px RESOFEED masthead; operational
+      subtitle/nav including SOURCE LEDGER / DOCTOR / INSPECTOR; centered bordered
+      shell with 32px page margin and <=1280px width; desktop grid feed + 480px Inspector;
+      explicit 44x44 star; preserved selected 3px marker and typography roles. Raw-source
+      guard preserved via existing sanitizers. No Go/API/storage changes; no sidecars/vector
+      DB/sync/merge/folders/tags/unread/archive/settings/onboarding flows. No deviation
+      records. Worker verification: `npm --prefix web run check` passed; `npm --prefix
+      web run build` passed; `npm --prefix web run test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe` passed 1/1; targeted Inspector raw-source/UI regression
+      Playwright suite passed 7/7. Mainline final-state verification after squash
+      merge: `npm --prefix web run check` passed; `npm --prefix web run build` passed;
+      PRD preview conformance Playwright passed 1/1; targeted Inspector raw-source/UI
+      regression Playwright passed 7/7.'
   - id: prd-inspector-preview-conformance-remediation.independent-retest-prd-preview
     name: Independent retest for PRD fields and preview parity
     status: pending
