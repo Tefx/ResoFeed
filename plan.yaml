@@ -32533,7 +32533,7 @@ phases:
   steps:
   - id: fuidcr-contract-matrix-lock
     name: Lock UI audit contract matrix for findings 1-52
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -32650,6 +32650,47 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:20:09.117381+00:00'
+    done_at: '2026-05-10T17:26:19.637724+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
+      \ — Executive summary identifies 52 UI conformance findings; repair order starts\
+      \ with feed metadata/summaries/time grouping/row rhythm, then Inspector hierarchy/original-link\
+      \ behavior, Source Ledger/State Portability, shell breakpoint, search/doctor,\
+      \ and preview cleanup.\n- docs/DESIGN.md — Key contract: dense but legible analyst\
+      \ workbench; feed rows use flat metadata, 18px serif titles, clamped summaries,\
+      \ 44px controls, Inspector becomes full-screen below 1080px, and Owner Token\
+      \ Prompt remains terse.\n- docs/ARCHITECTURE.md — Key boundary: one Go binary,\
+      \ one SQLite DB with FTS5 lexical search, no accounts/OAuth/sync/vector/RAG,\
+      \ and frontend must preserve DESIGN.md without extra dashboard/settings surfaces.\n\
+      - AGENTS.md — Subagent read from repo root environment because absent in isolated\
+      \ worktree; key invariant: canonical docs are ARCHITECTURE.md and DESIGN.md;\
+      \ no vector DB, accounts, sync coordinator, folders/tags/unread/mark-all-read/settings\
+      \ sliders/drag ordering.\n- docs/ui-preview.html — Key preview target: 1079px\
+      \ breakpoint hides split Inspector; feed metadata uses flat src/age/status model,\
+      \ star is 44px, Source Ledger has bracket actions, and mobile preview separates\
+      \ feed and Inspector.\n\n## Contract Matrix Evidence\n- Matrix path(s): web/tests/contracts/ui-remediation-contract-matrix.json\n\
+      - Findings covered exactly once: 1-52 = YES\n- P0/P1 evidence requirement summary:\
+      \ every P0/P1 entry includes required browser/DOM/behavior evidence in `required_evidence`,\
+      \ with selectors, desktop/narrow screenshot states, and keyboard/focus checks\
+      \ where applicable.\n- DTO-gap candidates, if any:\n  - ItemSummary.feed_excerpt_or_clean_excerpt\n\
+      \  - ItemSummary.external_surfaced_actor_id_or_label\n  - SearchResult.match_excerpt_or_provenance\n\
+      - Production files changed: none\n\n## Files changed\n- web/tests/contracts/ui-remediation-contract-matrix.json\n\
+      \n## Verification\n- Subagent: `node -e \"...validate matrix...\"` — exit 0;\
+      \ `matrix ok: findings=52 ids=1-52 exactly once; P0/P1 require browser/DOM/behavior\
+      \ evidence`.\n- Subagent: `git show --name-only --format='%H%n%s' HEAD` — exit\
+      \ 0; only `web/tests/contracts/ui-remediation-contract-matrix.json` changed.\n\
+      - Subagent: `git status --short --branch --untracked-files=all` — exit 0; clean\
+      \ on branch `vectl/step-fuidcr-contract-matrix-lock`.\n- Orchestrator mainline\
+      \ verification after squash merge: matrix validation command — exit 0; `matrix\
+      \ ok: findings=52 ids=1-52 exactly once; P0/P1 require hard evidence`.\n- Orchestrator\
+      \ mainline verification after squash merge: `npm --prefix web run check` — exit\
+      \ 0; svelte-check found 0 errors and 0 warnings.\n\n## Commit hash(es)\n- Worktree\
+      \ commit: 0d2aca669eefe465a5ae0fd3da10a7d53084118a\n- Mainline squash commit:\
+      \ e970d32 [vectl] step-fuidcr-contract-matrix-lock completed\n\n## Gaps/Notes\n\
+      - The audit file and AGENTS.md were not present inside the isolated worktree\
+      \ tree; subagent read them from the repo root path available in the environment\
+      \ for required-reference confirmation.\n- Contract step intentionally changed\
+      \ only test/contract artifact JSON and no production Svelte/CSS/Go implementation\
+      \ logic."
   - id: fuidcr-expected-red-ui-tests
     name: Add expected-red browser and DOM tests for all audit findings
     status: pending
