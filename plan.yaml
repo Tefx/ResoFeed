@@ -33762,7 +33762,7 @@ phases:
       above and docs/ui-preview drift; the foundation step''s finding set is closed.'
   - id: fuidcr-feed-search-anatomy
     name: Repair shared Feed and Search item anatomy
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -34001,6 +34001,136 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T18:37:29.725269+00:00'
+    done_at: '2026-05-10T18:46:24.240484+00:00'
+    evidence: 'status: SUCCESS
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — Feed/Search must use dense feed-item anatomy: flat metadata
+      `src`, age/time, extraction, agent; summaries clamp 2 lines desktop / 1 line
+      narrow; time groups `TODAY`, `YESTERDAY`, `EARLIER` inline in first item metadata
+      row, not divider headings.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree; direct read returned file-not-found and glob found
+      no matching audit file.
+
+
+      ## Feed/Search Anatomy Evidence
+
+      **Upstream DTO fields consumed**:
+
+      - Timestamp fallback fields: `published_at` → `first_seen_at` through `itemDisplayTimestamp`;
+      rendered as compact age labels and time groups.
+
+      - Excerpt fallback fields: `summary` → `core_insight` → `display_excerpt` through
+      `itemDisplayExcerpt`; list UI no longer repeats `summary unavailable` when fallback
+      text exists. `feed_excerpt` remains detail DTO scope and was not added to list
+      API assumptions.
+
+
+      **Rendered proof**:
+
+      - Worker Feed desktop screenshot: `.test-artifacts/feed-search-anatomy/feed-desktop.png`;
+      DOM excerpt showed `TODAY`, `YESTERDAY`, `EARLIER`, `SRC: EXAMPLE SOURCE`, compact
+      `1M/1D/3D`, `PARTIAL`, `AGENT:EXTERNAL`, and `Source-backed feed excerpt for
+      fallback rendering.`
+
+      - Worker Feed narrow/mobile screenshot: `.test-artifacts/feed-search-anatomy/feed-narrow.png`.
+
+      - Worker Search desktop screenshot: `.test-artifacts/feed-search-anatomy/search-desktop.png`.
+
+      - Worker Search narrow/mobile screenshot: `.test-artifacts/feed-search-anatomy/search-narrow.png`;
+      DOM excerpt included stacked filters, `3 results`, shared feed metadata, `match:
+      lexical index · provenance: source-backed`, Inspect affordance verified by Playwright,
+      and star buttons.
+
+
+      **Findings closed**:
+
+      - Feed 8-16: closed — shared anatomy, compact metadata, lower-case prefixes
+      in DOM source, fallback excerpt, clamps, row rhythm, inline groups, Inspect/Resonate
+      actions.
+
+      - Search 40-44: closed — compact non-RFC3339 dates, plain result count, terse
+      raw states retained, lexical provenance line, responsive/narrow form and row
+      anatomy.
+
+
+      **Commands**:
+
+      Worker verification:
+
+      - `npm --prefix web install` — PASS; installed missing frontend dependencies
+      because `svelte-kit` was absent.
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/rendering-expected-red.test.ts`
+      — PASS; 17 tests passed.
+
+      - `npm --prefix web run test:e2e -- tests/e2e/feed-search-anatomy.spec.ts --project=chromium-ci-safe`
+      — PASS; 1 Playwright test passed and produced rendered proof artifacts.
+
+      Mainline final-state gate after squash merge:
+
+      - `npm --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/rendering-expected-red.test.ts`
+      — PASS; 1 file / 17 tests passed.
+
+      - `npm --prefix web run test:e2e -- tests/e2e/feed-search-anatomy.spec.ts --project=chromium-ci-safe`
+      — PASS; 1 Playwright test passed.
+
+      - `npm --prefix web run build` — PASS; production build completed.
+
+      - Go tests not run because no Go/backend/API/storage files were touched; upstream
+      `fuidcr-feed-search-dto-source-fields` `go test ./...` remains cited for backend
+      DTO availability.
+
+
+      ## Commit hash(es)
+
+      - Worker branch: 4b7ea4a80353a865e44533b294a8dccff2981ef2
+
+      - Main squash commit: e1abb92 (`[vectl] step-fuidcr-feed-search-anatomy completed`)
+
+
+      ## Files changed
+
+      - web/src/app.css
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - web/tests/e2e/feed-search-anatomy.spec.ts
+
+
+      ## Guardrails
+
+      - Backend/API/storage changed: NO.
+
+      - New routes/auth/sync/accounts/vector/admin/service layers added: NO.
+
+
+      ## Deviations
+
+      none
+
+
+      ## Gaps/Notes
+
+      - Required audit file was absent in isolated worktree.
+
+      - Playwright proof artifacts were left untracked under `.test-artifacts/feed-search-anatomy/`
+      in the worktree for inspection; generated tracked `.test-artifacts` changes
+      from the run were restored and not committed.'
   - id: fuidcr-inspector-reading-contract
     name: Repair Inspector reading and diagnostic boundary
     status: done
