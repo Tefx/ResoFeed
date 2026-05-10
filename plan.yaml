@@ -26284,7 +26284,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: blind-runtime-browser-ux-verification
     name: Blind runtime browser UX verification
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -26355,6 +26355,116 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-10T12:14:11.461093+00:00'
+    done_at: '2026-05-10T12:28:51.879415+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n\nNo refs for this step.\n\n\
+      ## Blind Runtime Browser UX Evidence\n- Exact command(s) or harness steps:\n\
+      ```sh\npwd && git status --short --branch\nnpm --prefix web run test:e2e\nnpm\
+      \ --prefix web install\nnpm --prefix web run test:e2e\nmkdir -p \".audit-artifacts/blind-runtime-browser-ux\"\
+      \ && node --input-type=module - <<'NODE'\n# ad-hoc black-box Playwright audit\
+      \ script launching real Go binary,\n# fixture RSS server, OPML import, OpenRouter\
+      \ stub, browser interaction,\n# screenshots/video/log capture\nNODE\ngit add\
+      \ .audit-artifacts/blind-runtime-browser-ux\ngit commit -m \"Add blind runtime\
+      \ browser UX audit evidence\"\n```\n- Runner/browser output:\n```text\nInitial\
+      \ documented harness failed because dependencies were absent:\nsh: playwright:\
+      \ command not found\n\nAfter verified missing dependency install:\nnpm --prefix\
+      \ web install\nadded 150 packages, and audited 151 packages in 2s\n\nDocumented\
+      \ harness:\nnpm --prefix web run test:e2e\n22 passed, 2 skipped (29.1s)\n\n\
+      Independent manual browser audit:\n{\n  \"status\": \"FAIL\",\n  \"issues\"\
+      : [\n    {\n      \"severity\": \"BLOCKER\",\n      \"description\": \"Inspector\
+      \ primary reading area exposes raw JSON-LD as primary text\",\n      \"reproduction\"\
+      : \"Open dirty-content item in Inspector\",\n      \"artifact\": \"09-feed-row-selected-inspector.png\"\
+      \n    }\n  ]\n}\n```\n- Screenshots/traces: `.audit-artifacts/blind-runtime-browser-ux/`\n\
+      \  - `01-owner-token-prompt.png`\n  - `02-first-use-today.png`\n  - `03-source-ledger-active.png`\n\
+      \  - `04-opml-import-result.png`\n  - `05-source-fetch-result.png`\n  - `06-today-after-fetch.png`\n\
+      \  - `07-feed-row-hover.png`\n  - `08-feed-row-focus.png`\n  - `09-feed-row-selected-inspector.png`\n\
+      \  - `10-feed-row-selected-hover.png`\n  - `11-feed-row-selected-focus-star.png`\n\
+      \  - `12-star-resonated.png`\n  - `13-steer-receipt.png`\n  - `14-doctor.png`\n\
+      \  - `15-keyboard-source-ledger.png`\n  - `page@4e2ae6331abf18edbd7570aa0eea49a4.webm`\n\
+      \  - `manual-browser-interaction-log.json`\n\n## Scenario coverage\n| Scenario\
+      \ | Public action | Expected result | Evidence ref | Status |\n| --- | --- |\
+      \ --- | --- | --- |\n| Real app launch | Built/used real Go binary; probed `/api/feed/today`\
+      \ auth boundary | Server binds and browser UI loads | `manual-browser-interaction-log.json`,\
+      \ `server.stdout.log` | PROVEN |\n| SOURCE LEDGER click | Pointer clicked `SOURCE\
+      \ LEDGER` nav | Ledger active, source controls visible | `03-source-ledger-active.png`\
+      \ | PROVEN |\n| TODAY click | Pointer clicked `TODAY` after source fetch | Feed\
+      \ active with imported item | `06-today-after-fetch.png` | PROVEN |\n| Steer\
+      \ submit | Filled Steer and clicked apply | Terse receipt/status visible | `13-steer-receipt.png`\
+      \ | PROVEN |\n| Star/resonate | Focused star and pressed Space | Label changed\
+      \ `Resonate item` to `Remove resonance`; 44px target | `12-star-resonated.png`,\
+      \ log lines 93-101 | PROVEN |\n| Inspector links | Opened feed row in Inspector\
+      \ | Original link present with non-empty href | `09-feed-row-selected-inspector.png`,\
+      \ log line 104 | PROVEN |\n| `/doctor` | Typed `/doctor`, pressed Enter | Plain\
+      \ diagnostic text visible | `14-doctor.png`, log line 114 | PROVEN |\n| OPML\
+      \ import | Used Source Ledger file import | Imported source, folders flattened\
+      \ | `04-opml-import-result.png`, log line 48 | PROVEN |\n| Source fetch | Clicked\
+      \ `[FETCH]`/run ingest action | Source fetched and feed item appeared | `05-source-fetch-result.png`,\
+      \ `06-today-after-fetch.png` | PROVEN |\n| Keyboard navigation | Tabbed to `SOURCE\
+      \ LEDGER`, pressed Enter | Ledger activated via keyboard | `15-keyboard-source-ledger.png`,\
+      \ log lines 115-119 | PROVEN |\n| Feed row states | Hover/focus/selected/selected-hover/selected-focus\
+      \ screenshots | No layout shift; selected state persists | `07`-`11` screenshots,\
+      \ log lines 56-102 | PROVEN |\n| Dirty content Inspector | Opened dirty RSS\
+      \ item containing JSON-LD/script | Raw payload demoted/collapsed/labeled, not\
+      \ primary | `09-feed-row-selected-inspector.png`, log lines 103-128 | FAIL |\n\
+      | Negative UX bans | Visible runtime text scanned for banned concepts | No unread/folder/tag/settings/SaaS/AI-magic\
+      \ copy | log line 121 | PROVEN |\n\n## Issues found\n| Severity | Description\
+      \ | Reproduction | Artifact | Suggested owner |\n| --- | --- | --- | --- | ---\
+      \ |\n| BLOCKER | Inspector primary reading area displays dirty raw JSON-LD payload\
+      \ inline in the article body: `{ \"@context\":\"https://schema.org\", \"@type\"\
+      :\"NewsArticle\", ... }`. Contract requires raw JSON/JSON-LD only in labelled\
+      \ collapsed/secondary provenance or diagnostic regions, not primary reading\
+      \ text. | Launch app; accept owner token; import `.audit-artifacts/blind-runtime-browser-ux/blind-dirty.opml`;\
+      \ click source fetch; click TODAY; open `Readable dirty-content article` in\
+      \ Inspector. | `.audit-artifacts/blind-runtime-browser-ux/09-feed-row-selected-inspector.png`;\
+      \ `.audit-artifacts/blind-runtime-browser-ux/manual-browser-interaction-log.json`\
+      \ lines 103-128 | UI/content rendering owner |\n\n## Behavioral Proof Register\n\
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |\
+      \ status | closure_path | gate_decision_basis |\n| --- | --- | --- | --- | ---\
+      \ | --- | --- |\n| UI_REGRESSION_CONTRACT real hit-target contract | Nav, Steer,\
+      \ star, Inspector, OPML, source fetch controls are real hit targets | Browser\
+      \ pointer/keyboard activation with screenshots/logs | `03`-`15` screenshots;\
+      \ manual log | PROVEN | Keep artifacts | Actions produced visible state transitions\
+      \ |\n| UI_REGRESSION_CONTRACT keyboard contract | Keyboard can reach/activate\
+      \ primary surfaces | Tab + Enter/Space behavior | `15-keyboard-source-ledger.png`;\
+      \ log lines 115-119 | PROVEN | Keep artifacts | Keyboard activated SOURCE LEDGER\
+      \ |\n| UI_REGRESSION_CONTRACT feed row state matrix | Feed rows maintain readable\
+      \ states without layout shift | Hover/focus/selected screenshots and bounding\
+      \ boxes | `07`-`11` screenshots; log lines 56-102 | PROVEN | Keep artifacts\
+      \ | Row bounds stable |\n| UI_REGRESSION_CONTRACT inspector raw payload placement\
+      \ | Dirty raw JSON-LD is not primary readable text | Dirty corpus item opened\
+      \ in Inspector | `09-feed-row-selected-inspector.png`; log lines 103-128 | UNPROVEN\
+      \ | Fix required, rerun dirty-content Inspector audit | Blocking raw payload\
+      \ regression observed |\n| UI_REGRESSION_CONTRACT negative UX assertions | No\
+      \ forbidden unread/folder/tag/settings/SaaS/AI-magic copy visible | Runtime\
+      \ visible-text scan | manual log line 121 | PROVEN | Keep artifacts | No banned\
+      \ copy found |\n| DESIGN/USAGE Source Ledger OPML | OPML import flattens folders\
+      \ and exposes flat source rows | Import OPML through visible UI | `04-opml-import-result.png`\
+      \ | PROVEN | Keep artifacts | `imported 1 sources; folders flattened` visible\
+      \ |\n| DESIGN/USAGE `/doctor` | `/doctor` is plain raw operational diagnostics,\
+      \ not dashboard | Steer `/doctor` command | `14-doctor.png` | PROVEN | Keep\
+      \ artifacts | Raw diagnostic lines visible |\n\n## Batched remediation ownership\
+      \ created before completion\nPlanner created remediation ownership via MCP:\n\
+      - `fix-blind-dirty-jsonld-inspector` — batched implementation fix for blocker\
+      \ B1, depends on `blind-runtime-browser-ux-verification` and `playwright-repair-verification`.\n\
+      - `retest-blind-dirty-jsonld-inspector` — independent retest, depends on the\
+      \ fix step.\n- Downstream `visual-ux-audit` and `gate` now depend on remediation/retest\
+      \ so the blocker cannot be bypassed.\n\n## Mainline merge / verification\n-\
+      \ Blind audit artifacts were squash-merged into main as `0d8a834 [vectl] salvage\
+      \ blind-runtime-browser-ux-verification evidence`.\n- Artifact-only merge verification:\n\
+      ```sh\ngit diff --name-only HEAD^ HEAD\nnpm --prefix web run check\n```\nOutput\
+      \ confirmed only `.audit-artifacts/blind-runtime-browser-ux/*` files changed,\
+      \ and `svelte-check found 0 errors and 0 warnings`.\n\n## Closure Fields\nverdict:\
+      \ FAIL\nblockers:\n  - B1: Inspector primary reading area exposes raw JSON-LD\
+      \ as primary text. Repro/artifacts above.\ngate_open_allowed: false\norchestrator_action_hint:\
+      \ DO_NOT_COMPLETE_FOR_GATE; remediation steps created and this verification\
+      \ step is complete as a blocker-finding artifact.\n\nstep_intent: verification\n\
+      expected_result: green/pass or issue report with blockers surfaced\nobserved_result:\
+      \ documented Playwright harness passed after installing missing deps; independent\
+      \ runtime browser audit failed on dirty-content Inspector raw payload placement.\n\
+      failure_alignment: intended product blocker finding, now assigned to remediation\
+      \ steps.\nproduct_implementation_files_modified: false\ncommit_hashes:\n- worktree:\
+      \ `4c1f21a Add blind runtime browser UX audit evidence`\n- main: `0d8a834 [vectl]\
+      \ salvage blind-runtime-browser-ux-verification evidence`\n- planner remediation:\
+      \ `fix-blind-dirty-jsonld-inspector`, `retest-blind-dirty-jsonld-inspector`"
   - id: fix-blind-dirty-jsonld-inspector
     name: Fix blind dirty JSON-LD Inspector blocker
     status: pending
