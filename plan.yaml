@@ -32038,7 +32038,7 @@ phases:
       \ flat Go files and uses the existing single-binary CLI path."
   - id: cli-liveness-probe
     name: Black-box CLI liveness probe for reset command
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -32150,6 +32150,8 @@ phases:
     depends_on:
     - complete-cli-reset
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-10T17:42:35.783653+00:00'
   - id: integration-verification
     name: Independent integration verification for reset and serve replacement paths
     status: pending
