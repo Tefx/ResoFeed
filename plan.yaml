@@ -22137,7 +22137,7 @@ phases:
   steps:
   - id: playwright-comprehensive-e2e.harness-contract-lock
     name: Harness Contract Lock
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - Playwright launch contract\n  - real-server command contract\n  - secret/live-smoke\
       \ boundary contract\n\nLock the comprehensive Playwright E2E harness contract\
@@ -22206,6 +22206,83 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T09:44:24.758046+00:00'
+    done_at: '2026-05-10T09:49:09.486259+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — one deployable Go process serves static UI/API/MCP/background
+      ingest; one SQLite DB; OpenRouter secrets are runtime-only via OPENROUTER_KEY/.env
+      and never committed/logged.
+
+      - docs/DESIGN.md — owner-token prompt before API calls; dense-but-legible RESOFEED/TODAY/SOURCE
+      LEDGER/INSPECTOR chrome; no SaaS copy, folders, tags, unread counts, archive
+      flows, settings sliders, or decorative AI styling.
+
+      - docs/ui-preview.html — preview includes Steer, RESOFEED, Today feed, Inspector,
+      Source Ledger [RUN INGEST]/[FETCH], /doctor, mobile feed/Inspector, 44px controls,
+      and focusable buttons.
+
+      - docs/PRD.md — first useful session requires source import/add, Today surface,
+      Inspect, Resonate, optional Steer; explicit non-goals include accounts, folders,
+      unread mechanics, archive, vector/RAG-style search.
+
+      - AGENTS.md — NOT READ: not present in isolated worktree.
+
+      - .agents/instructions.md — canonical docs are law; one binary, one SQLite DB,
+      OpenRouter runtime-only secrets, no sync/merge, no accounts/vector DBs.
+
+      - web/package.json — scripts include dev/build/preview/check/lint/test/test:render;
+      no test:e2e script exists; Playwright dependency is declared.
+
+      - Playwright config/tests — no playwright.config.* or *.spec.ts found; existing
+      audit artifact showed prior UI Playwright report evidence for owner-token prompt/auth
+      shell.
+
+
+      ## Harness Contract Evidence
+
+      - Test matrix locked: real server/UI boot, first-use owner token, source/feed
+      operations, manual global ingest, per-source fetch, today/feed, inspect/retrieve/search,
+      LLM failure/mock, LLM live-smoke, API/MCP parity probes, visual/UX invariants.
+
+      - Real server command locked: `mkdir -p ./.test-artifacts/bin && go build -o
+      ./.test-artifacts/bin/resofeed ./cmd/resofeed`; launch built binary with temp
+      DB and owner token under sanitized env.
+
+      - Browser command locked: fallback `npm --prefix web exec playwright test --
+      --config web/playwright.config.ts`; preferred future script `npm --prefix web
+      run test:e2e`.
+
+      - CI-safe vs live-only LLM boundary: CI-safe runs sanitize environment and clear
+      OPENROUTER_KEY; live smoke is opt-in via `--grep @live-openrouter`, reads runtime
+      OPENROUTER_KEY/.env only, skips deterministically when absent, and records redacted
+      evidence only.
+
+      - Required artifact list: Playwright report, JSON/JUnit results, traces, screenshots,
+      video where applicable, server stdout/stderr, SQLite DB fixture path, sanitized
+      environment notes, redacted launch command, browser console/network summaries.
+
+      - Forbidden scope check: accounts/sync/vector DB/queues/new product concepts
+      not introduced.
+
+      - Files changed: `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`; `web/src/lib/playwright-e2e-harness-contract.ts`;
+      `web/src/lib/playwright-e2e-harness-contract.test.ts`.
+
+      - Worker commit: `b5a5f45fc0cf56d18ebc7886c74240f533689b38`.
+
+      - Squash merge commit on main: `ce2f6c5 [vectl] step-playwright-comprehensive-e2e.harness-contract-lock
+      completed`.
+
+      - Worker verification: go build exit 0; `npm --prefix web run check` exit 0;
+      targeted Vitest exit 0.
+
+      - Mainline final-state verification after merge: `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-e2e-contract
+      ./cmd/resofeed && npm --prefix web run check && npm --prefix web exec vitest
+      run -- src/lib/playwright-e2e-harness-contract.test.ts` exit 0; output included
+      `svelte-check found 0 errors and 0 warnings`, `Test Files 2 passed (2); Tests
+      8 passed (8)`.
+
+      - Gaps/Notes: no product behavior or Playwright runtime config implemented in
+      this contract step.'
   - id: playwright-comprehensive-e2e.harness-fixtures-env
     name: Playwright Harness, Fixtures, and Environment Setup
     status: pending
