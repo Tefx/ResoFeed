@@ -60,7 +60,7 @@
 </script>
 
 <section class="contract-region contract-search" aria-labelledby="search-heading">
-  <h2 id="search-heading">Search and Retrieval</h2>
+  <h2 id="search-heading">SEARCH</h2>
   <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <label for="search-query">Plain text query</label>
     <input id="search-query" bind:value={searchQuery} aria-describedby="search-status search-contract-note" />

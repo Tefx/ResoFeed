@@ -59,7 +59,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(tokenInput).toHaveFocus();
 
     await user.type(tokenInput, 'rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG');
-    await user.click(screen.getByRole('button', { name: 'submit' }));
+    await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
 
     expect(window.localStorage.getItem('resofeed.ownerToken')).toBeNull();
     expect(onAccepted).toHaveBeenCalledWith('rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG');
@@ -74,7 +74,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     render(Page);
     await user.type(screen.getByLabelText('Owner token'), 'rfeed_rejected0123456789abcdefghijklmnopqrstuvwxyz');
-    await user.click(screen.getByRole('button', { name: 'submit' }));
+    await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('err: owner token rejected'));
     expect(window.localStorage.getItem('resofeed.ownerToken')).toBeNull();
@@ -90,7 +90,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     render(Page);
     await user.type(screen.getByLabelText('Owner token'), 'rfeed_accepted0123456789abcdefghijklmnopqrstuvwxyz');
-    await user.click(screen.getByRole('button', { name: 'submit' }));
+    await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
 
     await waitFor(() => expect(screen.getByLabelText('Steer or paste RSS URL')).toBeVisible());
     expect(window.localStorage.getItem('resofeed.ownerToken')).toBe('rfeed_accepted0123456789abcdefghijklmnopqrstuvwxyz');
@@ -390,7 +390,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
   it('renders search/retrieval and exposes missing filters plus provenance-rich result anatomy', () => {
     render(SearchRetrieval, { props: { items: [expectedRedItem], query: 'sqlite', onSearch: async () => ({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } }) } });
 
-    const search = screen.getByRole('region', { name: 'Search and Retrieval' });
+    const search = screen.getByRole('region', { name: 'SEARCH' });
     expect(within(search).getByLabelText('Plain text query')).toHaveValue('sqlite');
     expect(within(search).getByLabelText('Source filter')).toBeVisible();
     expect(within(search).getByLabelText('From date')).toBeVisible();
@@ -415,7 +415,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       }
     });
 
-    const search = screen.getByRole('region', { name: 'Search and Retrieval' });
+    const search = screen.getByRole('region', { name: 'SEARCH' });
     const result = within(search).getByRole('listitem');
     expect(result).toHaveClass('contract-feed-item');
     expect(within(result).getByText('Source-backed feed excerpt for list/search fallback.')).toBeVisible();

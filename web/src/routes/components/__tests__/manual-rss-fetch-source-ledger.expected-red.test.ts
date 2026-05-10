@@ -136,10 +136,11 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(row).toBeInstanceOf(HTMLLIElement);
     expect(row).toHaveTextContent('simonwillison.net/feed.xml · ok · last_fetch: 10:25:31https://simonwillison.net/atom/everything[FETCH][DELETE]');
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
-    expect(row?.children).toHaveLength(4);
+    expect(row?.children).toHaveLength(3);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');
     expect(row?.children[1]).toHaveClass('source-ledger-url');
-    expect(row?.children[2]).toHaveClass('manual-fetch-action');
-    expect(row?.children[3]).toHaveClass('source-ledger-delete');
+    expect(row?.children[2]).toHaveClass('source-ledger__actions');
+    expect(row?.children[2]?.children[0]).toHaveClass('manual-fetch-action');
+    expect(row?.children[2]?.children[1]).toHaveClass('source-ledger-delete');
   });
 });

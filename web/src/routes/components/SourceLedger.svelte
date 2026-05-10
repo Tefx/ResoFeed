@@ -107,8 +107,8 @@
 </script>
 
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-heading">
-  <div class="source-ledger-head">
-    <h2 id="source-ledger-heading">SOURCE LEDGER</h2>
+  <div class="source-ledger-head source-ledger__header">
+    <h2 id="source-ledger-heading" class="source-ledger__title">SOURCE LEDGER</h2>
     <button
       type="button"
       class="manual-fetch-action"
@@ -123,21 +123,21 @@
   {#if sources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
   {:else}
-    <ul class="contract-list">
+    <ul class="contract-list source-ledger__list">
       {#each sources as source (source.id)}
         {@const fetching = fetchingSourceIds.has(source.id)}
         {@const sourceError = truncateTerse(manualFetchState.sourceErrors?.[source.id])}
         {@const lastFetch = formatTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
-        <li class="source-ledger-row source-row" data-testid="source-row">
-          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><div class="source-ledger-url" title={source.url}>{source.url}</div><button
+        <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
+          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><div class="source-ledger-url source-ledger__url" title={source.url}>{source.url}</div><span class="source-ledger__actions"><button
             type="button"
             class="manual-fetch-action"
             aria-label={fetching ? `Fetching ${sourceLabel}` : `Fetch ${sourceLabel}`}
             disabled={fetching}
             onclick={() => void fetchSource(source)}
-          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
+          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button></span>
           {#if confirmingSourceId === source.id}
             <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
           {/if}

@@ -1,0 +1,44 @@
+<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="7.3417650000000005">
+<testsuite name="full-ui-design-conformance.expected-red.spec.ts" timestamp="2026-05-10T20:21:50.919Z" hostname="chromium-ci-safe" tests="2" failures="0" skipped="0" time="1.743" errors="0">
+<testcase name="expected-red UI/design conformance matrix covers findings F1-F47 on the real app" classname="full-ui-design-conformance.expected-red.spec.ts" time="1.741">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-owner-token-empty-focused-1280x900-png-d5dca56a2593f8e1fb56cc890d39715257293445.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-owner-token-rejected-1280x900-png-e82df0917d601e40ff9e5bab8bc846b2ef0b8936.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-authenticated-today-split-pane-1280x900-png-3e04c466a4aa23d58b910c08783aad011f566c64.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-authenticated-feed-inspector-with-items-1280x900-png-6164c46b0fd2245682a67f697fc46ae42b944ea2.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-source-ledger-with-actions-1280x900-png-74edea214fbc8c807616bd703fa7dca0d45c00ae.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/narrow-source-ledger-390x844-png-3c1df868a52b2d322bccefb60797e5bf5912241a.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-doctor-output-1280x900-png-8f77812479d0d660569fe4f5a5235404b6b6cd95.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/narrow-doctor-output-390x844-png-4d53e3515888685128847c005392bef6e09a1d0a.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/narrow-search-form-and-results-390x844-png-d02d98a3a2d2da0ceba8e8767e9b3d172f54b965.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/desktop-search-results-1280x900-png-9af18eb191dada3d3633ff658da1c08ea4d852c2.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/narrow-authenticated-feed-390x844-png-8f220e96c36be49e6857e45cd11ef0b778cbe25e.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/attachments/narrow-inspector-route-390x844-png-9a0dbe49ce90acfa44e3ecf425e16bea2ba1f283.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="expected-red docs/ui-preview.html drift contract covers findings F48-F52" classname="full-ui-design-conformance.expected-red.spec.ts" time="0.002">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

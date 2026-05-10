@@ -198,7 +198,7 @@ a:focus,
 .bracket-action {
   appearance: none;
   min-height: 44px;
-  border-color: var(--rf-color-border);
+  border: 0;
   padding: 0 10px;
   color: var(--rf-color-text);
   background: transparent;
@@ -220,7 +220,7 @@ a:focus,
 
 .manual-fetch-action:disabled,
 .bracket-action:disabled {
-  border-color: var(--rf-color-border);
+  border: 0;
   color: var(--rf-color-muted);
   background: transparent;
   cursor: default;
@@ -231,7 +231,7 @@ a:focus,
   width: auto;
   height: 44px;
   min-height: 44px;
-  border-color: var(--rf-color-border);
+  border: 0;
   padding: 0 10px;
   color: var(--rf-color-danger);
   background: transparent;
@@ -254,7 +254,7 @@ a:focus,
 .source-ledger-confirm {
   grid-column: 1 / -1;
   min-height: 44px;
-  border-color: var(--rf-color-border);
+  border: 0;
   padding: 0 10px;
   color: var(--rf-color-danger);
   background: transparent;

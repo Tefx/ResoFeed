@@ -429,7 +429,7 @@
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
-      <SearchRetrieval items={items} query={steerCommand} onSearch={searchItems} />
+      <SearchRetrieval items={items} query={steerCommand} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">

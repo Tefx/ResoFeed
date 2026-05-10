@@ -1,0 +1,1002 @@
+{
+  "register_id": "fuidcr-batched-architecture-blocker-remediation-closure-register",
+  "source_matrix": "web/tests/contracts/ui-remediation-contract-matrix.json",
+  "generated_from": "full-ui-design-conformance.expected-red.spec.ts chromium-ci-safe pass",
+  "row_count": 52,
+  "ids_present": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52
+  ],
+  "schema_fields": [
+    "finding_id",
+    "matrix_title",
+    "severity",
+    "priority",
+    "status",
+    "evidence_paths",
+    "non_intersection_rationale",
+    "authority_basis",
+    "notes"
+  ],
+  "preview_canonicality": "canonical",
+  "p0_covered": 13,
+  "p1_covered": 19,
+  "findings": [
+    {
+      "finding_id": 1,
+      "matrix_title": "Extra masthead chrome above the actual workbench",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 2,
+      "matrix_title": "Persistent surface navigation is not part of the design model",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Resolved by implementation removal/proof: no nav.surface-nav/tablist/side nav selectors are rendered; TODAY, SOURCE LEDGER, /doctor, and INSPECTOR are command/routed operational surfaces, not a persistent peer-nav strip."
+    },
+    {
+      "finding_id": 3,
+      "matrix_title": "Mobile/narrow shell keeps too much desktop chrome",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 4,
+      "matrix_title": "Responsive breakpoint is too narrow",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 5,
+      "matrix_title": "Redundant RESOFEED brand text appears below mobile Steer",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 6,
+      "matrix_title": "Owner Token Prompt includes extra explanatory copy",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-owner-token-empty-focused-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-owner-token-rejected-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 7,
+      "matrix_title": "Submit control reads like a generic form button",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-owner-token-empty-focused-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 8,
+      "matrix_title": "Feed has an extra standalone TODAY heading",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 9,
+      "matrix_title": "Feed metadata omits item age/time",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 10,
+      "matrix_title": "Feed metadata is uppercased by styling",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 11,
+      "matrix_title": "Feed summaries show summary unavailable even when detail data has usable text",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "DTO-gap candidate reviewed; UI derives source-backed summary/excerpt/core-insight fallback from existing ItemSummary/ItemDetail fields without backend/API expansion."
+    },
+    {
+      "finding_id": 12,
+      "matrix_title": "Desktop feed summary does not clamp to two lines",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 13,
+      "matrix_title": "Title-summary spacing is too loose",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 14,
+      "matrix_title": "Row rhythm is not mathematically stable",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-authenticated-feed-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 15,
+      "matrix_title": "Time grouping only handles the first item",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 16,
+      "matrix_title": "Search results do not reuse feed item anatomy",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-search-results-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-search-form-and-results-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 17,
+      "matrix_title": "Inspector heading focus ring is visually too heavy",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 18,
+      "matrix_title": "Inspector exposes model status in the visible header",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 19,
+      "matrix_title": "Inspector reading payload contains raw site boilerplate and ads",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 20,
+      "matrix_title": "Inspector information hierarchy is overloaded",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 21,
+      "matrix_title": "original link is visibly present but navigation is suppressed",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 22,
+      "matrix_title": "Mobile Inspector star is not visible in the first viewport",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 23,
+      "matrix_title": "Raw provenance disclosure copy is too diagnostic-heavy",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 24,
+      "matrix_title": "Source Ledger does not follow the required DOM contract",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 25,
+      "matrix_title": "Manual ingest actions look like bordered buttons",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 26,
+      "matrix_title": "Delete action is x instead of [DELETE]",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 27,
+      "matrix_title": "Import/export actions are lowercase and not bracket actions",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 28,
+      "matrix_title": "Source Ledger shows a false imported status by default",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 29,
+      "matrix_title": "Source rows omit a stable URL column",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 30,
+      "matrix_title": "last fetch / last ingest labels are not canonical",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 31,
+      "matrix_title": "File input leaves a visible/occupied artifact",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 32,
+      "matrix_title": "Disabled/active manual controls use filled disabled backgrounds",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 33,
+      "matrix_title": "Source Ledger action block baseline is unstable",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 34,
+      "matrix_title": "State Portability is a settings-like separate section",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-source-ledger-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 35,
+      "matrix_title": "State Portability action labels are lowercase and filled",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 36,
+      "matrix_title": "Default State Portability explanatory copy is too verbose",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 37,
+      "matrix_title": "/doctor long lines overflow/crop on narrow viewport",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-doctor-output-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-doctor-output-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 38,
+      "matrix_title": "/doctor renders above feed instead of as a clean operational surface",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-doctor-output-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-doctor-output-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 39,
+      "matrix_title": "/doctor item IDs are visually overwhelming",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-doctor-output-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-doctor-output-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 40,
+      "matrix_title": "Search form breaks at narrow width",
+      "severity": "P0",
+      "priority": "P0",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-search-form-and-results-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 41,
+      "matrix_title": "Search title is document-like",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-search-results-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 42,
+      "matrix_title": "Search results lack Inspect/Resonate affordances",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-search-results-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-search-form-and-results-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 43,
+      "matrix_title": "Search result dates use raw RFC3339",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-search-results-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 44,
+      "matrix_title": "Search results also show summary unavailable",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-search-results-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-search-form-and-results-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "DTO-gap candidate reviewed; UI derives source-backed summary/excerpt/core-insight fallback from existing ItemSummary/ItemDetail fields without backend/API expansion."
+    },
+    {
+      "finding_id": 45,
+      "matrix_title": "Global button styling conflicts with component contracts",
+      "severity": "P1",
+      "priority": "P1",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-owner-token-empty-focused-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 46,
+      "matrix_title": "Global focus rule is too broad and too strong",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/narrow-inspector-route-390x844.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 47,
+      "matrix_title": "Accent/focus color appears more often than intended",
+      "severity": "P2",
+      "priority": "P2",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-feed-inspector-with-items-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-authenticated-today-split-pane-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/full-ui-design-conformance-baseline-states/desktop-source-ledger-with-actions-1280x900.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/test-finished-1.png",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-e0fab-ings-F1-F47-on-the-real-app-chromium-ci-safe/trace.zip"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Matrix-exact browser/DOM/static assertion passed in full-ui-design-conformance.expected-red.spec.ts; no ID remapping used."
+    },
+    {
+      "finding_id": 48,
+      "matrix_title": "Preview uses non-token hard-coded surface color",
+      "severity": "P3",
+      "priority": "P3",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "docs/ui-preview.html",
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip",
+        "web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Preview closure is static-contract evidence; docs/ui-preview.html remains canonical after remediation."
+    },
+    {
+      "finding_id": 49,
+      "matrix_title": "Preview mobile Inspector title size differs from design",
+      "severity": "P3",
+      "priority": "P3",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "docs/ui-preview.html",
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip",
+        "web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Preview closure is static-contract evidence; docs/ui-preview.html remains canonical after remediation."
+    },
+    {
+      "finding_id": 50,
+      "matrix_title": "Preview mobile headers include explanatory labels",
+      "severity": "P3",
+      "priority": "P3",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "docs/ui-preview.html",
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip",
+        "web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Preview closure is static-contract evidence; docs/ui-preview.html remains canonical after remediation."
+    },
+    {
+      "finding_id": 51,
+      "matrix_title": "Preview feed marker/padding model is slightly off-token",
+      "severity": "P3",
+      "priority": "P3",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "docs/ui-preview.html",
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip",
+        "web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Preview closure is static-contract evidence; docs/ui-preview.html remains canonical after remediation."
+    },
+    {
+      "finding_id": 52,
+      "matrix_title": "Preview Source Ledger heading level differs from required DOM example",
+      "severity": "P3",
+      "priority": "P3",
+      "status": "PROVEN",
+      "evidence_paths": [
+        "docs/ui-preview.html",
+        "web/test-results/ui-remediation/playwright-results/junit.xml",
+        "web/test-results/ui-remediation/playwright-results/results.json",
+        "web/test-results/ui-remediation/playwright-test-output/full-ui-design-conformance-5600f-act-covers-findings-F48-F52-chromium-ci-safe/trace.zip",
+        "web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts"
+      ],
+      "non_intersection_rationale": "",
+      "authority_basis": "matrix",
+      "notes": "Preview closure is static-contract evidence; docs/ui-preview.html remains canonical after remediation."
+    }
+  ]
+}
