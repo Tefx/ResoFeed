@@ -25092,7 +25092,7 @@ phases:
     agent: gate-reviewer
   - id: expected-red-hit-target-clickability-tests
     name: Expected-red real hit-target and clickability tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -25169,6 +25169,98 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T11:31:07.200601+00:00'
+    done_at: '2026-05-10T11:42:38.234269+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+      ## refs Read Confirmation
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — tests must use real pointer center/safe-offset
+      hit targets and capture obstruction diagnostics; required controls include TODAY,
+      SOURCE LEDGER, Steer submit, star/resonate, feed Inspect, Inspector links, `/doctor`,
+      OPML import, and source fetch.
+
+      - `docs/DESIGN.md` — source-backed operational chrome labels, Steer behavior,
+      Resonate 44px target/non-color semantics, Inspector/Source Ledger/OPML hierarchy,
+      no layout shift.
+
+      - `docs/ui-preview.html` — Source Ledger, fetch buttons, OPML/state actions,
+      and `/doctor` visual anchors.
+
+      - `web/src/routes/+page.svelte`, `Feed.svelte`, `Inspector.svelte` — implementation
+      selectors and state observables targeted.
+
+
+      ## Expected-Red Hit-Target Evidence
+
+      - Files changed: `web/tests/e2e/hit-target-clickability.spec.ts` only.
+
+      - Product UI/source/orchestrator files modified: NONE.
+
+      - Worktree commit: `bf2589b`; merged to main as squash commit `483f751`.
+
+      - Worktree command: `cd web && npm run test:e2e -- --grep "hit-target|clickability|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline verification command: `npm --prefix web run test:e2e -- --grep "hit-target|clickability|ui-navigation-hover-inspector-repair"`.
+
+      - Mainline result: exit code 1 accepted as expected red; 7 tests run, 4 passed,
+      3 expected-red failures including this step''s OPML hit-target failure plus
+      previously merged expected-red failures.
+
+
+      Control coverage:
+
+      - SOURCE LEDGER nav: real pointer click, top-element obstruction check, active
+      ledger panel, feed inactive.
+
+      - TODAY nav: real pointer click, `data-surface="feed"`, `.feed-pane.active-panel`,
+      Source Ledger inactive.
+
+      - Steer submit: `/doctor` command, real pointer click, diagnostics log.
+
+      - Star/resonate: 44x44 hit-target assertion, real pointer click, label/glyph
+      state.
+
+      - Feed row Inspect/open: real pointer click, Inspector focus, selected row `aria-current`,
+      stable bounds.
+
+      - Inspector links: visible original link, unobstructed, non-empty href, primary
+      content remains visible.
+
+      - `/doctor`: submitted through Steer and asserts raw diagnostics log.
+
+      - OPML import: EXPECTED RED; visible import label is only 20px high.
+
+      - Source fetch buttons: 44px min-height assertion, real pointer click, ledger
+      remains active, status visible.
+
+
+      Obstruction diagnostics captured for OPML expected-red:
+
+      - click point x=78.2109375 y=550
+
+      - bounding box x=32 y=540 width=92.421875 height=20
+
+      - top element: `<label class="text-action" for="opml-file">import OPML</label>`
+
+      - pointer-events: auto; position: static; z-index: auto; active surface: ledger;
+      active panel: SOURCE LEDGER surface.
+
+      - Failure: OPML import action must be a touch-safe hit target, expected min-height
+      >=44, received 20.
+
+
+      ## Closure Fields
+
+      verdict: EXPECTED_RED_PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      proof_gap_status: exposed_gaps — OPML import hit-target size gap is reproducible
+      with obstruction diagnostics; full clickability coverage installed.
+
+      orchestrator_action_hint: COMPLETE'
   - id: expected-red-keyboard-a11y-tests
     name: Expected-red keyboard and accessibility activation tests
     status: claimed
