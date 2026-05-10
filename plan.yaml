@@ -30055,6 +30055,9 @@ phases:
     verification: '- Retest step completed with green web check/build and targeted
       Playwright evidence.
 
+      - Residual UI/UX audit completed downstream of the generalized sanitation retest
+      with rendered Inspector evidence and PASS/BLOCK handoff.
+
       - If backend files were touched, Go test evidence is present and green; if not,
       backend untouched is explicitly evidenced.
 
@@ -30063,6 +30066,10 @@ phases:
 
       - Runtime/test evidence confirms screenshot-family forbidden strings and raw
       non-article garbage still cannot appear in Inspector primary body.
+
+      - UI/UX evidence confirms DESIGN.md Inspector primary-body legibility, metadata/provenance
+      separation, raw-source-garbage exclusion, and no product/design invention after
+      generalized sanitation.
 
       - Gate decision basis explicitly maps unresolved items, if any, to BLOCK or
       documented non-intersection; no implementation logic debt remains unowned.
@@ -30122,6 +30129,7 @@ phases:
     depends_on:
     - retest-generalized-inspector-primary-body-sanitation
     - uiux-audit-clean-inspector-primary-body
+    - inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     agent: gate-reviewer
   - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     name: residual-uiux-audit-generalized-inspector-primary-body
