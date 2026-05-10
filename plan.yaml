@@ -33762,7 +33762,7 @@ phases:
       above and docs/ui-preview drift; the foundation step''s finding set is closed.'
   - id: fuidcr-feed-search-anatomy
     name: Repair shared Feed and Search item anatomy
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -33999,6 +33999,8 @@ phases:
     - fuidcr-feed-search-dto-source-fields
     - fuidcr-feed-search-client-dto-contract
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T18:37:29.725269+00:00'
   - id: fuidcr-inspector-reading-contract
     name: Repair Inspector reading and diagnostic boundary
     status: done
