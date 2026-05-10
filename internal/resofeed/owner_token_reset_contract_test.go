@@ -3,6 +3,8 @@ package resofeed
 import (
 	"bytes"
 	"context"
+	"database/sql"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -79,25 +81,47 @@ func TestOwnerTokenResetHelpPinsForbiddenSurfacesAndReplacementSemantics(t *test
 	}
 }
 
-func TestOwnerTokenResetValidGrammarIsStubOnlyAndDoesNotMutateDatabase(t *testing.T) {
+func TestOwnerTokenResetValidGrammarDeletesOnlyOwnerTokenHash(t *testing.T) {
 	ctx := context.Background()
-	db := newContractDB(t, ctx)
+	dbPath := filepath.Join(t.TempDir(), "resofeed.sqlite3")
+	db, err := OpenDB(ctx, dbPath)
+	if err != nil {
+		t.Fatalf("OpenDB returned error: %v", err)
+	}
+	defer func() { _ = db.Close() }()
+	if err := RunMigrations(ctx, db); err != nil {
+		t.Fatalf("RunMigrations returned error: %v", err)
+	}
 	if _, err := db.ExecContext(ctx, `insert into runtime_metadata (key, value, updated_at) values ('owner_token_sha256', 'contract_hash', 1)`); err != nil {
 		t.Fatalf("seed owner token hash: %v", err)
 	}
+	if _, err := db.ExecContext(ctx, `insert into runtime_metadata (key, value, updated_at) values ('startup_mode', 'preserve-me', 1)`); err != nil {
+		t.Fatalf("seed startup mode: %v", err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatalf("close seeded db: %v", err)
+	}
 
 	var stdout, stderr bytes.Buffer
-	code := Main([]string{"owner-token", "reset", "--db", "resofeed.sqlite3", "--confirm-reset"}, &stdout, &stderr)
-	if code != 1 || !strings.Contains(stderr.String(), "owner_token_reset_not_implemented") {
-		t.Fatalf("valid reset grammar should be contract stub only: code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	code := Main([]string{"owner-token", "reset", "--db", dbPath, "--confirm-reset"}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("valid reset grammar code=%d, want 0; stdout=%q stderr=%q", code, stdout.String(), stderr.String())
 	}
 
-	var got string
-	if err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = 'owner_token_sha256'`).Scan(&got); err != nil {
-		t.Fatalf("read owner token hash after stub command: %v", err)
+	db, err = OpenDB(ctx, dbPath)
+	if err != nil {
+		t.Fatalf("reopen db after reset: %v", err)
 	}
-	if got != "contract_hash" {
-		t.Fatalf("owner token hash mutated by contract stub: got %q", got)
+	defer func() { _ = db.Close() }()
+	var got string
+	if err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = 'owner_token_sha256'`).Scan(&got); err != sql.ErrNoRows {
+		t.Fatalf("owner token hash after reset err=%v value=%q, want sql.ErrNoRows", err, got)
+	}
+	if err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = 'startup_mode'`).Scan(&got); err != nil {
+		t.Fatalf("read preserved startup mode: %v", err)
+	}
+	if got != "preserve-me" {
+		t.Fatalf("startup mode after reset = %q, want preserve-me", got)
 	}
 	assertOwnerTokenResetDoesNotExposeReplacementToken(t, stdout.String(), stderr.String())
 }

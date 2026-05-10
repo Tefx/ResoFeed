@@ -67,7 +67,7 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 		if !ok {
 			return exitCode
 		}
-		return runOwnerTokenResetContractStub(cfg, stderr)
+		return runOwnerTokenReset(cfg, stderr)
 	default:
 		_, _ = fmt.Fprintf(stderr, "err: unknown_command: %s\n", args[0])
 		return 2
@@ -80,16 +80,14 @@ func printRootHelp(w io.Writer) {
 Commands:
   serve    Start web UI, JSON HTTP API, MCP endpoint, SQLite, and background ingest.
   owner-token reset --db PATH --confirm-reset
-           Offline contract stub for deleting only the stored owner-token hash.
+           Offline command for deleting only the stored owner-token hash.
 
 Run "resofeed serve --help" or "resofeed owner-token reset --help" for flags.
 `)
 }
 
-// OwnerTokenResetConfig pins the offline CLI grammar for the downstream reset
-// implementation. The contract allows deleting only runtime_metadata key
-// owner_token_sha256 from the selected offline SQLite DB; this step intentionally
-// does not implement that deletion or any replacement-token behavior.
+// OwnerTokenResetConfig pins the offline CLI grammar for deleting only
+// runtime_metadata key owner_token_sha256 from the selected offline SQLite DB.
 type OwnerTokenResetConfig struct {
 	DBPath       string
 	ConfirmReset bool
@@ -108,7 +106,7 @@ func parseOwnerTokenResetFlags(args []string, stdout io.Writer, stderr io.Writer
 	fs.Usage = func() {
 		_, _ = io.WriteString(stdout, `Usage: resofeed owner-token reset --db PATH --confirm-reset
 
-Pins the documented offline owner-token reset contract. The eventual command
+Runs the documented offline owner-token reset command. It
 deletes only runtime_metadata.key='owner_token_sha256' while serve is stopped.
 
 It must not start serve, bind HTTP/MCP, run UI, generate, print, accept, or
@@ -142,10 +140,42 @@ Flags:
 	return cfg, 0, true
 }
 
-func runOwnerTokenResetContractStub(cfg OwnerTokenResetConfig, stderr io.Writer) int {
-	_ = cfg
-	_, _ = io.WriteString(stderr, "err: owner_token_reset_not_implemented: contract stub only; no database changes made\n")
-	return 1
+func runOwnerTokenReset(cfg OwnerTokenResetConfig, stderr io.Writer) int {
+	ctx := context.Background()
+	if err := resetOwnerTokenHash(ctx, cfg.DBPath); err != nil {
+		_, _ = io.WriteString(stderr, "err: invalid_db: cannot open sqlite database\n")
+		return 2
+	}
+	return 0
+}
+
+func resetOwnerTokenHash(ctx context.Context, dbPath string) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("reset owner token hash: %w", err)
+	}
+	if dbPath == "" {
+		return fmt.Errorf("reset owner token hash: db path required")
+	}
+	info, err := os.Stat(dbPath)
+	if err != nil {
+		return fmt.Errorf("stat sqlite database: %w", err)
+	}
+	if info.IsDir() {
+		return fmt.Errorf("stat sqlite database: path is directory")
+	}
+
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return fmt.Errorf("open sqlite database: %w", err)
+	}
+	defer func() { _ = db.Close() }()
+	if err := db.PingContext(ctx); err != nil {
+		return fmt.Errorf("ping sqlite database: %w", err)
+	}
+	if _, err := db.ExecContext(ctx, `delete from runtime_metadata where key = 'owner_token_sha256'`); err != nil {
+		return fmt.Errorf("delete owner token hash: %w", err)
+	}
+	return nil
 }
 
 func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeConfig, int, bool) {

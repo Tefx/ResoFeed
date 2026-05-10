@@ -290,7 +290,7 @@ func assertPathDoesNotExist(t *testing.T, path string) {
 	t.Helper()
 	if _, err := os.Stat(path); err == nil {
 		t.Fatalf("path %s exists, want absent", path)
-	} else if !os.IsNotExist(err) {
+	} else if !os.IsNotExist(err) && !strings.Contains(err.Error(), "not a directory") {
 		t.Fatalf("stat %s: %v", path, err)
 	}
 }
