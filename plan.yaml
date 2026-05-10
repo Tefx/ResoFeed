@@ -27961,3 +27961,131 @@ phases:
 
       - Manifest contains stale absolute paths, but direct worktree-local image files
       were read and used as visual evidence.'
+  - id: ui-navigation-hover-inspector-repair.fix-gate-keyboard-a11y-flake
+    name: fix-gate-keyboard-a11y-flake
+    status: pending
+    description: "step_type: implementation\npriority: HIGH\nagent_source: project\n\
+      known_blocker_id: B-GATE-001\n\nFix ALL gate blockers from the failed `ui-navigation-hover-inspector-repair.gate`\
+      \ review. This is a batched implementation fix step; currently the batch contains\
+      \ one blocker, and it must be treated as blocker-class until the comprehensive\
+      \ targeted suite is deterministically green.\n\n## Blockers to Fix (ALL of these,\
+      \ not just the first)\n\n### B-GATE-001 — Inspector original link keyboard focus\
+      \ is nondeterministic/order-dependent\n- Severity: BLOCKER\n- Evidence: Fresh\
+      \ comprehensive targeted Playwright run exited 1: `keyboard-a11y.expected-red.spec.ts:78`\
+      \ failed because `getByRole('link', { name: 'original link' })` was expected\
+      \ focused but received inactive; helper assertion at `web/tests/e2e/keyboard-a11y-helpers.ts:55`.\n\
+      - Why it matters: Gate criteria explicitly block if keyboard/focus activation\
+      \ is absent or verification is not deterministically green.\n- Single-test rerun:\
+      \ `npm --prefix web run test:e2e -- --project=chromium-ci-safe keyboard-a11y.expected-red.spec.ts:78`\
+      \ passed, but that does NOT clear blocker because the comprehensive targeted\
+      \ command failed and demonstrates nondeterminism/flakiness/order-dependence.\n\
+      - Failing artifacts reported by gate:\n  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/test-failed-1.png`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/video.webm`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/error-context.md`\n\
+      \  - `.test-artifacts/playwright/test-output/keyboard-a11y.expected-red-41b8a-and-Inspector-original-link-chromium-ci-safe/trace.zip`\n\
+      \n## Root Cause vs Symptom\n- Root cause to diagnose: why the Inspector original\
+      \ link focus assertion becomes order-dependent/flaky under the full targeted\
+      \ Playwright suite.\n- Symptom: after the comprehensive targeted suite sequence,\
+      \ the expected `original link` focus target is inactive/not focused at `keyboard-a11y.expected-red.spec.ts:78`\
+      \ / `web/tests/e2e/keyboard-a11y-helpers.ts:55`.\n- Required remediation: fix\
+      \ the root cause in UI focus behavior and/or test synchronization without weakening\
+      \ keyboard accessibility assertions.\n- Forbidden remediations: do NOT lower\
+      \ test thresholds, skip tests, mark the blocker non-blocking, or replace meaningful\
+      \ keyboard/focus assertions with weak existence checks.\n\n## Scope and preservation\
+      \ constraints\n- Preserve ResoFeed architecture/design constraints from `docs/ARCHITECTURE.md`\
+      \ and `docs/DESIGN.md`.\n- Preserve existing successful JSON-LD/mobile/provenance\
+      \ fixes from this phase.\n- Search sibling keyboard/focus paths around Inspector\
+      \ navigation and hover/selected feed state so the fix is not narrowly tailored\
+      \ to one test line.\n- Treat the comprehensive targeted command as the authority;\
+      \ single-test green is insufficient.\n\n## Completion Criteria (stub exclusion)\n\
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each\
+      \ deliverable MUST contain substantive logic or synchronization that processes\
+      \ real UI state and preserves accessible keyboard behavior. Private placeholder\
+      \ or test-skip style changes do not satisfy this requirement.\n\n## Gate Preview\
+      \ (what the gate WILL reject)\n1. The comprehensive targeted Playwright command\
+      \ still exits non-zero.\n2. Only the single failing test is rerun or cited as\
+      \ proof.\n3. Keyboard/focus assertions are weakened, skipped, or made non-blocking.\n\
+      4. Existing JSON-LD/mobile/provenance repairs regress.\n5. Evidence lacks root-cause\
+      \ explanation, sibling search notes, exact command output, and artifact paths."
+    verification: '- Root cause of B-GATE-001 is diagnosed with file/test references.
+
+      - Fix preserves keyboard accessibility assertions and does not skip, lower,
+      or mark tests non-blocking.
+
+      - Main path: Inspector original link can receive expected keyboard focus in
+      the full targeted suite context.
+
+      - Failure path: order-dependent/flaky state is addressed or synchronized so
+      the comprehensive targeted Playwright command is expected to be deterministic.
+
+      - Existing successful JSON-LD/mobile/provenance repairs are preserved.
+
+      - Evidence includes sibling search notes and the exact command/output used during
+      local validation, if run by the executor.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/keyboard-a11y.expected-red.spec.ts — key passage or "NOT READ:
+      <reason>"
+
+      - web/tests/e2e/keyboard-a11y-helpers.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fix Evidence
+
+
+      **Blocker addressed**: B-GATE-001
+
+
+      **Root cause vs symptom**:
+
+      - Root cause: <diagnosis>
+
+      - Symptom: <observed failing focus assertion>
+
+      - Why this fix is not surface-level: <explanation>
+
+
+      **Files changed**:
+
+      - <path> — <why>
+
+
+      **Sibling search performed**:
+
+      ```
+
+      <paste search commands/output or explain equivalent IDE/tool search>
+
+      ```
+
+
+      **Assertions preserved**:
+
+      - Keyboard/focus assertions were not weakened/skipped: YES/NO
+
+      - Existing JSON-LD/mobile/provenance fixes preserved: YES/NO
+
+
+      **Validation run by executor, if any**:
+
+      ```
+
+      <paste exact command/output>
+
+      ```
+
+
+      **Remaining risk**: <none or explicit risk for independent retest>'
+    depends_on:
+    - gate
+    agent: frontend-engineer
