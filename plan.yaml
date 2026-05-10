@@ -33115,7 +33115,7 @@ phases:
       orchestrator evidence plus direct artifact verification.'
 - id: full-ui-design-conformance-remediation
   name: Full UI Design Conformance Remediation
-  status: in_progress
+  status: done
   gate: All 52 audit findings from docs/audits/full-ui-design-conformance-audit-2026-05-11.md
     are closed or have explicit accepted non-blocking/non-intersection rationale;
     P0/P1 findings have browser or DOM/behavior evidence; Feed/Search share anatomy;
@@ -36008,7 +36008,7 @@ phases:
       blocked until the created remediation path closes the findings.'
   - id: fuidcr-final-design-conformance-gate
     name: Final gate for full UI design conformance remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -36193,6 +36193,213 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T20:31:36.687089+00:00'
+    done_at: '2026-05-10T20:34:45.965044+00:00'
+    evidence: '## Gate Review Report
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: full-ui-design-conformance-remediation
+
+      **Timestamp**: 2026-05-11T04:40:00Z
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read. No persistent left navigation; below 1080px Inspector
+      becomes route/full-screen; Source Ledger is flat with bracket export/import;
+      Search uses feed-item anatomy; forbidden SaaS/settings/folders/tags/unread concepts
+      are explicit.
+
+      - docs/ARCHITECTURE.md — Read. One Go binary, one SQLite DB, lexical retrieval
+      only, single owner token, no accounts/OAuth/vector/RAG/sync/activity-ledger
+      surfaces.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree; matrix plus closure register used as substitute
+      per instruction.
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — Read. Authoritative
+      matrix has contract_id `fuidcr-contract-matrix-lock`, findings 1-52, P0/P1 browser
+      evidence requirement, and architecture guardrails.
+
+      - docs/ui-remediation-closure-register.json — Read. Register declares row_count
+      52, ids_present 1-52, p0_covered 13, p1_covered 19, preview canonicality canonical.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read. Contains
+      exact F1-F52 expectations mapped to matrix titles; browser test covers F1-F47
+      real app and static preview test covers F48-F52.
+
+      - web/test-results/ui-remediation/playwright-results/results.json — Read. Playwright
+      stats: expected=2, unexpected=0, skipped=0, flaky=0; both conformance specs
+      passed.
+
+      - web/test-results/ui-remediation/playwright-test-output/ — Read. Artifact inventory
+      includes trace.zip, test-finished PNG, baseline screenshots for desktop/narrow
+      feed, Source Ledger, Search, /doctor, Inspector, owner-token desktop states,
+      plus F48-F52 trace.
+
+      - audits/fuidcr-architecture-blocker-retest.md — Read. Verdict PASS; B1-B5 proven/fixed,
+      exact matrix/register validation, F1-F52 semantic check, P0=13/P1=19 evidence
+      check, targeted Playwright retest 2 passed.
+
+
+      ### Gate Decision
+
+      step_intent: final_phase_gate
+
+      expected_result: green
+
+      observed_result: PASS
+
+      verdict: PASS
+
+      headline: PASS
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): none (read-only gate; worktree clean)
+
+
+      ### Execution Review
+
+      - fuidcr-contract-matrix-lock: PASS; matrix IDs exactly 1-52; P0=13, P1=19.
+      Original audit file absent, but matrix substitutes.
+
+      - fuidcr-expected-red-ui-tests: PASS; F1-F52 test titles match matrix titles;
+      no semantic remap.
+
+      - fuidcr-batched-architecture-blocker-remediation: PASS; closure register 52
+      rows, titles/severity/status/evidence validated against matrix.
+
+      - fuidcr-architecture-blocker-retest: PASS; retest artifact states PASS and
+      targeted Playwright 2 passed.
+
+      - Browser regression proof: PASS_WITH_NOTE; existing results plus local rerun
+      passed targeted e2e. Non-blocking note about narrow owner-token attachment names
+      because owner-token issues are P2 and P0/P1 obligations are proven.
+
+      - Post-remediation UIUX audit: PASS; underlying screenshots/results cross-checked.
+
+
+      ### Finding Closure / Matrix Integrity
+
+      - Matrix IDs: 1-52 exactly once.
+
+      - Closure register IDs: 1-52 exactly once.
+
+      - Matrix/register titles and severities match exactly.
+
+      - P0 covered: 13/13.
+
+      - P1 covered: 19/19.
+
+      - P0/P1 rows include browser result JSON, PNG, and trace evidence.
+
+      - F2 resolved by implementation proof; tests assert no `.surface-nav`, tablist,
+      side nav, or sidebar.
+
+      - F4 e2e asserts Inspector hidden below 1080px and mobile detail route screenshot
+      exists.
+
+      - F48-F52 static preview drift test passed and retest confirms preview canonicality.
+
+
+      ### Wiring Audit (W1-W8)
+
+      - W1 Matrix/register wiring: PASS.
+
+      - W2 F<n> semantic mapping: PASS.
+
+      - W3 Closure evidence paths: PASS for P0/P1; relative artifacts exist.
+
+      - W4 Browser liveness: PASS via local targeted Playwright rerun.
+
+      - W5 Static/render regression: PASS via check and render tests.
+
+      - W6 Source Ledger reachability/no persistent nav: PASS via e2e and forbidden-surface
+      scan.
+
+      - W7 Preview canonicality F48-F52: PASS.
+
+      - W8 Architecture forbidden concepts: PASS; production UI scan found 0 forbidden
+      surface matches.
+
+
+      ### Escape Hatch Audit
+
+      Scoped source/test/doc scan for `@invar:allow` / `invar:allow` over `cmd`, `internal`,
+      `web/src`, `web/tests`, `docs/DESIGN.md`, and `docs/ARCHITECTURE.md`: 0 matches.
+      No escape-hatch blocker.
+
+
+      ### Smoke / Liveness and Integration-Realness
+
+      Local verification:
+
+      - `npm --prefix web ci` exit 0 after verifying `web/node_modules` was absent.
+
+      - `npm --prefix web run check` exit 0: svelte-check 0 errors, 0 warnings.
+
+      - `npm --prefix web run test:render` exit 0: 6 files passed, 37 tests passed.
+
+      - `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe --reporter=list` exit 0: 2 passed.
+
+      Integration-realness: PASS. The e2e test builds the Svelte app, launches the
+      real browser flow, authenticates with owner token, imports OPML, runs ingest,
+      opens Source Ledger, /doctor, Search, and Inspector, and captures browser screenshots/traces.
+      This is not fixture-only evidence.
+
+
+      ### Behavioral Proof Register
+
+      - F1-F47 real app conformance: PROVEN by passing browser e2e.
+
+      - F48-F52 preview conformance: PROVEN by passing static drift test.
+
+      - Source Ledger reachability with no persistent nav: PROVEN.
+
+      - Feed/Search shared anatomy: PROVEN.
+
+      - Inspector boilerplate/debug/model diagnostics removal and original link behavior:
+      PROVEN.
+
+      - Responsive <1080px behavior: PROVEN.
+
+      - /doctor and Search narrow viewport behavior: PROVEN.
+
+      - No unresolved NEEDS_TEST / UNPROVEN / UNCERTAIN_BLOCKING / BLOCKED found in
+      closure register validation.
+
+
+      ### Architecture / Forbidden Concepts Check
+
+      PASS. Production UI forbidden-surface scan found 0 matches for persistent nav/tablist/sidebar
+      and forbidden product concepts. Architecture constraints remain aligned: no
+      new accounts/OAuth, vector/RAG, sync/merge, settings dashboard, folders/tags/unread,
+      or activity ledger surfaces.
+
+
+      ### Gaps/Notes
+
+      - Non-blocking note: required original audit markdown is absent; matrix and
+      closure register were used as substitute as instructed.
+
+      - Non-blocking note: committed results JSON attachment list lacks narrow owner-token
+      screenshots, but owner-token findings are P2 and final P0/P1 behavioral obligations
+      are fully proven.
+
+      - No tracked files remained modified after verification cleanup.'
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
     status: done
