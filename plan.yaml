@@ -24565,3 +24565,126 @@ phases:
     depends_on:
     - implementation-repair
     agent: integration-verifier
+  - id: visual-ux-audit
+    name: Native multimodal UI/UX audit for repaired states
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+
+      As an INDEPENDENT UI/UX AUDITOR, perform a native multimodal implementation
+      audit using rendered screenshots/traces from the repaired browser UI. This audit
+      is required for user-visible UI changes and is not replaceable by DOM assertions
+      alone.
+
+
+      Audit focus:
+
+      - SOURCE LEDGER: the visible navigation/control clearly opens the Source Ledger
+      surface without hidden/inert hitbox behavior.
+
+      - Selected+hover feed state: selected item remains distinguishable from hover/focus
+      with low-noise archival-index treatment; no large noisy color block or ambiguous
+      selected/hover stacking.
+
+      - Inspector hierarchy: primary area presents a readable hierarchy; raw JSON-LD/original
+      metadata/provenance payloads are demoted/collapsed/labeled outside the main
+      reading flow.
+
+      - Visual constraints: muted palette, rare accent only where appropriate, dense
+      but legible rhythm, functional labels, no SaaS/AI-magic copy, no forbidden concepts.
+
+
+      Require screenshots or equivalent visual/spatial artifacts for default desktop
+      split view and the affected interactive states. If responsive/mobile behavior
+      is materially affected, include the narrow Inspector/Source Ledger route evidence
+      too.'
+    verification: '- Audit rendered screenshots/traces for all three repaired states;
+      DOM-only evidence is insufficient.
+
+      - Produce parseable PASS / PASS_WITH_DEBT / FAIL handoff.
+
+      - Block if selected+hover remains visually ambiguous, SOURCE LEDGER remains
+      inert, or Inspector primary reading flow still dumps raw JSON-LD/metadata.
+
+      - Block if new UI copy/concepts violate ResoFeed design/product constraints.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Native Multimodal UI/UX Audit
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: SOURCE LEDGER navigation, selected+hover feed state, Inspector hierarchy
+
+
+      ### Artifacts reviewed
+
+      - SOURCE LEDGER opened state screenshot/trace: <path>
+
+      - Selected feed row normal state: <path>
+
+      - Selected feed row hovered/focused state: <path>
+
+      - Inspector default structured view: <path>
+
+      - Raw/provenance secondary/collapsed region, if present: <path>
+
+
+      ### Before/after notes
+
+      - SOURCE LEDGER clickability: <before -> after>
+
+      - Selected+hover clarity: <before -> after>
+
+      - Inspector hierarchy: <before -> after>
+
+
+      ### Design conformance checklist
+
+      - Muted/archival, low-fatigue direction preserved: PASS/FAIL + notes
+
+      - Functional labels only, no SaaS/AI-magic copy: PASS/FAIL + notes
+
+      - No forbidden folders/tags/unread/settings concepts: PASS/FAIL + notes
+
+      - No layout-shifting hover/focus/selected state: PASS/FAIL + notes
+
+      - Inspector raw/provenance payload demoted/clearly separated: PASS/FAIL + notes
+
+
+      ### Findings
+
+      | Severity | Finding | Screenshot/evidence | Closure needed |
+
+      | --- | --- | --- | --- |
+
+      | <blocker/should_fix/suggestion> | <finding> | <path> | <fix/retest or none>
+      |
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL
+
+
+      ### Blocker/closure fields
+
+      - blockers_found: <none/list>
+
+      - closure_path: <none or required follow-up>
+
+      - unresolved_ambiguity: <none/list>
+
+      '
+    depends_on:
+    - playwright-repair-verification
+    agent: uiux-auditor
