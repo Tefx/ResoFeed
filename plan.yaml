@@ -25273,3 +25273,74 @@ phases:
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
+  - id: blind-runtime-browser-ux-verification
+    name: Blind runtime browser UX verification
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+      agent_source: project
+
+
+      As an INDEPENDENT BLIND TESTER, validate the repaired UI through public browser
+      behavior and docs/design expectations, not implementation details. This is a
+      semi-blind runtime check for the class of user-visible issues that standard
+      Playwright assertions can miss.
+
+
+      Required real-runtime scenarios:
+
+      - Start/use the app as documented by the project test harness and interact with
+      the visible UI.
+
+      - Click `SOURCE LEDGER`, `TODAY`, Steer submit, star/resonate, Inspector links,
+      `/doctor`, OPML import, and source fetch buttons where reachable; record active
+      panel/action proof.
+
+      - Use keyboard-only navigation and activation for the same surfaces; record
+      focus visibility and Enter/Space behavior.
+
+      - Inspect feed rows across normal/hover/selected/selected+hover/focus/selected+focus
+      states.
+
+      - Open Inspector on dirty real-content examples and verify primary reading area
+      remains readable and raw payload/provenance is demoted/labeled/collapsed.
+
+      - Check negative UX bans from the contract: no raw `{ "@context"` primary text,
+      huge raw JSON blobs, unread/folder/tag/settings concepts, mascot/SaaS/AI-magic
+      copy, or nav clicks that leave the wrong panel active.
+
+
+      Finding issues is the goal. Report blockers with reproduction steps and artifact
+      paths.'
+    verification: '- Evidence includes exact command(s) or harness steps used to launch/test
+      the browser UI.
+
+      - Evidence includes runner output or manual browser interaction log, screenshots/traces,
+      and reproduction steps for any blocker.
+
+      - All required runtime scenarios are covered or explicitly marked non-applicable
+      with contract-backed reason.
+
+      - Behavioral proof register uses PROVEN / NEEDS_TEST / UNPROVEN statuses and
+      closure paths.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Blind Runtime Browser\
+      \ UX Evidence\n- Exact command(s) or harness steps:\n```sh\n<paste commands>\n\
+      ```\n- Runner/browser output:\n```text\n<paste output or interaction log>\n\
+      ```\n- Screenshots/traces: <paths>\n- Scenario coverage:\n  | Scenario | Public\
+      \ action | Expected result | Evidence ref | Status |\n  | --- | --- | --- |\
+      \ --- | --- |\n- Issues found:\n  | Severity | Description | Reproduction |\
+      \ Artifact | Suggested owner |\n  | --- | --- | --- | --- | --- |\n\n## Behavioral\
+      \ Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n\n## Closure Fields\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status: <PROVEN|NEEDS_TEST|UNPROVEN\
+      \ with notes>\norchestrator_action_hint: proceed_to_visual_ux_audit | create_fix_retest_loop"
+    depends_on:
+    - implementation-repair
+    agent: blind-tester
