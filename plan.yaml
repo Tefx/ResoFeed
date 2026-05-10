@@ -28874,7 +28874,7 @@ phases:
       No blocking semantic signals remain.'
 - id: inspector-readable-content-remediation
   name: Inspector Readable Content Remediation
-  status: pending
+  status: in_progress
   gate: 'Inspector primary body must render readable article copy only: no raw JavaScript,
     CSS, JSON-LD/provenance garbage, navigation boilerplate, or model diagnostics
     in the primary reading text. Controlled fallback copy such as `summary unavailable`
@@ -28884,7 +28884,7 @@ phases:
   steps:
   - id: expected-red-inspector-readable-body-regression
     name: Expected-red Inspector readable body regression test
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -29054,6 +29054,8 @@ phases:
 
       **Downstream implementation owner**: inspector-readable-content-remediation.clean-inspector-primary-body-implementation'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-10T14:04:51.976882+00:00'
   - id: clean-inspector-primary-body-implementation
     name: Clean Inspector primary body content path
     status: pending
