@@ -30198,7 +30198,7 @@ phases:
     agent: gate-reviewer
   - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
     name: residual-uiux-audit-generalized-inspector-primary-body
-    status: claimed
+    status: done
     description: 'Focused residual UI/UX audit downstream of `retest-remove-inspector-screenshot-family-guard-literals`.
 
 
@@ -30300,6 +30300,26 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T15:04:14.821234+00:00'
+    done_at: '2026-05-10T15:09:48.918667+00:00'
+    evidence: 'Residual UI/UX audit accepted from uiux-auditor. Audit artifact committed
+      on branch as `cc76294`, squash-merged to main as `c0ff118` at `docs/audits/inspector-readable-content-remediation-residual-uiux-audit.md`;
+      no product code changed. refs Read Confirmation present for docs/DESIGN.md and
+      docs/ARCHITECTURE.md, with key passages on dense/legible Inspector, provenance/title/original
+      link/status/summary/full text, and frontend boundary/no forbidden product concepts.
+      Rendered evidence reviewed: focused Playwright screenshots and result attachments
+      including `inspector-readable-regression-primary-body.txt` and `dirty-corpus-negative-assertions.txt`.
+      Audit findings PASS for Inspector primary-body legibility, metadata/provenance
+      separation, raw source garbage exclusion, screenshot-family forbidden strings
+      absent from rendered primary body, and product/design invention absent. Behavioral
+      proof register marks obligations PROVEN/no blockers. Closure fields: headline
+      PASS, verdict PASS, blockers [], gate_open_allowed true, proof_gap_status NONE,
+      blocking_status CLOSED, orchestrator_action_hint COMPLETE. Commands run: dependency
+      bootstrap, `npm --prefix web run check` passed, focused Playwright 3-spec suite
+      passed 7/7, artifacts cleaned. Mainline final-state verification after squash
+      merge: `npm --prefix web run check` passed with 0 errors/warnings. Gaps note
+      mobile/reduced-motion not re-audited; accepted as non-blocking because this
+      residual audit scope is Inspector primary-body sanitation after guard-literal
+      removal.'
   - id: remove-inspector-screenshot-family-guard-literals
     name: Remove Inspector screenshot-family guard literals
     status: done
