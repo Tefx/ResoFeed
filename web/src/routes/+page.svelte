@@ -309,13 +309,20 @@
   }
 
   onMount(() => {
-    const media = window.matchMedia('(max-width: 760px)');
+    const media = window.matchMedia('(max-width: 1079px)');
     const updateMedia = () => {
       isNarrow = media.matches;
       if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
     };
     updateMedia();
     media.addEventListener('change', updateMedia);
+
+    const preserveKeyboardFocusModality = (event: MouseEvent) => {
+      if (event.button !== 0) return;
+      const target = event.target instanceof Element ? event.target.closest('button') : null;
+      if (target instanceof HTMLButtonElement) event.preventDefault();
+    };
+    document.addEventListener('mousedown', preserveKeyboardFocusModality);
 
     const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {
@@ -324,7 +331,10 @@
       void loadShellData(storedToken);
     }
 
-    return () => media.removeEventListener('change', updateMedia);
+    return () => {
+      media.removeEventListener('change', updateMedia);
+      document.removeEventListener('mousedown', preserveKeyboardFocusModality);
+    };
   });
 </script>
 
