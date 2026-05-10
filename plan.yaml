@@ -19405,8 +19405,10 @@ phases:
       closure proof for the concurrent semantic failures from `manual-rss-fetch.integration-proof`
       and `manual-rss-fetch.spec-conformance`.
 
-      - Gate must treat `visual-parity-retest` as the authoritative follow-up UI/UX
-      closure proof that supersedes the semantic FAIL from `manual-rss-fetch.uiux-audit`.
+      - Gate must treat `manual-rss-fetch.row-parity-retest` as the focused authoritative
+      follow-up UI/UX closure proof for the remaining B2/R9 Source Ledger row-shape/copy
+      blocker from `visual-parity-retest`; this supersedes the failed broad `visual-parity-retest`
+      path for row parity closure.
 
 
       Review criteria:
@@ -19422,8 +19424,9 @@ phases:
       flat `ManualFetchResult` schema unless an authoritative deviation record proves
       otherwise.
 
-      4. Strict UI/UX audit: must have parseable PASS from `visual-parity-retest`
-      against docs/ui-preview.html after B1/B2/B3/R9 visual blockers are closed.
+      4. Strict focused UI/UX row audit: must have parseable PASS from `manual-rss-fetch.row-parity-retest`
+      against docs/ui-preview.html after B2/R9 row DOM/copy/layout blocker is closed,
+      with B1 and negative constraints still passing.
 
       5. Spec conformance: no unresolved DIVERGES/PARTIAL/NEEDS_TEST blocker-class
       findings for B1/B2/R9; any non-intersection disposition must explain why remaining
@@ -19438,11 +19441,11 @@ phases:
 
 
       Handler-only completion, mock-only proof, visual "close enough", unresolved
-      frontend/backend response-schema mismatch, or any remaining visual parity blocker
-      from the failed `manual-rss-fetch.uiux-audit` artifacts is insufficient.'
+      frontend/backend response-schema mismatch, any remaining B2/R9 Source Ledger
+      row parity blocker from `visual-parity-retest`, or any regression of already-passing
+      B1/negative/footer constraints is insufficient.'
     verification: '- All required phase steps completed successfully with complete
-      evidence, including the batched semantic remediation/retest and the batched
-      visual parity remediation/retest.
+      evidence, including semantic remediation/retest and the focused row-parity remediation/retest.
 
       - Runtime endpoint proof includes exact launch/test command and real HTTP path
       evidence for 200 source fetch, 200 global ingest, and 409 concurrent conflict.
@@ -19450,10 +19453,13 @@ phases:
       - Retest evidence proves frontend/backend schema compatibility using flat `ManualFetchResult`
       or documents an authoritative deviation record.
 
-      - `visual-parity-retest` evidence is parseable PASS and explicitly proves exact
-      visual compliance with post-remediation docs/ui-preview.html for bracket controls,
-      Source Ledger row density/shape, default footer/import presentation, R9 copy,
-      and required states.
+      - `manual-rss-fetch.row-parity-retest` evidence is parseable PASS and explicitly
+      proves exact B2/R9 Source Ledger row compliance with `docs/ui-preview.html`:
+      one primary source/status text string, 3-column source/status + [FETCH] + compact
+      `x` layout, and no nested flex action grouping that breaks parity.
+
+      - Regression checks prove B1 bracket controls/busy states, negative constraints,
+      and footer/import presentation remain passing.
 
       - Spec conformance shows no blocker-class drift for B1/B2/R9 or includes explicit
       non-intersection closure for R9 before OPEN.
@@ -19525,7 +19531,8 @@ phases:
     - remediate-verifier-blockers
     - verification-retest-after-remediation
     - visual-parity-remediation
-    - visual-parity-retest
+    - manual-rss-fetch.row-parity-remediation
+    - manual-rss-fetch.row-parity-retest
     agent: gate-reviewer
   - id: backend-contract
     name: Backend Contract Lock
