@@ -29801,3 +29801,94 @@ phases:
       errors/warnings. Note: mobile/narrow states were not rerun; accepted as non-blocking
       because this phase gate scope is the reported desktop/right Inspector primary-body
       contamination and targeted desktop Chromium Inspector coverage.'
+  - id: generalize-inspector-primary-body-sanitation
+    name: Generalize Inspector primary-body sanitation
+    status: pending
+    description: 'Residual remediation for PASS_WITH_DEBT from `inspector-readable-content-gate`.
+
+
+      Issue context:
+
+      - Gate warning: `web/src/routes/components/Inspector.svelte:112-114` contains
+      fixture-specific guards for screenshot-family strings.
+
+      - The debt is product implementation logic debt, not cosmetic/doc-only debt.
+
+      - Product code must not hard-code fixture strings as primary-body sanitation
+      criteria.
+
+
+      Scope:
+
+      - Generalize Inspector primary-body sanitation so it uses product-level rules/predicates
+      for script/CSS/JSON-LD/provenance/navigation/model-diagnostic garbage rather
+      than fixture-specific string guards.
+
+      - Preserve the original clean body behavior: screenshot-family forbidden strings
+      and other non-article garbage still cannot appear in the Inspector primary body.
+
+      - Preserve ResoFeed architecture and design constraints from `docs/ARCHITECTURE.md`
+      and `docs/DESIGN.md`: single-tenant workbench, dense/legible archival UI, no
+      SaaS/friendly onboarding drift, no folders/tags/unread/archive flows.
+
+      - Keep changes localized to the Inspector/front-end sanitation path unless evidence
+      proves a shared sanitizer must be adjusted.
+
+
+      Out of scope:
+
+      - Do not alter completed steps.
+
+      - Do not introduce new product concepts, backend storage changes, auth changes,
+      or unrelated UI redesign.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      deliverable MUST contain substantive generalized sanitation logic whose output
+      varies based on content structure/patterns, not a hard-coded list of current
+      test fixture strings.'
+    verification: '- Product code no longer contains fixture-specific guards for the
+      gate-reported screenshot-family strings in `web/src/routes/components/Inspector.svelte:112-114`
+      or successor sanitation code.
+
+      - Clean Inspector primary-body behavior is preserved: screenshot-family forbidden
+      strings and non-article garbage still cannot appear in primary body output.
+
+      - Any changed sanitizer logic is generalized and documented by targeted assertions
+      or comments that describe product-level categories, not fixture literals.
+
+      - Architecture/design constraints from `docs/ARCHITECTURE.md` and `docs/DESIGN.md`
+      remain respected.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Residual Remediation Closure
+
+      - issue_source: `inspector-readable-content-gate` PASS_WITH_DEBT warning
+
+      - affected_location: `web/src/routes/components/Inspector.svelte:112-114` or
+      successor sanitation code
+
+      - fixture_specific_guard_removed_or_generalized: YES/NO with file:line evidence
+
+      - generalized_rule_summary: <describe product-level sanitation rule>
+
+      - clean_body_behavior_preserved: YES/NO with evidence
+
+      - architecture_design_constraints_preserved: YES/NO with cited rationale
+
+      - remaining_debt: <none or explicit residual with non-intersection rationale>
+
+      '
+    depends_on:
+    - inspector-readable-content-gate
+    agent: frontend-engineer
