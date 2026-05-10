@@ -21344,3 +21344,185 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T08:41:06.836091+00:00'
+  - id: manual-rss-fetch.row-parity-remediation
+    name: Source Ledger Row Parity Remediation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+      work_type: defect_repair
+
+      verification_scope: local-check
+
+      prior_loop: visual-parity-remediation -> visual-parity-retest
+
+      remaining_blocker: B2/R9 Source Ledger row DOM/copy parity only
+
+      why_new_loop: The broad visual pass closed bracket controls, negative constraints,
+      and footer/import presentation, but left a narrower row-shape/copy mismatch.
+
+
+      Focused root-cause remediation for the second UI/UX remediation loop. Fix ONLY
+      the remaining B2/R9 Source Ledger row parity blocker reported by `visual-parity-retest`
+      artifacts salvaged in commit `499b986` under `.audit-artifacts/manual-rss-fetch/visual-parity-retest/`.
+
+
+      Required root-cause target:
+
+      - Align Source Ledger row DOM/copy with `docs/ui-preview.html`.
+
+      - Render one primary source string matching the reference row text; do NOT render
+      a duplicate title plus compact URL pair.
+
+      - Use a 3-column grid compatible with the reference: source/status text column,
+      manual fetch action column, compact delete `x` column.
+
+      - Remove nested flex action grouping if it prevents parity with the reference
+      3-column grid.
+
+
+      Preserve already-passing behavior and visual constraints:
+
+      - Preserve B1 bracket control styles and busy states.
+
+      - Preserve footer/import presentation that visually passed, except where the
+      row copy mismatch was grouped under R9.
+
+      - Preserve negative style constraints: no spinners, shadows, gradients, animations,
+      SaaS pill rounding, friendly copy, or layout shift.
+
+      - Do not broaden into another visual pass or redesign unrelated Source Ledger
+      areas.
+
+
+      ## Required Evidence
+
+      - `why_previous_fix_failed`: explain why the broad `visual-parity-remediation`
+      pass claimed row parity but the retest still observed duplicate title + compact
+      URL and a 2-column/nested-flex row.
+
+      - Before/after row evidence for the canonical simonwillison.net/feed.xml row.
+
+      - DOM/computed-style evidence proving the implementation now uses the 3-column
+      row shape and single source/status text matching `docs/ui-preview.html`.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires visible rendered Source Ledger output. Evidence MUST include
+      DOM snapshot or screenshot plus computed style proving the focused row parity
+      change.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      deliverable MUST contain substantive rendering/style changes that produce row
+      output matching the reference.
+
+
+      ## Gate Preview (what the retest/gate WILL reject)
+
+      1. Row text still includes both title and compact URL where the reference has
+      one primary source string.
+
+      2. Row layout remains `746.859px 135.141px` two-column or uses nested flex action
+      grouping that prevents reference parity.
+
+      3. Regression in already-passing B1 bracket controls, busy states, footer/import
+      presentation, or negative style constraints.'
+    verification: '- Main path: the canonical Source Ledger row matches `docs/ui-preview.html`
+      text and 3-column grid shape.
+
+      - Failure path: prove duplicate title + compact URL rendering is removed and
+      nested flex action grouping no longer controls the row shape.
+
+      - Regression guard: bracket controls/busy states, footer/import presentation,
+      and negative style constraints remain unchanged from the passing retest findings.
+
+      - Evidence includes `why_previous_fix_failed`, before/after DOM or screenshot
+      artifacts, and computed grid columns for the row.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - .audit-artifacts/manual-rss-fetch/visual-parity-retest/ — key passage/artifact
+      summary or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Focused Row Parity Remediation Evidence
+
+
+      **why_previous_fix_failed**: <required explanation>
+
+
+      **Scope confirmation**:
+
+      - B2/R9 row parity only: YES/NO
+
+      - Unrelated visual pass avoided: YES/NO
+
+
+      **Before/after row text**:
+
+      ```
+
+      Reference: <paste>
+
+      Before: <paste>
+
+      After: <paste>
+
+      ```
+
+
+      **Row layout proof**:
+
+      ```
+
+      Reference gridTemplateColumns: <paste>
+
+      Implementation gridTemplateColumns after fix: <paste>
+
+      ```
+
+
+      **DOM structure proof**:
+
+      - Single primary source/status text column: <evidence>
+
+      - Manual fetch action column: <evidence>
+
+      - Compact delete x column: <evidence>
+
+      - Nested flex action group removed or proven non-interfering: <evidence>
+
+
+      **Regression guards**:
+
+      - B1 bracket controls/busy states preserved: <evidence>
+
+      - Footer/import presentation preserved: <evidence>
+
+      - Negative constraints preserved: <evidence>
+
+
+      **Commands/artifacts**:
+
+      ```
+
+      <commands executed and artifact paths>
+
+      ```'
+    depends_on:
+    - visual-parity-remediation
+    agent: frontend-engineer
