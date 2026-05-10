@@ -32733,7 +32733,7 @@ phases:
       \ logic."
   - id: fuidcr-expected-red-ui-tests
     name: Add expected-red browser and DOM tests for all audit findings
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -32848,6 +32848,47 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T17:26:53.536440+00:00'
+    done_at: '2026-05-10T17:35:12.797310+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/full-ui-design-conformance-audit-2026-05-11.md\
+      \ — NOT READ: subagent reported file absent in isolated worktree; audit finding\
+      \ details were derived from dispatch finding map plus `docs/DESIGN.md` and `docs/ui-preview.html`.\n\
+      - docs/DESIGN.md — Read key passage: Owner Token Prompt requires `Enter owner\
+      \ token`; feed uses compact `src:` metadata, 12px/11px row rhythm, inline TODAY/YESTERDAY/EARLIER\
+      \ groups; Source Ledger/State Portability are flat/terse; `/doctor` is raw wrapping\
+      \ operational text; accent is scarce.\n- docs/ui-preview.html — Read key passage:\
+      \ preview currently contains feed/inspector/ledger/doctor/mobile examples, inline\
+      \ styles, title-case time groups, non-bracket import/state labels, and mobile\
+      \ inspector typography drift captured by F48-F52 tests.\n\n## Expected-Red Test\
+      \ Evidence\nstep_intent: test_define_red\nexpected_result: red\nobserved_result:\
+      \ red\nfailure_alignment: matches audit/design gaps; failures are assertion\
+      \ failures mapped to finding IDs, not infrastructure failure\nverdict: PASS\n\
+      blockers: []\nproduct_implementation_files_modified: false\n- Verification Run:\
+      \ `npm run test:e2e -- full-ui-design-conformance.expected-red.spec.ts --project=chromium-ci-safe`\
+      \ — exit 1 expected red\n- Test files added/updated: `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`\n\
+      - Production files changed: none\n- Findings covered: F1-F52 checklist enumerated\
+      \ in the expected-red registry in the spec\n- Expected failures / exposed gaps:\n\
+      \  - F7: owner-token submit action is generic `submit`, not bracket/text treatment.\n\
+      \  - F13-F14: feed row rhythm/time-group placement drift.\n  - F24, F26-F29,\
+      \ F31-F32, F35: Source Ledger/State Portability DOM/classes, bracket labels,\
+      \ timestamp labels, file input artifact, and standalone State Portability section\
+      \ gaps.\n  - F37: `/doctor` narrow wrapping contract fails.\n  - F44: narrow\
+      \ search lacks both Inspect and Resonate affordances.\n  - F45-F46: filled button\
+      \ leakage and focus outline issues.\n  - F4/F22: mobile feed/Inspector verification\
+      \ exposes compact/mobile header-star gaps.\n  - F48-F52: preview drift: inline\
+      \ styles, missing canonical labels, title-case groups, timestamp label drift,\
+      \ mobile inspector typography drift.\n- Screenshot states defined: desktop >=1080,\
+      \ narrow/mobile <1080, /doctor narrow, Search narrow, Inspector mobile\n- Downstream\
+      \ implementation owners: shell/chrome, owner-token, feed/search, inspector,\
+      \ source-ledger/state-portability, /doctor, styling/tokens, preview cleanup\n\
+      \n## Files changed\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n\
+      \n## Commit hash(es)\n- Worktree commit: 0faf71b\n- Mainline squash commit:\
+      \ d0dd776 [vectl] step-fuidcr-expected-red-ui-tests completed\n\n## Gaps/Notes\n\
+      - Required audit file was missing from the isolated worktree, so audit details\
+      \ were derived from the dispatch finding map plus design/preview refs.\n- `npm\
+      \ ci` was required in the subagent worktree because `web/node_modules` was missing;\
+      \ no dependency manifests changed.\n- Orchestrator mainline expected-red verification\
+      \ produced the same intended red failures and generated transient Playwright\
+      \ artifacts; only the test spec was committed."
   - id: fuidcr-api-dto-escalation-guard
     name: Confirm no backend API or storage changes are needed by default
     status: claimed
