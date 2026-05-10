@@ -32549,7 +32549,7 @@ phases:
       - none; no files changed, so no commit needed."
   - id: spec-architecture-drift-review
     name: Spec and architecture drift review for owner-token reset
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       verification_scope: phase-check
@@ -32685,6 +32685,8 @@ phases:
     - cli-liveness-probe
     - integration-verification
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-10T17:57:55.371403+00:00'
   - id: final-gate
     name: Final gate for owner-token offline reset
     status: pending
