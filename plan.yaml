@@ -30123,3 +30123,108 @@ phases:
     - retest-generalized-inspector-primary-body-sanitation
     - uiux-audit-clean-inspector-primary-body
     agent: gate-reviewer
+  - id: inspector-readable-content-remediation.residual-uiux-audit-generalized-inspector-primary-body
+    name: residual-uiux-audit-generalized-inspector-primary-body
+    status: pending
+    description: 'Focused residual UI/UX audit downstream of `retest-generalized-inspector-primary-body-sanitation`.
+
+
+      Context:
+
+      - The previous `uiux-audit-clean-inspector-primary-body` step happened before
+      the residual generalized sanitation implementation and is not downstream of
+      that new change.
+
+      - This audit exists specifically to validate the UI/UX impact of removing fixture-specific
+      guards from the Inspector primary-body sanitation path.
+
+
+      Audit focus:
+
+      - Verify generalized sanitation still preserves DESIGN.md Inspector primary-body
+      legibility: dense but readable article copy, not blank or over-sanitized output.
+
+      - Verify metadata/provenance remains separated from the primary reading body;
+      provenance/debug/model/source details must not be mixed into the primary article
+      copy.
+
+      - Verify no raw source garbage appears in the Inspector primary body, including
+      script, CSS, JSON-LD, navigation boilerplate, diagnostics, or screenshot-family
+      forbidden strings.
+
+      - Verify the residual fix does not invent new product/design concepts after
+      removing fixture-specific guards: no folders/tags/unread/archive flows, onboarding
+      wizard copy, SaaS-friendly language, or unrelated UI redesign.
+
+
+      This is a native multimodal UI/UX implementation audit. Evidence must include
+      rendered Inspector artifacts (screenshot, DOM capture, or equivalent visual/spatial
+      proof) from the post-retest implementation state, not only unit-test output
+      or code review.'
+    verification: '- Rendered Inspector evidence from the residual post-retest state
+      is reviewed by `uiux-auditor`.
+
+      - DESIGN.md Inspector primary-body legibility is preserved: readable article
+      copy remains visible and usable after generalized sanitation.
+
+      - Metadata/provenance/debug/source details remain outside the primary body and
+      do not pollute the reading text.
+
+      - Raw source garbage, screenshot-family forbidden strings, scripts, CSS, JSON-LD,
+      navigation boilerplate, and model diagnostics are absent from primary body rendering.
+
+      - No product/design invention or unrelated UI concept was introduced by the
+      residual sanitation change.
+
+      - Audit produces a parseable PASS/BLOCK handoff and lists any UI/UX blockers
+      for gate review.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Residual UI/UX Audit Report
+
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Inspector primary-body rendering after generalized sanitation residual
+      fix
+
+
+      ### Rendered Evidence
+
+      - Screenshot/DOM capture/visual artifact path(s): <paths or pasted capture summary>
+
+      - View/state exercised: <Inspector state and content fixture/source used>
+
+
+      ### Design Conformance
+
+      - Primary-body legibility: PASS | BLOCK — <notes>
+
+      - Metadata/provenance separation: PASS | BLOCK — <notes>
+
+      - Raw source garbage absent: PASS | BLOCK — <notes>
+
+      - No product/design invention: PASS | BLOCK — <notes>
+
+
+      ### Handoff
+
+      Headline: PASS | BLOCK
+
+      Blocking findings: <none or list with reproduction and affected requirement>
+
+      '
+    depends_on:
+    - retest-generalized-inspector-primary-body-sanitation
+    agent: uiux-auditor
