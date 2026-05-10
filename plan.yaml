@@ -22753,7 +22753,7 @@ phases:
       and 1 live-openrouter opt-in skipped.'
   - id: playwright-comprehensive-e2e.llm-deterministic-failure-flows
     name: LLM Deterministic, Missing-Key, and Invalid-Key E2E Flows
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -22867,6 +22867,108 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-10T10:00:56.292976+00:00'
+    done_at: '2026-05-10T10:14:15.780439+00:00'
+    evidence: 'status: SUCCESS
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - .agents/instructions.md — READ: ResoFeed is a single-tenant analyst workbench;
+      OpenRouter is a JSON-in/JSON-out transformer only; runtime LLM secrets are runtime-only,
+      OS `OPENROUTER_KEY` > `.env`, never persisted/logged/committed.
+
+      - docs/ARCHITECTURE.md — READ: OpenRouter is sole LLM backend but never owns
+      durable state/orchestration/DB writes; missing/empty key exits with `err: invalid_openrouter_key:
+      value required`; `/doctor` and diagnostics must never print keys.
+
+      - docs/PRD.md — READ: AI is utility infrastructure; failures degrade plainly
+      with strict fallback taxonomy and no elaborate UI; Steer is natural-language
+      correction with visible terse receipt.
+
+      - docs/DESIGN.md — READ: Steer receipts are terse inline feedback; raw errors
+      use feedback/error lines; `/doctor` is raw diagnostics; no friendly SaaS degradation.
+
+      - docs/DESIGN_VISION.md — READ: “AI as Raw Utility”; if AI fails, UI degrades
+      to raw/plain states without cute apology; core primitives are Inspect, Resonate,
+      Steer.
+
+      - docs/USAGE.md — READ: OpenRouter key must come from OS env or local `.env`;
+      `OPENROUTER_KEY` only; `.env` local-only; `/doctor` and live-smoke evidence
+      must redact keys.
+
+      - AGENTS.md — NOT READ: `AGENTS.md` was not present in the isolated worktree
+      path; equivalent project guidance was available in dispatch context and `.agents/instructions.md`.
+
+
+      ## LLM Deterministic/Failure E2E Evidence
+
+      Exact command executed in worktree: `npm --prefix web run test:e2e -- --grep
+      @llm-deterministic`
+
+      Actual output summary: 3 tests passed: missing/invalid OPENROUTER_KEY startup
+      before browser binding; browser-led steering with deterministic OpenRouter transport
+      and terse receipt; invalid OPENROUTER_KEY browser path graceful sanitized diagnostics.
+      Exit Code 0.
+
+      Additional validation in worktree: `npm --prefix web run check && go test ./...`;
+      svelte-check 0 errors/warnings; `ok resofeed/internal/resofeed 0.623s`; Exit
+      Code 0.
+
+      Secret handling: missing path env without key; invalid startup whitespace key;
+      browser invalid path non-secret sentinel through env only. Tests assert owner
+      token, fake OpenRouter key, invalid sentinel, and Authorization bearer absent
+      from relevant logs. Missing key exits code 2 with `invalid_openrouter_key: value
+      required` and no server binding. Invalid browser path shows terse sanitized
+      `err: internal: internal error` without leaking key.
+
+      Artifacts: trace/screenshot/video retained only on failure so none retained
+      for green; server logs generated under `.test-artifacts/playwright/server-logs/`;
+      DB fixtures under `.test-artifacts/playwright/fixtures/resofeed-e2e-*.sqlite3`;
+      sanitized env notes under `.test-artifacts/playwright/sanitized-environment.md`;
+      generated artifacts not committed.
+
+      Test semantic reporting: step_intent retest_green; expected_result green; observed_result
+      green; failure_alignment deterministic sanitized missing/invalid paths and browser-visible
+      real-server steering via deterministic OpenRouter stub; verdict PASS; blockers
+      []; product implementation files modified: yes — `internal/resofeed/openrouter.go`,
+      `internal/resofeed/db.go` add an E2E-only endpoint override gated by `RESOFEED_E2E`;
+      no new product concept or durable authority added.
+
+      Implementation evidence: commit `ffcf815d048bd6eb7e04f66e8f375ece15a35891`;
+      files changed `internal/resofeed/openrouter.go`, `internal/resofeed/db.go`,
+      `web/tests/e2e/e2e-contract.ts`, `web/tests/e2e/global-setup.ts`, `web/tests/e2e/global-teardown.ts`,
+      `web/tests/e2e/real-server-ui.spec.ts`; spec link: `playwright-comprehensive-e2e.llm-deterministic-failure-flows`,
+      architecture OpenRouter runtime secret contract; gaps: initial e2e run failed
+      with `playwright: command not found`; verified `web/node_modules` absent, ran
+      `npm --prefix web install`, then locked grep command passed; worktree clean
+      after commit.
+
+
+      ## Merge conflict resolution evidence
+
+      Initial squash merge conflicted in `web/tests/e2e/e2e-contract.ts`, `web/tests/e2e/global-setup.ts`,
+      and `web/tests/e2e/real-server-ui.spec.ts`. Conflict resolver preserved prior
+      core feed/source E2E behavior and integrated deterministic OpenRouter stub/runtime
+      wiring. Resolver checks passed: `git diff --check`, `npm --prefix web run check`,
+      `go test ./internal/resofeed`, `git ls-files -u`, unresolved-file scan, and
+      conflict-marker scan.
+
+      Merged to main as squash commit `2cb732a`.
+
+
+      ## Mainline final-state verification
+
+      Commands executed in main:
+
+      - `npm --prefix web run test:e2e -- --grep @llm-deterministic` — Exit Code 0;
+      3 passed.
+
+      - `npm --prefix web run check` — Exit Code 0; svelte-check 0 errors/warnings.
+
+      - `go test ./...` — Exit Code 0; `resofeed/cmd/resofeed` no test files, `resofeed/internal/resofeed`
+      ok.
+
+      - `RESOFEED_E2E_PRESERVE_DB=1 npm --prefix web run test:e2e` — Exit Code 0;
+      full E2E ran 7 tests with 6 passed and 1 live-openrouter opt-in skipped.'
   - id: playwright-comprehensive-e2e.llm-live-smoke-boundary
     name: LLM Live Smoke Boundary and Skip Semantics
     status: pending
