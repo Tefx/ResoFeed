@@ -11,12 +11,14 @@
     loading?: boolean;
     error?: string | null;
     focusHeading?: boolean;
+    focusRequestId?: number;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
   }
 
-  let { item, mode, loading = false, error = null, focusHeading = false, onResonanceToggle }: Props = $props();
+  let { item, mode, loading = false, error = null, focusHeading = false, focusRequestId = 0, onResonanceToggle }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
+  let handledFocusRequestId = $state(0);
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     return status === 'partial_extraction' ? 'partial' : status;
@@ -175,7 +177,8 @@
   }
 
   $effect(() => {
-    if (item && focusHeading) {
+    if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
+      handledFocusRequestId = focusRequestId;
       void tick().then(() => heading?.focus());
     }
   });

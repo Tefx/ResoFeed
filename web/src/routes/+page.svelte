@@ -41,6 +41,7 @@
   let selectedItemDetail = $state<ItemDetail | null>(null);
   let inspectorState = $state<ApiLoadState>('idle');
   let inspectorError = $state<string | null>(null);
+  let inspectorFocusRequestId = $state(0);
   let steerCommand = $state('');
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
   let agentSteeringRules = $state<SteerRule[]>([]);
@@ -147,9 +148,10 @@
   async function selectItem(item: ItemSummary): Promise<void> {
     selectedItemId = item.id;
     selectedItemDetail = null;
+    currentSurface = 'inspector';
+    inspectorFocusRequestId += 1;
     await apiClient().inspect(item.id);
     await loadItemDetail(item.id);
-    currentSurface = 'inspector';
   }
 
   function showSurface(surface: Surface): void {
@@ -391,7 +393,7 @@
           <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {/if}
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}
