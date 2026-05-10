@@ -25446,7 +25446,7 @@ phases:
       fresh manual browser interaction in this audit.'
   - id: gate
     name: Gate complete UI regression test plan and repair phase
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -25639,6 +25639,8 @@ phases:
     - remediate-visual-ux-debt-and-proof-gap
     - retest-visual-ux-debt-and-proof-gap
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-10T12:58:10.721566+00:00'
   - id: expected-red-hit-target-clickability-tests
     name: Expected-red real hit-target and clickability tests
     status: done
