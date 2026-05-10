@@ -604,13 +604,121 @@ func stableID(prefix string, value string) string {
 	return prefix + "_" + hex.EncodeToString(h.Sum(nil))
 }
 
+var articleTagRE = regexp.MustCompile(`(?is)<article\b[^>]*>([\s\S]*?)</article>`)
+var bodyTagRE = regexp.MustCompile(`(?is)<body\b[^>]*>([\s\S]*?)</body>`)
+var executableHTMLRE = regexp.MustCompile(`(?is)<(?:script|style|noscript|svg)\b[^>]*>[\s\S]*?</(?:script|style|noscript|svg)>`)
+var structuralBoilerplateHTMLRE = regexp.MustCompile(`(?is)<(?:nav|header|footer|aside|form)\b[^>]*>[\s\S]*?</(?:nav|header|footer|aside|form)>`)
 var htmlTagRE = regexp.MustCompile(`<[^>]+>`)
 var whitespaceRE = regexp.MustCompile(`\s+`)
+var diagnosticTokenRE = regexp.MustCompile(`(?i)\b(?:model_latency_error|summary_unavailable|partial_extraction|original_unavailable)\b`)
+var cssCustomPropertyRE = regexp.MustCompile(`(?i)(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?`)
 
 func textFromHTML(value string) string {
+	value = readableHTMLFragment(value)
+	value = removeEnclosureMetadata(value)
+	value = executableHTMLRE.ReplaceAllString(value, " ")
+	value = structuralBoilerplateHTMLRE.ReplaceAllString(value, " ")
 	value = htmlTagRE.ReplaceAllString(value, " ")
-	value = strings.NewReplacer("&amp;", "&", "&lt;", "<", "&gt;", ">", "&quot;", `"`, "&#39;", "'").Replace(value)
+	value = decodeHTMLEntities(value)
+	value = executableHTMLRE.ReplaceAllString(value, " ")
+	value = htmlTagRE.ReplaceAllString(value, " ")
+	value = removeJSONLDObjects(value)
+	value = cssCustomPropertyRE.ReplaceAllString(value, " ")
+	value = removePollutedSentences(value)
 	return strings.TrimSpace(whitespaceRE.ReplaceAllString(value, " "))
+}
+
+func removeEnclosureMetadata(value string) string {
+	return regexp.MustCompile(`(?is)\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+(?:\s+image=\S+)?`).ReplaceAllString(value, " ")
+}
+
+func removeJSONLDObjects(value string) string {
+	var clean strings.Builder
+	cursor := 0
+	for cursor < len(value) {
+		match := regexp.MustCompile(`(?is)\{\s*"@context"`).FindStringIndex(value[cursor:])
+		if match == nil {
+			clean.WriteString(value[cursor:])
+			break
+		}
+		start := cursor + match[0]
+		end := jsonObjectEnd(value, start)
+		if end < 0 {
+			clean.WriteString(value[cursor:])
+			break
+		}
+		clean.WriteString(value[cursor:start])
+		clean.WriteByte(' ')
+		cursor = end
+	}
+	return clean.String()
+}
+
+func jsonObjectEnd(value string, start int) int {
+	depth := 0
+	inString := false
+	escaped := false
+	for index := start; index < len(value); index++ {
+		char := value[index]
+		if escaped {
+			escaped = false
+			continue
+		}
+		if char == '\\' {
+			escaped = true
+			continue
+		}
+		if char == '"' {
+			inString = !inString
+			continue
+		}
+		if inString {
+			continue
+		}
+		if char == '{' {
+			depth++
+		}
+		if char == '}' {
+			depth--
+			if depth == 0 {
+				return index + 1
+			}
+		}
+	}
+	return -1
+}
+
+func readableHTMLFragment(value string) string {
+	if match := articleTagRE.FindStringSubmatch(value); len(match) == 2 {
+		return match[1]
+	}
+	if match := bodyTagRE.FindStringSubmatch(value); len(match) == 2 {
+		return match[1]
+	}
+	return value
+}
+
+func decodeHTMLEntities(value string) string {
+	return strings.NewReplacer("&amp;", "&", "&lt;", "<", "&gt;", ">", "&quot;", `"`, "&#39;", "'", "&#x27;", "'").Replace(value)
+}
+
+func removePollutedSentences(value string) string {
+	parts := regexp.MustCompile(`(?m)([^.!?]+[.!?]?)`).FindAllString(value, -1)
+	if len(parts) == 0 {
+		if diagnosticTokenRE.MatchString(value) {
+			return ""
+		}
+		return value
+	}
+	clean := make([]string, 0, len(parts))
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed == "" || diagnosticTokenRE.MatchString(trimmed) {
+			continue
+		}
+		clean = append(clean, trimmed)
+	}
+	return strings.Join(clean, " ")
 }
 
 func nullableString(value string) *string {

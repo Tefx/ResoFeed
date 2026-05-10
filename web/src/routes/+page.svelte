@@ -149,9 +149,9 @@
     selectedItemId = item.id;
     selectedItemDetail = null;
     currentSurface = 'inspector';
-    inspectorFocusRequestId += 1;
     await apiClient().inspect(item.id);
     await loadItemDetail(item.id);
+    inspectorFocusRequestId += 1;
   }
 
   function showSurface(surface: Surface): void {

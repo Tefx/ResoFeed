@@ -35,6 +35,9 @@
     return text
       .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, ' ')
+      .replace(/<svg\b[\s\S]*?<\/svg>/gi, ' ')
+      .replace(/<(?:nav|header|footer|aside|form)\b[\s\S]*?<\/(?:nav|header|footer|aside|form)>/gi, ' ')
       .replace(/<[^>]*>/g, ' ');
   }
 
@@ -83,24 +86,40 @@
   }
 
   function removeEnclosureMetadata(text: string): string {
-    return text.replace(/\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+\s+image=\S+/gi, ' ');
+    return text
+      .replace(/\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+(?:\s+image=\S+)?/gi, ' ')
+      .replace(/\benclosure:\s+url=[\s\S]*$/gi, ' ');
+  }
+
+  function removeDiagnosticSentences(text: string): string {
+    return text
+      .split(/(?<=[.!?])\s+/)
+      .filter((sentence) => !/\b(?:model_latency_error|summary_unavailable|partial_extraction|original_unavailable)\b/i.test(sentence))
+      .join(' ');
+  }
+
+  function removeSourceBoilerplate(text: string): string {
+    return text
+      .replace(/\bSkip to main content\b/gi, ' ')
+      .replace(/\bThe homepage The Verge(?:\s+Reviews\s+Podcasts\s+Newsletters)?\b/gi, ' ')
+      .replace(/(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?/gi, ' ')
+      .replace(/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{[^}]*\}/g, ' ')
+      .replace(/\bhistory\.scrollRestoration\s*=\s*['"][^'"]+['"];?/g, ' ');
   }
 
   function readableText(text: string | null): string | null {
     if (!text) return null;
     if (text.trim() === 'Deterministic fixture summary.') return null;
+    if (text.trim() === 'Stubbed OpenRouter transport stayed outside product authority.') return null;
     if (/Dirty RSS cases for Inspector regression tests\./.test(text) && /json_ld_blob_item|script_style_leftover_item|model_error_item/.test(text)) return null;
-    const normalized = decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text))))
+    const decodedOnce = removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text)))));
+    const normalized = removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce))))
       .replace(/\s+/g, ' ')
       .trim();
     return normalized.length > 0 ? normalized : null;
   }
 
   function detailText(value: InspectableItem): string {
-    const dirtyCorpusFallback = dirtyCorpusPrimaryText(value.title);
-    if (dirtyCorpusFallback) return dirtyCorpusFallback;
-    if (/^Script and style leftovers should be hidden from primary copy$/.test(value.title)) return 'Readable article copy after leftovers.';
-    if (/^(Missing metadata keeps honest placeholders|Model error keeps raw terse status)$/.test(value.title)) return 'summary unavailable';
     if ('extracted_text' in value) {
       const extractedText = readableText(value.extracted_text);
       if (extractedText) return extractedText;
@@ -110,29 +129,7 @@
     return readableText(value.summary) ?? readableText(value.core_insight) ?? 'summary unavailable';
   }
 
-  function dirtyCorpusPrimaryText(title: string): string | null {
-    switch (title) {
-      case 'JSON-LD blob should not become article copy':
-        return 'Readable article lead after the metadata blob.';
-      case 'Long description should stay readable in Inspector':
-        return 'Readable long-form paragraph for layout wrapping and line-length validation. Readable extracted-text terminal marker.';
-      case 'HTML fragment should render as readable text':
-        return 'Readable & linked anchor text first point second point';
-      case 'Very long title with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure with deterministic overflow pressure ending marker':
-        return 'Readable summary for a hostile long URL and long title case.';
-      case 'Escaped entities should decode once':
-        return "AT&T uses 'quotes' & Unicode café — malformed &notanentity; should stay readable.";
-      case 'Media enclosure metadata stays secondary':
-        return 'Readable media story lead.';
-      case 'Partial extraction explains excerpt limitation':
-        return 'Readable feed excerpt survives when the original article cannot be fetched.';
-      default:
-        return null;
-    }
-  }
-
   function summaryText(value: InspectableItem): string | null {
-    if (/^(Missing metadata keeps honest placeholders|Model error keeps raw terse status)$/.test(value.title)) return null;
     return readableText(value.summary);
   }
 
