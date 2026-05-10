@@ -19402,6 +19402,9 @@ phases:
       closure proof for the concurrent semantic failures from `manual-rss-fetch.integration-proof`
       and `manual-rss-fetch.spec-conformance`.
 
+      - Gate must treat `visual-parity-retest` as the authoritative follow-up UI/UX
+      closure proof that supersedes the semantic FAIL from `manual-rss-fetch.uiux-audit`.
+
 
       Review criteria:
 
@@ -19416,8 +19419,8 @@ phases:
       flat `ManualFetchResult` schema unless an authoritative deviation record proves
       otherwise.
 
-      4. Strict UI/UX audit: must have parseable PASS from uiux-auditor against docs/ui-preview.html
-      after B2 design-reference ambiguity is closed.
+      4. Strict UI/UX audit: must have parseable PASS from `visual-parity-retest`
+      against docs/ui-preview.html after B1/B2/B3/R9 visual blockers are closed.
 
       5. Spec conformance: no unresolved DIVERGES/PARTIAL/NEEDS_TEST blocker-class
       findings for B1/B2/R9; any non-intersection disposition must explain why remaining
@@ -19431,10 +19434,12 @@ phases:
       gates, and final OPEN/BLOCK recommendation.
 
 
-      Handler-only completion, mock-only proof, visual "close enough", or unresolved
-      frontend/backend response-schema mismatch is insufficient.'
+      Handler-only completion, mock-only proof, visual "close enough", unresolved
+      frontend/backend response-schema mismatch, or any remaining visual parity blocker
+      from the failed `manual-rss-fetch.uiux-audit` artifacts is insufficient.'
     verification: '- All required phase steps completed successfully with complete
-      evidence, including the batched remediation implementation and remediation retest.
+      evidence, including the batched semantic remediation/retest and the batched
+      visual parity remediation/retest.
 
       - Runtime endpoint proof includes exact launch/test command and real HTTP path
       evidence for 200 source fetch, 200 global ingest, and 409 concurrent conflict.
@@ -19442,8 +19447,10 @@ phases:
       - Retest evidence proves frontend/backend schema compatibility using flat `ManualFetchResult`
       or documents an authoritative deviation record.
 
-      - UI/UX audit PASS explicitly states exact visual compliance with post-remediation
-      docs/ui-preview.html.
+      - `visual-parity-retest` evidence is parseable PASS and explicitly proves exact
+      visual compliance with post-remediation docs/ui-preview.html for bracket controls,
+      Source Ledger row density/shape, default footer/import presentation, R9 copy,
+      and required states.
 
       - Spec conformance shows no blocker-class drift for B1/B2/R9 or includes explicit
       non-intersection closure for R9 before OPEN.
@@ -19514,7 +19521,8 @@ phases:
     - manual-rss-fetch.frontend-implementation
     - remediate-verifier-blockers
     - verification-retest-after-remediation
-    - manual-rss-fetch.uiux-audit
+    - visual-parity-remediation
+    - visual-parity-retest
     agent: gate-reviewer
   - id: backend-contract
     name: Backend Contract Lock
