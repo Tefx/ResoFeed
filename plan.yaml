@@ -37095,3 +37095,315 @@ phases:
       Test-generated `.test-artifacts` changes were restored/cleaned before worker
       commit; mainline still has pre-existing unrelated dirty artifact files outside
       this step.'
+  - id: fuidcr-batched-architecture-blocker-remediation
+    name: Batched architecture blocker remediation for UI design closure evidence
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      refs:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json
+
+      - docs/ARCHITECTURE.md
+
+      - docs/DESIGN.md
+
+      - docs/ui-preview.html
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      spec_refs:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — authoritative findings
+      1-52 matrix substitute for this remediation loop
+
+      - docs/ARCHITECTURE.md — ResoFeed product/architecture invariants, no forbidden
+      surfaces
+
+      - docs/DESIGN.md — canonical UI/design contract and navigation/surface semantics
+
+      touch_paths:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/**
+
+      - web/test-results/**
+
+      - docs/ui-preview.html
+
+      - docs/**/ui*closure*.json
+
+      - docs/**/ui*closure*.md
+
+      - web/src/**
+
+
+      Fix ALL blocker families found by fuidcr-software-architect-conformance-review
+      in one batched remediation path. This step exists because the review semantically
+      returned verdict: FAIL and orchestrator_action_hint: DO_NOT_COMPLETE; the final
+      gate must not proceed until the blocker families have explicit closure ownership
+      and review.
+
+
+      ## Blockers to remediate (ALL of these, not just the first)
+
+
+      ### B1 — Objective closure register missing or semantically drifted
+
+      Produce a machine-readable closure register with exactly one row per matrix
+      finding ID 1-52. Each row MUST include:
+
+      - finding_id: integer 1-52
+
+      - exact matrix title
+
+      - exact matrix severity / priority
+
+      - current status: PROVEN | FIXED_WITH_EVIDENCE | ACCEPTED_NON_INTERSECTION |
+      ACCEPTED_AMENDMENT | BLOCKED
+
+      - direct evidence paths, including browser/DOM/visual artifacts where required
+
+      - non-intersection rationale where applicable
+
+      - authority basis: matrix | DESIGN.md amendment | architecture review | other
+      explicit source
+
+      - notes explaining any gap, without remapping IDs
+
+
+      The register MUST preserve exact matrix semantics. Do NOT treat the existing
+      F<n> labels as authoritative unless each F<n> expectation maps to matrix finding
+      <n> exactly.
+
+
+      ### B2 — F<n> expected-red/test artifacts semantically remapped
+
+      Re-align web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts or successor
+      artifacts so each F<n> expectation matches exact matrix finding <n>. No semantic
+      remapping is allowed. Examples to explicitly check:
+
+      - matrix F4 is responsive breakpoint; F4 tests must check responsive breakpoint
+      semantics, not mobile chrome if the matrix title says otherwise.
+
+      - matrix F48-F52 preview findings must remain preview findings and must not
+      be remapped to unrelated preview issues.
+
+
+      ### B3 — P0/P1 browser/DOM/visual proof insufficient
+
+      Re-run and archive browser/DOM/visual evidence covering all required P0/P1 checks:
+      all 13 P0 and all 19 P1 obligations from the authoritative matrix. The closure
+      register MUST list artifact paths for each P0/P1 row. A JUnit artifact containing
+      only the 3 inspector/preview-focused tests is insufficient.
+
+
+      ### B4 — Matrix finding 2 product drift unresolved
+
+      Resolve F2 explicitly by exactly one of:
+
+      1. Remove persistent dashboard/tab/peer-nav drift so TODAY, SOURCE LEDGER, /doctor,
+      and INSPECTOR are not represented by a persistent dashboard/tab nav strip contrary
+      to the matrix; OR
+
+      2. Obtain and record an explicit design-review amendment or accepted non-intersection
+      rationale that supersedes the matrix for F2.
+
+
+      Do NOT silently reinterpret F2. Do NOT let existing artifacts that accept TODAY
+      and SOURCE LEDGER peer nav buttons count as closure unless the amendment/non-intersection
+      authority is recorded.
+
+
+      ### B5 — Preview cleanup PASS_WITH_DEBT lacks final matrix closure proof
+
+      Re-run and record preview parity/static checks proving docs/ui-preview.html
+      remains canonical after any live UI repairs. The closure register MUST include
+      final evidence paths for F48-F52 and must state whether docs/ui-preview.html
+      is canonical, amended, or blocked.
+
+
+      ## Root Cause vs Symptom
+
+      - Root cause: architecture/product-boundary review lacked a single authoritative
+      closure register tying matrix findings 1-52 to exact evidence, causing ID remapping
+      and incomplete P0/P1 proof to slip past narrower test artifacts.
+
+      - Symptom: fuidcr-software-architect-conformance-review returned FAIL even though
+      backend/API/DTO boundaries passed and some UI artifacts existed.
+
+      - Why this fix is not surface-level: it requires matrix-exact ID alignment,
+      full P0/P1 browser/DOM/visual artifact coverage, explicit F2 authority resolution,
+      and final preview parity evidence.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION/EVIDENCE remediation step. Stub-only completion is
+      NOT acceptable. Each deliverable MUST contain substantive evidence that varies
+      by actual matrix finding and actual rendered UI behavior. Placeholder closure
+      rows, generic PASS labels, or evidence paths that do not exist do not satisfy
+      this step.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any closure register missing a matrix ID 1-52, duplicating IDs, or remapping
+      F<n> semantics.
+
+      2. Any P0/P1 row without direct browser/DOM/visual evidence or explicit accepted
+      non-intersection/amendment.
+
+      3. F2 closure based on silent reinterpretation instead of implementation fix
+      or design-reviewed amendment/non-intersection.
+
+      4. docs/ui-preview.html cleanup without final parity/static evidence after live
+      UI repairs.
+
+      5. A final report that relies only on the prior 3-test JUnit artifact for the
+      full 13 P0 / 19 P1 obligation set.
+
+
+      ## Integration Evidence Required
+
+      Changed seams require real browser/DOM/static-path proof. Unit tests or grep-only
+      evidence are insufficient for P0/P1 visual/behavioral obligations.'
+    verification: '- Machine-readable closure register exists and contains exactly
+      one row per matrix finding ID 1-52 with exact matrix title/severity/status,
+      direct evidence paths, and non-intersection/amendment rationale where applicable.
+
+      - F<n> expected-red/e2e artifacts align one-to-one with exact matrix finding
+      <n>; examples F4 and F48-F52 are explicitly checked for semantic alignment.
+
+      - Browser/DOM/visual evidence is re-run and archived for all 13 P0 and 19 P1
+      obligations, with artifact paths recorded in the register.
+
+      - F2 is resolved by implementation removal of persistent peer-nav drift OR by
+      an explicit design-review amendment/non-intersection rationale recorded as the
+      authority basis.
+
+      - Preview parity/static checks prove docs/ui-preview.html remains canonical
+      after live UI repairs, with final evidence paths for F48-F52.
+
+      - Backend/API/DTO boundary remains narrow and source-backed; no forbidden product
+      concepts or runtime surfaces are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json — key passage or "NOT
+      READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Architecture Blocker Remediation Evidence
+
+
+      ### Closure Register
+
+      - Register path: <path>
+
+      - Total rows: <must be 52>
+
+      - IDs present: <1-52 exactly once>
+
+      - Schema fields present: finding_id, exact matrix title, severity/priority,
+      status, evidence paths, non-intersection/amendment rationale, authority basis,
+      notes
+
+
+      ### Matrix/Test Alignment
+
+      - Test artifact path(s): <paths>
+
+      - Proof that F<n> maps to matrix finding <n>: <summary>
+
+      - F4 semantic check: <responsive breakpoint evidence>
+
+      - F48-F52 semantic check: <preview finding evidence>
+
+      - Remapped/renamed successor artifacts: <paths or NONE>
+
+
+      ### P0/P1 Browser/DOM/Visual Evidence
+
+      - P0 obligations covered: <13/13 with artifact paths>
+
+      - P1 obligations covered: <19/19 with artifact paths>
+
+      - Commands executed:
+
+      ```text
+
+      <paste exact commands>
+
+      ```
+
+      - Artifact directory/list:
+
+      ```text
+
+      <paste paths>
+
+      ```
+
+
+      ### F2 Resolution
+
+      - Resolution mode: FIXED | ACCEPTED_AMENDMENT | ACCEPTED_NON_INTERSECTION
+
+      - Evidence or amendment path: <path>
+
+      - Why this supersedes or satisfies matrix F2: <explanation>
+
+
+      ### Preview Parity / Static Canonicality
+
+      - Commands/checks executed:
+
+      ```text
+
+      <paste exact commands>
+
+      ```
+
+      - docs/ui-preview.html canonical status: CANONICAL | AMENDED | BLOCKED
+
+      - F48-F52 evidence paths: <paths>
+
+
+      ### Product Boundary Guard
+
+      - Backend/API/DTO boundary status: <unchanged/narrow/source-backed or explain>
+
+      - Forbidden concepts introduced: <NONE required, or list as blocker>
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL
+
+
+      PASS requires no blocker-class gaps remain for B1-B5.'
+    depends_on:
+    - fuidcr-software-architect-conformance-review
+    agent: frontend-engineer
