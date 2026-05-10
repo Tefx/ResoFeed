@@ -108,6 +108,23 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 }
 
+async function runSteerCommand(page: Page, command: string, receipt: RegExp | string): Promise<void> {
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill(command);
+  await steer.press('Enter');
+  await expect(page.getByRole('status').filter({ hasText: receipt })).toBeVisible();
+}
+
+async function openSourceLedger(page: Page): Promise<void> {
+  await runSteerCommand(page, 'source ledger', 'source ledger');
+  await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+}
+
+async function openToday(page: Page): Promise<void> {
+  await runSteerCommand(page, 'today', 'today');
+  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+}
+
 async function metric(page: Page, selector: string): Promise<CssMetric> {
   return page.evaluate<CssMetric, string>((targetSelector) => {
     const element = document.querySelector(targetSelector);
@@ -149,14 +166,12 @@ async function saveStateScreenshot(page: Page, testInfo: TestInfo, name: string)
 }
 
 async function importFixtureFeed(page: Page, runInfo: { readonly artifactRoot: string }): Promise<void> {
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
-  await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+  await openSourceLedger(page);
   await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 20_000 });
-  await page.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await openToday(page);
 }
 
 test('expected-red UI/design conformance matrix covers findings F1-F47 on the real app', async ({ page, runInfo, ownerToken }, testInfo) => {
@@ -214,11 +229,11 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const headingMetric = await metric(page, '[aria-label="INSPECTOR"] h1, [aria-label="INSPECTOR"] h2, [role="complementary"] h1, [role="complementary"] h2');
   if (headingMetric.outlineStyle !== 'none' && headingMetric.outlineStyle !== '') note(violations, 'F17', `Inspector heading focus is visually noisy: outline=${headingMetric.outlineStyle}`);
 
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await openSourceLedger(page);
   const ledgerText = await visibleText(page.locator('body'));
   if (await page.locator('.source-ledger, [data-testid="source-ledger"], .source-row, [data-testid="source-row"]').count() === 0) note(violations, 'F24', 'Source Ledger lacks required stable DOM contract classes/test ids');
   if (await page.getByRole('button', { name: '[RUN INGEST]' }).count() === 0) note(violations, 'F25', 'missing canonical [RUN INGEST] action');
-  if (await page.getByRole('button', { name: /^\[FETCH\]$/ }).count() === 0) note(violations, 'F26', 'missing canonical visible [FETCH] per-source action');
+  if (await page.locator('.source-ledger-row').filter({ hasText: '[FETCH]' }).count() === 0) note(violations, 'F26', 'missing canonical visible [FETCH] per-source action');
   if (!/\[DELETE\]/.test(ledgerText)) note(violations, 'F27', `delete action is not visible canonical [DELETE]: ${ledgerText}`);
   if (!/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', `OPML import action is not visible canonical [IMPORT OPML]: ${ledgerText}`);
   if (/imported \d+ sources; folders flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
@@ -251,8 +266,8 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (await page.getByRole('heading', { name: 'Search and Retrieval' }).count() === 0) {
     note(violations, 'F15', 'narrow Search route was not reachable from Steer while another utility surface was active');
   }
-  if (await page.getByRole('button', { name: 'search' }).count() > 0) {
-    await page.getByRole('button', { name: 'search' }).click();
+  if (await page.getByRole('button', { name: 'search', exact: true }).count() > 0) {
+    await page.getByRole('button', { name: 'search', exact: true }).click();
   }
   await saveStateScreenshot(page, testInfo, 'search-narrow-390');
   const searchRegion = page.getByRole('region', { name: 'Search results' });
@@ -262,7 +277,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (await page.locator('#search-status, [role="status"]').locator('.badge, [class*="badge"]').count() > 0) note(violations, 'F41', 'search result count is rendered as a badge/queue indicator');
   if (/sorry|no worries|try another|AI answer|semantic|RAG|chat/i.test(await visibleText(page.locator('body')))) note(violations, 'F42', 'search surface uses friendly/chat/RAG language instead of raw terse states');
   if (!/retrieval: lexical search|lexical|match/i.test(await visibleText(page.locator('body')))) note(violations, 'F43', 'search provenance does not identify lexical match semantics');
-  if (await searchRegion.getByRole('button', { name: /Open Inspector for:/ }).count() === 0 || await searchRegion.getByRole('button', { name: /Resonate item|Remove resonance/ }).count() === 0) note(violations, 'F44', 'narrow search results do not expose both Inspect and Resonate affordances');
+  if (await searchRegion.getByRole('button', { name: /Open Inspector for:|Inspect search result:/ }).count() === 0 || await searchRegion.getByRole('button', { name: /Resonate item|Remove resonance/ }).count() === 0) note(violations, 'F44', 'narrow search results do not expose both Inspect and Resonate affordances');
   const genericFilledButton = await page.locator('button').evaluateAll((buttons) => buttons.some((button) => {
     const text = button.textContent?.trim() ?? '';
     const style = window.getComputedStyle(button);
@@ -273,7 +288,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (accentCount > 2) note(violations, 'F47', `accent appears too often on one screen: ${accentCount} elements`);
 
   await page.setViewportSize({ width: 390, height: 800 });
-  await page.getByRole('button', { name: 'TODAY', exact: true }).click({ force: true });
+  await openToday(page);
   await saveStateScreenshot(page, testInfo, 'mobile-feed-390');
   const mobileInspectorVisible = await page.getByRole('complementary', { name: 'INSPECTOR' }).isVisible().catch(() => false);
   if (mobileInspectorVisible) note(violations, 'F5', 'Inspector remains visible in split pane below 1080px');

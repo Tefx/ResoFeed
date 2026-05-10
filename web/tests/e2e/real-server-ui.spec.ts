@@ -2,6 +2,7 @@ import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
+import type { Page, TestInfo } from 'playwright/test';
 
 import { test, expect } from './fixtures';
 import { E2E_FAKE_OPENROUTER_KEY } from './e2e-contract';
@@ -69,11 +70,41 @@ async function startIsolatedServer(runInfo: { binaryPath: string; artifactRoot: 
   return { child, baseURL, stdoutPath, stderrPath };
 }
 
-async function enterOwnerToken(page: import('playwright/test').Page, ownerToken: string, url = '/'): Promise<void> {
+async function enterOwnerToken(page: Page, ownerToken: string, url = '/'): Promise<void> {
   await page.goto(url);
   await page.locator('#owner-token-input').fill(ownerToken);
   await page.getByRole('button', { name: 'submit' }).click();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+}
+
+async function runSteerCommand(page: Page, command: string, receipt: RegExp | string): Promise<void> {
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill(command);
+  await steer.press('Enter');
+  await expect(page.getByRole('status').filter({ hasText: receipt })).toBeVisible();
+}
+
+async function openSourceLedger(page: Page): Promise<void> {
+  await runSteerCommand(page, 'source ledger', 'source ledger');
+  await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+}
+
+async function openToday(page: Page): Promise<void> {
+  await runSteerCommand(page, 'today', 'today');
+  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+}
+
+async function roundTripStateThroughLedgerFooter(page: Page, testInfo: TestInfo): Promise<void> {
+  await expect(page.getByRole('button', { name: '[EXPORT STATE]' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: '[EXPORT STATE]' }).click();
+  const download = await downloadPromise;
+  const exportedStatePath = path.join(testInfo.outputDir, 'exported-state.json');
+  await download.saveAs(exportedStatePath);
+  expect(fs.existsSync(exportedStatePath), 'state export download was saved').toBe(true);
+  await page.locator('#state-json-file').setInputFiles(exportedStatePath);
+  await expect(page.getByText('import complete')).toBeVisible();
 }
 
 type ItemSummary = {
@@ -192,14 +223,13 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
   request,
   runInfo,
   ownerToken
-}) => {
+}, testInfo) => {
   const server = await startIsolatedServer(runInfo, E2E_FAKE_OPENROUTER_KEY);
   try {
   await enterOwnerToken(page, ownerToken, `${server.baseURL}/`);
   await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
 
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
-  await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+  await openSourceLedger(page);
   await expect(page.getByText('No sources. Paste RSS URL in Steer.')).toBeVisible();
 
   await page
@@ -210,15 +240,17 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
 
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
   await expect(page.getByRole('button', { name: '[INGESTING...]' })).toBeVisible();
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText(/last ingest:/)).toBeVisible();
+  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/last_ingest:/)).toBeVisible();
+  await expect(page.getByText('[DELETE]')).toBeVisible();
 
   await page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' }).click();
   await expect(page.getByRole('button', { name: 'Fetching ResoFeed E2E Local Source' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' })).toHaveText('[FETCH]');
+  await roundTripStateThroughLedgerFooter(page, testInfo);
 
-  await page.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await openToday(page);
   const fixtureFeedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await expect(fixtureFeedItem).toBeVisible();
   await expect(fixtureFeedItem).toContainText('src: ResoFeed E2E Local Source');
@@ -244,7 +276,7 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Search and Retrieval' })).toBeVisible();
   await expect(page.getByLabel('Plain text query')).toHaveValue('Local fixture');
-  await page.getByRole('button', { name: 'search' }).click();
+  await page.getByRole('button', { name: 'search', exact: true }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
@@ -286,13 +318,12 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await page.getByRole('button', { name: 'submit' }).click();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await openSourceLedger(page);
   await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
-  await page.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+  await openToday(page);
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 
   const apiFeed = await authorizedGet<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, '/api/feed/today?limit=20');
@@ -329,7 +360,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await steer.fill('search Local fixture');
   await page.getByRole('button', { name: 'apply' }).click();
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
-  await page.getByRole('button', { name: 'search' }).click();
+  await page.getByRole('button', { name: 'search', exact: true }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, isolatedRunInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
   const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });
