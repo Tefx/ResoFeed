@@ -19267,7 +19267,7 @@ phases:
     skipped_reason: superseded
   - id: manual-rss-fetch.uiux-audit
     name: Strict UI/UX Audit Against ui-preview
-    status: claimed
+    status: skipped
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -19374,6 +19374,7 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-10T08:22:01.771765+00:00'
+    skipped_reason: superseded
   - id: manual-rss-fetch.gate
     name: Gate Manual RSS Fetch
     status: pending
