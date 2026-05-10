@@ -32676,3 +32676,78 @@ phases:
     depends_on:
     - fuidcr-contract-matrix-lock
     agent: frontend-engineer
+  - id: fuidcr-api-dto-escalation-guard
+    name: Confirm no backend API or storage changes are needed by default
+    status: pending
+    description: 'step_type: planning
+
+      agent_source: project
+
+
+      Validate the architecture-basis assumption that UI remediation should use existing
+      JSON HTTP DTOs by default.
+
+
+      SCOPE / touch_paths:
+
+      - Read-only inspection of existing API response shapes and frontend item models.
+
+      - No production code changes in this step.
+
+
+      CHECKS:
+
+      - Feed/Search display needs from findings 9, 11, 15, 16, 42, 43, 44 can be satisfied
+      from existing source-backed item fields or frontend formatting.
+
+      - Inspector display needs from findings 18-23 can be satisfied by cleaning/presenting
+      existing fields without new storage.
+
+      - SourceLedger/StatePortability needs from findings 24-36 can be satisfied from
+      existing source/state fields.
+
+
+      ESCALATION RULE:
+
+      - If and only if an existing DTO lacks a required item-display-only, source-backed
+      field, produce an escalation record naming the exact field, endpoint, source
+      table/field, and consumer finding IDs.
+
+      - Do NOT authorize new routes, auth models, persistence tables, sync, accounts,
+      vector/RAG, admin process, or service/repository/DI layers.
+
+      - If no DTO gap exists, evidence says backend/API/storage change is not needed
+      and downstream frontend implementation proceeds normally.'
+    verification: '- Evidence lists required display fields and their existing frontend/API
+      sources or explicit narrow DTO-gap records.
+
+      - No code or docs changed.
+
+      - Any gap record is item-display-only and source-backed; forbidden architecture
+      concepts remain forbidden.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — key passage or
+      "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## DTO Escalation Guard Evidence
+
+      - Display needs checked: findings 9, 11, 15, 16, 18-23, 24-36, 42-44
+
+      - Existing DTO/source mapping: <table>
+
+      - DTO gaps: <none or exact endpoint/field/finding IDs>
+
+      - Architecture forbidden concepts introduced: <must be none>
+
+      '
+    depends_on:
+    - fuidcr-contract-matrix-lock
+    agent: software-architect
