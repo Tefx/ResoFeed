@@ -36189,6 +36189,7 @@ phases:
     - fuidcr-software-architect-conformance-review
     - fuidcr-batched-architecture-blocker-remediation
     - fuidcr-architecture-blocker-retest
+    - fuidcr-post-remediation-screenshot-uiux-audit
     agent: gate-reviewer
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
