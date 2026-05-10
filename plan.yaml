@@ -24876,7 +24876,7 @@ phases:
       orchestrator_action_hint: COMPLETE'
   - id: playwright-repair-verification
     name: Comprehensive deterministic Playwright UI regression verification
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -24956,6 +24956,8 @@ phases:
     depends_on:
     - implementation-repair
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-10T12:14:28.035722+00:00'
   - id: visual-ux-audit
     name: Native multimodal UI/UX audit for complete regression artifact set
     status: pending
