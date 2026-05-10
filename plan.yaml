@@ -34841,7 +34841,7 @@ phases:
     agent: gate-reviewer
   - id: fuidcr-feed-search-dto-source-fields
     name: Surface source-backed Feed/Search DTO display fields
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -35007,6 +35007,70 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-10T17:57:33.630230+00:00'
+    done_at: '2026-05-10T18:03:27.311469+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read: items require published and first-seen timestamps;
+      HTTP JSON timestamps are RFC3339 UTC; one SQLite DB/no vector/RAG/service layers.
+
+      - docs/DESIGN.md — Read: Feed Item raw fallback state says show feed excerpt
+      when AI summary is unavailable; Search results use feed-item anatomy.
+
+      - docs/audits/full-ui-design-conformance-audit-2026-05-11.md — NOT READ: file
+      absent in isolated worktree.
+
+
+      ## DTO Support Evidence
+
+      **Fields added or derived**:
+
+      - Feed timestamp fallback: `first_seen_at` on `ItemSummary`, populated only
+      when `published_at` is null from `items.first_seen_at`.
+
+      - Search timestamp fallback: same `first_seen_at` derivation in search item
+      scan.
+
+      - Feed excerpt fallback: `display_excerpt`, populated only when `summary` and
+      `core_insight` are null from `items.feed_excerpt`.
+
+      - Search excerpt fallback: same `display_excerpt` derivation in search item
+      scan.
+
+
+      **Guardrail confirmation**:
+
+      - New routes/tables/auth/sync/accounts/vector/admin/service layers added: NO
+
+      - Existing source columns used only: YES
+
+
+      **Tests/commands**:
+
+      - Subagent: `gofmt -w internal/resofeed/types.go internal/resofeed/ranking.go
+      internal/resofeed/search.go internal/resofeed/backend_contract_test.go && go
+      test ./...` — exit 0; cmd no tests; internal package ok.
+
+      - Orchestrator mainline final-state verification after squash merge: `go test
+      ./...` — exit 0; cmd no tests; internal package ok.
+
+
+      **Files changed**:
+
+      - internal/resofeed/types.go
+
+      - internal/resofeed/ranking.go
+
+      - internal/resofeed/search.go
+
+      - internal/resofeed/backend_contract_test.go
+
+
+      **Commit hash(es)**:
+
+      - Worktree commit: 2549137
+
+      - Mainline squash commit: bdb21a1 [vectl] step-fuidcr-feed-search-dto-source-fields
+      completed'
   - id: fuidcr-feed-search-client-dto-contract
     name: Update Feed/Search frontend DTO contract for display fallbacks
     status: pending
