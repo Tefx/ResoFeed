@@ -30668,7 +30668,7 @@ phases:
       merge; no retest branch changes required merging.'
 - id: prd-inspector-preview-conformance-remediation
   name: PRD Inspector and Preview Conformance Remediation
-  status: in_progress
+  status: done
   gate: Inspector/Inspect surfaces expose PRD-required item-understanding outputs
     and the live rendered UI visually conforms to docs/ui-preview.html and docs/DESIGN.md
     with screenshot-first proof.
@@ -31364,7 +31364,7 @@ phases:
       errors/warnings.'
   - id: prd-inspector-preview-conformance-remediation.final-prd-preview-gate
     name: Final gate for PRD Inspector and preview conformance
-    status: claimed
+    status: done
     description: 'step_type: gate
 
 
@@ -31466,3 +31466,85 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-10T16:02:42.454556+00:00'
+    done_at: '2026-05-10T16:08:06.084548+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/PRD.md — Read. Key passage:\
+      \ §7.5 requires processed items to expose objective quality assessment, value/priority\
+      \ tier, core insight, dense factual summary, source/extraction provenance, topical\
+      \ metadata/searchable text, and why-this-appeared rationale; §12.1-12.2 require\
+      \ why/provenance/extraction-limit visibility.\n- docs/DESIGN.md — Read. Key\
+      \ passage: dense-but-legible analyst workbench; desktop top row contains Steer\
+      \ input, Inspector opens right at 420–560px, feed rows use compact metadata/title/summary/star,\
+      \ Inspector anatomy includes provenance header, original link, extraction status,\
+      \ summary/body, why line.\n- docs/ARCHITECTURE.md — Read. Key passage: one Go\
+      \ binary, one SQLite+FTS5 store, no vector/RAG, frontend in `web/`, no extra\
+      \ dashboards/settings; verification targets include web build and Go tests.\n\
+      - docs/ui-preview.html — Read. Key passage: preview specifies 1280px page, 32px\
+      \ `RESOFEED`, `SOURCE LEDGER / DOCTOR / INSPECTOR`, top Steer prompt, 44px star,\
+      \ 480px Inspector, 28px Inspector heading.\n- AGENTS.md — NOT READ: subagent\
+      \ reported `AGENTS.md` absent in isolated worktree; worktree-local `.agents/instructions.md`\
+      \ was read and confirms single binary, SQLite+FTS5 only, no vector/RAG, no folders/tags/unread/mark-all-read/settings,\
+      \ operational labels only.\n\n## Gate Decision Basis\n| Requirement / Risk |\
+      \ Evidence reviewed | Status | Blocks? | Rationale |\n| --- | --- | --- | ---\
+      \ | --- |\n| PRD Inspector fields | `web/src/routes/components/Inspector.svelte:275-299`;\
+      \ `web/tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts:276-302`;\
+      \ Playwright 3 passed | PROVEN | NO | Inspector visibly renders provenance,\
+      \ extraction, summary, core insight, why, priority, quality, searchable text,\
+      \ and raw provenance disclosure; e2e asserts all required Chinese/English field\
+      \ concepts. |\n| Preview/live visual parity | `docs/ui-preview.html`; `web/tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts:130-158`;\
+      \ preview/live screenshots | PROVEN | NO | Browser test captures baseline/live\
+      \ screenshots and checks masthead, nav, prompt y-position, panel geometry/margins,\
+      \ row height, 44px star, Inspector width, and heading typography. |\n| Screenshot-first\
+      \ audit | `.audit-artifacts/prd-inspector-screenshot-first-uiux-audit.md`; `.audit-artifacts/prd-inspector-side-by-side.png`\
+      \ | PASS | NO | Audit is screenshot-first, covers masthead/nav/prompt/panel/margins/row/star/typography/Inspector\
+      \ hierarchy, and concludes PASS with no blockers. |\n| Raw-source regression\
+      \ | `Inspector.svelte`; dirty/readable Playwright specs | PROVEN | NO | Primary\
+      \ body cleaning excludes script/style/JSON-LD/navigation/diagnostic garbage;\
+      \ raw payload is behind labelled raw provenance diagnostics disclosure. |\n\
+      | Architecture/design drift | `.agents/instructions.md`; `docs/ARCHITECTURE.md`;\
+      \ `docs/DESIGN.md`; git status/product file review | PROVEN | NO | No product\
+      \ implementation files modified by gate; implementation stays in `web/`, uses\
+      \ existing HTTP/SQLite/FTS contracts, and adds no forbidden accounts/tags/folders/settings/vector/RAG/sidecars.\
+      \ |\n\n## Behavioral Proof Register\n- requirement_ref: docs/PRD.md §7.5, §12.1,\
+      \ §12.2\n  proof: `Inspector.svelte:275-299` plus Playwright `prd-inspector-preview-conformance.expected-red.spec.ts`\
+      \ passed\n  status: PROVEN\n  blocker: false\n- requirement_ref: docs/DESIGN.md\
+      \ Inspector/Feed/Layout; docs/ui-preview.html\n  proof: `.test-artifacts/playwright/screenshots/prd-inspector-preview-baseline.png`,\
+      \ `.test-artifacts/playwright/screenshots/prd-inspector-live-app-expected-red.png`,\
+      \ `.audit-artifacts/prd-inspector-side-by-side.png`\n  status: PROVEN\n  blocker:\
+      \ false\n- requirement_ref: raw-source readable-body regression\n  proof: Playwright\
+      \ `inspector-dirty-corpus.spec.ts` and `inspector-readable-content-regression.spec.ts`\
+      \ passed\n  status: PROVEN\n  blocker: false\n- requirement_ref: web/build/browser\
+      \ regression\n  proof: subagent and mainline `npm --prefix web run check &&\
+      \ npm --prefix web run build && npm --prefix web run test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts inspector-readable-content-regression.spec.ts\
+      \ --project=chromium-ci-safe` passed; 3 browser tests passed\n  status: PROVEN\n\
+      \  blocker: false\n- requirement_ref: Go/API regression\n  proof: subagent and\
+      \ mainline `go test ./...` passed; `resofeed/internal/resofeed` ok\n  status:\
+      \ PROVEN\n  blocker: false\n\n## Gate Decision\nheadline: PASS\nverdict: PASS\n\
+      blockers: []\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\n\n## Verification Run\nstep_intent:\
+      \ Final skeptical gate for PRD Inspector field visibility, screenshot-first\
+      \ UI preview parity, raw-source regression, and architecture/design drift.\n\
+      expected_result: All required PRD fields visible or validly disposed; screenshot-first\
+      \ audit PASS; web check/build/browser tests and relevant Go tests green; no\
+      \ product-code drift.\nobserved_result: All required checks passed. No blockers\
+      \ found.\nfailure_alignment: No failure; evidence aligns with closure criteria.\n\
+      verdict: PASS\nblockers: []\nproduct_implementation_files_modified: false\n\
+      commands:\n- Subagent: `npm ci && npm run check && npm run build && npm run\
+      \ test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts inspector-dirty-corpus.spec.ts\
+      \ inspector-readable-content-regression.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; svelte-check 0 errors/0 warnings; build succeeded; 3 browser tests\
+      \ passed.\n- Subagent: `go test ./...` — exit 0; cmd no tests, internal package\
+      \ ok.\n- Subagent committed verification artifacts: `921a185 test: refresh final\
+      \ PRD inspector gate artifacts`.\n- Orchestrator merged worktree and ran mainline\
+      \ final-state verification: `npm --prefix web run check && npm --prefix web\
+      \ run build && npm --prefix web run test:e2e -- prd-inspector-preview-conformance.expected-red.spec.ts\
+      \ inspector-dirty-corpus.spec.ts inspector-readable-content-regression.spec.ts\
+      \ --project=chromium-ci-safe && go test ./...` — exit 0; svelte-check 0 errors/0\
+      \ warnings; build succeeded; 3 browser tests passed; Go tests passed.\n- Orchestrator\
+      \ committed merged verification artifacts: `7e140ff [vectl] step-prd-inspector-preview-conformance-remediation.final-prd-preview-gate\
+      \ completed`.\n\n## Gaps/Notes\n- `AGENTS.md` was not available to the subagent\
+      \ inside the isolated worktree; `.agents/instructions.md` was read as equivalent\
+      \ invariant source.\n- `npm ci` reported 3 low-severity npm audit findings;\
+      \ subagent treated as non-blocking for this PRD/UI gate because no security-sensitive\
+      \ dependency change was made and all required checks passed.\n- No unresolved\
+      \ blocker, should-fix, NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item remains."
