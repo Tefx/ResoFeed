@@ -24314,7 +24314,7 @@ phases:
     - web/src/routes/components/Inspector.svelte
     agent: uiux-auditor
   - id: expected-red-browser-tests
-    name: Expected-red browser tests for nav, hover, and Inspector hierarchy
+    name: Expected-red core UI regression browser tests
     status: pending
     description: 'step_type: test
 
@@ -24322,35 +24322,41 @@ phases:
 
       expected_result: red
 
-
-      Create Playwright/browser tests that expose the three user-reported gaps before
-      implementation. This is a pre-implementation test-definition step: product UI
-      source must not be modified except test harness selectors/fixtures if strictly
-      necessary.
+      agent_source: project
 
 
-      Tests to add/update:
+      Create pre-implementation Playwright/browser tests that expose the core user-reported
+      UI regressions and bind them to the contract/design audit. Product UI implementation
+      files must not be modified in this step.
 
-      1. SOURCE LEDGER clickability: clicking the `SOURCE LEDGER` tab/button opens
-      the Source Ledger panel/surface and exposes the `SOURCE LEDGER` heading or ledger
-      region with active state.
 
-      2. Selected feed item hover treatment: with an item selected/open in the Inspector,
+      Core expected-red assertions:
+
+      1. SOURCE LEDGER clickability: a real click on the visible `SOURCE LEDGER` control
+      opens the ledger surface and exposes active-state proof; failure output must
+      distinguish handler failure from overlay/z-index/pointer-events obstruction
+      when possible.
+
+      2. TODAY navigation regression guard: clicking `TODAY` after visiting another
+      panel returns to the Today feed and does not leave the wrong panel active.
+
+      3. Selected feed item hover treatment: with an item selected/open in the Inspector,
       hovering that same feed row must not stack a noisy/ambiguous hover state over
       selected state; selected remains visually and semantically distinguishable.
-      Use screenshots plus stable computed-style/DOM assertions derived from the contract
-      step.
 
-      3. Inspector hierarchy: default Inspector view shows structured readable content
-      and does not dump raw JSON-LD/extracted metadata into the primary reading area.
-      Raw/provenance content may be available only behind a labeled secondary/collapsed
-      region if the contract allows or implementation adds a minimal conformant pattern.
+      4. Inspector hierarchy: default Inspector view shows structured readable title/source/time/link/summary/content
+      hierarchy and does not dump raw JSON-LD/extracted metadata into the primary
+      reading area.
+
+      5. Negative UX guard: primary visible copy must not introduce folders, tags,
+      unread counts, settings concepts, onboarding wizard copy, mascot/SaaS language,
+      or AI-magic trust-palette phrasing.
 
 
-      Spec-Fixture Conformance (MANDATORY): any mock/feed fixture used for Inspector
-      raw metadata must be derived from documented item/detail shapes and include
-      a minimal case with JSON-LD or extracted metadata that would reveal an accidental
-      raw dump.
+      Spec-Fixture Conformance (MANDATORY): use at least one fixture derived from
+      documented item/detail shape with JSON-LD or extracted metadata that would reveal
+      accidental raw dumping. The fixture must not rely on convenience-only fields
+      absent from documented external data.
 
 
       Expected result before implementation: red. Success means the tests expose the
@@ -24361,24 +24367,30 @@ phases:
       - Run expected-red command before implementation: `cd web && npm run test:e2e
       -- --grep "ui-navigation-hover-inspector-repair"`.
 
-      - Evidence records failing assertions for all feasible cases and links each
-      failure to the contract/design audit.
+      - Evidence records failing assertions for SOURCE LEDGER, TODAY panel correctness,
+      selected+hover noise, Inspector hierarchy, and negative UX guards where feasible.
 
       - No product UI implementation files are modified in this step.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
-      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Test Evidence\n\
-      - Test file(s) changed:\n  ```\n  <paths>\n  ```\n- Exact command executed before\
-      \ implementation:\n  ```\n  cd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair\"\
-      \n  ```\n- Actual red output / exposed gaps:\n  ```\n  <paste failure summary\
-      \ for SOURCE LEDGER, selected+hover, Inspector hierarchy>\n  ```\n- Screenshots/traces\
-      \ captured:\n  - <artifact path or NOT CAPTURED: reason>\n- Spec fixture conformance:\n\
-      \  - Fixture source section(s): <docs/API/design refs>\n  - Minimal raw metadata/JSON-LD\
-      \ fixture included: yes/no + path\n- Product-code modification check:\n  - Product\
-      \ UI files modified: <none/list + reason>\n- Downstream owner: ui-navigation-hover-inspector-repair.implementation-repair\n\
-      - Blocker/closure fields:\n  - blockers_found: <none/list>\n  - closure_path:\
-      \ failing tests are expected to turn green after implementation step\n  - unresolved_ambiguity:\
-      \ <none/list>\n"
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Core Browser\
+      \ Evidence\n- Files changed: <test/fixture/helper paths only>\n- Exact command:\n\
+      ```sh\ncd web && npm run test:e2e -- --grep \"ui-navigation-hover-inspector-repair\"\
+      \n```\n- Runner output: <paste failing output, not summary only>\n- Expected\
+      \ failures/exposed gaps:\n  - SOURCE LEDGER clickability: <failure>\n  - TODAY\
+      \ panel correctness: <failure>\n  - selected+hover state: <failure>\n  - Inspector\
+      \ hierarchy: <failure>\n  - negative UX guard: <failure>\n- Product files modified:\
+      \ NONE | <explain violation>\n\n## Closure Fields\nverdict: EXPECTED_RED_PASS\
+      \ | INCOMPLETE | FAIL\nblockers: []\ngate_open_allowed: false\nproof_gap_status:\
+      \ <exposed_gaps|missing_coverage with details>\norchestrator_action_hint: proceed_to_remaining_expected_red_tests\
+      \ | repair_test_plan_first"
+    refs:
+    - docs/DESIGN.md
+    - docs/ui-preview.html
+    - docs/DESIGN_VISION.md
+    - web/src/routes/+page.svelte
+    - web/src/routes/components/Feed.svelte
+    - web/src/routes/components/Inspector.svelte
     depends_on:
     - contract-design-audit
     agent: frontend-engineer
