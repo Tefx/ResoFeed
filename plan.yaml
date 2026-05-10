@@ -30666,3 +30666,11 @@ phases:
       product implementation files modified no. Mainline had already passed the same
       check/build/targeted Playwright/static guard verification after the fix squash
       merge; no retest branch changes required merging.'
+- id: prd-inspector-preview-conformance-remediation
+  name: PRD Inspector and Preview Conformance Remediation
+  status: pending
+  gate: Inspector/Inspect surfaces expose PRD-required item-understanding outputs
+    and the live rendered UI visually conforms to docs/ui-preview.html and docs/DESIGN.md
+    with screenshot-first proof.
+  depends_on:
+  - inspector-readable-content-remediation
