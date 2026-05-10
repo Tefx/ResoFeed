@@ -24688,3 +24688,157 @@ phases:
     depends_on:
     - playwright-repair-verification
     agent: uiux-auditor
+  - id: gate
+    name: Gate UI navigation, hover, and Inspector repair
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase repairs user-visible navigation and Inspector rendering after final
+      completion.
+
+      - Phase touches hover/selected visual states, a known high-rework UI class.
+
+      - Gate must review contract-first sequence, expected-red coverage, green browser
+      verification, and native visual audit artifacts.
+
+
+      As an INDEPENDENT REVIEWER, assess whether the repair phase meets the quality
+      bar for reopening completed-plan confidence.
+
+
+      Review criteria:
+
+      1. Contract/design audit read the authoritative design docs and resolved all
+      three reported issues into testable expected behavior.
+
+      2. Expected-red browser tests were authored before implementation and exposed
+      the intended gaps where feasible.
+
+      3. Implementation evidence shows design-conformant fixes without new forbidden
+      product concepts.
+
+      4. Deterministic Playwright/browser verification is green and includes exact
+      commands/output/traces.
+
+      5. Native multimodal UI/UX audit reviewed screenshots for Source Ledger, selected+hover
+      state, and Inspector hierarchy and returned PASS or an explicit non-blocking
+      disposition.
+
+      6. Structured behavioral proof register has no unresolved blocker-class NEEDS_TEST,
+      UNPROVEN, or UNCERTAIN_BLOCKING item.
+
+
+      Gate must BLOCK if SOURCE LEDGER is still not clickable, selected+hover states
+      remain ambiguous/noisy, or Inspector still dumps raw JSON-LD/extracted metadata
+      into the primary reading area.'
+    verification: '- All phase steps are complete with evidence.
+
+      - Evidence templates include refs read confirmation, exact commands/output,
+      screenshots/traces, before/after notes, and blocker/closure fields.
+
+      - Expected-red tests preceded implementation and are green after implementation.
+
+      - Playwright repair verification and UI/UX audit are PASS or PASS_WITH_DEBT
+      with explicit non-blocking disposition.
+
+      - No unresolved blocker-class behavioral proof remains.
+
+      - Final gate decision basis maps each user-reported issue to evidence and OPEN/BLOCK
+      recommendation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: ui-navigation-hover-inspector-repair
+
+
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | contract-design-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing |
+      <notes> |
+
+      | expected-red-browser-tests | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | implementation-repair | ✅/⚠️/❌ | excellent/adequate/insufficient/missing |
+      <notes> |
+
+      | playwright-repair-verification | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | visual-ux-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes>
+      |
+
+
+      ### Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates?
+      | rationale | final_disposition |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | SOURCE LEDGER clickability | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN
+      | yes/no | <why> | OPEN/BLOCK |
+
+      | selected+hover clarity | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN | yes/no
+      | <why> | OPEN/BLOCK |
+
+      | Inspector hierarchy/raw demotion | <artifact/step> | PROVEN/NEEDS_TEST/UNPROVEN
+      | yes/no | <why> | OPEN/BLOCK |
+
+
+      ### Issues Identified
+
+      | Severity | Description | Related Step | Blocking? | Closure Path |
+
+      | --- | --- | --- | --- | --- |
+
+      | <blocker/should_fix/suggestion> | <issue> | <step_id> | YES/NO | <required
+      follow-up or none> |
+
+
+      ### Final Decision
+
+      - [ ] OPEN: repair phase passes gate
+
+      - [ ] BLOCKED: follow-up fix/retest required
+
+
+      ### Blocker/closure fields
+
+      - blockers_found: <none/list>
+
+      - acceptance_gaps_closed: <list>
+
+      - still_ambiguous: <none/list>
+
+      - closure_path: <none or required follow-up>
+
+      '
+    depends_on:
+    - contract-design-audit
+    - expected-red-browser-tests
+    - implementation-repair
+    - playwright-repair-verification
+    - visual-ux-audit
+    agent: gate-reviewer
