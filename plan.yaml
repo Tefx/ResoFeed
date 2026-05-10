@@ -29302,7 +29302,7 @@ phases:
       --project chromium-ci-safe` passed with 7/7 tests.'
   - id: retest-clean-inspector-primary-body
     name: Retest clean Inspector primary body regression
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -29477,6 +29477,29 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-10T14:22:56.754724+00:00'
+    done_at: '2026-05-10T14:26:38.388730+00:00'
+    evidence: 'Retest evidence accepted from integration-verifier. Refs confirmation
+      present for docs/DESIGN.md, inspector-readable-content-regression, inspector-dirty-corpus,
+      ui-navigation-hover-inspector-repair, web/playwright.config.ts, and project
+      instructions. Verify-only step; no product implementation files modified; no
+      commits created. Worker verification after installing missing isolated worktree
+      dependencies: `npm --prefix web run check` passed with 0 errors/warnings; `npm
+      --prefix web run build` passed; `npm --prefix web run test:e2e -- web/tests/e2e/inspector-readable-content-regression.spec.ts
+      web/tests/e2e/inspector-dirty-corpus.spec.ts web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      --project chromium-ci-safe` passed with 7/7 tests. Decoded rendered Inspector
+      primary body sample: `Readable article polluted by page source boilerplate original
+      link Readable article lead that should be safe for primary Inspector reading
+      copy.` Forbidden screenshot-family tokens all absent in primary body: `function
+      OptanonWrapper()` false, `--verge-font-body` false, `<script` false, `<style`
+      false, `Skip to main content` false, `The homepage The Verge` false, `model_latency_error`
+      false. Behavioral proof register marks all obligations PASS/PROVEN: raw JS/CSS/navigation/provenance
+      garbage absent, `model_latency_error` absent, readable copy visible, prior UI
+      repair coverage not regressed. Closure fields: verdict PASS, blockers [], gate_open_allowed
+      true, proof_gap_status NONE, blocking_status CLOSED, orchestrator_action_hint
+      COMPLETE. Mainline final-state verification: `npm --prefix web run check` passed;
+      `npm --prefix web run build` passed; `npm --prefix web run test:e2e -- web/tests/e2e/inspector-readable-content-regression.spec.ts
+      web/tests/e2e/inspector-dirty-corpus.spec.ts web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      --project chromium-ci-safe` passed with 7/7 tests.'
   - id: inspector-readable-content-gate
     name: Gate clean Inspector readable content remediation
     status: pending
