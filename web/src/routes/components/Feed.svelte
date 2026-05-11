@@ -27,7 +27,7 @@
 </script>
 
 <section class="contract-region" aria-labelledby="feed-heading">
-  <h2 id="feed-heading" class="visually-hidden">Today feed items</h2>
+  <h2 id="feed-heading" class="visually-hidden" tabindex="-1">Today feed items</h2>
   <div role="list" aria-label="Today feed items">
     {#each items as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>

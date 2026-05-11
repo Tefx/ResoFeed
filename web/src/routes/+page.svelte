@@ -84,6 +84,19 @@
   function replaceSurfaceFromLocation(): void {
     const routeSurface = surfaceForPath(window.location.pathname);
     if (routeSurface !== currentSurface) currentSurface = routeSurface;
+    void focusActiveSurface(routeSurface);
+  }
+
+  async function focusActiveSurface(surface = currentSurface): Promise<void> {
+    await tick();
+    const headingIdBySurface: Record<Surface, string> = {
+      feed: 'feed-heading',
+      inspector: 'inspector-heading',
+      ledger: 'source-ledger-heading',
+      search: 'search-heading',
+      doctor: 'doctor-heading'
+    };
+    document.getElementById(headingIdBySurface[surface])?.focus();
   }
 
   function apiClient(token = ownerToken): ResoFeedApiClient {
@@ -116,7 +129,9 @@
       }
       await tick();
       const activeText = document.activeElement?.textContent?.trim();
-      if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
+      if (currentSurface !== 'feed') {
+        await focusActiveSurface(currentSurface);
+      } else if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
         steerInput?.focus();
       }
     } catch (error) {
@@ -195,19 +210,6 @@
     void focusActiveSurface(surface);
   }
 
-  async function focusActiveSurface(surface: Surface): Promise<void> {
-    await tick();
-    if (surface === 'ledger') {
-      document.getElementById('source-ledger-heading')?.focus();
-    } else if (surface === 'search') {
-      document.getElementById('search-heading')?.focus();
-    } else if (surface === 'doctor') {
-      document.getElementById('doctor-heading')?.focus();
-    } else if (surface === 'feed') {
-      steerInput?.focus();
-    }
-  }
-
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
@@ -227,8 +229,8 @@
         return;
       }
       if (command.toLowerCase().startsWith('search ')) {
-        showSurface('search', false);
         searchSeedQuery = command.replace(/^search\s+/i, '');
+        showSurface('search', false);
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'retrieval: lexical search' };
         return;
@@ -238,6 +240,7 @@
         showSurface('doctor');
         steerCommand = '';
         steerFeedback = { kind: 'doctor', text: diagnostics };
+        void focusActiveSurface('doctor');
         return;
       }
 
@@ -247,7 +250,7 @@
       const suffix = changed > 0 ? ` · rules:${changed}` : '';
       steerFeedback = {
         kind: 'receipt',
-        text: `applied: ${response.receipt.message}${suffix}`
+        text: `applied: interpreted_as: ${response.receipt.interpreted_as}; ${response.receipt.message}${suffix}`
       };
       await refreshShellLists();
     } catch (error) {

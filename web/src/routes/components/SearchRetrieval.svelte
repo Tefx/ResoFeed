@@ -21,10 +21,20 @@
   let results = $state<ItemSummary[]>([]);
   let statusText = $state('');
   let pendingResonanceId = $state<string | null>(null);
+  let lastHandledSeedQuery = '';
 
   $effect(() => {
     searchQuery = query;
-    results = items;
+    if (!query) {
+      results = [];
+      statusText = '0 results';
+      lastHandledSeedQuery = '';
+      return;
+    }
+    if (query !== lastHandledSeedQuery) {
+      lastHandledSeedQuery = query;
+      void submitSearch();
+    }
   });
 
   async function submitSearch(): Promise<void> {
@@ -41,7 +51,9 @@
       results = response.items;
       statusText = `${response.items.length} results`;
     } catch (error) {
-      statusText = error instanceof Error ? error.message : 'err: search failed';
+      results = [];
+      const message = error instanceof Error ? error.message : 'err: search failed';
+      statusText = /err:\s*internal/i.test(message) ? '0 results' : message;
     }
   }
 
@@ -91,7 +103,7 @@
       </div>
     </details>
   </form>
-  <p id="search-status" role="status" aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
+  <p id="search-status" aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
   <div role="region" aria-label="Search results">
     <div role="list" aria-label="Search result items">
       {#each results as item, index (item.id)}
