@@ -45056,6 +45056,111 @@ phases:
     depends_on:
     - pbar-backend-gate
     agent: golang-developer
+  - id: pbar-backend-liveness-retest
+    name: Retest backend Mode D liveness after remediation
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an INDEPENDENT BLACK-BOX TESTER (blind-tester Mode D), rerun runnable/API
+      liveness validation from documented public startup/runtime surfaces after `pbar-backend-liveness-remediation`.
+
+
+      Scope and required probes:
+
+      1. Start the ResoFeed single binary/server using the documented public startup
+      path and confirm the configured port binds.
+
+      2. `GET /api/doctor` must return 200 diagnostics and include a stable fallback/provenance
+      key/string even when there are zero item-transform failures.
+
+      3. `/api/doctor` and all probed responses must not leak owner token, provider
+      API key values, dummy secret values, `OPENROUTER_KEY`, or equivalent secret-bearing
+      strings.
+
+      4. `GET /api/search?q=no-such-lexical-token-zzzz&limit=5` must return 200 JSON,
+      canonical query echo, and `items=[]` without generic internal error.
+
+      5. Through a documented public/runtime path, create or ingest a known lexical
+      fixture and prove `GET /api/search?q=<known-token>` returns the matching item.
+      Manual-only UI ingest that cannot be completed headlessly is not sufficient.
+
+      6. `POST /api/steer` with RSS URL/source-add intent returns 200 JSON receipt
+      with source-add interpretation and no generic internal error.
+
+      7. `POST /api/steer` with natural-language steering returns 200 JSON receipt
+      with changed rules or equivalent local parser receipt and no generic internal
+      error.
+
+      8. `POST /api/steer` with search-like command returns 200 JSON receipt interpreted
+      as search/no-result or equivalent, with no generic internal error.
+
+
+      Independence Level: L3 black-box liveness. Use only public docs/interfaces and
+      runtime behavior; do not rely on private internals, direct SQLite writes, or
+      implementation-source assumptions.
+
+
+      Verification scope: phase-check protecting downstream frontend remediation and
+      final strict closure. This retest is the gate-acceptance liveness barrier after
+      `pbar-backend-gate`.'
+    verification: 'phase-check protecting frontend remediation and final closure:
+      blind-tester Mode D returns PASS or PASS_WITH_DEBT with no blockers after exercising
+      startup, `/api/doctor` fallback/provenance plus secret non-leakage, `/api/search`
+      no-match and positive lexical match through public/runtime surfaces, and `/api/steer`
+      source-add, natural-language, and search-like receipts. Any NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      behavioral obligation must include explicit remediation or non-intersection
+      closure path before downstream phases proceed.'
+    evidence_template: "## Verification Report\n\n**Tester**: blind-tester Mode D\
+      \ (independent of backend implementation)\n**Scope**: backend runnable/API liveness\
+      \ after `pbar-backend-liveness-remediation`\n**Independence Level**: L3 black-box\n\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs were\
+      \ provided, state: \"No refs for this step.\"\n\n### Runtime Startup\n- Exact\
+      \ startup command:\n  ```\n  <command>\n  ```\n- Bound address/port evidence:\n\
+      \  ```\n  <output>\n  ```\n\n### Liveness Probe Results\n\n| Surface | Expected\
+      \ | Actual status | Evidence ref | Verdict |\n| --- | --- | --- | --- | ---\
+      \ |\n| `/api/doctor` | 200 text/plain diagnostics with fallback/provenance key/string\
+      \ | <status> | <excerpt> | PASS/FAIL |\n| Secret non-leakage | no owner token/provider\
+      \ key/dummy secret/OPENROUTER_KEY leakage | <status> | <scan excerpt> | PASS/FAIL\
+      \ |\n| `/api/search` no-match | 200 JSON, canonical query echo, `items=[]` |\
+      \ <status> | <response excerpt> | PASS/FAIL |\n| Positive lexical search | documented\
+      \ public/runtime path yields matching item | <status> | <path + response excerpt>\
+      \ | PASS/FAIL |\n| `/api/steer` source-add | 200 JSON receipt, no generic internal\
+      \ error | <status> | <response excerpt> | PASS/FAIL |\n| `/api/steer` natural-language\
+      \ | 200 JSON receipt with changed rules/equivalent | <status> | <response excerpt>\
+      \ | PASS/FAIL |\n| `/api/steer` search-like | 200 JSON search/no-result receipt/equivalent\
+      \ | <status> | <response excerpt> | PASS/FAIL |\n\n### Behavioral Proof Register\n\
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |\
+      \ status | closure_path | gate_decision_basis |\n| --- | --- | --- | --- | ---\
+      \ | --- | --- |\n| backend-liveness:doctor-fallback | Doctor exposes fallback/provenance\
+      \ signal in zero-failure case | `/api/doctor` excerpt contains stable key/string\
+      \ | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <OPEN/BLOCK\
+      \ basis> |\n| backend-liveness:positive-search | Lexical matching is provable\
+      \ through public/runtime surfaces | fixture path + `/api/search` matching item\
+      \ | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <OPEN/BLOCK\
+      \ basis> |\n| backend-liveness:secret-nonleak | Liveness surfaces do not leak\
+      \ secrets | secret scan/probe excerpts | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <OPEN/BLOCK basis> |\n| backend-liveness:steer-receipts | Steer\
+      \ source/natural/search receipts remain non-error JSON | response excerpts |\
+      \ <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <OPEN/BLOCK\
+      \ basis> |\n\n### Issues Found\n| Severity | Description | Surface | Reproduction\
+      \ |\n| --- | --- | --- | --- |\n| blocker | <issue or none> | <surface> | <steps>\
+      \ |\n| should_fix | <issue or none> | <surface> | <steps> |\n\n### Headline\n\
+      - [ ] **PASS**: No blocking liveness issues found and all blocker-class behavioral\
+      \ obligations are PROVEN.\n- [ ] **PASS_WITH_DEBT**: Only explicit non-blocking\
+      \ debt remains with non-intersection evidence.\n- [ ] **FAIL**: Blocking liveness\
+      \ issue or blocking proof gap remains.\n\n**Confidence**: high/medium/low"
+    depends_on:
+    - pbar-backend-liveness-remediation
+    agent: blind-tester
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
   status: locked
