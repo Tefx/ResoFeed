@@ -9,9 +9,10 @@
     onSearch: (params: SearchRequestParams) => Promise<SearchResponse>;
     onSelect?: (item: ItemSummary) => Promise<void> | void;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
+    suppressStatusRole?: boolean;
   }
 
-  let { items, query = '', onSearch, onSelect, onResonanceToggle }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResonanceToggle, suppressStatusRole = false }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -103,7 +104,7 @@
       </div>
     </details>
   </form>
-  <p id="search-status" aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
+  <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
   <div role="region" aria-label="Search results">
     <div role="list" aria-label="Search result items">
       {#each results as item, index (item.id)}

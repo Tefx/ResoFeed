@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { ImportOpmlResponse, ItemDetail, ItemSummary, Source, StateBundleV1, SteerRule } from '$lib/api-contract';
+  import type { ImportOpmlResponse, ItemDetail, ItemSummary, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -210,6 +210,56 @@
     void focusActiveSurface(surface);
   }
 
+  function compactUrlIdentity(urlText: string): string {
+    try {
+      const parsed = new URL(urlText);
+      return parsed.host || urlText;
+    } catch {
+      return urlText.replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || urlText;
+    }
+  }
+
+  function sourceIdentityFromMessage(message: string): string | null {
+    const match = /source added:\s*([^;]+)/i.exec(message);
+    return match?.[1]?.trim() || null;
+  }
+
+  function receiptMessageWithoutInterpretation(receipt: SteerReceipt): string {
+    return receipt.message
+      .replace(new RegExp(`^interpreted_as:\\s*${receipt.interpreted_as.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*;?\\s*`, 'i'), '')
+      .trim();
+  }
+
+  function receiptState(receipt: SteerReceipt): 'applied' | 'rejected' {
+    if (receipt.interpreted_as === 'add_source') return 'applied';
+    if (receipt.changed_rules.length > 0) return 'applied';
+    return /rejected|not applied|could not|conflict|unsafe|invariant|no safe|failed/i.test(receipt.message)
+      ? 'rejected'
+      : 'applied';
+  }
+
+  function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
+    if (receipt.interpreted_as === 'add_source') {
+      const sourceIdentity = sourceIdentityFromMessage(receipt.message) ?? compactUrlIdentity(command);
+      return `interpreted_as: ${receipt.interpreted_as}; applied: source added: ${sourceIdentity}; run ingest in SOURCE LEDGER`;
+    }
+
+    const state = receiptState(receipt);
+    const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
+    const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
+    const changed = receipt.changed_rules.length;
+    const suffix = changed > 0 ? ` · rules:${changed}` : '';
+    return `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
+  }
+
+  function formatSteerError(error: unknown): string {
+    if (error instanceof ResoFeedApiError && error.body.error.code === 'internal') {
+      return 'err: steering translation unavailable; try a narrower rule or paste an RSS URL';
+    }
+    if (error instanceof Error) return error.message;
+    return 'err: could not apply steering';
+  }
+
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
@@ -246,15 +296,13 @@
 
       const response = await apiClient().steer(command);
       steerCommand = '';
-      const changed = response.receipt.changed_rules.length;
-      const suffix = changed > 0 ? ` · rules:${changed}` : '';
       steerFeedback = {
         kind: 'receipt',
-        text: `applied: interpreted_as: ${response.receipt.interpreted_as}; ${response.receipt.message}${suffix}`
+        text: formatSteerReceipt(response.receipt, command)
       };
       await refreshShellLists();
     } catch (error) {
-      steerFeedback = { kind: 'error', text: error instanceof Error ? error.message : 'err: could not apply' };
+      steerFeedback = { kind: 'error', text: formatSteerError(error) };
     }
   }
 
@@ -487,12 +535,13 @@
         onFetchSource={fetchManualSource}
         onExportState={exportState}
         onImportState={importState}
+        suppressStatusRole={steerFeedback.kind === 'receipt'}
         manualFetchState={manualFetchState}
       />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+      <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} suppressStatusRole={steerFeedback.kind === 'receipt'} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">

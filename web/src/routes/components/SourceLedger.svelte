@@ -11,6 +11,7 @@
     onFetchSource?: (source: Source) => Promise<unknown> | unknown;
     onExportState: () => Promise<StateBundleV1>;
     onImportState: (bundle: StateBundleV1) => Promise<void> | void;
+    suppressStatusRole?: boolean;
     manualFetchState?: {
       readonly ingesting?: boolean;
       readonly fetchingSourceIds?: readonly string[];
@@ -27,6 +28,7 @@
     onFetchSource,
     onExportState,
     onImportState,
+    suppressStatusRole = false,
     manualFetchState = {}
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
@@ -174,7 +176,7 @@
       onchange={() => void importSelectedFile()}
     />
     {#if statusText}
-      <span role="status" class="ledger-status imported-status">{statusText}</span>
+      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
     {/if}
     <StatePortability onExportState={onExportState} onImportState={onImportState} />
   </div>
