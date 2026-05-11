@@ -108,7 +108,7 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		return applySearchSteering(ctx, db, searchQuery)
 	}
 
-	proposal := OpenRouterSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
+	proposal := deterministicSteeringProposal(command)
 	if llm != nil {
 		active, err := loadActiveSteerRules(ctx, db)
 		if err != nil {
@@ -116,7 +116,8 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		}
 		translated, err := llm.TranslateSteering(ctx, OpenRouterSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
 		if err != nil {
-			return SteerResult{}, fmt.Errorf("translate steering: %w", err)
+			proposal.Message = "interpreted_as: " + proposal.InterpretedAs + "; applied with local steering parser"
+			return applySteeringRules(ctx, db, proposal, req.ActorKind, req.ActorID)
 		}
 		translated = normalizeOpenRouterSteeringOutput(translated)
 		if translated.InterpretedAs != "" {
@@ -158,6 +159,112 @@ func applySearchSteering(ctx context.Context, db *sql.DB, query string) (SteerRe
 		ChangedRules:  []SteerRule{},
 		Message:       fmt.Sprintf("search: %d results for %q", len(items), echo.Q),
 	}}, nil
+}
+
+func deterministicSteeringProposal(command string) OpenRouterSteeringOutput {
+	rules := extractIntentRules(command)
+	if len(rules) == 0 {
+		rules = []string{strings.TrimSpace(command)}
+	}
+	interpreted := strings.Join(rules, "; ")
+	if interpreted == "" {
+		interpreted = "steering_policy_update"
+	}
+	return OpenRouterSteeringOutput{
+		InterpretedAs: interpreted,
+		RuleTexts:     rules,
+		Message:       "interpreted_as: " + interpreted + "; applied",
+	}
+}
+
+func extractIntentRules(command string) []string {
+	segments := splitSteeringClauses(command)
+	rules := make([]string, 0, len(segments))
+	for _, segment := range segments {
+		if rule, ok := normalizeIntentClause(segment); ok {
+			rules = append(rules, rule)
+		}
+	}
+	return dedupeStrings(rules)
+}
+
+func splitSteeringClauses(command string) []string {
+	cleaned := strings.TrimSpace(command)
+	if cleaned == "" {
+		return nil
+	}
+	parts := strings.Fields(cleaned)
+	clauses := []string{}
+	start := 0
+	for i, part := range parts {
+		word := strings.Trim(strings.ToLower(part), ",.;:!?()[]{}\"'")
+		if i > start && (word == "and" || word == "but") && i+1 < len(parts) && startsSteeringIntent(parts[i+1]) {
+			clauses = append(clauses, strings.Join(parts[start:i], " "))
+			start = i + 1
+		}
+	}
+	clauses = append(clauses, strings.Join(parts[start:], " "))
+	return clauses
+}
+
+func startsSteeringIntent(value string) bool {
+	switch strings.Trim(strings.ToLower(value), ",.;:!?()[]{}\"'") {
+	case "boost", "push", "prioritize", "prefer", "promote", "increase", "more", "reduce", "hide", "filter", "suppress", "exclude", "less", "downrank", "deprioritize":
+		return true
+	default:
+		return false
+	}
+}
+
+func normalizeIntentClause(clause string) (string, bool) {
+	words := strings.FieldsFunc(strings.ToLower(clause), func(r rune) bool {
+		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
+	})
+	if len(words) == 0 {
+		return "", false
+	}
+	intent := ""
+	subject := make([]string, 0, len(words))
+	stop := map[string]bool{"there": true, "is": true, "too": true, "much": true, "recently": true, "future": true, "coverage": true, "items": true, "articles": true, "documents": true, "unless": true, "story": true, "stories": true, "quality": true, "shallow": true, "show": true, "fewer": true, "more": true, "primary": true, "source": true}
+	for _, word := range words {
+		switch word {
+		case "hide", "filter", "suppress", "exclude", "reduce", "less", "downrank", "deprioritize", "fewer":
+			if intent == "" {
+				intent = "reduce"
+			}
+			continue
+		case "boost", "push", "prioritize", "prefer", "promote", "increase":
+			if intent == "" {
+				intent = "boost"
+			}
+			continue
+		}
+		if intent == "" || stop[word] || len(word) < 4 {
+			continue
+		}
+		subject = append(subject, word)
+	}
+	if intent == "" {
+		return "", false
+	}
+	if len(subject) == 0 {
+		return intent + " matching items", true
+	}
+	return intent + " " + strings.Join(subject, " "), true
+}
+
+func dedupeStrings(values []string) []string {
+	seen := map[string]bool{}
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		value = strings.TrimSpace(value)
+		if value == "" || seen[value] {
+			continue
+		}
+		seen[value] = true
+		out = append(out, value)
+	}
+	return out
 }
 
 // MarkItemInspected records deliberate human attention. Agent silent evaluation
@@ -500,11 +607,20 @@ func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (
 	}
 	now := time.Now().UTC().Format(time.RFC3339Nano)
 	id := stableTextID("src", sourceURL)
-	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1) on conflict(url) do update set is_active = 1, revision = revision + 1`, id, sourceURL, sourceURL, now)
+	identity := sourceIdentity(sourceURL)
+	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1) on conflict(url) do update set is_active = 1, revision = revision + 1`, id, sourceURL, identity, now)
 	if err != nil {
 		return SteerResult{}, fmt.Errorf("add source through steering: %w", err)
 	}
-	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added"}}, nil
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added: " + identity + "; run ingest in SOURCE LEDGER"}}, nil
+}
+
+func sourceIdentity(sourceURL string) string {
+	parsed, err := url.Parse(sourceURL)
+	if err != nil || parsed.Host == "" {
+		return sourceURL
+	}
+	return parsed.Host
 }
 
 func applySteeringRules(ctx context.Context, db *sql.DB, proposal OpenRouterSteeringOutput, actorKind ActorKind, actorID string) (SteerResult, error) {
