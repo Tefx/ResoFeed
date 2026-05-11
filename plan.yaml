@@ -46455,7 +46455,7 @@ phases:
       output; commit contains only source changes.'
   - id: pbar-frontend-gate
     name: Gate frontend PRD behavior remediation
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether frontend/browser-visible
       remediation is complete after the dedicated batched remediation and independent
       retest/proof step.
@@ -46581,6 +46581,8 @@ phases:
     depends_on:
     - pbar-frontend-gate-retest-proof
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T18:04:44.187360+00:00'
   - id: pbar-frontend-gate-blocker-remediation
     name: Batched remediation for frontend gate blockers
     status: done
