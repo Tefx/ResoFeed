@@ -258,20 +258,19 @@ export type ManualRssFetchApiResult<T> =
   | { ok: false; status: 404 | 409; body: ManualRssFetchErrorBody };
 
 export interface SourceLedgerManualFetchRenderContract {
-  readonly globalIdleLabel: '[RUN INGEST]';
-  readonly globalActiveLabel: '[INGESTING...]';
-  readonly sourceIdleLabel: '[FETCH]';
-  readonly sourceActiveLabel: '[FETCHING...]';
-  readonly activeControlDisabled: true;
+  readonly globalIdleLabel: null;
+  readonly globalActiveLabel: null;
+  readonly sourceIdleLabel: null;
+  readonly sourceActiveLabel: null;
+  readonly activeControlDisabled: false;
   readonly timestampFormat: 'HH:MM:SS';
-  readonly timestampInputs: readonly ['last_ingest', 'last_fetch'];
-  readonly errorCopy: 'terse-truncated-non-layout-shifting';
+  readonly timestampInputs: readonly ['last_fetch'];
+  readonly diagnosticDisclosure: '[DETAILS]';
   readonly bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible';
   readonly accessibility: readonly [
-    'native-button',
-    'named-global-ingest-control',
-    'named-per-source-fetch-control',
-    'disabled-active-fetch-controls',
+    'native-details-summary',
+    'named-delete-control',
+    'visible-diagnostic-disclosure',
     'visible-keyboard-focus'
   ];
   readonly forbiddenPatterns: readonly [
@@ -294,20 +293,19 @@ export interface SourceLedgerManualFetchRenderContract {
 }
 
 export const sourceLedgerManualFetchRenderContract: SourceLedgerManualFetchRenderContract = {
-  globalIdleLabel: '[RUN INGEST]',
-  globalActiveLabel: '[INGESTING...]',
-  sourceIdleLabel: '[FETCH]',
-  sourceActiveLabel: '[FETCHING...]',
-  activeControlDisabled: true,
+  globalIdleLabel: null,
+  globalActiveLabel: null,
+  sourceIdleLabel: null,
+  sourceActiveLabel: null,
+  activeControlDisabled: false,
   timestampFormat: 'HH:MM:SS',
-  timestampInputs: ['last_ingest', 'last_fetch'],
-  errorCopy: 'terse-truncated-non-layout-shifting',
+  timestampInputs: ['last_fetch'],
+  diagnosticDisclosure: '[DETAILS]',
   bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible',
   accessibility: [
-    'native-button',
-    'named-global-ingest-control',
-    'named-per-source-fetch-control',
-    'disabled-active-fetch-controls',
+    'native-details-summary',
+    'named-delete-control',
+    'visible-diagnostic-disclosure',
     'visible-keyboard-focus'
   ],
   forbiddenPatterns: [

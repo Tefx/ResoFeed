@@ -94,7 +94,8 @@ async function expectCanonicalLedgerSurface(page: Page): Promise<void> {
   const ledgerSurface = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]');
   await expect(ledgerSurface).toHaveClass(/active-panel/);
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  await expect(ledgerSurface.getByRole('button', { name: '[RUN INGEST]' })).toBeVisible();
+  await expect(ledgerSurface.getByRole('button', { name: /Fetch /i })).toHaveCount(0);
+  await expect(ledgerSurface.getByRole('button', { name: '[RUN INGEST]' })).toHaveCount(0);
   await expect(ledgerSurface.getByLabel('import OPML')).toBeAttached();
 }
 
@@ -104,8 +105,9 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
     await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
     await captureLedgerRegressionScreenshot(page, testInfo, 'root-after-owner-token');
 
-    const chrome = page.locator('nav.surface-nav');
-    await expect(chrome, 'SOURCE LEDGER must be an app-chrome navigation entry, not only a Steer command').toBeVisible();
+    const chrome = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+    await expect(chrome, 'SOURCE LEDGER must be reachable through the RESOFEED utility menu, not only a Steer command').toBeVisible();
+    await chrome.locator('summary').click();
     const ledgerEntry = chrome.getByRole('button', { name: 'SOURCE LEDGER' });
     await expect(ledgerEntry).toBeVisible();
     await expect(ledgerEntry).toBeEnabled();
@@ -122,13 +124,16 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
     await acceptOwnerTokenAt(page, `${runInfo.baseURL}/`, ownerToken);
     await captureLedgerRegressionScreenshot(page, testInfo, 'before-source-ledger-click');
 
-    await page.locator('nav.surface-nav').getByRole('button', { name: 'SOURCE LEDGER' }).click();
+    const chrome = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+    await chrome.locator('summary').click();
+    await chrome.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expectCanonicalLedgerSurface(page);
 
     const shellText = await visibleText(page);
     expect(shellText, 'primary visible copy must stay operational and avoid forbidden source-management/SaaS concepts').not.toMatch(forbiddenPrimaryCopy);
     await expect(page.getByText('RESOFEED')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'TODAY' })).toBeVisible();
+    await chrome.locator('summary').click();
+    await expect(chrome.getByRole('button', { name: 'TODAY' })).toBeVisible();
     await expect(page.getByLabel('INSPECTOR')).toBeAttached();
   });
 

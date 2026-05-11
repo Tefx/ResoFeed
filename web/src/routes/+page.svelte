@@ -14,12 +14,6 @@
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
   type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
-  type ManualFetchState = {
-    readonly ingesting: boolean;
-    readonly fetchingSourceIds: readonly string[];
-    readonly lastIngestAt: string | null;
-    readonly sourceErrors: Readonly<Record<string, string>>;
-  };
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -47,12 +41,7 @@
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
-  let manualFetchState = $state<ManualFetchState>({
-    ingesting: false,
-    fetchingSourceIds: [],
-    lastIngestAt: null,
-    sourceErrors: {}
-  });
+  let surfaceMenu = $state<HTMLDetailsElement | undefined>();
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -227,7 +216,7 @@
   function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
     if (receipt.interpreted_as === 'add_source') {
       const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
-      const detail = normalizedMessage.length > 0 ? normalizedMessage : 'source added; run ingest in SOURCE LEDGER';
+      const detail = normalizedMessage.length > 0 ? normalizedMessage : 'source added';
       return `applied: ${detail}`;
     }
 
@@ -245,6 +234,11 @@
     }
     if (error instanceof Error) return error.message;
     return 'err: could not apply steering';
+  }
+
+  function openSurfaceFromMenu(surface: Surface): void {
+    showSurface(surface);
+    if (surfaceMenu) surfaceMenu.open = false;
   }
 
   async function submitSteer(): Promise<void> {
@@ -312,80 +306,6 @@
     const response = await apiClient().importOpml(opml);
     sources = (await apiClient().sources()).sources;
     return response;
-  }
-
-  function formatManualSourceError(message: string): string {
-    return message.startsWith('err:') ? message : `err: ${message}`;
-  }
-
-  async function runManualIngest(): Promise<void> {
-    if (manualFetchState.ingesting) return;
-    manualFetchState = { ...manualFetchState, ingesting: true };
-    try {
-      let result = await apiClient().runIngest();
-      if (!result.ok && result.status === 409) {
-        await new Promise((resolve) => window.setTimeout(resolve, 1200));
-        result = await apiClient().runIngest();
-      }
-      if (result.ok) {
-        const sourceErrors = Object.fromEntries(
-          result.body.errors.map((sourceError) => [sourceError.source_id, formatManualSourceError(sourceError.message)])
-        );
-        manualFetchState = {
-          ...manualFetchState,
-          lastIngestAt: result.body.completed ? new Date().toISOString() : manualFetchState.lastIngestAt,
-          sourceErrors
-        };
-        await refreshShellLists();
-        return;
-      }
-      apiError = `err: ${result.body.error.message}`;
-    } catch (error) {
-      apiError = error instanceof Error ? error.message : 'err: ingest failed';
-    } finally {
-      manualFetchState = { ...manualFetchState, ingesting: false };
-    }
-  }
-
-  async function fetchManualSource(source: Source): Promise<void> {
-    if (manualFetchState.fetchingSourceIds.includes(source.id)) return;
-    manualFetchState = {
-      ...manualFetchState,
-      fetchingSourceIds: [...manualFetchState.fetchingSourceIds, source.id]
-    };
-    try {
-      const result = await apiClient().fetchSource(source.id);
-      if (result.ok) {
-        const remainingErrors: Record<string, string> = { ...manualFetchState.sourceErrors };
-        delete remainingErrors[source.id];
-        const sourceError = result.body.errors.find((errorEntry) => errorEntry.source_id === source.id);
-        manualFetchState = {
-          ...manualFetchState,
-          sourceErrors: sourceError
-            ? { ...remainingErrors, [source.id]: formatManualSourceError(sourceError.message) }
-            : remainingErrors
-        };
-        await refreshShellLists();
-        return;
-      }
-      manualFetchState = {
-        ...manualFetchState,
-        sourceErrors: { ...manualFetchState.sourceErrors, [source.id]: `err: ${result.body.error.message}` }
-      };
-    } catch (error) {
-      manualFetchState = {
-        ...manualFetchState,
-        sourceErrors: {
-          ...manualFetchState.sourceErrors,
-          [source.id]: error instanceof Error ? error.message : 'err: fetch failed'
-        }
-      };
-    } finally {
-      manualFetchState = {
-        ...manualFetchState,
-        fetchingSourceIds: manualFetchState.fetchingSourceIds.filter((sourceId) => sourceId !== source.id)
-      };
-    }
   }
 
   async function exportState(): Promise<StateBundleV1> {
@@ -461,7 +381,13 @@
           <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
         {/if}
       </form>
-      <span class="contract-label">RESOFEED</span>
+      <details class="surface-nav" aria-label="RESOFEED surface menu" bind:this={surfaceMenu}>
+        <summary class="contract-label" aria-label="RESOFEED surface menu">RESOFEED</summary>
+        <div class="surface-nav-menu">
+          <button type="button" aria-current={currentSurface === 'feed' ? 'page' : undefined} onclick={() => openSurfaceFromMenu('feed')}>TODAY</button>
+          <button type="button" aria-current={currentSurface === 'ledger' ? 'page' : undefined} onclick={() => openSurfaceFromMenu('ledger')}>SOURCE LEDGER</button>
+        </div>
+      </details>
     </header>
 
     {#if steerFeedback.kind === 'receipt'}
@@ -513,12 +439,9 @@
         sources={sources}
         onDeleteSource={deleteSource}
         onImportOpml={importOpml}
-        onRunIngest={runManualIngest}
-        onFetchSource={fetchManualSource}
         onExportState={exportState}
         onImportState={importState}
         suppressStatusRole={steerFeedback.kind === 'receipt'}
-        manualFetchState={manualFetchState}
       />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">

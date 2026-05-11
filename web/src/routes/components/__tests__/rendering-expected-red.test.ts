@@ -315,7 +315,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(document.querySelector('.shell-grid')).toHaveAttribute('data-surface', 'doctor');
   });
 
-  it('does not render persistent product surface navigation outside Steer', async () => {
+  it('exposes Source Ledger through a non-persistent RESOFEED utility menu', async () => {
+    const user = userEvent.setup();
     window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
@@ -329,9 +330,13 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(Page);
     await screen.findByLabelText('Steer or paste RSS URL');
 
-    expect(screen.queryByRole('navigation', { name: 'Surfaces' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'TODAY' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'SOURCE LEDGER' })).not.toBeInTheDocument();
+    const menu = screen.getByRole('group', { name: 'RESOFEED surface menu' });
+    expect(within(menu).getByText('RESOFEED')).toBeVisible();
+    expect(within(menu).queryByRole('button', { name: 'SOURCE LEDGER' })).not.toBeVisible();
+    await user.click(within(menu).getByText('RESOFEED'));
+    await user.click(within(menu).getByRole('button', { name: 'SOURCE LEDGER' }));
+    await waitFor(() => expect(screen.getByRole('region', { name: 'SOURCE LEDGER surface' })).toHaveClass('active-panel'));
+    expect(screen.getByRole('heading', { name: 'SOURCE LEDGER' })).toHaveFocus();
     expect(screen.queryByRole('button', { name: 'SEARCH' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'STATE' })).not.toBeInTheDocument();
   });

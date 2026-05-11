@@ -69,19 +69,21 @@ describe('manual RSS fetch acceptance contract lock', () => {
     expect(notFound.body.error.code).toBe('not_found');
   });
 
-  it('pins Source Ledger labels, state text, timestamp, a11y, and forbidden visual patterns', () => {
-    expect(sourceLedgerManualFetchRenderContract.globalIdleLabel).toBe('[RUN INGEST]');
-    expect(sourceLedgerManualFetchRenderContract.globalActiveLabel).toBe('[INGESTING...]');
-    expect(sourceLedgerManualFetchRenderContract.sourceIdleLabel).toBe('[FETCH]');
-    expect(sourceLedgerManualFetchRenderContract.sourceActiveLabel).toBe('[FETCHING...]');
-    expect(sourceLedgerManualFetchRenderContract.activeControlDisabled).toBe(true);
+  it('pins Source Ledger product-boundary labels, diagnostics, timestamp, a11y, and forbidden visual patterns', () => {
+    expect(sourceLedgerManualFetchRenderContract.globalIdleLabel).toBeNull();
+    expect(sourceLedgerManualFetchRenderContract.globalActiveLabel).toBeNull();
+    expect(sourceLedgerManualFetchRenderContract.sourceIdleLabel).toBeNull();
+    expect(sourceLedgerManualFetchRenderContract.sourceActiveLabel).toBeNull();
+    expect(sourceLedgerManualFetchRenderContract.activeControlDisabled).toBe(false);
     expect(sourceLedgerManualFetchRenderContract.timestampFormat).toBe('HH:MM:SS');
-    expect(sourceLedgerManualFetchRenderContract.timestampInputs).toEqual(['last_ingest', 'last_fetch']);
-    expect(sourceLedgerManualFetchRenderContract.errorCopy).toBe('terse-truncated-non-layout-shifting');
+    expect(sourceLedgerManualFetchRenderContract.timestampInputs).toEqual(['last_fetch']);
+    expect(sourceLedgerManualFetchRenderContract.diagnosticDisclosure).toBe('[DETAILS]');
     expect(sourceLedgerManualFetchRenderContract.bracketActionStyle).toBe(
       'bracket-padding-uppercase-terminal-hover-inversion-focus-visible'
     );
-    expect(sourceLedgerManualFetchRenderContract.accessibility).toContain('visible-keyboard-focus');
+    expect(sourceLedgerManualFetchRenderContract.accessibility).toEqual(
+      expect.arrayContaining(['native-details-summary', 'named-delete-control', 'visible-diagnostic-disclosure', 'visible-keyboard-focus'])
+    );
     expect(sourceLedgerManualFetchRenderContract.forbiddenPatterns).toEqual(
       expect.arrayContaining([
         'spinner',
