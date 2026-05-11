@@ -39671,8 +39671,14 @@ phases:
     description: 'Final independent gate for UI Remediation Retest Closure.
 
 
-      step_type: gate. verification_scope: phase-check. Agent: gate-reviewer. Independent
-      from implementation agent frontend-engineer.
+      step_type: gate
+
+      verification_scope: phase-check
+
+      Agent: gate-reviewer
+
+      Independent from implementation agent frontend-engineer and from UIUX remediation/audit
+      production work.
 
 
       Review all phase evidence before reopening completion. This gate must BLOCK
@@ -39680,19 +39686,47 @@ phases:
       remains unproven or if evidence bypasses real browser/UIUX/architecture validation.
 
 
+      This gate must also review the committed downstream UIUX canonical evidence
+      re-audit artifact produced by `ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact`.
+      The gate failure B1 was specifically that the downstream UIUX canonical evidence
+      re-audit returned PASS in vectl evidence but no committed artifact-level re-audit
+      report was found in the worktree. Therefore this gate MUST NOT open unless the
+      committed artifact exists, is parseable, and is reviewed directly.
+
+
+      Required downstream re-audit artifact criteria:
+
+      - The artifact exists under `audits/` or `docs/audits/` and is included in committed
+      changes/evidence.
+
+      - The artifact reviews and cites `audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md`.
+
+      - The artifact reviews and cites `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`.
+
+      - The artifact maps R1-R8 to exact screenshot, trace, DOM, and a11y evidence
+      paths.
+
+      - The artifact includes parseable fields `verdict`, `blockers`, and `gate_open_allowed`.
+
+      - The artifact uses `verdict: PASS`, `blockers: []`, and `gate_open_allowed:
+      true` if and only if no residual blockers remain; otherwise it lists explicit
+      residual blockers and blocks gate open.
+
+
       Gate decision basis must include:
 
       - R1-R8 closure matrix with evidence refs from fix, Playwright retest, focused
       R1 fixes/retests, uiux-auditor audits, the canonical visual evidence repair
-      handoff, and architecture/product-boundary retest.
+      handoff, the committed downstream UIUX canonical re-audit artifact, and architecture/product-boundary
+      retest.
 
       - Confirmation that the canonical evidence repair artifact itself records `gate_open_allowed:
       true` only when `blockers: []` and marks R1-R8 statuses `PROVEN` with exact
       screenshot/trace/DOM/a11y paths.
 
-      - Confirmation that the downstream UIUX canonical evidence re-audit returned
-      PASS or an explicit residual blocker list after reviewing the canonical handoff
-      artifact and visual evidence bundle.
+      - Confirmation that the committed downstream UIUX canonical evidence re-audit
+      artifact returned PASS or an explicit residual blocker list after reviewing
+      the canonical handoff artifact and visual evidence bundle.
 
       - Confirmation that R1 has BOTH sanitation and readable-prose preservation:
       `Follow us on Twitter for more newsletters` absent, `summary-like lead repeated
@@ -39702,8 +39736,8 @@ phases:
       - Confirmation that browser evidence includes desktop and mobile 390x844 states.
 
       - Confirmation that uiux-auditor produced a parseable PASS or explicit residual
-      blocker list for both the earlier screenshot conformance audit and the canonical
-      evidence re-audit.
+      blocker list for both the earlier screenshot conformance audit and the committed
+      canonical evidence re-audit artifact.
 
       - Confirmation that software-architect found no forbidden product concept or
       architecture boundary violation.
@@ -39715,19 +39749,38 @@ phases:
       PROVEN or has explicit non-intersection evidence. Because these R1-R8 findings
       directly intersect final UI design validation, unresolved UNPROVEN/NEEDS_TEST
       items must BLOCK. The gate must not run until the canonical visual evidence
-      repair and downstream UIUX re-audit have completed.'
+      repair, downstream UIUX re-audit, and materialized committed re-audit artifact
+      step have completed.'
     verification: '- All remediation, browser retest, focused R1 fix/retest loops,
       original uiux-auditor audit, canonical visual evidence repair, downstream UIUX
-      re-audit, and architecture/product-boundary retest steps are complete with adequate
-      evidence.
+      re-audit, materialized committed downstream re-audit artifact, and architecture/product-boundary
+      retest steps are complete with adequate evidence.
+
+      - The committed downstream UIUX canonical evidence re-audit artifact produced
+      by `ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact`
+      exists under `audits/` or `docs/audits/` and is directly reviewed by this gate.
+
+      - The downstream re-audit artifact references `audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md`
+      and `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`.
+
+      - The downstream re-audit artifact includes exact screenshot, trace, DOM, and
+      a11y evidence paths for each R1-R8 item, or explicit residual blockers naming
+      missing/contradictory paths.
+
+      - The downstream re-audit artifact includes parseable decision fields `verdict`,
+      `blockers`, and `gate_open_allowed`.
+
+      - The downstream re-audit artifact may support OPEN only when it states `verdict:
+      PASS`, `blockers: []`, and `gate_open_allowed: true`; any residual blocker,
+      missing artifact, missing path mapping, or non-parseable decision blocks OPEN.
 
       - Gate decision basis maps R1-R8 to concrete evidence refs and statuses.
 
       - Canonical visual evidence repair artifact must include `gate_open_allowed:
       true`, `blockers: []`, and R1-R8 all `PROVEN` before OPEN is allowed.
 
-      - Canonical evidence repair and downstream UIUX re-audit must provide exact
-      screenshot/trace/DOM/a11y paths for R1-R8.
+      - Canonical evidence repair and downstream UIUX re-audit artifacts must provide
+      exact screenshot/trace/DOM/a11y paths for R1-R8.
 
       - R1 closure requires both exact forbidden strings absent and readable article
       prose present, including `Second readable paragraph confirms the body is not
@@ -39748,54 +39801,102 @@ phases:
 
       For each ref in this step:
 
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
-
       - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
       <reason>"
+
+      - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+      — key passage or "NOT READ: <reason>"
+
+      - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ — key
+      evidence inventory passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Final Remediation Gate Decision Basis
+      ## Gate Review Report
 
 
-      | Requirement | Final status | Evidence artifact(s) | Gate decision basis |
+      **Reviewer**: gate-reviewer (independent of phase implementation)
 
-      | --- | --- | --- | --- |
+      **Phase**: ui-remediation-retest-closure
 
-      | R1 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R2 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R3 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R4 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R5 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R6 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R7 | PROVEN/UNPROVEN | <paths> | <basis> |
-
-      | R8 | PROVEN/UNPROVEN | <paths> | <basis> |
+      **Timestamp**: <ISO 8601>
 
 
-      **Canonical evidence repair artifact reviewed**: <audits/...md>
+      ## Required Downstream Re-Audit Artifact Review
 
-      **UIUX canonical evidence re-audit reviewed**: <evidence ref>
 
-      **gate_open_allowed**: true/false
+      **Artifact path reviewed**: `<audits/...md or docs/audits/...md>`
 
-      **blockers**: [] or list
+      **Artifact exists**: yes/no
+
+      **Artifact committed/included in changes**: yes/no
+
+      **Canonical handoff cited**: yes/no — `audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md`
+
+      **Evidence bundle cited**: yes/no — `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`
+
+
+      ```yaml
+
+      verdict: PASS|FAIL
+
+      blockers: []
+
+      gate_open_allowed: true|false
+
+      ```
+
+
+      ## R1-R8 Closure Matrix
+
+
+      | Requirement | Status | Evidence refs reviewed | Residual blocker | Gate impact
+      |
+
+      | --- | --- | --- | --- | --- |
+
+      | R1 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R2 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R3 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R4 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R5 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R6 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R7 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
+
+      | R8 | PROVEN/UNPROVEN | <exact screenshot/trace/DOM/a11y paths> | <none or
+      blocker> | OPEN/BLOCK |
 
 
       ## Gate Decision
 
-      - [ ] OPEN: R1-R8 PROVEN, blockers empty, canonical evidence exists, UIUX re-audit
-      passed
 
-      - [ ] BLOCKED: missing/contradictory visual proof or residual blockers remain'
+      - [ ] OPEN: Phase passes gate; committed downstream re-audit artifact supports
+      PASS and no blockers remain.
+
+      - [ ] BLOCKED: Required artifact is missing/non-parseable/not committed, or
+      residual blockers remain.
+
+
+      If BLOCKED, list required remediation steps and exact missing evidence paths.'
+    refs:
+    - docs/audits/ui-remediation-retest-2026-05-11.md
+    - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+    - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/
     depends_on:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
@@ -39806,6 +39907,7 @@ phases:
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     - ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
     - ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
+    - ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
     - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     agent: gate-reviewer
   - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
