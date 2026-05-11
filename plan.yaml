@@ -45463,7 +45463,7 @@ phases:
       scoped changed-file diff check passed.'
   - id: pbar-backend-liveness-retest
     name: Retest backend Mode D liveness after remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -45566,6 +45566,8 @@ phases:
     depends_on:
     - pbar-backend-liveness-remediation
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-11T16:58:15.215929+00:00'
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
   status: locked
