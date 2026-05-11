@@ -48678,7 +48678,7 @@ phases:
       - none'
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether independent
       retests and audits are sufficient for final strict closure.
 
@@ -48744,6 +48744,8 @@ phases:
     - pbar-wiring-audit
     - pbar-browser-flow-failure-remediation
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T19:25:11.281229+00:00'
   - id: pbar-backend-mcp-fresh-related-delivery-fix
     name: Fix MCP fresh related delivery candidate regression
     status: done
