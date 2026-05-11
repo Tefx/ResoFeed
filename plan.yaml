@@ -47499,90 +47499,93 @@ phases:
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
     status: pending
-    description: 'step_type: test
-
-      step_intent: retest_green
-
-      expected_result: green
-
-
-      As an INDEPENDENT TESTER (integration-verifier), retest the real rendered browser
-      workflows against the PRD behavior audit after remediation.
-
-
-      Scope must include desktop and narrow/mobile:
-
-      - Inspect, Resonate, Search command and Search submit, natural-language Steer
-      accepted/rejected paths, RSS URL add receipt, manual ingest, /doctor direct
-      route and /doctor via Steer, Source Ledger diagnostics, state-portability restore
-      safety, top-nav surface switching, Enter/apply submissions from feed/Inspector/Search/Ledger.
-
-      - Produce screenshots/DOM snapshots equivalent to the audit artifacts, not only
-      test summaries.
-
-
-      This is a phase-check protecting UIUX audit and final closure. Findings must
-      be mapped to B1-B23 and U1-U5.'
+    description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
+      \nAs an INDEPENDENT TESTER (integration-verifier), retest the real rendered\
+      \ browser workflows against the PRD behavior audit after remediation.\n\nMANDATORY\
+      \ PRECONDITION:\n- Do not run this retest until `pbar-browser-flow-failure-remediation`\
+      \ is complete. That step owns remediation for the prior FAIL verdict and encodes\
+      \ the authoritative failure context.\n\nScope must include desktop and narrow/mobile:\n\
+      - Inspect, Resonate, Search command and Search submit, natural-language Steer\
+      \ accepted/rejected paths, RSS URL add receipt, manual ingest, /doctor direct\
+      \ route and /doctor via Steer, Source Ledger diagnostics, state-portability\
+      \ restore safety, top-nav surface switching, Enter/apply submissions from feed/Inspector/Search/Ledger.\n\
+      - Produce screenshots/DOM snapshots equivalent to the audit artifacts, not only\
+      \ test summaries.\n- Re-run and report the exact previously failing commands:\n\
+      \  - `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`\n\
+      \  - `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts`\n\
+      - Verify the previously failing U1, B5/U2, B12, and invalid `OPENROUTER_KEY`\
+      \ alert path are now green.\n- Ensure B16/B17/B18 either receive direct browser\
+      \ proof in this retest or explicit non-intersection evidence accepted by the\
+      \ gate.\n\nThis is a phase-check protecting UIUX audit and final closure. Findings\
+      \ must be mapped to B1-B23 and U1-U5."
     verification: 'phase-check protecting UIUX audit and final closure: real browser
       retest passes green for every UI-visible finding and includes screenshots/DOM
       snapshots for desktop and mobile states, with explicit B1-B23/U1-U5 closure
-      mapping.'
+      mapping. Must include the prior failed command outputs now green and direct
+      B16/B17/B18 browser proof or gate-accepted non-intersection evidence.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - <filename> — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Browser Retest Evidence
-
-      **Tester**: integration-verifier (independent of implementation)
-
-      **Scope**: End-user PRD workflows
-
-      **Independence Level**: L2
+      ## Browser Retest Report
 
 
-      ### Commands executed
+      **Precondition confirmed**: `pbar-browser-flow-failure-remediation` complete:
+      yes/no
+
+
+      **Commands executed**:
+
+      ```sh
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
 
       ```
 
-      <playwright/vitest commands and output>
 
-      ```
+      **Previously failing assertions**:
 
+      - U1 mobile Search form height <= 170px: PASS/FAIL with observed height
 
-      ### Runtime target
+      - B5/U2 source-add receipt includes source identity/title and ingest orientation:
+      PASS/FAIL with rendered text
 
-      - URL:
+      - B12 Source Ledger row full diagnostic affordance count: PASS/FAIL with count
 
-      - owner-token setup method:
-
-      - viewport matrix:
-
-
-      ### Artifacts
-
-      - Desktop screenshots/snapshots: <paths>
-
-      - Mobile screenshots/snapshots: <paths>
+      - Invalid OPENROUTER_KEY browser path surfaces role=alert text `err: internal:
+      internal error`: PASS/FAIL with rendered alert text
 
 
-      ### Finding-by-finding UI closure
+      **B16/B17/B18 closure**:
 
-      | Finding | Evidence ref | Status | Notes |
+      - B16 ranking/filtering after accepted steering: PROVEN / non-intersection accepted
+      / unresolved
 
-      | --- | --- | --- | --- |
+      - B17 boost ranking effect: PROVEN / non-intersection accepted / unresolved
 
-      | B1-B23,U1-U5 | <artifact/command> | PROVEN/UNPROVEN/NON_INTERSECTING | |
+      - B18 fresh item model health: PROVEN / non-intersection accepted / unresolved
 
 
-      ### Headline
+      **Artifacts**:
 
-      PASS / PASS_WITH_DEBT / FAIL'
+      - Desktop screenshots/DOM snapshots: <paths>
+
+      - Mobile screenshots/DOM snapshots: <paths>
+
+
+      **Gate decision basis**:
+
+      - unresolved blocker-class behavioral obligations: <none/list>
+
+      - gate_open_allowed: true/false
+
+      - orchestrator_action_hint: COMPLETE / DO_NOT_COMPLETE'
+    depends_on:
+    - pbar-browser-flow-failure-remediation
     agent: integration-verifier
   - id: pbar-runtime-liveness-probe
     name: Black-box liveness probe for runnable web surfaces
