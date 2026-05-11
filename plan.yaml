@@ -44363,7 +44363,7 @@ phases:
     agent: golang-developer
   - id: pbar-backend-readable-payload-sanitation
     name: Move readable payload sanitation to shared backend layer
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -44420,6 +44420,8 @@ phases:
       \ proof: dirty tail/source furniture is removed or fallback-labelled.\n- Shared-layer\
       \ proof: sanitation is not only UI-local."
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:25:47.397805+00:00'
   - id: pbar-backend-llm-doctor-provenance-remediation
     name: Align LLM fallback provenance and doctor diagnostic semantics
     status: claimed
