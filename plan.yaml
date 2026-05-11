@@ -46072,7 +46072,7 @@ phases:
     claimed_at: '2026-05-11T17:03:32.048806+00:00'
   - id: pbar-frontend-steer-receipt-remediation
     name: Render actionable Steer and source-add receipts without product creep
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -46126,6 +46126,8 @@ phases:
       \ screenshots or DOM>\n- Product-boundary proof: no wizard/toast stack/activity\
       \ ledger/rule manager."
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T17:03:44.861936+00:00'
   - id: pbar-frontend-gate
     name: Gate frontend PRD behavior remediation
     status: pending
