@@ -41721,7 +41721,7 @@ phases:
   steps:
   - id: slnr-contract-doc-route-contract
     name: Pin Source Ledger navigation and route contract from docs
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - documented_navigation_contract\n  - browser_acceptance_matrix\n\nRead the\
       \ authoritative docs and existing UI tests to pin the Source Ledger navigation\
@@ -41778,6 +41778,56 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-11T11:50:26.864140+00:00'
+    done_at: '2026-05-11T11:54:54.879322+00:00'
+    evidence: "## refs Read Confirmation\n\n- docs/DESIGN.md — Read. Key passages:\
+      \ App Shell allows optional Source Ledger route/overlay; Source Ledger is flat\
+      \ source management without settings-dashboard behavior; product labels must\
+      \ remain terse including `SOURCE LEDGER`.\n- docs/ARCHITECTURE.md — Read. Key\
+      \ passages: frontend lives in `web/` and must preserve DESIGN.md; it must expose\
+      \ flat Source Ledger without folders/tags/settings-dashboard behavior; verification\
+      \ forbids folders, tags, settings dashboard, archive flow, notification ownership,\
+      \ or RAG surface.\n- web/src/routes/+page.svelte — Read. Current root UI imports\
+      \ SourceLedger and has `currentSurface = 'ledger'`, but visible nav/chrome route\
+      \ is not present in the read code; Source Ledger opens via Steer command only.\n\
+      - web/tests/e2e/real-server-ui.spec.ts — Read. Existing helpers open Source\
+      \ Ledger by typing `source ledger` into Steer; tests cover ledger behavior via\
+      \ command but not visible chrome nav or direct `/source-ledger`, `/source`,\
+      \ `/sources` routes.\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — Read. Prior expected-red tests already assert a `nav.surface-nav` SOURCE\
+      \ LEDGER click path and forbidden-copy guard.\n\n## Contract Evidence\n\n- Documented\
+      \ acceptance matrix:\n  - root chrome visible SOURCE LEDGER nav: docs/DESIGN.md\
+      \ App Shell/labels and docs/ARCHITECTURE.md frontend boundary.\n  - click activation\
+      \ opens ledger: docs/DESIGN.md Source Ledger flat source-management surface.\n\
+      \  - direct `/source-ledger` opens ledger: route/overlay allowance; canonicalized\
+      \ in new expected-red contract.\n  - `/source` and `/sources` compatibility\
+      \ aliases: user regression path preserved as compatibility aliases; no doc conflict\
+      \ found because docs do not name route slugs.\n- Files changed: test-only artifact\
+      \ `web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts`;\
+      \ no product implementation files modified.\n- Worker commit hash(es): ad33f7d\n\
+      - Mainline squash commit: e4ffdc5\n- Forbidden concepts checked: accounts, profiles,\
+      \ password reset, folders, tags, source hierarchy, settings dashboards/settings,\
+      \ onboarding wizard, mascot, SaaS/AI-magic copy, unread/mark-all-read/archive\
+      \ concepts, sync/merge engines, vector DB/RAG, service/repository layers, event\
+      \ buses.\n- Headline: PASS\n\n## Expected-Red Verification\n\nstep_intent: test_define_red\n\
+      expected_result: red\nobserved_result: red\nfailure_alignment: matches declared\
+      \ user-visible regression: no visible `nav.surface-nav` / SOURCE LEDGER entry\
+      \ and direct `/source-ledger`, `/source`, `/sources` do not activate the ledger\
+      \ surface.\nproduct_implementation_files_modified: no\n\nMainline targeted command\
+      \ run from `web/`:\n`npm run test:e2e -- source-ledger-navigation-regression.expected-red.spec.ts`\n\
+      \nObserved output:\n- Build succeeded.\n- Playwright ran 5 tests.\n- 5 failed\
+      \ as expected-red:\n  1. root chrome lacks visible keyboard-reachable SOURCE\
+      \ LEDGER nav (`nav.surface-nav` not found).\n  2. clicking SOURCE LEDGER cannot\
+      \ work because entry is missing.\n  3. `/source-ledger` does not activate the\
+      \ ledger surface (`active-panel` absent).\n  4. `/source` does not activate\
+      \ the ledger surface.\n  5. `/sources` does not activate the ledger surface.\n\
+      \n## Verification\n\n- Contract step produced a test-only artifact and committed\
+      \ it on isolated branch.\n- Orchestrator squash-merged to main as `e4ffdc5 [vectl]\
+      \ step-slnr-contract-doc-route-contract completed`.\n- Mainline expected-red\
+      \ test execution confirmed the exact regression and did not require product-code\
+      \ changes for this contract step.\n\n## Gaps/Notes\n\n- Runtime behavior intentionally\
+      \ not implemented or proven in this contract step.\n- Direct alias behavior\
+      \ has no explicit doc route-slug authority; kept as user-reported compatibility\
+      \ per task instruction."
   - id: slnr-expected-red-browser-test
     name: Add expected-red browser coverage for Source Ledger discoverability and
       direct routes
