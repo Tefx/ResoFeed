@@ -41710,7 +41710,7 @@ phases:
       None'
 - id: source-ledger-navigation-regression
   name: Source Ledger Navigation Regression Remediation
-  status: in_progress
+  status: done
   gate: Restore documented SOURCE LEDGER discoverability and direct-route access without
     introducing forbidden product concepts, settings dashboards, sync/merge behavior,
     or non-canonical UI chrome. Gate requires expected-red browser coverage, frontend
@@ -42660,7 +42660,7 @@ phases:
       artifacts prove the rendered behavior.'
   - id: slnr-gate
     name: Gate Source Ledger navigation regression remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -42812,6 +42812,188 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T13:11:07.633569+00:00'
+    done_at: '2026-05-11T13:14:29.685448+00:00'
+    evidence: '## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: source-ledger-navigation-regression
+
+
+      ## refs Read Confirmation
+
+
+      - docs/DESIGN.md — READ: lines 250-263 define flat Source Ledger as a primary
+      surface and require operational labels; lines 463-476 define flat Source Ledger
+      anatomy and forbid folders/tags/settings-dashboard behavior; lines 505-521 require
+      keyboard navigation and terse labels.
+
+      - docs/ARCHITECTURE.md — READ: lines 904-924 require `web/` to preserve DESIGN.md,
+      expose flat Source Ledger, and avoid extra dashboard/source-management/settings
+      surfaces.
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts — READ:
+      lines 5-23 pin root nav, click activation, `/source-ledger`, `/source`, `/sources`,
+      and forbidden-copy expectations; lines 101-143 implement five Playwright checks.
+
+      - web/src/routes/+page.svelte — READ: lines 71-79 map `/source-ledger`, `/source`,
+      `/sources` to ledger and canonicalize ledger nav to `/source-ledger`; lines
+      410-413 render TODAY/SOURCE LEDGER nav; lines 458-470 render active Source Ledger
+      surface.
+
+      - web/src/routes/components/SourceLedger.svelte — READ: lines 115-170 render
+      `SOURCE LEDGER`, `[RUN INGEST]`, flat rows, delete controls, OPML import, and
+      state portability footer.
+
+      - .audit-artifacts/slnr-materialize-browser-proof-artifacts/proof-report.md
+      — READ: lines 17-29 document dependency hydration, `npm ci`, `npm run check`,
+      and focused E2E exit 0; lines 50-63 list required screenshots/traces/results/junit
+      paths; lines 65-73 close all behavioral proof rows as PROVEN.
+
+      - .audit-artifacts/slnr-materialize-browser-proof-artifacts/logs/npm-run-check.log
+      — READ: lines 2-8 show `svelte-kit sync && svelte-check --tsconfig ./tsconfig.json`
+      and `svelte-check found 0 errors and 0 warnings`.
+
+      - .audit-artifacts/slnr-materialize-browser-proof-artifacts/logs/focused-source-ledger-e2e.log
+      — READ: lines 61-71 show 5 Playwright tests run and passed for root nav, click,
+      `/source-ledger`, `/source`, `/sources`.
+
+      - .audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/results.json
+      or junit.xml — READ: results/JUnit show 5 expected tests, 0 unexpected, screenshots/traces
+      attached, tests=5 failures=0 errors=0.
+
+
+      ## Dependency Hydration / Static Check
+
+
+      - svelte-kit present before check: NO
+
+      - npm ci run: YES — required because `web/node_modules/.bin/svelte-kit` was
+      missing. Exit 0.
+
+      - npm run check: PASS — exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+
+      ## Execution Review
+
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | slnr-contract-doc-route-contract | ✅ | excellent | Docs pinned Source Ledger
+      as flat primary surface/optional route-overlay without implementation. |
+
+      | slnr-expected-red-browser-test | ✅ | excellent | Expected-red coverage predates
+      implementation and covers root nav, click, canonical route, aliases, forbidden
+      copy, keyboard/hit-target checks. |
+
+      | slnr-restore-navigation-route | ✅ | excellent | `+page.svelte` implements
+      chrome nav and path mapping without forbidden source dashboard/settings/folders/tags/accounts/sync
+      concepts. |
+
+      | slnr-browser-route-retest | ✅ | excellent | Committed proof log and gate independent
+      rerun both show 5 focused Playwright tests passed. |
+
+      | slnr-uiux-navigation-audit | ✅ | adequate | Rendered screenshot/trace evidence
+      committed for required states; UI copy aligns with docs. |
+
+      | slnr-materialize-browser-proof-artifacts | ✅ | excellent | Proof report, check/e2e
+      logs, screenshots, traces, results.json, and junit.xml are tracked and inspectable.
+      |
+
+
+      ## Gate Evidence Completeness
+
+
+      - Wiring audit results: W1 route ingress PASS; W2 URL canonicalization PASS;
+      W3 root chrome discoverability PASS; W4 click activation PASS; W5 active panel
+      binding PASS; W6 owner-token route liveness PASS; W7 alias disposition PASS;
+      W8 forbidden product concepts PASS_WITH_NOTE.
+
+      - Escape hatch audit: PASS — targeted grep found no TODO/FIXME, `@ts-ignore`,
+      `@ts-expect-error`, `eslint-disable`, `@invar:allow`, mocks/stubs in reviewed
+      implementation. False positives: `folders flattened` is required design copy
+      and `syncRoute` is local route-sync parameter, not sync/merge product behavior.
+
+      - Runtime/browser proof basis: PASS — committed logs plus independent command
+      `npm run test:e2e -- --project=chromium-ci-safe source-ledger-navigation-regression.expected-red.spec.ts`
+      exited 0 with `5 passed (5.7s)`.
+
+      - Integration proof distinction: Browser proof is real SvelteKit/Playwright
+      UI route proof with owner-token harness and fixture server; external RSS/OpenRouter
+      proof is not required for this navigation regression gate.
+
+      - Committed artifact proof: `git ls-files` confirmed proof report, logs, results,
+      junit, screenshots, and traces under `.audit-artifacts/slnr-materialize-browser-proof-artifacts/`.
+
+
+      ## behavioral_proof_register
+
+
+      - SLNR-root-nav: PROVEN; evidence proof-report, focused e2e log, independent
+      rerun passed test 1; blocking_gap: none.
+
+      - SLNR-click-open: PROVEN; evidence proof-report, focused e2e log, independent
+      rerun passed test 2; blocking_gap: none.
+
+      - SLNR-direct-source-ledger: PROVEN; evidence proof-report, focused e2e log,
+      independent rerun passed test 3; blocking_gap: none.
+
+      - SLNR-alias-source: PROVEN; evidence proof-report, focused e2e log, independent
+      rerun passed test 4; blocking_gap: none.
+
+      - SLNR-alias-sources: PROVEN; evidence proof-report, focused e2e log, independent
+      rerun passed test 5; blocking_gap: none.
+
+      - unresolved_NEEDS_TEST_UNPROVEN_UNCERTAIN_BLOCKING: none found by artifact
+      grep.
+
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      verdict: PASS
+
+      blockers: []
+
+
+      ## Files changed
+
+
+      None. No gate report artifact was created and no commit was made. Gate branch
+      had no commits ahead of main and final worktree status was clean.
+
+
+      ## Verification
+
+
+      - `npm ci` — exit 0.
+
+      - `npm run check` — exit 0.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe source-ledger-navigation-regression.expected-red.spec.ts`
+      — exit 0; 5 passed.
+
+      - `git ls-files` confirmed required audit artifacts are tracked.
+
+      - Escape-hatch/forbidden-concept grep found no blocker.
+
+      - `git status --short --branch` final status clean.
+
+
+      ## Gaps/Notes
+
+
+      - Non-blocking: `npm ci` reported 3 low severity vulnerabilities.
+
+      - Non-blocking: Playwright emitted Node `[DEP0205] module.register()` deprecation
+      warning.
+
+      - No blocker remains from previous gate failure: proof artifacts are committed/inspectable
+      and dependencies were hydrated before `npm run check`.'
   - id: slnr-materialize-browser-proof-artifacts
     name: Materialize Source Ledger browser proof artifacts
     status: done
