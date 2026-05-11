@@ -44224,7 +44224,7 @@ phases:
       \ cleaned; final status clean.\n```"
 - id: prd-behavior-audit-remediation-backend-semantics
   name: PRD Behavior Audit Remediation — Backend Semantics
-  status: in_progress
+  status: done
   gate: Backend remediation closes search, steering/ranking, readable payload sanitation,
     LLM provenance, and doctor diagnostic semantics with expected-red tests turned
     green and no forbidden product concepts introduced.
@@ -45463,7 +45463,7 @@ phases:
       scoped changed-file diff check passed.'
   - id: pbar-backend-liveness-retest
     name: Retest backend Mode D liveness after remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -45568,9 +45568,174 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-11T16:58:15.215929+00:00'
+    done_at: '2026-05-11T17:00:48.681248+00:00'
+    evidence: '## Verification Report
+
+      **Tester**: blind-tester Mode D (independent of backend implementation)
+
+      **Scope**: backend runnable/API liveness after `pbar-backend-liveness-remediation`
+
+      **Independence Level**: L3 black-box
+
+      **Timestamp**: 2026-05-11T17:00:03Z
+
+
+      ### refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — one binary started with `resofeed serve`; `/api/*`
+      requires owner token; `/api/doctor` returns text diagnostics; OpenRouter secrets
+      must not leak.
+
+      - docs/DESIGN.md — confirms ResoFeed analyst workbench surfaces and diagnostic-output/steer
+      UI contract context.
+
+      - docs/USAGE.md — documented build/run path, HTTP auth header, `/api/steer`,
+      `/api/search`, `/api/doctor`, and runtime lexical liveness proof via Steer +
+      `POST /api/ingest` + Search.
+
+
+      verdict: PASS
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      blockers: []
+
+
+      ### Runtime Startup
+
+      - Exact startup command:
+
+      ```text
+
+      /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed_liveness_ci953m78/resofeed
+      serve --addr 127.0.0.1:19180 --public-url http://127.0.0.1:19180 --db /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed_liveness_ci953m78/data/resofeed.sqlite3
+      --owner-token <OWNER_TOKEN>
+
+      ```
+
+      - Bound address/port evidence:
+
+      ```text
+
+      PORT_BOUND True
+
+      lsof -nP -i :19180
+
+      COMMAND    PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+
+      resofeed 15977 tefx    6u  IPv4 ... TCP 127.0.0.1:19180 (LISTEN)
+
+      ```
+
+
+      ### Liveness Probe Results
+
+      | Surface | Expected | Actual status | Evidence ref | Verdict |
+
+      | --- | --- | --- | --- | --- |
+
+      | `/api/doctor` | 200 text/plain diagnostics with fallback/provenance key/string
+      | 200 text/plain | `rss: ok`; `openrouter: provider_reachable=unknown configured_model=account_default`;
+      `fallback_provenance: item_transform_failures=0 summary=none`; `ingest: last_run=never`
+      | PASS |
+
+      | Secret non-leakage | no owner token/provider key/dummy/OPENROUTER_KEY leak
+      | no leaks detected | Checked all probed response bodies for explicit owner
+      token, dummy OpenRouter key value, dummy secret value, and `OPENROUTER_KEY`;
+      result `leaks=[]` | PASS |
+
+      | `/api/search` no-match | 200 JSON items=[] canonical query | 200 JSON | `{"items":[],"query":{"q":"no-such-lexical-token-zzzz","source":null,"from":null,"to":null,"resonated":null,"limit":5}}`
+      | PASS |
+
+      | positive lexical search | public/runtime ingest then matching item returned
+      | 200 JSON after Steer source-add + `POST /api/ingest` | Ingest returned `sources_fetched:1`,
+      `items_discovered:1`, `items_upserted:1`; search returned title `Known lexical
+      fixture pbarlexicaltokenzzzz` and URL `/article-pbarlexicaltokenzzzz.html` |
+      PASS |
+
+      | `/api/steer` RSS/source-add | 200 receipt no generic internal error | 200
+      JSON | `{"receipt":{"interpreted_as":"add_source","changed_rules":[],"message":"source
+      added: 127.0.0.1:19181; run ingest in SOURCE LEDGER"}}` | PASS |
+
+      | `/api/steer` NL steering | 200 receipt no generic internal error | 200 JSON
+      | `interpreted_as: boost careful analysis about local first software sqlite
+      tradeoffs; applied with local steering parser`; changed rule returned | PASS
+      |
+
+      | `/api/steer` search-like | 200 search/search_empty receipt no generic internal
+      error | 200 JSON | `{"receipt":{"interpreted_as":"search_empty","changed_rules":[],"message":"search:
+      0 results for \"no-such-lexical-token-zzzz\""}}` | PASS |
+
+
+      ### behavioral_proof_register
+
+      - startup/port binding: PROVEN
+
+      - doctor fallback/provenance: PROVEN
+
+      - secret non-leakage: PROVEN
+
+      - search no-match: PROVEN
+
+      - search positive match: PROVEN
+
+      - steer source-add receipt: PROVEN
+
+      - steer natural-language receipt: PROVEN
+
+      - steer search-like receipt: PROVEN
+
+
+      **Repository changes**: none; `git status --short --branch` showed only the
+      clean liveness retest branch.
+
+      **Commands executed**:
+
+      ```text
+
+      pwd && git status --short --branch
+
+      Read docs/ARCHITECTURE.md, docs/DESIGN.md, docs/USAGE.md
+
+      go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed_liveness_ci953m78/resofeed
+      ./cmd/resofeed
+
+      Started local black-box fixture RSS server on 127.0.0.1:19181
+
+      Started ResoFeed on 127.0.0.1:19180 with temp SQLite DB and dummy runtime secrets
+
+      lsof -nP -i :19180
+
+      GET /api/doctor
+
+      GET /api/search?q=no-such-lexical-token-zzzz&limit=5
+
+      POST /api/steer with fixture RSS URL
+
+      POST /api/ingest with {}
+
+      GET /api/search?q=pbarlexicaltokenzzzz&limit=5
+
+      POST /api/steer with natural-language steering command
+
+      POST /api/steer with search-like command
+
+      git status --short --branch
+
+      ```
+
+      **Limitations**: none'
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
-  status: locked
+  status: pending
   gate: Frontend surfaces close Search, Steer, Doctor, Inspector, Feed, Resonate,
     Source Ledger, mobile containment, accessibility semantics, and scan-readable
     visual grammar with expected-red browser tests turned green.
