@@ -44975,6 +44975,87 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T16:37:26.311493+00:00'
+  - id: pbar-backend-liveness-remediation
+    name: Remediate backend liveness proof blockers
+    status: pending
+    description: "step_type: implementation\nagent_source: project\n\nBatched remediation\
+      \ for blind-tester Mode D blockers found after `pbar-backend-gate`. This step\
+      \ must cover BOTH blocker families together; do not fix only one.\n\nContext\
+      \ from failed liveness probe:\n- Server startup and core API surfaces were live.\n\
+      - `/api/doctor` returned diagnostics and did not leak dummy/OpenRouter secrets,\
+      \ but did not expose an explicit fallback-related key/string when there were\
+      \ zero item-transform failures.\n- Positive lexical matching search could not\
+      \ be proven through documented public startup/runtime surfaces because the fixture\
+      \ RSS source was not ingested and the token-gated UI did not unlock in the headless\
+      \ probe.\n\nRequired remediation:\n1. Doctor fallback/provenance signal:\n \
+      \  - Ensure `GET /api/doctor` exposes a stable fallback/provenance key or literal\
+      \ string even when there are zero item-transform failures.\n   - Keep output\
+      \ terse diagnostic text/raw diagnostics; do NOT turn Doctor into a dashboard\
+      \ or settings surface.\n   - Preserve secret non-leakage: no owner token, provider\
+      \ API key, dummy secret, `OPENROUTER_KEY`, or equivalent secret value may appear.\n\
+      \n2. Black-box positive lexical search proof path:\n   - Provide or repair a\
+      \ documented, public/runtime liveness path that can create or ingest a known\
+      \ lexical fixture and then prove `GET /api/search?q=<known-token>` returns the\
+      \ matching item.\n   - Prefer existing product surfaces and documented startup\
+      \ behavior. If the existing owner-token UI unlock or documented ingest path\
+      \ is broken, fix the minimum necessary runtime path consistent with `docs/ARCHITECTURE.md`\
+      \ and `docs/DESIGN.md`.\n   - The path may use an already-authorized minimal\
+      \ runtime operation consistent with ResoFeed's Inspect/Resonate/Steer/Retrieve\
+      \ model, but MUST NOT introduce admin sidecars, sync/history systems, accounts,\
+      \ vector/RAG search, dashboards, settings surfaces, or manual-only UI ingest\
+      \ as the sole proof path.\n   - Positive search proof must exercise public/runtime\
+      \ surfaces after server startup, not direct database writes or private test\
+      \ hooks.\n\nFailure-mode checklist:\n- no item-transform failures still shows\
+      \ fallback/provenance key/string;\n- no-match search remains `200` JSON with\
+      \ `items=[]` and canonical query echo;\n- positive lexical fixture is actually\
+      \ ingested/available before search assertion;\n- source-add, natural-language\
+      \ steer, and search-like steer receipts still avoid generic internal errors;\n\
+      - no forbidden product concepts or secret leakage are introduced.\n\nState and\
+      \ architecture guardrails:\n- Single Go binary only (`cmd/resofeed`); no sidecar\
+      \ worker/admin process.\n- SQLite + FTS5 lexical search only; no vector DB,\
+      \ embeddings, or RAG.\n- Owner token remains the universal delegation boundary;\
+      \ no accounts or per-agent registry.\n- `actor_id` is provenance/idempotency\
+      \ only, not authorization.\n\n## Completion Criteria (stub exclusion)\nThis\
+      \ is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each deliverable\
+      \ MUST contain substantive runtime logic or repaired wiring that processes public\
+      \ inputs and produces outputs that vary based on those inputs. Private `_Runtime*`,\
+      \ `_Stub*`, or `_Placeholder*` classes/functions do not satisfy this requirement.\n\
+      \n## Gate Preview (what the liveness retest WILL reject)\n1. Doctor output lacks\
+      \ any stable fallback/provenance key/string in the zero-failure case.\n2. Positive\
+      \ lexical search depends on manual UI actions that headless Mode D cannot complete.\n\
+      3. Positive search proof bypasses public startup/runtime surfaces by writing\
+      \ directly to SQLite or invoking private internals.\n4. Any secret-bearing value\
+      \ appears in `/api/doctor` or API responses.\n5. New admin/sync/account/vector/dashboard/settings\
+      \ concepts are introduced."
+    verification: 'local-check protecting backend runnable/API gate acceptance: focused
+      runtime or integration evidence demonstrates `/api/doctor` exposes the fallback/provenance
+      key/string without secret leakage, no-match lexical search remains stable, a
+      documented public/runtime path creates or ingests a known lexical fixture, and
+      `GET /api/search?q=<known-token>` returns the matching item through the running
+      server. Evidence must also show source-add, natural-language steer, and search-like
+      steer receipts remain non-error JSON receipts.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n## Liveness Remediation Evidence\n\n**Doctor\
+      \ fallback/provenance fix**:\n- Stable key/string added or repaired: `<key-or-string>`\n\
+      - Zero-failure `/api/doctor` sample excerpt:\n  ```\n  <paste relevant lines>\n\
+      \  ```\n- Secret scan/non-leakage evidence for owner token, dummy secret, provider\
+      \ key names/values, and `OPENROUTER_KEY`:\n  ```\n  <commands/output or probe\
+      \ excerpts>\n  ```\n\n**Positive lexical proof path**:\n- Public/runtime path\
+      \ used to make fixture searchable: `<documented API/UI/runtime path>`\n- Why\
+      \ this path is consistent with ARCH/DESIGN and owner-token boundary:\n  `<one\
+      \ paragraph>`\n- Known lexical token: `<token>`\n- Positive search response\
+      \ excerpt showing matching item:\n  ```json\n  <paste response excerpt>\n  ```\n\
+      \n**Receipt regression coverage**:\n- Source-add steer receipt result:\n  ```json\n\
+      \  <excerpt>\n  ```\n- Natural-language steer receipt result:\n  ```json\n \
+      \ <excerpt>\n  ```\n- Search-like steer receipt result:\n  ```json\n  <excerpt>\n\
+      \  ```\n\n**Forbidden concepts check**:\n- No sidecar/admin/sync/history/account/vector/RAG/dashboard/settings\
+      \ surface introduced: PASS/FAIL with notes\n\n**Headline**: PASS | PASS_WITH_DEBT\
+      \ | FAIL"
+    depends_on:
+    - pbar-backend-gate
+    agent: golang-developer
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
   status: locked
