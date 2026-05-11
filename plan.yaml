@@ -42010,3 +42010,178 @@ phases:
     - slnr-contract-doc-route-contract
     - slnr-expected-red-browser-test
     agent: frontend-engineer
+  - id: slnr-browser-route-retest
+    name: Independently verify Source Ledger nav and direct routes in real browser
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+
+      As an INDEPENDENT TESTER, validate the Source Ledger navigation remediation
+      from a fresh browser perspective.
+
+
+      This check protects the phase gate and any downstream UI release decision. Finding
+      issues is a successful verification outcome, but unresolved blocker-class findings
+      must be routed to remediation before gate opens.
+
+
+      Required real-browser proof:
+
+      1. Start/use the real Go-served ResoFeed UI according to existing Playwright
+      fixture patterns.
+
+      2. At `/`, enter/restore owner token and prove `SOURCE LEDGER` navigation entry
+      is visible, keyboard reachable, unobstructed, and activates the existing ledger
+      surface.
+
+      3. Prove direct navigation to `/source-ledger` opens the ledger surface after
+      token acceptance.
+
+      4. Prove `/source` and `/sources` compatibility paths open the ledger surface,
+      or cite the contract step''s explicit docs conflict if aliases were rejected.
+
+      5. Prove `TODAY`, `INSPECTOR`, and `/doctor` remain reachable and are not masked
+      by the new navigation.
+
+      6. Capture screenshot and trace artifacts for root nav and direct-route ledger
+      states.
+
+
+      Control-plane closure semantics:
+
+      Produce a behavioral proof register with requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for each route/navigation
+      obligation. Any NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING item requires remediation
+      ownership before the gate.
+
+
+      touch_paths:
+
+      - evidence/artifacts only unless test harness repair is required
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts may
+      be renamed or reclassified only if preserving assertions as must-green'
+    verification: '- Green focused Playwright/browser run proves visible SOURCE LEDGER
+      nav, click activation, `/source-ledger`, `/source`, and `/sources` behavior.
+
+      - Actual output and artifact paths are pasted, not summarized as "tests pass".
+
+      - Behavioral proof register statuses are PROVEN or have explicit non-intersection/remediation
+      closure paths.
+
+      - Any blocker found is reported with reproduction details for a follow-up fix/retest
+      loop.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer implementation)
+
+      **Scope**: Source Ledger navigation/direct-route remediation
+
+      **Independence Level**: L1
+
+      **Timestamp**: <ISO 8601>
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts — key
+      passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/real-server-ui.spec.ts — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/fixtures.ts — key passage or "NOT READ: <reason>"
+
+
+      ## Seam-Level Integration Evidence
+
+      **Changed seam path**: Go static UI server / Svelte app shell / Source Ledger
+      navigation
+
+
+      **Exact command executed**:
+
+      ```
+
+      <paste focused Playwright command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste stdout/stderr>
+
+      ```
+
+
+      **Route matrix**:
+
+      | Route/action | Expected | Evidence artifact | Status |
+
+      |---|---|---|---|
+
+      | `/` visible SOURCE LEDGER nav | visible + keyboard reachable | <path> | PASS/FAIL
+      |
+
+      | click SOURCE LEDGER | ledger active + heading visible | <path> | PASS/FAIL
+      |
+
+      | `/source-ledger` | ledger active after token | <path> | PASS/FAIL |
+
+      | `/source` | ledger active or documented conflict | <path> | PASS/FAIL |
+
+      | `/sources` | ledger active or documented conflict | <path> | PASS/FAIL |
+
+      | TODAY/INSPECTOR/doctor regression check | still reachable | <path> | PASS/FAIL
+      |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | <ref> | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+
+      ## Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS: No blocking issues found and coverage justified
+
+      - [ ] PASS_WITH_DEBT: Only explicit non-blocking debt remains
+
+      - [ ] FAIL: Blocking issues or proof gaps remain
+
+
+      Confidence: high/medium/low'
+    depends_on:
+    - slnr-restore-navigation-route
+    agent: integration-verifier
