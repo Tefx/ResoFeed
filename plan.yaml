@@ -41831,7 +41831,7 @@ phases:
   - id: slnr-expected-red-browser-test
     name: Add expected-red browser coverage for Source Ledger discoverability and
       direct routes
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -41925,6 +41925,54 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T11:55:18.787573+00:00'
+    done_at: '2026-05-11T12:01:14.018820+00:00'
+    evidence: "## refs Read Confirmation\n\n- docs/DESIGN.md — Source Ledger is a\
+      \ primary surface; permitted operational labels include `RESOFEED`, `TODAY`,\
+      \ `SOURCE LEDGER`, `INSPECTOR`, `/doctor`; Source Ledger must be flat, keyboard-accessible,\
+      \ and avoid folders/tags/settings dashboards.\n- docs/ARCHITECTURE.md — Frontend\
+      \ must be served by the single Go binary, preserve DESIGN.md, store/send owner\
+      \ token, and expose flat Source Ledger without extra dashboards.\n- web/tests/e2e/real-server-ui.spec.ts\
+      \ — Real-server fixture pattern uses Go binary, owner-token prompt acceptance,\
+      \ and Playwright fixtures `runInfo`/`ownerToken`.\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — Prior navigation assertions use `nav.surface-nav`, `.utility-surface[aria-label=\"\
+      SOURCE LEDGER surface\"]`, `active-panel`, and unobstructed hit-target probing.\n\
+      - web/src/routes/+page.svelte — Current regression state has Source Ledger surface\
+      \ present but no `nav.surface-nav`; route path is not mapped to `currentSurface\
+      \ = 'ledger'`.\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — Existing contract file was present and was extended to real Go-served app\
+      \ path with owner-token acceptance and screenshot capture.\n\n## Expected-Red\
+      \ Test Evidence\n\nstep_intent: test_define_red\nexpected_result: red\nobserved_result:\
+      \ red\nfailure_alignment: Expected-red reproduced. Root app lacks visible `nav.surface-nav`\
+      \ / `SOURCE LEDGER` chrome entry, click path cannot activate missing entry,\
+      \ and direct `/source-ledger`, `/source`, `/sources` leave `.utility-surface[aria-label=\"\
+      SOURCE LEDGER surface\"]` inactive.\nproduct_implementation_files_modified:\
+      \ no\n\n- Test file(s) changed: `web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts`\n\
+      - Worker commit hash(es): 1106650\n- Mainline squash commit: 420c589\n- Exact\
+      \ command executed on mainline:\n  `npm run test:e2e -- source-ledger-navigation-regression.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` from `web/`\n- Observed result: build succeeded,\
+      \ 5 Playwright tests failed as expected-red.\n- Expected failures / exposed_gaps:\n\
+      \  - missing visible SOURCE LEDGER chrome entry: `locator('nav.surface-nav')`\
+      \ not found after owner-token acceptance at `/`.\n  - click activation: SOURCE\
+      \ LEDGER button is missing, so click path cannot activate the ledger.\n  - `/source-ledger`\
+      \ direct route: ledger DOM exists but lacks `active-panel`.\n  - `/source` and\
+      \ `/sources` aliases: same inactive ledger-surface failure.\n- Artifact paths\
+      \ from run include screenshots/videos/traces under `.test-artifacts/playwright/test-output/source-ledger-navigation-*`.\n\
+      - Downstream owner: `slnr-restore-navigation-route`.\n\n## Behavioral Proof\
+      \ Register\n\n- root SOURCE LEDGER nav visible/focusable/unobstructed after\
+      \ owner-token acceptance: UNPROVEN_EXPECTED_RED\n- SOURCE LEDGER click activates\
+      \ `.utility-surface[aria-label=\"SOURCE LEDGER surface\"]`: UNPROVEN_EXPECTED_RED\n\
+      - direct `/source-ledger` activates Source Ledger surface: UNPROVEN_EXPECTED_RED\n\
+      - direct `/source` and `/sources` activate Source Ledger surface aliases: UNPROVEN_EXPECTED_RED\n\
+      - real Go-served browser path exercised: PROVEN\n\n## Verification\n\n- Worker\
+      \ extended only the expected-red browser spec; no product implementation files\
+      \ changed.\n- Worker focused Playwright run exercised the Go-served app URL,\
+      \ accepted owner token in browser, and produced 5 expected failures.\n- Orchestrator\
+      \ squash-merged worker branch into main as `420c589 [vectl] step-slnr-expected-red-browser-test\
+      \ completed`.\n- Orchestrator reran focused expected-red test on mainline and\
+      \ observed the same 5 aligned failures.\n\n## Gaps/Notes\n\nExpected-red coverage\
+      \ is in place. The implementation gap is intentionally left for downstream step\
+      \ `slnr-restore-navigation-route`. Generated Playwright screenshots/traces are\
+      \ evidence artifacts only and were not committed."
   - id: slnr-restore-navigation-route
     name: Restore SOURCE LEDGER chrome entry and direct-route handling
     status: pending
