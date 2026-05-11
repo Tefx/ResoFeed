@@ -41286,3 +41286,136 @@ phases:
 
 
       none'
+  - id: urrc-fix-uiux-reaudit-dom-a11y-paths
+    name: Fix UIUX re-audit DOM/a11y evidence paths
+    status: pending
+    description: "Batched remediation for final gate blockers B1 and B2 in the committed\
+      \ downstream UIUX re-audit artifact.\n\nstep_type: implementation\nverification_scope:\
+      \ local-check\nAgent: uiux-auditor\n\nScope: update or replace `audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md`\
+      \ only as needed to correct the downstream UIUX re-audit decision record created\
+      \ after `ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact`.\n\
+      \nBlockers covered in this one step:\n- B1: Rows R2-R8 silently list `N/A` for\
+      \ DOM/a11y/text paths even though the final gate requires exact screenshot,\
+      \ trace, DOM, and a11y evidence paths for each R1-R8 item OR explicit residual\
+      \ blockers naming missing paths.\n- B2: The artifact declares `verdict: PASS`,\
+      \ `blockers: []`, and `gate_open_allowed: true` despite missing DOM/a11y path\
+      \ mapping, violating the if-and-only-if gate-open rule.\n\nRequired correction:\n\
+      1. For each R1-R8 row, provide exact evidence paths for every required proof\
+      \ class: screenshot, trace, DOM, a11y, and text evidence where applicable.\n\
+      2. If any required DOM/a11y/text proof path is genuinely unavailable, do NOT\
+      \ use silent `N/A` while claiming PROVEN/PASS. Instead, record an explicit residual\
+      \ blocker that names the item, the missing proof class, and the missing path.\n\
+      3. Ensure parseable decision fields match row-level proof state:\n   - `verdict:\
+      \ PASS`, `blockers: []`, and `gate_open_allowed: true` are allowed if and only\
+      \ if every R1-R8 required proof path is present and no residual blocker remains.\n\
+      \   - Any missing or contradictory required path mapping MUST produce `verdict:\
+      \ FAIL`, non-empty `blockers`, and `gate_open_allowed: false`.\n4. Preserve\
+      \ the artifact's role as a downstream UIUX canonical re-audit of `audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md`\
+      \ and `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`.\n\
+      \n## Gate Preview (what the final gate WILL reject)\n1. Any R1-R8 row claiming\
+      \ PROVEN/PASS while a required DOM, a11y, text, screenshot, or trace proof path\
+      \ is `N/A`, blank, generic, or non-existent.\n2. `verdict: PASS` with non-empty\
+      \ residual proof gaps, or `gate_open_allowed: true` when blockers are present.\n\
+      3. `blockers: []` when any required proof class is missing or contradictory.\n\
+      \n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION remediation\
+      \ step for an audit artifact. Stub-only or placeholder evidence completion is\
+      \ NOT acceptable. Each row-level proof claim MUST be backed by exact paths or\
+      \ converted into an explicit blocker with closed gate state."
+    verification: '- B1 coverage: each R1-R8 row contains exact screenshot, trace,
+      DOM, a11y, and text evidence paths where required, or an explicit residual blocker
+      names the missing/contradictory proof class and path.
+
+      - B2 coverage: parseable `verdict`, `blockers`, and `gate_open_allowed` fields
+      are internally consistent with row-level proof state.
+
+      - No row silently uses `N/A`, blank, placeholder, or generic path mappings for
+      required DOM/a11y/text proof while claiming PROVEN or supporting PASS.
+
+      - `verdict: PASS`, `blockers: []`, and `gate_open_allowed: true` appear together
+      only when all required R1-R8 proof paths are present and no residual blockers
+      remain.
+
+      - Any missing required DOM/a11y/text/screenshot/trace path forces `verdict:
+      FAIL`, non-empty `blockers`, and `gate_open_allowed: false`.
+
+      - Evidence cites the corrected artifact path and summarizes the before/after
+      decision-field consistency.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md — key passage
+      or "NOT READ: <reason>"
+
+      - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+      — key passage or "NOT READ: <reason>"
+
+      - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ — key
+      passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Re-audit Artifact Remediation Evidence
+
+
+      **Artifact corrected**: `audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md`
+
+
+      ### B1 Row-Level Proof Matrix
+
+      | Item | Screenshot path | Trace path | DOM path | a11y path | Text path | Status
+      | Residual blocker if any |
+
+      | ---- | --------------- | ---------- | -------- | --------- | --------- | ------
+      | ----------------------- |
+
+      | R1 | | | | | | PROVEN/FAIL | |
+
+      | R2 | | | | | | PROVEN/FAIL | |
+
+      | R3 | | | | | | PROVEN/FAIL | |
+
+      | R4 | | | | | | PROVEN/FAIL | |
+
+      | R5 | | | | | | PROVEN/FAIL | |
+
+      | R6 | | | | | | PROVEN/FAIL | |
+
+      | R7 | | | | | | PROVEN/FAIL | |
+
+      | R8 | | | | | | PROVEN/FAIL | |
+
+
+      ### B2 Decision Field Consistency
+
+      ```yaml
+
+      verdict: <PASS|FAIL>
+
+      blockers: <[] or non-empty list>
+
+      gate_open_allowed: <true|false>
+
+      ```
+
+
+      **Consistency result**: PASS | FAIL
+
+
+      ### Anti-silent-N/A Check
+
+      - Rows with required proof path set to `N/A`: <none or list>
+
+      - For each listed row, explicit blocker exists and gate is closed: yes/no
+
+
+      ### Headline
+
+      PASS only if B1 and B2 are both corrected under the if-and-only-if gate-open
+      rule.'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
+    agent: uiux-auditor
