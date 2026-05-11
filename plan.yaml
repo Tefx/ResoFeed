@@ -44752,3 +44752,72 @@ phases:
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
     agent: wiring-auditor
+  - id: pbar-retest-audit-gate
+    name: Gate independent retests and audits
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether independent
+      retests and audits are sufficient for final strict closure.
+
+
+      Review depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Verification spans backend tests, real browser workflows, liveness routes,
+      multimodal UI/UX, product-boundary conformance, and wiring reachability.
+
+      - Any unresolved B1-B23/U1-U5 obligation can block final closure.
+
+
+      BLOCK if any verifier reports FAIL, missing evidence, unresolved behavioral
+      proof, missing rendered artifacts for UI findings, or missing product-boundary/wiring
+      closure.
+
+
+      Verification scope: phase-check protecting final strict gate.'
+    verification: 'phase-check protecting final closure: all independent verification/audit
+      steps are complete, all blocker-class behavioral obligations are PROVEN or have
+      explicit non-intersection evidence, and no missing evidence remains for B1-B23/U1-U5.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest/Audit Gate Review
+
+      - Backend retest reviewed: PASS/FAIL
+
+      - Browser retest reviewed: PASS/FAIL
+
+      - Liveness probe reviewed: PASS/FAIL
+
+      - UIUX audit reviewed: PASS/FAIL
+
+      - Spec/product-boundary review reviewed: PASS/FAIL
+
+      - Wiring audit reviewed: PASS/FAIL
+
+
+      ### Unresolved behavioral obligations
+
+      | Finding | Status | Closure path | Blocks final gate? |
+
+      | --- | --- | --- | --- |
+
+
+      ### Gate decision
+
+      OPEN / BLOCK'
+    depends_on:
+    - pbar-backend-green-retest
+    - pbar-browser-flow-retest
+    - pbar-runtime-liveness-probe
+    - pbar-uiux-multimodal-audit
+    - pbar-spec-product-boundary-review
+    - pbar-wiring-audit
+    agent: gate-reviewer
