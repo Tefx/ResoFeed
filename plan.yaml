@@ -48527,9 +48527,13 @@ phases:
 
       Verification scope: phase-check protecting final strict gate.'
     verification: 'phase-check protecting final closure: all independent verification/audit
-      steps and the batched remediation/adjudication step are complete, all blocker-class
-      behavioral obligations are PROVEN or have explicit non-intersection evidence,
-      the Source Ledger product-boundary conflict is resolved by authoritative citations/proof,
+      steps and the batched remediation/adjudication step are complete, including
+      the downstream post-remediation uiux-auditor validation for Source Ledger UI
+      changes; all blocker-class behavioral obligations are PROVEN or have explicit
+      non-intersection evidence; the Source Ledger product-boundary conflict is resolved
+      by authoritative citations/proof; post-remediation multimodal UI/UX evidence
+      is present for Source Ledger operation-control boundary, allowed visible reachability
+      path, diagnostic full-view expansion, accessibility, and DESIGN.md conformance;
       and no missing evidence remains for B1-B23/U1-U5.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
@@ -48558,6 +48562,7 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-uiux-multimodal-audit
     - pbar-source-ledger-boundary-wiring-remediation
+    - pbar-post-remediation-uiux-audit
     - pbar-spec-product-boundary-review
     - pbar-wiring-audit
     - pbar-browser-flow-failure-remediation
