@@ -39173,7 +39173,7 @@ phases:
       close the blocker.'
   - id: ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     name: urrc-uiux-screenshot-conformance-audit
-    status: claimed
+    status: done
     description: 'Native multimodal UI/UX implementation audit after the residual
       UI fixes and second focused R1 browser retest.
 
@@ -39297,6 +39297,127 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-11T09:25:56.409407+00:00'
+    done_at: '2026-05-11T09:37:21.575418+00:00'
+    evidence: '## UIUX Screenshot Audit Handoff
+
+      **Auditor**: uiux-auditor
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — Remaining blockers from
+      previous audit include P1 Inspector content sanitation (R1) and mobile Source
+      Ledger row geometry (R2), plus R3-R8 residuals.
+
+      - docs/DESIGN.md — Verified required design contracts for App Shell, Feed Item,
+      Search, and Source Ledger.
+
+      - audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md — Notes
+      that R1 is proven by runtime evidence, but did not itself record `gate_open_allowed
+      true` or list all R1-R8 statuses as `PROVEN`.
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — Verifies R1 readable
+      prose and forbidden strings but delegates R2-R8 to sibling tests without explicit
+      proof.
+
+      - .test-artifacts/playwright/ or artifacts/ui-remediation-retest-2026-05-11/
+      — Reviewed test output traces and screenshots; no explicit fresh visual evidence
+      provided to prove R2-R8 remediation.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: FAIL
+
+      verdict: FAIL
+
+      headline: FAIL
+
+      blockers:
+
+      - `audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md` does
+      not record `gate_open_allowed true` with all R1-R8 statuses PROVEN.
+
+      - Missing clear visual evidence proving remediation of findings R2 through R8.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE until canonical visual evidence repair
+      and re-audit complete
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): none
+
+
+      ## R1-R8 visual conformance matrix
+
+      - R1 Inspector raw boilerplate: FAIL/OPEN under strict evidence condition. Runtime
+      evidence exists but strict `gate_open_allowed` condition unmet.
+
+      - R2 Mobile Source Ledger row: UNPROVEN. No visual evidence proving mobile row
+      geometry matches required layout.
+
+      - R3 Metadata unreadable: UNPROVEN. Missing visual evidence of compact inline
+      metadata grammar.
+
+      - R4 Inspector duplicate state: UNPROVEN. Missing visual evidence proving duplicate
+      provenance state is fixed.
+
+      - R5 Search command leaks: UNPROVEN. Missing visual evidence proving search
+      context does not leak into Today.
+
+      - R6 Duplicate Inspect DOM: UNPROVEN. Missing evidence proving inactive inspect
+      controls are unmounted.
+
+      - R7 Source Ledger grammar: UNPROVEN. Missing visual evidence for exact ledger
+      grammar contract.
+
+      - R8 State Portability layout: UNPROVEN. Missing visual evidence of corrected
+      layout cluster.
+
+
+      ## Behavioral/Visual Proof Register
+
+      - R1: NEEDS_TEST under strict UIUX audit evidence requirements.
+
+      - R2: UNPROVEN
+
+      - R3: UNPROVEN
+
+      - R4: UNPROVEN
+
+      - R5: UNPROVEN
+
+      - R6: UNPROVEN
+
+      - R7: UNPROVEN
+
+      - R8: UNPROVEN
+
+
+      ## Remediation Ownership Created
+
+      Planner added downstream evidence repair and re-audit steps:
+
+      - `ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair`
+
+      - `ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit`
+
+
+      Planner also updated `ui-remediation-retest-closure.urrc-final-remediation-gate`
+      dependencies so final closure cannot proceed while visual proof is missing.
+
+
+      ## Gaps/Notes
+
+      - This UIUX audit step is complete as a blocker-finding audit, not a green closure.
+      The phase remains blocked until canonical visual evidence and re-audit close
+      the evidence gaps.'
   - id: ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     name: urrc-architecture-product-boundary-retest
     status: done
