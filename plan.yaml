@@ -40363,3 +40363,154 @@ phases:
 
       - `npm ci` was required in isolated worktree because Playwright was missing
       from `web/node_modules`.'
+  - id: urrc-canonical-visual-evidence-repair
+    name: urrc-canonical-visual-evidence-repair
+    status: pending
+    description: "Focused evidence repair for the semantically failed UIUX audit.\n\
+      \nstep_type: verification. verification_scope: phase-check. Agent: integration-verifier.\
+      \ This is proof-closure work, not product remediation.\n\nContext to close exactly:\n\
+      - `ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest` passed\
+      \ and completed. It proved R1, R2-R8, and `gate_open_allowed: true` in vectl\
+      \ evidence, and merged artifact `audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md`.\n\
+      - `ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit` then\
+      \ semantically FAILED.\n- UIUX failure details: R1 runtime evidence exists,\
+      \ but the committed artifact `audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md`\
+      \ does not itself record `gate_open_allowed: true` or list all R1-R8 statuses\
+      \ as `PROVEN`, so strict R1 condition was judged unmet.\n- UIUX failure details:\
+      \ R2-R8 visual conformance is UNPROVEN due missing clear fresh visual evidence\
+      \ for R2 mobile Source Ledger geometry, R3 lower-case metadata grammar/readability,\
+      \ R4 single Inspector provenance, R5 Search context not leaking into Today,\
+      \ R6 duplicate Inspect DOM/a11y absence, R7 Source Ledger row grammar, and R8\
+      \ State Portability ledger footer/action cluster.\n- Product files were not\
+      \ modified by uiux-auditor.\n\nScope:\n1. Re-run or recapture only the focused\
+      \ browser/visual proof needed to create a canonical evidence bundle for R1-R8.\n\
+      2. Produce or update a canonical proof handoff artifact under `audits/` and/or\
+      \ a paired artifact bundle under `artifacts/` that records:\n   - `gate_open_allowed:\
+      \ true` only if `blockers: []`.\n   - R1-R8 all `PROVEN` when supported by evidence.\n\
+      \   - Exact screenshot, trace, DOM, or accessibility snapshot paths for R1-R8.\n\
+      \   - R1 forbidden strings absent and readable prose present.\n   - R2-R8 visual\
+      \ proof paths for every listed residual.\n3. Do NOT perform broad product rework.\
+      \ If fresh proof discovers a real visual/runtime regression, stop the proof\
+      \ handoff with the blocker recorded and recommend a separate product fix loop\
+      \ instead of silently changing product files.\n\nRequired closure targets:\n\
+      - R1: Inspector primary text must not contain `Follow us on Twitter for more\
+      \ newsletters` or `summary-like lead repeated by the site`; it must contain\
+      \ readable prose including `Second readable paragraph confirms the body is not\
+      \ empty after bounded cleanup.`\n- R2: mobile 390x844 Source Ledger geometry\
+      \ proves source identity/status row grammar does not collapse.\n- R3: lower-case\
+      \ metadata grammar/readability is visible and legible.\n- R4: Inspector provenance\
+      \ is singular, not duplicated.\n- R5: Search context/receipt does not leak into\
+      \ Today.\n- R6: duplicate Inspect DOM/a11y absence is proven by DOM or accessibility\
+      \ evidence.\n- R7: Source Ledger row grammar is visually intact.\n- R8: State\
+      \ Portability ledger footer/action cluster is visually intact.\n\n## Completion\
+      \ Criteria (evidence-only guardrail)\nThis step succeeds by producing fresh,\
+      \ reviewable evidence and a canonical handoff. Product changes are out of scope\
+      \ unless the step first proves a real regression; in that case, record the blocker\
+      \ and do not claim closure."
+    verification: '- Fresh browser/visual evidence is captured or referenced for R1-R8
+      with exact paths.
+
+      - Canonical proof handoff artifact records `gate_open_allowed: true` only when
+      `blockers: []`.
+
+      - Canonical proof handoff artifact lists R1-R8 as `PROVEN` with exact screenshot/trace/DOM/a11y
+      paths.
+
+      - R1 proof explicitly records both forbidden strings absent and readable prose
+      present.
+
+      - R2-R8 proof explicitly maps each requirement to visual evidence paths.
+
+      - Evidence states whether product files were untouched; if any product change
+      was necessary, it records the discovered real regression and requires a separate
+      product fix loop before closure.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md — key
+      passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Canonical Visual Evidence Repair Handoff
+
+
+      **Product files modified**: YES/NO
+
+      **If YES, discovered real regression**: <describe blocker and required follow-up
+      fix loop>
+
+
+      **Canonical handoff artifact**: <audits/...md>
+
+      **Evidence bundle root**: <artifacts/.../>
+
+      **gate_open_allowed**: true/false
+
+      **blockers**: [] or list
+
+
+      | Requirement | Status | Screenshot path(s) | Trace/DOM/a11y path(s) | Notes
+      |
+
+      | --- | --- | --- | --- | --- |
+
+      | R1 Inspector readable body and sanitation | PROVEN/UNPROVEN | <path> | <path>
+      | forbidden strings absent; readable prose present |
+
+      | R2 Mobile Source Ledger geometry | PROVEN/UNPROVEN | <path> | <path> | 390x844
+      evidence |
+
+      | R3 Metadata grammar/readability | PROVEN/UNPROVEN | <path> | <path> | lower-case
+      `src:` grammar |
+
+      | R4 Single Inspector provenance | PROVEN/UNPROVEN | <path> | <path> | no duplicate
+      provenance |
+
+      | R5 Search context isolation from Today | PROVEN/UNPROVEN | <path> | <path>
+      | no Search leakage into Today |
+
+      | R6 Duplicate Inspect absence | PROVEN/UNPROVEN | <path> | <path> | DOM/a11y
+      absence proof |
+
+      | R7 Source Ledger row grammar | PROVEN/UNPROVEN | <path> | <path> | row grammar
+      intact |
+
+      | R8 State Portability footer/action cluster | PROVEN/UNPROVEN | <path> | <path>
+      | ledger/action cluster intact |
+
+
+      ## R1 String Proof
+
+
+      Forbidden strings absent:
+
+      - `Follow us on Twitter for more newsletters`: YES/NO
+
+      - `summary-like lead repeated by the site`: YES/NO
+
+
+      Readable prose present:
+
+      - `Second readable paragraph confirms the body is not empty after bounded cleanup.`:
+      YES/NO
+
+
+      ## Closure Decision
+
+
+      - [ ] PASS: blockers empty, R1-R8 all PROVEN, gate_open_allowed true
+
+      - [ ] FAIL: one or more blockers/UNPROVEN items remain, gate_open_allowed false'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
+    agent: integration-verifier
