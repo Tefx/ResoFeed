@@ -49829,7 +49829,7 @@ phases:
       - none'
   - id: pbar-source-add-receipt-stale-guidance-fix
     name: Fix stale source-add receipt after Source Ledger ingest control removal
-    status: claimed
+    status: done
     description: 'Fix the reopened B5/U2 stale receipt guidance after the Source Ledger
       ingest-control boundary changed.
 
@@ -49962,6 +49962,149 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T19:33:02.290706+00:00'
+    done_at: '2026-05-11T19:39:34.800301+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Source Ledger is user-owned subscription state; one
+      Go process runs background ingestion; frontend must expose flat Source Ledger
+      without extra dashboards.
+
+      - docs/DESIGN.md — Source Ledger anatomy is title, OPML import, flat source
+      rows, delete action, and state export/import; URL subscription routes back to
+      Steer and Ledger has no second manual URL paste field.
+
+      - docs/PRD.md — Source addition is by pasting RSS URLs into Steer; Source Ledger
+      is flat and only supports viewing source name/URL plus deletion, with no complex
+      controls.
+
+      - .agents/instructions.md — Canonical docs are law; preserve one deployable,
+      one SQLite DB, flat internal/resofeed logic, and UI forbidden concepts.
+
+
+      ## Fix Evidence
+
+      **Files changed**:
+
+      - internal/resofeed/ranking.go — replaced stale source-add receipt copy.
+
+      - internal/resofeed/pbar_steer_receipt_remediation_test.go — updated backend
+      expectation and added explicit stale-guidance negatives.
+
+      - web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts — updated browser
+      receipt expectations and added focused browser coverage for non-stale source-add
+      receipt.
+
+
+      **Receipt copy before**:
+
+      ```text
+
+      source added: <identity>; run ingest in SOURCE LEDGER
+
+      ```
+
+
+      **Receipt copy after**:
+
+      ```text
+
+      source added: <identity>; visible in SOURCE LEDGER; background ingest will pick
+      it up
+
+      ```
+
+
+      **Worktree verification**:
+
+      ```text
+
+      go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction
+      -count=1
+
+      ok  resofeed/internal/resofeed  3.501s
+
+      ```
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -g "source-add receipt orients"
+
+      1 passed (19.6s)
+
+      ```
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts
+      -g "flat ledger surface"
+
+      1 passed (18.4s)
+
+      ```
+
+
+      **Mainline final-state verification after squash merge**:
+
+      ```text
+
+      go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction
+      -count=1
+
+      ok  resofeed/internal/resofeed  0.716s
+
+      ```
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -g "source-add receipt orients"
+
+      1 passed (12.1s)
+
+      ```
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts
+      -g "flat ledger surface"
+
+      1 passed (9.6s)
+
+      ```
+
+
+      **Boundary preservation statement**: Source Ledger run/fetch/ingest controls
+      were not reintroduced; receipt now points to Source Ledger visibility and background
+      ingest only.
+
+
+      ## Behavioral Proof Register
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - product_implementation_files_modified: true
+
+
+      ## Commit hash(es)
+
+      - bde316a0bac3ac6ad0a34bd195c9ca72df55a765 — fix stale source-add receipt guidance
+
+      - 8f80feb — [vectl] step-pbar-source-add-receipt-stale-guidance-fix completed
+
+
+      ## Gaps / Notes
+
+      - npm dependencies were installed in the isolated worktree because Playwright
+      was missing; mainline verification reused existing dependencies and passed.
+
+      - Worktree and mainline target paths verified clean before merge.'
   - id: pbar-source-add-receipt-closure-retest
     name: Retest source-add receipt closure after stale guidance fix
     status: pending
