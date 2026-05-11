@@ -45864,7 +45864,7 @@ phases:
       **Limitations**: none'
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
-  status: pending
+  status: in_progress
   gate: Frontend surfaces close Search, Steer, Doctor, Inspector, Feed, Resonate,
     Source Ledger, mobile containment, accessibility semantics, and scan-readable
     visual grammar with expected-red browser tests turned green.
@@ -45941,7 +45941,7 @@ phases:
     agent: frontend-engineer
   - id: pbar-frontend-feed-inspector-resonate-remediation
     name: Fix Feed/Inspector fallback labels, quality metadata, and Resonate accessibility
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -45996,6 +45996,8 @@ phases:
       \ rows>\n- Fallback label proof: <example item>\n- Resonate a11y proof: <before/after\
       \ accessible state>\n- Pollution absence proof: <grep/snapshot excerpts>"
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T17:03:26.672395+00:00'
   - id: pbar-frontend-mobile-search-ledger-remediation
     name: Fix mobile non-feed containment, Search metadata/form anatomy, and Ledger
       diagnostics grammar
