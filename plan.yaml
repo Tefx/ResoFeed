@@ -43607,3 +43607,60 @@ phases:
     green and no forbidden product concepts introduced.
   depends_on:
   - prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests
+  steps:
+  - id: pbar-backend-search-remediation
+    name: Fix backend lexical search execution and no-match semantics
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete backend search behavior for audit findings B1 and B2 within the existing
+      ResoFeed single-binary/SQLite lexical-search architecture.
+
+
+      Scope:
+
+      - internal/resofeed/search.go and HTTP search/Steer command path as needed.
+
+      - Ensure `search <query>` reaches the same lexical query semantics as direct
+      Search API/UI submission.
+
+      - Ensure no-match lexical queries return a stable empty result set and no internal
+      error.
+
+      - Ensure stale/default Today items are not returned as query results after an
+      empty or failed search.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT introduce semantic/vector/RAG search, new search services, dashboards,
+      settings, or hidden ranking taxonomies.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Search receipt claims lexical search while returning Today/default items.
+
+      2. No-match path shows `err: internal` or keeps stale rows visible.
+
+      3. Any vector/semantic/RAG search concept or external service is introduced.'
+    verification: 'local-check protecting B1/B2: targeted Go tests for search execution
+      and no-match behavior pass green; evidence shows empty search returns empty
+      state without internal error and without stale/default Today rows.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B1, B2\n- Files changed: <list>\n- Expected-red tests now\
+      \ green:\n  ```\n  <commands and output>\n  ```\n- Main path proof: `search\
+      \ cricut` or fixture query returns only lexical matches.\n- Failure path proof:\
+      \ unique no-match query returns stable empty state, no internal error.\n- Product-boundary\
+      \ proof: no vector/RAG/semantic search introduced."
+    agent: golang-developer
