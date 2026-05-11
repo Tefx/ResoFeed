@@ -42767,3 +42767,198 @@ phases:
     - slnr-browser-route-retest
     - slnr-uiux-navigation-audit
     agent: gate-reviewer
+  - id: slnr-materialize-browser-proof-artifacts
+    name: Materialize Source Ledger browser proof artifacts
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      issue_context:
+
+      - B1: Prior retest passed in vectl evidence but did not materialize a phase-specific
+      targeted browser retest artifact/report that the gate can inspect for source-ledger-navigation-regression.expected-red.spec.ts.
+
+      - B2: Prior gate could not independently run frontend static verification because
+      the gate worktree lacked hydrated web dependencies and svelte-kit was missing.
+
+
+      As an INDEPENDENT VERIFIER, materialize committed, inspectable proof artifacts
+      for the Source Ledger navigation regression remediation without changing product
+      implementation code.
+
+
+      Scope and non-goals:
+
+      - DO NOT modify product implementation code.
+
+      - DO NOT broaden the feature or introduce forbidden product concepts.
+
+      - You MAY add a bounded proof report under `audits/` or `.audit-artifacts/`
+      and, if practical and bounded, selected screenshots/traces needed for gate inspection.
+
+      - If screenshots/traces are too large or generated under ignored paths, the
+      committed report MUST explain their generated locations and include enough committed
+      excerpts/metadata for the gate to inspect the proof.
+
+
+      Required commands and hydration:
+
+      1. If `node_modules/.bin/svelte-kit` is missing, run `npm ci` before `npm run
+      check`.
+
+      2. If Playwright browser dependencies are missing, hydrate them using the repository''s
+      established Playwright install path.
+
+      3. Run `npm run check` and record the exact command, exit status, and relevant
+      stdout/stderr excerpts.
+
+      4. Run the focused Source Ledger route browser test covering `source-ledger-navigation-regression.expected-red.spec.ts`
+      and record exact command, exit status, and relevant stdout/stderr excerpts.
+
+
+      Required proof coverage:
+
+      - root navigation shows `SOURCE LEDGER`
+
+      - click-opened Source Ledger view works
+
+      - direct `/source-ledger` route works
+
+      - direct `/source` route behavior is proven or documented with explicit alias
+      disposition
+
+      - direct `/sources` route behavior is proven or documented with explicit alias
+      disposition
+
+
+      Required artifact:
+
+      Create a committed, inspectable proof report under `audits/` or `.audit-artifacts/`
+      containing:
+
+      - exact commands run
+
+      - dependency hydration decisions (`npm ci` run or not, and why)
+
+      - exit statuses
+
+      - stdout/stderr excerpts
+
+      - screenshot/trace/video artifact paths for each required route/state
+
+      - behavioral proof register rows with requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis
+
+      - explicit statement that no product implementation code was changed
+
+
+      Evidence materialization requirement:
+
+      The proof report itself MUST be included in the submitted repository changes
+      for the gate to inspect. Selected screenshots/traces MAY be included when practical
+      and bounded; otherwise the report MUST provide sufficient committed evidence
+      plus generated artifact paths.'
+    verification: '- `npm run check` completed after dependency hydration when needed,
+      with command and output excerpts recorded in the proof report.
+
+      - Focused Source Ledger browser route test completed with command, exit status,
+      and artifact paths recorded.
+
+      - Proof report exists under `audits/` or `.audit-artifacts/` and is included
+      in repository changes for gate inspection.
+
+      - Report covers root nav, click-opened ledger, `/source-ledger`, `/source`,
+      and `/sources` with screenshot/trace paths or explicit alias disposition.
+
+      - Report confirms no product implementation code was changed.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Materialized Browser Proof Report
+
+
+      **Proof report path committed under audits/ or .audit-artifacts/**: <path>
+
+      **Product implementation code changed**: NO | YES (YES is blocking; explain)
+
+
+      ## Dependency Hydration
+
+
+      - `node_modules/.bin/svelte-kit` existed before check: YES | NO
+
+      - `npm ci` run: YES | NO — <why>
+
+      - Playwright/browser hydration run: YES | NO — <why>
+
+
+      ## Commands and Exit Statuses
+
+
+      | Command | Exit status | stdout/stderr excerpt location |
+
+      | --- | --- | --- |
+
+      | `npm run check` | <status> | <excerpt in report> |
+
+      | `<focused Source Ledger browser test command>` | <status> | <excerpt in report>
+      |
+
+
+      ## Required Route/State Artifact Register
+
+
+      | Requirement | Screenshot/trace/video path | Committed? | Generated location
+      if not committed | Status |
+
+      | --- | --- | --- | --- | --- |
+
+      | root nav shows SOURCE LEDGER | <path> | YES/NO | <path> | PROVEN/UNPROVEN
+      |
+
+      | click-opened Source Ledger | <path> | YES/NO | <path> | PROVEN/UNPROVEN |
+
+      | `/source-ledger` | <path> | YES/NO | <path> | PROVEN/UNPROVEN |
+
+      | `/source` | <path or alias disposition> | YES/NO | <path> | PROVEN/EXPLICIT_NON_INTERSECTION/UNPROVEN
+      |
+
+      | `/sources` | <path or alias disposition> | YES/NO | <path> | PROVEN/EXPLICIT_NON_INTERSECTION/UNPROVEN
+      |
+
+
+      ## Behavioral Proof Register
+
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | <ref> | <claim> | <proof> | <artifact/report section> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <closure> | <OPEN/BLOCK basis> |
+
+
+      ## Headline
+
+
+      - [ ] PASS: committed proof report is inspectable and all required Source Ledger
+      route/navigation proof is green.
+
+      - [ ] FAIL: proof report missing, dependency hydration incomplete, browser/static
+      checks failed, or any required proof remains unresolved.'
+    depends_on:
+    - slnr-browser-route-retest
+    - slnr-uiux-navigation-audit
+    agent: integration-verifier
