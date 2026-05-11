@@ -40514,3 +40514,98 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     agent: integration-verifier
+  - id: ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
+    name: urrc-uiux-canonical-evidence-reaudit
+    status: pending
+    description: "Downstream native multimodal UIUX re-audit of the canonical visual\
+      \ evidence repair bundle.\n\nstep_type: verification. verification_scope: phase-check.\
+      \ Agent: uiux-auditor. This is independent screenshot-first review and depends\
+      \ on the focused evidence-repair handoff.\n\nScope:\n- Review the canonical\
+      \ proof handoff and visual evidence bundle produced by `ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair`.\n\
+      - Do not require product rework unless the evidence bundle proves a real visual/runtime\
+      \ regression.\n- Confirm that the prior semantic audit failure is closed by\
+      \ artifact-level evidence, not by informal vectl evidence alone.\n\nAudit closure\
+      \ questions:\n1. Does the canonical handoff artifact itself record `gate_open_allowed:\
+      \ true` only when `blockers: []`?\n2. Does the artifact list R1-R8 statuses\
+      \ as `PROVEN` with exact screenshot/trace/DOM/a11y paths?\n3. Does R1 show forbidden\
+      \ strings absent and readable prose present, including `Second readable paragraph\
+      \ confirms the body is not empty after bounded cleanup.`?\n4. Do R2-R8 each\
+      \ have clear fresh visual evidence for:\n   - R2 mobile Source Ledger geometry\n\
+      \   - R3 lower-case metadata grammar/readability\n   - R4 single Inspector provenance\n\
+      \   - R5 Search context not leaking into Today\n   - R6 duplicate Inspect DOM/a11y\
+      \ absence\n   - R7 Source Ledger row grammar\n   - R8 State Portability ledger\
+      \ footer/action cluster\n\nReturn a parseable PASS/PASS_WITH_DEBT/FAIL handoff.\
+      \ Any blocker-class residual must cite exact missing/contradictory artifact\
+      \ paths and the requirement id."
+    verification: '- uiux-auditor reviews the canonical handoff artifact and evidence
+      bundle, not only vectl step prose.
+
+      - Audit output includes PASS/PASS_WITH_DEBT/FAIL and explicitly maps R1-R8 to
+      evidence paths.
+
+      - PASS requires `gate_open_allowed: true`, `blockers: []`, and R1-R8 all `PROVEN`
+      in the committed/produced handoff artifact.
+
+      - PASS requires R1 forbidden-string absence plus readable-prose presence and
+      R2-R8 visual proof paths.
+
+      - Any UNPROVEN/NEEDS_TEST blocker-class item blocks the final remediation gate
+      and includes exact missing evidence paths.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Canonical Evidence Re-Audit Handoff
+
+
+      **Reviewed canonical handoff artifact**: <audits/...md>
+
+      **Reviewed evidence bundle root**: <artifacts/.../>
+
+      **Decision**: PASS/PASS_WITH_DEBT/FAIL
+
+      **gate_open_allowed in artifact**: true/false
+
+      **blockers in artifact**: [] or list
+
+
+      | Requirement | Artifact status | Evidence path(s) reviewed | Audit verdict
+      | Residual gap |
+
+      | --- | --- | --- | --- | --- |
+
+      | R1 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R2 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R3 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R4 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R5 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R6 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R7 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+      | R8 | PROVEN/UNPROVEN | <paths> | PASS/FAIL | <gap or none> |
+
+
+      ## Blocking Residuals
+
+
+      If FAIL or PASS_WITH_DEBT, list each residual with requirement id, artifact
+      path, and closure recommendation.'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
+    agent: uiux-auditor
