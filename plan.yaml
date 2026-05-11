@@ -48391,7 +48391,7 @@ phases:
       introduced.'
   - id: pbar-browser-flow-failure-remediation
     name: Remediate failed browser PRD workflow blockers before retest
-    status: pending
+    status: claimed
     description: "step_type: implementation\n\nBatched implementation remediation\
       \ for the failed independent browser PRD workflow retest. This step owns remediation\
       \ before `pbar-browser-flow-retest` may run again.\n\nPrerequisite context:\n\
@@ -48560,6 +48560,8 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-backend-mcp-fresh-related-delivery-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T18:20:41.125197+00:00'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
