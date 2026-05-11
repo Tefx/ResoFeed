@@ -49829,7 +49829,7 @@ phases:
       - none'
   - id: pbar-source-add-receipt-stale-guidance-fix
     name: Fix stale source-add receipt after Source Ledger ingest control removal
-    status: pending
+    status: claimed
     description: 'Fix the reopened B5/U2 stale receipt guidance after the Source Ledger
       ingest-control boundary changed.
 
@@ -49960,6 +49960,8 @@ phases:
     depends_on:
     - pbar-retest-audit-gate
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T19:33:02.290706+00:00'
   - id: pbar-source-add-receipt-closure-retest
     name: Retest source-add receipt closure after stale guidance fix
     status: pending
