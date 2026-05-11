@@ -41302,7 +41302,7 @@ phases:
       none'
   - id: urrc-fix-uiux-reaudit-dom-a11y-paths
     name: Fix UIUX re-audit DOM/a11y evidence paths
-    status: claimed
+    status: done
     description: "Batched remediation for final gate blockers B1 and B2 in the committed\
       \ downstream UIUX re-audit artifact.\n\nstep_type: implementation\nverification_scope:\
       \ local-check\nAgent: uiux-auditor\n\nScope: update or replace `audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md`\
@@ -41435,3 +41435,89 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-11T10:18:40.620553+00:00'
+    done_at: '2026-05-11T10:23:57.459132+00:00'
+    evidence: '## refs Read Confirmation
+
+
+      - audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md — Read; identified
+      R2-R8 still had partial `N/A` semantics by only mapping trace DOM/a11y proof
+      without addressing text paths.
+
+      - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+      — Read; confirmed text proof is not required for R2-R8 visual/geometry rules.
+
+      - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ — Read;
+      verified structure and evidence inventory.
+
+
+      ## UIUX Re-audit Artifact Remediation Evidence
+
+
+      **Artifact corrected**: audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+
+      **Worker commit hash(es)**: ebbbcc96a7395bcf87168e85c8e6ea125689d869, ae15879d595beea20c2d450bf0c96a41d514713b
+
+      **Mainline squash commit**: 364f0b2
+
+
+      ### B1 Row-Level Proof Matrix
+
+
+      Worker evidence reports:
+
+      - R1 maps screenshot, trace, DOM, a11y, and text proof to exact artifact paths,
+      including `ui-remediation-r1-r8-browser-retest--r1-primary-inspector-text.txt.txt`.
+
+      - R2-R8 map screenshot/trace/DOM/a11y proof to exact paths under `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`.
+
+      - R2-R8 text proof cells no longer use bare/silent `N/A`; they explicitly state
+      text proof is not required for the non-text visual/DOM obligation and cite the
+      trace path containing DOM/a11y evidence.
+
+      - All R1-R8 statuses remain `PROVEN` with no residual blockers.
+
+
+      ### B2 Decision Field Consistency
+
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      consistency_basis: Worker re-audited and corrected the artifact so R2-R8 no
+      longer contain silent `N/A` mappings. Text proof is explicitly marked non-required
+      for non-text visual/DOM obligations while DOM/a11y proof is mapped to exact
+      trace paths. Decision fields now match row-level proof.
+
+
+      ## Files changed
+
+
+      audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+
+
+      ## Verification
+
+
+      - Worker verified the corrected artifact maps explicit text paths for R1 and
+      explicitly declares text verification non-applicable for R2-R8 with precise
+      trace/DOM/a11y mappings.
+
+      - Orchestrator squash-merged branch into main: `364f0b2 [vectl] step-urrc-fix-uiux-reaudit-dom-a11y-paths
+      completed`.
+
+      - Mainline verification command: `git show --name-status --oneline --no-renames
+      HEAD -- audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md &&
+      git grep -n "N/A" HEAD -- audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+      || true`.
+
+      - Output confirmed artifact modified in `364f0b2`; `git grep` produced no `N/A`
+      matches.
+
+
+      ## Gaps/Notes
+
+
+      None'
