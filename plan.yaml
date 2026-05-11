@@ -42660,7 +42660,7 @@ phases:
       artifacts prove the rendered behavior.'
   - id: slnr-gate
     name: Gate Source Ledger navigation regression remediation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -42767,3 +42767,5 @@ phases:
     - slnr-browser-route-retest
     - slnr-uiux-navigation-audit
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T12:58:24.318403+00:00'
