@@ -47394,7 +47394,7 @@ phases:
       completed`).'
 - id: prd-behavior-audit-remediation-independent-retest-and-audits
   name: PRD Behavior Audit Remediation — Independent Retest and Audits
-  status: pending
+  status: in_progress
   gate: Independent retests, UI/UX multimodal audit, liveness probe, wiring/spec/product-boundary
     review all pass with finding-by-finding evidence for B1-B23 and U1-U5.
   depends_on:
@@ -47988,7 +47988,7 @@ phases:
     agent: gate-reviewer
   - id: pbar-backend-mcp-fresh-related-delivery-fix
     name: Fix MCP fresh related delivery candidate regression
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -48129,6 +48129,8 @@ phases:
 
       '
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T18:08:46.820487+00:00'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
