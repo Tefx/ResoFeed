@@ -40363,7 +40363,7 @@ phases:
 
       - `npm ci` was required in isolated worktree because Playwright was missing
       from `web/node_modules`.'
-  - id: urrc-canonical-visual-evidence-repair
+  - id: ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
     name: urrc-canonical-visual-evidence-repair
     status: pending
     description: "Focused evidence repair for the semantically failed UIUX audit.\n\
