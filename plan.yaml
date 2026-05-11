@@ -44921,7 +44921,7 @@ phases:
       successfully after merge.'
   - id: pbar-backend-gate
     name: Gate backend PRD behavior remediation
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether backend
       semantics are complete for PRD behavior audit remediation.
 
@@ -44973,6 +44973,8 @@ phases:
     - pbar-backend-readable-payload-sanitation
     - pbar-backend-llm-doctor-provenance-remediation
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T16:37:26.311493+00:00'
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
   status: locked
