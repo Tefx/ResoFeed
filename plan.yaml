@@ -44224,7 +44224,7 @@ phases:
       \ cleaned; final status clean.\n```"
 - id: prd-behavior-audit-remediation-backend-semantics
   name: PRD Behavior Audit Remediation — Backend Semantics
-  status: pending
+  status: in_progress
   gate: Backend remediation closes search, steering/ranking, readable payload sanitation,
     LLM provenance, and doctor diagnostic semantics with expected-red tests turned
     green and no forbidden product concepts introduced.
@@ -44422,7 +44422,7 @@ phases:
     agent: golang-developer
   - id: pbar-backend-llm-doctor-provenance-remediation
     name: Align LLM fallback provenance and doctor diagnostic semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -44483,6 +44483,8 @@ phases:
       - Fallback labelling proof: <feed/Inspector status examples>\n- Product-boundary\
       \ proof: raw diagnostics only; no dashboard/settings/remediation panel."
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:25:42.573235+00:00'
   - id: pbar-backend-gate
     name: Gate backend PRD behavior remediation
     status: pending
