@@ -39917,3 +39917,120 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     agent: frontend-engineer
+  - id: ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
+    name: urrc-r1-second-focused-browser-retest
+    status: pending
+    description: "Second focused browser retest for repeated R1 remediation after\
+      \ ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix.\n\nstep_type:\
+      \ test. step_intent: retest_green. expected_result: green. verification_scope:\
+      \ phase-check. Independence Level: L1 independent tester. Agent: integration-verifier.\
+      \ This verifier must not modify product code.\n\nRun the focused browser proof\
+      \ against the real runtime path and require the focused spec to pass green:\n\
+      `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts`\n\
+      \nRequired proof obligations:\n- R1 PROVEN: Inspector primary text does not\
+      \ contain either forbidden string:\n  - `Follow us on Twitter for more newsletters`\n\
+      \  - `summary-like lead repeated by the site`\n- R1 PROVEN: Inspector primary\
+      \ text preserves readable article prose/fallback and includes:\n  - `Second\
+      \ readable paragraph confirms the body is not empty after bounded cleanup.`\n\
+      - Anti-cheat rule: empty/truncated Inspector body, title/original-link/status-only\
+      \ body, or repeated `summary unavailable ... summary unavailable` is INVALID\
+      \ and must keep R1 BLOCKING.\n- R2-R8 remain PROVEN in the same focused R1-R8\
+      \ behavioral proof register.\n\nAlso run or cite fresh baseline evidence when\
+      \ useful:\n`npm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`\n\
+      \nGate opening is allowed only if all R1-R8 statuses are PROVEN, blockers are\
+      \ empty, and gate_open_allowed is true."
+    verification: '- Required focused Playwright command exits 0.
+
+      - Evidence includes pasted command output showing the focused spec passed.
+
+      - Behavioral proof register marks R1, R2, R3, R4, R5, R6, R7, and R8 as PROVEN.
+
+      - R1 proof explicitly records both forbidden strings ABSENT and expected readable
+      prose substring PRESENT.
+
+      - Anti-cheat invalid bodies are rejected: no empty/truncated/title-link-status-only/repeated-summary-unavailable
+      Inspector body.
+
+      - Evidence includes `gate_open_allowed: true` only when blockers are empty and
+      all R1-R8 statuses are PROVEN.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+
+      ## Second Focused Browser Retest Evidence
+
+      **Tester**: integration-verifier (independent of frontend-engineer)
+
+      **Command executed**:
+
+      ```bash
+
+      npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+
+      ```
+
+      **Exit code**: <0 required>
+
+      **Output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ## R1 Proof
+
+      - `Follow us on Twitter for more newsletters`: ABSENT/PRESENT
+
+      - `summary-like lead repeated by the site`: ABSENT/PRESENT
+
+      - Expected readable substring `Second readable paragraph confirms the body is
+      not empty after bounded cleanup.`: PRESENT/ABSENT
+
+      - Inspector primary text excerpt: <paste>
+
+      - Anti-cheat confirmation: body is not empty/truncated/title-link-status-only/repeated-summary-unavailable.
+
+
+      ## R1-R8 Behavioral Proof Register
+
+      | Requirement | Status | Evidence ref | Closure path |
+
+      | --- | --- | --- | --- |
+
+      | R1 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R2 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R3 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R4 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R5 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R6 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R7 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+      | R8 | PROVEN/UNPROVEN | <ref> | <closure> |
+
+
+      blockers: []
+
+      gate_open_allowed: true|false'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
+    agent: integration-verifier
