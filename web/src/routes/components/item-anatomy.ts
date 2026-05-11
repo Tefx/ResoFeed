@@ -92,10 +92,11 @@ export function itemExtractionLabel(status: ItemSummary['extraction_status']): s
 }
 
 export function itemSummaryProvenanceLabel(item: ItemSummary): string {
-  if (item.model_status === 'ok' && (item.summary || item.core_insight)) return 'model-backed';
+  if (readableItemText(itemDisplayExcerpt(item))) {
+    return item.model_status === 'ok' ? 'model-backed' : 'fallback: excerpt-only';
+  }
   if (item.model_status === 'model_latency_error') return 'fallback: model_status model_latency_error';
-  if (item.display_excerpt) return 'fallback: excerpt-only';
-  return 'summary unavailable';
+  return 'fallback: unavailable';
 }
 
 export function itemPriorityLabel(item: ItemSummary): string {

@@ -75,12 +75,6 @@
     return parts.join(' · ');
   }
 
-  function sourceDiagnosticText(source: Source, fullError: string | undefined, lastFetch: string | null): string {
-    const diagnostic = fullError ? (fullError.startsWith('err:') ? fullError : `err: ${fullError}`) : 'err: none';
-    return `${diagnostic}\nsrc: ${sourceLedgerLabel(source)}\nfetch_status=${source.last_fetch_status}\nlast_fetch=${lastFetch ?? 'not_fetched'}\nurl=${source.url}`;
-  }
-
-
   async function importSelectedFile(): Promise<void> {
     const file = importInput?.files?.[0];
     if (!file) return;
@@ -153,10 +147,6 @@
             disabled={fetching}
             onclick={() => void fetchSource(source)}
           >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button></span>
-          <details class="source-diagnostic-details">
-            <summary>diagnostic details</summary>
-            <pre>{sourceDiagnosticText(source, fullSourceError, lastFetch)}</pre>
-          </details>
           {#if confirmingSourceId === source.id}
             <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
           {/if}

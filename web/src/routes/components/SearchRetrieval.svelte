@@ -25,21 +25,23 @@
   let lastHandledSeedQuery = '';
 
   $effect(() => {
-    searchQuery = query;
     if (!query) {
       results = [];
       statusText = '0 results';
       lastHandledSeedQuery = '';
       return;
     }
+    searchQuery = query;
     if (query !== lastHandledSeedQuery) {
       lastHandledSeedQuery = query;
-      void submitSearch();
+      results = items;
+      statusText = `${items.length} results`;
+      void submitSearch(false);
     }
   });
 
-  async function submitSearch(): Promise<void> {
-    statusText = 'searching';
+  async function submitSearch(showLoading = true): Promise<void> {
+    if (showLoading) statusText = 'searching';
     try {
       const response = await onSearch({
         q: searchQuery || undefined,
@@ -81,20 +83,20 @@
       <button type="submit">search</button>
       <button class="search-submit-a11y" type="submit" aria-label="submit search">submit search</button>
     </div>
-    <details class="search-secondary-filters">
+    <details class="search-secondary-filters" open>
       <summary>filters</summary>
       <div class="search-secondary-grid">
-        <label for="search-source">Source</label>
+        <label for="search-source">Source filter</label>
         <input id="search-source" name="source" bind:value={source} />
-        <label for="search-from">From</label>
+        <label for="search-from">From date</label>
         <input id="search-from" name="from" type="date" bind:value={from} />
-        <label for="search-to">To</label>
+        <label for="search-to">To date</label>
         <input id="search-to" name="to" type="date" bind:value={to} />
         <label class="contract-checkbox" for="search-resonated">
           <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} />
-          Resonated
+          Resonated only
         </label>
-        <label for="search-limit">Limit</label>
+        <label for="search-limit">Result limit</label>
         <select id="search-limit" name="limit" bind:value={limit}>
           <option value={10}>10</option>
           <option value={20}>20</option>

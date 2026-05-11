@@ -65,7 +65,7 @@
 
   const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
-  const feedPaneInactive = $derived(isNarrow ? currentSurface !== 'feed' : currentSurface !== 'feed' && currentSurface !== 'inspector');
+  const feedPaneInactive = $derived(currentSurface !== 'feed' && currentSurface !== 'inspector');
   const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
 
   function surfaceForPath(pathname: string): Surface {
@@ -210,20 +210,6 @@
     void focusActiveSurface(surface);
   }
 
-  function compactUrlIdentity(urlText: string): string {
-    try {
-      const parsed = new URL(urlText);
-      return parsed.host || urlText;
-    } catch {
-      return urlText.replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || urlText;
-    }
-  }
-
-  function sourceIdentityFromMessage(message: string): string | null {
-    const match = /source added:\s*([^;]+)/i.exec(message);
-    return match?.[1]?.trim() || null;
-  }
-
   function receiptMessageWithoutInterpretation(receipt: SteerReceipt): string {
     return receipt.message
       .replace(new RegExp(`^interpreted_as:\\s*${receipt.interpreted_as.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*;?\\s*`, 'i'), '')
@@ -240,8 +226,7 @@
 
   function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
     if (receipt.interpreted_as === 'add_source') {
-      const sourceIdentity = sourceIdentityFromMessage(receipt.message) ?? compactUrlIdentity(command);
-      return `interpreted_as: ${receipt.interpreted_as}; applied: source added: ${sourceIdentity}; run ingest in SOURCE LEDGER`;
+      return 'applied: source added';
     }
 
     const state = receiptState(receipt);
@@ -476,11 +461,6 @@
       </form>
       <span class="contract-label">RESOFEED</span>
     </header>
-
-    <nav class="surface-nav" aria-label="Primary surfaces">
-      <button type="button" aria-current={currentSurface === 'feed' ? 'page' : undefined} onclick={() => showSurface('feed')}>TODAY</button>
-      <button type="button" aria-current={currentSurface === 'ledger' ? 'page' : undefined} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
-    </nav>
 
     {#if steerFeedback.kind === 'receipt'}
       <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>

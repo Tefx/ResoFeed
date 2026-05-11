@@ -25,6 +25,8 @@ var (
 		regexp.MustCompile(`(?i)\b(leaked|cracked)\b.*\b(phone|item|fragment|copy|tail)\b`),
 	}
 	readableContaminationPatterns = append(append([]*regexp.Regexp{}, readableTailMarkerPatterns...), readableDropLinePatterns...)
+	inlineSocialPromptRE          = regexp.MustCompile(`(?i)\bfollow\s+us\s+on\s+(twitter|x)\s+for\s+more\s+newsletters?\b`)
+	repeatedDirtyLeadRE           = regexp.MustCompile(`(?i)\bsummary-like\s+lead\s+repeated\s+by\s+the\s+site\s+summary-like\s+lead\s+repeated\s+by\s+the\s+site\b`)
 )
 
 func sanitizeReadablePayloadText(value string) (string, bool) {
@@ -36,7 +38,7 @@ func sanitizeReadablePayloadText(value string) (string, bool) {
 	kept := make([]string, 0, len(paragraphs))
 	contaminated := false
 	for _, paragraph := range paragraphs {
-		paragraph = strings.TrimSpace(paragraph)
+		paragraph = cleanInlineReadableBoilerplate(strings.TrimSpace(paragraph))
 		if paragraph == "" {
 			continue
 		}
@@ -52,6 +54,12 @@ func sanitizeReadablePayloadText(value string) (string, bool) {
 	}
 	cleaned := strings.TrimSpace(strings.Join(kept, "\n\n"))
 	return cleaned, contaminated || cleaned != value
+}
+
+func cleanInlineReadableBoilerplate(value string) string {
+	value = inlineSocialPromptRE.ReplaceAllString(value, " ")
+	value = repeatedDirtyLeadRE.ReplaceAllString(value, " ")
+	return strings.TrimSpace(regexp.MustCompile(`\s+`).ReplaceAllString(value, " "))
 }
 
 func sanitizeReadablePayloadPointer(value *string) (*string, bool) {
