@@ -47402,7 +47402,7 @@ phases:
   steps:
   - id: pbar-backend-green-retest
     name: Independently retest backend behavior fixes green
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -47496,6 +47496,8 @@ phases:
     depends_on:
     - pbar-backend-mcp-fresh-related-delivery-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T18:20:33.758073+00:00'
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
     status: pending
