@@ -50107,7 +50107,7 @@ phases:
       - Worktree and mainline target paths verified clean before merge.'
   - id: pbar-source-add-receipt-closure-retest
     name: Retest source-add receipt closure after stale guidance fix
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT TESTER (`integration-verifier`), retest closure
       of reopened B5/U2 after `pbar-source-add-receipt-stale-guidance-fix`.
 
@@ -50259,6 +50259,8 @@ phases:
     depends_on:
     - pbar-source-add-receipt-stale-guidance-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T19:39:56.352939+00:00'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
