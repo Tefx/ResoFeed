@@ -39605,3 +39605,66 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
     agent: frontend-engineer
+  - id: ui-remediation-retest-closure.urrc-r1-focused-browser-retest
+    name: urrc-r1-focused-browser-retest
+    status: pending
+    description: "Focused browser retest for the R1 residual Inspector sanitation\
+      \ blocker after ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix.\n\
+      \nstep_type: verification. step_intent: retest_green. expected_result: green.\
+      \ verification_scope: phase-check. Independence Level: L1 independent tester.\
+      \ Agent: integration-verifier. This verifier must not modify product code.\n\
+      \nRun the focused R1/R1-R8 Playwright proof against the real browser/runtime\
+      \ path and produce a behavioral proof register. The retest must prove:\n- R1\
+      \ is no longer leaking either exact failure string in Inspector primary text:\n\
+      \  - `Follow us on Twitter for more newsletters`\n  - `summary-like lead repeated\
+      \ by the site`\n- R1 still shows readable article prose rather than an empty/trivially\
+      \ truncated body.\n- R2/R3/R4/R5/R6/R7/R8 remain PROVEN and no previously proven\
+      \ behavior regressed.\n\nRequired command:\n`npm run test:e2e -- --project=chromium-ci-safe\
+      \ ui-remediation-r1-r8-browser-retest.spec.ts`\n\nIf available and still relevant,\
+      \ also compare against the prior baseline command evidence:\n`npm run test:e2e\
+      \ -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`\n\
+      \nFindings are successful verification output. Gate opening is allowed only\
+      \ if R1-R8 are all PROVEN and no blocker fields remain open."
+    verification: '- Focused Playwright command runs against the real browser/runtime
+      path and exits green.
+
+      - R1 proof explicitly checks Inspector primary text does not contain `Follow
+      us on Twitter for more newsletters` or `summary-like lead repeated by the site`.
+
+      - R1 proof confirms readable article prose remains visible.
+
+      - R2-R8 remain PROVEN in the same focused R1-R8 proof register.
+
+      - Evidence includes `gate_open_allowed` and blocker fields; gate_open_allowed
+      may be true only when all R1-R8 statuses are PROVEN.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/ui-remediation-retest-2026-05-11.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n\n## Focused Browser Retest Evidence\n**Tester**: integration-verifier (independent\
+      \ of frontend-engineer)\n**Scope**: R1 residual Inspector sanitation plus R2-R8\
+      \ non-regression\n\n### Commands Executed\n```sh\nnpm run test:e2e -- --project=chromium-ci-safe\
+      \ ui-remediation-r1-r8-browser-retest.spec.ts\n```\n\nOptional baseline comparison,\
+      \ if run:\n```sh\nnpm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts\n\
+      ```\n\n### Required String Checks\n- `Follow us on Twitter for more newsletters`:\
+      \ ABSENT/PRESENT\n- `summary-like lead repeated by the site`: ABSENT/PRESENT\n\
+      - Inspector primary text still contains readable article prose: YES/NO\n\n###\
+      \ R1-R8 Behavioral Proof Register\n| Requirement | Status | Evidence ref | Notes\
+      \ |\n| --- | --- | --- | --- |\n| R1 Inspector sanitation | PROVEN/UNPROVEN/BLOCKING\
+      \ | <screenshot/DOM/test output> | <notes> |\n| R2 mobile Source Ledger | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R3 metadata grammar/readability | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R4 Inspector provenance | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R5 Search/Today state scoping | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R6 mobile Search DOM/a11y | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R7 Source Ledger grammar | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n| R8 State Portability placement | PROVEN/UNPROVEN/BLOCKING\
+      \ | <evidence> | <notes> |\n\n### Gate Control Fields\n```yaml\ngate_open_allowed:\
+      \ false\nblockers:\n  - requirement: \"R1\"\n    status: \"UNPROVEN/BLOCKING\
+      \ if any failure string remains or readable prose is missing\"\n    closure_path:\
+      \ \"Fix Inspector sanitation and rerun this focused browser retest\"\n```\n\n\
+      Set `gate_open_allowed: true` only when blockers is `[]` and all R1-R8 statuses\
+      \ are PROVEN.\n\n## Headline\nPASS | PASS_WITH_DEBT | FAIL"
+    depends_on:
+    - ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
+    agent: integration-verifier
