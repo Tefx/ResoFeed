@@ -50403,7 +50403,7 @@ phases:
   steps:
   - id: pbar-final-closure-matrix
     name: Finalize finding-by-finding closure matrix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
 
@@ -50458,6 +50458,88 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-11T19:44:14.028002+00:00'
+    done_at: '2026-05-11T19:48:45.327823+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/PRD.md — Steer + flat Source Ledger, lexical Search, `/doctor`, state
+      portability, steering receipts, and AC-8–AC-17 gates.
+
+      - docs/DESIGN.md — Operational labels, flat Source Ledger, inline receipts,
+      State Portability, raw `/doctor`, accessibility/focus requirements.
+
+      - docs/ARCHITECTURE.md — One binary, SQLite/FTS, thin HTTP/MCP, owner-token
+      boundary, state portability, search/query/endpoint contracts.
+
+      - .agents/instructions.md — Canonical docs, architecture boundaries, portable-state
+      limits, HTTP/MCP uniformity, UI prohibitions.
+
+      - Relevant artifacts read/verified: `.audit-artifacts/pbar-browser-flow-retest-report.md`,
+      `artifacts/pbar-backend-green-retest/report.md`, `artifacts/pbar-runtime-liveness-probe/README.md`,
+      `artifacts/pbar-runtime-liveness-probe/probe-summary.json`, `.audit-artifacts/pbar-wiring-audit.md`,
+      `.audit-artifacts/uiux-audit-report.md`, `.audit-artifacts/frontend-gate/pbar-frontend-gate-retest-proof-register.yaml`,
+      `web/test-results/ui-remediation/pbar-frontend-gate-retest-proof-current.md`,
+      and `.audit-artifacts/pbar-post-remediation-uiux-audit/` screenshots.
+
+
+      ## Final Closure Matrix Evidence
+
+      - Matrix path: `.audit-artifacts/pbar-final-closure-matrix.md`
+
+      - Rows present: B1-B23 and U1-U5
+
+      - Status summary: PROVEN_FIXED=28, NON_INTERSECTING=0, BLOCKED=0
+
+      - Evidence refs by row: `.audit-artifacts/pbar-final-closure-matrix.md` final
+      closure matrix table
+
+      - Remaining blockers: none
+
+      - Gate decision basis: every B/U row has direct backend/browser/runtime/UIUX/wiring/product-boundary
+      evidence; stale contradictory artifacts are explicitly marked superseded by
+      later fix/retest evidence.
+
+
+      ## Behavioral Proof Register / Gate Decision
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - uncertainty_sources: []
+
+
+      ## Verification
+
+      - Worktree branch diff contained only `.audit-artifacts/pbar-final-closure-matrix.md`.
+
+      - Mainline squash merge commit: aabea78 `[vectl] step-pbar-final-closure-matrix
+      completed`.
+
+      - Mainline final-state verification: `git ls-files .audit-artifacts/pbar-final-closure-matrix.md`
+      listed the matrix artifact and `git status --porcelain -- .audit-artifacts/pbar-final-closure-matrix.md`
+      returned no dirty output.
+
+
+      ## Commit hash(es)
+
+      - 6353823 — [vectl] add PBAR final closure matrix
+
+      - aabea78 — [vectl] step-pbar-final-closure-matrix completed
+
+
+      ## Gaps / Notes
+
+      - none'
   - id: pbar-strict-final-gate
     name: Strict final gate for PRD behavior audit remediation
     status: pending
