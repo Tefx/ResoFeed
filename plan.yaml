@@ -44048,3 +44048,71 @@ phases:
       \ rows>\n- Fallback label proof: <example item>\n- Resonate a11y proof: <before/after\
       \ accessible state>\n- Pollution absence proof: <grep/snapshot excerpts>"
     agent: frontend-engineer
+  - id: pbar-frontend-mobile-search-ledger-remediation
+    name: Fix mobile non-feed containment, Search metadata/form anatomy, and Ledger
+      diagnostics grammar
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete frontend mobile and ledger remediation for B10, B11, B12, B13, U1,
+      U3, and U5.
+
+
+      Scope:
+
+      - On narrow/mobile screens, non-feed surfaces such as Source Ledger, Search,
+      Doctor, and Inspector must hide/unmount/inert the feed pane from layout and
+      accessibility flow and move focus to the active surface heading or back command.
+
+      - Mobile Search metadata should use dedicated anatomy: first line source + age,
+      second line extraction/match/provenance; time grouping must not compete with
+      source/provenance on narrow/search rows.
+
+      - Mobile Search form should prioritize query + submit + result count; source/date/resonated/limit
+      controls should move to compact disclosure or tighter secondary row without
+      adding dashboard/settings chrome.
+
+      - Source Ledger rows should stabilize around predictable fields: src/status/last_fetch/url/actions;
+      long diagnostics stay raw but expose full text via title/details/accessible
+      disclosure.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires mobile/narrow rendered screenshots or DOM snapshots for
+      Search, Ledger, Doctor/Inspector surface containment, and diagnostic full-view
+      affordance.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Feed remains readable/focusable beneath mobile non-feed surfaces.
+
+      2. Search provenance collapses into low-information fragments.
+
+      3. Time group marker crowds source/age/provenance on mobile Search.
+
+      4. Source diagnostics truncate with no full raw affordance.
+
+      5. Ledger becomes a dashboard or settings surface.'
+    verification: 'local-check protecting B10/B11/B12/B13/U1/U3/U5: expected-red mobile
+      browser tests pass green for inactive feed containment, focus movement, Search
+      metadata/form anatomy, time marker restraint, stable Ledger row grammar, and
+      full raw diagnostic affordance.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B10, B11, B12, B13, U1, U3, U5\n- Files changed: <list>\n\
+      - Commands/tests:\n  ```\n  <commands and output>\n  ```\n- Mobile rendered\
+      \ artifacts: <Search/Ledger/Doctor/Inspector screenshot or DOM snapshot paths>\n\
+      - Inactive feed containment proof: <aria-hidden/inert/unmounted/focus evidence>\n\
+      - Search metadata anatomy proof: <row examples>\n- Ledger diagnostic affordance\
+      \ proof: <title/details/a11y evidence>\n- Product-boundary proof: no dashboard/settings/source-management\
+      \ creep."
+    agent: frontend-engineer
