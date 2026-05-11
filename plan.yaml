@@ -48268,7 +48268,7 @@ phases:
       None.'
   - id: pbar-spec-product-boundary-review
     name: Spec and product-boundary conformance review
-    status: pending
+    status: claimed
     description: 'As spec-verifier, independently rerun the product-boundary conformance
       review AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
       the remediation evidence as the new candidate state, but do not lower the product-boundary
@@ -48403,6 +48403,8 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-source-ledger-boundary-wiring-remediation
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-11T19:09:51.635019+00:00'
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
     status: pending
