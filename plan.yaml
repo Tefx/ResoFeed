@@ -39562,10 +39562,16 @@ phases:
       Gate decision basis must include:
 
       - R1-R8 closure matrix with evidence refs from fix, Playwright retest, focused
-      R1 fixes/retests, uiux-auditor audit, and architecture/product-boundary retest.
+      R1 fixes/retests, uiux-auditor audits, the canonical visual evidence repair
+      handoff, and architecture/product-boundary retest.
 
-      - Confirmation that the second focused R1 browser retest passed green, recorded
-      gate_open_allowed: true, and marked all R1-R8 statuses PROVEN.
+      - Confirmation that the canonical evidence repair artifact itself records `gate_open_allowed:
+      true` only when `blockers: []` and marks R1-R8 statuses `PROVEN` with exact
+      screenshot/trace/DOM/a11y paths.
+
+      - Confirmation that the downstream UIUX canonical evidence re-audit returned
+      PASS or an explicit residual blocker list after reviewing the canonical handoff
+      artifact and visual evidence bundle.
 
       - Confirmation that R1 has BOTH sanitation and readable-prose preservation:
       `Follow us on Twitter for more newsletters` absent, `summary-like lead repeated
@@ -39575,7 +39581,8 @@ phases:
       - Confirmation that browser evidence includes desktop and mobile 390x844 states.
 
       - Confirmation that uiux-auditor produced a parseable PASS or explicit residual
-      blocker list.
+      blocker list for both the earlier screenshot conformance audit and the canonical
+      evidence re-audit.
 
       - Confirmation that software-architect found no forbidden product concept or
       architecture boundary violation.
@@ -39586,15 +39593,20 @@ phases:
       OPEN is allowed only when each blocker-class behavioral/design obligation is
       PROVEN or has explicit non-intersection evidence. Because these R1-R8 findings
       directly intersect final UI design validation, unresolved UNPROVEN/NEEDS_TEST
-      items must BLOCK.'
+      items must BLOCK. The gate must not run until the canonical visual evidence
+      repair and downstream UIUX re-audit have completed.'
     verification: '- All remediation, browser retest, focused R1 fix/retest loops,
-      uiux-auditor audit, and architecture/product-boundary retest steps are complete
-      with adequate evidence.
+      original uiux-auditor audit, canonical visual evidence repair, downstream UIUX
+      re-audit, and architecture/product-boundary retest steps are complete with adequate
+      evidence.
 
       - Gate decision basis maps R1-R8 to concrete evidence refs and statuses.
 
-      - Second focused browser retest evidence must include gate_open_allowed: true,
-      blockers: [], and R1-R8 all PROVEN.
+      - Canonical visual evidence repair artifact must include `gate_open_allowed:
+      true`, `blockers: []`, and R1-R8 all `PROVEN` before OPEN is allowed.
+
+      - Canonical evidence repair and downstream UIUX re-audit must provide exact
+      screenshot/trace/DOM/a11y paths for R1-R8.
 
       - R1 closure requires both exact forbidden strings absent and readable article
       prose present, including `Second readable paragraph confirms the body is not
@@ -39603,8 +39615,8 @@ phases:
 
       - Playwright/browser evidence covers desktop and 390x844 mobile runtime behavior.
 
-      - uiux-auditor validation covers required screenshots/images and returns PASS
-      or blocks with precise residuals.
+      - UIUX validation covers required screenshots/images and returns PASS or blocks
+      with precise residuals.
 
       - software-architect review confirms no forbidden product concepts or architecture
       boundary violations.
@@ -39615,78 +39627,54 @@ phases:
 
       For each ref in this step:
 
-      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
-      <reason>"
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Gate Review Report
+      ## Final Remediation Gate Decision Basis
 
 
-      **Reviewer**: gate-reviewer (independent of frontend-engineer implementation)
-
-      **Phase**: ui-remediation-retest-closure
-
-
-      ### Evidence Review
-
-      | Step ID | Status | Evidence Quality | Concerns |
+      | Requirement | Final status | Evidence artifact(s) | Gate decision basis |
 
       | --- | --- | --- | --- |
 
-      | ui-remediation-retest-closure.urrc-batched-residual-ui-fix | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      | R1 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      | ui-remediation-retest-closure.urrc-playwright-browser-retest | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
-      | <notes> |
+      | R2 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      | ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit | ✅/⚠️/❌
-      | excellent/adequate/insufficient/missing | <notes> |
+      | R3 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      | ui-remediation-retest-closure.urrc-architecture-product-boundary-retest |
-      ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |
+      | R4 | PROVEN/UNPROVEN | <paths> | <basis> |
 
+      | R5 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      ### R1-R8 Gate Decision Basis
+      | R6 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      | Finding | Evidence refs reviewed | Status | Blocks final validation? | Closure
-      path |
+      | R7 | PROVEN/UNPROVEN | <paths> | <basis> |
 
-      | --- | --- | --- | --- | --- |
-
-      | R1 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R2 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R3 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R4 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R5 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R6 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R7 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
-
-      | R8 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+      | R8 | PROVEN/UNPROVEN | <paths> | <basis> |
 
 
-      ### Gate Decision
+      **Canonical evidence repair artifact reviewed**: <audits/...md>
 
-      - [ ] OPEN: R1-R8 are closed with browser/UIUX/architecture evidence.
+      **UIUX canonical evidence re-audit reviewed**: <evidence ref>
 
-      - [ ] BLOCKED: blocker-class residuals remain.
+      **gate_open_allowed**: true/false
+
+      **blockers**: [] or list
 
 
-      **Required actions if BLOCKED**: <fix/retest loop needed>'
+      ## Gate Decision
+
+      - [ ] OPEN: R1-R8 PROVEN, blockers empty, canonical evidence exists, UIUX re-audit
+      passed
+
+      - [ ] BLOCKED: missing/contradictory visual proof or residual blockers remain'
     depends_on:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
@@ -39695,6 +39683,8 @@ phases:
     - ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     - ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
+    - ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
+    - ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
     - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     agent: gate-reviewer
   - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
