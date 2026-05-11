@@ -38514,3 +38514,12 @@ phases:
       ## Gaps/Notes
 
       none'
+- id: ui-remediation-retest-closure
+  name: UI Remediation Retest Closure
+  status: pending
+  gate: Close all remaining blocker-class findings R1-R8 from docs/audits/ui-remediation-retest-2026-05-11.md
+    with real browser/Playwright evidence, screenshot-first uiux-auditor validation,
+    architecture/product-boundary retest, and a final independent gate. No forbidden
+    product concepts or new service/repository/DI/event-bus layers may be introduced.
+  depends_on:
+  - full-ui-design-conformance-remediation
