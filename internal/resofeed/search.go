@@ -157,6 +157,7 @@ where i.id = ?`, itemID)
 	detail.FeedExcerpt = stringPtrFromNull(feedExcerpt)
 	detail.ExtractedText = stringPtrFromNull(extractedText)
 	detail.Provenance = Provenance{SourceURL: sourceURL.String, CanonicalURL: stringPtrFromNull(canonicalURL), OriginalURL: detail.URL, StoryKey: detail.StoryKey, DuplicateOfItemID: detail.DuplicateOfItemID}
+	sanitizeReadableDetail(&detail)
 	return detail, nil
 }
 
@@ -192,6 +193,7 @@ func scanItemSummary(rows *sql.Rows) (ItemSummary, error) {
 	item.ExternalSurfacedAt = timePtrFromNull(surfacedAt)
 	item.StoryKey = stringPtrFromNull(storyKey)
 	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
+	sanitizeReadableSummary(&item)
 	return item, nil
 }
 

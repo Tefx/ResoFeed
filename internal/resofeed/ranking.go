@@ -201,6 +201,7 @@ func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCand
 	item.ExternalSurfacedAt = timePtrFromNull(surfacedAt)
 	item.StoryKey = stringPtrFromNull(storyKey)
 	item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
+	sanitizeReadableSummary(&item)
 	firstSeenAt := timePtrFromNull(firstSeen)
 	fresh := isFresh(item.PublishedAt, firstSeenAt, now)
 	textParts := []string{item.Title, item.SourceTitle, item.URL, stringValue(item.Summary), stringValue(item.CoreInsight), stringValue(item.ValueTier)}

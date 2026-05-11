@@ -428,25 +428,30 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	if item.Title == "" {
 		item.Title = entry.URL
 	}
+	sanitizeReadableItem(&item)
 	extracted, extractionStatus := extractArticleText(ctx, entry.URL, entry.Description)
 	item.ExtractedText = nullableString(extracted)
 	item.ExtractionStatus = extractionStatus
 	available := extracted
 	if strings.TrimSpace(available) == "" {
-		available = entry.Description
+		available = stringValue(item.FeedExcerpt)
 	}
+	available, _ = sanitizeReadablePayloadText(available)
 	if strings.TrimSpace(available) == "" {
 		item.ExtractionStatus = extractionStatusOriginalNA
 		item.ModelStatus = modelStatusSummaryNA
+		sanitizeReadableItem(&item)
 		return item, nil
 	}
 	if llm == nil {
 		item.ModelStatus = modelStatusSummaryNA
+		sanitizeReadableItem(&item)
 		return item, nil
 	}
 	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
 	if err != nil {
 		item.ModelStatus = modelStatusLatencyError
+		sanitizeReadableItem(&item)
 		return item, nil
 	}
 	item.ModelStatus = mapModelStatus(out.ModelStatus)
@@ -457,6 +462,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	} else if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 		item.ExtractionStatus = extractionStatusSummaryNA
 	}
+	sanitizeReadableItem(&item)
 	return item, nil
 }
 
@@ -511,10 +517,12 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		}
 		return "", extractionStatusOriginalNA
 	}
-	return extracted, extractionStatusFull
+	cleaned, _ := sanitizeReadablePayloadText(extracted)
+	return cleaned, extractionStatusFull
 }
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) error {
+	sanitizeReadableItem(&item)
 	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do update set source_url = excluded.source_url, title = excluded.title, summary = excluded.summary, core_insight = excluded.core_insight, value_tier = excluded.value_tier, published_at = excluded.published_at, extraction_status = excluded.extraction_status, model_status = excluded.model_status, feed_excerpt = excluded.feed_excerpt, extracted_text = excluded.extracted_text, canonical_url = excluded.canonical_url, story_key = excluded.story_key, duplicate_of_item_id = excluded.duplicate_of_item_id`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return fmt.Errorf("ingest item %q: %w", item.ID, err)
