@@ -41975,7 +41975,7 @@ phases:
       \ evidence artifacts only and were not committed."
   - id: slnr-restore-navigation-route
     name: Restore SOURCE LEDGER chrome entry and direct-route handling
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       tags:
@@ -42112,6 +42112,8 @@ phases:
     - slnr-contract-doc-route-contract
     - slnr-expected-red-browser-test
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T12:01:36.396807+00:00'
   - id: slnr-browser-route-retest
     name: Independently verify Source Ledger nav and direct routes in real browser
     status: pending
