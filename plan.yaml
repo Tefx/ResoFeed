@@ -41776,3 +41776,98 @@ phases:
       \ tests/docs-in-test only, no product implementation>\n- Forbidden concepts\
       \ checked: <list>\n- Headline: PASS | FAIL"
     agent: spec-verifier
+  - id: slnr-expected-red-browser-test
+    name: Add expected-red browser coverage for Source Ledger discoverability and
+      direct routes
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Create browser-level Playwright coverage that exposes the regression before
+      implementation.
+
+
+      Scope:
+
+      - Add or extend `web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts`.
+
+      - Use the existing real-server/auth fixture patterns from `web/tests/e2e/real-server-ui.spec.ts`
+      and navigation assertions from `web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts`.
+
+      - Do not modify product implementation code.
+
+
+      Required expected-red assertions:
+
+      1. At `/`, after owner-token acceptance, `page.getByRole(''button'', { name:
+      ''SOURCE LEDGER'' })` or an equivalent accessible navigation control is visible,
+      keyboard focusable, and unobstructed.
+
+      2. Activating that entry opens `.utility-surface[aria-label="SOURCE LEDGER surface"]`
+      as the active panel and shows heading `SOURCE LEDGER`.
+
+      3. Direct navigation to `/source-ledger` after owner-token acceptance opens
+      the same Source Ledger surface.
+
+      4. Direct navigation to `/source` and `/sources` either opens the same surface
+      as compatibility aliases or records a deliberate contract conflict from `slnr-contract-doc-route-contract`;
+      absent conflict, these must be red coverage for the reported bug.
+
+      5. The test must capture at least one screenshot or Playwright trace artifact
+      showing the missing nav/direct-route failure.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      - Use exact documented UI labels from `docs/DESIGN.md`: `SOURCE LEDGER`, `TODAY`,
+      `INSPECTOR`, `/doctor`.
+
+      - Do not invent convenience copy, icons, settings labels, or alias labels that
+      docs do not permit.
+
+
+      Integration Evidence requirement:
+
+      - The test must exercise the real Svelte UI through the Go-served app path,
+      not only component rendering.
+
+      - Browser proof must include actual route URLs and visible DOM assertions.
+
+
+      touch_paths:
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts
+
+      - web/tests/e2e/fixtures.ts or helpers only if needed
+
+      - web/tests/e2e/real-server-ui.spec.ts (reference/pattern only unless minimal
+      helper extraction is necessary)'
+    verification: '- Expected-red Playwright test exists and is limited to tests/helpers.
+
+      - Running the focused test before implementation reports red for the user-visible
+      missing SOURCE LEDGER entry and/or direct-route failure.
+
+      - Evidence lists exposed_gaps and expected_failures, not a green claim.
+
+      - Evidence names the downstream implementation step `source-ledger-navigation-regression.slnr-restore-navigation-route`
+      as owner of the exposed gap.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/real-server-ui.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/routes/+page.svelte — key\
+      \ passage or \"NOT READ: <reason>\"\n\n## Expected-Red Test Evidence\n- Test\
+      \ file(s) changed: <paths>\n- Product files modified: <must be none>\n- Exact\
+      \ command executed:\n  ```\n  <focused Playwright command>\n  ```\n- Expected\
+      \ failures / exposed_gaps:\n  - missing visible SOURCE LEDGER chrome entry:\
+      \ <observed output>\n  - `/source-ledger` direct route: <observed output>\n\
+      \  - `/source` and `/sources` aliases: <observed output or documented conflict>\n\
+      - Artifact paths: <screenshot/trace paths>\n- Downstream owner: source-ledger-navigation-regression.slnr-restore-navigation-route\n\
+      - Headline: PASS_EXPECTED_RED | FAIL"
+    depends_on:
+    - slnr-contract-doc-route-contract
+    agent: integration-verifier
