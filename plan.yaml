@@ -39844,7 +39844,7 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T08:41:33.156823+00:00'
-  - id: urrc-r1-second-prose-preservation-fix
+  - id: ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     name: urrc-r1-second-prose-preservation-fix
     status: pending
     description: "Focused second R1 remediation after ui-remediation-retest-closure.urrc-r1-focused-browser-retest\
