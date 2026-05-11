@@ -45874,7 +45874,7 @@ phases:
   - id: pbar-frontend-search-doctor-surface-remediation
     name: Fix Search execution UI, direct Doctor route, and surface command/navigation
       semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -45939,6 +45939,8 @@ phases:
       \ proof: <states covered>\n- Accessibility proof: <submit label, landmark/focus/current\
       \ state>"
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T17:03:36.859777+00:00'
   - id: pbar-frontend-feed-inspector-resonate-remediation
     name: Fix Feed/Inspector fallback labels, quality metadata, and Resonate accessibility
     status: claimed
