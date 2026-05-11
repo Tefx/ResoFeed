@@ -41302,7 +41302,7 @@ phases:
       none'
   - id: urrc-fix-uiux-reaudit-dom-a11y-paths
     name: Fix UIUX re-audit DOM/a11y evidence paths
-    status: pending
+    status: claimed
     description: "Batched remediation for final gate blockers B1 and B2 in the committed\
       \ downstream UIUX re-audit artifact.\n\nstep_type: implementation\nverification_scope:\
       \ local-check\nAgent: uiux-auditor\n\nScope: update or replace `audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md`\
@@ -41433,3 +41433,5 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-11T10:18:40.620553+00:00'
