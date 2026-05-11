@@ -43811,7 +43811,7 @@ phases:
       implementation files were not edited.'
   - id: pbar-expected-red-browser-tests
     name: Add expected-red browser/UI behavior coverage for PRD audit findings
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -43861,6 +43861,190 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T16:08:56.354173+00:00'
+    done_at: '2026-05-11T16:18:52.395034+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — confirmed one Go deployable, SQLite/FTS5 lexical
+      only, Steer/Inspect/Resonate uniformity, dense functional UI, no folders/tags/settings
+      dashboards.
+
+      - docs/ARCHITECTURE.md — confirmed one deployable, /api/search, /api/steer,
+      /api/doctor, frontend owner-token storage, Steer-driven Search/Doctor/Ledger
+      surfaces, fallback/status labels.
+
+      - docs/PRD.md — confirmed Inspect/Resonate/Steer primitives, lexical Search
+      requirements, summary reliability, AC-8 steering clarity, AC-14 summary transparency,
+      AC-17 diagnostics.
+
+      - docs/DESIGN.md — confirmed Steer receipt anatomy, Search results anatomy,
+      Feed metadata/value tier expectations, Resonate aria state, Inspector fallback/provenance,
+      Source Ledger grammar, raw /doctor diagnostics.
+
+      - docs/DESIGN_VISION.md — confirmed desktop split pane, mobile single-column
+      surface containment, flat Source Ledger, /doctor raw text, persistent/time-grouped
+      feed.
+
+      - docs/USAGE.md — confirmed owner token UI flow, Search query example, Steer
+      source-add response, /doctor plain-text diagnostics.
+
+      - docs/audits/prd-behavior-audit-closure-matrix.json — used B1-B15, B19-B23,
+      U1-U5 records and acceptance/evidence requirements.
+
+
+      ## Expected-Red Browser Test Evidence
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      observed_result: red
+
+      failure_alignment: Targeted Playwright tests failed on intended B/U gaps: Search
+      no-match/internal/stale rows, ambiguous Search submit, mobile Search density/time
+      marker, terse source-add receipt, missing direct /doctor route/diagnostic keys,
+      missing feed value metadata/fallback labels, mobile focus/full-error affordance
+      gaps.
+
+      verdict: PASS
+
+      blockers: []
+
+
+      **Modified files limited to tests/fixtures**:
+
+      - web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+
+
+      **Subagent commit hash(es)**:
+
+      - f5e9c2a test: add expected-red PRD browser gap coverage
+
+      **Mainline squash commit**:
+
+      - 500d2e9 ([vectl] step-pbar-expected-red-browser-tests completed)
+
+
+      **Commands executed**:
+
+      ```bash
+
+      npm --prefix web ci
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe
+
+      # first run exposed a test bug (page.accessibility undefined); subagent fixed
+      test evidence capture.
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe
+
+      # exit non-zero expected-red; build succeeded; 5 tests failed with aligned assertions.
+
+
+      # Mainline final-state verification wrapper:
+
+      set +e; npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe; code=$?; if [ "$code" -ne 0 ]; then exit 0; fi;
+      exit 1
+
+      ```
+
+
+      **Mainline expected-red output summary**:
+
+      - Browser run produced 5 failed tests in `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`,
+      matching the declared expected-red groups.
+
+      - B5/U2: source-add receipt remains `applied: source added`, missing source
+      title/host and ingest orientation.
+
+      - B9/B20/U4: direct /doctor route lacks /doctor heading and provider/model/item-transform
+      diagnostic keys and still renders Today feed.
+
+      - B21/B6/B19: feed rows lack value/quality/tier metadata and Inspector lacks
+      explicit fallback/provenance labels.
+
+      - B10/B12/U5: mobile focus does not move to active surface heading; full error/details
+      affordance absent.
+
+      - Output also included aligned failures for B1/B2/B3/B11/B13/U1 and B4/B14/B15/B23/U2
+      groups.
+
+
+      **Expected failures/exposed gaps by finding**:
+
+      - B1: Search command seeds form; immediate execution assertion included.
+
+      - B2: no-match shows `err: internal: internal error` and stale row.
+
+      - B3: submit named `search`, not `submit search`.
+
+      - B4/B14/B15: receipts require interpreted/normalized or safe rejection coverage.
+
+      - B5/U2: source-add receipt observed `applied: source added`, missing title/host
+      and ingest hint.
+
+      - B6/B19: Inspector lacks explicit fallback/excerpt provenance label expected
+      by test.
+
+      - B7/B22: sanitation assertions included for source furniture/pollution.
+
+      - B8: resonate aria-pressed transition covered.
+
+      - B9: direct `/doctor` renders Today; no `/doctor` heading.
+
+      - B10/U5: mobile inactive-surface containment/focus assertions included.
+
+      - B11/B13/U1: mobile Search metadata/form/time-marker assertions included; form
+      height observed 504px; result y 660.
+
+      - B12/U3: full error affordance and ledger row grammar assertions included.
+
+      - B20/U4: provider/model/item-transform diagnostic key assertions included.
+
+      - B21: feed row missing `value:`/`quality:`/`tier:` metadata.
+
+
+      **Visual artifacts captured**:
+
+      - Desktop Search: `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-7166e-t-accessible-mobile-anatomy-chromium-ci-safe/attachments/desktop-search-command-seeded-*`
+
+      - Desktop no-match Search: same directory, `desktop-search-no-match-*`
+
+      - Mobile Search: same directory, `mobile-search-result-anatomy-*`
+
+      - Steer receipts: `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-87ff0-orientation-across-surfaces-chromium-ci-safe/attachments/steer-*-receipt-*`
+
+      - Direct Doctor: `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-c28c7-ostics-without-Today-chrome-chromium-ci-safe/attachments/desktop-direct-doctor-route-*`
+
+      - Feed/Inspector: `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-4d584-te-state-and-value-metadata-chromium-ci-safe/attachments/desktop-*-presentation-*`
+
+      - Mobile Ledger/Search/Doctor containment: `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-9e8ae-rors-and-stable-ledger-rows-chromium-ci-safe/attachments/mobile-*-surface-*`
+
+
+      **Product code modified**: NO
+
+
+      **behavioral_proof_register**:
+
+      - Search UI expected-red coverage: PROVEN
+
+      - Steer/receipt expected-red coverage: PROVEN
+
+      - Doctor diagnostics expected-red coverage: PROVEN
+
+      - Inspector/feed presentation expected-red coverage: PROVEN
+
+      - Mobile/surface/ledger expected-red coverage: PROVEN
+
+      - Product implementation unchanged: PROVEN
+
+
+      **Gaps/Notes**:
+
+      - Playwright generated `.test-artifacts/` evidence files during verification;
+      committed diff is test-only.'
   - id: pbar-contract-tests-gate
     name: Gate audit matrix and expected-red coverage
     status: pending
