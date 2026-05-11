@@ -42159,7 +42159,7 @@ phases:
       \ needed; existing Go static fallback serves SPA direct routes."
   - id: slnr-browser-route-retest
     name: Independently verify Source Ledger nav and direct routes in real browser
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -42334,6 +42334,70 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T12:07:10.035253+00:00'
+    done_at: '2026-05-11T12:10:49.448682+00:00'
+    evidence: "## Verification Report\n\n**Tester**: integration-verifier (independent\
+      \ of frontend-engineer implementation)\n**Scope**: Source Ledger navigation/direct-route\
+      \ remediation\n**Independence Level**: L1\n\n## refs Read Confirmation\n\n-\
+      \ docs/DESIGN.md — READ. Key passages: terse operational labels including `RESOFEED`,\
+      \ `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`; optional Source Ledger route/overlay\
+      \ in app shell; flat Source Ledger behavior forbids folders/tags/source-management\
+      \ bloat.\n- docs/ARCHITECTURE.md — READ. Key passages: one Go-served UI/API/MCP\
+      \ deployable; `web/` must preserve DESIGN.md, owner-token-gate browser API calls,\
+      \ and expose flat Source Ledger.\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — READ. Key passages: acceptance matrix pins visible/focusable Source Ledger\
+      \ nav, click activation, canonical `/source-ledger`, compatibility `/source`\
+      \ and `/sources`; tests exercise root nav, unobstructed hit target, keyboard\
+      \ tab focus, click activation, and direct route aliases.\n- web/tests/e2e/real-server-ui.spec.ts\
+      \ — READ. Key passages: proves Go binary owner-token gate and browser-led Source\
+      \ Ledger import/ingest, TODAY feed, INSPECTOR, `/doctor`, search against a real\
+      \ isolated server.\n- web/tests/e2e/fixtures.ts — READ. Key passage: load `RESOFEED_E2E_RUN_INFO`\
+      \ from global setup and provide real runInfo/ownerToken fixtures to Playwright\
+      \ tests.\n\n## Seam-Level Integration Evidence\n\n**Changed seam path**: Go\
+      \ static UI server / Svelte app shell / Source Ledger navigation\n\n**Exact\
+      \ commands executed by verifier**:\n```\nnpm ci\nnpm run test:e2e -- tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ --reporter=line\nnpm run test:e2e -- tests/e2e/real-server-ui.spec.ts -g \"\
+      ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, and\
+      \ search\" --reporter=line\nnpm run test:e2e -- tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ --reporter=line\n```\n\n**Actual output excerpt**:\n```\nFocused route/navigation\
+      \ run:\nRunning 5 tests using 1 worker\n[1/5] root app chrome exposes a visible\
+      \ keyboard-reachable unobstructed SOURCE LEDGER entry after owner-token acceptance\n\
+      [2/5] clicking SOURCE LEDGER opens the documented flat ledger surface without\
+      \ forbidden source-management concepts\n[3/5] direct navigation to /source-ledger\
+      \ opens SOURCE LEDGER after token acceptance\n[4/5] direct navigation to /source\
+      \ opens SOURCE LEDGER after token acceptance\n[5/5] direct navigation to /sources\
+      \ opens SOURCE LEDGER after token acceptance\n  5 passed (3.7s)\n\nReal-server\
+      \ reachability run:\nRunning 1 test using 1 worker\n[1/1] ci-safe browser-led\
+      \ source import, manual fetch, feed, inspect, retrieve, and search\n  1 passed\
+      \ (4.0s)\n```\n\n## Behavioral Proof Register\n\n- requirement_ref: root SOURCE\
+      \ LEDGER nav visible/focusable/unobstructed\n  behavior_claim: After owner-token\
+      \ acceptance at `/`, app chrome exposes visible enabled SOURCE LEDGER nav button;\
+      \ hit target is unobstructed and reachable by Tab.\n  runtime_proof_expected:\
+      \ Playwright real browser assertion on `nav.surface-nav` SOURCE LEDGER button,\
+      \ obstruction probe, and keyboard focus.\n  evidence_ref: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/root-after-owner-token-source-ledger-regression.png`;\
+      \ trace: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/trace.zip`\n\
+      \  status: PROVEN\n  closure_path: Closed by focused Playwright test 1/5 passing.\n\
+      \  gate_decision_basis: Runtime browser proof with real Go-served UI fixture,\
+      \ not direct component invocation.\n- requirement_ref: click SOURCE LEDGER activates\
+      \ ledger\n  status: PROVEN\n  evidence_ref: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/before-source-ledger-click-source-ledger-regression.png`;\
+      \ trace: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/trace.zip`\n\
+      \  closure_path: Closed by focused Playwright test 2/5 passing.\n- requirement_ref:\
+      \ direct /source-ledger opens ledger\n  status: PROVEN\n  evidence_ref: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-bd212-DGER-after-token-acceptance-chromium-ci-safe/direct-source-ledger-source-ledger-regression.png`;\
+      \ trace zip same directory.\n  closure_path: Closed by focused Playwright test\
+      \ 3/5 passing.\n- requirement_ref: /source alias opens ledger\n  status: PROVEN\n\
+      \  evidence_ref: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-91603-DGER-after-token-acceptance-chromium-ci-safe/direct-source-source-ledger-regression.png`;\
+      \ trace zip same directory.\n  closure_path: Closed by focused Playwright test\
+      \ 4/5 passing.\n- requirement_ref: /sources alias opens ledger\n  status: PROVEN\n\
+      \  evidence_ref: `.test-artifacts/playwright/test-output/source-ledger-navigation-r-e807d-DGER-after-token-acceptance-chromium-ci-safe/direct-sources-source-ledger-regression.png`;\
+      \ trace zip same directory.\n  closure_path: Closed by focused Playwright test\
+      \ 5/5 passing.\n- requirement_ref: TODAY/INSPECTOR/doctor remain reachable\n\
+      \  status: PROVEN\n  evidence_ref: `real-server-ui.spec.ts -g \"ci-safe browser-led\
+      \ source import, manual fetch, feed, inspect, retrieve, and search\"` output\
+      \ showing `1 passed (4.0s)`.\n  closure_path: Closed by real-server UI test\
+      \ passing.\n\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      verdict: PASS\nblockers: []\n\n## Files changed\n\nNo product code changed.\
+      \ No commit created; verification-only branch had no commits ahead of main.\
+      \ Untracked Playwright screenshot/trace artifacts remained local to the isolated\
+      \ worktree.\n\n## Gaps/Notes\n\nNone blocking."
   - id: slnr-uiux-navigation-audit
     name: Audit Source Ledger navigation chrome and route visual conformance
     status: pending
