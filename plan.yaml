@@ -46318,7 +46318,7 @@ phases:
       only source changes were committed.'
   - id: pbar-frontend-steer-receipt-remediation
     name: Render actionable Steer and source-add receipts without product creep
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -46374,6 +46374,85 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T17:03:44.861936+00:00'
+    done_at: '2026-05-11T17:24:11.845683+00:00'
+    evidence: '## refs Read Confirmation
+
+      - Read: .agents/instructions.md, docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,
+      docs/DESIGN_VISION.md, docs/USAGE.md, docs/audits/prd-behavior-audit-closure-matrix.json,
+      web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts, and relevant Svelte
+      components.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B4, B5, B14, B15, U2, plus B23 receipt visibility subset
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B4/B5/B14/B15/U2
+
+      **Subagent commit hash(es)**: ca898f07d451f342274e3d1b4fa251dfedc55dce
+
+      **Mainline squash commit**: b186b7b ([vectl] step-pbar-frontend-steer-receipt-remediation
+      completed)
+
+      **Files changed**:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+
+      **Merge conflict resolution**:
+
+      - Conflict files: web/src/routes/+page.svelte and web/src/routes/components/SearchRetrieval.svelte.
+
+      - Preserved mainline feed/Inspector/resonate, mobile/search/ledger, direct doctor/search
+      semantics while integrating backend-contract receipt formatting, actionable
+      internal failure copy, source-add guidance, and inline receipt status-role behavior.
+
+
+      **Verification**:
+
+      ```bash
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # SvelteKit/Vite build completed
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe
+
+      # post-commit mainline: 5 passed
+
+      ```
+
+
+      **Rendered receipt artifacts**: Playwright generated Steer receipt DOM/screenshot
+      attachments under `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-87ff0-orientation-across-surfaces-chromium-ci-safe/attachments/`.
+
+      **Receipt proof**:
+
+      - accepted NL receipts show interpreted/applied evidence.
+
+      - source-add receipt shows source identity and `run ingest in SOURCE LEDGER`
+      guidance.
+
+      - actionable failure copy path was covered by subagent temporary artifact test.
+
+      **Product-boundary proof**: No wizard, toast stack, activity ledger, rule manager,
+      settings surface, accounts, sync, vector DB, or new backend concept added. Receipts
+      remain inline near Steer.
+
+      **Deviation records**: temporary Playwright specs were added/deleted only to
+      capture local artifact; no existing tests/assertions were modified or deleted.
+
+      **Gaps/Notes**: generated `.test-artifacts` remain uncommitted verification
+      output; commit contains only source changes.'
   - id: pbar-frontend-gate
     name: Gate frontend PRD behavior remediation
     status: pending
