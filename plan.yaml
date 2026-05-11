@@ -44821,3 +44821,10 @@ phases:
     - pbar-spec-product-boundary-review
     - pbar-wiring-audit
     agent: gate-reviewer
+- id: prd-behavior-audit-remediation-final-strict-closure
+  name: PRD Behavior Audit Remediation — Final Strict Closure
+  status: locked
+  gate: Final gate blocks unless every audit finding B1-B23 and U1-U5 is proven fixed
+    with evidence or has explicit non-intersection evidence accepted by gate-reviewer.
+  depends_on:
+  - prd-behavior-audit-remediation-independent-retest-and-audits
