@@ -39007,3 +39007,108 @@ phases:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
     agent: uiux-auditor
+  - id: ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
+    name: urrc-architecture-product-boundary-retest
+    status: pending
+    description: 'Independent architecture/product-boundary retest for residual UI
+      remediation.
+
+
+      step_type: verification. verification_scope: phase-check. Agent: software-architect.
+      This step is read-only unless reporting findings; do not modify product code.
+
+
+      Review the completed residual fix against ResoFeed architecture invariants and
+      product boundaries:
+
+      - Single Go binary and existing web surface only; no sidecar/admin process.
+
+      - SQLite-only storage; no vector/RAG/embedding concept.
+
+      - Owner-token boundary preserved; no accounts/OAuth/multi-user auth.
+
+      - State Portability remains JSON backup/restore only; no sync/merge/conflict
+      resolver/activity ledger/portable receipts.
+
+      - UI remains dense/archival; no settings-heavy UI or forbidden folders/tags/unread/archive/drag-and-drop
+      flows.
+
+      - Code shape remains flat and project-idiomatic; no service/repository/DI/event-bus
+      or Java-style layers.
+
+
+      Also inspect R5 specifically as a product-boundary/state-scoping issue: Search
+      receipts and Steer retained state must be scoped to active surface without creating
+      new global command history, reading history, or activity feed concepts.
+
+
+      Inspect R8 specifically: State Portability placement must move UI actions into
+      Ledger footer/action cluster while preserving the strict warning text and no-sync/no-merge
+      semantics.'
+    verification: '- Architecture review confirms no forbidden concepts or new layers
+      were introduced.
+
+      - R5 state/receipt scoping is closed without adding global command history/activity-feed
+      semantics.
+
+      - R8 State Portability remains backup/restore-only and warning text is preserved.
+
+      - Any blocker-class boundary issue includes exact file path and closure_path
+      for final gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Architecture/Product-Boundary Retest
+
+
+      **Changed files reviewed**:
+
+      ```
+
+      <paths>
+
+      ```
+
+
+      **Forbidden concept check**:
+
+      | Boundary | Status | Evidence |
+
+      | --- | --- | --- |
+
+      | accounts/OAuth/multi-user auth | ABSENT/PRESENT | <evidence> |
+
+      | sync/merge/conflict resolver/activity ledger | ABSENT/PRESENT | <evidence>
+      |
+
+      | vector/RAG/embeddings | ABSENT/PRESENT | <evidence> |
+
+      | settings-heavy/admin/sidecar | ABSENT/PRESENT | <evidence> |
+
+      | service/repository/DI/event-bus layers | ABSENT/PRESENT | <evidence> |
+
+
+      **R5 state-scoping decision basis**: PASS | FAIL
+
+      **R8 portability semantics decision basis**: PASS | FAIL
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+    agent: software-architect
