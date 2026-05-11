@@ -38526,7 +38526,7 @@ phases:
   steps:
   - id: ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     name: urrc-batched-residual-ui-fix
-    status: claimed
+    status: done
     description: 'Batched UI remediation fix for all residual blocker-class findings
       in docs/audits/ui-remediation-retest-2026-05-11.md.
 
@@ -38749,6 +38749,161 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T07:08:15.739290+00:00'
+    done_at: '2026-05-11T08:00:38.283178+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ in isolated worktree:
+      file absent there; step-provided R1-R8 findings used as controlling audit contract.
+
+      - docs/DESIGN.md — Read by worker: dense analyst workbench, feed metadata grammar,
+      Inspector and Source Ledger/State Portability contracts.
+
+      - docs/ARCHITECTURE.md — Read by worker: one binary, one SQLite, lexical retrieval
+      only, no accounts/OAuth/vector/RAG/sync/layering.
+
+      - web/src/routes/components/Inspector.svelte — Re-read/modified: Inspector readableText/fallback
+      path.
+
+      - web/src/routes/components/Feed.svelte — Read/modified: Today metadata and
+      controls.
+
+      - web/src/routes/components/SearchRetrieval.svelte — Read/modified: Search metadata/inspect
+      controls.
+
+      - web/src/routes/components/SourceLedger.svelte — Read/modified: row grammar/actions/mobile
+      layout.
+
+      - web/src/routes/components/StatePortability.svelte — Read/modified: export/import
+      warning/action surface.
+
+      - web/src/routes/+page.svelte — Read/modified: cross-surface state/navigation/receipts.
+
+      - web/src/routes/components/item-anatomy.ts — Read/modified: shared metadata
+      helpers.
+
+
+      ## Batched Fix Evidence
+
+      **Audit findings fixed**: R1=PASS, R2=PASS, R3=PASS, R4=PASS, R5=PASS, R6=PASS,
+      R7=PASS, R8=PASS.
+
+
+      **Changed files**:
+
+      - web/src/app.css
+
+      - web/src/lib/api-client.test.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/StatePortability.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - web/tests/e2e/dirty-corpus-fixtures.ts
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts
+
+      - web/tests/e2e/real-server-ui.spec.ts
+
+
+      **Fix details**:
+
+      - Inspector sanitation/fallback now removes boilerplate while preserving readable
+      feed/display excerpt for partial extraction.
+
+      - Source Ledger mobile/desktop row grammar preserves `src:`, URL, status/diagnostic,
+      and actions.
+
+      - Feed/Search metadata uses compact readable lowercase `src:` grammar with truncation
+      priority.
+
+      - Inspector provenance collapses duplicate internal extraction state.
+
+      - Search receipts/query state are scoped away from Today/feed.
+
+      - Mobile Search accessibility hides inactive feed-style inspect controls.
+
+      - State export/import moved into Ledger footer/action cluster while preserving
+      warning text.
+
+
+      **Regression coverage added/updated**:
+
+      - R1: inspector dirty corpus/readable-content tests updated; render test verifies
+      boilerplate removal.
+
+      - R2/R7: SourceLedger render tests assert `src:`, `status:`, URL, actions.
+
+      - R3: Feed/Search metadata labels now compact lowercase with truncation priority.
+
+      - R4: Inspector render tests updated for single provenance string.
+
+      - R5/R6: render test `scopes mobile Search controls and retrieval receipts away
+      from Today`.
+
+      - R8: SourceLedger tests assert `[EXPORT STATE]` and `[IMPORT STATE]` in Ledger
+      footer.
+
+
+      **Verification commands**:
+
+      - Worker: `npm run check && npm run test:render` — exit 0; `svelte-check found
+      0 errors and 0 warnings`; 6 files / 38 tests passed.
+
+      - Worker retry: `npx playwright test --config ./playwright.config.ts tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      tests/e2e/inspector-readable-content-regression.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts
+      --project=chromium-ci-safe` — exit 0; 4 passed.
+
+      - Mainline: `npm run check && npm run test:render && npx playwright test --config
+      ./playwright.config.ts tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      tests/e2e/inspector-readable-content-regression.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts
+      --project=chromium-ci-safe` from `web/` — exit 0; svelte-check 0 errors/warnings;
+      6 render files / 38 tests passed; 4 Playwright tests passed.
+
+
+      **Forbidden concepts check**:
+
+      - accounts/OAuth: absent
+
+      - sync/merge: absent
+
+      - vector/RAG: absent
+
+      - settings-heavy UI/admin/sidecar/service-repository-DI: absent
+
+
+      **Commit hash(es)**:
+
+      - Worktree initial: b1ae8a7911ec339005b5514902fbe5fe7dcd51b5
+
+      - Worktree follow-up: 479374f3b8f58d502148dc341f0e3936d39b7eb1
+
+      - Mainline squash: 1bca159 [vectl] step-ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+      completed
+
+
+      **Gaps/Notes**:
+
+      - `docs/audits/ui-remediation-retest-2026-05-11.md` was not tracked into the
+      isolated worktree; the explicit R1-R8 findings in the step were used as controlling
+      contract.'
   - id: ui-remediation-retest-closure.urrc-playwright-browser-retest
     name: urrc-playwright-browser-retest
     status: pending
