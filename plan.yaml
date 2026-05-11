@@ -40987,7 +40987,7 @@ phases:
       mainline state.'
   - id: ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
     name: urrc-materialize-uiux-canonical-reaudit-artifact
-    status: pending
+    status: claimed
     description: 'Materialize the missing downstream UIUX canonical evidence re-audit
       artifact for the UI remediation retest closure gate.
 
@@ -41185,3 +41185,5 @@ phases:
     - ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
     - ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-11T10:06:17.705486+00:00'
