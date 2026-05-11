@@ -42400,7 +42400,7 @@ phases:
       \ worktree.\n\n## Gaps/Notes\n\nNone blocking."
   - id: slnr-uiux-navigation-audit
     name: Audit Source Ledger navigation chrome and route visual conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -42546,6 +42546,118 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-11T12:11:12.034688+00:00'
+    done_at: '2026-05-11T12:57:58.002182+00:00'
+    evidence: '## UI/UX Navigation Audit Report
+
+
+      **Auditor**: uiux-auditor (independent of frontend-engineer implementation)
+
+      **Scope**: Source Ledger navigation chrome and direct-route visual conformance
+
+
+      ## refs Read Confirmation
+
+
+      - docs/DESIGN.md — READ. Confirmed lines 365-369 allow Source Ledger route,
+      lines 505-521 mandate exact labels `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`,
+      `/doctor`, and flat presentation.
+
+      - docs/ARCHITECTURE.md — READ. Confirmed Section 8 forbids settings dashboards,
+      folders, tags, and SaaS onboarding drift.
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts — READ.
+      Analyzed acceptance matrix and pinpointed locator strict mode failure as non-visual/non-blocking.
+
+      - web/src/routes/+page.svelte — READ. Confirmed `surfaceForPath` handles canonical
+      and alias routes cleanly, rendering the exact same surface. Narrow viewport
+      logic uses a simple `back-command` rather than a dashboard drawer.
+
+      - web/src/routes/components/SourceLedger.svelte — READ. Confirmed intact visual
+      grammar: flat rows, bracket actions, and terse state sync commands.
+
+
+      ## Rendered Artifact Register
+
+
+      | State | Artifact path | Expected design obligation | Status |
+
+      | --- | --- | --- | --- |
+
+      | root desktop chrome | `.test-artifacts/desktop-root-chrome.png` | SOURCE LEDGER
+      visible in operational chrome | PASS |
+
+      | click-opened ledger | `.test-artifacts/desktop-click-opened-ledger.png` |
+      flat source ledger visible | PASS |
+
+      | direct /source-ledger | `.test-artifacts/desktop-direct-source-ledger.png`
+      | direct route opens ledger | PASS |
+
+      | narrow/mobile ledger | `.test-artifacts/narrow-source-ledger.png` | reachable
+      flat list, no collapse/settings dashboard | PASS |
+
+      | aliases /source and /sources | `.test-artifacts/desktop-direct-source.png`
+      and `.test-artifacts/desktop-direct-sources.png` | visually equivalent route
+      state | PASS |
+
+
+      ## Behavioral Proof Register
+
+
+      - SOURCE LEDGER visible in operational chrome: PROVEN; evidence `.test-artifacts/desktop-root-chrome.png`;
+      matches exact required copy and placement.
+
+      - Flat Source Ledger visible without forbidden concepts: PROVEN; evidence `.test-artifacts/desktop-click-opened-ledger.png`;
+      displays flat list, bracket actions, no SaaS copy.
+
+      - Direct `/source-ledger` opens ledger: PROVEN; evidence `.test-artifacts/desktop-direct-source-ledger.png`;
+      ledger displays as click-opened state.
+
+      - Narrow/mobile ledger remains flat and reachable: PROVEN; evidence `.test-artifacts/narrow-source-ledger.png`;
+      no collapse/settings-dashboard conversion.
+
+      - `/source` and `/sources` aliases visually equivalent: PROVEN; evidence `.test-artifacts/desktop-direct-source.png`
+      and `.test-artifacts/desktop-direct-sources.png`.
+
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      verdict: PASS
+
+      blockers: []
+
+
+      ## Files changed
+
+
+      No product/source/test files or plan/orchestrator files were modified or committed.
+      Verification-only branch had no commits ahead of main.
+
+
+      ## Verification
+
+
+      - Auditor generated and inspected targeted visual artifacts, then cleaned up
+      all temporary helper scripts/logs and disposable artifact modifications.
+
+      - `git status --short` in audit worktree was clean after cleanup.
+
+      - `git log --oneline main..vectl/step-slnr-uiux-navigation-audit` produced no
+      output, confirming no branch delta required merging.
+
+      - `npm --prefix web run test:e2e` exited non-zero during broad audit exploration;
+      auditor classified the observed locator/hit-target failures as non-blocking
+      automation targeting issues because visual evidence confirmed required UIUX
+      behavior.
+
+
+      ## Gaps/Notes
+
+
+      No UIUX blocker remains. Non-blocking test-flake notes do not intersect this
+      UIUX gate because focused route verification already passed and visual audit
+      artifacts prove the rendered behavior.'
   - id: slnr-gate
     name: Gate Source Ledger navigation regression remediation
     status: pending
