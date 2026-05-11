@@ -42673,12 +42673,27 @@ phases:
 
       - Regression has screenshot evidence from a user and affects discoverability.
 
-      - Phase contains expected-red browser coverage, real-browser retest, and native
-      multimodal UI/UX audit.
+      - Phase contains expected-red browser coverage, real-browser retest, native
+      multimodal UI/UX audit, and materialized proof artifacts for independent gate
+      inspection.
+
+      - Prior gate failed because retest evidence was not materialized into committed/inspectable
+      artifacts and dependency hydration was missing in the gate context.
 
 
       As an INDEPENDENT REVIEWER, assess whether the Source Ledger navigation regression
       phase meets the quality bar for proceeding.
+
+
+      Required dependency hydration for gate verification:
+
+      - Before running frontend static verification, check whether `node_modules/.bin/svelte-kit`
+      exists.
+
+      - If it is missing, run `npm ci` before `npm run check`.
+
+      - Record the hydration decision, exact commands, exit statuses, and relevant
+      stdout/stderr in gate evidence.
 
 
       Review criteria:
@@ -42699,10 +42714,17 @@ phases:
       5. uiux-auditor produced rendered artifact evidence and passed/block-decided
       UI/UX conformance.
 
-      6. Evidence quality includes refs read confirmations and actual commands/artifact
-      paths.
+      6. `slnr-materialize-browser-proof-artifacts` produced a committed, inspectable
+      proof report under `audits/` or `.audit-artifacts/` summarizing exact commands,
+      hydration decisions, exit statuses, stdout/stderr excerpts, and screenshot/trace
+      artifact paths for root nav, click-opened ledger, `/source-ledger`, `/source`,
+      and `/sources`.
 
-      7. No unresolved behavioral proof register item remains NEEDS_TEST, UNPROVEN,
+      7. Evidence quality includes refs read confirmations, actual commands, committed
+      proof report path, and actual artifact paths or explicit bounded disposition
+      for uncommitted large artifacts.
+
+      8. No unresolved behavioral proof register item remains NEEDS_TEST, UNPROVEN,
       or UNCERTAIN_BLOCKING without explicit remediation ownership.
 
 
@@ -42714,6 +42736,15 @@ phases:
 
       - Browser evidence lacks screenshots/traces or actual output.
 
+      - The materialized proof report is missing, uncommitted, or not inspectable
+      by the gate.
+
+      - The materialized proof report omits any required route/state: root nav, click-opened
+      ledger, `/source-ledger`, `/source`, `/sources`.
+
+      - `npm run check` is skipped or fails because dependencies were not hydrated
+      when `svelte-kit` was missing.
+
       - The solution introduces settings/source dashboard concepts, folders/tags,
       accounts, sync/merge, service/repository layers, or non-canonical UI labels.
 
@@ -42723,18 +42754,29 @@ phases:
       touch_paths:
 
       - plan/evidence review only; no product code changes'
-    verification: '- All phase steps completed successfully with evidence.
+    verification: '- All phase steps completed successfully with evidence, including
+      `slnr-materialize-browser-proof-artifacts`.
+
+      - Gate hydrates dependencies when needed: if `node_modules/.bin/svelte-kit`
+      is missing, `npm ci` is run before `npm run check`.
+
+      - `npm run check` command, exit status, and relevant stdout/stderr are recorded
+      in gate evidence.
 
       - Gate decision basis maps each requirement/proof obligation to reviewed evidence
       and OPEN/BLOCK recommendation.
 
-      - Browser retest and uiux-auditor audit are both reviewed and contain actual
-      runtime/rendered artifacts.
+      - Browser retest, uiux-auditor audit, and materialized proof report are reviewed
+      and contain actual runtime/rendered artifacts.
+
+      - A committed proof report under `audits/` or `.audit-artifacts/` is present
+      and inspectable, covering root nav, click-opened ledger, `/source-ledger`, `/source`,
+      and `/sources` with screenshot/trace paths or explicit route-alias disposition.
 
       - No unresolved blocker or blocker-class proof gap remains.
 
       - Ready to close the remediation phase only if SOURCE LEDGER discoverability
-      and direct-route behavior are proven green.'
+      and direct-route behavior are proven green from committed/inspectable evidence.'
     evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
       \ of phase implementation)\n**Phase**: source-ledger-navigation-regression\n\
       **Timestamp**: <ISO 8601>\n\n## refs Read Confirmation (MANDATORY)\n\nFor each\
@@ -42766,6 +42808,7 @@ phases:
     - slnr-restore-navigation-route
     - slnr-browser-route-retest
     - slnr-uiux-navigation-audit
+    - slnr-materialize-browser-proof-artifacts
     agent: gate-reviewer
   - id: slnr-materialize-browser-proof-artifacts
     name: Materialize Source Ledger browser proof artifacts
