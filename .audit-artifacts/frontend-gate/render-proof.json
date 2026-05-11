@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T10:51:22.461Z",
+  "generated_at": "2026-05-11T17:58:38.690Z",
   "current_artifacts": {
     "desktop": ".audit-artifacts/frontend-gate/current-populated-desktop-full.png",
     "mobile_feed": ".audit-artifacts/frontend-gate/current-mobile-feed.png",
@@ -36,7 +36,52 @@
         "B3": {
           "required_fields_present": true
         },
+        "B4": {
+          "required_fields_present": true
+        },
         "B5": {
+          "required_fields_present": true
+        },
+        "B6": {
+          "required_fields_present": true
+        },
+        "B7": {
+          "required_fields_present": true
+        },
+        "B8": {
+          "required_fields_present": true
+        },
+        "B9": {
+          "required_fields_present": true
+        },
+        "B10": {
+          "required_fields_present": true
+        },
+        "B11": {
+          "required_fields_present": true
+        },
+        "B12": {
+          "required_fields_present": true
+        },
+        "B13": {
+          "required_fields_present": true
+        },
+        "B14": {
+          "required_fields_present": true
+        },
+        "B15": {
+          "required_fields_present": true
+        },
+        "B19": {
+          "required_fields_present": true
+        },
+        "B21": {
+          "required_fields_present": true
+        },
+        "B22": {
+          "required_fields_present": true
+        },
+        "B23": {
           "required_fields_present": true
         },
         "U1": {
@@ -46,6 +91,9 @@
           "required_fields_present": true
         },
         "U3": {
+          "required_fields_present": true
+        },
+        "U5": {
           "required_fields_present": true
         }
       },

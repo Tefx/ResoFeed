@@ -7,7 +7,10 @@ const root = resolve(dirname(new URL(import.meta.url).pathname), '../..');
 const outDir = resolve(root, '.audit-artifacts/frontend-gate');
 const ownerToken = 'rfeed_proof0123456789abcdefghijklmnopqrstuvwxyzABCDEFG';
 const baseURL = 'http://127.0.0.1:4177';
-const requiredClosureItemIds = ['B1', 'B2', 'B3', 'B5', 'U1', 'U2', 'U3'];
+const requiredClosureItemIds = [
+  'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'B12', 'B13', 'B14', 'B15',
+  'B19', 'B21', 'B22', 'B23', 'U1', 'U2', 'U3', 'U5'
+];
 const requiredClosureFields = [
   'requirement_ref',
   'behavior_claim',
@@ -214,7 +217,8 @@ async function main() {
     await mobile.screenshot({ path: resolve(outDir, 'current-mobile-inspector.png'), fullPage: true });
     await mobile.screenshot({ path: resolve(root, '.audit-artifacts/populated-mobile-full.png'), fullPage: true });
     await mobile.getByRole('button', { name: 'back to TODAY' }).click();
-    await mobile.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+    await mobile.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('source ledger');
+    await mobile.getByRole('button', { name: 'apply' }).click();
     await mobile.getByRole('region', { name: 'SOURCE LEDGER surface' }).waitFor();
     await mobile.screenshot({ path: resolve(outDir, 'current-mobile-source-ledger.png'), fullPage: true });
     const closureRegister = await inspectClosureRegister();
