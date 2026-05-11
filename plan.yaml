@@ -49126,7 +49126,7 @@ phases:
       filters visible by default and compact only in narrow app shell.'
   - id: pbar-source-ledger-boundary-wiring-remediation
     name: Resolve Source Ledger boundary, reachability, and diagnostics audit blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       work_type: authority_adjudication + defect_repair
@@ -49302,6 +49302,79 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T18:58:05.953050+00:00'
+    done_at: '2026-05-11T19:09:08.693180+00:00'
+    evidence: "## refs Read Confirmation\n- docs/PRD.md — §7.2 Source Ledger is flat\
+      \ and only supports viewing source name/URL and deleting it; broader PRD forbids\
+      \ product-management creep.\n- docs/DESIGN.md — Source Ledger anatomy permits\
+      \ OPML import, flat rows, delete, state links, optional last fetch status; forbids\
+      \ folders/tags/pause/order/sliders and persistent SaaS navigation creep.\n-\
+      \ docs/ARCHITECTURE.md — Preserves one Go binary, SQLite/FTS5, owner-token boundary,\
+      \ no accounts/OAuth/RBAC/vector/RAG/sync/event bus.\n- docs/DESIGN_VISION.md\
+      \ — Source Ledger is a barebones flat list via discreet menu, not settings dashboard.\n\
+      - docs/USAGE.md — Source addition via Steer URL/OPML; Source Ledger delete action\
+      \ only; /doctor remains plain diagnostics.\n- .agents/instructions.md — Canonical\
+      \ docs are ARCHITECTURE/DESIGN; do not edit plan directly; preserve ResoFeed\
+      \ invariants.\n- .audit-artifacts/pbar-wiring-audit.md — Prior blockers: visible\
+      \ Source Ledger path absent/unproven and diagnostic full-view only aria/title\
+      \ without expanded visible panel.\n\n## Remediation / Adjudication Record\n\
+      - Source Ledger operation-control decision: removed `[RUN INGEST]` and per-source\
+      \ `[FETCH]` from Source Ledger UI; rows expose view fields, `[DELETE]`, visible\
+      \ `[DETAILS]` disclosure, and OPML/state actions only.\n- Authoritative citations\
+      \ used: PRD §7.2, DESIGN Source Ledger anatomy/Do's & Don'ts, ARCHITECTURE frontend\
+      \ boundary.\n- Deviation/adjudication: implementation/test contract updated\
+      \ to prefer PRD/DESIGN Source Ledger boundary over prior manual-fetch UI assumptions;\
+      \ backend manual-fetch endpoints remain untouched but are no longer exposed\
+      \ as Source Ledger row controls.\n- Product-boundary invariants preserved: single\
+      \ Go binary, SQLite/FTS5 only, owner-token boundary, no accounts/OAuth/RBAC,\
+      \ no vector/RAG, no sync/merge/event bus/service layer, no folders/tags/unread/settings/archive/navigation\
+      \ creep.\n\n## Files Changed\n- web/src/routes/components/SourceLedger.svelte\
+      \ — removed ingest/fetch controls; added visible native diagnostics disclosure\
+      \ with keyboard toggle.\n- web/src/routes/+page.svelte — removed Source Ledger\
+      \ manual-fetch wiring; added non-persistent RESOFEED utility menu path to SOURCE\
+      \ LEDGER/TODAY.\n- web/src/app.css — updated menu/disclosure styles and removed\
+      \ manual-fetch control styling.\n- web/src/lib/api-contract.ts — updated Source\
+      \ Ledger render contract away from manual fetch controls toward diagnostics\
+      \ disclosure.\n- web/src/lib/manual-rss-fetch-contract.test.ts — updated contract\
+      \ assertions for no Source Ledger ingest/fetch controls.\n- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
+      \ — asserts no `[RUN INGEST]`/`[FETCH]`, visible details expansion by click/keyboard.\n\
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts — proves\
+      \ non-persistent RESOFEED utility menu opens Source Ledger.\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — proves menu reachability/direct routes and absence of ingest/fetch controls.\n\
+      \n## Commit hash(es)\n- Worktree commits: 4a31776 `fix source ledger boundary\
+      \ wiring`; c3a16c6 `test source diagnostics disclosure`.\n- Mainline squash\
+      \ merge: 12d7990 `[vectl] step-pbar-source-ledger-boundary-wiring-remediation\
+      \ completed`.\n\n## Verification\n- Worktree verification reported by frontend-engineer:\
+      \ `npm --prefix web install` PASS; `npm run test:render` PASS (6 files / 39\
+      \ tests); `npm run check` PASS (0 errors/warnings); `npm run build` PASS; `npm\
+      \ exec playwright test tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` PASS (5 passed); worktree git status clean.\n\
+      - Mainline final-state verification after squash merge:\n  - Initial root-level\
+      \ `npm run ...` attempt failed with ENOENT because root has no package.json;\
+      \ corrected by running from `web/`.\n  - `npm run test:render` PASS: 6 test\
+      \ files, 39 tests passed.\n  - `npm run check` PASS: svelte-check found 0 errors\
+      \ and 0 warnings.\n  - `npm run build` PASS: Vite/SvelteKit production build\
+      \ completed and adapter-static wrote `build`.\n  - `npm exec playwright test\
+      \ tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts --project=chromium-ci-safe`\
+      \ PASS: 5 passed.\n\n## Runtime / Static Proof Register\n- search_steer_to_search_retrieval:\
+      \ PROVEN — render test exercises `search sqlite` Steer path into SearchRetrieval;\
+      \ mainline render tests passed.\n- doctor_direct_and_steer_share_diagnostics_source:\
+      \ PROVEN — direct `/doctor` and Steer `/doctor` use `apiClient().doctor()`;\
+      \ render test verifies diagnostics log surface.\n- source_ledger_direct_route_to_component:\
+      \ PROVEN — Playwright verifies `/source-ledger`, `/source`, `/sources` all render\
+      \ active SOURCE LEDGER surface.\n- metadata_visible_consumption: PROVEN — render\
+      \ tests cover Feed/Inspector/Search metadata visibility; mainline build/check\
+      \ passed.\n- source_diagnostic_affordance_a11y: PROVEN — native details/summary\
+      \ visible `[DETAILS]`, focus-visible styling, mouse click expansion, keyboard\
+      \ Enter collapse in render tests.\n- source_ledger_only_view_delete_import_export:\
+      \ PROVEN — SourceLedger component has no `[RUN INGEST]`/`[FETCH]`; tests assert\
+      \ absence and Playwright validates no Fetch/Run Ingest controls in active ledger.\n\
+      - populated_live_llm_quality: NON_BLOCKING — no live OpenRouter run performed;\
+      \ remediation did not alter LLM quality paths; Playwright harness uses deterministic\
+      \ OpenRouter stub.\n\n## Behavioral Proof Register\n- verdict: PASS\n- blockers:\
+      \ []\n- gate_open_allowed: true\n- orchestrator_action_hint: COMPLETE\n- uncertainty_sources:\
+      \ []\n\n## Gaps / Notes\n- Live OpenRouter quality was not re-run; classified\
+      \ non-blocking for this Source Ledger/product-boundary and wiring remediation\
+      \ step."
   - id: pbar-post-remediation-uiux-audit
     name: Post-remediation UI/UX audit for Source Ledger boundary changes
     status: pending
