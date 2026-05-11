@@ -44047,7 +44047,7 @@ phases:
       committed diff is test-only.'
   - id: pbar-contract-tests-gate
     name: Gate audit matrix and expected-red coverage
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the PRD
       behavior audit remediation foundation is complete enough for implementation.
 
@@ -44120,6 +44120,8 @@ phases:
     - pbar-expected-red-backend-tests
     - pbar-expected-red-browser-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T16:19:10.242332+00:00'
 - id: prd-behavior-audit-remediation-backend-semantics
   name: PRD Behavior Audit Remediation — Backend Semantics
   status: locked
