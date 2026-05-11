@@ -39999,7 +39999,7 @@ phases:
       and focused browser retest close the blocker.'
   - id: ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     name: urrc-r1-second-prose-preservation-fix
-    status: claimed
+    status: done
     description: "Focused second R1 remediation after ui-remediation-retest-closure.urrc-r1-focused-browser-retest\
       \ semantically failed.\n\nstep_type: implementation. This is a focused defect_repair/proof_closure\
       \ loop for R1 only; do NOT create broad UI rework.\n\nScope:\n- Preserve the\
@@ -40072,6 +40072,59 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T08:56:15.367473+00:00'
+    done_at: '2026-05-11T09:15:25.294598+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-remediation-retest-2026-05-11.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/DESIGN.md — Inspector\
+      \ Pane contract: detail reading surface includes source/provenance, title, original\
+      \ link, extraction status, dense summary, full text/excerpt; must not include\
+      \ related/recommendation/ads; keyboard focus moves to detail heading.\n- docs/ARCHITECTURE.md\
+      \ — Frontend Boundary requires web UI preserve DESIGN.md, keep dense feed/Inspector,\
+      \ owner-token boundary, flat Source Ledger, no extra settings/dashboard/product\
+      \ concepts.\n- web/src/routes/components/Inspector.svelte — Read sanitation\
+      \ path: `detailText()` prefers `readableText(extracted_text)`, then feed/display\
+      \ excerpts, then summary/core fallback; `removeSourceBoilerplate()` was the\
+      \ social/newsletter cleanup point.\n- web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts\
+      \ — NOT READ initially because absent; recreated focused browser spec preserving\
+      \ R1 sanitation + prose proof intent.\n- web/tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ — Dirty corpus imports feed, opens Inspector, asserts readable primary expectations\
+      \ and forbidden raw tokens are absent.\n- web/tests/e2e/inspector-readable-content-regression.spec.ts\
+      \ — Regression asserts primary Inspector body keeps readable article/fallback\
+      \ while hiding scripts/styles/nav/diagnostic garbage.\n\n## Repeated R1 Loop\
+      \ Diagnosis\n- why_previous_fix_failed: It removed exact forbidden social/repeated-lead\
+      \ strings, but the social boilerplate regex consumed the rest of the same sentence/line\
+      \ after the newsletter phrase, so real article prose following the prompt was\
+      \ removed before fallback selection.\n- why_readable_prose_was_lost: In `Inspector.svelte`,\
+      \ `detailText()` called `readableText(extracted_text)`. Inside `readableText()`,\
+      \ `removeSourceBoilerplate()` used social regexes ending with `[^.!?\\n]*[.!?]?`,\
+      \ which ate `Second readable paragraph...` when it followed `Follow us on Twitter\
+      \ for more newsletters` on the same text run. With extracted text blanked/invalid,\
+      \ summary/core fallback rendered repeated `summary unavailable`.\n- reversal_risk:\
+      \ Narrowing boilerplate removal could reintroduce social/newsletter fragments.\
+      \ Guard: added explicit follow-on-Twitter/newsletter fixture and focused browser\
+      \ spec requiring both forbidden exact strings absent and readable prose present;\
+      \ existing dirty corpus/readable regression e2e protect R2-R8 and broader boilerplate\
+      \ paths.\n\n## Focused Fix Evidence\n- Files changed:\n  - web/src/routes/components/Inspector.svelte\n\
+      \  - web/tests/e2e/dirty-corpus-fixtures.ts\n  - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts\n\
+      - Focused spec status: recreated\n- Forbidden strings checked:\n  - `Follow\
+      \ us on Twitter for more newsletters`: ABSENT\n  - `summary-like lead repeated\
+      \ by the site`: ABSENT\n- Readable prose checked:\n  - `Second readable paragraph\
+      \ confirms the body is not empty after bounded cleanup.`: PRESENT\n- R2-R8 preservation:\
+      \ `inspector-dirty-corpus.spec.ts` and `inspector-readable-content-regression.spec.ts`\
+      \ both passed after the fix.\n\n## Verification\n- Worker: `npm ci` — exit 0.\n\
+      - Worker: `npm run check` — exit 0; svelte-check found 0 errors, 0 warnings.\n\
+      - Worker: `npx playwright test --config ./playwright.config.ts ui-remediation-r1-r8-browser-retest.spec.ts`\
+      \ — exit 0; 1 passed.\n- Worker: `npx playwright test --config ./playwright.config.ts\
+      \ inspector-dirty-corpus.spec.ts` — exit 0; 1 passed.\n- Worker: `npx playwright\
+      \ test --config ./playwright.config.ts inspector-readable-content-regression.spec.ts`\
+      \ — exit 0; 1 passed.\n- Mainline: `npm run check` — exit 0; svelte-check found\
+      \ 0 errors, 0 warnings.\n- Mainline: `npx playwright test --config ./playwright.config.ts\
+      \ ui-remediation-r1-r8-browser-retest.spec.ts --project=chromium-ci-safe` —\
+      \ exit 0; 1 passed.\n- Mainline: `npx playwright test --config ./playwright.config.ts\
+      \ inspector-dirty-corpus.spec.ts --project=chromium-ci-safe` — exit 0; 1 passed.\n\
+      - Mainline: `npx playwright test --config ./playwright.config.ts inspector-readable-content-regression.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0; 1 passed.\n\n## Commit hash(es)\n- Worktree:\
+      \ 19860ed\n- Mainline squash: 40f5311 [vectl] step-ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix\
+      \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     name: urrc-r1-second-focused-browser-retest
     status: pending
