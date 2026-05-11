@@ -40476,7 +40476,7 @@ phases:
       from `web/node_modules`.'
   - id: ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
     name: urrc-canonical-visual-evidence-repair
-    status: claimed
+    status: done
     description: "Focused evidence repair for the semantically failed UIUX audit.\n\
       \nstep_type: verification. verification_scope: phase-check. Agent: integration-verifier.\
       \ This is proof-closure work, not product remediation.\n\nContext to close exactly:\n\
@@ -40627,6 +40627,134 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T09:39:32.336769+00:00'
+    done_at: '2026-05-11T09:50:10.318984+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read. Dense but legible workbench; operational labels only;
+      Inspector must expose source/provenance/original link/readable full text; Source
+      Ledger must be flat with state export/import actions in footer.
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: file absent in
+      isolated worktree.
+
+      - audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md — Read.
+      Prior artifact records R1 PASS and decoded primary text, but lacked gate_open_allowed
+      and R1-R8 PROVEN matrix.
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — Read. Browser
+      test imports dirty corpus, asserts R1 readable prose, attaches primary Inspector
+      text, and rejects forbidden strings.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read and used
+      as visual proof source for R2-R8 screenshots and browser assertions.
+
+
+      ### Closure Signals
+
+      step_intent: evidence_repair
+
+      expected_result: green_evidence_bundle
+
+      observed_result: PASS
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+
+      ## Canonical Visual Evidence Repair Handoff
+
+      Product files modified: NO
+
+      Canonical handoff artifact: `audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md`
+
+      Evidence bundle root: `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`
+
+      gate_open_allowed: true
+
+      blockers: []
+
+
+      Requirements:
+
+      - R1: PROVEN. Screenshot `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ui-remediation-r1-r8-browser-retest--screenshot.png`;
+      trace `.../ui-remediation-r1-r8-browser-retest--trace.zip`; DOM text `.../ui-remediation-r1-r8-browser-retest--r1-primary-inspector-text.txt.txt`.
+      Forbidden strings absent; required readable prose present.
+
+      - R2: PROVEN. Screenshot `.../full-ui-design-conformance.expected-red--narrow-source-ledger-390x844.png.png`;
+      trace `.../full-ui-design-conformance.expected-red--trace.zip`.
+
+      - R3: PROVEN. Screenshots `.../full-ui-design-conformance.expected-red--desktop-authenticated-feed-inspector-with-items-1280x900.png.png`
+      and `.../full-ui-design-conformance.expected-red--narrow-authenticated-feed-390x844.png.png`.
+
+      - R4: PROVEN. Screenshot `.../full-ui-design-conformance.expected-red--desktop-authenticated-feed-inspector-with-items-1280x900.png.png`.
+
+      - R5: PROVEN. Screenshots `.../full-ui-design-conformance.expected-red--narrow-search-form-and-results-390x844.png.png`
+      and `.../full-ui-design-conformance.expected-red--narrow-authenticated-feed-390x844.png.png`.
+
+      - R6: PROVEN. Screenshot `.../full-ui-design-conformance.expected-red--desktop-search-results-1280x900.png.png`;
+      trace `.../full-ui-design-conformance.expected-red--trace.zip`.
+
+      - R7: PROVEN. Screenshots `.../full-ui-design-conformance.expected-red--desktop-source-ledger-with-actions-1280x900.png.png`
+      and `.../full-ui-design-conformance.expected-red--narrow-source-ledger-390x844.png.png`.
+
+      - R8: PROVEN. Screenshots `.../full-ui-design-conformance.expected-red--desktop-source-ledger-with-actions-1280x900.png.png`
+      and `.../full-ui-design-conformance.expected-red--narrow-source-ledger-390x844.png.png`.
+
+
+      ## Commands / Artifact Capture
+
+      - Worker: `npm ci` — exit 0.
+
+      - Worker: `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts` — exit 0; raw result `3 passed
+      (6.9s), 0 skipped`.
+
+      - Mainline: `npx playwright test --config ./playwright.config.ts ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts --project=chromium-ci-safe`
+      — exit 0; 3 passed.
+
+      - Artifact bundle copied from Playwright results into `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`.
+
+
+      ## behavioral_proof_register
+
+      - R1_inspector_primary_text_cleanup: PROVEN
+
+      - R2_mobile_source_ledger_geometry: PROVEN
+
+      - R3_lowercase_metadata_readability: PROVEN
+
+      - R4_single_inspector_provenance: PROVEN
+
+      - R5_search_context_not_leaking_into_today: PROVEN
+
+      - R6_duplicate_inspect_dom_a11y_absence: PROVEN
+
+      - R7_source_ledger_row_grammar: PROVEN
+
+      - R8_state_portability_footer_action_cluster: PROVEN
+
+
+      ## Commit hash(es)
+
+      - Worktree: 9bab85bcf7838d0d4847cd7fbd78b5e48f2f8b7d
+
+      - Mainline squash: fed929f [vectl] step-ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
+      completed
+
+
+      ## Gaps/Notes
+
+      - none'
   - id: ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
     name: urrc-uiux-canonical-evidence-reaudit
     status: pending
