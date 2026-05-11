@@ -116,6 +116,9 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		}
 		translated, err := llm.TranslateSteering(ctx, OpenRouterSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
 		if err != nil {
+			if strings.Contains(err.Error(), "status 401") || strings.Contains(err.Error(), "status 403") {
+				return SteerResult{}, err
+			}
 			proposal.Message = "interpreted_as: " + proposal.InterpretedAs + "; applied with local steering parser"
 			return applySteeringRules(ctx, db, proposal, req.ActorKind, req.ActorID)
 		}

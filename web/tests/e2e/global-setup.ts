@@ -189,8 +189,12 @@ http.createServer((req, res) => {
     }
     const payload = JSON.parse(body);
     const prompt = JSON.parse(payload.messages[0].content);
+    const command = typeof prompt.steering?.command === 'string' ? prompt.steering.command.toLowerCase() : '';
+    const steeringContent = command.includes('crypto') && command.includes('sqlite')
+      ? { interpreted_as: 'steering_policy_update', rule_texts: ['filter crypto token', 'boost sqlite storage analysis'], message: 'steering updated' }
+      : { interpreted_as: 'steering_policy_update', rule_texts: ['Push more deterministic llm fixtures.'], message: 'steering updated' };
     const content = prompt.task === 'translate_steering'
-      ? { interpreted_as: 'steering_policy_update', rule_texts: ['Push more deterministic llm fixtures.'], message: 'steering updated' }
+      ? steeringContent
       : { summary: 'Deterministic fixture summary.', core_insight: 'Stubbed OpenRouter transport stayed outside product authority.', value_tier: 'high', model_status: 'ok' };
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ id: 'e2e-chatcmpl', model: 'openrouter/e2e-deterministic', choices: [{ message: { role: 'assistant', content: JSON.stringify(content) } }] }));

@@ -226,7 +226,9 @@
 
   function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
     if (receipt.interpreted_as === 'add_source') {
-      return 'applied: source added';
+      const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
+      const detail = normalizedMessage.length > 0 ? normalizedMessage : 'source added; run ingest in SOURCE LEDGER';
+      return `applied: ${detail}`;
     }
 
     const state = receiptState(receipt);
@@ -239,7 +241,7 @@
 
   function formatSteerError(error: unknown): string {
     if (error instanceof ResoFeedApiError && error.body.error.code === 'internal') {
-      return 'err: steering translation unavailable; try a narrower rule or paste an RSS URL';
+      return error.message;
     }
     if (error instanceof Error) return error.message;
     return 'err: could not apply steering';

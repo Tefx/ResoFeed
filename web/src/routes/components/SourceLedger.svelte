@@ -86,7 +86,9 @@
         : 'imported sources; folders flattened';
       if (importInput) importInput.value = '';
     } catch (error) {
-      statusText = error instanceof Error ? error.message : 'err: import failed';
+      statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
+        ? `imported ${sources.length} sources; folders flattened`
+        : error instanceof Error ? error.message : 'err: import failed';
     }
   }
 
@@ -150,6 +152,10 @@
           {#if confirmingSourceId === source.id}
             <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
           {/if}
+          <details class="source-diagnostic-details">
+            <summary>diagnostic details</summary>
+            <pre>{`source: ${sourceLabel}\nfetch_state: ${source.last_fetch_status}\nfetched_at: ${lastFetch ?? 'not_fetched'}\nfeed_url: ${source.url}\nfull_error: ${fullSourceError ?? 'none'}`}</pre>
+          </details>
         </li>
       {/each}
     </ul>

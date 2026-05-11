@@ -38,6 +38,47 @@ async function waitForAuthBoundary(baseURL: string): Promise<void> {
   throw new Error(`server did not become ready at ${baseURL}`);
 }
 
+async function waitForHTTP(url: string): Promise<void> {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) return;
+    } catch {
+      // Retry until the test-local feed fixture has bound.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`fixture server did not become ready at ${url}`);
+}
+
+async function startPolicyFixtureServer(feedXml: string): Promise<{ child: ChildProcess; url: string }> {
+  const port = await reservePort();
+  const url = `http://127.0.0.1:${port}/policy-feed.xml`;
+  const child = spawn(process.execPath, ['-e', `
+const http = require('node:http');
+const feedXml = ${JSON.stringify(feedXml)};
+const port = ${port};
+const server = http.createServer((request, response) => {
+  if (request.url === '/policy-feed.xml') {
+    response.writeHead(200, { 'Content-Type': 'application/rss+xml; charset=utf-8' });
+    response.end(feedXml);
+    return;
+  }
+  response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  response.end('not found');
+});
+server.listen(port, '127.0.0.1');
+process.on('SIGTERM', () => server.close(() => process.exit(0)));
+`], {
+    env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', TMPDIR: process.env.TMPDIR ?? '/tmp' },
+    stdio: 'ignore'
+  });
+  child.unref();
+  await waitForHTTP(url);
+  return { child, url };
+}
+
 async function startIsolatedServer(runInfo: { binaryPath: string; artifactRoot: string; ownerToken: string; openRouterStub: { endpoint: string } }, openRouterKey: string): Promise<{ child: ChildProcess; baseURL: string; stdoutPath: string; stderrPath: string }> {
   const port = await reservePort();
   const baseURL = `http://127.0.0.1:${port}`;
@@ -454,6 +495,86 @@ test('@llm-deterministic browser-led steering uses deterministic OpenRouter tran
     expect(log).not.toContain(ownerToken);
     expect(log).not.toContain('resofeed_e2e_non_secret_openrouter_key');
     expect(log).not.toContain('Authorization: Bearer');
+  }
+});
+
+test('@llm-deterministic browser-led accepted steering changes ranking, filtering, and fresh model-health proof', async ({ browser, runInfo, ownerToken }) => {
+  const policyFeedXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Policy Ranking Fixture</title>
+    <link>https://policy-ranking.example/</link>
+    <description>Deterministic ranking fixture for PBAR browser proof.</description>
+    <item>
+      <title>Crypto token launch</title>
+      <link>https://policy-ranking.example/crypto-token-launch</link>
+      <guid>policy-crypto-token-launch</guid>
+      <pubDate>Tue, 12 May 2026 12:00:00 GMT</pubDate>
+      <description>Crypto token coverage should be filtered by accepted steering.</description>
+    </item>
+    <item>
+      <title>SQLite storage analysis</title>
+      <link>https://policy-ranking.example/sqlite-storage-analysis</link>
+      <guid>policy-sqlite-storage-analysis</guid>
+      <pubDate>Tue, 12 May 2026 09:00:00 GMT</pubDate>
+      <description>SQLite storage analysis should rank first after boost steering.</description>
+    </item>
+    <item>
+      <title>Rust compiler release</title>
+      <link>https://policy-ranking.example/rust-compiler-release</link>
+      <guid>policy-rust-compiler-release</guid>
+      <pubDate>Tue, 12 May 2026 11:00:00 GMT</pubDate>
+      <description>Neutral fresh item remains eligible.</description>
+    </item>
+  </channel>
+</rss>`;
+  const policyServer = await startPolicyFixtureServer(policyFeedXml);
+  const isolated = await startIsolatedServer(runInfo, E2E_FAKE_OPENROUTER_KEY);
+  const context = await browser.newContext({ baseURL: isolated.baseURL });
+  const page = await context.newPage();
+  try {
+    await enterOwnerToken(page, ownerToken);
+    const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+    await steer.fill(policyServer.url);
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.getByRole('status')).toContainText(/source added: 127\.0\.0\.1|run ingest in SOURCE LEDGER/i);
+
+    await openSourceLedger(page);
+    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+    await expect(page.getByText(/src: Policy Ranking Fixture · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+
+    await openToday(page);
+    await expect(page.getByRole('button', { name: 'Open Inspector for: Crypto token launch' })).toBeVisible();
+
+    await steer.fill('Filter out crypto token coverage and push more sqlite storage analysis.');
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.getByRole('status')).toContainText('applied: steering updated · rules:2');
+    await openToday(page);
+
+    const rankedRows = page.getByRole('list', { name: 'Today feed items' }).getByRole('listitem');
+    await expect(rankedRows.first()).toContainText('SQLite storage analysis');
+    await expect(page.getByRole('button', { name: 'Open Inspector for: Crypto token launch' })).toHaveCount(0);
+
+    await steer.fill('/doctor');
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: item_transform_failures=0');
+    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: model_resolved=true');
+  } finally {
+    await context.close();
+    if (isolated.child.pid) {
+      try {
+        process.kill(isolated.child.pid, 'SIGTERM');
+      } catch {
+        // Process already exited; artifacts remain useful.
+      }
+    }
+    if (policyServer.child.pid) {
+      try {
+        process.kill(policyServer.child.pid, 'SIGTERM');
+      } catch {
+        // Process already exited.
+      }
+    }
   }
 });
 

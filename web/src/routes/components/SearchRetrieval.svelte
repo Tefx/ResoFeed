@@ -83,7 +83,7 @@
       <button type="submit">search</button>
       <button class="search-submit-a11y" type="submit" aria-label="submit search">submit search</button>
     </div>
-    <details class="search-secondary-filters" open>
+    <details class="search-secondary-filters">
       <summary>filters</summary>
       <div class="search-secondary-grid">
         <label for="search-source">Source filter</label>
