@@ -43346,81 +43346,145 @@ phases:
   - id: pbar-contract-audit-matrix
     name: Build PRD behavior audit closure matrix
     status: pending
-    description: 'step_type: contract
-
-      contract_purity: ENFORCED
-
-
-      Create an audit closure matrix for every newly discovered issue in docs/audits/prd-behavior-audit-2026-05-11.md.
-
-
-      REQUIRED FINDING INVENTORY (do not omit any): B1 P1 Search command shows Today/feed
-      results instead of executing query; B2 P1 No-match Search returns internal error
-      while still showing feed items; B3 P3 Search surface has noisy/ambiguous interactive
-      naming; B4 P1 Natural-language Steer policy correction fails or gives no usable
-      interpretation; B5 P3 Add-feed via Steer works, but the receipt is too terse;
-      B6 P1 Newly added feed can ingest and appear, but LLM understanding degrades;
-      B7 P1 Inspector still leaks real-source boilerplate and related-story tail;
-      B8 P3 Resonate feedback is visually present but programmatically/semantically
-      unclear; B9 P1 /doctor via Steer works, but direct /doctor route does not; B10
-      P2 Mobile Source Ledger still leaves Today feed in page/accessibility flow;
-      B11 P2 Mobile Search metadata still loses useful information; B12 P3 Source
-      error diagnostics need a full-view affordance; B13 P3 Time group labels compete
-      with metadata on narrow/search rows; B14 P1 Complex natural-language Steer still
-      fails with internal error; B15 P1 Simple natural-language Steer also fails;
-      B16 P1 Explicit hide/reduce intent did not affect Today; B17 P2 Boost intent
-      did not affect ranking against the probe corpus; B18 P1 LLM chain still reports
-      model latency failures for newly ingested items; B19 P1 Inspector is still fallback/excerpt-driven
-      for probe items; B20 P2 /doctor status semantics are misleading; B21 P2 Feed
-      rows omit visible quality/value tier metadata; B22 P1 Inspector core insight
-      and body still contain extraction pollution; B23 P2 Steer Enter-submit and surface
-      navigation reliability need reproduction-grade coverage; U1 P2 Mobile Search
-      form consumes too much first-screen space; U2 P3 Add-feed receipt is too terse
-      to orient the next action; U3 P2 Source Ledger row grammar is still visually
-      unstable; U4 P2 Diagnostics should be more scan-readable without becoming a
-      dashboard; U5 P2 Current surface state needs stronger programmatic semantics.
-
-
-      For each row include: finding id, title, severity, authoritative PRD/DESIGN/ARCH
-      refs, owning remediation step, expected-red test owner, implementation owner,
-      independent retest owner, UIUX/spec audit requirement, acceptance criteria,
-      and evidence requirement. B5 and U2 may share one implementation owner but must
-      remain separate rows. B7 and B22 may share implementation but must remain separate
-      rows. B4/B14/B15 may share implementation but must remain separate rows.
-
-
-      Output artifact: add or update a machine-readable closure matrix under docs/audits/
-      or web/tests/contracts/ so downstream steps can cite it. Do not modify product
-      code.'
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - machine_readable_closure_matrix\nagent_source: default\n\nWriting-capable\
+      \ contract/docs artifact step. Create or update ONLY the audit closure matrix\
+      \ artifact for docs/audits/prd-behavior-audit-2026-05-11.md. Do not modify product\
+      \ implementation code, tests, runtime assets, generated UI output, or unrelated\
+      \ documentation. The artifact must be machine-readable and placed under docs/audits/\
+      \ or web/tests/contracts/ so downstream steps can cite it directly. Record the\
+      \ final artifact path in evidence and leave the repository change limited to\
+      \ that artifact; any repository durability/commit action outside the artifact\
+      \ content is orchestrator-owned.\n\nContract purity is enforced: this step may\
+      \ define closure/acceptance metadata and ownership mappings only. It must not\
+      \ implement fixes, change behavior, rewrite PRD/DESIGN/ARCH authority, or resolve\
+      \ findings by changing product code.\n\nAuthoritative audit source: docs/audits/prd-behavior-audit-2026-05-11.md.\n\
+      \nREQUIRED FINDING INVENTORY (do not omit any; matrix must contain exactly these\
+      \ ids): B1 P1 Search command shows Today/feed results instead of executing query;\
+      \ B2 P1 No-match Search returns internal error while still showing feed items;\
+      \ B3 P3 Search surface has noisy/ambiguous interactive naming; B4 P1 Natural-language\
+      \ Steer policy correction fails or gives no usable interpretation; B5 P3 Add-feed\
+      \ via Steer works, but the receipt is too terse; B6 P1 Newly added feed can\
+      \ ingest and appear, but LLM understanding degrades; B7 P1 Inspector still leaks\
+      \ real-source boilerplate and related-story tail; B8 P3 Resonate feedback is\
+      \ visually present but programmatically/semantically unclear; B9 P1 /doctor\
+      \ via Steer works, but direct /doctor route does not; B10 P2 Mobile Source Ledger\
+      \ still leaves Today feed in page/accessibility flow; B11 P2 Mobile Search metadata\
+      \ still loses useful information; B12 P3 Source error diagnostics need a full-view\
+      \ affordance; B13 P3 Time group labels compete with metadata on narrow/search\
+      \ rows; B14 P1 Complex natural-language Steer still fails with internal error;\
+      \ B15 P1 Simple natural-language Steer also fails; B16 P1 Explicit hide/reduce\
+      \ intent did not affect Today; B17 P2 Boost intent did not affect ranking against\
+      \ the probe corpus; B18 P1 LLM chain still reports model latency failures for\
+      \ newly ingested items; B19 P1 Inspector is still fallback/excerpt-driven for\
+      \ probe items; B20 P2 /doctor status semantics are misleading; B21 P2 Feed rows\
+      \ omit visible quality/value tier metadata; B22 P1 Inspector core insight and\
+      \ body still contain extraction pollution; B23 P2 Steer Enter-submit and surface\
+      \ navigation reliability need reproduction-grade coverage; U1 P2 Mobile Search\
+      \ form consumes too much first-screen space; U2 P3 Add-feed receipt is too terse\
+      \ to orient the next action; U3 P2 Source Ledger row grammar is still visually\
+      \ unstable; U4 P2 Diagnostics should be more scan-readable without becoming\
+      \ a dashboard; U5 P2 Current surface state needs stronger programmatic semantics.\n\
+      \nFor each row include all required fields: finding id, title, severity, authoritative\
+      \ PRD/DESIGN/ARCH refs, owning remediation step, expected-red test owner, implementation\
+      \ owner, independent retest owner, UIUX/spec audit requirement, acceptance criteria,\
+      \ and evidence requirement.\n\nOwner mapping requirements:\n- B5 and U2 may\
+      \ share one implementation owner but must remain separate rows.\n- B7 and B22\
+      \ may share implementation but must remain separate rows.\n- B4, B14, and B15\
+      \ may share implementation but must remain separate rows.\n- Every row must\
+      \ map to a downstream remediation/test/retest/audit owner; unresolved/non-intersection\
+      \ is forbidden unless explicitly justified by PRD/DESIGN/ARCH refs.\n\nOutput\
+      \ artifact requirements:\n- Add or update one machine-readable closure matrix\
+      \ artifact under docs/audits/ or web/tests/contracts/.\n- Prefer a stable filename\
+      \ that downstream steps can cite, e.g. docs/audits/prd-behavior-audit-closure-matrix.json\
+      \ or .yaml.\n- Matrix must be parseable by standard tooling for its file extension.\n\
+      - Artifact must preserve the exact B1-B23 and U1-U5 inventory as structured\
+      \ records.\n- No product implementation files may be changed by this step.\n\
+      \n## Completion Criteria (stub exclusion)\nThis is a CONTRACT step producing\
+      \ an acceptance/ownership artifact. Stub-only or prose-only completion is NOT\
+      \ acceptable: the deliverable must be a complete machine-readable matrix with\
+      \ all required records and fields populated from the audit source."
     verification: 'local-check protecting all downstream remediation gates: matrix
-      contains exactly B1-B23 and U1-U5, no missing ids, each row has owner/acceptance/evidence
-      fields, and unresolved/non-intersection is forbidden unless explicitly justified
-      by PRD/DESIGN/ARCH refs.'
+      contains exactly B1-B23 and U1-U5, no missing ids, no extra ids, each row has
+      owner/acceptance/evidence fields, each row cites authoritative PRD/DESIGN/ARCH
+      refs where applicable, grouped implementation ownership does not collapse required
+      separate rows, the artifact is machine-readable/parseable for its extension,
+      and the repository changes for this step are limited to the matrix artifact
+      with no product implementation code changes.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
-      - <filename> — key passage or "NOT READ: <reason>"
+      - docs/audits/prd-behavior-audit-2026-05-11.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Audit Matrix Evidence
+      ## Contract Artifact Evidence
 
-      - Matrix artifact path: <path>
 
-      - Finding IDs present: <paste complete B1-B23, U1-U5 list>
+      **Matrix artifact path**: <docs/audits/... or web/tests/contracts/...>
 
-      - Owner mapping summary: <owner per coherent subsystem>
 
-      - Acceptance criteria source citations: <PRD/DESIGN/ARCH lines or sections>
+      **Parse/check command used**:
 
-      - Evidence requirements: <how each finding will be proven closed>
+      ```
 
-      - Non-intersection claims: <must be none, or cite exact authority and why final
-      gate is not affected>'
-    agent: spec-verifier
+      <exact command proving the matrix is machine-readable>
+
+      ```
+
+
+      **Inventory check**:
+
+      - B findings present exactly: B1-B23
+
+      - U findings present exactly: U1-U5
+
+      - Extra/missing ids: <none or list>
+
+
+      **Required fields check**:
+
+      - finding id/title/severity present for every row: PASS/FAIL
+
+      - authoritative PRD/DESIGN/ARCH refs present or justified for every row: PASS/FAIL
+
+      - owning remediation step present for every row: PASS/FAIL
+
+      - expected-red test owner present for every row: PASS/FAIL
+
+      - implementation owner present for every row: PASS/FAIL
+
+      - independent retest owner present for every row: PASS/FAIL
+
+      - UIUX/spec audit requirement present for every row: PASS/FAIL
+
+      - acceptance criteria and evidence requirement present for every row: PASS/FAIL
+
+
+      **Scope check**:
+
+      - Product implementation files changed: NONE (required)
+
+      - Unrelated docs/tests changed: NONE (required)
+
+      - Artifact is ready for orchestrator-owned repository durability/commit handling:
+      YES/NO
+
+
+      **Grouped-owner exceptions preserved as separate rows**:
+
+      - B5 and U2 separate rows: PASS/FAIL
+
+      - B7 and B22 separate rows: PASS/FAIL
+
+      - B4/B14/B15 separate rows: PASS/FAIL'
+    refs:
+    - docs/audits/prd-behavior-audit-2026-05-11.md
+    agent: general
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
