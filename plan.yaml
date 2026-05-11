@@ -41975,7 +41975,7 @@ phases:
       \ evidence artifacts only and were not committed."
   - id: slnr-restore-navigation-route
     name: Restore SOURCE LEDGER chrome entry and direct-route handling
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags:
@@ -42114,6 +42114,49 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T12:01:36.396807+00:00'
+    done_at: '2026-05-11T12:06:47.095457+00:00'
+    evidence: "## refs Read Confirmation\n\n- docs/DESIGN.md — App Shell allows optional\
+      \ Source Ledger route/overlay; Source Ledger must stay flat with OPML/import/export\
+      \ actions; labels must remain `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`,\
+      \ `/doctor`; folders/tags/settings dashboards are forbidden.\n- docs/ARCHITECTURE.md\
+      \ — Frontend lives in `web/`, must preserve DESIGN.md, expose flat Source Ledger,\
+      \ and avoid extra dashboards/services.\n- web/src/routes/+page.svelte — Primary\
+      \ shell owned surface state locally; existing SourceLedger component already\
+      \ mounted as `ledger` utility surface but no visible nav/direct route mapping\
+      \ existed.\n- web/src/routes/+layout.svelte — Only imports `app.css` and renders\
+      \ children; no route logic needed.\n- web/src/app.css — Existing shell/layout/focus/token\
+      \ styles; added nav styles using existing tokens and 44px hit targets.\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — Protected assertions require `nav.surface-nav`, exact `SOURCE LEDGER` button,\
+      \ click activation, and `/source-ledger`, `/source`, `/sources` direct route\
+      \ behavior.\n- web/tests/e2e/real-server-ui.spec.ts — Real-server fixture uses\
+      \ Go binary/static Svelte build and existing steer-command Source Ledger flow.\n\
+      \n## Implementation Evidence\n\n- Files changed: `web/src/routes/+page.svelte`,\
+      \ `web/src/app.css`\n- Protected tests preserved: yes; no test files modified.\n\
+      - Route behavior implemented:\n  - `/`: focused e2e verifies owner-token accepted\
+      \ root shell exposes visible, enabled, unobstructed, keyboard-reachable `SOURCE\
+      \ LEDGER` nav.\n  - `/source-ledger`: focused e2e verifies direct navigation\
+      \ opens active SOURCE LEDGER surface after token acceptance.\n  - `/source`:\
+      \ focused e2e verifies compatibility alias opens active SOURCE LEDGER surface\
+      \ after token acceptance.\n  - `/sources`: focused e2e verifies compatibility\
+      \ alias opens active SOURCE LEDGER surface after token acceptance.\n- Canonical\
+      \ chrome labels preserved: `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`,\
+      \ `/doctor` command branch unchanged.\n- Forbidden concepts absent: folders,\
+      \ tags, source hierarchy, settings dashboards, accounts, sync/merge, unread/archive\
+      \ flows.\n- Deviation records: none.\n- Worker commit hash(es): 999eaf8\n- Mainline\
+      \ squash commit: 9e0cd90\n\n## Verification\n\nWorker verification:\n- `npm\
+      \ run check` — exit 0; svelte-check found 0 errors and 0 warnings.\n- `npx playwright\
+      \ test --config ./playwright.config.ts tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts`\
+      \ — exit 0; 5 passed.\n- `npx playwright test --config ./playwright.config.ts\
+      \ tests/e2e/real-server-ui.spec.ts --grep \"ci-safe browser-led source import\"\
+      ` — exit 0; 1 passed after routing steer-ledger activation through `showSurface('ledger')`.\n\
+      \nOrchestrator mainline final-state verification after squash merge:\n- `npm\
+      \ run check` — passed, 0 errors/0 warnings.\n- `npm run build` — passed.\n-\
+      \ `npm run test:e2e -- source-ledger-navigation-regression.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` — passed, 5/5 tests green.\n- `npx playwright\
+      \ test --config ./playwright.config.ts tests/e2e/real-server-ui.spec.ts --grep\
+      \ \"ci-safe browser-led source import\" --project=chromium-ci-safe` — passed,\
+      \ 1/1 test green.\n\n## Gaps/Notes\n\nNo backend/static-server changes were\
+      \ needed; existing Go static fallback serves SPA direct routes."
   - id: slnr-browser-route-retest
     name: Independently verify Source Ledger nav and direct routes in real browser
     status: pending
