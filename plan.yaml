@@ -43914,3 +43914,11 @@ phases:
     - pbar-backend-readable-payload-sanitation
     - pbar-backend-llm-doctor-provenance-remediation
     agent: gate-reviewer
+- id: prd-behavior-audit-remediation-frontend-surfaces
+  name: PRD Behavior Audit Remediation — Frontend Surfaces
+  status: locked
+  gate: Frontend surfaces close Search, Steer, Doctor, Inspector, Feed, Resonate,
+    Source Ledger, mobile containment, accessibility semantics, and scan-readable
+    visual grammar with expected-red browser tests turned green.
+  depends_on:
+  - prd-behavior-audit-remediation-backend-semantics
