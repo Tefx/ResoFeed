@@ -46583,7 +46583,7 @@ phases:
     agent: gate-reviewer
   - id: pbar-frontend-gate-blocker-remediation
     name: Batched remediation for frontend gate blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -46727,6 +46727,8 @@ phases:
     - pbar-frontend-mobile-search-ledger-remediation
     - pbar-frontend-steer-receipt-remediation
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T17:41:34.283940+00:00'
   - id: pbar-frontend-gate-retest-proof
     name: Retest and proof for frontend gate blockers
     status: pending
