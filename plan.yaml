@@ -47588,7 +47588,7 @@ phases:
     claimed_at: '2026-05-11T18:08:51.700757+00:00'
   - id: pbar-runtime-liveness-probe
     name: Black-box liveness probe for runnable web surfaces
-    status: claimed
+    status: done
     description: 'As a BLACK-BOX TESTER (blind-tester), verify runnable/deployability
       behavior through public surfaces only.
 
@@ -47675,6 +47675,147 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-11T18:08:57.821035+00:00'
+    done_at: '2026-05-11T18:16:36.256764+00:00'
+    evidence: '## refs Read Confirmation
+
+      No refs for this step. Blind tester read README.md, docs/USAGE.md, docs/DESIGN.md,
+      and docs/ARCHITECTURE.md for public behavior only.
+
+
+      ## Liveness Probe Evidence
+
+      **Tester**: blind-tester
+
+      **Independence Level**: L3 black-box
+
+
+      ### Launch
+
+      ```text
+
+      Build:
+
+      npm --prefix web install
+
+      npm --prefix web run build
+
+      mkdir -p ./bin
+
+      go build -o ./bin/resofeed ./cmd/resofeed
+
+
+      Launch:
+
+      OPENROUTER_KEY=<redacted> ./bin/resofeed serve --addr 127.0.0.1:18080 --public-url
+      http://127.0.0.1:18080 --db artifacts/pbar-runtime-liveness-probe/resofeed.sqlite3
+      --openrouter-model openai/gpt-4.1-mini --owner-token <redacted>
+
+
+      Server log:
+
+      owner token explicit: stored hash
+
+      serving ResoFeed on 127.0.0.1:18080 (public-url http://127.0.0.1:18080)
+
+      shutdown complete
+
+
+      Network proof:
+
+      lsof -nP -i :18080 -> TCP 127.0.0.1:18080 (LISTEN)
+
+      Process alive after 3 seconds: true
+
+      ```
+
+
+      ### Route/operation proof
+
+      - `/` — PASS; browser rendered `RESOFEED`, Steer input, First Use text, Inspector.
+      Artifacts: `artifacts/pbar-runtime-liveness-probe/browser-auth-root.png`, `browser-auth-proof.json`.
+
+      - `/doctor` — PASS; browser rendered `/doctor` heading and diagnostic lines.
+      Artifact: `browser-auth-doctor.png`.
+
+      - `/source-ledger` — PASS; browser rendered `SOURCE LEDGER`, `[RUN INGEST]`,
+      empty source state, import/export controls. Artifact: `browser-auth-source-ledger.png`.
+
+      - Search API — PASS; `GET /api/search?q=sqlite&limit=1` returned 200 JSON with
+      query echo. Artifact: `get-_api_search.txt`.
+
+      - Source Ledger read — PASS; `GET /api/sources` returned 200 JSON `{"sources":[]}`.
+      Artifact: `get-_api_sources.txt`.
+
+      - State-safe feed read — PASS; `GET /api/feed/today?limit=1` returned 200 JSON
+      `{"items":[]}`. Artifact: `get-_api_feed_today.txt`.
+
+      - Diagnostics API — PASS; `GET /api/doctor` returned 200 text/plain diagnostics.
+      Artifact: `get-_api_doctor.txt`.
+
+
+      ### Behavioral proof register
+
+      - Single Go binary starts via documented `serve` entrypoint and stays alive:
+      PROVEN via port probe + server responses.
+
+      - `/` reaches real workbench UI entrypoint: PROVEN via browser-visible workbench.
+
+      - `/doctor` reaches diagnostics runtime path: PROVEN via browser route and API
+      diagnostics.
+
+      - `/source-ledger` reaches Source Ledger runtime path: PROVEN via browser ledger
+      and sources API.
+
+      - Search operation reaches real runtime: PROVEN via 200 JSON query echo.
+
+
+      ### Gate semantic reporting
+
+      step_intent: runtime_liveness_probe
+
+      expected_result: green
+
+      observed_result: entrypoint starts, stays alive, binds TCP port, serves `/`,
+      `/doctor`, `/source-ledger`, and fulfills documented API read/search/diagnostics
+      operations
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      explicit_uncertainty_sources: []
+
+
+      ## Files changed / commits
+
+      - Worktree commits: `f1dd28a` (`test: add runtime liveness probe evidence`),
+      `dc12ff4` (`test: document liveness probe artifacts`).
+
+      - Mainline squash commit: `92b3716` (`[vectl] step-pbar-runtime-liveness-probe
+      completed`).
+
+      - Proof artifacts committed under `artifacts/pbar-runtime-liveness-probe/`;
+      no product files modified.
+
+
+      ## Mainline final-state verification
+
+      - `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-liveness-check
+      ./cmd/resofeed` — exit 0.
+
+      - `test -f artifacts/pbar-runtime-liveness-probe/probe-summary.json` — exit
+      0.
+
+      - `test -f artifacts/pbar-runtime-liveness-probe/browser-auth-proof.json` —
+      exit 0.'
   - id: pbar-uiux-multimodal-audit
     name: Native multimodal UI/UX audit for remediated surfaces
     status: pending
