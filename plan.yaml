@@ -50395,7 +50395,7 @@ phases:
       worktree status clean.'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
-  status: pending
+  status: in_progress
   gate: Final gate blocks unless every audit finding B1-B23 and U1-U5 is proven fixed
     with evidence or has explicit non-intersection evidence accepted by gate-reviewer.
   depends_on:
@@ -50403,7 +50403,7 @@ phases:
   steps:
   - id: pbar-final-closure-matrix
     name: Finalize finding-by-finding closure matrix
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
 
@@ -50456,6 +50456,8 @@ phases:
 
       - Gate decision basis: <why final gate can open or must block>'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-11T19:44:14.028002+00:00'
   - id: pbar-strict-final-gate
     name: Strict final gate for PRD behavior audit remediation
     status: pending
