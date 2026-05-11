@@ -49882,6 +49882,160 @@ phases:
     depends_on:
     - pbar-retest-audit-gate
     agent: golang-developer
+  - id: pbar-source-add-receipt-closure-retest
+    name: Retest source-add receipt closure after stale guidance fix
+    status: pending
+    description: 'As an INDEPENDENT TESTER (`integration-verifier`), retest closure
+      of reopened B5/U2 after `pbar-source-add-receipt-stale-guidance-fix`.
+
+
+      Scope:
+
+      - Rerun and report the focused backend PBAR/source receipt tests proving source-add
+      receipts no longer direct users to `run ingest in SOURCE LEDGER`.
+
+      - Rerun and report the browser source-add receipt flow with the updated expected
+      receipt copy.
+
+      - Rerun and report the Source Ledger regression proving no `[RUN INGEST]`, `[FETCH]`,
+      ingest, or fetch controls are present or reachable.
+
+      - Update the B5/U2 closure assessment with explicit evidence references.
+
+
+      This is a post-fix retest step: expected_result: green. Finding unresolved stale
+      guidance or reintroduced Source Ledger controls is a valid retest finding and
+      must block closure.
+
+
+      Required closure fields in evidence:
+
+      - verdict: PASS | FAIL
+
+      - blockers: [] when PASS, otherwise list blockers
+
+      - gate_open_allowed: true only when backend receipt, browser receipt, and Source
+      Ledger no-control regression all pass
+
+
+      Independence: The retest agent MUST be independent of the fix agent (`golang-developer`).'
+    verification: '- Backend receipt/PBAR focused tests were rerun and reported with
+      actual command output.
+
+      - Browser source-add receipt flow was rerun and reported with actual command
+      output or trace evidence.
+
+      - Source Ledger no-ingest-control regression was rerun and reported with actual
+      command output or browser evidence.
+
+      - B5/U2 closure record says `verdict: PASS`, `blockers: []`, and `gate_open_allowed:
+      true`.
+
+      - If any stale `run ingest in SOURCE LEDGER`, `[RUN INGEST]`, `[FETCH]`, ingest,
+      or fetch guidance/control remains, verdict must be FAIL and `gate_open_allowed`
+      must be false.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Independent Retest Report
+
+
+      **Tester**: integration-verifier
+
+      **Fix step retested**: pbar-source-add-receipt-stale-guidance-fix
+
+      **Independence confirmation**: Retester is independent of golang-developer fix
+      work.
+
+
+      ### Backend receipt/PBAR tests
+
+      Command:
+
+      ```text
+
+      <paste command>
+
+      ```
+
+      Output:
+
+      ```text
+
+      <paste output>
+
+      ```
+
+      Verdict: PASS | FAIL
+
+
+      ### Browser source-add receipt flow
+
+      Command / trace:
+
+      ```text
+
+      <paste command or trace reference>
+
+      ```
+
+      Output / artifact:
+
+      ```text
+
+      <paste output or artifact path>
+
+      ```
+
+      Verdict: PASS | FAIL
+
+
+      ### Source Ledger no-ingest-control regression
+
+      Command / trace:
+
+      ```text
+
+      <paste command or trace reference>
+
+      ```
+
+      Output / artifact:
+
+      ```text
+
+      <paste output or artifact path>
+
+      ```
+
+      Verdict: PASS | FAIL
+
+
+      ### B5/U2 Closure
+
+      verdict: PASS | FAIL
+
+      blockers: []
+
+      gate_open_allowed: true | false
+
+
+      ### Headline
+
+      PASS only if all three retest lanes pass and B5/U2 is closed with no blockers.'
+    depends_on:
+    - pbar-source-add-receipt-stale-guidance-fix
+    agent: integration-verifier
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
