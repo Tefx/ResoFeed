@@ -39844,3 +39844,76 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T08:41:33.156823+00:00'
+  - id: urrc-r1-second-prose-preservation-fix
+    name: urrc-r1-second-prose-preservation-fix
+    status: pending
+    description: "Focused second R1 remediation after ui-remediation-retest-closure.urrc-r1-focused-browser-retest\
+      \ semantically failed.\n\nstep_type: implementation. This is a focused defect_repair/proof_closure\
+      \ loop for R1 only; do NOT create broad UI rework.\n\nScope:\n- Preserve the\
+      \ R1 sanitation fix: Inspector primary/readable text MUST NOT contain either\
+      \ exact forbidden string:\n  - `Follow us on Twitter for more newsletters`\n\
+      \  - `summary-like lead repeated by the site`\n- Restore/preserve readable article\
+      \ prose/fallback in the real browser/runtime Inspector path. The focused retest\
+      \ observed:\n  - Expected readable substring: `Second readable paragraph confirms\
+      \ the body is not empty after bounded cleanup.`\n  - Received primary text:\
+      \ title/original link/status plus `summary unavailable ... summary unavailable`\n\
+      - Anti-cheat rule: an empty Inspector body, trivially truncated body, status-only\
+      \ body, title/link-only body, or repeated `summary unavailable` placeholder\
+      \ does NOT satisfy R1 even if forbidden strings are absent.\n- If `web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts`\
+      \ is absent from main because the verifier-created branch/commit `57af635` was\
+      \ not merged, port or recreate the focused spec. Preserve its R1-R8 proof intent.\n\
+      \nRepeated-loop required diagnosis fields to record in evidence:\n- why_previous_fix_failed:\
+      \ explain why the prior fix removed forbidden strings but did not preserve readable\
+      \ prose in this runtime path.\n- why_readable_prose_was_lost: identify the specific\
+      \ sanitizer/fallback/Inspector selection path that collapsed prose to `summary\
+      \ unavailable`.\n- reversal_risk: explain how the new fix could accidentally\
+      \ reintroduce newsletter/social boilerplate or regress R2-R8, and what guard\
+      \ prevents it.\n\nAnti-regression guardrails:\n- Do NOT weaken, skip, loosen,\
+      \ delete, or mark expected-failing any assertion in `web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts`\
+      \ or related R1-R8 browser proof. The spec must continue to require both sanitation\
+      \ and readable prose preservation.\n- Do NOT satisfy the test by hardcoding\
+      \ the expected substring into product rendering; the article body/fallback path\
+      \ must preserve real readable content from the fixture/runtime data.\n- Do NOT\
+      \ introduce forbidden product concepts or broad architecture changes; this is\
+      \ only the focused Inspector sanitation/prose-preservation path.\n\n## Completion\
+      \ Criteria (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only completion\
+      \ is NOT acceptable. Each deliverable MUST contain substantive logic that processes\
+      \ its inputs and produces outputs that vary based on those inputs."
+    verification: '- Product/runtime fix preserves absence of `Follow us on Twitter
+      for more newsletters` and `summary-like lead repeated by the site` in Inspector
+      primary text.
+
+      - Product/runtime fix preserves readable article prose/fallback, including proof
+      that `Second readable paragraph confirms the body is not empty after bounded
+      cleanup.` remains visible in the focused R1 path.
+
+      - Focused spec is present in main (ported/recreated if necessary) and not weakened;
+      assertions still require both sanitation and prose preservation.
+
+      - Evidence includes why_previous_fix_failed, why_readable_prose_was_lost, and
+      reversal_risk.
+
+      - Evidence includes sibling-path check that the fix does not regress R2-R8 proof
+      obligations.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/ui-remediation-retest-2026-05-11.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — key passage\
+      \ or \"NOT READ: <reason>\"\n\n## Repeated R1 Loop Diagnosis\n- why_previous_fix_failed:\
+      \ <why forbidden strings were removed but readable prose was not preserved>\n\
+      - why_readable_prose_was_lost: <specific sanitizer/fallback/Inspector runtime\
+      \ path that collapsed prose to summary unavailable>\n- reversal_risk: <how this\
+      \ could reintroduce boilerplate or regress R2-R8, and the guard used>\n\n##\
+      \ Focused Fix Evidence\n- Files changed: <list>\n- Focused spec status: <present/ported/recreated;\
+      \ commit/source if applicable>\n- Forbidden strings checked:\n  - `Follow us\
+      \ on Twitter for more newsletters`: ABSENT/PRESENT\n  - `summary-like lead repeated\
+      \ by the site`: ABSENT/PRESENT\n- Readable prose preserved:\n  - Expected substring:\
+      \ `Second readable paragraph confirms the body is not empty after bounded cleanup.`\n\
+      \  - Observed Inspector primary text excerpt: <paste>\n- Anti-cheat confirmation:\
+      \ Inspector body is not empty, not title/link/status-only, not trivially truncated,\
+      \ and not repeated `summary unavailable`.\n- Spec weakening check: <confirm\
+      \ no R1-R8 assertions were loosened/skipped/deleted/expected-failed>\n- R2-R8\
+      \ regression risk check: <summary>"
+    depends_on:
+    - ui-remediation-retest-closure.urrc-r1-focused-browser-retest
+    agent: frontend-engineer
