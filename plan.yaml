@@ -48406,84 +48406,98 @@ phases:
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
     status: pending
-    description: 'As wiring-auditor, verify every remediated public surface and symbol
-      is reachable at runtime.
+    description: 'As wiring-auditor, independently rerun the wiring and reachability
+      audit AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
+      the remediation evidence plus the salvaged artifact `.audit-artifacts/pbar-wiring-audit.md`
+      (commit `0224ade`) as required context. Do not modify code.
 
 
-      Required checks:
+      ## Prior failed verdict that must be closed
+
+      - Prior status/verdict: FAIL; gate_open_allowed false; orchestrator_action_hint
+      DO_NOT_COMPLETE.
+
+      - Blocker: Source Ledger direct route and Steer command were wired, but required
+      visible nav control/path to the same Source Ledger surface was absent or unproven.
+
+      - Source diagnostic “full-view” was reachable via focusable button aria-label/title,
+      but no expanded visible details panel was proven.
+
+      - behavioral_proof_register NEEDS_TEST entries: `search_steer_to_search_retrieval`,
+      `doctor_direct_and_steer_share_diagnostics_source`, `source_ledger_direct_route_to_component`,
+      `metadata_visible_consumption`, `source_diagnostic_affordance_a11y`.
+
+      - `no_stub_placeholder_route_targets` was PROVEN; rerun should preserve that
+      proof and report any regression.
+
+
+      ## Required checks
 
       1. Search command path from Steer reaches actual search execution and SearchRetrieval
       rendering.
 
       2. /doctor direct route and Steer /doctor share the intended diagnostics source.
 
-      3. Source Ledger direct route and nav reach the same component/surface state.
+      3. Source Ledger direct route and an allowed visible/non-persistent user path
+      reach the same component/surface state.
 
       4. Feed/Inspector metadata fields for quality/value/fallback/provenance are
       read by visible components.
 
-      5. Source diagnostic full-view affordance is reachable by mouse/keyboard/assistive
-      tech.
+      5. Source diagnostic full-view affordance is visibly expandable and reachable
+      by mouse, keyboard, and assistive-tech-oriented semantics; aria-label/title
+      alone is insufficient.
 
       6. No placeholder/stub route, _Runtime*/_Stub*/_Placeholder* target, or dead
       public field remains in the remediated paths.
 
 
-      Use import traces, route traces, grep evidence, and runtime path evidence. Do
-      not modify code.'
+      Use import traces, route traces, grep evidence, and runtime path evidence. The
+      audit must provide a behavioral proof register with `requirement_ref`, `behavior_claim`,
+      `runtime_proof_expected`, `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis`
+      for every blocker-class obligation.'
     verification: 'phase-check protecting final closure: wiring audit proves Search,
       Doctor, Source Ledger, Feed/Inspector metadata, and diagnostic affordances are
       reachable through real runtime paths with no dead fields or placeholder/stub
-      route targets.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - <filename> — key passage or "NOT READ: <reason>"
-
-
-      If no refs were provided, state: "No refs for this step."
-
-
-      ## Wiring Audit Report
-
-      **Orphan exports/dead public fields**:
-
-      ```
-
-      <grep/import trace output or none>
-
-      ```
-
-      **Route/command reachability**:
-
-      ```
-
-      <Search, /doctor, /source-ledger traces>
-
-      ```
-
-      **Metadata consumption**:
-
-      ```
-
-      <quality/value/fallback/provenance field readers>
-
-      ```
-
-      **Stub/placeholder scan**:
-
-      ```
-
-      <_Runtime/_Stub/_Placeholder scan output or none>
-
-      ```
-
-      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+      route targets; all prior NEEDS_TEST entries are PROVEN or have explicit blocking
+      closure paths; Source Ledger reachability uses an allowed visible/non-persistent
+      path.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- .audit-artifacts/pbar-wiring-audit.md — key passage\
+      \ or \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for\
+      \ this step.\"\n\n## Wiring Audit Rerun Report\n**Remediation step reviewed**:\
+      \ pbar-source-ledger-boundary-wiring-remediation\n**Prior artifact reviewed**:\
+      \ .audit-artifacts/pbar-wiring-audit.md (commit 0224ade)\n\n## Behavioral Proof\
+      \ Register\n| requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref\
+      \ | status | closure_path | gate_decision_basis |\n| --- | --- | --- | --- |\
+      \ --- | --- | --- |\n| search_steer_to_search_retrieval | <claim> | <expected>\
+      \ | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |\n| doctor_direct_and_steer_share_diagnostics_source\
+      \ | <claim> | <expected> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path>\
+      \ | <basis> |\n| source_ledger_direct_route_to_component | <claim> | <expected>\
+      \ | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |\n| metadata_visible_consumption\
+      \ | <claim> | <expected> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path>\
+      \ | <basis> |\n| source_diagnostic_affordance_a11y | <claim> | <expected> |\
+      \ <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |\n| no_stub_placeholder_route_targets\
+      \ | <claim> | <expected> | <evidence> | PROVEN/REGRESSED | <path> | <basis>\
+      \ |\n\n## Required Evidence\n- Import/route trace output:\n```text\n<paste evidence>\n\
+      ```\n- Runtime path evidence:\n```text\n<paste commands/output>\n```\n- Source\
+      \ diagnostic full-view evidence:\n  - Mouse expansion proof: <evidence>\n  -\
+      \ Keyboard expansion proof: <evidence>\n  - AT-oriented semantic proof: <evidence>\n\
+      \n## Gate Decision Basis\n- gate_open_allowed: true/false\n- unresolved blocker-class\
+      \ obligations: <list>\n- closure_path for every unresolved item: <remediation/retest/non-intersection>\n\
+      - orchestrator_action_hint: COMPLETE / DO_NOT_COMPLETE"
+    refs:
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/ARCHITECTURE.md
+    - .audit-artifacts/pbar-wiring-audit.md
     depends_on:
     - pbar-backend-green-retest
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
+    - pbar-source-ledger-boundary-wiring-remediation
     agent: wiring-auditor
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
