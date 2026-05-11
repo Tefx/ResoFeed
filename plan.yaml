@@ -44383,7 +44383,7 @@ phases:
       mainline targeted verification for B1/B2 and overlapping sanitation passed.'
   - id: pbar-backend-steer-ranking-remediation
     name: Fix natural-language steering receipts and deterministic ranking effects
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -44457,6 +44457,114 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:25:56.092942+00:00'
+    done_at: '2026-05-11T16:37:07.699533+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: confirmed one Go binary, one SQLite DB, OpenRouter
+      as JSON transformer only, current-state steering, no accounts/settings/rule-builder/activity
+      ledger.
+
+      - `docs/ARCHITECTURE.md`: confirmed §5.2 ranking applies active steering rules;
+      §5.3 Steer accepts NL commands/RSS URLs and returns terse receipts; §5.3.1 conflicts
+      return 200 receipts; `/api/steer` schema includes `interpreted_as`, `changed_rules`,
+      `message`.
+
+      - `docs/PRD.md`: confirmed Steer natural-language correction, AC-4 strict filter/boost
+      execution, AC-8 steering clarity, Source Addition through Steer only.
+
+      - `docs/DESIGN.md`: confirmed Steer receipts are concise inline evidence; Source
+      Ledger is flat; no wizard/settings/rule-builder.
+
+      - `docs/DESIGN_VISION.md`: confirmed no paternalism/settings panels; Steer remains
+      lightweight intent input.
+
+      - `docs/USAGE.md`: confirmed RSS URL paste in Steer, steering receipt should
+      explain what changed, no rule-management product.
+
+      - `docs/audits/prd-behavior-audit-closure-matrix.json`: confirmed B4/B14/B15
+      receipt requirements, B5/U2 source receipt identity + ingest hint, B16/B17 deterministic
+      ranking/filtering requirements.
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`: confirmed target failures
+      for B4/B14/B15 and B17 expected robotics first with celebrity filtered.
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`: confirmed UI receipt
+      context for interpreted/specific rejection and source-add copy.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B4, B5, B14, B15, B16, B17, U2
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B4/B5/B14/B15/B16/B17/U2
+
+      **Subagent commit hash(es)**: caa922f4371b6d4653e2fd64a3172c9cd1291559
+
+      **Mainline squash commit**: 191c9ec ([vectl] step-pbar-backend-steer-ranking-remediation
+      completed)
+
+      **Files changed**:
+
+      - internal/resofeed/ranking.go
+
+      - internal/resofeed/pbar_steer_receipt_remediation_test.go
+
+
+      **Merge conflict resolution**:
+
+      - Conflict file: internal/resofeed/ranking.go
+
+      - Resolver preserved mainline search command/no-match handling and readable
+      payload sanitation while integrating incoming deterministic steering fallback,
+      local reduce/boost parsing, source identity receipt copy, and strict filter/boost
+      ranking effects.
+
+      - Conflict-resolver performed no commit; orchestrator committed after verification.
+
+
+      **Verification**:
+
+      ```bash
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackendSteerTranslationFailureReturnsReceiptNotInternal|TestExpectedRedBackendCombinedReduceAndBoostRulesAffectRankingIndependently''
+      -count=1
+
+      # subagent: ok resofeed/internal/resofeed
+
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackendSearchCommandExecutesLexicalQuery|TestHTTPHandlersExerciseCorePaths/search|TestExpectedRedBackendReadablePayloadSanitizesSourceBoilerplate|TestSanitizeReadable|TestExpectedRedBackendSteerTranslationFailureReturnsReceiptNotInternal|TestExpectedRedBackendCombinedReduceAndBoostRulesAffectRankingIndependently|TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction|TestStrictFilterAndBoostSteeringExecuteOnRealFeedRanking|TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety|TestMCPSteerUsesConfiguredOpenRouterAndReceipts''
+      -count=1
+
+      # post-commit mainline: ok resofeed/internal/resofeed 0.249s
+
+      ```
+
+
+      **Receipt examples**:
+
+      - accepted NL: `interpreted_as: reduce celebrity gossip; boost robotics safety
+      research; applied`
+
+      - rejected: `not fully applied: freshness, coverage, provenance, and minimalism
+      invariants stay enabled`
+
+      - source added: `source added: receipt.example; run ingest in SOURCE LEDGER`
+
+
+      **Ranking proof**: controlled corpus default freshness would favor celebrity/plain
+      before older robotics; after accepted `Reduce celebrity gossip and boost robotics
+      safety research.`, `item_robotics` ranks first and `item_celebrity` is filtered.
+
+
+      **Product-boundary proof**: no rule builder, settings, history ledger, accounts,
+      or sync concepts added.
+
+
+      **Deviation records**: none
+
+      **Gaps/Notes**: Full internal package test in subagent worktree still had unrelated
+      expected-red failures outside this step scope; mainline post-commit targeted
+      verification including overlapping search/sanitation/steer tests passed.'
   - id: pbar-backend-readable-payload-sanitation
     name: Move readable payload sanitation to shared backend layer
     status: done
