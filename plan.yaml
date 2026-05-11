@@ -44237,3 +44237,98 @@ phases:
     review all pass with finding-by-finding evidence for B1-B23 and U1-U5.
   depends_on:
   - prd-behavior-audit-remediation-frontend-surfaces
+  steps:
+  - id: pbar-backend-green-retest
+    name: Independently retest backend behavior fixes green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+
+      As an INDEPENDENT TESTER (integration-verifier), retest backend behavior from
+      a fresh perspective after implementation.
+
+
+      Scope:
+
+      - B1/B2 search semantics.
+
+      - B4/B5/B14/B15 Steer/source receipts.
+
+      - B16/B17 accepted steering ranking effects.
+
+      - B6/B18/B19/B20/U4 LLM/model/doctor/fallback provenance.
+
+      - B7/B22 readable payload sanitation.
+
+
+      This is a phase-check protecting final closure. Finding issues is successful
+      verification output; unresolved blockers require remediation before final gate.'
+    verification: 'phase-check protecting final closure: backend expected-red tests
+      now pass green, no targeted backend regression fails, and evidence maps every
+      backend-owned finding to command output and runtime claim.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Verification Report
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Backend PRD behavior remediation
+
+      **Independence Level**: L1
+
+
+      ### Commands executed
+
+      ```
+
+      <go test commands and output>
+
+      ```
+
+
+      ### Finding-by-finding backend closure
+
+      | Finding | Evidence ref | Status | Notes |
+
+      | --- | --- | --- | --- |
+
+      | B1 | <command/artifact> | PROVEN/UNPROVEN | |
+
+      | B2 | <command/artifact> | PROVEN/UNPROVEN | |
+
+      | B4/B5/B6/B7/B14-B20/B22/U2/U4 | <command/artifact> | PROVEN/UNPROVEN | |
+
+
+      ### Behavioral Proof Register
+
+      - requirement_ref:
+
+      - behavior_claim:
+
+      - runtime_proof_expected:
+
+      - evidence_ref:
+
+      - status:
+
+      - closure_path:
+
+      - gate_decision_basis:
+
+
+      ### Headline
+
+      PASS / PASS_WITH_DEBT / FAIL'
+    agent: integration-verifier
