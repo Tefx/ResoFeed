@@ -39551,8 +39551,16 @@ phases:
 
       Gate decision basis must include:
 
-      - R1-R8 closure matrix with evidence refs from fix, Playwright retest, uiux-auditor
-      audit, and architecture/product-boundary retest.
+      - R1-R8 closure matrix with evidence refs from fix, Playwright retest, focused
+      R1 fixes/retests, uiux-auditor audit, and architecture/product-boundary retest.
+
+      - Confirmation that the second focused R1 browser retest passed green, recorded
+      gate_open_allowed: true, and marked all R1-R8 statuses PROVEN.
+
+      - Confirmation that R1 has BOTH sanitation and readable-prose preservation:
+      `Follow us on Twitter for more newsletters` absent, `summary-like lead repeated
+      by the site` absent, and `Second readable paragraph confirms the body is not
+      empty after bounded cleanup.` present in Inspector primary text.
 
       - Confirmation that browser evidence includes desktop and mobile 390x844 states.
 
@@ -39569,14 +39577,19 @@ phases:
       PROVEN or has explicit non-intersection evidence. Because these R1-R8 findings
       directly intersect final UI design validation, unresolved UNPROVEN/NEEDS_TEST
       items must BLOCK.'
-    verification: '- All remediation, browser retest, focused R1 fix/retest, uiux-auditor
-      audit, and architecture/product-boundary retest steps are complete with adequate
-      evidence.
+    verification: '- All remediation, browser retest, focused R1 fix/retest loops,
+      uiux-auditor audit, and architecture/product-boundary retest steps are complete
+      with adequate evidence.
 
       - Gate decision basis maps R1-R8 to concrete evidence refs and statuses.
 
-      - Focused browser retest evidence must include gate_open_allowed: true, blockers:
-      [], and R1 PROVEN with both failure strings absent from Inspector primary text.
+      - Second focused browser retest evidence must include gate_open_allowed: true,
+      blockers: [], and R1-R8 all PROVEN.
+
+      - R1 closure requires both exact forbidden strings absent and readable article
+      prose present, including `Second readable paragraph confirms the body is not
+      empty after bounded cleanup.`; empty/truncated/title-link-status-only/repeated-summary-unavailable
+      Inspector body blocks the gate.
 
       - Playwright/browser evidence covers desktop and 390x844 mobile runtime behavior.
 
@@ -39669,6 +39682,8 @@ phases:
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
     - ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
     - ui-remediation-retest-closure.urrc-r1-focused-browser-retest
+    - ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
+    - ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     agent: gate-reviewer
