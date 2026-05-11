@@ -81,7 +81,13 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, rssLines...)
-	lines = append(lines, openRouterDoctorLine(cfg))
+	modelFailureCount, err := countItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
+	lines = append(lines, openRouterProviderDoctorLine(cfg))
+	lines = append(lines, openRouterModelDoctorLine(cfg))
+	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d item_transform_failures: %d", modelFailureCount, modelFailureCount))
 	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -89,6 +95,11 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if hasFailureDiagnostics(modelLines) {
 		lines = append(lines, modelLines...)
 	}
+	fallbackLines, err := readFallbackProvenanceDiagnostics(ctx, db)
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
+	lines = append(lines, fallbackLines...)
 	extractionLines, err := readItemStatusDiagnostics(ctx, db, "extraction", "extraction_status", []string{extractionStatusPartial, extractionStatusOriginalNA, extractionStatusSummaryNA})
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -109,16 +120,69 @@ func hasFailureDiagnostics(lines []string) bool {
 	return !strings.HasSuffix(lines[0], ": ok")
 }
 
-func openRouterDoctorLine(cfg DoctorConfig) string {
+func openRouterProviderDoctorLine(cfg DoctorConfig) string {
 	configured := strings.TrimSpace(cfg.ConfiguredOpenRouterModel)
 	if configured == "" {
 		configured = "account_default"
 	}
+	providerReachable := "unknown"
+	if strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
+		providerReachable = "true"
+	}
+	return "openrouter: provider_reachable=" + providerReachable + " configured_model=" + configured + " provider_reachable: " + providerReachable
+}
+
+func openRouterModelDoctorLine(cfg DoctorConfig) string {
 	resolved := strings.TrimSpace(cfg.ResolvedOpenRouterModel)
+	modelResolved := "true"
 	if resolved == "" {
 		resolved = "unknown"
+		modelResolved = "false"
 	}
-	return "openrouter: ok configured_model=" + configured + " resolved_model=" + resolved
+	return "openrouter: model_resolved=" + modelResolved + " resolved_model=" + resolved + " model_resolved: " + modelResolved
+}
+
+func countItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, column string, failingStatuses []string) (int, error) {
+	if column != "model_status" && column != "extraction_status" {
+		return 0, fmt.Errorf("count %s diagnostics: unsupported status column %q", label, column)
+	}
+	placeholders := strings.TrimRight(strings.Repeat("?,", len(failingStatuses)), ",")
+	args := make([]any, 0, len(failingStatuses))
+	for _, status := range failingStatuses {
+		args = append(args, status)
+	}
+	query := fmt.Sprintf(`select count(*) from items where %s in (`+placeholders+`)`, column)
+	var count int
+	if err := db.QueryRowContext(ctx, query, args...).Scan(&count); err != nil {
+		return 0, fmt.Errorf("count %s diagnostics: %w", label, err)
+	}
+	return count, nil
+}
+
+func readFallbackProvenanceDiagnostics(ctx context.Context, db *sql.DB) ([]string, error) {
+	rows, err := db.QueryContext(ctx, `
+select id, model_status, extraction_status,
+       case when coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' then 'excerpt' else 'model' end
+from items
+where model_status != ? or extraction_status != ?
+order by first_seen_at desc, id asc
+limit 25`, modelStatusOK, extractionStatusFull)
+	if err != nil {
+		return nil, fmt.Errorf("read fallback provenance diagnostics: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	var lines []string
+	for rows.Next() {
+		var id, modelStatus, extractionStatus, summarySource string
+		if err := rows.Scan(&id, &modelStatus, &extractionStatus, &summarySource); err != nil {
+			return nil, fmt.Errorf("scan fallback provenance diagnostics: %w", err)
+		}
+		lines = append(lines, fmt.Sprintf("fallback_provenance: item=%s summary=%s model_status=%s extraction_status=%s", id, summarySource, modelStatus, extractionStatus))
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate fallback provenance diagnostics: %w", err)
+	}
+	return lines, nil
 }
 
 func readRSSDiagnostics(ctx context.Context, db *sql.DB) ([]string, sql.NullString, error) {

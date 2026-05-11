@@ -292,6 +292,13 @@
     return `src: ${value.source_title} · ${extraction}${tier}`;
   }
 
+  function summaryProvenanceDisclosure(value: InspectableItem): string {
+    const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
+    if (hasModelText) return `summary provenance: model-backed · model_status: ${value.model_status}`;
+    const fallback = summaryText(value) ? 'fallback excerpt-only' : 'fallback unavailable';
+    return `summary provenance: ${fallback} · model_status: ${value.model_status}`;
+  }
+
   $effect(() => {
     if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
       handledFocusRequestId = focusRequestId;
@@ -332,7 +339,7 @@
     <p class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
-      <span>source-backed</span>
+      <span>{summaryProvenanceDisclosure(item)}</span>
     </p>
     <p><strong>summary:</strong> {denseSummaryText(item)}</p>
     <p><strong>core insight:</strong> {coreInsightText(item)}</p>

@@ -69,12 +69,14 @@
   const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
 
   function surfaceForPath(pathname: string): Surface {
+    if (pathname === '/doctor') return 'doctor';
     if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
     return 'feed';
   }
 
   function canonicalPathForSurface(surface: Surface): string | null {
     if (surface === 'ledger') return '/source-ledger';
+    if (surface === 'doctor') return '/doctor';
     if (surface === 'feed') return '/';
     return null;
   }
@@ -105,6 +107,9 @@
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
       if (syncRoute) replaceSurfaceFromLocation();
+      if (currentSurface === 'doctor') {
+        steerFeedback = { kind: 'doctor', text: await client.doctor() };
+      }
       loadState = 'ready';
       if (selectedItemId) {
         await loadItemDetail(selectedItemId, token);

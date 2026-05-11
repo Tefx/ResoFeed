@@ -91,6 +91,13 @@ export function itemExtractionLabel(status: ItemSummary['extraction_status']): s
   return 'excerpt';
 }
 
+export function itemSummaryProvenanceLabel(item: ItemSummary): string {
+  if (item.model_status === 'ok' && (item.summary || item.core_insight)) return 'model-backed';
+  if (item.model_status === 'model_latency_error') return 'fallback: model_status model_latency_error';
+  if (item.display_excerpt) return 'fallback: excerpt-only';
+  return 'summary unavailable';
+}
+
 export function shouldShowTimeGroup(items: ItemSummary[], index: number): boolean {
   if (index === 0) return true;
   return itemTimeGroup(items[index]) !== itemTimeGroup(items[index - 1]);
