@@ -42185,3 +42185,149 @@ phases:
     depends_on:
     - slnr-restore-navigation-route
     agent: integration-verifier
+  - id: slnr-uiux-navigation-audit
+    name: Audit Source Ledger navigation chrome and route visual conformance
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      Native multimodal implementation audit for the user-visible Source Ledger navigation
+      regression. This is required because the remediation touches UI/UX navigation
+      chrome and route discoverability.
+
+
+      As `uiux-auditor`, compare rendered browser artifacts against `docs/DESIGN.md`
+      and the route/navigation contract from `slnr-contract-doc-route-contract`.
+
+
+      Required audit states/artifacts:
+
+      1. Desktop root shell after token acceptance showing visible operational chrome
+      including `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, and `/doctor` where
+      implemented by the shell.
+
+      2. Desktop Source Ledger opened through the visible nav entry.
+
+      3. Direct `/source-ledger` route opened after token acceptance.
+
+      4. Narrow/mobile Source Ledger access remains a flat full-screen list and does
+      not collapse or become a settings dashboard.
+
+      5. Alias routes `/source` and `/sources` are visually equivalent to the canonical
+      route if accepted by the contract.
+
+
+      Audit criteria:
+
+      - `SOURCE LEDGER` label is exact, visible, and functionally discoverable.
+
+      - No SaaS/friendly copy, mascot/AI trust palette, settings dashboard, folders/tags,
+      unread/archive concepts, or source hierarchy are introduced.
+
+      - Existing Source Ledger visual grammar remains intact: flat rows, bracket actions,
+      terse state import/export actions, no filled SaaS buttons at rest.
+
+      - Navigation hit targets are at least 44 CSS px on touch/mobile surfaces and
+      keyboard focus is visible.
+
+
+      Control-plane closure semantics:
+
+      Return a structured behavioral proof register or equivalent artifact mapping
+      requirement_ref, behavior_claim, runtime_proof_expected, evidence_ref, status,
+      closure_path, and gate_decision_basis. NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      items must be classified as blocking or explicitly non-intersecting with the
+      phase gate.
+
+
+      touch_paths:
+
+      - audit artifact files only; no product code changes'
+    verification: '- Rendered screenshots/images/DOM or accessibility snapshots exist
+      for root chrome, click-opened Source Ledger, direct `/source-ledger`, and narrow/mobile
+      Source Ledger access.
+
+      - Audit explicitly decides PASS/BLOCK for Source Ledger discoverability, visual
+      label exactness, direct route visual state, hit target/focus visibility, and
+      forbidden concept absence.
+
+      - Behavioral proof register contains no unresolved blocker-class UI/UX obligation
+      without remediation ownership.
+
+      - uiux-auditor remains independent from frontend-engineer implementation.'
+    evidence_template: '## UI/UX Navigation Audit Report
+
+
+      **Auditor**: uiux-auditor (independent of frontend-engineer implementation)
+
+      **Scope**: Source Ledger navigation chrome and direct-route visual conformance
+
+      **Timestamp**: <ISO 8601>
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts — key
+      passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Rendered Artifact Register
+
+      | State | Artifact path | Expected design obligation | Status |
+
+      |---|---|---|---|
+
+      | root desktop chrome | <screenshot/snapshot> | SOURCE LEDGER visible in operational
+      chrome | PASS/FAIL |
+
+      | click-opened ledger | <screenshot/snapshot> | flat Source Ledger visible |
+      PASS/FAIL |
+
+      | `/source-ledger` direct route | <screenshot/snapshot> | direct route opens
+      ledger | PASS/FAIL |
+
+      | mobile/narrow ledger | <screenshot/snapshot> | flat full-screen list, no collapse
+      | PASS/FAIL |
+
+      | aliases `/source`, `/sources` | <screenshot/snapshot or conflict note> | compatibility
+      behavior | PASS/FAIL/NON_INTERSECTING |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Findings
+
+      | Severity | Description | Evidence | Blocking? |
+
+      |---|---|---|---|
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | BLOCK'
+    depends_on:
+    - slnr-restore-navigation-route
+    - slnr-browser-route-retest
+    agent: uiux-auditor
