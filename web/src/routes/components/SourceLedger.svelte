@@ -69,9 +69,13 @@
   }
 
   function sourceLedgerSummary(source: Source, lastFetch: string | null): string {
-    const parts = [`src: ${sourceLedgerLabel(source)}`, `status: ${source.last_fetch_status}`];
-    if (lastFetch) parts.push(`last_fetch: ${lastFetch}`);
+    const parts = [`src: ${sourceLedgerLabel(source)}`, `status: ${source.last_fetch_status}`, `last_fetch: ${lastFetch ?? 'not_fetched'}`];
     return parts.join(' · ');
+  }
+
+  function sourceDiagnosticText(source: Source, fullError: string | undefined, lastFetch: string | null): string {
+    const diagnostic = fullError ? (fullError.startsWith('err:') ? fullError : `err: ${fullError}`) : 'err: none';
+    return `${diagnostic}\nsrc: ${sourceLedgerLabel(source)}\nfetch_status=${source.last_fetch_status}\nlast_fetch=${lastFetch ?? 'not_fetched'}\nurl=${source.url}`;
   }
 
 
@@ -114,7 +118,7 @@
 
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-heading">
   <div class="source-ledger-head source-ledger__header">
-    <h2 id="source-ledger-heading" class="source-ledger__title">SOURCE LEDGER</h2>
+    <h2 id="source-ledger-heading" class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h2>
     <button
       type="button"
       class="manual-fetch-action"
@@ -132,12 +136,13 @@
     <ul class="contract-list source-ledger__list">
       {#each sources as source (source.id)}
         {@const fetching = fetchingSourceIds.has(source.id)}
-        {@const sourceError = truncateTerse(manualFetchState.sourceErrors?.[source.id])}
+        {@const fullSourceError = manualFetchState.sourceErrors?.[source.id]}
+        {@const sourceError = truncateTerse(fullSourceError)}
         {@const lastFetch = formatTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
-          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div>
+          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error" title={fullSourceError}>{sourceError}</span>{/if}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url}>url: {source.url}</div>
           <span class="source-ledger__actions"><button
             type="button"
@@ -146,6 +151,10 @@
             disabled={fetching}
             onclick={() => void fetchSource(source)}
           >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button></span>
+          <details class="source-diagnostic-details">
+            <summary>diagnostic details</summary>
+            <pre>{sourceDiagnosticText(source, fullSourceError, lastFetch)}</pre>
+          </details>
           {#if confirmingSourceId === source.id}
             <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
           {/if}

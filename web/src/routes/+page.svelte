@@ -192,6 +192,20 @@
       searchSeedQuery = '';
       steerCommand = '';
     }
+    void focusActiveSurface(surface);
+  }
+
+  async function focusActiveSurface(surface: Surface): Promise<void> {
+    await tick();
+    if (surface === 'ledger') {
+      document.getElementById('source-ledger-heading')?.focus();
+    } else if (surface === 'search') {
+      document.getElementById('search-heading')?.focus();
+    } else if (surface === 'doctor') {
+      document.getElementById('doctor-heading')?.focus();
+    } else if (surface === 'feed') {
+      steerInput?.focus();
+    }
   }
 
   async function submitSteer(): Promise<void> {
@@ -213,7 +227,7 @@
         return;
       }
       if (command.toLowerCase().startsWith('search ')) {
-        currentSurface = 'search';
+        showSurface('search', false);
         searchSeedQuery = command.replace(/^search\s+/i, '');
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'retrieval: lexical search' };
@@ -221,7 +235,7 @@
       }
       if (command === '/doctor') {
         const diagnostics = await apiClient().doctor();
-        currentSurface = 'doctor';
+        showSurface('doctor');
         steerCommand = '';
         steerFeedback = { kind: 'doctor', text: diagnostics };
         return;
@@ -481,7 +495,7 @@
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
         {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
         <div class="contract-region">
-          <h2 id="doctor-heading">/doctor</h2>
+          <h2 id="doctor-heading" tabindex="-1">/doctor</h2>
           <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
         </div>
       </section>
