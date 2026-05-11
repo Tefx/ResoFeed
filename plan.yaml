@@ -38747,3 +38747,152 @@ phases:
 
       **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     agent: frontend-engineer
+  - id: ui-remediation-retest-closure.urrc-playwright-browser-retest
+    name: urrc-playwright-browser-retest
+    status: pending
+    description: 'Independent real-browser retest for residual UI remediation findings
+      R1-R8 from docs/audits/ui-remediation-retest-2026-05-11.md.
+
+
+      step_type: verification. verification_scope: phase-check. Independence Level:
+      L1 independent tester. Agent must not modify product code.
+
+
+      Run the app through the real browser path used by the audit (`http://127.0.0.1:8080/`)
+      and capture both desktop and mobile 390x844 evidence. The retest must prove
+      the actual rendered UI and accessibility tree, not just unit tests.
+
+
+      Required coverage:
+
+      - R1 Inspector body sanitation: verify no affiliate disclosures, author/profile
+      boilerplate, image credits outside prose, follow/recommendation prompts, related-story
+      tails, or repeated summary-like lead text appear in Inspector body.
+
+      - R2 mobile Source Ledger: at 390px, row visibly preserves `src: <name>`, URL,
+      status/last-fetch diagnostic, and action block.
+
+      - R3 metadata grammar/readability: Feed and Search use lower-case `src:` grammar;
+      source and age remain legible on mobile before extraction marker truncation.
+
+      - R4 Inspector provenance: exactly one extraction/provenance value is visible;
+      no `full · full` duplicate.
+
+      - R5 Search/Today state scoping: after Search then Today/feed, stale `retrieval:
+      lexical search`, previous query, and visible apply state do not leak ambiguously
+      into Today.
+
+      - R6 mobile Search DOM/a11y: only current Search result inspect controls are
+      exposed; inactive feed-style `Open Inspector for:` controls are absent from
+      accessibility tree while Search is active.
+
+      - R7 Source Ledger grammar: desktop row visibly follows `src: <name>`, URL,
+      status, right-aligned actions.
+
+      - R8 State Portability placement: `[EXPORT STATE]` and `[IMPORT STATE]` are
+      in Ledger footer/action cluster and warning text `import replaces active sources,
+      rules, and stars` remains visible.
+
+
+      Use or extend existing Playwright suites where appropriate:
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/real-server-ui.spec.ts
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+
+      Findings are successful verification output. If any R finding remains open,
+      record exact reproduction, screenshot path, and selector/DOM evidence for follow-up.'
+    verification: '- Real Playwright/browser run exercises desktop and 390x844 mobile
+      surfaces against the runtime entrypoint.
+
+      - Screenshots and DOM/accessibility evidence exist for each R1-R8 requirement.
+
+      - Behavioral proof register marks each R finding PROVEN or records blocker reproduction
+      with closure_path.
+
+      - No product code is modified by this independent retest.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Playwright Browser Retest Report
+
+
+      **Tester**: integration-verifier
+
+      **Runtime URL**: http://127.0.0.1:8080/
+
+      **Viewports**: desktop + 390x844 mobile
+
+
+      **Commands executed**:
+
+      ```
+
+      <paste exact command(s)>
+
+      ```
+
+
+      **Artifacts captured**:
+
+      ```
+
+      <screenshot/trace/DOM snapshot paths>
+
+      ```
+
+
+      ## Behavioral Proof Register
+
+      | Finding | Requirement ref | Behavior claim | Runtime proof expected | Evidence
+      ref | Status | Closure path | Gate decision basis |
+
+      | --- | --- | --- | --- | --- | --- | --- | --- |
+
+      | R1 | DESIGN Inspector Pane | Inspector excludes raw boilerplate | Browser
+      Inspector content screenshot/text dump | <path> | PROVEN/UNPROVEN | <path> |
+      OPEN/BLOCK |
+
+      | R2 | DESIGN Source Ledger | Mobile row preserves identity/status | 390x844
+      screenshot + text snapshot | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK
+      |
+
+      | R3 | DESIGN Feed Item | Metadata grammar readable | desktop/mobile Feed+Search
+      screenshots | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+      | R4 | DESIGN Inspector Pane | Single provenance string | Inspector text assertion
+      | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+      | R5 | DESIGN Steering Receipt/Search | Search state scoped | Search→Today interaction
+      proof | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+      | R6 | DESIGN Search and Retrieval | No duplicate inactive controls | accessibility
+      tree/query proof | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+      | R7 | DESIGN Source Ledger | Desktop row grammar matches contract | screenshot/text
+      snapshot | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+      | R8 | DESIGN State Portability | Actions in Ledger footer cluster | screenshot/text
+      snapshot | <path> | PROVEN/UNPROVEN | <path> | OPEN/BLOCK |
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+    agent: integration-verifier
