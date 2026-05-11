@@ -38523,3 +38523,227 @@ phases:
     product concepts or new service/repository/DI/event-bus layers may be introduced.
   depends_on:
   - full-ui-design-conformance-remediation
+  steps:
+  - id: ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+    name: urrc-batched-residual-ui-fix
+    status: pending
+    description: 'Batched UI remediation fix for all residual blocker-class findings
+      in docs/audits/ui-remediation-retest-2026-05-11.md.
+
+
+      Work type: defect_repair. Priority: HIGH. step_type: implementation.
+
+
+      Authoritative refs:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md -> Remaining Findings, Priority
+      Fix Order, Retest Matrix, Verification Notes.
+
+      - docs/DESIGN.md -> Inspector Pane, Source Ledger, Feed Item, Steering Receipt,
+      Search and Retrieval, State Portability.
+
+
+      Touch paths to inspect first:
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/StatePortability.svelte
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+      - web/src/app.css
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/real-server-ui.spec.ts
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+
+      Fix ALL audit findings below, not just the first:
+
+
+      R1 P1 blocker: Inspector reading payload still contains raw site boilerplate.
+      Evidence artifacts: artifacts/ui-remediation-retest-2026-05-11/mobile-inspector-content.png,
+      mobile-inspector-boilerplate.png, mobile-inspector-tail.png. Required correction:
+      Inspector body sanitation removes affiliate disclosures, author/profile boilerplate,
+      photo credits when not article prose, follow/recommendation prompts, related-story
+      tails, repeated summary-like intro text, and unrelated story titles before rendering
+      the reading payload.
+
+
+      R2 P1 blocker: Mobile Source Ledger row loses source identity/status at 390px.
+      Evidence artifact: artifacts/ui-remediation-retest-2026-05-11/mobile-ledger.png.
+      Required correction: mobile row layout preserves `src: <name>`, URL, status/last-fetch
+      diagnostics, and action block in predictable stacked order; do not compress
+      name/status out of view.
+
+
+      R3 P2 blocker-class: Feed and Search metadata remain forced uppercase and unreadable
+      on mobile. Evidence artifacts: artifacts/ui-remediation-retest-2026-05-11/feed.png,
+      mobile-search.png. Required correction: render compact inline grammar `src:
+      <host> · <age> · <full|partial|excerpt>` without forced uppercase; on narrow
+      widths keep source and age legible before lower-priority extraction markers
+      truncate.
+
+
+      R4 P2 blocker-class: Inspector renders duplicate extraction state (`full · full`).
+      Evidence artifacts: artifacts/ui-remediation-retest-2026-05-11/inspector.png,
+      mobile-inspector.png. Required correction: collapse internal extraction/provenance
+      fields into one user-facing provenance string.
+
+
+      R5 P2 blocker-class: Search command state leaks back into Today/feed context.
+      Evidence artifacts: artifacts/ui-remediation-retest-2026-05-11/mobile-feed.png,
+      mobile-search.png. Required correction: scope or clear Search retrieval receipts
+      and retained Steer query value when returning to Today/feed; Today must not
+      show stale `retrieval: lexical search` unless explicitly timestamped and clearly
+      scoped.
+
+
+      R6 P3 blocker-class accessibility issue: Mobile Search DOM exposes duplicate
+      Inspect surfaces. Evidence artifact: artifacts/ui-remediation-retest-2026-05-11/mobile-search.png.
+      Required correction: when Search is active, hide or unmount inactive feed-style
+      `Open Inspector for:` controls from the accessibility tree so only visible/current
+      Search result controls are interactive.
+
+
+      R7 P3 blocker-class: Source Ledger row still does not fully match required row
+      grammar. Evidence artifact: artifacts/ui-remediation-retest-2026-05-11/ledger.png.
+      Required correction: visible markup/text follows `src: <name>`, URL, status,
+      and right-aligned actions; source identity includes `src:` prefix with strict
+      field separation.
+
+
+      R8 P3 blocker-class: State Portability remains visually separated from Ledger
+      actions. Evidence artifacts: artifacts/ui-remediation-retest-2026-05-11/ledger.png,
+      mobile-ledger.png. Required correction: move `[EXPORT STATE]` and `[IMPORT STATE]`
+      into a Ledger footer/action cluster while preserving warning text `import replaces
+      active sources, rules, and stars`.
+
+
+      Implementation constraints:
+
+      - Stay within the single ResoFeed web/runtime surface; do NOT introduce accounts/OAuth,
+      sync/merge, vector/RAG, settings-heavy UI, admin processes, sidecar services,
+      service/repository/DI/event-bus layers, or Java-style layering.
+
+      - Preserve the one Go binary / one SQLite / flat internal/resofeed architecture
+      if any backend DTO support is touched.
+
+      - Prefer existing component/style patterns over new abstractions.
+
+      - Update or add focused regression coverage for every R1-R8 finding, including
+      a 390x844 mobile viewport and DOM/a11y checks for R6.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires BOTH logic correctness and visible DOM rendering completeness.
+      A data-only/view-model-only change does not satisfy this step. Evidence MUST
+      include rendered-output proof paths consumed by downstream Playwright/uiux-auditor
+      steps.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      Stub-only completion is NOT acceptable. Each deliverable MUST contain substantive
+      logic that processes inputs and produces outputs that vary based on those inputs.
+      Private stub classes or placeholder render branches do not satisfy this requirement.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any R1-R8 finding left unclosed or closed only by assertion without a browser/DOM
+      proof path.
+
+      2. Uppercase metadata, duplicate `full · full`, stale Search receipts on Today,
+      or duplicate Inspect controls in the accessibility tree.
+
+      3. Mobile Source Ledger at 390px that hides `src: <name>` or status.
+
+      4. State Portability still presented as a separate settings-like block instead
+      of Ledger footer/action cluster.
+
+      5. Any forbidden product concept or architecture layer added during the UI fix.'
+    verification: '- Main path: focused unit/component and Playwright tests demonstrate
+      all R1-R8 corrections against desktop and 390x844 mobile contexts.
+
+      - Failure path: regression tests cover dirty Inspector boilerplate corpus, mobile
+      Source Ledger identity/status preservation, metadata truncation/casing, duplicate
+      Inspector provenance, stale Search receipt scoping, and duplicate Inspect accessibility
+      controls.
+
+      - Proof: no forbidden product concepts or architecture layers introduced; implementation
+      evidence cites exact changed files and browser-visible outputs.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Fix Evidence
+
+
+      **Audit findings fixed**: R1/R2/R3/R4/R5/R6/R7/R8 (list PASS/PARTIAL/OPEN for
+      each)
+
+
+      **Changed files**:
+
+      ```
+
+      <paste exact paths>
+
+      ```
+
+
+      **Regression coverage added/updated**:
+
+      ```
+
+      <test file and test names for each R finding>
+
+      ```
+
+
+      **Rendered/browser proof paths prepared for retest**:
+
+      - Desktop surfaces: <commands/tests/screenshots>
+
+      - Mobile 390x844 surfaces: <commands/tests/screenshots>
+
+      - DOM/a11y duplicate-control check for R6: <selector/query proof>
+
+
+      **Forbidden concepts check**:
+
+      - accounts/OAuth: absent
+
+      - sync/merge: absent
+
+      - vector/RAG: absent
+
+      - settings-heavy UI/admin/sidecar/service-repository-DI-event-bus layers: absent
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    agent: frontend-engineer
