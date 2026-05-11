@@ -48349,7 +48349,7 @@ phases:
     agent: spec-verifier
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
-    status: claimed
+    status: pending
     description: 'As wiring-auditor, verify every remediated public surface and symbol
       is reachable at runtime.
 
@@ -48429,8 +48429,6 @@ phases:
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
     agent: wiring-auditor
-    claimed_by: wiring-auditor
-    claimed_at: '2026-05-11T18:44:30.535102+00:00'
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
     status: pending
