@@ -1,0 +1,147 @@
+{
+  "command": "npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts full-ui-design-conformance.expected-red.spec.ts",
+  "exit_code": 0,
+  "stats": {
+    "startTime": "2026-05-11T09:43:04.591Z",
+    "duration": 6879.756,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "attachments": [
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-owner-token-empty-focused-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-owner-token-empty-focused-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-owner-token-rejected-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-owner-token-rejected-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-authenticated-today-split-pane-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-authenticated-today-split-pane-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-authenticated-feed-inspector-with-items-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-authenticated-feed-inspector-with-items-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-source-ledger-with-actions-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-source-ledger-with-actions-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "narrow-source-ledger-390x844.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--narrow-source-ledger-390x844.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-doctor-output-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-doctor-output-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "narrow-doctor-output-390x844.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--narrow-doctor-output-390x844.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "narrow-search-form-and-results-390x844.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--narrow-search-form-and-results-390x844.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "desktop-search-results-1280x900.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--desktop-search-results-1280x900.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "narrow-authenticated-feed-390x844.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--narrow-authenticated-feed-390x844.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "narrow-inspector-route-390x844.png",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--narrow-inspector-route-390x844.png.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "screenshot",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--screenshot.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red UI/design conformance matrix covers findings F1-F47 on the real app",
+      "name": "trace",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--trace.zip",
+      "type": "application/zip"
+    },
+    {
+      "suite": "full-ui-design-conformance.expected-red.spec.ts",
+      "spec": "expected-red docs/ui-preview.html drift contract covers findings F48-F52",
+      "name": "trace",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/full-ui-design-conformance.expected-red--trace-2.zip",
+      "type": "application/zip"
+    },
+    {
+      "suite": "ui-remediation-r1-r8-browser-retest.spec.ts",
+      "spec": "R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payloads out of primary reading copy",
+      "name": "r1-primary-inspector-text.txt",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ui-remediation-r1-r8-browser-retest--r1-primary-inspector-text.txt.txt",
+      "type": "text/plain"
+    },
+    {
+      "suite": "ui-remediation-r1-r8-browser-retest.spec.ts",
+      "spec": "R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payloads out of primary reading copy",
+      "name": "r2-r8-sibling-proof.txt",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ui-remediation-r1-r8-browser-retest--r2-r8-sibling-proof.txt.txt",
+      "type": "text/plain"
+    },
+    {
+      "suite": "ui-remediation-r1-r8-browser-retest.spec.ts",
+      "spec": "R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payloads out of primary reading copy",
+      "name": "screenshot",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ui-remediation-r1-r8-browser-retest--screenshot.png",
+      "type": "image/png"
+    },
+    {
+      "suite": "ui-remediation-r1-r8-browser-retest.spec.ts",
+      "spec": "R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payloads out of primary reading copy",
+      "name": "trace",
+      "path": "artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ui-remediation-r1-r8-browser-retest--trace.zip",
+      "type": "application/zip"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+R2-R8 sibling proof obligations are covered by inspector-dirty-corpus.spec.ts and inspector-readable-content-regression.spec.ts in this patch verification.
