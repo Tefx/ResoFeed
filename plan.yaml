@@ -44233,7 +44233,7 @@ phases:
   steps:
   - id: pbar-backend-search-remediation
     name: Fix backend lexical search execution and no-match semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -44289,6 +44289,98 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:25:51.507804+00:00'
+    done_at: '2026-05-11T16:34:18.631022+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: Read hard boundary requiring single Go binary,
+      one SQLite+FTS5 store, lexical search only, no vector/RAG, and flat `internal/resofeed/`
+      file shape.
+
+      - `docs/ARCHITECTURE.md`: Read §2 single-process boundary; §4.6 `search_fts`
+      derived lexical index with no embedding/vector columns; §5.4 Search forbids
+      semantic/vector retrieval; §6 `/api/search` contract; §9 minimal file shape.
+
+      - `docs/PRD.md`: Read §10 requiring keyword/plain text lexical retrieval over
+      indexed fields and forbidding RAG/vector/semantic answer behavior; §14 non-goals.
+
+      - `docs/DESIGN.md`: Read Search and Retrieval purpose: keyword/plain text retrieval,
+      not RAG/chat/semantic answer engine; no stale/error UI embellishment.
+
+      - `docs/DESIGN_VISION.md`: Read PRD-to-UI mapping for Steer command bar and
+      anti-slop guardrails; no secondary inbox/dashboard expansion.
+
+      - `docs/USAGE.md`: Read Search command reference and Search section: plain text
+      query, source/time/resonated filters, no embeddings/vector DB/RAG/semantic generation.
+
+      - `docs/audits/prd-behavior-audit-closure-matrix.json`: Read B1 acceptance:
+      `search <query>` executes lexical query immediately and results reflect submitted
+      query, not Today/default rows. Read B2 acceptance: unique no-match query returns
+      no-results, clears prior/default rows, no generic internal error.
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`: Read B1/B2 backend
+      assertions requiring `/api/steer` command `search sqlite fts` -> `interpreted_as:
+      search`, `search nozzzztoken` -> `search_empty`, no changed steering rules,
+      and direct no-match `SearchItems` empty without error.
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`: Read B1/B2 UI
+      context covering `search Local fixture`, result count should update immediately,
+      no-match query should show `0 results`, clear stale fixture row, and avoid `err:
+      internal`.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B1, B2
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B1/B2
+
+      **Subagent commit hash(es)**: 52eaa85be63019d693a0f6779a92a8ea7ab6beb2
+
+      **Mainline squash commit**: 502fc2b ([vectl] step-pbar-backend-search-remediation
+      completed)
+
+      **Files changed**:
+
+      - internal/resofeed/ranking.go
+
+      - internal/resofeed/search.go
+
+      - internal/resofeed/http_impl_test.go
+
+
+      **Verification**:
+
+      ```bash
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackendSearchCommandExecutesLexicalQuery|TestHTTPHandlersExerciseCorePaths/search|TestExpectedRedBackendReadablePayloadSanitizesSourceBoilerplate|TestSanitizeReadable''
+      -count=1
+
+      # ok resofeed/internal/resofeed 0.528s
+
+      ```
+
+
+      **Main path proof**: `search sqlite fts` through `/api/steer` now executes `SearchItems`
+      and returns receipt `interpreted_as: search` with zero changed rules; direct
+      `/api/search?q=sqlite...` focused test still returns only the seeded lexical
+      match.
+
+
+      **Failure path proof**: `search nozzzztoken` through `/api/steer` now returns
+      `interpreted_as: search_empty`; added HTTP coverage proves `q=no-match-pbar-expected-red-zzzz`
+      returns 200 with empty items and submitted query echoed, not an internal error.
+
+
+      **Product-boundary proof**: Changes stay in existing Go backend files, reuse
+      SQLite FTS5/LIKE lexical search, and introduce no vector, embedding, semantic,
+      RAG, external search service, dashboard, or new architecture layer.
+
+
+      **Deviation records**: none
+
+      **Gaps/Notes**: Full `go test ./internal/resofeed -count=1` remained red in
+      the subagent worktree for unrelated expected-red tests outside B1/B2 scope;
+      mainline targeted verification for B1/B2 and overlapping sanitation passed.'
   - id: pbar-backend-steer-ranking-remediation
     name: Fix natural-language steering receipts and deterministic ranking effects
     status: claimed
