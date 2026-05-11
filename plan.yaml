@@ -48407,7 +48407,7 @@ phases:
     claimed_at: '2026-05-11T19:09:51.635019+00:00'
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
-    status: pending
+    status: claimed
     description: 'As wiring-auditor, independently rerun the wiring and reachability
       audit AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
       the remediation evidence plus the salvaged artifact `.audit-artifacts/pbar-wiring-audit.md`
@@ -48501,6 +48501,8 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-source-ledger-boundary-wiring-remediation
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-11T19:09:57.287206+00:00'
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
     status: pending
