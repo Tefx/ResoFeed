@@ -46001,7 +46001,7 @@ phases:
   - id: pbar-frontend-mobile-search-ledger-remediation
     name: Fix mobile non-feed containment, Search metadata/form anatomy, and Ledger
       diagnostics grammar
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -46066,6 +46066,8 @@ phases:
       \ proof: <title/details/a11y evidence>\n- Product-boundary proof: no dashboard/settings/source-management\
       \ creep."
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T17:03:32.048806+00:00'
   - id: pbar-frontend-steer-receipt-remediation
     name: Render actionable Steer and source-add receipts without product creep
     status: pending
