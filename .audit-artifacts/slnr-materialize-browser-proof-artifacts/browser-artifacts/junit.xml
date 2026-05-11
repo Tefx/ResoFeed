@@ -1,0 +1,49 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="5.7400720000000005">
+<testsuite name="source-ledger-navigation-regression.expected-red.spec.ts" timestamp="2026-05-11T13:07:19.730Z" hostname="chromium-ci-safe" tests="5" failures="0" skipped="0" time="1.329" errors="0">
+<testcase name="source-ledger-navigation-regression expected-red contract › root app chrome exposes a visible keyboard-reachable unobstructed SOURCE LEDGER entry after owner-token acceptance" classname="source-ledger-navigation-regression.expected-red.spec.ts" time="0.419">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="source-ledger-navigation-regression expected-red contract › clicking SOURCE LEDGER opens the documented flat ledger surface without forbidden source-management concepts" classname="source-ledger-navigation-regression.expected-red.spec.ts" time="0.275">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="source-ledger-navigation-regression expected-red contract › direct navigation to /source-ledger opens SOURCE LEDGER after token acceptance" classname="source-ledger-navigation-regression.expected-red.spec.ts" time="0.22">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-bd212-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-bd212-DGER-after-token-acceptance-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="source-ledger-navigation-regression expected-red contract › direct navigation to /source opens SOURCE LEDGER after token acceptance" classname="source-ledger-navigation-regression.expected-red.spec.ts" time="0.207">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-91603-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-91603-DGER-after-token-acceptance-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="source-ledger-navigation-regression expected-red contract › direct navigation to /sources opens SOURCE LEDGER after token acceptance" classname="source-ledger-navigation-regression.expected-red.spec.ts" time="0.208">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-e807d-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png]]
+
+[[ATTACHMENT|../test-output/source-ledger-navigation-r-e807d-DGER-after-token-acceptance-chromium-ci-safe/trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

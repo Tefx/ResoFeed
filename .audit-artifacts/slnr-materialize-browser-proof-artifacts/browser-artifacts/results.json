@@ -1,0 +1,342 @@
+{
+  "config": {
+    "configFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/playwright.config.ts",
+    "rootDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/tests/e2e/global-setup.ts",
+    "globalTeardown": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/tests/e2e/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-ci-safe",
+        "name": "chromium-ci-safe",
+        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "live-openrouter",
+        "name": "live-openrouter",
+        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/web/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/html-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "source-ledger-navigation-regression.expected-red.spec.ts",
+      "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "source-ledger-navigation-regression expected-red contract",
+          "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+          "line": 101,
+          "column": 6,
+          "specs": [
+            {
+              "title": "root app chrome exposes a visible keyboard-reachable unobstructed SOURCE LEDGER entry after owner-token acceptance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-ci-safe",
+                  "projectName": "chromium-ci-safe",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 419,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T13:07:20.002Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-de4bd-fter-owner-token-acceptance-chromium-ci-safe/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96b60dc6e36fc7f7615e-edd4a8122c976cc55ccf",
+              "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+              "line": 102,
+              "column": 3
+            },
+            {
+              "title": "clicking SOURCE LEDGER opens the documented flat ledger surface without forbidden source-management concepts",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-ci-safe",
+                  "projectName": "chromium-ci-safe",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 275,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T13:07:20.605Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-edbf3--source-management-concepts-chromium-ci-safe/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96b60dc6e36fc7f7615e-869b56c05b46ba1efef8",
+              "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+              "line": 121,
+              "column": 3
+            },
+            {
+              "title": "direct navigation to /source-ledger opens SOURCE LEDGER after token acceptance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-ci-safe",
+                  "projectName": "chromium-ci-safe",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 220,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T13:07:20.891Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-bd212-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-bd212-DGER-after-token-acceptance-chromium-ci-safe/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96b60dc6e36fc7f7615e-d4da074ef0f48dd8ca40",
+              "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+              "line": 136,
+              "column": 5
+            },
+            {
+              "title": "direct navigation to /source opens SOURCE LEDGER after token acceptance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-ci-safe",
+                  "projectName": "chromium-ci-safe",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 207,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T13:07:21.120Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-91603-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-91603-DGER-after-token-acceptance-chromium-ci-safe/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96b60dc6e36fc7f7615e-0a27bc6c38336d50cc79",
+              "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+              "line": 136,
+              "column": 5
+            },
+            {
+              "title": "direct navigation to /sources opens SOURCE LEDGER after token acceptance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-ci-safe",
+                  "projectName": "chromium-ci-safe",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 208,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-11T13:07:21.336Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-e807d-DGER-after-token-acceptance-chromium-ci-safe/test-finished-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/slnr-materialize-browser-proof-artifacts/.test-artifacts/playwright/test-output/source-ledger-navigation-r-e807d-DGER-after-token-acceptance-chromium-ci-safe/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96b60dc6e36fc7f7615e-6ec31c591b8928a36075",
+              "file": "source-ledger-navigation-regression.expected-red.spec.ts",
+              "line": 136,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-11T13:07:15.853Z",
+    "duration": 5740.072,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
