@@ -47211,6 +47211,8 @@ phases:
       ### Headline
 
       PASS / PASS_WITH_DEBT / FAIL'
+    depends_on:
+    - pbar-backend-mcp-fresh-related-delivery-fix
     agent: integration-verifier
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
