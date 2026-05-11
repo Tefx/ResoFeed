@@ -39104,10 +39104,14 @@ phases:
       Return a parseable PASS/PASS_WITH_DEBT/FAIL handoff. Any blocker-class residual
       must include screenshot coordinates or DOM/visual artifact references.'
     verification: '- uiux-auditor reviews real rendered screenshots/images for desktop
-      and mobile required states.
+      and mobile required states after the focused R1 retest.
 
       - Audit output includes PASS/PASS_WITH_DEBT/FAIL and explicitly maps R1-R8 to
       visual/spatial evidence.
+
+      - R1 must be treated as open unless ui-remediation-retest-closure.urrc-r1-focused-browser-retest
+      records gate_open_allowed: true with R1 PROVEN and no blocker strings in Inspector
+      primary text.
 
       - Blocking visual/design residuals include artifact paths and closure recommendations.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
@@ -39165,6 +39169,7 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     - ui-remediation-retest-closure.urrc-playwright-browser-retest
+    - ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     agent: uiux-auditor
   - id: ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     name: urrc-architecture-product-boundary-retest
