@@ -39667,7 +39667,7 @@ phases:
       integration-verifier step.'
   - id: ui-remediation-retest-closure.urrc-final-remediation-gate
     name: urrc-final-remediation-gate
-    status: pending
+    status: claimed
     description: 'Final independent gate for UI Remediation Retest Closure.
 
 
@@ -39924,6 +39924,8 @@ phases:
     - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     - urrc-fix-uiux-reaudit-dom-a11y-paths
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-11T10:24:29.015064+00:00'
   - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
     name: urrc-r1-inspector-sanitation-fix
     status: done
