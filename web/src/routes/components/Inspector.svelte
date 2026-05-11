@@ -21,7 +21,9 @@
   let handledFocusRequestId = $state(-1);
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
-    return status === 'partial_extraction' ? 'partial' : status;
+    if (status === 'full') return 'full';
+    if (status === 'partial_extraction') return 'partial';
+    return 'excerpt';
   }
 
   function decodeEntities(text: string): string {
@@ -124,25 +126,43 @@
       && hasOperationalStatusLeak(normalized);
     const sourceInventory = /\b(?:rss|feed|inspector|article|source)\s+(?:case|cases|corpus|regression|inventory|dump|payload)s?\b/i.test(normalized)
       && /\b[a-z][a-z0-9]+(?:_[a-z0-9]+){2,}\b/.test(normalized);
+    const fetchFailureBody = /\b(?:404|not found|page not found)\b/i.test(normalized)
+      && normalized.length <= 160;
 
-    return operationalDiagnostic || sourceInventory || isOperationalTransportNotice(normalized) || isPlaceholderSummary(normalized);
+    return fetchFailureBody || operationalDiagnostic || sourceInventory || isOperationalTransportNotice(normalized) || isPlaceholderSummary(normalized);
   }
 
   function removeSourceBoilerplate(text: string): string {
     return text
       .replace(/\bskip\s+to\s+(?:main\s+)?(?:content|article|navigation|menu)\b/gi, ' ')
-      .replace(/\b(?:related|most\s+popular|advertiser\s+content|advertisement|sponsored\s+content|commerce|shopping|newsletter\s+sign\s*up|subscribe\s+now)\b(?:\s+[^.!?]{0,160})?[.!?]?/gi, ' ')
-      .replace(/\b(?:share|follow|sign\s+up|log\s+in|read\s+more)\b\s+(?:on\s+)?(?:facebook|twitter|x|instagram|linkedin|email|newsletter)\b[^.!?]*[.!?]?/gi, ' ')
+      .replace(/\b(?:affiliate|commission|reader-supported|may earn|product links|commerce disclosure)\b[^.!?]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:related|related stories|more from|more stories|recommended|recommendation|most\s+popular|advertiser\s+content|advertisement|sponsored\s+content|commerce|shopping|newsletter\s+sign\s*up|subscribe\s+now)\b(?:\s+[^.!?]{0,220})?[.!?]?/gi, ' ')
+      .replace(/\b(?:share|follow|sign\s+up|log\s+in|read\s+more|subscribe|join our newsletter)\b\s+(?:on\s+)?(?:facebook|twitter|x|instagram|linkedin|email|newsletter|for more)\b[^.!?]*[.!?]?/gi, ' ')
+      .replace(/\b(?:by|about)\s+(?:the\s+)?author\b[^.!?]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:author profile|staff profile|view author archive|contact the author)\b[^.!?]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:photo|image|illustration|credit|credits?)\s*(?::|by)\s*[^.!?]*(?:[.!?]|$)/gi, ' ')
       .replace(/\b(?:the\s+)?(?:homepage|home\s+page)\b(?:\s+[A-Z][\w&'-]*){1,10}(?=\s+(?:reviews|podcasts|newsletters|news|videos|sections|menu)\b)(?:\s+\w+){0,8}/g, ' ')
       .replace(/(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?/gi, ' ')
       .replace(/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{[^}]*\}/g, ' ')
       .replace(/\bhistory\.scrollRestoration\s*=\s*['"][^'"]+['"];?/g, ' ');
   }
 
+  function removeRepeatedIntro(text: string): string {
+    const sentences = text.split(/(?<=[.!?])\s+/).filter((sentence) => sentence.trim().length > 0);
+    const seen = new Set<string>();
+    return sentences.filter((sentence) => {
+      const key = sentence.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      if (key.length < 24) return true;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).join(' ');
+  }
+
   function readableText(text: string | null): string | null {
     if (!text) return null;
     const decodedOnce = removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text)))));
-    const normalized = removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce))))
+    const normalized = removeRepeatedIntro(removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce)))))
       .replace(/\s+/g, ' ')
       .trim();
     if (isNonArticleDiagnosticText(normalized)) return null;
@@ -155,12 +175,14 @@
       if (extractedText) return extractedText;
       const feedExcerpt = readableText(value.feed_excerpt);
       if (feedExcerpt) return feedExcerpt;
+      const displayExcerpt = readableText(value.display_excerpt ?? null);
+      if (displayExcerpt) return displayExcerpt;
     }
     return readableText(value.summary) ?? readableText(value.core_insight) ?? 'summary unavailable';
   }
 
   function summaryText(value: InspectableItem): string | null {
-    return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null);
+    return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null) ?? readableText(value.display_excerpt ?? null);
   }
 
   function coreInsightText(value: InspectableItem): string | null {
@@ -213,6 +235,12 @@
     return 'full';
   }
 
+  function provenanceDisclosure(value: InspectableItem): string {
+    const extraction = extractionLabel(value.extraction_status);
+    const tier = value.value_tier ? ` · ${value.value_tier}` : '';
+    return `src: ${value.source_title} · ${extraction}${tier}`;
+  }
+
   $effect(() => {
     if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
       handledFocusRequestId = focusRequestId;
@@ -241,13 +269,7 @@
   {/if}
   {#if item}
     <div class="inspector-header-row">
-      <p class="contract-muted inspector-provenance">
-        <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
-        · <span aria-label={`Extraction: ${item.extraction_status}`}>extraction: {extractionLabel(item.extraction_status)}</span>
-        {#if item.value_tier}
-          · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
-        {/if}
-      </p>
+      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${provenanceDisclosure(item)}`}>{provenanceDisclosure(item)}</p>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
@@ -257,9 +279,9 @@
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener">original link</a></p>
     <p class:contract-warning={item.extraction_status !== 'full'}>
-      <span>{extractionLabel(item.extraction_status)}</span>
-      <span aria-hidden="true"> · </span>
       <span>{extractionDisclosure(item)}</span>
+      <span aria-hidden="true"> · </span>
+      <span>source-backed</span>
     </p>
     <p><strong>summary:</strong> {denseSummaryText(item)}</p>
     <p><strong>core insight:</strong> {coreInsightText(item)}</p>

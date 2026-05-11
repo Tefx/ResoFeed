@@ -170,7 +170,7 @@ async function importFixtureFeed(page: Page, runInfo: { readonly artifactRoot: s
   await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
   await openToday(page);
 }
 
@@ -249,6 +249,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (/imported \d+ sources; folders flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
   if (!/\[EXPORT STATE\]/.test(ledgerText) || !/\[IMPORT STATE\]/.test(ledgerText)) note(violations, 'F35', `state actions are not canonical bracket labels: ${ledgerText}`);
   if (!/https?:\/\//.test(ledgerText)) note(violations, 'F29', `source URL column/value is not visible in ledger rows: ${ledgerText}`);
+  if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/status:\s*ok/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/status fields: ${ledgerText}`);
   if (!/last_fetch/.test(ledgerText) || !/last_ingest/.test(ledgerText)) note(violations, 'F30', `timestamp labels are not canonical last_fetch/last_ingest: ${ledgerText}`);
   const fileInputMetric = await metric(page, 'input[type="file"]');
   if (fileInputMetric.found && fileInputMetric.display !== 'none' && fileInputMetric.width > 1 && fileInputMetric.height > 1) note(violations, 'F31', `file input leaves visible browser artifact: ${fileInputMetric.width}x${fileInputMetric.height}`);

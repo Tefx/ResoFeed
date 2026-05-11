@@ -24,13 +24,20 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
 
 async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await runSteerCommand(page, 'source ledger', 'source ledger');
   await page.getByLabel('import OPML').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/Dirty Inspector Corpus · ok · last fetch:/)).toBeVisible({ timeout: 20_000 });
-  await page.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await expect(page.getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await runSteerCommand(page, 'today', 'today');
+  await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
+}
+
+async function runSteerCommand(page: Page, command: string, receipt: RegExp | string): Promise<void> {
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill(command);
+  await steer.press('Enter');
+  await expect(page.getByRole('status').filter({ hasText: receipt })).toBeVisible();
 }
 
 async function visibleText(locator: Locator): Promise<string> {
@@ -61,8 +68,7 @@ async function inspectDirtyItem(page: Page, item: DirtyCorpusItem): Promise<read
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   await expect(inspector.getByText('src: Dirty Inspector Corpus')).toBeVisible();
   await expect(inspector.getByRole('link', { name: 'original link' })).toBeVisible();
-  await expect(inspector.getByLabel(/Extraction:/)).toBeVisible();
-  await expect(inspector.getByLabel(/Model status:/)).toBeVisible();
+  await expect(inspector.getByLabel(/Provenance:/)).toBeVisible();
   if (item.readablePrimaryExpected[0]) {
     await inspector.getByText(item.readablePrimaryExpected[0]).waitFor({ state: 'visible', timeout: 5_000 }).catch(() => undefined);
   }

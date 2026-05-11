@@ -56,7 +56,7 @@
   }
 </script>
 
-<div class="source-ledger-footer state-portability-footer contract-portability" role="group" aria-label="State portability" data-state={portabilityState}>
+<div class="state-portability-actions contract-portability" role="group" aria-label="State portability" data-state={portabilityState}>
   <button id="state-export" class="bracket-action" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? '[EXPORTING...]' : '[EXPORT STATE]'}</button>
   <button id="state-import" class="bracket-action" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>{portabilityState === 'importing' ? '[IMPORTING...]' : '[IMPORT STATE]'}</button>
   <label class="visually-hidden" for="state-json-file">import state JSON</label>

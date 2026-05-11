@@ -268,8 +268,8 @@ a:focus,
   margin-block-start: var(--rf-space-md);
 }
 
-.state-portability-footer {
-  margin-block-start: var(--rf-space-sm);
+.state-portability-actions {
+  display: contents;
 }
 
 .text-action {
@@ -452,6 +452,8 @@ a:focus,
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
+  letter-spacing: 0.02em;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -460,6 +462,15 @@ a:focus,
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.contract-feed-meta .feed-meta-source,
+.contract-feed-meta .feed-meta-age {
+  flex: 0 1 auto;
+}
+
+.contract-feed-meta .feed-meta-extraction {
+  flex: 1 2 auto;
 }
 
 .contract-time-label {
@@ -672,6 +683,26 @@ a:focus,
 
   .contract-search-form button[type='submit'] {
     width: 100%;
+  }
+
+  .source-ledger-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    padding-block: var(--rf-space-row);
+  }
+
+  .source-ledger-copy,
+  .source-ledger-url {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .source-ledger__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rf-space-row);
+    justify-content: flex-start;
   }
 
 }

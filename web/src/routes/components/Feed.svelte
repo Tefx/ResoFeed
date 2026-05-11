@@ -38,9 +38,9 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
-            · <span aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
-            · <span aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
+            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
+            · <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
+            · <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
             {#if item.value_tier}
               · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
             {/if}

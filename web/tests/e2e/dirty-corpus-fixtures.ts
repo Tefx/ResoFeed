@@ -114,7 +114,7 @@ export const dirtyCorpusItems: readonly DirtyCorpusItem[] = [
     pubDate: 'Sun, 10 May 2026 10:01:00 GMT',
     description: 'Readable feed excerpt survives when the original article cannot be fetched.',
     rawPrimaryForbidden: ['[object Object]'],
-    readablePrimaryExpected: ['partial: excerpt only', 'Readable feed excerpt survives']
+    readablePrimaryExpected: ['Readable feed excerpt survives', 'partial: excerpt only']
   },
   {
     id: 'model_error_item',

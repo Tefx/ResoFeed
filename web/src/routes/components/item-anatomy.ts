@@ -86,7 +86,9 @@ export function itemAgeLabel(item: ItemSummary, now = new Date()): string {
 }
 
 export function itemExtractionLabel(status: ItemSummary['extraction_status']): string {
-  return status === 'partial_extraction' ? 'partial' : status.replaceAll('_', ' ');
+  if (status === 'full') return 'full';
+  if (status === 'partial_extraction') return 'partial';
+  return 'excerpt';
 }
 
 export function shouldShowTimeGroup(items: ItemSummary[], index: number): boolean {

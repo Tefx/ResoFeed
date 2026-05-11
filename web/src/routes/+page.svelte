@@ -8,7 +8,6 @@
   import Feed from './components/Feed.svelte';
   import Inspector from './components/Inspector.svelte';
   import SourceLedger from './components/SourceLedger.svelte';
-  import StatePortability from './components/StatePortability.svelte';
   import SearchRetrieval from './components/SearchRetrieval.svelte';
 
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
@@ -43,6 +42,7 @@
   let inspectorError = $state<string | null>(null);
   let inspectorFocusRequestId = $state(0);
   let steerCommand = $state('');
+  let searchSeedQuery = $state('');
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
@@ -65,6 +65,8 @@
 
   const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
+  const feedPaneInactive = $derived(isNarrow ? currentSurface !== 'feed' : currentSurface !== 'feed' && currentSurface !== 'inspector');
+  const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
 
   function apiClient(token = ownerToken): ResoFeedApiClient {
     return new ResoFeedApiClient({ ownerToken: token });
@@ -157,6 +159,11 @@
 
   function showSurface(surface: Surface): void {
     currentSurface = surface;
+    if (surface === 'feed' && steerFeedback.kind === 'receipt' && steerFeedback.text.startsWith('retrieval:')) {
+      steerFeedback = { kind: 'idle' };
+      searchSeedQuery = '';
+      steerCommand = '';
+    }
   }
 
   async function submitSteer(): Promise<void> {
@@ -172,14 +179,15 @@
         return;
       }
       if (command.toLowerCase() === 'today') {
-        currentSurface = 'feed';
+        showSurface('feed');
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'today' };
         return;
       }
       if (command.toLowerCase().startsWith('search ')) {
         currentSurface = 'search';
-        steerCommand = command.replace(/^search\s+/i, '');
+        searchSeedQuery = command.replace(/^search\s+/i, '');
+        steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'retrieval: lexical search' };
         return;
       }
@@ -395,7 +403,7 @@
     {/if}
 
     <div class="shell-grid" data-surface={currentSurface}>
-      <section id="today-feed" class="feed-pane" class:active-panel={currentSurface === 'feed'} aria-labelledby="feed-heading">
+      <section id="today-feed" class="feed-pane" class:active-panel={currentSurface === 'feed'} aria-labelledby="feed-heading" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
@@ -403,7 +411,7 @@
         {/if}
       </section>
 
-      <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR">
+      <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
         {#if isNarrow}
           <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {/if}
@@ -423,13 +431,14 @@
         onImportOpml={importOpml}
         onRunIngest={runManualIngest}
         onFetchSource={fetchManualSource}
+        onExportState={exportState}
+        onImportState={importState}
         manualFetchState={manualFetchState}
       />
-      <StatePortability onExportState={exportState} onImportState={importState} />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
       {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
-      <SearchRetrieval items={items} query={steerCommand} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+      <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">

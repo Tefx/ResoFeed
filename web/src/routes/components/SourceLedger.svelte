@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { ImportOpmlResponse, Source } from '$lib/api-contract';
+  import type { StateBundleV1 } from '$lib/api-contract';
+  import StatePortability from './StatePortability.svelte';
 
   interface Props {
     sources: Source[];
@@ -7,6 +9,8 @@
     onImportOpml: (opml: string) => Promise<ImportOpmlResponse | void> | ImportOpmlResponse | void;
     onRunIngest?: () => Promise<unknown> | unknown;
     onFetchSource?: (source: Source) => Promise<unknown> | unknown;
+    onExportState: () => Promise<StateBundleV1>;
+    onImportState: (bundle: StateBundleV1) => Promise<void> | void;
     manualFetchState?: {
       readonly ingesting?: boolean;
       readonly fetchingSourceIds?: readonly string[];
@@ -21,6 +25,8 @@
     onImportOpml,
     onRunIngest,
     onFetchSource,
+    onExportState,
+    onImportState,
     manualFetchState = {}
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
@@ -63,7 +69,7 @@
   }
 
   function sourceLedgerSummary(source: Source, lastFetch: string | null): string {
-    const parts = [sourceLedgerLabel(source), source.last_fetch_status];
+    const parts = [`src: ${sourceLedgerLabel(source)}`, `status: ${source.last_fetch_status}`];
     if (lastFetch) parts.push(`last_fetch: ${lastFetch}`);
     return parts.join(' · ');
   }
@@ -131,7 +137,9 @@
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
-          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div><div class="source-ledger-url source-ledger__url" title={source.url}>{source.url}</div><span class="source-ledger__actions"><button
+          <div class="source-ledger-copy"><span>{sourceSummary}</span>{#if sourceError}<span class="source-error">{sourceError}</span>{/if}</div>
+          <div class="source-ledger-url source-ledger__url" title={source.url}>url: {source.url}</div>
+          <span class="source-ledger__actions"><button
             type="button"
             class="manual-fetch-action"
             aria-label={fetching ? `Fetching ${sourceLabel}` : `Fetch ${sourceLabel}`}
@@ -159,5 +167,6 @@
     {#if statusText}
       <span role="status" class="ledger-status imported-status">{statusText}</span>
     {/if}
+    <StatePortability onExportState={onExportState} onImportState={onImportState} />
   </div>
 </section>

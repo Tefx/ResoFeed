@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
-import type { Source } from '$lib/api-contract';
+import type { Source, StateBundleV1 } from '$lib/api-contract';
 import SourceLedger from '../SourceLedger.svelte';
 import { documentedRunIngestSourceError } from '../../../test/manual-rss-fetch-fixtures';
 
@@ -10,6 +10,8 @@ type ManualFetchSourceLedgerProps = {
   sources: Source[];
   onDeleteSource: (source: Source) => Promise<void> | void;
   onImportOpml: (opml: string) => Promise<void> | void;
+  onExportState: () => Promise<StateBundleV1>;
+  onImportState: (bundle: StateBundleV1) => Promise<void> | void;
   onRunIngest?: () => Promise<unknown>;
   onFetchSource?: (source: Source) => Promise<unknown>;
   manualFetchState?: {
@@ -38,6 +40,8 @@ function renderLedger(props?: Partial<ManualFetchSourceLedgerProps>): void {
       sources: [sourceWithFetchTime],
       onDeleteSource: async () => {},
       onImportOpml: async () => {},
+      onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }),
+      onImportState: async () => {},
       ...props
     }
   });
@@ -134,7 +138,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     const row = ledger.querySelector('.source-ledger-row');
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent('simonwillison.net/feed.xml · ok · last_fetch: 10:25:31https://simonwillison.net/atom/everything[FETCH][DELETE]');
+    expect(row).toHaveTextContent('src: simonwillison.net/feed.xml · status: ok · last_fetch: 10:25:31 url: https://simonwillison.net/atom/everything [FETCH][DELETE]');
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
     expect(row?.children).toHaveLength(3);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');

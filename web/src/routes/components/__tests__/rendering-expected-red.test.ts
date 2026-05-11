@@ -188,7 +188,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       'href',
       expectedRedItem.url
     );
-    expect(within(inspector).getByText('partial')).toBeVisible();
+    expect(within(inspector).getByText('partial: excerpt only')).toBeVisible();
     expect(within(inspector).getByText('why: fresh from configured source')).toBeVisible();
     expect(within(inspector).queryByRole('button', { name: 'Resonate item' })).not.toBeInTheDocument();
     await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());
@@ -221,7 +221,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
     expect(within(inspector).getByRole('heading', { name: dirtyDetail.title })).toBeVisible();
-    expect(within(inspector).getByLabelText('Source: Example Source')).toBeVisible();
+    expect(within(inspector).getByLabelText(/Provenance: src: Example Source · full/)).toBeVisible();
     expect(within(inspector).queryByLabelText(/Model status:/)).not.toBeInTheDocument();
     expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
     expect(within(inspector).getByText(/Readable article paragraph after the metadata blob/)).toBeVisible();
@@ -358,13 +358,58 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(screen.getByRole('region', { name: 'SOURCE LEDGER surface' })).toHaveClass('active-panel');
   });
 
+  it('scopes mobile Search controls and retrieval receipts away from Today', async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (query: string) => ({
+        matches: query.includes('max-width'),
+        media: query,
+        onchange: null,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        dispatchEvent: () => false
+      })
+    });
+    window.localStorage.setItem('resofeed.ownerToken', 'rfeed_existing0123456789abcdefghijklmnopqrstuvwxyz');
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
+      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
+      if (url.includes('/api/search')) return jsonResponse({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } });
+      if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
+    }));
+
+    render(Page);
+    const steer = await screen.findByLabelText('Steer or paste RSS URL');
+    await user.type(steer, 'search sqlite');
+    await user.click(screen.getByRole('button', { name: 'apply' }));
+
+    const search = await screen.findByRole('region', { name: 'SEARCH' });
+    expect(screen.getByText('retrieval: lexical search')).toBeVisible();
+    expect(within(search).getByRole('button', { name: `Inspect search result: ${expectedRedItem.title}` })).toBeVisible();
+    expect(screen.queryByRole('button', { name: `Open Inspector for: ${expectedRedItem.title}` })).not.toBeInTheDocument();
+
+    await user.clear(steer);
+    await user.type(steer, 'today');
+    await user.click(screen.getByRole('button', { name: 'apply' }));
+    await waitFor(() => expect(screen.queryByText('retrieval: lexical search')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: `Open Inspector for: ${expectedRedItem.title}` })).toBeVisible();
+  });
+
   it('renders the flat Source Ledger and exposes missing destructive confirmation behavior', async () => {
     const user = userEvent.setup();
-    render(SourceLedger, { props: { sources: [expectedRedSource], onDeleteSource: async () => {}, onImportOpml: async () => {} } });
+    render(SourceLedger, { props: { sources: [expectedRedSource], onDeleteSource: async () => {}, onImportOpml: async () => {}, onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
-    expect(within(ledger).getByText(/Example Source · ok/)).toBeVisible();
+    expect(within(ledger).getByText(/src: Example Source · status: ok/)).toBeVisible();
+    expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
+    expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
     expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example Source' }));

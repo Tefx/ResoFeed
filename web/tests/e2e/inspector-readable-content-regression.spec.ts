@@ -38,13 +38,20 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
 
 async function importRegressionFixture(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await runSteerCommand(page, 'source ledger', 'source ledger');
   await page.getByLabel('import OPML').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/Inspector Readable Regression Source · ok · last fetch:/)).toBeVisible({ timeout: 20_000 });
-  await page.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  await expect(page.getByText(/src: Inspector Readable Regression Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await runSteerCommand(page, 'today', 'today');
+  await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
+}
+
+async function runSteerCommand(page: Page, command: string, receipt: RegExp | string): Promise<void> {
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill(command);
+  await steer.press('Enter');
+  await expect(page.getByRole('status').filter({ hasText: receipt })).toBeVisible();
 }
 
 function primaryInspectorBody(page: Page): Locator {
