@@ -44230,3 +44230,10 @@ phases:
     - pbar-frontend-mobile-search-ledger-remediation
     - pbar-frontend-steer-receipt-remediation
     agent: gate-reviewer
+- id: prd-behavior-audit-remediation-independent-retest-and-audits
+  name: PRD Behavior Audit Remediation — Independent Retest and Audits
+  status: locked
+  gate: Independent retests, UI/UX multimodal audit, liveness probe, wiring/spec/product-boundary
+    review all pass with finding-by-finding evidence for B1-B23 and U1-U5.
+  depends_on:
+  - prd-behavior-audit-remediation-frontend-surfaces
