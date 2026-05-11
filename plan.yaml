@@ -38896,3 +38896,114 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     agent: integration-verifier
+  - id: ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
+    name: urrc-uiux-screenshot-conformance-audit
+    status: pending
+    description: 'Native multimodal UI/UX implementation audit after the residual
+      UI fix.
+
+
+      step_type: verification. verification_scope: phase-check. Agent: uiux-auditor.
+      This is screenshot-first and independent from implementation.
+
+
+      Compare real rendered artifacts against docs/DESIGN.md and the audit findings
+      in docs/audits/ui-remediation-retest-2026-05-11.md. Validate that the visual/spatial
+      design contract is closed for R1-R8 after the fix and browser retest.
+
+
+      Required artifacts to inspect or recapture:
+
+      - Desktop feed/search/Inspector/Source Ledger/State Portability screenshots.
+
+      - Mobile 390x844 feed/search/Inspector/Source Ledger/State Portability screenshots.
+
+      - The prior audit evidence paths under artifacts/ui-remediation-retest-2026-05-11/
+      for before/after comparison.
+
+
+      Focus areas:
+
+      - Inspector reading payload is actual article content, not raw site boilerplate
+      or related modules.
+
+      - Mobile Source Ledger row preserves source identity/status and does not collapse
+      row grammar.
+
+      - Feed/Search metadata reads as compact lower-case `src:` grammar and remains
+      legible on mobile.
+
+      - Inspector provenance is singular, not duplicate.
+
+      - Search state/receipt does not visually leak into Today.
+
+      - Search exposes only the current visible result-control surface.
+
+      - Source Ledger and State Portability visually behave as one ledger/action cluster.
+
+
+      Return a parseable PASS/PASS_WITH_DEBT/FAIL handoff. Any blocker-class residual
+      must include screenshot coordinates or DOM/visual artifact references.'
+    verification: '- uiux-auditor reviews real rendered screenshots/images for desktop
+      and mobile required states.
+
+      - Audit output includes PASS/PASS_WITH_DEBT/FAIL and explicitly maps R1-R8 to
+      visual/spatial evidence.
+
+      - Blocking visual/design residuals include artifact paths and closure recommendations.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Screenshot Audit Handoff
+
+
+      **Auditor**: uiux-auditor
+
+      **Artifact set reviewed**:
+
+      ```
+
+      <paths to screenshots/images/DOM captures>
+
+      ```
+
+
+      **R1-R8 visual conformance matrix**:
+
+      | Finding | Visual artifact | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | R1 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R2 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R3 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R4 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R5 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R6 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R7 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | R8 | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+
+      **Parseable headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+    - ui-remediation-retest-closure.urrc-playwright-browser-retest
+    agent: uiux-auditor
