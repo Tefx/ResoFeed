@@ -43627,7 +43627,7 @@ phases:
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -43679,6 +43679,136 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:08:52.507090+00:00'
+    done_at: '2026-05-11T16:16:19.439370+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — Canonical docs are docs/ARCHITECTURE.md and docs/DESIGN.md;
+      SQLite+FTS5 lexical search only; OpenRouter is JSON-in/JSON-out transformer;
+      steering must return terse receipts, not generic failures.
+
+      - docs/ARCHITECTURE.md — Search uses SQLite FTS5 lexical retrieval only; HTTP/MCP
+      share product operations; /doctor must report OpenRouter configured/resolved
+      model without secrets; item rows include extraction/model fallback status.
+
+      - docs/PRD.md — Search is retrieval; Steer is natural-language correction that
+      must affect future scoring/surfacing/summaries; fallback taxonomy must distinguish
+      summary unavailable, partial extraction, model latency/error, and RSS fetch
+      errors.
+
+      - docs/DESIGN.md — Steer receipt requires interpreted summary and applied/rejected
+      state; diagnostics are raw text; Inspector must not include related-content
+      modules or source furniture.
+
+      - docs/DESIGN_VISION.md — Analyst workbench; AI degrades to raw payload without
+      cute states; no paternalism/settings dashboards; Inspector is the reading payload.
+
+      - docs/USAGE.md — /api/search is lexical retrieval; /doctor is plain text; Inspector
+      shows summary/core insight/full text with extraction/model provenance.
+
+      - docs/audits/prd-behavior-audit-closure-matrix.json — Used B1,B2,B4,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22
+      records and downstream owners.
+
+
+      ## Expected-Red Backend Test Evidence
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      observed_result: red
+
+      failure_alignment: Focused tests fail on declared backend gaps: search commands
+      become steering rules; NL steer provider failures return generic 500 internal;
+      combined reduce+boost policy filters the boost target; /doctor reports `openrouter:
+      ok` despite item transform failures; readable payloads leak source boilerplate.
+
+      verdict: PASS
+
+      blockers: []
+
+
+      **Modified files limited to tests/fixtures**:
+
+      - internal/resofeed/pbar_expected_red_backend_test.go
+
+
+      **Subagent commit hash(es)**:
+
+      - 01cc8ec13a56afefa5bc512aaa52d203fdac9934
+
+      **Mainline squash commit**:
+
+      - 6673bde ([vectl] step-pbar-expected-red-backend-tests completed)
+
+
+      **Commands executed**:
+
+      ```bash
+
+      gofmt -w internal/resofeed/pbar_expected_red_backend_test.go
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackend'' -count=1
+
+      # Exit code: 1 (expected red)
+
+
+      # Mainline final-state verification wrapper:
+
+      set +e; go test ./internal/resofeed -run ''TestExpectedRedBackend'' -count=1;
+      code=$?; if [ "$code" -eq 1 ]; then exit 0; fi; exit 1
+
+      ```
+
+
+      **Mainline expected-red output summary**:
+
+      - B1/B2: search command interpreted as `steering_policy_update` instead of executing
+      lexical search/search-empty.
+
+      - B4/B14/B15: steer translation failure returns generic 500 internal instead
+      of receipt/specific rejection.
+
+      - B17: combined reduce+boost ranks only `item_plain`, filtering intended boost
+      target.
+
+      - B6/B18/B19/B20: /doctor output lacks separated provider/model/item-transform
+      health keys.
+
+      - B7/B22: readable payload still contains source boilerplate such as `follow
+      topics`.
+
+
+      **Expected failures/exposed gaps by finding**:
+
+      - B1: `search sqlite fts` via `/api/steer` returns `steering_policy_update`
+      and writes a rule instead of executing lexical search.
+
+      - B2: `search nozzzztoken` via `/api/steer` returns `steering_policy_update`
+      instead of a stable search-empty receipt; direct no-match API assertion is present
+      and passes.
+
+      - B4/B14/B15: failing OpenRouter steering translation returns generic `500 internal`
+      rather than interpreted/applied or specific rejection receipt.
+
+      - B16/B17: combined “Reduce celebrity gossip and boost robotics safety research”
+      accepts a rule but ranks only `item_plain`, filtering the intended boost target.
+
+      - B6/B18/B19/B20: `/doctor` emits `openrouter: ok ... resolved_model=unknown`
+      while item transform failures exist, lacking separated provider/model/item-transform
+      keys and fallback provenance.
+
+      - B7/B22: `ReadItemDetail` returns polluted summary/core insight/feed excerpt/extracted
+      text containing `follow topics`, `More from The Verge`, related-story tail,
+      and unrelated leaked copy.
+
+
+      **Downstream implementation owners**: pbar-backend-search-remediation, pbar-backend-steer-ranking-remediation,
+      pbar-backend-llm-doctor-provenance-remediation, pbar-backend-readable-payload-sanitation
+
+      **Product code modified**: NO
+
+      **Gaps/Notes**: Focused expected-red command intentionally exits non-zero; product
+      implementation files were not edited.'
   - id: pbar-expected-red-browser-tests
     name: Add expected-red browser/UI behavior coverage for PRD audit findings
     status: claimed
