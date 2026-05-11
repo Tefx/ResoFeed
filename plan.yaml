@@ -47696,6 +47696,7 @@ phases:
 
       OPEN / BLOCK'
     depends_on:
+    - pbar-backend-mcp-fresh-related-delivery-fix
     - pbar-backend-green-retest
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
