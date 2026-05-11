@@ -1,4 +1,4 @@
-import type { Page } from 'playwright/test';
+import type { Locator, Page, TestInfo } from 'playwright/test';
 
 import { expect, test } from './fixtures';
 
@@ -22,44 +22,52 @@ Acceptance matrix pinned by this expected-red contract:
   dashboards and friendly SaaS/onboarding drift.
 */
 
-const ownerTokenStorageKey = 'resofeed.ownerToken';
-const acceptedOwnerToken = 'rfeed_source_ledger_contract_owner_token_000000000000000000';
 const forbiddenPrimaryCopy = /\b(accounts?|profile|password reset|folders?|tags?|source hierarchy|settings dashboards?|settings|onboarding wizard|mascot|SaaS|AI[- ]?magic|unread|mark all read|archive)\b/i;
 
-const fixtureSource = {
-  id: 'source-ledger-nav-fixture',
-  url: 'https://example.test/feed.xml',
-  title: 'Contract Fixture Source',
-  last_fetch_at: '2026-05-11T08:09:10Z',
-  last_fetch_status: 'ok',
-  is_active: true,
-  revision: 1
-} as const;
+test.use({ trace: 'on', screenshot: 'on' });
 
-async function installAcceptedOwnerFixtureApi(page: Page): Promise<void> {
-  await page.addInitScript(
-    ({ key, token }) => window.localStorage.setItem(key, token),
-    { key: ownerTokenStorageKey, token: acceptedOwnerToken }
-  );
+async function acceptOwnerTokenAt(page: Page, absoluteURL: string, ownerToken: string): Promise<void> {
+  await page.goto(absoluteURL);
+  const tokenInput = page.locator('#owner-token-input');
+  if (await tokenInput.isVisible()) {
+    await tokenInput.fill(ownerToken);
+    await page.getByRole('button', { name: 'submit' }).click();
+  }
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+}
 
-  await page.route('**/api/sources', async (route) => {
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ sources: [fixtureSource] })
-    });
+async function captureLedgerRegressionScreenshot(page: Page, testInfo: TestInfo, label: string): Promise<string> {
+  const screenshotPath = testInfo.outputPath(`${label}-source-ledger-regression.png`);
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  return screenshotPath;
+}
+
+async function expectUnobstructedHitTarget(locator: Locator, label: string): Promise<void> {
+  await expect(locator, `${label} must be visible before hit-target probing`).toBeVisible();
+  const obstruction = await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const top = document.elementFromPoint(x, y);
+    const style = window.getComputedStyle(element);
+    return {
+      area: rect.width * rect.height,
+      disabled: element instanceof HTMLButtonElement ? element.disabled : false,
+      pointerEvents: style.pointerEvents,
+      visibility: style.visibility,
+      allowedTopElement: top === element || Boolean(top && element.contains(top)),
+      topTag: top?.tagName ?? null,
+      topText: top?.textContent?.trim().slice(0, 120) ?? null
+    };
   });
-  await page.route('**/api/feed/today', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: [] }) });
+
+  expect(obstruction, `${label} obstruction probe`).toMatchObject({
+    disabled: false,
+    pointerEvents: 'auto',
+    visibility: 'visible',
+    allowedTopElement: true
   });
-  await page.route('**/api/steer/active', async (route) => {
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ rules: [] }) });
-  });
-  await page.route('**/api/state/export', async (route) => {
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-11T08:09:10Z', sources: [], steer_rules: [], resonated_items: [] })
-    });
-  });
+  expect(obstruction.area, `${label} must have non-zero clickable area`).toBeGreaterThan(0);
 }
 
 async function visibleText(page: Page): Promise<string> {
@@ -86,25 +94,22 @@ async function expectCanonicalLedgerSurface(page: Page): Promise<void> {
   const ledgerSurface = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]');
   await expect(ledgerSurface).toHaveClass(/active-panel/);
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  await expect(ledgerSurface.getByRole('list')).toContainText('src: Contract Fixture Source · status: ok · last_fetch: 08:09:10');
-  await expect(ledgerSurface.getByText('url: https://example.test/feed.xml')).toBeVisible();
   await expect(ledgerSurface.getByRole('button', { name: '[RUN INGEST]' })).toBeVisible();
   await expect(ledgerSurface.getByLabel('import OPML')).toBeAttached();
-  await expect(ledgerSurface.getByRole('button', { name: 'Fetch Contract Fixture Source' })).toHaveText('[FETCH]');
-  await expect(ledgerSurface.getByRole('button', { name: 'Delete source: Contract Fixture Source' })).toHaveText('[DELETE]');
 }
 
 test.describe('source-ledger-navigation-regression expected-red contract', () => {
-  test('root app chrome exposes a visible keyboard-reachable SOURCE LEDGER entry after owner-token acceptance', async ({ page }) => {
-    await installAcceptedOwnerFixtureApi(page);
-    await page.goto('/');
+  test('root app chrome exposes a visible keyboard-reachable unobstructed SOURCE LEDGER entry after owner-token acceptance', async ({ page, runInfo, ownerToken }, testInfo) => {
+    await acceptOwnerTokenAt(page, `${runInfo.baseURL}/`, ownerToken);
     await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+    await captureLedgerRegressionScreenshot(page, testInfo, 'root-after-owner-token');
 
     const chrome = page.locator('nav.surface-nav');
     await expect(chrome, 'SOURCE LEDGER must be an app-chrome navigation entry, not only a Steer command').toBeVisible();
     const ledgerEntry = chrome.getByRole('button', { name: 'SOURCE LEDGER' });
     await expect(ledgerEntry).toBeVisible();
     await expect(ledgerEntry).toBeEnabled();
+    await expectUnobstructedHitTarget(ledgerEntry, 'SOURCE LEDGER nav');
 
     for (let i = 0; i < 12; i += 1) {
       if (await ledgerEntry.evaluate((element) => element === document.activeElement)) return;
@@ -113,9 +118,9 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
     await expect(ledgerEntry, 'SOURCE LEDGER nav must be reachable by keyboard tab order').toBeFocused();
   });
 
-  test('clicking SOURCE LEDGER opens the documented flat ledger surface without forbidden source-management concepts', async ({ page }) => {
-    await installAcceptedOwnerFixtureApi(page);
-    await page.goto('/');
+  test('clicking SOURCE LEDGER opens the documented flat ledger surface without forbidden source-management concepts', async ({ page, runInfo, ownerToken }, testInfo) => {
+    await acceptOwnerTokenAt(page, `${runInfo.baseURL}/`, ownerToken);
+    await captureLedgerRegressionScreenshot(page, testInfo, 'before-source-ledger-click');
 
     await page.locator('nav.surface-nav').getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expectCanonicalLedgerSurface(page);
@@ -128,9 +133,9 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
   });
 
   for (const pathName of ['/source-ledger', '/source', '/sources'] as const) {
-    test(`direct navigation to ${pathName} opens SOURCE LEDGER after token acceptance`, async ({ page }) => {
-      await installAcceptedOwnerFixtureApi(page);
-      await page.goto(pathName);
+    test(`direct navigation to ${pathName} opens SOURCE LEDGER after token acceptance`, async ({ page, runInfo, ownerToken }, testInfo) => {
+      await acceptOwnerTokenAt(page, `${runInfo.baseURL}${pathName}`, ownerToken);
+      await captureLedgerRegressionScreenshot(page, testInfo, `direct-${pathName.replaceAll('/', '') || 'root'}`);
 
       await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
       await expectCanonicalLedgerSurface(page);
