@@ -40127,7 +40127,7 @@ phases:
       \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     name: urrc-r1-second-focused-browser-retest
-    status: pending
+    status: claimed
     description: "Second focused browser retest for repeated R1 remediation after\
       \ ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix.\n\nstep_type:\
       \ test. step_intent: retest_green. expected_result: green. verification_scope:\
@@ -40242,3 +40242,5 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T09:17:14.025412+00:00'
