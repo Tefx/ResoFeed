@@ -69,6 +69,16 @@ async function captureEvidence(page: Page, testInfo: TestInfo, label: string): P
 }
 
 test.describe('pbar expected-red PRD browser gaps', () => {
+  test('B5/U2 source-add receipt orients to background ingest without removed Source Ledger controls', async ({ page, runInfo, ownerToken }) => {
+    await enterOwnerToken(page, ownerToken);
+    await steer(page, runInfo.fixtureServer.url);
+
+    const sourceReceipt = page.getByRole('status').last();
+    await expect(sourceReceipt).toContainText(/source added: .*127\.0\.0\.1|source added: .*e2e-feed\.xml/i);
+    await expect(sourceReceipt).toContainText(/source ledger.*background ingest|background ingest.*source ledger/i);
+    await expect(sourceReceipt).not.toContainText(/run ingest|\[RUN INGEST\]|\[FETCH\]|source ledger.*fetch|source ledger.*run/i);
+  });
+
   test('B1/B2/B3/B11/B13/U1 expected-red: Search UI executes real lexical query and has compact accessible mobile anatomy', async ({ page, runInfo, ownerToken }, testInfo) => {
     await ensureSeededItem(page, runInfo, ownerToken);
 
@@ -120,7 +130,8 @@ test.describe('pbar expected-red PRD browser gaps', () => {
 
     const sourceReceipt = page.getByRole('status').last();
     await expect.soft(sourceReceipt, 'B5/U2: source-add receipt should include source title/host identity').toContainText(/127\.0\.0\.1|ResoFeed E2E Local Source|e2e-feed\.xml/i);
-    await expect.soft(sourceReceipt, 'B5/U2: source-add receipt should orient user toward ingest in SOURCE LEDGER').toContainText(/run ingest.*source ledger|source ledger.*ingest/i);
+    await expect.soft(sourceReceipt, 'B5/U2: source-add receipt should orient user toward background ingest without removed Source Ledger controls').toContainText(/source ledger.*background ingest|background ingest.*source ledger/i);
+    await expect.soft(sourceReceipt, 'B5/U2: source-add receipt must not mention removed Source Ledger ingest controls').not.toContainText(/run ingest|\[RUN INGEST\]|\[FETCH\]|source ledger.*fetch|source ledger.*run/i);
   });
 
   test('B9/B20/U4 expected-red: direct /doctor route renders scan-readable raw diagnostics without Today chrome', async ({ page, ownerToken }, testInfo) => {

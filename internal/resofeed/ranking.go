@@ -653,7 +653,7 @@ func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (
 	if err != nil {
 		return SteerResult{}, fmt.Errorf("add source through steering: %w", err)
 	}
-	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added: " + identity + "; run ingest in SOURCE LEDGER"}}, nil
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added: " + identity + "; visible in SOURCE LEDGER; background ingest will pick it up"}}, nil
 }
 
 func sourceIdentity(sourceURL string) string {
