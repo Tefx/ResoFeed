@@ -47498,7 +47498,7 @@ phases:
     agent: integration-verifier
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
-    status: claimed
+    status: pending
     description: 'step_type: test
 
       step_intent: retest_green
@@ -47584,8 +47584,6 @@ phases:
 
       PASS / PASS_WITH_DEBT / FAIL'
     agent: integration-verifier
-    claimed_by: integration-verifier
-    claimed_at: '2026-05-11T18:08:51.700757+00:00'
   - id: pbar-runtime-liveness-probe
     name: Black-box liveness probe for runnable web surfaces
     status: done
