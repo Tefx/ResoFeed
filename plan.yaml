@@ -45217,7 +45217,7 @@ phases:
       itself.'
   - id: pbar-backend-liveness-remediation
     name: Remediate backend liveness proof blockers
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\n\nBatched remediation\
       \ for blind-tester Mode D blockers found after `pbar-backend-gate`. This step\
       \ must cover BOTH blocker families together; do not fix only one.\n\nContext\
@@ -45298,6 +45298,169 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:51:07.353105+00:00'
+    done_at: '2026-05-11T16:57:57.134764+00:00'
+    evidence: '## refs Read Confirmation
+
+      - .agents/instructions.md — one Go binary, SQLite+FTS5 lexical only, owner token
+      boundary, no dashboards/settings/sync/accounts/vector/RAG.
+
+      - docs/ARCHITECTURE.md — `serve` is one process; `/api/*` requires owner token;
+      `/doctor` must not expose OpenRouter keys or secret-source metadata.
+
+      - docs/DESIGN.md — diagnostic output is raw/plain; provenance/fallback labels
+      are allowed; no dashboard or friendly SaaS chrome.
+
+      - docs/PRD.md — fallback taxonomy includes `summary unavailable`, `partial extraction`,
+      `model latency/error`, and `/doctor` as the raw diagnostic surface.
+
+      - docs/USAGE.md — public HTTP surfaces include `POST /api/steer`, `POST /api/ingest`,
+      `GET /api/search`, and `GET /api/doctor`.
+
+      - docs/audits/prd-behavior-audit-closure-matrix.json — backend rows B1/B2/B4/B5/B6/B18/B19/B20
+      require search stability, non-internal steer receipts, and doctor fallback/provenance
+      diagnostics.
+
+      - internal/resofeed/doctor.go — raw diagnostic writer/snapshot for RSS, OpenRouter,
+      item-transform, fallback provenance, and ingest status.
+
+      - internal/resofeed/http.go — owner-token protected public runtime routes for
+      steer, manual ingest, search, sources, and doctor.
+
+      - internal/resofeed/ingest.go — manual/background ingest fetches active sources,
+      upserts items, and refreshes FTS search index.
+
+      - internal/resofeed/ranking.go — Steer URL source-add, search-like steer, and
+      natural-language steering receipt paths.
+
+      - internal/resofeed/pbar_expected_red_backend_test.go — authoritative expected-red
+      backend coverage; added tests only, did not modify/delete existing assertions.
+
+      - internal/resofeed/pbar_steer_receipt_remediation_test.go — source-add receipt
+      must name source and include Source Ledger ingest hint.
+
+
+      ## Liveness Remediation Evidence
+
+      **Spec link**: pbar-backend-gate blind-tester liveness blockers; docs/audits/prd-behavior-audit-closure-matrix.json
+      backend rows
+
+      **Subagent commit hash(es)**: 43e510d
+
+      **Mainline squash commit**: e8c31d3 ([vectl] step-pbar-backend-liveness-remediation
+      completed)
+
+      **Files changed**:
+
+      - docs/USAGE.md
+
+      - internal/resofeed/doctor.go
+
+      - internal/resofeed/pbar_expected_red_backend_test.go
+
+
+      **Doctor fallback/provenance fix**:
+
+      - Stable key/string added or repaired: `fallback_provenance: item_transform_failures=0
+      summary=none`
+
+      - Zero-failure `/api/doctor` sample excerpt:
+
+      ```text
+
+      openrouter: provider_reachable=unknown configured_model=account_default provider_reachable:
+      unknown
+
+      openrouter: model_resolved=false resolved_model=unknown model_resolved: false
+
+      openrouter: item_transform_failures=0 item_transform_failures: 0
+
+      fallback_provenance: item_transform_failures=0 summary=none
+
+      ```
+
+      - Secret scan/non-leakage evidence:
+
+      ```text
+
+      TestPBARDoctorShowsFallbackProvenanceWhenNoItemTransformFailures checks absence
+      of contractOwnerToken, OPENROUTER_KEY, dummy, sk-or-, and provider API key.
+
+      Runtime probe /api/doctor output did not include owner token or fake OPENROUTER_KEY
+      value.
+
+      ```
+
+
+      **Positive lexical proof path**:
+
+      - Public/runtime path used to make fixture searchable: `POST /api/steer` with
+      RSS URL → `POST /api/ingest` body `{}` → `GET /api/search?q=<known-token>`
+
+      - Why this path is consistent with ARCH/DESIGN and owner-token boundary: This
+      uses the existing single-binary, owner-token protected JSON HTTP surfaces documented
+      for Steer, manual ingest, and lexical Search. It creates an active Source Ledger
+      row and ingests RSS into SQLite+FTS5 without direct SQLite writes, private hooks,
+      sidecars, accounts, dashboards, sync, vector search, or manual UI-only steps.
+
+      - Known lexical token: `pbarlivexyzruntime`
+
+      - Positive search response excerpt:
+
+      ```text
+
+      POSITIVE_SEARCH 200 {"items":[{"id":"item_20e9c696593c07020bee8d479594f9f5","source_id":"src_5d35dd808fbb770f","source_title":"PBAR
+      Runtime Feed","url":"http://127.0.0.1:9/no-article","title":"Runtime fixture
+      pbarlivexyzruntime",...}],"query":{"q":"pbarlivexyzruntime",...}}
+
+      ```
+
+
+      **Verification**:
+
+      ```bash
+
+      gofmt -w internal/resofeed/doctor.go internal/resofeed/pbar_expected_red_backend_test.go
+
+      # exit 0
+
+
+      go test ./internal/resofeed -run ''TestPBAR|TestExpectedRedBackend|TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor''
+      -count=1
+
+      # mainline: ok resofeed/internal/resofeed 0.584s
+
+
+      go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-mainline-liveness
+      ./cmd/resofeed
+
+      # exit 0
+
+
+      git diff --check -- docs/USAGE.md internal/resofeed/doctor.go internal/resofeed/pbar_expected_red_backend_test.go
+
+      # exit 0, no output
+
+      ```
+
+
+      **Steer receipt preservation**: Source-add, natural-language, and search-like
+      steer receipts all returned HTTP 200 JSON without generic internal errors in
+      the runtime probe.
+
+
+      **Product-boundary proof**: Only raw `/doctor` diagnostic text and documented
+      owner-token protected HTTP runtime paths were changed/documented. No admin sidecar,
+      sync/history/account/vector/RAG/dashboard/settings concepts were introduced.
+
+
+      **UI touched**: NO.
+
+      **Deviation records**: none.
+
+      **Gaps/Notes**: `go test ./...` still fails on unrelated `TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment`;
+      not modified because it is outside this task boundary. Repo-wide `git diff --check`
+      also reported pre-existing dirty `.test-artifacts` whitespace outside this step;
+      scoped changed-file diff check passed.'
   - id: pbar-backend-liveness-retest
     name: Retest backend Mode D liveness after remediation
     status: pending
