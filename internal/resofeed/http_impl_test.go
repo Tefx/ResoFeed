@@ -60,6 +60,20 @@ func TestHTTPHandlersExerciseCorePaths(t *testing.T) {
 		}
 	})
 
+	t.Run("search hyphenated no match is empty not internal", func(t *testing.T) {
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/search?q=no-match-pbar-expected-red-zzzz&limit=5", nil))
+
+		assertStatus(t, recorder, http.StatusOK)
+		var parsed SearchResponse
+		if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+			t.Fatalf("unmarshal hyphenated no-match search response: %v; body=%s", err, recorder.Body.String())
+		}
+		if parsed.Query.Q != "no-match-pbar-expected-red-zzzz" || len(parsed.Items) != 0 {
+			t.Fatalf("hyphenated no-match search items=%+v query=%+v, want stable empty result for submitted query", parsed.Items, parsed.Query)
+		}
+	})
+
 	t.Run("state export import", func(t *testing.T) {
 		exportRecorder := httptest.NewRecorder()
 		router.ServeHTTP(exportRecorder, authorizedRequest(http.MethodGet, "/api/state/export", nil))

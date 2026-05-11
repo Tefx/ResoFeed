@@ -77,8 +77,14 @@ func buildSearchSQL(query SearchQuery, echo SearchQueryEcho) (string, []any) {
 	q := query.Q
 	if q != "" {
 		like := "%" + escapeLike(q) + "%"
-		clauses = append(clauses, `(i.id in (select item_id from search_fts where search_fts match ?) or i.title like ? escape '\' or coalesce(i.summary, '') like ? escape '\' or coalesce(i.core_insight, '') like ? escape '\' or coalesce(i.value_tier, '') like ? escape '\' or coalesce(i.feed_excerpt, '') like ? escape '\' or coalesce(i.extracted_text, '') like ? escape '\' or s.title like ? escape '\' or i.url like ? escape '\')`)
-		args = append(args, ftsQuery(q), like, like, like, like, like, like, like, like)
+		fts := ftsQuery(q)
+		if fts == "" {
+			clauses = append(clauses, `(i.title like ? escape '\' or coalesce(i.summary, '') like ? escape '\' or coalesce(i.core_insight, '') like ? escape '\' or coalesce(i.value_tier, '') like ? escape '\' or coalesce(i.feed_excerpt, '') like ? escape '\' or coalesce(i.extracted_text, '') like ? escape '\' or s.title like ? escape '\' or i.url like ? escape '\')`)
+			args = append(args, like, like, like, like, like, like, like, like)
+		} else {
+			clauses = append(clauses, `(i.id in (select item_id from search_fts where search_fts match ?) or i.title like ? escape '\' or coalesce(i.summary, '') like ? escape '\' or coalesce(i.core_insight, '') like ? escape '\' or coalesce(i.value_tier, '') like ? escape '\' or coalesce(i.feed_excerpt, '') like ? escape '\' or coalesce(i.extracted_text, '') like ? escape '\' or s.title like ? escape '\' or i.url like ? escape '\')`)
+			args = append(args, fts, like, like, like, like, like, like, like, like)
+		}
 	}
 	args = append(args, echo.Limit)
 
@@ -262,12 +268,18 @@ func escapeLike(value string) string {
 func ftsQuery(value string) string {
 	fields := strings.Fields(value)
 	if len(fields) == 0 {
-		return value
+		return ""
 	}
-	for i, field := range fields {
-		fields[i] = strings.Trim(field, `"`)
+	quoted := make([]string, 0, len(fields))
+	replacer := strings.NewReplacer(`"`, `""`)
+	for _, field := range fields {
+		field = strings.TrimSpace(strings.Trim(field, `"`))
+		if field == "" {
+			continue
+		}
+		quoted = append(quoted, `"`+replacer.Replace(field)+`"`)
 	}
-	return strings.Join(fields, " ")
+	return strings.Join(quoted, " ")
 }
 
 func minInt(a int, b int) int {

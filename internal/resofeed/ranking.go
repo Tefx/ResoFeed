@@ -104,6 +104,9 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 	if parsedURL, ok := parseRSSURL(command); ok {
 		return applySourceURLSteering(ctx, db, parsedURL)
 	}
+	if searchQuery, ok := parseSearchSteerCommand(command); ok {
+		return applySearchSteering(ctx, db, searchQuery)
+	}
 
 	proposal := OpenRouterSteeringOutput{InterpretedAs: "steering_policy_update", RuleTexts: []string{command}, Message: "steering updated"}
 	if llm != nil {
@@ -127,6 +130,34 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		}
 	}
 	return applySteeringRules(ctx, db, proposal, req.ActorKind, req.ActorID)
+}
+
+func parseSearchSteerCommand(command string) (string, bool) {
+	command = strings.TrimSpace(command)
+	if strings.EqualFold(command, "search") {
+		return "", true
+	}
+	prefix, rest, ok := strings.Cut(command, " ")
+	if !ok || !strings.EqualFold(prefix, "search") {
+		return "", false
+	}
+	return strings.TrimSpace(rest), true
+}
+
+func applySearchSteering(ctx context.Context, db *sql.DB, query string) (SteerResult, error) {
+	items, echo, err := SearchItems(ctx, db, SearchQuery{Q: query, Limit: defaultSearchLimit})
+	if err != nil {
+		return SteerResult{}, fmt.Errorf("apply search steering: %w", err)
+	}
+	interpretedAs := "search"
+	if len(items) == 0 {
+		interpretedAs = "search_empty"
+	}
+	return SteerResult{Receipt: SteeringReceipt{
+		InterpretedAs: interpretedAs,
+		ChangedRules:  []SteerRule{},
+		Message:       fmt.Sprintf("search: %d results for %q", len(items), echo.Q),
+	}}, nil
 }
 
 // MarkItemInspected records deliberate human attention. Agent silent evaluation
