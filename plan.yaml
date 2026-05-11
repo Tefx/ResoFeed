@@ -44172,3 +44172,61 @@ phases:
       \ screenshots or DOM>\n- Product-boundary proof: no wizard/toast stack/activity\
       \ ledger/rule manager."
     agent: frontend-engineer
+  - id: pbar-frontend-gate
+    name: Gate frontend PRD behavior remediation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether frontend/browser-visible
+      remediation is complete.
+
+
+      Review depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches UI behavior, mobile layouts, accessibility, direct route handling,
+      and product-boundary-sensitive chrome.
+
+      - UI/UX multimodal audit will run downstream, but this gate must block obvious
+      missing rendered evidence now.
+
+
+      BLOCK if any frontend-owned finding lacks green expected-red tests, rendered
+      artifact evidence, accessibility/focus proof where required, or product-boundary
+      compliance.
+
+
+      Verification scope: phase-check protecting independent retest/audit and final
+      strict closure.'
+    verification: 'phase-check protecting downstream retest/audit phases: frontend-owned
+      rows in the closure matrix are green or explicitly assigned to independent retest
+      follow-up, rendered artifacts exist for all touched states, accessibility/focus
+      requirements are evidenced, and no forbidden product concepts were introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Gate Review
+
+      - Frontend-owned findings reviewed: B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B19,B21,B22,B23,U1,U2,U3,U5
+
+      - Green browser/Vitest evidence reviewed: <commands/artifacts>
+
+      - Rendered artifact evidence reviewed: <screenshots/snapshots>
+
+      - Accessibility/focus proof reviewed: <PASS/FAIL with notes>
+
+      - Product-boundary review: <PASS/FAIL with notes>
+
+      - Gate decision: OPEN/BLOCK'
+    depends_on:
+    - pbar-frontend-search-doctor-surface-remediation
+    - pbar-frontend-feed-inspector-resonate-remediation
+    - pbar-frontend-mobile-search-ledger-remediation
+    - pbar-frontend-steer-receipt-remediation
+    agent: gate-reviewer
