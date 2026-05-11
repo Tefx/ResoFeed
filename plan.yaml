@@ -48678,7 +48678,7 @@ phases:
       - none'
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether independent
       retests and audits are sufficient for final strict closure.
 
@@ -48746,6 +48746,84 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T19:25:11.281229+00:00'
+    done_at: '2026-05-11T19:32:26.890937+00:00'
+    evidence: "## refs Read Confirmation\n- docs/PRD.md — Core product boundary: Today\
+      \ for freshness, Star for memory, Search for retrieval; no unread/folders/settings;\
+      \ Source Ledger flat active-state ownership; `/doctor` raw system health.\n\
+      - docs/DESIGN.md — Source Ledger flat title/OPML/import/rows/delete/export/import;\
+      \ URL subscription routes back to Steer; operational chrome labels RESOFEED/TODAY/SOURCE\
+      \ LEDGER//doctor.\n- docs/ARCHITECTURE.md — One Go binary, one SQLite DB, thin\
+      \ HTTP/MCP transports, strict query validation, background ingest inside `serve`,\
+      \ no sidecars or extra product concepts.\n- .agents/instructions.md — Canonical\
+      \ docs are law; no vector DB/RAG, multi-user auth, folders/tags/unread/settings,\
+      \ or auditor plan mutation.\n\n## Gate Review Report\n**Reviewer**: gate-reviewer\n\
+      **Phase**: prd-behavior-audit-remediation-independent-retest-and-audits\n**Timestamp**:\
+      \ 2026-05-12T03:35:00-07:00\n\n### Execution Review / Gate Outcome\n- pbar-backend-green-retest:\
+      \ PASS evidence, but gate spot-check found a passing backend expectation still\
+      \ contains stale receipt copy.\n- pbar-browser-flow-retest: PASS_STALE; evidence\
+      \ predates Source Ledger operation-control remediation and cites receipt text\
+      \ `run ingest in SOURCE LEDGER`.\n- pbar-runtime-liveness-probe: PASS; real\
+      \ Go binary served public routes/APIs.\n- pbar-uiux-multimodal-audit: PASS_STALE\
+      \ but superseded by later remediation/post-remediation audit.\n- pbar-source-ledger-boundary-wiring-remediation:\
+      \ PASS_WITH_GAP; UI controls fixed but backend source-add receipt copy not updated.\n\
+      - pbar-post-remediation-uiux-audit: PASS; screenshots prove current UI states.\n\
+      - pbar-spec-product-boundary-review: PASS_CLAIMED but contradicted by gate spot-check\
+      \ for receipt copy.\n- pbar-wiring-audit: wiring PASS with warning about stale\
+      \ artifact naming/content.\n\n### Required Conflict Closure\n- Source Ledger\
+      \ UI controls conflict is closed by commit 12d7990, post-remediation screenshots\
+      \ in commit 61e5ca5, SourceLedger spot-checks, render tests, and Playwright\
+      \ Source Ledger regression.\n- Final strict closure remains BLOCKED because\
+      \ backend/user-visible receipt copy still says `source added: <identity>; run\
+      \ ingest in SOURCE LEDGER`, pointing to removed controls.\n\n### Wiring Audit\
+      \ Results (W1-W8 equivalent)\n- W1 Dead export/dead public field scan: PASS.\n\
+      - W2 Schema/field trace: PASS except receipt text blocker.\n- W3 CLI param E2E:\
+      \ NOT_APPLICABLE; no CLI surface changed.\n- W4 Command/entry registration:\
+      \ PASS via runtime liveness `serve` proof.\n- W5 Contract strength: WARNING/BLOCKING\
+      \ for stale source-add receipt expectation.\n- W6 Config field consumption:\
+      \ PASS via runtime liveness command/config proof.\n- W7 Escape hatch concentration:\
+      \ PASS; `rg -n '@invar:allow|invar:allow' cmd internal web/src web/tests docs\
+      \ .agents` produced no output.\n- W8 Import alignment/route-render integrity:\
+      \ PASS_WITH_WARNING; routes/menu render Source Ledger and e2e regression passes.\n\
+      \n### Runnable Surface / Liveness Evidence\n- Runtime liveness probe launched\
+      \ compiled Go binary with `serve`, confirmed TCP listen and HTTP behavior for\
+      \ `/`, `/doctor`, `/source-ledger`, `/api/search`, `/api/sources`, `/api/feed/today`,\
+      \ and `/api/doctor`.\n- Gate spot-check reran Source Ledger Playwright regression:\
+      \ 5 passed.\n\n### Real Integration vs Fixture Evidence\n- Real process integration:\
+      \ runtime liveness launched compiled Go binary and probed TCP/HTTP.\n- Real\
+      \ browser integration: Source Ledger regression used Playwright Chromium against\
+      \ built app/server fixture and passed.\n- Fixture-injected integration: backend\
+      \ PBAR tests use httptest/deterministic seams for RSS/LLM semantics; acceptable\
+      \ for targeted semantics but not live internet proof.\n- Browser-flow evidence\
+      \ includes real server fixture/deterministic OpenRouter transport, not live\
+      \ OpenRouter.\n\n### CLI Executability Matrix\n- Not applicable: this phase\
+      \ did not add/change CLI commands or flags. Existing `serve` executability covered\
+      \ by liveness probe.\n\n### B1-B23 / U1-U5 Closure\n- Closed/proven: B1/B2/B3/B4/B6/B7/B8/B9/B10/B11/B12/B13/B14/B15/B16/B17/B18/B19/B20/B21/B22/B23\
+      \ and U1/U3/U4/U5.\n- Blocking reopened: B5/U2. Evidence: `internal/resofeed/ranking.go:656`\
+      \ emits `Message: \"source added: \" + identity + \"; run ingest in SOURCE LEDGER\"\
+      `; backend and browser tests codify stale expectation while Source Ledger post-remediation\
+      \ tests assert no `[RUN INGEST]`/`[FETCH]` controls.\n\n## Behavioral Proof\
+      \ Register / Gate Decision\n- verdict: FAIL\n- headline: FAIL\n- proof_gap_status:\
+      \ BLOCKING\n- blocking_status: OPEN\n- blockers:\n  - B5/U2 stale source-add\
+      \ receipt directs users to `run ingest in SOURCE LEDGER` after Source Ledger\
+      \ ingest controls were removed.\n- gate_open_allowed: false\n- orchestrator_action_hint:\
+      \ DO_NOT_COMPLETE\n- uncertainty_sources:\n  - Objective spec review passed,\
+      \ but gate source spot-check contradicted it for receipt copy.\n\n## Remediation\
+      \ Ownership Created\n- Planner added `pbar-source-add-receipt-stale-guidance-fix`\
+      \ to update source-add receipt/tests away from removed Source Ledger manual-ingest\
+      \ instruction and forbid reintroducing run/fetch controls.\n- Planner added\
+      \ `pbar-source-add-receipt-closure-retest` to rerun backend receipt/PBAR tests,\
+      \ browser receipt flow, Source Ledger no-run/fetch regression, and B5/U2 closure.\n\
+      \n## Verification Run\n- `go test -v ./internal/resofeed -run 'Test(ExpectedRedBackend|PBAR)'`\
+      \ — exit 0.\n- `npm --prefix web install && npm --prefix web run test:render\
+      \ -- SourceLedger manual-rss-fetch-source-ledger.expected-red.test.ts` — exit\
+      \ 0; 6 passed.\n- `npm --prefix web run test:e2e -- --project=chromium-ci-safe\
+      \ web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts` —\
+      \ exit 0; 5 passed.\n- `rg -n '@invar:allow|invar:allow' cmd internal web/src\
+      \ web/tests docs .agents` — no output.\n\n## Commit hash(es)\n- none (read-only\
+      \ gate; no branch changes)\n\n## Gaps / Notes\n- Gate intentionally completed\
+      \ as failed evidence after remediation ownership was created, per batched fix\
+      \ protocol. Final closure remains blocked until `pbar-source-add-receipt-stale-guidance-fix`\
+      \ and `pbar-source-add-receipt-closure-retest` pass."
   - id: pbar-backend-mcp-fresh-related-delivery-fix
     name: Fix MCP fresh related delivery candidate regression
     status: done
