@@ -44884,3 +44884,109 @@ phases:
 
       - Gate decision basis: <why final gate can open or must block>'
     agent: spec-verifier
+  - id: pbar-strict-final-gate
+    name: Strict final gate for PRD behavior audit remediation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), perform the final strict
+      gate for docs/audits/prd-behavior-audit-2026-05-11.md remediation.
+
+
+      YOU MUST BLOCK unless every finding from the audit is proven fixed or has explicit
+      non-intersection evidence.
+
+
+      Required finding inventory: B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12,
+      B13, B14, B15, B16, B17, B18, B19, B20, B21, B22, B23, U1, U2, U3, U4, U5.
+
+
+      Strict review criteria:
+
+      1. Closure matrix rows exactly match the required inventory.
+
+      2. Every row has an implementation owner, expected-red proof or justified infeasibility,
+      independent green retest evidence, and final evidence ref.
+
+      3. UI-touched rows have uiux-auditor rendered artifact evidence.
+
+      4. Product-boundary-sensitive rows have spec/product-boundary review evidence.
+
+      5. Runtime/route rows have liveness proof.
+
+      6. Wiring-sensitive rows have reachability proof.
+
+      7. No row is dismissed as pre-existing, out-of-scope, or tech debt without non-intersection
+      proof.
+
+      8. No forbidden product concept appears: vector/RAG search, settings/rule builder,
+      sync/merge/history ledger, dashboard diagnostics, accounts, per-agent registry,
+      onboarding wizard.
+
+
+      Gate decision basis must list unresolved statuses and why each blocks or does
+      not intersect remaining required gates. OPEN is valid only when all blocker-class
+      behavioral obligations are PROVEN_FIXED or explicitly NON_INTERSECTING with
+      evidence.'
+    verification: 'full-plan-check final gate: blocks unless B1-B23 and U1-U5 all
+      have closure matrix evidence, green independent retests, UIUX/spec/wiring/liveness
+      evidence where applicable, and no unresolved blocker-class behavioral obligation
+      remains.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Strict Final Gate Report
+
+      **Reviewer**: gate-reviewer
+
+      **Audit path**: docs/audits/prd-behavior-audit-2026-05-11.md
+
+
+      ### Required inventory check
+
+      - B1-B23 present: PASS/FAIL
+
+      - U1-U5 present: PASS/FAIL
+
+      - Extra/missing rows: <none or list>
+
+
+      ### Closure matrix
+
+      | Finding | Severity | Final status | Implementation evidence | Retest evidence
+      | UIUX/spec/wiring/liveness evidence | Gate decision |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 | P1 | <status> | <ref> | <ref> | <ref> | OPEN/BLOCK |
+
+      | ... | ... | ... | ... | ... | ... | ... |
+
+      | U5 | P2 | <status> | <ref> | <ref> | <ref> | OPEN/BLOCK |
+
+
+      ### Forbidden concept scan
+
+      - Vector/RAG/semantic search: absent/present
+
+      - Settings/rule builder/history ledger/sync/accounts/per-agent registry: absent/present
+
+      - Dashboard diagnostics/onboarding wizard/noncanonical chrome: absent/present
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: every finding proven fixed or explicitly non-intersecting with evidence
+
+      - [ ] BLOCKED: unresolved/missing evidence remains
+
+
+      Blocking issues and required follow-up: <list or none>'
+    depends_on:
+    - pbar-final-closure-matrix
+    agent: gate-reviewer
