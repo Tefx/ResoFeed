@@ -33,6 +33,16 @@ export const dirtyCorpusItems: readonly DirtyCorpusItem[] = [
     readablePrimaryExpected: ['Readable article lead']
   },
   {
+    id: 'follow_prompt_repeated_lead_item',
+    title: 'Follow prompt cleanup preserves readable article prose',
+    linkPath: '/article/follow-prompt-repeated-lead',
+    pubDate: 'Sun, 10 May 2026 10:07:45 GMT',
+    description: '',
+    articleHtml: '<article><p>summary-like lead repeated by the site summary-like lead repeated by the site Follow us on Twitter for more newsletters Second readable paragraph confirms the body is not empty after bounded cleanup.</p></article>',
+    rawPrimaryForbidden: ['Follow us on Twitter for more newsletters', 'summary-like lead repeated by the site'],
+    readablePrimaryExpected: ['Second readable paragraph confirms the body is not empty after bounded cleanup.']
+  },
+  {
     id: 'inline_json_ld_runtime_item',
     title: 'Readable dirty-content article',
     linkPath: '/article/inline-json-ld-runtime',
