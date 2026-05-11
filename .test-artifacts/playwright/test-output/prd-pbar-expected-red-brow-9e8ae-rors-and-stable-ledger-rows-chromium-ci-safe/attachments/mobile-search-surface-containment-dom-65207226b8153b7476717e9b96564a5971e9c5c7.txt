@@ -1,0 +1,49 @@
+skip to feed
+Steer or paste RSS URL
+>
+
+retrieval: lexical search
+
+Today feed items
+
+src: ResoFeed E2E Local Source
+·
+2d
+·
+excerpt
+·
+fallback: unavailable
+·
+quality: fallback: unavailable
+EARLIER
+
+Local fixture item one
+
+summary unavailable
+
+★
+back to TODAY
+SEARCH
+Plain text query
+search
+FILTERS
+
+1 results
+
+src: ResoFeed E2E Local Source
+·
+2d
+EARLIER
+
+extraction: excerpt
+match: lexical index
+provenance: source-backed
+quality: fallback: unavailable
+
+Local fixture item one
+
+summary unavailable
+
+★
+
+Lexical and metadata retrieval only; results stay source-backed.

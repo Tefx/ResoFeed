@@ -1,0 +1,27 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+
+retrieval: lexical search
+
+SEARCH
+Plain text query
+search
+submit search
+FILTERS
+Source filter
+From date
+To date
+ Resonated only
+Result limit
+10
+20
+50
+100
+
+0 results
+
+no results
+
+Lexical and metadata retrieval only; results stay source-backed.

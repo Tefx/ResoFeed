@@ -1,0 +1,15 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+/doctor
+rss: ok
+openrouter: provider_reachable=true configured_model=account_default provider_reachable: true
+openrouter: model_resolved=true resolved_model=openrouter/e2e-deterministic model_resolved: true
+openrouter: item_transform_failures=1 item_transform_failures: 1
+openrouter: failures=1
+openrouter: item=item_26877727abfd99cdda36963866729092 source=src_269fd790da0c41e01b89ef82fad65994 status=summary_unavailable title=Local fixture item one
+fallback_provenance: item=item_26877727abfd99cdda36963866729092 summary=model model_status=summary_unavailable extraction_status=original_unavailable
+extraction: failures=1
+extraction: item=item_26877727abfd99cdda36963866729092 source=src_269fd790da0c41e01b89ef82fad65994 status=original_unavailable title=Local fixture item one
+ingest: last_run=2026-05-11T18:39:35Z

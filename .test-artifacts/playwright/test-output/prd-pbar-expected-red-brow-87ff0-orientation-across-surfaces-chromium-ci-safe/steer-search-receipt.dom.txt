@@ -1,0 +1,41 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+
+interpreted_as: steering_policy_update; applied: steering updated · rules:1
+
+SEARCH
+Plain text query
+search
+submit search
+FILTERS
+Source filter
+From date
+To date
+ Resonated only
+Result limit
+10
+20
+50
+100
+
+1 results
+
+src: ResoFeed E2E Local Source
+·
+2d
+EARLIER
+
+extraction: excerpt
+match: lexical index
+provenance: source-backed
+quality: fallback: unavailable
+
+Local fixture item one
+
+summary unavailable
+
+☆
+
+Lexical and metadata retrieval only; results stay source-backed.

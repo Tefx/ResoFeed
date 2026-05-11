@@ -1,0 +1,45 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+
+interpreted_as: steering_policy_update; applied: steering updated · rules:1
+
+Today feed items
+
+src: ResoFeed E2E Local Source
+·
+2d
+·
+excerpt
+·
+fallback: unavailable
+·
+quality: fallback: unavailable
+EARLIER
+
+Local fixture item one
+
+summary unavailable
+
+☆
+
+INSPECTOR
+
+src: ResoFeed E2E Local Source · excerpt
+
+Local fixture item one
+
+original link
+
+original unavailable · summary provenance: fallback unavailable · model_status: summary_unavailable
+
+summary: summary unavailable
+
+core insight: summary unavailable
+
+summary unavailable
+
+why: fresh from configured source
+
+source details
