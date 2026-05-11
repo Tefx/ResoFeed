@@ -45943,7 +45943,7 @@ phases:
     claimed_at: '2026-05-11T17:03:36.859777+00:00'
   - id: pbar-frontend-feed-inspector-resonate-remediation
     name: Fix Feed/Inspector fallback labels, quality metadata, and Resonate accessibility
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -46000,6 +46000,83 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T17:03:26.672395+00:00'
+    done_at: '2026-05-11T17:13:03.374959+00:00'
+    evidence: '## refs Read Confirmation
+
+      - Read: .agents/instructions.md, docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,
+      docs/DESIGN_VISION.md, docs/USAGE.md, docs/audits/prd-behavior-audit-closure-matrix.json,
+      web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts, and relevant Svelte
+      components.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B6, B7, B8, B19, B21, B22
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B6/B7/B8/B19/B21/B22
+
+      **Subagent commit hash(es)**: 845dd7ca1fda25f3ce3b1629d305656d40b7124c
+
+      **Mainline squash commit**: 8eeb2b2 ([vectl] step-pbar-frontend-feed-inspector-resonate-remediation
+      completed)
+
+      **Files changed**:
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+
+      **Verification**:
+
+      ```bash
+
+      npm --prefix web ci
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # SvelteKit/Vite build completed
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe -g ''B6/B7/B8/B19/B21/B22''
+
+      # mainline: 1 passed
+
+      ```
+
+
+      **Rendered artifacts**:
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-4d584-te-state-and-value-metadata-chromium-ci-safe/attachments/desktop-feed-presentation-*`
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-4d584-te-state-and-value-metadata-chromium-ci-safe/attachments/desktop-inspector-presentation-*`
+
+
+      **Quality/value scan label proof**: Feed DOM shows `quality: summary unavailable`;
+      code emits `value: <tier>` when value_tier exists, otherwise `quality: ...`.
+
+      **Fallback label proof**: Inspector DOM shows `summary provenance: fallback
+      unavailable · model_status: summary_unavailable`.
+
+      **Resonate a11y proof**: A11y artifacts show `Resonate item` with `ariaPressed:
+      false`, then `Remove resonance` with `ariaPressed: true` after click.
+
+      **Pollution absence proof**: Targeted Playwright assertions passed for absence
+      of related stories/follow us/sign up/personalized feed/more from.
+
+      **Product-boundary proof**: No dashboard/settings/archive concepts added; implementation
+      stayed in existing Svelte UI anatomy.
+
+      **Deviation records**: none
+
+      **Gaps/Notes**: Playwright generated untracked `.test-artifacts` evidence files;
+      only source changes were committed.'
   - id: pbar-frontend-mobile-search-ledger-remediation
     name: Fix mobile non-feed containment, Search metadata/form anatomy, and Ledger
       diagnostics grammar
