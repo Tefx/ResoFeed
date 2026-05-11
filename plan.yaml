@@ -44420,3 +44420,90 @@ phases:
 
       PASS / PASS_WITH_DEBT / FAIL'
     agent: integration-verifier
+  - id: pbar-runtime-liveness-probe
+    name: Black-box liveness probe for runnable web surfaces
+    status: pending
+    description: 'As a BLACK-BOX TESTER (blind-tester), verify runnable/deployability
+      behavior through public surfaces only.
+
+
+      Scope:
+
+      - Start the single Go binary / real app entrypoint using the documented command.
+
+      - Confirm the app stays alive long enough for interactions.
+
+      - Verify `/`, `/doctor`, and `/source-ledger` direct routes reach the intended
+      real entrypoint path.
+
+      - Verify at least one documented operation reaches the real entrypoint end-to-end:
+      Search query, Steer `/doctor`, Source Ledger view, and one state-safe read operation.
+
+
+      Do not inspect implementation code. Use docs and public behavior only. This
+      liveness probe is required because the audit includes runnable web-route failures.
+
+
+      Behavioral proof register is mandatory for every route/operation.'
+    verification: 'phase-check protecting final closure: entrypoint starts, stays
+      alive, `/`, `/doctor`, and `/source-ledger` behave as documented, and at least
+      one Search/Steer/Source Ledger operation reaches the real runtime path end-to-end.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Liveness Probe Evidence
+
+      **Tester**: blind-tester
+
+      **Independence Level**: L3 black-box
+
+
+      ### Launch
+
+      ```
+
+      <exact launch command and output>
+
+      ```
+
+
+      ### Route/operation proof
+
+      | Surface | Input/URL | Expected | Actual output/artifact | Status |
+
+      | --- | --- | --- | --- | --- |
+
+      | / | <url> | workbench | <artifact> | PASS/FAIL |
+
+      | /doctor | <url> | diagnostics or visible documented redirect | <artifact>
+      | PASS/FAIL |
+
+      | /source-ledger | <url> | Source Ledger | <artifact> | PASS/FAIL |
+
+      | Search/Steer/Ledger op | <input> | documented behavior | <artifact> | PASS/FAIL
+      |
+
+
+      ### Behavioral Proof Register
+
+      - requirement_ref:
+
+      - behavior_claim:
+
+      - runtime_proof_expected:
+
+      - evidence_ref:
+
+      - status:
+
+      - closure_path:
+
+      - gate_decision_basis:'
+    agent: blind-tester
