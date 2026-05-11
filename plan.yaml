@@ -48384,6 +48384,177 @@ phases:
 
       - None observed. No new goroutines, channels, shared mutable state, or I/O paths
       introduced.'
+  - id: pbar-browser-flow-failure-remediation
+    name: Remediate failed browser PRD workflow blockers before retest
+    status: pending
+    description: "step_type: implementation\n\nBatched implementation remediation\
+      \ for the failed independent browser PRD workflow retest. This step owns remediation\
+      \ before `pbar-browser-flow-retest` may run again.\n\nPrerequisite context:\n\
+      - The current phase depends on the completed frontend remediation phase; `pbar-frontend-gate`\
+      \ and `pbar-frontend-gate-retest-proof` are completed upstream inputs.\n- This\
+      \ step also waits for completed same-phase runtime/backend prerequisites listed\
+      \ in `depends_on` so the retry is based on the current audited runtime surface.\n\
+      \nAuthoritative failure context (from deferred verifier branch; product files\
+      \ were not merged):\n- Step `pbar-browser-flow-retest` returned `status: FAIL`,\
+      \ `verdict: FAIL`, `gate_open_allowed: false`, `orchestrator_action_hint: DO_NOT_COMPLETE`.\n\
+      - Command `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`\
+      \ failed: 5 tests run, 3 failed, 2 passed.\n  - U1: mobile Search form height\
+      \ observed `343px`, expected `<= 170px`.\n  - B5/U2: source-add receipt text\
+      \ remained `applied: source added`; missing source identity and ingest orientation.\n\
+      \  - B12: Source Ledger row lacks full error/details/diagnostic affordance;\
+      \ expected count 1, received 0.\n- Command `npm --prefix web run test:e2e --\
+      \ --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts` failed: 7\
+      \ tests run, 1 failed, 6 passed.\n  - invalid `OPENROUTER_KEY` browser path\
+      \ expected role=alert text `err: internal: internal error`; alert element not\
+      \ found.\n- Behavioral proof register blockers/unproven:\n  - RSS URL add receipt:\
+      \ UNPROVEN because receipt lacks source/title and ingest hint.\n  - Source Ledger\
+      \ diagnostics: UNPROVEN because missing full diagnostic affordance for source\
+      \ row.\n  - Natural-language Steer rejected/failure path: UNPROVEN because invalid-key\
+      \ graceful-failure browser alert missing.\n- Additional proof gaps marked NEEDS_TEST\
+      \ / incomplete:\n  - B16: ranking/filtering effect after accepted steering not\
+      \ directly asserted by executed browser tests.\n  - B17: boost ranking effect\
+      \ not proven in browser retest.\n  - B18: fresh item model health only partially\
+      \ covered through deterministic harness paths.\n\nScope and constraints:\n-\
+      \ Repair product/UI/API behavior and/or add missing browser proof only as required\
+      \ by these blockers.\n- Do NOT lower, delete, or weaken browser tests. If a\
+      \ test is genuinely contract-wrong, create an explicit deviation record with\
+      \ authoritative spec citation and replacement proof before changing that expectation.\n\
+      - Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner token\
+      \ boundary, no accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event bus/service\
+      \ layer, no folders/tags/unread/settings/archive/product creep.\n- Keep fixes\
+      \ within existing ResoFeed architecture and UI design vocabulary from `docs/ARCHITECTURE.md`\
+      \ and `docs/DESIGN.md`.\n\nRequired remediation targets:\n1. Mobile Search containment:\
+      \ reduce the mobile Search form rendered height to satisfy the existing browser\
+      \ contract (`<= 170px`) without hiding required controls or adding new settings/product\
+      \ concepts.\n2. RSS URL source-add receipt: include source identity/title and\
+      \ ingest orientation in the rendered receipt while preserving terse ResoFeed\
+      \ language.\n3. Source Ledger diagnostics: ensure each source row exposes the\
+      \ expected full error/details/diagnostic affordance required by the PRD browser\
+      \ test.\n4. Natural-language Steer rejected/failure path: surface the invalid\
+      \ `OPENROUTER_KEY` browser failure as an accessible `role=alert` containing\
+      \ `err: internal: internal error` or produce a deviation record with spec citation\
+      \ if the exact text is contract-wrong.\n5. B16/B17/B18 proof closure: ensure\
+      \ the subsequent browser retest can directly prove ranking/filtering after accepted\
+      \ steering, boost ranking effect, and fresh item model health, OR provide explicit\
+      \ non-intersection evidence accepted by the gate. Prefer adding/repairing browser\
+      \ assertions over non-intersection unless the behavior is truly outside UI/browser\
+      \ closure.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only completion is NOT acceptable. Each deliverable MUST contain\
+      \ substantive logic that processes its inputs and produces outputs that vary\
+      \ based on those inputs. Private stub classes (`_Runtime*`, `_Stub*`, `_Placeholder*`)\
+      \ do not satisfy this requirement.\n\n## Frontend Completion Criteria (rendering\
+      \ required)\nCompletion requires BOTH:\n1. Logic correctness: data/state computation\
+      \ produces correct values.\n2. Rendering completeness: components produce visible\
+      \ DOM elements and accessible semantics in the real browser.\nEvidence MUST\
+      \ include rendered output proof or exact Playwright output for affected states.\n\
+      \n## Gate Preview (what the gate WILL reject)\n1. Re-running `pbar-browser-flow-retest`\
+      \ before this remediation lands.\n2. Any lowered/deleted browser assertion without\
+      \ an explicit deviation record and authoritative spec citation.\n3. Receipt\
+      \ text that omits source identity/title or ingest orientation.\n4. Source Ledger\
+      \ rows that still lack the full diagnostic affordance.\n5. Invalid-key failure\
+      \ paths that are only logged or hidden, not surfaced as accessible browser feedback.\n\
+      6. B16/B17/B18 left as `NEEDS_TEST`, `UNPROVEN`, or `UNCERTAIN_BLOCKING` without\
+      \ direct browser proof or explicit gate-accepted non-intersection."
+    verification: 'local-check protecting `pbar-browser-flow-retest`, UIUX audit,
+      and `pbar-retest-audit-gate`:
+
+      - The exact failed browser commands are runnable after the fix and no longer
+      fail for U1, B5/U2, B12, or invalid `OPENROUTER_KEY` alert visibility.
+
+      - Evidence includes before/after mapping for each authoritative failure bullet
+      in this step.
+
+      - Evidence includes B16/B17/B18 direct browser proof or explicit non-intersection
+      evidence suitable for gate review.
+
+      - Evidence confirms no ResoFeed architecture/product-boundary invariant was
+      violated and no browser test was lowered/deleted without a deviation record.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+      - web/tests/e2e/real-server-ui.spec.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Browser Failure Remediation Evidence
+
+
+      **Commands executed**:
+
+      ```sh
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+
+      ```
+
+
+      **Failure mapping**:
+
+      | Failure | Before | After | Files changed | Browser proof |
+
+      | --- | --- | --- | --- | --- |
+
+      | U1 mobile Search height | 343px > 170px | <observed> | <paths> | <output/screenshot/DOM>
+      |
+
+      | B5/U2 source-add receipt | missing identity + ingest hint | <observed> | <paths>
+      | <output/screenshot/DOM> |
+
+      | B12 Source Ledger diagnostics | expected 1, received 0 | <observed> | <paths>
+      | <output/screenshot/DOM> |
+
+      | Invalid OPENROUTER_KEY alert | role=alert missing | <observed> | <paths> |
+      <output/screenshot/DOM> |
+
+
+      **B16/B17/B18 proof register update**:
+
+      - B16 ranking/filtering after accepted steering: PROVEN with browser evidence
+      OR explicit non-intersection rationale accepted by gate.
+
+      - B17 boost ranking effect: PROVEN with browser evidence OR explicit non-intersection
+      rationale accepted by gate.
+
+      - B18 fresh item model health: PROVEN with browser evidence OR explicit non-intersection
+      rationale accepted by gate.
+
+
+      **Test integrity**:
+
+      - Browser tests lowered/deleted: NO, or deviation record with authoritative
+      spec citation: <record>.
+
+
+      **ResoFeed invariant check**:
+
+      - Single Go binary preserved: yes/no
+
+      - SQLite/FTS5 only: yes/no
+
+      - Owner token boundary preserved: yes/no
+
+      - No accounts/OAuth/RBAC/vector/RAG/sync/merge/event bus/service layer/product
+      creep introduced: yes/no
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - pbar-runtime-liveness-probe
+    - pbar-backend-mcp-fresh-related-delivery-fix
+    agent: frontend-engineer
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
