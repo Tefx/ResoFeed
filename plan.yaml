@@ -47701,6 +47701,149 @@ phases:
     - pbar-spec-product-boundary-review
     - pbar-wiring-audit
     agent: gate-reviewer
+  - id: pbar-backend-mcp-fresh-related-delivery-fix
+    name: Fix MCP fresh related delivery candidate regression
+    status: pending
+    description: 'step_type: implementation
+
+
+      Focused backend remediation for a downstream-blocker discovered during completed
+      frontend remediation.
+
+
+      Failure context:
+
+      - Command observed by frontend remediation worker: `go test ./internal/resofeed`.
+
+      - Observed result: exit 1.
+
+      - Reported failing test: `TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment`.
+
+      - Orchestrator classification: downstream-blocker for backend retest/final closure,
+      not attributable to the frontend remediation step.
+
+
+      Scope:
+
+      - Diagnose and fix the backend behavior exercised by `internal/resofeed/core_blockers_test.go::TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment`.
+
+      - Touch likely backend MCP/feed delivery semantics in `internal/resofeed/mcp.go`
+      and tightly related backend helpers only if the diagnosis proves they are the
+      source.
+
+      - Preserve ResoFeed invariants from `docs/ARCHITECTURE.md` and `docs/DESIGN.md`:
+      one Go binary, one SQLite DB, owner-token delegation boundary, no per-agent
+      registry, no sync/merge coordinator, lexical/product-boundary behavior only.
+
+      - Do NOT change frontend scope, frontend tests, UI copy, CSS, browser workflows,
+      or completed frontend remediation evidence.
+
+      - Do NOT perform broad architecture redesign; this is a narrow regression repair
+      for MCP candidate delivery/fresh-related behavior.
+
+
+      Failure-mode checklist:
+
+      - Delivered item is suppressed when there is no fresh related development.
+
+      - Delivered item and fresh related item are both candidates when a newer related
+      item shares the same `story_key`.
+
+      - Idempotency/provenance for `ReportDeliveryForMCP` remains intact.
+
+      - Existing MCP candidate limits and feed ordering semantics remain compatible
+      with current backend contracts.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes (`_Runtime*`,
+      `_Stub*`, `_Placeholder*`) do not satisfy this requirement.'
+    verification: '- Focused proof: `go test ./internal/resofeed -run TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+      -count=1` passes.
+
+      - Broad backend proof: `go test ./internal/resofeed -count=1` no longer exits
+      1 for this failure family.
+
+      - Evidence explains the root cause and why the fix is backend-owned, not frontend-owned.
+
+      - Evidence confirms no frontend files or UI scope were modified.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/core_blockers_test.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/mcp.go — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Backend Remediation Evidence
+
+
+      **Failure reproduced**:
+
+      ```
+
+      <command/output for focused failing test before fix, or justification if not
+      reproduced>
+
+      ```
+
+
+      **Root cause**:
+
+      <explain backend semantic seam causing TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+      to fail>
+
+
+      **Files changed**:
+
+      <list backend files; confirm no frontend files changed>
+
+
+      **Focused retest**:
+
+      ```
+
+      go test ./internal/resofeed -run TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+      -count=1
+
+      <actual output>
+
+      ```
+
+
+      **Broad backend retest**:
+
+      ```
+
+      go test ./internal/resofeed -count=1
+
+      <actual output>
+
+      ```
+
+
+      **Invariant check**:
+
+      - No frontend scope changed: yes/no + evidence
+
+      - No architecture redesign introduced: yes/no + evidence
+
+      - ResoFeed invariants preserved: yes/no + notes
+
+      '
+    agent: golang-developer
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
