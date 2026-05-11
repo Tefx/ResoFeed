@@ -48494,7 +48494,7 @@ phases:
       - none'
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
-    status: claimed
+    status: done
     description: 'As wiring-auditor, independently rerun the wiring and reachability
       audit AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
       the remediation evidence plus the salvaged artifact `.audit-artifacts/pbar-wiring-audit.md`
@@ -48590,6 +48590,92 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-11T19:09:57.287206+00:00'
+    done_at: '2026-05-11T19:24:57.622056+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/PRD.md — Source Ledger is a flat Steer-led ledger only; Search is first-class
+      lexical retrieval with provenance; `/doctor` must output raw health data.
+
+      - docs/DESIGN.md — Source Ledger requires visible flat rows/delete/OPML/state
+      actions; Diagnostics Output must be labelled status/log text; Search results
+      use feed-item anatomy with provenance.
+
+      - docs/ARCHITECTURE.md — Frontend keeps Steer as command surface for search
+      and `/doctor`; `/api/search` and `/api/doctor` are canonical backend endpoints;
+      static UI may serve direct app routes.
+
+      - .audit-artifacts/pbar-wiring-audit.md — Prior blocker was Source Ledger visible
+      nav/direct-route proof plus diagnostic expansion proof; prior register marked
+      five NEEDS_TEST and no_stub_placeholder_route_targets PROVEN.
+
+
+      ## Wiring Audit Rerun Report
+
+      **Remediation step reviewed**: pbar-source-ledger-boundary-wiring-remediation
+
+      **Prior artifact reviewed**: .audit-artifacts/pbar-wiring-audit.md (commit 0224ade)
+
+
+      ## Behavioral Proof Register
+
+      - search_steer_to_search_retrieval: PROVEN. Evidence: `+page.svelte`, `SearchRetrieval.svelte`,
+      `api-client.ts`, `http.go`, `search.go`, and `rendering-expected-red.test.ts`
+      trace Steer submit → `searchSeedQuery` → SearchRetrieval → `apiClient.search`
+      → `/api/search` → rendered list with no stub hop.
+
+      - doctor_direct_and_steer_share_diagnostics_source: PROVEN. Evidence: direct
+      `/doctor` and Steer `/doctor` both call `apiClient().doctor()` / `/api/doctor`
+      and backend `WriteDoctorWithConfig`; render test verifies diagnostics log.
+
+      - source_ledger_direct_route_to_component: PROVEN. Evidence: `/source-ledger`,
+      `/source`, `/sources`, and visible RESOFEED menu path activate the same SourceLedger
+      surface; Source Ledger regression e2e covers menu/direct URLs.
+
+      - metadata_visible_consumption: PROVEN. Evidence: Feed/Search/Inspector visibly
+      consume quality/value/fallback/provenance fields through anatomy helpers and
+      component render paths; tests cover visible metadata.
+
+      - source_diagnostic_affordance_a11y: PROVEN. Evidence: `SourceLedger.svelte`
+      native details/summary with `[DETAILS]`, CSS focus-visible styling, and test
+      proving click/keyboard expansion into visible `<pre>` diagnostic payload.
+
+      - no_stub_placeholder_route_targets: PROVEN. Evidence: public surfaces import
+      real Feed, Inspector, SourceLedger, SearchRetrieval components; fallback search
+      found only test stubs/sanitation helpers, not route targets.
+
+
+      ## Closure Decision
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - uncertainty_sources: []
+
+
+      ## Verification / Merge Handling
+
+      - Read-only audit branch had no committed file changes (`git diff --name-only
+      main...vectl/step-pbar-wiring-audit` returned no files) and worktree status
+      was clean.
+
+      - No squash merge was required for this read-only audit.
+
+
+      ## Commit hash(es)
+
+      - none (read-only audit)
+
+
+      ## Gaps / Notes
+
+      - none'
   - id: pbar-retest-audit-gate
     name: Gate independent retests and audits
     status: pending
