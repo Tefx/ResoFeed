@@ -44291,7 +44291,7 @@ phases:
     claimed_at: '2026-05-11T16:25:51.507804+00:00'
   - id: pbar-backend-steer-ranking-remediation
     name: Fix natural-language steering receipts and deterministic ranking effects
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -44363,6 +44363,8 @@ phases:
       \ corpus before/after accepted rule>\n- Product-boundary proof: no rule builder,\
       \ settings, history ledger, accounts, or sync concepts added."
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:25:56.092942+00:00'
   - id: pbar-backend-readable-payload-sanitation
     name: Move readable payload sanitation to shared backend layer
     status: claimed
