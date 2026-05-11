@@ -47992,7 +47992,7 @@ phases:
     agent: gate-reviewer
   - id: pbar-backend-mcp-fresh-related-delivery-fix
     name: Fix MCP fresh related delivery candidate regression
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -48135,6 +48135,116 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T18:08:46.820487+00:00'
+    done_at: '2026-05-11T18:15:26.824939+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: read by executor; one Go binary/one SQLite/current-state
+      boundaries, MCP/HTTP shared product operations, item externally-surfaced timestamp
+      semantics, and ranking guardrail for externally surfaced items cited.
+
+      - `docs/DESIGN.md`: read by executor; feed item external `agent:<name>` marker
+      and grouped story provenance cited.
+
+      - `internal/resofeed/core_blockers_test.go`: read; `TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment`
+      expects delivered item suppression with no related development, then resurfacing
+      alongside newer same-`story_key` related item.
+
+      - `internal/resofeed/mcp.go`: read; MCP exposes same product concepts, `ListCandidateItemsForMCP`
+      delegates to `ListTodayFeed`, `ReportDeliveryForMCP` records external surfacing/idempotency/provenance.
+
+
+      ## Backend Remediation Evidence
+
+
+      **Failure reproduced**:
+
+      ```text
+
+      go test ./internal/resofeed -run TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+      -count=1
+
+      --- FAIL: TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+
+      core_blockers_test.go:212: MCP candidates ... want delivered item resurfaced
+      with fresh related development
+
+      FAIL
+
+      Exit code: 1
+
+      ```
+
+
+      **Root cause**:
+
+      Executor found backend ranking semantics only treated a story as related when
+      there was both a globally fresh item and a touched memory item. The related
+      development in the contract test is newer than the MCP delivery event, but wall-clock
+      freshness can expire; the delivered item therefore stayed suppressed even though
+      delivery/provenance state showed a newer same-`story_key` development. This
+      is backend-owned because MCP candidate delivery delegates through backend ranking,
+      not frontend/UI.
+
+
+      **Files changed**:
+
+      - `internal/resofeed/ranking.go` — pure in-memory ranking pass fix.
+
+      - No frontend files, UI copy, CSS, or browser workflow files modified.
+
+
+      **Commit hash(es)**:
+
+      - Worktree commit: `2673877b39878fffb61d28590a8b647266b56839` — `fix MCP related
+      delivery resurfacing`.
+
+      - Mainline squash commit: `b9915ac` — `[vectl] step-pbar-backend-mcp-fresh-related-delivery-fix
+      completed`.
+
+
+      **Focused retest**:
+
+      ```text
+
+      go test ./internal/resofeed -run TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment
+      -count=1
+
+      ok resofeed/internal/resofeed 0.513s (executor)
+
+      ok resofeed/internal/resofeed 0.558s (mainline)
+
+      ```
+
+
+      **Broad backend retest**:
+
+      ```text
+
+      go test ./internal/resofeed -count=1
+
+      ok resofeed/internal/resofeed 0.411s (executor)
+
+      ok resofeed/internal/resofeed 0.740s (mainline)
+
+      ```
+
+
+      **Spec link**:
+
+      - `docs/ARCHITECTURE.md` ranking guardrail: externally surfaced items are suppressed
+      unless a new related development exists.
+
+      - `docs/ARCHITECTURE.md` state/idempotency: externally surfaced timestamp and
+      receipts exist for retry/idempotency/provenance.
+
+      - `docs/DESIGN.md` feed provenance: externally surfaced rows may show compact
+      agent provenance and grouped stories preserve access/provenance.
+
+
+      **Gaps/Notes**:
+
+      - None observed. No new goroutines, channels, shared mutable state, or I/O paths
+      introduced.'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
