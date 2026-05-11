@@ -48268,7 +48268,7 @@ phases:
       None.'
   - id: pbar-spec-product-boundary-review
     name: Spec and product-boundary conformance review
-    status: claimed
+    status: pending
     description: 'As spec-verifier, independently verify that remediation conforms
       to PRD, ARCHITECTURE, and DESIGN without introducing forbidden product concepts.
 
@@ -48347,8 +48347,6 @@ phases:
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
     agent: spec-verifier
-    claimed_by: spec-verifier
-    claimed_at: '2026-05-11T18:44:15.211723+00:00'
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
     status: claimed
