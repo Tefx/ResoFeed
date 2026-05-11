@@ -39112,3 +39112,135 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
     agent: software-architect
+  - id: ui-remediation-retest-closure.urrc-final-remediation-gate
+    name: urrc-final-remediation-gate
+    status: pending
+    description: 'Final independent gate for UI Remediation Retest Closure.
+
+
+      step_type: gate. verification_scope: phase-check. Agent: gate-reviewer. Independent
+      from implementation agent frontend-engineer.
+
+
+      Review all phase evidence before reopening completion. This gate must BLOCK
+      if any blocker-class residual from docs/audits/ui-remediation-retest-2026-05-11.md
+      remains unproven or if evidence bypasses real browser/UIUX/architecture validation.
+
+
+      Gate decision basis must include:
+
+      - R1-R8 closure matrix with evidence refs from fix, Playwright retest, uiux-auditor
+      audit, and architecture/product-boundary retest.
+
+      - Confirmation that browser evidence includes desktop and mobile 390x844 states.
+
+      - Confirmation that uiux-auditor produced a parseable PASS or explicit residual
+      blocker list.
+
+      - Confirmation that software-architect found no forbidden product concept or
+      architecture boundary violation.
+
+      - Confirmation that final validation would no longer fail on the audit findings.
+
+
+      OPEN is allowed only when each blocker-class behavioral/design obligation is
+      PROVEN or has explicit non-intersection evidence. Because these R1-R8 findings
+      directly intersect final UI design validation, unresolved UNPROVEN/NEEDS_TEST
+      items must BLOCK.'
+    verification: '- All remediation, browser retest, uiux-auditor audit, and architecture/product-boundary
+      retest steps are complete with adequate evidence.
+
+      - Gate decision basis maps R1-R8 to concrete evidence refs and statuses.
+
+      - Playwright/browser evidence covers desktop and 390x844 mobile runtime behavior.
+
+      - uiux-auditor validation covers required screenshots/images and returns PASS
+      or blocks with precise residuals.
+
+      - software-architect review confirms no forbidden product concepts or architecture
+      boundary violations.
+
+      - No unresolved blocker-class finding intersects remaining/final validation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent of frontend-engineer implementation)
+
+      **Phase**: ui-remediation-retest-closure
+
+
+      ### Evidence Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | ui-remediation-retest-closure.urrc-batched-residual-ui-fix | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | ui-remediation-retest-closure.urrc-playwright-browser-retest | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit | ✅/⚠️/❌
+      | excellent/adequate/insufficient/missing | <notes> |
+
+      | ui-remediation-retest-closure.urrc-architecture-product-boundary-retest |
+      ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |
+
+
+      ### R1-R8 Gate Decision Basis
+
+      | Finding | Evidence refs reviewed | Status | Blocks final validation? | Closure
+      path |
+
+      | --- | --- | --- | --- | --- |
+
+      | R1 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R2 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R3 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R4 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R5 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R6 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R7 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+      | R8 | <refs> | PROVEN/UNPROVEN/NEEDS_TEST | YES/NO | <path> |
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: R1-R8 are closed with browser/UIUX/architecture evidence.
+
+      - [ ] BLOCKED: blocker-class residuals remain.
+
+
+      **Required actions if BLOCKED**: <fix/retest loop needed>'
+    depends_on:
+    - ui-remediation-retest-closure.urrc-batched-residual-ui-fix
+    - ui-remediation-retest-closure.urrc-playwright-browser-retest
+    - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
+    - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
+    agent: gate-reviewer
