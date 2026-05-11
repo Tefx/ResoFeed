@@ -49056,6 +49056,182 @@ phases:
       - Accessibility preserved via native/accessible controls: source diagnostics
       in existing actions column, invalid steering failures use `role=alert`, search
       filters visible by default and compact only in narrow app shell.'
+  - id: pbar-source-ledger-boundary-wiring-remediation
+    name: Resolve Source Ledger boundary, reachability, and diagnostics audit blockers
+    status: pending
+    description: 'step_type: implementation
+
+      work_type: authority_adjudication + defect_repair
+
+
+      Batched remediation/adjudication step for the two failed concurrent audit families
+      in this phase. Resolve the spec/product-boundary conflict and wiring proof gaps
+      together before rerunning `pbar-spec-product-boundary-review` and `pbar-wiring-audit`.
+      Do NOT add duplicate serial retest chains; the existing failed audit steps are
+      the retests after this remediation.
+
+
+      ## Concurrent failure context to preserve
+
+
+      ### A) `pbar-spec-product-boundary-review` failed
+
+      - status/verdict: FAIL; gate_open_allowed false; orchestrator_action_hint DO_NOT_COMPLETE.
+
+      - Blocker PB-1: Source Ledger exposes `[RUN INGEST]` and per-source `[FETCH]`
+      controls beyond strict PRD/DESIGN product boundary, per spec-verifier.
+
+      - Spec-verifier cited PRD §7.2: Source Ledger "ONLY supports viewing the source
+      name/URL and deleting it"; DESIGN Source Ledger anatomy lists OPML import, flat
+      rows, delete, state links; forbidden settings/dashboard behavior.
+
+      - Evidence cited: `SourceLedger.svelte:120-127` adds `[RUN INGEST]`; `SourceLedger.svelte:145-151`
+      adds per-source `[FETCH]`.
+
+      - The reviewer classified this as DIVERGES/BLOCKING and recommended either explicit
+      spec update or moving/removing controls so Source Ledger rows remain view/delete
+      plus OPML/state actions only.
+
+      - Proof gaps: `populated_live_llm_quality: NEEDS_TEST` and `source_ledger_only_view_delete_import_export:
+      UNPROVEN`.
+
+
+      ### B) `pbar-wiring-audit` failed
+
+      - status/verdict: FAIL; gate_open_allowed false; orchestrator_action_hint DO_NOT_COMPLETE.
+
+      - Blocker: Source Ledger direct route and Steer command are wired, but required
+      visible nav control/path to the same Source Ledger surface is absent or unproven.
+
+      - Source diagnostic “full-view” is reachable via focusable button aria-label/title,
+      but no expanded visible details panel was proven.
+
+      - behavioral_proof_register NEEDS_TEST entries: `search_steer_to_search_retrieval`,
+      `doctor_direct_and_steer_share_diagnostics_source`, `source_ledger_direct_route_to_component`,
+      `metadata_visible_consumption`, `source_diagnostic_affordance_a11y`; `no_stub_placeholder_route_targets`
+      PROVEN.
+
+      - Wiring artifact was salvaged to main at `.audit-artifacts/pbar-wiring-audit.md`
+      via commit `0224ade`.
+
+
+      ### C) Completed `pbar-uiux-multimodal-audit` passed but conflicts with A
+
+      - UIUX auditor considered `[RUN INGEST]`, `[FETCH]`, `[DELETE]` bracket actions
+      visually faithful to DESIGN.md and found no UIUX blocker.
+
+      - Treat this as a contract/adjudication issue: resolve spec/product-boundary
+      and reachability requirements, not just visual presentation.
+
+
+      ## Required resolution scope
+
+      1. Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
+      boundary, no accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event bus/service
+      layer, no folders/tags/unread/settings/archive/product creep.
+
+      2. Do not lower, delete, or weaken tests/audits. If a spec/document contradiction
+      is real, produce an explicit deviation/adjudication record with authoritative
+      citations and replacement proof; do not silently rewrite product boundaries.
+
+      3. Resolve Source Ledger operation-control boundary: either move/remove `[RUN
+      INGEST]` and `[FETCH]` from forbidden Source Ledger locations, or document authoritative
+      contract support and provide proof sufficient for spec-verifier acceptance.
+
+      4. Resolve Source Ledger reachability: prove or implement an allowed visible,
+      non-persistent path to the Source Ledger surface that does not reintroduce forbidden
+      persistent peer navigation or product creep.
+
+      5. Resolve full diagnostic affordance proof: if native `<details>`/`summary`
+      is used, ensure expanded visible details can be proven by mouse, keyboard, and
+      assistive-tech-oriented evidence, not only aria-label/title.
+
+      6. Produce runtime/static evidence for the wiring audit NEEDS_TEST items: search
+      steer to SearchRetrieval, `/doctor` direct and Steer sharing diagnostics source,
+      Source Ledger direct route to component, metadata visible consumption, and source
+      diagnostic affordance accessibility.
+
+
+      ## Expected touch paths
+
+      - `web/src/lib/SourceLedger.svelte` or equivalent Source Ledger component path.
+
+      - Source Ledger route/nav shell files under `web/src/**` if reachability is
+      missing or unproven.
+
+      - Diagnostic affordance component(s) under `web/src/**` if expanded details
+      proof requires code adjustment.
+
+      - Existing Playwright/unit/integration tests under `web/tests/**`, `tests/**`,
+      or project-equivalent harnesses only as needed to add proof without weakening
+      existing tests.
+
+
+      ## Gate Preview (what rerun audits WILL reject)
+
+      1. Source Ledger row actions that exceed view/delete plus documented OPML/state
+      actions without explicit authoritative adjudication.
+
+      2. A Source Ledger route that is technically wired but has no allowed visible
+      user path.
+
+      3. Diagnostic “full-view” evidence that proves only focusable metadata, aria-label,
+      or title without visible expanded content.
+
+      4. NEEDS_TEST behavioral register items left without concrete runtime/static
+      proof.
+
+      5. Any product creep violating ARCHITECTURE.md or DESIGN.md invariants.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive logic/proof that processes real runtime
+      paths and produces observable outputs that vary based on user interaction or
+      route state. Private stub classes or placeholder route targets do not satisfy
+      this requirement.'
+    verification: 'phase-check protecting final closure: evidence shows the Source
+      Ledger product-boundary blocker is resolved or explicitly adjudicated with authoritative
+      citations; Source Ledger is reachable via an allowed visible non-persistent
+      path; diagnostic full-view can be visibly expanded by mouse/keyboard/AT-oriented
+      checks; and runtime/static proof covers all wiring-audit NEEDS_TEST items without
+      weakening tests or ResoFeed invariants.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- .audit-artifacts/pbar-wiring-audit.md — key passage\
+      \ or \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for\
+      \ this step.\"\n\n## Remediation / Adjudication Record\n- Source Ledger operation-control\
+      \ decision: removed/moved controls OR authoritative support documented.\n- Authoritative\
+      \ citations used: <PRD/DESIGN/ARCHITECTURE sections>\n- If deviation/adjudication\
+      \ was required: what changed, why, impact, and replacement proof.\n- Product-boundary\
+      \ invariants preserved: single binary, SQLite/FTS5, owner-token boundary, no\
+      \ accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event bus/service layer,\
+      \ no folders/tags/unread/settings/archive/product creep.\n\n## Code / Proof\
+      \ Changes\n- Files changed:\n  - <path> — <summary>\n- Source Ledger forbidden\
+      \ controls resolution:\n  - `[RUN INGEST]`: <removed/moved/adjudicated>\n  -\
+      \ `[FETCH]`: <removed/moved/adjudicated>\n- Allowed Source Ledger reachability\
+      \ path:\n  - <visible path/control/route and why it is non-persistent / not\
+      \ forbidden peer navigation>\n- Diagnostic full-view proof:\n  - Mouse: <evidence>\n\
+      \  - Keyboard: <evidence>\n  - AT-oriented/semantic: <evidence>\n\n## Wiring\
+      \ Proof Register\n| Requirement | Evidence Ref | Status | Closure Path |\n|\
+      \ --- | --- | --- | --- |\n| search_steer_to_search_retrieval | <runtime/static\
+      \ proof> | PROVEN/NEEDS_TEST | <path> |\n| doctor_direct_and_steer_share_diagnostics_source\
+      \ | <runtime/static proof> | PROVEN/NEEDS_TEST | <path> |\n| source_ledger_direct_route_to_component\
+      \ | <runtime/static proof> | PROVEN/NEEDS_TEST | <path> |\n| metadata_visible_consumption\
+      \ | <runtime/static proof> | PROVEN/NEEDS_TEST | <path> |\n| source_diagnostic_affordance_a11y\
+      \ | <runtime/static proof> | PROVEN/NEEDS_TEST | <path> |\n\n## Commands / Runtime\
+      \ Evidence\n```text\n<paste exact commands and relevant output; do not summarize\
+      \ as \"tests pass\">\n```\n\n## Audit Rerun Readiness\n- `pbar-spec-product-boundary-review`\
+      \ can rerun: yes/no and why.\n- `pbar-wiring-audit` can rerun: yes/no and why.\n\
+      - Remaining gaps: <none or explicit non-intersection / owner>."
+    depends_on:
+    - pbar-backend-green-retest
+    - pbar-browser-flow-retest
+    - pbar-runtime-liveness-probe
+    - pbar-uiux-multimodal-audit
+    agent: frontend-engineer
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
