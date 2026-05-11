@@ -42331,3 +42331,112 @@ phases:
     - slnr-restore-navigation-route
     - slnr-browser-route-retest
     agent: uiux-auditor
+  - id: slnr-gate
+    name: Gate Source Ledger navigation regression remediation
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches user-visible navigation chrome and direct routing.
+
+      - Regression has screenshot evidence from a user and affects discoverability.
+
+      - Phase contains expected-red browser coverage, real-browser retest, and native
+      multimodal UI/UX audit.
+
+
+      As an INDEPENDENT REVIEWER, assess whether the Source Ledger navigation regression
+      phase meets the quality bar for proceeding.
+
+
+      Review criteria:
+
+      1. Contract/doc-reading step pinned Source Ledger discoverability and route
+      obligations from docs without product implementation.
+
+      2. Expected-red browser coverage existed before implementation and exposed the
+      reported missing nav/direct-route gap.
+
+      3. Frontend implementation restored documented `SOURCE LEDGER` discoverability
+      and direct-route behavior without forbidden product concepts.
+
+      4. Independent browser retest proved root nav visibility, click activation,
+      `/source-ledger`, `/source`, and `/sources` behavior or documented explicit
+      alias conflict.
+
+      5. uiux-auditor produced rendered artifact evidence and passed/block-decided
+      UI/UX conformance.
+
+      6. Evidence quality includes refs read confirmations and actual commands/artifact
+      paths.
+
+      7. No unresolved behavioral proof register item remains NEEDS_TEST, UNPROVEN,
+      or UNCERTAIN_BLOCKING without explicit remediation ownership.
+
+
+      Gate Preview / rejection triggers:
+
+      - SOURCE LEDGER remains accessible only by typing a Steer command.
+
+      - Direct `/source-ledger` loads the shell but does not activate the ledger.
+
+      - Browser evidence lacks screenshots/traces or actual output.
+
+      - The solution introduces settings/source dashboard concepts, folders/tags,
+      accounts, sync/merge, service/repository layers, or non-canonical UI labels.
+
+      - uiux-auditor did not provide rendered artifacts.
+
+
+      touch_paths:
+
+      - plan/evidence review only; no product code changes'
+    verification: '- All phase steps completed successfully with evidence.
+
+      - Gate decision basis maps each requirement/proof obligation to reviewed evidence
+      and OPEN/BLOCK recommendation.
+
+      - Browser retest and uiux-auditor audit are both reviewed and contain actual
+      runtime/rendered artifacts.
+
+      - No unresolved blocker or blocker-class proof gap remains.
+
+      - Ready to close the remediation phase only if SOURCE LEDGER discoverability
+      and direct-route behavior are proven green.'
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: source-ledger-navigation-regression\n\
+      **Timestamp**: <ISO 8601>\n\n## refs Read Confirmation (MANDATORY)\n\nFor each\
+      \ ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/routes/+page.svelte — key\
+      \ passage or \"NOT READ: <reason>\"\n- web/src/routes/components/SourceLedger.svelte\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Execution Review\n| Step ID\
+      \ | Status | Evidence Quality | Concerns |\n|---|---|---|---|\n| slnr-contract-doc-route-contract\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| slnr-expected-red-browser-test\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| slnr-restore-navigation-route\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| slnr-browser-route-retest\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n| slnr-uiux-navigation-audit\
+      \ | ✅/⚠️/❌ | excellent/adequate/insufficient/missing | <notes> |\n\n## Gate\
+      \ Decision Basis\n| requirement_ref | evidence_ref reviewed | unresolved status\
+      \ | blocks? | rationale |\n|---|---|---|---|---|\n\n## Issues Identified\n|\
+      \ Severity | Description | Related Step | Blocking? |\n|---|---|---|---|\n\n\
+      ## Phase Assessment\n- All steps completed: ✅/❌\n- Expected-red existed before\
+      \ implementation: ✅/❌\n- Root visible SOURCE LEDGER nav proven: ✅/❌\n- Direct\
+      \ `/source-ledger` proven: ✅/❌\n- Alias routes `/source` and `/sources` disposition\
+      \ proven: ✅/❌\n- UI/UX rendered artifact audit complete: ✅/❌\n- Forbidden concepts\
+      \ absent: ✅/❌\n- Evidence quality acceptable: ✅/❌\n- Blocking issues resolved:\
+      \ ✅/❌\n\n## Gate Decision\n- [ ] OPEN: Phase passes gate\n- [ ] BLOCKED: Issues\
+      \ must be resolved before proceeding\n  - Blocking issues: <list>\n  - Required\
+      \ actions: <what needs to happen>"
+    depends_on:
+    - slnr-contract-doc-route-contract
+    - slnr-expected-red-browser-test
+    - slnr-restore-navigation-route
+    - slnr-browser-route-retest
+    - slnr-uiux-navigation-audit
+    agent: gate-reviewer
