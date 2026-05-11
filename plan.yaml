@@ -46583,7 +46583,7 @@ phases:
     agent: gate-reviewer
   - id: pbar-frontend-gate-blocker-remediation
     name: Batched remediation for frontend gate blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -46729,6 +46729,130 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T17:41:34.283940+00:00'
+    done_at: '2026-05-11T17:51:42.179111+00:00'
+    evidence: '## refs Read Confirmation (from execution evidence)
+
+      - docs/ARCHITECTURE.md — read; key passages: one Go deployable, one SQLite DB,
+      lexical retrieval only, single owner token/no accounts, and no folders/tags/settings/archive
+      concepts.
+
+      - docs/DESIGN.md — read; key passages: operational chrome only; no persistent
+      left navigation; Steer/Feed/Inspector/Source Ledger contracts; Search is lexical/metadata
+      retrieval; Source Ledger is flat; Inspector must preserve readable prose.
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts — read;
+      key failures/insights: persistent TODAY/SOURCE LEDGER nav forbidden, Inspector
+      prose must not collapse to `summary unavailable`, Search labels/listitem semantics
+      required, mobile Inspector star behavior required.
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — read; key insight:
+      `.inspector-reading` must contain R1 readable prose and exclude follow/repeated
+      boilerplate.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — read; key
+      insight: F2 rejects persistent tab/side navigation; F37-F44 assert /doctor and
+      Search real-browser semantics; F24-F33 assert Source Ledger shape.
+
+      - web/tests/e2e/manual-rss-fetch-source-ledger.expected-red.test.ts — NOT READ:
+      file does not exist at requested path in this worktree; actual test read at
+      `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`.
+
+      - .audit-artifacts/frontend-gate/semantic-closure-register.yaml — read; key
+      insight: only B1,B2,B3,B5,U1,U2,U3 were closed; required frontend-owned coverage
+      needed B4,B6-B15,B19,B21-B23,U5 added.
+
+
+      ## Files changed
+
+      - `.audit-artifacts/frontend-gate/semantic-closure-register.yaml` — completed
+      frontend-owned closure coverage.
+
+      - `internal/resofeed/readable_sanitation.go` — preserved readable Inspector
+      prose while stripping boilerplate.
+
+      - `web/src/routes/+page.svelte` — removed persistent surface nav and restored
+      terse add-source receipt.
+
+      - `web/src/routes/components/SearchRetrieval.svelte` — exposed visible accessible
+      filter labels, open filter controls, and result list semantics.
+
+      - `web/src/routes/components/SourceLedger.svelte` — removed duplicated diagnostic
+      details from normal row shape.
+
+      - `web/src/routes/components/item-anatomy.ts` — avoided visible `summary unavailable`
+      provenance when readable fallback text exists.
+
+
+      ## Commit hashes
+
+      - Worktree commit: `c1b2b25f16eeb5cfd0332b351d503857557f3c59` — `fix frontend
+      gate blockers`.
+
+      - Mainline squash commit: `b1862a1` — `[vectl] step-pbar-frontend-gate-blocker-remediation
+      completed`.
+
+
+      ## Verification
+
+      Execution evidence reported:
+
+      - `npm ci` from `web/` — exit 0.
+
+      - `npm run check` from `web/` — exit 0; 0 errors/0 warnings.
+
+      - `npm run test:render` from `web/` — exit 0; 6 files/39 tests passed.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts` from `web/` — exit 0; 3 passed.
+
+      - `go test ./internal/resofeed -run ''TestReadable|TestExpectedRed|TestPbar|TestManual|TestSource|TestIngest''`
+      — exit 0.
+
+      - YAML closure coverage check — exit 0; `missing=[]`, `items=24`.
+
+      - Execution agent also reported broad `go test ./internal/resofeed` exit 1 on
+      `TestMCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment`; classified
+      by orchestrator as downstream-blocker requiring separate remediation ownership,
+      not as a blocker to this frontend step''s targeted completion.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm run check` from `web/` — exit 0; svelte-check found 0 errors and 0 warnings.
+
+      - `npm run test:render` from `web/` — exit 0; 6 test files passed, 39 tests
+      passed.
+
+      - `npm run build` from `web/` — exit 0; SvelteKit static build succeeded.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts` from `web/` — exit 0; 3 passed.
+
+      - `go test ./internal/resofeed -run ''TestReadable|TestExpectedRed|TestPbar|TestManual|TestSource|TestIngest''`
+      — exit 0; `ok resofeed/internal/resofeed 0.743s`.
+
+
+      ## Spec link
+
+      - `docs/DESIGN.md` passages used by executor: shell no persistent left navigation;
+      Steer receipts; feed anatomy/fallback/keyboard/source markers; Inspector readable
+      payload/mobile Resonate; flat Source Ledger; Search/Retrieval lexical source-backed
+      semantics.
+
+      - `docs/ARCHITECTURE.md` passages used by executor: one binary, one SQLite,
+      lexical retrieval only, no accounts/OAuth/RBAC/vector/RAG.
+
+
+      ## Gaps/Notes
+
+      - Frontend blocker families GATE-FE-001 through GATE-FE-005 were addressed with
+      targeted green verification.
+
+      - Downstream independent retest still must regenerate/current-proof artifacts
+      and verify closure independently.
+
+      - Broad internal Go test failure observed by the worker is separate downstream
+      debt and must be owned before final closure.'
   - id: pbar-frontend-gate-retest-proof
     name: Retest and proof for frontend gate blockers
     status: pending
