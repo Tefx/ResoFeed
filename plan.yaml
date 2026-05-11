@@ -43345,7 +43345,7 @@ phases:
   steps:
   - id: pbar-contract-audit-matrix
     name: Build PRD behavior audit closure matrix
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - machine_readable_closure_matrix\nagent_source: default\n\nWriting-capable\
       \ contract/docs artifact step. Create or update ONLY the audit closure matrix\
@@ -43485,6 +43485,8 @@ phases:
     refs:
     - docs/audits/prd-behavior-audit-2026-05-11.md
     agent: general
+    claimed_by: general
+    claimed_at: '2026-05-11T16:00:56.009049+00:00'
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
