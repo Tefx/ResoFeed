@@ -46657,6 +46657,263 @@ phases:
     - pbar-frontend-mobile-search-ledger-remediation
     - pbar-frontend-steer-receipt-remediation
     agent: frontend-engineer
+  - id: pbar-frontend-gate-retest-proof
+    name: Retest and proof for frontend gate blockers
+    status: pending
+    description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
+      verification_scope: phase-check protecting the final frontend gate and downstream\
+      \ UI/UX audit\n\nAs an INDEPENDENT TESTER, retest the frontend gate blocker\
+      \ family after `pbar-frontend-gate-blocker-remediation`.\n\nThis step must prove\
+      \ the remediation is current and green before `pbar-frontend-gate` can run.\
+      \ Finding remaining blockers is valid verification output, but this step is\
+      \ only complete when the blocker family has green proof or explicit blocking\
+      \ findings for orchestrator remediation.\n\nRequired commands (run from the\
+      \ exact working directory shown):\n1. `cd web && npm run test:render`\n   -\
+      \ Required result for completion: exit code 0.\n   - This closes GATE-FE-001\
+      \ and must include the render contract suite that previously failed with 3 failed\
+      \ files and 9 failed tests.\n2. `cd web && npm run test:e2e -- --project=chromium-ci-safe\
+      \ ui-remediation-r1-r8-browser-retest.spec.ts full-ui-design-conformance.expected-red.spec.ts`\n\
+      \   - Required result for completion: exit code 0.\n   - This retests the targeted\
+      \ Playwright failures that previously exited 1 with 2 failed and 1 passed.\n\
+      3. `cd web && grep -R -n -E '@invar:allow|invar:allow' src || true`\n   - Required\
+      \ result for completion: no matches, or every match has an explicit approved\
+      \ contract justification.\n\nProof obligations:\n- GATE-FE-002: prove the shell\
+      \ no longer exposes persistent peer/surface tab or side navigation prohibited\
+      \ by contract; include evidence for the prior failure at `full-ui-design-conformance.expected-red.spec.ts:322`\
+      \ and the prior `TODAY` button failure at `rendering-expected-red.test.ts:333`.\n\
+      - GATE-FE-003: prove `.inspector-reading` contains readable prose where required\
+      \ and no longer regresses to only `summary unavailable`; include evidence for\
+      \ the prior failure at `ui-remediation-r1-r8-browser-retest.spec.ts:85`.\n-\
+      \ GATE-FE-004: prove accessibility/search/mobile semantics are green, including\
+      \ `Source filter` labeling, search result `listitem` role, mobile/full-screen\
+      \ surface containment, and focus/a11y behavior; include evidence for prior failures\
+      \ at `rendering-expected-red.test.ts:473`, `:497`, and `:386`.\n- GATE-FE-005:\
+      \ prove `.audit-artifacts/frontend-gate/semantic-closure-register.yaml` covers\
+      \ every required frontend-owned row or assigns explicit independent retest follow-up:\
+      \ B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B19,B21,B22,B23,U1,U2,U3,U5.\n\
+      - Additional proof-register rows: include current status and evidence for B12\
+      \ source diagnostic render tests (`manual-rss-fetch-source-ledger.expected-red.test.ts:115`),\
+      \ U2 add-feed receipt copy, U3 source ledger row grammar, and U5 active surface\
+      \ semantics/focus/a11y.\n- Artifact currency: rendered artifact evidence under\
+      \ `.audit-artifacts/frontend-gate/` and `web/test-results/ui-remediation/` must\
+      \ be regenerated during this retest or accompanied by explicit timestamp/content\
+      \ proof showing it corresponds to the current commands and current code. Prior\
+      \ artifacts contradicted by current runs are not sufficient.\n- Product-boundary\
+      \ compliance: confirm the remediation preserves ResoFeed invariants from `docs/ARCHITECTURE.md`\
+      \ and `docs/DESIGN.md`: single Go binary, SQLite/FTS5 only, no accounts/OAuth/RBAC,\
+      \ no vector/RAG, no sync/merge/event-bus/service-layer expansion, no forbidden\
+      \ SaaS/onboarding/unread/folders/tags/settings/archive concepts.\n\nBehavioral\
+      \ proof register requirement:\nProduce a structured proof register or update\
+      \ the existing closure register with `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,\
+      \ `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis` for every\
+      \ required frontend-owned row. Any `NEEDS_TEST`, `UNPROVEN`, or `UNCERTAIN_BLOCKING`\
+      \ row must include explicit remediation ownership or non-intersection proof\
+      \ before the final gate can open."
+    verification: '- `cd web && npm run test:render` exits 0 and output is included.
+
+      - `cd web && npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts` exits 0 and output is included.
+
+      - Escape hatch scan in `web/src` for `@invar:allow|invar:allow` has no unapproved
+      matches.
+
+      - Current regenerated artifacts or explicit artifact-currency proof are present
+      for `.audit-artifacts/frontend-gate/` and `web/test-results/ui-remediation/`.
+
+      - Closure register/proof register covers B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B19,B21,B22,B23,U1,U2,U3,U5
+      with evidence refs or independent retest assignments.
+
+      - Accessibility/focus proof covers Source filter labeling, search result listitem
+      role, mobile/full-screen containment, and U5 active surface semantics.
+
+      - Product-boundary compliance is explicitly checked against architecture/design
+      invariants.
+
+      - Final output contains a PASS/PASS_WITH_BLOCKERS headline; PASS is required
+      for `pbar-frontend-gate` to open.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/tests/e2e/manual-rss-fetch-source-ledger.expected-red.test.ts — key passage
+      or "NOT READ: <reason>"
+
+      - .audit-artifacts/frontend-gate/semantic-closure-register.yaml — key passage
+      or "NOT READ: <reason>"
+
+
+      ## Retest / Proof Report
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer implementation)
+
+      **Scope**: Frontend gate blocker family GATE-FE-001 through GATE-FE-005 plus
+      B12/U2/U3/U5 proof-register failures.
+
+      **Expected result**: green
+
+
+      ### Command execution
+
+      1. Render contract suite:
+
+      ```sh
+
+      cd web && npm run test:render
+
+      ```
+
+      Exit code: <0 required>
+
+      Output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      2. Targeted Playwright retest:
+
+      ```sh
+
+      cd web && npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts
+
+      ```
+
+      Exit code: <0 required>
+
+      Output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      3. Escape hatch scan:
+
+      ```sh
+
+      cd web && grep -R -n -E ''@invar:allow|invar:allow'' src || true
+
+      ```
+
+      Output:
+
+      ```
+
+      <paste output; expected no matches>
+
+      ```
+
+
+      ### Blocker closure table
+
+      | Blocker/Row | Prior failure evidence | Current proof artifact | Status | Closure
+      path | Gate decision basis |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | GATE-FE-001 | `npm run test:render` failed: 3 files, 9 tests | <output/artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | GATE-FE-002 | `full-ui-design-conformance.expected-red.spec.ts:322`; `rendering-expected-red.test.ts:333`
+      | <output/artifact> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | GATE-FE-003 | `ui-remediation-r1-r8-browser-retest.spec.ts:85` summary unavailable
+      | <output/artifact> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | GATE-FE-004 | `rendering-expected-red.test.ts:473`, `:497`, `:386` | <output/artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | GATE-FE-005 | closure register missing required rows | <register/artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | B12 | `manual-rss-fetch-source-ledger.expected-red.test.ts:115` | <output/artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | U2 | add-feed receipt copy expectation changed/failing | <output/artifact>
+      | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+      | U3 | source ledger row grammar failures | <output/artifact> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> | <basis> |
+
+      | U5 | active surface semantics/focus/a11y failures | <output/artifact> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> | <basis> |
+
+
+      ### Closure register completeness
+
+      Required rows: B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B19,B21,B22,B23,U1,U2,U3,U5
+
+      - Rows with evidence refs: <list>
+
+      - Rows with explicit independent retest assignments: <list>
+
+      - Missing rows: <must be empty for PASS>
+
+
+      ### Artifact currency proof
+
+      - `.audit-artifacts/frontend-gate/`: <regenerated timestamp/content hash or
+      explanation>
+
+      - `web/test-results/ui-remediation/`: <regenerated timestamp/content hash or
+      explanation>
+
+      - Statement: prior artifacts contradicted by current runs were not reused as
+      current proof.
+
+
+      ### Product-boundary compliance
+
+      - Single Go binary preserved: yes/no + evidence
+
+      - SQLite/FTS5 only preserved: yes/no + evidence
+
+      - No accounts/OAuth/RBAC: yes/no + evidence
+
+      - No vector/RAG: yes/no + evidence
+
+      - No sync/merge/event-bus/service-layer expansion: yes/no + evidence
+
+      - No forbidden SaaS/onboarding/unread/folders/tags/settings/archive concepts:
+      yes/no + evidence
+
+
+      ### Headline
+
+      - [ ] PASS: all required commands are green, artifacts are current, closure
+      register is complete, and product boundaries are preserved.
+
+      - [ ] PASS_WITH_BLOCKERS: one or more blocker-class obligations remain; list
+      required remediation ownership below.
+
+
+      Remaining blockers/remediation ownership:
+
+      - <none for PASS, otherwise exact rows and proposed follow-up>'
+    depends_on:
+    - pbar-frontend-gate-blocker-remediation
+    agent: integration-verifier
 - id: prd-behavior-audit-remediation-independent-retest-and-audits
   name: PRD Behavior Audit Remediation — Independent Retest and Audits
   status: locked
