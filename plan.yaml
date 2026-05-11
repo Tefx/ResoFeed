@@ -49295,6 +49295,88 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-uiux-multimodal-audit
     agent: frontend-engineer
+  - id: pbar-post-remediation-uiux-audit
+    name: Post-remediation UI/UX audit for Source Ledger boundary changes
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check protecting pbar-retest-audit-gate and final
+      strict closure
+
+
+      As an INDEPENDENT UI/UX AUDITOR (uiux-auditor), validate the UI after `pbar-source-ledger-boundary-wiring-remediation`
+      changes the Source Ledger, route/nav shell, or diagnostic affordance surfaces.
+      This audit is downstream of remediation and must not rely on the completed upstream
+      `pbar-uiux-multimodal-audit` as post-change proof.
+
+
+      Audit focus:
+
+      1. Source Ledger operation-control boundary: verify visible controls conform
+      to PRD/DESIGN after remediation, with no forbidden product creep or unsupported
+      run/fetch actions in disallowed Source Ledger locations unless explicitly adjudicated
+      by authoritative citations.
+
+      2. Allowed visible reachability path: verify a visible, non-persistent, product-boundary-compliant
+      path reaches the Source Ledger surface without introducing persistent peer navigation,
+      SaaS dashboard patterns, settings/product-management UI, folders/tags/unread/archive
+      flows, or sync/merge affordances.
+
+      3. Diagnostic full-view expansion: verify the source diagnostic full-view affordance
+      expands visible details, not only aria-label/title metadata, and works through
+      mouse, keyboard, and assistive-tech-oriented semantics.
+
+      4. Accessibility: verify labels, focus order, keyboard operation, visible state
+      indication, and screen-reader-oriented names for the affected Source Ledger
+      and diagnostics controls.
+
+      5. DESIGN.md conformance: verify dense archival aesthetic, functional chrome
+      labels, muted palette/rare accent discipline, and ResoFeed forbidden UI patterns
+      remain intact.
+
+
+      Native multimodal evidence is mandatory. DOM snapshots or test logs alone are
+      insufficient unless paired with screenshots/video/terminal-capture-equivalent
+      visual evidence for the remediated states.
+
+
+      Do not modify code. Finding blocker issues is a successful audit outcome; report
+      them explicitly for gate handling.'
+    verification: 'phase-check protecting pbar-retest-audit-gate: uiux-auditor provides
+      post-remediation multimodal evidence for Source Ledger operation-control boundary,
+      allowed visible reachability path, diagnostic full-view expansion, accessibility,
+      and DESIGN.md conformance. The audit output must include explicit PASS/PASS_WITH_BLOCKERS/FAIL
+      verdict and blocker fields; unresolved blocker-class UI/UX or accessibility
+      findings must block pbar-retest-audit-gate.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n\n## Post-Remediation UI/UX Audit Report\n\n**Auditor**:\
+      \ uiux-auditor\n**Scope**: Source Ledger boundary/remediation, visible reachability\
+      \ path, diagnostic full-view expansion, accessibility, DESIGN.md conformance\n\
+      **Remediation step reviewed**: pbar-source-ledger-boundary-wiring-remediation\n\
+      \n### Multimodal Evidence (MANDATORY)\n- Screenshot/video/capture artifact paths:\n\
+      \  - `<artifact path>`\n- States captured:\n  - Source Ledger default/reachable\
+      \ state\n  - Source Ledger allowed visible path/nav or command result state\n\
+      \  - Diagnostic collapsed state\n  - Diagnostic expanded full-view state\n \
+      \ - Keyboard-focused diagnostic/source controls\n\n### Required Findings Table\n\
+      | Area | Evidence Ref | Verdict | Blockers |\n| --- | --- | --- | --- |\n| Source\
+      \ Ledger operation-control boundary | `<artifact/ref>` | PASS/PASS_WITH_BLOCKERS/FAIL\
+      \ | `<none or list>` |\n| Allowed visible reachability path | `<artifact/ref>`\
+      \ | PASS/PASS_WITH_BLOCKERS/FAIL | `<none or list>` |\n| Diagnostic full-view\
+      \ expansion | `<artifact/ref>` | PASS/PASS_WITH_BLOCKERS/FAIL | `<none or list>`\
+      \ |\n| Accessibility and keyboard/AT semantics | `<artifact/ref>` | PASS/PASS_WITH_BLOCKERS/FAIL\
+      \ | `<none or list>` |\n| DESIGN.md conformance | `<artifact/ref>` | PASS/PASS_WITH_BLOCKERS/FAIL\
+      \ | `<none or list>` |\n\n### Verdict\n- Overall verdict: PASS | PASS_WITH_BLOCKERS\
+      \ | FAIL\n- Blockers:\n  - `<blocker id, description, location, reproduction,\
+      \ required closure>`\n- Non-blocking observations:\n  - `<observation>`\n\n\
+      ### Gate Decision Basis\n- Requirement refs reviewed: `<PRD/DESIGN/ARCHITECTURE\
+      \ passages>`\n- Runtime/multimodal proof expected: screenshot or equivalent\
+      \ visual/spatial artifact for each required state\n- Evidence refs: `<artifact\
+      \ paths>`\n- Closure path for any blocker: `<fix/retest owner or BLOCK gate>`"
+    depends_on:
+    - pbar-source-ledger-boundary-wiring-remediation
+    agent: uiux-auditor
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
