@@ -43524,3 +43524,78 @@ phases:
     depends_on:
     - pbar-contract-audit-matrix
     agent: integration-verifier
+  - id: pbar-contract-tests-gate
+    name: Gate audit matrix and expected-red coverage
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the PRD
+      behavior audit remediation foundation is complete enough for implementation.
+
+
+      Review depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase covers all PRD behavior audit findings B1-B23 and U1-U5.
+
+      - Search, Steer, Doctor, Inspector, mobile surface containment, and LLM provenance
+      are product-critical behavior paths.
+
+      - UI behavior and backend semantics both need expected-red proof before fixes.
+
+
+      BLOCK if any finding is missing from the matrix, lacks an owner, lacks acceptance
+      criteria, lacks evidence requirements, or lacks expected-red coverage/explicit
+      infeasibility rationale.
+
+
+      Verification scope: phase-check protecting backend/frontend remediation phases
+      and the final strict closure gate.'
+    verification: 'phase-check protecting downstream implementation: all foundation
+      steps complete, matrix enumerates B1-B23 and U1-U5 exactly, expected-red tests
+      map to every behavior regression whenever feasible, test-only scope is verified,
+      and no implementation phase may proceed with missing ownership or ambiguous
+      acceptance.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of test authors)
+
+      **Phase**: prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests
+
+
+      ### Finding Inventory Check
+
+      - B1-B23 present: PASS/FAIL
+
+      - U1-U5 present: PASS/FAIL
+
+      - Owners/acceptance/evidence present for every row: PASS/FAIL
+
+
+      ### Expected-Red Check
+
+      - Backend expected-red coverage complete or justified: PASS/FAIL
+
+      - Browser expected-red coverage complete or justified: PASS/FAIL
+
+      - Product code untouched by test steps: PASS/FAIL
+
+
+      ### Decision
+
+      - OPEN only if every finding has owner + acceptance + evidence + expected-red
+      coverage/justification.'
+    depends_on:
+    - pbar-contract-audit-matrix
+    - pbar-expected-red-backend-tests
+    - pbar-expected-red-browser-tests
+    agent: gate-reviewer
