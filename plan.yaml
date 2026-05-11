@@ -39545,3 +39545,63 @@ phases:
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     - ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     agent: gate-reviewer
+  - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
+    name: urrc-r1-inspector-sanitation-fix
+    status: pending
+    description: "Focused R1 residual blocker fix for Inspector sanitation after browser\
+      \ retest evidence.\n\nstep_type: implementation. work_type: defect_repair. Agent:\
+      \ frontend-engineer. This is a focused residual fix only; do NOT create a broad\
+      \ UI rework loop.\n\nUpstream blocker evidence from ui-remediation-retest-closure.urrc-playwright-browser-retest:\n\
+      - Baseline command: `npm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`\
+      \ — exit 0, 11 passed.\n- Focused command: `npm run test:e2e -- --project=chromium-ci-safe\
+      \ ui-remediation-r1-r8-browser-retest.spec.ts` — exit 1.\n- R2/R3/R4/R5/R6/R7/R8:\
+      \ PROVEN.\n- R1: UNPROVEN/BLOCKING.\n- Inspector primary text leaked these exact\
+      \ strings:\n  - `Follow us on Twitter for more newsletters`\n  - `summary-like\
+      \ lead repeated by the site`\n\nScope:\n- Fix Inspector article-body sanitation\
+      \ so follow/newsletter/social prompts and repeated lead-like text are removed\
+      \ from the primary Inspector reading payload.\n- Preserve the already-proven\
+      \ R2-R8 behavior; do not alter Source Ledger, metadata grammar, Search scoping,\
+      \ or State Portability placement except where unavoidable for shared code.\n\
+      - Product implementation changes are allowed only where needed for R1 sanitation\
+      \ and related focused regressions.\n\nAnti-cheat / test integrity:\n- Do NOT\
+      \ merely weaken, skip, delete, or relax Playwright tests.\n- Do NOT hide the\
+      \ failure strings only in test fixtures while leaving equivalent production\
+      \ leakage paths.\n- Do NOT replace the Inspector with empty/truncated content\
+      \ to avoid bad strings; it must still show readable article prose.\n\nKnown\
+      \ risk / Gate Preview:\n- The final gate WILL reject a fix that removes only\
+      \ the two literal examples but leaves sibling follow prompts, newsletter/social\
+      \ CTAs, or repeated lead-like boilerplate in the Inspector body.\n- The final\
+      \ gate WILL reject test-only changes or evidence that omits the focused browser\
+      \ retest.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only completion is NOT acceptable. The deliverable MUST contain\
+      \ substantive sanitation logic that processes Inspector content inputs and produces\
+      \ outputs that vary based on those inputs."
+    verification: '- Focused R1 sanitation changes are implemented without weakening
+      or deleting the failing Playwright proof.
+
+      - The Inspector primary text no longer contains `Follow us on Twitter for more
+      newsletters` or `summary-like lead repeated by the site`.
+
+      - Regression coverage or focused local proof covers follow/newsletter/social
+      prompt removal and repeated lead-like text removal while preserving readable
+      article prose.
+
+      - Evidence identifies touched files and confirms R2-R8 surfaces were not intentionally
+      changed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/ui-remediation-retest-2026-05-11.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n\n## Focused R1 Fix Evidence\n- Touched files:\n  - <file paths>\n- Root cause\
+      \ of R1 leak:\n  - <why follow prompts / repeated lead-like text reached Inspector\
+      \ primary text>\n- Fix summary:\n  - <how sanitation now removes those classes\
+      \ without blanking article prose>\n- Test integrity confirmation:\n  - Playwright\
+      \ proof weakened/skipped/deleted: YES/NO (must be NO)\n- Literal failure strings\
+      \ absent from Inspector primary text in local proof:\n  - `Follow us on Twitter\
+      \ for more newsletters`: ABSENT/PRESENT\n  - `summary-like lead repeated by\
+      \ the site`: ABSENT/PRESENT\n- R2-R8 preservation note:\n  - <confirm no intentional\
+      \ changes to proven surfaces or list unavoidable shared changes>\n\n## Headline\n\
+      PASS | PASS_WITH_DEBT | FAIL"
+    depends_on:
+    - ui-remediation-retest-closure.urrc-playwright-browser-retest
+    agent: frontend-engineer
