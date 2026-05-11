@@ -234,6 +234,39 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(originalLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))).toBe(true);
   });
 
+  it('removes follow/newsletter prompts and adjacent repeated lead-like filler without blanking article prose', () => {
+    const dirtyDetail: ItemDetail = {
+      ...expectedRedItem,
+      id: 'item_inspector_follow_prompt_repeated_lead',
+      title: 'Article with follow prompt and repeated lead',
+      summary: 'Readable summary remains outside social boilerplate.',
+      core_insight: 'Readable core insight remains outside social boilerplate.',
+      extraction_status: 'full',
+      feed_excerpt: 'Readable fallback excerpt remains available.',
+      extracted_text: `summary-like lead repeated by the site summary-like lead repeated by the site
+        Follow us on Twitter for more newsletters
+        Readable article prose survives after social boilerplate and repeated lead filler.`,
+      provenance: {
+        source_url: expectedRedSource.url,
+        canonical_url: expectedRedItem.url,
+        original_url: expectedRedItem.url,
+        story_key: null,
+        duplicate_of_item_id: null
+      }
+    };
+
+    render(Inspector, { props: { item: dirtyDetail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
+    expect(within(inspector).getByText(/Readable article prose survives after social boilerplate/)).toBeVisible();
+    const primaryText = Array.from(inspector.querySelectorAll('h2, p:not(.contract-label):not(.contract-muted):not(.contract-warning)'))
+      .map((node) => node.textContent ?? '')
+      .join(' ')
+      .replace(/\s+/g, ' ');
+    expect(primaryText).not.toContain('Follow us on Twitter for more newsletters');
+    expect(primaryText).not.toContain('summary-like lead repeated by the site');
+  });
+
   it('places the mobile Inspector Resonate action in the top header row without duplicating debug status', () => {
     const onResonanceToggle = vi.fn(async () => {});
     render(Inspector, { props: { item: expectedRedItem, mode: 'mobile-route', onResonanceToggle } });

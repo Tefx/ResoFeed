@@ -5,6 +5,12 @@
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
 
+  interface WordSpan {
+    word: string;
+    start: number;
+    end: number;
+  }
+
   interface Props {
     item: InspectableItem | null;
     mode: InspectorMode;
@@ -135,20 +141,64 @@
   function removeSourceBoilerplate(text: string): string {
     return text
       .replace(/\bskip\s+to\s+(?:main\s+)?(?:content|article|navigation|menu)\b/gi, ' ')
-      .replace(/\b(?:affiliate|commission|reader-supported|may earn|product links|commerce disclosure)\b[^.!?]*(?:[.!?]|$)/gi, ' ')
-      .replace(/\b(?:related|related stories|more from|more stories|recommended|recommendation|most\s+popular|advertiser\s+content|advertisement|sponsored\s+content|commerce|shopping|newsletter\s+sign\s*up|subscribe\s+now)\b(?:\s+[^.!?]{0,220})?[.!?]?/gi, ' ')
-      .replace(/\b(?:share|follow|sign\s+up|log\s+in|read\s+more|subscribe|join our newsletter)\b\s+(?:on\s+)?(?:facebook|twitter|x|instagram|linkedin|email|newsletter|for more)\b[^.!?]*[.!?]?/gi, ' ')
-      .replace(/\b(?:by|about)\s+(?:the\s+)?author\b[^.!?]*(?:[.!?]|$)/gi, ' ')
-      .replace(/\b(?:author profile|staff profile|view author archive|contact the author)\b[^.!?]*(?:[.!?]|$)/gi, ' ')
-      .replace(/\b(?:photo|image|illustration|credit|credits?)\s*(?::|by)\s*[^.!?]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:affiliate|commission|reader-supported|may earn|product links|commerce disclosure)\b[^.!?\n]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:related|related stories|more from|more stories|recommended|recommendation|most\s+popular|advertiser\s+content|advertisement|sponsored\s+content|commerce|shopping|newsletter\s+sign\s*up|subscribe\s+now)\b(?:[^.!?\n]{0,220})[.!?]?/gi, ' ')
+      .replace(/\b(?:share|follow|sign\s+up|log\s+in|read\s+more|subscribe|join our newsletter)\b\s+(?:us\s+)?(?:on\s+|for\s+|to\s+|our\s+)?(?:facebook|twitter|x|instagram|linkedin|email|newsletter|newsletters|updates|more\s+newsletters?)\b[^.!?\n]*[.!?]?/gi, ' ')
+      .replace(/\b(?:follow|subscribe|sign\s+up|join)\b[^.!?\n]{0,80}\b(?:twitter|facebook|instagram|linkedin|newsletter|newsletters|email|updates)\b[^.!?\n]*[.!?]?/gi, ' ')
+      .replace(/\b(?:by|about)\s+(?:the\s+)?author\b[^.!?\n]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:author profile|staff profile|view author archive|contact the author)\b[^.!?\n]*(?:[.!?]|$)/gi, ' ')
+      .replace(/\b(?:photo|image|illustration|credit|credits?)\s*(?::|by)\s*[^.!?\n]*(?:[.!?]|$)/gi, ' ')
       .replace(/\b(?:the\s+)?(?:homepage|home\s+page)\b(?:\s+[A-Z][\w&'-]*){1,10}(?=\s+(?:reviews|podcasts|newsletters|news|videos|sections|menu)\b)(?:\s+\w+){0,8}/g, ' ')
       .replace(/(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?/gi, ' ')
       .replace(/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{[^}]*\}/g, ' ')
       .replace(/\bhistory\.scrollRestoration\s*=\s*['"][^'"]+['"];?/g, ' ');
   }
 
+  function removeAdjacentRepeatedWordSequences(text: string): string {
+    const words = Array.from(text.matchAll(/[\p{L}\p{N}'-]+/gu), (match): WordSpan => ({
+      word: match[0].toLowerCase(),
+      start: match.index ?? 0,
+      end: (match.index ?? 0) + match[0].length
+    }));
+    if (words.length < 10) return text;
+
+    const removals: Array<{ start: number; end: number }> = [];
+    let index = 0;
+    while (index < words.length) {
+      let removed = false;
+      for (let wordCount = Math.min(24, Math.floor((words.length - index) / 2)); wordCount >= 5; wordCount -= 1) {
+        const first = words.slice(index, index + wordCount).map((word) => word.word).join(' ');
+        const second = words.slice(index + wordCount, index + (wordCount * 2)).map((word) => word.word).join(' ');
+        if (first === second) {
+          let repeatCount = 2;
+          while (index + ((repeatCount + 1) * wordCount) <= words.length) {
+            const next = words.slice(index + (repeatCount * wordCount), index + ((repeatCount + 1) * wordCount)).map((word) => word.word).join(' ');
+            if (next !== first) break;
+            repeatCount += 1;
+          }
+          if (repeatCount === 2) {
+            removals.push({ start: words[index].start, end: words[index + (wordCount * 2) - 1].end });
+          }
+          index += wordCount * repeatCount;
+          removed = true;
+          break;
+        }
+      }
+      if (!removed) index += 1;
+    }
+    if (removals.length === 0) return text;
+
+    let cleanText = '';
+    let cursor = 0;
+    for (const removal of removals) {
+      cleanText += `${text.slice(cursor, removal.start)} `;
+      cursor = removal.end;
+    }
+    return `${cleanText}${text.slice(cursor)}`;
+  }
+
   function removeRepeatedIntro(text: string): string {
-    const sentences = text.split(/(?<=[.!?])\s+/).filter((sentence) => sentence.trim().length > 0);
+    const sentences = removeAdjacentRepeatedWordSequences(text).split(/(?<=[.!?])\s+/).filter((sentence) => sentence.trim().length > 0);
     const seen = new Set<string>();
     return sentences.filter((sentence) => {
       const key = sentence.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
