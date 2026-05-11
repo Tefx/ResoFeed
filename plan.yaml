@@ -43664,3 +43664,77 @@ phases:
       \ unique no-match query returns stable empty state, no internal error.\n- Product-boundary\
       \ proof: no vector/RAG/semantic search introduced."
     agent: golang-developer
+  - id: pbar-backend-steer-ranking-remediation
+    name: Fix natural-language steering receipts and deterministic ranking effects
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete backend natural-language Steer and ranking behavior for B4, B5, B14,
+      B15, B16, B17, and U2.
+
+
+      Scope:
+
+      - Existing Steer request/receipt path in internal/resofeed/http.go/types.go/ranking.go
+      and related storage only.
+
+      - Natural-language steering must return a terse verifiable receipt: `interpreted_as:
+      <normalized rule>` plus applied or a specific actionable `err:`.
+
+      - Short and complex natural-language instructions must use the same translation,
+      validation, and receipt path.
+
+      - Accepted reduce/hide and boost rules must influence Today ranking/filtering
+      in a deterministic small corpus.
+
+      - RSS URL add-source receipts must include `source added: <title|host>` and
+      a terse next-action hint such as `run ingest in SOURCE LEDGER` without adding
+      onboarding wizard behavior.
+
+
+      State semantics:
+
+      - Human steering remains current active state, not an event-sourced history
+      or rule-management product.
+
+      - `actor_id` remains provenance/idempotency, not authorization.
+
+      - Human steering supersedes delegated agent steering per architecture.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT add settings sliders, rule builder UI, per-rule CRUD, accounts, sync,
+      command history, or an activity ledger.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Generic `err: internal: internal error` for natural-language steering.
+
+      2. Accepted rules that do not affect small-corpus ordering/filtering.
+
+      3. Receipts that hide the interpreted rule or added source identity.
+
+      4. New product concepts forbidden by PRD/ARCHITECTURE.'
+    verification: 'local-check protecting B4/B5/B14/B15/B16/B17/U2: targeted Go tests
+      pass for interpreted steering receipts, specific failure receipts, source-added
+      receipt content, and deterministic accepted-rule ranking/filtering in a controlled
+      corpus.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B4, B5, B14, B15, B16, B17, U2\n- Files changed: <list>\n\
+      - Commands/tests:\n  ```\n  <commands and output>\n  ```\n- Receipt examples:\
+      \ <natural-language accepted, rejected, source added>\n- Ranking proof: <controlled\
+      \ corpus before/after accepted rule>\n- Product-boundary proof: no rule builder,\
+      \ settings, history ledger, accounts, or sync concepts added."
+    agent: golang-developer
