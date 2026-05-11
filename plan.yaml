@@ -38516,7 +38516,7 @@ phases:
       none'
 - id: ui-remediation-retest-closure
   name: UI Remediation Retest Closure
-  status: in_progress
+  status: done
   gate: Close all remaining blocker-class findings R1-R8 from docs/audits/ui-remediation-retest-2026-05-11.md
     with real browser/Playwright evidence, screenshot-first uiux-auditor validation,
     architecture/product-boundary retest, and a final independent gate. No forbidden
@@ -39667,7 +39667,7 @@ phases:
       integration-verifier step.'
   - id: ui-remediation-retest-closure.urrc-final-remediation-gate
     name: urrc-final-remediation-gate
-    status: claimed
+    status: done
     description: 'Final independent gate for UI Remediation Retest Closure.
 
 
@@ -39926,6 +39926,191 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T10:24:29.015064+00:00'
+    done_at: '2026-05-11T10:27:54.070086+00:00'
+    evidence: '## refs Read Confirmation
+
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: absent in isolated
+      worktree; `invar_doc_toc` returned file not found and glob found no matching
+      audit files.
+
+      - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+      — Read. Key passage: `verdict: PASS`, `blockers: []`, `gate_open_allowed: true`;
+      command `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts`, exit code `0`, `3 passed`,
+      and R1-R8 all `PROVEN`.
+
+      - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ — Read/inventoried.
+      Key insight: bundle contains manifest, desktop and 390x844 mobile screenshots,
+      traces, R1 primary text, and sibling proof; `manifest.json` records exit_code
+      `0`, expected `3`, skipped `0`, unexpected `0`, flaky `0`.
+
+      - audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md — Read. Key
+      passage: artifact cites canonical handoff and evidence bundle, has R1-R8 matrix
+      with exact screenshot/trace/DOM/text mappings, `verdict: PASS`, `blockers: []`,
+      `gate_open_allowed: true`.
+
+
+      ## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent)
+
+      **Phase**: ui-remediation-retest-closure
+
+      **Headline**: [PASS] Final remediation gate may open; corrected downstream UIUX
+      re-audit artifact is committed, parseable, and no longer uses silent N/A mappings.
+
+      **Blocking Status**: none found.
+
+      **Proof-Gap Status**: original `docs/audits/ui-remediation-retest-2026-05-11.md`
+      is absent, but canonical repair, committed downstream re-audit, evidence bundle,
+      browser manifest, test source, and architecture retest artifacts provide sufficient
+      closure evidence.
+
+
+      ## Required Downstream Re-Audit Artifact Review
+
+
+      **Artifact path reviewed**: audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+
+      **Artifact exists**: yes
+
+      **Artifact committed/included in changes**: yes; `git ls-files --error-unmatch`
+      found it, and `git log --oneline -- <artifact>` shows commit `364f0b2` after
+      materialization commit `2c834d0`.
+
+      **Canonical handoff cited**: yes
+
+      **Evidence bundle cited**: yes
+
+      **Parseable verdict/blockers/gate_open_allowed**: yes; `verdict: PASS`, `blockers:
+      []`, `gate_open_allowed: true`.
+
+      **N/A/path-mapping consistency**: pass. Search for `N/A|UNPROVEN|NEEDS_TEST|UNCERTAIN_BLOCKING|blocking_status:
+      OPEN|gate_open_allowed: false` in the downstream artifact returned no matches.
+      R2-R8 explicitly state text evidence is not required for non-text visual/DOM
+      obligations and map DOM/a11y proof to exact trace paths.
+
+
+      ## R1-R8 Closure Matrix
+
+
+      All R1-R8 final statuses are `PROVEN`:
+
+      - R1: R1 browser screenshot/trace and primary Inspector text artifact prove
+      forbidden-string absence and readable prose presence, including `Second readable
+      paragraph confirms the body is not empty after bounded cleanup.`
+
+      - R2: narrow Source Ledger 390x844 screenshot and trace prove mobile geometry.
+
+      - R3: desktop/narrow authenticated feed screenshots and trace prove lower-case
+      metadata readability.
+
+      - R4: feed/Inspector screenshots and corresponding traces prove single Inspector
+      provenance.
+
+      - R5: narrow search and Today screenshots plus trace prove Search context does
+      not leak into Today.
+
+      - R6: desktop feed/Inspector and search screenshots plus trace prove duplicate
+      Inspect DOM/a11y absence.
+
+      - R7: desktop/narrow Source Ledger screenshots plus trace prove Source Ledger
+      row grammar.
+
+      - R8: desktop/narrow Source Ledger screenshots plus trace prove State Portability
+      footer/action cluster.
+
+
+      ## Gate Evidence Completeness
+
+
+      - Wiring audit results: W1 required refs checked; W2 artifact existence/tracking
+      PASS; W3 decision fields PASS; W4 R1-R8 mapping PASS; W5 cited path existence
+      PASS; W6 browser/runtime evidence PASS; W7 escape hatch audit PASS; W8 architecture/product
+      boundary PASS.
+
+      - Escape hatch audit: no `@invar:allow` found in scoped `cmd/`, `internal/`,
+      or `web/` product/source/test paths.
+
+      - Runtime/browser proof basis: committed Playwright evidence bundle, `manifest.json`,
+      screenshot PNGs, trace zips, and R1 text attachment; manifest reports command
+      exit_code `0`.
+
+      - Integration proof distinction: real browser/UI integration via Playwright
+      `page.goto`, owner-token entry, OPML import, `[RUN INGEST]`, Source Ledger,
+      Today, Search, Inspector interactions, viewport changes, screenshots, and traces.
+
+
+      ## behavioral_proof_register
+
+
+      - R1 Inspector primary text cleanup: PROVEN; artifacts include R1 text attachment
+      and browser retest spec; uncertainty none material.
+
+      - R2 mobile Source Ledger geometry: PROVEN; artifacts include 390x844 screenshot
+      and trace; uncertainty none material.
+
+      - R3 lower-case metadata readability: PROVEN; artifacts include desktop/narrow
+      authenticated feed screenshots and trace.
+
+      - R4 single Inspector provenance: PROVEN; artifacts include feed/Inspector screenshots
+      and traces.
+
+      - R5 Search context not leaking into Today: PROVEN; artifacts include narrow
+      search screenshot, narrow authenticated feed after Today, and trace.
+
+      - R6 duplicate Inspect DOM/a11y absence: PROVEN; artifacts include desktop feed/Inspector
+      screenshot, desktop search screenshot, and trace.
+
+      - R7 Source Ledger row grammar: PROVEN; artifacts include desktop/narrow Source
+      Ledger screenshots and trace.
+
+      - R8 State Portability footer/action cluster: PROVEN; artifacts include desktop/narrow
+      Source Ledger screenshots and trace.
+
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      verdict: PASS
+
+      blockers: []
+
+
+      ## Files changed
+
+
+      none; verify-only gate. Worktree remained clean, no audit artifact was created
+      and no commit was made in the isolated branch.
+
+
+      ## Verification
+
+
+      - Final gate worktree status was clean.
+
+      - `git log --oneline main..vectl/step-ui-remediation-retest-closure.urrc-final-remediation-gate`
+      produced no output, confirming no branch delta required merging.
+
+      - Gate reviewer verified required artifacts are tracked, evidence bundle paths
+      exist, browser manifest is green, no N/A/proof-gap markers remain in the downstream
+      artifact, no scoped `@invar:allow` escape hatch exists, and architecture/product-boundary
+      retest passed.
+
+
+      ## Gaps/Notes
+
+
+      - Original/latest audit reference `docs/audits/ui-remediation-retest-2026-05-11.md`
+      is absent in this worktree; gate reviewer recorded it and did not classify it
+      as blocking because canonical repair + committed downstream re-audit + evidence
+      bundle independently prove R1-R8 closure.
+
+      - No unresolved blocker-class `NEEDS_TEST`, `UNPROVEN`, `UNCERTAIN_BLOCKING`,
+      open blocker status, or false gate-open flag found.'
   - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
     name: urrc-r1-inspector-sanitation-fix
     status: done
