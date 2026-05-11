@@ -43797,3 +43797,66 @@ phases:
       \ proof: dirty tail/source furniture is removed or fallback-labelled.\n- Shared-layer\
       \ proof: sanitation is not only UI-local."
     agent: golang-developer
+  - id: pbar-backend-llm-doctor-provenance-remediation
+    name: Align LLM fallback provenance and doctor diagnostic semantics
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete LLM/item-understanding provenance and /doctor diagnostic semantics
+      for B6, B18, B19, B20, and U4.
+
+
+      Scope:
+
+      - internal/resofeed/openrouter.go, ingest/model-status handling, doctor.go,
+      and related item summary/detail fields.
+
+      - Freshly ingested items should move through a successful model state when OpenRouter
+      is available.
+
+      - If provider/model work times out or fails, distinguish provider reachability/configuration,
+      model resolution, item transformation health, fallback/excerpt provenance, and
+      item-level status.
+
+      - /doctor remains raw monospace/plain text but should expose stable scan-readable
+      keys such as provider_reachable, model_resolved, item_transform_failures, and
+      raw item lines below.
+
+      - Feed/Inspector must not overstate fallback/excerpt summaries as completed
+      model-backed summary/core insight.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT add dashboards, charts, remediation panels, secondary fallback product
+      modes, or settings pages. Raw diagnostics only.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. `openrouter: ok` headline while item transforms are failing without separated
+      status keys.
+
+      2. `resolved_model=unknown` presented as healthy.
+
+      3. Fallback/excerpt text presented as model-backed summary/core insight.'
+    verification: 'local-check protecting B6/B18/B19/B20/U4: targeted Go tests pass
+      for provider reachability vs model resolution vs item transform status, fresh-item
+      model status, fallback/excerpt labelling, and raw /doctor output keys.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B6, B18, B19, B20, U4\n- Files changed: <list>\n- Commands/tests:\n\
+      \  ```\n  <commands and output>\n  ```\n- Doctor output sample: <provider_reachable/model_resolved/item_transform_failures/raw\
+      \ item lines>\n- Fresh ingest/model proof: <fixture item state transitions>\n\
+      - Fallback labelling proof: <feed/Inspector status examples>\n- Product-boundary\
+      \ proof: raw diagnostics only; no dashboard/settings/remediation panel."
+    agent: golang-developer
