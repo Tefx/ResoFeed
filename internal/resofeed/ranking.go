@@ -353,18 +353,40 @@ func rankCandidates(candidates []rankedCandidate, limit int, now time.Time) []It
 func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.Time, rules []SteerRule) []ItemSummary {
 	storyHasFresh := map[string]bool{}
 	storyHasTouchedMemory := map[string]bool{}
+	storyTouchedAfter := map[string][]time.Time{}
+	storyHasNewerTouchedDevelopment := map[string]bool{}
 	freshSources := map[string]bool{}
 	for _, candidate := range candidates {
 		if candidate.item.StoryKey != nil {
+			key := *candidate.item.StoryKey
 			if candidate.fresh {
-				storyHasFresh[*candidate.item.StoryKey] = true
+				storyHasFresh[key] = true
 			}
 			if candidate.memory && (candidate.item.IsResonated || candidate.item.HumanInspectedAt != nil || candidate.item.ExternalSurfacedAt != nil) {
-				storyHasTouchedMemory[*candidate.item.StoryKey] = true
+				storyHasTouchedMemory[key] = true
+			}
+			if touchedAt, ok := candidateTouchTime(candidate); ok {
+				storyTouchedAfter[key] = append(storyTouchedAfter[key], touchedAt)
 			}
 		}
 		if candidate.fresh {
 			freshSources[candidate.item.SourceID] = true
+		}
+	}
+	for _, candidate := range candidates {
+		if candidate.item.StoryKey == nil {
+			continue
+		}
+		key := *candidate.item.StoryKey
+		candidateAt := itemTime(candidate)
+		if candidateAt.IsZero() {
+			continue
+		}
+		for _, touchedAt := range storyTouchedAfter[key] {
+			if candidateAt.After(touchedAt) {
+				storyHasNewerTouchedDevelopment[key] = true
+				break
+			}
 		}
 	}
 
@@ -378,7 +400,7 @@ func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.T
 		}
 		if candidate.item.StoryKey != nil {
 			key := *candidate.item.StoryKey
-			candidate.related = storyHasFresh[key] && storyHasTouchedMemory[key]
+			candidate.related = (storyHasFresh[key] && storyHasTouchedMemory[key]) || storyHasNewerTouchedDevelopment[key]
 		}
 		if candidate.item.ExternalSurfacedAt != nil && !candidate.related {
 			continue
@@ -476,6 +498,22 @@ func scoreCandidate(candidate rankedCandidate, now time.Time, rules []SteerRule)
 	score -= int(age / time.Hour)
 	score -= candidate.ordinal
 	return score
+}
+
+func candidateTouchTime(candidate rankedCandidate) (time.Time, bool) {
+	if candidate.item.ExternalSurfacedAt != nil {
+		return *candidate.item.ExternalSurfacedAt, true
+	}
+	if candidate.item.HumanInspectedAt != nil {
+		return *candidate.item.HumanInspectedAt, true
+	}
+	if candidate.item.IsResonated {
+		candidateAt := itemTime(candidate)
+		if !candidateAt.IsZero() {
+			return candidateAt, true
+		}
+	}
+	return time.Time{}, false
 }
 
 func steeringScore(candidate rankedCandidate, rules []SteerRule) int {
