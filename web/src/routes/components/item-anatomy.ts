@@ -98,6 +98,13 @@ export function itemSummaryProvenanceLabel(item: ItemSummary): string {
   return 'summary unavailable';
 }
 
+export function itemPriorityLabel(item: ItemSummary): string {
+  if (item.value_tier) return `value: ${item.value_tier}`;
+  if (item.model_status !== 'ok') return `quality: ${itemSummaryProvenanceLabel(item)}`;
+  if (item.extraction_status !== 'full') return `quality: ${itemExtractionLabel(item.extraction_status)}`;
+  return 'quality: source-backed';
+}
+
 export function shouldShowTimeGroup(items: ItemSummary[], index: number): boolean {
   if (index === 0) return true;
   return itemTimeGroup(items[index]) !== itemTimeGroup(items[index - 1]);

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ItemSummary, SearchResponse } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
-  import { itemAgeLabel, itemExtractionLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -98,9 +98,7 @@
               <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
               · <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
               · <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
-              {#if item.value_tier}
-                · <span aria-label={`Value tier: ${item.value_tier}`}>{item.value_tier}</span>
-              {/if}
+              · <span aria-label={`Priority signal: ${itemPriorityLabel(item)}`}>{itemPriorityLabel(item)}</span>
               {#if item.external_surfaced_at}
                 · <span aria-label="Externally surfaced by agent">agent:external</span>
               {/if}
