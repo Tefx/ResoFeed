@@ -44233,7 +44233,7 @@ phases:
   steps:
   - id: pbar-backend-search-remediation
     name: Fix backend lexical search execution and no-match semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -44287,6 +44287,8 @@ phases:
       \ unique no-match query returns stable empty state, no internal error.\n- Product-boundary\
       \ proof: no vector/RAG/semantic search introduced."
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:25:51.507804+00:00'
   - id: pbar-backend-steer-ranking-remediation
     name: Fix natural-language steering receipts and deterministic ranking effects
     status: pending
