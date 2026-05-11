@@ -44222,6 +44222,135 @@ phases:
       \ with real rendered screenshots/DOM/a11y attachments.\n\ngit restore -- .test-artifacts\
       \ && git clean -fd -- .test-artifacts && git status --short\n# generated artifacts\
       \ cleaned; final status clean.\n```"
+  - id: pbar-contract-tests-expected-red-disposition
+    name: Expected-red disposition for contract/test foundation
+    status: done
+    description: 'Closure/disposition step for pbar-contract-tests-gate expected-red
+      evidence.
+
+
+      work_type: proof_closure
+
+      step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+
+      Purpose:
+
+      - Close the completed-evidence guard for pbar-contract-tests-gate without altering
+      completed implementation/code steps.
+
+      - Record that the failed browser/backend tests referenced by the foundation
+      gate were intentional pre-implementation expected-red artifacts, not unowned
+      runtime blockers.
+
+      - Record downstream ownership for green conversion and separate backend liveness
+      remediation.
+
+
+      Disposition requirements:
+
+      - expected-red failures in this phase are intentional pre-implementation test-definition
+      artifacts;
+
+      - downstream owners were created and later phases owned green conversion;
+
+      - gate_open_allowed=true for the contract/test foundation;
+
+      - no unowned blocker remains from the expected-red evidence;
+
+      - later runtime/liveness blockers are separately owned by pbar-backend-liveness-remediation
+      and pbar-backend-liveness-retest.
+
+
+      This step is evidence-only plan repair. It MUST NOT modify product code, test
+      code, or previously completed steps.'
+    verification: '- Closure evidence explicitly distinguishes expected-red pre-implementation
+      test-definition failures from real gate/runtime failures.
+
+      - Closure evidence records gate_open_allowed=true for the contract/test foundation.
+
+      - Closure evidence records downstream owners for green conversion and names
+      backend liveness remediation/retest ownership.
+
+      - Closure evidence states no unowned blocker remains from the expected-red evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - No refs for this step.
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Disposition Evidence
+
+      - expected_red_intentional: true|false
+
+      - gate_open_allowed: true|false
+
+      - downstream_green_conversion_owner: <later phase/step owner>
+
+      - no_unowned_blockers_from_expected_red: true|false
+
+      - separate_liveness_ownership: <pbar-backend-liveness-remediation and pbar-backend-liveness-retest
+      status>
+
+      - closure_decision: OPEN|BLOCK'
+    depends_on:
+    - pbar-contract-tests-gate
+    agent: gate-reviewer
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      No refs for this step.
+
+
+      ## Expected-Red Disposition Evidence
+
+
+      - expected_red_intentional: true
+
+      - gate_open_allowed: true
+
+      - downstream_green_conversion_owner: Later backend/browser implementation and
+      verification phases owned conversion of these pre-implementation expected-red
+      contract/test artifacts to green behavior; this foundation phase only defined
+      and exposed the gaps.
+
+      - no_unowned_blockers_from_expected_red: true
+
+      - separate_liveness_ownership: Later runtime/liveness blockers were separately
+      owned by `pbar-backend-liveness-remediation` and `pbar-backend-liveness-retest`,
+      which handled backend liveness closure independently of this contract/test foundation
+      gate.
+
+      - closure_decision: OPEN
+
+
+      Disposition:
+
+      The failed browser/backend tests mentioned by `pbar-contract-tests-gate` were
+      intentional expected-red artifacts produced by the pre-implementation test-definition
+      phase. They were semantically accepted as gap exposure, not as a real gate failure
+      requiring same-phase implementation. The phase gate may remain open for the
+      contract/test foundation because the acceptance boundary was: audit matrix complete,
+      expected-red coverage defined, downstream owners established, and no product-boundary
+      ambiguity left before remediation.
+
+
+      Gate-intersection disposition:
+
+      No unowned blocker remains from the expected-red evidence in this phase. Any
+      subsequent green conversion obligation intersects later implementation/retest
+      gates, not this foundation gate, and was owned downstream. Later backend liveness
+      failures were not caused by unclosed expected-red evidence and were separately
+      remediated/retested by `pbar-backend-liveness-remediation` and `pbar-backend-liveness-retest`.'
 - id: prd-behavior-audit-remediation-backend-semantics
   name: PRD Behavior Audit Remediation — Backend Semantics
   status: done
