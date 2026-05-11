@@ -43421,3 +43421,56 @@ phases:
       - Non-intersection claims: <must be none, or cite exact authority and why final
       gate is not affected>'
     agent: spec-verifier
+  - id: pbar-expected-red-backend-tests
+    name: Add expected-red backend behavior tests for search, steering, ranking, LLM
+      provenance, doctor, and sanitation
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add expected-red Go tests and fixtures that expose backend gaps before remediation.
+      Product code must not be modified.
+
+
+      Coverage required:
+
+      - B1/B2: search command/API path executes lexical query, no-match returns stable
+      empty state and clears stale/default rows.
+
+      - B4/B14/B15: natural-language Steer returns interpreted_as/apply or specific
+      rejection, never generic internal error.
+
+      - B16/B17: accepted reduce/hide and boost rules visibly influence ranking in
+      a small controlled corpus.
+
+      - B6/B18/B19/B20: OpenRouter/model diagnostics distinguish provider reachability,
+      model resolution, item transformation health, fallback/excerpt provenance, and
+      do not overstate summary/core-insight completion.
+
+      - B7/B22: shared readable payload sanitation removes real-source boilerplate,
+      topic/author furniture, personalization copy, and related-story tails before
+      summary/core insight/body presentation.
+
+
+      Tests should live in internal/resofeed/*_test.go and may add deterministic fixtures.
+      Red is expected before implementation; success means the gaps are exposed with
+      precise failing assertions and without product-code edits.'
+    verification: 'local-check protecting backend remediation: expected-red tests
+      are limited to tests/fixtures, fail for the intended behavior gaps before implementation,
+      and list expected_failures mapped to B1,B2,B4,B6,B7,B14-B20,B22.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Backend\
+      \ Test Evidence\n- Modified files limited to tests/fixtures: <list>\n- Commands\
+      \ executed:\n  ```\n  <go test commands>\n  ```\n- Expected failures/exposed\
+      \ gaps by finding: <B-id table>\n- Downstream implementation owners: pbar-backend-search-remediation,\
+      \ pbar-backend-steer-ranking-remediation, pbar-backend-llm-doctor-provenance-remediation,\
+      \ pbar-backend-readable-payload-sanitation\n- Product code modified: must be\
+      \ NO"
+    depends_on:
+    - pbar-contract-audit-matrix
+    agent: golang-developer
