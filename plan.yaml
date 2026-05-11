@@ -48512,7 +48512,7 @@ phases:
       introduced.'
   - id: pbar-browser-flow-failure-remediation
     name: Remediate failed browser PRD workflow blockers before retest
-    status: claimed
+    status: done
     description: "step_type: implementation\n\nBatched implementation remediation\
       \ for the failed independent browser PRD workflow retest. This step owns remediation\
       \ before `pbar-browser-flow-retest` may run again.\n\nPrerequisite context:\n\
@@ -48683,6 +48683,135 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T18:20:41.125197+00:00'
+    done_at: '2026-05-11T18:36:52.489182+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: read by executor; one deployable Go process, one SQLite
+      DB/lexical retrieval only, owner-token boundary, OpenRouter secret/error handling,
+      Source Ledger diagnostics fields.
+
+      - `docs/DESIGN.md`: read; dense/tool-like chrome, mobile compact density/touch
+      targets, Steer receipts/errors live-region behavior, Source Ledger row/actions
+      contract, Search/retrieval provenance.
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`: read; U1 mobile
+      Search <=170px assertion, B5/U2 source identity + ingest orientation, B12 diagnostic
+      affordance.
+
+      - `web/tests/e2e/real-server-ui.spec.ts`: read; real Go binary/UI flow, invalid
+      OPENROUTER_KEY browser alert contract, parity/deterministic OpenRouter tests.
+
+
+      ## Browser Failure Remediation Evidence
+
+
+      **Commands executed by executor**:
+
+      ```sh
+
+      npm --prefix web install
+
+      go test ./internal/resofeed
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+
+      ```
+
+      Executor results: Go backend test passed; PRD browser gaps passed 5/5; real-server
+      UI passed 8/8.
+
+
+      **Failure mapping**:
+
+      - U1 mobile Search height: before 343px > 170px; after Search filter details
+      compact only in narrow app shell and PRD browser gaps passed 5/5.
+
+      - B5/U2 source-add receipt: before `applied: source added`; after receipt includes
+      source host and ingest orientation; PRD browser gaps passed 5/5.
+
+      - B12 diagnostic affordance: before count 0; after source rows expose one keyboard/AT
+      reachable diagnostic affordance; PRD browser gaps passed 5/5.
+
+      - invalid OPENROUTER_KEY alert: before alert missing; after UI renders `role=alert`
+      sanitized error; real-server UI passed 8/8.
+
+      - B16/B17/B18 proof: added browser proof for accepted steering changing ranking/filtering
+      and fresh model-health proof; real-server UI passed 8/8.
+
+
+      **Files changed**:
+
+      - Initial worktree remediation: `internal/resofeed/ranking.go`, `web/src/routes/+page.svelte`,
+      `web/src/routes/components/SearchRetrieval.svelte`, `web/src/routes/components/SourceLedger.svelte`,
+      `web/tests/e2e/global-setup.ts`, `web/tests/e2e/real-server-ui.spec.ts`.
+
+      - Mainline final-state repair: `web/src/app.css`, `web/src/routes/+page.svelte`,
+      `web/src/routes/components/SearchRetrieval.svelte`, `web/src/routes/components/SourceLedger.svelte`.
+
+
+      **Commit hash(es)**:
+
+      - Worktree remediation: `92037e5694868d1769c9efcaa7a3877303511795` — `fix pbar
+      browser flow blockers`.
+
+      - Worktree final-state repair: `da180bfcc71251502c63e93eec82ff34533c8e1d` —
+      `fix pbar render contract regressions`.
+
+      - Mainline squash commit: `61b57fc` — `[vectl] step-pbar-browser-flow-failure-remediation
+      completed`.
+
+      - Mainline final-state repair commit after conflict/semantic resolution: `ce94e32`
+      — `[vectl] step-pbar-browser-flow-failure-remediation final-state repair`.
+
+
+      **Mainline final-state verification**:
+
+      ```text
+
+      go test ./internal/resofeed -> exit 0; ok resofeed/internal/resofeed 1.339s
+
+      npm --prefix web run test:render -> exit 0; 6 files passed, 39 tests passed
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -> exit 0; 5 passed
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+      -> exit 0; 8 passed
+
+      ```
+
+
+      **Mainline gate failure and repair note**:
+
+      - Initial mainline verification after `61b57fc` failed `npm --prefix web run
+      test:render` due Source Ledger row child count and Search filter visibility
+      regressions.
+
+      - Conflict/semantic resolver repaired Search merge conflict and SourceLedger
+      child-shape issue without committing; the orchestrator reran full verification
+      successfully before committing `ce94e32`.
+
+
+      **Spec link / deviation records**:
+
+      - No browser test was lowered, deleted, or weakened.
+
+      - No deviation record required.
+
+      - Preserved `docs/DESIGN.md` Source Ledger rows/actions, Steer receipts, Search
+      retrieval provenance, raw feedback-line behavior, and `docs/ARCHITECTURE.md`
+      OpenRouter runtime secret/error boundary and single-binary/SQLite invariants.
+
+
+      **Gaps/Notes**:
+
+      - None known.
+
+      - Accessibility preserved via native/accessible controls: source diagnostics
+      in existing actions column, invalid steering failures use `role=alert`, search
+      filters visible by default and compact only in narrow app shell.'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
