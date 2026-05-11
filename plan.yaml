@@ -47402,7 +47402,7 @@ phases:
   steps:
   - id: pbar-backend-green-retest
     name: Independently retest backend behavior fixes green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -47498,6 +47498,127 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T18:20:33.758073+00:00'
+    done_at: '2026-05-11T18:28:37.118388+00:00'
+    evidence: '## refs Read Confirmation
+
+      No refs for this step. Integration verifier voluntarily read `internal/resofeed/pbar_expected_red_backend_test.go`,
+      `internal/resofeed/pbar_steer_receipt_remediation_test.go`, and `docs/audits/prd-behavior-audit-2026-05-11.md`.
+
+
+      ## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: Backend PRD behavior remediation
+
+      **Independence Level**: L1
+
+
+      ### Commands executed
+
+      Executor evidence:
+
+      ```text
+
+      go test -v ./internal/resofeed -run ''Test(ExpectedRedBackend|PBAR)'' -> exit
+      0, PASS
+
+      go test -v ./... -> exit 0, PASS
+
+      ```
+
+      Mainline final-state verification after squash merge:
+
+      ```text
+
+      go test -v ./internal/resofeed -run ''Test(ExpectedRedBackend|PBAR)'' -> exit
+      0, PASS
+
+      go test -v ./... -> exit 0, PASS
+
+      ```
+
+
+      ### Finding-by-finding backend closure
+
+      - B1: PROVEN — `TestExpectedRedBackendSearchCommandExecutesLexicalQuery/B1_matching_search_command`
+      passed.
+
+      - B2: PROVEN — `B2_no-match_search_command` and direct `SearchItems` assertion
+      passed.
+
+      - B4/B14/B15: PROVEN — `TestExpectedRedBackendSteerTranslationFailureReturnsReceiptNotInternal`
+      passed.
+
+      - B5/U2: PROVEN — `TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`
+      passed.
+
+      - B16/B17: PROVEN — `TestExpectedRedBackendCombinedReduceAndBoostRulesAffectRankingIndependently`
+      passed.
+
+      - B6/B18/B19/B20/U4: PROVEN — doctor/model/fallback provenance tests passed.
+
+      - B7/B22: PROVEN — readable payload sanitation tests passed.
+
+
+      ### Behavioral proof register
+
+      - Steer search executes lexical retrieval and avoids policy mutation: PROVEN.
+
+      - No-match search is stable empty state: PROVEN.
+
+      - NL steering failure returns receipt, not generic internal error: PROVEN.
+
+      - Add-source receipt is actionable: PROVEN.
+
+      - Accepted steering affects ranking independently: PROVEN.
+
+      - Doctor/provenance semantics distinguish provider/model/item/fallback states:
+      PROVEN.
+
+      - Readable payload sanitation protects summary/core/body presentation: PROVEN.
+
+      - Newly added source can ingest and be found by lexical search: PROVEN.
+
+
+      ### Gate semantic reporting
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green; targeted backend PBAR tests and full Go suite passed
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      explicit_uncertainty_sources: []
+
+
+      ### Files changed / commits
+
+      - Worktree commit: `141ab65` — `test: add pbar backend green retest evidence`.
+
+      - Mainline squash commit: `e7a393c` — `[vectl] step-pbar-backend-green-retest
+      completed`.
+
+      - Artifact committed: `artifacts/pbar-backend-green-retest/report.md`.
+
+      - Product implementation files modified: false.
+
+
+      ### Headline
+
+      PASS'
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
     status: pending
