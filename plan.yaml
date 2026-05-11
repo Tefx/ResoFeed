@@ -44589,3 +44589,84 @@ phases:
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
     agent: uiux-auditor
+  - id: pbar-spec-product-boundary-review
+    name: Spec and product-boundary conformance review
+    status: pending
+    description: 'As spec-verifier, independently verify that remediation conforms
+      to PRD, ARCHITECTURE, and DESIGN without introducing forbidden product concepts.
+
+
+      Scope:
+
+      - Search remains lexical/metadata-driven; no vector DB, RAG, semantic answer
+      engine, or external search service.
+
+      - Steer remains natural-language correction/current active state; no rule builder,
+      settings sliders, per-rule CRUD, command history, activity ledger, or account/agent
+      registry.
+
+      - Source Ledger remains flat; no sync coordinator, conflict resolver, state
+      merger, dashboards, or backup-management UI.
+
+      - /doctor remains raw diagnostics text; no charts/cards/remediation panels.
+
+      - LLM remains JSON-in/JSON-out transformer; no LLM orchestration/state/database
+      writes.
+
+      - UI chrome remains canonical: RESOFEED, TODAY, SOURCE LEDGER, INSPECTOR, /doctor;
+      no onboarding wizard or friendly SaaS copy.
+
+
+      This review must produce a finding-by-finding conformance table and explicitly
+      mark any unresolved item as BLOCKING unless non-intersection with final gate
+      is proven.'
+    verification: 'phase-check protecting final closure: spec-verifier confirms all
+      remediated behavior matches PRD/DESIGN/ARCHITECTURE and no forbidden concepts
+      or product-boundary violations were introduced; unresolved behavioral obligations
+      include closure paths.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec/Product Boundary Review
+
+      **Reviewer**: spec-verifier
+
+
+      ### Conformance table
+
+      | Finding | Spec refs | Implementation evidence | Verdict | Blocking? |
+
+      | --- | --- | --- | --- | --- |
+
+      | B1-B23,U1-U5 | <PRD/DESIGN/ARCH refs> | <evidence> | CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
+      | YES/NO |
+
+
+      ### Forbidden concept scan
+
+      - Vector/RAG/semantic search: absent/present
+
+      - Settings/rule builder/history ledger/accounts/sync: absent/present
+
+      - Dashboards/cards/remediation panels for /doctor or Source Ledger: absent/present
+
+      - Non-canonical chrome/onboarding wizard: absent/present
+
+
+      ### Gate decision basis
+
+      - OPEN/BLOCK recommendation:
+
+      - Unresolved obligations and closure paths:'
+    depends_on:
+    - pbar-backend-green-retest
+    - pbar-browser-flow-retest
+    - pbar-runtime-liveness-probe
+    agent: spec-verifier
