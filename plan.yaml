@@ -43738,3 +43738,62 @@ phases:
       \ corpus before/after accepted rule>\n- Product-boundary proof: no rule builder,\
       \ settings, history ledger, accounts, or sync concepts added."
     agent: golang-developer
+  - id: pbar-backend-readable-payload-sanitation
+    name: Move readable payload sanitation to shared backend layer
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete shared readable-payload sanitation for B7 and B22.
+
+
+      Scope:
+
+      - Move or enforce contamination filtering at a shared payload/backend layer
+      before summary, core insight, and Inspector body are exposed.
+
+      - Cover real-source contamination patterns from the audit: follow-topic prompts,
+      author/topic taxonomy, source-site navigation, personalization copy, related-story
+      titles, unrelated leaked/cracked item fragments, and category/headline residue.
+
+      - Add regression fixtures for the exact The Verge/GM-style tail patterns described
+      in the audit.
+
+      - If clean model/extraction output cannot be produced, label fallback explicitly
+      rather than presenting category/headline residue as a completed insight.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT implement a recommendation carousel, ad filter dashboard, source trust
+      taxonomy, or UI-only regex that diverges from the shared payload contract.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Sanitation exists only as a one-off Svelte regex.
+
+      2. Inspector body still contains related-story tails, personalization text,
+      or source furniture.
+
+      3. Core insight is category/headline residue while item is marked full/source-backed.'
+    verification: 'local-check protecting B7/B22 and frontend Inspector trust: targeted
+      contamination fixtures pass, sanitation is shared before payload exposure, and
+      evidence shows no audit-listed boilerplate/tail patterns survive into summary/core
+      insight/body.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B7, B22\n- Files changed: <list>\n- Contamination fixture\
+      \ inventory: <patterns covered>\n- Commands/tests:\n  ```\n  <commands and output>\n\
+      \  ```\n- Main path proof: clean article body remains readable.\n- Failure path\
+      \ proof: dirty tail/source furniture is removed or fallback-labelled.\n- Shared-layer\
+      \ proof: sanitation is not only UI-local."
+    agent: golang-developer
