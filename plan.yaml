@@ -49381,7 +49381,7 @@ phases:
       \ step."
   - id: pbar-post-remediation-uiux-audit
     name: Post-remediation UI/UX audit for Source Ledger boundary changes
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check protecting pbar-retest-audit-gate and final
@@ -49463,6 +49463,117 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-11T19:09:45.931176+00:00'
+    done_at: '2026-05-11T19:24:24.279579+00:00'
+    evidence: '## Worktree Hygiene Repair
+
+      - Initial audit returned PASS but left uncommitted scratch/generated changes
+      in the isolated worktree; same auditor repaired by running `git clean -fd` and
+      `git restore .`.
+
+      - Final worktree status reported clean: `## vectl/step-pbar-post-remediation-uiux-audit`.
+
+      - Preserved artifact commit: d363c90.
+
+      - Mainline squash merge: 61e5ca5 `[vectl] step-pbar-post-remediation-uiux-audit
+      completed`.
+
+
+      ## refs Read Confirmation
+
+      - docs/PRD.md — Source Ledger is a read/delete-only flat roster; operations
+      like fetch/sync do not exist per-source.
+
+      - docs/DESIGN.md — Source Ledger is a barebones flat list of subscribed URLs
+      and strictly read/delete-only text roster.
+
+      - docs/ARCHITECTURE.md — Frontend must expose flat Source Ledger without folders/tags/settings-dashboard
+      behavior.
+
+      - docs/DESIGN_VISION.md — Source Ledger is a barebones flat list reachable via
+      discreet menu, not a settings dashboard.
+
+      - .agents/instructions.md — Forbidden product patterns include folders, tags,
+      unread counts, mark-all-read, archive bins, settings sliders.
+
+
+      ## Post-Remediation UI/UX Audit Report
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Source Ledger boundary/remediation, visible reachability path, diagnostic
+      full-view expansion, accessibility, DESIGN.md conformance
+
+      **Remediation step reviewed**: pbar-source-ledger-boundary-wiring-remediation
+
+
+      ### Multimodal Evidence
+
+      - `.audit-artifacts/pbar-post-remediation-uiux-audit/02_main_page_menu_open.png`
+      — RESOFEED menu reachability path.
+
+      - `.audit-artifacts/pbar-post-remediation-uiux-audit/03_source_ledger_default.png`
+      — default Source Ledger with items.
+
+      - `.audit-artifacts/pbar-post-remediation-uiux-audit/04_source_ledger_diagnostic_expanded.png`
+      — diagnostic details expanded into visible content.
+
+      - `.audit-artifacts/pbar-post-remediation-uiux-audit/06_source_ledger_tab_focus.png`
+      — keyboard focus ring visibility on details element.
+
+
+      ### Required Findings
+
+      - Source Ledger operation-control boundary: PASS, no blocker; default screenshot
+      shows only read/delete operations and no run-ingest/fetch buttons.
+
+      - Allowed visible reachability path: PASS, no blocker; non-persistent RESOFEED
+      dropdown exposes TODAY and SOURCE LEDGER.
+
+      - Diagnostic full-view expansion: PASS, no blocker; `[DETAILS]` expands into
+      visible `<pre>` diagnostic content.
+
+      - Accessibility: PASS, no blocker; visible focus outline and keyboard test evidence.
+
+      - DESIGN.md conformance: PASS, no blocker; dense archival aesthetic, muted palette,
+      functional chrome, no folder/tag concepts.
+
+
+      ## Behavioral Proof Register
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - uncertainty_sources: []
+
+
+      ## Verification
+
+      - `git diff --name-only main...vectl/step-pbar-post-remediation-uiux-audit`
+      before merge showed only `.audit-artifacts/pbar-post-remediation-uiux-audit/*.png`
+      committed artifacts.
+
+      - Mainline final-state verification after merge: `git ls-files .audit-artifacts/pbar-post-remediation-uiux-audit`
+      lists all six PNG audit artifacts and `git status --porcelain -- .audit-artifacts/pbar-post-remediation-uiux-audit`
+      returned no dirty output.
+
+
+      ## Commit hash(es)
+
+      - d363c90 — audit artifact commit in isolated branch.
+
+      - 61e5ca5 — mainline squash merge commit.
+
+
+      ## Gaps / Notes
+
+      - none'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
