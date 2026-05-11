@@ -42400,7 +42400,7 @@ phases:
       \ worktree.\n\n## Gaps/Notes\n\nNone blocking."
   - id: slnr-uiux-navigation-audit
     name: Audit Source Ledger navigation chrome and route visual conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -42544,6 +42544,8 @@ phases:
     - slnr-restore-navigation-route
     - slnr-browser-route-retest
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-11T12:11:12.034688+00:00'
   - id: slnr-gate
     name: Gate Source Ledger navigation regression remediation
     status: pending
