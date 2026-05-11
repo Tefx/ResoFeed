@@ -39168,7 +39168,7 @@ phases:
     agent: uiux-auditor
   - id: ui-remediation-retest-closure.urrc-architecture-product-boundary-retest
     name: urrc-architecture-product-boundary-retest
-    status: claimed
+    status: done
     description: 'Independent architecture/product-boundary retest for residual UI
       remediation.
 
@@ -39273,6 +39273,146 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-11T08:01:23.769434+00:00'
+    done_at: '2026-05-11T08:17:25.042664+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: file absent in
+      isolated worktree; used provided R1-R8 summary.
+
+      - docs/ARCHITECTURE.md — Read. Key invariants: one Go binary, one SQLite+FTS5
+      DB, no vector/RAG, owner-token-only auth, no activity ledger, no sync/merge/conflict
+      resolver; state portability is backup/restore only.
+
+      - docs/DESIGN.md — Read. Key UI authority: dense archival workbench; Source
+      Ledger is flat; State Portability actions live in Source Ledger footer with
+      warning `import replaces active sources, rules, and stars`; no settings dashboard/folders/tags/unread/archive/drag
+      flows.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree root; repo constraints were
+      available in prompt but no local file existed to read.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: PASS
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): none
+
+
+      ## Architecture/Product-Boundary Retest
+
+      Changed files reviewed:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/StatePortability.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+      - web/src/app.css
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+
+      - web/tests/e2e/feed-search-anatomy.spec.ts
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+      - web/tests/contracts/ui-remediation-contract-matrix.json
+
+
+      Forbidden concept check:
+
+      - Single Go binary / existing web surface only: PASS. Reviewed changes are Svelte/CSS/test
+      artifacts only; no cmd/internal process split or sidecar/admin/sync process
+      introduced.
+
+      - SQLite-only / lexical retrieval: PASS. Search UI says lexical and metadata
+      retrieval only; no vector, embedding, RAG, or generated-answer concept found.
+
+      - Owner-token boundary: PASS. +page.svelte uses `resofeed.ownerToken`; no account/OAuth/user-registration/password-reset
+      surface introduced.
+
+      - State portability backup/restore only: PASS. StatePortability.svelte only
+      calls export/import state and preserves warning; no sync/merge/conflict/history/portable
+      receipt UI.
+
+      - Dense archival UI / forbidden flows: PASS. Source Ledger remains flat; no
+      folders, tags, unread counts, archive, drag ordering, settings dashboard, or
+      onboarding wizard added.
+
+      - Flat code shape / no Java layers: PASS. Changes are component-local UI composition
+      and shared item-anatomy helper only; no service/repository/DI/event-bus layer
+      introduced.
+
+
+      R5 state-scoping review: PASS. `+page.svelte` scopes retrieval feedback to transient
+      `steerFeedback`; `showSurface(''feed'')` clears `retrieval:` receipt, `searchSeedQuery`,
+      and `steerCommand`. Search controls are rendered in the Search surface, with
+      feed pane marked `aria-hidden` and `inert` when inactive. No global command
+      history/activity feed/reading history was added.
+
+
+      R8 state-portability review: PASS. `SourceLedger.svelte` places `<StatePortability
+      />` inside `.source-ledger-footer`; `StatePortability.svelte` renders `[EXPORT
+      STATE]`, `[IMPORT STATE]`, hidden JSON input, and warning `import replaces active
+      sources, rules, and stars`. No sync/merge semantics appear.
+
+
+      ## Behavioral Proof Register
+
+      - R1: PASS — boundary review only; Inspector sanitation/fallback remains component-local
+      and does not introduce forbidden concepts.
+
+      - R2: PASS — Source Ledger row grammar/layout remains component/CSS-local.
+
+      - R3: PASS — metadata grammar changes remain presentation-only.
+
+      - R4: PASS — provenance collapse remains presentation-only.
+
+      - R5: PASS — no global command history/activity feed introduced.
+
+      - R6: PASS — accessibility scoping via `aria-hidden`/`inert`, no new product
+      concept.
+
+      - R7: PASS — Source Ledger grammar presentation-only.
+
+      - R8: PASS — State portability remains backup/restore-only and warning preserved.
+
+
+      ## Gaps/Notes
+
+      - Focused npm retest commands were attempted by reviewer but JS dev binaries
+      were absent in that worktree; architecture/product-boundary verdict is based
+      on direct source/test artifact review. Browser behavior is owned by the separate
+      integration-verifier step.'
   - id: ui-remediation-retest-closure.urrc-final-remediation-gate
     name: urrc-final-remediation-gate
     status: pending
