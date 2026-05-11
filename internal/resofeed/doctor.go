@@ -85,9 +85,15 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
+	if modelFailureCount == 0 && strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
+		lines = append(lines, "openrouter: ok item_transform_failures=0")
+	}
 	lines = append(lines, openRouterProviderDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
 	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d item_transform_failures: %d", modelFailureCount, modelFailureCount))
+	if modelFailureCount == 0 {
+		lines = append(lines, "fallback_provenance: item_transform_failures=0 summary=none")
+	}
 	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
 	if err != nil {
 		return DoctorSnapshot{}, err

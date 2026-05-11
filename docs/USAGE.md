@@ -457,9 +457,26 @@ Abridged example response: `text/plain`, canonical contract is in `docs/ARCHITEC
 
 ```text
 rss: ok
-openrouter: ok configured_model=account_default resolved_model=unknown
+openrouter: provider_reachable=unknown configured_model=account_default
+openrouter: model_resolved=false resolved_model=unknown
+openrouter: item_transform_failures=0
+fallback_provenance: item_transform_failures=0 summary=none
 ingest: last_run=2026-05-09T00:00:00Z
 ```
+
+### Runtime lexical liveness proof
+
+To prove a newly added source is searchable through public runtime surfaces, use
+the same owner-token protected path as the UI:
+
+1. Add a fixture RSS/Atom URL through `POST /api/steer` with the URL as the
+   `command`.
+2. Trigger ingestion with `POST /api/ingest` and body `{}`.
+3. Query the known fixture token with `GET /api/search?q=<known-token>`.
+
+This path uses the documented Steer, manual ingest, and Search HTTP surfaces. It
+does not require direct SQLite writes, private test hooks, sidecar workers, or
+manual UI-only actions.
 
 ## First Useful Session
 

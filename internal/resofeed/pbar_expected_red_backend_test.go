@@ -166,6 +166,79 @@ func TestExpectedRedBackendDoctorSeparatesOpenRouterModelAndItemTransformHealth(
 	}
 }
 
+func TestPBARDoctorShowsFallbackProvenanceWhenNoItemTransformFailures(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	var out bytes.Buffer
+	if err := WriteDoctorWithConfig(ctx, db, DoctorConfig{ConfiguredOpenRouterModel: "account_default"}, &out); err != nil {
+		t.Fatalf("WriteDoctorWithConfig returned error: %v", err)
+	}
+	text := out.String()
+	for _, want := range []string{
+		"openrouter: item_transform_failures=0",
+		"fallback_provenance: item_transform_failures=0 summary=none",
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("zero-failure doctor output missing %q; got:\n%s", want, text)
+		}
+	}
+	for _, forbidden := range []string{contractOwnerToken, "OPENROUTER_KEY", "dummy", "sk-or-", "provider API key"} {
+		if strings.Contains(text, forbidden) {
+			t.Fatalf("doctor output leaked forbidden secret marker %q; got:\n%s", forbidden, text)
+		}
+	}
+}
+
+func TestPBARPublicRuntimeSourceAddIngestThenSearchFindsLexicalFixture(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	const knownToken = "pbarlexicalfixturetoken"
+
+	var feedServer *httptest.Server
+	feedServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = w.Write([]byte(`<?xml version="1.0"?><rss version="2.0"><channel><title>PBAR Fixture Feed</title><item><guid>fixture-1</guid><title>Runtime lexical fixture</title><link>` + feedServer.URL + `/article</link><description>Known fixture body ` + knownToken + ` for public runtime search proof.</description><pubDate>Tue, 12 May 2026 10:00:00 +0000</pubDate></item></channel></rss>`))
+		case "/article":
+			w.Header().Set("Content-Type", "text/html")
+			_, _ = w.Write([]byte(`<html><body><article>Article body contains ` + knownToken + ` after source ingestion.</article></body></html>`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feedServer.Close)
+
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+
+	steerBody := `{"command":` + mustMarshalString(t, feedServer.URL+"/feed.xml") + `,"actor_kind":"human","actor_id":"owner","idempotency_key":"pbar-runtime-add-source"}`
+	steerRecorder := httptest.NewRecorder()
+	steerReq := authorizedRequest(http.MethodPost, "/api/steer", bytes.NewReader([]byte(steerBody)))
+	steerReq.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(steerRecorder, steerReq)
+	assertStatus(t, steerRecorder, http.StatusOK)
+
+	ingestRecorder := httptest.NewRecorder()
+	ingestReq := authorizedRequest(http.MethodPost, ManualIngestHTTPPath, bytes.NewReader([]byte(ManualFetchRequestBody)))
+	ingestReq.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(ingestRecorder, ingestReq)
+	assertStatus(t, ingestRecorder, ManualFetchHTTPStatusOK)
+
+	searchRecorder := httptest.NewRecorder()
+	searchReq := authorizedRequest(http.MethodGet, "/api/search?q="+knownToken, nil)
+	router.ServeHTTP(searchRecorder, searchReq)
+	assertStatus(t, searchRecorder, http.StatusOK)
+
+	var response SearchResponse
+	if err := json.Unmarshal(searchRecorder.Body.Bytes(), &response); err != nil {
+		t.Fatalf("unmarshal search response: %v; body=%s", err, searchRecorder.Body.String())
+	}
+	if response.Query.Q != knownToken || len(response.Items) != 1 || response.Items[0].Title != "Runtime lexical fixture" {
+		t.Fatalf("search response = %+v, want one matching runtime-ingested fixture for %q", response, knownToken)
+	}
+}
+
 func TestExpectedRedBackendReadablePayloadSanitizesSourceBoilerplate(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
