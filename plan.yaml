@@ -39781,7 +39781,7 @@ phases:
       \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     name: urrc-r1-focused-browser-retest
-    status: pending
+    status: claimed
     description: "Focused browser retest for the R1 residual Inspector sanitation\
       \ blocker after ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix.\n\
       \nstep_type: verification. step_intent: retest_green. expected_result: green.\
@@ -39842,3 +39842,5 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T08:41:33.156823+00:00'
