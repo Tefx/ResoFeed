@@ -49126,7 +49126,7 @@ phases:
       filters visible by default and compact only in narrow app shell.'
   - id: pbar-source-ledger-boundary-wiring-remediation
     name: Resolve Source Ledger boundary, reachability, and diagnostics audit blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       work_type: authority_adjudication + defect_repair
@@ -49300,6 +49300,8 @@ phases:
     - pbar-runtime-liveness-probe
     - pbar-uiux-multimodal-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T18:58:05.953050+00:00'
   - id: pbar-post-remediation-uiux-audit
     name: Post-remediation UI/UX audit for Source Ledger boundary changes
     status: pending
