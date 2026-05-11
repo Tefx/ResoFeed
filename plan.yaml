@@ -42812,7 +42812,7 @@ phases:
     agent: gate-reviewer
   - id: slnr-materialize-browser-proof-artifacts
     name: Materialize Source Ledger browser proof artifacts
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -43005,3 +43005,5 @@ phases:
     - slnr-browser-route-retest
     - slnr-uiux-navigation-audit
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T13:05:12.131957+00:00'
