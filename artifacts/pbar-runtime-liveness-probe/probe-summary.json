@@ -1,0 +1,77 @@
+{
+  "launch_command": "OPENROUTER_KEY=<redacted> ./bin/resofeed serve --addr 127.0.0.1:18080 --public-url http://127.0.0.1:18080 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-test-owner-token>",
+  "pid": 24199,
+  "surfaces": [
+    {
+      "surface": "/",
+      "path": "/",
+      "expected": "HTML app shell/workbench",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body_prefix": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link href=\"./_app/immutable/entry/start.2gKgUABQ.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/21mz6aEz.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/Bd18Qkx8.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/entry/app.BkgGq4st.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/DXP6PDVy.js\" rel=\"",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/route-root.html"
+    },
+    {
+      "surface": "/doctor",
+      "path": "/doctor",
+      "expected": "HTML diagnostics route or documented UI entrypoint",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body_prefix": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link href=\"./_app/immutable/entry/start.2gKgUABQ.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/21mz6aEz.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/Bd18Qkx8.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/entry/app.BkgGq4st.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/DXP6PDVy.js\" rel=\"",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/route-doctor.html"
+    },
+    {
+      "surface": "/source-ledger",
+      "path": "/source-ledger",
+      "expected": "HTML Source Ledger route",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body_prefix": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link href=\"./_app/immutable/entry/start.2gKgUABQ.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/21mz6aEz.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/Bd18Qkx8.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/entry/app.BkgGq4st.js\" rel=\"modulepreload\">\n\t\t<link href=\"./_app/immutable/chunks/DXP6PDVy.js\" rel=\"",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/route-source-ledger.html"
+    },
+    {
+      "surface": "GET /api/search",
+      "path": "/api/search?q=sqlite&limit=1",
+      "expected": "JSON search response with query echo",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body_prefix": "{\"items\":[],\"query\":{\"q\":\"sqlite\",\"source\":null,\"from\":null,\"to\":null,\"resonated\":null,\"limit\":1}}\n",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/get-_api_search.txt"
+    },
+    {
+      "surface": "GET /api/sources",
+      "path": "/api/sources",
+      "expected": "JSON sources read response",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body_prefix": "{\"sources\":[]}\n",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/get-_api_sources.txt"
+    },
+    {
+      "surface": "GET /api/feed/today",
+      "path": "/api/feed/today?limit=1",
+      "expected": "JSON today feed read response",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body_prefix": "{\"items\":[]}\n",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/get-_api_feed_today.txt"
+    },
+    {
+      "surface": "GET /api/doctor",
+      "path": "/api/doctor",
+      "expected": "Plain-text diagnostics",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "body_prefix": "rss: ok\nopenrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=0 item_transform_failures: 0\nfallback_provenance: item_transform_failures=0 summary=none\nextraction: ok\ningest: last_run=never\n",
+      "artifact": "artifacts/pbar-runtime-liveness-probe/get-_api_doctor.txt"
+    }
+  ],
+  "port_probe": {
+    "cmd": "lsof -nP -i :18080",
+    "returncode": 0,
+    "stdout": "COMMAND    PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\nresofeed 24199 tefx    6u  IPv4 0xfe9b2000b131ed96      0t0  TCP 127.0.0.1:18080 (LISTEN)\n",
+    "stderr": ""
+  },
+  "process_alive_after_3s": true,
+  "server_log": "owner token explicit: stored hash\nserving ResoFeed on 127.0.0.1:18080 (public-url http://127.0.0.1:18080)\nshutdown complete\n"
+}

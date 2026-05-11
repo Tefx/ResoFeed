@@ -1,0 +1,7 @@
+rss: ok
+openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown
+openrouter: model_resolved=false resolved_model=unknown model_resolved: false
+openrouter: item_transform_failures=0 item_transform_failures: 0
+fallback_provenance: item_transform_failures=0 summary=none
+extraction: ok
+ingest: last_run=never

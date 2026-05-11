@@ -1,0 +1,102 @@
+{
+  "launch_command": "OPENROUTER_KEY=<redacted> ./bin/resofeed serve --addr 127.0.0.1:18082 --public-url http://127.0.0.1:18082 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-test-owner-token>",
+  "browser_commands": [
+    {
+      "cmd": "uvx browser-use close",
+      "returncode": 0,
+      "stdout": "No active browser session\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18082/",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18082/\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval localStorage.setItem('resofeed.ownerToken', '<redacted-test-owner-token>')",
+      "returncode": 0,
+      "stdout": "result: None\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18082/",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18082/\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[22]<div />\n\t[62]<a />\n\t\tskip to feed\n\tSteer or paste RSS URL\n\t|SHADOW(open)|[9]<input id=steer-input type=text placeholder=Steer or paste RSS URL... autocomplete=off />\n\tRESOFEED\n\tFirst use\n\tPaste RSS URL in Steer or import OPML.\n\tInspect opens the item.\n\tStar preserves durable value.\n\tSteer is optional correction.\n\tINSPECTOR\n\t|SHADOW(open)|*[11]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml aria-label=import OPML compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />\n\t|SHADOW(open)|*[12]<input id=state-json-file type=file accept=application/json,.json compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-root.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-root.png\nsize: 27159\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nFirst use\n\nPaste RSS URL in Steer or import OPML.\n\nInspect opens the item.\n\nStar preserves durable value.\n\nSteer is optional correction.\n\nINSPECTOR\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18082/doctor",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18082/doctor\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[330]<div />\n\t[370]<a />\n\t\tskip to feed\n\tSteer or paste RSS URL\n\t|SHADOW(open)|[319]<input id=steer-input type=text placeholder=Steer or paste RSS URL... autocomplete=off />\n\tRESOFEED\n\t|SHADOW(open)|*[320]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml aria-label=import OPML compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />\n\t|SHADOW(open)|*[321]<input id=state-json-file type=file accept=application/json,.json compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />\n\t[529]<h2 id=doctor-heading level=2 />\n\t\t/doctor\n\trss: ok\nopenrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=0 item_transform_failures: 0\nfallback_provenance: item_transform_failures=0 summary=none\nextraction: ok\ningest: last_run=never\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-doctor.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-doctor.png\nsize: 45050\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\n/doctor\nrss: ok\nopenrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=0 item_transform_failures: 0\nfallback_provenance: item_transform_failures=0 summary=none\nextraction: ok\ningest: last_run=never\n\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18082/source-ledger",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18082/source-ledger\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[648]<div />\n\t[688]<a />\n\t\tskip to feed\n\tSteer or paste RSS URL\n\t|SHADOW(open)|[637]<input id=steer-input type=text placeholder=Steer or paste RSS URL... autocomplete=off />\n\tRESOFEED\n\t[741]<h2 id=source-ledger-heading level=2 />\n\t\tSOURCE LEDGER\n\t[744]<button aria-label=[RUN INGEST] />\n\t\t[RUN INGEST]\n\tNo sources. Paste RSS URL in Steer.\n\t[IMPORT OPML]\n\t[761]<button id=state-export />\n\t\t[EXPORT STATE]\n\t[764]<button id=state-import />\n\t\t[IMPORT STATE]\n\timport state JSON\n\t|SHADOW(open)|*[639]<input id=state-json-file type=file accept=application/json,.json compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />\n\timport replaces active sources, rules, and stars\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-source-ledger.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-auth-source-ledger.png\nsize: 27268\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nSOURCE LEDGER\n[RUN INGEST]\n\nNo sources. Paste RSS URL in Steer.\n\n[IMPORT OPML]\n[EXPORT STATE]\n[IMPORT STATE]\nimport state JSON\nimport replaces active sources, rules, and stars\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use close",
+      "returncode": 0,
+      "stdout": "Browser closed\n",
+      "stderr": ""
+    }
+  ],
+  "server_log": "owner token explicit: stored hash\nserving ResoFeed on 127.0.0.1:18082 (public-url http://127.0.0.1:18082)\nshutdown complete\n"
+}

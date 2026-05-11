@@ -1,0 +1,90 @@
+{
+  "launch_command": "OPENROUTER_KEY=<redacted> ./bin/resofeed serve --addr 127.0.0.1:18081 --public-url http://127.0.0.1:18081 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-test-owner-token>",
+  "browser_commands": [
+    {
+      "cmd": "uvx browser-use close",
+      "returncode": 0,
+      "stdout": "No active browser session\n",
+      "stderr": "Installed 101 packages in 225ms\n"
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18081/",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18081/\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[7]<div />\n\tRESOFEED\n\tEnter owner token\n\tOwner token\n\t|SHADOW(open)|[3]<input id=owner-token-input name=owner-token type=password autocomplete=off />\n\t[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-root.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-root.png\nsize: 12180\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: RESOFEED\n\nEnter owner token\nOwner token\n[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18081/doctor",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18081/doctor\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[85]<div />\n\tRESOFEED\n\tEnter owner token\n\tOwner token\n\t|SHADOW(open)|[81]<input id=owner-token-input name=owner-token type=password autocomplete=off />\n\t[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-doctor.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-doctor.png\nsize: 12180\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: RESOFEED\n\nEnter owner token\nOwner token\n[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use open http://127.0.0.1:18081/source-ledger",
+      "returncode": 0,
+      "stdout": "url: http://127.0.0.1:18081/source-ledger\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use state",
+      "returncode": 0,
+      "stdout": "viewport: 1470x956\npage: 1470x1020\nscroll: (0, 0)\n[163]<div />\n\tRESOFEED\n\tEnter owner token\n\tOwner token\n\t|SHADOW(open)|[159]<input id=owner-token-input name=owner-token type=password autocomplete=off />\n\t[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use screenshot /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-source-ledger.png",
+      "returncode": 0,
+      "stdout": "saved: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/pbar-runtime-liveness-probe/artifacts/pbar-runtime-liveness-probe/browser-source-ledger.png\nsize: 12180\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use eval document.body.innerText",
+      "returncode": 0,
+      "stdout": "result: RESOFEED\n\nEnter owner token\nOwner token\n[SUBMIT]\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "uvx browser-use close",
+      "returncode": 0,
+      "stdout": "Browser closed\n",
+      "stderr": ""
+    }
+  ],
+  "server_log": "owner token explicit: stored hash\nserving ResoFeed on 127.0.0.1:18081 (public-url http://127.0.0.1:18081)\nshutdown complete\n"
+}
