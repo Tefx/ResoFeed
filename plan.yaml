@@ -43599,3 +43599,11 @@ phases:
     - pbar-expected-red-backend-tests
     - pbar-expected-red-browser-tests
     agent: gate-reviewer
+- id: prd-behavior-audit-remediation-backend-semantics
+  name: PRD Behavior Audit Remediation — Backend Semantics
+  status: locked
+  gate: Backend remediation closes search, steering/ranking, readable payload sanitation,
+    LLM provenance, and doctor diagnostic semantics with expected-red tests turned
+    green and no forbidden product concepts introduced.
+  depends_on:
+  - prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests
