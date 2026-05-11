@@ -44116,3 +44116,59 @@ phases:
       \ proof: <title/details/a11y evidence>\n- Product-boundary proof: no dashboard/settings/source-management\
       \ creep."
     agent: frontend-engineer
+  - id: pbar-frontend-steer-receipt-remediation
+    name: Render actionable Steer and source-add receipts without product creep
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete frontend receipt rendering for B4, B5, B14, B15, and U2 using the backend
+      receipt contract from the backend remediation phase.
+
+
+      Scope:
+
+      - Natural-language Steer success must show `interpreted_as: <normalized rule>`
+      and applied state in a terse inline receipt.
+
+      - Natural-language Steer failure must show a specific actionable `err:` instead
+      of generic internal error.
+
+      - RSS URL add-source receipt must show `source added: <title|host>; run ingest
+      in SOURCE LEDGER` or equivalent terse text.
+
+      - Receipts remain inline near Steer and must not accumulate into a command history/activity
+      ledger.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered receipt DOM/screenshot proof for accepted Steer,
+      rejected Steer, and source-add receipt.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Receipts are API-only and not visible in the UI.
+
+      2. Generic internal errors are shown for steering failures.
+
+      3. Source-add receipt lacks source identity or next action.
+
+      4. Receipt UI becomes a rule manager, wizard, toast stack, or activity ledger.'
+    verification: 'local-check protecting B4/B5/B14/B15/U2: browser tests pass green
+      for accepted/rejected natural-language Steer receipts and source-add receipt
+      content, with rendered artifacts and no product-boundary creep.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B4, B5, B14, B15, U2\n- Files changed: <list>\n- Commands/tests:\n\
+      \  ```\n  <commands and output>\n  ```\n- Rendered receipt artifacts: <accepted/rejected/source-add\
+      \ screenshots or DOM>\n- Product-boundary proof: no wizard/toast stack/activity\
+      \ ledger/rule manager."
+    agent: frontend-engineer
