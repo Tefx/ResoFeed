@@ -47621,7 +47621,7 @@ phases:
       PASS'
   - id: pbar-browser-flow-retest
     name: Independently retest browser PRD workflows green
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       \nAs an INDEPENDENT TESTER (integration-verifier), retest the real rendered\
       \ browser workflows against the PRD behavior audit after remediation.\n\nMANDATORY\
@@ -47712,6 +47712,161 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T18:37:17.314242+00:00'
+    done_at: '2026-05-11T18:43:51.643502+00:00'
+    evidence: '## refs Read Confirmation
+
+      No refs for this step. Integration verifier voluntarily read `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`,
+      `web/tests/e2e/real-server-ui.spec.ts`, `.audit-artifacts/frontend-gate/pbar-frontend-gate-retest-proof-register.yaml`,
+      and `web/test-results/ui-remediation/pbar-frontend-gate-retest-proof-current.md`.
+
+
+      ## Browser Retest Report
+
+
+      **Precondition confirmed**: `pbar-browser-flow-failure-remediation` complete:
+      yes.
+
+
+      **Commands executed by verifier**:
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -> exit 0; 5 passed
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+      -> exit 0; 8 passed
+
+      ```
+
+      Initial verifier attempt failed because Playwright dependencies were absent;
+      `npm --prefix web install` succeeded and tests then passed.
+
+
+      **Mainline final-state verification after squash merge**:
+
+      ```text
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -> exit 0; 5 passed
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+      -> exit 0; 8 passed
+
+      ```
+
+
+      **Previously failing assertions**:
+
+      - U1 mobile Search form height <= 170px: PASS; Chromium assertion passed.
+
+      - B5/U2 source-add receipt includes source identity/title and ingest orientation:
+      PASS; rendered DOM included `applied: source added: 127.0.0.1:58123; run ingest
+      in SOURCE LEDGER` and ledger row `src: ResoFeed E2E Local Source`.
+
+      - B12 Source Ledger row full diagnostic affordance count: PASS; `toHaveCount(1)`
+      passed and a11y snapshot included one `source-diagnostic-action`.
+
+      - Invalid OPENROUTER_KEY browser path surfaces `role=alert` text `err: internal:
+      internal error`: PASS.
+
+
+      **B16/B17/B18 proof (clarified by verifier)**:
+
+      - B16: PROVEN — real browser accepted steering applies a rule and exposes model-health
+      proof; `real-server-ui.spec.ts` test `@llm-deterministic browser-led accepted
+      steering changes ranking, filtering, and fresh model-health proof`, assertions
+      around lines 549-561, passed.
+
+      - B17: PROVEN — boost/ranking-effect proof: after steering, browser Today list
+      has first row containing `SQLite storage analysis` and `Crypto token launch`
+      count 0; same real-server UI test passed.
+
+      - B18: PROVEN — invalid OpenRouter key browser path renders exact `role=alert`
+      text `err: internal: internal error` and log redaction checks pass; `real-server-ui.spec.ts`
+      invalid-key test passed.
+
+
+      **Artifacts**:
+
+      - Report: `.audit-artifacts/pbar-browser-flow-retest-report.md`.
+
+      - Desktop/mobile screenshot, DOM, a11y, and trace artifacts committed under
+      `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-*`.
+
+
+      **Finding-by-finding UI closure**:
+
+      - B1-B23: PROVEN, with B16/B17/B18 clarified as PROVEN by browser evidence.
+
+      - U1-U5: PROVEN.
+
+
+      **Behavioral proof register**:
+
+      - Inspect: PROVEN
+
+      - Resonate: PROVEN
+
+      - Search command: PROVEN
+
+      - Search submit: PROVEN
+
+      - Natural-language Steer accepted/rejected: PROVEN
+
+      - RSS URL add receipt: PROVEN
+
+      - Manual ingest: PROVEN
+
+      - /doctor direct and via Steer: PROVEN
+
+      - Source Ledger diagnostics: PROVEN
+
+      - State portability restore safety: PROVEN
+
+      - Top-nav/surface switching: PROVEN
+
+      - Enter/apply from feed/Inspector/Search/Ledger: PROVEN
+
+
+      **Gate semantic reporting**:
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: previously failing U1, B5/U2, B12, and invalid OPENROUTER_KEY
+      alert path are now green
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      explicit_uncertainty_sources:
+
+      - U1 exact pixel height not logged by existing test, only pass/fail assertion
+      observed.
+
+
+      **Files changed / commits**:
+
+      - Worktree commit: `d78df87` — `test: add pbar browser retest evidence`.
+
+      - Mainline squash commit: `ad1983f` — `[vectl] step-pbar-browser-flow-retest
+      completed`.
+
+      - Product implementation files modified: false.
+
+
+      **Headline**: PASS'
   - id: pbar-runtime-liveness-probe
     name: Black-box liveness probe for runnable web surfaces
     status: done
