@@ -38906,7 +38906,7 @@ phases:
       contract.'
   - id: ui-remediation-retest-closure.urrc-playwright-browser-retest
     name: urrc-playwright-browser-retest
-    status: claimed
+    status: done
     description: 'Independent real-browser retest for residual UI remediation findings
       R1-R8 from docs/audits/ui-remediation-retest-2026-05-11.md.
 
@@ -39055,6 +39055,122 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T08:02:08.660577+00:00'
+    done_at: '2026-05-11T08:20:50.910842+00:00'
+    evidence: '## Playwright Browser Retest Report
+
+      **Tester**: integration-verifier
+
+      **Runtime URL**: Playwright real-server harness dynamic localhost URL; requested
+      nominal URL http://127.0.0.1:8080/
+
+      **Viewports**: desktop + 390x844 mobile
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: file absent in
+      isolated worktree at required path.
+
+      - docs/DESIGN.md — Read. Inspector must not include related/recommendation/ads;
+      Source Ledger flat rows with state export/import in footer; mobile feed metadata
+      remains flat inline `src:`.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read. Covers
+      expected-red design matrix, Source Ledger/mobile/search/Inspector assertions
+      and screenshots.
+
+      - web/tests/e2e/real-server-ui.spec.ts — Read. Uses real Go binary/server, owner-token
+      gate, OPML import, ingest, inspect, retrieve/search, MCP/API parity.
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts — Read. Verifies
+      Inspector primary body hides script/style/navigation/diagnostic garbage.
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — Read. Verifies dirty corpus
+      hides raw payloads/provenance from primary Inspector hierarchy.
+
+      - Relevant changed components — Read: Inspector, Feed, SearchRetrieval, SourceLedger,
+      StatePortability, +page, item-anatomy.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: FAIL
+
+      verdict: FAIL
+
+      headline: FAIL
+
+      blockers:
+
+      - R1 Inspector body sanitation still leaks boilerplate/follow prompt and repeated
+      lead-like text under focused adversarial browser fixture.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE until focused R1 fix and retest complete
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): 6bb19e6 (browser retest artifact branch only; not merged to
+      main)
+
+
+      ## Commands executed
+
+      - `npm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts
+      real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`
+      — exit 0; 11 passed.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts`
+      — exit 1; focused R1-R8 retest failed on R1.
+
+
+      ## Behavioral Proof Register
+
+      - R1: UNPROVEN/BLOCKING. Focused retest found Inspector primary text contained
+      `Follow us on Twitter for more newsletters` and `summary-like lead repeated
+      by the site`. Closure path: fix Inspector sanitation for follow prompts and
+      repeated lead-like text, then rerun focused spec.
+
+      - R2: PROVEN. Mobile Source Ledger preserves `src`, URL, status/last_fetch,
+      actions.
+
+      - R3: PROVEN. Feed/Search metadata lower-case `src:` with age.
+
+      - R4: PROVEN. Inspector provenance single value; no `full · full`.
+
+      - R5: PROVEN. Search receipt/query controls hidden after Today.
+
+      - R6: PROVEN. Search inspect controls exposed; inactive feed controls absent.
+
+      - R7: PROVEN. Desktop Source Ledger row has `src:`, URL, status, actions.
+
+      - R8: PROVEN. Export/import in Ledger footer and warning visible.
+
+
+      ## Remediation Ownership Created
+
+      Planner added focused downstream remediation:
+
+      - `ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix`
+
+      - `ui-remediation-retest-closure.urrc-r1-focused-browser-retest`
+
+
+      Planner also updated downstream `ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit`
+      and `ui-remediation-retest-closure.urrc-final-remediation-gate` dependencies
+      so final closure cannot proceed while R1 remains open.
+
+
+      ## Gaps/Notes
+
+      - This verification step is complete as a blocker-finding retest, not a green
+      closure. The phase remains blocked until the focused R1 fix and browser retest
+      close the blocker.'
   - id: ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     name: urrc-uiux-screenshot-conformance-audit
     status: pending
