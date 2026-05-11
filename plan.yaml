@@ -44332,3 +44332,91 @@ phases:
 
       PASS / PASS_WITH_DEBT / FAIL'
     agent: integration-verifier
+  - id: pbar-browser-flow-retest
+    name: Independently retest browser PRD workflows green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+
+      As an INDEPENDENT TESTER (integration-verifier), retest the real rendered browser
+      workflows against the PRD behavior audit after remediation.
+
+
+      Scope must include desktop and narrow/mobile:
+
+      - Inspect, Resonate, Search command and Search submit, natural-language Steer
+      accepted/rejected paths, RSS URL add receipt, manual ingest, /doctor direct
+      route and /doctor via Steer, Source Ledger diagnostics, state-portability restore
+      safety, top-nav surface switching, Enter/apply submissions from feed/Inspector/Search/Ledger.
+
+      - Produce screenshots/DOM snapshots equivalent to the audit artifacts, not only
+      test summaries.
+
+
+      This is a phase-check protecting UIUX audit and final closure. Findings must
+      be mapped to B1-B23 and U1-U5.'
+    verification: 'phase-check protecting UIUX audit and final closure: real browser
+      retest passes green for every UI-visible finding and includes screenshots/DOM
+      snapshots for desktop and mobile states, with explicit B1-B23/U1-U5 closure
+      mapping.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Browser Retest Evidence
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: End-user PRD workflows
+
+      **Independence Level**: L2
+
+
+      ### Commands executed
+
+      ```
+
+      <playwright/vitest commands and output>
+
+      ```
+
+
+      ### Runtime target
+
+      - URL:
+
+      - owner-token setup method:
+
+      - viewport matrix:
+
+
+      ### Artifacts
+
+      - Desktop screenshots/snapshots: <paths>
+
+      - Mobile screenshots/snapshots: <paths>
+
+
+      ### Finding-by-finding UI closure
+
+      | Finding | Evidence ref | Status | Notes |
+
+      | --- | --- | --- | --- |
+
+      | B1-B23,U1-U5 | <artifact/command> | PROVEN/UNPROVEN/NON_INTERSECTING | |
+
+
+      ### Headline
+
+      PASS / PASS_WITH_DEBT / FAIL'
+    agent: integration-verifier
