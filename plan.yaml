@@ -43860,3 +43860,57 @@ phases:
       - Fallback labelling proof: <feed/Inspector status examples>\n- Product-boundary\
       \ proof: raw diagnostics only; no dashboard/settings/remediation panel."
     agent: golang-developer
+  - id: pbar-backend-gate
+    name: Gate backend PRD behavior remediation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether backend
+      semantics are complete for PRD behavior audit remediation.
+
+
+      Review depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches search/retrieval, natural-language steering, ranking, extraction/LLM
+      provenance, and diagnostics.
+
+      - Product-boundary risk includes forbidden vector/RAG search, settings/rule-builder
+      creep, dashboards, and sync/history concepts.
+
+
+      BLOCK if any backend-owned finding lacks green expected-red tests, concrete
+      evidence, or PRD/ARCH/DESIGN boundary compliance.
+
+
+      Verification scope: phase-check protecting frontend remediation and final closure.'
+    verification: 'phase-check protecting downstream frontend/retest phases: backend-owned
+      rows in the closure matrix are green or explicitly assigned to frontend follow-up,
+      expected-red backend tests pass green, and no forbidden product concepts were
+      introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Backend Gate Review
+
+      - Backend-owned findings reviewed: B1,B2,B4,B5,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22,U2,U4
+
+      - Green test evidence reviewed: <commands/artifacts>
+
+      - Product-boundary review: <PASS/FAIL with notes>
+
+      - Residual frontend dependencies: <list or none>
+
+      - Gate decision: OPEN/BLOCK'
+    depends_on:
+    - pbar-backend-search-remediation
+    - pbar-backend-steer-ranking-remediation
+    - pbar-backend-readable-payload-sanitation
+    - pbar-backend-llm-doctor-provenance-remediation
+    agent: gate-reviewer
