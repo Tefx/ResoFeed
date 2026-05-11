@@ -49749,6 +49749,139 @@ phases:
       ## Gaps / Notes
 
       - none'
+  - id: pbar-source-add-receipt-stale-guidance-fix
+    name: Fix stale source-add receipt after Source Ledger ingest control removal
+    status: pending
+    description: 'Fix the reopened B5/U2 stale receipt guidance after the Source Ledger
+      ingest-control boundary changed.
+
+
+      Scope:
+
+      - Update `internal/resofeed/ranking.go` so source-add user-visible receipt copy
+      no longer says or implies `run ingest in SOURCE LEDGER`, `[RUN INGEST]`, `[FETCH]`,
+      or any Source Ledger run/fetch control.
+
+      - Update backend expectation tests in `internal/resofeed/pbar_steer_receipt_remediation_test.go`
+      away from the stale `run ingest in SOURCE LEDGER` expectation.
+
+      - Update browser receipt expectation in `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`
+      away from stale Source Ledger ingest guidance.
+
+      - Preserve the now-authoritative PRD/DESIGN Source Ledger boundary established
+      by `pbar-source-ledger-boundary-wiring-remediation`: Source Ledger must not
+      expose run/fetch controls.
+
+
+      Forbidden:
+
+      - Do NOT reintroduce Source Ledger `[RUN INGEST]`, `[FETCH]`, ingest buttons,
+      fetch buttons, or equivalent controls.
+
+      - Do NOT paper over the stale receipt by changing only tests; product copy and
+      expectations must agree.
+
+      - Do NOT change completed-step evidence or completed plan steps.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION/FIX step. Stub-only completion is NOT acceptable.
+      The receipt behavior must be corrected in product code and protected by updated
+      backend and browser expectations.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      Evidence must cite the key PRD/DESIGN/plan passages confirming the Source Ledger
+      boundary, or state `NOT READ: <reason>` for each unavailable ref.'
+    verification: '- Focused backend PBAR/source receipt test passes and proves the
+      source-add receipt no longer contains `run ingest in SOURCE LEDGER`, `[RUN INGEST]`,
+      or `[FETCH]` guidance.
+
+      - Browser source-add receipt expectation test passes with the updated non-stale
+      receipt copy.
+
+      - Source Ledger regression passes confirming no run/fetch/ingest controls are
+      present or reachable in Source Ledger UI.
+
+      - Evidence lists the exact files changed and the exact commands/tests run for
+      backend receipt, browser receipt, and Source Ledger no-control regression.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fix Evidence
+
+
+      **Files changed**:
+
+      - `internal/resofeed/ranking.go`
+
+      - `internal/resofeed/pbar_steer_receipt_remediation_test.go`
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`
+
+
+      **Receipt copy before**:
+
+      ```text
+
+      <old stale copy>
+
+      ```
+
+
+      **Receipt copy after**:
+
+      ```text
+
+      <new copy without Source Ledger ingest/run/fetch guidance>
+
+      ```
+
+
+      **Backend focused test command + output**:
+
+      ```text
+
+      <paste command and output>
+
+      ```
+
+
+      **Browser receipt test command + output**:
+
+      ```text
+
+      <paste command and output>
+
+      ```
+
+
+      **Source Ledger no-run/fetch-control regression command + output**:
+
+      ```text
+
+      <paste command and output>
+
+      ```
+
+
+      **Boundary preservation statement**: Confirm no Source Ledger `[RUN INGEST]`,
+      `[FETCH]`, ingest, or fetch controls were introduced.'
+    depends_on:
+    - pbar-retest-audit-gate
+    agent: golang-developer
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
   status: locked
