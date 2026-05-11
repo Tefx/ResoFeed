@@ -45874,7 +45874,7 @@ phases:
   - id: pbar-frontend-search-doctor-surface-remediation
     name: Fix Search execution UI, direct Doctor route, and surface command/navigation
       semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -45941,6 +45941,85 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T17:03:36.859777+00:00'
+    done_at: '2026-05-11T17:20:28.693413+00:00'
+    evidence: '## refs Read Confirmation
+
+      - Read: .agents/instructions.md, docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,
+      docs/DESIGN_VISION.md, docs/USAGE.md, docs/audits/prd-behavior-audit-closure-matrix.json,
+      web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts, and relevant Svelte
+      components.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B1, B2, B3, B9, B23, U5
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B1/B2/B3/B9/B23/U5
+
+      **Subagent commit hash(es)**: b143198ab5891d3a9ee76fc154e53faf0b987e71
+
+      **Mainline squash commit**: aeb2b97 ([vectl] step-pbar-frontend-search-doctor-surface-remediation
+      completed)
+
+      **Files changed**:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+
+      **Merge conflict resolution**:
+
+      - Conflict files: web/src/routes/+page.svelte and web/src/routes/components/SearchRetrieval.svelte.
+
+      - Preserved feed/Inspector quality/fallback/resonate changes and mobile containment/search
+      anatomy/ledger changes while integrating search-through-Steer execution, stale-result
+      clearing, direct /doctor route, focus/current-state semantics, and explicit
+      search submit naming.
+
+
+      **Verification**:
+
+      ```bash
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # build completed during Playwright pre-run
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe
+
+      # post-commit mainline: 5 passed
+
+      ```
+
+
+      **Rendered artifacts**: Playwright generated Search, Doctor, Steer, Feed/Inspector,
+      and mobile surface screenshots/DOM/a11y attachments under `.test-artifacts/playwright/test-output/prd-pbar-expected-red-*`.
+
+      **Search/no-match proof**: Full PRD browser gap spec passed; Search execution
+      and no-match stale-row/internal-error assertions are green.
+
+      **/doctor route proof**: Full PRD browser gap spec passed; direct `/doctor`
+      route shows diagnostic surface instead of Today.
+
+      **Keyboard/nav proof**: B23 grouped Playwright test passed for Enter/apply steering
+      receipts across feed, Inspector, Search, and Ledger.
+
+      **Accessibility proof**: Focusable headings/current surfaces and explicit Search
+      submit accessible naming are integrated; full spec passed.
+
+      **Deviation records**: none; expected-red tests were not modified.
+
+      **Gaps/Notes**: none for owned scope.'
   - id: pbar-frontend-feed-inspector-resonate-remediation
     name: Fix Feed/Inspector fallback labels, quality metadata, and Resonate accessibility
     status: done
