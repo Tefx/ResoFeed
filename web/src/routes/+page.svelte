@@ -68,11 +68,27 @@
   const feedPaneInactive = $derived(isNarrow ? currentSurface !== 'feed' : currentSurface !== 'feed' && currentSurface !== 'inspector');
   const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
 
+  function surfaceForPath(pathname: string): Surface {
+    if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
+    return 'feed';
+  }
+
+  function canonicalPathForSurface(surface: Surface): string | null {
+    if (surface === 'ledger') return '/source-ledger';
+    if (surface === 'feed') return '/';
+    return null;
+  }
+
+  function replaceSurfaceFromLocation(): void {
+    const routeSurface = surfaceForPath(window.location.pathname);
+    if (routeSurface !== currentSurface) currentSurface = routeSurface;
+  }
+
   function apiClient(token = ownerToken): ResoFeedApiClient {
     return new ResoFeedApiClient({ ownerToken: token });
   }
 
-  async function loadShellData(token: string): Promise<void> {
+  async function loadShellData(token: string, syncRoute = true): Promise<void> {
     loadState = 'loading';
     apiError = null;
 
@@ -88,6 +104,7 @@
       selectedItemId = feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
+      if (syncRoute) replaceSurfaceFromLocation();
       loadState = 'ready';
       if (selectedItemId) {
         await loadItemDetail(selectedItemId, token);
@@ -157,8 +174,14 @@
     inspectorFocusRequestId += 1;
   }
 
-  function showSurface(surface: Surface): void {
+  function showSurface(surface: Surface, updateUrl = true): void {
     currentSurface = surface;
+    if (updateUrl) {
+      const canonicalPath = canonicalPathForSurface(surface);
+      if (canonicalPath && window.location.pathname !== canonicalPath) {
+        window.history.pushState({}, '', canonicalPath);
+      }
+    }
     if (surface === 'feed' && steerFeedback.kind === 'receipt' && steerFeedback.text.startsWith('retrieval:')) {
       steerFeedback = { kind: 'idle' };
       searchSeedQuery = '';
@@ -173,7 +196,7 @@
     steerFeedback = { kind: 'submitting' };
     try {
       if (command.toLowerCase() === 'source ledger' || command.toLowerCase() === 'ledger') {
-        currentSurface = 'ledger';
+        showSurface('ledger');
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'source ledger' };
         return;
@@ -337,6 +360,9 @@
     };
     document.addEventListener('mousedown', preserveKeyboardFocusModality);
 
+    const handlePopState = () => replaceSurfaceFromLocation();
+    window.addEventListener('popstate', handlePopState);
+
     const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {
       ownerToken = storedToken;
@@ -347,6 +373,7 @@
     return () => {
       media.removeEventListener('change', updateMedia);
       document.removeEventListener('mousedown', preserveKeyboardFocusModality);
+      window.removeEventListener('popstate', handlePopState);
     };
   });
 </script>
@@ -379,6 +406,11 @@
       </form>
       <span class="contract-label">RESOFEED</span>
     </header>
+
+    <nav class="surface-nav" aria-label="Primary surfaces">
+      <button type="button" aria-current={currentSurface === 'feed' ? 'page' : undefined} onclick={() => showSurface('feed')}>TODAY</button>
+      <button type="button" aria-current={currentSurface === 'ledger' ? 'page' : undefined} onclick={() => showSurface('ledger')}>SOURCE LEDGER</button>
+    </nav>
 
     {#if steerFeedback.kind === 'receipt'}
       <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>

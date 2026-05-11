@@ -358,6 +358,33 @@ a:focus,
   align-items: center;
 }
 
+.surface-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rf-space-row);
+  align-items: center;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: 0 var(--rf-space-md);
+}
+
+.surface-nav button {
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  color: var(--rf-color-muted);
+  background: transparent;
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.surface-nav button[aria-current='page'],
+.surface-nav button:hover,
+.surface-nav button:focus-visible {
+  color: var(--rf-color-text);
+}
+
 .back-command {
   border-color: var(--rf-color-border);
   color: var(--rf-color-muted);
