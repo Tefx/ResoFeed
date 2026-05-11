@@ -48269,11 +48269,40 @@ phases:
   - id: pbar-spec-product-boundary-review
     name: Spec and product-boundary conformance review
     status: pending
-    description: 'As spec-verifier, independently verify that remediation conforms
-      to PRD, ARCHITECTURE, and DESIGN without introducing forbidden product concepts.
+    description: 'As spec-verifier, independently rerun the product-boundary conformance
+      review AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
+      the remediation evidence as the new candidate state, but do not lower the product-boundary
+      bar.
 
 
-      Scope:
+      ## Prior failed verdict that must be closed
+
+      - Prior status/verdict: FAIL; gate_open_allowed false; orchestrator_action_hint
+      DO_NOT_COMPLETE.
+
+      - Blocker PB-1: Source Ledger exposed `[RUN INGEST]` and per-source `[FETCH]`
+      controls beyond strict PRD/DESIGN product boundary, per prior spec-verifier.
+
+      - Prior citations: PRD §7.2 says Source Ledger “ONLY supports viewing the source
+      name/URL and deleting it”; DESIGN Source Ledger anatomy lists OPML import, flat
+      rows, delete, state links; forbidden settings/dashboard behavior.
+
+      - Prior evidence: `SourceLedger.svelte:120-127` added `[RUN INGEST]`; `SourceLedger.svelte:145-151`
+      added per-source `[FETCH]`.
+
+      - Prior recommendation: either explicit spec update/adjudication or move/remove
+      controls so Source Ledger rows remain view/delete plus OPML/state actions only.
+
+      - Prior proof gaps: `populated_live_llm_quality: NEEDS_TEST` and `source_ledger_only_view_delete_import_export:
+      UNPROVEN`.
+
+      - Conflict to adjudicate: completed `pbar-uiux-multimodal-audit` considered
+      `[RUN INGEST]`, `[FETCH]`, `[DELETE]` visually faithful to DESIGN.md; this is
+      NOT sufficient by itself. Resolve using authoritative product-boundary citations
+      and replacement proof.
+
+
+      ## Scope
 
       - Search remains lexical/metadata-driven; no vector DB, RAG, semantic answer
       engine, or external search service.
@@ -48296,56 +48325,83 @@ phases:
 
       This review must produce a finding-by-finding conformance table and explicitly
       mark any unresolved item as BLOCKING unless non-intersection with final gate
-      is proven.'
-    verification: 'phase-check protecting final closure: spec-verifier confirms all
-      remediated behavior matches PRD/DESIGN/ARCHITECTURE and no forbidden concepts
-      or product-boundary violations were introduced; unresolved behavioral obligations
-      include closure paths.'
+      is proven. Do not modify code.'
+    verification: 'phase-check protecting final closure: spec-verifier confirms the
+      remediated Source Ledger operation-control boundary is PROVEN or explicitly
+      adjudicated with authoritative citations; all remediated behavior matches PRD/DESIGN/ARCHITECTURE;
+      no forbidden concepts or product-boundary violations were introduced; unresolved
+      behavioral obligations include explicit closure paths and cannot bypass final
+      closure.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
-      - <filename> — key passage or "NOT READ: <reason>"
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Spec/Product Boundary Review
+      ## Spec/Product Boundary Rerun Report
 
-      **Reviewer**: spec-verifier
+      **Remediation step reviewed**: pbar-source-ledger-boundary-wiring-remediation
 
 
-      ### Conformance table
+      ## Requirements Register
 
-      | Finding | Spec refs | Implementation evidence | Verdict | Blocking? |
+      | R# | Spec Section | Requirement | Level | Checkable? |
 
       | --- | --- | --- | --- | --- |
 
-      | B1-B23,U1-U5 | <PRD/DESIGN/ARCH refs> | <evidence> | CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
-      | YES/NO |
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation/Evidence | Verdict | Notes
+      |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
 
 
-      ### Forbidden concept scan
+      ## Required Closure Checks
 
-      - Vector/RAG/semantic search: absent/present
+      - PB-1 Source Ledger operation controls (`[RUN INGEST]`, `[FETCH]`): PROVEN_CLOSED
+      / STILL_BLOCKING / ADJUDICATED_WITH_CITATION.
 
-      - Settings/rule builder/history ledger/accounts/sync: absent/present
+      - `populated_live_llm_quality`: PROVEN / NEEDS_TEST / non-intersection evidence.
 
-      - Dashboards/cards/remediation panels for /doctor or Source Ledger: absent/present
+      - `source_ledger_only_view_delete_import_export`: PROVEN / UNPROVEN / non-intersection
+      evidence.
 
-      - Non-canonical chrome/onboarding wizard: absent/present
+      - UIUX conflict resolved by authoritative product-boundary evidence, not visual
+      preference alone: yes/no.
 
 
-      ### Gate decision basis
+      ## Gate Decision Basis
 
-      - OPEN/BLOCK recommendation:
+      - gate_open_allowed: true/false
 
-      - Unresolved obligations and closure paths:'
+      - unresolved blocker-class obligations: <list>
+
+      - closure_path for every unresolved item: <remediation/retest/non-intersection>
+
+      - orchestrator_action_hint: COMPLETE / DO_NOT_COMPLETE'
+    refs:
+    - docs/PRD.md
+    - docs/DESIGN.md
+    - docs/ARCHITECTURE.md
     depends_on:
     - pbar-backend-green-retest
     - pbar-browser-flow-retest
     - pbar-runtime-liveness-probe
+    - pbar-source-ledger-boundary-wiring-remediation
     agent: spec-verifier
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
