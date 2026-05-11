@@ -40476,7 +40476,7 @@ phases:
       from `web/node_modules`.'
   - id: ui-remediation-retest-closure.urrc-canonical-visual-evidence-repair
     name: urrc-canonical-visual-evidence-repair
-    status: pending
+    status: claimed
     description: "Focused evidence repair for the semantically failed UIUX audit.\n\
       \nstep_type: verification. verification_scope: phase-check. Agent: integration-verifier.\
       \ This is proof-closure work, not product remediation.\n\nContext to close exactly:\n\
@@ -40625,6 +40625,8 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T09:39:32.336769+00:00'
   - id: ui-remediation-retest-closure.urrc-uiux-canonical-evidence-reaudit
     name: urrc-uiux-canonical-evidence-reaudit
     status: pending
