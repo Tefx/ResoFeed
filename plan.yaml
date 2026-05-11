@@ -43922,3 +43922,72 @@ phases:
     visual grammar with expected-red browser tests turned green.
   depends_on:
   - prd-behavior-audit-remediation-backend-semantics
+  steps:
+  - id: pbar-frontend-search-doctor-surface-remediation
+    name: Fix Search execution UI, direct Doctor route, and surface command/navigation
+      semantics
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete frontend behavior for B1, B2, B3, B9, B23, and U5.
+
+
+      Scope:
+
+      - web/src/routes/+page.svelte and SearchRetrieval integration.
+
+      - When `search <query>` is submitted through Steer, Search immediately executes
+      the lexical query and renders only query results or no-results state.
+
+      - No-match UI clears prior/default rows and shows stable empty state, not `err:
+      internal` plus stale items.
+
+      - Search form submit accessible name must be explicit (for example `submit search`)
+      and result-level Inspect controls must not collide with the core submit action
+      in the active accessibility tree.
+
+      - Direct `/doctor` route must render the diagnostic surface or visibly redirect/document
+      the supported command path; do not leave `/doctor` URL showing Today.
+
+      - Steer Enter and apply click must be covered from feed, Inspector, Search,
+      and Ledger states; top-nav TODAY/SOURCE LEDGER must escape Inspector reliably.
+
+      - Active surface must expose heading/landmark/focus/current-state semantics
+      and inactive surface containment.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires BOTH logic correctness and rendering completeness: visible
+      DOM output for Search, Doctor, and active-surface states.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Search surface seeded but not executed.
+
+      2. /doctor URL renders Today without visible redirect/documentation.
+
+      3. Enter submission works only from one surface.
+
+      4. Surface state is visual-only without programmatic semantics.'
+    verification: 'local-check protecting B1/B2/B3/B9/B23/U5: expected-red browser
+      tests for Search execution/no-match, direct /doctor route, Enter/apply submission,
+      nav escape, active landmarks, and accessible submit naming pass green with desktop
+      and mobile DOM/screenshot evidence.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B1, B2, B3, B9, B23, U5\n- Files changed: <list>\n- Browser\
+      \ commands/tests:\n  ```\n  <commands and output>\n  ```\n- Rendered artifacts:\
+      \ <screenshots/snapshots paths>\n- Search/no-match proof: <query, count, stale\
+      \ row absence>\n- /doctor route proof: <direct URL behavior>\n- Keyboard/nav\
+      \ proof: <states covered>\n- Accessibility proof: <submit label, landmark/focus/current\
+      \ state>"
+    agent: frontend-engineer
