@@ -41708,3 +41708,13 @@ phases:
 
 
       None'
+- id: source-ledger-navigation-regression
+  name: Source Ledger Navigation Regression Remediation
+  status: pending
+  gate: Restore documented SOURCE LEDGER discoverability and direct-route access without
+    introducing forbidden product concepts, settings dashboards, sync/merge behavior,
+    or non-canonical UI chrome. Gate requires expected-red browser coverage, frontend
+    implementation, independent browser route proof, uiux-auditor validation, and
+    final independent review.
+  depends_on:
+  - ui-remediation-retest-closure
