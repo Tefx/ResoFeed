@@ -44507,3 +44507,85 @@ phases:
 
       - gate_decision_basis:'
     agent: blind-tester
+  - id: pbar-uiux-multimodal-audit
+    name: Native multimodal UI/UX audit for remediated surfaces
+    status: pending
+    description: 'As uiux-auditor, perform a native multimodal implementation audit
+      of all remediated UI surfaces against docs/DESIGN.md and the PRD behavior audit.
+
+
+      Scope:
+
+      - Search desktop/mobile behavior, form density, result metadata anatomy, time
+      marker restraint, accessible submit naming.
+
+      - Steer receipt clarity for natural-language and source-add flows.
+
+      - Feed row quality/value microcopy and Resonate visible/programmatic state.
+
+      - Inspector body/core insight sanitation, fallback labels, and mobile route
+      presentation.
+
+      - Direct /doctor raw diagnostics scan-readability.
+
+      - Source Ledger row grammar, full raw `err:` affordance, and mobile non-feed
+      containment.
+
+      - Active surface headings, landmarks, focus destinations, and inactive-surface
+      containment.
+
+
+      Verification must use rendered screenshots/images/terminal captures or equivalent
+      visual/spatial artifacts for required states/viewports and return a parseable
+      PASS/PASS_WITH_DEBT/FAIL handoff. Standard tests or DOM snapshots alone are
+      insufficient.'
+    verification: 'phase-check protecting final closure: uiux-auditor reviews rendered
+      artifacts for all UI-touched findings and blocks on visual/accessibility/design-token
+      regressions or missing screenshot evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UI/UX Audit Handoff
+
+      **Auditor**: uiux-auditor
+
+      **Design authority**: docs/DESIGN.md
+
+
+      ### Artifacts reviewed
+
+      - Desktop: <paths>
+
+      - Mobile/narrow: <paths>
+
+      - Accessibility/DOM support: <paths>
+
+
+      ### Finding coverage
+
+      | Finding | Visual/spatial evidence | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | B1-B13,B19,B21-B23,U1-U5 | <artifact> | PASS/PASS_WITH_DEBT/FAIL | |
+
+
+      ### Headline
+
+      PASS / PASS_WITH_DEBT / FAIL
+
+
+      ### Blocking issues
+
+      <list or none>'
+    depends_on:
+    - pbar-browser-flow-retest
+    - pbar-runtime-liveness-probe
+    agent: uiux-auditor
