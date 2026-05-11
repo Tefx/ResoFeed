@@ -46080,7 +46080,7 @@ phases:
   - id: pbar-frontend-mobile-search-ledger-remediation
     name: Fix mobile non-feed containment, Search metadata/form anatomy, and Ledger
       diagnostics grammar
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -46147,6 +46147,96 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T17:03:32.048806+00:00'
+    done_at: '2026-05-11T17:16:00.284531+00:00'
+    evidence: '## refs Read Confirmation
+
+      - Read: .agents/instructions.md, docs/ARCHITECTURE.md, docs/PRD.md, docs/DESIGN.md,
+      docs/DESIGN_VISION.md, docs/USAGE.md, docs/audits/prd-behavior-audit-closure-matrix.json,
+      web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts, and relevant Svelte
+      components.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B10, B11, B12, B13, U1, U3, U5
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B10/B11/B12/B13/U1/U3/U5
+
+      **Subagent commit hash(es)**: 454a551e3500c686da7b2682dae768b2e72e2bed
+
+      **Mainline squash commit**: e5e8fc2 ([vectl] step-pbar-frontend-mobile-search-ledger-remediation
+      completed)
+
+      **Files changed**:
+
+      - web/src/app.css
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+
+      **Merge conflict resolution**:
+
+      - Conflict file: web/src/routes/components/SearchRetrieval.svelte
+
+      - Preserved mainline feed/Inspector item priority metadata while integrating
+      incoming mobile compact search form/result anatomy and time-label classes.
+
+
+      **Verification**:
+
+      ```bash
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # build completed
+
+      npm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts
+      --project=chromium-ci-safe -g ''B6/B7/B8/B19/B21/B22|B10/B12/U3/U5|B1/B2/B3/B11/B13/U1''
+
+      # post-commit mainline: 3 passed
+
+      ```
+
+
+      **Mobile rendered artifacts**:
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-7166e-t-accessible-mobile-anatomy-chromium-ci-safe/attachments/mobile-search-result-anatomy-*`
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-9e8ae-rors-and-stable-ledger-rows-chromium-ci-safe/attachments/mobile-source-ledger-surface-*`
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-9e8ae-rors-and-stable-ledger-rows-chromium-ci-safe/attachments/mobile-search-surface-containment-*`
+
+      - `.test-artifacts/playwright/test-output/prd-pbar-expected-red-brow-9e8ae-rors-and-stable-ledger-rows-chromium-ci-safe/attachments/mobile-doctor-surface-containment-*`
+
+
+      **Inactive feed containment proof**: Targeted Playwright passed assertions that
+      `#today-feed` has inert on mobile ledger/search/doctor, Today row controls have
+      count 0 on mobile ledger, and SOURCE LEDGER heading receives active focus.
+
+      **Search metadata anatomy proof**: Mobile Search DOM shows source+age first,
+      then `extraction: excerpt`, `match: lexical index`, and `provenance: source-backed`;
+      form-height/result viewport and absence of `.contract-time-label` in result
+      metadata assertions passed.
+
+      **Ledger diagnostic affordance proof**: Source Ledger rows render stable `src
+      / status / last_fetch / url` grammar and include keyboard/AT reachable details
+      disclosure labelled `diagnostic details` with raw diagnostic text.
+
+      **Product-boundary proof**: No dashboard/settings/source-management creep; changes
+      remain Svelte UI/CSS and dense functional labels.
+
+      **Deviation records**: none
+
+      **Gaps/Notes**: Playwright generated untracked `.test-artifacts` evidence files;
+      only source changes were committed.'
   - id: pbar-frontend-steer-receipt-remediation
     name: Render actionable Steer and source-add receipts without product creep
     status: claimed
