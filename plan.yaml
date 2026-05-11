@@ -40987,7 +40987,7 @@ phases:
       mainline state.'
   - id: ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
     name: urrc-materialize-uiux-canonical-reaudit-artifact
-    status: claimed
+    status: done
     description: 'Materialize the missing downstream UIUX canonical evidence re-audit
       artifact for the UI remediation retest closure gate.
 
@@ -41187,3 +41187,102 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-11T10:06:17.705486+00:00'
+    done_at: '2026-05-11T10:10:28.015125+00:00'
+    evidence: '## refs Read Confirmation
+
+
+      - audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+      — read. Key insight: Shows `PROVEN` for R1-R8 and gate_open_allowed set to true.
+
+      - artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/ — read.
+      Key inventory/insight: Confirmed presence of screenshots and traces matching
+      the required evidence references.
+
+
+      ## Downstream UIUX Canonical Re-Audit Artifact Evidence
+
+
+      **Created artifact path**: audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+
+
+      **Worker commit hash(es)**: 574ac9371770e12e2311a0ed5e85eb01b9a6ca95
+
+      **Mainline squash commit**: 2c834d0
+
+
+      **Canonical handoff reviewed**: audits/ui-remediation-r1-r8-canonical-visual-evidence-repair-2026-05-11.md
+
+      **Evidence bundle reviewed**: artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/
+
+
+      ## R1-R8 Evidence Matrix
+
+
+      Worker evidence reported R1-R8 all `PROVEN` with exact paths under `artifacts/ui-remediation-r1-r8-canonical-visual-evidence-2026-05-11/`,
+      including:
+
+      - R1: `ui-remediation-r1-r8-browser-retest--screenshot.png`, `ui-remediation-r1-r8-browser-retest--trace.zip`,
+      `ui-remediation-r1-r8-browser-retest--r1-primary-inspector-text.txt.txt`.
+
+      - R2: `full-ui-design-conformance.expected-red--narrow-source-ledger-390x844.png.png`,
+      `full-ui-design-conformance.expected-red--trace.zip`.
+
+      - R3: desktop/narrow authenticated feed screenshots plus `full-ui-design-conformance.expected-red--trace.zip`.
+
+      - R4: desktop Inspector screenshot, R1 browser retest screenshot, and both trace
+      families.
+
+      - R5: narrow search form/results and narrow authenticated feed screenshots plus
+      trace.
+
+      - R6: desktop feed/Inspector and desktop search results screenshots plus trace.
+
+      - R7/R8: desktop and narrow Source Ledger screenshots plus trace.
+
+
+      ## behavioral_proof_register
+
+
+      Worker evidence reported a structured behavioral proof register mapping R1-R8
+      obligations to artifacts with `status: PROVEN`, `closure_path: true`, and gate
+      decision bases for Inspector sanitation/readable prose, mobile Source Ledger
+      geometry, metadata readability, single Inspector provenance, Search/Today separation,
+      duplicate Inspect absence, Source Ledger row grammar, and State Portability
+      footer/action cluster.
+
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Files changed
+
+
+      audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md
+
+
+      ## Verification
+
+
+      - Worker committed artifact on isolated branch: `574ac9371770e12e2311a0ed5e85eb01b9a6ca95`.
+
+      - Orchestrator squash-merged into main: `2c834d0 [vectl] step-ui-remediation-retest-closure.urrc-materialize-uiux-canonical-reaudit-artifact
+      completed`.
+
+      - Mainline verification command: `git show --name-status --oneline --no-renames
+      HEAD -- audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md &&
+      git status --porcelain audits/ui-remediation-r1-r8-canonical-uiux-reaudit-2026-05-11.md`.
+
+      - Output confirmed artifact added in `2c834d0` and no dirty status for the artifact
+      path.
+
+
+      ## Gaps/Notes
+
+
+      none'
