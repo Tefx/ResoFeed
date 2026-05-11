@@ -43991,3 +43991,60 @@ phases:
       \ proof: <states covered>\n- Accessibility proof: <submit label, landmark/focus/current\
       \ state>"
     agent: frontend-engineer
+  - id: pbar-frontend-feed-inspector-resonate-remediation
+    name: Fix Feed/Inspector fallback labels, quality metadata, and Resonate accessibility
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete frontend presentation for B6, B7, B8, B19, B21, and B22.
+
+
+      Scope:
+
+      - Feed row metadata must expose a terse quality/value label or equivalent priority/quality
+      signal in the scan path.
+
+      - Inspector and Feed must label fallback/excerpt-driven summaries/core insight
+      plainly and must not present excerpt/category/headline residue as completed
+      model-backed synthesis.
+
+      - Inspector must render sanitized body/core insight from the shared payload
+      layer without source-site boilerplate or related-story tails.
+
+      - Resonate control must expose stable programmatic state through aria-pressed,
+      accessible name, or equivalent while preserving simple star visual.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered Feed and Inspector DOM/screenshot evidence, not
+      only data/view-model correctness.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      1. Quality/value exists only in API data but not visible scan metadata.
+
+      2. Fallback/excerpt summaries look like full model summaries.
+
+      3. Resonate active state relies on color/fill alone.
+
+      4. Inspector body still shows audit-listed pollution patterns.'
+    verification: 'local-check protecting B6/B7/B8/B19/B21/B22: expected-red UI tests
+      pass green for quality/value metadata, fallback/excerpt labelling, sanitized
+      Inspector body/core insight, and Resonate accessible state with rendered artifacts.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Implementation Evidence\n\
+      - Findings closed: B6, B7, B8, B19, B21, B22\n- Files changed: <list>\n- Commands/tests:\n\
+      \  ```\n  <commands and output>\n  ```\n- Rendered artifacts: <Feed/Inspector\
+      \ screenshots or DOM snapshots>\n- Quality/value scan label proof: <example\
+      \ rows>\n- Fallback label proof: <example item>\n- Resonate a11y proof: <before/after\
+      \ accessible state>\n- Pollution absence proof: <grep/snapshot excerpts>"
+    agent: frontend-engineer
