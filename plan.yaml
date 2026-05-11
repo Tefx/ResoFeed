@@ -43335,7 +43335,7 @@ phases:
       not blocking.'
 - id: prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests
   name: PRD Behavior Audit Remediation — Contract Matrix and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Every finding B1-B23 and U1-U5 from docs/audits/prd-behavior-audit-2026-05-11.md
     is enumerated with explicit owner, acceptance criteria, expected-red coverage
     or justified infeasibility, and no product-boundary ambiguity before remediation
@@ -44047,7 +44047,7 @@ phases:
       committed diff is test-only.'
   - id: pbar-contract-tests-gate
     name: Gate audit matrix and expected-red coverage
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the PRD
       behavior audit remediation foundation is complete enough for implementation.
 
@@ -44122,9 +44122,109 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T16:19:10.242332+00:00'
+    done_at: '2026-05-11T16:24:46.150499+00:00'
+    evidence: "## refs Read Confirmation\n- .agents/instructions.md — lines 4-12 define\
+      \ single-tenant analyst workbench, one deployable, SQLite/FTS5 only, OpenRouter\
+      \ as JSON transformer; lines 19-35 define owner-token, steering, idempotency,\
+      \ strict HTTP validation.\n- docs/ARCHITECTURE.md — lines 11-19 define one Go\
+      \ process, one SQLite DB, thin HTTP/MCP transports, OpenRouter-only utility,\
+      \ lexical retrieval only; lines 425-465 define Steer/Search contracts; lines\
+      \ 904-969 define frontend and verification boundaries.\n- docs/PRD.md — lines\
+      \ 16-18 define Today/Star/Search/Coverage rule; lines 121-149 define trustworthy\
+      \ compression/fallback taxonomy; lines 197-218 define Steer; lines 417-429 define\
+      \ lexical search; lines 543-581 define AC-8/AC-17.\n- docs/DESIGN.md — lines\
+      \ 390-410 define Steer input/receipt; lines 411-449 define feed item/resonate\
+      \ semantics; lines 451-489 define Inspector/Source Ledger/Diagnostics; lines\
+      \ 491-497 define Search.\n- docs/DESIGN_VISION.md — lines 3-11 define no inbox-zero/folders/settings\
+      \ and AI raw utility; lines 34-39 define desktop/mobile/Source Ledger surfaces;\
+      \ lines 63-69 define anti-slop guardrails.\n- docs/USAGE.md — lines 7-20 define\
+      \ product scope/non-goals; lines 507-544 define Steer/search/doctor usage; lines\
+      \ 618-641 define lexical Search; lines 667-681 define /doctor raw diagnostics.\n\
+      - docs/audits/prd-behavior-audit-closure-matrix.json — parsed 28 records exactly:\
+      \ B1-B23 and U1-U5; required owner, implementation owner, expected-red owner,\
+      \ independent retest owner, UI/UX audit requirement, acceptance criteria, evidence\
+      \ requirement, PRD/DESIGN/ARCH/audit refs all populated.\n- internal/resofeed/pbar_expected_red_backend_test.go\
+      \ — audited five expected-red functions covering B1,B2,B4,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22.\n\
+      - web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts — audited five Playwright\
+      \ tests covering B1-B5,B8-B13,B21-B23,U1-U5 plus frontend-visible B6,B7,B14,B15,B19,B20,B22.\n\
+      \n## Gate Review Report\n**Reviewer**: gate-reviewer (independent auditor)\n\
+      **Phase**: prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests\n\
+      \nverdict: PASS\nheadline: PASS\nproof_gap_status: NONE\nblocking_status: CLOSED\n\
+      gate_open_allowed: true\norchestrator_action_hint: COMPLETE\nblockers: []\n\n\
+      ### Finding Inventory Check\n- B1-B23 present: PASS\n- U1-U5 present: PASS\n\
+      - Owners/acceptance/evidence present for every row: PASS\n- Evidence: matrix\
+      \ parser reported `matrix_records 28`, `missing_ids []`, `extra_ids []`, `duplicates\
+      \ []`, `field_gaps_count 0`, `ref_gaps_count 0`, `all_required_ok True`.\n\n\
+      ### Expected-Red Check\n- Backend expected-red coverage complete or justified:\
+      \ PASS\n  - Static map found no missing markers for B1,B2,B4,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22.\n\
+      \  - Runtime command exited 1 as expected, exposing search, steer receipt, ranking,\
+      \ doctor health, and payload sanitation gaps.\n- Browser expected-red coverage\
+      \ complete or justified: PASS\n  - Static map found no missing markers for required\
+      \ browser/UI findings.\n  - Runtime command exited 1 as expected with 5 failing\
+      \ Playwright tests covering Search, Steer/receipts, Doctor, Inspector/feed presentation,\
+      \ and mobile/ledger surfaces.\n- Product code untouched by test steps: PASS\n\
+      \  - Current worktree clean after cleanup.\n  - Artifact history for scoped\
+      \ files shows only additions of matrix JSON and expected-red test files.\n\n\
+      ### Wiring Audit (W1-W8)\n- W1 Matrix inventory traceability: PASS — records\
+      \ enumerate exact B1-B23/U1-U5 inventory.\n- W2 Ownership traceability: PASS\
+      \ — every row has owning remediation step, implementation owner, expected-red\
+      \ owner, independent retest owner.\n- W3 Acceptance/evidence traceability: PASS\
+      \ — every row has non-empty acceptance criteria and evidence requirement.\n\
+      - W4 Backend test mapping: PASS — backend file maps required backend-relevant\
+      \ findings to executable expected-red tests.\n- W5 Browser test mapping: PASS\
+      \ — Playwright file maps required UI/browser findings to real browser tests.\n\
+      - W6 Downstream retest/audit traceability: PASS — every matrix row carries independent\
+      \ retest owner and UIUX/spec audit requirement.\n- W7 Scope purity: PASS — scoped\
+      \ artifact commits add matrix/test files only; no product implementation file\
+      \ changes identified.\n- W8 Runtime authenticity: PASS — browser tests use `page.goto`,\
+      \ role locators, screenshots, DOM/a11y captures, fixture server, and viewport\
+      \ changes; backend tests use deterministic DB/HTTP/router fixtures.\n\n### Escape\
+      \ Hatch Audit\n- PASS: no `@invar:allow` / `invar:allow` found in scoped `internal`,\
+      \ `web`, or matrix artifact scans.\n- Note: broader repository search found\
+      \ matches only in orchestrator/audit text such as `plan.yaml` and `.audit-artifacts`;\
+      \ these were not source escape hatches and were not used for approval.\n\n###\
+      \ Real Rendered / Fixture Distinction\n- Browser coverage is real rendered app\
+      \ coverage: Playwright test uses `page.goto`, owner-token entry, real role locators,\
+      \ screenshots, DOM snapshots, a11y JSON captures, fixture RSS/OPML server, and\
+      \ mobile viewport changes.\n- Backend coverage is deterministic fixture/contract\
+      \ coverage: in-memory/contract DB setup, HTTP router calls, direct product functions,\
+      \ controlled corpus, and deterministic polluted payload fixtures.\n- Limitation:\
+      \ browser tests use fixture-backed RSS and local server, not live external feeds;\
+      \ acceptable for expected-red regression foundation.\n\n### behavioral_proof_register\n\
+      - matrix inventory and required fields: PROVEN\n- backend expected-red coverage:\
+      \ PROVEN\n- browser expected-red coverage: PROVEN\n- test-only scope purity:\
+      \ PROVEN\n- downstream owner traceability: PROVEN\n\n### Decision\nOPEN only\
+      \ if every finding has owner + acceptance + evidence + expected-red coverage/justification.\n\
+      Decision: OPEN. Foundation is complete enough for downstream implementation.\n\
+      \n### Programmatic Handoff JSON\n```json\n{\n  \"verdict\": \"PASS\",\n  \"\
+      blockers\": [],\n  \"headline\": \"PASS\",\n  \"proof_gap_status\": \"NONE\"\
+      ,\n  \"blocking_status\": \"CLOSED\",\n  \"gate_open_allowed\": true,\n  \"\
+      orchestrator_action_hint\": \"COMPLETE\",\n  \"behavioral_proof_register\":\
+      \ {\n    \"matrix_inventory_and_required_fields\": \"PROVEN\",\n    \"backend_expected_red_coverage\"\
+      : \"PROVEN\",\n    \"browser_expected_red_coverage\": \"PROVEN\",\n    \"scope_purity\"\
+      : \"PROVEN\",\n    \"owner_traceability\": \"PROVEN\"\n  }\n}\n```\n\n**Repository\
+      \ changes**: none. No commit created because this was verify/gate-only and no\
+      \ repo changes were appropriate.\n**Commands executed**:\n```text\npython3 matrix\
+      \ parser\n# matrix_records 28; missing_ids []; extra_ids []; duplicates [];\
+      \ field_gaps_count 0; ref_gaps_count 0; all_required_ok True\n\npython3 expected-red\
+      \ coverage mapper\n# backend_missing_markers []\n# browser_missing_markers []\n\
+      # backend_test_funcs: 5 expected-red tests\n# browser_tests: 5 Playwright expected-red\
+      \ tests\n\ngit log --oneline --name-status -12 -- docs/audits/prd-behavior-audit-closure-matrix.json\
+      \ internal/resofeed/pbar_expected_red_backend_test.go web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts\n\
+      # 9ffb5d0 adds matrix JSON\n# 6673bde adds backend expected-red test\n# 500d2e9\
+      \ adds browser expected-red test\n\ngo test ./internal/resofeed -run 'TestExpectedRedBackend'\
+      \ -count=1\n# EXIT_CODE=1, expected-red failures for B1/B2/B4/B6/B7/B14-B20/B22.\n\
+      \nnpm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts\
+      \ --project=chromium-ci-safe\n# initial EXIT_CODE=127, playwright missing.\n\
+      \nnpm --prefix web ci\n# dependencies restored; no repo-tracked product changes\
+      \ intended.\n\nnpm --prefix web run test:e2e -- prd-pbar-expected-red-browser-gaps.spec.ts\
+      \ --project=chromium-ci-safe\n# EXIT_CODE=1, 5 failed expected-red browser tests\
+      \ with real rendered screenshots/DOM/a11y attachments.\n\ngit restore -- .test-artifacts\
+      \ && git clean -fd -- .test-artifacts && git status --short\n# generated artifacts\
+      \ cleaned; final status clean.\n```"
 - id: prd-behavior-audit-remediation-backend-semantics
   name: PRD Behavior Audit Remediation — Backend Semantics
-  status: locked
+  status: pending
   gate: Backend remediation closes search, steering/ranking, readable payload sanitation,
     LLM provenance, and doctor diagnostic semantics with expected-red tests turned
     green and no forbidden product concepts introduced.
