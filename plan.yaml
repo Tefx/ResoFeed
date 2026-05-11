@@ -45217,7 +45217,7 @@ phases:
       itself.'
   - id: pbar-backend-liveness-remediation
     name: Remediate backend liveness proof blockers
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\n\nBatched remediation\
       \ for blind-tester Mode D blockers found after `pbar-backend-gate`. This step\
       \ must cover BOTH blocker families together; do not fix only one.\n\nContext\
@@ -45296,6 +45296,8 @@ phases:
     depends_on:
     - pbar-backend-gate
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:51:07.353105+00:00'
   - id: pbar-backend-liveness-retest
     name: Retest backend Mode D liveness after remediation
     status: pending
