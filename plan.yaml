@@ -43345,7 +43345,7 @@ phases:
   steps:
   - id: pbar-contract-audit-matrix
     name: Build PRD behavior audit closure matrix
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - machine_readable_closure_matrix\nagent_source: default\n\nWriting-capable\
       \ contract/docs artifact step. Create or update ONLY the audit closure matrix\
@@ -43487,6 +43487,143 @@ phases:
     agent: general
     claimed_by: general
     claimed_at: '2026-05-11T16:03:41.704855+00:00'
+    done_at: '2026-05-11T16:08:25.098626+00:00'
+    evidence: '## refs Read Confirmation
+
+
+      - docs/audits/prd-behavior-audit-2026-05-11.md — Subagent confirmed reading
+      authoritative audit; key passage summary: verdict identifies Search, no-match
+      Search, natural-language Steer, Inspector payload pollution, /doctor, LLM model
+      latency, and mobile non-feed surface containment as major behavioral failures;
+      Findings/Addenda enumerate B1-B23 and U1-U5 with severity, PRD/Design refs,
+      evidence links, and required corrections.
+
+
+      ## Contract Artifact Evidence
+
+
+      **Matrix artifact path**: docs/audits/prd-behavior-audit-closure-matrix.json
+
+
+      **Subagent commit hash(es)**: e8977367a3cd1105d47be6468f7aa01a14c418fa
+
+      **Mainline squash commit**: 9ffb5d0 ([vectl] step-pbar-contract-audit-matrix
+      completed)
+
+
+      **Files changed**:
+
+      - docs/audits/prd-behavior-audit-closure-matrix.json
+
+
+      **Parse/check command used (subagent worktree and mainline):**
+
+      ```bash
+
+      python3 - <<''PY''
+
+      import json
+
+      from pathlib import Path
+
+      p=Path(''docs/audits/prd-behavior-audit-closure-matrix.json'')
+
+      data=json.loads(p.read_text())
+
+      ids=[r[''finding_id''] for r in data[''records'']]
+
+      expected=[f''B{i}'' for i in range(1,24)]+[f''U{i}'' for i in range(1,6)]
+
+      required=[''finding_id'',''title'',''severity'',''authoritative_refs'',''owning_remediation_step'',''expected_red_test_owner'',''implementation_owner'',''independent_retest_owner'',''uiux_spec_audit_requirement'',''acceptance_criteria'',''evidence_requirement'']
+
+      print(''parse=PASS'')
+
+      print(''count='', len(ids))
+
+      print(''missing='', [x for x in expected if x not in ids])
+
+      print(''extra='', [x for x in ids if x not in expected])
+
+      print(''duplicate='', sorted({x for x in ids if ids.count(x)>1}))
+
+      print(''required_missing='', [(r.get(''finding_id''), k) for r in data[''records'']
+      for k in required if not r.get(k)])
+
+      print(''refs_missing_or_empty='', [(r[''finding_id''], key) for r in data[''records'']
+      for key in [''prd'',''design'',''architecture'',''audit_source''] if not r[''authoritative_refs''].get(key)])
+
+      assert ids == expected
+
+      assert not [(r.get(''finding_id''), k) for r in data[''records''] for k in required
+      if not r.get(k)]
+
+      assert not [(r[''finding_id''], key) for r in data[''records''] for key in [''prd'',''design'',''architecture'',''audit_source'']
+      if not r[''authoritative_refs''].get(key)]
+
+      PY
+
+      ```
+
+
+      **Mainline verification output:**
+
+      ```text
+
+      parse=PASS
+
+      count= 28
+
+      missing= []
+
+      extra= []
+
+      duplicate= []
+
+      required_missing= []
+
+      refs_missing_or_empty= []
+
+      ```
+
+
+      **Inventory check**:
+
+      - B findings present exactly: B1-B23
+
+      - U findings present exactly: U1-U5
+
+      - Extra/missing ids: none
+
+
+      **Required fields check**:
+
+      - finding id/title/severity present for every row: PASS
+
+      - authoritative PRD/DESIGN/ARCH refs present or justified for every row: PASS
+
+      - owning remediation step present for every row: PASS
+
+      - expected-red test owner present for every row: PASS
+
+      - implementation owner present for every row: PASS
+
+      - independent retest owner present for every row: PASS
+
+      - UIUX/spec audit requirement present for every row: PASS
+
+      - acceptance criteria present for every row: PASS
+
+      - evidence requirement present for every row: PASS
+
+
+      **Scope check**:
+
+      - Repository changes limited to matrix artifact: PASS
+
+      - Product code/tests/runtime assets/generated UI/unrelated docs untouched: PASS
+
+
+      **Gaps/Notes**: none'
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
