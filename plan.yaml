@@ -47394,7 +47394,7 @@ phases:
       completed`).'
 - id: prd-behavior-audit-remediation-independent-retest-and-audits
   name: PRD Behavior Audit Remediation — Independent Retest and Audits
-  status: in_progress
+  status: done
   gate: Independent retests, UI/UX multimodal audit, liveness probe, wiring/spec/product-boundary
     review all pass with finding-by-finding evidence for B1-B23 and U1-U5.
   depends_on:
@@ -50107,7 +50107,7 @@ phases:
       - Worktree and mainline target paths verified clean before merge.'
   - id: pbar-source-add-receipt-closure-retest
     name: Retest source-add receipt closure after stale guidance fix
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (`integration-verifier`), retest closure
       of reopened B5/U2 after `pbar-source-add-receipt-stale-guidance-fix`.
 
@@ -50261,9 +50261,141 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T19:39:56.352939+00:00'
+    done_at: '2026-05-11T19:43:09.100752+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — ResoFeed is one Go process with one SQLite DB; Source
+      Ledger is canonical user-owned subscription state and background ingestion starts
+      after storage is ready.
+
+      - docs/DESIGN.md — Source Ledger anatomy is title, OPML import, flat source
+      rows, delete action, and state portability links; URL subscription routes back
+      to Steer; forbidden concepts include folders/tags/pause-resume/drag ordering/scoring
+      sliders.
+
+      - docs/PRD.md — Source management follows “Steer + Flat Ledger”; RSS URL subscription
+      is through Steer, while the ledger only supports viewing source name/URL and
+      deleting it, with no complex settings controls.
+
+      - .agents/instructions.md — Preserve single-deployable/SQLite/minimal-file boundaries;
+      no vectl plan mutation by execution agents; UI chrome must use functional labels
+      including SOURCE LEDGER.
+
+
+      ## Independent Retest Report
+
+      **Tester**: integration-verifier
+
+      **Fix step retested**: pbar-source-add-receipt-stale-guidance-fix
+
+      **Independence confirmation**: Retested from isolated worktree branch `vectl/step-pbar-source-add-receipt-closure-retest`;
+      independent of golang-developer fix work; no product code/docs modified.
+
+
+      ### Backend receipt/PBAR tests
+
+      Command: `go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction
+      -count=1`
+
+      Exit Code: 0
+
+      Output: `ok  resofeed/internal/resofeed  0.530s`
+
+      Verdict: PASS
+
+
+      ### Browser source-add receipt flow
+
+      Command: `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+      -g "source-add receipt orients"`
+
+      Exit Code: 0 after installing missing web deps with `npm --prefix web ci` because
+      `web/node_modules/.bin` was absent and first attempt failed with `sh: playwright:
+      command not found`.
+
+      Output: Playwright built SvelteKit app and ran 1 test: `B5/U2 source-add receipt
+      orients to background ingest without removed Source Ledger controls`; `1 passed
+      (11.2s)`.
+
+      Verdict: PASS
+
+
+      ### Source Ledger no-ingest-control regression
+
+      Command: `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts
+      -g "flat ledger surface"`
+
+      Exit Code: 0
+
+      Output: Playwright built SvelteKit app and ran 1 test: `clicking SOURCE LEDGER
+      opens the documented flat ledger surface without forbidden source-management
+      concepts`; `1 passed (9.2s)`.
+
+      Verdict: PASS
+
+
+      ### B5/U2 Closure Assessment
+
+      - stale_receipt_guidance_absent: PROVEN
+
+      - source_ledger_run_fetch_controls_absent: PROVEN
+
+      - user_orientation_matches_product_boundary: PROVEN
+
+
+      ## Behavioral Proof Register
+
+      - backend_source_add_receipt_no_stale_run_ingest_guidance: PROVEN
+
+      - browser_source_add_receipt_updated_copy_flow: PROVEN
+
+      - source_ledger_no_run_fetch_ingest_controls: PROVEN
+
+
+      ## Gate semantic reporting
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      explicit_uncertainty_sources: []
+
+
+      ## Verification / Merge Handling
+
+      - Read-only retest branch had no committed file changes (`git diff --name-only
+      main...vectl/step-pbar-source-add-receipt-closure-retest` returned no files)
+      and worktree status was clean.
+
+      - No squash merge was required.
+
+
+      ## Commit hash(es)
+
+      - none (read-only retest)
+
+
+      ## Gaps / Notes
+
+      - Generated `.test-artifacts` were restored/cleaned by the retest agent; final
+      worktree status clean.'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
-  status: locked
+  status: pending
   gate: Final gate blocks unless every audit finding B1-B23 and U1-U5 is proven fixed
     with evidence or has explicit non-intersection evidence accepted by gate-reviewer.
   depends_on:
