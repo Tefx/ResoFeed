@@ -41718,3 +41718,61 @@ phases:
     final independent review.
   depends_on:
   - ui-remediation-retest-closure
+  steps:
+  - id: slnr-contract-doc-route-contract
+    name: Pin Source Ledger navigation and route contract from docs
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - documented_navigation_contract\n  - browser_acceptance_matrix\n\nRead the\
+      \ authoritative docs and existing UI tests to pin the Source Ledger navigation\
+      \ regression contract before any product implementation.\n\nAuthoritative requirements\
+      \ to extract and preserve:\n- `docs/DESIGN.md` Components/App Shell: app shell\
+      \ allows an optional Source Ledger route/overlay.\n- `docs/DESIGN.md` Components/Source\
+      \ Ledger: SOURCE LEDGER is the flat source-management surface and the only location\
+      \ for manual ingestion controls.\n- `docs/DESIGN.md` Do's and Don'ts: product\
+      \ labels must stay operational and terse, including `SOURCE LEDGER`; no folders/tags/settings-dashboard\
+      \ behavior.\n- `docs/ARCHITECTURE.md` Frontend Boundary: frontend lives in `web/`,\
+      \ preserves DESIGN.md, exposes flat Source Ledger, and must not create extra\
+      \ settings/dashboard surfaces.\n- User-reported regression path: root UI lacks\
+      \ a discoverable SOURCE LEDGER entry; `/source`, `/sources`, and `/source-ledger`\
+      \ do not open the ledger.\n\nAcceptance contract to document for downstream\
+      \ steps:\n1. After owner-token acceptance at `/`, a visible, keyboard-reachable\
+      \ `SOURCE LEDGER` navigation entry exists in the app chrome.\n2. Activating\
+      \ the entry opens the existing Source Ledger surface with the documented heading\
+      \ and flat ledger behavior.\n3. Direct navigation to `/source-ledger` opens\
+      \ the Source Ledger surface after token acceptance; `/source` and `/sources`\
+      \ are compatibility aliases for the user-reported failure path unless a doc\
+      \ conflict is found.\n4. UI copy remains functional and canonical: `RESOFEED`,\
+      \ `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`; no SaaS/friendly copy or\
+      \ forbidden source-management concepts.\n5. This step must not modify product\
+      \ implementation code.\n\ntouch_paths:\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\n\
+      - web/tests/e2e/real-server-ui.spec.ts\n- web/src/routes/+page.svelte (read-only\
+      \ in this step)\n- web/src/routes/components/SourceLedger.svelte (read-only\
+      \ in this step)\n\nIf the docs conflict with the user-reported direct-route\
+      \ aliases, record the conflict in the test contract and proceed with `/source-ledger`\
+      \ as canonical while keeping alias behavior as regression compatibility unless\
+      \ gate-reviewer later blocks it."
+    verification: '- Contract artifact is test-only or documentation-in-test only;
+      no product implementation files are modified.
+
+      - Acceptance matrix explicitly covers visible SOURCE LEDGER nav, click activation,
+      `/source-ledger`, `/source`, and `/sources` direct-route behavior.
+
+      - Contract cites the exact docs passages used for Source Ledger app-shell/flat-ledger/product-label
+      requirements.
+
+      - Forbidden concepts remain out of scope: accounts, sync/merge engines, vector
+      DBs, settings dashboards, folders/tags, service/repository layers, event buses.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/routes/+page.svelte — key\
+      \ passage or \"NOT READ: <reason>\"\n- web/tests/e2e/real-server-ui.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Contract Evidence\n- Documented\
+      \ acceptance matrix:\n  - root chrome visible SOURCE LEDGER nav: <requirement\
+      \ ref>\n  - click activation opens ledger: <requirement ref>\n  - direct `/source-ledger`\
+      \ opens ledger: <requirement ref>\n  - `/source` and `/sources` compatibility\
+      \ aliases: <user regression ref or conflict note>\n- Files changed: <must be\
+      \ tests/docs-in-test only, no product implementation>\n- Forbidden concepts\
+      \ checked: <list>\n- Headline: PASS | FAIL"
+    agent: spec-verifier
