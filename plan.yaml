@@ -42812,7 +42812,7 @@ phases:
     agent: gate-reviewer
   - id: slnr-materialize-browser-proof-artifacts
     name: Materialize Source Ledger browser proof artifacts
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -43007,3 +43007,145 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T13:05:12.131957+00:00'
+    done_at: '2026-05-11T13:10:47.143348+00:00'
+    evidence: '## refs Read Confirmation
+
+
+      - docs/ARCHITECTURE.md — READ: frontend boundary requires `web/` preserve DESIGN.md,
+      expose flat Source Ledger, and avoid extra dashboard/source-management/settings
+      surfaces.
+
+      - docs/DESIGN.md — READ: flat Source Ledger is a primary surface; product labels
+      include `SOURCE LEDGER`; Source Ledger anatomy/forbidden concepts and keyboard
+      navigation are specified.
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts — READ:
+      acceptance matrix covers root nav, click activation, `/source-ledger`, `/source`,
+      and `/sources`; five browser tests use trace/screenshot.
+
+      - web/src/routes/+page.svelte — READ: `/source-ledger`, `/source`, and `/sources`
+      map to ledger; nav renders `SOURCE LEDGER`; utility surface renders Source Ledger.
+
+
+      ## Materialized Browser Proof Report
+
+
+      **Proof report path committed under audits/ or .audit-artifacts/**: `.audit-artifacts/slnr-materialize-browser-proof-artifacts/proof-report.md`
+
+      **Product implementation code changed**: NO
+
+      **Worker commit hash(es)**: f23543866e09e2bd58337a5b4515c4d53af4d09e
+
+      **Mainline squash commit**: b228dad
+
+
+      ## Dependency Hydration
+
+
+      - `node_modules/.bin/svelte-kit` existed before check: NO
+
+      - `npm ci` run: YES — required because `web/node_modules/.bin/svelte-kit` and
+      `web/node_modules` were missing.
+
+      - Playwright/browser hydration run: YES — `npm exec -- playwright install chromium`,
+      exited 0 with no output.
+
+
+      ## Commands and Exit Statuses
+
+
+      | Command | Exit status | stdout/stderr excerpt location |
+
+      | --- | --- | --- |
+
+      | `npm run check` | 0 | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/logs/npm-run-check.log`;
+      proof report lines 24-29 |
+
+      | `npm run test:e2e -- --project=chromium-ci-safe source-ledger-navigation-regression.expected-red.spec.ts`
+      | 0 | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/logs/focused-source-ledger-e2e.log`;
+      proof report lines 24-29 |
+
+
+      ## Required Route/State Artifact Register
+
+
+      | State | Screenshot path | Trace/video path | Status |
+
+      | --- | --- | --- | --- |
+
+      | root nav | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/root-nav/screenshot.png`
+      | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/root-nav/trace.zip`
+      | PROVEN |
+
+      | click-opened ledger | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/click-opened-ledger/screenshot.png`
+      | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/click-opened-ledger/trace.zip`
+      | PROVEN |
+
+      | /source-ledger | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-source-ledger/screenshot.png`
+      | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-source-ledger/trace.zip`
+      | PROVEN |
+
+      | /source | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-source/screenshot.png`
+      | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-source/trace.zip`
+      | PROVEN |
+
+      | /sources | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-sources/screenshot.png`
+      | `.audit-artifacts/slnr-materialize-browser-proof-artifacts/browser-artifacts/direct-sources/trace.zip`
+      | PROVEN |
+
+
+      ## behavioral_proof_register
+
+
+      - SLNR-root-nav: PROVEN; root app chrome shows `SOURCE LEDGER` after owner-token
+      acceptance; evidence focused E2E log and root-nav screenshot/trace artifacts.
+
+      - SLNR-click-open: PROVEN; clicking `SOURCE LEDGER` opens documented flat ledger
+      surface; evidence focused E2E log and click-opened-ledger screenshot/trace artifacts.
+
+      - SLNR-direct-source-ledger: PROVEN; direct `/source-ledger` opens Source Ledger
+      after token acceptance; evidence focused E2E log and direct-source-ledger artifacts.
+
+      - SLNR-alias-source: PROVEN; direct `/source` opens Source Ledger as compatibility
+      alias; evidence focused E2E log and direct-source artifacts.
+
+      - SLNR-alias-sources: PROVEN; direct `/sources` opens Source Ledger as compatibility
+      alias; evidence focused E2E log and direct-sources artifacts.
+
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      verdict: PASS
+
+      blockers: []
+
+
+      ## Verification
+
+
+      - `npm run check` completed with `svelte-check found 0 errors and 0 warnings`.
+
+      - Focused Source Ledger browser test completed with `5 passed (5.7s)`.
+
+      - Worker commit included only `.audit-artifacts/slnr-materialize-browser-proof-artifacts/`
+      files.
+
+      - Orchestrator squash-merged into main as `b228dad [vectl] step-slnr-materialize-browser-proof-artifacts
+      completed`.
+
+      - Mainline verification command `git show --name-status --oneline --no-renames
+      HEAD -- .audit-artifacts/slnr-materialize-browser-proof-artifacts && git status
+      --porcelain .audit-artifacts/slnr-materialize-browser-proof-artifacts` confirmed
+      the proof report, logs, screenshots, traces, junit, and results JSON were added
+      and are clean.
+
+
+      ## Gaps/Notes
+
+
+      - `npm ci` reported 3 low severity vulnerabilities; not blocking for route proof.
+
+      - Playwright emitted Node `[DEP0205] module.register()` deprecation warning;
+      not blocking.'
