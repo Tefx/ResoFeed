@@ -44921,7 +44921,7 @@ phases:
       successfully after merge.'
   - id: pbar-backend-gate
     name: Gate backend PRD behavior remediation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether backend
       semantics are complete for PRD behavior audit remediation.
 
@@ -44975,6 +44975,246 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T16:37:26.311493+00:00'
+    done_at: '2026-05-11T16:50:25.583128+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: confirmed hard boundaries: one Go deployable, SQLite+FTS5
+      lexical only, OpenRouter JSON transformer only, no sync/history/accounts/settings/rule-builder/dashboard
+      creep.
+
+      - `docs/ARCHITECTURE.md`: confirmed decisions §1, OpenRouter runtime contract
+      §2, steering/search contracts §5.3/§5.4, HTTP/MCP parity §6/§7.
+
+      - `docs/PRD.md`: confirmed Steer, Search/Retrieval, Source Intake, Summary Reliability,
+      fallback taxonomy, non-goals, AC-4/8/14/17.
+
+      - `docs/DESIGN.md`: confirmed inline steering receipts, Inspector provenance/fallback
+      labels, raw `/doctor` diagnostics, lexical Search surface, no dashboards/settings.
+
+      - `docs/DESIGN_VISION.md`: confirmed anti-slop guardrails and PRD-to-UI mapping
+      for Steer/Search/Diagnostics.
+
+      - `docs/USAGE.md`: confirmed Search forbids vector/RAG/semantic chat; `/doctor`
+      is raw plain text. Note: diagnostics command-reference example still says `openrouter:
+      ok`; implementation/tests prove separated status keys.
+
+      - `docs/audits/prd-behavior-audit-closure-matrix.json`: confirmed backend-owned
+      rows B1,B2,B4,B5,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22,U2,U4 have remediation/test/implementation/retest
+      ownership.
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`: expected-red backend
+      tests cover B1/B2, B4/B14/B15, B16/B17, B6/B18/B19/B20, B7/B22.
+
+      - `internal/resofeed/pbar_steer_receipt_remediation_test.go`: source URL receipt
+      covers B5/U2.
+
+      - `internal/resofeed/ranking.go`: search steer command executes `SearchItems`;
+      NL steering failure falls back to local parser receipt; reduce/boost rules affect
+      ranking.
+
+      - `internal/resofeed/search.go`: lexical/metadata retrieval via SQLite FTS5/LIKE;
+      no vector/RAG path; no-match returns empty result.
+
+      - `internal/resofeed/doctor.go`: `/doctor` emits `provider_reachable`, `model_resolved`,
+      `item_transform_failures`, fallback provenance, no `openrouter: ok` overstatement
+      on item failures.
+
+      - `internal/resofeed/ingest.go` and `readable_sanitation.go`: shared sanitation
+      strips audited source furniture/tails before persistence/detail/read surfaces.
+
+      - Relevant web labels checked: `Inspector.svelte`, `SearchRetrieval.svelte`,
+      `+page.svelte` expose fallback/model provenance, lexical search note, and raw
+      `/doctor` log surface.
+
+
+      ## Backend Gate Review
+
+      verdict: PASS_WITH_REMEDIATION
+
+      headline: PASS_WITH_DEBT
+
+      proof_gap_status: BLOCKING_LIVENESS_GAPS_BATHED_FOR_REMEDIATION
+
+      blocking_status: CLOSED_BY_PLAN_REMEDIATION
+
+      orchestrator_action_hint: COMPLETE_AFTER_FIX_STEPS_CREATED
+
+      blockers:
+
+      - Blind-tester Mode D could not prove an explicit `/api/doctor` fallback-related
+      key/string in a zero-failure runtime.
+
+      - Blind-tester Mode D could not prove positive lexical matching search through
+      documented public startup because source ingest was not reachable from the token-gated
+      headless public-UI probe.
+
+
+      Gate-reviewer findings:
+
+      - Backend-owned findings reviewed: B1,B2,B4,B5,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22,U2,U4
+
+      - Green test evidence reviewed: required Go targeted bundle passed; web check
+      and build passed after installing web dependencies in gate worktree.
+
+      - Product-boundary review: PASS. Source scans found only explicit anti-vector/RAG/account/sync/dashboard
+      guardrails or tests; no implementation of forbidden vector search, sync/history/accounts,
+      settings/rule-builder, dashboards/remediation panels, or extra deployables.
+
+      - Residual frontend dependencies: browser-level closure evidence for visible
+      rows/screenshots remains downstream frontend/retest ownership per matrix evidence
+      requirements.
+
+      - Gate reviewer decision: OPEN for static/backend semantic review.
+
+
+      ### Wiring Audit (W1-W8)
+
+      - W1 Matrix ownership: PASS. Closure matrix rows B1,B2,B4,B5,B6,B7,B14,B15,B16,B17,B18,B19,B20,B22,U2,U4
+      each map to remediation/test/implementation/retest owners.
+
+      - W2 Expected-red coverage: PASS. `pbar_expected_red_backend_test.go` and `pbar_steer_receipt_remediation_test.go`
+      cover all backend-owned findings.
+
+      - W3 Implementation mapping: PASS. Search: `search.go`/`ranking.go`; steer/ranking:
+      `ranking.go`; doctor/provenance: `doctor.go`; sanitation: `readable_sanitation.go`/`ingest.go`.
+
+      - W4 Handler/API evidence: PASS. `TestHTTPHandlersExerciseCorePaths/search`,
+      `/api/doctor`, MCP steer tests, and OpenRouter product integration tests exercise
+      real `httptest`/MCP handler paths.
+
+      - W5 Contract strength: PASS. Tests assert no-match empty state, no generic
+      internal steer errors, receipt interpretation, ranking effects, OpenRouter naming,
+      fallback visibility, sanitation removal.
+
+      - W6 Downstream ownership: PASS_WITH_DEBT. Browser screenshot/DOM evidence remains
+      required by matrix for final closure, but not blocking backend implementation
+      semantics.
+
+      - W7 Product boundary: PASS. No forbidden product concepts introduced in reviewed
+      implementation.
+
+      - W8 Regression stability: PASS. Required targeted Go bundle plus web check/build
+      passed; no tracked worktree changes.
+
+
+      ### Escape Hatch Audit
+
+      - Scoped source scans of `internal/resofeed`, `cmd`, and `web/src` found no
+      `@invar:allow` or `invar:allow`.
+
+      - No escape-hatch blocker.
+
+
+      ### Smoke/Liveness and Real Integration Distinction
+
+      Gate-reviewer evidence:
+
+      - Real handler/API checks: `TestHTTPHandlersExerciseCorePaths/search` exercises
+      `/api/search`; `TestDoctorUsesOpenRouterPrefixAndNoGeminiRuntimeText` exercises
+      `/api/doctor`; MCP tests exercise authenticated MCP steer/resource paths.
+
+      - Backend functional checks: expected-red tests directly exercise `ApplySteering`,
+      `SearchItems`, `ListTodayFeed`, `ReadItemDetail`, `WriteDoctorWithConfig`, ingestion/OpenRouter
+      persistence, and sanitation.
+
+      - Fixture-only distinction: sanitation fixtures and controlled corpus ranking
+      are deterministic backend proofs, not browser-render proofs.
+
+      - Frontend build/liveness: `npm --prefix web run check` and `npm --prefix web
+      run build` passed; no browser automation run in this gate.
+
+
+      Blind-tester Mode D liveness evidence:
+
+      - Server port 127.0.0.1:18180 bound successfully after startup.
+
+      - GET /api/doctor returned 200 text/plain with provider/model/item-transform
+      lines and no dummy secret/OPENROUTER_KEY leakage.
+
+      - GET /api/search?q=no-such-lexical-token-zzzz&limit=5 returned 200 JSON with
+      items=[] and canonical query echo; no generic internal error.
+
+      - POST /api/steer RSS URL returned interpreted_as=add_source; no generic internal
+      error.
+
+      - POST /api/steer natural-language steering returned changed_rules via local
+      parser; no generic internal error.
+
+      - POST /api/steer search-like command returned interpreted_as=search_empty;
+      no generic internal error.
+
+      - Blocking gaps: explicit fallback-related doctor key was not present in zero-failure
+      doctor output; positive lexical matching search was not proven through public
+      runtime ingest path.
+
+
+      ### Remediation ownership created
+
+      Planner created a batched remediation chain in `prd-behavior-audit-remediation-backend-semantics`:
+
+      - `pbar-backend-liveness-remediation` (golang-developer), depends on `pbar-backend-gate`,
+      covers both liveness blockers.
+
+      - `pbar-backend-liveness-retest` (blind-tester), depends on `pbar-backend-liveness-remediation`,
+      reruns Mode D liveness for startup, /api/doctor fallback + secret non-leakage,
+      /api/search no-match + positive match, and /api/steer source-add/NL/search receipts.
+
+
+      Backend phase remains blocked until those new liveness steps complete; downstream
+      frontend phase remains locked.
+
+
+      ### behavioral_proof_register
+
+      - backend expected-red closure: PROVEN
+
+      - product-boundary compliance: PROVEN
+
+      - downstream ownership: PROVEN
+
+      - smoke/liveness: BLOCKING_GAPS_OWNED_BY_NEW_STEPS
+
+
+      **Repository changes**: none from gate step. No product code/tests/docs/runtime
+      files modified by gate reviewer or blind tester.
+
+      **Commands executed**:
+
+      ```text
+
+      go test ./internal/resofeed -run ''<required targeted regex>'' -count=1
+
+      # gate-reviewer: ok resofeed/internal/resofeed 0.627s
+
+      npm --prefix web ci
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # SvelteKit build completed
+
+
+      blind-tester Mode D:
+
+      go build -o /tmp/.../resofeed ./cmd/resofeed
+
+      curl GET /api/doctor
+
+      curl GET /api/search?q=no-such-lexical-token-zzzz&limit=5
+
+      curl POST /api/steer (RSS URL, NL steering, search-like command)
+
+      # liveness blockers captured above
+
+      ```
+
+
+      **Gaps/Notes**: This gate is completed only after remediation ownership was
+      created for the liveness blockers; it does not authorize phase completion by
+      itself.'
   - id: pbar-backend-liveness-remediation
     name: Remediate backend liveness proof blockers
     status: pending
