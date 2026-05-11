@@ -39999,7 +39999,7 @@ phases:
       and focused browser retest close the blocker.'
   - id: ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     name: urrc-r1-second-prose-preservation-fix
-    status: pending
+    status: claimed
     description: "Focused second R1 remediation after ui-remediation-retest-closure.urrc-r1-focused-browser-retest\
       \ semantically failed.\n\nstep_type: implementation. This is a focused defect_repair/proof_closure\
       \ loop for R1 only; do NOT create broad UI rework.\n\nScope:\n- Preserve the\
@@ -40070,6 +40070,8 @@ phases:
     depends_on:
     - ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-11T08:56:15.367473+00:00'
   - id: ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     name: urrc-r1-second-focused-browser-retest
     status: pending
