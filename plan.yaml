@@ -45864,7 +45864,7 @@ phases:
       **Limitations**: none'
 - id: prd-behavior-audit-remediation-frontend-surfaces
   name: PRD Behavior Audit Remediation — Frontend Surfaces
-  status: in_progress
+  status: done
   gate: Frontend surfaces close Search, Steer, Doctor, Inspector, Feed, Resonate,
     Source Ledger, mobile containment, accessibility semantics, and scan-readable
     visual grammar with expected-red browser tests turned green.
@@ -46455,7 +46455,7 @@ phases:
       output; commit contains only source changes.'
   - id: pbar-frontend-gate
     name: Gate frontend PRD behavior remediation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether frontend/browser-visible
       remediation is complete after the dedicated batched remediation and independent
       retest/proof step.
@@ -46583,6 +46583,155 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T18:04:44.187360+00:00'
+    done_at: '2026-05-11T18:07:53.452841+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — read; one Go deployable, one SQLite DB, lexical retrieval
+      only, single owner-token boundary, and product-boundary prohibitions cited.
+
+      - docs/DESIGN.md — read; operational product copy, desktop/mobile shell behavior,
+      Inspector accessibility/Resonate behavior, and forbidden UI concepts cited.
+
+      - .audit-artifacts/frontend-gate/semantic-closure-register.yaml — read; current
+      artifacts, required closure fields, B12/U2/U3/U5 closure, and closed/safe_should_fix_non_blocking
+      statuses cited.
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: prd-behavior-audit-remediation-frontend-surfaces
+
+
+      ### Mandatory input review
+
+      - `pbar-frontend-gate-blocker-remediation` evidence reviewed: yes — mainline
+      commit `b1862a1` and changed frontend/remediation files/register reviewed.
+
+      - `pbar-frontend-gate-retest-proof` evidence reviewed: yes — commit `27bb1c5`,
+      retest proof register, render-proof JSON, screenshots, and current pointer reviewed.
+
+      - Retest headline: PASS.
+
+
+      ### Verification run
+
+      - Initial `npm run test:render` failed due missing local `vitest`; verifier
+      ran `npm ci` successfully.
+
+      - `npm run test:render` — exit 0; 6 files / 39 tests passed.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts
+      full-ui-design-conformance.expected-red.spec.ts` — exit 0; build succeeded and
+      3 Playwright tests passed.
+
+      - `rg -n ''@invar:allow|invar:allow'' src || true` under `web/` — exit 0; no
+      output.
+
+      - Closure token scan — 23 ids / 23 statuses, unique status `PROVEN`, no unresolved
+      tokens.
+
+      - Final gate worktree status/diff clean after restoring generated artifacts.
+
+
+      ### Gate decision basis
+
+      - GATE-FE-001 render green: PROVEN; current local render suite passed.
+
+      - GATE-FE-002 shell navigation contract: PROVEN; retest register and targeted
+      Playwright passed.
+
+      - GATE-FE-003 Inspector readable prose: PROVEN; R1-R8 browser retest passed.
+
+      - GATE-FE-004 accessibility/search/mobile semantics: PROVEN; render and Playwright
+      active-surface/focus/search semantics passed.
+
+      - GATE-FE-005 closure coverage: PROVEN; required closure items present and retest
+      register statuses all PROVEN.
+
+      - B12/U2/U3/U5 rows: PROVEN with explicit runtime proof expectations and current
+      green evidence.
+
+
+      ### Rendered artifact evidence reviewed
+
+      - `.audit-artifacts/frontend-gate/render-proof.json` generated_at `2026-05-11T17:58:38.690Z`.
+
+      - Current screenshots reviewed: `current-populated-desktop-full.png`, `current-mobile-feed.png`,
+      `current-mobile-inspector.png`, `current-mobile-source-ledger.png`.
+
+      - Runtime assertions reviewed: desktop Inspector star count 0, desktop feed
+      star count 2, mobile Inspector star count 1, mobile back-to-TODAY visible true.
+
+
+      ### Accessibility/focus proof reviewed
+
+      PASS — U5 PROVEN; targeted Playwright passed; DESIGN requirements represented
+      in closure matrix.
+
+
+      ### Product-boundary review
+
+      PASS — no accounts, folders/tags/settings dashboards, unread/archive workflows,
+      vector/RAG, chat transcript surfaces, or escape-hatch annotations found as product-surface
+      expansion.
+
+
+      ### Gate semantic reporting
+
+      step_intent: phase_gate_review
+
+      expected_result: frontend gate opens only with green proof
+
+      observed_result: current render tests pass, targeted Playwright retest passes,
+      closure registers prove required rows, artifacts are current, and escape hatch
+      scan is clean
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      explicit_uncertainty_sources: []
+
+      product_implementation_files_modified: false
+
+
+      behavioral_proof_register:
+
+      - GATE-FE-001: PROVEN
+
+      - GATE-FE-002: PROVEN
+
+      - GATE-FE-003: PROVEN
+
+      - GATE-FE-004: PROVEN
+
+      - GATE-FE-005: PROVEN
+
+      - B12: PROVEN
+
+      - U2: PROVEN
+
+      - U3: PROVEN
+
+      - U5: PROVEN
+
+
+      ### Gate decision
+
+      OPEN
+
+
+      ### Artifacts modified
+
+      None retained; no product implementation files modified.'
   - id: pbar-frontend-gate-blocker-remediation
     name: Batched remediation for frontend gate blockers
     status: done
@@ -47245,7 +47394,7 @@ phases:
       completed`).'
 - id: prd-behavior-audit-remediation-independent-retest-and-audits
   name: PRD Behavior Audit Remediation — Independent Retest and Audits
-  status: locked
+  status: pending
   gate: Independent retests, UI/UX multimodal audit, liveness probe, wiring/spec/product-boundary
     review all pass with finding-by-finding evidence for B1-B23 and U1-U5.
   depends_on:
