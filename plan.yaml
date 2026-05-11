@@ -44367,7 +44367,7 @@ phases:
     claimed_at: '2026-05-11T16:25:56.092942+00:00'
   - id: pbar-backend-readable-payload-sanitation
     name: Move readable payload sanitation to shared backend layer
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -44426,6 +44426,121 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:25:47.397805+00:00'
+    done_at: '2026-05-11T16:33:39.301180+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: confirmed one Go binary, one SQLite DB, flat `internal/resofeed/`
+      logic, strict no plan/orchestrator edits.
+
+      - `docs/ARCHITECTURE.md`: confirmed item cache includes feed excerpt, extracted
+      text, summary/core insight, extraction/model fallback status; product behavior
+      lives in `internal/resofeed`; ingestion must validate text before saving/display.
+
+      - `docs/PRD.md`: confirmed trustworthy compression, visible partial/fallback
+      provenance, full-article extraction attempts, concise core insight/dense summary
+      requirements.
+
+      - `docs/DESIGN.md`: confirmed Inspector Pane is the long-form reading payload
+      surface.
+
+      - `docs/DESIGN_VISION.md`: confirmed Inspector displays extracted text/expanded
+      summary and AI failures degrade plainly.
+
+      - `docs/USAGE.md`: confirmed `/api/items/ITEM_ID` exposes `summary`, `core_insight`,
+      `feed_excerpt`, `extracted_text`, `extraction_status`, `model_status`.
+
+      - `docs/audits/prd-behavior-audit-closure-matrix.json`: confirmed B7 requires
+      shared payload stripping of The Verge follow/topic/taxonomy/related-story tail;
+      B22 requires removal of navigation/personalization/topic-author/cross-article
+      contamination and explicit fallback if clean insight unavailable.
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`: confirmed failing assertion
+      expected removal of follow topics, More from The Verge, related stories, personalization,
+      unrelated leaked/cracked copy from Summary/CoreInsight/FeedExcerpt/ExtractedText.
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`: confirmed relevant
+      Inspector expectations: no related stories/follow/sign up/personalized feed/more
+      from text; core insight clean or explicitly unavailable; fallback/provenance
+      labels visible.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B7, B22
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B7/B22
+
+      **Subagent commit hash(es)**: 2bcdbc02c4acf60a6da58dd9a39fa58212e752c5
+
+      **Mainline squash commit**: 21c4e89 ([vectl] step-pbar-backend-readable-payload-sanitation
+      completed)
+
+      **Files changed**:
+
+      - internal/resofeed/readable_sanitation.go
+
+      - internal/resofeed/readable_sanitation_test.go
+
+      - internal/resofeed/ingest.go
+
+      - internal/resofeed/search.go
+
+      - internal/resofeed/ranking.go
+
+
+      **Contamination fixture inventory**:
+
+      - follow-topic prompts
+
+      - author/topic taxonomy
+
+      - More from The Verge tail marker
+
+      - Related Stories tail marker
+
+      - personalization/personalized-feed copy
+
+      - source furniture/navigation/newsletter/privacy/terms residue
+
+      - unrelated leaked/cracked item fragments
+
+      - category/headline residue such as `Transportation News Tech`
+
+
+      **Verification**:
+
+      ```bash
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackendReadablePayloadSanitizesSourceBoilerplate|TestSanitizeReadable''
+      -count=1
+
+      # ok resofeed/internal/resofeed 0.523s
+
+      ```
+
+
+      **Main path proof**: `TestSanitizeReadablePayloadTextKeepsCleanArticleBody`
+      confirms clean article text remains unchanged.
+
+
+      **Failure path proof**: dirty The Verge-style tail/source furniture is removed;
+      GM-style category/headline core insight residue is replaced with `insight unavailable
+      (fallback: source payload contaminated)`.
+
+
+      **Shared-layer proof**: sanitation is implemented in `internal/resofeed/readable_sanitation.go`
+      and applied from ingestion before LLM input/storage, item detail reads, and
+      list/ranking summary scans; it is not UI-local.
+
+
+      **Concurrency/error handling considerations**: no goroutines added; no panics
+      added; existing context-aware ingestion/read paths preserved.
+
+
+      **Deviation records**: none
+
+      **Gaps/Notes**: none; unrelated expected-red backend/browser gaps were not run
+      or fixed per task boundary.'
   - id: pbar-backend-llm-doctor-provenance-remediation
     name: Align LLM fallback provenance and doctor diagnostic semantics
     status: done
