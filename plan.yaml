@@ -43627,7 +43627,7 @@ phases:
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -43677,6 +43677,8 @@ phases:
     depends_on:
     - pbar-contract-audit-matrix
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-11T16:08:52.507090+00:00'
   - id: pbar-expected-red-browser-tests
     name: Add expected-red browser/UI behavior coverage for PRD audit findings
     status: pending
