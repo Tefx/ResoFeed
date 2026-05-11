@@ -48268,7 +48268,7 @@ phases:
       None.'
   - id: pbar-spec-product-boundary-review
     name: Spec and product-boundary conformance review
-    status: claimed
+    status: done
     description: 'As spec-verifier, independently rerun the product-boundary conformance
       review AFTER `pbar-source-ledger-boundary-wiring-remediation` completes. Treat
       the remediation evidence as the new candidate state, but do not lower the product-boundary
@@ -48405,6 +48405,93 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-11T19:09:51.635019+00:00'
+    done_at: '2026-05-11T19:24:44.582017+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/PRD.md — §7.2 requires Source Ledger as strictly flat/barebones: view
+      source name/URL, delete, OPML import with folders flattened; source addition
+      through Steer.
+
+      - docs/DESIGN.md — Source Ledger anatomy allows title, OPML import, flat rows,
+      delete, terse state export/import; `/doctor` is raw text, not dashboard.
+
+      - docs/ARCHITECTURE.md — Frontend must preserve DESIGN.md, keep Steer primary,
+      expose flat Source Ledger without settings-dashboard behavior, and avoid extra
+      dashboard/source-management surfaces.
+
+
+      ## Spec/Product Boundary Rerun Report
+
+      **Remediation step reviewed**: pbar-source-ledger-boundary-wiring-remediation
+
+
+      ## Requirements / Evidence Summary
+
+      - R1 Source Ledger must not expose `[RUN INGEST]` or per-source `[FETCH]`; only
+      view/delete/import/export: PASS. Evidence: `SourceLedger.svelte` renders rows,
+      URL, `[DELETE]`, `[CONFIRM DELETE]`, `[DETAILS]`, `[IMPORT OPML]`, StatePortability;
+      grep found no `[RUN INGEST]`/`[FETCH]` in live component.
+
+      - R2 URL subscription routes through Steer, not a second Ledger URL field: PASS.
+      Evidence: `+page.svelte` routes commands through Steer; SourceLedger only has
+      OPML file input and no URL paste field.
+
+      - R3 State portability remains terse export/import, not backup/sync/history
+      UI: PASS. Evidence: Ledger embeds StatePortability; reviewed source has no sync/merge/backup-management
+      UI.
+
+      - R4 Search remains lexical/metadata; no vector/RAG/semantic answer surface:
+      PASS. Evidence: search receipt says lexical search; reviewed search references
+      are lexical/prohibition comments and no vector/RAG implementation.
+
+      - R5 `/doctor` remains raw diagnostics text, no dashboard: PASS. Evidence: `+page.svelte`
+      renders doctor output in `<pre class="contract-diagnostics" role="log">`.
+
+
+      ## Closure Clarification
+
+      - prior_mixed_signal_resolved_as: PASS
+
+      - non_intersection_evidence: Missing local web dependencies only affected an
+      optional rerun inside the isolated audit worktree; orchestrator mainline verification
+      already passed render tests, svelte-check, build, and Source Ledger Playwright
+      regression after merge. Still-existing manual fetch API client/contract symbols
+      are not invoked by `SourceLedger.svelte` or `+page.svelte` in the Source Ledger
+      path and are not user-visible Source Ledger operation controls, so they do not
+      intersect PB-1 or Source Ledger-only view/delete/import/export gate.
+
+
+      ## Behavioral Proof Register
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - uncertainty_sources: []
+
+
+      ## Verification / Merge Handling
+
+      - Review-only branch had no committed file changes (`git diff --name-only main...vectl/step-pbar-spec-product-boundary-review`
+      returned no files) and worktree status was clean.
+
+      - No squash merge was required for this read-only review.
+
+
+      ## Commit hash(es)
+
+      - none (read-only review)
+
+
+      ## Gaps / Notes
+
+      - none'
   - id: pbar-wiring-audit
     name: Wiring and reachability audit for remediated public surfaces
     status: claimed
