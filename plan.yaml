@@ -41871,3 +41871,142 @@ phases:
     depends_on:
     - slnr-contract-doc-route-contract
     agent: integration-verifier
+  - id: slnr-restore-navigation-route
+    name: Restore SOURCE LEDGER chrome entry and direct-route handling
+    status: pending
+    description: 'step_type: implementation
+
+      tags:
+
+      - integration
+
+
+      Complete the frontend implementation within the existing ResoFeed/SvelteKit
+      app shape to restore documented Source Ledger discoverability and direct route
+      access.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - `slnr-contract-doc-route-contract` — documented navigation/route acceptance
+      matrix is AUTHORITATIVE.
+
+      - `slnr-expected-red-browser-test` — browser assertions are PROTECTED; do not
+      weaken them to pass.
+
+
+      YOUR SCOPE:
+
+      - Restore a visible, keyboard-reachable `SOURCE LEDGER` navigation entry in
+      operational chrome after owner-token acceptance.
+
+      - The visible label must be exactly `SOURCE LEDGER` and must coexist with the
+      canonical labels `RESOFEED`, `TODAY`, `INSPECTOR`, and `/doctor` where applicable.
+
+      - Activating the entry must call existing surface selection and open the existing
+      Source Ledger component; do not create a separate settings dashboard or duplicate
+      source-management surface.
+
+      - Add direct route handling so `/source-ledger` opens the Source Ledger surface
+      after token acceptance. Preserve user-reported alias paths `/source` and `/sources`
+      as compatibility aliases unless the contract step recorded a blocking docs conflict.
+
+      - Keep URL/routing behavior within the single Go-served Svelte UI; do not add
+      backend product APIs unless static asset fallback/runtime route proof shows
+      it is necessary.
+
+      - Preserve `docs/ARCHITECTURE.md` constraints: one Go binary, frontend in `web/`,
+      no sidecar process, no accounts, no sync/merge engine, no folders/tags/settings
+      dashboard.
+
+
+      Likely touch_paths:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/+layout.svelte or SvelteKit route files only if direct route
+      support requires them
+
+      - web/src/app.css or existing CSS only for chrome layout/accessibility
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts only
+      for non-weakened selector updates if the protected contract still holds
+
+      - internal/resofeed/http.go only if real-server direct-route fallback proves
+      the Go static server blocks `/source-ledger` despite the existing SPA fallback
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive UI/routing logic that processes the current
+      URL or user activation and opens the correct Source Ledger surface. Private
+      stub classes or placeholder controls do not satisfy this requirement.
+
+
+      ## Failure-mode checklist
+
+      - root `/` after token: SOURCE LEDGER entry is visible and reachable without
+      typing a Steer command;
+
+      - direct `/source-ledger`: opens ledger after token acceptance;
+
+      - direct `/source` and `/sources`: open ledger as compatibility aliases or document
+      an explicit contract conflict;
+
+      - browser back/forward behavior does not strand users on an inert panel;
+
+      - narrow/mobile layout keeps Source Ledger reachable as a flat full-screen list;
+
+      - `/doctor` and `TODAY` remain reachable and are not relabeled;
+
+      - no hidden duplicate settings/source dashboard is introduced.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Steer-command-only access with no visible SOURCE LEDGER chrome entry.
+
+      2. A button that is visually present but not keyboard reachable or obstructed.
+
+      3. `/source-ledger` serving the root app but leaving the Today/Inspector surface
+      active.
+
+      4. Lowercase/friendly labels, icons-as-primary-labels, or settings-dashboard
+      copy.
+
+      5. Any folders/tags/sync/merge/account concepts.
+
+      6. Weakening expected-red tests instead of making them green through real UI
+      behavior.'
+    verification: '- Main path: focused browser test from `slnr-expected-red-browser-test`
+      now passes for visible SOURCE LEDGER entry and click activation.
+
+      - Direct-route path: focused browser test passes for `/source-ledger`, `/source`,
+      and `/sources` or documents any alias conflict already recorded by contract
+      step.
+
+      - Failure path: evidence verifies `/doctor`, `TODAY`, and `INSPECTOR` remain
+      reachable with canonical labels.
+
+      - Proof: implementation does not introduce forbidden source-management concepts
+      or new service/repository/event-bus layers.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/routes/+page.svelte — key\
+      \ passage or \"NOT READ: <reason>\"\n- web/src/routes/+layout.svelte — key passage\
+      \ or \"NOT READ: <reason>\"\n- web/src/app.css — key passage or \"NOT READ:\
+      \ <reason>\"\n- web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/real-server-ui.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Implementation Evidence\n- Files\
+      \ changed: <paths>\n- Protected tests preserved: <yes/no + note>\n- Route behavior\
+      \ implemented:\n  - `/`: <proof summary>\n  - `/source-ledger`: <proof summary>\n\
+      \  - `/source`: <proof summary>\n  - `/sources`: <proof summary>\n- Canonical\
+      \ chrome labels preserved: <list>\n- Forbidden concepts absent: <list checked>\n\
+      - Exact focused command(s) run:\n  ```\n  <commands>\n  ```\n- Actual output:\n\
+      \  ```\n  <paste output>\n  ```\n- Path exercised: Go static UI server → Svelte\
+      \ route/load state → Source Ledger surface\n- Headline: PASS | FAIL"
+    depends_on:
+    - slnr-contract-doc-route-contract
+    - slnr-expected-red-browser-test
+    agent: frontend-engineer
