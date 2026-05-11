@@ -44828,3 +44828,59 @@ phases:
     with evidence or has explicit non-intersection evidence accepted by gate-reviewer.
   depends_on:
   - prd-behavior-audit-remediation-independent-retest-and-audits
+  steps:
+  - id: pbar-final-closure-matrix
+    name: Finalize finding-by-finding closure matrix
+    status: pending
+    description: 'step_type: verification
+
+
+      As spec-verifier, consolidate all remediation, retest, audit, liveness, UIUX,
+      wiring, and product-boundary evidence into the closure matrix created by pbar-contract-audit-matrix.
+
+
+      Required output:
+
+      - Every finding B1-B23 and U1-U5 must have final status: PROVEN_FIXED, BLOCKED,
+      or NON_INTERSECTING.
+
+      - NON_INTERSECTING is allowed only with explicit PRD/DESIGN/ARCH evidence and
+      why the issue does not intersect any remaining required gate. The default expectation
+      is PROVEN_FIXED for every row.
+
+      - Each row must include implementation step id(s), test step id(s), independent
+      retest/audit evidence refs, screenshots/snapshots where UI is touched, and final
+      owner.
+
+      - Any BLOCKED row must include remediation owner and retest path; do not hide
+      blockers as pre-existing/out-of-scope.
+
+
+      This step does not fix code; it prepares the strict gate decision basis.'
+    verification: 'full-plan-check protecting final strict gate: closure matrix contains
+      B1-B23 and U1-U5, every row has final status and evidence refs, no blocker-class
+      issue is deferred without explicit non-intersection proof and future ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Closure Matrix Evidence
+
+      - Matrix path: <path>
+
+      - Rows present: B1-B23 and U1-U5
+
+      - Status summary: PROVEN_FIXED=<n>, NON_INTERSECTING=<n>, BLOCKED=<n>
+
+      - Evidence refs by row: <table or matrix path>
+
+      - Remaining blockers: <none or list with owner/retest path>
+
+      - Gate decision basis: <why final gate can open or must block>'
+    agent: spec-verifier
