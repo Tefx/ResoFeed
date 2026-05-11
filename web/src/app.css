@@ -241,6 +241,23 @@ a:focus,
   cursor: pointer;
 }
 
+.source-diagnostic-action {
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  color: var(--rf-color-muted);
+  background: transparent;
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.source-diagnostic-action::before {
+  content: '[DETAILS]';
+}
+
 .source-ledger-delete:hover,
 .source-ledger-delete:focus-visible,
 .source-ledger-confirm:hover,

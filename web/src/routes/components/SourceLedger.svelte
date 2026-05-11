@@ -148,14 +148,12 @@
             aria-label={fetching ? `Fetching ${sourceLabel}` : `Fetch ${sourceLabel}`}
             disabled={fetching}
             onclick={() => void fetchSource(source)}
-          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button></span>
-          {#if confirmingSourceId === source.id}
-            <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>
-          {/if}
-          <details class="source-diagnostic-details">
-            <summary>diagnostic details</summary>
-            <pre>{`source: ${sourceLabel}\nfetch_state: ${source.last_fetch_status}\nfetched_at: ${lastFetch ?? 'not_fetched'}\nfeed_url: ${source.url}\nfull_error: ${fullSourceError ?? 'none'}`}</pre>
-          </details>
+          >{fetching ? '[FETCHING...]' : '[FETCH]'}</button><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button><button
+            type="button"
+            class="source-diagnostic-action"
+            aria-label={`diagnostic details for ${sourceLabel}: status ${source.last_fetch_status}; last fetch ${lastFetch ?? 'not_fetched'}; url ${source.url}; full error ${fullSourceError ?? 'none'}`}
+            title={`source: ${sourceLabel}\nfetch_state: ${source.last_fetch_status}\nfetched_at: ${lastFetch ?? 'not_fetched'}\nfeed_url: ${source.url}\nfull_error: ${fullSourceError ?? 'none'}`}
+          ></button>{#if confirmingSourceId === source.id}<button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>{/if}</span>
         </li>
       {/each}
     </ul>

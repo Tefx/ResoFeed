@@ -10,9 +10,10 @@
     onSelect?: (item: ItemSummary) => Promise<void> | void;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
     suppressStatusRole?: boolean;
+    compactFilters?: boolean;
   }
 
-  let { items, query = '', onSearch, onSelect, onResonanceToggle, suppressStatusRole = false }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResonanceToggle, suppressStatusRole = false, compactFilters = false }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -83,7 +84,7 @@
       <button type="submit">search</button>
       <button class="search-submit-a11y" type="submit" aria-label="submit search">submit search</button>
     </div>
-    <details class="search-secondary-filters">
+    <details class="search-secondary-filters" open={!compactFilters}>
       <summary>filters</summary>
       <div class="search-secondary-grid">
         <label for="search-source">Source filter</label>
