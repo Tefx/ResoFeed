@@ -43342,3 +43342,82 @@ phases:
     starts.
   depends_on:
   - source-ledger-navigation-regression
+  steps:
+  - id: pbar-contract-audit-matrix
+    name: Build PRD behavior audit closure matrix
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+
+      Create an audit closure matrix for every newly discovered issue in docs/audits/prd-behavior-audit-2026-05-11.md.
+
+
+      REQUIRED FINDING INVENTORY (do not omit any): B1 P1 Search command shows Today/feed
+      results instead of executing query; B2 P1 No-match Search returns internal error
+      while still showing feed items; B3 P3 Search surface has noisy/ambiguous interactive
+      naming; B4 P1 Natural-language Steer policy correction fails or gives no usable
+      interpretation; B5 P3 Add-feed via Steer works, but the receipt is too terse;
+      B6 P1 Newly added feed can ingest and appear, but LLM understanding degrades;
+      B7 P1 Inspector still leaks real-source boilerplate and related-story tail;
+      B8 P3 Resonate feedback is visually present but programmatically/semantically
+      unclear; B9 P1 /doctor via Steer works, but direct /doctor route does not; B10
+      P2 Mobile Source Ledger still leaves Today feed in page/accessibility flow;
+      B11 P2 Mobile Search metadata still loses useful information; B12 P3 Source
+      error diagnostics need a full-view affordance; B13 P3 Time group labels compete
+      with metadata on narrow/search rows; B14 P1 Complex natural-language Steer still
+      fails with internal error; B15 P1 Simple natural-language Steer also fails;
+      B16 P1 Explicit hide/reduce intent did not affect Today; B17 P2 Boost intent
+      did not affect ranking against the probe corpus; B18 P1 LLM chain still reports
+      model latency failures for newly ingested items; B19 P1 Inspector is still fallback/excerpt-driven
+      for probe items; B20 P2 /doctor status semantics are misleading; B21 P2 Feed
+      rows omit visible quality/value tier metadata; B22 P1 Inspector core insight
+      and body still contain extraction pollution; B23 P2 Steer Enter-submit and surface
+      navigation reliability need reproduction-grade coverage; U1 P2 Mobile Search
+      form consumes too much first-screen space; U2 P3 Add-feed receipt is too terse
+      to orient the next action; U3 P2 Source Ledger row grammar is still visually
+      unstable; U4 P2 Diagnostics should be more scan-readable without becoming a
+      dashboard; U5 P2 Current surface state needs stronger programmatic semantics.
+
+
+      For each row include: finding id, title, severity, authoritative PRD/DESIGN/ARCH
+      refs, owning remediation step, expected-red test owner, implementation owner,
+      independent retest owner, UIUX/spec audit requirement, acceptance criteria,
+      and evidence requirement. B5 and U2 may share one implementation owner but must
+      remain separate rows. B7 and B22 may share implementation but must remain separate
+      rows. B4/B14/B15 may share implementation but must remain separate rows.
+
+
+      Output artifact: add or update a machine-readable closure matrix under docs/audits/
+      or web/tests/contracts/ so downstream steps can cite it. Do not modify product
+      code.'
+    verification: 'local-check protecting all downstream remediation gates: matrix
+      contains exactly B1-B23 and U1-U5, no missing ids, each row has owner/acceptance/evidence
+      fields, and unresolved/non-intersection is forbidden unless explicitly justified
+      by PRD/DESIGN/ARCH refs.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Audit Matrix Evidence
+
+      - Matrix artifact path: <path>
+
+      - Finding IDs present: <paste complete B1-B23, U1-U5 list>
+
+      - Owner mapping summary: <owner per coherent subsystem>
+
+      - Acceptance criteria source citations: <PRD/DESIGN/ARCH lines or sections>
+
+      - Evidence requirements: <how each finding will be proven closed>
+
+      - Non-intersection claims: <must be none, or cite exact authority and why final
+      gate is not affected>'
+    agent: spec-verifier
