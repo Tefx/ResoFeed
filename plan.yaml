@@ -42159,7 +42159,7 @@ phases:
       \ needed; existing Go static fallback serves SPA direct routes."
   - id: slnr-browser-route-retest
     name: Independently verify Source Ledger nav and direct routes in real browser
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -42332,6 +42332,8 @@ phases:
     depends_on:
     - slnr-restore-navigation-route
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T12:07:10.035253+00:00'
   - id: slnr-uiux-navigation-audit
     name: Audit Source Ledger navigation chrome and route visual conformance
     status: pending
