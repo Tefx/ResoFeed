@@ -39674,7 +39674,7 @@ phases:
     agent: gate-reviewer
   - id: ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix
     name: urrc-r1-inspector-sanitation-fix
-    status: claimed
+    status: done
     description: "Focused R1 residual blocker fix for Inspector sanitation after browser\
       \ retest evidence.\n\nstep_type: implementation. work_type: defect_repair. Agent:\
       \ frontend-engineer. This is a focused residual fix only; do NOT create a broad\
@@ -39734,6 +39734,51 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-11T08:22:16.658369+00:00'
+    done_at: '2026-05-11T08:38:54.641378+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-remediation-retest-2026-05-11.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/DESIGN.md — Inspector\
+      \ Pane requires readable detail/provenance, original link, and explicitly forbids\
+      \ related/recommendation/ads in Inspector.\n- docs/ARCHITECTURE.md — Frontend\
+      \ must preserve DESIGN.md; no extra dashboard/settings surfaces or new architecture\
+      \ layers.\n- web/src/routes/components/Inspector.svelte — Inspector primary\
+      \ text flows through `readableText()` / `detailText()` sanitation before rendering.\n\
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — E2E verifies primary Inspector\
+      \ text excludes raw forbidden tokens while preserving expected readable text.\n\
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts — E2E verifies\
+      \ readable article prose/fallback survives while raw page-source/navigation/diagnostic\
+      \ garbage is hidden.\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ — F19 covers Inspector raw boilerplate leakage; suite also proves broader\
+      \ R1-R8 design surfaces.\n\n## Focused R1 Fix Evidence\n- Touched files:\n \
+      \ - web/src/routes/components/Inspector.svelte\n  - web/src/routes/components/__tests__/rendering-expected-red.test.ts\n\
+      - Root cause of R1 leak:\n  - Social CTA regex did not cover “Follow us on …”\
+      \ phrasing.\n  - Repeated lead-like text without sentence punctuation was not\
+      \ removed by sentence-level duplicate detection.\n- Fix summary:\n  - Expanded\
+      \ CTA sanitation for follow/share/subscribe/newsletter/social variants without\
+      \ crossing newline boundaries into article prose.\n  - Added bounded adjacent\
+      \ word-sequence duplicate removal for exactly duplicated lead-like runs, while\
+      \ preserving long repeated article prose.\n  - Added component regression proving\
+      \ literal leak strings are absent and readable article prose remains.\n- Test\
+      \ integrity confirmation:\n  - Playwright proof weakened/skipped/deleted: NO\n\
+      - Literal failure strings absent from Inspector primary text in local proof:\n\
+      \  - `Follow us on Twitter for more newsletters`: ABSENT\n  - `summary-like\
+      \ lead repeated by the site`: ABSENT\n- R2-R8 preservation note:\n  - No intentional\
+      \ changes to Source Ledger, metadata grammar, Search scoping, State Portability\
+      \ placement, or other proven surfaces.\n\n## Verification\n- Worker: `npm ci`\
+      \ — exit 0.\n- Worker: `npm test -- --run src/routes/components/__tests__/rendering-expected-red.test.ts`\
+      \ — exit 0; svelte-check 0 errors/0 warnings; 19 passed.\n- Worker: `npm run\
+      \ test:e2e -- --project=chromium-ci-safe inspector-readable-content-regression.spec.ts\
+      \ inspector-dirty-corpus.spec.ts` — exit 0; 2 passed.\n- Worker: `npm run test:e2e\
+      \ -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`\
+      \ — exit 0; 11 passed.\n- Mainline: `npm test -- --run src/routes/components/__tests__/rendering-expected-red.test.ts`\
+      \ — exit 0; svelte-check 0 errors/0 warnings; 1 file / 19 tests passed.\n- Mainline:\
+      \ `npm run test:e2e -- --project=chromium-ci-safe inspector-readable-content-regression.spec.ts\
+      \ inspector-dirty-corpus.spec.ts` — exit 0; 2 passed.\n- Mainline: `npm run\
+      \ test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts\
+      \ real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`\
+      \ — exit 0; 11 passed.\n\n## Commit hash(es)\n- Worktree: 41fddfee88d824732838a3ed9c986f92eaf12081\n\
+      - Mainline squash: 6a9347f [vectl] step-ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix\
+      \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     name: urrc-r1-focused-browser-retest
     status: pending
