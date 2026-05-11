@@ -47588,7 +47588,7 @@ phases:
     claimed_at: '2026-05-11T18:08:51.700757+00:00'
   - id: pbar-runtime-liveness-probe
     name: Black-box liveness probe for runnable web surfaces
-    status: pending
+    status: claimed
     description: 'As a BLACK-BOX TESTER (blind-tester), verify runnable/deployability
       behavior through public surfaces only.
 
@@ -47673,6 +47673,8 @@ phases:
 
       - gate_decision_basis:'
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-11T18:08:57.821035+00:00'
   - id: pbar-uiux-multimodal-audit
     name: Native multimodal UI/UX audit for remediated surfaces
     status: pending
