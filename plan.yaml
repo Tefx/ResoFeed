@@ -50395,7 +50395,7 @@ phases:
       worktree status clean.'
 - id: prd-behavior-audit-remediation-final-strict-closure
   name: PRD Behavior Audit Remediation — Final Strict Closure
-  status: in_progress
+  status: done
   gate: Final gate blocks unless every audit finding B1-B23 and U1-U5 is proven fixed
     with evidence or has explicit non-intersection evidence accepted by gate-reviewer.
   depends_on:
@@ -50542,7 +50542,7 @@ phases:
       - none'
   - id: pbar-strict-final-gate
     name: Strict final gate for PRD behavior audit remediation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), perform the final strict
       gate for docs/audits/prd-behavior-audit-2026-05-11.md remediation.
 
@@ -50648,3 +50648,144 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-11T19:49:04.506819+00:00'
+    done_at: '2026-05-11T19:53:44.253861+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/audits/prd-behavior-audit-2026-05-11.md — Original PBAR audit defines
+      B1-B23/U1-U5 behavioral failures: search execution/no-match, Steer receipts/ranking,
+      Inspector sanitation/provenance, `/doctor`, Source Ledger/mobile/focus/diagnostic
+      rows.
+
+      - .audit-artifacts/pbar-final-closure-matrix.md — Headline PASS; rows B1-B23/U1-U5;
+      PROVEN_FIXED=28, NON_INTERSECTING=0, BLOCKED=0; older B5/U2 and Source Ledger
+      ingest-control artifacts marked superseded by later fix/retest.
+
+      - docs/PRD.md — Key constraints: no onboarding/accounts/settings; Search is
+      lexical retrieval; Steer understandable/reversible and not rule-management UI;
+      Source Ledger flat; `/doctor` raw operational output.
+
+      - docs/DESIGN.md — Functional labels only; flat Source Ledger; raw `/doctor`;
+      inline receipts not activity ledger; no sync/account/backup/settings dashboard.
+
+      - docs/ARCHITECTURE.md — One Go binary, one SQLite DB, FTS5 lexical only, no
+      embeddings/vector/RAG, one owner token, no accounts/OAuth/per-agent registry/sync/ledger.
+
+      - .agents/instructions.md — Reinforces architecture/design as law; one binary/SQLite;
+      no vector/RAG, sync/merge/history ledger, accounts, per-agent registry, onboarding
+      wizards, folders/tags/settings sliders.
+
+      - Relevant artifacts read: `.audit-artifacts/pbar-browser-flow-retest-report.md`,
+      `artifacts/pbar-backend-green-retest/report.md`, `artifacts/pbar-runtime-liveness-probe/README.md`,
+      `artifacts/pbar-runtime-liveness-probe/probe-summary.json`, `.audit-artifacts/pbar-wiring-audit.md`,
+      `.audit-artifacts/frontend-gate/pbar-frontend-gate-retest-proof-register.yaml`,
+      `.audit-artifacts/uiux-audit-report.md`, `web/test-results/ui-remediation/pbar-frontend-gate-retest-proof-current.md`,
+      `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`, `internal/resofeed/pbar_steer_receipt_remediation_test.go`;
+      `.audit-artifacts/pbar-post-remediation-uiux-audit/` screenshots present. Standalone
+      pbar-spec-product-boundary-review artifact not found; closure matrix and objective
+      evidence record PASS.
+
+
+      ## Strict Final Gate Report
+
+      **Reviewer**: gate-reviewer
+
+      **Audit path**: docs/audits/prd-behavior-audit-2026-05-11.md
+
+
+      ### Required inventory check
+
+      - B1-B23 present: PASS
+
+      - U1-U5 present: PASS
+
+      - Extra/missing rows: none
+
+      - Matrix parser: exit 0; row_count 28; missing []; extra []; statuses `{''PROVEN_FIXED'':
+      28}`.
+
+
+      ### Closure matrix
+
+      - Every row B1-B23/U1-U5 is PROVEN_FIXED and CLOSED.
+
+      - B5/U2 specifically closed by commit `8f80feb` and independent retest proving
+      stale `run ingest in SOURCE LEDGER` guidance absent, Source Ledger run/fetch
+      controls absent, and user orientation matches product boundary.
+
+
+      ### Forbidden concept scan
+
+      - Vector/RAG/semantic search: absent as active product concept; production matches
+      are negative boundary comments such as SearchQuery excluding embeddings/vector/chat
+      and MCP excluding RAG answers.
+
+      - Settings/rule builder/history ledger/sync/accounts/onboarding/dashboard diagnostics:
+      absent as active product concepts; matches are boundary comments/tests or ordinary
+      Go `sync` primitives. UIUX report PASSes no folders/tags/settings/sync/RAG/accounts
+      drift.
+
+
+      ### Wiring / Escape Hatch / Liveness / Integration / CLI Evidence
+
+      - Wiring: prior wiring FAIL artifact superseded by later PASS evidence; current
+      browser tests assert Source Ledger menu/reachability, diagnostic details, active-surface
+      focus, and no stale run/fetch controls.
+
+      - Escape hatch: PASS; scoped scan over `cmd`, `internal`, `web/src`, `web/tests`,
+      `docs`, `.agents` for `@invar:allow|invar:allow` returned 0 matches.
+
+      - Liveness: PASS; `probe-summary.json` shows compiled `resofeed serve` listening
+      and HTTP 200 for `/`, `/doctor`, `/source-ledger`, `/api/search`, `/api/sources`,
+      `/api/feed/today`, `/api/doctor`.
+
+      - Real integration vs fixture: backend targeted fixtures and full Go suite passed;
+      Playwright expected-red fixture suite passed 5/5; real-server UI suite passed
+      8/8 using Go binary/owner-token gate and browser-led API/MCP parity.
+
+      - CLI matrix: not applicable; PBAR remediation did not touch CLI surface. Runtime
+      CLI executability indirectly covered by liveness `./bin/resofeed serve ...`
+      proof.
+
+
+      ## Behavioral Proof Register / Final Gate Decision
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - uncertainty_sources: []
+
+
+      ## Verification
+
+      - Worktree branch diff contained only `.audit-artifacts/pbar-strict-final-gate.md`.
+
+      - Mainline squash merge commit: 87acbd1 `[vectl] step-pbar-strict-final-gate
+      completed`.
+
+      - Mainline final-state verification: `git ls-files .audit-artifacts/pbar-strict-final-gate.md`
+      listed the artifact and `git status --porcelain -- .audit-artifacts/pbar-strict-final-gate.md`
+      returned no dirty output.
+
+
+      ## Commit hash(es)
+
+      - 5f1d903d25ca0a4824ba28a01b301d9a46671da5 — strict gate artifact commit in
+      isolated branch
+
+      - 87acbd1 — [vectl] step-pbar-strict-final-gate completed
+
+
+      ## Gaps / Notes
+
+      - none'
