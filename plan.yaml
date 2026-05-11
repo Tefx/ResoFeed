@@ -40127,7 +40127,7 @@ phases:
       \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
     name: urrc-r1-second-focused-browser-retest
-    status: claimed
+    status: done
     description: "Second focused browser retest for repeated R1 remediation after\
       \ ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix.\n\nstep_type:\
       \ test. step_intent: retest_green. expected_result: green. verification_scope:\
@@ -40244,3 +40244,120 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T09:17:14.025412+00:00'
+    done_at: '2026-05-11T09:25:08.891048+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: file absent in
+      isolated worktree.
+
+      - docs/DESIGN.md — Inspector Pane contract: Inspector is deliberate detail reading/verification
+      surface; must include title, original link, extraction status, dense summary,
+      full text/excerpt, and must not include recommendation/ads; opening Inspector
+      moves focus to detail heading.
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts — Focused test asserts
+      R1 readable prose is present, forbidden strings are absent, and repeated fallback
+      is absent; attaches `r1-primary-inspector-text.txt`.
+
+      - web/src/routes/components/Inspector.svelte — Inspector sanitizes via `readableText`,
+      removes source boilerplate including follow/newsletter strings, de-duplicates
+      repeated intros, and renders `.inspector-reading` from `detailText(item)`.
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — Dirty corpus test imports live
+      local fixture feed, opens Inspector per item, verifies readable primary text
+      exists and raw forbidden tokens are absent.
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts — Regression test
+      serves RSS + HTML over a local HTTP server and verifies primary Inspector body
+      contains readable article/fallback while excluding script/style/navigation/diagnostic
+      garbage.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: PASS
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      product_implementation_files_modified: no
+
+
+      ## Second Focused Browser Retest Evidence
+
+      **Tester**: integration-verifier
+
+
+      Commands executed:
+
+      - Worker: `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts`
+      — exit 0; 1 passed.
+
+      - Worker baseline: `npm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts
+      real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`
+      — exit 0; 11 passed.
+
+      - Mainline: `npx playwright test --config ./playwright.config.ts ui-remediation-r1-r8-browser-retest.spec.ts
+      --project=chromium-ci-safe` — exit 0; 1 passed.
+
+      - Mainline baseline: `npx playwright test --config ./playwright.config.ts full-ui-design-conformance.expected-red.spec.ts
+      real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts
+      --project=chromium-ci-safe` — exit 0; 11 passed.
+
+
+      ## R1 Proof
+
+      - `Follow us on Twitter for more newsletters`: ABSENT
+
+      - `summary-like lead repeated by the site`: ABSENT
+
+      - Expected readable substring `Second readable paragraph confirms the body is
+      not empty after bounded cleanup.`: PRESENT
+
+      - Inspector primary text excerpt: `Follow prompt cleanup preserves readable
+      article prose original link full · source-backed summary: Second readable paragraph
+      confirms the body is not empty after bounded cleanup. core insight: Second readable
+      paragraph confirms...`
+
+
+      ## Behavioral Proof Register
+
+      - R1 Inspector primary text removes forbidden follow prompt: PROVEN.
+
+      - R1 Inspector primary text removes repeated summary-like lead: PROVEN.
+
+      - R1 preserves readable article prose/fallback: PROVEN.
+
+      - R2-R8 non-regression: PROVEN via focused and baseline browser retests.
+
+      - Baseline design/server/dirty corpus regressions: PROVEN; 11-test baseline
+      passed.
+
+
+      ## Artifacts
+
+      - Worktree artifact: `audits/ui-remediation-r1-second-focused-browser-retest-2026-05-11.md`
+      committed at 61c347bb69fb047252078fb60bfe3d17dd758b03.
+
+      - Mainline squash: a2dda96 [vectl] step-ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest
+      completed.
+
+
+      ## Gaps/Notes
+
+      - Initial run from repository root failed with npm package path error; rerun
+      from `web/` package succeeded.
+
+      - `npm ci` was required in isolated worktree because Playwright was missing
+      from `web/node_modules`.'
