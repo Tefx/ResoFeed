@@ -43345,7 +43345,7 @@ phases:
   steps:
   - id: pbar-contract-audit-matrix
     name: Build PRD behavior audit closure matrix
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -43421,6 +43421,8 @@ phases:
       - Non-intersection claims: <must be none, or cite exact authority and why final
       gate is not affected>'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-11T15:57:09.808659+00:00'
   - id: pbar-expected-red-backend-tests
     name: Add expected-red backend behavior tests for search, steering, ranking, LLM
       provenance, doctor, and sanitation
