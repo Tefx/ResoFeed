@@ -46855,7 +46855,7 @@ phases:
       debt and must be owned before final closure.'
   - id: pbar-frontend-gate-retest-proof
     name: Retest and proof for frontend gate blockers
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       verification_scope: phase-check protecting the final frontend gate and downstream\
       \ UI/UX audit\n\nAs an INDEPENDENT TESTER, retest the frontend gate blocker\
@@ -47110,6 +47110,8 @@ phases:
     depends_on:
     - pbar-frontend-gate-blocker-remediation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-11T17:55:32.578183+00:00'
 - id: prd-behavior-audit-remediation-independent-retest-and-audits
   name: PRD Behavior Audit Remediation — Independent Retest and Audits
   status: locked
