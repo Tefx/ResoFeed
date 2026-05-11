@@ -43333,3 +43333,12 @@ phases:
 
       - Playwright emitted Node `[DEP0205] module.register()` deprecation warning;
       not blocking.'
+- id: prd-behavior-audit-remediation-contract-matrix-and-expected-red-tests
+  name: PRD Behavior Audit Remediation — Contract Matrix and Expected-Red Tests
+  status: pending
+  gate: Every finding B1-B23 and U1-U5 from docs/audits/prd-behavior-audit-2026-05-11.md
+    is enumerated with explicit owner, acceptance criteria, expected-red coverage
+    or justified infeasibility, and no product-boundary ambiguity before remediation
+    starts.
+  depends_on:
+  - source-ledger-navigation-regression
