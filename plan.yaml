@@ -43474,3 +43474,53 @@ phases:
     depends_on:
     - pbar-contract-audit-matrix
     agent: golang-developer
+  - id: pbar-expected-red-browser-tests
+    name: Add expected-red browser/UI behavior coverage for PRD audit findings
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add expected-red Playwright/Vitest coverage that exercises the real rendered
+      app before implementation. Product code must not be modified.
+
+
+      Coverage required:
+
+      - Search UI: B1/B2/B3/B11/B13/U1 (search <query> executes, no-match empty state,
+      accessible submit naming, mobile metadata anatomy, time marker placement, compact
+      mobile form).
+
+      - Steer and receipts: B4/B5/B14/B15/B23/U2 (Enter and apply from feed/Inspector/Search/Ledger,
+      interpreted_as receipt, source-added receipt with title/host and ingest hint).
+
+      - Doctor and diagnostics: B9/B20/U4 (direct /doctor route and scan-readable
+      raw diagnostic keys without dashboard chrome).
+
+      - Inspector and feed presentation: B6/B7/B8/B19/B21/B22 (fallback labels, sanitation
+      evidence, accessible resonate state, quality/value metadata).
+
+      - Mobile/surface semantics and ledger: B10/B12/U3/U5 (inactive feed hidden/unmounted/inert
+      on non-feed surfaces, focus destination, full err affordance, stable ledger
+      row anatomy).
+
+
+      Browser evidence must include desktop and narrow/mobile screenshots or DOM snapshots
+      for required states. Red is expected before implementation; success means the
+      gaps are reproducible and mapped to finding ids.'
+    verification: 'local-check protecting frontend remediation: expected-red UI tests
+      are test-only, exercise real rendered desktop and mobile surfaces, and expose
+      B1-B5,B8-B13,B21-B23,U1-U5 plus frontend-visible parts of B6/B7/B14/B15/B19/B20/B22.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Expected-Red Browser\
+      \ Test Evidence\n- Modified files limited to tests/fixtures: <list>\n- Commands\
+      \ executed:\n  ```\n  <npm/playwright/vitest commands>\n  ```\n- Expected failures/exposed\
+      \ gaps by finding: <B/U id table>\n- Visual artifacts captured: <screenshots/snapshots\
+      \ paths>\n- Product code modified: must be NO"
+    depends_on:
+    - pbar-contract-audit-matrix
+    agent: integration-verifier
