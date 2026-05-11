@@ -39804,7 +39804,7 @@ phases:
       \ completed\n\n## Gaps/Notes\n- none"
   - id: ui-remediation-retest-closure.urrc-r1-focused-browser-retest
     name: urrc-r1-focused-browser-retest
-    status: claimed
+    status: done
     description: "Focused browser retest for the R1 residual Inspector sanitation\
       \ blocker after ui-remediation-retest-closure.urrc-r1-inspector-sanitation-fix.\n\
       \nstep_type: verification. step_intent: retest_green. expected_result: green.\
@@ -39867,6 +39867,136 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-11T08:41:33.156823+00:00'
+    done_at: '2026-05-11T08:54:41.209123+00:00'
+    evidence: '## Focused Browser Retest Evidence
+
+      **Tester**: integration-verifier
+
+      **Scope**: R1 residual Inspector sanitation plus R2-R8 non-regression
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-remediation-retest-2026-05-11.md — NOT READ: file not present
+      in isolated worktree.
+
+      - docs/DESIGN.md — Read. Inspector Pane requires source/provenance header, title,
+      original link, extraction status, dense summary/full text, and no ads/recommendation
+      modules; article content must remain readable.
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts — Read. Existing
+      browser test imports a real RSS/HTML fixture and asserts Inspector primary body
+      excludes script/style/nav/diagnostic garbage while preserving readable text
+      or fallback.
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts — Read. Dirty corpus test iterates
+      real browser Inspector states and fails on raw payload/provenance leaks in primary
+      text.
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — Read. Design
+      conformance matrix includes Inspector findings F17-F23 and asserts visible UI
+      anatomy against real app.
+
+      - web/tests/e2e/real-server-ui.spec.ts — Read. Real-server UI tests boot the
+      Go binary, verify owner-token gate, import/feed/inspect/search/resonate, and
+      API/MCP parity.
+
+      - web/src/routes/components/Inspector.svelte — Read. Sanitizer includes follow/share/subscribe/newsletter/social
+      removal and adjacent repeated word-sequence cleanup; Inspector renders summary/core/detail
+      from sanitized text.
+
+
+      ### Closure Signals
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: FAIL
+
+      verdict: FAIL
+
+      headline: FAIL
+
+      blockers:
+
+      - B1: Focused R1 browser retest fails; first R1 Inspector primary text renders
+      only title/original link/status plus `summary unavailable`, so readable article
+      prose is not preserved in that runtime path.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE until second R1 prose-preservation
+      fix and retest complete
+
+      product_implementation_files_modified: no
+
+      Commit hash(es): 57af635 (focused retest spec/evidence branch only; not merged
+      to main)
+
+
+      ## Commands Executed
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts`
+      — exit 127 initially: `sh: playwright: command not found`.
+
+      - `npm ci` — exit 0; installed missing web dependencies.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe ui-remediation-r1-r8-browser-retest.spec.ts`
+      — exit 1; final run: `1 failed, 7 passed`.
+
+      - `npm run test:e2e -- --project=chromium-ci-safe full-ui-design-conformance.expected-red.spec.ts
+      real-server-ui.spec.ts inspector-readable-content-regression.spec.ts inspector-dirty-corpus.spec.ts`
+      — exit 0; `11 passed`.
+
+
+      ### Required String Checks
+
+      - `Follow us on Twitter for more newsletters`: ABSENT in failed R1 captured
+      primary text.
+
+      - `summary-like lead repeated by the site`: ABSENT in failed R1 captured primary
+      text.
+
+      - Readable article prose remains: NO in failed R1 path; captured primary text
+      was `... summary unavailable ... summary unavailable`.
+
+
+      ## Behavioral Proof Register
+
+      - R1 exact residual strings absent: PROVEN_PARTIAL. Forbidden strings absent,
+      but prose preservation fails.
+
+      - R1 readable article prose preserved: UNPROVEN/BLOCKING. Expected `Second readable
+      paragraph confirms the body is not empty after bounded cleanup.` but received
+      `summary unavailable`.
+
+      - R2-R8: PROVEN. No regressions observed in focused retest before R1 blocker
+      conclusion.
+
+      - Baseline design/server/dirty corpus regressions: PROVEN. Baseline command
+      exit 0, 11 passed.
+
+
+      ## Remediation Ownership Created
+
+      Planner added focused downstream remediation:
+
+      - `ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix`
+
+      - `ui-remediation-retest-closure.urrc-r1-second-focused-browser-retest`
+
+
+      Planner also updated downstream `ui-remediation-retest-closure.urrc-uiux-screenshot-conformance-audit`
+      and `ui-remediation-retest-closure.urrc-final-remediation-gate` dependencies
+      so final closure cannot proceed while R1 prose preservation remains open.
+
+
+      ## Gaps/Notes
+
+      - This verification step is complete as a blocker-finding retest, not a green
+      closure. The phase remains blocked until the second R1 prose-preservation fix
+      and focused browser retest close the blocker.'
   - id: ui-remediation-retest-closure.urrc-r1-second-prose-preservation-fix
     name: urrc-r1-second-prose-preservation-fix
     status: pending
