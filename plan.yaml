@@ -44428,7 +44428,7 @@ phases:
     claimed_at: '2026-05-11T16:25:47.397805+00:00'
   - id: pbar-backend-llm-doctor-provenance-remediation
     name: Align LLM fallback provenance and doctor diagnostic semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -44491,6 +44491,119 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-11T16:25:42.573235+00:00'
+    done_at: '2026-05-11T16:33:06.656397+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `.agents/instructions.md`: confirmed one deployable, one SQLite DB, OpenRouter
+      JSON transformer only, raw `/doctor`, no dashboards/settings, no secrets in
+      diagnostics.
+
+      - `docs/ARCHITECTURE.md`: confirmed OpenRouter-only runtime, `account_default`
+      configured model semantics, item `extraction_status`/`model_status`, raw text
+      `/api/doctor`, fallback/status labels.
+
+      - `docs/PRD.md`: confirmed trustworthy compression, fallback taxonomy, item
+      understanding outputs, `/doctor` raw operational health.
+
+      - `docs/DESIGN.md`: confirmed Feed/Inspector must show partial/excerpt provenance
+      and Diagnostics Output must remain monospace raw text, not a dashboard.
+
+      - `docs/DESIGN_VISION.md`: confirmed AI failure degrades to raw RSS payload/blank
+      without cute remediation UI.
+
+      - `docs/USAGE.md`: confirmed `/doctor` plain text expectations, OpenRouter secret
+      redaction, fallback labels.
+
+      - `docs/audits/prd-behavior-audit-closure-matrix.json`: confirmed B6/B18/B19/B20/U4
+      records and acceptance criteria.
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`: confirmed required
+      doctor keys and fallback provenance assertion.
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`: confirmed relevant
+      B20/U4 `/doctor` keys and B6/B19 Inspector fallback/provenance label assertions.
+
+
+      ## Implementation Evidence
+
+      **Findings closed**: B6, B18, B19, B20, U4
+
+      **Spec link**: docs/audits/prd-behavior-audit-closure-matrix.json records B6/B18/B19/B20/U4
+
+      **Subagent commit hash(es)**: 8d7192186cb33ec00958056e9567ff5288d3353a
+
+      **Mainline squash commit**: 8a60ecd ([vectl] step-pbar-backend-llm-doctor-provenance-remediation
+      completed)
+
+      **Files changed**:
+
+      - internal/resofeed/doctor.go
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+
+      **Verification**:
+
+      ```bash
+
+      go test ./internal/resofeed -run ''TestExpectedRedBackendDoctorSeparatesOpenRouterModelAndItemTransformHealth|TestOpenRouterChatCompletionSummaryResponseValidatesAndPersists|TestOpenRouterModelFailureKeepsItemVisibleWithSafeStatus|TestDoctorUsesOpenRouterPrefixAndNoGeminiRuntimeText''
+      -count=1
+
+      # ok resofeed/internal/resofeed 0.541s
+
+      npm --prefix web run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm --prefix web run build
+
+      # vite/SvelteKit build completed successfully
+
+      ```
+
+
+      **Doctor output sample**:
+
+      - `openrouter: provider_reachable=unknown configured_model=account_default provider_reachable:
+      unknown`
+
+      - `openrouter: model_resolved=false resolved_model=unknown model_resolved: false`
+
+      - `openrouter: item_transform_failures=1 item_transform_failures: 1`
+
+      - `fallback_provenance: item=item_model_failed summary=excerpt model_status=model_latency_error
+      extraction_status=partial_extraction`
+
+      - Raw item lines remain below summary keys.
+
+
+      **Fresh ingest/model proof**: targeted OpenRouter fixture test persists validated
+      `summary`, `core_insight`, and `model_status=ok`; failure fixture keeps item
+      visible with nil model-backed summary/core insight and `model_status=model_latency_error`.
+
+
+      **Fallback labelling proof**: Feed metadata now includes summary provenance
+      labels; Inspector now renders `summary provenance: fallback excerpt-only · model_status:
+      ...` instead of generic `source-backed` for fallback/excerpt states.
+
+
+      **Product-boundary proof**: `/doctor` remains raw plain text; direct `/doctor`
+      route renders the same raw diagnostics surface. No dashboard, settings, chart,
+      remediation panel, or secondary fallback mode added.
+
+
+      **Deviation records**: none
+
+
+      **Gaps/Notes**: none; subagent worktree lacked web dependencies, but mainline
+      verification ran `npm --prefix web run check` and `npm --prefix web run build`
+      successfully after merge.'
   - id: pbar-backend-gate
     name: Gate backend PRD behavior remediation
     status: pending
