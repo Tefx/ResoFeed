@@ -54947,7 +54947,7 @@ phases:
       - Artifacts contain only `<redacted-openrouter-key>` and no derived secret value.'
   - id: regression-backend-mcp-llm-openrouter-live-retest
     name: Retest live OpenRouter proof after remediation or disposition
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -55086,6 +55086,8 @@ phases:
     depends_on:
     - regression-backend-mcp-llm-openrouter-live-remediation
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-12T18:23:27.895702+00:00'
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: done
