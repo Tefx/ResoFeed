@@ -53084,7 +53084,7 @@ phases:
     - regression-ui-containment-and-diagnostics-fix
     agent: integration-verifier
   - id: regression-frontend-uiux-audit
-    name: Audit regression UI repairs against DESIGN.md with multimodal artifacts
+    name: Audit regression UI repairs and Source Ledger boundary against DESIGN.md
     status: pending
     description: 'step_type: verification
 
@@ -53092,12 +53092,16 @@ phases:
 
 
       As a native multimodal UI/UX implementation auditor (uiux-auditor), compare
-      real rendered artifacts against docs/DESIGN.md and the regression audit evidence.
+      real rendered artifacts against docs/DESIGN.md and the corrected regression
+      contract.
 
 
       Scope:
 
-      - REG-2026-05-12-01 Source Ledger manual controls and row grammar.
+      - REG-2026-05-12-01 Source Ledger boundary and row grammar: forbidden run/fetch/manual-ingest
+      controls are absent; allowed view/delete/import/export/details/diagnostics remain
+      usable and visually coherent; source-add/background-ingest guidance remains
+      accurate.
 
       - REG-2026-05-12-03 Search submit control uniqueness.
 
@@ -53112,7 +53116,8 @@ phases:
 
       Required artifacts:
 
-      - Desktop Source Ledger after at least one source exists.
+      - Desktop Source Ledger after at least one source exists, showing allowed actions
+      and absence of forbidden run/fetch controls.
 
       - Mobile/narrow Search, Source Ledger, and /doctor.
 
@@ -53126,9 +53131,10 @@ phases:
       - Dense archival workbench, muted colors, rare accents, functional labels.
 
       - No SaaS copy, mascots, dashboards, onboarding wizards, folders/tags/unread/archive,
-      settings sliders, or drag-and-drop.
+      settings sliders, drag-and-drop.
 
-      - Source Ledger remains flat and operational.
+      - Source Ledger remains flat and is not a management dashboard; `[RUN INGEST]`
+      / `[FETCH]` controls are rejected unless newer canonical docs explicitly supersede.
 
 
       This is a required UI/UX gate; ordinary tests or DOM snapshots alone do not
@@ -53143,14 +53149,31 @@ phases:
       - Finding-by-finding UI/UX verdicts are provided for REG-01, REG-03, REG-05,
       REG-07, REG-08, and REG-09.
 
+      - REG-01 verdict rejects any forbidden run/fetch/manual-ingest controls and
+      confirms allowed Source Ledger diagnostics/details/guidance remain intact.
+
       - Any design deviations are mapped to blockers or explicit non-blocking debt.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## UI/UX Multimodal\
-      \ Audit Report\nartifacts_reviewed:\n  - <path>\nfinding_verdicts:\n  REG-2026-05-12-01:\
-      \ PASS | FAIL\n  REG-2026-05-12-03: PASS | FAIL\n  REG-2026-05-12-05: PASS |\
-      \ FAIL\n  REG-2026-05-12-07: PASS | FAIL\n  REG-2026-05-12-08: PASS | FAIL\n\
-      \  REG-2026-05-12-09: PASS | FAIL\ndesign_drift: []\nverdict: PASS | PASS_WITH_DEBT\
-      \ | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UI/UX Audit Evidence
+
+      - Artifact list by required viewport/state.
+
+      - REG finding verdict table.
+
+      - Source Ledger boundary check: forbidden controls absent; allowed operations
+      visible; guidance/diagnostics intact.
+
+      - PASS/PASS_WITH_DEBT/FAIL handoff.'
     depends_on:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
