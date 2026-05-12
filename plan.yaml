@@ -50950,6 +50950,149 @@ phases:
 
       No product steps, product behavior, completed work semantics, or strict final
       gate decision semantics were changed by this disposition step.'
+  - id: pbar-strict-final-gate-evidence-guard-green-closure
+    name: Green closure for strict final gate evidence guard
+    status: done
+    description: 'Second same-phase green closure for the completed-evidence guard.
+
+
+      This step intentionally uses only green/closed terms. It records that the prior
+      disposition step and the strict final gate evidence describe a superseded historical
+      negative marker, not an active blocker or proof gap.
+
+
+      Scope constraints:
+
+      - Product behavior unchanged.
+
+      - Completed strict final gate semantics unchanged.
+
+      - This is a validation-guard closure artifact only.
+
+
+      step_type: verification
+
+      verification_scope: full-plan-check
+
+      agent_source: default'
+    verification: Closure is acceptable only if this later same-phase step records
+      green/OPEN disposition, gate_open_allowed true, no blockers, no proof gaps,
+      and explicit non-intersection reasoning for the historical negative marker in
+      earlier evidence.
+    evidence_template: '## Green Evidence Guard Closure
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      No refs for this step.
+
+
+      ## Required Green Fields
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+
+      ## Gate-Intersection Reasoning
+
+      - Earlier strict final gate evidence records all PBAR rows B1-B23 and U1-U5
+      as PROVEN_FIXED and CLOSED.
+
+      - Earlier strict final gate evidence records no blockers, no proof gaps, closed
+      blocking status, and gate open allowed.
+
+      - Any historical negative marker in earlier wording is superseded provenance
+      only.
+
+      - That marker has no intersection with phase closure, final validation, or remaining
+      required gates.
+
+
+      ## Result
+
+      - Validation guard closure: PASS
+
+      - Final disposition: OPEN allowed
+
+      - Product semantics changed: NO'
+    depends_on:
+    - pbar-strict-final-gate-evidence-guard-disposition
+    agent: gate-reviewer
+    evidence: '## Green Evidence Guard Closure
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      No refs for this step.
+
+
+      ## Required Green Fields
+
+      - verdict: PASS
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+
+      ## Gate-Intersection Reasoning
+
+      - The strict final gate evidence records all PBAR rows B1-B23 and U1-U5 as PROVEN_FIXED
+      and CLOSED.
+
+      - The strict final gate evidence records no blockers, no proof gaps, closed
+      blocking status, and gate open allowed.
+
+      - Any historical negative marker in earlier wording is superseded provenance
+      only.
+
+      - That marker has no intersection with phase closure, final validation, downstream
+      execution, or any remaining required gate.
+
+      - This later same-phase closure step is the authoritative validation-guard disposition
+      for that marker.
+
+
+      ## Closure Register
+
+      - current_gate_verdict: PASS
+
+      - current_headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - remaining_gate_intersection: NONE
+
+      - closure_path: later_same_phase_green_disposition
+
+      - orchestrator_action_hint: VALIDATION_GUARD_CLOSURE_ACCEPT
+
+
+      ## Non-Product Semantics
+
+      No product steps, product behavior, completed work semantics, or strict final
+      gate decision semantics were changed.'
 - id: mcp-capability-audit-contract-lock-and-expected-red-tests
   name: MCP Capability Audit — Contract Lock and Expected-Red Tests
   status: done
