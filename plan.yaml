@@ -54947,7 +54947,7 @@ phases:
       - Artifacts contain only `<redacted-openrouter-key>` and no derived secret value.'
   - id: regression-backend-mcp-llm-openrouter-live-retest
     name: Retest live OpenRouter proof after remediation or disposition
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -55088,6 +55088,109 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-12T18:23:27.895702+00:00'
+    done_at: '2026-05-12T18:32:03.916232+00:00'
+    evidence: 'Blind-tester independent retest returned semantic PASS_WITH_DEBT with
+      blockers closed.
+
+
+      Closure fields:
+
+      - Headline: PASS_WITH_DEBT
+
+      - Verdict: PASS
+
+      - Blocking Status: CLOSED
+
+      - Proof-Gap Status: NON_BLOCKING
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Command executed:
+
+      - `go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`
+
+
+      Subagent result fields:
+
+      - `external_openrouter_env_present=true` without secret value.
+
+      - `live_item_model_status=model_latency_error`.
+
+      - `live_summary_successes=0`.
+
+      - `health_classification=openrouter_client_timeout_or_error`.
+
+      - `external_live_probe_status=external_live_probe_nonblocking_provider_or_auth`.
+
+      - Fallback-only summaries counted as live success: NO.
+
+
+      Accepted closure path:
+
+      - REAL_LIVE_PASS was not proven.
+
+      - ACCEPTED_NON_BLOCKING_DISPOSITION was selected because direct OpenRouter preflight
+      returned provider/auth/data-policy 404 while deterministic backend/MCP proof
+      remains green.
+
+      - This disposition is non-blocking for `regression-backend-mcp-llm-gate` because
+      the remaining live-provider issue is account/provider policy availability, not
+      a repo-owned product failure; if provider settings/model availability later
+      allow chat completions, a live provider success obligation reopens.
+
+
+      Behavioral proof:
+
+      - Exact build+liveness command runs successfully.
+
+      - REG-04 MCP `read_item` full detail remains proven via `mcp_read_item.json`.
+
+      - Deterministic backend/MCP proof remains valid via `feed_today.json`, `mcp_sources_resource.json`,
+      and `report.json`.
+
+      - Secret redaction proven: `/api/doctor` and post-live doctor artifacts report
+      `contains_raw_secret=false`; independent artifact scan reported `raw_secret_hits=[]`;
+      `.env` was not copied/committed.
+
+
+      Artifacts/commits:
+
+      - Worktree retest commit: `1be3934728bf1a3cf4f800c6916cacfeccdb9162`.
+
+      - Worktree cleanup commit: `52569892c8025bb1c621c02f79ff19672c5ea454` removed
+      transient SQLite DB from tracked branch.
+
+      - Main squash commit: `18ada81` (`[vectl] step-regression-backend-mcp-llm-openrouter-live-retest
+      completed`).
+
+      - Mainline evidence commit: `6f0299a` (`[vectl] record mainline OpenRouter retest
+      evidence`).
+
+
+      Mainline final-state verification after merge:
+
+      - Command: `go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`.
+
+      - Exit 0.
+
+      - Output status PASS with `external_live_probe_status=external_live_probe_nonblocking_provider_or_auth`,
+      `external_openrouter_env_present=true`, `openrouter_live_preflight.classification=provider_or_auth`,
+      and no failures.
+
+
+      Gaps/notes:
+
+      - Real live OpenRouter success remains unproven (`live_summary_successes=0`),
+      but proof gap is explicitly classified NON_BLOCKING due provider/auth/data-policy
+      limitation outside repo control.
+
+      - No `.sqlite3` DB files were merged as durable evidence; only text/JSON/log
+      artifacts were committed.'
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: done
