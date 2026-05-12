@@ -51701,3 +51701,124 @@ phases:
     - mcp-audit-parity-security-idempotency-proof
     - mcp-audit-doc-sync-check
     agent: gate-reviewer
+  - id: mcp-audit-final-gate
+    name: Final gate for MCP capability audit closure
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), make the final OPEN/BLOCK decision
+      for docs/audits/mcp-capability-audit-2026-05-12.md remediation.
+
+
+      YOU ARE THE QUALITY GATE. Block closure if any blocker-class behavioral obligation
+      is NEEDS_TEST, UNPROVEN, UNCERTAIN_BLOCKING, or lacks non-intersection evidence.
+
+
+      Final gate scope:
+
+      - MCP-1: current/runtime MCP instance liveness and owner-token boundary proof.
+
+      - MCP-2: empty `resofeed://sources` and `resofeed://rules/active` resources
+      serialize arrays as `[]`, never `null`.
+
+      - MCP capability parity: protocol surface, resource MIME declarations, tool
+      schemas, HTTP/MCP consistency, owner-token/security boundaries, idempotency/receipt
+      semantics.
+
+      - Documentation sync and architecture invariants.
+
+
+      Independence: gate-reviewer MUST NOT be the same agent as implementation step
+      `mcp-audit-empty-resources-fix`.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Public MCP API/runtime surface and owner-token security boundary are in scope.
+
+      - Audit closure requires real runtime liveness evidence and finding-by-finding
+      closure.
+
+
+      Gate OPEN requires:
+
+      1. `mcp-audit-fresh-db-resource-retest` PASS with payload evidence for `sources:
+      []` and `rules: []`.
+
+      2. `mcp-audit-live-localhost-liveness-probe` PASS with listener + missing-auth
+      401 + valid-token MCP operation proof.
+
+      3. `mcp-audit-parity-security-idempotency-proof` PASS or PASS_WITH_DEBT with
+      only explicit non-blocking debt and no gate-intersecting issues.
+
+      4. `mcp-audit-doc-sync-check` PASS or cited no-doc-change-needed proof.
+
+      5. `mcp-audit-focused-deep-review` says `gate_open_allowed: true`.
+
+      6. No forbidden architecture/product creep.
+
+
+      Gate BLOCK requires creating/remanding remediation ownership for every unresolved
+      blocker-class item; do not label it merely pre-existing or out-of-scope unless
+      non-intersection with all remaining gates is explicit.'
+    verification: 'full-plan-check protecting final audit closure.
+
+      - All verification/finalization steps complete with refs confirmation and concrete
+      output evidence.
+
+      - Gate decision basis maps MCP-1 and MCP-2 to PROVEN status or explicit BLOCK
+      with remediation owner.
+
+      - MCP capability parity, HTTP/MCP consistency, owner-token/security boundaries,
+      idempotency/receipt semantics, liveness, and doc sync are reviewed.
+
+      - No unresolved blocker-class behavioral obligation is bypassed.
+
+      - Final output includes verdict, blockers, gate_open_allowed, and finding-by-finding
+      closure.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key\
+      \ passage or \"NOT READ: <reason>\"\n\n## Final MCP Capability Audit Gate\n\
+      Reviewer: gate-reviewer\nPhase: mcp-capability-audit-verification-and-finalization\n\
+      \n## Evidence Reviewed\n| Step ID | Verdict | Evidence Quality | Concerns |\n\
+      |---|---|---|---|\n| mcp-audit-fresh-db-resource-retest | <verdict> | <quality>\
+      \ | <concerns> |\n| mcp-audit-live-localhost-liveness-probe | <verdict> | <quality>\
+      \ | <concerns> |\n| mcp-audit-parity-security-idempotency-proof | <verdict>\
+      \ | <quality> | <concerns> |\n| mcp-audit-doc-sync-check | <verdict> | <quality>\
+      \ | <concerns> |\n| mcp-audit-focused-deep-review | <verdict> | <quality> |\
+      \ <concerns> |\n\n## Finding-by-Finding Closure\nMCP-1:\n  headline: Current\
+      \ localhost MCP instance was unreachable during live probe\n  severity: P2\n\
+      \  requirement_ref: docs/ARCHITECTURE.md §2 System Boundary and §7 MCP Surface\n\
+      \  behavior_claim: current/runtime MCP endpoint is reachable and owner-token\
+      \ protected\n  evidence_ref: <liveness proof refs>\n  status: PROVEN | NEEDS_TEST\
+      \ | UNPROVEN | UNCERTAIN_BLOCKING\n  closure_path: <closed or remediation step\
+      \ needed>\n  gate_decision_basis: <why final gate may/may not open>\nMCP-2:\n\
+      \  headline: Empty MCP sources and rules/active resources return null arrays\n\
+      \  severity: P2\n  requirement_ref: docs/ARCHITECTURE.md §7 MCP Surface resource\
+      \ bodies\n  behavior_claim: empty resources serialize non-null arrays\n  evidence_ref:\
+      \ <fresh DB payload proof refs>\n  status: PROVEN | NEEDS_TEST | UNPROVEN |\
+      \ UNCERTAIN_BLOCKING\n  closure_path: <closed or remediation step needed>\n\
+      \  gate_decision_basis: <why final gate may/may not open>\n\n## Cross-Cutting\
+      \ Closure\n- MCP capability parity: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\
+      - HTTP/MCP contract consistency: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\
+      - Owner-token/security boundaries: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\
+      - Idempotency/receipt semantics: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\
+      - Runtime/liveness checks: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\
+      - Documentation sync: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n- Architecture/product\
+      \ invariants: PROVEN | BLOCKED | NON_INTERSECTING_WITH_EVIDENCE\n\nverdict:\
+      \ PASS | PASS_WITH_DEBT | FAIL\nblockers:\n  - <blocker or none>\ngate_open_allowed:\
+      \ true | false\nfinal_decision: OPEN | BLOCKED"
+    depends_on:
+    - mcp-audit-fresh-db-resource-retest
+    - mcp-audit-live-localhost-liveness-probe
+    - mcp-audit-parity-security-idempotency-proof
+    - mcp-audit-doc-sync-check
+    - mcp-audit-focused-deep-review
+    agent: gate-reviewer
