@@ -57535,7 +57535,7 @@ phases:
       now mark or supersede stale Source Ledger run/fetch expectations.'
   - id: regression-audit-focused-deep-review
     name: Perform focused deep review of regression remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -57596,6 +57596,90 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T19:12:57.697526+00:00'
+    done_at: '2026-05-12T19:25:59.440488+00:00'
+    evidence: 'Gate-reviewer completed focused deep review with semantic PASS_WITH_DEBT/PASS
+      and no blockers.
+
+
+      Closure fields:
+
+      - Verdict: PASS_WITH_DEBT
+
+      - gate_open_allowed: true
+
+      - blocking_status: CLOSED
+
+      - proof_gap_status: NON_BLOCKING
+
+      - blockers: []
+
+      - Product implementation files modified: false.
+
+
+      Review areas:
+
+      - wiring_completeness: PASS
+
+      - runtime_mcp_api: PASS
+
+      - ui_accessibility: PASS
+
+      - diagnostic_placement: PASS
+
+      - architecture_invariants: PASS
+
+
+      Issues classified:
+
+      - should_fix/non-blocking: Live OpenRouter `model_status=ok` remains unproven;
+      external provider/account debt with no gate-blocking intersection.
+
+      - suggestion/non-blocking: UI runtime proof is Chromium-focused.
+
+      - tech_debt/non-blocking: Historical artifacts still mention superseded Source
+      Ledger fetch/run expectations.
+
+
+      Subagent verification:
+
+      - `go test ./...`: exit 0.
+
+      - `npm run check` initially failed because `svelte-kit` missing, then `npm ci
+      && npm run check`: exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+      - `npx playwright test --config ./playwright.config.ts web/tests/e2e/regression-audit-ui-expected-red.spec.ts
+      --project=chromium-ci-safe`: exit 0; `6 passed`.
+
+      - Escape hatch scan for `@invar:allow|invar:allow` over scoped source/docs:
+      exit 1, no matches.
+
+      - Forbidden Source Ledger control scan for `[RUN INGEST]|[INGESTING...]|[FETCH]|[FETCHING...]`
+      in non-test frontend source: exit 1, no matches.
+
+
+      Artifacts/commits:
+
+      - Worktree commit: `e28f400` (`mcp: add focused regression audit review`).
+
+      - Main squash commit: `901994b` (`[vectl] step-regression-audit-focused-deep-review
+      completed`).
+
+      - Added artifact: `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-focused-deep-review.md`.
+
+
+      Mainline final-state verification after merge:
+
+      - `git diff --check HEAD~1..HEAD && go test ./...`: exit 0; Go tests passed.
+
+      - From `web/`, `npm run check`: exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+
+      Gaps/notes:
+
+      - No blocker-class issue found requiring remediation before final gate.
+
+      - Remaining live-provider debt is explicitly non-blocking and depends on OpenRouter
+      account/provider guardrail/data-policy availability, not repository logic.'
   - id: regression-audit-final-gate
     name: Final gate for regression audit remediation closure
     status: pending
