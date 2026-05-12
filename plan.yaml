@@ -51848,3 +51848,13 @@ phases:
     and uiux-auditor provides a parseable PASS/PASS_WITH_DEBT handoff.
   depends_on:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
+- id: regression-audit-remediation-independent-retest-and-closure
+  name: Regression Audit Remediation — Independent Retest and Closure
+  status: locked
+  gate: Final closure blocks unless every actionable finding REG-2026-05-12-01 through
+    REG-2026-05-12-09 has finding-by-finding verdict, blockers, gate_open_allowed,
+    artifact paths, and explicit remaining gaps; REG-02 must cite the existing MCP
+    audit closure evidence rather than duplicate work.
+  depends_on:
+  - regression-audit-remediation-backend-mcp-and-live-llm-repair
+  - regression-audit-remediation-frontend-surface-repair
