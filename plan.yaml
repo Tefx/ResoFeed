@@ -54328,7 +54328,7 @@ phases:
     agent: gate-reviewer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
-  status: pending
+  status: in_progress
   gate: Frontend gate blocks unless REG-2026-05-12-01 is adjudicated against canonical
     Source Ledger boundaries, forbidden `[RUN INGEST]` / `[FETCH]` controls are not
     reintroduced, REG-2026-05-12-03, -05, -07, -08, and -09 are fixed with rendered
@@ -54340,7 +54340,7 @@ phases:
   steps:
   - id: regression-source-ledger-controls-fix
     name: Adjudicate Source Ledger control regression audit conflict
-    status: pending
+    status: claimed
     description: 'step_type: authority_adjudication
 
       agent_source: project
@@ -54489,6 +54489,8 @@ phases:
 
       - Product creep check: no forbidden dashboard/management behavior introduced'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-12T14:17:38.451036+00:00'
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
     status: pending
