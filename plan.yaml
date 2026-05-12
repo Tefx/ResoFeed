@@ -50791,7 +50791,7 @@ phases:
       - none'
 - id: mcp-capability-audit-contract-lock-and-expected-red-tests
   name: MCP Capability Audit — Contract Lock and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Contract/test phase blocks unless audit findings MCP-1 and MCP-2 are translated
     into explicit proof obligations and MCP-2 has expected-red coverage before implementation.
   depends_on:
@@ -51048,7 +51048,7 @@ phases:
       \ step; no runtime implementation files were changed."
   - id: mcp-audit-contract-gate
     name: Gate MCP audit contract and expected-red coverage
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -51136,9 +51136,99 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T08:53:29.842304+00:00'
+    done_at: '2026-05-12T09:14:41.182472+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file unavailable in isolated worktree; objective artifact bundle\
+      \ supplies the audit finding context for MCP-1 and MCP-2, sufficient for this\
+      \ gate.\n- docs/ARCHITECTURE.md — READ: key passages include one binary `/mcp`\
+      \ boundary at lines 11 and 40; owner-token auth at line 19; MCP surface/auth/resources\
+      \ at lines 833-857; missing/invalid `/mcp` auth returns HTTP 401 before handling\
+      \ at lines 839-847 and 873.\n- AGENTS.md — NOT READ: file unavailable in isolated\
+      \ worktree; project authority/rules were supplied in the task/developer context\
+      \ and used only as invariant context.\n\n## Gate Review Report\nReviewer: gate-reviewer\n\
+      Phase: mcp-capability-audit-contract-lock-and-expected-red-tests\n\n## Verification\
+      \ Run\n- Command: `pwd && git status --short && git branch --show-current`\n\
+      \  Exit Code: 0\n  Evidence: worktree `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/mcp-audit-contract-gate`,\
+      \ branch `vectl/step-mcp-audit-contract-gate`, no local modifications.\n- Command:\
+      \ `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1`\n  Exit Code: 1 (EXPECTED RED)\n  Evidence: failed with `resofeed://sources\
+      \ resource field \"sources\" = null, want empty JSON array; text={\"sources\"\
+      :null}` and `resofeed://rules/active resource field \"rules\" = null, want empty\
+      \ JSON array; text={\"rules\":null}`.\n- Command: `git show --stat --oneline\
+      \ c96e912 && git show --name-only --oneline c96e912`\n  Exit Code: 0\n  Evidence:\
+      \ expected-red commit changed only `internal/resofeed/mcp_integration_test.go`.\n\
+      \n## Finding-by-Finding Closure Basis\nMCP-1:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ lines 11, 40, 833-847, 873; supplied audit context says current localhost\
+      \ MCP instance was unreachable and no process listened on TCP port 8080.\n \
+      \ behavior_claim: current-instance liveness must be proven later through the\
+      \ real `resofeed serve` Go binary, not just handler tests.\n  runtime_proof_expected:\
+      \ listener proof, missing-auth POST /mcp returns HTTP 401 before JSON-RPC dispatch,\
+      \ valid-token initialize/resources/list/resources/read succeeds through real\
+      \ /mcp, shutdown cleanup evidence.\n  evidence_ref: objective downstream scheduled\
+      \ step `mcp-audit-live-localhost-liveness-probe`; source comment in `internal/resofeed/mcp_integration_test.go:128-132`.\n\
+      \  status: PROOF_OBLIGATION_SCHEDULED\n  closure_path: mcp-audit-live-localhost-liveness-probe\n\
+      \  gate_decision_basis: remediation may proceed because MCP-1 is correctly retained\
+      \ as a downstream liveness/proof-closure blocker and is not represented as already\
+      \ fixed.\n\nMCP-2:\n  requirement_ref: docs/ARCHITECTURE.md lines 852-857 require\
+      \ `resofeed://sources` as `{ \"sources\": [Source] }` and `resofeed://rules/active`\
+      \ as `{ \"rules\": [SteerRule] }`.\n  behavior_claim: fresh empty resource reads\
+      \ must serialize empty arrays, not null, for `sources` and `rules`.\n  runtime_proof_expected:\
+      \ expected-red coverage now; implementation fix and retest in downstream remediation.\n\
+      \  evidence_ref: `internal/resofeed/mcp_integration_test.go:78-95`; focused\
+      \ test output observed expected red for both URIs; `internal/resofeed/mcp.go:363-380`\
+      \ still marshals current nil slices.\n  status: EXPECTED_RED_COVERED\n  closure_path:\
+      \ mcp-audit-empty-resources-fix and downstream retest/gate\n  gate_decision_basis:\
+      \ remediation may proceed because the failing test is scoped to the known MCP-2\
+      \ defect and the expected-red commit is test-only.\n\n## Behavioral Proof Register\n\
+      - requirement_ref: MCP-1 /mcp runtime liveness and owner-token boundary\n  behavior_claim:\
+      \ real current `resofeed serve` exposes reachable authenticated MCP Streamable\
+      \ HTTP.\n  runtime_proof_expected: build/start binary, TCP listener, unauthenticated\
+      \ 401, valid-token initialize/resources/list/resources/read doctor, cleanup.\n\
+      \  evidence_ref: downstream scheduled closure path `mcp-audit-live-localhost-liveness-probe`;\
+      \ architecture lines 833-847 and 873.\n  status: PROOF_OBLIGATION_SCHEDULED\n\
+      \  closure_path: mcp-audit-live-localhost-liveness-probe\n  gate_decision_basis:\
+      \ acceptable to open remediation because proof is scheduled behind remediation\
+      \ and cannot be treated as closed at this gate.\n\n- requirement_ref: MCP-2\
+      \ empty resources response shape\n  behavior_claim: fresh empty `resofeed://sources`\
+      \ and `resofeed://rules/active` return arrays, not nulls.\n  runtime_proof_expected:\
+      \ expected-red test fails before fix; downstream fix turns it green without\
+      \ scope expansion.\n  evidence_ref: `internal/resofeed/mcp_integration_test.go:78-95`;\
+      \ focused test output.\n  status: EXPECTED_RED_COVERED\n  closure_path: mcp-audit-empty-resources-fix\n\
+      \  gate_decision_basis: acceptable to open remediation because defect is captured\
+      \ by a behavioral test and no implementation fix was included.\n\n## Test/Gate\
+      \ Semantic Reporting\nstep_intent: phase-check protecting `mcp-capability-audit-remediation`.\n\
+      expected_result: MCP-2 expected-red test fails for null-vs-empty-array; MCP-1\
+      \ remains scheduled as downstream liveness closure.\nobserved_result: expected-red\
+      \ test fails exactly on `sources:null` and `rules:null`; MCP-1 closure path\
+      \ is supplied and explicit.\nfailure_alignment: aligned with MCP-2 audit gap;\
+      \ no unrelated failure observed in focused command.\nproduct_implementation_files_modified:\
+      \ expected-red step no; contract-lock step modified implementation files comments\
+      \ only per objective evidence, with no runtime logic changes accepted.\nverdict:\
+      \ PASS\nblockers: []\n\n## Risk Classification\nBlockers: []\nWarnings:\n- Required\
+      \ audit doc and AGENTS.md were absent from this isolated worktree. This is not\
+      \ blocking because the objective bundle and prompt supplied the material audit/project\
+      \ context, and architecture was read directly.\nNotes:\n- MCP-1 remains unproven\
+      \ by design at this phase and must not be marked closed until the live localhost\
+      \ liveness probe passes.\n- MCP-2 remediation must avoid changing product scope\
+      \ or adding MCP-only concepts.\n\n## Gate Decision\nheadline: PASS\nverdict:\
+      \ PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      \n## Action Summary\nIndependent gate review completed. Contract/test phase\
+      \ is ready for remediation.\n\n## Artifacts Modified\nNone. No commit was created\
+      \ because this verification step required no code/doc changes and worktree status\
+      \ is clean.\n\n## Mainline Merge and Final-State Verification\n- Merge: `git\
+      \ merge --squash vectl/step-mcp-audit-contract-gate` reported `Already up to\
+      \ date. (nothing to squash)`; no step commit was needed because the gate was\
+      \ read-only and branch had no changes.\n- Mainline expected-red verification\
+      \ command: `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1`; observed expected exit code 1 with the same `sources:null` and\
+      \ `rules:null` failures, confirming MCP-2 remains captured before remediation.\n\
+      \n## Programmatic Handoff\n{\"status\":\"SUCCESS\",\"verdict\":\"PASS\",\"gate_open_allowed\"\
+      :true,\"orchestrator_action_hint\":\"COMPLETE\",\"blockers\":[],\"warnings\"\
+      :[\"audit doc and AGENTS.md unavailable in isolated worktree; objective context\
+      \ used\"],\"modified_artifacts\":[]}"
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
-  status: locked
+  status: pending
   gate: Remediation gate blocks unless MCP-2 null-array response shaping is fixed
     within the existing MCP/HTTP response surfaces without expanding product scope.
   depends_on:
