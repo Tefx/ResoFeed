@@ -462,6 +462,9 @@ func (h apiHandler) handleActiveSteeringRules(w http.ResponseWriter, r *http.Req
 		writeInternal(w)
 		return
 	}
+	if rules == nil {
+		rules = []SteerRule{}
+	}
 	writeJSON(w, http.StatusOK, RulesResponse{Rules: rules})
 }
 

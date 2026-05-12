@@ -365,6 +365,9 @@ func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (
 		var rules []SteerRule
 		rules, err = loadActiveSteerRules(ctx, h.db)
 		if err == nil {
+			if rules == nil {
+				rules = []SteerRule{}
+			}
 			payload, err = json.Marshal(RulesResponse{Rules: rules})
 		}
 	case "resofeed://system/doctor":
@@ -472,7 +475,7 @@ func listSourcesForMCP(ctx context.Context, db *sql.DB) ([]Source, error) {
 		return nil, fmt.Errorf("list MCP sources: %w", err)
 	}
 	defer func() { _ = rows.Close() }()
-	var sources []Source
+	sources := []Source{}
 	for rows.Next() {
 		var source Source
 		var lastFetch sql.NullString
