@@ -164,7 +164,19 @@ where i.id = ?`, itemID)
 	detail.ExtractedText = stringPtrFromNull(extractedText)
 	detail.Provenance = Provenance{SourceURL: sourceURL.String, CanonicalURL: stringPtrFromNull(canonicalURL), OriginalURL: detail.URL, StoryKey: detail.StoryKey, DuplicateOfItemID: detail.DuplicateOfItemID}
 	sanitizeReadableDetail(&detail)
+	normalizeDetailExtractionStatus(&detail)
 	return detail, nil
+}
+
+func normalizeDetailExtractionStatus(detail *ItemDetail) {
+	if detail == nil || detail.ExtractionStatus != extractionStatusFull || strings.TrimSpace(derefString(detail.ExtractedText)) != "" {
+		return
+	}
+	if strings.TrimSpace(derefString(detail.FeedExcerpt)) != "" {
+		detail.ExtractionStatus = extractionStatusPartial
+		return
+	}
+	detail.ExtractionStatus = extractionStatusOriginalNA
 }
 
 func rebuildSearchIndexTx(ctx context.Context, tx *sql.Tx) error {

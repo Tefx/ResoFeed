@@ -518,6 +518,12 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		return "", extractionStatusOriginalNA
 	}
 	cleaned, _ := sanitizeReadablePayloadText(extracted)
+	if strings.TrimSpace(cleaned) == "" {
+		if strings.TrimSpace(fallback) != "" {
+			return "", extractionStatusPartial
+		}
+		return "", extractionStatusOriginalNA
+	}
 	return cleaned, extractionStatusFull
 }
 

@@ -56,6 +56,16 @@ func TestExtractionStatusMappingCoversFullPartialAndOriginalUnavailable(t *testi
 		t.Fatalf("partial extraction = (%q, %q), want empty/partial_extraction", text, status)
 	}
 
+	boilerplateOnly := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>Sign up for our newsletter</article></body></html>`)
+	}))
+	defer boilerplateOnly.Close()
+
+	text, status = extractArticleText(context.Background(), boilerplateOnly.URL, "fallback excerpt")
+	if status != extractionStatusPartial || text != "" {
+		t.Fatalf("boilerplate-only extraction = (%q, %q), want empty/partial_extraction", text, status)
+	}
+
 	text, status = extractArticleText(context.Background(), "://bad-url", "")
 	if status != extractionStatusOriginalNA || text != "" {
 		t.Fatalf("unavailable extraction = (%q, %q), want empty/original_unavailable", text, status)
