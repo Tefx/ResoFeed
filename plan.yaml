@@ -53310,3 +53310,64 @@ phases:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
     agent: doc-reviewer
+  - id: regression-audit-focused-deep-review
+    name: Perform focused deep review of regression remediation
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), perform a focused deep review for
+      systemic regressions that per-family checks may miss.
+
+
+      Review focus:
+
+      - Wiring completeness: Source Ledger controls are reachable from real rendered
+      UI and real API client behavior.
+
+      - Runtime/API/MCP: /mcp owner-token boundary, empty-resource array shape from
+      existing MCP chain, read_item detail parity, and no idempotency/receipt regressions.
+
+      - UI/accessibility: mobile utility route containment, Search submit uniqueness,
+      stale receipt scoping.
+
+      - Diagnostic placement: feed/Inspector primary surfaces stay dense and non-diagnostic
+      while /doctor remains raw.
+
+      - Architecture invariants: no accounts/OAuth/RBAC, vector/RAG, sync/merge, service
+      layer, sidecar worker, event bus, per-agent registry, folders/tags/unread/archive.
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - regression evidence quality
+
+      - forbidden scope creep
+
+      - real runtime proof vs handler/component-only proof'
+    verification: 'phase-check protecting regression-audit-final-gate.
+
+      - Deep review evidence explicitly checks wiring, runtime, UI/accessibility,
+      diagnostic placement, and architecture invariants.
+
+      - Findings are classified as blocker/should_fix/suggestion/tech_debt with gate
+      intersection reasoning.
+
+      - Any blocker-class issue has a remediation owner before final gate can open.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Focused\
+      \ Deep Review Report\nreview_areas:\n  wiring_completeness: PASS | FAIL\n  runtime_mcp_api:\
+      \ PASS | FAIL\n  ui_accessibility: PASS | FAIL\n  diagnostic_placement: PASS\
+      \ | FAIL\n  architecture_invariants: PASS | FAIL\nissues:\n  - severity: blocker\
+      \ | should_fix | suggestion | tech_debt\n    description: <issue>\n    related_finding:\
+      \ <REG id or cross-cutting>\n    gate_intersection: <why blocking/non-blocking>\n\
+      verdict: PASS | PASS_WITH_DEBT | FAIL\nblockers: []\ngate_open_allowed: true\
+      \ | false\nremaining_gaps: []"
+    depends_on:
+    - regression-audit-full-runtime-retest
+    - regression-audit-spec-conformance-review
+    agent: gate-reviewer
