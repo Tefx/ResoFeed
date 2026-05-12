@@ -52728,7 +52728,7 @@ phases:
       (cached)\n```\n\n## Files changed\nNone."
 - id: regression-audit-remediation-contract-matrix-and-expected-red-tests
   name: Regression Audit Remediation — Contract Matrix and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Contract/test phase blocks unless every actionable finding in docs/audits/regression-audit-2026-05-12.md
     is mapped to an owner, REG-2026-05-12-02 is explicitly delegated to the existing
     MCP capability audit chain, and expected-red/proof tests exist for distinct non-duplicative
@@ -52738,7 +52738,7 @@ phases:
   steps:
   - id: regression-audit-contract-matrix
     name: Lock regression audit matrix with Source Ledger boundary adjudication
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - behavioral proof matrix\n  - product-boundary adjudication record\n  -\
       \ existing public surface contracts\n  - test obligations\nagent_source: project\n\
@@ -52837,6 +52837,8 @@ phases:
 
       - Statement that no product code changed.'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-12T12:46:18.671796+00:00'
   - id: regression-audit-ui-expected-red-tests
     name: Add expected-red UI regression tests with Source Ledger boundary guard
     status: pending
