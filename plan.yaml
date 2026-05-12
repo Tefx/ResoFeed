@@ -51754,7 +51754,7 @@ phases:
     claimed_at: '2026-05-12T09:37:59.056666+00:00'
   - id: mcp-audit-parity-security-idempotency-proof
     name: Verify MCP capability parity, owner-token boundary, and receipt semantics
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -51871,6 +51871,8 @@ phases:
       \ or none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: SUPPORTING_PROOF\
       \ | BLOCKED\n  MCP-2: SUPPORTING_PROOF | BLOCKED"
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-12T09:38:06.025962+00:00'
   - id: mcp-audit-doc-sync-check
     name: Check documentation sync for MCP audit closure
     status: claimed
