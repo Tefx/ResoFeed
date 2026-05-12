@@ -52709,43 +52709,64 @@ phases:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
   steps:
   - id: regression-source-ledger-controls-fix
-    name: Restore Source Ledger manual ingest and fetch controls
+    name: Adjudicate Source Ledger control regression audit conflict
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: authority_adjudication
 
       agent_source: project
 
 
-      Complete the frontend implementation for REG-2026-05-12-01 within existing Source
-      Ledger and HTTP API contracts. This phase depends on the contract/test phase;
-      consume `regression-audit-ui-expected-red-tests`.
+      Adjudicate and remediate the REG-2026-05-12-01 regression audit conflict without
+      reintroducing forbidden Source Ledger run/fetch/manual-ingest controls.
 
 
       Finding context:
 
-      - REG-2026-05-12-01 — Source Ledger is missing manual ingest and fetch controls.
+      - REG-2026-05-12-01 audit text expected Source Ledger global `[RUN INGEST]`
+      and per-source `[FETCH]` controls.
 
-      - Audit observed `[DELETE]`, `[DETAILS]`, `[IMPORT OPML]`, `[EXPORT STATE]`,
-      and `[IMPORT STATE]`, but no global `[RUN INGEST]` or per-source `[FETCH]` controls
-      on current, isolated, or mobile Source Ledger.
+      - Current canonical boundary from AGENTS.md, docs/ARCHITECTURE.md, docs/DESIGN.md,
+      docs/PRD.md, and prior final strict closure forbids Source Ledger management-dashboard
+      behavior: Source Ledger is view/delete/import/export/details only; source addition
+      remains via Steer; background ingest handles refresh.
 
-      - Expected labels/states from PRD/DESIGN/ui-preview: `[RUN INGEST]`, `[INGESTING...]`,
-      `[FETCH]`, `[FETCHING...]`, raw `err: <diagnostic>`, `last_ingest`, `last_fetch`.
+      - Therefore the implementation intent is NOT to restore controls. The intent
+      is to document authority, preserve the boundary, and adjust tests/audit expectations
+      so forbidden controls are rejected.
 
 
       YOUR SCOPE:
 
-      - Reinstate Source Ledger props/actions for `runIngest` and per-source `fetchSource`
-      using existing API client/HTTP operations.
+      - Read the canonical Source Ledger authority and the regression audit passages.
 
-      - Render `[RUN INGEST]` in the ledger header with last_ingest status.
+      - Produce an adjudication record explaining why Source Ledger controls remain
+      absent, OR, only if a newer authoritative docs/ARCHITECTURE.md or docs/DESIGN.md
+      section explicitly supersedes the boundary, produce an explicit deviation record
+      before any implementation is considered.
 
-      - Render per-source `[FETCH]` / `[FETCHING...]`, raw error diagnostic, and updated
-      last_fetch without row layout shift.
+      - Ensure frontend tests and proof expectations treat `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, and `[FETCHING...]` as forbidden Source Ledger action controls under
+      current authority.
 
-      - Preserve flat Source Ledger grammar; do not add folders, tags, unread counts,
-      archive bins, settings sliders, drag-and-drop, accounts, OAuth/RBAC, or service-layer
-      abstractions.
+      - Preserve allowed Source Ledger behavior: source list visibility, delete, details/diagnostics
+      visibility, import/export state/OPML, accurate source-add receipt/background-ingest
+      guidance, and no stale Search receipt leakage.
+
+      - If docs/ui-preview.html or audit text conflicts with canonical docs, mark
+      it as SPEC_POSSIBLY_STALE or authority conflict; do not implement the stale
+      expectation.
+
+
+      FORBIDDEN:
+
+      - Do NOT add, restore, or render Source Ledger `[RUN INGEST]` / `[FETCH]` /
+      manual ingest controls.
+
+      - Do NOT wire Source Ledger controls to manual ingestion HTTP actions.
+
+      - Do NOT loosen product constraints by adding dashboards, folders, tags, unread
+      counts, archive bins, settings sliders, drag-and-drop, accounts, OAuth/RBAC,
+      sidecars, service layers, or sync/merge concepts.
 
 
       Likely touch paths:
@@ -52754,63 +52775,90 @@ phases:
 
       - web/src/routes/+page.svelte
 
-      - web/src/lib/api-client.ts
+      - web/src/routes/components/__tests__/*.test.ts
 
-      - web/src/lib/api-contract.ts
+      - web/src/lib/playwright-e2e-harness-contract.test.ts
 
-      - web/src/app.css
+      - docs/audits/artifacts/regression-audit-2026-05-12c/*
 
 
       ## Frontend Completion Criteria (rendering required)
 
-      Completion requires BOTH logic correctness and rendering completeness. Controls
-      must be visible, accessible, clickable through rendered UI, and backed by real
-      API calls. Evidence MUST include rendered output or screenshot/DOM artifact.
+      If code/test adjustments are needed, evidence MUST include rendered output or
+      DOM artifact proving Source Ledger remains usable while forbidden controls are
+      absent.
 
 
       ## Completion Criteria (stub exclusion)
 
-      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Hardcoded
-      controls that do not call real existing operations do not satisfy this step.
+      This is an adjudication/remediation step. Stub-only or summary-only completion
+      is not acceptable; evidence must contain concrete spec citations and rendered/test
+      proof for the boundary.
 
 
       known_risks:
 
-      - Source Ledger is a canonical design surface; do not invent alternate labels.
+      - Source Ledger is a canonical design surface; audit artifacts can be stale
+      relative to docs/ARCHITECTURE.md and docs/DESIGN.md.
 
       - Shared file conflict: web/src/routes/+page.svelte is also touched by other
-      UI fixes, so downstream UI containment step is serialized after this one.
+      UI fixes, so downstream UI containment step remains serialized after this one.
 
 
       ## Gate Preview (what the gate WILL reject)
 
-      1. Missing `[RUN INGEST]` or per-source `[FETCH]` on desktop/mobile Source Ledger.
+      1. Any reintroduced Source Ledger `[RUN INGEST]` or per-source `[FETCH]` action
+      control without newer canonical docs and explicit deviation record.
 
-      2. Controls that render but do not invoke real API operations.
+      2. Treating stale audit/ui-preview expectations as higher authority than ARCHITECTURE/DESIGN.
 
-      3. Row layout shift or loss of existing `[DELETE]`, `[DETAILS]`, import/export
-      state operations.
+      3. Loss of existing allowed Source Ledger actions or diagnostics/details visibility.
 
-      4. Any forbidden product creep or architecture expansion.'
+      4. Inaccurate guidance about source addition via Steer or background ingest
+      refresh.'
     verification: 'local-check protecting frontend runtime retest and uiux audit.
 
-      - REG-01 expected-red tests now pass.
+      - REG-01 boundary-guard tests pass: Source Ledger does NOT show `[RUN INGEST]`
+      / `[FETCH]` action controls.
 
-      - Rendered Source Ledger shows `[RUN INGEST]` and per-source `[FETCH]` in desktop
-      and mobile/narrow views.
+      - Evidence includes an adjudication record citing canonical docs and any conflicting
+      audit/ui-preview passages.
 
-      - At least one real/manual action path is exercised against existing HTTP API
-      client behavior.
+      - Rendered Source Ledger proof shows allowed view/delete/import/export/details/diagnostics
+      behavior remains intact.
 
-      - Existing Source Ledger actions remain present and row grammar remains stable.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## REG-2026-05-12-01\
-      \ Fix Evidence\ncommands:\n  - <exact frontend test/build command>\noutputs_or_artifacts:\n\
-      \  - <rendered DOM/screenshot/artifact path>\nvisible_controls:\n  run_ingest:\
-      \ <present/absent>\n  per_source_fetch: <present/absent>\nreal_api_path_exercised:\
-      \ <yes/no + evidence>\nverdict: PASS | FAIL\nblockers: []\ngate_open_allowed:\
-      \ true | false\nremaining_gaps: []"
-    agent: frontend-engineer
+      - Source-add receipt/background-ingest guidance remains accurate.
+
+      - No manual ingestion/fetch controls or HTTP wiring are added unless newer canonical
+      docs explicitly supersede the boundary and a deviation record exists.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Source Ledger Boundary Adjudication Evidence
+
+      - Canonical authority cited: <ARCHITECTURE/DESIGN/PRD passages>
+
+      - Conflicting audit/ui-preview text: <passage or none>
+
+      - Decision: controls remain forbidden | deviation required by newer canonical
+      docs
+
+      - Forbidden controls proof: `[RUN INGEST]` absent, `[FETCH]` absent from Source
+      Ledger action controls
+
+      - Allowed behavior proof: view/delete/import/export/details/diagnostics and
+      source-add/background-ingest guidance
+
+      - Product creep check: no forbidden dashboard/management behavior introduced'
+    agent: spec-verifier
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
     status: pending
