@@ -55183,7 +55183,7 @@ phases:
     claimed_at: '2026-05-12T15:37:59.455367+00:00'
   - id: regression-frontend-uiux-audit
     name: Audit regression UI repairs and Source Ledger boundary against DESIGN.md
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -55276,6 +55276,8 @@ phases:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-12T15:38:14.124119+00:00'
   - id: regression-frontend-surface-gate
     name: Gate frontend regression surface repair with Source Ledger boundary
     status: pending
