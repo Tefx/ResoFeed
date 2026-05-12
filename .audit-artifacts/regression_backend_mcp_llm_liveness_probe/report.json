@@ -2,7 +2,7 @@
   "failures": [],
   "observations": {
     "artifacts": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe",
-    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3",
+    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3",
     "doctor": {
       "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor.txt",
       "contains_raw_secret": false,
@@ -33,13 +33,13 @@
       "status": 200
     },
     "migration": {
-      "command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61321 --public-url http://127.0.0.1:61321 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+      "command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:61442 --public-url http://127.0.0.1:61442 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
       "ready": true,
       "stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stderr.log",
       "stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stdout.log"
     },
     "port_bound": true,
-    "serve_command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61321 --public-url http://127.0.0.1:61321 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+    "serve_command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:61442 --public-url http://127.0.0.1:61442 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
     "server_stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stderr.log",
     "server_stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stdout.log",
     "stub_runtime_openrouter_key": "<non-secret dummy value injected only to satisfy startup validation>"
