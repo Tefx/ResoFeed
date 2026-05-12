@@ -54544,15 +54544,36 @@ phases:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
   steps:
   - id: regression-source-ledger-controls-fix
-    name: Adjudicate Source Ledger control regression audit conflict
+    name: Adjudicate and remediate Source Ledger control authority conflict
     status: claimed
-    description: 'step_type: authority_adjudication
+    description: 'step_type: implementation
+
+      authority_adjudication: true
 
       agent_source: project
 
 
       Adjudicate and remediate the REG-2026-05-12-01 regression audit conflict without
-      reintroducing forbidden Source Ledger run/fetch/manual-ingest controls.
+      reintroducing forbidden Source Ledger run/fetch/manual-ingest controls. This
+      step is intentionally assigned to an implementation-capable frontend agent because
+      the prior read-only/static adjudication attempt could not update stale artifacts/tests
+      or produce rendered DOM proof.
+
+
+      Concurrent failure context:
+
+      - Prior attempt by `spec-verifier` produced useful static adjudication but made
+      no changes, could not bootstrap frontend dependencies, and produced no rendered
+      DOM proof.
+
+      - Do NOT repeat the same failure mode: if dependencies are absent, perform the
+      documented dependency bootstrap for the frontend workspace before declaring
+      proof unavailable. If bootstrap fails, evidence must include the exact command/output
+      and blocker.
+
+      - Static adjudication alone is insufficient for this step; code/test/artifact
+      updates are in scope when stale audit/ui-preview/test expectations conflict
+      with canonical authority.
 
 
       Finding context:
@@ -54566,8 +54587,8 @@ phases:
       remains via Steer; background ingest handles refresh.
 
       - Therefore the implementation intent is NOT to restore controls. The intent
-      is to document authority, preserve the boundary, and adjust tests/audit expectations
-      so forbidden controls are rejected.
+      is to document authority, preserve the boundary, and adjust tests/audit/ui-preview
+      expectations so forbidden controls are rejected.
 
 
       YOUR SCOPE:
@@ -54579,9 +54600,12 @@ phases:
       section explicitly supersedes the boundary, produce an explicit deviation record
       before any implementation is considered.
 
-      - Ensure frontend tests and proof expectations treat `[RUN INGEST]`, `[INGESTING...]`,
-      `[FETCH]`, and `[FETCHING...]` as forbidden Source Ledger action controls under
-      current authority.
+      - Update or mark stale docs/audit/ui-preview/test artifacts as authority conflicts
+      where they still require manual Source Ledger controls.
+
+      - Preserve REG-01 negative assertions: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,
+      and `[FETCHING...]` remain forbidden Source Ledger action controls under current
+      authority.
 
       - Preserve allowed Source Ledger behavior: source list visibility, delete, details/diagnostics
       visibility, import/export state/OPML, accurate source-add receipt/background-ingest
@@ -54591,6 +54615,9 @@ phases:
       it as SPEC_POSSIBLY_STALE or authority conflict; do not implement the stale
       expectation.
 
+      - Run focused frontend tests and produce rendered Source Ledger proof after
+      dependency bootstrap.
+
 
       FORBIDDEN:
 
@@ -54598,6 +54625,8 @@ phases:
       manual ingest controls.
 
       - Do NOT wire Source Ledger controls to manual ingestion HTTP actions.
+
+      - Do NOT weaken REG-01 negative assertions while updating stale artifacts/tests.
 
       - Do NOT loosen product constraints by adding dashboards, folders, tags, unread
       counts, archive bins, settings sliders, drag-and-drop, accounts, OAuth/RBAC,
@@ -54616,18 +54645,32 @@ phases:
 
       - docs/audits/artifacts/regression-audit-2026-05-12c/*
 
+      - docs/ui-preview.html or related preview/audit artifacts if present and stale
+
+
+      ## Dependency bootstrap / rendered proof requirement
+
+      - If frontend dependencies are absent, run the documented install/bootstrap
+      command for the web workspace before proof attempts.
+
+      - Evidence MUST include the exact dependency/bootstrap command(s), focused test
+      command(s), and rendered DOM/browser/test-renderer artifact path(s).
+
+      - Rendered proof must show Source Ledger remains usable while forbidden controls
+      are absent; a static text adjudication is not enough.
+
 
       ## Frontend Completion Criteria (rendering required)
 
-      If code/test adjustments are needed, evidence MUST include rendered output or
-      DOM artifact proving Source Ledger remains usable while forbidden controls are
-      absent.
+      Evidence MUST include rendered output or DOM artifact proving Source Ledger
+      remains usable while forbidden controls are absent.
 
 
       ## Completion Criteria (stub exclusion)
 
-      This is an adjudication/remediation step. Stub-only or summary-only completion
-      is not acceptable; evidence must contain concrete spec citations and rendered/test
+      This is an implementation-capable adjudication/remediation step. Stub-only or
+      summary-only completion is not acceptable; evidence must contain concrete spec
+      citations, any stale-artifact/test updates, focused test output, and rendered/test
       proof for the boundary.
 
 
@@ -54638,6 +54681,9 @@ phases:
 
       - Shared file conflict: web/src/routes/+page.svelte is also touched by other
       UI fixes, so downstream UI containment step remains serialized after this one.
+
+      - Read-only verifier failure mode: do not leave remediation to a static-only
+      agent when stale artifacts/tests need edits.
 
 
       ## Gate Preview (what the gate WILL reject)
@@ -54650,50 +54696,51 @@ phases:
       3. Loss of existing allowed Source Ledger actions or diagnostics/details visibility.
 
       4. Inaccurate guidance about source addition via Steer or background ingest
-      refresh.'
+      refresh.
+
+      5. Evidence that contains only static adjudication and no dependency-bootstrap/rendered
+      DOM proof.'
     verification: 'local-check protecting frontend runtime retest and uiux audit.
 
+      - Dependency bootstrap: if frontend dependencies were absent, exact install/bootstrap
+      command and output are included; if bootstrap fails, blocker and output are
+      recorded.
+
       - REG-01 boundary-guard tests pass: Source Ledger does NOT show `[RUN INGEST]`
-      / `[FETCH]` action controls.
+      / `[FETCH]` action controls, and negative assertions are not weakened.
 
       - Evidence includes an adjudication record citing canonical docs and any conflicting
-      audit/ui-preview passages.
+      audit/ui-preview passages marked as stale authority conflicts or deviation records.
 
       - Rendered Source Ledger proof shows allowed view/delete/import/export/details/diagnostics
-      behavior remains intact.
+      behavior remains intact and forbidden manual controls are absent.
 
       - Source-add receipt/background-ingest guidance remains accurate.
 
       - No manual ingestion/fetch controls or HTTP wiring are added unless newer canonical
       docs explicitly supersede the boundary and a deviation record exists.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-
-      For each ref in this step:
-
-      - <filename> — key passage or "NOT READ: <reason>"
-
-
-      If no refs were provided, state: "No refs for this step."
-
-
-      ## Source Ledger Boundary Adjudication Evidence
-
-      - Canonical authority cited: <ARCHITECTURE/DESIGN/PRD passages>
-
-      - Conflicting audit/ui-preview text: <passage or none>
-
-      - Decision: controls remain forbidden | deviation required by newer canonical
-      docs
-
-      - Forbidden controls proof: `[RUN INGEST]` absent, `[FETCH]` absent from Source
-      Ledger action controls
-
-      - Allowed behavior proof: view/delete/import/export/details/diagnostics and
-      source-add/background-ingest guidance
-
-      - Product creep check: no forbidden dashboard/management behavior introduced'
-    agent: spec-verifier
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\
+      \n\nIf no refs were provided, state: \"No refs for this step.\"\n\n## Source\
+      \ Ledger Authority Remediation Evidence\n- Canonical authority decision: <summary\
+      \ with cited sections>\n- Conflicting stale artifacts/tests found:\n  | Path\
+      \ | Conflict | Action taken |\n  | --- | --- | --- |\n- REG-01 negative assertions\
+      \ preserved: yes/no with test names.\n\n## Dependency Bootstrap / Rendered Proof\n\
+      - Bootstrap/install commands and output:\n  ```\n  <actual commands and output>\n\
+      \  ```\n- Focused test commands and output:\n  ```\n  <actual commands and output>\n\
+      \  ```\n- Rendered DOM/browser/test-renderer artifact(s): <paths>\n- Forbidden\
+      \ controls present? MUST be NO for `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,\
+      \ `[FETCHING...]`.\n- Allowed behavior visible: source list, delete, details/diagnostics,\
+      \ import/export, source-add/background-ingest guidance.\n\ngate_open_allowed:\
+      \ true|false\nblockers: <list or []>"
+    refs:
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PRD.md
+    agent: frontend-engineer
     claimed_by: spec-verifier
     claimed_at: '2026-05-12T14:17:38.451036+00:00'
   - id: regression-ui-containment-and-diagnostics-fix
