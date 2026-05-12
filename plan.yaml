@@ -52738,7 +52738,7 @@ phases:
   steps:
   - id: regression-audit-contract-matrix
     name: Lock regression audit matrix with Source Ledger boundary adjudication
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - behavioral proof matrix\n  - product-boundary adjudication record\n  -\
       \ existing public surface contracts\n  - test obligations\nagent_source: project\n\
@@ -52839,6 +52839,185 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-12T12:46:18.671796+00:00'
+    done_at: '2026-05-12T13:03:31.503923+00:00'
+    evidence: "**Headline**: PASS\n**Blocking Status**: CLOSED\n**Proof-Gap Status**:\
+      \ NON_BLOCKING\n**Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**:\
+      \ COMPLETE\n\n## refs Read Confirmation (MANDATORY)\n- `docs/audits/regression-audit-2026-05-12.md`\
+      \ — NOT READ: absent from isolated worktree because orchestrator confirms it\
+      \ is untracked in the main worktree and not propagated to isolated step worktrees.\
+      \ Used the REG findings supplied in the task prompt as the available audit-passage\
+      \ authority for this contract matrix.\n- `docs/ARCHITECTURE.md` — read in prior\
+      \ pass. Key passages: one Go binary, one SQLite DB, thin HTTP/MCP transports,\
+      \ OpenRouter JSON transformer, lexical retrieval only, owner-token boundary/no\
+      \ accounts; ingestion is a background operation; Steer owns source subscription\
+      \ and invariant conflict receipts; state portability excludes sync/ledger/merge.\n\
+      - `docs/DESIGN.md` — read in prior pass. Key passages: Source Ledger is flat\
+      \ and limited to title, OPML import, flat rows, delete action, and state export/import\
+      \ links; URL subscription routes users back to Steer; use Steer for RSS URL\
+      \ paste/correction/`/doctor`; keep Source Ledger flat and delete-only beyond\
+      \ import/export.\n- `docs/PRD.md` — read in prior pass. Key passages: “Steer\
+      \ + Flat Ledger”; source addition via Steer; ledger only viewing source name/URL\
+      \ and deleting, OPML flattened; lexical/metadata search, no RAG/vector; MCP/agent\
+      \ capabilities required.\n- `AGENTS.md` — NOT READ: absent from isolated worktree.\
+      \ Project-level AGENTS authority was supplied in session context and is consistent\
+      \ with ARCHITECTURE/DESIGN.\n- `docs/ui-preview.html` — read in prior pass.\
+      \ Key passage: preview Source Ledger currently shows `[RUN INGEST]` and `[FETCH]`,\
+      \ conflicting with canonical Source Ledger boundary unless superseded.\n\n##\
+      \ Contract Matrix Evidence\n- Contract artifact changed/created: none; the contract\
+      \ artifact is this response evidence matrix.\n- Commit hash(es): none; no files\
+      \ modified. Mainline merge was no-op.\n- Worktree/branch verified in prior pass:\
+      \ `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-audit-contract-matrix`,\
+      \ branch `vectl/step-regression-audit-contract-matrix`.\n- Prior HEAD observed:\
+      \ `b877eddcf3aea036b72546ab7e587afa375b9ebd`.\n\n| REG ID | Audit claim / key\
+      \ passage | Authority adjudication | Owner phase/step | Expected behavior |\
+      \ Forbidden regression | Required proof artifact | Closure path |\n|---|---|---|---|---|---|---|---|\n\
+      | REG-2026-05-12-01 | Prompt-supplied audit finding: audit expected Source Ledger\
+      \ `[RUN INGEST]` / `[FETCH]`. | SPEC/AUDIT CONFLICT. Canonical DESIGN/PRD restrict\
+      \ Source Ledger to flat view/delete/import/export/details; source addition routes\
+      \ through Steer; ingestion is background-owned. UI preview showing `[RUN INGEST]`/`[FETCH]`\
+      \ is subordinate conflict, not supersession. | Fix owner: `regression-source-ledger-controls-fix`;\
+      \ test coverage: `regression-audit-ui-expected-red-tests`; final closure: `regression-frontend-surface-gate`,\
+      \ `regression-audit-final-gate`. | Source addition through Steer; background\
+      \ ingest handles refresh; Source Ledger may show status/details/delete/import/export\
+      \ only. | Reintroducing `[RUN INGEST]` or `[FETCH]` controls in Source Ledger\
+      \ without newer ARCH/DESIGN supersession and recorded deviation. | Authority\
+      \ record plus frontend expected-red coverage proving controls are absent or\
+      \ rejected; final surface gate evidence. | Close as product-boundary adjudication;\
+      \ frontend repair removes/keeps out forbidden controls; gates prove no regression.\
+      \ |\n| REG-2026-05-12-02 | Prompt-supplied audit finding: MCP empty resources\
+      \ serialize arrays as `null` (P2). | Valid MCP schema issue but explicitly delegated;\
+      \ do not duplicate implementation in this contract step. | Closed/cross-referenced\
+      \ owner: `mcp-audit-final-gate`; upstream MCP chain: `mcp-audit-contract-lock`,\
+      \ `mcp-audit-empty-resources-red-tests`, `mcp-audit-empty-resources-fix`, `mcp-audit-fresh-db-resource-retest`.\
+      \ | Empty MCP resource arrays serialize as `[]`, not `null`. | Duplicate implementation/test\
+      \ ownership in regression audit contract scope. | Existing MCP final gate proof\
+      \ showing fresh DB resources payloads with arrays as `[]`. | Cross-reference\
+      \ only; no duplicate implementation. |\n| REG-2026-05-12-03 | Prompt-supplied\
+      \ audit finding: Search exposes duplicate visible submit controls (P2). | Actionable\
+      \ UI regression. DESIGN Steer/Search require clear lightweight input semantics\
+      \ and accessible controls. | Test owner: `regression-audit-ui-expected-red-tests`;\
+      \ fix owner: `regression-ui-containment-and-diagnostics-fix`; retest/gates:\
+      \ `regression-frontend-route-integration-retest`, `regression-frontend-uiux-audit`,\
+      \ `regression-frontend-surface-gate`. | One active visible submit control per\
+      \ Search input/surface, deterministic accessible name. | Duplicate visible submit\
+      \ buttons for the same active query. | Browser/a11y snapshot and UI regression\
+      \ test proving one submit. | Expected-red test → UI containment/diagnostics\
+      \ fix → route retest → UI/UX audit → frontend surface gate. |\n| REG-2026-05-12-04\
+      \ | Prompt-supplied audit finding: MCP `read_item` can return full item without\
+      \ extracted detail text (P2). | Actionable MCP/read parity issue. ARCH requires\
+      \ `ItemDetail` with excerpt/extracted text/provenance; PRD requires visible\
+      \ extraction limitations. | Test owner: `regression-audit-mcp-read-item-expected-red-tests`;\
+      \ fix owner: `regression-mcp-read-item-detail-fix`; retest/gate: `regression-backend-mcp-llm-liveness-probe`,\
+      \ `regression-backend-mcp-llm-gate`. | `read_item` returns extracted text when\
+      \ available, fallback excerpt when not, and provenance/status accurately reflecting\
+      \ limitation. | Claiming/implying full detail while `extracted_text`/detail\
+      \ text is absent. | MCP `read_item` fixture response and assertion covering\
+      \ full/partial/fallback detail. | Expected-red MCP test → read-item detail fix\
+      \ → backend MCP/LLM liveness probe → backend gate. |\n| REG-2026-05-12-05 |\
+      \ Prompt-supplied audit finding: Mobile utility surfaces leak inactive Today\
+      \ feed into page/accessibility flow (P1/P2). | Actionable UI/a11y issue. DESIGN\
+      \ mobile utility surfaces require full-screen/route behavior for non-feed contexts.\
+      \ | Test owner: `regression-audit-ui-expected-red-tests`; fix owner: `regression-ui-containment-and-diagnostics-fix`;\
+      \ retest/audit/gates: `regression-frontend-route-integration-retest`, `regression-frontend-uiux-audit`,\
+      \ `regression-frontend-surface-gate`. | Active utility surface owns mobile layout\
+      \ and a11y flow; inactive Today feed hidden/unmounted/inert. | Today feed remains\
+      \ reachable by scroll/focus/screen reader while Source Ledger/Search/Doctor\
+      \ active. | Mobile accessibility snapshot and focus traversal proof. | Expected-red\
+      \ UI test → containment fix → route integration retest → UI/UX audit → frontend\
+      \ surface gate. |\n| REG-2026-05-12-06 | Prompt-supplied audit finding: Current\
+      \ live LLM path is not healthy (P1 current instance, P2 product regression until\
+      \ classified). | Actionable but environment-sensitive. ARCH OpenRouter diagnostics\
+      \ and fallback contract require live/fallback distinction; PRD fallback taxonomy\
+      \ forbids misleading health. | Contract owner: `regression-audit-llm-health-proof-contract`;\
+      \ fix owner: `regression-live-llm-health-classification-fix`; retest/gate: `regression-backend-mcp-llm-liveness-probe`,\
+      \ `regression-backend-mcp-llm-gate`. | Live model-backed summaries are distinguished\
+      \ from fallback/feed-excerpt summaries; `/doctor` health cannot mark fallback-only\
+      \ as live success. | Treating fallback-only current summaries as successful\
+      \ live model summaries. | Redacted live-smoke proof or classified environment\
+      \ failure with `/doctor` output and item status evidence. | Proof contract →\
+      \ live health classification fix → backend MCP/LLM liveness probe → backend\
+      \ gate. |\n| REG-2026-05-12-07 | Prompt-supplied audit finding: Source Ledger\
+      \ inherits stale Search receipt (P3). | Actionable UI state isolation issue.\
+      \ DESIGN receipts are inline transparency records, not accumulated activity/surface-global\
+      \ state. | Test owner: `regression-audit-ui-expected-red-tests`; fix owner:\
+      \ `regression-ui-containment-and-diagnostics-fix`; retest/audit/gates: `regression-frontend-route-integration-retest`,\
+      \ `regression-frontend-uiux-audit`, `regression-frontend-surface-gate`. | Receipts\
+      \ scoped to current command/affected surface and cleared/isolated on Source\
+      \ Ledger transition. | Stale Search receipt appears as Source Ledger feedback.\
+      \ | UI navigation test: Search → Source Ledger receipt state. | Expected-red\
+      \ UI test → containment/diagnostics fix → route retest → UI/UX audit → frontend\
+      \ surface gate. |\n| REG-2026-05-12-08 | Prompt-supplied audit finding: Feed\
+      \ row metadata is overly diagnostic (P3). | Actionable design polish. DESIGN\
+      \ feed anatomy requires compact provenance/quality microcopy; raw diagnostics\
+      \ belong in Inspector/provenance disclosure or `/doctor`, not primary row noise.\
+      \ | Test owner: `regression-audit-ui-expected-red-tests`; fix owner: `regression-ui-containment-and-diagnostics-fix`;\
+      \ retest/audit/gates: `regression-frontend-route-integration-retest`, `regression-frontend-uiux-audit`,\
+      \ `regression-frontend-surface-gate`. | Feed row metadata is terse: source,\
+      \ age, extraction/value tier as needed; enough provenance without raw internals.\
+      \ | Raw parser/model/internal diagnostic noise in primary feed row. | Screenshot/a11y\
+      \ text assertion over feed rows. | Expected-red UI test → containment/diagnostics\
+      \ fix → route retest → UI/UX audit → frontend surface gate. |\n| REG-2026-05-12-09\
+      \ | Prompt-supplied audit finding: Inspector exposes model status in the primary\
+      \ reading header (P3). | Actionable design polish. DESIGN Inspector header prioritizes\
+      \ source/provenance/title/original/extraction; diagnostics belong in `/doctor`\
+      \ or secondary material provenance. | Test owner: `regression-audit-ui-expected-red-tests`;\
+      \ fix owner: `regression-ui-containment-and-diagnostics-fix`; retest/audit/gates:\
+      \ `regression-frontend-route-integration-retest`, `regression-frontend-uiux-audit`,\
+      \ `regression-frontend-surface-gate`. | Inspector primary header avoids noisy\
+      \ model status; model diagnostics appear only as secondary/material provenance\
+      \ or `/doctor`. | Model status promoted into primary reading header as noisy\
+      \ reading chrome. | Inspector screenshot/a11y proof. | Expected-red UI test\
+      \ → containment/diagnostics fix → route retest → UI/UX audit → frontend surface\
+      \ gate. |\n\n## REG-01 Authority Adjudication Record\nDecision path:\n1. The\
+      \ prompt supplies the audit finding that Source Ledger was expected to expose\
+      \ `[RUN INGEST]` / `[FETCH]`.\n2. Canonical `docs/DESIGN.md` says Source Ledger\
+      \ anatomy is title, OPML import, flat source rows, delete action, and state\
+      \ export/import links. URL subscription must route users back to Steer.\n3.\
+      \ Canonical `docs/DESIGN.md` Do’s say to use Steer for RSS URL paste/correction/`/doctor`\
+      \ and keep Source Ledger flat/delete-only beyond import/export.\n4. `docs/PRD.md`\
+      \ defines “Steer + Flat Ledger”: source addition by RSS URL in Steer; ledger\
+      \ only supports viewing source name/URL and deleting; OPML flattened.\n5. `docs/ARCHITECTURE.md`\
+      \ makes ingestion a background responsibility and does not elevate manual Source\
+      \ Ledger run/fetch controls to product primitives.\n6. `docs/ui-preview.html`\
+      \ currently displays `[RUN INGEST]`/`[FETCH]`; this is a UI-preview-vs-canonical-doc\
+      \ conflict, not a reason to restore those controls.\n7. Disposition: REG-01\
+      \ is a product-boundary conflict. Source Ledger manual run/fetch controls are\
+      \ rejected unless newer `docs/ARCHITECTURE.md` or `docs/DESIGN.md` explicitly\
+      \ supersede the boundary and the deviation is recorded.\n\n## REG-02 Overlap\
+      \ Delegation Record\nREG-02 is intentionally not implemented or duplicated here.\
+      \ The MCP empty-resources array/null family is closed/cross-referenced through\
+      \ `mcp-audit-final-gate` and its upstream MCP chain. This matrix only records\
+      \ that ownership and required proof: empty resource arrays serialize as `[]`,\
+      \ not `null`.\n\n## Product Boundary / Invariant Check\n- Single Go binary preserved:\
+      \ no files changed.\n- SQLite/FTS5 only preserved: no storage/indexing scope\
+      \ changed.\n- Owner-token boundary preserved: no accounts/OAuth/RBAC/per-agent\
+      \ registry introduced.\n- LLM remains OpenRouter JSON-in/JSON-out transformer\
+      \ only: no orchestration/state ownership added.\n- Source Ledger remains flat\
+      \ and limited to view/delete/import/export/details; `[RUN INGEST]`/`[FETCH]`\
+      \ restoration is forbidden by this adjudication.\n- No sync/merge/event bus/service-layer/product-creep\
+      \ introduced.\n- No production code, UI implementation, or tests changed.\n\n\
+      ## Coverage Summary\n- Total REG findings required: 9\n- REG findings mapped\
+      \ exactly once: 9\n- Owner phase/step assigned without TBD: 9\n- REG findings\
+      \ implemented here: 0\n- REG findings delegated/cross-referenced: 1 (`REG-2026-05-12-02`)\n\
+      - Authority conflicts recorded: 1 (`REG-2026-05-12-01`)\n- Product code changes:\
+      \ 0\n- Contract artifact: response evidence matrix\n- Missing refs treated as\
+      \ non-blocking availability limitations: `docs/audits/regression-audit-2026-05-12.md`,\
+      \ `AGENTS.md`\n\n## Behavioral Proof Register\nbehavioral_proof_register:\n\
+      \  REG-2026-05-12-01: PROVEN\n  REG-2026-05-12-02: PROVEN\n  REG-2026-05-12-03:\
+      \ NEEDS_TEST\n  REG-2026-05-12-04: NEEDS_TEST\n  REG-2026-05-12-05: NEEDS_TEST\n\
+      \  REG-2026-05-12-06: NEEDS_TEST\n  REG-2026-05-12-07: NEEDS_TEST\n  REG-2026-05-12-08:\
+      \ NEEDS_TEST\n  REG-2026-05-12-09: NEEDS_TEST\n\n## Verification\nPrior verification\
+      \ evidence:\n- Required canonical docs were read where present.\n- `docs/audits/regression-audit-2026-05-12.md`\
+      \ and worktree-local `AGENTS.md` were absent and recorded as NOT READ.\n- Worktree/branch\
+      \ verified: `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-audit-contract-matrix`,\
+      \ branch `vectl/step-regression-audit-contract-matrix`.\n- `git diff --stat`\
+      \ returned no output in prior pass.\n- No new commands or file modifications\
+      \ were performed for corrected evidence response.\n- Mainline final-state verification\
+      \ after no-op squash merge: `go test ./...` -> `? resofeed/cmd/resofeed [no\
+      \ test files]`, `ok resofeed/internal/resofeed (cached)`.\n\n## Gate Decision\n\
+      headline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\n\n## Files changed\nnone; contract artifact is this response evidence\
+      \ matrix."
   - id: regression-audit-ui-expected-red-tests
     name: Add expected-red UI regression tests with Source Ledger boundary guard
     status: pending
