@@ -294,9 +294,9 @@
 
   function summaryProvenanceDisclosure(value: InspectableItem): string {
     const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
-    if (hasModelText) return `summary provenance: model-backed · model_status: ${value.model_status}`;
+    if (hasModelText) return 'summary provenance: model-backed';
     const fallback = summaryText(value) ? 'fallback excerpt-only' : 'fallback unavailable';
-    return `summary provenance: ${fallback} · model_status: ${value.model_status}`;
+    return `summary provenance: ${fallback}`;
   }
 
   $effect(() => {

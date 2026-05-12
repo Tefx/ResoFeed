@@ -768,7 +768,10 @@ a:focus,
   }
 
   .shell-grid[data-surface='inspector'] .feed-pane,
-  .shell-grid[data-surface='feed'] .detail-pane {
+  .shell-grid[data-surface='feed'] .detail-pane,
+  .shell-grid[data-surface='ledger'] .feed-pane,
+  .shell-grid[data-surface='search'] .feed-pane,
+  .shell-grid[data-surface='doctor'] .feed-pane {
     display: none;
   }
 
@@ -802,10 +805,6 @@ a:focus,
   .search-primary-row {
     grid-template-columns: 1fr auto;
     gap: var(--rf-space-sm);
-  }
-
-  .search-submit-a11y {
-    display: none;
   }
 
   .search-primary-row label {

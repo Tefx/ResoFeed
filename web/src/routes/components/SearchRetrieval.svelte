@@ -82,7 +82,6 @@
       <label for="search-query">Plain text query</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status search-contract-note" />
       <button type="submit">search</button>
-      <button class="search-submit-a11y" type="submit" aria-label="submit search">submit search</button>
     </div>
     <details class="search-secondary-filters" open={!compactFilters}>
       <summary>filters</summary>

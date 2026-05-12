@@ -191,7 +191,7 @@
         window.history.pushState({}, '', canonicalPath);
       }
     }
-    if (surface === 'feed' && steerFeedback.kind === 'receipt' && steerFeedback.text.startsWith('retrieval:')) {
+    if (surface !== 'search' && steerFeedback.kind === 'receipt' && steerFeedback.text.startsWith('retrieval:')) {
       steerFeedback = { kind: 'idle' };
       searchSeedQuery = '';
       steerCommand = '';
@@ -390,7 +390,7 @@
       </details>
     </header>
 
-    {#if steerFeedback.kind === 'receipt'}
+    {#if steerFeedback.kind === 'receipt' && (!steerFeedback.text.startsWith('retrieval:') || currentSurface === 'search')}
       <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>
     {:else if steerFeedback.kind === 'error'}
       <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>

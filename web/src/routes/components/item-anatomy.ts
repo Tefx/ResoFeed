@@ -93,15 +93,14 @@ export function itemExtractionLabel(status: ItemSummary['extraction_status']): s
 
 export function itemSummaryProvenanceLabel(item: ItemSummary): string {
   if (readableItemText(itemDisplayExcerpt(item))) {
-    return item.model_status === 'ok' ? 'model-backed' : 'fallback: excerpt-only';
+    return item.model_status === 'ok' ? 'model-backed' : 'fallback';
   }
-  if (item.model_status === 'model_latency_error') return 'fallback: model_status model_latency_error';
-  return 'fallback: unavailable';
+  return 'fallback';
 }
 
 export function itemPriorityLabel(item: ItemSummary): string {
   if (item.value_tier) return `value: ${item.value_tier}`;
-  if (item.model_status !== 'ok') return `quality: ${itemSummaryProvenanceLabel(item)}`;
+  if (item.model_status !== 'ok') return `quality: ${itemExtractionLabel(item.extraction_status)}`;
   if (item.extraction_status !== 'full') return `quality: ${itemExtractionLabel(item.extraction_status)}`;
   return 'quality: source-backed';
 }
