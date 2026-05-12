@@ -51228,7 +51228,7 @@ phases:
       \ used\"],\"modified_artifacts\":[]}"
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
-  status: pending
+  status: in_progress
   gate: Remediation gate blocks unless MCP-2 null-array response shaping is fixed
     within the existing MCP/HTTP response surfaces without expanding product scope.
   depends_on:
@@ -51236,7 +51236,7 @@ phases:
   steps:
   - id: mcp-audit-empty-resources-fix
     name: Fix empty MCP sources and active rules array serialization
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\n\nComplete the\
       \ implementation within existing signatures for MCP-2. This phase depends on\
       \ `mcp-capability-audit-contract-lock-and-expected-red-tests`; consume the contract\
@@ -51323,6 +51323,8 @@ phases:
       finding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2: FIXED_LOCALLY\
       \ | GAP"
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T09:16:26.077850+00:00'
   - id: mcp-audit-remediation-gate
     name: Gate MCP audit remediation implementation
     status: pending
