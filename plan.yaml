@@ -50860,6 +50860,115 @@ phases:
       finding_closure:\n  MCP-1: CONTRACT_LOCKED | GAP\n  MCP-2: CONTRACT_LOCKED |\
       \ GAP"
     agent: golang-developer
+  - id: mcp-audit-empty-resources-red-tests
+    name: Add expected-red tests for empty MCP sources and active rules arrays
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define the MCP-2 gap before implementation.
+
+
+      Audit failure context:
+
+      - Finding MCP-2: fresh isolated DB returned `resofeed://sources` as `{ "sources":
+      null }` and `resofeed://rules/active` as `{ "rules": null }`.
+
+      - Required behavior from docs/ARCHITECTURE.md MCP Surface and Resource JSON
+      Bodies: fresh empty state serializes as `{ "sources": [] }` and `{ "rules":
+      [] }`.
+
+      - `resofeed://feed/today` already returns `items: []`; use it as the expected
+      response-shaping pattern where helpful.
+
+
+      Scope:
+
+      - Modify tests only: expected location `internal/resofeed/mcp_integration_test.go`
+      or a focused Go test file in `internal/resofeed/`.
+
+      - Use a fresh migrated SQLite database with no seeded sources and no active
+      steering rules.
+
+      - Exercise the real MCP resource read path through `NewMCPHandler` or the existing
+      real-bound listener harness; do not assert handler internals only.
+
+      - Parse the JSON text for `resofeed://sources` and `resofeed://rules/active`
+      and assert the array fields are present and empty arrays, never `null`.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      At least one test fixture MUST:
+
+      - Use the exact documented resource URIs from docs/ARCHITECTURE.md.
+
+      - Use a minimal fresh DB fixture; do not insert convenience rows that mask empty-slice
+      serialization.
+
+      - Cite the spec section the fixture was derived from.
+
+
+      Expected-red semantics:
+
+      - Red is expected before the MCP-2 implementation fix if current code still
+      marshals nil slices.
+
+      - Success for this step means the gap is exposed without modifying product code.
+
+      - Evidence MUST list `expected_failures` or `exposed_gaps` and identify downstream
+      owner `mcp-audit-empty-resources-fix`.
+
+
+      touch_paths:
+
+      - internal/resofeed/mcp_integration_test.go
+
+      - internal/resofeed/*_test.go
+
+
+      harness_refs:
+
+      - mcpResourceText / mcpRequestJSON helpers in internal/resofeed/mcp_integration_test.go
+
+      - newContractDB test fixture
+
+
+      authoritative_interface: `resources/read` for `resofeed://sources` and `resofeed://rules/active`.'
+    verification: 'local-check protecting mcp-audit-contract-gate and downstream implementation.
+
+      - Test-only diff: modified files limited to `internal/resofeed/*_test.go` plus
+      fixtures/helpers.
+
+      - Focused expected-red run exposes MCP-2 null-array gap before implementation.
+
+      - Tests cite exact resource URIs and assert JSON array presence for both `sources`
+      and `rules`.
+
+      - No product implementation code is changed in this step.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red Test\
+      \ Evidence\n- Modified files limited to tests/helpers: <yes/no; list>\n- Exact\
+      \ test names added: <test names>\n- Command executed:\n  ```\n  <focused go\
+      \ test command>\n  ```\n- Actual output:\n  ```\n  <paste output showing expected\
+      \ red, or explain if already green>\n  ```\n- expected_failures / exposed_gaps:\n\
+      \  - MCP-2: <observed null-array failure or already-green rationale>\n- Downstream\
+      \ implementation owner: mcp-audit-empty-resources-fix\n- Spec-derived minimal\
+      \ fixture used: <yes/no; cited section>\n\nverdict: PASS | PASS_WITH_DEBT |\
+      \ FAIL\nblockers:\n  - <blocker or none>\ngate_open_allowed: true | false\n\
+      finding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2: EXPECTED_RED_DEFINED\
+      \ | GAP"
+    depends_on:
+    - mcp-audit-contract-lock
+    agent: golang-developer
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
   status: locked
