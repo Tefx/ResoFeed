@@ -53417,25 +53417,33 @@ phases:
 
 
       This is NOT "do tests pass"; it is "does the repaired behavior match the authoritative
-      specs and audit expectations?"
+      specs, and were stale audit expectations adjudicated correctly?"
 
 
       Scope:
 
-      - docs/audits/regression-audit-2026-05-12.md all actionable findings.
+      - docs/audits/regression-audit-2026-05-12.md all actionable findings, with REG-01
+      control expectations checked against canonical docs before any product-failure
+      conclusion.
 
       - docs/ARCHITECTURE.md constraints for single binary, SQLite/FTS5, owner-token
       boundary, MCP resources/tools, HTTP/API parity, LLM JSON transformer role.
 
-      - docs/DESIGN.md and docs/ui-preview.html for Source Ledger controls, Search/Source
-      Ledger/doctor utility surfaces, feed row anatomy, and Inspector primary metadata.
+      - docs/DESIGN.md for Source Ledger boundary, Search/Source Ledger/doctor utility
+      surfaces, feed row anatomy, and Inspector primary metadata.
 
-      - docs/PRD.md Source Ledger/manual ingestion ACs and retrieval/Inspector expectations.
+      - docs/PRD.md Source Ledger/source-add/background-ingest guidance and retrieval/Inspector
+      expectations.
+
+      - docs/ui-preview.html only as subordinate preview evidence; if it conflicts
+      with ARCHITECTURE/DESIGN, mark SPEC_POSSIBLY_STALE or authority conflict.
 
 
       Focus areas:
 
-      - Character-exact UI labels: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`.
+      - Source Ledger boundary: view/delete/import/export/details/diagnostics allowed;
+      `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]` controls forbidden
+      unless newer canonical docs explicitly supersede and deviation is recorded.
 
       - Boundary/visibility semantics: inactive mobile feed must not remain in active
       visual/accessibility flow.
@@ -53459,20 +53467,33 @@ phases:
 
       - Every REG finding receives CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC/SPEC_POSSIBLY_STALE.
 
+      - REG-01 review explicitly confirms whether audit/ui-preview control expectations
+      conflict with canonical docs, and blocks any forbidden control reintroduction.
+
       - Any NEEDS_TEST/UNPROVEN item has closure path before gate can open.
 
       - Invariant violations are blocker-class unless explicit non-intersection is
       proven.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Spec Conformance\
-      \ Report\nrequirements_register:\n  - id: REG-2026-05-12-01\n    spec_ref: <section>\n\
-      \    requirement: <text>\n    evidence_ref: <artifact>\n    verdict: CONFORMS\
-      \ | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC | SPEC_POSSIBLY_STALE\n\
-      \  - id: REG-2026-05-12-02\n    spec_ref: <section>\n    requirement: <text>\n\
-      \    evidence_ref: <artifact>\n    verdict: CONFORMS | DIVERGES | PARTIAL |\
-      \ NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC | SPEC_POSSIBLY_STALE\ncoverage_summary:\
-      \ <counts>\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps: []\n\
-      verdict: PASS | PASS_WITH_DEBT | FAIL"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec Conformance Report
+
+      - Requirements register.
+
+      - Evidence table with 7-verdict model.
+
+      - REG-01 authority/conflict disposition.
+
+      - Top risks and suggested tests for NEEDS_TEST items.'
     depends_on:
     - regression-audit-full-runtime-retest
     agent: spec-verifier
