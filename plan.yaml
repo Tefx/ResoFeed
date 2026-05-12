@@ -53623,7 +53623,9 @@ phases:
       This final gate MUST NOT open unless every actionable finding has finding-by-finding
       closure evidence:
 
-      - REG-2026-05-12-01 — Source Ledger is missing manual ingest and fetch controls.
+      - REG-2026-05-12-01 — Source Ledger control audit conflict adjudicated; canonical
+      boundary preserved; no `[RUN INGEST]` / `[FETCH]` controls unless newer canonical
+      docs explicitly supersede with deviation record.
 
       - REG-2026-05-12-02 — MCP empty resources serialize arrays as null (must cite
       existing MCP capability audit chain closure, not duplicate work).
@@ -53655,17 +53657,25 @@ phases:
       - PASS_WITH_DEBT is allowed only for non-blocking debt with explicit non-intersection
       from remaining gates.
 
+      - REG-01 may open only if Source Ledger forbidden controls are absent and any
+      audit/docs/ui-preview conflict is resolved against canonical docs or by explicit
+      newer-doc deviation.
+
 
       review_depth: THOROUGH
 
       review_depth_rationale:
 
       - Final full-plan regression closure across UI, accessibility, HTTP/MCP, LLM,
-      docs, and architecture invariants.'
+      docs, architecture invariants, and product-boundary adjudication.'
     verification: 'full-plan-check final gate.
 
       - Every REG finding has a reviewed evidence ref, verdict, blockers, gate_open_allowed
       value, and remaining_gaps field.
+
+      - REG-01 closure confirms Source Ledger hard boundary is preserved: no `[RUN
+      INGEST]` / `[FETCH]` action controls, allowed details/diagnostics/import/export/delete
+      behavior remains, and source-add/background-ingest guidance is accurate.
 
       - Existing MCP capability audit closure is cited for REG-02 and remains compatible
       with this regression audit closure.
@@ -53676,38 +53686,26 @@ phases:
       non-intersecting.
 
       - ResoFeed architecture/product invariants remain intact.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Final Regression\
-      \ Audit Gate Decision\nfinding_register:\n  REG-2026-05-12-01:\n    behavior_claim:\
-      \ <claim>\n    evidence_ref: <artifact/step>\n    status: PROVEN | NEEDS_TEST\
-      \ | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed or required remediation>\n\
-      \    gate_decision_basis: <why open/block>\n  REG-2026-05-12-02:\n    behavior_claim:\
-      \ <claim>\n    evidence_ref: <existing MCP chain artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-03:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-04:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-05:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-06:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-07:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-08:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-09:\n\
-      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
-      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
-      \ or required remediation>\n    gate_decision_basis: <why open/block>\nverdict:\
-      \ OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
-      \ []"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Gate Evidence
+
+      - Finding-by-finding decision table.
+
+      - REG-01 Source Ledger boundary closure proof.
+
+      - REG-02 MCP overlap closure citation.
+
+      - OPEN/BLOCK recommendation and remaining gaps.'
     depends_on:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
