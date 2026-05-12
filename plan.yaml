@@ -55559,6 +55559,7 @@ phases:
     - regression-ui-containment-and-diagnostics-fix
     - regression-frontend-route-integration-retest
     - regression-frontend-uiux-audit
+    - regression-frontend-real-api-proof-uiux-delta-audit
     agent: gate-reviewer
   - id: regression-frontend-real-api-proof-remediation
     name: Remediate real API frontend proof blockers
