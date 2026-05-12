@@ -51553,7 +51553,7 @@ phases:
   steps:
   - id: mcp-audit-fresh-db-resource-retest
     name: Retest fresh-database MCP resource arrays are non-null
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -51655,6 +51655,80 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-12T09:37:53.306759+00:00'
+    done_at: '2026-05-12T09:56:16.564131+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file not present in isolated worktree.\n- docs/ARCHITECTURE.md\
+      \ — §7 MCP Surface requires `/mcp` Remote Streamable HTTP, owner-token auth\
+      \ on every request, resources `resofeed://feed/today`, `resofeed://rules/active`,\
+      \ `resofeed://sources`, and HTTP 401 before tool/resource handling for missing/invalid\
+      \ auth.\n- AGENTS.md — NOT READ: file not present in isolated worktree.\n- internal/resofeed/mcp_integration_test.go\
+      \ — `TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays` uses\
+      \ fresh migrated DB and asserts sources/rules fields are JSON arrays and not\
+      \ null; existing MCP auth/idempotency tests must continue to pass.\n- internal/resofeed/mcp.go\
+      \ — `ServeHTTP` checks auth before JSON-RPC dispatch; resource read path marshals\
+      \ `RulesResponse{Rules: []}` and `SourcesResponse{Sources: sources}`, with `listSourcesForMCP`\
+      \ initialized to `[]Source{}`.\n\n## Retest Evidence\n- Fresh DB fixture path:\
+      \ `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/TestAuditFreshEmptyMCPPayloadSnippets2064316290/001/resofeed.sqlite3`\
+      \ from transient audit probe using `OpenDB` + `RunMigrations`; verified 0 active\
+      \ sources and 0 active steer rules.\n- Commands executed:\n  1. `go test ./internal/resofeed\
+      \ -run 'TestMCP(ResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays|StreamableHTTPResourcesToolsAuthAndIdempotency|RealBoundListenerInitializeResourcesAndTools)$'\
+      \ -count=1 -v` — exit 0\n  2. `go test ./internal/resofeed -run '^TestAuditFreshEmptyMCPPayloadSnippets$'\
+      \ -count=1 -v` — exit 0\n  3. `git status --short` — exit 0, no output\n- Actual\
+      \ output:\n  ```text\n  === RUN   TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency\n\
+      \  --- PASS: TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency (0.01s)\n\
+      \  === RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\n\
+      \  === RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://sources\n\
+      \  === RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://rules/active\n\
+      \  --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ (0.00s)\n      --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://sources\
+      \ (0.00s)\n      --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://rules/active\
+      \ (0.00s)\n  === RUN   TestMCPRealBoundListenerInitializeResourcesAndTools\n\
+      \  --- PASS: TestMCPRealBoundListenerInitializeResourcesAndTools (0.01s)\n \
+      \ PASS\n  ok  \tresofeed/internal/resofeed\t0.582s\n  ```\n  ```text\n  ===\
+      \ RUN   TestAuditFreshEmptyMCPPayloadSnippets\n      mcp_audit_probe_test.go:28:\
+      \ fresh_db_fixture_path=/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/TestAuditFreshEmptyMCPPayloadSnippets2064316290/001/resofeed.sqlite3\n\
+      \      mcp_audit_probe_test.go:50: missing_auth_status=401 body={\"error\":{\"\
+      code\":\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n\
+      \      mcp_audit_probe_test.go:55: invalid_auth_status=401 body={\"error\":{\"\
+      code\":\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n\
+      \      mcp_audit_probe_test.go:66: resource_payload resofeed://sources = {\"\
+      sources\":[]}\n      mcp_audit_probe_test.go:66: resource_payload resofeed://rules/active\
+      \ = {\"rules\":[]}\n      mcp_audit_probe_test.go:66: resource_payload resofeed://feed/today\
+      \ = {\"items\":[]}\n  --- PASS: TestAuditFreshEmptyMCPPayloadSnippets (0.01s)\n\
+      \  PASS\n  ok  \tresofeed/internal/resofeed\t0.446s\n  ```\n- `resofeed://sources`\
+      \ payload: `{\"sources\":[]}`\n- `resofeed://rules/active` payload: `{\"rules\"\
+      :[]}`\n- `resofeed://feed/today` payload: `{\"items\":[]}`\n- Missing/invalid\
+      \ auth proof: missing auth and wrong token both returned HTTP 401 with body\
+      \ `{\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\"\
+      ,\"details\":{}}}` before JSON-RPC response handling.\n- Files changed: none.\
+      \ A transient audit-only test probe was added and removed to print payload snippets;\
+      \ final `git status --short` was clean.\n- Commit hash(es): none created; no\
+      \ final file changes to commit. Worktree HEAD observed: `dac42d15d2deea5afba501ddef263097b05f6a77`.\n\
+      \n## Behavioral Proof Register\nMCP-2:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ §7 MCP Surface; audit MCP-2\n  behavior_claim: empty MCP sources/rules resources\
+      \ serialize arrays as []\n  runtime_proof_expected: fresh DB resource reads\
+      \ through /mcp\n  evidence_ref: targeted go test plus transient real-bound listener\
+      \ audit probe payload logs above\n  proof_status: PROVEN\n  status: PASS\n \
+      \ closure_path: none\n  gate_decision_basis: Fresh migrated empty DB over real\
+      \ bound `/mcp` returned `{\"sources\":[]}`, `{\"rules\":[]}`, and `{\"items\"\
+      :[]}`; missing/invalid auth returned HTTP 401.\n\n## Verification Report: mcp-audit-fresh-db-resource-retest\n\
+      **Headline**: PASS\n**Blocking Status**: CLOSED\n**Proof-Gap Status**: NONE\n\
+      **Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**: COMPLETE\n\
+      \n### Artifacts Modified\n- none\n\n## Gate Decision\nheadline: PASS\nverdict:\
+      \ PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      \n## Mainline Final-State Verification\nAfter no-op squash merge, mainline command:\n\
+      ```text\ngo test ./internal/resofeed -run 'TestMCP(ResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays|StreamableHTTPResourcesToolsAuthAndIdempotency|RealBoundListenerInitializeResourcesAndTools)$'\
+      \ -count=1 -v\n```\nOutput:\n```text\n=== RUN   TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency\n\
+      --- PASS: TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency (0.02s)\n===\
+      \ RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\n\
+      === RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://sources\n\
+      === RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://rules/active\n\
+      --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ (0.01s)\n    --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://sources\
+      \ (0.00s)\n    --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays/resofeed://rules/active\
+      \ (0.00s)\n=== RUN   TestMCPRealBoundListenerInitializeResourcesAndTools\n---\
+      \ PASS: TestMCPRealBoundListenerInitializeResourcesAndTools (0.01s)\nPASS\n\
+      ok  \tresofeed/internal/resofeed\t0.578s\n```"
   - id: mcp-audit-live-localhost-liveness-probe
     name: Probe current localhost MCP liveness and owner-token boundary
     status: claimed
