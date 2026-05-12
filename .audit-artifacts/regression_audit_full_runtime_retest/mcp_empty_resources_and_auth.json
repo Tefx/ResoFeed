@@ -1,0 +1,23 @@
+{
+  "unauthorized_api_sources": {
+    "status": 401,
+    "content_type": "application/json; charset=utf-8",
+    "body": "{\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n"
+  },
+  "mcp_initialize": {
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\":\"2025-03-26\",\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"}}}\n"
+  },
+  "mcp_empty_sources": {
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "body": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"contents\":[{\"uri\":\"resofeed://sources\",\"mimeType\":\"application/json\",\"text\":\"{\\\"sources\\\":[]}\"}]}}\n"
+  },
+  "mcp_empty_rules": {
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "body": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"contents\":[{\"uri\":\"resofeed://rules/active\",\"mimeType\":\"application/json\",\"text\":\"{\\\"rules\\\":[]}\"}]}}\n"
+  },
+  "serve_command": "bin/resofeed serve --addr 127.0.0.1:<port> --public-url http://127.0.0.1:<port> --db <temp-sqlite> --owner-token <redacted-owner-token>"
+}
