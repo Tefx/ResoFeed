@@ -169,8 +169,8 @@ async function importFixtureFeed(page: Page, runInfo: { readonly artifactRoot: s
   await openSourceLedger(page);
   await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByText(/src: ResoFeed E2E Local Source/)).toBeVisible({ timeout: 20_000 });
   await openToday(page);
 }
 

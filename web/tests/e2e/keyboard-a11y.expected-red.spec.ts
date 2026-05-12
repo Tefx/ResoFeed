@@ -99,7 +99,7 @@ test('expected-red keyboard a11y Steer submit doctor log and Inspector original 
   });
 });
 
-test('expected-red keyboard a11y Source Ledger OPML state and fetch controls', async ({ page, ownerToken, runInfo }, testInfo) => {
+test('expected-red keyboard a11y Source Ledger OPML state without manual fetch controls', async ({ page, ownerToken, runInfo }, testInfo) => {
   await enterOwnerToken(page, ownerToken);
   const ledgerNav = page.getByRole('button', { name: 'SOURCE LEDGER' });
   await ledgerNav.focus();
@@ -115,15 +115,10 @@ test('expected-red keyboard a11y Source Ledger OPML state and fetch controls', a
   await opmlInput.setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
 
-  const runIngest = page.getByRole('button', { name: '[RUN INGEST]' });
-  await focusAndAudit(runIngest, 'Source Ledger run ingest');
-  await page.keyboard.press('Space');
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
-
-  const fetchSource = page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' });
-  await focusAndAudit(fetchSource, 'Source Ledger per-source fetch');
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: /Fetch(?:ing)? ResoFeed E2E Local Source/ })).toBeVisible();
+  for (const forbiddenName of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]'] as const) {
+    await expect(page.getByRole('button', { name: forbiddenName }), `${forbiddenName} must not be keyboard reachable from Source Ledger`).toHaveCount(0);
+  }
+  await expect(page.getByRole('button', { name: /run ingest|ingesting|fetch|fetching/i }), 'Source Ledger must not expose keyboard-reachable manual ingestion/fetch controls').toHaveCount(0);
 
   await focusAndAudit(page.getByRole('button', { name: 'Delete source: ResoFeed E2E Local Source' }), 'Source Ledger delete source');
   await focusAndAudit(page.getByRole('button', { name: 'export state' }), 'State export action');

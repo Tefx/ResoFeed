@@ -34,10 +34,7 @@ async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string }, o
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
   }
   const feedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-  if (!(await feedItem.isVisible().catch(() => false))) {
-    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-    await expect(page.getByText(/status: ok/)).toBeVisible({ timeout: 15_000 });
-  }
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
   await steer(page, 'today');
   await expect(feedItem).toBeVisible({ timeout: 10_000 });
 }

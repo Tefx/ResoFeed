@@ -60,8 +60,8 @@ async function importFixtureAndOpenInspector(page: Page, ownerToken: string, opm
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   await page.getByLabel('import OPML').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByText(/PRD Inspector Fixture Source · ok · last fetch:/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByText(/PRD Inspector Fixture Source/)).toBeVisible({ timeout: 20_000 });
   await page.getByRole('button', { name: 'TODAY' }).click();
   await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
 

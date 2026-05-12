@@ -36,13 +36,13 @@ export async function enterOwnerToken(page: Page, ownerToken: string): Promise<v
 export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): Promise<void> {
   await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  const sourceText = page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/);
+  const sourceText = page.getByText(/ResoFeed E2E Local Source/);
   if (!(await sourceText.isVisible().catch(() => false))) {
     await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
-    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
     await expect(sourceText).toBeVisible({ timeout: 15_000 });
   }
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'TODAY' }).click();
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 }
