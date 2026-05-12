@@ -57175,7 +57175,7 @@ phases:
       were not committed.'
   - id: regression-audit-spec-conformance-review
     name: Verify regression fixes against ARCHITECTURE DESIGN PRD and audit contracts
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -57268,6 +57268,104 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-12T19:02:01.910511+00:00'
+    done_at: '2026-05-12T19:12:14.889845+00:00'
+    evidence: 'Spec-verifier completed adversarial conformance review with semantic
+      PASS_WITH_DEBT accepted as non-blocking.
+
+
+      Closure fields:
+
+      - headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blockers: []
+
+      - product implementation files modified: false
+
+
+      Artifact/commits:
+
+      - Worktree commit: `7d1bcb6` (`audit: record regression spec conformance review`).
+
+      - Main squash commit: `4512d29` (`[vectl] step-regression-audit-spec-conformance-review
+      completed`).
+
+      - Durable artifact: `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-spec-conformance-review.md`.
+
+
+      REG conformance verdicts:
+
+      - REG-01: CONFORMS — historical Source Ledger run/fetch expectation is superseded;
+      forbidden controls remain absent.
+
+      - REG-02: CONFORMS — MCP empty `sources`/`rules` serialize as `[]`.
+
+      - REG-03: CONFORMS — Search has one visible submit control.
+
+      - REG-04: CONFORMS — MCP `read_item` returns full extraction detail text.
+
+      - REG-05: CONFORMS — mobile utility routes exclude inactive Today feed from
+      visual/a11y flow.
+
+      - REG-06: CONFORMS_WITH_DEBT — fallback/live LLM classification is honest; no
+      live `model_status=ok` due external provider/account policy debt.
+
+      - REG-07: CONFORMS — Search receipt scoped away from Source Ledger/Today/doctor.
+
+      - REG-08: CONFORMS — feed row metadata compact, no raw model enum foregrounding.
+
+      - REG-09: CONFORMS — Inspector primary copy avoids raw `model_status`.
+
+
+      Authority/conflict disposition:
+
+      - Canonical Architecture/Design plus adjudication artifact supersede the original
+      audit/ui-preview Source Ledger run/fetch expectation.
+
+      - Source Ledger may expose view/delete/import/export/details/diagnostics but
+      must not expose `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]`.
+
+
+      Behavioral proof register:
+
+      - Owner-token API/MCP auth boundary: PROVEN.
+
+      - MCP empty resources return arrays: PROVEN.
+
+      - MCP `read_item` full detail text: PROVEN.
+
+      - Source Ledger forbidden controls absent: PROVEN.
+
+      - Mobile inactive feed excluded: PROVEN.
+
+      - Feed/Inspector diagnostic containment: PROVEN.
+
+      - Fallback-only output not counted as live LLM success: PROVEN.
+
+      - Actual live OpenRouter `model_status=ok`: UNPROVEN but non-blocking provider/account
+      debt.
+
+
+      Mainline final-state verification after merge:
+
+      - `git diff --check HEAD~1..HEAD`: exit 0 with no whitespace/errors.
+
+
+      Risks:
+
+      - Non-blocking REG-06 live-provider debt remains until OpenRouter account/privacy/model
+      availability permits true live success.
+
+      - Historical audit drift around Source Ledger controls must not be reused as
+      implementation guidance.
+
+      - UI behavioral proof is Chromium-focused; optional cross-browser a11y hardening
+      can follow.'
   - id: regression-audit-doc-sync-check
     name: Check documentation sync for regression audit closure
     status: pending
