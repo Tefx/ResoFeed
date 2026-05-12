@@ -55089,7 +55089,7 @@ phases:
       Post-verification status for changed source/artifact paths was clean.'
   - id: regression-frontend-route-integration-retest
     name: Retest frontend routes and Source Ledger boundary behavior
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -55179,8 +55179,6 @@ phases:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
     agent: integration-verifier
-    claimed_by: integration-verifier
-    claimed_at: '2026-05-12T15:37:59.455367+00:00'
   - id: regression-frontend-uiux-audit
     name: Audit regression UI repairs and Source Ledger boundary against DESIGN.md
     status: done
