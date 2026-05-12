@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "sources": [
+      {
+        "id": "src_da1c4c6f43b850651ab9d98522b1c7fa",
+        "url": "http://127.0.0.1:59685/dirty-corpus.xml",
+        "title": "Dirty Inspector Corpus",
+        "last_fetch_at": "2026-05-12T16:11:47Z",
+        "last_fetch_status": "ok",
+        "is_active": true,
+        "revision": 1
+      }
+    ]
+  },
+  "feedItemCount": 12,
+  "searchItemCount": 10,
+  "doctorFirstLine": "rss: ok"
+}

@@ -737,12 +737,17 @@ a:focus,
   }
 
   .shell-command {
-    position: sticky;
-    z-index: 1;
+    position: fixed;
+    z-index: 4;
     inset-block-end: 0;
+    inset-inline: 0;
     order: 2;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     background: var(--rf-color-background);
+  }
+
+  .resofeed-shell {
+    padding-block-end: 78px;
   }
 
   .shell-command > .contract-label {
@@ -751,6 +756,11 @@ a:focus,
 
   .steer-form {
     grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .surface-nav-menu {
+    inset-block-start: auto;
+    inset-block-end: 100%;
   }
 
   .shell-grid {
@@ -780,7 +790,8 @@ a:focus,
     display: block;
     position: fixed;
     z-index: 3;
-    inset: 0;
+    inset-block: 0 78px;
+    inset-inline: 0;
     overflow: auto;
     padding: var(--rf-space-lg);
     background: var(--rf-color-background);
