@@ -52580,6 +52580,63 @@ phases:
     - regression-mcp-read-item-detail-fix
     - regression-live-llm-health-classification-fix
     agent: blind-tester
+  - id: regression-backend-mcp-llm-gate
+    name: Gate backend MCP and LLM regression repair
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), decide whether backend/MCP/LLM regression
+      repair may proceed to final closure.
+
+
+      Review criteria:
+
+      - REG-2026-05-12-04 has implementation evidence and real `/mcp` read_item runtime
+      proof.
+
+      - REG-2026-05-12-06 has a root-cause classification, redacted artifacts, and
+      honest success/fallback accounting.
+
+      - REG-2026-05-12-02 is closed by or remains dependent on the existing MCP capability
+      audit chain; this phase must not duplicate or contradict that chain.
+
+      - ResoFeed invariants remain intact: single Go binary, SQLite/FTS5, owner-token
+      boundary, no accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event bus/service
+      layer.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches runnable MCP/API/LLM surfaces and current-live behavior.
+
+      - Gate must inspect runtime proof, not handler-only evidence.'
+    verification: 'phase-check protecting regression-audit independent final closure.
+
+      - All backend phase steps complete with specific evidence.
+
+      - Runtime/liveness evidence exists for real `/mcp`, /api/doctor, and feed/model
+      health probes.
+
+      - Gate decision basis maps REG-02, REG-04, and REG-06 to OPEN/BLOCK status.
+
+      - Any unresolved behavioral evidence has explicit blockers and closure path.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Backend\
+      \ Gate Decision Basis\nREG-2026-05-12-02: <existing MCP chain status + evidence\
+      \ ref>\nREG-2026-05-12-04: <verdict + evidence ref>\nREG-2026-05-12-06: <verdict\
+      \ + classification + evidence ref>\nunresolved_statuses:\n  - <NEEDS_TEST|UNPROVEN|UNCERTAIN_BLOCKING\
+      \ if any>\nverdict: OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true |\
+      \ false\nremaining_gaps: []"
+    depends_on:
+    - regression-mcp-read-item-detail-fix
+    - regression-live-llm-health-classification-fix
+    - regression-backend-mcp-llm-liveness-probe
+    agent: gate-reviewer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: locked
