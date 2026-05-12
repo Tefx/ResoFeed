@@ -54606,7 +54606,7 @@ phases:
   steps:
   - id: regression-source-ledger-controls-fix
     name: Adjudicate and remediate Source Ledger control authority conflict
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       authority_adjudication: true
@@ -54804,6 +54804,85 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-12T14:38:11.579333+00:00'
+    done_at: '2026-05-12T15:00:50.847492+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-source-ledger-controls-fix`
+      into main as squash commit `6b5c6ff`.
+
+
+      Subagent evidence:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - isolated branch commit: `1078874e5571bc38ca83150eaa9cdb6b6b819f25`
+
+
+      Files changed:
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md`
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-forbidden-controls-absent.dom.txt`
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-forbidden-controls-absent.png`
+
+      - `docs/audits/regression-audit-2026-05-12.md`
+
+      - `docs/ui-preview.html`
+
+      - focused stale-control updates in `web/tests/e2e/*.spec.ts`
+
+      - `web/tests/e2e/keyboard-a11y-helpers.ts`
+
+
+      REG-01 authority/remediation summary:
+
+      - Source Ledger remains view/delete/details/OPML import/state export/import
+      only.
+
+      - Source addition stays in Steer; refresh is background ingest.
+
+      - Manual Source Ledger `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`
+      controls remain forbidden.
+
+      - Original REG-01 audit text was marked as a historical/superseded authority
+      conflict rather than implementation guidance.
+
+      - `docs/ui-preview.html` stale RUN/FETCH/FETCHING/INGESTING controls were removed
+      and replaced with background-ingest guidance.
+
+      - Stale tests that clicked `[RUN INGEST]` were updated to absence assertions/fixture
+      ingest setup while preserving REG-01 negative assertions.
+
+
+      Rendered/test evidence from subagent:
+
+      - `npm --prefix web install` after `web/node_modules` was absent.
+
+      - `npm --prefix web run check` passed.
+
+      - Focused REG-01 Playwright passed.
+
+      - Focused `docs/ui-preview` expected-red drift contract passed.
+
+      - Rendered artifacts: `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-forbidden-controls-absent.dom.txt`
+      and `.png`.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm --prefix web run check` -> `svelte-check found 0 errors and 0 warnings`
+
+      - `npm --prefix web run test:e2e -- regression-audit-ui-expected-red.spec.ts
+      -g "REG-01" --project chromium-ci-safe` -> 1 passed
+
+      - `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      -g "docs/ui-preview" --project chromium-ci-safe` -> 1 passed
+
+
+      Post-verification status for changed source/docs/test paths was clean.'
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
     status: pending
