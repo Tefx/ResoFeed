@@ -50903,7 +50903,7 @@ phases:
       \n## Gaps / Notes\n- none"
   - id: mcp-audit-empty-resources-red-tests
     name: Add expected-red tests for empty MCP sources and active rules arrays
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -51012,6 +51012,40 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T08:19:52.740823+00:00'
+    done_at: '2026-05-12T08:32:37.910352+00:00'
+    evidence: "## refs Read Confirmation\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ in isolated worktree: file absent there; dispatch/audit context\
+      \ identified MCP-2 null-array failure.\n- docs/ARCHITECTURE.md — §7 MCP Surface\
+      \ Resources defines exact URIs `resofeed://sources` and `resofeed://rules/active`\
+      \ with JSON bodies `{ \"sources\": [Source] }` and `{ \"rules\": [SteerRule]\
+      \ }`; §6 says MCP resource JSON bodies reuse canonical HTTP types.\n- AGENTS.md\
+      \ — NOT READ in isolated worktree: file absent there; dispatch-provided hard\
+      \ rules followed.\n\n## Expected-Red Test Evidence\n- Modified files limited\
+      \ to tests/helpers: yes; `internal/resofeed/mcp_integration_test.go` only.\n\
+      - Exact test names added: `TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays`.\n\
+      - Command executed in worktree:\n  ```text\n  go test ./internal/resofeed -run\
+      \ TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays -count=1\n\
+      \  ```\n- Actual output in worktree:\n  ```text\n  FAIL: resofeed://sources\
+      \ resource field \"sources\" = null, want empty JSON array; text={\"sources\"\
+      :null}\n  FAIL: resofeed://rules/active resource field \"rules\" = null, want\
+      \ empty JSON array; text={\"rules\":null}\n  FAIL resofeed/internal/resofeed\n\
+      \  ```\n- Mainline final-state expected-red verification after squash merge\
+      \ produced the same aligned red output:\n  ```text\n  resofeed://sources resource\
+      \ field \"sources\" = null, want empty JSON array; text={\"sources\":null}\n\
+      \  resofeed://rules/active resource field \"rules\" = null, want empty JSON\
+      \ array; text={\"rules\":null}\n  FAIL resofeed/internal/resofeed 0.599s\n \
+      \ ```\n- expected_failures / exposed_gaps:\n  - MCP-2: fresh empty MCP resource\
+      \ reads return null fields instead of empty arrays for both `sources` and `rules`.\n\
+      - Downstream implementation owner: `mcp-audit-empty-resources-fix`.\n- Spec-derived\
+      \ minimal fixture used: yes; test comment cites docs/ARCHITECTURE.md §7 MCP\
+      \ Surface Resources and §6 Endpoint contracts.\n\n## Behavioral Proof Register\n\
+      - step_intent: test_define_red\n- expected_result: red\n- observed_result: red\n\
+      - failure_alignment: matches MCP-2 gap\n- verdict: PASS\n- blockers: []\n- product_implementation_files_modified:\
+      \ false\n- gate_open_allowed: true\n- orchestrator_action_hint: COMPLETE\n-\
+      \ finding_closure:\n  MCP-2: EXPECTED_RED_DEFINED\n\n## Commit hash(es)\n- 95ee8da24447d3440ac519075f6fb57d1dc2ef1a\
+      \ — isolated branch commit\n- c96e912 — mainline squash merge\n\n## Gaps / Notes\n\
+      - Red result is accepted semantic completion for this pre-implementation test-definition\
+      \ step; no runtime implementation files were changed."
   - id: mcp-audit-contract-gate
     name: Gate MCP audit contract and expected-red coverage
     status: pending
