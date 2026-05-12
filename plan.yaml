@@ -56947,7 +56947,7 @@ phases:
   steps:
   - id: regression-audit-full-runtime-retest
     name: Run full regression audit retest across UI HTTP MCP and LLM surfaces
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -57050,6 +57050,129 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-12T18:45:01.525430+00:00'
+    done_at: '2026-05-12T19:01:36.792433+00:00'
+    evidence: 'Integration verifier completed full regression runtime retest with
+      semantic PASS_WITH_DEBT accepted as non-blocking.
+
+
+      Closure fields:
+
+      - status/headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blockers: []
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: green with non-blocking live-provider debt
+
+      - product implementation files modified: false
+
+
+      REG verdict table:
+
+      - REG-2026-05-12-01 Source Ledger boundary: PASS
+
+      - REG-2026-05-12-02 MCP empty arrays: PASS
+
+      - REG-2026-05-12-03 Search one visible submit: PASS
+
+      - REG-2026-05-12-04 MCP `read_item` detail/fallback: PASS
+
+      - REG-2026-05-12-05 Mobile inactive Today exclusion: PASS
+
+      - REG-2026-05-12-06 LLM health classification: PASS_WITH_DEBT
+
+      - REG-2026-05-12-07 Source Ledger stale receipt: PASS
+
+      - REG-2026-05-12-08 Feed row metadata compact/non-repetitive: PASS
+
+      - REG-2026-05-12-09 Inspector header avoids raw `model_status`: PASS
+
+
+      Subagent verification:
+
+      - `go test ./... && mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed
+      && .venv/bin/python tests/repro/regression_backend_mcp_llm_liveness_probe.py`:
+      exit 0; Go tests passed; real `bin/resofeed serve` bound; probe `status: PASS`,
+      `failures: []`; `/api/doctor`, `/api/feed/today`, `/mcp read_item` returned
+      200.
+
+      - `npm ci && npm run check && npx playwright ... regression-audit-ui-expected-red.spec.ts
+      ... && npx playwright ... ui-remediation-r1-r8-browser-retest.spec.ts ...`:
+      exit 0; `svelte-check found 0 errors and 0 warnings`; REG suite `6 passed`;
+      real API browser retest `1 passed`.
+
+      - Empty MCP/auth Python probe: exit 0; unauthorized `/api/sources` returned
+      401; `resofeed://sources` returned `{"sources":[]}`; `resofeed://rules/active`
+      returned `{"rules":[]}`.
+
+      - Secret scan: exit 0; main `.env` OpenRouter key present; audit files scanned;
+      `leak_count: 0`.
+
+
+      Artifacts/commits:
+
+      - Worktree commit: `37ba7b7` (`audit: record full runtime regression retest`).
+
+      - Main squash commit: `2ddc608` (`[vectl] step-regression-audit-full-runtime-retest
+      completed`).
+
+      - Mainline evidence commit: `89df94c` (`[vectl] record mainline full runtime
+      retest verification`).
+
+      - Added `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md`.
+
+      - Added `.audit-artifacts/regression_audit_full_runtime_retest/mcp_empty_resources_and_auth.json`.
+
+      - Refreshed selected `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/*`
+      runtime evidence.
+
+
+      Mainline final-state verification after merge:
+
+      - Backend/runtime command: `go test ./... && go build -o ./bin/resofeed ./cmd/resofeed
+      && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`: exit 0;
+      Go tests passed; liveness probe `status: PASS`, `failures: []`, `/mcp read_item`
+      full text marker present, no raw secret.
+
+      - Frontend/browser command from `web/`: `npm ci && npm run check && npx playwright
+      test --config ./playwright.config.ts tests/e2e/regression-audit-ui-expected-red.spec.ts
+      --project=chromium-ci-safe && npx playwright test --config ./playwright.config.ts
+      tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts --project=chromium-ci-safe`:
+      exit 0; `svelte-check found 0 errors and 0 warnings`; REG suite `6 passed`;
+      R1-R8 real API browser retest `1 passed`.
+
+
+      Proof distinctions:
+
+      - Real integration proof: `cmd/resofeed` runtime, HTTP/MCP probes, owner-token
+      auth, source fetch/import, real local browser tests.
+
+      - Browser-rendered proof: Playwright regression audit and R1-R8 browser retest
+      artifacts.
+
+      - Deterministic/stub proof: controlled LLM/fallback and backend/MCP probe artifacts.
+
+      - Citation-only proof: REG-02 MCP chain cited and rechecked by empty MCP/auth
+      probe.
+
+
+      Gaps/notes:
+
+      - REG-06 real live OpenRouter success remains unavailable due provider/account
+      guardrail/data-policy limitation, but fallback-only summaries are not counted
+      as live success and the debt is classified non-blocking.
+
+      - Transient SQLite DB directories, built binaries, `.venv`, and `node_modules`
+      were not committed.'
   - id: regression-audit-spec-conformance-review
     name: Verify regression fixes against ARCHITECTURE DESIGN PRD and audit contracts
     status: pending
