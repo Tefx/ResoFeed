@@ -53967,7 +53967,7 @@ phases:
   steps:
   - id: regression-mcp-read-item-detail-fix
     name: Fix MCP read_item extracted detail text for full items
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -54076,6 +54076,8 @@ phases:
       verdict: PASS | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
       \ []"
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T14:17:32.153362+00:00'
   - id: regression-live-llm-health-classification-fix
     name: Classify and repair live LLM health regression
     status: claimed
