@@ -55854,6 +55854,164 @@ phases:
 
 
       Post-verification status for changed source/artifact paths was clean.'
+  - id: regression-frontend-real-api-proof-uiux-delta-audit
+    name: Audit real API proof mobile visual delta
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+
+      As an INDEPENDENT UI/UX AUDITOR (uiux-auditor), audit only the visual/spatial
+      delta introduced after the completed regression-frontend-uiux-audit by regression-frontend-real-api-proof-remediation.
+
+
+      Scope is intentionally narrow and MUST NOT reopen completed implementation steps
+      except to assess whether the later CSS/mobile changes invalidate the prior UI/UX
+      evidence.
+
+
+      Delta surfaces to audit:
+
+      - Mobile command row behavior and spacing after the real API proof remediation.
+
+      - Utility surface bottom inset behavior on mobile.
+
+      - Upward-opening menu behavior and clipping/overlap on mobile.
+
+      - Confirmation that REG-01, REG-03, REG-05, REG-07, REG-08, and REG-09 visual
+      artifacts remain acceptable after the delta.
+
+
+      Required artifacts:
+
+      - Rendered mobile visual/spatial evidence for the command row, utility surface
+      bottom inset, and upward menu states.
+
+      - A comparison note explaining whether the prior regression-frontend-uiux-audit
+      evidence remains valid, partially stale, or stale for each listed REG item.
+
+      - Parseable headline: PASS, PASS_WITH_DEBT, or FAIL.
+
+
+      Out of scope:
+
+      - Do not redesign the mobile layout.
+
+      - Do not re-audit unrelated desktop surfaces unless needed to explain a delta
+      regression.
+
+      - Do not alter completed steps or their evidence.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."'
+    verification: 'phase-check protecting regression-frontend-surface-gate and final
+      regression closure.
+
+      - uiux-auditor provides rendered mobile artifacts for the real API proof remediation
+      delta.
+
+      - Audit explicitly covers mobile command row, utility bottom inset, and upward
+      menu behavior.
+
+      - Audit explicitly confirms REG-01/03/05/07/08/09 visual artifacts remain acceptable
+      or identifies blocker-class stale evidence.
+
+      - Evidence includes a parseable PASS/PASS_WITH_DEBT/FAIL handoff and non-intersection
+      rationale for any debt.'
+    evidence_template: '## UI/UX Delta Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Delta Scope
+
+      - Source completed step reviewed: regression-frontend-real-api-proof-remediation
+
+      - Prior audit applicability note reviewed: prior_uiux_audit_applicability =
+      may_be_stale
+
+
+      ### Rendered Mobile Artifacts
+
+      | Surface | Artifact path / capture | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | Mobile command row | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | Utility bottom inset | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+      | Upward menu | <path> | PASS/PASS_WITH_DEBT/FAIL | <notes> |
+
+
+      ### REG Artifact Continuity
+
+      | REG | Prior artifact still acceptable? | New/updated artifact if needed |
+      Reason |
+
+      | --- | --- | --- | --- |
+
+      | REG-01 | yes/no/partial | <path or n/a> | <reason> |
+
+      | REG-03 | yes/no/partial | <path or n/a> | <reason> |
+
+      | REG-05 | yes/no/partial | <path or n/a> | <reason> |
+
+      | REG-07 | yes/no/partial | <path or n/a> | <reason> |
+
+      | REG-08 | yes/no/partial | <path or n/a> | <reason> |
+
+      | REG-09 | yes/no/partial | <path or n/a> | <reason> |
+
+
+      ### Findings
+
+      | Severity | Description | Surface / REG | Blocking? |
+
+      | --- | --- | --- | --- |
+
+      | blocker/should_fix/suggestion/tech_debt | <finding> | <surface> | YES/NO |
+
+
+      ### Headline
+
+      - [ ] PASS: Delta remains visually/spatially acceptable and prior REG artifacts
+      remain valid.
+
+      - [ ] PASS_WITH_DEBT: Only explicit non-blocking debt remains with non-intersection
+      rationale.
+
+      - [ ] FAIL: Delta invalidates required UI/UX evidence or introduces blocker-class
+      visual/spatial regression.
+
+
+      Confidence: high/medium/low'
+    depends_on:
+    - regression-frontend-real-api-proof-remediation
+    - regression-frontend-route-integration-retest
+    agent: uiux-auditor
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
