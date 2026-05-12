@@ -55183,7 +55183,7 @@ phases:
     claimed_at: '2026-05-12T15:37:59.455367+00:00'
   - id: regression-frontend-uiux-audit
     name: Audit regression UI repairs and Source Ledger boundary against DESIGN.md
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -55278,6 +55278,74 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-12T15:38:14.124119+00:00'
+    done_at: '2026-05-12T15:52:47.557451+00:00'
+    evidence: 'UI/UX audit returned semantic PASS with minor non-blocking design debt.
+
+
+      Closure signals:
+
+      - headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Finding verdicts:
+
+      - REG-2026-05-12-01: PASS
+
+      - REG-2026-05-12-03: PASS
+
+      - REG-2026-05-12-05: PASS
+
+      - REG-2026-05-12-07: PASS
+
+      - REG-2026-05-12-08: PASS
+
+      - REG-2026-05-12-09: PASS_WITH_DEBT
+
+
+      Artifact coverage reviewed:
+
+      - Source Ledger forbidden-controls screenshot and DOM artifacts.
+
+      - Search visible-submit screenshot.
+
+      - Mobile Search, mobile Source Ledger, and mobile Doctor containment screenshots.
+
+      - Feed row metadata screenshot.
+
+      - Inspector header screenshot.
+
+
+      Source Ledger boundary check:
+
+      - Forbidden `[RUN INGEST]` and `[FETCH]` controls absent.
+
+      - Allowed `[DELETE]`, `[DETAILS]`, `[IMPORT OPML]`, `[EXPORT STATE]`, and `[IMPORT
+      STATE]` controls visible.
+
+
+      Non-blocking debt recorded:
+
+      - Inspector `original link` uses standard browser blue rather than a mapped
+      DESIGN.md token color. This is a cosmetic/token debt and does not block REG-09
+      behavioral closure because raw `model_status` / `model_latency_error` is absent
+      from primary visible copy.
+
+
+      Scope/mutation audit:
+
+      - Product files modified: no
+
+      - Commit hash(es): none — verify-only UI/UX audit; no files changed
+
+      - Files changed: none'
   - id: regression-frontend-surface-gate
     name: Gate frontend regression surface repair with Source Ledger boundary
     status: pending
