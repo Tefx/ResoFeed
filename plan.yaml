@@ -51154,6 +51154,72 @@ phases:
       finding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2: FIXED_LOCALLY\
       \ | GAP"
     agent: golang-developer
+  - id: mcp-audit-remediation-gate
+    name: Gate MCP audit remediation implementation
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the MCP-2 remediation
+      is ready for independent runtime verification.
+
+
+      Review criteria:
+
+      - `mcp-audit-empty-resources-fix` consumed the upstream contract/test artifacts
+      from the previous phase.
+
+      - Fresh empty MCP resource responses are locally green for both `resofeed://sources`
+      and `resofeed://rules/active`.
+
+      - Existing seeded MCP behavior, owner-token auth, tool schemas, idempotency,
+      and receipt semantics are not expanded or regressed.
+
+      - No forbidden architecture/product scope was introduced.
+
+
+      Independence: gate-reviewer MUST NOT be the same agent as the implementation
+      step in this phase.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches a public MCP runtime/API surface.
+
+      - Audit closure requires downstream real `/mcp` liveness proof, not handler-only
+      evidence.
+
+
+      Gate decision basis MUST state that final closure is not allowed until the verification/finalization
+      phase completes MCP-1 and MCP-2 proof obligations.'
+    verification: 'phase-check protecting mcp-capability-audit-verification-and-finalization.
+
+      - Local MCP-2 fix evidence reviewed and adequate.
+
+      - No architecture invariant violations found.
+
+      - Gate output explicitly carries unresolved MCP-1 liveness proof into `mcp-audit-live-localhost-liveness-probe`.
+
+      - Gate output explicitly requires independent fresh-DB retest before final closure.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Remediation Gate\
+      \ Report\nReviewer: gate-reviewer\nPhase: mcp-capability-audit-remediation\n\
+      \n## Finding-by-Finding Closure Basis\nMCP-1:\n  status: OPEN_PROOF_OBLIGATION\n\
+      \  closure_path: mcp-audit-live-localhost-liveness-probe\n  gate_decision_basis:\
+      \ <why implementation phase may close while final closure remains blocked>\n\
+      MCP-2:\n  status: LOCALLY_FIXED | GAP\n  evidence_ref: <fix evidence>\n  closure_path:\
+      \ mcp-audit-fresh-db-resource-retest\n  gate_decision_basis: <why independent\
+      \ retest is required>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n\
+      \  - <blocker or none>\ngate_open_allowed: true | false"
+    depends_on:
+    - mcp-audit-empty-resources-fix
+    agent: gate-reviewer
 - id: mcp-capability-audit-verification-and-finalization
   name: MCP Capability Audit — Verification and Finalization
   status: locked
