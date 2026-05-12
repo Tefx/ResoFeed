@@ -51610,3 +51610,94 @@ phases:
       \  MCP-1: DOCS_SYNCED_OR_ALREADY_ACCURATE | BLOCKED\n  MCP-2: DOCS_SYNCED_OR_ALREADY_ACCURATE\
       \ | BLOCKED"
     agent: doc-reviewer
+  - id: mcp-audit-focused-deep-review
+    name: Focused deep review for MCP audit remediation
+    status: pending
+    description: 'step_type: review
+
+      agent_source: project
+
+
+      Focused independent deep review for the MCP capability audit remediation.
+
+
+      Review all evidence from:
+
+      - `mcp-audit-fresh-db-resource-retest`
+
+      - `mcp-audit-live-localhost-liveness-probe`
+
+      - `mcp-audit-parity-security-idempotency-proof`
+
+      - `mcp-audit-doc-sync-check`
+
+
+      Deep review focus:
+
+      - Wiring audit: every MCP resource URI in `resources/list` is reachable through
+      `resources/read`; no orphan or handler-only route exists for the audited resources.
+
+      - Spec conformance: resource MIME types, resource JSON bodies, tool schemas,
+      and owner-token behavior match docs/ARCHITECTURE.md exactly.
+
+      - Architecture review: changes remain in flat `internal/resofeed/` Go files
+      and do not introduce service layers, event buses, sync/merge abstractions, vector/RAG,
+      accounts, OAuth/RBAC, or per-agent registry.
+
+      - Runtime review: MCP-1 liveness evidence is from a real `resofeed serve` process
+      and not only a stale browser URL or in-process handler shortcut.
+
+      - Receipt/idempotency review: mutating MCP operations still use bounded runtime
+      receipts only.
+
+
+      Behavioral proof register required for any unresolved item:
+
+      - overturned_decision, if any prior PASS is contradicted
+
+      - review_miss_cause
+
+      - reversal_risk
+
+      - remediation_owner
+
+      - re-close proof path
+
+
+      This is read-only unless documentation evidence from `mcp-audit-doc-sync-check`
+      requires review comments; do not modify product code.'
+    verification: 'phase-check protecting mcp-audit-final-gate.
+
+      - Evidence from all four prerequisite verification/doc steps is reviewed.
+
+      - Any blocker-class unresolved status gets a remediation owner and re-close
+      path.
+
+      - Review output explicitly decides whether MCP-1 and MCP-2 are ready for final
+      gate closure.
+
+      - Review confirms no forbidden architecture/product scope was introduced.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key\
+      \ passage or \"NOT READ: <reason>\"\n\n## Focused Deep Review Report\n- Verification\
+      \ evidence reviewed: <list>\n- Wiring audit verdict: PASS | PASS_WITH_DEBT |\
+      \ FAIL\n- Spec conformance verdict: PASS | PASS_WITH_DEBT | FAIL\n- Architecture\
+      \ invariant verdict: PASS | PASS_WITH_DEBT | FAIL\n- Runtime liveness verdict:\
+      \ PASS | PASS_WITH_DEBT | FAIL\n- Receipt/idempotency verdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\n\n## Finding-by-Finding Closure\nMCP-1:\n  evidence_refs: <liveness\
+      \ + supporting parity refs>\n  status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n\
+      \  closure_path: <closed or remediation owner>\nMCP-2:\n  evidence_refs: <fresh\
+      \ DB retest + parity refs>\n  status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n\
+      \  closure_path: <closed or remediation owner>\n\n## Overturn Handling\n- overturned_decision:\
+      \ <none or details>\n- review_miss_cause: <none or details>\n- reversal_risk:\
+      \ <none or details>\n- remediation_owner: <none or step/agent>\n- re-close proof\
+      \ path: <none or details>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n\
+      \  - <blocker or none>\ngate_open_allowed: true | false"
+    depends_on:
+    - mcp-audit-fresh-db-resource-retest
+    - mcp-audit-live-localhost-liveness-probe
+    - mcp-audit-parity-security-idempotency-proof
+    - mcp-audit-doc-sync-check
+    agent: gate-reviewer
