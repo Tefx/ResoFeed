@@ -1,17 +1,23 @@
 {
-  "failures": [],
+  "failures": [
+    "OpenRouter live proof did not produce model_status=ok/live_summary_successes through public source fetch; inspect live_source_fetch and doctor_after_live_probe artifacts"
+  ],
   "observations": {
     "artifacts": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe",
-    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3",
+    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-pid6mvpq/resofeed.sqlite3",
     "doctor": {
       "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor.txt",
       "contains_raw_secret": false,
       "content_type": "text/plain; charset=utf-8",
       "status": 200
     },
-    "external_live_probe_missing_prerequisite": "OPENROUTER_KEY was absent in the auditor environment",
-    "external_live_probe_status": "external_live_probe_unavailable",
-    "external_openrouter_env_present": false,
+    "doctor_after_live_probe": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor_after_live_probe.txt",
+      "contains_raw_secret": false,
+      "status": 200
+    },
+    "external_live_probe_status": "external_live_probe_failed_provider",
+    "external_openrouter_env_present": true,
     "feed": {
       "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/feed_today.json",
       "status": 200
@@ -19,6 +25,29 @@
     "fixture_extraction_status": "full",
     "fixture_in_feed": true,
     "fixture_model_status": "summary_unavailable",
+    "live_feed": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_feed_today.json",
+      "live_item_found": true,
+      "status": 200
+    },
+    "live_fixture_feed_url": "http://127.0.0.1:61974/feed.xml",
+    "live_item_extraction_status": "full",
+    "live_item_model_status": "model_latency_error",
+    "live_opml_import": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_opml_import.json",
+      "status": 200
+    },
+    "live_source_fetch": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_source_fetch.json",
+      "status": 200
+    },
+    "live_source_found": true,
+    "main_workspace_env": {
+      "exists": true,
+      "loaded": true,
+      "path": "/Users/tefx/Projects/ResoFeed/.env",
+      "value": "<redacted-openrouter-key>"
+    },
     "mcp_initialize": {
       "body_head": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\":\"2025-03-26\",\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"}}}\n",
       "status": 200
@@ -33,16 +62,17 @@
       "status": 200
     },
     "migration": {
-      "command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:61442 --public-url http://127.0.0.1:61442 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+      "command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61964 --public-url http://127.0.0.1:61964 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-pid6mvpq/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
       "ready": true,
       "stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stderr.log",
       "stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stdout.log"
     },
+    "openrouter_key_source": "main_workspace_env_file",
+    "openrouter_key_value": "<redacted-openrouter-key>",
     "port_bound": true,
-    "serve_command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:61442 --public-url http://127.0.0.1:61442 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-t2yvajgy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+    "serve_command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61964 --public-url http://127.0.0.1:61964 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-pid6mvpq/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
     "server_stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stderr.log",
-    "server_stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stdout.log",
-    "stub_runtime_openrouter_key": "<non-secret dummy value injected only to satisfy startup validation>"
+    "server_stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stdout.log"
   },
-  "status": "PASS"
+  "status": "FAIL"
 }

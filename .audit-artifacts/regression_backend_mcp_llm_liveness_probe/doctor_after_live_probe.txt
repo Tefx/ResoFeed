@@ -2,12 +2,14 @@ rss: errors=1
 rss: source=src_full_regression_probe status=rss_fetch_error url=https://example.test/full-feed.xml error=rss fetch: Get "https://example.test/full-feed.xml": dial tcp: lookup example.test: no such host
 openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown
 openrouter: model_resolved=false resolved_model=unknown model_resolved: false
-openrouter: item_transform_failures=1 item_transform_failures: 1
-openrouter: current_item_transform_failures=1 historic_item_transform_failures=0
-openrouter: live_summary_successes=0 fallback_only_current_summaries=0
+openrouter: item_transform_failures=2 item_transform_failures: 2
+openrouter: current_item_transform_failures=2 historic_item_transform_failures=0
+openrouter: live_summary_successes=0 fallback_only_current_summaries=1
 openrouter: health_classification=openrouter_client_timeout_or_error
-openrouter: failures=1
+openrouter: failures=2
+openrouter: item=item_1373d4265c73db0c62e86cbc08fb30ef source=src_308080ac7a3bde4300bdefd233a1efb5 status=model_latency_error title=OPENROUTER LIVE LIVENESS REG-06
 openrouter: item=item_full_detail_regression_probe source=src_full_regression_probe status=summary_unavailable title=Full extraction regression fixture
+fallback_provenance: item=item_1373d4265c73db0c62e86cbc08fb30ef summary=excerpt model_status=model_latency_error extraction_status=full
 fallback_provenance: item=item_full_detail_regression_probe summary=model model_status=summary_unavailable extraction_status=full
 extraction: ok
 ingest: last_run=2026-05-12T18:00:56Z
