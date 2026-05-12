@@ -50903,7 +50903,7 @@ phases:
       \n## Gaps / Notes\n- none"
   - id: mcp-audit-empty-resources-red-tests
     name: Add expected-red tests for empty MCP sources and active rules arrays
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -51010,6 +51010,8 @@ phases:
     depends_on:
     - mcp-audit-contract-lock
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T08:19:52.740823+00:00'
   - id: mcp-audit-contract-gate
     name: Gate MCP audit contract and expected-red coverage
     status: pending
