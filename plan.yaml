@@ -54727,6 +54727,147 @@ phases:
     depends_on:
     - regression-backend-mcp-llm-liveness-probe
     agent: golang-developer
+  - id: regression-backend-mcp-llm-openrouter-live-retest
+    name: Retest live OpenRouter proof after remediation or disposition
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      priority: HIGH
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (blind-tester), retest the live OpenRouter proof after
+      `regression-backend-mcp-llm-openrouter-live-remediation`.
+
+
+      Use the exact mainline command family; do not substitute a narrower smoke test:
+
+      ```bash
+
+      go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py
+
+      ```
+
+
+      Required closure path:
+
+      - PASS path: real live OpenRouter success is proven, with `live_summary_successes
+      > 0` or an equivalent explicit live-model success signal from the probe/report.
+      Fallback-only summaries MUST NOT count.
+
+      - Disposition path: if provider/environment limitation remains, verify the remediation
+      step produced a fully justified non-blocking disposition with gate-intersection
+      reasoning showing the remaining issue does not intersect `regression-backend-mcp-llm-gate`
+      or final closure.
+
+
+      Test from the main workspace context where `.env` is available, while preserving
+      secret redaction. Confirm `OPENROUTER_KEY` is present only as an environment
+      fact, never as a printed value.
+
+
+      Document ALL findings. Finding issues is a valid tester outcome; closure is
+      allowed only on real live PASS or accepted non-blocking disposition evidence.'
+    verification: "phase-check protecting regression-backend-mcp-llm-gate and final\
+      \ closure.\n- Run the exact command family: `go build -o ./bin/resofeed ./cmd/resofeed\
+      \ && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`.\n- Close\
+      \ GREEN only if either:\n  1. report/probe shows real live OpenRouter success\
+      \ and fallback-only summaries are not counted; or\n  2. non-repo-owned limitation\
+      \ has explicit non-blocking disposition with gate-intersection reasoning accepted\
+      \ by tester.\n- Confirm REG-04 MCP `read_item` full detail remains proven by\
+      \ artifact or rerun output.\n- Confirm deterministic backend/MCP proof remains\
+      \ valid.\n- Confirm no secret value leaked in stdout/stderr or artifacts."
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Independent Live OpenRouter Retest Report
+
+
+      **Tester**: blind-tester
+
+      **Scope**: backend/MCP/LLM live OpenRouter retest after remediation/disposition
+
+      **Independence Level**: L2
+
+
+      ### Command Executed
+
+      ```bash
+
+      go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py
+
+      ```
+
+
+      ### Actual Output
+
+      ```text
+
+      <paste stdout/stderr, redacted>
+
+      ```
+
+
+      ### Result Fields
+
+      - `external_openrouter_env_present`: <true/false without secret value>
+
+      - `live_item_model_status`: <value>
+
+      - `live_summary_successes`: <count>
+
+      - `health_classification`: <value>
+
+      - fallback-only summaries counted as live success: NO (required)
+
+
+      ### Closure Decision
+
+      - [ ] REAL_LIVE_PASS: real live OpenRouter success proven.
+
+      - [ ] ACCEPTED_NON_BLOCKING_DISPOSITION: provider/environment limitation is
+      non-repo-owned and does not intersect backend/MCP/LLM gate or final closure.
+
+      - [ ] BLOCKED: live proof still fails and disposition is missing or intersects
+      gate/final closure.
+
+
+      ### Gate-Intersection Reasoning if disposition accepted
+
+      - Affected requirement(s):
+
+      - Why remaining issue does not block `regression-backend-mcp-llm-gate`:
+
+      - Why remaining issue does not block final closure:
+
+      - Future condition that would re-open the obligation:
+
+
+      ### Secret Redaction
+
+      - Confirm no `OPENROUTER_KEY` value or derived secret appears in logs/artifacts:
+      PASS/FAIL
+
+
+      ### Headline
+
+      PASS | PASS_WITH_NON_BLOCKING_DISPOSITION | FAIL'
+    depends_on:
+    - regression-backend-mcp-llm-openrouter-live-remediation
+    agent: blind-tester
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: done
