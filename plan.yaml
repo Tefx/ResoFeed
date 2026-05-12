@@ -50796,3 +50796,10 @@ phases:
     into explicit proof obligations and MCP-2 has expected-red coverage before implementation.
   depends_on:
   - prd-behavior-audit-remediation-final-strict-closure
+- id: mcp-capability-audit-remediation
+  name: MCP Capability Audit — Remediation
+  status: locked
+  gate: Remediation gate blocks unless MCP-2 null-array response shaping is fixed
+    within the existing MCP/HTTP response surfaces without expanding product scope.
+  depends_on:
+  - mcp-capability-audit-contract-lock-and-expected-red-tests
