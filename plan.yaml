@@ -57368,7 +57368,7 @@ phases:
       can follow.'
   - id: regression-audit-doc-sync-check
     name: Check documentation sync for regression audit closure
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -57439,6 +57439,8 @@ phases:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-12T19:12:44.282486+00:00'
   - id: regression-audit-focused-deep-review
     name: Perform focused deep review of regression remediation
     status: pending
