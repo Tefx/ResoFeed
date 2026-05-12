@@ -52646,6 +52646,110 @@ phases:
     and uiux-auditor provides a parseable PASS/PASS_WITH_DEBT handoff.
   depends_on:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
+  steps:
+  - id: regression-source-ledger-controls-fix
+    name: Restore Source Ledger manual ingest and fetch controls
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the frontend implementation for REG-2026-05-12-01 within existing Source
+      Ledger and HTTP API contracts. This phase depends on the contract/test phase;
+      consume `regression-audit-ui-expected-red-tests`.
+
+
+      Finding context:
+
+      - REG-2026-05-12-01 — Source Ledger is missing manual ingest and fetch controls.
+
+      - Audit observed `[DELETE]`, `[DETAILS]`, `[IMPORT OPML]`, `[EXPORT STATE]`,
+      and `[IMPORT STATE]`, but no global `[RUN INGEST]` or per-source `[FETCH]` controls
+      on current, isolated, or mobile Source Ledger.
+
+      - Expected labels/states from PRD/DESIGN/ui-preview: `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, `[FETCHING...]`, raw `err: <diagnostic>`, `last_ingest`, `last_fetch`.
+
+
+      YOUR SCOPE:
+
+      - Reinstate Source Ledger props/actions for `runIngest` and per-source `fetchSource`
+      using existing API client/HTTP operations.
+
+      - Render `[RUN INGEST]` in the ledger header with last_ingest status.
+
+      - Render per-source `[FETCH]` / `[FETCHING...]`, raw error diagnostic, and updated
+      last_fetch without row layout shift.
+
+      - Preserve flat Source Ledger grammar; do not add folders, tags, unread counts,
+      archive bins, settings sliders, drag-and-drop, accounts, OAuth/RBAC, or service-layer
+      abstractions.
+
+
+      Likely touch paths:
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/+page.svelte
+
+      - web/src/lib/api-client.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/app.css
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires BOTH logic correctness and rendering completeness. Controls
+      must be visible, accessible, clickable through rendered UI, and backed by real
+      API calls. Evidence MUST include rendered output or screenshot/DOM artifact.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Hardcoded
+      controls that do not call real existing operations do not satisfy this step.
+
+
+      known_risks:
+
+      - Source Ledger is a canonical design surface; do not invent alternate labels.
+
+      - Shared file conflict: web/src/routes/+page.svelte is also touched by other
+      UI fixes, so downstream UI containment step is serialized after this one.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Missing `[RUN INGEST]` or per-source `[FETCH]` on desktop/mobile Source Ledger.
+
+      2. Controls that render but do not invoke real API operations.
+
+      3. Row layout shift or loss of existing `[DELETE]`, `[DETAILS]`, import/export
+      state operations.
+
+      4. Any forbidden product creep or architecture expansion.'
+    verification: 'local-check protecting frontend runtime retest and uiux audit.
+
+      - REG-01 expected-red tests now pass.
+
+      - Rendered Source Ledger shows `[RUN INGEST]` and per-source `[FETCH]` in desktop
+      and mobile/narrow views.
+
+      - At least one real/manual action path is exercised against existing HTTP API
+      client behavior.
+
+      - Existing Source Ledger actions remain present and row grammar remains stable.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## REG-2026-05-12-01\
+      \ Fix Evidence\ncommands:\n  - <exact frontend test/build command>\noutputs_or_artifacts:\n\
+      \  - <rendered DOM/screenshot/artifact path>\nvisible_controls:\n  run_ingest:\
+      \ <present/absent>\n  per_source_fetch: <present/absent>\nreal_api_path_exercised:\
+      \ <yes/no + evidence>\nverdict: PASS | FAIL\nblockers: []\ngate_open_allowed:\
+      \ true | false\nremaining_gaps: []"
+    agent: frontend-engineer
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
