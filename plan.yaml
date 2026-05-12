@@ -51543,7 +51543,7 @@ phases:
       : true,\n  \"orchestrator_action_hint\": \"COMPLETE\"\n}\n```"
 - id: mcp-capability-audit-verification-and-finalization
   name: MCP Capability Audit — Verification and Finalization
-  status: pending
+  status: in_progress
   gate: Final closure blocks unless MCP-1 and MCP-2 have finding-by-finding closure
     evidence, MCP capability parity is rechecked through the real /mcp Streamable
     HTTP endpoint, owner-token boundaries remain intact, idempotency/receipt semantics
@@ -51869,7 +51869,7 @@ phases:
     agent: integration-verifier
   - id: mcp-audit-doc-sync-check
     name: Check documentation sync for MCP audit closure
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -51931,6 +51931,8 @@ phases:
       \  MCP-1: DOCS_SYNCED_OR_ALREADY_ACCURATE | BLOCKED\n  MCP-2: DOCS_SYNCED_OR_ALREADY_ACCURATE\
       \ | BLOCKED"
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-12T09:37:46.768427+00:00'
   - id: mcp-audit-focused-deep-review
     name: Focused deep review for MCP audit remediation
     status: pending
