@@ -52279,6 +52279,118 @@ phases:
     to the existing MCP capability audit chain without duplicate implementation work.
   depends_on:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
+  steps:
+  - id: regression-mcp-read-item-detail-fix
+    name: Fix MCP read_item extracted detail text for full items
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the implementation within existing signatures for REG-2026-05-12-04.
+      This phase depends on `regression-audit-remediation-contract-matrix-and-expected-red-tests`;
+      consume the contract from `regression-audit-contract-matrix` and protected expected-red
+      tests from `regression-audit-mcp-read-item-expected-red-tests`.
+
+
+      Finding context:
+
+      - REG-2026-05-12-04 — MCP `read_item` can return a full item without extracted
+      detail text.
+
+      - Audit failure: fixture `SQLite transport parity regression` had `extraction_status=full`;
+      MCP response had provenance/summary/item metadata but `hasExtracted: false`.
+
+
+      YOUR SCOPE:
+
+      - Complete the implementation within existing Go/MCP extraction/read paths so
+      `read_item` returns non-empty extracted/detail text whenever an item is marked
+      `extraction_status=full`.
+
+      - If extraction legitimately produces no detail text, downgrade status or expose
+      a clear fallback reason through the existing response contract; do not silently
+      claim `full` with empty detail text.
+
+      - Preserve Inspect workflow parity, source provenance, owner-token authorization,
+      and already-passing MCP `search_items`/`resonate_item` behavior.
+
+      - Do not add MCP-only product concepts, service layers, sidecars, event buses,
+      vector/RAG, accounts/OAuth/RBAC, or sync/merge semantics.
+
+
+      Failure-mode checklist:
+
+      - Full extraction path: stored/exposed extracted_text is non-empty.
+
+      - Empty extraction path: no false `full` status; fallback/downgrade is explicit.
+
+      - MCP read path: `read_item` returns detail text through POST /mcp, not handler-only
+      internals.
+
+      - Inspect parity: UI Inspect and MCP read_item agree on detail availability
+      for the same item.
+
+      - Auth path: missing/invalid owner token remains HTTP 401 before tool handling.
+
+
+      Out-of-scope guardrail:
+
+      - REG-2026-05-12-02 empty resources are owned by the existing MCP capability
+      audit chain; do not rework that family here.
+
+      - UI display polish is owned by frontend remediation steps.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      known_risks:
+
+      - Public MCP response drift: field names/tool schema/resource behavior must
+      remain compatible.
+
+      - Runtime surface preservation: downstream liveness will exercise real `/mcp`;
+      handler-only evidence is insufficient.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. `extraction_status=full` with empty extracted/detail text.
+
+      2. A fake constant detail string or fallback that does not derive from article/source
+      content.
+
+      3. REG-02 duplicate churn instead of REG-04 repair.
+
+      4. Auth/idempotency regressions in existing MCP paths.'
+    verification: 'local-check protecting backend liveness probe and final MCP regression
+      retest.
+
+      - Main path: focused tests for REG-04 pass and show non-empty detail text for
+      full extraction.
+
+      - Failure path: focused test proves empty extraction does not claim full status
+      without fallback reason.
+
+      - Real MCP path: at least one test or local probe exercises POST /mcp read_item
+      with owner token.
+
+      - Proof: REG-02 empty-resource logic is not duplicated or regressed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## REG-2026-05-12-04\
+      \ Fix Evidence\ncommands:\n  - <exact go test command>\noutputs_or_artifacts:\n\
+      \  - <path or pasted output>\nmain_path: <full extraction item returns non-empty\
+      \ detail text>\nfailure_path: <empty extraction downgrade/fallback proof>\n\
+      REG-02_overlap: <existing MCP chain untouched or specific non-intersection>\n\
+      verdict: PASS | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
+      \ []"
+    agent: golang-developer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: locked
