@@ -51831,3 +51831,11 @@ phases:
     regression families before remediation.
   depends_on:
   - mcp-capability-audit-verification-and-finalization
+- id: regression-audit-remediation-backend-mcp-and-live-llm-repair
+  name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
+  status: locked
+  gate: Backend gate blocks unless REG-2026-05-12-04 and REG-2026-05-12-06 are remediated
+    or dispositioned with runtime proof, and REG-2026-05-12-02 closure remains delegated
+    to the existing MCP capability audit chain without duplicate implementation work.
+  depends_on:
+  - regression-audit-remediation-contract-matrix-and-expected-red-tests
