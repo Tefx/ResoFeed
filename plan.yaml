@@ -51731,7 +51731,7 @@ phases:
       ok  \tresofeed/internal/resofeed\t0.578s\n```"
   - id: mcp-audit-live-localhost-liveness-probe
     name: Probe current localhost MCP liveness and owner-token boundary
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -51826,6 +51826,75 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-12T09:37:59.056666+00:00'
+    done_at: '2026-05-12T09:59:24.634764+00:00'
+    evidence: "**Headline**: PASS\n**Blocking Status**: CLOSED\n**Proof-Gap Status**:\
+      \ NONE\n**Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**: COMPLETE\n\
+      \n## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file absent in isolated worktree; glob for `**/*mcp*audit*2026-05-12*.md`\
+      \ found no matches.\n- docs/ARCHITECTURE.md — key passage: one binary started\
+      \ with `resofeed serve` serves static UI, JSON HTTP API, MCP Streamable HTTP\
+      \ at `/mcp`, and background ingest; every `/mcp` request requires `Authorization:\
+      \ Bearer <OWNER_TOKEN>`; missing/invalid auth returns HTTP 401 before MCP handling;\
+      \ resources include `resofeed://system/doctor`.\n- AGENTS.md — NOT READ: absent\
+      \ in isolated worktree root.\n\n## MCP-1 Liveness Probe Evidence\n- Binary/entrypoint\
+      \ used: `./bin/resofeed`, built with `go build -o ./bin/resofeed ./cmd/resofeed`\
+      \ in isolated worktree.\n- DB path: `.audit-artifacts/mcp-1-live/resofeed-live.sqlite3`\
+      \ isolated probe DB.\n- Bind address: `127.0.0.1:8080`.\n- Owner token handling:\
+      \ explicit `--owner-token <redacted>`; verified at least 32 visible non-whitespace\
+      \ chars.\n- Server start command: `OPENROUTER_KEY=<redacted> ./bin/resofeed\
+      \ serve --addr 127.0.0.1:8080 --public-url http://127.0.0.1:8080 --db .audit-artifacts/mcp-1-live/resofeed-live.sqlite3\
+      \ --owner-token <redacted>`.\n- Listener proof:\n  ```text\n  lsof -nP -iTCP:8080\
+      \ -sTCP:LISTEN\n  resofeed 15711 tefx 6u IPv4 ... TCP 127.0.0.1:8080 (LISTEN)\n\
+      \  ```\n- Missing-auth `/mcp` proof:\n  ```text\n  HTTP/1.1 401 Unauthorized\n\
+      \  {\"error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\"\
+      ,\"details\":{}}}\n  ```\n- Valid-token initialize/resources/doctor proof:\n\
+      \  ```text\n  initialize: HTTP/1.1 200 OK; {\"jsonrpc\":\"2.0\",\"id\":1,\"\
+      result\":{\"capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\"\
+      :\"2025-03-26\",\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"\
+      }}}\n  resources/list: HTTP/1.1 200 OK; included resofeed://feed/today, resofeed://rules/active,\
+      \ resofeed://system/doctor, resofeed://sources\n  resources/read doctor: HTTP/1.1\
+      \ 200 OK; included uri=resofeed://system/doctor, mimeType=text/plain, rss/openrouter/ingest\
+      \ diagnostics\n  ```\n- Cleanup/shutdown proof: `kill \"$PID\"; wait \"$PID\"\
+      ` returned `wait_status=0`; post-shutdown `lsof -nP -iTCP:8080 -sTCP:LISTEN`\
+      \ returned no listener output.\n- Files changed: none; probe artifacts and built\
+      \ binary removed; `git status --short` clean.\n- Commit hash(es): none created\
+      \ because no files changed. Worktree branch at `dac42d1`.\n\n## Behavioral Proof\
+      \ Register\nMCP-1:\n  requirement_ref: docs/ARCHITECTURE.md MCP `/mcp` owner-token/current-instance\
+      \ contract; audit MCP-1\n  behavior_claim: real current `resofeed serve` exposes\
+      \ reachable authenticated MCP endpoint\n  runtime_proof_expected: listener +\
+      \ missing-auth 401 + valid-token initialize/resources/doctor + cleanup\n  evidence_ref:\
+      \ build/start command, `lsof` listener, curl HTTP 401, curl MCP 200 responses,\
+      \ shutdown port release\n  status: PASS\n  closure_path: none\n  gate_decision_basis:\
+      \ Single Go binary bound to 127.0.0.1:8080; unauthenticated MCP request rejected\
+      \ with 401 before dispatch; authenticated initialize/resources/list/resources/read\
+      \ doctor succeeded over real HTTP `/mcp`; server stopped and port released.\n\
+      \n## Completion Receipt\nSurface Area Tested: `resofeed serve`; TCP `127.0.0.1:8080`;\
+      \ HTTP `POST /mcp`; MCP methods `initialize`, `resources/list`, `resources/read`\
+      \ for `resofeed://system/doctor`.\nVulnerabilities Triggered: none; no 500s,\
+      \ crashes, or unhandled errors observed during required probe.\nThe Blind Verdict:\
+      \ PASS\nProgrammatic Handoff:\n{\"status\":\"SUCCESS\",\"headline\":\"PASS\"\
+      ,\"blocking_status\":\"CLOSED\",\"proof_gap_status\":\"NONE\",\"verdict\":\"\
+      PASS\",\"blockers\":[],\"orchestrator_action_hint\":\"COMPLETE\",\"behavioral_proof_register\"\
+      :{\"MCP-1\":{\"status\":\"PASS\",\"runtime_proof\":\"listener + missing-auth\
+      \ 401 + valid-token initialize/resources/list/resources/read doctor + cleanup\"\
+      }}}\n\n## Gate Decision\nheadline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\n\n## Mainline Final-State Verification\n\
+      After no-op squash merge, mainline black-box command built a temporary binary\
+      \ outside the repo, started `resofeed serve --addr 127.0.0.1:8080 --public-url\
+      \ http://127.0.0.1:8080 --db <temp>/resofeed.sqlite3 --owner-token <redacted>`,\
+      \ and verified:\n```text\nLISTENER=COMMAND    PID USER   FD   TYPE         \
+      \    DEVICE SIZE/OFF NODE NAME\nresofeed 20594 tefx    6u  IPv4 0x63f49063cc0c4815\
+      \      0t0  TCP 127.0.0.1:8080 (LISTEN)\nNOAUTH_CODE=401\nNOAUTH_BODY={\"error\"\
+      :{\"code\":\"unauthorized\",\"message\":\"owner token required\",\"details\"\
+      :{}}}\nINIT_CODE=200\nINIT_BODY={\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"\
+      capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\":\"2025-03-26\"\
+      ,\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"}}}\nLIST_CODE=200\n\
+      DOCTOR_CODE=200\nDOCTOR_BODY_SNIP={\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"\
+      contents\":[{\"uri\":\"resofeed://system/doctor\",\"mimeType\":\"text/plain\"\
+      ,\"text\":\"rss: ok\\nopenrouter: provider_reachable=unknown configured_model=account_default\
+      \ ... ingest: last_run=never\\n\"}]}}\nPOST_LISTENER=\n```\nCorrected mainline\
+      \ proof exited successfully: listener present during run, no-auth 401, valid-token\
+      \ initialize/list/doctor all 200, and port released after shutdown."
   - id: mcp-audit-parity-security-idempotency-proof
     name: Verify MCP capability parity, owner-token boundary, and receipt semantics
     status: claimed
