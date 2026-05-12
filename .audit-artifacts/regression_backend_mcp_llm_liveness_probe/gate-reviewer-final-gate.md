@@ -40,7 +40,7 @@ Debt is limited to live OpenRouter provider/account privacy-policy availability:
 | REG-2026-05-12-06 | CLOSED_WITH_NON_BLOCKING_DEBT | Required classification artifacts exist: `docs/audits/reg-2026-05-12-06-llm-health-proof-contract.md:18-36`; `.audit-artifacts/.../doctor_after_live_probe.txt:3-13` reports `openrouter_client_timeout_or_error`, `live_summary_successes=0`, `fallback_only_current_summaries=1`; `.audit-artifacts/.../live_feed_today.json:1` shows live item `model_status":"model_latency_error"`; `.audit-artifacts/.../openrouter_live_preflight.json:1-7` classifies direct live preflight as `provider_or_auth` with redacted key. | Fallback-only summaries were not counted as live success. Provider/privacy restriction is non-blocking for repo closure; live PASS remains debt outside current gate. |
 
 unresolved_statuses: []
-verdict: OPEN
+verdict: PASS_WITH_DEBT
 blockers: []
 gate_open_allowed: true
 remaining_gaps:

@@ -8,7 +8,7 @@ Status: acceptance-only contract artifact. This document defines browser/a11y/sc
 - `docs/DESIGN.md:411-449` defines Feed Item and Resonate anatomy, state semantics, keyboard/a11y rules, non-layout-shifting selection, 44px star target, and non-color active star semantics.
 - `docs/DESIGN.md:451-482` defines Inspector, Source Ledger, and State Portability hierarchy and keyboard/a11y behavior.
 - `docs/DESIGN.md:536-545` defines motion/state rules: color/border-only transitions, no bounce, no skeleton loaders, reduced motion support, and no layout shift.
-- `docs/ui-preview.html:530-590` visually anchors selected feed row, star buttons, inline metadata, and Inspector hierarchy; `docs/ui-preview.html:596-619` anchors Source Ledger, source fetch buttons, OPML/state actions, and `/doctor`; `docs/ui-preview.html:623-668` anchors mobile feed/detail behavior.
+- `docs/ui-preview.html:530-590` visually anchors selected feed row, star buttons, inline metadata, and Inspector hierarchy; `docs/ui-preview.html:672-710` anchors Source Ledger import/state/delete actions, source diagnostics, and background-ingest guidance; `docs/ui-preview.html:713-720` anchors `/doctor`; `docs/ui-preview.html:723-773` anchors mobile feed/detail behavior.
 - `docs/DESIGN_VISION.md:34-39` anchors split-pane desktop, single-column mobile, and flat Source Ledger; `docs/DESIGN_VISION.md:63-75` anchors anti-slop and no-layout-shift interaction behavior.
 - `web/src/routes/+page.svelte:313-410`, `web/src/routes/components/Feed.svelte:31-70`, and `web/src/routes/components/Inspector.svelte:47-85` define implementation selectors and state observables to target in tests.
 
@@ -33,14 +33,14 @@ Shared obstruction observables:
 | Inspector original links | `.contract-inspector a[href]` with accessible text `original link` or labelled equivalent | Link is reachable, unobstructed, has non-empty href, and primary reading content remains visible; link click may be intercepted in tests but must be a real anchor target. | `docs/DESIGN.md:451-461`, `Inspector.svelte:65` |
 | `/doctor` | Type `/doctor` in `#steer-input`, submit button | Submits through Steer, shows `.doctor-surface` with heading `/doctor` and `pre.contract-diagnostics[role="log"]`; no dashboard cards/charts replace raw text. | `docs/DESIGN.md:483-489`, `DESIGN_VISION.md:88`, `+page.svelte:169-172`, `+page.svelte:351-355` |
 | OPML import | Source Ledger import action in `SourceLedger` plus `StatePortability` actions; observable copy `import OPML`, `imported N sources; folders flattened` | Import action is keyboard/pointer reachable from Source Ledger, invokes file/text import path, displays raw progress/completion/error line, and does not expose folders as UI hierarchy. | `docs/DESIGN.md:463-482`, `docs/ui-preview.html:605-609`, `+page.svelte:397-405` |
-| Source fetch buttons | Source Ledger per-source fetch buttons and run-ingest action; preview `.manual-fetch-action` | Buttons are 44px min-height, unobstructed, disabled only while fetching/ingesting, labelled per source (`Fetch <source>`/`[RUN INGEST]`), and show source-specific raw error/status without moving row bounds. | `docs/ui-preview.html:330-357`, `docs/ui-preview.html:597-604`, `+page.svelte:214-278` |
+| Source diagnostics/details | Source Ledger per-source `[DETAILS]` disclosure and row status text; no run/fetch buttons | Diagnostic disclosures and delete/import/export/import-state controls are reachable and unobstructed; Source Ledger must not expose `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]` controls. Source-specific raw error/status may appear without moving row bounds. | `docs/DESIGN.md:463-476`, `docs/ui-preview.html:672-710`, `SourceLedger.svelte:107-145` |
 
 ## Keyboard and accessibility contract
 
 Required global proofs:
 
 - `Tab` order starts at Owner Token input when token is absent; after accepted token focus moves to `#steer-input` or first feed item (`docs/DESIGN.md:371-380`).
-- With token accepted, `Tab` reaches Steer, visible submit when present, `TODAY`, `SOURCE LEDGER`, feed open buttons, star buttons, Inspector original link, Source Ledger actions, OPML import, source fetch/delete buttons, state export/import actions, and search controls.
+- With token accepted, `Tab` reaches Steer, visible submit when present, `TODAY`, `SOURCE LEDGER`, feed open buttons, star buttons, Inspector original link, Source Ledger actions, OPML import, Source Ledger details/delete controls, state export/import actions, and search controls.
 - Focus indicator must be visible independent of active/accent state (`docs/DESIGN.md:271-272`) and must not rely solely on color.
 - `Enter` activates links/buttons and Steer submit; `Space` activates feed open button and Resonate buttons (`docs/DESIGN.md:433`, `docs/DESIGN.md:449`).
 - Navigation/action state uses `aria-current`, `aria-selected`, `aria-pressed`, `aria-expanded`, `data-surface`, active-panel class, or an equivalent machine-observable state; tests must fail if the visual active panel and semantic active state disagree.
@@ -77,12 +77,12 @@ Test target: `.contract-feed-item` with child `.contract-feed-open`, `.contract-
 
 ## Inspector hierarchy and raw/provenance payload placement
 
-Authority: `docs/DESIGN.md:451-461`, `docs/DESIGN.md:514`, `docs/ui-preview.html:579-590`, `Inspector.svelte:47-85`.
+Authority: `docs/DESIGN.md:451-461`, `docs/DESIGN.md:514`, `docs/ui-preview.html:655-667`, `Inspector.svelte`.
 
 Primary readable hierarchy must be, in order or visually equivalent:
 
 1. Operational `INSPECTOR` label.
-2. Source/provenance header (`src`, extraction status, model status/value where material) in compact mono metadata.
+2. Source/provenance header (`src`, extraction status, source/value context where material) in compact mono metadata; raw `model_status` enum strings belong in `/doctor` or secondary diagnostics, not the primary reading header.
 3. Article title as the detail heading; opening Inspector moves focus to this heading.
 4. Original link, visibly secondary but reachable.
 5. Extraction status warning when partial/unavailable.
@@ -151,7 +151,7 @@ Tests and audit checks MUST fail on these patterns unless the text appears insid
 
 ## Acceptance checklist mapping
 
-- Hit-target coverage: `TODAY`, `SOURCE LEDGER`, Steer submit, row Inspect, star/resonate, Inspector links, `/doctor`, OPML import, source fetch/delete, state import/export.
+- Hit-target coverage: `TODAY`, `SOURCE LEDGER`, Steer submit, row Inspect, star/resonate, Inspector links, `/doctor`, OPML import, Source Ledger details/delete, state import/export.
 - Keyboard/a11y coverage: tab order, focus visibility, Enter/Space activation, roles/labels/live regions, selected/active semantics.
 - Interaction state matrix: normal, hover, selected, selected+hover, focus, selected+focus with no layout shift or noisy stacking.
 - Inspector hierarchy: primary reading hierarchy separated from secondary raw/provenance diagnostics.

@@ -471,12 +471,12 @@ the same owner-token protected path as the UI:
 
 1. Add a fixture RSS/Atom URL through `POST /api/steer` with the URL as the
    `command`.
-2. Trigger ingestion with `POST /api/ingest` and body `{}`.
+2. Let the `resofeed serve` background ingest loop fetch active sources.
 3. Query the known fixture token with `GET /api/search?q=<known-token>`.
 
-This path uses the documented Steer, manual ingest, and Search HTTP surfaces. It
-does not require direct SQLite writes, private test hooks, sidecar workers, or
-manual UI-only actions.
+This path uses the documented Steer, background ingest, and Search surfaces. It
+does not require direct SQLite writes, private test hooks, sidecar workers,
+Source Ledger run/fetch controls, or manual UI-only actions.
 
 ## First Useful Session
 
