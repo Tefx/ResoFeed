@@ -53300,7 +53300,7 @@ phases:
     claimed_at: '2026-05-12T13:04:23.468148+00:00'
   - id: regression-audit-llm-health-proof-contract
     name: Define live LLM health classification proof obligations
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - live/stub health proof obligations\n  - fallback classification acceptance\n\
       \  - diagnostic artifact requirements\nagent_source: project\n\nLock proof obligations\
@@ -53354,6 +53354,44 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T13:04:13.125512+00:00'
+    done_at: '2026-05-12T13:21:44.265787+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\nREAD:\n- docs/ARCHITECTURE.md\n\
+      - docs/PRD.md\n- docs/DESIGN.md\n- internal/resofeed/openrouter.go\n- internal/resofeed/doctor.go\n\
+      - internal/resofeed/ingest.go\n- internal/resofeed/openrouter_product_integration_contract_test.go\n\
+      - internal/resofeed/openrouter_cli_adapter_contract_test.go\n- internal/resofeed/openrouter_runtime_wiring_test.go\n\
+      - runtime secret test paths located: internal/resofeed/runtime_secret_config_test.go,\
+      \ internal/resofeed/docs_runtime_secret_contract_test.go\n\nNOT READ / ABSENT:\n\
+      - AGENTS.md absent in isolated worktree\n- docs/audits/regression-audit-2026-05-12.md\
+      \ absent\n\n## LLM Health Proof Contract\nclassification_options: [missing_live_model_configuration,\
+      \ stale_database_prior_failures, openrouter_client_timeout_or_error, unresolved_product_regression]\n\
+      required_artifacts:\n- /api/doctor current response snapshot with secrets redacted\n\
+      - current feed model_status/value_tier sample\n- deterministic stub control\
+      \ result\n- explicit live/stub distinction\nsuccess_definition: live model success\
+      \ requires at least one current item with model_status ok, model-backed summary/core_insight\
+      \ evidence, non-null/non-empty value_tier evidence, and no current doctor provider/model\
+      \ uncertainty or transform failure for that item set.\nfallback_only_is_live_success:\
+      \ false\nstub_success_vs_live_health: deterministic OpenRouter-compatible stub\
+      \ success proves request/response shape and local validation/persistence only;\
+      \ it does not prove current live provider reachability, model resolution, latency,\
+      \ or live model-backed summaries.\ndownstream_owner: regression-live-llm-health-classification-fix\n\
+      retest_owner: regression-backend-mcp-llm-liveness-probe\nverdict: PASS\nblockers:\
+      \ []\ngate_open_allowed: true\nremaining_gaps:\n- Downstream live classification\
+      \ and retest artifacts still required; this step only locked the proof contract.\n\
+      \n## Verification\nWorktree:\n- `gofmt -w internal/resofeed/llm_health_proof_contract_test.go\
+      \ && go test ./internal/resofeed -run TestREG2026051206LLMHealthProofContractLocksObligations`\
+      \ -> exit_code 0; `ok resofeed/internal/resofeed 0.700s`\n- `go test ./internal/resofeed`\
+      \ -> exit_code 0; `ok resofeed/internal/resofeed 1.199s`\n- `git commit -m \"\
+      test: lock LLM health proof contract\"` -> commit `1819c89`\n- `git status --short\
+      \ --branch` -> `## vectl/step-regression-audit-llm-health-proof-contract`\n\n\
+      Mainline final-state verification after squash merge:\n- Mainline squash commit:\
+      \ `fa1f9ad` (`[vectl] step-regression-audit-llm-health-proof-contract completed`)\n\
+      - Command: `gofmt -w internal/resofeed/llm_health_proof_contract_test.go &&\
+      \ go test ./internal/resofeed -run TestREG2026051206LLMHealthProofContractLocksObligations\
+      \ -count=1 && go test ./internal/resofeed`\n- Output:\n```text\nok  \tresofeed/internal/resofeed\t\
+      0.605s\nok  \tresofeed/internal/resofeed\t0.717s\n```\n\n## Files changed\n\
+      - docs/audits/reg-2026-05-12-06-llm-health-proof-contract.md\n- internal/resofeed/llm_health_proof_contract_test.go\n\
+      \n## Gate Decision\nheadline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE"
   - id: regression-audit-contract-gate
     name: Gate regression audit contract and expected-red coverage
     status: pending
