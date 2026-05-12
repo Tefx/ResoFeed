@@ -52953,6 +52953,78 @@ phases:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
     agent: integration-verifier
+  - id: regression-frontend-uiux-audit
+    name: Audit regression UI repairs against DESIGN.md with multimodal artifacts
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As a native multimodal UI/UX implementation auditor (uiux-auditor), compare
+      real rendered artifacts against docs/DESIGN.md and the regression audit evidence.
+
+
+      Scope:
+
+      - REG-2026-05-12-01 Source Ledger manual controls and row grammar.
+
+      - REG-2026-05-12-03 Search submit control uniqueness.
+
+      - REG-2026-05-12-05 mobile utility route containment.
+
+      - REG-2026-05-12-07 Search receipt scope.
+
+      - REG-2026-05-12-08 feed row metadata density.
+
+      - REG-2026-05-12-09 Inspector primary reading header.
+
+
+      Required artifacts:
+
+      - Desktop Source Ledger after at least one source exists.
+
+      - Mobile/narrow Search, Source Ledger, and /doctor.
+
+      - Feed row with fallback/excerpt summary state.
+
+      - Inspector detail/header state.
+
+
+      Design constraints:
+
+      - Dense archival workbench, muted colors, rare accents, functional labels.
+
+      - No SaaS copy, mascots, dashboards, onboarding wizards, folders/tags/unread/archive,
+      settings sliders, or drag-and-drop.
+
+      - Source Ledger remains flat and operational.
+
+
+      This is a required UI/UX gate; ordinary tests or DOM snapshots alone do not
+      replace multimodal artifact review.'
+    verification: 'phase-check protecting frontend gate and final closure.
+
+      - Rendered screenshots/images/terminal captures or equivalent visual/spatial
+      artifacts exist for required states/viewports.
+
+      - uiux-auditor returns parseable PASS/PASS_WITH_DEBT/FAIL handoff.
+
+      - Finding-by-finding UI/UX verdicts are provided for REG-01, REG-03, REG-05,
+      REG-07, REG-08, and REG-09.
+
+      - Any design deviations are mapped to blockers or explicit non-blocking debt.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## UI/UX Multimodal\
+      \ Audit Report\nartifacts_reviewed:\n  - <path>\nfinding_verdicts:\n  REG-2026-05-12-01:\
+      \ PASS | FAIL\n  REG-2026-05-12-03: PASS | FAIL\n  REG-2026-05-12-05: PASS |\
+      \ FAIL\n  REG-2026-05-12-07: PASS | FAIL\n  REG-2026-05-12-08: PASS | FAIL\n\
+      \  REG-2026-05-12-09: PASS | FAIL\ndesign_drift: []\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-source-ledger-controls-fix
+    - regression-ui-containment-and-diagnostics-fix
+    agent: uiux-auditor
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
