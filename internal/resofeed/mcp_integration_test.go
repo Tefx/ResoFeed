@@ -96,6 +96,55 @@ func TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays(t *tes
 	}
 }
 
+func TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason(t *testing.T) {
+	// REG-2026-05-12-04: distinct from REG-02 empty-resource array coverage.
+	// This fixture models the audit gap where SQLite transport parity showed
+	// extraction_status=full while MCP read_item evidence had no extracted detail
+	// text. A full extraction must expose non-empty detail text through the real
+	// POST /mcp tool response, or the response/storage status must no longer claim
+	// full extraction, or a clear fallback reason must be present.
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedMCPFullExtractionWithoutDetailText(t, ctx, db)
+	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken})
+
+	var storedStatus string
+	var storedExtracted sql.NullString
+	err := db.QueryRowContext(ctx, `select extraction_status, extracted_text from items where id = 'mcp_reg04_full_without_text'`).Scan(&storedStatus, &storedExtracted)
+	if err != nil {
+		t.Fatalf("read REG-04 fixture storage: %v", err)
+	}
+	if storedStatus != "full" {
+		t.Fatalf("REG-04 fixture storage extraction_status = %q, want full", storedStatus)
+	}
+	if strings.TrimSpace(storedExtracted.String) != "" {
+		t.Fatalf("REG-04 fixture storage extracted_text = %q, want empty audit-gap fixture", storedExtracted.String)
+	}
+
+	resp := mcpCall(t, handler, "read_item", map[string]any{"item_id": "mcp_reg04_full_without_text"})
+	rawToolText := mcpToolText(t, resp, "read_item")
+	var body struct {
+		Item struct {
+			ID               string  `json:"id"`
+			ExtractionStatus string  `json:"extraction_status"`
+			ExtractedText    *string `json:"extracted_text"`
+		} `json:"item"`
+		FallbackReason *string `json:"fallback_reason"`
+	}
+	if err := json.Unmarshal([]byte(rawToolText), &body); err != nil {
+		t.Fatalf("unmarshal REG-04 read_item response: %v; text=%s", err, rawToolText)
+	}
+	if body.Item.ID != "mcp_reg04_full_without_text" {
+		t.Fatalf("REG-04 read_item id = %q, want fixture item; text=%s", body.Item.ID, rawToolText)
+	}
+
+	hasDetailText := body.Item.ExtractedText != nil && strings.TrimSpace(*body.Item.ExtractedText) != ""
+	hasFallbackReason := body.FallbackReason != nil && strings.TrimSpace(*body.FallbackReason) != ""
+	if body.Item.ExtractionStatus == "full" && !hasDetailText && !hasFallbackReason {
+		t.Fatalf("REG-2026-05-12-04 exposed: MCP read_item returned extraction_status=full without non-empty extracted/detail text or fallback reason; response=%s", rawToolText)
+	}
+}
+
 func TestMCPSteerUsesConfiguredOpenRouterAndReceipts(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -237,6 +286,22 @@ func seedMCPCorpus(t *testing.T, ctx context.Context, db *sql.DB) {
 	}
 }
 
+func seedMCPFullExtractionWithoutDetailText(t *testing.T, ctx context.Context, db *sql.DB) {
+	t.Helper()
+	now := time.Date(2026, 5, 12, 9, 0, 0, 0, time.UTC)
+	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, ?, 'ok', 1, 1)`, "mcp_reg04_src", "https://reg04.example/feed.xml", "REG-04 Source", now.Format(time.RFC3339), now.Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("insert REG-04 source: %v", err)
+	}
+	_, err = db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, feed_excerpt, extracted_text, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status) values (?, ?, ?, ?, ?, ?, ?, null, ?, ?, ?, ?, ?, 'full', 'ok')`, "mcp_reg04_full_without_text", "mcp_reg04_src", "https://reg04.example/feed.xml", "https://reg04.example/full-without-text", "https://reg04.example/full-without-text", "REG-04 full status without detail text", "feed excerpt exists but is not extracted article detail", "summary exists but cannot substitute for extracted detail text", "full status must imply stored extracted detail text", "high", now.Format(time.RFC3339), now.Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("insert REG-04 item: %v", err)
+	}
+	if err := rebuildSearchIndex(ctx, db); err != nil {
+		t.Fatalf("rebuild REG-04 search index: %v", err)
+	}
+}
+
 func mcpResourceText(t *testing.T, handler http.Handler, uri string) string {
 	t.Helper()
 	resp := mcpRequestJSON(t, handler, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "resources/read", "params": map[string]any{"uri": uri}})
@@ -293,6 +358,16 @@ func mcpToolJSON[T any](t *testing.T, handler http.Handler, name string, args ma
 
 func mcpToolResultJSON[T any](t *testing.T, resp mcpResponse, name string) T {
 	t.Helper()
+	text := mcpToolText(t, resp, name)
+	var value T
+	if err := json.Unmarshal([]byte(text), &value); err != nil {
+		t.Fatalf("unmarshal tool JSON text for %s: %v; text=%s", name, err, text)
+	}
+	return value
+}
+
+func mcpToolText(t *testing.T, resp mcpResponse, name string) string {
+	t.Helper()
 	if resp.Error != nil {
 		t.Fatalf("tools/call %s error: %+v", name, resp.Error)
 	}
@@ -309,11 +384,7 @@ func mcpToolResultJSON[T any](t *testing.T, resp mcpResponse, name string) T {
 	if len(parsed.Content) != 1 {
 		t.Fatalf("tool content len = %d, want 1", len(parsed.Content))
 	}
-	var value T
-	if err := json.Unmarshal([]byte(parsed.Content[0].Text), &value); err != nil {
-		t.Fatalf("unmarshal tool JSON text for %s: %v; text=%s", name, err, parsed.Content[0].Text)
-	}
-	return value
+	return parsed.Content[0].Text
 }
 
 func mcpCall(t *testing.T, handler http.Handler, name string, args map[string]any) mcpResponse {
