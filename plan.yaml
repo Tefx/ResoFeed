@@ -54382,7 +54382,7 @@ phases:
       Post-verification path status for changed files was clean.'
   - id: regression-backend-mcp-llm-liveness-probe
     name: Probe backend MCP and LLM runtime liveness after repair
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -54537,6 +54537,105 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-12T17:51:53.815554+00:00'
+    done_at: '2026-05-12T18:10:06.495171+00:00'
+    evidence: 'Verification report delivered by blind-tester; semantic closure is
+      blocker-owned rather than green.
+
+
+      Closure fields from latest retry:
+
+      - Headline: FAIL
+
+      - Verdict: FAIL
+
+      - Blocking Status: OPEN
+
+      - Proof-Gap Status: BLOCKING
+
+      - gate_open_allowed: false
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE
+
+      - blockers: B1 — OpenRouter live proof did not produce `model_status=ok` or
+      positive `live_summary_successes` despite loading the main workspace `.env`
+      key.
+
+
+      Successful proof obtained:
+
+      - refs read confirmation included `docs/ARCHITECTURE.md`, `docs/DESIGN.md`,
+      and `docs/PRD.md` with key passages.
+
+      - Single `cmd/resofeed` binary started and accepted HTTP/MCP probes.
+
+      - `/mcp initialize` returned HTTP 200.
+
+      - `/mcp tools/call read_item` returned HTTP 200 and included `FULL EXTRACTION
+      DETAIL TEXT -- REG-04 black-box proof` in `extracted_text`.
+
+      - Deterministic/stub proof passed: seeded fallback item remained visible with
+      `extraction_status: full` and `model_status: summary_unavailable`.
+
+      - Fallback-only summaries were not counted as live model success.
+
+      - REG-02 existing MCP chain was cited via final black-box/MCP audit evidence.
+
+      - Secret redaction confirmed: no OpenRouter key in artifacts/logs/evidence.
+
+
+      External live proof failure:
+
+      - User clarified OpenRouter key is in `.env`; retry loaded `/Users/tefx/Projects/ResoFeed/.env`
+      for `OPENROUTER_KEY` without printing/copying/committing the secret.
+
+      - Live OPML import and public source fetch via product HTTP API succeeded.
+
+      - Live feed item surfaced, but item `model_status` was `model_latency_error`,
+      not `ok`.
+
+      - `/api/doctor` after live probe showed `live_summary_successes=0`, `fallback_only_current_summaries=1`,
+      and `health_classification=openrouter_client_timeout_or_error`.
+
+
+      Artifacts/commits:
+
+      - Worktree retry commit: `127296de5060268119dadf32788b61745e309fc3`.
+
+      - Salvage commits on main: `7789829` (`[vectl] salvage live OpenRouter probe
+      evidence`) and `16bcc18` (`[vectl] record live OpenRouter mainline failure evidence`).
+
+      - Key artifacts: `tests/repro/regression_backend_mcp_llm_liveness_probe.py`,
+      `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/report.json`, `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor_after_live_probe.txt`,
+      `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_feed_today.json`,
+      `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_source_fetch.json`,
+      `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/mcp_read_item.json`.
+
+
+      Mainline final-state verification after salvage:
+
+      - Command: `go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`.
+
+      - Result: reproduced semantic failure: `external_openrouter_env_present=true`,
+      `live_item_model_status=model_latency_error`, `live_summary_successes=0`, `health_classification=openrouter_client_timeout_or_error`.
+
+
+      Remediation ownership created before completing this verifier:
+
+      - Added `regression-backend-mcp-llm-openrouter-live-remediation`.
+
+      - Added `regression-backend-mcp-llm-openrouter-live-retest`.
+
+      - Updated `regression-backend-mcp-llm-gate` to wait for the new remediation/retest
+      path.
+
+
+      Gaps/notes:
+
+      - This step is completed as a verification report that discovered and preserved
+      a blocker; the blocker is not closed here.
+
+      - Backend gate must not open until the new remediation and retest resolve or
+      disposition the live OpenRouter proof gap.'
   - id: regression-backend-mcp-llm-gate
     name: Gate backend MCP and LLM regression repair
     status: pending
