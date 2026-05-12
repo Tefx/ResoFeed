@@ -53260,3 +53260,53 @@ phases:
     depends_on:
     - regression-audit-full-runtime-retest
     agent: spec-verifier
+  - id: regression-audit-doc-sync-check
+    name: Check documentation sync for regression audit closure
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As an INDEPENDENT DOC REVIEWER (doc-reviewer), check whether repaired behavior
+      requires documentation updates and whether docs still match the implemented
+      UI/API/MCP behavior.
+
+
+      Scope:
+
+      - Source Ledger manual ingest/fetch controls.
+
+      - MCP resources/read and read_item behavior.
+
+      - LLM fallback/live health taxonomy and /doctor diagnostics.
+
+      - Search, mobile utility routes, feed row metadata, and Inspector metadata placement.
+
+
+      Do not rewrite product requirements into a new product. Documentation must preserve
+      ResoFeed invariants: single Go binary, SQLite/FTS5, owner-token boundary, no
+      accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event bus/service layer, flat
+      Source Ledger, no forbidden UI/product creep.
+
+
+      If docs already match implementation, provide citations and mark no-op. If drift
+      remains, identify exact docs and downstream documentation work required.'
+    verification: 'phase-check protecting regression-audit-final-gate.
+
+      - Evidence lists every doc checked and whether it matches repaired behavior.
+
+      - Any required docs update is either completed by this step if documentation-only
+      or reported as a blocker with exact file/section.
+
+      - No documentation change introduces forbidden product/architecture scope.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Documentation\
+      \ Sync Check\nchecked_docs:\n  - path: <path>\n    relevant_sections: <sections>\n\
+      \    verdict: MATCHES | DRIFT | NOT_APPLICABLE\nrequired_doc_changes: []\noutputs_or_artifacts:\n\
+      \  - <diff summary or no-op citation>\nverdict: PASS | PASS_WITH_DEBT | FAIL\n\
+      blockers: []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-audit-full-runtime-retest
+    - regression-audit-spec-conformance-review
+    agent: doc-reviewer
