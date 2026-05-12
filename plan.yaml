@@ -53571,6 +53571,115 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T13:26:29.352355+00:00'
+  - id: regression-audit-contract-gate-batched-fix
+    name: Batched remediation for regression audit contract gate blockers
+    status: pending
+    description: "Batched remediation for failed gate `regression-audit-contract-gate`.\n\
+      \nwork_type: defect_repair\nstep_type: implementation\nagent_source: project\n\
+      provenance/disposition:\n- B-REG01-CONTRACT-CONTRADICTION: introduced_now or\
+      \ stale-test carryover; disposition: blocking-now because it contradicts the\
+      \ REG-01 authority decision and can poison downstream frontend gates.\n- B-MATRIX-NOT-VERIFIABLE:\
+      \ evidence-only matrix is not durable; disposition: blocking-now because gate\
+      \ review needs a reviewable artifact outside transient step evidence.\n- B-FRONTEND-VERIFICATION-NOT-REPRODUCED:\
+      \ likely environment/bootstrap issue; disposition: blocking-now for closure\
+      \ because the gate must be able to reproduce frontend check commands.\n\nSCOPE:\
+      \ Contract/test/doc-artifact remediation only. Do NOT modify product implementation\
+      \ code, runtime behavior, Svelte components, Go handlers, MCP tools, database/state\
+      \ code, or styling.\n\nRequired changes:\n1. Create durable owner matrix artifact\
+      \ at `docs/audits/regression-audit-2026-05-12-contract-matrix.md`.\n   - Map\
+      \ REG-01 through REG-09 exactly once.\n   - For each REG item, include: finding\
+      \ summary, authoritative disposition, downstream owner step(s), expected-red/proof\
+      \ step coverage, and closure phase/gate.\n   - REG-01 must record the Source\
+      \ Ledger authority adjudication: Source Ledger controls must NOT expose `[RUN\
+      \ INGEST]` or `[FETCH]`; negative assertions preserving this boundary are required.\n\
+      \   - REG-02 must be explicitly delegated to the existing MCP capability audit\
+      \ chain / downstream MCP owner rather than duplicated as a new contract family.\n\
+      \   - The artifact must be durable and reviewable from the repository, not only\
+      \ described in plan/evidence.\n2. Repair the test-contract contradiction.\n\
+      \   - Remove, rewrite, or isolate stale active expected-red expectations in\
+      \ `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts` that still\
+      \ click or require `[RUN INGEST]`.\n   - Also search for stale `[FETCH]` expectations\
+      \ in active expected-red paths.\n   - Preserve the Source Ledger forbidden-control\
+      \ negative assertions in `web/tests/e2e/regression-audit-ui-expected-red.spec.ts`;\
+      \ do NOT weaken or delete the REG-01 negative assertions.\n   - If any legacy\
+      \ full-UI test remains intentionally stale, mark it out of the active expected-red\
+      \ contract path with a clear comment and ensure it cannot contradict REG-01\
+      \ closure.\n3. Make frontend verification reproducible using the repo-native\
+      \ web dependency workflow.\n   - Before `npm --prefix web run check`, verify\
+      \ whether dependencies are installed.\n   - If `web/node_modules` is missing\
+      \ or SvelteKit is unavailable, run the repo-native install command, e.g. `npm\
+      \ --prefix web ci` when a lockfile is present, or the documented equivalent\
+      \ if the repo uses another workflow.\n   - Then run `npm --prefix web run check`\
+      \ and a focused expected-red Playwright command covering the regression-audit\
+      \ UI spec.\n   - Capture exact commands and outputs in evidence so the re-gate\
+      \ can reproduce them.\n\nGate Preview (what the re-gate WILL reject):\n1. The\
+      \ durable matrix artifact is missing, transient-only, or maps any REG-01..REG-09\
+      \ item more or less than once.\n2. Any active expected-red test still requires\
+      \ `[RUN INGEST]` or `[FETCH]` as a Source Ledger control.\n3. REG-01 negative\
+      \ assertions are weakened or deleted instead of preserved.\n4. REG-02 delegation\
+      \ is omitted or duplicated into conflicting owner paths.\n5. Frontend check\
+      \ commands omit dependency bootstrap or cannot be reproduced in a clean worktree.\n\
+      6. Product implementation code changes are included in this contract/test/doc-artifact\
+      \ fix.\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION-style\
+      \ remediation step for contract/test/doc artifacts. Stub-only completion is\
+      \ NOT acceptable. The durable matrix must contain substantive REG-01..REG-09\
+      \ ownership content, and tests must encode non-contradictory active expected-red\
+      \ semantics."
+    verification: 'local-check protecting `regression-audit-contract-gate-rerun` and
+      downstream frontend/backend remediation gates.
+
+
+      Required proof:
+
+      - Durable artifact proof: `docs/audits/regression-audit-2026-05-12-contract-matrix.md`
+      exists and maps REG-01..REG-09 exactly once with downstream owner step(s).
+
+      - REG-01 contradiction proof: active expected-red UI tests no longer click or
+      require `[RUN INGEST]` / `[FETCH]` as Source Ledger controls, while forbidden-control
+      negative assertions remain present.
+
+      - REG-02 delegation proof: matrix delegates REG-02 to the MCP capability/downstream
+      owner path without creating conflicting duplicate ownership.
+
+      - Frontend reproducibility proof: evidence includes the exact dependency bootstrap
+      decision/command, `npm --prefix web run check`, and a focused expected-red Playwright
+      command with pasted output.
+
+      - Scope proof: changed files are limited to contract/test/doc-artifact files;
+      no product implementation code changed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/regression-audit-2026-05-12.md — key passage or \"NOT\
+      \ READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/regression-audit-ui-expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Batched Gate Blocker Remediation\
+      \ Evidence\n\n### Blockers addressed\n- B-REG01-CONTRACT-CONTRADICTION: <how\
+      \ stale RUN INGEST/FETCH active expectations were removed/isolated while preserving\
+      \ forbidden-control negative assertions>\n- B-MATRIX-NOT-VERIFIABLE: <path to\
+      \ durable matrix artifact and REG-01..REG-09 exact-once proof>\n- B-FRONTEND-VERIFICATION-NOT-REPRODUCED:\
+      \ <dependency bootstrap/check commands and outputs>\n\n### Durable matrix artifact\n\
+      - Path: docs/audits/regression-audit-2026-05-12-contract-matrix.md\n- REG exact-once\
+      \ proof:\n  ```\n  <paste command/output showing REG-01..REG-09 each appear\
+      \ as matrix rows exactly once>\n  ```\n- REG-02 delegation excerpt:\n  ```\n\
+      \  <paste matrix row or excerpt>\n  ```\n\n### Test contradiction repair\n-\
+      \ Files changed:\n  ```\n  <list>\n  ```\n- Stale active control expectations\
+      \ search:\n  ```\n  <paste grep/rg output for RUN INGEST and FETCH in active\
+      \ expected-red tests, with explanation for intentional historical references\
+      \ if any>\n  ```\n- Source Ledger forbidden-control negative assertions preserved:\n\
+      \  ```\n  <paste relevant assertions>\n  ```\n\n### Reproducible frontend verification\n\
+      - Dependency bootstrap decision: <web/node_modules present? svelte-kit available?\
+      \ command used?>\n- Commands executed:\n  ```\n  <npm --prefix web ci or documented\
+      \ equivalent if needed>\n  <npm --prefix web run check>\n  <focused expected-red\
+      \ Playwright command>\n  ```\n- Actual output:\n  ```\n  <paste key stdout/stderr,\
+      \ not a summary>\n  ```\n\n### Scope confirmation\n- Product implementation\
+      \ files changed: <none, or explain why this violates scope>\n- Contract/test/doc-artifact\
+      \ files changed only: YES/NO\n\n### Headline\nPASS | FAIL"
+    depends_on:
+    - regression-audit-contract-matrix
+    - regression-audit-ui-expected-red-tests
+    - regression-audit-mcp-read-item-expected-red-tests
+    - regression-audit-llm-health-proof-contract
+    agent: frontend-engineer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
