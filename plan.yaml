@@ -52280,17 +52280,21 @@ phases:
       1. Every actionable finding REG-2026-05-12-01 through REG-2026-05-12-09 is mapped
       to a downstream owner.
 
-      2. REG-2026-05-12-02 is not duplicated and is delegated to the existing MCP
+      2. REG-2026-05-12-01 is correctly classified as an authority-adjudication/product-boundary
+      conflict when audit/ui-preview text demands Source Ledger `[RUN INGEST]` / `[FETCH]`
+      controls contrary to canonical docs and prior strict closure.
+
+      3. REG-2026-05-12-02 is not duplicated and is delegated to the existing MCP
       capability audit chain.
 
-      3. Expected-red tests/proof contracts exist for distinct new gaps: UI surface
+      4. Expected-red tests/proof contracts exist for distinct new gaps: UI surface
       regressions, MCP read_item detail text, and live LLM health classification.
 
-      4. Contract/test evidence respects ResoFeed invariants: single Go binary, SQLite/FTS5,
+      5. Contract/test evidence respects ResoFeed invariants: single Go binary, SQLite/FTS5,
       owner-token boundary, no accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event
       bus/service layer, flat Source Ledger, no forbidden UI/product creep.
 
-      5. Downstream backend and frontend branches can safely fan out after this gate.
+      6. Downstream backend and frontend branches can safely fan out after this gate.
 
 
       review_depth: STANDARD
@@ -52298,6 +52302,8 @@ phases:
       cross_cutting_focus:
 
       - audit finding ownership completeness
+
+      - Source Ledger canonical boundary preservation and conflict adjudication
 
       - no duplicate MCP empty-resource remediation
 
@@ -52312,20 +52318,31 @@ phases:
 
       - Finding-by-finding owner matrix has no gaps or duplicates.
 
+      - REG-01 gate basis rejects forbidden Source Ledger run/fetch controls unless
+      newer canonical authority is cited with deviation record.
+
       - Gate decision basis lists unresolved statuses and why they block or do not
       intersect downstream gates.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Gate Review\
-      \ Report\nphase: regression-audit-remediation-contract-matrix-and-expected-red-tests\n\
-      steps_reviewed:\n  - regression-audit-contract-matrix\n  - regression-audit-ui-expected-red-tests\n\
-      \  - regression-audit-mcp-read-item-expected-red-tests\n  - regression-audit-llm-health-proof-contract\n\
-      finding_coverage:\n  REG-2026-05-12-01: <owner + status>\n  REG-2026-05-12-02:\
-      \ <existing MCP chain owner + status>\n  REG-2026-05-12-03: <owner + status>\n\
-      \  REG-2026-05-12-04: <owner + status>\n  REG-2026-05-12-05: <owner + status>\n\
-      \  REG-2026-05-12-06: <owner + status>\n  REG-2026-05-12-07: <owner + status>\n\
-      \  REG-2026-05-12-08: <owner + status>\n  REG-2026-05-12-09: <owner + status>\n\
-      verdict: OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
-      \ []"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Gate Evidence
+
+      - Step evidence review table.
+
+      - REG-01 authority conflict decision basis.
+
+      - REG-02 delegation confirmation.
+
+      - OPEN/BLOCK recommendation with unresolved statuses.'
     depends_on:
     - regression-audit-contract-matrix
     - regression-audit-ui-expected-red-tests
