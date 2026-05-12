@@ -51897,7 +51897,7 @@ phases:
       \ initialize/list/doctor all 200, and port released after shutdown."
   - id: mcp-audit-parity-security-idempotency-proof
     name: Verify MCP capability parity, owner-token boundary, and receipt semantics
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -52016,6 +52016,140 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-12T09:38:06.025962+00:00'
+    done_at: '2026-05-12T10:03:07.515381+00:00'
+    evidence: "## Verification Report: mcp-audit-parity-security-idempotency-proof\n\
+      **Headline**: PASS\n**Blocking Status**: CLOSED\n**Proof-Gap Status**: NONE\n\
+      **Verdict**: PASS\n**Blockers**: []\n**Orchestrator Action Hint**: COMPLETE\n\
+      \n## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/ARCHITECTURE.md — key\
+      \ passages read: §1 lines 11-19 require one Go binary, one SQLite DB, thin HTTP/MCP\
+      \ transports, lexical retrieval only, single owner token/no accounts/OAuth/RBAC;\
+      \ §7 lines 833-902 define `/mcp` Streamable HTTP auth, no per-agent registry,\
+      \ `actor_id` attribution only, resources/tools, exact MIME rules, idempotency,\
+      \ no delivery-channel ownership; §9 lines 926-948 enforces minimal file shape\
+      \ and no repository/service/event-bus/sync layers.\n- AGENTS.md — NOT READ:\
+      \ file absent in isolated worktree.\n- relevant code/tests:\n  - `internal/resofeed/mcp.go`:\
+      \ auth before dispatch; strict schema via `DisallowUnknownFields`; tool schemas\
+      \ `additionalProperties=false`; exact resource MIME list.\n  - `internal/resofeed/mcp_integration_test.go`:\
+      \ real listener MCP tests; auth/idempotency tests; OpenRouter replay test.\n\
+      \  - `internal/resofeed/openrouter_product_integration_contract_test.go`: HTTP/MCP\
+      \ steering retry/human precedence and transport parity.\n\n## Integration Regression\
+      \ Evidence\n- Commands executed:\n  1. `pwd && git status --short --branch`\n\
+      \  2. `go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts|SearchItemsMatchesHTTPSearch|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)$'\
+      \ -count=1 -v`\n  3. Temporary runtime probe: `go test ./internal/resofeed -run\
+      \ TestMCPAuditRuntimeProbe -count=1 -v`\n  4. `go test ./internal/resofeed -run\
+      \ 'Test(MCP(StreamableHTTPResourcesToolsAuthAndIdempotency|ResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays|SteerUsesConfiguredOpenRouterAndReceipts|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)|SteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety|InvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence|HTTPAndMCPTransportParityForCoreOperations)$'\
+      \ -count=1 -v`\n  5. Forbidden-scope scan across `internal/resofeed/*.go`.\n\
+      \  6. `git status --short --branch && git diff --stat`\n- Actual output highlights:\n\
+      \  - Focused suggested command passed: `ok  \tresofeed/internal/resofeed\t0.556s`.\n\
+      \  - Temporary real runtime probe passed: `ok  \tresofeed/internal/resofeed\t\
+      0.982s`.\n  - Final committed-suite regression passed: `ok  \tresofeed/internal/resofeed\t\
+      0.303s`.\n- MCP resources/tools/schema proof: real bound `/mcp` listener returned\
+      \ `initialize`, `tools/list`, and `resources/list`; tool schemas logged `additionalProperties:false`;\
+      \ resources logged exact MIME map: `feed/today=application/json`, `rules/active=application/json`,\
+      \ `system/doctor=text/plain`, `sources=application/json`.\n- HTTP/MCP parity\
+      \ proof: temporary real-listener probe hit HTTP `/api/search?q=sqlite&limit=20`\
+      \ and MCP `search_items` against same SQLite fixture: `http_ids=[item_http_01]\
+      \ mcp_ids=[item_http_01]`.\n- Owner-token/security proof: missing and invalid\
+      \ `/mcp` auth both returned HTTP 401 with JSON error body before dispatch: `{\"\
+      error\":{\"code\":\"unauthorized\",\"message\":\"owner token required\",\"details\"\
+      :{}}}`. Schema text and test output confirm `actor_id` is attribution only,\
+      \ not an auth lookup.\n- Idempotency/receipt proof: temporary real-listener\
+      \ probe executed actual MCP `mark_inspected`, `resonate_item`, and `report_delivery`;\
+      \ replay returned `AlreadyApplied:true`; conflicting reuse of `audit-resonate-001`\
+      \ with a different payload returned JSON-RPC invalid params with `field:idempotency_key`;\
+      \ SQLite snapshot after mutations had `is_resonated:1`, `last_actor_id:audit-agent`,\
+      \ timestamps set, and `receipt_count=3`.\n- OpenRouter/steer proof: MCP `steer`\
+      \ URL command added `https://audit.example/feed.xml`, visible via `resofeed://sources`;\
+      \ human steering then took precedence over MCP agent steering; replay did not\
+      \ double-call LLM (`llm_calls=1`).\n- Forbidden-scope scan/result: grep hits\
+      \ in `internal/resofeed/*.go` were prohibitive comments/contracts or unrelated\
+      \ Go `sync` imports. No evidence found of introduced accounts/OAuth/RBAC/per-agent\
+      \ registry, vector/RAG implementation, sync/merge/event bus/service/repository\
+      \ layer, or delivery-channel ownership.\n- Files changed: none in final worktree.\
+      \ Temporary probe file `internal/resofeed/mcp_audit_runtime_probe_test.go` was\
+      \ created only to produce runtime proof and removed before exit.\n- Commit hash(es):\
+      \ none. Verification produced no final file changes; worktree clean. No empty\
+      \ commit created.\n\n## Evidence Levels\n- L0 Static: PASS — required files\
+      \ read; MCP implementation and tests inspected.\n- L1 Contracts: PASS — focused\
+      \ Go tests passed; strict schemas and exact MIME values verified.\n- L2 Real\
+      \ Wiring: PASS — real bound HTTP listener exercised `/mcp` and `/api/search`;\
+      \ SQLite state/receipt snapshot observed.\n- L3 Live Intelligence: NOT REQUIRED\
+      \ — OpenRouter intentionally stubbed for deterministic path/replay proof; no\
+      \ live external credential requested.\n\n## Protocol Results\n- P1 Empty Room:\
+      \ PASS — named tests collected and ran.\n- P2 Fake Seam: PASS_WITH_CONTEXT —\
+      \ existing tests use OpenRouter stubs, but MCP/HTTP seams were exercised through\
+      \ real listener and SQLite; no live OpenRouter required by task.\n- P4 Live\
+      \ External Service: N/A — stub path explicitly required for OpenRouter replay\
+      \ proof.\n- P8 Caller Reachability: PASS — `initialize`, `tools/list`, `resources/list`,\
+      \ `resources/read`, `tools/call`, HTTP `/api/search` invoked through router/listener.\n\
+      - P9 Smoke/Liveness: PASS — real `net.Listen(\"127.0.0.1:0\")` server accepted\
+      \ HTTP requests and shut down cleanly.\n\n## behavioral_proof_register\nMCP\
+      \ capability parity:\n  requirement_ref: docs/ARCHITECTURE.md §7 MCP Surface\n\
+      \  behavior_claim: initialize/tools/list/resources/list expose expected surface;\
+      \ schemas strict; MIME exact\n  runtime_proof_expected: real /mcp calls through\
+      \ listener\n  evidence_ref: TestMCPAuditRuntimeProbe logs + committed MCP tests\n\
+      \  status: PROVEN\n  closure_path: none\n  gate_decision_basis: real listener\
+      \ responses and tests passed\n\nOwner-token security:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ lines 837-850\n  behavior_claim: missing/invalid MCP auth returns HTTP 401\
+      \ before JSON-RPC dispatch\n  runtime_proof_expected: unauthorized /mcp POST\
+      \ returns 401 JSON error\n  evidence_ref: auth proof missing_status=401 invalid_status=401\n\
+      \  status: PROVEN\n  closure_path: none\n  gate_decision_basis: real listener\
+      \ 401 evidence\n\nHTTP/MCP search parity:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ tool table: search_items equivalent to GET /api/search\n  behavior_claim:\
+      \ same seeded lexical query returns same retrieval item\n  runtime_proof_expected:\
+      \ HTTP /api/search and MCP search_items against same DB fixture\n  evidence_ref:\
+      \ search parity proof: http_ids=[item_http_01] mcp_ids=[item_http_01]\n  status:\
+      \ PROVEN\n  closure_path: none\n  gate_decision_basis: same fixture and same\
+      \ item id\n\nRead/evaluate non-mutation:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ line 898\n  behavior_claim: resources/read, search_items, read_item do not\
+      \ mutate item_state\n  runtime_proof_expected: item_state count unchanged after\
+      \ read/evaluate calls\n  evidence_ref: temporary runtime probe checked beforeState\
+      \ == afterReadsState\n  status: PROVEN\n  closure_path: none\n  gate_decision_basis:\
+      \ test would fail on mutation\n\nMutating MCP idempotency and receipts:\n  requirement_ref:\
+      \ docs/ARCHITECTURE.md lines 824-831 and 866-869\n  behavior_claim: mark_inspected,\
+      \ resonate_item, report_delivery mutate and replay idempotently; conflicting\
+      \ key rejected unchanged; receipts bounded runtime provenance\n  runtime_proof_expected:\
+      \ actual MCP mutations + SQLite item_state and agent_receipts snapshot\n  evidence_ref:\
+      \ AlreadyApplied true; conflict field=idempotency_key; receipt_count=3\n  status:\
+      \ PROVEN\n  closure_path: none\n  gate_decision_basis: runtime DB snapshot and\
+      \ response proof\n\nMCP steer URL/source and human precedence:\n  requirement_ref:\
+      \ docs/ARCHITECTURE.md lines 843-850 and frontend/steer source ledger contract\n\
+      \  behavior_claim: MCP steer URL subscription appears in resofeed://sources;\
+      \ agent steering respects active human steering precedence; replay avoids double\
+      \ LLM call\n  runtime_proof_expected: MCP steer URL + resources/read sources\
+      \ + human steer then MCP agent steer replay\n  evidence_ref: source added; sources_resource\
+      \ contains URL; human_precedence; llm_calls=1\n  status: PROVEN\n  closure_path:\
+      \ none\n  gate_decision_basis: real MCP/HTTP calls and LLM call counter\n\n\
+      Forbidden architecture scope:\n  requirement_ref: docs/ARCHITECTURE.md §§1,\
+      \ 9\n  behavior_claim: no accounts/OAuth/RBAC/per-agent registry/vector/RAG/sync/event\
+      \ bus/service layer/delivery ownership introduced\n  runtime_proof_expected:\
+      \ static seam scan sufficient for absence claim\n  evidence_ref: forbidden-scope\
+      \ grep result\n  status: PROVEN\n  closure_path: none\n  gate_decision_basis:\
+      \ matches are prohibitive comments/contracts or unrelated sync imports\n\n##\
+      \ Gate Decision\nheadline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\n\n## Action Summary\nRan focused\
+      \ MCP/HTTP parity/security/idempotency regression sweep in isolated worktree.\
+      \ Added and removed a temporary runtime probe to obtain real listener and SQLite\
+      \ receipt evidence.\n\n## Mainline Final-State Verification\nAfter no-op squash\
+      \ merge, mainline command:\n```text\ngo test ./internal/resofeed -run 'Test(MCP(StreamableHTTPResourcesToolsAuthAndIdempotency|ResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays|SteerUsesConfiguredOpenRouterAndReceipts|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)|SteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety|InvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence|HTTPAndMCPTransportParityForCoreOperations)$'\
+      \ -count=1 -v\n```\nOutput:\n```text\n=== RUN   TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency\n\
+      --- PASS: TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency (0.01s)\n===\
+      \ RUN   TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\n\
+      --- PASS: TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ (0.00s)\n=== RUN   TestMCPSteerUsesConfiguredOpenRouterAndReceipts\n--- PASS:\
+      \ TestMCPSteerUsesConfiguredOpenRouterAndReceipts (0.00s)\n=== RUN   TestMCPRealBoundListenerInitializeResourcesAndTools\n\
+      --- PASS: TestMCPRealBoundListenerInitializeResourcesAndTools (0.01s)\n=== RUN\
+      \   TestMCPRealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency\n---\
+      \ PASS: TestMCPRealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency\
+      \ (0.00s)\n=== RUN   TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety\n\
+      --- PASS: TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety (0.00s)\n\
+      === RUN   TestInvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence\n\
+      --- PASS: TestInvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence\
+      \ (0.00s)\n=== RUN   TestHTTPAndMCPTransportParityForCoreOperations\n--- PASS:\
+      \ TestHTTPAndMCPTransportParityForCoreOperations (0.00s)\nPASS\nok  \tresofeed/internal/resofeed\t\
+      0.549s\n```\n\n## Artifacts Modified\nNone final. Temporary probe file removed\
+      \ before exit."
   - id: mcp-audit-doc-sync-check
     name: Check documentation sync for MCP audit closure
     status: done
