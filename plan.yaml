@@ -51546,3 +51546,67 @@ phases:
       \ or none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: SUPPORTING_PROOF\
       \ | BLOCKED\n  MCP-2: SUPPORTING_PROOF | BLOCKED"
     agent: integration-verifier
+  - id: mcp-audit-doc-sync-check
+    name: Check documentation sync for MCP audit closure
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Doc-sync check for the focused MCP audit repair.
+
+
+      Scope:
+
+      - Compare implemented behavior after remediation against docs/ARCHITECTURE.md
+      §2, §6, §7, §10, docs/DESIGN.md invariants, AGENTS.md, and docs/audits/mcp-capability-audit-2026-05-12.md.
+
+      - If behavior matches docs exactly, produce a no-doc-change-needed decision
+      with citations.
+
+      - If documentation drift is found, update only project documentation needed
+      to match implemented behavior. Do not rewrite product scope or introduce new
+      concepts.
+
+
+      Required checks:
+
+      - MCP resources still documented as `resofeed://sources` => `{ "sources": [Source]
+      }` and `resofeed://rules/active` => `{ "rules": [SteerRule] }`; empty state
+      means `[]` by array contract.
+
+      - Runtime command/liveness expectations remain `resofeed serve` single binary
+      with `/mcp` on the configured bind.
+
+      - Owner-token boundary remains universal; actor_id remains attribution only.
+
+      - Receipts remain runtime idempotency/provenance only and not portable state/activity
+      feed.
+
+      - No docs mention accounts/OAuth/RBAC, vector/RAG, sync/merge, event bus/service
+      layer, folders/tags/unread/archive/settings creep, or delivery-channel ownership.
+
+
+      This is documentation verification/sync, not product implementation.'
+    verification: 'phase-check protecting mcp-audit-final-gate.
+
+      - Documentation either remains accurate with cited no-change-needed proof or
+      is synced to the repaired behavior.
+
+      - Any doc edits preserve the canonical architecture/design invariants.
+
+      - Evidence explicitly maps MCP-1 and MCP-2 documentation status.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key\
+      \ passage or \"NOT READ: <reason>\"\n\n## Doc-Sync Evidence\n- Docs inspected:\
+      \ <list>\n- Doc edits made: <none or list>\n- No-change-needed rationale, if\
+      \ applicable: <citations>\n- MCP-1 documentation status: <accurate / synced\
+      \ / gap>\n- MCP-2 documentation status: <accurate / synced / gap>\n- Forbidden-scope\
+      \ docs scan: <result>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n\
+      \  - <blocker or none>\ngate_open_allowed: true | false\nfinding_closure:\n\
+      \  MCP-1: DOCS_SYNCED_OR_ALREADY_ACCURATE | BLOCKED\n  MCP-2: DOCS_SYNCED_OR_ALREADY_ACCURATE\
+      \ | BLOCKED"
+    agent: doc-reviewer
