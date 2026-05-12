@@ -55543,7 +55543,7 @@ phases:
       - Files changed: none'
   - id: regression-frontend-surface-gate
     name: Gate frontend regression surface repair with Source Ledger boundary
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -55637,6 +55637,8 @@ phases:
     - regression-frontend-uiux-audit
     - regression-frontend-real-api-proof-uiux-delta-audit
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T16:38:35.117241+00:00'
   - id: regression-frontend-real-api-proof-remediation
     name: Remediate real API frontend proof blockers
     status: done
