@@ -51833,15 +51833,24 @@ phases:
   - mcp-capability-audit-verification-and-finalization
   steps:
   - id: regression-audit-contract-matrix
-    name: Lock regression audit finding matrix and repair contracts
+    name: Lock regression audit matrix with Source Ledger boundary adjudication
     status: pending
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
-      \  - behavioral proof matrix\n  - existing public surface contracts\n  - test\
-      \ obligations\nagent_source: project\n\nLock the repair contract for docs/audits/regression-audit-2026-05-12.md\
-      \ without implementing behavior.\n\nFindings to preserve exactly:\n- REG-2026-05-12-01\
-      \ — Source Ledger is missing manual ingest and fetch controls (P1).\n- REG-2026-05-12-02\
-      \ — MCP empty resources serialize arrays as null (P2); DO NOT duplicate implementation\
-      \ because existing pending steps mcp-audit-contract-lock, mcp-audit-empty-resources-red-tests,\
+      \  - behavioral proof matrix\n  - product-boundary adjudication record\n  -\
+      \ existing public surface contracts\n  - test obligations\nagent_source: project\n\
+      \nLock the repair contract for docs/audits/regression-audit-2026-05-12.md without\
+      \ implementing behavior.\n\nPrimary work_type: authority_adjudication for REG-2026-05-12-01,\
+      \ because the regression audit expectation for Source Ledger manual run/fetch\
+      \ controls conflicts with the canonical product boundary supplied by AGENTS.md,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md, and prior final strict\
+      \ closure.\n\nFindings to preserve with corrected disposition:\n- REG-2026-05-12-01\
+      \ — Product-boundary conflict: audit text expected Source Ledger `[RUN INGEST]`\
+      \ / `[FETCH]`, but canonical Source Ledger boundary is view/delete/import/export/details\
+      \ only; source addition remains via Steer; background ingest handles refresh.\
+      \ This finding must be adjudicated as a spec/audit conflict unless newer authoritative\
+      \ docs explicitly supersede the boundary.\n- REG-2026-05-12-02 — MCP empty resources\
+      \ serialize arrays as null (P2); DO NOT duplicate implementation because existing\
+      \ pending steps mcp-audit-contract-lock, mcp-audit-empty-resources-red-tests,\
       \ mcp-audit-empty-resources-fix, and mcp-audit-fresh-db-resource-retest already\
       \ own this family.\n- REG-2026-05-12-03 — Search exposes duplicate visible submit\
       \ controls (P2).\n- REG-2026-05-12-04 — MCP read_item can return a full item\
@@ -51852,28 +51861,39 @@ phases:
       \ inherits stale Search receipt (P3).\n- REG-2026-05-12-08 — Feed row metadata\
       \ is overly diagnostic (P3).\n- REG-2026-05-12-09 — Inspector exposes model\
       \ status in the primary reading header (P3).\n\nAuthoritative invariants:\n\
-      - Single Go binary cmd/resofeed; SQLite/FTS5 only; Gemini/OpenRouter is JSON-in/JSON-out\
-      \ transformer only.\n- Owner token is the universal delegation boundary; actor_id\
-      \ is attribution/idempotency only.\n- No accounts, OAuth, RBAC, per-agent registry,\
-      \ vector/RAG, sync/merge/event bus/service layer, folder/tag/unread/archive/product\
-      \ creep.\n- Source Ledger remains flat and is the only location for manual ingestion\
-      \ controls.\n\nPublic surfaces locked:\n- UI routes/surfaces: Today, Search,\
-      \ Source Ledger, /doctor, Inspector.\n- HTTP actions used by UI manual ingest/fetch\
-      \ controls must stay inside the existing single-binary HTTP API boundary.\n\
-      - MCP resources/tools: resources/read for sources/rules/item/detail and read_item\
-      \ retrieval parity through POST /mcp.\n- LLM live-health classification must\
-      \ not treat fallback-only current summaries as successful live model-backed\
+      - docs/ARCHITECTURE.md and docs/DESIGN.md are the ultimate sources of truth;\
+      \ PRD and audit artifacts are subordinate when they conflict with those canonical\
+      \ docs or prior strict closure.\n- Single Go binary cmd/resofeed; SQLite/FTS5\
+      \ only; Gemini/OpenRouter is JSON-in/JSON-out transformer only.\n- Owner token\
+      \ is the universal delegation boundary; actor_id is attribution/idempotency\
+      \ only.\n- No accounts, OAuth, RBAC, per-agent registry, vector/RAG, sync/merge/event\
+      \ bus/service layer, folder/tag/unread/archive/product creep.\n- Source Ledger\
+      \ remains flat and limited to view/delete/import/export/details. It MUST NOT\
+      \ reintroduce `[RUN INGEST]` / `[FETCH]` controls unless a newer authoritative\
+      \ docs/ARCHITECTURE.md or docs/DESIGN.md section explicitly supersedes that\
+      \ boundary and the deviation is recorded.\n\nPublic surfaces locked:\n- UI routes/surfaces:\
+      \ Today, Search, Source Ledger, /doctor, Inspector.\n- Source addition guidance\
+      \ remains through Steer; background ingest handles refresh; Source Ledger may\
+      \ expose receipts, diagnostics, details, delete, import/export state/OPML as\
+      \ allowed by canonical docs.\n- MCP resources/tools: resources/read for sources/rules/item/detail\
+      \ and read_item retrieval parity through POST /mcp.\n- LLM live-health classification\
+      \ must not treat fallback-only current summaries as successful live model-backed\
       \ summaries.\n\nDeliverable: a table mapping each REG finding to owner phase/step,\
-      \ expected behavior, forbidden regression, and proof artifact required. No production\
-      \ code changes in this step.\n\ntouch_paths:\n- docs/audits/regression-audit-2026-05-12.md\n\
-      - docs/ARCHITECTURE.md\n- docs/DESIGN.md\n- docs/PRD.md\n- docs/ui-preview.html\n\
-      - internal/resofeed/*_test.go\n- web/src/routes/+page.svelte\n- web/src/routes/components/*.svelte\n\
-      - web/src/lib/api-client.ts\n\nauthoritative_interface: existing UI labels [RUN\
-      \ INGEST], [INGESTING...], [FETCH], [FETCHING...]; existing POST /mcp owner-token\
-      \ boundary; existing single-binary HTTP API.\n\nCompletion Criteria:\n- Every\
-      \ actionable audit issue is mapped exactly once.\n- REG-02 overlap is explicitly\
-      \ delegated to the existing MCP capability chain and not reimplemented here.\n\
-      - No architecture or design invariant is loosened."
+      \ expected behavior, forbidden regression, and proof artifact required. The\
+      \ REG-01 row must explicitly record the audit-vs-canonical-doc conflict and\
+      \ the decision path. No production code changes in this step.\n\ntouch_paths:\n\
+      - docs/audits/regression-audit-2026-05-12.md\n- docs/ARCHITECTURE.md\n- docs/DESIGN.md\n\
+      - docs/PRD.md\n- docs/ui-preview.html\n- internal/resofeed/*_test.go\n- web/src/routes/+page.svelte\n\
+      - web/src/routes/components/*.svelte\n- web/src/lib/api-client.ts\n\nauthoritative_interface:\
+      \ Source Ledger view/delete/import/export/details; source addition via Steer;\
+      \ background ingest refresh; NO `[RUN INGEST]` / `[FETCH]` controls unless canonical\
+      \ docs explicitly supersede.\n\nCompletion Criteria:\n- Every actionable audit\
+      \ issue is mapped exactly once.\n- REG-01 is adjudicated against canonical docs\
+      \ and prior final strict closure, not implemented as forbidden control restoration.\n\
+      - REG-02 overlap is explicitly delegated to the existing MCP capability chain\
+      \ and not reimplemented here.\n- No architecture or design invariant is loosened.\n\
+      - Evidence identifies any audit/docs/ui-preview conflict as authority conflict\
+      \ with closure path, not product implementation scope."
     verification: 'local-check protecting regression-audit-contract-gate and all downstream
       repair phases.
 
@@ -51883,40 +51903,36 @@ phases:
       - Evidence cites the audit passages for each finding and the relevant ARCHITECTURE/DESIGN/PRD
       authority.
 
+      - REG-01 evidence confirms Source Ledger forbidden controls are rejected unless
+      superseded by newer authoritative docs, and records the product-boundary adjudication.
+
       - Evidence confirms REG-02 is covered by existing MCP capability audit steps
       and only final closure cross-references it.
 
       - Evidence confirms no product code changed.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
+
       For each ref in this step:
 
       - <filename> — key passage or "NOT READ: <reason>"
 
 
+      If no refs were provided, state: "No refs for this step."
+
+
       ## Contract Matrix Evidence
 
-      | Finding | Headline | Owner step(s) | Expected behavior | Forbidden regression
-      | Required proof artifact |
+      - REG finding owner matrix with expected behavior, forbidden regression, proof
+      artifact, and closure path.
 
-      | --- | --- | --- | --- | --- | --- |
+      - REG-01 authority adjudication record proving Source Ledger `[RUN INGEST]`
+      / `[FETCH]` controls remain forbidden unless newer canonical docs supersede.
 
-      | REG-2026-05-12-01 | Source Ledger is missing manual ingest and fetch controls
-      | <step> | <behavior> | <regression> | <artifact> |
+      - REG-02 overlap delegation evidence for existing MCP capability chain.
 
-
-      REG-02 delegation: <existing MCP step ids and why this plan does not duplicate
-      them>
-
-
-      verdict: PASS | FAIL
-
-      blockers: []
-
-      gate_open_allowed: true | false
-
-      remaining_gaps: []'
-    agent: golang-developer
+      - Statement that no product code changed.'
+    agent: spec-verifier
   - id: regression-audit-ui-expected-red-tests
     name: Add expected-red UI regression tests for audit surface failures
     status: pending
