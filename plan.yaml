@@ -51228,7 +51228,7 @@ phases:
       \ used\"],\"modified_artifacts\":[]}"
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
-  status: in_progress
+  status: done
   gate: Remediation gate blocks unless MCP-2 null-array response shaping is fixed
     within the existing MCP/HTTP response surfaces without expanding product scope.
   depends_on:
@@ -51376,7 +51376,7 @@ phases:
       \ out of scope for this step."
   - id: mcp-audit-remediation-gate
     name: Gate MCP audit remediation implementation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -51442,9 +51442,108 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T09:25:48.300340+00:00'
+    done_at: '2026-05-12T09:36:43.865249+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: absent from isolated worktree; supplied Objective Artifact Bundle\
+      \ provided sufficient audit context.\n- docs/ARCHITECTURE.md — read. Key passages:\
+      \ one Go binary, one SQLite DB, thin transports, lexical retrieval only, single\
+      \ owner token; `/mcp` owner-token auth before handling; resources include `resofeed://rules/active`\
+      \ and `resofeed://sources`.\n- AGENTS.md — NOT READ: absent from isolated worktree;\
+      \ supplied prompt included AGENTS.md authority and architecture constraints.\n\
+      - internal/resofeed/http.go — read. Key passages: active rules normalize nil\
+      \ to `[]SteerRule{}`; source list initializes as `[]Source{}`; response contracts\
+      \ require non-null arrays.\n- internal/resofeed/mcp.go — read. Key passages:\
+      \ owner-token auth before dispatch; `rules/active` normalizes nil rules; MCP\
+      \ sources initialize as `[]Source{}`; resource list preserved.\n- internal/resofeed/mcp_integration_test.go\
+      \ — read. Key passages: fresh empty resources test covers `resofeed://sources`\
+      \ and `resofeed://rules/active`; existing auth/resources/tools/idempotency tests\
+      \ remain present.\n\n## Remediation Gate Report\nReviewer: gate-reviewer\nPhase:\
+      \ mcp-capability-audit-remediation\n\nstep_intent: Assess whether MCP-2 remediation\
+      \ is ready to proceed to independent runtime verification.\nexpected_result:\
+      \ Fresh empty MCP resources serialize as empty arrays, existing MCP behavior/auth/idempotency\
+      \ remain green, no forbidden architecture/product scope introduced, and MCP-1/final\
+      \ proof obligations are explicitly carried forward.\nobserved_result: PASS for\
+      \ this remediation phase gate. MCP-2 local fix evidence is adequate; remaining\
+      \ functional proof obligations are explicitly scheduled downstream and are not\
+      \ blockers for this phase gate.\nfailure_alignment: No observed local failure.\
+      \ Remaining proof gaps align with downstream verification/finalization scope.\n\
+      product_implementation_files_modified_by_reviewer: false\n\n## Finding-by-Finding\
+      \ Closure Basis\nMCP-1:\n  status: OPEN_PROOF_OBLIGATION_SCHEDULED_DOWNSTREAM\n\
+      \  closure_path: mcp-audit-live-localhost-liveness-probe\n  gate_decision_basis:\
+      \ Not a blocker for this remediation phase gate because MCP-1 was explicitly\
+      \ out of scope for the empty-resource fix and has a scheduled downstream black-box\
+      \ proof path. Final audit closure remains disallowed until that proof completes.\n\
+      \nMCP-2:\n  status: LOCALLY_FIXED_PENDING_INDEPENDENT_RETEST\n  evidence_ref:\n\
+      \    - internal/resofeed/http.go\n    - internal/resofeed/mcp.go\n    - internal/resofeed/mcp_integration_test.go\n\
+      \    - prior command: go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1\n  closure_path: mcp-audit-fresh-db-resource-retest\n  gate_decision_basis:\
+      \ Local handler/test evidence proves intended empty-array normalization. Independent\
+      \ fresh-DB retest is scheduled downstream and is not a blocker for this phase\
+      \ gate.\n\n## Behavioral Proof Register\n- requirement_ref: docs/ARCHITECTURE.md\
+      \ MCP resources contract\n  behavior_claim: `resofeed://rules/active` and `resofeed://sources`\
+      \ return JSON arrays, including fresh empty state.\n  runtime_proof_expected:\
+      \ Fresh empty DB returns `{\"rules\":[]}` and `{\"sources\":[]}`.\n  evidence_ref:\
+      \ internal/resofeed/mcp_integration_test.go; internal/resofeed/mcp.go; internal/resofeed/http.go\n\
+      \  status: LOCALLY_FIXED_PENDING_DOWNSTREAM_RETEST\n  closure_path: mcp-audit-fresh-db-resource-retest\n\
+      \  gate_decision_basis: Non-blocking for this phase because downstream independent\
+      \ retest is explicitly scheduled.\n\n- requirement_ref: docs/ARCHITECTURE.md\
+      \ MCP auth/idempotency contract\n  behavior_claim: `/mcp` requires owner-token\
+      \ authority before handling and preserves idempotency/receipt semantics.\n \
+      \ runtime_proof_expected: Missing/invalid auth returns 401 before dispatch;\
+      \ valid token supports initialize/resources/tools.\n  evidence_ref: internal/resofeed/mcp.go;\
+      \ internal/resofeed/mcp_integration_test.go; prior command output below.\n \
+      \ status: LOCALLY_GREEN_PENDING_LIVE_LIVENESS_PROOF\n  closure_path: mcp-audit-live-localhost-liveness-probe\n\
+      \  gate_decision_basis: Non-blocking for this phase because final black-box\
+      \ liveness proof is explicitly scheduled downstream.\n\n- requirement_ref: architecture/product\
+      \ invariants\n  behavior_claim: No forbidden architecture/product scope was\
+      \ introduced.\n  runtime_proof_expected: Diff limited to response normalization;\
+      \ no accounts, OAuth/RBAC, vector/RAG, sync/merge, sidecars, schema expansions,\
+      \ or service layers.\n  evidence_ref: prior diff review of remediation commit\
+      \ affecting only internal/resofeed/http.go and internal/resofeed/mcp.go\n  status:\
+      \ PASS\n  closure_path: none\n  gate_decision_basis: No blocker found.\n\n##\
+      \ Gate Decision\nheadline: PASS\nverdict: PASS\nblocking_status: CLOSED_FOR_THIS_PHASE\n\
+      proof_gap_status: NON_BLOCKING_FOR_THIS_PHASE_SCHEDULED_DOWNSTREAM\nblockers:\
+      \ []\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\n## Verification\n\
+      Prior commands run from `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/mcp-audit-remediation-gate`:\n\
+      \n1. `git status --short --branch`\n   exit_code: 0\n   output: `## vectl/step-mcp-audit-remediation-gate`\n\
+      \n2. `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1 && go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)$'\
+      \ -count=1 && go test ./internal/resofeed && gofmt -l \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\" && git diff --check -- \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\"`\n   exit_code: 0\n   output:\n   ```\n   ok\
+      \  \tresofeed/internal/resofeed\t0.433s\n   ok  \tresofeed/internal/resofeed\t\
+      0.213s\n   ok  \tresofeed/internal/resofeed\t0.408s\n   ```\n   gofmt_output:\
+      \ `<no output>`\n   diff_check_output: `<no output>`\n\n3. `git status --short`\n\
+      \   exit_code: 0\n   output: `<no output>`\n\nMainline final-state verification\
+      \ after read-only gate branch merge:\n```\ngo test ./internal/resofeed -run\
+      \ TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays -count=1\
+      \ && go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)$'\
+      \ -count=1 && go test ./internal/resofeed && gofmt -l \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\" && git diff --check -- \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\"\n```\nOutput:\n```\nok  \tresofeed/internal/resofeed\t\
+      0.485s\nok  \tresofeed/internal/resofeed\t0.250s\nok  \tresofeed/internal/resofeed\t\
+      (cached)\n```\n\n## Files changed\nNone by reviewer. No commit created because\
+      \ this was a verification-only gate and worktree remained clean.\n\n## Gaps/Notes\n\
+      - This corrected decision removes the prior `PASS_WITH_DEBT` closure-signal\
+      \ conflict.\n- MCP-1 live localhost liveness proof remains required downstream\
+      \ before final audit closure.\n- MCP-2 independent fresh-DB resource retest\
+      \ remains required downstream before final audit closure.\n- These are scheduled\
+      \ downstream proof obligations, not blockers for this remediation phase gate.\n\
+      \n```json\n{\n  \"action_summary\": \"Corrected remediation gate decision classification\
+      \ from PASS_WITH_DEBT to PASS because remaining functional proof obligations\
+      \ are scheduled downstream and non-blocking for this phase.\",\n  \"verification_run\"\
+      : {\n    \"command\": \"go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1 && go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)$'\
+      \ -count=1 && go test ./internal/resofeed && gofmt -l \\\\\\\"internal/resofeed/http.go\\\
+      \\\\\" \\\\\\\"internal/resofeed/mcp.go\\\\\\\" && git diff --check -- \\\\\\\
+      \"internal/resofeed/http.go\\\\\\\" \\\\\\\"internal/resofeed/mcp.go\\\\\\\"\
+      \",\n    \"exit_code\": 0\n  },\n  \"artifacts_modified\": [],\n  \"verdict\"\
+      : \"PASS\",\n  \"blocking_status\": \"CLOSED_FOR_THIS_PHASE\",\n  \"proof_gap_status\"\
+      : \"NON_BLOCKING_FOR_THIS_PHASE_SCHEDULED_DOWNSTREAM\",\n  \"gate_open_allowed\"\
+      : true,\n  \"orchestrator_action_hint\": \"COMPLETE\"\n}\n```"
 - id: mcp-capability-audit-verification-and-finalization
   name: MCP Capability Audit — Verification and Finalization
-  status: locked
+  status: pending
   gate: Final closure blocks unless MCP-1 and MCP-2 have finding-by-finding closure
     evidence, MCP capability parity is rechecked through the real /mcp Streamable
     HTTP endpoint, owner-token boundaries remain intact, idempotency/receipt semantics
