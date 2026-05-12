@@ -53485,7 +53485,7 @@ phases:
       \ true\norchestrator_action_hint: COMPLETE"
   - id: regression-audit-contract-gate
     name: Gate regression audit contract and expected-red coverage
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -53571,6 +53571,64 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T13:26:29.352355+00:00'
+    done_at: '2026-05-12T13:38:08.022418+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- READ: `docs/ARCHITECTURE.md`\n\
+      - READ: `docs/DESIGN.md`\n- READ: `docs/PRD.md`\n- NOT READ: `docs/audits/regression-audit-2026-05-12.md`\
+      \ absent\n- NOT READ: `AGENTS.md` absent in isolated worktree\n\n## Contract\
+      \ Gate Evidence\nHeadline: REJECT\nVerdict: BLOCKED\nblocking_status: BLOCKED\n\
+      proof_gap_status: MATERIAL_PROOF_GAPS_PRESENT\ngate_open_allowed: false\norchestrator_action_hint:\
+      \ REMEDIATION_CREATED\n\n### Step Evidence Review Table\n| Step | Evidence reviewed\
+      \ | Result |\n|---|---|---|\n| regression-audit-contract-matrix | Objective\
+      \ bundle asserted PASS but no durable reviewable matrix artifact existed outside\
+      \ plan/evidence. | BLOCKER: cannot independently verify REG-01..REG-09 exact-once\
+      \ owner mapping. |\n| regression-audit-llm-health-proof-contract | `docs/audits/reg-2026-05-12-06-llm-health-proof-contract.md`\
+      \ and `internal/resofeed/llm_health_proof_contract_test.go`. | PASS: contract-only\
+      \ proof obligations exist and forbid fallback-only live success. |\n| regression-audit-mcp-read-item-expected-red-tests\
+      \ | `internal/resofeed/mcp_integration_test.go` expected-red coverage and focused\
+      \ red output for REG-04; REG-02 duplicate array test passes independently. |\
+      \ PASS for expected-red semantics. |\n| regression-audit-ui-expected-red-tests\
+      \ | `web/tests/e2e/regression-audit-ui-expected-red.spec.ts`; `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`.\
+      \ | REJECT: an active expected-red helper still requires `[RUN INGEST]`, contradicting\
+      \ REG-01 product-boundary basis. |\n\n### Verification Run\n- `go test ./internal/resofeed\
+      \ -run 'TestREG2026051206LLMHealthProofContractLocksObligations|TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason|TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays'`\
+      \ -> exit 1 with expected-red failure for REG-04.\n- `go test ./internal/resofeed\
+      \ -run TestREG2026051206LLMHealthProofContractLocksObligations` -> exit 0.\n\
+      - `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays`\
+      \ -> exit 0.\n- `npm --prefix web run check` -> exit 127 (`svelte-kit: command\
+      \ not found`) in gate worktree.\n\n### REG-01 authority conflict decision basis\n\
+      - Canonical authority rejects Source Ledger run/fetch controls: docs/DESIGN.md\
+      \ Source Ledger is flat with OPML import/delete/state actions only; docs/ARCHITECTURE.md\
+      \ frontend exposes flat Source Ledger.\n- Good contract evidence: `web/tests/e2e/regression-audit-ui-expected-red.spec.ts`\
+      \ forbids `[RUN INGEST]`, `[FETCH]`, and matching manual ingest/fetch buttons.\n\
+      - Blocking contradiction: `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`\
+      \ still clicks `[RUN INGEST]` in an active expected-red test helper.\n\n###\
+      \ REG-02 delegation confirmation\n- `internal/resofeed/mcp_integration_test.go`\
+      \ covers empty MCP resources as arrays.\n- Focused command `go test ./internal/resofeed\
+      \ -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays`\
+      \ passed.\n- Objective bundle says REG-02 delegated to `mcp-audit-final-gate`;\
+      \ no duplicate REG-02 implementation found in the newly added REG-04 test block.\n\
+      \n### Expected-red semantic validation\n- REG-04 MCP read_item: valid expected-red;\
+      \ test seeds `extraction_status='full'` with null extracted text and fails unless\
+      \ detail text or fallback reason is present.\n- REG-06 LLM health: valid proof\
+      \ contract; fallback-only excerpt output is explicitly not live model success.\n\
+      - UI REG-03/05/07/08/09: distinct tests exist in `web/tests/e2e/regression-audit-ui-expected-red.spec.ts`.\n\
+      - REG-01 UI boundary: partially valid but contradicted by active `[RUN INGEST]`\
+      \ dependency in `full-ui-design-conformance.expected-red.spec.ts`.\n\n### Blockers\
+      \ batched for remediation\n- `B-REG01-CONTRACT-CONTRADICTION`: active full-UI\
+      \ expected-red helper still clicks/requires `[RUN INGEST]` while REG-01 forbids\
+      \ Source Ledger run/fetch controls.\n- `B-MATRIX-NOT-VERIFIABLE`: no durable\
+      \ REG-01..REG-09 owner matrix artifact available for gate review.\n- `B-FRONTEND-VERIFICATION-NOT-REPRODUCED`:\
+      \ frontend check could not be reproduced in gate worktree due missing SvelteKit\
+      \ dependency.\n\n### Planner-created remediation ownership\n- Added `regression-audit-contract-gate-batched-fix`\
+      \ to create durable matrix artifact, repair REG-01 test contradiction, and make\
+      \ frontend verification reproducible.\n- Added `regression-audit-contract-gate-rerun`\
+      \ as follow-up closure gate after the batched fix.\n\n## Gate Decision\nheadline:\
+      \ FAIL\nverdict: BLOCKED\nblocking_status: OPEN\nproof_gap_status: BLOCKING\n\
+      blockers:\n  - B-REG01-CONTRACT-CONTRADICTION\n  - B-MATRIX-NOT-VERIFIABLE\n\
+      \  - B-FRONTEND-VERIFICATION-NOT-REPRODUCED\ngate_open_allowed: false\norchestrator_action_hint:\
+      \ REMEDIATION_CREATED\n\n## Files changed\nNone by gate reviewer; no commit\
+      \ created for read-only gate branch. The orchestrator merged no-op branch state\
+      \ before completion."
   - id: regression-audit-contract-gate-batched-fix
     name: Batched remediation for regression audit contract gate blockers
     status: pending
