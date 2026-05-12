@@ -52296,7 +52296,7 @@ phases:
       \ No documentation drift found; no commit created per explicit no-change instruction."
   - id: mcp-audit-focused-deep-review
     name: Focused deep review for MCP audit remediation
-    status: claimed
+    status: done
     description: 'step_type: review
 
       agent_source: project
@@ -52387,6 +52387,113 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T10:03:36.208641+00:00'
+    done_at: '2026-05-12T10:12:06.534370+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/ARCHITECTURE.md — READ:\
+      \ §1/§2 require one `resofeed serve` binary serving static UI, JSON HTTP, MCP\
+      \ `/mcp`, and ingest; §7 defines authenticated MCP resources/tools, MIME types,\
+      \ schemas, owner-token behavior, and runtime receipts only; §9 forbids repositories,\
+      \ DI, event buses, sync/merge abstractions, vector/RAG, accounts/OAuth/RBAC.\n\
+      - docs/DESIGN.md — READ: ResoFeed is a single-tenant analyst workbench; owner-token\
+      \ prompt, first-use empty state, steering receipts, and dense archival UI are\
+      \ defined; no MCP contradiction found.\n- AGENTS.md — NOT READ: file absent\
+      \ in isolated worktree.\n\n## Focused Deep Review Report\n- Verification evidence\
+      \ reviewed: objective bundles for `mcp-audit-doc-sync-check`, `mcp-audit-fresh-db-resource-retest`,\
+      \ `mcp-audit-live-localhost-liveness-probe`, and `mcp-audit-parity-security-idempotency-proof`;\
+      \ direct source review of `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `internal/resofeed/mcp.go`,\
+      \ `internal/resofeed/http.go`, `internal/resofeed/mcp_integration_test.go`,\
+      \ `internal/resofeed/backend_contract_test.go`, and `internal/resofeed/openrouter_product_integration_contract_test.go`;\
+      \ verification commands listed below.\n- Wiring audit verdict: PASS\n- Spec\
+      \ conformance verdict: PASS\n- Architecture invariant verdict: PASS\n- Runtime\
+      \ liveness verdict: PASS\n- Receipt/idempotency verdict: PASS\n\n## Wiring Audit\
+      \ (W1-W8)\n- W1 resources/list completeness: PASS. `internal/resofeed/mcp.go:661-668`\
+      \ lists exactly `resofeed://feed/today`, `resofeed://rules/active`, `resofeed://system/doctor`,\
+      \ `resofeed://sources`.\n- W2 resources/read reachability: PASS. `internal/resofeed/mcp.go:345-392`\
+      \ has a `readResource` switch case for each listed URI with matching URI echo\
+      \ in returned content.\n- W3 orphan listed resource check: PASS. The four `mcpResourceList`\
+      \ URIs all have corresponding `readResource` cases.\n- W4 handler-only route\
+      \ check: PASS. Grep for `resofeed://` in Go source found only the four audited\
+      \ resources in `mcp.go` plus tests/comments; no extra handler-only resource\
+      \ route found.\n- W5 MIME map: PASS. `mcpResourceList` and `readResource` agree:\
+      \ feed/rules/sources `application/json`; doctor `text/plain`.\n- W6 JSON body\
+      \ shape: PASS. `readResource` marshals `TodayFeedResponse{Items: ...}`, `RulesResponse{Rules:\
+      \ ...}`, and `SourcesResponse{Sources: ...}`. Fresh-empty tests cover rules/sources\
+      \ arrays, and supplied fresh DB retest covers feed/sources/rules arrays.\n-\
+      \ W7 owner-token pre-dispatch: PASS. `mcpHandler.ServeHTTP` checks `authorized`\
+      \ before method/body/JSON-RPC dispatch at `internal/resofeed/mcp.go:287-291`;\
+      \ supplied liveness/security probes reported HTTP 401 `owner token required`\
+      \ for missing/invalid auth.\n- W8 tools/list and tools/call schema/wiring: PASS.\
+      \ `mcpToolList` defines seven documented tools with `additionalProperties:false`\
+      \ via `objectSchema`; `callTool` dispatches the same seven names; focused tests\
+      \ passed.\n\n## Escape Hatch Audit\n- Scoped source scan for `@invar:allow|invar:allow`\
+      \ over `cmd internal web/src web/tests docs` returned no escape-hatch output.\n\
+      - Forbidden-pattern scan output was limited to prohibition/contract comments\
+      \ and tests, e.g. `mcp.go` comments forbidding embeddings/vector DB/RAG and\
+      \ manual-fetch contract guardrails. No service/repository/event-bus/sync/RAG\
+      \ implementation was found in the reviewed MCP path.\n\n## Real Integration\
+      \ vs Fixture Evidence\n- Real runtime evidence: supplied `mcp-audit-live-localhost-liveness-probe`\
+      \ states a built `resofeed` binary was started with `resofeed serve --addr 127.0.0.1:8080\
+      \ ... --owner-token <redacted>`, `lsof` proved `resofeed ... TCP 127.0.0.1:8080\
+      \ (LISTEN)`, missing-auth `/mcp` returned 401, valid-token initialize/resources/list/resources/read\
+      \ returned 200, and the process/port were cleaned up. This is real runtime evidence,\
+      \ not only fixture or in-process handler evidence.\n- Real bound listener evidence:\
+      \ `TestMCPRealBoundListenerInitializeResourcesAndTools` and `TestMCPRealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency`\
+      \ use `net.Listen(\"127.0.0.1:0\")` and `http.Server{Handler: NewRouter(...)}`.\
+      \ This proves networked HTTP routing through `/mcp`, but is not by itself `resofeed\
+      \ serve`; the supplied liveness probe covers the actual serve process.\n- Fixture/in-process\
+      \ evidence: tests using `httptest.NewRecorder` and `NewMCPHandler` validate\
+      \ schema, auth ordering, idempotency, resource shapes, and dispatch logic but\
+      \ are not runtime liveness substitutes.\n\n## Finding-by-Finding Closure\nMCP-1:\n\
+      \  evidence_refs:\n    - Supplied live-localhost liveness probe: real `resofeed\
+      \ serve`, listener proof, `/mcp` 401/200 checks, cleanup.\n    - `internal/resofeed/http.go:55-60`:\
+      \ `/mcp` wired into single router with HTTP/static API.\n    - `internal/resofeed/mcp_integration_test.go:128-222`:\
+      \ real bound listener MCP initialize/resources/tools and steer/idempotency checks.\n\
+      \    - Command: `go test ./internal/resofeed -run 'TestMCP|TestHTTPAndMCPTransportParityForCoreOperations|TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas|TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer|TestHumanSteeringSupersedesPriorAgentRuleWithSupersededBy'`\
+      \ -> exit 0.\n  status: PROVEN\n  closure_path: closed; no remediation owner\
+      \ required.\nMCP-2:\n  evidence_refs:\n    - Supplied fresh DB resource retest:\
+      \ real bound `/mcp` returned `{\"sources\":[]}`, `{\"rules\":[]}`, `{\"items\"\
+      :[]}` and auth failures returned 401.\n    - `internal/resofeed/mcp.go:356-384`:\
+      \ resource body implementations.\n    - `internal/resofeed/mcp_integration_test.go:78-97`:\
+      \ fresh empty rules/sources array regression.\n    - Supplied parity/security/idempotency\
+      \ proof: schemas, MIME map, HTTP/MCP parity, idempotency conflict behavior,\
+      \ receipt count, human precedence.\n    - Command: `go test ./...` -> exit 0.\n\
+      \  status: PROVEN\n  closure_path: closed; no remediation owner required.\n\n\
+      ## Behavioral Proof Register\n- unresolved_items: []\n- overturned_decision:\
+      \ none\n- review_miss_cause: none identified; prior PASS evidence is consistent\
+      \ with direct source/test review.\n- reversal_risk: LOW. Main residual risk\
+      \ is that the actual liveness logs are supplied objective evidence rather than\
+      \ a local rerun in this read-only audit; mitigated by source wiring review,\
+      \ the orchestrator's mainline liveness rerun in `mcp-audit-live-localhost-liveness-probe`,\
+      \ and passing full Go regression.\n- remediation_owner: none\n- re-close proof\
+      \ path: if reopened, rerun real `resofeed serve` `/mcp` liveness with fresh\
+      \ DB plus focused MCP regression and capture listener/auth/resource-read outputs.\n\
+      \n## Review-Miss / Reversal-Risk Assessment\n- Blockers: none.\n- Warnings:\
+      \ none blocking.\n- Notes: canonical audit markdown file was absent, so this\
+      \ review used supplied objective evidence for the four prerequisite steps plus\
+      \ direct source/test verification. Local test proof includes real bound listener\
+      \ tests; actual serve proof was supplied by prerequisite evidence and separately\
+      \ rerun by orchestrator on mainline for the liveness step.\n\n## Gate Decision\n\
+      headline: PASS\nverdict: PASS\nblocking_status: CLOSED\nproof_gap_status: NONE\n\
+      blockers: []\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      mcp_1_ready_for_final_gate_closure: true\nmcp_2_ready_for_final_gate_closure:\
+      \ true\nforbidden_architecture_or_product_scope_introduced: false\n\n## Verification\n\
+      Worktree commands:\n- `pwd && git status --short --branch` -> exit 0; output\
+      \ showed `/Users/tefx/Projects/ResoFeed/.vectl/worktrees/mcp-audit-focused-deep-review`\
+      \ and branch `vectl/step-mcp-audit-focused-deep-review`.\n- `go test ./internal/resofeed\
+      \ -run 'TestMCP|TestHTTPAndMCPTransportParityForCoreOperations|TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas|TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer|TestHumanSteeringSupersedesPriorAgentRuleWithSupersededBy'`\
+      \ -> exit 0; `ok resofeed/internal/resofeed 0.578s`.\n- `rg -n '@invar:allow|invar:allow'\
+      \ cmd internal web/src web/tests docs --glob '!docs/audits/**' || true; rg -n\
+      \ 'type .*Service|type .*Repository|EventBus|DI container|OAuth|RBAC|vector\
+      \ DB|embedding|RAG|sync coordinator|state merger|conflict resolver|per-agent\
+      \ registry' cmd internal --glob '*.go' || true` -> exit 0; no `@invar` output;\
+      \ forbidden terms only in guardrail comments/tests.\n- `go test ./...` -> exit\
+      \ 0; `? resofeed/cmd/resofeed [no test files]`, `ok resofeed/internal/resofeed\
+      \ 0.868s`.\n- Final `git status --short --branch` -> exit 0; clean branch status.\n\
+      \nMainline final-state verification after no-op squash merge:\n```\ngo test\
+      \ ./internal/resofeed -run 'TestMCP|TestHTTPAndMCPTransportParityForCoreOperations|TestMCPRequiresOwnerTokenBeforeToolHandlingAndUsesDocumentedSchemas|TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer|TestHumanSteeringSupersedesPriorAgentRuleWithSupersededBy'\
+      \ -count=1 && go test ./...\n```\nOutput:\n```\nok  \tresofeed/internal/resofeed\t\
+      0.556s\n?   \tresofeed/cmd/resofeed\t[no test files]\nok  \tresofeed/internal/resofeed\t\
+      (cached)\n```\n\n## Files changed\nNone."
   - id: mcp-audit-final-gate
     name: Final gate for MCP capability audit closure
     status: pending
