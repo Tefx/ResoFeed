@@ -1,0 +1,48 @@
+{
+  "failures": [],
+  "observations": {
+    "artifacts": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe",
+    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3",
+    "doctor": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor.txt",
+      "contains_raw_secret": false,
+      "content_type": "text/plain; charset=utf-8",
+      "status": 200
+    },
+    "external_live_probe_missing_prerequisite": "OPENROUTER_KEY was absent in the auditor environment",
+    "external_live_probe_status": "external_live_probe_unavailable",
+    "external_openrouter_env_present": false,
+    "feed": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/feed_today.json",
+      "status": 200
+    },
+    "fixture_extraction_status": "full",
+    "fixture_in_feed": true,
+    "fixture_model_status": "summary_unavailable",
+    "mcp_initialize": {
+      "body_head": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"resources\":{},\"tools\":{}},\"protocolVersion\":\"2025-03-26\",\"serverInfo\":{\"name\":\"resofeed\",\"version\":\"0.0.0\"}}}\n",
+      "status": 200
+    },
+    "mcp_read_item": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/mcp_read_item.json",
+      "status": 200
+    },
+    "mcp_read_item_contains_full_text_marker": true,
+    "mcp_sources_resource": {
+      "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/mcp_sources_resource.json",
+      "status": 200
+    },
+    "migration": {
+      "command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61321 --public-url http://127.0.0.1:61321 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+      "ready": true,
+      "stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stderr.log",
+      "stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stdout.log"
+    },
+    "port_bound": true,
+    "serve_command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/bin/resofeed serve --addr 127.0.0.1:61321 --public-url http://127.0.0.1:61321 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-liveness-probe/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-1qou4oxy/resofeed.sqlite3 --owner-token <redacted-owner-token>",
+    "server_stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stderr.log",
+    "server_stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stdout.log",
+    "stub_runtime_openrouter_key": "<non-secret dummy value injected only to satisfy startup validation>"
+  },
+  "status": "PASS"
+}
