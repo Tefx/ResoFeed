@@ -51048,7 +51048,7 @@ phases:
       \ step; no runtime implementation files were changed."
   - id: mcp-audit-contract-gate
     name: Gate MCP audit contract and expected-red coverage
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -51134,6 +51134,8 @@ phases:
     - mcp-audit-contract-lock
     - mcp-audit-empty-resources-red-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T08:53:29.842304+00:00'
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
   status: locked
