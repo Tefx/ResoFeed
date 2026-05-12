@@ -53296,7 +53296,7 @@ phases:
     agent: golang-developer
   - id: regression-audit-llm-health-proof-contract
     name: Define live LLM health classification proof obligations
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - live/stub health proof obligations\n  - fallback classification acceptance\n\
       \  - diagnostic artifact requirements\nagent_source: project\n\nLock proof obligations\
@@ -53348,6 +53348,8 @@ phases:
     depends_on:
     - regression-audit-contract-matrix
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T13:04:13.125512+00:00'
   - id: regression-audit-contract-gate
     name: Gate regression audit contract and expected-red coverage
     status: pending
