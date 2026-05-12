@@ -55439,6 +55439,212 @@ phases:
     - regression-frontend-route-integration-retest
     - regression-frontend-uiux-audit
     agent: gate-reviewer
+  - id: regression-frontend-real-api-proof-remediation
+    name: Remediate real API frontend proof blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Batched remediation owner for the real API frontend route proof blockers discovered
+      by `regression-frontend-route-integration-retest`.
+
+
+      Scope: fix or adjudicate ALL of these together, not one-at-a-time:
+
+      1. Source Ledger real API row expectation: distinguish a true product bug from
+      a stale real-API test assumption around `status: ok` versus `status: not_fetched`
+      after source add/background ingest. Use canonical Source Ledger/background ingest
+      authority from `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, and existing regression
+      contract evidence. Repair product behavior OR repair the fixture/expectation
+      so the rendered proof matches the authoritative lifecycle.
+
+      2. Mobile real API route proof: diagnose the click interception during mobile
+      route navigation. If the active Source Ledger surface intercepts clicks due
+      to product layering/visibility/accessibility flow, repair product behavior.
+      If the failure is harness-caused, adjust the proof script/test to navigate reliably
+      without weakening product assertions.
+
+      3. Real API seam proof coverage: ensure the rendered browser proof exercises
+      real backend/API paths, not only `page.route(...).fulfill` API mocks, for REG-2026-05-12-01,
+      -03, -05, -07, -08, and -09.
+
+
+      Out of scope:
+
+      - Do NOT solve or mask the backend liveness blocker `external_live_probe_unavailable`;
+      record it as external to this frontend remediation if encountered.
+
+      - Do NOT reintroduce Source Ledger `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,
+      or `[FETCHING...]` controls unless newer canonical authority explicitly supersedes
+      the current boundary and a deviation record is produced.
+
+      - Do NOT modify completed vectl steps or their evidence.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive product or harness logic that processes
+      real rendered/API inputs and produces observable outputs that vary based on
+      those inputs.
+
+
+      ## Real API Proof Requirements
+
+      - API-mocked Playwright coverage may remain as focused regression coverage,
+      but it is insufficient by itself.
+
+      - Evidence MUST include at least one real API rendered browser proof path with
+      actual command output/artifact paths.
+
+      - The proof must cover REG-01/03/05/07/08/09 seams or explicitly map any uncovered
+      seam to a blocker for the retest.
+
+
+      ## UIUX Audit Staleness Note
+
+      `regression-frontend-uiux-audit` is already completed and must not be edited.
+      If this step changes product visual/spatial behavior, route containment, or
+      Source Ledger visible UI, evidence MUST flag that the prior UIUX audit may be
+      stale so the orchestrator/gate can require follow-up UIUX audit coverage. Pure
+      test-harness or expectation repair that does not alter rendered UI should state
+      that the prior UIUX audit remains applicable.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Real API proof that only uses `page.route(...).fulfill` mocks.
+
+      2. Source Ledger expectation drift that contradicts canonical background ingest/source
+      lifecycle.
+
+      3. Mobile proof that exits nonzero due unresolved click interception.
+
+      4. Hidden reintroduction of forbidden Source Ledger run/fetch controls.
+
+      5. Treating `external_live_probe_unavailable` as solved by frontend-only work.'
+    verification: 'local-check protecting regression-frontend-route-integration-retest
+      and regression-frontend-surface-gate.
+
+      - Root-cause disposition distinguishes product bug vs stale real-API test/harness
+      assumption for Source Ledger `ok`/`not_fetched` status.
+
+      - Product or harness repair is applied according to canonical Source Ledger/background
+      ingest authority.
+
+      - Mobile route navigation/click interception is fixed or harness-adjusted without
+      weakening real rendered assertions.
+
+      - A real API rendered proof command runs successfully and covers REG-01/03/05/07/08/09
+      seams, with API-mocked-only coverage explicitly rejected as insufficient.
+
+      - Evidence states whether prior `regression-frontend-uiux-audit` remains applicable
+      or may be stale.
+
+      - Evidence confirms `external_live_probe_unavailable` remains external and unresolved
+      if encountered.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Real API Remediation Evidence
+
+
+      ### Blocker disposition table
+
+      | Blocker | Product bug / stale test / harness issue | Authority cited | Change
+      made | Residual risk |
+
+      | --- | --- | --- | --- | --- |
+
+      | Source Ledger status ok vs not_fetched | <...> | <doc/contract passage> |
+      <...> | <...> |
+
+      | Mobile route click interception | <...> | <doc/contract passage> | <...> |
+      <...> |
+
+      | API-mocked-only proof gap | <...> | <doc/contract passage> | <...> | <...>
+      |
+
+
+      ### Real API rendered proof
+
+      **Command executed**:
+
+      ```sh
+
+      <paste exact command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```text
+
+      <paste stdout/stderr; must show successful real API rendered proof, not API-mocked-only>
+
+      ```
+
+
+      **Artifact paths**:
+
+      - <screenshots/traces/videos/logs>
+
+
+      ### REG seam coverage
+
+      | REG ID | Real API rendered evidence | Mock-only evidence? | Verdict |
+
+      | --- | --- | --- | --- |
+
+      | REG-2026-05-12-01 | <artifact/output> | yes/no | PASS/FAIL |
+
+      | REG-2026-05-12-03 | <artifact/output> | yes/no | PASS/FAIL |
+
+      | REG-2026-05-12-05 | <artifact/output> | yes/no | PASS/FAIL |
+
+      | REG-2026-05-12-07 | <artifact/output> | yes/no | PASS/FAIL |
+
+      | REG-2026-05-12-08 | <artifact/output> | yes/no | PASS/FAIL |
+
+      | REG-2026-05-12-09 | <artifact/output> | yes/no | PASS/FAIL |
+
+
+      ### UIUX audit staleness assessment
+
+      - Product visual/spatial behavior changed: yes/no
+
+      - Prior `regression-frontend-uiux-audit` remains applicable: yes/no
+
+      - If no, required follow-up UIUX coverage for orchestrator/gate: <specific states>
+
+
+      ### External blocker boundary
+
+      - `external_live_probe_unavailable` encountered: yes/no
+
+      - Confirmed external to frontend remediation: yes/no
+
+
+      ### Headline
+
+      PASS / PASS_WITH_DEBT / FAIL'
+    depends_on:
+    - regression-source-ledger-controls-fix
+    - regression-ui-containment-and-diagnostics-fix
+    agent: frontend-engineer
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
