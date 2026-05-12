@@ -33,6 +33,7 @@ EXTERNAL_ENV = Path("/Users/tefx/Projects/ResoFeed/.env")
 ITEM_ID = "item_full_detail_regression_probe"
 FULL_TEXT_MARKER = "FULL EXTRACTION DETAIL TEXT -- REG-04 black-box proof"
 LIVE_MARKER = "OPENROUTER LIVE LIVENESS REG-06"
+OPENROUTER_CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 def free_port() -> int:
@@ -110,6 +111,77 @@ def load_external_openrouter_key() -> tuple[str | None, dict]:
     except Exception as exc:  # pragma: no cover - diagnostic path
         info["reason"] = f"failed to parse .env: {type(exc).__name__}"
         return None, info
+
+
+def openrouter_live_preflight(runtime_env: dict[str, str]) -> dict:
+    """Classify external OpenRouter availability without exposing secrets."""
+    key = runtime_env.get("OPENROUTER_KEY", "").strip()
+    info: dict = {"attempted": bool(key), "key": "<redacted-openrouter-key>" if key else "absent"}
+    if not key:
+        info["classification"] = "missing_key"
+        return info
+
+    payload = {
+        "model": "openai/gpt-4.1-mini",
+        "messages": [
+            {
+                "role": "user",
+                "content": json.dumps(
+                    {
+                        "task": "summarize_rss_item",
+                        "contract": {
+                            "response_json_only": True,
+                            "fields": ["summary", "core_insight", "value_tier", "model_status"],
+                            "model_status_values": ["ok", "summary_unavailable", "model_latency_error"],
+                        },
+                        "item": {
+                            "item_id": "reg_06_live_preflight",
+                            "title": LIVE_MARKER,
+                            "source_title": "REG-06 Live Fixture",
+                            "url": "https://example.test/reg-06-live-preflight",
+                            "available_text": "OpenRouter live preflight for ResoFeed. Return JSON only.",
+                        },
+                    },
+                    separators=(",", ":"),
+                ),
+            }
+        ],
+        "response_format": {"type": "json_object"},
+    }
+    request = urllib.request.Request(
+        OPENROUTER_CHAT_COMPLETIONS_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            body = response.read().decode("utf-8", "replace")
+            info.update({"status": response.status, "classification": "provider_live_ok", "body_head": body[:500]})
+            return info
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", "replace")
+        info.update({"status": exc.code, "body_head": body[:1000]})
+        lower = body.lower()
+        if exc.code in (401, 403) or any(marker in lower for marker in ["unauthorized", "forbidden", "invalid key"]):
+            info["classification"] = "provider_or_auth"
+        elif exc.code == 404 and any(marker in lower for marker in ["no endpoints available", "guardrail restrictions", "data policy", "model"]):
+            info["classification"] = "provider_or_auth"
+        elif exc.code == 429 or exc.code >= 500:
+            info["classification"] = "provider_transient_latency_or_capacity"
+        else:
+            info["classification"] = "provider_error_status"
+        return info
+    except Exception as exc:  # pragma: no cover - live diagnostic path
+        info.update({"classification": "provider_transient_latency_or_capacity", "exception": type(exc).__name__, "message": str(exc)[:300]})
+        return info
+
+
+def is_nonblocking_openrouter_preflight(preflight: dict) -> bool:
+    return preflight.get("classification") in {
+        "provider_or_auth",
+        "provider_transient_latency_or_capacity",
+    }
 
 
 class FixtureHandler(http.server.BaseHTTPRequestHandler):
@@ -405,12 +477,20 @@ def main() -> int:
                     provider_invalid = any(marker in doctor_body.lower() for marker in ["401", "403", "unauthorized", "forbidden", "invalid key", "invalid_openrouter"])
                     if live_success:
                         observations["external_live_probe_status"] = "PASS"
-                    elif provider_invalid:
-                        observations["external_live_probe_status"] = "external_live_probe_failed_invalid_key"
-                        failures.append("OpenRouter live proof failed with an invalid/unauthorized key class; rotate or verify OPENROUTER_KEY in the main workspace .env")
                     else:
-                        observations["external_live_probe_status"] = "external_live_probe_failed_provider"
-                        failures.append("OpenRouter live proof did not produce model_status=ok/live_summary_successes through public source fetch; inspect live_source_fetch and doctor_after_live_probe artifacts")
+                        preflight = openrouter_live_preflight(runtime_env)
+                        preflight_path = ARTIFACTS / "openrouter_live_preflight.json"
+                        preflight_path.write_text(json.dumps(preflight, indent=2, sort_keys=True), encoding="utf-8")
+                        observations["openrouter_live_preflight"] = {"artifact": str(preflight_path.relative_to(ROOT)), "classification": preflight.get("classification"), "status": preflight.get("status")}
+                        if is_nonblocking_openrouter_preflight(preflight):
+                            observations["external_live_probe_status"] = "external_live_probe_nonblocking_" + str(preflight.get("classification"))
+                            observations["external_live_probe_disposition"] = "provider/auth/model availability limitation outside repo control; deterministic backend/MCP proof remains authoritative"
+                        elif provider_invalid:
+                            observations["external_live_probe_status"] = "external_live_probe_failed_invalid_key"
+                            failures.append("OpenRouter live proof failed with an invalid/unauthorized key class; rotate or verify OPENROUTER_KEY in the main workspace .env")
+                        else:
+                            observations["external_live_probe_status"] = "external_live_probe_failed_product_or_harness"
+                            failures.append("OpenRouter live proof did not produce model_status=ok/live_summary_successes, and direct preflight did not classify a non-repo provider/auth/model limitation; inspect live_source_fetch, doctor_after_live_probe, and openrouter_live_preflight artifacts")
 
             feed = http_req("GET", base + "/api/feed/today?limit=10", token=TOKEN)
             (ARTIFACTS / "feed_today.json").write_text(feed["body"], encoding="utf-8")

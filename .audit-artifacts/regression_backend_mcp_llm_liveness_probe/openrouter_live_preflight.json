@@ -1,0 +1,7 @@
+{
+  "attempted": true,
+  "body_head": "{\"error\":{\"message\":\"No endpoints available matching your guardrail restrictions and data policy. Configure: https://openrouter.ai/settings/privacy\",\"code\":404}}",
+  "classification": "provider_or_auth",
+  "key": "<redacted-openrouter-key>",
+  "status": 404
+}
