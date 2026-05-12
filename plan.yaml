@@ -53631,7 +53631,7 @@ phases:
       \ before completion."
   - id: regression-audit-contract-gate-batched-fix
     name: Batched remediation for regression audit contract gate blockers
-    status: claimed
+    status: done
     description: "Batched remediation for failed gate `regression-audit-contract-gate`.\n\
       \nwork_type: defect_repair\nstep_type: implementation\nagent_source: project\n\
       provenance/disposition:\n- B-REG01-CONTRACT-CONTRADICTION: introduced_now or\
@@ -53740,6 +53740,46 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-12T13:39:10.270466+00:00'
+    done_at: '2026-05-12T13:58:02.192053+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-audit-contract-gate-batched-fix`
+      into main as squash commit `e433360`.
+
+
+      Files changed by branch:
+
+      - `docs/audits/regression-audit-2026-05-12-contract-matrix.md` (added durable
+      REG-01..REG-09 contract matrix artifact)
+
+      - `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`
+
+      - `web/tests/e2e/keyboard-a11y-helpers.ts`
+
+      - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts`
+
+      - `web/tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts`
+
+      - `web/tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts`
+
+
+      Scope proof: merge diff was limited to doc/test-contract artifacts; no Go runtime,
+      Svelte component, MCP, database/state, or styling implementation files were
+      included.
+
+
+      Mainline verification after squash merge:
+
+      - `npm --prefix web run check` completed successfully with `svelte-check found
+      0 errors and 0 warnings`.
+
+      - Initial focused Playwright command from repo root using `npm --prefix web
+      exec ... --config playwright.config.ts` failed because Playwright resolved `/Users/tefx/Projects/ResoFeed/playwright.config.ts`;
+      reran from `web/`.
+
+      - `npm exec playwright test -- tests/e2e/regression-audit-ui-expected-red.spec.ts
+      --config playwright.config.ts` from `web/` built successfully and ran 6 tests.
+      REG-01 Source Ledger boundary guard passed. Remaining expected-red gaps reproduced
+      for REG-03, REG-07, REG-08, and REG-09 (4 failed, 2 passed), preserving expected-red/proof
+      semantics for downstream remediation rather than product implementation.'
   - id: regression-audit-contract-gate-rerun
     name: Re-gate regression audit contract blocker remediation
     status: pending
