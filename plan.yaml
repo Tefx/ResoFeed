@@ -51427,3 +51427,122 @@ phases:
       \ none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: PROVEN\
       \ | BLOCKED\n  MCP-2: NOT_IN_SCOPE_FOR_THIS_STEP"
     agent: blind-tester
+  - id: mcp-audit-parity-security-idempotency-proof
+    name: Verify MCP capability parity, owner-token boundary, and receipt semantics
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (integration-verifier), run a focused regression sweep
+      that proves the MCP capability audit remains closed beyond the two direct failures.
+
+
+      Audit passing coverage to preserve:
+
+      - Missing/invalid MCP auth returns HTTP 401 before JSON-RPC dispatch.
+
+      - `initialize`, `tools/list`, and `resources/list` expose expected protocol
+      surface.
+
+      - Tool schemas remain strict object schemas with `additionalProperties=false`.
+
+      - Resource MIME declarations remain exact.
+
+      - Read/evaluate MCP calls do not mutate `item_state`.
+
+      - `mark_inspected`, `resonate_item`, and `report_delivery` mutate state and
+      replay idempotently.
+
+      - Reusing an idempotency key with a different payload is rejected and leaves
+      state unchanged.
+
+      - Natural-language `steer` respects OpenRouter stub path and does not double-call
+      on replay.
+
+      - URL subscription through MCP `steer` appears in `resofeed://sources`.
+
+      - MCP agent `steer` respects active human steering precedence.
+
+      - HTTP `/api/search` and MCP `search_items` expose the same seeded retrieval
+      item for the same lexical query.
+
+      - Mutating MCP calls create bounded runtime receipts for idempotency/provenance
+      only.
+
+
+      Scope:
+
+      - Exercise real `/mcp` Streamable HTTP endpoint where practical, not only in-process
+      handler shortcuts.
+
+      - Include HTTP/MCP contract consistency for search/source/rules surfaces touched
+      by this audit.
+
+      - Verify no accounts/OAuth/RBAC/per-agent registry, vector/RAG, sync/merge/event
+      bus/service layer, or delivery-channel ownership was introduced.
+
+
+      Independence Level: L2 semi-blind integration verification because this spans
+      runtime/API, storage, and MCP surfaces.
+
+
+      Changed seams require at least ONE real execution proof:
+
+      - MCP seam: actual MCP calls through server/listener.
+
+      - HTTP/MCP parity seam: actual HTTP `/api/search` and MCP `search_items` calls
+      against same fixture.
+
+      - Receipt seam: actual SQLite receipt count/result snapshot proof after mutating
+      MCP calls.'
+    verification: 'phase-check protecting mcp-audit-final-gate.
+
+      - MCP capability parity: focused integration tests or script proves resources/tools/schemas
+      remain compatible with audit passing coverage.
+
+      - HTTP/MCP consistency: same seeded search query yields consistent retrieval
+      item through `/api/search` and `search_items`.
+
+      - Owner-token/security: missing/invalid MCP auth returns HTTP 401 before JSON-RPC
+      dispatch; actor_id remains attribution only.
+
+      - Idempotency/receipts: mutating calls replay correctly, conflicting payloads
+      reject without state change, and receipts remain bounded runtime provenance
+      only.
+
+      - Evidence includes actual commands/output and database/response proof, not
+      summary-only claims.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Integration Regression\
+      \ Evidence\n- Commands executed:\n  ```\n  <actual commands>\n  ```\n- Actual\
+      \ output:\n  ```\n  <paste output>\n  ```\n- MCP resources/tools/schema proof:\n\
+      \  ```\n  <responses or test output>\n  ```\n- HTTP/MCP parity proof:\n  ```\n\
+      \  <same-fixture HTTP and MCP outputs>\n  ```\n- Owner-token/security proof:\n\
+      \  ```\n  <401 before JSON-RPC proof; actor_id attribution proof>\n  ```\n-\
+      \ Idempotency/receipt proof:\n  ```\n  <replay/conflict/receipt DB proof>\n\
+      \  ```\n- Forbidden-scope scan/result: <no accounts/OAuth/RBAC/per-agent registry/vector/RAG/sync/event\
+      \ bus/service layer>\n\n## Behavioral Proof Register\nMCP capability parity:\n\
+      \  requirement_ref: docs/ARCHITECTURE.md §7 and audit Passing Coverage\n  behavior_claim:\
+      \ MCP tools/resources preserve published operations and schemas\n  runtime_proof_expected:\
+      \ real /mcp calls and focused integration tests\n  evidence_ref: <commands/output\
+      \ refs>\n  status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n  closure_path:\
+      \ <closed or remediation step needed>\n  gate_decision_basis: <why gate may/may\
+      \ not open>\nHTTP/MCP consistency:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ §6 and §7\n  behavior_claim: shared product operations produce consistent\
+      \ results\n  runtime_proof_expected: same-fixture HTTP/MCP comparison\n  evidence_ref:\
+      \ <commands/output refs>\n  status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n\
+      \  closure_path: <closed or remediation step needed>\n  gate_decision_basis:\
+      \ <why gate may/may not open>\nOwner-token and receipts:\n  requirement_ref:\
+      \ docs/ARCHITECTURE.md §7 and §4.5\n  behavior_claim: owner token is universal\
+      \ boundary; receipts are bounded idempotency/provenance only\n  runtime_proof_expected:\
+      \ auth/idempotency/conflict replay proof\n  evidence_ref: <commands/output refs>\n\
+      \  status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n  closure_path:\
+      \ <closed or remediation step needed>\n  gate_decision_basis: <why gate may/may\
+      \ not open>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n  - <blocker\
+      \ or none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: SUPPORTING_PROOF\
+      \ | BLOCKED\n  MCP-2: SUPPORTING_PROOF | BLOCKED"
+    agent: integration-verifier
