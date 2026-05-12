@@ -51332,3 +51332,98 @@ phases:
       \ true | false\nfinding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2:\
       \ PROVEN | BLOCKED"
     agent: integration-verifier
+  - id: mcp-audit-live-localhost-liveness-probe
+    name: Probe current localhost MCP liveness and owner-token boundary
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As a BLACK-BOX TESTER (blind-tester), close MCP-1 by proving the current/runtime
+      MCP surface is actually alive and authenticated.
+
+
+      Audit failure context:
+
+      - Finding MCP-1: current `http://localhost:8080` instance was unreachable during
+      live probe; artifact recorded `transport_error: fetch failed`, and no process
+      listened on TCP port 8080.
+
+      - Audit states this is not proof the MCP handler is broken, but it blocks current-state
+      verification until server lifecycle/bind/token evidence is explicit.
+
+
+      Runtime surface preservation:
+
+      - The runtime surface is the single Go binary `resofeed serve`; do not use a
+      sidecar worker, test-only service, admin process, sync server, or handler-only
+      shortcut.
+
+      - Default/documented bind is `127.0.0.1:8080`; if the environment requires a
+      different configured address, evidence must state the exact bind and why it
+      is the configured current instance.
+
+
+      Required black-box proof:
+
+      1. Build or use the current `resofeed` binary.
+
+      2. Start `resofeed serve` with an isolated SQLite DB, `--addr 127.0.0.1:8080`
+      unless the current configured address is explicitly different, and a valid owner
+      token of at least 32 visible non-whitespace characters.
+
+      3. Confirm a TCP listener exists on the expected host/port.
+
+      4. Confirm `POST /mcp` with no Authorization returns HTTP 401 before JSON-RPC
+      dispatch.
+
+      5. Confirm valid-token `initialize`, `resources/list`, and `resources/read resofeed://system/doctor`
+      succeed through the real `/mcp` endpoint.
+
+      6. Capture shutdown/cleanup evidence so the probe does not leave a stray server
+      process.
+
+
+      Independence Level: L3 black-box runtime verification.
+
+
+      This step is a liveness/proof step. Do not modify product code. If liveness
+      fails, report a blocker with exact command, stderr/stdout, port status, and
+      suggested remediation family.'
+    verification: 'phase-check protecting mcp-audit-final-gate.
+
+      - Entry point starts through `resofeed serve` single binary.
+
+      - Listener is proven on localhost/127.0.0.1:8080 or explicitly configured current
+      bind.
+
+      - Missing-auth `/mcp` returns HTTP 401.
+
+      - Valid owner-token MCP initialize/resources/doctor succeeds through real HTTP.
+
+      - Evidence includes exact commands, actual outputs, port/listener proof, and
+      cleanup/shutdown proof.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## MCP-1 Liveness Probe\
+      \ Evidence\n- Binary/entrypoint used: <path and build command if built>\n- DB\
+      \ path: <isolated DB path>\n- Bind address: <127.0.0.1:8080 or configured current\
+      \ bind with rationale>\n- Owner token handling: <redacted; confirm valid length\
+      \ only>\n- Server start command:\n  ```\n  <exact command with token redacted\
+      \ if logged>\n  ```\n- Listener proof:\n  ```\n  <socket/HTTP proof>\n  ```\n\
+      - Missing-auth `/mcp` proof:\n  ```\n  <HTTP status/body; expect 401 owner token\
+      \ required>\n  ```\n- Valid-token initialize/resources/doctor proof:\n  ```\n\
+      \  <HTTP/MCP responses>\n  ```\n- Cleanup/shutdown proof:\n  ```\n  <process\
+      \ stopped / port released proof>\n  ```\n\n## Behavioral Proof Register\nMCP-1:\n\
+      \  requirement_ref: docs/ARCHITECTURE.md §2 System Boundary and §7 MCP Surface;\
+      \ audit MCP-1\n  behavior_claim: current/runtime MCP endpoint is reachable and\
+      \ owner-token protected\n  runtime_proof_expected: listener + missing-auth 401\
+      \ + valid-token MCP operation\n  evidence_ref: <commands/output refs>\n  status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n  closure_path: <closed\
+      \ or remediation step needed>\n  gate_decision_basis: <why gate may/may not\
+      \ open>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n  - <blocker or\
+      \ none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: PROVEN\
+      \ | BLOCKED\n  MCP-2: NOT_IN_SCOPE_FOR_THIS_STEP"
+    agent: blind-tester
