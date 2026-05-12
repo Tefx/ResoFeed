@@ -54638,7 +54638,7 @@ phases:
       disposition the live OpenRouter proof gap.'
   - id: regression-backend-mcp-llm-gate
     name: Gate backend MCP and LLM regression repair
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -54703,6 +54703,8 @@ phases:
     - regression-backend-mcp-llm-openrouter-live-remediation
     - regression-backend-mcp-llm-openrouter-live-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T18:32:54.738253+00:00'
   - id: regression-backend-mcp-llm-openrouter-live-remediation
     name: Root-cause and remediate live OpenRouter proof failure
     status: done
