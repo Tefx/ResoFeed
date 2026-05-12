@@ -52509,6 +52509,77 @@ phases:
       fallback_only_counted_as_success: false\nverdict: PASS | FAIL\nblockers: []\n\
       gate_open_allowed: true | false\nremaining_gaps: []"
     agent: golang-developer
+  - id: regression-backend-mcp-llm-liveness-probe
+    name: Probe backend MCP and LLM runtime liveness after repair
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (blind-tester), validate runnable backend/API/MCP/LLM
+      surfaces from a fresh perspective.
+
+
+      Scope:
+
+      - REG-2026-05-12-04: real `/mcp` read_item proof for full extraction detail
+      text.
+
+      - REG-2026-05-12-06: live/stub LLM health classification proof and honest fallback
+      handling.
+
+      - REG-2026-05-12-02: cite existing MCP capability chain evidence for empty-resource
+      array normalization; do not duplicate implementation work.
+
+
+      Required runtime proof:
+
+      - Start or use the single `cmd/resofeed` binary with a temporary SQLite DB and
+      owner token.
+
+      - Exercise real HTTP/MCP calls, not only in-process handlers.
+
+      - Confirm entrypoint starts, accepts at least one MCP operation, and produces
+      expected output.
+
+      - Probe /api/doctor and feed summary/model status with secrets redacted.
+
+
+      Independence Level: L2 semi-blind integration verification because this spans
+      runtime API, MCP, storage, and external model/stub behavior.
+
+
+      A test that discovers issues is a SUCCESSFUL verification outcome, but gate_open_allowed
+      must be false if blockers remain.'
+    verification: 'phase-check protecting regression-backend-mcp-llm-gate and final
+      closure.
+
+      - Entry point starts from cmd/resofeed or equivalent test binary, stays alive
+      long enough for probes, and accepts authenticated /mcp calls.
+
+      - REG-04: read_item for a full extraction fixture returns non-empty detail text
+      or an explicit downgrade/fallback reason.
+
+      - REG-06: /api/doctor/current feed evidence classifies live health and does
+      not count fallback-only summaries as live model success.
+
+      - REG-02: evidence references existing MCP audit chain closure for empty resource
+      arrays.
+
+      - Evidence includes exact commands, redacted outputs, and artifact paths.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Backend/MCP/LLM\
+      \ Liveness Report\nentrypoint_command: <exact command>\ncommands:\n  - <exact\
+      \ HTTP/MCP/doctor/feed probes>\noutputs_or_artifacts:\n  - <artifact path or\
+      \ pasted output>\nREG-2026-05-12-02: <existing MCP chain evidence ref>\nREG-2026-05-12-04:\
+      \ <PASS/FAIL + evidence path>\nREG-2026-05-12-06: <PASS/FAIL + classification\
+      \ + evidence path>\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers: []\ngate_open_allowed:\
+      \ true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-mcp-read-item-detail-fix
+    - regression-live-llm-health-classification-fix
+    agent: blind-tester
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: locked
