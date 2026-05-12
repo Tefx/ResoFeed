@@ -105,6 +105,10 @@ func TestMCPSteerUsesConfiguredOpenRouterAndReceipts(t *testing.T) {
 }
 
 func TestMCPRealBoundListenerInitializeResourcesAndTools(t *testing.T) {
+	// Audit contract lock: downstream MCP-1 closure must exercise a real bound
+	// listener equivalent to resofeed serve, prove missing/invalid POST /mcp auth
+	// returns HTTP 401 before JSON-RPC dispatch, then prove a valid owner token can
+	// initialize and read resources on that same running instance.
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	seedMCPCorpus(t, ctx, db)

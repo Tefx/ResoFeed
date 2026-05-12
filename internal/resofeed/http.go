@@ -49,6 +49,9 @@ type RuntimeLifecycleRecorder interface {
 // NewRouter returns the HTTP router for static assets, /api/* JSON, /api/doctor
 // text/plain, and /mcp Streamable HTTP. Query validation must run after auth and
 // before backend reads; unknown or duplicate query params return 400 bad_request.
+// The MCP audit liveness contract is bound to this single-binary router: POST
+// /mcp is reachable on the configured serve listener and rejects missing/invalid
+// owner-token auth with HTTP 401 before JSON-RPC dispatch.
 func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
@@ -851,7 +854,9 @@ type ItemResponse struct {
 	Item ItemDetail `json:"item"`
 }
 
-// SourcesResponse is GET /api/sources and resofeed://sources.
+// SourcesResponse is GET /api/sources and resofeed://sources. Empty result sets
+// are contractually encoded as {"sources":[]} rather than {"sources":null};
+// response constructors must initialize an empty slice when no rows exist.
 type SourcesResponse struct {
 	Sources []Source `json:"sources"`
 }
@@ -862,7 +867,9 @@ type SearchResponse struct {
 	Query SearchQueryEcho `json:"query"`
 }
 
-// RulesResponse is resofeed://rules/active.
+// RulesResponse is resofeed://rules/active. Empty result sets are contractually
+// encoded as {"rules":[]} rather than {"rules":null}; response constructors
+// must initialize an empty slice when no active rules exist.
 type RulesResponse struct {
 	Rules []SteerRule `json:"rules"`
 }

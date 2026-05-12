@@ -16,7 +16,8 @@ import (
 
 // MCPConfig defines the Remote Streamable HTTP endpoint at /mcp. Every request
 // requires Authorization: Bearer <OWNER_TOKEN>; missing/invalid auth returns
-// HTTP 401 before tool/resource handling and creates no receipt or queue.
+// HTTP 401 before JSON-RPC dispatch, tool/resource handling, receipt creation,
+// or backend mutation.
 type MCPConfig struct {
 	DB             *sql.DB
 	OwnerToken     string
@@ -27,6 +28,8 @@ type MCPConfig struct {
 // NewMCPHandler returns the /mcp Streamable HTTP handler. MCP exposes the same
 // product concepts as HTTP/UI: inspect, resonate, steer, retrieve, and report
 // delivery. It must not add per-agent registries or MCP-only product concepts.
+// Live audit closure for MCP liveness must prove this handler through the single
+// resofeed serve listener, not only through in-process handler invocation.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
 	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM}
 }

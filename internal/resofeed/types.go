@@ -40,7 +40,8 @@ type APIError struct {
 }
 
 // Source is the flat Source Ledger row shared by storage, HTTP, MCP, and UI
-// response boundaries. OPML folders/tags are discarded on import.
+// response boundaries. OPML folders/tags are discarded on import. MCP must use
+// the canonical SourcesResponse envelope rather than an MCP-only source shape.
 type Source struct {
 	ID              string     `json:"id"`
 	URL             string     `json:"url"`
@@ -148,7 +149,8 @@ type ItemState struct {
 }
 
 // SteerRule is the current steering policy row. Only active rules affect
-// ranking; inactive/superseded rows are not a command history UI.
+// ranking; inactive/superseded rows are not a command history UI. MCP must use
+// the canonical RulesResponse envelope rather than an MCP-only rule shape.
 type SteerRule struct {
 	ID                 string  `json:"id"`
 	RuleText           string  `json:"rule_text"`
