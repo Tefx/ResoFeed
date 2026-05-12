@@ -53315,13 +53315,15 @@ phases:
 
       As an INDEPENDENT TESTER (integration-verifier), rerun a focused equivalent
       of docs/audits/regression-audit-2026-05-12.md after backend and frontend repair
-      phases.
+      phases, applying the corrected Source Ledger authority boundary.
 
 
       Scope and required finding closure:
 
-      - REG-2026-05-12-01 Source Ledger exposes global `[RUN INGEST]` and per-source
-      `[FETCH]` with real action behavior.
+      - REG-2026-05-12-01 Source Ledger boundary is preserved: no global `[RUN INGEST]`,
+      no per-source `[FETCH]`, no `[INGESTING...]` / `[FETCHING...]` action states;
+      allowed source list, delete, details/diagnostics, import/export, accurate source-add
+      receipt/background-ingest guidance remain intact.
 
       - REG-2026-05-12-02 MCP empty `sources` and `rules/active` resources serialize
       arrays as `[]`; cite existing MCP capability chain evidence and recheck if the
@@ -53357,6 +53359,9 @@ phases:
 
       - Redact owner tokens and model secrets.
 
+      - Treat any reintroduced Source Ledger run/fetch/manual-ingest control as blocker
+      unless newer canonical docs and a deviation record explicitly authorize it.
+
 
       Independence Level: L2 semi-blind full regression verification.'
     verification: 'full-plan-check protecting regression-audit-final-gate.
@@ -53368,23 +53373,36 @@ phases:
       - Browser artifacts cover desktop Source Ledger, Search, feed/Inspector, and
       mobile Search/Source Ledger/doctor.
 
+      - REG-01 evidence proves forbidden Source Ledger run/fetch controls are absent
+      and allowed Source Ledger behaviors/guidance remain intact.
+
       - HTTP/MCP artifacts cover empty resources, read_item detail text, owner-token
       boundary, and LLM health classification.
 
       - gate_open_allowed is false if any blocker-class finding remains unresolved
       or unproven.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Full Regression\
-      \ Retest Evidence\ncommands:\n  - <exact command>\noutputs_or_artifacts:\n \
-      \ - <observations.json path>\n  - <screenshot path>\n  - <HTTP/MCP transcript\
-      \ path>\nfinding_verdicts:\n  REG-2026-05-12-01: PASS | PASS_WITH_DEBT | FAIL\n\
-      \  REG-2026-05-12-02: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-03: PASS\
-      \ | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-04: PASS | PASS_WITH_DEBT | FAIL\n\
-      \  REG-2026-05-12-05: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-06: PASS\
-      \ | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-07: PASS | PASS_WITH_DEBT | FAIL\n\
-      \  REG-2026-05-12-08: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-09: PASS\
-      \ | PASS_WITH_DEBT | FAIL\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\
-      \ []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Full Runtime Retest Evidence
+
+      - Commands and outputs.
+
+      - Artifact paths.
+
+      - REG finding verdict table.
+
+      - Source Ledger boundary proof and product-creep check.
+
+      - MCP overlap evidence refs for REG-02.'
     agent: integration-verifier
   - id: regression-audit-spec-conformance-review
     name: Verify regression fixes against ARCHITECTURE DESIGN PRD and audit contracts
