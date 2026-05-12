@@ -75,6 +75,27 @@ func TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency(t *testing.T) {
 	}
 }
 
+func TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays(t *testing.T) {
+	// Spec-derived fixture: docs/ARCHITECTURE.md §7 MCP Surface Resources
+	// documents the exact resource URIs and JSON bodies, while §6 Endpoint
+	// contracts require /api/sources and /api/steer/active parity as arrays.
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken})
+
+	for _, tc := range []struct {
+		uri   string
+		field string
+	}{
+		{uri: "resofeed://sources", field: "sources"},
+		{uri: "resofeed://rules/active", field: "rules"},
+	} {
+		t.Run(tc.uri, func(t *testing.T) {
+			assertMCPResourceJSONEmptyArray(t, handler, tc.uri, tc.field)
+		})
+	}
+}
+
 func TestMCPSteerUsesConfiguredOpenRouterAndReceipts(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -236,6 +257,29 @@ func mcpResourceText(t *testing.T, handler http.Handler, uri string) string {
 		t.Fatalf("resource contents len = %d, want 1", len(parsed.Contents))
 	}
 	return parsed.Contents[0].Text
+}
+
+func assertMCPResourceJSONEmptyArray(t *testing.T, handler http.Handler, uri string, field string) {
+	t.Helper()
+	text := mcpResourceText(t, handler, uri)
+	var body map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(text), &body); err != nil {
+		t.Fatalf("unmarshal %s resource JSON: %v; text=%s", uri, err, text)
+	}
+	raw, ok := body[field]
+	if !ok {
+		t.Fatalf("%s resource missing %q field; text=%s", uri, field, text)
+	}
+	if bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
+		t.Fatalf("%s resource field %q = null, want empty JSON array; text=%s", uri, field, text)
+	}
+	var values []json.RawMessage
+	if err := json.Unmarshal(raw, &values); err != nil {
+		t.Fatalf("%s resource field %q is not a JSON array: %v; raw=%s", uri, field, err, raw)
+	}
+	if len(values) != 0 {
+		t.Fatalf("%s resource field %q len = %d, want 0; text=%s", uri, field, len(values), text)
+	}
 }
 
 func mcpToolJSON[T any](t *testing.T, handler http.Handler, name string, args map[string]any) T {
