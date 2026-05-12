@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 )
 
 // WriteDoctor writes raw text diagnostics for /api/doctor,
@@ -85,12 +86,19 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
+	health, err := readOpenRouterHealthMetrics(ctx, db, time.Now().UTC())
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
 	if modelFailureCount == 0 && strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
 		lines = append(lines, "openrouter: ok item_transform_failures=0")
 	}
 	lines = append(lines, openRouterProviderDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
 	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d item_transform_failures: %d", modelFailureCount, modelFailureCount))
+	lines = append(lines, fmt.Sprintf("openrouter: current_item_transform_failures=%d historic_item_transform_failures=%d", health.CurrentFailures, health.HistoricFailures))
+	lines = append(lines, fmt.Sprintf("openrouter: live_summary_successes=%d fallback_only_current_summaries=%d", health.CurrentLiveSuccesses, health.CurrentFallbackOnly))
+	lines = append(lines, "openrouter: health_classification="+health.classification(cfg))
 	if modelFailureCount == 0 {
 		lines = append(lines, "fallback_provenance: item_transform_failures=0 summary=none")
 	}
@@ -117,6 +125,42 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		lines = append(lines, "ingest: last_run=never")
 	}
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+type openRouterHealthMetrics struct {
+	CurrentFailures      int
+	HistoricFailures     int
+	CurrentLiveSuccesses int
+	CurrentFallbackOnly  int
+}
+
+func (m openRouterHealthMetrics) classification(cfg DoctorConfig) string {
+	if m.CurrentFailures > 0 {
+		return "openrouter_client_timeout_or_error"
+	}
+	if m.HistoricFailures > 0 && m.CurrentLiveSuccesses > 0 {
+		return "stale_database_prior_failures"
+	}
+	if m.CurrentLiveSuccesses == 0 && strings.TrimSpace(cfg.ConfiguredOpenRouterModel) == "" && strings.TrimSpace(cfg.ResolvedOpenRouterModel) == "" {
+		return "missing_live_model_configuration"
+	}
+	return "unresolved_product_regression"
+}
+
+func readOpenRouterHealthMetrics(ctx context.Context, db *sql.DB, now time.Time) (openRouterHealthMetrics, error) {
+	cutoff := now.Add(-freshWindow).Format(time.RFC3339)
+	var metrics openRouterHealthMetrics
+	row := db.QueryRowContext(ctx, `
+select
+  coalesce(sum(case when model_status in (?, ?) and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status in (?, ?) and coalesce(published_at, first_seen_at) < ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status = ? and coalesce(summary, '') != '' and coalesce(core_insight, '') != '' and coalesce(value_tier, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status != ? and coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0)
+from items`, modelStatusSummaryNA, modelStatusLatencyError, cutoff, modelStatusSummaryNA, modelStatusLatencyError, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff)
+	if err := row.Scan(&metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly); err != nil {
+		return openRouterHealthMetrics{}, fmt.Errorf("read openrouter health metrics: %w", err)
+	}
+	return metrics, nil
 }
 
 func hasFailureDiagnostics(lines []string) bool {
