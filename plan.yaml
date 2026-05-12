@@ -53371,3 +53371,109 @@ phases:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
     agent: gate-reviewer
+  - id: regression-audit-final-gate
+    name: Final gate for regression audit remediation closure
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), decide whether docs/audits/regression-audit-2026-05-12.md
+      remediation is complete.
+
+
+      This final gate MUST NOT open unless every actionable finding has finding-by-finding
+      closure evidence:
+
+      - REG-2026-05-12-01 — Source Ledger is missing manual ingest and fetch controls.
+
+      - REG-2026-05-12-02 — MCP empty resources serialize arrays as null (must cite
+      existing MCP capability audit chain closure, not duplicate work).
+
+      - REG-2026-05-12-03 — Search exposes duplicate visible submit controls.
+
+      - REG-2026-05-12-04 — MCP read_item can return a full item without extracted
+      detail text.
+
+      - REG-2026-05-12-05 — Mobile utility surfaces leak inactive Today feed.
+
+      - REG-2026-05-12-06 — Current live LLM path is not healthy.
+
+      - REG-2026-05-12-07 — Source Ledger inherits stale Search receipt.
+
+      - REG-2026-05-12-08 — Feed row metadata is overly diagnostic.
+
+      - REG-2026-05-12-09 — Inspector exposes model_status in primary reading header.
+
+
+      Gate decision basis requirements:
+
+      - requirement_ref, behavior_claim, runtime_proof_expected, evidence_ref, status,
+      closure_path, gate_decision_basis for every REG finding.
+
+      - `gate_open_allowed: true` only when all blocker-class obligations are PROVEN
+      or have explicit non-intersection evidence.
+
+      - PASS_WITH_DEBT is allowed only for non-blocking debt with explicit non-intersection
+      from remaining gates.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Final full-plan regression closure across UI, accessibility, HTTP/MCP, LLM,
+      docs, and architecture invariants.'
+    verification: 'full-plan-check final gate.
+
+      - Every REG finding has a reviewed evidence ref, verdict, blockers, gate_open_allowed
+      value, and remaining_gaps field.
+
+      - Existing MCP capability audit closure is cited for REG-02 and remains compatible
+      with this regression audit closure.
+
+      - Runtime proof includes real rendered UI artifacts and real HTTP/MCP outputs.
+
+      - Documentation/spec conformance/deep review blockers are resolved or explicitly
+      non-intersecting.
+
+      - ResoFeed architecture/product invariants remain intact.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Final Regression\
+      \ Audit Gate Decision\nfinding_register:\n  REG-2026-05-12-01:\n    behavior_claim:\
+      \ <claim>\n    evidence_ref: <artifact/step>\n    status: PROVEN | NEEDS_TEST\
+      \ | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed or required remediation>\n\
+      \    gate_decision_basis: <why open/block>\n  REG-2026-05-12-02:\n    behavior_claim:\
+      \ <claim>\n    evidence_ref: <existing MCP chain artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-03:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-04:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-05:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-06:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-07:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-08:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\n  REG-2026-05-12-09:\n\
+      \    behavior_claim: <claim>\n    evidence_ref: <artifact/step>\n    status:\
+      \ PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n    closure_path: <closed\
+      \ or required remediation>\n    gate_decision_basis: <why open/block>\nverdict:\
+      \ OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
+      \ []"
+    depends_on:
+    - regression-audit-full-runtime-retest
+    - regression-audit-spec-conformance-review
+    - regression-audit-doc-sync-check
+    - regression-audit-focused-deep-review
+    agent: gate-reviewer
