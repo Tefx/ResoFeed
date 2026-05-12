@@ -53020,7 +53020,7 @@ phases:
       \ matrix."
   - id: regression-audit-ui-expected-red-tests
     name: Add expected-red UI regression tests with Source Ledger boundary guard
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -53184,6 +53184,53 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-12T13:04:31.392433+00:00'
+    done_at: '2026-05-12T13:25:31.786558+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/regression-audit-2026-05-12.md:\
+      \ NOT READ, absent in isolated worktree.\n- docs/ARCHITECTURE.md: READ.\n- docs/DESIGN.md:\
+      \ READ.\n- docs/PRD.md: READ.\n- AGENTS.md: NOT READ, absent in isolated worktree.\n\
+      - Existing frontend/Svelte/Playwright harnesses inspected:\n  - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\n\
+      \  - web/tests/e2e/e2e-contract.ts\n  - web/tests/e2e/fixtures.ts\n  - web/tests/e2e/feed-search-anatomy.spec.ts\n\
+      \  - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n  - web/tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts\n\
+      \  - web/playwright.config.ts\n\n## Expected-Red / Boundary-Guard Evidence\n\
+      Action Summary:\n- Added focused Playwright expected-red coverage for REG-01,\
+      \ REG-03, REG-05, REG-07, REG-08, REG-09.\n- Corrected existing UI conformance\
+      \ expected-red assertions so missing Source Ledger [RUN INGEST]/[FETCH] is not\
+      \ treated as product failure.\n- Product implementation files modified: false.\n\
+      \nArtifacts Modified:\n- web/tests/e2e/regression-audit-ui-expected-red.spec.ts\n\
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts\n\nCommit:\n\
+      - 60f3e71 — isolated branch commit `test: define regression audit UI expected-red\
+      \ coverage`\n- 889a140 — mainline squash commit `[vectl] step-regression-audit-ui-expected-red-tests\
+      \ completed`\n\nVerification Run (worktree):\n- `npm ci` -> Exit Code: 0; installed\
+      \ web dependencies from lockfile.\n- `npm --prefix web run check` -> Exit Code:\
+      \ 0; svelte-check found 0 errors and 0 warnings.\n- `npx playwright test --config\
+      \ ./playwright.config.ts regression-audit-ui-expected-red.spec.ts --project=chromium-ci-safe`\
+      \ -> Exit Code: 1; aligned expected-red. 2 passed, 4 failed.\n\nAlready-green\
+      \ proof:\n- REG-01 passed: Source Ledger showed canonical allowed grammar and\
+      \ no [RUN INGEST], [INGESTING...], [FETCH], or [FETCHING...] action controls.\n\
+      - REG-05 passed: mobile Source Ledger/Search/doctor utility surfaces set inactive\
+      \ Today feed aria-hidden/inert and excluded visible Today feed list.\n\nExpected\
+      \ failures / exposed gaps:\n- REG-03 failed: Search rendered 2 visible submit\
+      \ controls; expected exactly 1.\n- REG-07 failed: search receipt `retrieval:\
+      \ lexical search` remained visible after navigating to Source Ledger.\n- REG-08\
+      \ failed: feed row metadata foregrounded repeated raw diagnostic strings: model_status/model_latency_error\
+      \ and fallback duplication.\n- REG-09 failed: Inspector visible primary copy\
+      \ foregrounded raw model_status/model_latency_error.\n\nDownstream Owners:\n\
+      - regression-source-ledger-controls-fix\n- regression-ui-containment-and-diagnostics-fix\n\
+      \nMainline final-state verification after squash merge:\n- `npm --prefix web\
+      \ run check` -> Exit Code: 0; svelte-check found 0 errors and 0 warnings.\n\
+      - Corrected Playwright command: `npm --prefix web exec -- playwright test --config\
+      \ web/playwright.config.ts regression-audit-ui-expected-red.spec.ts --project=chromium-ci-safe`\
+      \ -> expected Exit Code: 1, accepted red.\n- Output summary: 6 tests ran, 2\
+      \ passed and 4 failed with aligned expected failures:\n  - REG-03: desktop Search\
+      \ visible submit control count was 2, expected 1.\n  - REG-07: Search receipt\
+      \ remained visible on Source Ledger.\n  - REG-08: feed row metadata foregrounded\
+      \ `model_status` / `model_latency_error` and fallback duplication.\n  - REG-09:\
+      \ Inspector primary copy foregrounded `model_status` / `model_latency_error`.\n\
+      \nExpected-red semantics accepted: step_intent=test_define_red, expected_result=red,\
+      \ observed_result=red, failure_alignment=matches REG-03/07/08/09 while REG-01/05\
+      \ already-green boundary proofs are preserved, product_implementation_files_modified=false.\n\
+      \n## Gate Decision\nheadline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE"
   - id: regression-audit-mcp-read-item-expected-red-tests
     name: Add expected-red MCP read_item detail-text tests
     status: done
