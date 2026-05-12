@@ -55562,7 +55562,7 @@ phases:
     agent: gate-reviewer
   - id: regression-frontend-real-api-proof-remediation
     name: Remediate real API frontend proof blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -55766,6 +55766,8 @@ phases:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-12T15:58:22.752416+00:00'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
