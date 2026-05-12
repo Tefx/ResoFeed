@@ -52992,7 +52992,7 @@ phases:
     - regression-source-ledger-controls-fix
     agent: frontend-engineer
   - id: regression-frontend-route-integration-retest
-    name: Retest frontend routes and Source Ledger real-path behavior
+    name: Retest frontend routes and Source Ledger boundary behavior
     status: pending
     description: 'step_type: verification
 
@@ -53009,7 +53009,9 @@ phases:
 
       Scope:
 
-      - REG-2026-05-12-01 Source Ledger controls and real run/fetch action path.
+      - REG-2026-05-12-01 Source Ledger boundary behavior: no `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, or `[FETCHING...]` action controls; source-add receipt/background-ingest
+      guidance remains accurate; details/diagnostics visibility remains intact.
 
       - REG-2026-05-12-03 Search visible submit uniqueness.
 
@@ -53027,19 +53029,23 @@ phases:
 
       - UI seam: rendered Svelte route/component evidence.
 
-      - HTTP seam: at least one Source Ledger manual action uses the real API client/HTTP
-      operation where available.
+      - Source Ledger seam: rendered proof that allowed operations remain visible/usable
+      and forbidden run/fetch controls are absent.
+
+      - Guidance seam: source-add receipt/background-ingest guidance remains accurate
+      under rendered navigation.
 
       - Mobile seam: actual narrow viewport/browser or Playwright/mobile emulation
       artifact.
 
 
       Independence Level: L2 semi-blind because this verifies cross-component route
-      state and real API wiring.
+      state and real UI behavior.
 
 
       A test that finds issues is valuable; gate_open_allowed must be false if any
-      REG finding remains blocking.'
+      REG finding remains blocking, including any forbidden Source Ledger control
+      reintroduction.'
     verification: 'phase-check protecting frontend gate and final closure.
 
       - Run focused frontend tests and at least one browser/rendered route proof.
@@ -53047,19 +53053,32 @@ phases:
       - Finding-by-finding verdicts for REG-01, REG-03, REG-05, REG-07, REG-08, and
       REG-09 are green or blockers are listed.
 
-      - Evidence includes command outputs and artifact paths, not summary-only claims.
+      - REG-01 proof verifies `[RUN INGEST]` / `[FETCH]` controls are absent, allowed
+      Source Ledger actions/details remain visible, and guidance reflects Steer/background-ingest
+      behavior.
 
-      - Source Ledger manual controls invoke real API-client behavior where available.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Frontend\
-      \ Route Integration Retest\ncommands:\n  - <exact test/build/browser command>\n\
-      outputs_or_artifacts:\n  - <desktop Source Ledger artifact>\n  - <mobile Search\
-      \ artifact>\n  - <mobile Source Ledger artifact>\n  - <mobile /doctor artifact>\n\
-      \  - <feed/Inspector artifact>\nfinding_verdicts:\n  REG-2026-05-12-01: PASS\
-      \ | FAIL\n  REG-2026-05-12-03: PASS | FAIL\n  REG-2026-05-12-05: PASS | FAIL\n\
-      \  REG-2026-05-12-07: PASS | FAIL\n  REG-2026-05-12-08: PASS | FAIL\n  REG-2026-05-12-09:\
-      \ PASS | FAIL\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers: []\ngate_open_allowed:\
-      \ true | false\nremaining_gaps: []"
+      - Evidence includes command outputs and artifact paths, not summary-only claims.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Retest Evidence
+
+      - Commands executed and outputs.
+
+      - Artifact paths for desktop/mobile rendered routes.
+
+      - REG finding verdict table.
+
+      - REG-01 forbidden-controls absence proof and allowed Source Ledger behavior
+      proof.'
     depends_on:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
