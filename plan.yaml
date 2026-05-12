@@ -52036,6 +52036,118 @@ phases:
     depends_on:
     - regression-audit-contract-matrix
     agent: frontend-engineer
+  - id: regression-audit-mcp-read-item-expected-red-tests
+    name: Add expected-red MCP read_item detail-text tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define the distinct MCP `read_item` detail-text gap before remediation. Do NOT
+      duplicate REG-2026-05-12-02 empty-resource null-array coverage; that belongs
+      to the existing MCP capability audit chain.
+
+
+      Finding covered:
+
+      - REG-2026-05-12-04 — MCP `read_item` can return a full item without extracted
+      detail text. Audit fixture `SQLite transport parity regression` had `extraction_status=full`
+      but MCP read_item evidence showed `hasExtracted: false`.
+
+
+      Required behavior:
+
+      - When an item is marked `extraction_status=full`, article extraction storage
+      and MCP `read_item` response must provide non-empty extracted/detail text.
+
+      - If full extraction legitimately yields no detail text, status must be downgraded
+      or a clear fallback reason must be exposed; do not silently return full status
+      with empty detail text.
+
+      - Preserve Inspect workflow parity and existing owner-token authorization.
+
+
+      Scope:
+
+      - Test-only changes in internal/resofeed/*_test.go, preferably MCP integration/readable
+      extraction tests.
+
+      - Use a real migrated SQLite fixture and the real `POST /mcp` or existing real-bound
+      MCP handler/listener harness.
+
+      - Seed or fetch a source-backed fixture equivalent to the audit''s `/articles/sqlite`
+      case.
+
+      - Assert both extraction status and response text shape; do not test handler
+      internals only.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      Use exact documented MCP `read_item` tool/arguments and item/extraction semantics
+      from docs/ARCHITECTURE.md and the audit fixture. Avoid convenience fixture fields
+      that hide empty extracted_text.
+
+
+      Expected-red semantics:
+
+      - Red is expected before remediation if the current extraction/read path can
+      create `extraction_status=full` with empty extracted text.
+
+      - Success means the gap is exposed without modifying product code.
+
+      - Evidence MUST list expected_failures/exposed_gaps and downstream owner `regression-mcp-read-item-detail-fix`.
+
+
+      touch_paths:
+
+      - internal/resofeed/mcp_integration_test.go
+
+      - internal/resofeed/ingest_gemini_test.go
+
+      - internal/resofeed/readable_sanitation_test.go
+
+      - internal/resofeed/*_test.go
+
+
+      harness_refs:
+
+      - existing MCP integration helpers
+
+      - existing article extraction/readability fixtures
+
+
+      authoritative_interface: existing MCP `read_item` tool over POST /mcp and existing
+      item extraction fields.
+
+
+      No product code changes are allowed in this step.'
+    verification: 'local-check protecting regression-audit-contract-gate and backend
+      remediation.
+
+      - Modified files are limited to Go tests/fixtures/helpers.
+
+      - Focused expected-red run exposes REG-04 without implementation changes.
+
+      - Test exercises real MCP read_item path and verifies non-empty extracted/detail
+      text for full extraction or explicit downgrade/fallback reason.
+
+      - Evidence confirms REG-02 null-array tests were not duplicated.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red\
+      \ MCP read_item Evidence\nexpected_failures:\n  REG-2026-05-12-04: <test name\
+      \ + failure summary>\ncommands:\n  - <exact go test command>\noutputs_or_artifacts:\n\
+      \  - <path or pasted output>\nREG-02_duplicate_check: <existing MCP step ids\
+      \ referenced, no duplicate test added>\nverdict: PASS | FAIL\nblockers: []\n\
+      gate_open_allowed: true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-audit-contract-matrix
+    agent: golang-developer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
