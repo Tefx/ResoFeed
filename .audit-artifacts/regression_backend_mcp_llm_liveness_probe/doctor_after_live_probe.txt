@@ -7,9 +7,9 @@ openrouter: current_item_transform_failures=2 historic_item_transform_failures=0
 openrouter: live_summary_successes=0 fallback_only_current_summaries=1
 openrouter: health_classification=openrouter_client_timeout_or_error
 openrouter: failures=2
-openrouter: item=item_01b89f7a4591159d60b51ba5ddb953ae source=src_c6cc4c4d992003a7e6b9b5c009e404c0 status=model_latency_error title=OPENROUTER LIVE LIVENESS REG-06
+openrouter: item=item_224d0c500d06523c5d817d0510750680 source=src_87bca0bfc50ef55a56a467e4c762b416 status=model_latency_error title=OPENROUTER LIVE LIVENESS REG-06
 openrouter: item=item_full_detail_regression_probe source=src_full_regression_probe status=summary_unavailable title=Full extraction regression fixture
-fallback_provenance: item=item_01b89f7a4591159d60b51ba5ddb953ae summary=excerpt model_status=model_latency_error extraction_status=full
+fallback_provenance: item=item_224d0c500d06523c5d817d0510750680 summary=excerpt model_status=model_latency_error extraction_status=full
 fallback_provenance: item=item_full_detail_regression_probe summary=model model_status=summary_unavailable extraction_status=full
 extraction: ok
-ingest: last_run=2026-05-12T18:31:09Z
+ingest: last_run=2026-05-12T18:37:28Z
