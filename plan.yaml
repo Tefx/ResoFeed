@@ -51934,7 +51934,7 @@ phases:
       - Statement that no product code changed.'
     agent: spec-verifier
   - id: regression-audit-ui-expected-red-tests
-    name: Add expected-red UI regression tests for audit surface failures
+    name: Add expected-red UI regression tests with Source Ledger boundary guard
     status: pending
     description: 'step_type: test
 
@@ -51949,11 +51949,31 @@ phases:
       test files only.
 
 
+      Corrected REG-01 authority rule:
+
+      - REG-2026-05-12-01 MUST NOT assert that missing Source Ledger `[RUN INGEST]`
+      / `[FETCH]` controls are a product failure.
+
+      - REG-01 coverage must expose the true closure requirement: Source Ledger must
+      NOT show run/fetch/manual-ingest controls under the current canonical boundary;
+      any audit or docs/ui-preview demand for those controls must be resolved by product-boundary
+      adjudication against docs/ARCHITECTURE.md and docs/DESIGN.md before implementation.
+
+      - Source Ledger must preserve allowed behavior: view sources, delete, details/diagnostics
+      visibility, import/export, accurate source-add receipt/background-ingest guidance,
+      and no stale receipt leakage.
+
+      - Negative assertions for forbidden labels are required: `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, `[FETCHING...]` must not appear as Source Ledger action controls
+      unless the contract matrix records newer canonical authority.
+
+
       Findings covered:
 
-      - REG-2026-05-12-01 — Source Ledger must expose global [RUN INGEST] and per-source
-      [FETCH], with [INGESTING...]/[FETCHING...] states, raw err diagnostics, last_ingest,
-      last_fetch, and no row layout shift.
+      - REG-2026-05-12-01 — Source Ledger boundary guard: no run/fetch/manual-ingest
+      controls; source-add receipt/background-ingest guidance remains accurate; diagnostics/details
+      visibility remains intact; audit-control demand is adjudication scope, not product
+      failure.
 
       - REG-2026-05-12-03 — Search must expose exactly one visible submit control;
       any secondary submit must be visually hidden and absent from visible control
@@ -51979,7 +51999,9 @@ phases:
       - Test-only changes in web/src/routes/components/__tests__/, web/src/lib/*test*,
       Playwright/e2e harness files, or equivalent frontend test locations.
 
-      - Use spec-derived fixtures from docs/DESIGN.md, docs/PRD.md, and docs/ui-preview.html.
+      - Use spec-derived fixtures from docs/DESIGN.md, docs/PRD.md, and regression
+      audit artifacts, with canonical docs taking precedence over docs/ui-preview.html
+      if it conflicts.
 
       - Include at least one mobile/narrow viewport rendered proof expectation for
       each utility route named in REG-05.
@@ -51989,17 +52011,21 @@ phases:
 
       Spec-Fixture Conformance (MANDATORY):
 
-      At least one fixture MUST use exact documented labels and surface grammar from
-      docs/DESIGN.md and docs/ui-preview.html: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,
-      `[FETCHING...]`, `SEARCH`, `SOURCE LEDGER`, `/doctor`.
+      At least one fixture MUST use exact documented allowed Source Ledger surface
+      grammar from canonical specs. Forbidden control labels `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, and `[FETCHING...]` may appear only as negative assertions or conflict
+      fixtures, not as expected product controls.
 
 
       Expected-red semantics:
 
-      - Red is expected before remediation if the audit failures still reproduce.
+      - Red is expected before remediation for unresolved REG-03, REG-05, REG-07,
+      REG-08, and REG-09 gaps if they still reproduce.
 
-      - Success means tests expose the gaps without modifying product implementation
-      code.
+      - REG-01 boundary-guard assertions may already pass if prior final closure preserved
+      the Source Ledger boundary; success for REG-01 means forbidden controls are
+      rejected and any conflicting audit expectation is routed to `regression-source-ledger-controls-fix`
+      for adjudication.
 
       - Evidence MUST list expected_failures or exposed_gaps and identify downstream
       owners `regression-source-ledger-controls-fix` and `regression-ui-containment-and-diagnostics-fix`.
@@ -52023,8 +52049,9 @@ phases:
       - existing Playwright/browser-use audit artifact patterns
 
 
-      authoritative_interface: documented UI labels and visual/accessibility states
-      from DESIGN.md/PRD/ui-preview.
+      authoritative_interface: Source Ledger view/delete/import/export/details; source
+      addition via Steer; background ingest refresh; no run/fetch controls without
+      newer canonical docs.
 
 
       No product code changes are allowed in this step.'
@@ -52033,22 +52060,40 @@ phases:
 
       - Modified files are limited to tests/fixtures/harnesses.
 
-      - Focused UI tests expose REG-01, REG-03, REG-05, REG-07, REG-08, and REG-09
-      before implementation.
+      - Focused UI tests expose REG-03, REG-05, REG-07, REG-08, and REG-09 before
+      implementation where still failing.
+
+      - REG-01 tests assert Source Ledger does NOT reintroduce `[RUN INGEST]` / `[FETCH]`
+      controls and that source-add receipt/background-ingest guidance plus diagnostics/details
+      visibility remain correct.
 
       - Tests use rendered output/visibility/accessibility assertions, including mobile/narrow
       viewport cases.
 
-      - Evidence includes expected-red command output and artifact paths.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red\
-      \ UI Test Evidence\nexpected_failures:\n  REG-2026-05-12-01: <test name + failure\
-      \ summary>\n  REG-2026-05-12-03: <test name + failure summary>\n  REG-2026-05-12-05:\
-      \ <test name + failure summary>\n  REG-2026-05-12-07: <test name + failure summary>\n\
-      \  REG-2026-05-12-08: <test name + failure summary>\n  REG-2026-05-12-09: <test\
-      \ name + failure summary>\ncommands:\n  - <exact command>\noutputs_or_artifacts:\n\
-      \  - <path or pasted output>\nverdict: PASS | FAIL\nblockers: []\ngate_open_allowed:\
-      \ true | false\nremaining_gaps: []"
+      - Evidence includes expected-red command output, any REG-01 already-green boundary
+      proof, and artifact paths.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red / Boundary-Guard Evidence
+
+      - Test-only file list.
+
+      - Expected failures or exposed gaps for REG-03/05/07/08/09.
+
+      - REG-01 negative assertion evidence: Source Ledger forbidden run/fetch controls
+      absent.
+
+      - Conflict fixture notes for any audit/ui-preview text that demands controls,
+      routed to adjudication rather than implementation.'
     depends_on:
     - regression-audit-contract-matrix
     agent: frontend-engineer
