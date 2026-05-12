@@ -53967,7 +53967,7 @@ phases:
   steps:
   - id: regression-mcp-read-item-detail-fix
     name: Fix MCP read_item extracted detail text for full items
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -54078,6 +54078,67 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T14:17:32.153362+00:00'
+    done_at: '2026-05-12T14:30:28.058512+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-mcp-read-item-detail-fix`
+      into main as squash commit `4c78ab5`.
+
+
+      Subagent evidence:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - commit in isolated branch: `52f2d80`
+
+      - changed files: `internal/resofeed/ingest.go`, `internal/resofeed/ingest_gemini_test.go`,
+      `internal/resofeed/search.go`
+
+
+      REG-2026-05-12-04 fix summary:
+
+      - `ReadItemDetail` now normalizes impossible `full` + empty extracted text to
+      `partial_extraction` or `original_unavailable`.
+
+      - Extraction no longer returns `full` when readable sanitation leaves no detail
+      text.
+
+      - Added boilerplate-only extraction regression coverage.
+
+      - Full extraction with non-empty extracted text remains `full` and is returned
+      through MCP `read_item`.
+
+      - Empty/sanitized-away extraction no longer claims `full`; it downgrades to
+      `partial_extraction` when feed excerpt exists, otherwise `original_unavailable`.
+
+      - REG-02 resource-array logic was not modified; focused REG-02 test remains
+      passing.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `gofmt -w internal/resofeed/ingest.go internal/resofeed/ingest_gemini_test.go
+      internal/resofeed/search.go`
+
+      - `go test ./internal/resofeed -run TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason
+      -count=1` -> ok
+
+      - `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays
+      -count=1` -> ok
+
+      - `go test ./internal/resofeed -run TestExtractionStatusMappingCoversFullPartialAndOriginalUnavailable
+      -count=1` -> ok
+
+      - `go test ./internal/resofeed` -> ok
+
+      - `go build ./cmd/resofeed` -> ok
+
+      - `go test ./...` -> ok
+
+
+      Post-verification path status for changed files was clean.'
   - id: regression-live-llm-health-classification-fix
     name: Classify and repair live LLM health regression
     status: claimed
