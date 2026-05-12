@@ -57368,7 +57368,7 @@ phases:
       can follow.'
   - id: regression-audit-doc-sync-check
     name: Check documentation sync for regression audit closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -57441,6 +57441,98 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-12T19:12:44.282486+00:00'
+    done_at: '2026-05-12T19:24:51.988014+00:00'
+    evidence: 'Doc-reviewer completed documentation sync with semantic PASS_WITH_DEBT/PASS
+      and no blockers.
+
+
+      Closure fields:
+
+      - headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blockers: []
+
+
+      Docs checked/updated:
+
+      - `.agents/instructions.md`: MATCH.
+
+      - `docs/ARCHITECTURE.md`: MATCH.
+
+      - `docs/PRD.md`: MATCH.
+
+      - `docs/DESIGN.md`: MATCH.
+
+      - `docs/DESIGN_VISION.md`: MATCH.
+
+      - `docs/USAGE.md`: UPDATED to remove normal manual-ingest liveness instruction.
+
+      - `docs/ui-preview.html`: MATCH.
+
+      - `docs/UI_REGRESSION_CONTRACT.md`: UPDATED to remove stale Source fetch/run-ingest
+      hit-target requirement.
+
+      - `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`: UPDATED to replace manual ingest/fetch
+      matrix cases with Source Ledger negative boundary.
+
+      - `docs/audits/prd-behavior-audit-2026-05-11.md`: UPDATED with staleness note
+      for old `[RUN INGEST]` references.
+
+      - `docs/audits/regression-audit-2026-05-12.md`: MATCH; stale text flagged in-document.
+
+      - `docs/audits/regression-audit-2026-05-12-contract-matrix.md`: MATCH.
+
+      - Source Ledger adjudication/spec/runtime artifacts: MATCH.
+
+      - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/gate-reviewer-final-gate.md`:
+      UPDATED to align verdict line to PASS_WITH_DEBT.
+
+
+      Source Ledger boundary citations:
+
+      - `docs/DESIGN.md`: Ledger anatomy excludes manual run/fetch and includes OPML
+      import, flat rows, delete, state export/import, optional last-fetch diagnostics.
+
+      - `docs/ui-preview.html`: Ledger shows `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT
+      STATE]`, `[DELETE]`, `last_fetch`, and background ingest guidance.
+
+      - `SourceLedger.svelte`: props/actions are delete/import/export/import-state
+      and `[DETAILS]`; no run/fetch wiring.
+
+
+      Product invariants:
+
+      - No product code changed.
+
+      - No accounts/OAuth/RBAC, vector/RAG, sync/merge/event bus/service layer, folders/tags/unread/archive/settings-dashboard
+      scope introduced.
+
+
+      Artifacts/commits:
+
+      - Worktree commit: `e6316ac` (`docs: sync regression audit contracts`).
+
+      - Main squash commit: `26b8d3a` (`[vectl] step-regression-audit-doc-sync-check
+      completed`).
+
+      - Added artifact: `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-doc-sync-check.md`.
+
+
+      Mainline final-state verification after merge:
+
+      - `git diff --check HEAD~1..HEAD`: exit 0 with no whitespace/errors.
+
+
+      Gaps/notes:
+
+      - Historical artifacts may still preserve old text as history, but current docs/contracts
+      now mark or supersede stale Source Ledger run/fetch expectations.'
   - id: regression-audit-focused-deep-review
     name: Perform focused deep review of regression remediation
     status: claimed
