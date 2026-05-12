@@ -51831,6 +51831,92 @@ phases:
     regression families before remediation.
   depends_on:
   - mcp-capability-audit-verification-and-finalization
+  steps:
+  - id: regression-audit-contract-matrix
+    name: Lock regression audit finding matrix and repair contracts
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - behavioral proof matrix\n  - existing public surface contracts\n  - test\
+      \ obligations\nagent_source: project\n\nLock the repair contract for docs/audits/regression-audit-2026-05-12.md\
+      \ without implementing behavior.\n\nFindings to preserve exactly:\n- REG-2026-05-12-01\
+      \ — Source Ledger is missing manual ingest and fetch controls (P1).\n- REG-2026-05-12-02\
+      \ — MCP empty resources serialize arrays as null (P2); DO NOT duplicate implementation\
+      \ because existing pending steps mcp-audit-contract-lock, mcp-audit-empty-resources-red-tests,\
+      \ mcp-audit-empty-resources-fix, and mcp-audit-fresh-db-resource-retest already\
+      \ own this family.\n- REG-2026-05-12-03 — Search exposes duplicate visible submit\
+      \ controls (P2).\n- REG-2026-05-12-04 — MCP read_item can return a full item\
+      \ without extracted detail text (P2).\n- REG-2026-05-12-05 — Mobile utility\
+      \ surfaces still leak inactive Today feed into the page/accessibility flow (P1/P2).\n\
+      - REG-2026-05-12-06 — Current live LLM path is not healthy (P1 current instance,\
+      \ P2 product regression until classified).\n- REG-2026-05-12-07 — Source Ledger\
+      \ inherits stale Search receipt (P3).\n- REG-2026-05-12-08 — Feed row metadata\
+      \ is overly diagnostic (P3).\n- REG-2026-05-12-09 — Inspector exposes model\
+      \ status in the primary reading header (P3).\n\nAuthoritative invariants:\n\
+      - Single Go binary cmd/resofeed; SQLite/FTS5 only; Gemini/OpenRouter is JSON-in/JSON-out\
+      \ transformer only.\n- Owner token is the universal delegation boundary; actor_id\
+      \ is attribution/idempotency only.\n- No accounts, OAuth, RBAC, per-agent registry,\
+      \ vector/RAG, sync/merge/event bus/service layer, folder/tag/unread/archive/product\
+      \ creep.\n- Source Ledger remains flat and is the only location for manual ingestion\
+      \ controls.\n\nPublic surfaces locked:\n- UI routes/surfaces: Today, Search,\
+      \ Source Ledger, /doctor, Inspector.\n- HTTP actions used by UI manual ingest/fetch\
+      \ controls must stay inside the existing single-binary HTTP API boundary.\n\
+      - MCP resources/tools: resources/read for sources/rules/item/detail and read_item\
+      \ retrieval parity through POST /mcp.\n- LLM live-health classification must\
+      \ not treat fallback-only current summaries as successful live model-backed\
+      \ summaries.\n\nDeliverable: a table mapping each REG finding to owner phase/step,\
+      \ expected behavior, forbidden regression, and proof artifact required. No production\
+      \ code changes in this step.\n\ntouch_paths:\n- docs/audits/regression-audit-2026-05-12.md\n\
+      - docs/ARCHITECTURE.md\n- docs/DESIGN.md\n- docs/PRD.md\n- docs/ui-preview.html\n\
+      - internal/resofeed/*_test.go\n- web/src/routes/+page.svelte\n- web/src/routes/components/*.svelte\n\
+      - web/src/lib/api-client.ts\n\nauthoritative_interface: existing UI labels [RUN\
+      \ INGEST], [INGESTING...], [FETCH], [FETCHING...]; existing POST /mcp owner-token\
+      \ boundary; existing single-binary HTTP API.\n\nCompletion Criteria:\n- Every\
+      \ actionable audit issue is mapped exactly once.\n- REG-02 overlap is explicitly\
+      \ delegated to the existing MCP capability chain and not reimplemented here.\n\
+      - No architecture or design invariant is loosened."
+    verification: 'local-check protecting regression-audit-contract-gate and all downstream
+      repair phases.
+
+      - Evidence contains finding-by-finding owner matrix for REG-2026-05-12-01 through
+      REG-2026-05-12-09.
+
+      - Evidence cites the audit passages for each finding and the relevant ARCHITECTURE/DESIGN/PRD
+      authority.
+
+      - Evidence confirms REG-02 is covered by existing MCP capability audit steps
+      and only final closure cross-references it.
+
+      - Evidence confirms no product code changed.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Matrix Evidence
+
+      | Finding | Headline | Owner step(s) | Expected behavior | Forbidden regression
+      | Required proof artifact |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | REG-2026-05-12-01 | Source Ledger is missing manual ingest and fetch controls
+      | <step> | <behavior> | <regression> | <artifact> |
+
+
+      REG-02 delegation: <existing MCP step ids and why this plan does not duplicate
+      them>
+
+
+      verdict: PASS | FAIL
+
+      blockers: []
+
+      gate_open_allowed: true | false
+
+      remaining_gaps: []'
+    agent: golang-developer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
