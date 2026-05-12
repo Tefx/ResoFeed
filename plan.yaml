@@ -54887,7 +54887,7 @@ phases:
       Post-verification status for changed source/docs/test paths was clean.'
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -55017,6 +55017,76 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-12T15:01:19.683351+00:00'
+    done_at: '2026-05-12T15:37:09.974487+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-ui-containment-and-diagnostics-fix`
+      into main as squash commit `3e0e424`.
+
+
+      Subagent evidence:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - isolated branch commits: `17fbfac` (UI fix) and `f517f01` (durable rendered
+      artifacts)
+
+
+      Files changed:
+
+      - `web/src/routes/+page.svelte`
+
+      - `web/src/routes/components/SearchRetrieval.svelte`
+
+      - `web/src/routes/components/Inspector.svelte`
+
+      - `web/src/routes/components/item-anatomy.ts`
+
+      - `web/src/app.css`
+
+      - durable rendered artifacts under `docs/audits/artifacts/regression-audit-2026-05-12c/regression-ui-containment/`
+
+
+      Finding verdicts:
+
+      - REG-2026-05-12-03: PASS
+
+      - REG-2026-05-12-05: PASS
+
+      - REG-2026-05-12-07: PASS
+
+      - REG-2026-05-12-08: PASS
+
+      - REG-2026-05-12-09: PASS
+
+
+      Rendered evidence:
+
+      - Search visible-control DOM/screenshot records one visible submit control.
+
+      - Mobile Search/Source Ledger/Doctor containment artifacts show inactive Today
+      feed inert/aria-hidden.
+
+      - Feed row metadata artifact shows compact fallback/partial labels rather than
+      repeated raw model diagnostics.
+
+      - Inspector header artifact contains no raw `model_status` or `model_latency_error`
+      in primary visible copy.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm --prefix web run check` -> `svelte-check found 0 errors and 0 warnings`
+
+      - `npm --prefix web run build` -> build succeeded
+
+      - `npm --prefix web run test:e2e -- web/tests/e2e/regression-audit-ui-expected-red.spec.ts`
+      -> 6 passed (REG-01, REG-03, REG-05, REG-07, REG-08, REG-09)
+
+
+      Post-verification status for changed source/artifact paths was clean.'
   - id: regression-frontend-route-integration-retest
     name: Retest frontend routes and Source Ledger boundary behavior
     status: pending
