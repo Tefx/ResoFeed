@@ -50791,7 +50791,7 @@ phases:
       - none'
 - id: mcp-capability-audit-contract-lock-and-expected-red-tests
   name: MCP Capability Audit — Contract Lock and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Contract/test phase blocks unless audit findings MCP-1 and MCP-2 are translated
     into explicit proof obligations and MCP-2 has expected-red coverage before implementation.
   depends_on:
@@ -50799,7 +50799,7 @@ phases:
   steps:
   - id: mcp-audit-contract-lock
     name: Lock MCP audit proof obligations and response-shape contract
-    status: pending
+    status: claimed
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - signatures\n  - type_defs\n  - interfaces\n  - stubs\nagent_source: project\n\
       \nLock the acceptance contract for docs/audits/mcp-capability-audit-2026-05-12.md\
@@ -50860,6 +50860,8 @@ phases:
       finding_closure:\n  MCP-1: CONTRACT_LOCKED | GAP\n  MCP-2: CONTRACT_LOCKED |\
       \ GAP"
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T07:49:21.741893+00:00'
   - id: mcp-audit-empty-resources-red-tests
     name: Add expected-red tests for empty MCP sources and active rules arrays
     status: pending
