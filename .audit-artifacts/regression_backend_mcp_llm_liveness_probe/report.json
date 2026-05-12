@@ -2,7 +2,7 @@
   "failures": [],
   "observations": {
     "artifacts": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe",
-    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-r4jfrgm6/resofeed.sqlite3",
+    "db_path": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-x2od99oy/resofeed.sqlite3",
     "doctor": {
       "artifact": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor.txt",
       "contains_raw_secret": false,
@@ -29,7 +29,7 @@
       "live_item_found": true,
       "status": 200
     },
-    "live_fixture_feed_url": "http://127.0.0.1:63054/feed.xml",
+    "live_fixture_feed_url": "http://127.0.0.1:63186/feed.xml",
     "live_item_extraction_status": "full",
     "live_item_model_status": "model_latency_error",
     "live_opml_import": {
@@ -61,7 +61,7 @@
       "status": 200
     },
     "migration": {
-      "command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-openrouter-live-retest/bin/resofeed serve --addr 127.0.0.1:63038 --public-url http://127.0.0.1:63038 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-openrouter-live-retest/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-r4jfrgm6/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
+      "command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:63171 --public-url http://127.0.0.1:63171 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-x2od99oy/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
       "ready": true,
       "stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stderr.log",
       "stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/migration.stdout.log"
@@ -74,7 +74,7 @@
       "status": 404
     },
     "port_bound": true,
-    "serve_command": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-openrouter-live-retest/bin/resofeed serve --addr 127.0.0.1:63038 --public-url http://127.0.0.1:63038 --db /Users/tefx/Projects/ResoFeed/.vectl/worktrees/regression-backend-mcp-llm-openrouter-live-retest/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-r4jfrgm6/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
+    "serve_command": "/Users/tefx/Projects/ResoFeed/bin/resofeed serve --addr 127.0.0.1:63171 --public-url http://127.0.0.1:63171 --db /Users/tefx/Projects/ResoFeed/.audit-artifacts/regression_backend_mcp_llm_liveness_probe/db-x2od99oy/resofeed.sqlite3 --openrouter-model openai/gpt-4.1-mini --owner-token <redacted-owner-token>",
     "server_stderr": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stderr.log",
     "server_stdout": ".audit-artifacts/regression_backend_mcp_llm_liveness_probe/server.stdout.log"
   },
