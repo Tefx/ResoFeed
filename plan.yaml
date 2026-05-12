@@ -51657,7 +51657,7 @@ phases:
     claimed_at: '2026-05-12T09:37:53.306759+00:00'
   - id: mcp-audit-live-localhost-liveness-probe
     name: Probe current localhost MCP liveness and owner-token boundary
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -51750,6 +51750,8 @@ phases:
       \ none>\ngate_open_allowed: true | false\nfinding_closure:\n  MCP-1: PROVEN\
       \ | BLOCKED\n  MCP-2: NOT_IN_SCOPE_FOR_THIS_STEP"
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-12T09:37:59.056666+00:00'
   - id: mcp-audit-parity-security-idempotency-proof
     name: Verify MCP capability parity, owner-token boundary, and receipt semantics
     status: pending
