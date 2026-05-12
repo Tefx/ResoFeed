@@ -51875,7 +51875,7 @@ phases:
     claimed_at: '2026-05-12T09:38:06.025962+00:00'
   - id: mcp-audit-doc-sync-check
     name: Check documentation sync for MCP audit closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -51939,6 +51939,84 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-12T09:37:46.768427+00:00'
+    done_at: '2026-05-12T09:54:26.076135+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/ARCHITECTURE.md — key\
+      \ passages: §2 lines 45-67 document `resofeed serve` as runtime command with\
+      \ one bind for web/API/MCP; §7 lines 837-850 document universal owner-token\
+      \ auth, `actor_id` attribution-only, and non-portable runtime receipts; §7 lines\
+      \ 852-857 document `resofeed://rules/active` as `{ \"rules\": [SteerRule] }`\
+      \ and `resofeed://sources` as `{ \"sources\": [Source] }`; §10 lines 954-969\
+      \ lists verification targets including single runtime command, `/mcp`, no sync\
+      \ process, no vector storage, no folders/tags/settings/archive/RAG surface.\n\
+      - docs/DESIGN.md — key passages: lines 371-375 owner-token prompt is local access\
+      \ gate with no account/login semantics; lines 477-480 state portability excludes\
+      \ sync controls, portable receipts, account setup, cloud sync, backup-management\
+      \ UI; lines 523-534 forbid account registration, folders/tags/settings dashboards,\
+      \ unread/archive flows, activity ledgers.\n- AGENTS.md — NOT READ: file absent\
+      \ in isolated worktree.\n\n## Doc-Sync Evidence\n- Docs inspected: docs/ARCHITECTURE.md;\
+      \ docs/DESIGN.md; required audit doc path checked and absent; AGENTS.md path/glob\
+      \ checked and absent.\n- Doc edits made: none.\n- Commit hash(es): none; no\
+      \ documentation drift found, and task explicitly said if docs already match\
+      \ behavior, make no edits and do not commit. Worktree HEAD observed: dac42d1.\n\
+      - No-change-needed rationale: Architecture §7 already documents MCP resources\
+      \ exactly: `resofeed://rules/active` => `{ \"rules\": [SteerRule] }` and `resofeed://sources`\
+      \ => `{ \"sources\": [Source] }`; implementation in `internal/resofeed/mcp.go:363-383`\
+      \ returns `RulesResponse{Rules: rules}` and `SourcesResponse{Sources: sources}`;\
+      \ `internal/resofeed/http.go:860-878` explicitly documents empty result sets\
+      \ as `[]`, not `null`.\n- MCP-1 documentation status: accurate. Docs still require\
+      \ real `/mcp` liveness under `resofeed serve` / configured bind and do not falsely\
+      \ claim a closed live proof beyond verification target.\n- MCP-2 documentation\
+      \ status: accurate. Docs specify resource array envelopes; implementation and\
+      \ test prove fresh empty resources serialize arrays.\n- Forbidden-scope docs\
+      \ scan: no enabling drift found. Matches for accounts/OAuth/RBAC/vector/RAG/sync/merge/event\
+      \ bus/service layer/folders/tags/unread/archive/settings/delivery-channel concepts\
+      \ are prohibitions or out-of-scope guardrails.\n\n## Behavioral Proof Register\n\
+      - requirement_ref: docs/ARCHITECTURE.md §7 MCP Surface resources\n  behavior_claim:\
+      \ `resofeed://sources` returns JSON `{ \"sources\": [Source] }` and empty state\
+      \ is `[]`, not `null`.\n  evidence_ref: docs/ARCHITECTURE.md:852-857; internal/resofeed/mcp.go:378-383;\
+      \ internal/resofeed/http.go:860-865; internal/resofeed/mcp_integration_test.go:78-96.\n\
+      \  status: PASS\n  closure_path: none\n  gate_decision_basis: focused MCP test\
+      \ passed and docs match implementation.\n- requirement_ref: docs/ARCHITECTURE.md\
+      \ §7 MCP Surface resources\n  behavior_claim: `resofeed://rules/active` returns\
+      \ JSON `{ \"rules\": [SteerRule] }` and empty state is `[]`, not `null`.\n \
+      \ evidence_ref: docs/ARCHITECTURE.md:852-857; internal/resofeed/mcp.go:363-371;\
+      \ internal/resofeed/http.go:873-878; internal/resofeed/mcp_integration_test.go:78-96.\n\
+      \  status: PASS\n  closure_path: none\n  gate_decision_basis: focused MCP test\
+      \ passed and docs match implementation.\n- requirement_ref: docs/ARCHITECTURE.md\
+      \ §2, §7, §10\n  behavior_claim: runtime/liveness expectation remains one `resofeed\
+      \ serve` binary exposing `/mcp` on configured bind.\n  evidence_ref: docs/ARCHITECTURE.md:45-67,\
+      \ 833-840, 950-963, 1023-1029; internal/resofeed/mcp_integration_test.go:128-168.\n\
+      \  status: PASS\n  closure_path: none for doc-sync; downstream live `resofeed\
+      \ serve` smoke remains the appropriate execution proof for MCP-1.\n  gate_decision_basis:\
+      \ docs accurately express the expectation and do not drift into sidecar/runtime\
+      \ alternatives.\n- requirement_ref: docs/ARCHITECTURE.md §7 Agent authorization\
+      \ contract\n  behavior_claim: owner-token boundary is universal and `actor_id`\
+      \ is attribution, not authorization.\n  evidence_ref: docs/ARCHITECTURE.md:837-850;\
+      \ internal/resofeed/mcp_integration_test.go:18-29, 119-126, 214-220.\n  status:\
+      \ PASS\n  closure_path: none\n  gate_decision_basis: docs and tests align on\
+      \ 401 before MCP handling for unauthorized requests.\n- requirement_ref: docs/ARCHITECTURE.md\
+      \ §3.2, §5.5, §7; docs/DESIGN.md State Portability\n  behavior_claim: receipts\
+      \ remain runtime idempotency/provenance only, not portable state or activity\
+      \ feed.\n  evidence_ref: docs/ARCHITECTURE.md:174, 450, 476-482, 848-850, 946;\
+      \ docs/DESIGN.md:407-410, 477-480.\n  status: PASS\n  closure_path: none\n \
+      \ gate_decision_basis: documentation consistently excludes portable receipts\
+      \ and activity-ledger semantics.\n\n## Gate Decision\nheadline: PASS\nverdict:\
+      \ PASS\nblockers: []\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      \n## Verification\n- Read attempted: `docs/audits/mcp-capability-audit-2026-05-12.md`\
+      \ — file not found.\n- Read: `docs/ARCHITECTURE.md` relevant sections §2, §5.5,\
+      \ §6, §7, §10.\n- Read: `docs/DESIGN.md` relevant invariants and forbidden-scope\
+      \ sections.\n- Read attempted/globbed: `AGENTS.md`, `**/AGENTS.md` — no files\
+      \ found in isolated worktree.\n- Grep: MCP resource/resource-array terms in\
+      \ docs and implementation; confirmed docs and code align.\n- Grep: forbidden-scope\
+      \ terms across docs; hits are prohibitions/out-of-scope statements, not drift.\n\
+      - Worktree focused tests: `go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|ResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays|RealBoundListenerInitializeResourcesAndTools|RealBoundListenerSteerUsesConfiguredOpenRouterAndIdempotency)'`\
+      \ => `ok resofeed/internal/resofeed 0.597s`.\n- Mainline final-state verification\
+      \ after no-op squash merge: same focused test command with `-count=1` => `ok\
+      \ resofeed/internal/resofeed 0.604s`.\n- Git status in worktree: clean; no doc\
+      \ edits.\n\n## Gaps/Notes\n- Required audit file and worktree-local AGENTS.md\
+      \ were absent; supplied context was used for MCP-1/MCP-2 interpretation.\n-\
+      \ No documentation drift found; no commit created per explicit no-change instruction."
   - id: mcp-audit-focused-deep-review
     name: Focused deep review for MCP audit remediation
     status: pending
