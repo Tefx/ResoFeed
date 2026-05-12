@@ -55933,7 +55933,7 @@ phases:
       Post-verification status for changed source/artifact paths was clean.'
   - id: regression-frontend-real-api-proof-uiux-delta-audit
     name: Audit real API proof mobile visual delta
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -56089,6 +56089,8 @@ phases:
     - regression-frontend-real-api-proof-remediation
     - regression-frontend-route-integration-retest
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-12T16:28:18.859454+00:00'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
