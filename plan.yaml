@@ -54147,9 +54147,22 @@ phases:
       agent_source: project
 
 
-      Investigate, classify, and repair REG-2026-05-12-06 within the existing single-binary
+      Retry, classify, and repair REG-2026-05-12-06 within the existing single-binary
       OpenRouter/Gemini transformer path. This phase depends on the contract/test
       phase; consume `regression-audit-llm-health-proof-contract`.
+
+
+      Retry context from concurrent failure:
+
+      - Previous execution produced useful implementation changes on branch `vectl/step-regression-live-llm-health-classification-fix`
+      commit `d094166`, touching `internal/resofeed/doctor.go` and `internal/resofeed/llm_health_classification_test.go`.
+
+      - The broad `go test ./internal/resofeed` failure was contaminated by REG-2026-05-12-04
+      expected-red status at that time. REG-04 is now fixed on main by `regression-mcp-read-item-detail-fix`
+      / commit `4c78ab5`, so retry this step on current main after that fix.
+
+      - Do NOT repeat the prior semantic-closure failure: evidence with non-empty
+      blockers or `gate_open_allowed=false` is not implementation closure.
 
 
       Finding context:
@@ -54167,6 +54180,9 @@ phases:
 
       YOUR SCOPE:
 
+      - Reapply or reproduce the prior useful changes only if they still fit current
+      main after REG-04; do not blindly replay stale worktree state.
+
       - Determine whether the current server issue is missing live model configuration,
       stale database with prior failures, OpenRouter client timeout/error, or unresolved
       product regression.
@@ -54182,6 +54198,23 @@ phases:
       - Redact all secrets/tokens in evidence.
 
 
+      External live probe ownership:
+
+      - If isolated executor context lacks owner token, OpenRouter key, or reachable
+      live server, record `external_live_probe_unavailable` with the exact missing
+      prerequisite and redaction-safe proof.
+
+      - In that case this implementation step may close only if deterministic classification
+      logic, focused tests, and current-main broad tests pass and evidence explicitly
+      states that live/stub success are distinct.
+
+      - Residual external live probing is owned by downstream `regression-backend-mcp-llm-liveness-probe`;
+      do NOT silently label unavailable live proof as success.
+
+      - If live credentials/server are available in this executor context, include
+      a redacted live probe artifact; blocker-class live failures remain blockers.
+
+
       Failure-mode checklist:
 
       - Missing config path: /api/doctor reports truthful provider/config state without
@@ -54194,9 +54227,11 @@ phases:
       summaries.
 
       - Successful live path: at least one current or controlled item has model-backed
-      summary/value evidence.
+      summary/value evidence when live prerequisites exist.
 
       - Stub path: deterministic OpenRouter-compatible stub remains green.
+
+      - Retry path: REG-04 no longer explains broad test failure on current main.
 
 
       Out-of-scope guardrail:
@@ -54223,6 +54258,9 @@ phases:
       - Output formatting drift: feed rows must not become diagnostic dumps; detailed
       raw status belongs in /doctor or disclosure.
 
+      - Concurrent failure drift: broad tests must be rerun against current main where
+      REG-04 is already fixed.
+
 
       ## Gate Preview (what the gate WILL reject)
 
@@ -54233,9 +54271,15 @@ phases:
       3. Breaking deterministic stub OpenRouter tests while chasing current-live health.
 
       4. Adding forbidden architecture such as sidecar workers, RAG, agent registries,
-      or service layers.'
+      or service layers.
+
+      5. Treating unavailable external owner-token/OpenRouter/live-server prerequisites
+      as a green live proof instead of a residual liveness-probe obligation.'
     verification: 'local-check protecting backend liveness probe and final LLM health
       retest.
+
+      - Retry basis: work is evaluated on current main after `regression-mcp-read-item-detail-fix`
+      / REG-04 closure.
 
       - Classification: evidence assigns REG-06 to one allowed root-cause class or
       marks unresolved_product_regression with blockers.
@@ -54246,16 +54290,32 @@ phases:
       - Failure path: fallback-only summaries are not reported as model-backed live
       success.
 
+      - Residual ownership: if external live prerequisites are unavailable, evidence
+      records `external_live_probe_unavailable` and points to `regression-backend-mcp-llm-liveness-probe`
+      for live runtime closure; implementation closure still requires deterministic
+      classification logic and current-main tests to pass.
+
       - Security: evidence redacts secrets and preserves owner-token boundaries.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## REG-2026-05-12-06\
-      \ LLM Health Evidence\nclassification: missing_live_model_configuration | stale_database_prior_failures\
-      \ | openrouter_client_timeout_or_error | unresolved_product_regression\ncommands:\n\
-      \  - <exact command or HTTP probe>\noutputs_or_artifacts:\n  - <redacted /api/doctor\
-      \ snapshot path>\n  - <feed model_status/value_tier sample path>\n  - <stub\
-      \ control output path>\nlive_success_basis: <model-backed evidence or NOT PROVEN>\n\
-      fallback_only_counted_as_success: false\nverdict: PASS | FAIL\nblockers: []\n\
-      gate_open_allowed: true | false\nremaining_gaps: []"
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md — key passage or \"\
+      NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this\
+      \ step.\"\n\n## Retry / Classification Evidence\n- Current main basis: confirm\
+      \ REG-04 fix is present before retrying this step.\n- Files changed: list paths\
+      \ and rationale.\n- Root-cause class: missing_config | stale_db_prior_failures\
+      \ | openrouter_client_timeout_or_error | unresolved_product_regression | external_live_probe_unavailable.\n\
+      - Deterministic test commands and outputs:\n  ```\n  <commands and outputs>\n\
+      \  ```\n- Broad current-main test command and output:\n  ```\n  <command and\
+      \ output>\n  ```\n- Live/stub distinction: explain what was proved by deterministic\
+      \ stub tests vs actual live OpenRouter/server proof.\n- External live prerequisite\
+      \ status: available/unavailable; if unavailable, identify the missing prerequisite\
+      \ without secrets.\n- gate_open_allowed: true|false with blocker list if false."
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PRD.md
+    depends_on:
+    - regression-mcp-read-item-detail-fix
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T14:17:26.666739+00:00'
