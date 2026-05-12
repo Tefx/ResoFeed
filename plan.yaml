@@ -52391,6 +52391,124 @@ phases:
       verdict: PASS | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
       \ []"
     agent: golang-developer
+  - id: regression-live-llm-health-classification-fix
+    name: Classify and repair live LLM health regression
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Investigate, classify, and repair REG-2026-05-12-06 within the existing single-binary
+      OpenRouter/Gemini transformer path. This phase depends on the contract/test
+      phase; consume `regression-audit-llm-health-proof-contract`.
+
+
+      Finding context:
+
+      - REG-2026-05-12-06 — Current live LLM path is not healthy.
+
+      - Evidence: current feed showed `fallback: excerpt-only`, `/doctor` showed provider/model
+      uncertainty and item transform failures, current items had `model_status: model_latency_error`
+      and `value_tier: null`.
+
+      - Important distinction: isolated deterministic OpenRouter-compatible path passed,
+      so this is either live configuration/current-data/timeout classification or
+      an unresolved product regression.
+
+
+      YOUR SCOPE:
+
+      - Determine whether the current server issue is missing live model configuration,
+      stale database with prior failures, OpenRouter client timeout/error, or unresolved
+      product regression.
+
+      - Repair only the classified root cause if it is product-code/config-loading
+      behavior inside existing ResoFeed boundaries.
+
+      - Keep fallback taxonomy visible but do not count fallback-only current summaries
+      as successful live LLM summaries.
+
+      - Preserve deterministic stub tests and natural-language Steer translation behavior.
+
+      - Redact all secrets/tokens in evidence.
+
+
+      Failure-mode checklist:
+
+      - Missing config path: /api/doctor reports truthful provider/config state without
+      exposing secrets.
+
+      - Stale DB path: evidence distinguishes historic transform failures from current
+      live-call failures.
+
+      - Timeout/client path: errors are classified and do not masquerade as model-backed
+      summaries.
+
+      - Successful live path: at least one current or controlled item has model-backed
+      summary/value evidence.
+
+      - Stub path: deterministic OpenRouter-compatible stub remains green.
+
+
+      Out-of-scope guardrail:
+
+      - Do not add model orchestration, stateful agents, vector/RAG, extra persistence,
+      sidecar workers, accounts, OAuth/RBAC, sync/merge, or new service layers.
+
+      - Do not hide fallback diagnostics from /doctor; frontend display polish belongs
+      to frontend phase.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic/proof that varies based on live/stub
+      health inputs.
+
+
+      known_risks:
+
+      - Live-env evidence can be flaky; provide classification and redacted artifacts,
+      not secret-dependent assumptions.
+
+      - Output formatting drift: feed rows must not become diagnostic dumps; detailed
+      raw status belongs in /doctor or disclosure.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Declaring live LLM success from fallback-only `excerpt` summaries.
+
+      2. Secret leakage in evidence or logs.
+
+      3. Breaking deterministic stub OpenRouter tests while chasing current-live health.
+
+      4. Adding forbidden architecture such as sidecar workers, RAG, agent registries,
+      or service layers.'
+    verification: 'local-check protecting backend liveness probe and final LLM health
+      retest.
+
+      - Classification: evidence assigns REG-06 to one allowed root-cause class or
+      marks unresolved_product_regression with blockers.
+
+      - Main path: deterministic stub path remains green and current/live health proof
+      is truthful.
+
+      - Failure path: fallback-only summaries are not reported as model-backed live
+      success.
+
+      - Security: evidence redacts secrets and preserves owner-token boundaries.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## REG-2026-05-12-06\
+      \ LLM Health Evidence\nclassification: missing_live_model_configuration | stale_database_prior_failures\
+      \ | openrouter_client_timeout_or_error | unresolved_product_regression\ncommands:\n\
+      \  - <exact command or HTTP probe>\noutputs_or_artifacts:\n  - <redacted /api/doctor\
+      \ snapshot path>\n  - <feed model_status/value_tier sample path>\n  - <stub\
+      \ control output path>\nlive_success_basis: <model-backed evidence or NOT PROVEN>\n\
+      fallback_only_counted_as_success: false\nverdict: PASS | FAIL\nblockers: []\n\
+      gate_open_allowed: true | false\nremaining_gaps: []"
+    agent: golang-developer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: locked
