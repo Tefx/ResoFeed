@@ -10,4 +10,4 @@ openrouter: failures=1
 openrouter: item=item_full_detail_regression_probe source=src_full_regression_probe status=summary_unavailable title=Full extraction regression fixture
 fallback_provenance: item=item_full_detail_regression_probe summary=model model_status=summary_unavailable extraction_status=full
 extraction: ok
-ingest: last_run=2026-05-12T18:37:27Z
+ingest: last_run=2026-05-12T18:43:08Z
