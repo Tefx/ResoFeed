@@ -55562,7 +55562,7 @@ phases:
     agent: gate-reviewer
   - id: regression-frontend-real-api-proof-remediation
     name: Remediate real API frontend proof blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -55768,6 +55768,92 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-12T15:58:22.752416+00:00'
+    done_at: '2026-05-12T16:18:17.393987+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-frontend-real-api-proof-remediation`
+      into main as squash commit `859eb22`.
+
+
+      Subagent evidence:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - isolated branch commits: `87194d977e1bc650db79613644f7ec97574704b6` and `67ec5579a3e727392f292cfbf32d91226afce1a1`
+
+
+      Files changed:
+
+      - `web/src/app.css`
+
+      - `web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts`
+
+      - durable real API proof artifacts under `docs/audits/artifacts/regression-audit-2026-05-12c/real-api-proof/`
+
+
+      Blocker disposition:
+
+      - Source Ledger `status: ok` vs `not_fetched`: stale real-API harness assumption;
+      `not_fetched` is valid before first successful fetch, and `ok` is valid after
+      real ingest completes. Retest now triggers real `/api/ingest`, tolerates transient
+      409, polls real `/api/sources` and `/api/feed/today`, reloads UI, then asserts
+      rendered `Dirty Inspector Corpus · status: ok`.
+
+      - Mobile click interception: product layering bug; mobile command row is fixed
+      above utility surfaces, utility surfaces reserve bottom inset, and surface menu
+      opens upward.
+
+      - API-mocked-only proof gap: extended real API Playwright retest with no `page.route(...).fulfill`
+      for REG-01/03/05/07/08/09 seams.
+
+
+      Real API rendered proof artifacts:
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/real-api-proof/real-api-reg-01-03-05-07-08-09.png`
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/real-api-proof/real-api-reg-01-03-05-07-08-09.dom.txt`
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/real-api-proof/real-api-reg-01-03-05-07-08-09-state.json`
+
+
+      Finding coverage:
+
+      - REG-2026-05-12-01: PASS
+
+      - REG-2026-05-12-03: PASS
+
+      - REG-2026-05-12-05: PASS
+
+      - REG-2026-05-12-07: PASS
+
+      - REG-2026-05-12-08: PASS
+
+      - REG-2026-05-12-09: PASS
+
+
+      UIUX audit staleness:
+
+      - `prior_uiux_audit_applicability: may_be_stale` because the remediation changed
+      mobile visual/spatial behavior. A downstream/follow-up UIUX audit is required
+      before frontend gate acceptance.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm --prefix web run check` -> `svelte-check found 0 errors and 0 warnings`
+
+      - `npm --prefix web run build` -> build succeeded
+
+      - `npm --prefix web run test:e2e -- regression-audit-ui-expected-red.spec.ts
+      --project=chromium-ci-safe` -> 6 passed
+
+      - `npm --prefix web run test:e2e -- ui-remediation-r1-r8-browser-retest.spec.ts
+      --project=chromium-ci-safe` -> 1 passed
+
+
+      Post-verification status for changed source/artifact paths was clean.'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
