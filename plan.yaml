@@ -54545,7 +54545,7 @@ phases:
   steps:
   - id: regression-source-ledger-controls-fix
     name: Adjudicate and remediate Source Ledger control authority conflict
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       authority_adjudication: true
@@ -54741,8 +54741,6 @@ phases:
     - docs/DESIGN.md
     - docs/PRD.md
     agent: frontend-engineer
-    claimed_by: spec-verifier
-    claimed_at: '2026-05-12T14:17:38.451036+00:00'
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
     status: pending
