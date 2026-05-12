@@ -51236,7 +51236,7 @@ phases:
   steps:
   - id: mcp-audit-empty-resources-fix
     name: Fix empty MCP sources and active rules array serialization
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\n\nComplete the\
       \ implementation within existing signatures for MCP-2. This phase depends on\
       \ `mcp-capability-audit-contract-lock-and-expected-red-tests`; consume the contract\
@@ -51325,6 +51325,55 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T09:16:26.077850+00:00'
+    done_at: '2026-05-12T09:25:06.526555+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — NOT READ: file absent in isolated worktree.\n- docs/ARCHITECTURE.md — §7\
+      \ MCP resources require `resofeed://rules/active` as `{ \"rules\": [SteerRule]\
+      \ }` and `resofeed://sources` as `{ \"sources\": [Source] }`; §6 requires HTTP/MCP\
+      \ reuse canonical JSON types and owner-token auth.\n- AGENTS.md — NOT READ:\
+      \ file absent in isolated worktree.\n- internal/resofeed/mcp_integration_test.go\
+      \ — protected fresh-empty test asserts `sources` and `rules` fields are JSON\
+      \ arrays, not `null`; existing MCP auth/idempotency tests must continue to pass.\n\
+      - internal/resofeed/http.go — `SourcesResponse` and `RulesResponse` comments\
+      \ require empty results encoded as `[]`, and `/api/steer/active` constructs\
+      \ `RulesResponse`.\n- internal/resofeed/mcp.go — `readResource` handles authoritative\
+      \ URIs, and `listSourcesForMCP` previously used a nil slice on empty rows.\n\
+      \n## Fix Evidence\n- Commit hash(es):\n  - e90c641 — isolated branch commit\
+      \ `fix empty MCP resource arrays`\n  - 4f62e8d — mainline squash commit `[vectl]\
+      \ step-mcp-audit-empty-resources-fix completed`\n- Files changed:\n  - internal/resofeed/http.go\n\
+      \  - internal/resofeed/mcp.go\n- Response-shaping location(s):\n  - internal/resofeed/http.go:\
+      \ active rules response now normalizes nil rules to `[]SteerRule{}`\n  - internal/resofeed/mcp.go:\
+      \ `resofeed://rules/active` resource normalizes nil rules to `[]SteerRule{}`\n\
+      \  - internal/resofeed/mcp.go: `listSourcesForMCP` initializes `sources := []Source{}`\n\
+      - Focused command(s):\n  ```\n  go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1\n  ```\n- Actual output:\n  ```\n  ok  \tresofeed/internal/resofeed\t\
+      0.692s\n  ```\n- Fresh DB `resofeed://sources` JSON text: `{\"sources\":[]}`\n\
+      - Fresh DB `resofeed://rules/active` JSON text: `{\"rules\":[]}`\n- Auth boundary\
+      \ proof retained: yes; `go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts)$'\
+      \ -count=1`\n- Product invariant check: preserved single Go binary/SQLite/owner-token\
+      \ model; no MCP-only product concepts, UI, docs, sync/merge, accounts, OAuth/RBAC,\
+      \ vector/RAG, service layers, or schema expansions added.\n- Deviation records:\
+      \ none\n\nverdict: PASS\nblockers:\n  - none\ngate_open_allowed: true\nfinding_closure:\n\
+      \  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2: FIXED\n\n## Verification\nWorktree\
+      \ commands run and outputs:\n```\ngo test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1\nexit 0\nok  \tresofeed/internal/resofeed\t0.692s\n```\n\n```\ngo\
+      \ test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts)$'\
+      \ -count=1\nexit 0\nok  \tresofeed/internal/resofeed\t0.509s\n```\n\n```\ngo\
+      \ test ./internal/resofeed\nexit 0\nok  \tresofeed/internal/resofeed\t0.493s\n\
+      ```\n\n```\ngofmt -w \"internal/resofeed/http.go\" \"internal/resofeed/mcp.go\"\
+      \nexit 0\n```\n\n```\ngofmt -l \"internal/resofeed/http.go\" \"internal/resofeed/mcp.go\"\
+      \nexit 0\n<no output>\n```\n\n```\ngit diff --check\nexit 0\n<no output>\n```\n\
+      \nMainline final-state verification after squash merge:\n```\ngo test ./internal/resofeed\
+      \ -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1 && go test ./internal/resofeed -run 'TestMCP(StreamableHTTPResourcesToolsAuthAndIdempotency|SteerUsesConfiguredOpenRouterAndReceipts)$'\
+      \ -count=1 && go test ./internal/resofeed && gofmt -l \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\" && git diff --check -- \"internal/resofeed/http.go\"\
+      \ \"internal/resofeed/mcp.go\"\n```\nOutput:\n```\nok  \tresofeed/internal/resofeed\t\
+      0.517s\nok  \tresofeed/internal/resofeed\t0.250s\nok  \tresofeed/internal/resofeed\t\
+      0.464s\n```\n\n## Gaps/Notes\n- Required audit doc and AGENTS.md were absent\
+      \ in the isolated worktree; step-provided audit context and architecture file\
+      \ were used.\n- No live localhost lifecycle proof was run; it is explicitly\
+      \ out of scope for this step."
   - id: mcp-audit-remediation-gate
     name: Gate MCP audit remediation implementation
     status: pending
