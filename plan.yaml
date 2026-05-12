@@ -53102,3 +53102,89 @@ phases:
   depends_on:
   - regression-audit-remediation-backend-mcp-and-live-llm-repair
   - regression-audit-remediation-frontend-surface-repair
+  steps:
+  - id: regression-audit-full-runtime-retest
+    name: Run full regression audit retest across UI HTTP MCP and LLM surfaces
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun a focused equivalent
+      of docs/audits/regression-audit-2026-05-12.md after backend and frontend repair
+      phases.
+
+
+      Scope and required finding closure:
+
+      - REG-2026-05-12-01 Source Ledger exposes global `[RUN INGEST]` and per-source
+      `[FETCH]` with real action behavior.
+
+      - REG-2026-05-12-02 MCP empty `sources` and `rules/active` resources serialize
+      arrays as `[]`; cite existing MCP capability chain evidence and recheck if the
+      final suite touches MCP resources.
+
+      - REG-2026-05-12-03 Search exposes one visible submit control.
+
+      - REG-2026-05-12-04 MCP `read_item` provides detail text for full extraction
+      or explicit downgrade/fallback reason.
+
+      - REG-2026-05-12-05 Mobile Search, Source Ledger, and /doctor exclude inactive
+      Today feed from visual/accessibility flow.
+
+      - REG-2026-05-12-06 Current/live LLM health is classified; fallback-only current
+      summaries are not counted as live model success.
+
+      - REG-2026-05-12-07 Source Ledger does not inherit stale Search receipt.
+
+      - REG-2026-05-12-08 Feed row metadata is compact and non-repetitive.
+
+      - REG-2026-05-12-09 Inspector primary reading header does not foreground raw
+      model_status.
+
+
+      Runtime requirements:
+
+      - Use real `cmd/resofeed` binary or equivalent project runtime, temporary SQLite
+      DB for destructive checks, owner-token auth, and deterministic OpenRouter-compatible
+      stub for controlled LLM checks.
+
+      - Include browser/rendered artifacts for UI findings and actual HTTP/MCP request
+      outputs for API/MCP findings.
+
+      - Redact owner tokens and model secrets.
+
+
+      Independence Level: L2 semi-blind full regression verification.'
+    verification: 'full-plan-check protecting regression-audit-final-gate.
+
+      - Exact commands and artifact paths are recorded.
+
+      - Every REG finding has PASS/FAIL/PASS_WITH_DEBT verdict.
+
+      - Browser artifacts cover desktop Source Ledger, Search, feed/Inspector, and
+      mobile Search/Source Ledger/doctor.
+
+      - HTTP/MCP artifacts cover empty resources, read_item detail text, owner-token
+      boundary, and LLM health classification.
+
+      - gate_open_allowed is false if any blocker-class finding remains unresolved
+      or unproven.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Full Regression\
+      \ Retest Evidence\ncommands:\n  - <exact command>\noutputs_or_artifacts:\n \
+      \ - <observations.json path>\n  - <screenshot path>\n  - <HTTP/MCP transcript\
+      \ path>\nfinding_verdicts:\n  REG-2026-05-12-01: PASS | PASS_WITH_DEBT | FAIL\n\
+      \  REG-2026-05-12-02: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-03: PASS\
+      \ | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-04: PASS | PASS_WITH_DEBT | FAIL\n\
+      \  REG-2026-05-12-05: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-06: PASS\
+      \ | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-07: PASS | PASS_WITH_DEBT | FAIL\n\
+      \  REG-2026-05-12-08: PASS | PASS_WITH_DEBT | FAIL\n  REG-2026-05-12-09: PASS\
+      \ | PASS_WITH_DEBT | FAIL\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\
+      \ []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    agent: integration-verifier
