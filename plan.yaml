@@ -52728,7 +52728,7 @@ phases:
       (cached)\n```\n\n## Files changed\nNone."
 - id: regression-audit-remediation-contract-matrix-and-expected-red-tests
   name: Regression Audit Remediation — Contract Matrix and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Contract/test phase blocks unless every actionable finding in docs/audits/regression-audit-2026-05-12.md
     is mapped to an owner, REG-2026-05-12-02 is explicitly delegated to the existing
     MCP capability audit chain, and expected-red/proof tests exist for distinct non-duplicative
@@ -53782,7 +53782,7 @@ phases:
       semantics for downstream remediation rather than product implementation.'
   - id: regression-audit-contract-gate-rerun
     name: Re-gate regression audit contract blocker remediation
-    status: claimed
+    status: done
     description: "Gate review rerun for the failed `regression-audit-contract-gate`\
       \ blockers after the batched remediation step.\n\nstep_type: gate\nverification_scope:\
       \ phase-check\nagent_source: project\nreview_depth: THOROUGH\nreview_depth_rationale:\n\
@@ -53877,9 +53877,88 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T13:58:33.791140+00:00'
+    done_at: '2026-05-12T14:15:43.559148+00:00'
+    evidence: 'Gate-reviewer rerun returned semantic PASS.
+
+
+      Key closure signals:
+
+      - Headline/Verdict: PASS
+
+      - Blocking Status: no blockers
+
+      - Proof-Gap Status: no proof gaps for the three prior blockers
+
+      - Blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Refs read confirmation included all required files:
+
+      - `docs/audits/regression-audit-2026-05-12.md`
+
+      - `docs/audits/regression-audit-2026-05-12-contract-matrix.md`
+
+      - `docs/ARCHITECTURE.md`
+
+      - `docs/DESIGN.md`
+
+      - `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`
+
+      - `web/tests/e2e/regression-audit-ui-expected-red.spec.ts`
+
+
+      Original blocker closure register:
+
+      - `B-REG01-CONTRACT-CONTRADICTION`: PROVEN. Active expected-red tests no longer
+      require/click Source Ledger `[RUN INGEST]` / `[FETCH]`; negative forbidden-control
+      assertions remain active. Focused Playwright REG-01 passed.
+
+      - `B-MATRIX-NOT-VERIFIABLE`: PROVEN. Durable matrix exists and REG-01..REG-09
+      each appear exactly once with owner/proof/closure gate; REG-02 delegated to
+      MCP final gate rather than duplicated into UI.
+
+      - `B-FRONTEND-VERIFICATION-NOT-REPRODUCED`: PROVEN. Repo-native bootstrap/check
+      and focused Playwright command reproduced; expected-red suite remains proof-oriented
+      with REG-03/07/08/09 still red for downstream product gaps.
+
+
+      Verification evidence from gate reviewer:
+
+      - Matrix exactness checked by Python count over `docs/audits/regression-audit-2026-05-12-contract-matrix.md`;
+      REG-01 through REG-09 each appeared exactly once.
+
+      - `npm --prefix web run check` passed after dependency bootstrap with `svelte-check
+      found 0 errors and 0 warnings`.
+
+      - Focused Playwright from `web/`: `npm exec playwright test -- tests/e2e/regression-audit-ui-expected-red.spec.ts
+      --config playwright.config.ts`; 6 tests ran, REG-01 and REG-05 passed, REG-03/07/08/09
+      failed as expected product-gap evidence.
+
+
+      Scope/mutation audit:
+
+      - Product implementation files modified: no
+
+      - Commit hash(es): none — verify-only gate; no repository changes retained
+
+      - Files changed: none
+
+
+      Non-blocking notes:
+
+      - Focused expected-red verification still fails for REG-03, REG-07, REG-08,
+      and REG-09 as intended downstream product-gap evidence.
+
+      - Broader non-focused E2E files still contain legacy `[RUN INGEST]` interactions;
+      gate reviewer classified them outside this gate’s required expected-red-contract
+      closure and recommended downstream reconciliation.'
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
-  status: locked
+  status: pending
   gate: Backend gate blocks unless REG-2026-05-12-04 and REG-2026-05-12-06 are remediated
     or dispositioned with runtime proof, and REG-2026-05-12-02 closure remains delegated
     to the existing MCP capability audit chain without duplicate implementation work.
@@ -54245,7 +54324,7 @@ phases:
     agent: gate-reviewer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
-  status: locked
+  status: pending
   gate: Frontend gate blocks unless REG-2026-05-12-01 is adjudicated against canonical
     Source Ledger boundaries, forbidden `[RUN INGEST]` / `[FETCH]` controls are not
     reintroduced, REG-2026-05-12-03, -05, -07, -08, and -09 are fixed with rendered
