@@ -56936,7 +56936,7 @@ phases:
       - Mainline artifact status after merge: clean'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
-  status: in_progress
+  status: done
   gate: Final closure blocks unless every actionable finding REG-2026-05-12-01 through
     REG-2026-05-12-09 has finding-by-finding verdict, blockers, gate_open_allowed,
     artifact paths, and explicit remaining gaps; REG-02 must cite the existing MCP
@@ -57682,7 +57682,7 @@ phases:
       account/provider guardrail/data-policy availability, not repository logic.'
   - id: regression-audit-final-gate
     name: Final gate for regression audit remediation closure
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -57786,3 +57786,124 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T19:26:19.970151+00:00'
+    done_at: '2026-05-12T19:45:51.733224+00:00'
+    evidence: 'Final gate reviewer completed final regression audit gate with semantic
+      PASS_WITH_DEBT/PASS and no blockers.
+
+
+      Gate decision:
+
+      - headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blocking_status: CLOSED
+
+      - proof_gap_status: NON_BLOCKING
+
+      - blockers: []
+
+
+      Finding closure:
+
+      - REG-2026-05-12-01: CLOSED — Source Ledger hard boundary preserved; no `[RUN
+      INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]`; allowed rows/details/delete/import/export
+      remain.
+
+      - REG-2026-05-12-02: CLOSED — MCP empty `sources` and `rules/active` serialize
+      arrays as `[]`; existing MCP chain cited and runtime compatibility proof reviewed.
+
+      - REG-2026-05-12-03: CLOSED — Search one visible submit control.
+
+      - REG-2026-05-12-04: CLOSED — MCP `read_item` provides full extraction detail
+      text via real runtime artifact.
+
+      - REG-2026-05-12-05: CLOSED — Mobile utility surfaces exclude inactive Today
+      feed.
+
+      - REG-2026-05-12-06: CLOSED_WITH_NON_BLOCKING_DEBT — real live OpenRouter `model_status=ok`
+      remains unproven due provider/account/privacy guardrail; fallback-only summaries
+      are not counted as live success and repo-owned behavior is honest/redacted.
+
+      - REG-2026-05-12-07: CLOSED — Source Ledger does not inherit stale Search receipt.
+
+      - REG-2026-05-12-08: CLOSED — Feed row metadata is compact/non-diagnostic.
+
+      - REG-2026-05-12-09: CLOSED — Inspector primary reading header avoids raw `model_status`.
+
+
+      Required final-gate coverage:
+
+      - Included complete finding-by-finding decision table with requirement refs,
+      behavior claims, runtime proof expectation, evidence refs, status, closure path,
+      and gate basis.
+
+      - Included REG-01 Source Ledger boundary proof and authority conflict disposition.
+
+      - Included REG-02 MCP overlap closure citation.
+
+      - Distinguished real runtime proof from fixture/citation proof.
+
+      - Included behavioral proof register and uncertainty sources.
+
+      - Included W1-W8 final wiring audit.
+
+      - Included escape hatch audit: scoped `rg` wrapper reported `rg_exit=1`, no
+      matches.
+
+      - Included secret redaction audit: 245 reviewed files scanned, `leak_count=0`.
+
+      - Included product invariant audit: no accounts/OAuth/RBAC, vector/RAG, sync/merge,
+      folders/tags/unread/archive, settings dashboard, source-run/fetch UI, or forbidden
+      architecture creep.
+
+      - Included PASS_WITH_DEBT non-intersection proof for REG-06 provider/account
+      guardrail debt.
+
+
+      Subagent verification:
+
+      - `go test ./...`: exit 0; `ok resofeed/internal/resofeed 0.725s`.
+
+      - `npm ci && npm run check && npx playwright test --config ./playwright.config.ts
+      web/tests/e2e/regression-audit-ui-expected-red.spec.ts --project=chromium-ci-safe`:
+      exit 0; `svelte-check found 0 errors and 0 warnings`; REG suite `6 passed`.
+
+      - `npx playwright test --config ./playwright.config.ts web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts
+      --project=chromium-ci-safe`: exit 0; `1 passed`.
+
+      - Scoped Source Ledger forbidden-control `rg`: `rg_exit=1`, no forbidden manual
+      ingest/fetch labels in non-test frontend source.
+
+      - Secret artifact scan: external env/key present; `files_scanned=245`, `leak_count=0`.
+
+
+      Artifacts/commits:
+
+      - Worktree commit: `226a5d3` (`docs: add regression audit final gate`).
+
+      - Main squash commit: `32fb819` (`[vectl] step-regression-audit-final-gate completed`).
+
+      - Added final artifact: `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-final-gate.md`.
+
+
+      Mainline final-state verification after merge:
+
+      - `git diff --check HEAD~1..HEAD && go test ./...`: exit 0; Go tests passed.
+
+      - From `web/`, `npm run check`: exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+
+      Gaps/notes:
+
+      - Only remaining debt is non-blocking REG-06 live OpenRouter provider/account/privacy
+      guardrail debt; this does not intersect final closure because repo-owned behavior,
+      fallback classification, MCP/API/runtime proof, docs, and UI regressions are
+      closed.
+
+      - Transient Playwright artifacts, `.test-artifacts`, built binaries, node_modules,
+      SQLite DBs, and `.venv` were not committed.'
