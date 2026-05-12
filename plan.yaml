@@ -56936,7 +56936,7 @@ phases:
       - Mainline artifact status after merge: clean'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
-  status: pending
+  status: in_progress
   gate: Final closure blocks unless every actionable finding REG-2026-05-12-01 through
     REG-2026-05-12-09 has finding-by-finding verdict, blockers, gate_open_allowed,
     artifact paths, and explicit remaining gaps; REG-02 must cite the existing MCP
@@ -56947,7 +56947,7 @@ phases:
   steps:
   - id: regression-audit-full-runtime-retest
     name: Run full regression audit retest across UI HTTP MCP and LLM surfaces
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -57048,6 +57048,8 @@ phases:
 
       - MCP overlap evidence refs for REG-02.'
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-12T18:45:01.525430+00:00'
   - id: regression-audit-spec-conformance-review
     name: Verify regression fixes against ARCHITECTURE DESIGN PRD and audit contracts
     status: pending
