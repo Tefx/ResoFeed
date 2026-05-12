@@ -54141,7 +54141,7 @@ phases:
       Post-verification path status for changed files was clean.'
   - id: regression-live-llm-health-classification-fix
     name: Classify and repair live LLM health regression
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -54319,6 +54319,67 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T14:17:26.666739+00:00'
+    done_at: '2026-05-12T14:57:09.596390+00:00'
+    evidence: 'Merged isolated branch `vectl/step-regression-live-llm-health-classification-fix`
+      into main as squash commit `31f2744`.
+
+
+      Subagent evidence:
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - classification: `openrouter_client_timeout_or_error`
+
+      - fallback_only_counted_as_success: false
+
+      - external_live_probe_unavailable: true
+
+      - residual_live_probe_owner: `regression-backend-mcp-llm-liveness-probe`
+
+      - isolated branch commit: `d094166b0cdc88ba5eb87009d0344330436a8081`
+
+
+      Files changed:
+
+      - `internal/resofeed/doctor.go`
+
+      - `internal/resofeed/llm_health_classification_test.go`
+
+
+      Implementation summary:
+
+      - `/doctor` now distinguishes current vs historic item transform failures.
+
+      - `/doctor` now reports live summary successes vs fallback-only current summaries.
+
+      - `/doctor` now emits a health classification.
+
+      - Tests prove stale prior failures are distinct from current model-backed success.
+
+      - Tests prove fallback-only current summaries are counted as fallback, not live
+      success.
+
+      - External live proof is not falsely marked green; downstream `regression-backend-mcp-llm-liveness-probe`
+      owns residual live runtime proof.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `gofmt -w internal/resofeed/doctor.go internal/resofeed/llm_health_classification_test.go`
+
+      - `go test ./internal/resofeed -run ''REG2026051206|OpenRouter|Doctor|LLMHealth''
+      -count=1` -> ok
+
+      - `go test ./internal/resofeed` -> ok
+
+      - `go test ./...` -> ok
+
+
+      Post-verification path status for changed files was clean.'
   - id: regression-backend-mcp-llm-liveness-probe
     name: Probe backend MCP and LLM runtime liveness after repair
     status: pending
