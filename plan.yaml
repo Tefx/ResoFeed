@@ -54382,7 +54382,7 @@ phases:
       Post-verification path status for changed files was clean.'
   - id: regression-backend-mcp-llm-liveness-probe
     name: Probe backend MCP and LLM runtime liveness after repair
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       agent_source: project
@@ -54535,8 +54535,6 @@ phases:
     - regression-mcp-read-item-detail-fix
     - regression-live-llm-health-classification-fix
     agent: blind-tester
-    claimed_by: blind-tester
-    claimed_at: '2026-05-12T15:01:13.347135+00:00'
   - id: regression-backend-mcp-llm-gate
     name: Gate backend MCP and LLM regression repair
     status: pending
