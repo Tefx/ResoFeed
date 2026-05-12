@@ -54887,7 +54887,7 @@ phases:
       Post-verification status for changed source/docs/test paths was clean.'
   - id: regression-ui-containment-and-diagnostics-fix
     name: Fix UI containment receipts and diagnostic presentation regressions
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -55015,6 +55015,8 @@ phases:
     depends_on:
     - regression-source-ledger-controls-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-12T15:01:19.683351+00:00'
   - id: regression-frontend-route-integration-retest
     name: Retest frontend routes and Source Ledger boundary behavior
     status: pending
