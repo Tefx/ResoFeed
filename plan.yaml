@@ -57443,7 +57443,7 @@ phases:
     claimed_at: '2026-05-12T19:12:44.282486+00:00'
   - id: regression-audit-focused-deep-review
     name: Perform focused deep review of regression remediation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -57502,6 +57502,8 @@ phases:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T19:12:57.697526+00:00'
   - id: regression-audit-final-gate
     name: Final gate for regression audit remediation closure
     status: pending
