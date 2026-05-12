@@ -52701,10 +52701,12 @@ phases:
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: locked
-  gate: Frontend gate blocks unless REG-2026-05-12-01, -03, -05, -07, -08, and -09
-    are fixed with rendered UI evidence, Source Ledger manual controls work through
-    real HTTP actions, inactive mobile panels are outside visual/accessibility flow,
-    and uiux-auditor provides a parseable PASS/PASS_WITH_DEBT handoff.
+  gate: Frontend gate blocks unless REG-2026-05-12-01 is adjudicated against canonical
+    Source Ledger boundaries, forbidden `[RUN INGEST]` / `[FETCH]` controls are not
+    reintroduced, REG-2026-05-12-03, -05, -07, -08, and -09 are fixed with rendered
+    UI evidence, source-add receipt/background-ingest guidance and diagnostics/details
+    visibility remain intact, inactive mobile panels are outside visual/accessibility
+    flow, and uiux-auditor provides a parseable PASS/PASS_WITH_DEBT handoff.
   depends_on:
   - regression-audit-remediation-contract-matrix-and-expected-red-tests
   steps:
