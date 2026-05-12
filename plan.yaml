@@ -52202,6 +52202,75 @@ phases:
     depends_on:
     - regression-audit-contract-matrix
     agent: golang-developer
+  - id: regression-audit-contract-gate
+    name: Gate regression audit contract and expected-red coverage
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the regression audit
+      repair plan is ready for implementation.
+
+
+      Review criteria:
+
+      1. Every actionable finding REG-2026-05-12-01 through REG-2026-05-12-09 is mapped
+      to a downstream owner.
+
+      2. REG-2026-05-12-02 is not duplicated and is delegated to the existing MCP
+      capability audit chain.
+
+      3. Expected-red tests/proof contracts exist for distinct new gaps: UI surface
+      regressions, MCP read_item detail text, and live LLM health classification.
+
+      4. Contract/test evidence respects ResoFeed invariants: single Go binary, SQLite/FTS5,
+      owner-token boundary, no accounts/OAuth/RBAC, no vector/RAG, no sync/merge/event
+      bus/service layer, flat Source Ledger, no forbidden UI/product creep.
+
+      5. Downstream backend and frontend branches can safely fan out after this gate.
+
+
+      review_depth: STANDARD
+
+      cross_cutting_focus:
+
+      - audit finding ownership completeness
+
+      - no duplicate MCP empty-resource remediation
+
+      - public surface/runtime proof obligations preserved'
+    verification: 'phase-check protecting regression-audit-backend and regression-audit-frontend
+      remediation phases.
+
+      - All contract/test phase steps have complete evidence.
+
+      - Expected-red semantics are explicit and no implementation leaked into contract/test
+      steps.
+
+      - Finding-by-finding owner matrix has no gaps or duplicates.
+
+      - Gate decision basis lists unresolved statuses and why they block or do not
+      intersect downstream gates.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Gate Review\
+      \ Report\nphase: regression-audit-remediation-contract-matrix-and-expected-red-tests\n\
+      steps_reviewed:\n  - regression-audit-contract-matrix\n  - regression-audit-ui-expected-red-tests\n\
+      \  - regression-audit-mcp-read-item-expected-red-tests\n  - regression-audit-llm-health-proof-contract\n\
+      finding_coverage:\n  REG-2026-05-12-01: <owner + status>\n  REG-2026-05-12-02:\
+      \ <existing MCP chain owner + status>\n  REG-2026-05-12-03: <owner + status>\n\
+      \  REG-2026-05-12-04: <owner + status>\n  REG-2026-05-12-05: <owner + status>\n\
+      \  REG-2026-05-12-06: <owner + status>\n  REG-2026-05-12-07: <owner + status>\n\
+      \  REG-2026-05-12-08: <owner + status>\n  REG-2026-05-12-09: <owner + status>\n\
+      verdict: OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
+      \ []"
+    depends_on:
+    - regression-audit-contract-matrix
+    - regression-audit-ui-expected-red-tests
+    - regression-audit-mcp-read-item-expected-red-tests
+    - regression-audit-llm-health-proof-contract
+    agent: gate-reviewer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
