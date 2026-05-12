@@ -50799,7 +50799,7 @@ phases:
   steps:
   - id: mcp-audit-contract-lock
     name: Lock MCP audit proof obligations and response-shape contract
-    status: claimed
+    status: done
     description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
       \  - signatures\n  - type_defs\n  - interfaces\n  - stubs\nagent_source: project\n\
       \nLock the acceptance contract for docs/audits/mcp-capability-audit-2026-05-12.md\
@@ -50862,6 +50862,45 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T07:49:21.741893+00:00'
+    done_at: '2026-05-12T08:17:41.061202+00:00'
+    evidence: "## refs Read Confirmation\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — unavailable in isolated worktree after scope repair and not modified; MCP-1/MCP-2\
+      \ contract source is the dispatch-provided audit context.\n- docs/ARCHITECTURE.md\
+      \ — one binary, SQLite/FTS5, `/mcp`, owner-token boundary, no forbidden scope.\n\
+      - docs/DESIGN.md — product/UI invariants forbid folders/tags/unread/archive/settings\
+      \ bloat.\n- AGENTS.md — unavailable in isolated worktree; dispatch-provided\
+      \ project rules followed.\n\n## Scope Hygiene Repair\n- Initial branch attempted\
+      \ to add `docs/audits/mcp-capability-audit-2026-05-12.md`; this was removed\
+      \ to avoid overwriting the untracked audit file in main.\n- Preserved changes\
+      \ only in `internal/resofeed/mcp.go`, `internal/resofeed/http.go`, `internal/resofeed/types.go`,\
+      \ and `internal/resofeed/mcp_integration_test.go`.\n\n## Contract Lock Evidence\n\
+      - MCP-1 proof obligation recorded in source/test comments: real serve listener,\
+      \ POST /mcp 401 before JSON-RPC dispatch, valid owner-token initialize/resource\
+      \ proof.\n- MCP-2 response-shape obligation recorded in type comments: `SourcesResponse`\
+      \ and `RulesResponse` empty slices must encode as `[]` not `null`.\n- Authoritative\
+      \ public surface pinned: `POST /mcp`; resources `resofeed://sources`, `resofeed://rules/active`,\
+      \ `resofeed://feed/today`, `resofeed://system/doctor`; types `SourcesResponse{Sources\
+      \ []Source}` and `RulesResponse{Rules []SteerRule}`.\n- Runtime logic changed\
+      \ in this step: no; comments only.\n- Product invariants preserved: single binary,\
+      \ SQLite/FTS5, owner-token boundary, no accounts/OAuth/RBAC/vector/RAG/sync/merge/event\
+      \ bus/service layer.\n\n## Files Changed\n- `internal/resofeed/mcp.go` — clarified\
+      \ MCP auth/liveness contract comments only.\n- `internal/resofeed/http.go` —\
+      \ clarified single-router liveness and empty-array response contract comments\
+      \ only.\n- `internal/resofeed/types.go` — clarified canonical shared MCP/HTTP\
+      \ type reuse comments only.\n- `internal/resofeed/mcp_integration_test.go` —\
+      \ added downstream expected-red liveness proof comment only.\n\n## Verification\n\
+      - Worktree: `gofmt`, `git diff --check`, `go test ./...`, `golangci-lint run`,\
+      \ and `go test -race ./internal/resofeed` passed; worktree clean.\n- Branch\
+      \ diff before merge contained only the four tracked source/test files listed\
+      \ above.\n- Mainline squash merge commit: `49a03c9`.\n- Mainline final-state\
+      \ verification: `gofmt -w internal/resofeed/mcp.go internal/resofeed/http.go\
+      \ internal/resofeed/types.go internal/resofeed/mcp_integration_test.go && git\
+      \ diff --check && go test ./...` passed (`ok resofeed/internal/resofeed 0.719s`).\n\
+      \n## Behavioral Proof Register\n- verdict: PASS\n- blockers: []\n- gate_open_allowed:\
+      \ true\n- orchestrator_action_hint: COMPLETE\n- finding_closure:\n  MCP-1: CONTRACT_LOCKED\n\
+      \  MCP-2: CONTRACT_LOCKED\n\n## Commit hash(es)\n- c743e06f4bf72778705b8feb266620f40578482a\
+      \ — repaired contract lock branch commit\n- 49a03c9 — mainline squash merge\n\
+      \n## Gaps / Notes\n- none"
   - id: mcp-audit-empty-resources-red-tests
     name: Add expected-red tests for empty MCP sources and active rules arrays
     status: pending
