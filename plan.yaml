@@ -52148,6 +52148,60 @@ phases:
     depends_on:
     - regression-audit-contract-matrix
     agent: golang-developer
+  - id: regression-audit-llm-health-proof-contract
+    name: Define live LLM health classification proof obligations
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - live/stub health proof obligations\n  - fallback classification acceptance\n\
+      \  - diagnostic artifact requirements\nagent_source: project\n\nLock proof obligations\
+      \ for REG-2026-05-12-06 without changing runtime behavior.\n\nFinding covered:\n\
+      - REG-2026-05-12-06 — Current live LLM path is not healthy. Current 8080 accepted\
+      \ the owner token but displayed `fallback: excerpt-only`, `/doctor` provider/model\
+      \ uncertainty, item transform failures, `model_status: model_latency_error`,\
+      \ and `value_tier: null`.\n\nImportant audit distinction:\n- Isolated deterministic\
+      \ OpenRouter-compatible path passed: summary generation requests were sent,\
+      \ fixture summaries rendered, and natural-language Steer translation succeeded.\n\
+      - Current live server remains degraded, so fallback-only current summaries must\
+      \ not count as successful live LLM summaries.\n\nProof contract:\n- Classify\
+      \ root cause as one of: missing live model configuration, stale database with\
+      \ prior failures, active OpenRouter client timeout/error, or unresolved product\
+      \ regression.\n- Preserve fallback taxonomy visibility, but keep success criteria\
+      \ honest: live model success requires at least one current item with model-backed\
+      \ summary/value evidence, not fallback-only excerpt output.\n- Do not require\
+      \ real secret disclosure in evidence; redact tokens/keys.\n- Do not introduce\
+      \ new LLM orchestration, persistence, vector/RAG, service layer, or sidecar\
+      \ worker.\n\nExpected deliverable:\n- A focused test/probe plan and health evidence\
+      \ schema that downstream remediation/retest can fill.\n- If a test is added,\
+      \ it must separate deterministic stub success from live current-instance health\
+      \ classification.\n\ntouch_paths:\n- internal/resofeed/openrouter.go\n- internal/resofeed/doctor.go\n\
+      - internal/resofeed/ingest.go\n- internal/resofeed/openrouter_*_test.go\n- internal/resofeed/runtime_secret*.go\n\
+      - web/src/routes/components/Feed.svelte\n- web/src/routes/components/Inspector.svelte\n\
+      \nauthoritative_interface: existing /api/doctor, feed item model_status/value_tier\
+      \ fields, OpenRouter-compatible JSON transformer path.\n\nNo production code\
+      \ changes are allowed in this contract step."
+    verification: 'local-check protecting regression-audit-contract-gate and backend/LLM
+      remediation.
+
+      - Evidence classifies REG-06 proof obligations and diagnostic artifact requirements.
+
+      - Evidence distinguishes deterministic stub success from current live instance
+      health.
+
+      - Evidence confirms fallback-only summaries are not accepted as live LLM success.
+
+      - Evidence confirms no runtime logic changed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## LLM Health\
+      \ Proof Contract\nclassification_options:\n  - missing_live_model_configuration\n\
+      \  - stale_database_prior_failures\n  - openrouter_client_timeout_or_error\n\
+      \  - unresolved_product_regression\nrequired_artifacts:\n  - /api/doctor current\
+      \ response snapshot with secrets redacted\n  - current feed model_status/value_tier\
+      \ sample\n  - deterministic stub control result\nsuccess_definition: <model-backed\
+      \ current summary evidence, not fallback-only>\nverdict: PASS | FAIL\nblockers:\
+      \ []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-audit-contract-matrix
+    agent: golang-developer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
