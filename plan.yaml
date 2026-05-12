@@ -50969,6 +50969,94 @@ phases:
     depends_on:
     - mcp-audit-contract-lock
     agent: golang-developer
+  - id: mcp-audit-contract-gate
+    name: Gate MCP audit contract and expected-red coverage
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the contract/test
+      phase is ready for remediation.
+
+
+      Review scope:
+
+      - MCP-1 proof obligation is captured as a liveness/proof-closure blocker for
+      current-instance verification.
+
+      - MCP-2 has expected-red coverage for fresh empty `resofeed://sources` and `resofeed://rules/active`
+      resource reads.
+
+      - Expected-red tests are test-only and do not implement the fix.
+
+      - Product invariants from docs/ARCHITECTURE.md, docs/DESIGN.md, and AGENTS.md
+      remain enforced.
+
+
+      Independence: gate-reviewer MUST NOT be the same agent as the contract/test
+      author.
+
+
+      review_depth: STANDARD
+
+      review_depth_rationale:
+
+      - Public MCP response shape is client-visible.
+
+      - Phase is contract/test only, with no runtime implementation.
+
+
+      Behavioral proof register required:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis'
+    verification: 'phase-check protecting mcp-capability-audit-remediation.
+
+      - All phase steps have evidence with refs confirmation.
+
+      - MCP-2 expected-red test evidence exists or explains already-green with code-level
+      proof.
+
+      - MCP-1 liveness proof obligation is scheduled downstream and cannot be bypassed.
+
+      - Gate decision basis explicitly maps MCP-1 and MCP-2 to downstream closure
+      paths.
+
+      - No implementation changes were accepted in the contract/test phase.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Gate Review Report\n\
+      Reviewer: gate-reviewer\nPhase: mcp-capability-audit-contract-lock-and-expected-red-tests\n\
+      \n## Finding-by-Finding Closure Basis\nMCP-1:\n  requirement_ref: <audit/spec\
+      \ refs>\n  behavior_claim: <current-instance liveness must be proven later>\n\
+      \  runtime_proof_expected: <listener + missing-auth 401 + valid-token initialize/resources>\n\
+      \  evidence_ref: <step evidence reviewed>\n  status: PROOF_OBLIGATION_SCHEDULED\
+      \ | GAP\n  closure_path: mcp-audit-live-localhost-liveness-probe\n  gate_decision_basis:\
+      \ <why remediation may proceed>\nMCP-2:\n  requirement_ref: <audit/spec refs>\n\
+      \  behavior_claim: <empty resources serialize as []>\n  runtime_proof_expected:\
+      \ <fresh DB resource reads>\n  evidence_ref: <expected-red test evidence>\n\
+      \  status: EXPECTED_RED_DEFINED | GAP\n  closure_path: mcp-audit-empty-resources-fix\
+      \ -> mcp-audit-fresh-db-resource-retest\n  gate_decision_basis: <why implementation\
+      \ may proceed>\n\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers:\n  - <blocker\
+      \ or none>\ngate_open_allowed: true | false"
+    depends_on:
+    - mcp-audit-contract-lock
+    - mcp-audit-empty-resources-red-tests
+    agent: gate-reviewer
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
   status: locked
