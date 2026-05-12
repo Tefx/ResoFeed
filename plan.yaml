@@ -51064,6 +51064,96 @@ phases:
     within the existing MCP/HTTP response surfaces without expanding product scope.
   depends_on:
   - mcp-capability-audit-contract-lock-and-expected-red-tests
+  steps:
+  - id: mcp-audit-empty-resources-fix
+    name: Fix empty MCP sources and active rules array serialization
+    status: pending
+    description: "step_type: implementation\nagent_source: project\n\nComplete the\
+      \ implementation within existing signatures for MCP-2. This phase depends on\
+      \ `mcp-capability-audit-contract-lock-and-expected-red-tests`; consume the contract\
+      \ from step `mcp-audit-contract-lock` and protected tests from `mcp-audit-empty-resources-red-tests`.\n\
+      \nUPSTREAM ARTIFACTS (from contract/test steps):\n- docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ — finding MCP-2 is authoritative failure context.\n- docs/ARCHITECTURE.md\
+      \ §7 MCP Surface — `resofeed://sources` is `{ \"sources\": [Source] }`; `resofeed://rules/active`\
+      \ is `{ \"rules\": [SteerRule] }`.\n- internal/resofeed/mcp_integration_test.go\
+      \ — expected-red tests are PROTECTED.\n- internal/resofeed/http.go — existing\
+      \ `SourcesResponse` and `RulesResponse` signatures are AUTHORITATIVE.\n- internal/resofeed/mcp.go\
+      \ — existing resource URIs and `NewMCPHandler(MCPConfig) http.Handler` are AUTHORITATIVE.\n\
+      \nYOUR SCOPE:\n- Replace nil-slice response behavior with working logic that\
+      \ guarantees empty arrays for `resofeed://sources` and `resofeed://rules/active`\
+      \ on a fresh DB.\n- Use Edit tool to modify existing response construction/query\
+      \ paths only.\n- Do not add public MCP resources/tools, product concepts, service\
+      \ layers, repositories, registries, event buses, sync/merge logic, accounts,\
+      \ OAuth/RBAC, vector/RAG, or UI/product creep.\n- Preserve `resofeed://feed/today`\
+      \ behavior and all owner-token checks.\n\nExpected behavior:\n- Fresh DB `resources/read`\
+      \ for `resofeed://sources` returns JSON text exactly shaped with `\"sources\"\
+      : []`, not `null`.\n- Fresh DB `resources/read` for `resofeed://rules/active`\
+      \ returns JSON text exactly shaped with `\"rules\": []`, not `null`.\n- Seeded\
+      \ DB behavior remains unchanged: arrays include actual Source/SteerRule rows.\n\
+      - HTTP/MCP canonical type reuse remains intact.\n\nFailure-mode checklist:\n\
+      - Empty DB path: sources/rules arrays are non-null empty arrays.\n- Seeded DB\
+      \ path: real rows are preserved and ordered by existing query contracts.\n-\
+      \ Missing DB/error path: errors remain MCP JSON-RPC errors, not malformed successful\
+      \ payloads.\n- Auth path: missing/invalid owner token still returns HTTP 401\
+      \ before resource handling.\n- Stale-definition vs new-state precedence: response\
+      \ constructors must reflect current SQLite reads only; no cached/resource-global\
+      \ slices.\n- Compatibility: do not change field names, MIME declarations, resource\
+      \ URIs, or tool schemas.\n\nState semantics:\n- This is response-shaping only;\
+      \ it must not mutate sources, steer rules, item_state, or agent_receipts.\n\
+      - Empty collection means zero active rows, serialized as `[]`.\n- Backward-compatible\
+      \ legacy behavior includes all already-passing seeded MCP checks from the audit.\n\
+      \nOut-of-scope guardrail:\n- No call-site migration beyond the existing MCP/HTTP\
+      \ response constructors if needed.\n- No documentation rewrite unless verification\
+      \ later finds docs drift.\n- No live localhost lifecycle proof in this step;\
+      \ that belongs to `mcp-audit-live-localhost-liveness-probe`.\n\n## Completion\
+      \ Criteria (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only completion\
+      \ is NOT acceptable. Each deliverable MUST contain substantive logic that processes\
+      \ its inputs and produces outputs that vary based on those inputs. Private stub\
+      \ classes (`_Runtime*`, `_Stub*`, `_Placeholder*`) do not satisfy this requirement.\n\
+      \nIf a contract artifact is wrong or incomplete, document a deviation record\
+      \ (type, what, why, impact) — do NOT silently rewrite.\n\nupstream_artifacts:\n\
+      - path: docs/audits/mcp-capability-audit-2026-05-12.md\n  from_step: mcp-audit-contract-lock\n\
+      \  tier: contract\n- path: docs/ARCHITECTURE.md\n  from_step: mcp-audit-contract-lock\n\
+      \  tier: contract\n- path: internal/resofeed/mcp_integration_test.go\n  from_step:\
+      \ mcp-audit-empty-resources-red-tests\n  tier: test\n\ntouch_paths:\n- internal/resofeed/mcp.go\n\
+      - internal/resofeed/http.go\n- internal/resofeed/mcp_integration_test.go\n\n\
+      known_risks:\n- Public response-shape drift: client-visible MCP JSON arrays\
+      \ must not become `null` under empty fixture conditions.\n- Runtime surface\
+      \ preservation: do not treat this as handler-only; downstream verification will\
+      \ probe the real `/mcp` endpoint.\n\n## Gate Preview (what the gate WILL reject)\n\
+      1. `{ \"sources\": null }` or `{ \"rules\": null }` on fresh DB.\n2. Any MCP-only\
+      \ product concept or schema expansion not present in docs/ARCHITECTURE.md.\n\
+      3. Auth regression where `/mcp` reaches JSON-RPC handling before owner-token\
+      \ validation.\n4. Receipt/idempotency regressions in already-passing mutating\
+      \ MCP tools.\n5. Handler-only evidence without the downstream real-bound `/mcp`\
+      \ proof."
+    verification: 'local-check protecting mcp-audit-remediation-gate and downstream
+      independent retests.
+
+      - Main path: focused tests for fresh empty MCP resources pass and show `sources:
+      []` and `rules: []`.
+
+      - Failure path: auth regression test or existing focused test proves missing/invalid
+      owner token returns HTTP 401 before resource handling.
+
+      - Seeded path: existing MCP integration tests still pass for seeded sources/rules/tools.
+
+      - Proof: no new MCP tools/resources/product concepts, service layers, sync/merge
+      logic, accounts/RBAC/OAuth, vector/RAG, or forbidden UI scope added.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Fix Evidence\n-\
+      \ Files changed: <list>\n- Response-shaping location(s): <file:line>\n- Focused\
+      \ command(s):\n  ```\n  <go test command(s)>\n  ```\n- Actual output:\n  ```\n\
+      \  <paste output>\n  ```\n- Fresh DB `resofeed://sources` JSON text: <paste>\n\
+      - Fresh DB `resofeed://rules/active` JSON text: <paste>\n- Auth boundary proof\
+      \ retained: <yes/no; command/test>\n- Product invariant check: <single binary/SQLite/owner-token/no\
+      \ forbidden scope>\n- Deviation records: <none or list>\n\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers:\n  - <blocker or none>\ngate_open_allowed: true | false\n\
+      finding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2: FIXED_LOCALLY\
+      \ | GAP"
+    agent: golang-developer
 - id: mcp-capability-audit-verification-and-finalization
   name: MCP Capability Audit — Verification and Finalization
   status: locked
