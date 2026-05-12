@@ -53782,7 +53782,7 @@ phases:
       semantics for downstream remediation rather than product implementation.'
   - id: regression-audit-contract-gate-rerun
     name: Re-gate regression audit contract blocker remediation
-    status: pending
+    status: claimed
     description: "Gate review rerun for the failed `regression-audit-contract-gate`\
       \ blockers after the batched remediation step.\n\nstep_type: gate\nverification_scope:\
       \ phase-check\nagent_source: project\nreview_depth: THOROUGH\nreview_depth_rationale:\n\
@@ -53875,6 +53875,8 @@ phases:
     depends_on:
     - regression-audit-contract-gate-batched-fix
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T13:58:33.791140+00:00'
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
