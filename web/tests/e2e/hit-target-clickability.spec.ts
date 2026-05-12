@@ -50,9 +50,23 @@ async function prepareImportedFeed(page: Page, ownerToken: string, opmlPath: str
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
   }
   if (!(await page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/).isVisible())) {
-    await pointerClick(page, page.getByRole('button', { name: '[RUN INGEST]' }), 'Source Ledger [RUN INGEST]', { minHeight: 44 });
+    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+    await triggerFixtureIngest(page);
     await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
   }
+}
+
+async function triggerFixtureIngest(page: Page): Promise<void> {
+  const result = await page.evaluate(async () => {
+    const token = window.localStorage.getItem('resofeed.ownerToken');
+    const response = await window.fetch('/api/ingest', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token ?? ''}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    return { ok: response.ok, status: response.status, body: await response.text() };
+  });
+  if (!result.ok && result.status !== 409) throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
 }
 
 async function collectHitTargetDiagnostic(page: Page, locator: Locator, label: string): Promise<HitTargetDiagnostic> {
@@ -150,7 +164,7 @@ function activePanelTexts(page: Page): Promise<readonly string[]> {
   return page.locator('.active-panel').evaluateAll((panels) => panels.map((panel) => (panel.textContent ?? '').replace(/\s+/g, ' ').trim()));
 }
 
-test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspector links, /doctor, OPML import, and source fetch controls', async ({ page, runInfo, ownerToken }) => {
+test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspector links, /doctor, and OPML import controls', async ({ page, runInfo, ownerToken }) => {
   const opmlPath = path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml');
   await prepareImportedFeed(page, ownerToken, opmlPath);
 

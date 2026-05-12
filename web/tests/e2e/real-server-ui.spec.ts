@@ -52,6 +52,24 @@ async function waitForHTTP(url: string): Promise<void> {
   throw new Error(`fixture server did not become ready at ${url}`);
 }
 
+async function triggerFixtureIngest(page: Page): Promise<void> {
+  const result = await page.evaluate(async () => {
+    const token = window.localStorage.getItem('resofeed.ownerToken');
+    const response = await window.fetch('/api/ingest', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token ?? ''}`,
+        'Content-Type': 'application/json'
+      },
+      body: '{}'
+    });
+    return { ok: response.ok, status: response.status, body: await response.text() };
+  });
+  if (!result.ok && result.status !== 409) {
+    throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
+  }
+}
+
 async function startPolicyFixtureServer(feedXml: string): Promise<{ child: ChildProcess; url: string }> {
   const port = await reservePort();
   const url = `http://127.0.0.1:${port}/policy-feed.xml`;
@@ -259,7 +277,7 @@ test('ci-safe harness records required artifact paths and sanitized runtime note
   expect(runInfo.sanitizedEnvironment.openRouterKey).toBe('ci-safe-fake-key');
 });
 
-test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, and search', async ({
+test('ci-safe browser-led source import, background ingest proof, feed, inspect, retrieve, and search', async ({
   page,
   request,
   runInfo,
@@ -279,16 +297,11 @@ test('ci-safe browser-led source import, manual fetch, feed, inspect, retrieve, 
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   await expect(page.getByText(/src: 127\.0\.0\.1:\d+.*status: not_fetched/)).toBeVisible();
 
-  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.getByRole('button', { name: '[INGESTING...]' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await triggerFixtureIngest(page);
   await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText(/last_ingest:/)).toBeVisible();
   await expect(page.getByText('[DELETE]')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' }).click();
-  await expect(page.getByRole('button', { name: 'Fetching ResoFeed E2E Local Source' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' })).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' })).toHaveText('[FETCH]');
   await roundTripStateThroughLedgerFooter(page, testInfo);
 
   await openToday(page);
@@ -362,7 +375,8 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await openSourceLedger(page);
   await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
-  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await triggerFixtureIngest(page);
   await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
   await openToday(page);
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
@@ -537,10 +551,11 @@ test('@llm-deterministic browser-led accepted steering changes ranking, filterin
     const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
     await steer.fill(policyServer.url);
     await page.getByRole('button', { name: 'apply' }).click();
-    await expect(page.getByRole('status')).toContainText(/source added: 127\.0\.0\.1|run ingest in SOURCE LEDGER/i);
+    await expect(page.getByRole('status')).toContainText(/source added: 127\.0\.0\.1|background ingest/i);
 
     await openSourceLedger(page);
-    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+    await triggerFixtureIngest(page);
     await expect(page.getByText(/src: Policy Ranking Fixture · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
 
     await openToday(page);

@@ -70,7 +70,7 @@ const expectations: readonly FindingExpectation[] = [
   { id: 'F27', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Import/export actions are bracket actions; fetch controls must not be exposed' },
   { id: 'F28', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source Ledger shows a false imported status by default' },
   { id: 'F29', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source rows omit a stable URL column' },
-  { id: 'F30', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'last fetch / last ingest labels are not canonical' },
+  { id: 'F30', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'last fetch diagnostic label is not canonical' },
   { id: 'F31', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'File input leaves a visible/occupied artifact' },
   { id: 'F32', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Disabled/active manual controls use filled disabled backgrounds' },
   { id: 'F33', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'Source Ledger action block baseline is unstable' },
@@ -249,7 +249,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (!/\[EXPORT STATE\]/.test(ledgerText) || !/\[IMPORT STATE\]/.test(ledgerText)) note(violations, 'F35', `state actions are not canonical bracket labels: ${ledgerText}`);
   if (!/https?:\/\//.test(ledgerText)) note(violations, 'F29', `source URL column/value is not visible in ledger rows: ${ledgerText}`);
   if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/status:\s*ok/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/status fields: ${ledgerText}`);
-  if (!/last_fetch/.test(ledgerText) || !/last_ingest/.test(ledgerText)) note(violations, 'F30', `timestamp labels are not canonical last_fetch/last_ingest: ${ledgerText}`);
+  if (!/last_fetch/.test(ledgerText)) note(violations, 'F30', `timestamp label is not canonical last_fetch: ${ledgerText}`);
   const fileInputMetric = await metric(page, 'input[type="file"]');
   if (fileInputMetric.found && fileInputMetric.display !== 'none' && fileInputMetric.width > 1 && fileInputMetric.height > 1) note(violations, 'F31', `file input leaves visible browser artifact: ${fileInputMetric.width}x${fileInputMetric.height}`);
   const disabledButtonMetric = await metric(page, 'button:disabled');

@@ -1,4 +1,7 @@
-import type { Locator, Page } from 'playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import type { Locator, Page, TestInfo } from 'playwright/test';
 
 import { expect, test } from './fixtures';
 
@@ -160,8 +163,20 @@ async function assertTodayExcludedFromA11yFlow(page: Page): Promise<void> {
   await expect(page.getByRole('list', { name: 'Today feed items' }), 'inactive Today feed list must not remain visible').not.toBeVisible();
 }
 
+async function saveRenderedLedgerProof(page: Page, testInfo: TestInfo): Promise<void> {
+  const outDir = path.join(testInfo.outputDir, 'source-ledger-reg-01-proof');
+  fs.mkdirSync(outDir, { recursive: true });
+  const ledgerSurface = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]');
+  const screenshotPath = path.join(outDir, 'source-ledger-forbidden-controls-absent.png');
+  const domPath = path.join(outDir, 'source-ledger-forbidden-controls-absent.dom.txt');
+  await ledgerSurface.screenshot({ path: screenshotPath });
+  await fs.promises.writeFile(domPath, await ledgerSurface.evaluate((node) => node.outerHTML), 'utf8');
+  await testInfo.attach('source-ledger-forbidden-controls-absent.png', { path: screenshotPath, contentType: 'image/png' });
+  await testInfo.attach('source-ledger-forbidden-controls-absent.dom.txt', { path: domPath, contentType: 'text/plain' });
+}
+
 test.describe('regression audit UI expected-red coverage', () => {
-  test('REG-01 Source Ledger boundary guard allows canonical ledger grammar but forbids run/fetch/manual-ingest controls', async ({ page, ownerToken }) => {
+  test('REG-01 Source Ledger boundary guard allows canonical ledger grammar but forbids run/fetch/manual-ingest controls', async ({ page, ownerToken }, testInfo) => {
     await openShell(page, ownerToken);
 
     const menu = await openSurfaceMenu(page);
@@ -179,6 +194,7 @@ test.describe('regression audit UI expected-red coverage', () => {
       await expect(ledgerSurface.getByRole('button', { name: forbiddenName }), `${forbiddenName} must not be a Source Ledger action control`).toHaveCount(0);
     }
     await expect(ledgerSurface.getByRole('button', { name: /run ingest|ingesting|fetch|fetching/i }), 'Source Ledger must not expose any manual ingestion/fetch action controls').toHaveCount(0);
+    await saveRenderedLedgerProof(page, testInfo);
   });
 
   test('REG-03 Search renders exactly one visible submit control in desktop and mobile retrieval states', async ({ page, ownerToken }) => {

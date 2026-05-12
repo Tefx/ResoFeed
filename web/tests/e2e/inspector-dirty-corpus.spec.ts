@@ -27,10 +27,24 @@ async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: strin
   await runSteerCommand(page, 'source ledger', 'source ledger');
   await page.getByLabel('import OPML').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await triggerFixtureIngest(page);
   await expect(page.getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
   await runSteerCommand(page, 'today', 'today');
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
+}
+
+async function triggerFixtureIngest(page: Page): Promise<void> {
+  const result = await page.evaluate(async () => {
+    const token = window.localStorage.getItem('resofeed.ownerToken');
+    const response = await window.fetch('/api/ingest', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token ?? ''}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    return { ok: response.ok, status: response.status, body: await response.text() };
+  });
+  if (!result.ok && result.status !== 409) throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
 }
 
 async function runSteerCommand(page: Page, command: string, receipt: RegExp | string): Promise<void> {

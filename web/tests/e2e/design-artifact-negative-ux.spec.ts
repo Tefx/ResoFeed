@@ -123,8 +123,22 @@ async function seedFeedFromOpml(page: Page, opmlPath: string): Promise<void> {
     await page.getByLabel('import OPML').setInputFiles(opmlPath);
     await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   }
-  await assertUnobstructedClick(page.getByRole('button', { name: '[RUN INGEST]' }));
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await triggerFixtureIngest(page);
   await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
+}
+
+async function triggerFixtureIngest(page: Page): Promise<void> {
+  const result = await page.evaluate(async () => {
+    const token = window.localStorage.getItem('resofeed.ownerToken');
+    const response = await window.fetch('/api/ingest', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token ?? ''}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    return { ok: response.ok, status: response.status, body: await response.text() };
+  });
+  if (!result.ok && result.status !== 409) throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
 }
 
 async function assertPrimaryTextIsClean(page: Page): Promise<void> {
@@ -186,7 +200,8 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'source-ledger', 'Ledger active with OPML import receipt and flattened source row.');
 
-  await assertUnobstructedClick(page.getByRole('button', { name: '[RUN INGEST]' }));
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await triggerFixtureIngest(page);
   await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
 
   await assertUnobstructedClick(page.getByRole('button', { name: 'TODAY', exact: true }));

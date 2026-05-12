@@ -42,7 +42,11 @@ Confirmed working:
 
 ## Findings
 
-### REG-2026-05-12-01 - Source Ledger is missing manual ingest and fetch controls
+### REG-2026-05-12-01 - Source Ledger manual ingest and fetch controls authority conflict
+
+Adjudication status: superseded by `docs/audits/regression-audit-2026-05-12-contract-matrix.md` and `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md`.
+
+The original audit text below is retained as historical evidence of what the audit expected at run time, but it is not authoritative implementation guidance. Canonical architecture/design authority keeps Source Ledger as view/delete/import/export/details only; source addition remains via Steer and refresh is handled by background ingest. Do not restore Source Ledger `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]` controls.
 
 Severity: P1.
 
@@ -59,7 +63,7 @@ Evidence:
   - `Isolated Source Ledger exposes global [RUN INGEST] control`
   - `Isolated Source Ledger exposes per-source [FETCH] control`
 
-Why this violates the product/design contract:
+Historical audit rationale, now adjudicated as a product/design authority conflict:
 
 - `docs/PRD.md` requires the Source Ledger to expose manual ingestion controls, one global and one per source.
 - `docs/PRD.md` AC-18 defines global manual ingest and per-source manual fetch behavior.
@@ -72,7 +76,7 @@ Impact:
 - The audit had to call the backend ingest API directly to continue validating feed rendering, search, Inspector, LLM summary, and MCP behavior.
 - This is not just a cosmetic issue. It blocks the PRD source-management workflow.
 
-Expected fix:
+Rejected historical fix, retained only to explain the conflict:
 
 - Reinstate Source Ledger props/actions for `runIngest` and per-source `fetchSource`.
 - Render `[RUN INGEST]` with `last_ingest` status.
@@ -294,7 +298,7 @@ Remaining MCP blockers:
 
 An additional UI/UX review was performed against the audit screenshots. It identified these open design issues:
 
-- Source Ledger is incomplete without `[RUN INGEST]` and `[FETCH]`.
+- Source Ledger manual `[RUN INGEST]` and `[FETCH]` expectation is superseded by the REG-01 authority adjudication; those controls must remain absent.
 - Mobile utility surfaces still need stricter inactive-panel containment.
 - Search should have one visible submit action.
 - Current feed metadata is too diagnostic and repetitive.
@@ -320,7 +324,7 @@ Appears fixed or improved compared with earlier rounds:
 
 Do not treat this round as green. The highest-priority remaining blockers are:
 
-1. Restore Source Ledger `[RUN INGEST]` and per-source `[FETCH]`.
+1. Preserve Source Ledger boundary: do not restore `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]`; keep negative UI assertions active.
 2. Fix mobile inactive panel containment for Search, Source Ledger, and `/doctor`.
 3. Normalize MCP empty resource arrays.
 4. Investigate current live LLM failures and avoid counting fallback-only current summaries as live LLM success.

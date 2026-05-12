@@ -126,7 +126,7 @@ export async function attachCoverageTable(testInfo: TestInfo): Promise<void> {
     ['Star/Resonate', '44px target, Enter/Space toggle, label/glyph state, aria-pressed/equivalent expected'],
     ['Steer submit and /doctor', 'Textbox label, Enter submit, live/status/log output for diagnostics'],
     ['Inspector links', 'Original link role/name/href, focus visibility, Enter-reachable anchor'],
-    ['Source Ledger controls', 'Run ingest, per-source fetch/delete, named buttons, stable focus targets'],
+    ['Source Ledger controls', 'OPML import, source details/delete, state export/import, named buttons, stable focus targets'],
     ['OPML/state portability', 'Import OPML and state export/import controls are keyboard-reachable with live status']
   ];
   await testInfo.attach('keyboard-a11y-focus-activation-coverage.json', {

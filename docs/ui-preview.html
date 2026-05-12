@@ -672,8 +672,7 @@
       <section class="panel ledger source-ledger" aria-labelledby="source-ledger-title">
         <header class="source-ledger__header">
           <h2 class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER</h2>
-          <span class="source-ledger__status" aria-live="polite">last_ingest: 14:00:00</span>
-          <button class="bracket-action bracket-action--run-ingest" type="button" aria-label="Run ingest for all sources">[RUN INGEST]</button>
+          <span class="source-ledger__status" aria-live="polite">background ingest active</span>
         </header>
 
         <div class="source-ledger__tools" aria-label="Ledger actions">
@@ -688,7 +687,6 @@
             <span class="source-ledger__url">https://simonwillison.net/feed.xml</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Simon Willison">[FETCH]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Simon Willison">[DELETE]</button>
             </span>
           </li>
@@ -697,7 +695,6 @@
             <span class="source-ledger__url">https://hn.algolia.com/rss</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 12:00:11</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Hacker News" disabled>[FETCHING...]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Hacker News">[DELETE]</button>
             </span>
           </li>
@@ -706,13 +703,11 @@
             <span class="source-ledger__url">https://example.org/wire.xml</span>
             <span class="source-ledger__status source-ledger__status--error" aria-live="polite">err: timeout</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Wires">[FETCH]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source Wires">[DELETE]</button>
             </span>
           </li>
         </ul>
-
-        <p class="why">active global ingest state: <button class="bracket-action bracket-action--run-ingest" type="button" aria-label="Global ingest currently running" disabled>[INGESTING...]</button></p>
+        <p class="why">source addition routes through Steer; refresh is handled by background ingest.</p>
       </section>
 
       <div class="panel doctor">
