@@ -53512,7 +53512,13 @@ phases:
 
       Scope:
 
-      - Source Ledger manual ingest/fetch controls.
+      - Source Ledger boundary documentation: no run/fetch/manual-ingest controls
+      unless newer canonical docs explicitly supersede; allowed view/delete/import/export/details/diagnostics
+      behavior; source addition via Steer; background ingest handles refresh.
+
+      - Any docs/ui-preview or audit text that still implies Source Ledger `[RUN INGEST]`
+      / `[FETCH]` controls must be flagged as stale/conflicting rather than normalized
+      into implementation scope.
 
       - MCP resources/read and read_item behavior.
 
@@ -53533,16 +53539,33 @@ phases:
 
       - Evidence lists every doc checked and whether it matches repaired behavior.
 
+      - Source Ledger documentation preserves the hard boundary and does not reintroduce
+      `[RUN INGEST]` / `[FETCH]` controls as product requirements.
+
       - Any required docs update is either completed by this step if documentation-only
       or reported as a blocker with exact file/section.
 
       - No documentation change introduces forbidden product/architecture scope.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Documentation\
-      \ Sync Check\nchecked_docs:\n  - path: <path>\n    relevant_sections: <sections>\n\
-      \    verdict: MATCHES | DRIFT | NOT_APPLICABLE\nrequired_doc_changes: []\noutputs_or_artifacts:\n\
-      \  - <diff summary or no-op citation>\nverdict: PASS | PASS_WITH_DEBT | FAIL\n\
-      blockers: []\ngate_open_allowed: true | false\nremaining_gaps: []"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Doc Sync Evidence
+
+      - Docs checked and verdicts.
+
+      - Source Ledger boundary citations.
+
+      - Stale/conflicting audit or ui-preview references, if any.
+
+      - Required doc changes or no-op rationale.'
     depends_on:
     - regression-audit-full-runtime-retest
     - regression-audit-spec-conformance-review
