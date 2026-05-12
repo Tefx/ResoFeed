@@ -51229,3 +51229,106 @@ phases:
     remain intact, and any documentation drift is explicitly closed or shown non-intersecting.
   depends_on:
   - mcp-capability-audit-remediation
+  steps:
+  - id: mcp-audit-fresh-db-resource-retest
+    name: Retest fresh-database MCP resource arrays are non-null
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (integration-verifier), retest MCP-2 from a fresh perspective
+      after `mcp-capability-audit-remediation`.
+
+
+      Scope:
+
+      - Phase dependency ensures remediation has completed before this phase runs.
+
+      - Use a fresh migrated SQLite DB with zero active sources and zero active steering
+      rules.
+
+      - Exercise the real MCP resource read path, preferably through the real-bound
+      HTTP listener harness rather than direct helper-only calls.
+
+      - Read `resofeed://sources` and `resofeed://rules/active`.
+
+
+      Required proof:
+
+      - `resofeed://sources` returns JSON text containing `"sources": []`, never `null`.
+
+      - `resofeed://rules/active` returns JSON text containing `"rules": []`, never
+      `null`.
+
+      - `resofeed://feed/today` still returns `"items": []` in the same empty fixture.
+
+      - Missing/invalid auth still returns HTTP 401 before JSON-RPC handling.
+
+
+      Independence Level: L1 independent review.
+
+
+      Behavioral proof register required for MCP-2:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      touch_paths:
+
+      - internal/resofeed/mcp_integration_test.go
+
+      - internal/resofeed/mcp.go
+
+      - docs/audits/mcp-capability-audit-2026-05-12.md
+
+
+      This step verifies behavior only; do not modify product code except test harness
+      fixes required to run the verification.'
+    verification: 'phase-check protecting mcp-audit-final-gate.
+
+      - Expected result is green.
+
+      - Fresh empty DB resource reads for `resofeed://sources` and `resofeed://rules/active`
+      prove empty arrays, not null.
+
+      - Auth failure proof confirms `/mcp` returns HTTP 401 before JSON-RPC dispatch.
+
+      - Evidence includes actual command output and JSON payload snippets, not summary-only
+      claims.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n\n## Retest Evidence\n\
+      - Fresh DB fixture path: <path or test fixture>\n- Commands executed:\n  ```\n\
+      \  <actual go test / integration command>\n  ```\n- Actual output:\n  ```\n\
+      \  <paste output>\n  ```\n- `resofeed://sources` payload:\n  ```json\n  <paste\
+      \ JSON text>\n  ```\n- `resofeed://rules/active` payload:\n  ```json\n  <paste\
+      \ JSON text>\n  ```\n- Missing/invalid auth proof:\n  ```\n  <status/body proof>\n\
+      \  ```\n\n## Behavioral Proof Register\nMCP-2:\n  requirement_ref: docs/ARCHITECTURE.md\
+      \ §7 MCP Surface; audit MCP-2\n  behavior_claim: empty MCP sources/rules resources\
+      \ serialize arrays as []\n  runtime_proof_expected: fresh DB resource reads\
+      \ through /mcp\n  evidence_ref: <command/output/payload refs>\n  status: PROVEN\
+      \ | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING\n  closure_path: <closed or remediation\
+      \ step needed>\n  gate_decision_basis: <why gate may/may not open>\n\nverdict:\
+      \ PASS | PASS_WITH_DEBT | FAIL\nblockers:\n  - <blocker or none>\ngate_open_allowed:\
+      \ true | false\nfinding_closure:\n  MCP-1: NOT_IN_SCOPE_FOR_THIS_STEP\n  MCP-2:\
+      \ PROVEN | BLOCKED"
+    agent: integration-verifier
