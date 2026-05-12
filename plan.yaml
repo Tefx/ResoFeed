@@ -53186,7 +53186,7 @@ phases:
     claimed_at: '2026-05-12T13:04:31.392433+00:00'
   - id: regression-audit-mcp-read-item-expected-red-tests
     name: Add expected-red MCP read_item detail-text tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -53298,6 +53298,50 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-12T13:04:23.468148+00:00'
+    done_at: '2026-05-12T13:23:07.911589+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/regression-audit-2026-05-12.md:\
+      \ NOT READ, absent.\n- docs/ARCHITECTURE.md: read.\n- docs/PRD.md: read.\n-\
+      \ AGENTS.md: NOT READ in isolated worktree, absent.\n\n## Expected-Red MCP read_item\
+      \ Evidence\nAction Summary:\n- Added expected-red REG-2026-05-12-04 coverage\
+      \ in internal/resofeed/mcp_integration_test.go.\n- Test uses migrated SQLite\
+      \ via newContractDB and real POST /mcp harness through mcpCall/read_item.\n\
+      - Fixture asserts storage starts with extraction_status=full and empty extracted_text,\
+      \ then verifies MCP read_item must not return full without non-empty detail\
+      \ text or a fallback reason.\n- Product implementation files modified: false.\n\
+      \nFiles Changed:\n- internal/resofeed/mcp_integration_test.go\n\nTest Names:\n\
+      - TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason\n- TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\n\
+      \nVerification Run (worktree):\n- `gofmt -w \"internal/resofeed/mcp_integration_test.go\"\
+      ` -> Exit Code: 0\n- `go test ./internal/resofeed -run TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason\
+      \ -count=1` -> Exit Code: 1, Observed Result: red, Failure Alignment: matches\
+      \ REG-04.\n  Output:\n  ```text\n  REG-2026-05-12-04 exposed: MCP read_item\
+      \ returned extraction_status=full without non-empty extracted/detail text or\
+      \ fallback reason; response includes \"extraction_status\":\"full\" and \"extracted_text\"\
+      :null.\n  ```\n- `go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1` -> Exit Code: 0; REG-02 Duplicate Check: Existing empty-resource\
+      \ null-array coverage remains separate and passing.\n- `git diff --check` ->\
+      \ Exit Code: 0\n\nExpected Failures / Exposed Gaps:\n- MCP read_item can report\
+      \ extraction_status=full while returning no extracted/detail text and no fallback\
+      \ reason.\n\nDownstream Owner:\n- regression-mcp-read-item-detail-fix\n\nCommit:\n\
+      - 4e8007751af6c98cf3ce19867900fdb492c65e9a — isolated branch commit\n- 1c69e39\
+      \ — mainline squash commit `[vectl] step-regression-audit-mcp-read-item-expected-red-tests\
+      \ completed`\n\nMainline final-state verification after squash merge:\n```text\n\
+      gofmt -w \"internal/resofeed/mcp_integration_test.go\" && go test ./internal/resofeed\
+      \ -run TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason\
+      \ -count=1; ec=$?; printf \"EXPECTED_RED_EXIT_CODE=%s\\n\" \"$ec\"; if [ \"\
+      $ec\" -eq 1 ]; then go test ./internal/resofeed -run TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays\
+      \ -count=1 && git diff --check -- \"internal/resofeed/mcp_integration_test.go\"\
+      ; else exit \"$ec\"; fi\n```\nOutput:\n```text\n--- FAIL: TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason\
+      \ (0.01s)\n    mcp_integration_test.go:144: REG-2026-05-12-04 exposed: MCP read_item\
+      \ returned extraction_status=full without non-empty extracted/detail text or\
+      \ fallback reason; response={...\"extraction_status\":\"full\"...\"extracted_text\"\
+      :null...}\nFAIL\nFAIL\tresofeed/internal/resofeed\t0.677s\nFAIL\nEXPECTED_RED_EXIT_CODE=1\n\
+      ok  \tresofeed/internal/resofeed\t0.511s\n```\nExpected-red semantics accepted:\
+      \ step_intent=test_define_red, expected_result=red, observed_result=red, failure_alignment=matches\
+      \ REG-04, product_implementation_files_modified=false.\n\nConcurrency/Error\
+      \ Handling:\n- Test-only change; no production goroutines or I/O paths added.\n\
+      - Test checks SQL and MCP errors explicitly with fatal assertions.\n\n## Gate\
+      \ Decision\nheadline: PASS\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE"
   - id: regression-audit-llm-health-proof-contract
     name: Define live LLM health classification proof obligations
     status: done
