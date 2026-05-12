@@ -50803,3 +50803,12 @@ phases:
     within the existing MCP/HTTP response surfaces without expanding product scope.
   depends_on:
   - mcp-capability-audit-contract-lock-and-expected-red-tests
+- id: mcp-capability-audit-verification-and-finalization
+  name: MCP Capability Audit — Verification and Finalization
+  status: locked
+  gate: Final closure blocks unless MCP-1 and MCP-2 have finding-by-finding closure
+    evidence, MCP capability parity is rechecked through the real /mcp Streamable
+    HTTP endpoint, owner-token boundaries remain intact, idempotency/receipt semantics
+    remain intact, and any documentation drift is explicitly closed or shown non-intersecting.
+  depends_on:
+  - mcp-capability-audit-remediation
