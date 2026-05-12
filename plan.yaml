@@ -55933,7 +55933,7 @@ phases:
       Post-verification status for changed source/artifact paths was clean.'
   - id: regression-frontend-real-api-proof-uiux-delta-audit
     name: Audit real API proof mobile visual delta
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -56091,6 +56091,80 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-12T16:28:18.859454+00:00'
+    done_at: '2026-05-12T16:38:13.384636+00:00'
+    evidence: 'UI/UX delta audit returned semantic PASS and was merged as artifact-only
+      squash commit `1cb0e9f`.
+
+
+      Closure signals:
+
+      - headline: PASS
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Refs read:
+
+      - `docs/DESIGN.md`: mobile command row behavior / Steer at bottom / touch-safe
+      upward overlay menu expectations.
+
+      - `docs/ARCHITECTURE.md`: frontend boundary and UI expectations.
+
+
+      Delta scope:
+
+      - Source completed step reviewed: `regression-frontend-real-api-proof-remediation`
+
+      - Prior audit applicability note reviewed; final conclusion: prior evidence
+      remains behaviorally valid, CSS delta purely addresses spatial layout without
+      invalidating DOM state rules.
+
+
+      Rendered mobile artifacts and verdicts:
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/uiux-delta-audit/mobile-command-row.png`:
+      PASS — command row fixed to bottom and feed layout respects it via padding.
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/uiux-delta-audit/mobile-utility-bottom-inset.png`:
+      PASS — utility surface respects bottom inset and does not overlap command row.
+
+      - `docs/audits/artifacts/regression-audit-2026-05-12c/uiux-delta-audit/mobile-upward-menu.png`:
+      PASS — surface navigation menu opens upward from bottom command row.
+
+
+      REG artifact continuity:
+
+      - REG-01: prior artifact still acceptable; no manual RUN INGEST/FETCH controls
+      added.
+
+      - REG-03: prior artifact still acceptable; search submit DOM unchanged.
+
+      - REG-05: prior artifact still acceptable; inset spacing preserves existing
+      aria-hidden/inert containment.
+
+      - REG-07: prior artifact still acceptable; receipt scoping logic untouched.
+
+      - REG-08: prior artifact still acceptable; metadata DOM generation untouched.
+
+      - REG-09: prior artifact still acceptable; Inspector heading/body generation
+      untouched.
+
+
+      Scope/mutation audit:
+
+      - Product files modified: no
+
+      - Isolated branch durable artifact commit: `d475145fac4fc2c9c386acfe62fb80f26bf41962`
+
+      - Main squash commit: `1cb0e9f`
+
+      - Mainline artifact status after merge: clean'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
