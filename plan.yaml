@@ -53485,7 +53485,7 @@ phases:
       \ true\norchestrator_action_hint: COMPLETE"
   - id: regression-audit-contract-gate
     name: Gate regression audit contract and expected-red coverage
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -53569,6 +53569,8 @@ phases:
     - regression-audit-mcp-read-item-expected-red-tests
     - regression-audit-llm-health-proof-contract
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T13:26:29.352355+00:00'
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
