@@ -50789,3 +50789,10 @@ phases:
       ## Gaps / Notes
 
       - none'
+- id: mcp-capability-audit-contract-lock-and-expected-red-tests
+  name: MCP Capability Audit — Contract Lock and Expected-Red Tests
+  status: pending
+  gate: Contract/test phase blocks unless audit findings MCP-1 and MCP-2 are translated
+    into explicit proof obligations and MCP-2 has expected-red coverage before implementation.
+  depends_on:
+  - prd-behavior-audit-remediation-final-strict-closure
