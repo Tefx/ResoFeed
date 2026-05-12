@@ -54579,9 +54579,17 @@ phases:
       - Runtime/liveness evidence exists for real `/mcp`, /api/doctor, and feed/model
       health probes.
 
-      - Gate decision basis maps REG-02, REG-04, and REG-06 to OPEN/BLOCK status.
+      - The live OpenRouter retest has closed either on real live PASS or a fully
+      justified non-blocking disposition with gate-intersection reasoning.
 
-      - Any unresolved behavioral evidence has explicit blockers and closure path.'
+      - Gate decision basis maps REG-02, REG-04, and REG-06 to OPEN/BLOCK status,
+      including the live OpenRouter proof/disposition path.
+
+      - Any unresolved behavioral evidence has explicit blockers and closure path.
+
+      - Fallback-only summaries are not counted as live OpenRouter success.
+
+      - Secret redaction is preserved in all reviewed artifacts.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
       \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Backend\
       \ Gate Decision Basis\nREG-2026-05-12-02: <existing MCP chain status + evidence\
@@ -54593,6 +54601,8 @@ phases:
     - regression-mcp-read-item-detail-fix
     - regression-live-llm-health-classification-fix
     - regression-backend-mcp-llm-liveness-probe
+    - regression-backend-mcp-llm-openrouter-live-remediation
+    - regression-backend-mcp-llm-openrouter-live-retest
     agent: gate-reviewer
   - id: regression-backend-mcp-llm-openrouter-live-remediation
     name: Root-cause and remediate live OpenRouter proof failure
