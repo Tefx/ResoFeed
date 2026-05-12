@@ -51376,7 +51376,7 @@ phases:
       \ out of scope for this step."
   - id: mcp-audit-remediation-gate
     name: Gate MCP audit remediation implementation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -51440,6 +51440,8 @@ phases:
     depends_on:
     - mcp-audit-empty-resources-fix
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T09:25:48.300340+00:00'
 - id: mcp-capability-audit-verification-and-finalization
   name: MCP Capability Audit — Verification and Finalization
   status: locked
