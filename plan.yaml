@@ -53958,7 +53958,7 @@ phases:
       closure and recommended downstream reconciliation.'
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
-  status: pending
+  status: in_progress
   gate: Backend gate blocks unless REG-2026-05-12-04 and REG-2026-05-12-06 are remediated
     or dispositioned with runtime proof, and REG-2026-05-12-02 closure remains delegated
     to the existing MCP capability audit chain without duplicate implementation work.
@@ -54078,7 +54078,7 @@ phases:
     agent: golang-developer
   - id: regression-live-llm-health-classification-fix
     name: Classify and repair live LLM health regression
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -54194,6 +54194,8 @@ phases:
       fallback_only_counted_as_success: false\nverdict: PASS | FAIL\nblockers: []\n\
       gate_open_allowed: true | false\nremaining_gaps: []"
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T14:17:26.666739+00:00'
   - id: regression-backend-mcp-llm-liveness-probe
     name: Probe backend MCP and LLM runtime liveness after repair
     status: pending
