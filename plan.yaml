@@ -50796,6 +50796,70 @@ phases:
     into explicit proof obligations and MCP-2 has expected-red coverage before implementation.
   depends_on:
   - prd-behavior-audit-remediation-final-strict-closure
+  steps:
+  - id: mcp-audit-contract-lock
+    name: Lock MCP audit proof obligations and response-shape contract
+    status: pending
+    description: "step_type: contract\ncontract_purity: ENFORCED\ncontract_outputs:\n\
+      \  - signatures\n  - type_defs\n  - interfaces\n  - stubs\nagent_source: project\n\
+      \nLock the acceptance contract for docs/audits/mcp-capability-audit-2026-05-12.md\
+      \ without implementing behavior.\n\nAuthoritative refs and exact audit context:\n\
+      - MCP-1 headline: \"Current localhost MCP instance was unreachable during live\
+      \ probe\". This is a proof/liveness blocker, not proof the handler is broken.\
+      \ The proof obligation is to confirm a listener on localhost/127.0.0.1:8080\
+      \ or the explicitly configured bind address, confirm POST /mcp missing-auth\
+      \ returns HTTP 401 before JSON-RPC dispatch, and confirm a valid owner token\
+      \ can initialize/read MCP resources on the running instance.\n- MCP-2 headline:\
+      \ \"Empty MCP `sources` and `rules/active` resources return `null` arrays\"\
+      . Fresh isolated DB returned `{ \"sources\": null }` and `{ \"rules\": null\
+      \ }`; required responses are `{ \"sources\": [] }` and `{ \"rules\": [] }`.\n\
+      - Architecture MCP Surface defines `resofeed://sources` as JSON `{ \"sources\"\
+      : [Source] }` and `resofeed://rules/active` as JSON `{ \"rules\": [SteerRule]\
+      \ }`.\n- HTTP/MCP type reuse means fixes must preserve canonical response types\
+      \ and not introduce MCP-only product concepts.\n\nPinned public surface:\n-\
+      \ Endpoint: Remote Streamable HTTP `POST /mcp` on the single `resofeed serve`\
+      \ Go binary.\n- Resources: `resofeed://sources`, `resofeed://rules/active`,\
+      \ `resofeed://feed/today`, `resofeed://system/doctor`.\n- Auth: every `/mcp`\
+      \ request requires `Authorization: Bearer <OWNER_TOKEN>`; missing or invalid\
+      \ auth returns HTTP 401 before tool/resource handling.\n- No accounts, OAuth,\
+      \ RBAC, per-agent registry, vector/RAG, sync/merge/event bus/service layer,\
+      \ or delivery-channel ownership may be added.\n\nPermitted output for this step:\n\
+      - Add or clarify contract comments/types/test helper signatures only if needed\
+      \ to make the response shape and liveness proof obligations explicit.\n- Do\
+      \ NOT change runtime logic, resource handlers, database queries, or response\
+      \ constructors.\n\nauthoritative_interface: existing `NewMCPHandler(MCPConfig)\
+      \ http.Handler`; existing resource URIs and response structs `SourcesResponse{Sources\
+      \ []Source}` and `RulesResponse{Rules []SteerRule}`.\n\ntouch_paths:\n- internal/resofeed/mcp.go\n\
+      - internal/resofeed/http.go\n- internal/resofeed/types.go\n- internal/resofeed/mcp_integration_test.go\n\
+      - docs/audits/mcp-capability-audit-2026-05-12.md\n\nharness_refs:\n- internal/resofeed/mcp_integration_test.go\
+      \ real-bound listener helpers\n- internal/resofeed/runtime_startup_test.go lifecycle/readiness\
+      \ helpers\n\nCompletion criteria:\n- Contract/proof obligations are explicit\
+      \ enough that the next expected-red test step can be written without guessing.\n\
+      - No runtime implementation is shipped in this contract step."
+    verification: 'local-check protecting mcp-audit-contract-gate and all downstream
+      MCP audit closure gates.
+
+      - Evidence identifies MCP-1 and MCP-2 as proof obligations with expected closure
+      artifacts.
+
+      - Evidence confirms the step did not implement runtime logic.
+
+      - Evidence confirms ResoFeed invariants remain unchanged: single Go binary,
+      SQLite/FTS5 only, owner-token boundary, no accounts/OAuth/RBAC, no vector/RAG,
+      no sync/merge/event bus/service layer.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/mcp-capability-audit-2026-05-12.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key\
+      \ passage or \"NOT READ: <reason>\"\n\n## Contract Lock Evidence\n- MCP-1 proof\
+      \ obligation recorded: <yes/no, citation>\n- MCP-2 response-shape obligation\
+      \ recorded: <yes/no, citation>\n- Authoritative public surface pinned: <endpoint/resources/types>\n\
+      - Runtime logic changed in this step: <must be no>\n- Product invariants preserved:\
+      \ <single binary/SQLite/owner-token/no forbidden scope>\n\nverdict: PASS | PASS_WITH_DEBT\
+      \ | FAIL\nblockers:\n  - <blocker or none>\ngate_open_allowed: true | false\n\
+      finding_closure:\n  MCP-1: CONTRACT_LOCKED | GAP\n  MCP-2: CONTRACT_LOCKED |\
+      \ GAP"
+    agent: golang-developer
 - id: mcp-capability-audit-remediation
   name: MCP Capability Audit — Remediation
   status: locked
