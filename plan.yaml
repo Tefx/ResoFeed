@@ -51917,6 +51917,125 @@ phases:
 
       remaining_gaps: []'
     agent: golang-developer
+  - id: regression-audit-ui-expected-red-tests
+    name: Add expected-red UI regression tests for audit surface failures
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define UI gaps from the regression audit before frontend remediation. Modify
+      test files only.
+
+
+      Findings covered:
+
+      - REG-2026-05-12-01 — Source Ledger must expose global [RUN INGEST] and per-source
+      [FETCH], with [INGESTING...]/[FETCHING...] states, raw err diagnostics, last_ingest,
+      last_fetch, and no row layout shift.
+
+      - REG-2026-05-12-03 — Search must expose exactly one visible submit control;
+      any secondary submit must be visually hidden and absent from visible control
+      enumeration.
+
+      - REG-2026-05-12-05 — Mobile Search, Source Ledger, and /doctor utility routes
+      must hide or unmount inactive Today feed panels and exclude them from accessibility
+      flow via inert/aria-hidden/equivalent.
+
+      - REG-2026-05-12-07 — Search receipts must be scoped to Search and hidden/cleared
+      on Source Ledger, Today, and /doctor navigation.
+
+      - REG-2026-05-12-08 — Feed row metadata must show compact value/fallback markers
+      once, not repeated diagnostic strings such as `fallback: excerpt-only` plus
+      `quality: fallback: excerpt-only`.
+
+      - REG-2026-05-12-09 — Inspector primary header must not foreground raw `model_status`;
+      raw provider/model diagnostics belong in /doctor or a secondary disclosure.
+
+
+      Scope:
+
+      - Test-only changes in web/src/routes/components/__tests__/, web/src/lib/*test*,
+      Playwright/e2e harness files, or equivalent frontend test locations.
+
+      - Use spec-derived fixtures from docs/DESIGN.md, docs/PRD.md, and docs/ui-preview.html.
+
+      - Include at least one mobile/narrow viewport rendered proof expectation for
+      each utility route named in REG-05.
+
+      - Include accessibility/visibility assertions, not DOM existence only.
+
+
+      Spec-Fixture Conformance (MANDATORY):
+
+      At least one fixture MUST use exact documented labels and surface grammar from
+      docs/DESIGN.md and docs/ui-preview.html: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`,
+      `[FETCHING...]`, `SEARCH`, `SOURCE LEDGER`, `/doctor`.
+
+
+      Expected-red semantics:
+
+      - Red is expected before remediation if the audit failures still reproduce.
+
+      - Success means tests expose the gaps without modifying product implementation
+      code.
+
+      - Evidence MUST list expected_failures or exposed_gaps and identify downstream
+      owners `regression-source-ledger-controls-fix` and `regression-ui-containment-and-diagnostics-fix`.
+
+
+      touch_paths:
+
+      - web/src/routes/components/__tests__/*.test.ts
+
+      - web/src/lib/playwright-e2e-harness-contract.test.ts
+
+      - web/src/test/contract-fixtures.ts
+
+      - docs/audits/artifacts/regression-audit-2026-05-12c/*
+
+
+      harness_refs:
+
+      - existing Svelte component tests
+
+      - existing Playwright/browser-use audit artifact patterns
+
+
+      authoritative_interface: documented UI labels and visual/accessibility states
+      from DESIGN.md/PRD/ui-preview.
+
+
+      No product code changes are allowed in this step.'
+    verification: 'local-check protecting regression-audit-contract-gate and frontend
+      remediation.
+
+      - Modified files are limited to tests/fixtures/harnesses.
+
+      - Focused UI tests expose REG-01, REG-03, REG-05, REG-07, REG-08, and REG-09
+      before implementation.
+
+      - Tests use rendered output/visibility/accessibility assertions, including mobile/narrow
+      viewport cases.
+
+      - Evidence includes expected-red command output and artifact paths.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red\
+      \ UI Test Evidence\nexpected_failures:\n  REG-2026-05-12-01: <test name + failure\
+      \ summary>\n  REG-2026-05-12-03: <test name + failure summary>\n  REG-2026-05-12-05:\
+      \ <test name + failure summary>\n  REG-2026-05-12-07: <test name + failure summary>\n\
+      \  REG-2026-05-12-08: <test name + failure summary>\n  REG-2026-05-12-09: <test\
+      \ name + failure summary>\ncommands:\n  - <exact command>\noutputs_or_artifacts:\n\
+      \  - <path or pasted output>\nverdict: PASS | FAIL\nblockers: []\ngate_open_allowed:\
+      \ true | false\nremaining_gaps: []"
+    depends_on:
+    - regression-audit-contract-matrix
+    agent: frontend-engineer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
