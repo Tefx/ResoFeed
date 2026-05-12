@@ -54594,6 +54594,139 @@ phases:
     - regression-live-llm-health-classification-fix
     - regression-backend-mcp-llm-liveness-probe
     agent: gate-reviewer
+  - id: regression-backend-mcp-llm-openrouter-live-remediation
+    name: Root-cause and remediate live OpenRouter proof failure
+    status: pending
+    description: "step_type: implementation\npriority: HIGH\nagent_source: project\n\
+      \nBatched remediation for the blocking live OpenRouter liveness failure reported\
+      \ by `regression-backend-mcp-llm-liveness-probe`.\n\nScope and required inputs:\n\
+      - Inspect the salvaged/committed live-failure artifacts before changing anything:\n\
+      \  - `tests/repro/regression_backend_mcp_llm_liveness_probe.py`\n  - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/report.json`\n\
+      \  - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/doctor_after_live_probe.txt`\n\
+      \  - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_feed_today.json`\n\
+      \  - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/live_source_fetch.json`\n\
+      \  - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/mcp_read_item.json`\n\
+      - Treat prior deterministic backend/MCP proof and REG-04 `read_item` full-detail\
+      \ proof as salvaged; do not rework those unless investigation proves they are\
+      \ causally involved.\n- Mainline reproduction command family is authoritative:\
+      \ `go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py`.\n\
+      \nRoot-cause classification required:\n- Determine whether `model_status=model_latency_error`,\
+      \ `live_summary_successes=0`, and `health_classification=openrouter_client_timeout_or_error`\
+      \ are caused by:\n  1. product bug in Go live LLM/OpenRouter handling, timeout\
+      \ accounting, health classification, or summary persistence;\n  2. repo-owned\
+      \ config/test harness issue, including `.env` loading or timeout budget;\n \
+      \ 3. provider/auth/model availability or transient latency outside repo control;\n\
+      \  4. environment/policy limitation that prevents reliable live provider proof\
+      \ in this workspace.\n\nRequired action:\n- If repo-owned, repair the product/config/test\
+      \ harness in the smallest safe seam and preserve ResoFeed architecture invariants:\
+      \ one Go binary, SQLite/FTS5 only, no accounts/OAuth/RBAC, no vector/RAG, no\
+      \ sync/merge/event bus/service layer.\n- If non-repo-owned, produce explicit\
+      \ non-blocking disposition evidence with gate-intersection reasoning: why this\
+      \ provider limitation does not invalidate the backend/MCP/LLM phase gate or\
+      \ final closure, what deterministic/runtime proofs remain valid, and what future\
+      \ live-provider condition would re-open the obligation.\n- Preserve secret redaction\
+      \ and `.env` handling. Never print or commit `OPENROUTER_KEY` or derived secrets.\n\
+      - No fallback-only summaries may count as live success. Any success accounting\
+      \ must distinguish live model summary success from fallback synthesis.\n\n##\
+      \ Gate Preview (what the gate WILL reject)\n1. Treating the issue as missing-key\
+      \ after evidence shows `external_openrouter_env_present=true`.\n2. Counting\
+      \ fallback-only summaries as live OpenRouter success.\n3. A vague retry-only\
+      \ explanation without product/provider/environment classification.\n4. Non-blocking\
+      \ disposition without explicit gate-intersection reasoning.\n5. Any artifact\
+      \ or log that leaks `OPENROUTER_KEY`.\n\n## Completion Criteria (stub exclusion)\n\
+      This is an IMPLEMENTATION/remediation step. Stub-only completion is NOT acceptable.\
+      \ Any repo-owned fix MUST contain substantive logic or harness/config changes\
+      \ that close the observed failure path rather than masking it."
+    verification: 'phase-check protecting regression-backend-mcp-llm-gate and final
+      closure.
+
+      - Evidence includes root-cause classification for the OpenRouter live failure.
+
+      - If repo-owned: targeted fix is implemented and the authoritative live probe
+      command family is ready for independent retest.
+
+      - If non-repo-owned: disposition explicitly proves non-intersection with remaining
+      backend/MCP/LLM gate and final closure obligations.
+
+      - Secret redaction confirmed; no OPENROUTER_KEY value or derived secret appears
+      in logs/artifacts.
+
+      - Live success accounting does not count fallback-only summaries.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Live OpenRouter Remediation Evidence
+
+
+      **Failure artifacts inspected**:
+
+      - `report.json`: <key fields and conclusion>
+
+      - `doctor_after_live_probe.txt`: <key health lines>
+
+      - `live_feed_today.json`: <live/fallback accounting evidence>
+
+      - `live_source_fetch.json`: <fetch/import result>
+
+      - `mcp_read_item.json`: <REG-04 preserved proof>
+
+
+      **Root-cause classification**: product_bug | repo_config_or_harness | provider_or_auth
+      | environment_or_policy_limitation
+
+
+      **Reasoning**:
+
+      - Observed status: `model_status=<value>`, `live_summary_successes=<count>`,
+      `health_classification=<value>`
+
+      - Why this is/is not repo-owned:
+
+      - Why fallback-only summaries were not counted as live success:
+
+
+      **Changes made if repo-owned**:
+
+      - Files changed:
+
+      - Failure path closed:
+
+      - Secret redaction preserved:
+
+
+      **Non-blocking disposition if non-repo-owned**:
+
+      - Provider/environment limitation:
+
+      - Gate-intersection reasoning:
+
+      - Remaining deterministic/runtime proofs that still satisfy backend/MCP/LLM
+      obligations:
+
+      - Future condition that would re-open live provider proof:
+
+
+      **Verification command family prepared for retest**:
+
+      ```bash
+
+      go build -o ./bin/resofeed ./cmd/resofeed && python3 tests/repro/regression_backend_mcp_llm_liveness_probe.py
+
+      ```
+
+
+      **Headline**: REPAIRED | NON_BLOCKING_DISPOSITION | BLOCKED'
+    depends_on:
+    - regression-backend-mcp-llm-liveness-probe
+    agent: golang-developer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
   status: done
