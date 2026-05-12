@@ -65,9 +65,9 @@ const expectations: readonly FindingExpectation[] = [
   { id: 'F22', cluster: 'Inspector', source: 'docs/DESIGN.md', expectation: 'Mobile Inspector star is not visible in the first viewport' },
   { id: 'F23', cluster: 'Inspector', source: 'docs/DESIGN.md', expectation: 'Raw provenance disclosure copy is too diagnostic-heavy' },
   { id: 'F24', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'Source Ledger does not follow the required DOM contract' },
-  { id: 'F25', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Manual ingest actions look like bordered buttons' },
+  { id: 'F25', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Manual ingest actions must not be exposed from Source Ledger' },
   { id: 'F26', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Delete action is x instead of [DELETE]' },
-  { id: 'F27', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Import/export actions are lowercase and not bracket actions' },
+  { id: 'F27', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Import/export actions are bracket actions; fetch controls must not be exposed' },
   { id: 'F28', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source Ledger shows a false imported status by default' },
   { id: 'F29', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source rows omit a stable URL column' },
   { id: 'F30', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'last fetch / last ingest labels are not canonical' },
@@ -242,8 +242,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   await page.setViewportSize({ width: 1280, height: 900 });
   const ledgerText = await visibleText(page.locator('body'));
   if (await page.locator('.source-ledger, [data-testid="source-ledger"], .source-row, [data-testid="source-row"]').count() === 0) note(violations, 'F24', 'Source Ledger lacks required stable DOM contract classes/test ids');
-  if (await page.getByRole('button', { name: '[RUN INGEST]' }).count() === 0) note(violations, 'F25', 'missing canonical [RUN INGEST] action');
-  if (await page.locator('.source-ledger__row').filter({ hasText: '[FETCH]' }).count() === 0) note(violations, 'F27', 'missing canonical visible [FETCH] per-source action');
+  if (await page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ }).count() > 0) note(violations, 'F25', 'Source Ledger exposes forbidden manual ingest/fetch action controls');
   if (!/\[DELETE\]/.test(ledgerText)) note(violations, 'F26', `delete action is not visible canonical [DELETE]: ${ledgerText}`);
   if (!/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F27', `OPML import action is not visible canonical [IMPORT OPML]: ${ledgerText}`);
   if (/imported \d+ sources; folders flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
