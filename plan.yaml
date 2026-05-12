@@ -55089,7 +55089,7 @@ phases:
       Post-verification status for changed source/artifact paths was clean.'
   - id: regression-frontend-route-integration-retest
     name: Retest frontend routes and Source Ledger boundary behavior
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -55302,6 +55302,80 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-12T16:21:20.478468+00:00'
+    done_at: '2026-05-12T16:27:55.827922+00:00'
+    evidence: 'Frontend route integration retest returned semantic PASS.
+
+
+      Closure signals:
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Refs read:
+
+      - `docs/ARCHITECTURE.md`: one deployable Go process serves static SvelteKit
+      app, JSON HTTP API, MCP, and background ingest; one SQLite DB; thin transports
+      share product operations.
+
+      - `docs/DESIGN.md`: dense analyst workbench; Source Ledger/State Portability
+      defined surfaces with terse operational labels and no SaaS/settings/folder/tag/archive
+      drift.
+
+
+      Real API proof rerun:
+
+      - `npm --prefix web run test:e2e -- ui-remediation-r1-r8-browser-retest.spec.ts
+      --project=chromium-ci-safe` -> 1 passed.
+
+      - Evidence states the spec uses browser `window.fetch` calls to `/api/ingest`,
+      `/api/sources`, `/api/feed/today`, `/api/search`, and `/api/doctor`, plus an
+      actual Dirty Inspector Corpus fixture feed server; it does not install `page.route`
+      API mocks.
+
+      - Real API state proof includes source URL on 127.0.0.1, `last_fetch_status:
+      ok`, feedItemCount 12, searchItemCount 10, and doctor first line `rss: ok`.
+
+
+      Focused regression coverage:
+
+      - `npm --prefix web run test:e2e -- regression-audit-ui-expected-red.spec.ts
+      --project=chromium-ci-safe` -> 6 passed.
+
+      - `npm --prefix web run check` -> `svelte-check found 0 errors and 0 warnings`.
+
+
+      Finding verdicts:
+
+      - REG-2026-05-12-01: PASS
+
+      - REG-2026-05-12-03: PASS
+
+      - REG-2026-05-12-05: PASS
+
+      - REG-2026-05-12-07: PASS
+
+      - REG-2026-05-12-08: PASS
+
+      - REG-2026-05-12-09: PASS
+
+
+      Scope/mutation audit:
+
+      - Product implementation files modified: no
+
+      - Commit hash(es): none — verify-only retest; no files changed
+
+      - Files changed: none'
   - id: regression-frontend-uiux-audit
     name: Audit regression UI repairs and Source Ledger boundary against DESIGN.md
     status: done
