@@ -54596,7 +54596,7 @@ phases:
     agent: gate-reviewer
 - id: regression-audit-remediation-frontend-surface-repair
   name: Regression Audit Remediation — Frontend Surface Repair
-  status: in_progress
+  status: done
   gate: Frontend gate blocks unless REG-2026-05-12-01 is adjudicated against canonical
     Source Ledger boundaries, forbidden `[RUN INGEST]` / `[FETCH]` controls are not
     reintroduced, REG-2026-05-12-03, -05, -07, -08, and -09 are fixed with rendered
@@ -55543,7 +55543,7 @@ phases:
       - Files changed: none'
   - id: regression-frontend-surface-gate
     name: Gate frontend regression surface repair with Source Ledger boundary
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -55639,6 +55639,75 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T16:38:35.117241+00:00'
+    done_at: '2026-05-12T17:10:07.658275+00:00'
+    evidence: 'Gate reviewer returned semantic PASS with `headline: PASS`, `verdict:
+      PASS`, `gate_open_allowed: true`, `orchestrator_action_hint: COMPLETE`, `blockers:
+      []`.
+
+
+      Artifacts/commit:
+
+      - Worktree commit: 4d0c428e7966cfa0f513b3d268ff83d84cb682a8 (`mcp: add regression
+      frontend surface gate evidence`)
+
+      - Main squash merge commit: f366150 (`[vectl] step-regression-frontend-surface-gate
+      completed`)
+
+      - Added artifact: `docs/audits/artifacts/regression-audit-2026-05-12c/regression-frontend-surface-gate.md`
+
+
+      Gate proof summary:
+
+      - REG-01, REG-03, REG-05, REG-07, REG-08, and REG-09 mapped CLOSED.
+
+      - Behavioral proof register reported all frontend regression surface claims
+      PROVEN, with warning-only historical-doc drift explicitly non-intersecting final
+      acceptance.
+
+      - W1-W8 wiring audit all PASS.
+
+      - Escape hatch audit: scoped `rg` for `@invar:allow|invar:allow` produced no
+      output.
+
+      - Forbidden Source Ledger controls audit: scoped `rg` for `[RUN INGEST]`, `[INGESTING...]`,
+      `[FETCH]`, `[FETCHING...]` in non-test frontend source produced no output.
+
+      - Liveness/smoke distinguished fixture-driven expected-red tests from real local
+      integration proof via `ui-remediation-r1-r8-browser-retest.spec.ts`.
+
+
+      Subagent verification:
+
+      - `npm run check && npx playwright test --config ./playwright.config.ts web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts
+      --project=chromium-ci-safe` from `web/`: exit 0; svelte-check 0 errors/0 warnings;
+      production build completed; 1 focused real-API browser retest passed.
+
+      - `npx playwright test --config ./playwright.config.ts web/tests/e2e/regression-audit-ui-expected-red.spec.ts
+      --project=chromium-ci-safe` from `web/`: exit 0; 6 passed for REG-01/03/05/07/08/09.
+
+
+      Mainline final-state verification after squash merge:
+
+      - From `web/`: `npm run check && npx playwright test --config ./playwright.config.ts
+      "web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts" --project=chromium-ci-safe
+      && npx playwright test --config ./playwright.config.ts "web/tests/e2e/regression-audit-ui-expected-red.spec.ts"
+      --project=chromium-ci-safe`
+
+      - Exit 0; svelte-check found 0 errors and 0 warnings; production build completed;
+      R1-R8 focused test `1 passed`; regression-audit expected-red suite `6 passed`.
+
+
+      Gaps/notes:
+
+      - Product code was not modified by this gate.
+
+      - Destructive Source Ledger delete was source/rendered verified but not independently
+      end-to-end deleted in this gate.
+
+      - Chromium was the browser target for Playwright verification.
+
+      - Historical stale artifacts remain but are superseded by current adjudication
+      and active negative tests.'
   - id: regression-frontend-real-api-proof-remediation
     name: Remediate real API frontend proof blockers
     status: done
