@@ -54331,6 +54331,13 @@ phases:
       surfaces from a fresh perspective.
 
 
+      This step owns residual external live probe ambiguity from `regression-live-llm-health-classification-fix`.
+      Implementation evidence may truthfully report `external_live_probe_unavailable`;
+      this liveness step must then either obtain real runtime proof or return blockers
+      with a closure path. Do not allow unavailable live prerequisites to be silently
+      treated as live success.
+
+
       Scope:
 
       - REG-2026-05-12-04: real `/mcp` read_item proof for full extraction detail
@@ -54355,6 +54362,11 @@ phases:
 
       - Probe /api/doctor and feed summary/model status with secrets redacted.
 
+      - If actual OpenRouter credentials/live server are unavailable, produce an explicit
+      `external_live_probe_unavailable` blocker with the missing prerequisite, non-secret
+      artifact, and closure path; still run deterministic/stub runtime proof where
+      possible.
+
 
       Independence Level: L2 semi-blind integration verification because this spans
       runtime API, MCP, storage, and external model/stub behavior.
@@ -54374,18 +54386,90 @@ phases:
       - REG-06: /api/doctor/current feed evidence classifies live health and does
       not count fallback-only summaries as live model success.
 
+      - External live ownership: if OpenRouter/live-server prerequisites are unavailable,
+      evidence must say `external_live_probe_unavailable`, list blockers/closure path,
+      and keep gate_open_allowed=false for live proof while preserving deterministic/stub
+      proof status.
+
       - REG-02: evidence references existing MCP audit chain closure for empty resource
       arrays.
 
       - Evidence includes exact commands, redacted outputs, and artifact paths.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
-      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Backend/MCP/LLM\
-      \ Liveness Report\nentrypoint_command: <exact command>\ncommands:\n  - <exact\
-      \ HTTP/MCP/doctor/feed probes>\noutputs_or_artifacts:\n  - <artifact path or\
-      \ pasted output>\nREG-2026-05-12-02: <existing MCP chain evidence ref>\nREG-2026-05-12-04:\
-      \ <PASS/FAIL + evidence path>\nREG-2026-05-12-06: <PASS/FAIL + classification\
-      \ + evidence path>\nverdict: PASS | PASS_WITH_DEBT | FAIL\nblockers: []\ngate_open_allowed:\
-      \ true | false\nremaining_gaps: []"
+    evidence_template: '## Verification Report
+
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Scope**: backend MCP and LLM runtime liveness
+
+      **Independence Level**: L2
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Runtime Commands
+
+      ```
+
+      <single-binary startup and probe commands>
+
+      ```
+
+
+      ### MCP Proof
+
+      - Request path and redacted output for `/mcp` read_item full extraction detail.
+
+
+      ### LLM Health Proof
+
+      - Deterministic/stub proof status: PASS|FAIL with artifact.
+
+      - External live proof status: PASS|FAIL|external_live_probe_unavailable.
+
+      - If unavailable: missing prerequisite and closure path.
+
+      - Fallback-only summaries counted as live model success? NO required.
+
+
+      ### Gate Decision Basis
+
+      | Requirement | Evidence ref | Status | Closure path |
+
+      | --- | --- | --- | --- |
+
+      | REG-04 read_item detail | <artifact> | PROVEN/UNPROVEN | <path> |
+
+      | REG-06 deterministic classification | <artifact> | PROVEN/UNPROVEN | <path>
+      |
+
+      | REG-06 external live probe | <artifact> | PROVEN/UNPROVEN/external_live_probe_unavailable
+      | <path> |
+
+      | REG-02 MCP resource arrays | <artifact> | PROVEN/DELEGATED | <path> |
+
+
+      gate_open_allowed: true|false
+
+      blockers: <list or []>'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PRD.md
     depends_on:
     - regression-mcp-read-item-detail-fix
     - regression-live-llm-health-classification-fix
