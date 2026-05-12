@@ -53958,7 +53958,7 @@ phases:
       closure and recommended downstream reconciliation.'
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
-  status: in_progress
+  status: done
   gate: Backend gate blocks unless REG-2026-05-12-04 and REG-2026-05-12-06 are remediated
     or dispositioned with runtime proof, and REG-2026-05-12-02 closure remains delegated
     to the existing MCP capability audit chain without duplicate implementation work.
@@ -54638,7 +54638,7 @@ phases:
       disposition the live OpenRouter proof gap.'
   - id: regression-backend-mcp-llm-gate
     name: Gate backend MCP and LLM regression repair
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -54705,6 +54705,105 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-12T18:32:54.738253+00:00'
+    done_at: '2026-05-12T18:44:08.550272+00:00'
+    evidence: 'Gate-reviewer completed backend MCP/LLM regression gate with semantic
+      PASS_WITH_DEBT accepted as non-blocking.
+
+
+      Gate decision fields:
+
+      - headline: PASS_WITH_DEBT
+
+      - verdict: PASS
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blocking_status: CLOSED
+
+      - proof_gap_status: NON_BLOCKING
+
+      - blockers: []
+
+
+      REG mapping:
+
+      - REG-2026-05-12-02: CLOSED via existing MCP capability chain and `internal/resofeed/mcp_integration_test.go`
+      empty array resource assertions.
+
+      - REG-2026-05-12-04: CLOSED via real `/mcp` `read_item` proof in `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/mcp_read_item.json`;
+      report shows HTTP 200 and full text marker present.
+
+      - REG-2026-05-12-06: CLOSED_WITH_NON_BLOCKING_DEBT; Doctor/feed/preflight artifacts
+      classify live OpenRouter as provider/auth guardrail limitation; fallback-only
+      summaries were not counted as live success.
+
+
+      Required audits/evidence:
+
+      - Behavioral proof register included runtime `resofeed serve`, `/api/doctor`,
+      `/api/feed/today`, public source fetch, real `/mcp read_item`, MCP sources resource,
+      live OpenRouter disposition, and secret redaction.
+
+      - Wiring audit W1-W8: single runtime binary PASS; SQLite/FTS boundary PASS;
+      owner-token auth boundary PASS; HTTP API liveness PASS; MCP Streamable HTTP
+      liveness PASS; LLM live/fallback classification PASS_WITH_DEBT; secret handling/redaction
+      PASS; architecture invariants PASS.
+
+      - Escape hatch audit: scoped `rg -n ''@invar:allow|invar:allow'' ...` exited
+      1 with no scoped source/ref escape hatches found.
+
+      - Secret redaction: raw key scan reported `leak_count: 0`.
+
+
+      Subagent verification:
+
+      - `go test ./...`: exit 0; `ok resofeed/internal/resofeed 0.687s`.
+
+      - `mkdir -p bin && go build -o ./bin/resofeed ./cmd/resofeed && .venv/bin/python
+      tests/repro/regression_backend_mcp_llm_liveness_probe.py`: exit 0; probe `status:
+      PASS`, `failures: []`.
+
+      - Raw OpenRouter key artifact scan via `.venv/bin/python`: exit 0; `key_present:
+      True`, `files_scanned: 15`, `leak_count: 0`.
+
+
+      Artifacts/commits:
+
+      - Worktree commit: `5d4c918` (`audit: record backend mcp llm gate`).
+
+      - Main squash commit: `456e51b` (`[vectl] step-regression-backend-mcp-llm-gate
+      completed`).
+
+      - Mainline evidence commit: `484d0ab` (`[vectl] record mainline backend gate
+      verification`).
+
+      - Added gate artifact: `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/gate-reviewer-final-gate.md`.
+
+
+      Mainline final-state verification after merge:
+
+      - Command: `go test ./... && go build -o ./bin/resofeed ./cmd/resofeed && python3
+      tests/repro/regression_backend_mcp_llm_liveness_probe.py`.
+
+      - Exit 0.
+
+      - `go test ./...`: `ok resofeed/internal/resofeed (cached)`.
+
+      - Liveness probe output: `status: PASS`, `failures: []`, `external_live_probe_status=external_live_probe_nonblocking_provider_or_auth`,
+      `external_openrouter_env_present=true`, `/mcp read_item` full text marker present,
+      `contains_raw_secret=false`.
+
+
+      Gaps/notes:
+
+      - Real live OpenRouter `model_status=ok` was not proven due provider/account
+      guardrail/data-policy restriction, but this is explicitly non-blocking and does
+      not intersect backend gate/final closure while deterministic runtime/MCP/LLM
+      fallback accounting remains valid.
+
+      - Transient SQLite DB directories and built binary were not committed.'
   - id: regression-backend-mcp-llm-openrouter-live-remediation
     name: Root-cause and remediate live OpenRouter proof failure
     status: done
@@ -56837,7 +56936,7 @@ phases:
       - Mainline artifact status after merge: clean'
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
-  status: locked
+  status: pending
   gate: Final closure blocks unless every actionable finding REG-2026-05-12-01 through
     REG-2026-05-12-09 has finding-by-finding verdict, blockers, gate_open_allowed,
     artifact paths, and explicit remaining gaps; REG-02 must cite the existing MCP
