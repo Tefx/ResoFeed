@@ -53184,7 +53184,7 @@ phases:
     agent: frontend-engineer
   - id: regression-audit-mcp-read-item-expected-red-tests
     name: Add expected-red MCP read_item detail-text tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -53294,6 +53294,8 @@ phases:
     depends_on:
     - regression-audit-contract-matrix
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T13:04:23.468148+00:00'
   - id: regression-audit-llm-health-proof-contract
     name: Define live LLM health classification proof obligations
     status: claimed
