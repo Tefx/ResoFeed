@@ -54705,7 +54705,7 @@ phases:
     agent: gate-reviewer
   - id: regression-backend-mcp-llm-openrouter-live-remediation
     name: Root-cause and remediate live OpenRouter proof failure
-    status: pending
+    status: claimed
     description: "step_type: implementation\npriority: HIGH\nagent_source: project\n\
       \nBatched remediation for the blocking live OpenRouter liveness failure reported\
       \ by `regression-backend-mcp-llm-liveness-probe`.\n\nScope and required inputs:\n\
@@ -54836,6 +54836,8 @@ phases:
     depends_on:
     - regression-backend-mcp-llm-liveness-probe
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-12T18:10:42.968905+00:00'
   - id: regression-backend-mcp-llm-openrouter-live-retest
     name: Retest live OpenRouter proof after remediation or disposition
     status: pending
