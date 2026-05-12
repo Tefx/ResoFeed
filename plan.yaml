@@ -53680,6 +53680,101 @@ phases:
     - regression-audit-mcp-read-item-expected-red-tests
     - regression-audit-llm-health-proof-contract
     agent: frontend-engineer
+  - id: regression-audit-contract-gate-rerun
+    name: Re-gate regression audit contract blocker remediation
+    status: pending
+    description: "Gate review rerun for the failed `regression-audit-contract-gate`\
+      \ blockers after the batched remediation step.\n\nstep_type: gate\nverification_scope:\
+      \ phase-check\nagent_source: project\nreview_depth: THOROUGH\nreview_depth_rationale:\n\
+      - Prior gate returned semantic BLOCKED.\n- REG-01 has an authority contradiction\
+      \ across active expected-red UI tests.\n- Durable artifact review is required\
+      \ because plan/evidence-only matrix text was insufficient.\n- Frontend verification\
+      \ previously failed to reproduce due to missing web dependencies / SvelteKit\
+      \ command availability.\n\nAs an INDEPENDENT REVIEWER (`gate-reviewer`), assess\
+      \ whether the contract/test phase now has an executable closure path.\n\nRequired\
+      \ review focus:\n1. Durable matrix artifact review.\n   - Confirm `docs/audits/regression-audit-2026-05-12-contract-matrix.md`\
+      \ exists.\n   - Confirm REG-01 through REG-09 are represented exactly once as\
+      \ owner-matrix entries.\n   - Confirm each REG item has downstream owner step(s),\
+      \ expected-red/proof coverage, and closure phase/gate.\n2. REG-01 contradiction\
+      \ repair.\n   - Confirm active expected-red tests no longer click or require\
+      \ `[RUN INGEST]` / `[FETCH]` as Source Ledger controls.\n   - Confirm Source\
+      \ Ledger forbidden-control negative assertions remain in the regression-audit\
+      \ UI expected-red tests.\n3. REG-02 delegation.\n   - Confirm REG-02 is delegated\
+      \ to the existing MCP capability/downstream owner chain and not duplicated into\
+      \ a conflicting owner path.\n4. Expected-red semantics.\n   - Confirm tests\
+      \ remain expected-red/proof-oriented and do not silently become product implementation\
+      \ or green-only checks before remediation.\n5. Reproducible frontend verification.\n\
+      \   - Confirm evidence includes repo-native dependency bootstrap when needed,\
+      \ then `npm --prefix web run check`, then a focused expected-red Playwright\
+      \ command with actual output.\n\nGate decision basis requirement:\n- Produce\
+      \ a structured blocker register mapping B-REG01-CONTRACT-CONTRADICTION, B-MATRIX-NOT-VERIFIABLE,\
+      \ and B-FRONTEND-VERIFICATION-NOT-REPRODUCED to PROVEN / NEEDS_TEST / UNPROVEN\
+      \ / UNCERTAIN_BLOCKING.\n- Gate may OPEN only if all three blockers are PROVEN\
+      \ or have explicit non-intersection evidence with downstream gates.\n- Any unresolved\
+      \ behavioral/runtime evidence must BLOCK and name the required follow-up remediation\
+      \ owner."
+    verification: 'phase-check protecting downstream `regression-audit-remediation-backend-mcp-and-live-llm-repair`,
+      `regression-audit-remediation-frontend-surface-repair`, and final independent
+      closure phases.
+
+
+      Required gate evidence:
+
+      - Durable matrix artifact reviewed and REG-01..REG-09 exact-once ownership verified.
+
+      - REG-01 contradiction repaired: no active Source Ledger expected-red path requires
+      `[RUN INGEST]` or `[FETCH]`, and negative forbidden-control assertions are preserved.
+
+      - REG-02 delegation verified against the existing MCP capability/downstream
+      owner path.
+
+      - Expected-red semantics verified: contract/test artifacts expose gaps without
+      product implementation changes.
+
+      - Reproducible frontend check verified: dependency bootstrap decision/command,
+      `npm --prefix web run check`, and focused expected-red Playwright command are
+      present with actual output.
+
+      - Structured gate decision basis includes PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      status for each original blocker and an OPEN/BLOCK recommendation.'
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: regression-audit-remediation-contract-matrix-and-expected-red-tests\n\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/audits/regression-audit-2026-05-12.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/audits/regression-audit-2026-05-12-contract-matrix.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage\
+      \ or \"NOT READ: <reason>\"\n- web/tests/e2e/regression-audit-ui-expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n### Original Blocker Closure Register\n\
+      | Blocker | Requirement Ref | Behavior Claim | Runtime/Artifact Proof Expected\
+      \ | Evidence Ref | Status | Closure Path | Gate Decision Basis |\n|---|---|---|---|---|---|---|---|\n\
+      | B-REG01-CONTRACT-CONTRADICTION | REG-01 | Source Ledger active tests forbid\
+      \ RUN INGEST/FETCH controls and contain no contradictory stale active expectation\
+      \ | test search + assertion excerpts | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <OPEN/BLOCK reason> |\n| B-MATRIX-NOT-VERIFIABLE | REG-01..REG-09\
+      \ | Durable matrix maps each REG item exactly once with owners | docs/audits/regression-audit-2026-05-12-contract-matrix.md\
+      \ | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <OPEN/BLOCK\
+      \ reason> |\n| B-FRONTEND-VERIFICATION-NOT-REPRODUCED | frontend check workflow\
+      \ | Frontend check and focused expected-red command are reproducible after repo-native\
+      \ dependency bootstrap | command outputs | <ref> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <OPEN/BLOCK reason> |\n\n### Durable Matrix Review\n- Artifact\
+      \ exists: YES/NO\n- REG exact-once result:\n  ```\n  <paste verification output>\n\
+      \  ```\n- REG-02 delegation reviewed: YES/NO\n- Missing/duplicated REG entries:\
+      \ <none/list>\n\n### Expected-Red Contract Review\n- Active RUN INGEST/FETCH\
+      \ contradictions found:\n  ```\n  <paste search output or none>\n  ```\n- Source\
+      \ Ledger negative assertions preserved:\n  ```\n  <paste assertion excerpts>\n\
+      \  ```\n- Product implementation changes included in fix: YES/NO\n\n### Frontend\
+      \ Reproducibility Review\n- Dependency bootstrap command reviewed: <command\
+      \ or not needed, with evidence>\n- `npm --prefix web run check` output reviewed:\
+      \ PASS/FAIL\n- Focused expected-red Playwright output reviewed: PASS/FAIL/EXPECTED-RED\
+      \ AS DESIGNED\n\n### Gate Decision\n- [ ] OPEN: all original blockers are closed\
+      \ and downstream phases may proceed\n- [ ] BLOCKED: unresolved blockers remain\n\
+      \  - Blocking issues: <list>\n  - Required follow-up owner(s): <steps/agents>\n\
+      \n**Confidence**: high/medium/low"
+    depends_on:
+    - regression-audit-contract-gate-batched-fix
+    agent: gate-reviewer
 - id: regression-audit-remediation-backend-mcp-and-live-llm-repair
   name: Regression Audit Remediation — Backend, MCP, and Live LLM Repair
   status: locked
