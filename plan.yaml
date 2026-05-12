@@ -52750,6 +52750,136 @@ phases:
       \ <yes/no + evidence>\nverdict: PASS | FAIL\nblockers: []\ngate_open_allowed:\
       \ true | false\nremaining_gaps: []"
     agent: frontend-engineer
+  - id: regression-ui-containment-and-diagnostics-fix
+    name: Fix UI containment receipts and diagnostic presentation regressions
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete frontend repairs for REG-2026-05-12-03, REG-2026-05-12-05, REG-2026-05-12-07,
+      REG-2026-05-12-08, and REG-2026-05-12-09. This step is serialized after `regression-source-ledger-controls-fix`
+      because both likely touch `web/src/routes/+page.svelte` and app-level route/surface
+      state.
+
+
+      Findings covered:
+
+      - REG-2026-05-12-03 — Search exposes duplicate visible submit controls (`search`
+      and `submit search`).
+
+      - REG-2026-05-12-05 — Mobile Search, Source Ledger, and /doctor leak inactive
+      Today feed into visual/accessibility flow.
+
+      - REG-2026-05-12-07 — Source Ledger inherits stale Search receipt (`retrieval:
+      lexical search`).
+
+      - REG-2026-05-12-08 — Feed row metadata repeats internal fallback labels such
+      as `fallback: excerpt-only` and `quality: fallback: excerpt-only`.
+
+      - REG-2026-05-12-09 — Inspector foregrounds raw `model_status` in the primary
+      reading header.
+
+
+      YOUR SCOPE:
+
+      - Keep exactly one visible Search submit control; any secondary submit must
+      be genuinely visually hidden and absent from visible control enumeration.
+
+      - On narrow/mobile Search, Source Ledger, and /doctor utility routes, hide or
+      unmount inactive Today feed panels and apply inert/aria-hidden/equivalent so
+      inactive feed is outside reading/accessibility flow.
+
+      - Scope retrieval receipts to Search and clear/hide them when navigating to
+      Source Ledger, Today, or /doctor.
+
+      - Make feed row fallback/model metadata compact: one terse marker such as `excerpt`
+      or `fallback`, with detailed model/fallback explanation moved to Inspector disclosure
+      or /doctor.
+
+      - Keep Inspector primary metadata focused on source, extraction status, summary
+      provenance, title, original link, summary, core insight, full text/excerpt,
+      and why-this-appeared; move raw model_status to /doctor or secondary disclosure.
+
+
+      Likely touch paths:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/item-anatomy.ts
+
+      - web/src/app.css
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered visible DOM evidence. Logic-only view-model changes
+      are insufficient. Evidence MUST include DOM snapshots/screenshots or test-renderer
+      output for Search, Source Ledger, /doctor mobile route, feed row, and Inspector
+      header states.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable; changes
+      must process actual route/surface state and item metadata.
+
+
+      known_risks:
+
+      - Output/formatting drift: diagnostic text belongs in /doctor or secondary disclosure,
+      not dense feed/primary Inspector surfaces.
+
+      - Accessibility drift: hidden panels must be absent from visible and accessibility
+      flow, not merely visually off-screen while still focusable.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Two visible Search submit controls.
+
+      2. Mobile utility routes with inactive Today feed still visible, focusable,
+      or present in accessibility snapshots.
+
+      3. Search receipt visible on Source Ledger, Today, or /doctor.
+
+      4. Repeated raw fallback/model diagnostics in feed rows or Inspector primary
+      header.
+
+      5. Design drift from dense archival workbench grammar or forbidden SaaS/onboarding/product
+      creep.'
+    verification: 'local-check protecting frontend runtime retest and uiux audit.
+
+      - REG-03, REG-05, REG-07, REG-08, and REG-09 expected-red tests now pass.
+
+      - Rendered evidence shows one visible Search submit control.
+
+      - Mobile/narrow Search, Source Ledger, and /doctor evidence shows inactive Today
+      feed absent from visual and accessibility flow.
+
+      - Feed row and Inspector artifacts show compact/non-diagnostic primary presentation.
+
+      - No forbidden UI/product scope is introduced.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## UI Containment\
+      \ and Diagnostic Presentation Fix Evidence\ncommands:\n  - <exact frontend test/build\
+      \ command>\noutputs_or_artifacts:\n  - <Search visible-control artifact>\n \
+      \ - <mobile Search/Source Ledger/doctor artifact>\n  - <feed row metadata artifact>\n\
+      \  - <Inspector header artifact>\nfinding_verdicts:\n  REG-2026-05-12-03: PASS\
+      \ | FAIL\n  REG-2026-05-12-05: PASS | FAIL\n  REG-2026-05-12-07: PASS | FAIL\n\
+      \  REG-2026-05-12-08: PASS | FAIL\n  REG-2026-05-12-09: PASS | FAIL\nverdict:\
+      \ PASS | FAIL\nblockers: []\ngate_open_allowed: true | false\nremaining_gaps:\
+      \ []"
+    depends_on:
+    - regression-source-ledger-controls-fix
+    agent: frontend-engineer
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
