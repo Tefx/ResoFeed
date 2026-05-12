@@ -51822,3 +51822,12 @@ phases:
     - mcp-audit-doc-sync-check
     - mcp-audit-focused-deep-review
     agent: gate-reviewer
+- id: regression-audit-remediation-contract-matrix-and-expected-red-tests
+  name: Regression Audit Remediation — Contract Matrix and Expected-Red Tests
+  status: locked
+  gate: Contract/test phase blocks unless every actionable finding in docs/audits/regression-audit-2026-05-12.md
+    is mapped to an owner, REG-2026-05-12-02 is explicitly delegated to the existing
+    MCP capability audit chain, and expected-red/proof tests exist for distinct non-duplicative
+    regression families before remediation.
+  depends_on:
+  - mcp-capability-audit-verification-and-finalization
