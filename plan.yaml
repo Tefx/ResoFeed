@@ -53631,7 +53631,7 @@ phases:
       \ before completion."
   - id: regression-audit-contract-gate-batched-fix
     name: Batched remediation for regression audit contract gate blockers
-    status: pending
+    status: claimed
     description: "Batched remediation for failed gate `regression-audit-contract-gate`.\n\
       \nwork_type: defect_repair\nstep_type: implementation\nagent_source: project\n\
       provenance/disposition:\n- B-REG01-CONTRACT-CONTRADICTION: introduced_now or\
@@ -53738,6 +53738,8 @@ phases:
     - regression-audit-mcp-read-item-expected-red-tests
     - regression-audit-llm-health-proof-contract
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-12T13:39:10.270466+00:00'
   - id: regression-audit-contract-gate-rerun
     name: Re-gate regression audit contract blocker remediation
     status: pending
