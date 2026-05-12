@@ -53025,6 +53025,73 @@ phases:
     - regression-source-ledger-controls-fix
     - regression-ui-containment-and-diagnostics-fix
     agent: uiux-auditor
+  - id: regression-frontend-surface-gate
+    name: Gate frontend regression surface repair
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), decide whether frontend regression
+      repair may proceed to final closure.
+
+
+      Review criteria:
+
+      - REG-2026-05-12-01, -03, -05, -07, -08, and -09 have rendered evidence and
+      independent retest verdicts.
+
+      - uiux-auditor reviewed real visual/spatial artifacts and produced parseable
+      PASS/PASS_WITH_DEBT/FAIL handoff.
+
+      - Source Ledger manual controls use canonical labels and real action paths.
+
+      - Mobile utility routes exclude inactive Today feed from visual and accessibility
+      flow.
+
+      - Search receipts and raw diagnostics are scoped to the proper surfaces.
+
+      - ResoFeed UI/product invariants remain intact.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches UI/UX, accessibility flow, output/diagnostic presentation, and
+      shared route state.
+
+      - Historical pattern risk: output/diagnostic strings can leak into primary user
+      surfaces.'
+    verification: 'phase-check protecting regression-audit independent final closure.
+
+      - All frontend implementation and verification steps complete with artifact-backed
+      evidence.
+
+      - Gate decision basis maps REG-01, REG-03, REG-05, REG-07, REG-08, and REG-09
+      to OPEN/BLOCK status.
+
+      - No unresolved UI/accessibility/design blockers remain.
+
+      - Any PASS_WITH_DEBT items have explicit non-intersection with final acceptance
+      gates.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- <filename> — key passage or \"NOT READ: <reason>\"\n\n## Frontend\
+      \ Gate Decision Basis\nfinding_verdicts:\n  REG-2026-05-12-01: <verdict + evidence\
+      \ ref>\n  REG-2026-05-12-03: <verdict + evidence ref>\n  REG-2026-05-12-05:\
+      \ <verdict + evidence ref>\n  REG-2026-05-12-07: <verdict + evidence ref>\n\
+      \  REG-2026-05-12-08: <verdict + evidence ref>\n  REG-2026-05-12-09: <verdict\
+      \ + evidence ref>\nuiux_auditor_handoff: <PASS/PASS_WITH_DEBT/FAIL + artifact\
+      \ refs>\nunresolved_statuses:\n  - <NEEDS_TEST|UNPROVEN|UNCERTAIN_BLOCKING if\
+      \ any>\nverdict: OPEN | BLOCKED\nblockers: []\ngate_open_allowed: true | false\n\
+      remaining_gaps: []"
+    depends_on:
+    - regression-source-ledger-controls-fix
+    - regression-ui-containment-and-diagnostics-fix
+    - regression-frontend-route-integration-retest
+    - regression-frontend-uiux-audit
+    agent: gate-reviewer
 - id: regression-audit-remediation-independent-retest-and-closure
   name: Regression Audit Remediation — Independent Retest and Closure
   status: locked
