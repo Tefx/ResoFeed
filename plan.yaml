@@ -57175,7 +57175,7 @@ phases:
       were not committed.'
   - id: regression-audit-spec-conformance-review
     name: Verify regression fixes against ARCHITECTURE DESIGN PRD and audit contracts
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -57266,6 +57266,8 @@ phases:
     depends_on:
     - regression-audit-full-runtime-retest
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-12T19:02:01.910511+00:00'
   - id: regression-audit-doc-sync-check
     name: Check documentation sync for regression audit closure
     status: pending
