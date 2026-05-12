@@ -52496,7 +52496,7 @@ phases:
       (cached)\n```\n\n## Files changed\nNone."
   - id: mcp-audit-final-gate
     name: Final gate for MCP capability audit closure
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -52615,6 +52615,8 @@ phases:
     - mcp-audit-doc-sync-check
     - mcp-audit-focused-deep-review
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-12T10:12:30.728181+00:00'
 - id: regression-audit-remediation-contract-matrix-and-expected-red-tests
   name: Regression Audit Remediation — Contract Matrix and Expected-Red Tests
   status: locked
