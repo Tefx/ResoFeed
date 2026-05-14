@@ -60582,7 +60582,7 @@ phases:
     claimed_at: '2026-05-14T18:27:11.213770+00:00'
   - id: urda-ui-preview-manual-ingest-sync
     name: Sync docs/ui-preview.html to manual ingest and fetch design contract
-    status: claimed
+    status: done
     description: "step_type: implementation\nsimple_feature_exception:\n  approved:\
       \ true\n  conditions_met:\n    - single_static_preview_fixture\n    - no_runtime_state_semantics_changed\n\
       \    - no_cross_module_coordination\n    - obvious_existing_pattern\n  pattern_reference:\
@@ -60657,6 +60657,78 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-14T18:27:19.189500+00:00'
+    done_at: '2026-05-14T18:39:55.850755+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — Issue 3 requires ui-preview
+      Source Ledger to include `last_ingest: HH:MM:SS`, `[RUN INGEST]`, row-level
+      `[FETCH]`, raw error display, and remove background-ingest-only copy.
+
+      - docs/DESIGN.md — Source Ledger contract requires global `[RUN INGEST]`, source-level
+      `[FETCH]`, `last_ingest: HH:MM:SS`, raw `err:` diagnostics, and forbids folders/tags/settings/queues/job
+      dashboards/sync/merge controls.
+
+      - docs/ui-preview.html — Before update, Source Ledger showed `background ingest
+      active`, only `[DELETE]` row actions, and copy saying refresh was handled by
+      background ingest.
+
+
+      ## Preview Sync Evidence
+
+      **Issue covered**: 3
+
+
+      ### Before/after snippets
+
+      - Before: `background ingest active`; row actions only `[DELETE]`; `refresh
+      is handled by background ingest.`
+
+      - After: `last_ingest: 14:00:00`; `[RUN INGEST]`; row-level `[FETCH]`; `err:
+      timeout contacting source`
+
+
+      ### Required preview elements
+
+      - `[RUN INGEST]`: PRESENT
+
+      - `[FETCH]`: PRESENT
+
+      - `last_ingest: HH:MM:SS`: PRESENT
+
+      - raw `err:` row diagnostic: PRESENT
+
+      - stale background-ingest-only copy removed: YES
+
+
+      ### Forbidden scope check
+
+      - folders/tags/settings/queues/job dashboards/sync/merge controls added: NO
+
+
+      ## Verification
+
+      - Worker ran literal/stale-copy inspection script against `docs/ui-preview.html`;
+      all required literals passed and stale background-ingest-only copy was absent.
+
+      - Preview-only diff committed.
+
+      - Worker commit: `4050c6b docs: sync source ledger preview controls`
+
+      - Mainline squash commit: `cac8e4b [vectl] step-urda-ui-preview-manual-ingest-sync
+      completed`
+
+      - Mainline final-state verification: `python3 -c ...` checked `docs/ui-preview.html`;
+      output `missing=[]`, `stale=False`; exit 0.
+
+
+      ## Commit
+
+      - `4050c6b docs: sync source ledger preview controls`
+
+
+      ## Headline
+
+      PASS'
   - id: urda-browser-regression-and-layout-retest
     name: Retest UI runtime audit fixes in real browser
     status: pending
