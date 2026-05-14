@@ -58531,7 +58531,7 @@ phases:
   - id: urda-backend-runtime-expected-red-tests
     name: Add expected-red backend/runtime tests for manual ingest and raw source
       diagnostics
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -58591,6 +58591,53 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-14T16:53:32.294900+00:00'
+    done_at: '2026-05-14T17:10:17.584336+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — issues 1/2 require Source Ledger `[RUN INGEST]` and row `[FETCH]`; issue\
+      \ 4 says backend `Source` JSON currently does not expose `last_fetch_error`,\
+      \ preventing raw `err:` row rendering.\n- docs/ARCHITECTURE.md — manual triggers\
+      \ are `POST /api/ingest` and `POST /api/sources/{id}/fetch` with exact `{}`\
+      \ JSON bodies, no query params/idempotency, `IngestRunResult` envelopes, global\
+      \ 409 conflict details, and source fetch returning `{ \"ingest\": ..., \"source\"\
+      : Source }`.\n- docs/DESIGN.md — Source Ledger must show raw `err: <diagnostic>`\
+      \ adjacent to affected rows, preserve literal `err:` text, and use immediate\
+      \ `[RUN INGEST]`/`[FETCH]` controls without jobs/queues/ledgers.\n\n## Expected-Red\
+      \ Backend/Runtime Test Report\n- Modified files limited to tests/fixtures: YES\n\
+      - Test names added:\n  - TestURDASourceLedgerSourcesExposeRawDiagnosticsForRows\n\
+      \  - TestURDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody\n\
+      \  - TestURDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors\n  - TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails\n\
+      - Commands run and outputs:\n  - gofmt -w internal/resofeed/urda_backend_runtime_expected_red_test.go:\
+      \ exit 0\n  - go test ./internal/resofeed -run 'TestURDA': exit 1 expected-red;\
+      \ failures show missing `last_fetch_error`, old unwrapped manual fetch result\
+      \ shape, missing updated source envelope, and missing conflict details.\n  -\
+      \ git diff --cached --check: exit 0\n  - git commit -m \"test: expose URDA backend\
+      \ runtime contract gaps\": exit 0, commit 1e80582\n  - orchestrator merge: `git\
+      \ merge --squash vectl/step-urda-backend-runtime-expected-red-tests && git commit\
+      \ -m \"[vectl] step-urda-backend-runtime-expected-red-tests completed\"`: exit\
+      \ 0, commit 723165f1\n  - mainline final-state verification: `go test ./internal/resofeed\
+      \ -run 'TestURDA'`: exit 1 EXPECTED_RED_ACCEPTED; failing assertions exactly\
+      \ match declared gaps (`last_fetch_error` missing, ingest/source fetch envelope\
+      \ scope missing, conflict details missing).\n- Expected failures / exposed gaps:\n\
+      \  - GET /api/sources omits raw `last_fetch_error` needed for Source Ledger\
+      \ `err:` diagnostics.\n  - POST /api/ingest currently returns legacy `ManualFetchResult`\
+      \ instead of `{ \"ingest\": IngestRunResult }`.\n  - POST /api/sources/{id}/fetch\
+      \ currently returns legacy result without updated `source`.\n  - 409 conflict\
+      \ message exists, but response lacks ARCHITECTURE `details.ingest_running`,\
+      \ `scope`, and `retry_allowed`.\n- Spec-derived fixtures used:\n  - tests/go/fixtures/manual_ingest_empty_request.json\
+      \ — exact `{}` request body.\n  - tests/go/fixtures/architecture_manual_ingest_success_example.json\
+      \ — ARCHITECTURE manual ingest example.\n  - tests/go/fixtures/architecture_source_fetch_success_example.json\
+      \ — ARCHITECTURE source fetch example.\n  - tests/go/fixtures/architecture_manual_ingest_conflict.json\
+      \ — ARCHITECTURE 409 conflict body.\n- Downstream implementation owner: urda-expose-source-diagnostics-and-ingest-runtime-contract\n\
+      \nstep_intent: test_define_red\nexpected_result: red\nobserved_result: red\n\
+      failure_alignment: The targeted tests fail exactly on the declared backend/runtime\
+      \ contract gaps for raw diagnostics and manual ingest/fetch schemas.\nverdict:\
+      \ PASS\nblockers: []\nproduct_implementation_files_modified: false\n\nAction\
+      \ Summary:\n  Added expected-red Go backend/runtime tests and spec fixtures\
+      \ only.\nVerification Run:\n  Command: go test ./internal/resofeed -run 'TestURDA'\n\
+      \  Exit Code: 1 expected-red\nArtifacts Modified:\n  - internal/resofeed/urda_backend_runtime_expected_red_test.go\n\
+      \  - tests/go/fixtures/manual_ingest_empty_request.json\n  - tests/go/fixtures/architecture_manual_ingest_success_example.json\n\
+      \  - tests/go/fixtures/architecture_source_fetch_success_example.json\n  - tests/go/fixtures/architecture_manual_ingest_conflict.json\n\
+      \n## Headline\nPASS_EXPECTED_RED"
   - id: urda-source-ledger-expected-red-browser-tests
     name: Add expected-red Source Ledger browser tests
     status: claimed
