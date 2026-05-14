@@ -58323,6 +58323,67 @@ phases:
 
       PASS | FAIL'
     agent: spec-verifier
+  - id: urda-backend-runtime-expected-red-tests
+    name: Add expected-red backend/runtime tests for manual ingest and raw source
+      diagnostics
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add tests/proof harness coverage, limited to tests and fixtures, for audit issues
+      1, 2, and 4 where frontend behavior depends on backend/runtime contracts.
+
+
+      Required test obligations:
+
+      - `GET /api/sources` exposes enough source diagnostic data for Source Ledger
+      to render raw `err: <diagnostic>` adjacent to rows without inventing text.
+
+      - `POST /api/ingest` and `POST /api/sources/{id}/fetch` keep the documented
+      empty `{}` request shape, no query params, no idempotency_key, no queues/jobs/ledgers.
+
+      - Ingest/fetch conflict still returns `409 conflict` with `err: ingest already
+      running`-compatible UI message source.
+
+      - Source-level manual fetch returns updated `source` data and source-scoped
+      errors according to ARCHITECTURE manual ingest schemas.
+
+
+      This is a pre-implementation expected-red step: success means the gap is exposed
+      without product-code changes. If tests already pass, evidence must explain which
+      implementation already satisfies the contract.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      Fixtures MUST use exact request/response formats from docs/ARCHITECTURE.md:
+      empty `{}` bodies for manual triggers, RFC3339 backend timestamps, and canonical
+      `Source`/`IngestRunResult` fields. Do not add convenience fields that are absent
+      from the spec unless the test explicitly marks them as the expected gap.'
+    verification: '- Tests are limited to backend/runtime test files and fixtures.
+
+      - Expected-red evidence lists exposed gaps for raw source diagnostics and manual
+      ingest/fetch runtime contracts.
+
+      - No product implementation files are modified.
+
+      - Evidence records downstream owner `urda-expose-source-diagnostics-and-ingest-runtime-contract`.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
+      \ <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n\n##\
+      \ Expected-Red Backend/Runtime Test Report\n- Modified files limited to tests/fixtures:\
+      \ YES/NO\n- Test names added:\n  - <test name>\n- Expected failures / exposed\
+      \ gaps:\n  - <gap>\n- Spec-derived fixtures used:\n  - <fixture and spec section>\n\
+      - Downstream implementation owner: urda-expose-source-diagnostics-and-ingest-runtime-contract\n\
+      \n## Headline\nPASS_EXPECTED_RED | FAIL"
+    depends_on:
+    - urda-contract-issue-matrix
+    agent: golang-developer
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
