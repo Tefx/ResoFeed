@@ -58620,6 +58620,147 @@ phases:
     preservation evidence are collected before frontend closure proceeds.
   depends_on:
   - ui-runtime-design-audit-contract-tests
+  steps:
+  - id: urda-expose-source-diagnostics-and-ingest-runtime-contract
+    name: Expose source diagnostics and preserve manual ingest/fetch runtime contract
+    status: pending
+    description: 'step_type: implementation
+
+      tags: ["integration"]
+
+
+      Complete backend/runtime support required by audit issues 1, 2, and 4.
+
+
+      Scope:
+
+      - Ensure `GET /api/sources` exposes raw source diagnostics needed by Source
+      Ledger to render literal `err: <diagnostic>` adjacent to affected rows. Prefer
+      an explicit nullable diagnostic/error field consistent with existing `sources.last_fetch_error`;
+      do not invent friendly copy.
+
+      - Preserve existing manual ingest endpoints: `POST /api/ingest` and `POST /api/sources/{id}/fetch`
+      with empty `{}` body only, no query params, no idempotency_key, no durable jobs,
+      no queues, no ingest ledger, no sync/merge semantics.
+
+      - Preserve one in-process ingest concurrency guard across background ingest,
+      global manual ingest, and per-source fetch. Conflict remains `409 conflict`
+      and must be translatable to raw `err: ingest already running` UI text.
+
+      - Ensure source-level fetch responses update source diagnostics/status according
+      to ARCHITECTURE failure contract.
+
+
+      Failure-mode checklist:
+
+      - missing source / deleted source returns `404 not_found` for per-source fetch;
+
+      - invalid body or query parameters return `400 bad_request`;
+
+      - guard conflict returns `409 conflict` without queuing or retry persistence;
+
+      - source RSS failure updates source diagnostics but does not block other sources;
+
+      - backend timestamps remain RFC3339 UTC; UI-only `HH:MM:SS` strings are not
+      persisted or sent back.
+
+
+      Out-of-scope guardrail:
+
+      - Do NOT create job tables, queues, activity ledgers, sync/merge mechanisms,
+      new services, sidecar workers, settings UI, or per-agent auth concepts.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or hardcoded constants
+      do not satisfy this requirement.'
+    verification: '- Main path: targeted backend tests for `GET /api/sources`, `POST
+      /api/ingest`, and `POST /api/sources/{id}/fetch` pass.
+
+      - Failure path: tests cover conflict `409`, invalid body/query validation, missing/deleted
+      source, and source-level RSS error diagnostic exposure.
+
+      - Proof: response fixtures include raw diagnostic text suitable for Source Ledger
+      `err:` rendering and no queued/job/ledger state is introduced.
+
+      - Integration proof identifies source module -> HTTP handler -> frontend API
+      client contract path.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Backend Runtime Repair Evidence
+
+      **Issues covered**: 1, 2, 4
+
+
+      ### Files changed
+
+      - <file>
+
+
+      ### Contract proof
+
+      - `GET /api/sources` diagnostic shape: <actual JSON excerpt>
+
+      - `POST /api/ingest` body/response proof: <test or curl output>
+
+      - `POST /api/sources/{id}/fetch` body/response proof: <test or curl output>
+
+
+      ### Failure-path proof
+
+      - conflict 409: <evidence>
+
+      - bad body/query: <evidence>
+
+      - missing/deleted source: <evidence>
+
+      - source error diagnostic: <evidence>
+
+
+      ### Forbidden scope check
+
+      - Queues/jobs/ledgers/sync/sidecars added: NO/YES with explanation
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact command/test>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Path exercised**: SQLite/source diagnostics -> internal/resofeed HTTP handlers
+      -> JSON API response
+
+
+      ## Headline
+
+      PASS | FAIL'
+    agent: golang-developer
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
   status: locked
