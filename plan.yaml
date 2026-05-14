@@ -58769,7 +58769,7 @@ phases:
       \n## Headline\nPASS_EXPECTED_RED"
   - id: urda-visual-a11y-expected-red-browser-tests
     name: Add expected-red visual, layout, accessibility, and preview tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -58843,6 +58843,62 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-14T16:53:43.063566+00:00'
+    done_at: '2026-05-14T17:13:24.114425+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — Read. Key passages: Issue 3 expects preview `[RUN INGEST]`, row `[FETCH]`,\
+      \ `last_ingest: HH:MM:SS`, and row raw errors; Issue 7 says `.bracket-action:hover`\
+      \ / `:focus-visible` are outline-only; Issues 8-14 define search prose, desktop\
+      \ filter alignment, mobile metadata truncation, inspector link default styling,\
+      \ owner prompt heading scale, and duplicate Resonate accessible names.\n- docs/DESIGN.md\
+      \ — Read. Key passages: Source Ledger includes lightweight manual `[FETCH]`\
+      \ per source and `[RUN INGEST]`; product copy must not expose internal design/architecture\
+      \ prose; bracket actions hover/focus use token inversion; mobile metadata stays\
+      \ flat inline but readable; Resonate has a 44px target and accessible label.\n\
+      - docs/ui-preview.html — Read. Key passages: preview `.bracket-action:hover,\
+      \ .bracket-action:focus` inverts `background: var(--text)` and `color: var(--background)`\
+      \ with no transition; Source Ledger currently renders `background ingest active`,\
+      \ `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `last_fetch`,\
+      \ and `err: timeout`, but no `[RUN INGEST]`, row `[FETCH]`, or `last_ingest`.\n\
+      \n## Expected-Red Visual/A11y Test Report\n- Action Summary: Added expected-red\
+      \ Playwright browser coverage for URDA audit issues 3, 7, 8, 9, 10, 11, 12,\
+      \ and 14 using rendered DOM, screenshots, computed styles, layout boxes, and\
+      \ accessible-name assertions.\n- Artifacts Modified:\n  - `web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts`\n\
+      - Commit: `da1970f test: add URDA expected-red visual a11y coverage`\n- Orchestrator\
+      \ merge commit: `290963b [vectl] step-urda-visual-a11y-expected-red-browser-tests\
+      \ completed`\n- Modified files limited to tests/fixtures: YES\n- product_implementation_files_modified:\
+      \ false\n- Test names added:\n  - `Issue 3: docs/ui-preview Source Ledger fixture\
+      \ includes manual ingest, row fetch, timestamp, and raw err examples`\n  - `Issues\
+      \ 7-14: rendered app visual/a11y checks expose current runtime divergences`\n\
+      - Verification Run (Command + Exit Code):\n  - `npm ci`: exit 0; installed missing\
+      \ frontend test dependencies locally, no tracked files changed.\n  - `npm run\
+      \ check`: exit 0; `svelte-check found 0 errors and 0 warnings`.\n  - `npm run\
+      \ test:e2e -- --project=chromium-ci-safe urda-visual-a11y-expected-red-browser-tests.spec.ts`:\
+      \ exit 1 expected-red; 2 tests failed with aligned visual/a11y gaps.\n  - mainline\
+      \ final-state verification after merge: `npm --prefix web run check`: exit 0;\
+      \ `npm --prefix web run test:e2e -- --project=chromium-ci-safe urda-visual-a11y-expected-red-browser-tests.spec.ts`:\
+      \ exit 1 EXPECTED_RED_ACCEPTED with failures matching issues 3,7,8,9,10,11,12,14.\n\
+      - Expected failures / exposed gaps by issue:\n  - Issue 3: Preview rendered\
+      \ Source Ledger lacks `[RUN INGEST]`, row `[FETCH]`, and `last_ingest: HH:MM:SS`;\
+      \ raw `err:` example is already present.\n  - Issue 7: Runtime `.bracket-action`\
+      \ hover/focus computed background remains transparent instead of token inversion/stark\
+      \ highlight.\n  - Issue 8: Search renders `Lexical and metadata retrieval only;\
+      \ results stay source-backed.`\n  - Issue 9: `Result limit` label/control pair\
+      \ is visually disconnected at 1280px (`centerDelta=56`, negative gap).\n  -\
+      \ Issue 10: Mobile metadata row is `nowrap`/hidden and source text is visually\
+      \ clipped, enabling `src: si...` style over-truncation.\n  - Issue 11: Inspector\
+      \ original link computed style is browser-default blue underline.\n  - Issue\
+      \ 12: Owner Token Prompt heading computes as oversized (`28px/20px`) rather\
+      \ than chrome/prompt scale.\n  - Issue 14: Repeated Resonate buttons expose\
+      \ duplicate `aria-label=\"Resonate item\"` and do not include item title context;\
+      \ visible glyph remains `☆`.\n- Rendered/computed-style evidence planned: yes;\
+      \ tests attach screenshots and JSON proofs for preview ledger, bracket styles,\
+      \ search layout, mobile metadata, inspector link style, owner heading style,\
+      \ and Resonate accessible names.\n- Downstream owners: urda-search-feed-inspector-owner-resonate-polish-fix,\
+      \ urda-ui-preview-manual-ingest-sync\n\n## Expected-Red Semantic Reporting\n\
+      - step_intent: test_define_red\n- expected_result: red\n- observed_result: red\n\
+      - failure_alignment: Observed Playwright failures match the declared audit gaps\
+      \ for issues 3, 7, 8, 9, 10, 11, 12, and 14; Issue 3 raw `err:` is already green\
+      \ and documented.\n- verdict: PASS\n- blockers: []\n\n## Headline\nPASS_EXPECTED_RED"
   - id: urda-contract-tests-gate
     name: Gate UI runtime audit contract and expected-red coverage
     status: pending
