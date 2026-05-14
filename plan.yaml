@@ -58450,6 +58450,80 @@ phases:
     depends_on:
     - urda-contract-issue-matrix
     agent: frontend-engineer
+  - id: urda-visual-a11y-expected-red-browser-tests
+    name: Add expected-red visual, layout, accessibility, and preview tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add tests/proof coverage, limited to tests and fixtures, for audit issues 3,
+      7, 8, 9, 10, 11, 12, and 14.
+
+
+      Required expected-red coverage:
+
+      - Issue 3: `docs/ui-preview.html` contains `[RUN INGEST]`, row-level `[FETCH]`,
+      `last_ingest: HH:MM:SS`, and row raw `err:` examples.
+
+      - Issue 7: `.bracket-action:hover` and `:focus-visible` invert or apply equally
+      stark token-based highlight immediately, without transition/transform.
+
+      - Issue 8: Search does not render architecture/design explanation prose such
+      as `Lexical and metadata retrieval only; results stay source-backed.`
+
+      - Issue 9: Search filter label/control pairs remain visually aligned at 1280px
+      desktop viewport.
+
+      - Issue 10: mobile feed metadata preserves readable source, age, extraction/provenance,
+      and time group signals; no `src: si...` style over-truncation.
+
+      - Issue 11: Inspector original link uses muted/token palette styling, not browser
+      default blue underline.
+
+      - Issue 12: Owner Token Prompt heading uses chrome/prompt scale, not browser-default
+      large heading dominance.
+
+      - Issue 14: repeated Resonate buttons have accessible names including item context
+      while visible glyph remains unchanged.
+
+
+      This is pre-implementation expected-red coverage. Success means the assertions
+      expose current divergence or document already-green coverage without modifying
+      product code.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Tests MUST include rendered DOM, computed style, browser screenshot, or test-renderer
+      evidence for visual/layout checks. Static type checks alone are insufficient.'
+    verification: '- Tests/fixtures only; no product implementation files modified.
+
+      - Expected-red evidence lists exposed gaps for issues 3, 7, 8, 9, 10, 11, 12,
+      and 14.
+
+      - Visual checks include rendered DOM/computed style/screenshot-based proof where
+      applicable.
+
+      - Resonate accessibility test confirms unique accessible names without changing
+      visible star glyph.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ui-preview.html — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red\
+      \ Visual/A11y Test Report\n- Modified files limited to tests/fixtures: YES/NO\n\
+      - Test names added:\n  - <test name>\n- Expected failures / exposed gaps by\
+      \ issue:\n  - Issue 3: <gap>\n  - Issue 7: <gap>\n  - Issue 8: <gap>\n  - Issue\
+      \ 9: <gap>\n  - Issue 10: <gap>\n  - Issue 11: <gap>\n  - Issue 12: <gap>\n\
+      \  - Issue 14: <gap>\n- Rendered/computed-style evidence planned: <yes/no>\n\
+      - Downstream owners: urda-search-feed-inspector-owner-resonate-polish-fix, urda-ui-preview-manual-ingest-sync\n\
+      \n## Headline\nPASS_EXPECTED_RED | FAIL"
+    depends_on:
+    - urda-contract-issue-matrix
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
