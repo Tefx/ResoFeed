@@ -60582,7 +60582,7 @@ phases:
     claimed_at: '2026-05-14T18:27:11.213770+00:00'
   - id: urda-ui-preview-manual-ingest-sync
     name: Sync docs/ui-preview.html to manual ingest and fetch design contract
-    status: pending
+    status: claimed
     description: "step_type: implementation\nsimple_feature_exception:\n  approved:\
       \ true\n  conditions_met:\n    - single_static_preview_fixture\n    - no_runtime_state_semantics_changed\n\
       \    - no_cross_module_coordination\n    - obvious_existing_pattern\n  pattern_reference:\
@@ -60655,6 +60655,8 @@ phases:
     depends_on:
     - urda-source-ledger-controls-diagnostics-layout-fix
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-14T18:27:19.189500+00:00'
   - id: urda-browser-regression-and-layout-retest
     name: Retest UI runtime audit fixes in real browser
     status: pending
