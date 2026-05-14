@@ -58901,7 +58901,7 @@ phases:
       \ and documented.\n- verdict: PASS\n- blockers: []\n\n## Headline\nPASS_EXPECTED_RED"
   - id: urda-contract-tests-gate
     name: Gate UI runtime audit contract and expected-red coverage
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -58987,6 +58987,8 @@ phases:
     - urda-source-ledger-expected-red-browser-tests
     - urda-visual-a11y-expected-red-browser-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-14T17:13:47.500547+00:00'
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
