@@ -61410,6 +61410,293 @@ phases:
     depends_on:
     - urda-browser-regression-and-layout-retest
     agent: frontend-engineer
+  - id: urda-browser-regression-post-fix-retest
+    name: Post-fix browser regression, live artifact, and layout retest
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      tags: ["integration", "uiux", "browser-regression"]
+
+
+      As an INDEPENDENT TESTER (integration-verifier), retest the batched remediation
+      from `urda-browser-regression-batched-fix` from a fresh browser/runtime perspective.
+
+
+      This retest must prove all three blocker families are closed and must not rely
+      only on mocked `page.route(''**/api/**'')` responses for integration seams.
+
+
+      Required retest coverage:
+
+      1. `full-ui-design-conformance.expected-red.spec.ts` is green under Chromium
+      CI-safe, including OPML strict-mode accessible-label repair.
+
+      2. Targeted URDA specs are green: `source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      and `urda-visual-a11y-expected-red-browser-tests.spec.ts`.
+
+      3. Real `resofeed serve` live audit proof is complete with isolated DB and owner
+      token.
+
+      4. Real API/manual ingest/fetch proof exists for Source Ledger controls and
+      cannot be satisfied solely by fixture-routed Playwright responses.
+
+      5. Issue-by-issue verdicts for audit issues 1-14 are produced.
+
+      6. Behavioral proof register lists blockers as empty before downstream UIUX
+      audit/gate can open.
+
+
+      Required live artifact set:
+
+      - desktop Owner Token Prompt screenshot and a11y snapshot;
+
+      - desktop Today populated item screenshot;
+
+      - desktop Inspector screenshot;
+
+      - desktop Source Ledger ingest/fetch states screenshot(s);
+
+      - desktop Search screenshot;
+
+      - desktop Doctor screenshot;
+
+      - mobile feed screenshot;
+
+      - mobile Inspector screenshot;
+
+      - mobile Source Ledger screenshot;
+
+      - metrics JSON;
+
+      - browser accessibility snapshots;
+
+      - console logs;
+
+      - network logs or request/response capture for ingest/fetch and item retrieval.
+
+
+      Finding issues is still valuable, but this is a post-fix retest with `expected_result:
+      green`; blocker-class findings must be reported with reproduction and mapped
+      to a new remediation owner before gates can open.'
+    verification: '- Expected result: green.
+
+      - Exact command output included for: `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe`.
+
+      - Exact command output included for targeted URDA specs: `source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      and `urda-visual-a11y-expected-red-browser-tests.spec.ts`.
+
+      - Real `resofeed serve` launched with isolated DB and owner token; evidence
+      includes command output and browser/API artifacts.
+
+      - Artifact manifest includes Today populated item, Inspector, Search, Doctor,
+      mobile feed, mobile Inspector, mobile Source Ledger, metrics JSON, accessibility
+      snapshots, console logs, and network logs.
+
+      - Issue-by-issue verdicts 1-14 are present.
+
+      - Behavioral proof register shows blockers empty; any non-PROVEN status has
+      remediation ownership and prevents downstream OPEN recommendation.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer)
+
+      **Scope**: post-fix browser regression, live artifact, layout, and accessibility
+      retest
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Exact Command Outputs
+
+
+      ### Full UI design conformance
+
+      ```
+
+      npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe
+
+      <paste full output and exit code>
+
+      ```
+
+
+      ### Targeted URDA specs
+
+      ```
+
+      npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe
+
+      <paste full output and exit code>
+
+      ```
+
+
+      ### Real `resofeed serve` live smoke
+
+      ```
+
+      <exact build/serve command, environment, DB path, owner token handling, stdout/stderr,
+      exit/cleanup notes>
+
+      ```
+
+
+      ## Real Runtime Artifact Manifest
+
+      | Artifact | Path | Status |
+
+      | --- | --- | --- |
+
+      | Owner Token Prompt desktop screenshot | <path> | PASS/FAIL |
+
+      | Owner Token Prompt a11y snapshot | <path> | PASS/FAIL |
+
+      | Today populated item screenshot | <path> | PASS/FAIL |
+
+      | Inspector screenshot | <path> | PASS/FAIL |
+
+      | Source Ledger ingest/fetch states screenshot(s) | <path> | PASS/FAIL |
+
+      | Search screenshot | <path> | PASS/FAIL |
+
+      | Doctor screenshot | <path> | PASS/FAIL |
+
+      | Mobile feed screenshot | <path> | PASS/FAIL |
+
+      | Mobile Inspector screenshot | <path> | PASS/FAIL |
+
+      | Mobile Source Ledger screenshot | <path> | PASS/FAIL |
+
+      | Metrics JSON | <path> | PASS/FAIL |
+
+      | Accessibility snapshots | <path(s)> | PASS/FAIL |
+
+      | Console logs | <path> | PASS/FAIL |
+
+      | Network logs/request-response capture | <path> | PASS/FAIL |
+
+
+      ## Fixture vs Real-API Integration Proof
+
+      - `page.route(''**/api/**'')` usages found:
+
+      ```
+
+      <paste search output>
+
+      ```
+
+      - Real API/manual ingest/fetch path exercised:
+
+      ```
+
+      <paste request/response or browser action evidence>
+
+      ```
+
+      - Why remaining fixtures do not substitute for integration proof:
+
+
+      ## Issue-by-Issue Verdicts 1-14
+
+      | Issue | Verdict | Evidence ref | Notes |
+
+      | --- | --- | --- | --- |
+
+      | 1 | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING/NON_INTERSECTING | <ref>
+      | <notes> |
+
+      | 2 | ... | ... | ... |
+
+      | 3 | ... | ... | ... |
+
+      | 4 | ... | ... | ... |
+
+      | 5 | ... | ... | ... |
+
+      | 6 | ... | ... | ... |
+
+      | 7 | ... | ... | ... |
+
+      | 8 | ... | ... | ... |
+
+      | 9 | ... | ... | ... |
+
+      | 10 | ... | ... | ... |
+
+      | 11 | ... | ... | ... |
+
+      | 12 | ... | ... | ... |
+
+      | 13 | ... | ... | ... |
+
+      | 14 | ... | ... | ... |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 | OPML visible button semantics preserved without strict label conflict
+      | Browser strict locator + keyboard activation | <ref> | PROVEN/UNPROVEN | <path>
+      | <basis> |
+
+      | B2 | Real server can produce deterministic audit item and full artifact set
+      | `resofeed serve` + browser/API proof | <ref> | PROVEN/UNPROVEN | <path> |
+      <basis> |
+
+      | B3 | Integration seam has real API proof beyond fixtures | Network/API logs
+      for ingest/fetch | <ref> | PROVEN/UNPROVEN | <path> | <basis> |
+
+
+      **Blockers empty**: YES/NO
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-browser-regression-batched-fix
+    agent: integration-verifier
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
