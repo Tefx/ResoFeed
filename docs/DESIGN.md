@@ -138,6 +138,60 @@ components:
     typography: "{typography.chrome}"
     padding: "{spacing.md}"
     rounded: "{rounded.none}"
+  source-ledger-header:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.none} {spacing.none} {spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
+  source-ledger-row:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
+  source-ledger-status:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  source-ledger-status-error:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.danger}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  bracket-action:
+    backgroundColor: "transparent"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  bracket-action-hover:
+    backgroundColor: "{colors.text}"
+    textColor: "{colors.background}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  bracket-action-active:
+    backgroundColor: "transparent"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  bracket-action-focus:
+    backgroundColor: "{colors.text}"
+    textColor: "{colors.background}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
+  bracket-action-disabled:
+    backgroundColor: "transparent"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.none}"
   state-portability:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -253,22 +307,24 @@ Primary surfaces covered by this contract:
 - first-use empty state inside the standard shell;
 - unified time-grouped feed;
 - right-side or full-screen Inspector for item detail;
-- Steer input for natural-language correction, RSS URL subscription, and `/doctor` diagnostics;
-- flat Source Ledger for viewing/deleting sources, importing flattened OPML, and reaching state export/import actions;
+- Steer input for natural-language correction, RSS URL subscription, search command entry, and `/doctor` diagnostics;
+- a discreet `RESOFEED` surface menu that may contain `TODAY` and `SOURCE LEDGER` rather than showing persistent top-level navigation links;
+- flat Source Ledger for viewing/deleting sources, lightweight manual `[FETCH]` per source, lightweight manual `[RUN INGEST]` for all sources, importing flattened OPML through `[IMPORT OPML]`, and reaching `[EXPORT STATE]` / `[IMPORT STATE]` actions;
 - search and retrieval surfaces;
 - agent receipt/provenance markers.
 
-Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
+Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Manual ingest feedback is terminal-synchronous text replacement, never animated loading chrome or job-dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
 
 Product copy rule: internal design metaphors and principles are not user-visible slogans. Do not render “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” in the app UI. The product chrome should use only operational labels such as `RESOFEED`, `TODAY`, `YESTERDAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`, and raw status strings.
+
 ## Colors
 
-The color system is nearly monochrome, but not literal terminal black-and-white. Low-fatigue neutrals carry almost every pixel. `primary`, `text`, `surface`, `background`, `muted`, and `border` form the base utility palette. `accent` is scarce and reserved for Resonate state or one active command affordance per view. Implementation should normally show no more than two accent moments per screen.
+The color system is nearly monochrome, but not literal terminal black-and-white. Low-fatigue neutrals carry almost every pixel. `primary`, `text`, `surface`, `background`, `muted`, and `border` form the base utility palette. `accent` is scarce and reserved for Resonate state. Implementation should normally show no more than two accent moments per screen.
 
 - `background` / `surface`: stone-paper and zinc-paper neutrals for an analyst workbench feel, avoiding both pastel SaaS softness and eye-straining pure canvas colors.
 - `text`: primary reading and chrome text; must meet 4.5:1 contrast on its paired background.
 - `muted`: source, timestamp, extraction-status, and secondary command text; must meet at least 4.5:1 for small text. Contrast failures are not permitted, never below 3:1 for UI boundaries.
-- `accent`: active Resonate star only; it is not a brand wash, button default, chart color, or decoration.
+- `accent`: active Resonate star only; it is not a brand wash, button default, chart color, fetch color, or decoration.
 - `focus`: accessible outline color; focus rings must be visible independent of accent state.
 - `danger`, `warning`, `success`: status-only colors. Status must also use text labels or symbols, never color alone.
 
@@ -276,7 +332,7 @@ Use perceptually even ramps when extending tokens: think in OKLCH/HSL for contra
 
 Dark mode mirrors the same hierarchy: dark slate canvas, zinc surface, warm ash text, blue-steel focus, amber Resonate. No gradients, decorative blobs, or purple AI trust palettes.
 
-If a future non-web shell is created, it should inherit semantic labels (`src:`, `agent:`, `partial:`, `err:`) and star shape changes (`☆` to `★`). This document does not define a separate terminal product surface.
+If a future non-web shell is created, it should inherit semantic labels (`src:`, `agent:`, `source text: RSS excerpt only`, `source excerpt`, `error:`) and star shape changes (`☆` to `★`). These labels preserve source-text provenance separately from generated-summary provenance. `partial:` is an internal extraction condition, not a user-facing semantic label. This document does not define a separate terminal product surface.
 
 ## Typography
 
@@ -315,6 +371,7 @@ Desktop layout:
 
 - Shell has no persistent left navigation.
 - Top row contains the Steer input and minimal product label.
+- The product label may act as a discreet `RESOFEED` surface menu; `TODAY` and `SOURCE LEDGER` are allowed to appear only after that menu opens. This is intentional low-chrome navigation, not a missing-link regression.
 - Feed column occupies the left/center and should remain scannable at 640–760px; compact density is the default rather than a settings preference.
 - Inspector opens to the right at 420–560px. If width is below 1080px, Inspector becomes a route/full-screen detail view.
 - Selected item state must not alter feed item dimensions.
@@ -327,6 +384,7 @@ Mobile layout:
 - Mobile feed title uses `{typography.feed-title}` (18px/24px) identical to desktop. Feed summaries clamp to one line in the feed.
 - Feed row padding should stay around 12px top, 11px bottom, and 10–12px left marker offset to preserve the exact 24px rhythm increment. Do not shrink independent controls to gain density.
 - Inspector uses full-screen navigation with back behavior and preserved feed scroll. Mobile Inspector/detail view returns to reading density: title uses `{typography.inspector-title}`, body uses `{typography.payload}`, with 20–24px horizontal padding.
+- Source Ledger opens as a flat full-screen utility surface on narrow layouts, reachable from the `RESOFEED` menu and optionally by Steer command text such as `source ledger`.
 - Touch targets must be at least 44 CSS px on web/mobile web. Native shells may map this to platform points.
 - Gestures: Support native OS edge-swipe to dismiss the Inspector (crucial for one-handed use). Feed rows are full-width tap targets (excluding the independent Resonate hit area). Double-tap in the Inspector reading body to toggle Resonate is encouraged as a power-user enhancement, provided the explicit star button remains visible.
 
@@ -366,7 +424,7 @@ Pills are exceptions for compact provenance only. They must not inflate left-fee
 
 Purpose: hold Steer, feed, and optional Inspector with no settings-sidebar bloat.
 
-Anatomy: top command row, feed viewport, detail pane, optional Source Ledger route/overlay. States: default, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; skip-to-feed link may exist but should be visually quiet.
+Anatomy: top command row, feed viewport, detail pane, and utility surfaces reachable through the `RESOFEED` surface menu. The menu may contain `TODAY` and `SOURCE LEDGER`; those labels do not need to be persistent visible links when the menu is closed. States: default, menu open, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; `RESOFEED` menu summary must be keyboard reachable; menu items must be real buttons/links with accessible names; skip-to-feed link may exist but should be visually quiet.
 
 ### Owner Token Prompt
 
@@ -387,6 +445,7 @@ Anatomy: a terse empty feed block with these plain-language lines: `Paste RSS UR
 States: no token, no sources, sources added but no items, feed temporarily empty. The no-token state uses Owner Token Prompt, not this empty state.
 
 Keyboard and accessibility: the first actionable control remains Steer or OPML import; explanatory text is static and not focusable unless it is an action.
+
 ### Steer Input
 
 Purpose: lightweight intent entry for natural-language correction, RSS URL subscription, `/doctor`, and source commands.
@@ -408,11 +467,12 @@ Keyboard and accessibility: `Tab` reaches the Steer field first, `Enter` submits
 Purpose: expose the minimum product-required steering transparency without creating a rule-management UI.
 
 Anatomy: raw command excerpt, interpreted summary, actor (`human` or delegated agent name), and terse `undo` or `correct` text action when reversible. Timestamp and superseded marker render only when already present in the API response or local transient UI state; the design does not require new persistent receipt fields. States: applied, superseded, agent-applied, rejected, failed. Receipts are inline near Steer or the affected feed item; they must not accumulate into a dedicated activity ledger.
+
 ### Feed Item
 
 Purpose: scan one RSS-derived item.
 
-Anatomy: compact metadata line (`src: <host> · <age> · <full|partial|excerpt> · agent:<name>` when needed), serif feed title, 1–2 line dense summary/core insight, provenance/extraction marker, Resonate action. Required item-understanding outputs are compressed into visible microcopy rather than dashboards: quality/value tier may appear as a terse label (`high`, `brief`, `source-claim`), source-quality provenance appears as `full`, `partial`, or `excerpt`, and reported fact/source claim/model interpretation distinctions appear in Inspector copy when material.
+Anatomy: compact metadata line (`src: <host> · <age> · <full|source excerpt|excerpt> · agent:<name>` when needed), serif feed title, 1–2 line dense summary/core insight, provenance/extraction marker, Resonate action. Required item-understanding outputs are compressed into visible microcopy rather than dashboards: quality/value tier may appear as a terse label (`high`, `brief`, `source-claim`), source-quality provenance appears as `full`, `source excerpt`, or `excerpt`, and reported fact/source claim/model interpretation distinctions appear in Inspector copy when material.
 
 Feed rows are triage surfaces, not miniature article cards. Title uses `{typography.feed-title}` on desktop and mobile; summary uses `{typography.feed-summary}` and clamps to two lines on desktop, one line on narrow/mobile previews. The text stack must stay continuous: metadata, title, and summary sit in one column with 4px title-to-summary separation. The independent 44x44 Resonate action may sit in a side column, but it must not force a blank row or enlarge the title-to-summary rhythm. Full summary, raw excerpt, and full body belong in the Inspector. Bordered source pills are allowed in the Inspector and ledger, but the feed should prefer flat monospace metadata with separators to preserve vertical density.
 
@@ -422,7 +482,7 @@ States:
 - hover/focus: tonal shift or outline only, no translation;
 - selected: non-layout-shifting 3px left marker only by default; optional `surface-active` tonal background is reserved for compact/narrow layouts where it does not create large empty color blocks. Selected state means "currently open in Inspector," not keyboard focus, importance, recommendation, unread, or priority. Use focus rings only for true keyboard focus;
 - externally surfaced: add compact `agent:<name>` marker;
-- partial extraction: text marker `partial` with warning color and explanation in Inspector;
+- RSS-excerpt source text: text marker `source excerpt` with warning color and explanation in Inspector;
 - raw fallback: show feed excerpt when AI summary is unavailable;
 - grouped duplicate/story: transparent grouping must preserve access to every source item and provenance.
 
@@ -430,7 +490,7 @@ No unseen/bold state. No numeric count. No hidden spam collapsing. No user-facin
 
 Time-group labels inside the feed (`TODAY`, `YESTERDAY`, `EARLIER`) must feel anchored without breaking the grid. Use uppercase monospace metadata styling and align them to the far right inside the metadata row of the first item belonging to that group. They should consume zero extra vertical height, preserving a mathematically consistent rhythm between feed row separators.
 
-Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, partial, and grouped markers need accessible names, e.g. `Source: NYT`, `Extraction: partial`, `Grouped story with 4 source items`.
+Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, source-text, and grouped markers need accessible names, e.g. `Source: NYT`, `Extraction: partial_extraction`, `Grouped story with 4 source items`.
 
 ### Resonate Button
 
@@ -452,34 +512,96 @@ Keyboard and accessibility: `Space` or `Enter` toggles. Label must announce stat
 
 Purpose: deliberate Inspect surface for detail reading and verification.
 
-Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, extraction status, dense summary, full text/excerpt, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, partial extraction, unavailable original, grouped-story sources, externally surfaced receipt.
+Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, source-text status, summary provenance, dense summary, full text/excerpt, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, RSS-excerpt source text, unavailable original, grouped-story sources, externally surfaced receipt.
+
+Source-text status and summary provenance are separate lines of evidence. If full article text is unavailable but RSS excerpt text exists, Inspector uses plain copy such as `source text: RSS excerpt only`; if the model still produced validated summary fields, it separately says `summary provenance: model-backed`. Fallback copy may say `summary provenance: feed excerpt fallback` only when no model-backed summary/core insight exists.
 
 Note on Resonate Action: To maintain a clean, low-fatigue interface, the Inspector only duplicates the Resonate action when presented as a single-column mobile route (where the feed is hidden). In desktop split-pane mode, the Inspector does not show a star; the user relies on the permanently visible star on the selected feed item to their left.
 
 Inspector must not include related-content carousels, recommendation modules, or ads. It may expose source provenance and original links plainly.
 
-Keyboard and accessibility: opening Inspector moves focus to the detail heading; closing/back returns focus to the originating feed item and preserves scroll. Original links, grouped sources, and provenance labels must be screen-reader readable.
+Keyboard and accessibility: opening Inspector moves focus to the detail heading; closing/back returns focus to the originating feed item and preserves scroll. Original links, grouped sources, source-text status, summary provenance, and provenance labels must be screen-reader readable.
 
 ### Source Ledger
-Purpose: flat source management without settings-dashboard behavior.
 
-Anatomy: title, OPML import action, flat source rows, delete action, and terse links to the State Portability `export state` / `import state` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, optional last fetch status if needed for diagnostics. States:
+Purpose: flat source management without settings-dashboard behavior. This is the only UI location for lightweight manual ingestion controls.
+
+Anatomy: title, global ingest status, global `[RUN INGEST]` action, `[IMPORT OPML]` action, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, diagnostic `[DETAILS]`, and terse links to the State Portability `[EXPORT STATE]` / `[IMPORT STATE]` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, adjacent last fetch status or raw diagnostic text, and a right-aligned action block. Bracket action labels are canonical and uppercase exactly as rendered here; prose may describe the capability, but UI text must not render lowercase variants such as `import opml`, `export state`, or `import state`.
+
+Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process ingest concurrency guard described in `docs/ARCHITECTURE.md`; conflict feedback is raw and terse.
+
+States:
 
 - empty: `No sources. Paste RSS URL in Steer.`;
-- import pending: raw progress line;
-- import complete: `imported N sources; folders flattened`;
+- OPML import default: `[IMPORT OPML]` in the Ledger header/footer action cluster;
+- OPML import active: `[IMPORTING OPML...]`, disabled, no spinner, no progress animation;
+- OPML import complete: revert to `[IMPORT OPML]` and show `imported N sources; folders flattened`;
+- OPML import failed: revert to `[IMPORT OPML]` and show raw `err: <diagnostic>` text;
+- global ingest default: `[RUN INGEST]` in the Ledger header/action bar;
+- global ingest active: `[INGESTING...]`, disabled, no spinner, no progress animation;
+- global ingest conflict: revert to `[RUN INGEST]` and show raw `err: ingest already running` or equivalent conflict text;
+- global ingest complete: revert to `[RUN INGEST]` and update `last_ingest: HH:MM:SS`;
+- source fetch default: `[FETCH]` on the same row as the source;
+- source fetch active: `[FETCHING...]`, disabled, no spinner, no progress animation;
+- source fetch conflict: revert to `[FETCH]` and show raw `err: ingest already running` or equivalent conflict text adjacent to the source;
+- source fetch complete: revert to `[FETCH]` and update `last_fetch: HH:MM:SS`;
+- source fetch failed: revert to `[FETCH]` and show raw `err: <diagnostic>` text adjacent to the source;
 - delete confirmation: terse confirmation for destructive removal;
 - deletion error: raw line.
 
-Forbidden: folders, tags, pause/resume toggles, drag ordering, scoring sliders, source categories.
+`last_fetch: HH:MM:SS` and `last_ingest: HH:MM:SS` are UI display-only formatting derived from backend RFC3339 UTC fields. The UI must not invent, persist, or send these clock strings back as canonical state; canonical API data remains RFC3339 UTC.
 
-Keyboard and accessibility: source rows are list items; delete is a named button (`Delete source: <name>`) and requires a terse confirmation before destructive removal. Focus returns to the next row or Ledger heading after deletion.
+Raw diagnostic strings (`err: <diagnostic>`) must not break Source Ledger geometry. Show one line adjacent to the affected source on desktop, clamp visually at approximately 80 characters with an ellipsis, and expose the full diagnostic through the element `title` or an accessible details disclosure. On narrow/mobile layouts, allow wrapping to at most two lines before truncation. Preserve the literal `err:` prefix and never replace raw diagnostics with friendly copy.
+
+Forbidden: folders, tags, pause/resume toggles, drag ordering, scoring sliders, source categories, job dashboards, retry panels, ingest queues, activity ledgers, sync/merge controls, and a second URL subscription field.
+
+Keyboard and accessibility: source rows are list items; `[RUN INGEST]` and `[FETCH]` are named buttons with stable 44px minimum hit targets; active states keep the same hitbox; delete is a named button (`Delete source: <name>`) and requires a terse confirmation before destructive removal. Focus returns to the next row or Ledger heading after deletion.
+
+Required DOM contract for manual ingest controls:
+
+```html
+<section class="source-ledger" aria-labelledby="source-ledger-title">
+  <header class="source-ledger__header">
+    <h1 id="source-ledger-title">SOURCE LEDGER</h1>
+    <span class="source-ledger__status" aria-live="polite">last_ingest: 14:00:00</span>
+    <button class="bracket-action bracket-action--run-ingest" type="button">[RUN INGEST]</button>
+  </header>
+  <ul class="source-ledger__list">
+    <li class="source-ledger__row">
+      <span class="source-ledger__name">src: nyt</span>
+      <span class="source-ledger__url">https://nyt.com/rss</span>
+      <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
+      <span class="source-ledger__actions">
+        <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source NYT">[FETCH]</button>
+        <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source NYT">[DELETE]</button>
+      </span>
+    </li>
+  </ul>
+</section>
+```
+
+CSS usage contract: `.source-ledger` uses `{components.source-ledger}`. `.source-ledger__header` uses `{components.source-ledger-header}` and must align `last_ingest` plus `.bracket-action--run-ingest` to the right side of the header. `.source-ledger__row` uses `{components.source-ledger-row}` and must use grid or flex columns that keep source name and URL stable while `.source-ledger__actions` is right-aligned; `[FETCHING...]`, `[INGESTING...]`, `[IMPORTING OPML...]`, `[EXPORTING STATE...]`, and `[IMPORTING STATE...]` expand leftward and must not push source metadata. `.source-ledger__status` uses `{components.source-ledger-status}` with `font-variant-numeric: tabular-nums`; error variants use `.source-ledger__status--error` and `{components.source-ledger-status-error}`. `.source-ledger__status--error` and standalone `.raw-error-line` must clamp/wrap according to the `err: <diagnostic>` constraint above. `.bracket-action` uses `{components.bracket-action}` and must render as a text-only `<button>` with strict monospace typography, transparent background, no border, no radius, no shadow, no icon, no pill fill, no transform, and no transition. `.bracket-action:focus-visible` uses `{components.bracket-action-focus}` and must include a visible `{colors.focus}` outline independent of inversion. `.bracket-action[disabled]` uses `{components.bracket-action-disabled}`, keeps the same hitbox dimensions, suppresses hover/focus inversion, preserves opacity at `1`, and shows raw active text such as `[FETCHING...]`, `[INGESTING...]`, `[IMPORTING OPML...]`, `[EXPORTING STATE...]`, or `[IMPORTING STATE...]`. Invisible hitbox enlargement is mandatory: use generous transparent padding (`0.5rem` / `{spacing.sm}` minimum) plus equal negative margin when needed so the click target grows without increasing Source Ledger row height or disrupting baseline alignment. Hover/focus must feel terminal-like: either invert colors immediately (`background: current text color`, `text: paired background color`) or apply an equally stark instantaneous highlight. Do not use soft fades, drop shadows, scale/translate lifts, opacity fades, or animated underlines for bracket actions.
+
 ### State Portability
 Purpose: satisfy active state export/import without adding a settings dashboard.
 
-Anatomy: two terse text actions reachable from the Source Ledger footer: `export state` and `import state`. Export includes active Source Ledger rows, active steering policy rules, and currently resonated items. Import accepts the same portable state bundle and replaces local portable active state with it. Before file selection or final submit, show the warning text `import replaces active sources, rules, and stars`. A future `/doctor` shortcut may point to the same actions, but the implemented surface is Source Ledger only. It must not expose raw command history, superseded steering state, resonance signal history, sync controls, portable receipts, account setup, cloud sync, privacy, or backup-management UI. States: idle, exporting, export complete, importing, import complete, import failed. Feedback is raw text (`exported state.json`, `err: import failed`).
+Anatomy: two terse bracket actions reachable from the Source Ledger footer: `[EXPORT STATE]` and `[IMPORT STATE]`. Export includes active Source Ledger rows, active steering policy rules, and currently resonated items. Import accepts the same portable state bundle and replaces local portable active state with it. Before file selection or final submit, show the warning text `import replaces active sources, rules, and stars`. A future `/doctor` shortcut may point to the same actions, but the implemented surface is Source Ledger only. It must not expose raw command history, superseded steering state, resonance signal history, sync controls, portable receipts, account setup, cloud sync, privacy, or backup-management UI.
+
+States:
+
+- state export default: `[EXPORT STATE]`;
+- state export active: `[EXPORTING STATE...]`, disabled, no spinner, no progress animation;
+- state export complete: revert to `[EXPORT STATE]` and show `exported state.json`;
+- state export failed: revert to `[EXPORT STATE]` and show raw `err: <diagnostic>` text;
+- state import default: `[IMPORT STATE]`;
+- state import active: `[IMPORTING STATE...]`, disabled, no spinner, no progress animation;
+- state import complete: revert to `[IMPORT STATE]` and show `imported state.json` or `import complete`;
+- state import failed: revert to `[IMPORT STATE]` and show raw `err: <diagnostic>` text.
+
+Feedback is raw text. Long `err: <diagnostic>` state-portability messages follow the same one-line desktop, two-line mobile truncation/accessibility constraint as Source Ledger diagnostics.
 
 Keyboard and accessibility: export/import actions are buttons or links with explicit names. Completion and failure messages use live regions. File inputs must remain reachable by keyboard.
+
 ### Diagnostics Output
 
 Purpose: `/doctor` output for power-user operational truth.
@@ -498,17 +620,21 @@ Keyboard and accessibility: search results follow normal feed item focus behavio
 
 ### Feedback Lines
 
-Purpose: raw system strings for errors, empty states, imports, and AI utility failures.
+Purpose: raw system strings for errors, empty states, imports, source-text provenance, and AI utility failures.
 
-Examples: `no new items`, `err: summary unavailable`, `partial: excerpt only`, `doctor: model latency 842ms`. No cute illustrations, skeleton characters, confetti, or apology copy.
+Examples: `no new items`, `err: summary unavailable`, `source text: RSS excerpt only`, `summary provenance: feed excerpt fallback`, `doctor: model latency 842ms`. No cute illustrations, skeleton characters, confetti, or apology copy.
 
 ## Do's and Don'ts
 
 Do:
 
 - Do keep Inspect, Resonate, and Steer as the only primary primitives.
-- Do use Steer for RSS URL paste, correction, and `/doctor` commands.
-- Do keep Source Ledger flat and delete-only beyond import/export.
+- Do use Steer for RSS URL paste, correction, search command entry, and `/doctor` commands.
+- Do allow `SOURCE LEDGER` and `TODAY` to live inside a discreet `RESOFEED` surface menu instead of persistent top-level links.
+- Do keep Source Ledger flat: view source rows, delete, details, OPML import, state export/import, and lightweight manual ingest/fetch only.
+- Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
+- Do represent manual ingest work with text replacement only: `[INGESTING...]`, `[FETCHING...]`, updated timestamps, conflict text, or raw `err:` diagnostics.
+- Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment.
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
@@ -524,11 +650,16 @@ Don't:
 
 - Don't add account registration, profile, password-reset, or onboarding wizard surfaces; the owner-token prompt is a local access gate, not account login.
 - Don't add folders, tags, source hierarchy, ranking sliders, or settings dashboards.
+- Don't turn Source Ledger manual controls into a job dashboard, retry panel, queue, command ledger, activity feed, sync/merge control, or backup-management UI.
+- Don't add a second URL paste/add-source field in Source Ledger; source addition remains through Steer.
 - Don't hide high-volume feeds behind paternalistic auto-collapsing.
 - Don't use unread counts, mark-all-read, queue-clearing, or archive workflows.
 - Don't create moderation consoles, hidden review queues, or extensive activity ledgers.
 - Don't communicate errors with cute empty-state art, ghosts, mascots, or apologetic SaaS copy.
 - Don't use decorative gradients, purple AI trust palettes, random blobs, or Memphis filler.
+- Don't use spinners, loaders, pulsing dots, animated ellipses, toast notifications, or background progress fills for manual ingest.
+- Don't spend the `accent` token on Source Ledger fetch actions; reserve it for Resonate.
+- Don't make bracket actions look like SaaS buttons: no filled pills at rest, no shadows, no transform lifts, no fades, no tiny text-only click targets.
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
 - Don't display internal design-positioning phrases such as “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” as product UI copy.
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
@@ -537,12 +668,14 @@ Don't:
 
 Motion is functional, brief, and optional.
 
-- Hover/focus transitions: 120–150ms ease-out for color/border only.
+- Hover/focus transitions: 120–150ms ease-out for color/border only, except bracket actions.
 - Resonate activation: 150ms ease-out star fill/shape change; no bounce.
 - Pane transitions: 150–220ms ease-out for Inspector on desktop; mobile route transitions may use platform defaults.
-- Loading: raw text states only, or clearly labelled non-skeleton static text placeholders; no skeleton loaders, shimmer or static, under this contract.
+- Loading: raw text states only, or clearly labelled non-skeleton static text placeholders; no skeleton loaders, shimmer or static, under this contract. Manual Source Ledger ingest uses only `[INGESTING...]`, `[FETCHING...]`, timestamps, and raw `err:` strings.
 - Reduced motion: disable transitions beyond immediate state changes.
 - No layout shift: hover, focus, selected, loading, error, and receipt states must keep component bounds stable.
+- No CSS animations or transitions are permitted on `.bracket-action`, `.source-ledger__status`, or manual ingest controls.
+- Bracket actions use immediate terminal feedback: transparent enlarged hitbox at rest, stark color inversion or equivalent hard highlight on hover/focus, strict monospace text, and zero transform/shadow/fade behavior.
 
 ## Low-Fidelity Wireframe
 
@@ -551,14 +684,14 @@ Motion is functional, brief, and optional.
 | > Steer or paste RSS URL...                                        RESOFEED    |
 +--------------------------------------------------------------------------------+
 | src: nyt · 2h · fresh                                    TODAY | INSPECTOR     |
-| The Main Headline Goes Here        [☆]    | [src: nyt] [partial]               |
+| The Main Headline Goes Here        [☆]    | [src: nyt] [source excerpt]        |
 | Dense factual summary, clamped to         | The Main Headline Goes Here        |
-| two lines in the index row.               | ---------------------------------- |
-| ----------------------------------------- | Full extracted text, raw excerpt,  |
-| src: hn · 4h · agent:delivery-bot         | provenance, original link.         |
-| Secondary Story                     [★]   |                                    |
-| ----------------------------------------- | why: fresh from configured source  |
-| src: blog.example · 1d · partial                     YESTERDAY |                                    |
+| two lines in the index row.               | source text: RSS excerpt only      |
+| ----------------------------------------- | summary provenance: model-backed   |
+| src: hn · 4h · agent:delivery-bot         | ---------------------------------- |
+| Secondary Story                     [★]   | Full extracted text, raw excerpt,  |
+| ----------------------------------------- | provenance, original link.         |
+| src: blog.example · 1d · source excerpt        YESTERDAY | why: fresh from configured source  |
 | Older item remains reachable.       [☆]   |                                    |
 +--------------------------------------------------------------------------------+
 | /doctor is raw text; Source Ledger is flat; export/import are terse JSON actions |
