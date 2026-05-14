@@ -58640,7 +58640,7 @@ phases:
       \n## Headline\nPASS_EXPECTED_RED"
   - id: urda-source-ledger-expected-red-browser-tests
     name: Add expected-red Source Ledger browser tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -58706,6 +58706,67 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-14T16:53:37.736325+00:00'
+    done_at: '2026-05-14T17:12:04.610258+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Key passages: Issue 1 says Source Ledger is missing `[RUN INGEST]`;\
+      \ Issue 2 says rows are missing per-source `[FETCH]`; Issue 4 says raw `err:`\
+      \ diagnostics are not inline; Issue 5 says row geometry collapses source/status/fetch\
+      \ data; Issue 6 says visible `[IMPORT OPML]` is a non-keyboard `<label>`; Issue\
+      \ 13 records delete confirmation changing row height from 101px to 102px.\n\
+      - docs/DESIGN.md — READ. Key passages: Source Ledger anatomy requires global\
+      \ `[RUN INGEST]`, row-level `[FETCH]`, `[IMPORT OPML]`, raw diagnostic text,\
+      \ stable right-aligned actions, exact bracket labels, button semantics, 44px\
+      \ hit targets, and DOM contract classes including `.bracket-action--run-ingest`,\
+      \ `.bracket-action--fetch`, `.source-ledger__name`, `.source-ledger__status`,\
+      \ and `.source-ledger__actions`.\n- docs/ARCHITECTURE.md — READ. Key passages:\
+      \ manual global ingest and per-source fetch use `POST /api/ingest` and `POST\
+      \ /api/sources/{id}/fetch`; they share the in-process ingest concurrency guard,\
+      \ must not overlap, return 409 conflict when already running, and must not create\
+      \ queues/jobs/activity ledgers.\n\n## Expected-Red Source Ledger Browser Test\
+      \ Report\n- step_intent: test_define_red\n- expected_result: red\n- observed_result:\
+      \ red\n- failure_alignment: Added real Playwright browser tests that render\
+      \ the actual Source Ledger surface through the app shell with fixture API responses.\
+      \ The observed failures expose the declared audit gaps for issues 1, 2, 4, 5,\
+      \ 6, and 13.\n- verdict: PASS\n- blockers: []\n- product_implementation_files_modified:\
+      \ false\n- Modified files limited to tests/fixtures: YES\n- Commit: 7e5ca02\
+      \ `test: add source ledger expected-red browser coverage`\n- Orchestrator merge\
+      \ commit: ba6708a `[vectl] step-urda-source-ledger-expected-red-browser-tests\
+      \ completed`\n- Artifacts Modified:\n  - `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\n\
+      - Desktop rendered DOM assertions:\n  - `.bracket-action--run-ingest` exists\
+      \ with exact `[RUN INGEST]`, switches to `[INGESTING...]`, stable hitbox, posts\
+      \ to `/api/ingest`, and shows terse completion/conflict/error feedback.\n  -\
+      \ Every `.source-ledger__row` exposes `.bracket-action--fetch` with exact `[FETCH]`,\
+      \ switches to `[FETCHING...]`, stable hitbox, and posts to `/api/sources/{id}/fetch`.\n\
+      \  - Rows expose stable `.source-ledger__name`, `.source-ledger__url`, `.source-ledger__status--error`,\
+      \ and right-aligned `.source-ledger__actions`.\n  - Raw `err:` diagnostic is\
+      \ inline and has full diagnostic in `title`.\n  - Delete confirmation preserves\
+      \ row bounding box.\n- Mobile rendered DOM assertions:\n  - At `390x844`, every\
+      \ row still exposes `[FETCH]`.\n  - At `390x844`, source name, URL, raw status/error,\
+      \ and action columns remain structurally present and stable.\n- Accessibility\
+      \ considerations:\n  - `[IMPORT OPML]` expected as visible keyboard-reachable\
+      \ `button` with accessible name `[IMPORT OPML]`.\n  - File input expected to\
+      \ remain reachable with accessible name matching `import OPML`.\n  - Manual\
+      \ ingest/fetch controls expected to be named buttons with stable hit targets.\n\
+      - Commands run and outputs:\n  - `npm --prefix web ci`: exit 0; installed missing\
+      \ web test dependencies locally.\n  - `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe`: exit 1 expected-red; 5 failed / 5 run.\n  - `npm\
+      \ --prefix web run check`: exit 0; `svelte-check found 0 errors and 0 warnings`.\n\
+      \  - `git status --short`: exit 0; clean after commit.\n  - mainline final-state\
+      \ verification after merge: `npm --prefix web run check`: exit 0; `npm --prefix\
+      \ web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe`: exit 1 EXPECTED_RED_ACCEPTED with 5 failures\
+      \ matching issues 1,2,4,5,6,13.\n- Expected failures / exposed gaps by issue:\n\
+      \  - Issue 1: `.bracket-action--run-ingest` not found; `[RUN INGEST]` missing\
+      \ from actual Source Ledger header.\n  - Issue 2: `.bracket-action--fetch` not\
+      \ found in desktop rows; per-source `[FETCH]` missing before mobile/fetch POST\
+      \ lifecycle can pass.\n  - Issue 4: raw `err:` diagnostic cannot be asserted\
+      \ inline because the required status/error element is absent.\n  - Issue 5:\
+      \ `.source-ledger__name` stable column missing; current layout still combines\
+      \ source/status copy instead of required column structure.\n  - Issue 6: `getByRole('button',\
+      \ { name: '[IMPORT OPML]' })` not found; visible action remains non-button semantics.\n\
+      \  - Issue 13: delete confirmation changes row bounds; observed height changed\
+      \ from 101 to 102.\n- Downstream owner: urda-source-ledger-controls-diagnostics-layout-fix\n\
+      \n## Headline\nPASS_EXPECTED_RED"
   - id: urda-visual-a11y-expected-red-browser-tests
     name: Add expected-red visual, layout, accessibility, and preview tests
     status: claimed
