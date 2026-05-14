@@ -59953,3 +59953,136 @@ phases:
     depends_on:
     - urda-final-issue-closure-matrix
     agent: spec-verifier
+  - id: urda-final-black-box-runtime-ui-smoke
+    name: Final black-box runtime UI smoke with CLI preservation confirmation
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      Independence Level: L3
+
+
+      As blind-tester Mode D, perform a final black-box smoke of the repaired UI/runtime
+      from public interfaces only.
+
+
+      Required:
+
+      - Build and launch real `resofeed serve` with the documented CLI flags and isolated
+      DB.
+
+      - Authenticate with owner token.
+
+      - Exercise Source Ledger `[RUN INGEST]`, row `[FETCH]`, OPML import button focus/activation,
+      state export/import reachability, Search, feed, Inspector original link, Owner
+      Token Prompt rejected-token state, `/doctor`, mobile feed, mobile Inspector,
+      and mobile Source Ledger.
+
+      - Confirm the CLI Surface Preservation Protocol matrix still passes: no new
+      CLI required for manual ingest/fetch repair, documented flags preserved, no
+      sidecar/worker/admin process required.
+
+      - Capture artifacts sufficient for gate review: screenshots, accessibility snapshots,
+      network request evidence, console logs, and command outputs.
+
+
+      Do not inspect or modify implementation code. Finding issues is valuable; report
+      with public reproduction steps.'
+    verification: '- `resofeed serve` starts with documented flags and serves the
+      repaired UI.
+
+      - Public UI workflows for all audit-affected surfaces are exercised through
+      real browser/runtime, not mocks.
+
+      - CLI matrix confirms documented flags are preserved and no extra process/sidecar/worker
+      is required.
+
+      - Evidence includes actual command output, request/response proof for ingest/fetch,
+      screenshots, and accessibility snapshots.
+
+      - Any blocker-class public-interface issue is reported with reproduction and
+      closure path.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Final Black-Box Runtime UI Smoke
+
+      **Tester**: blind-tester
+
+      **Independence Level**: L3
+
+
+      ### Commands
+
+      ```
+
+      <build and launch commands, secrets redacted>
+
+      ```
+
+
+      ### CLI Surface Preservation Matrix
+
+      | Surface | Expected | Actual | Verdict |
+
+      |---|---|---|---|
+
+      | `resofeed serve` one process | one Go binary | <actual> | PASS/FAIL |
+
+      | `--addr` | preserved | <actual> | PASS/FAIL |
+
+      | `--public-url` | preserved | <actual> | PASS/FAIL |
+
+      | `--db` | preserved | <actual> | PASS/FAIL |
+
+      | `--owner-token` | preserved | <actual> | PASS/FAIL |
+
+      | no new manual ingest/fetch CLI | preserved | <actual> | PASS/FAIL |
+
+
+      ### Public workflow probes
+
+      | Workflow | Artifact/ref | Verdict | Notes |
+
+      |---|---|---|---|
+
+      | Source Ledger `[RUN INGEST]` | <ref> | PASS/FAIL | <notes> |
+
+      | Source row `[FETCH]` | <ref> | PASS/FAIL | <notes> |
+
+      | OPML import keyboard semantics | <ref> | PASS/FAIL | <notes> |
+
+      | Search | <ref> | PASS/FAIL | <notes> |
+
+      | Feed/mobile metadata | <ref> | PASS/FAIL | <notes> |
+
+      | Inspector link | <ref> | PASS/FAIL | <notes> |
+
+      | Owner Token Prompt | <ref> | PASS/FAIL | <notes> |
+
+      | `/doctor` | <ref> | PASS/FAIL | <notes> |
+
+
+      ### Issues Found
+
+      | Severity | Description | Reproduction | Blocks final gate? |
+
+      |---|---|---|---|
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-final-spec-and-product-boundary-review
+    agent: blind-tester
