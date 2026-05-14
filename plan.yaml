@@ -59455,7 +59455,7 @@ phases:
       PASS'
   - id: urda-backend-runtime-green-retest
     name: Retest backend/runtime manual ingest and source diagnostics green
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -59556,6 +59556,8 @@ phases:
     depends_on:
     - urda-expose-source-diagnostics-and-ingest-runtime-contract
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-14T17:42:59.175795+00:00'
   - id: urda-serve-liveness-and-cli-surface-matrix
     name: Mode D liveness and CLI surface preservation matrix for serve runtime
     status: pending
