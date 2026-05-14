@@ -58219,6 +58219,110 @@ phases:
     aligned to docs/ARCHITECTURE.md and docs/DESIGN.md before remediation starts.
   depends_on:
   - regression-audit-remediation-independent-retest-and-closure
+  steps:
+  - id: urda-contract-issue-matrix
+    name: Lock UI runtime design audit issue matrix
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      work_type: defect_repair
+
+
+      Build a finding-by-finding closure matrix for all 14 findings in `docs/audits/ui-runtime-design-audit-2026-05-15.md`.
+
+
+      Required coverage:
+
+      - Issue 1: global Source Ledger `[RUN INGEST]`
+
+      - Issue 2: row-level `[FETCH]`
+
+      - Issue 3: `docs/ui-preview.html` manual ingest/fetch drift
+
+      - Issue 4: raw `err:` diagnostics inline
+
+      - Issue 5: Source Ledger stable row geometry
+
+      - Issue 6: keyboard/button semantic `[IMPORT OPML]`
+
+      - Issue 7: bracket action hover/focus inversion
+
+      - Issue 8: remove Search architecture-note prose
+
+      - Issue 9: Search filter label/control alignment
+
+      - Issue 10: mobile feed metadata legibility
+
+      - Issue 11: Inspector original-link token styling
+
+      - Issue 12: Owner Token Prompt heading scale
+
+      - Issue 13: delete confirmation must not shift row geometry
+
+      - Issue 14: Resonate repeated-control accessible names
+
+
+      Authority constraints:
+
+      - `docs/DESIGN.md` is authoritative for UI labels, token usage, DOM contracts,
+      accessibility, and forbidden UI patterns.
+
+      - `docs/ARCHITECTURE.md` is authoritative for the one Go binary, one SQLite
+      DB, HTTP API, ingest concurrency guard, and no queues/job dashboards/activity
+      ledgers/sync systems.
+
+      - The previous regression-audit Source Ledger control disposition is superseded
+      for this repair by the current DESIGN.md + audit authority requiring `[RUN INGEST]`
+      and `[FETCH]`; record that authority adjudication explicitly.
+
+      - Do not plan or create accounts, SaaS onboarding, vector/RAG features, folders/tags/unread/archive/settings
+      sliders, drag ordering, sidecar workers, queues, ledgers, or sync/merge systems.
+
+
+      Deliverable: a matrix artifact in evidence, not product code, mapping each issue
+      to downstream owner step(s), test/proof obligation, gate(s), refs, and non-forbidden
+      acceptance criteria.'
+    verification: '- Matrix enumerates all 14 audit issues exactly once.
+
+      - Every issue maps to at least one repair owner and one downstream verification/gate.
+
+      - Authority conflict around Source Ledger manual controls is explicitly resolved
+      against current DESIGN.md/ARCHITECTURE.md.
+
+      - Forbidden product concepts are listed as guardrails for downstream implementers.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Issue Coverage Matrix
+
+      | Issue | Severity | Acceptance owner step(s) | Verification/gate step(s) |
+      Authority refs | Forbidden-scope guardrail |
+
+      |---|---|---|---|---|---|
+
+
+      ## Authority Adjudication
+
+      - Source Ledger manual controls authority: <current decision and refs>
+
+      - Prior conflicting disposition, if any: <how superseded or non-intersecting>
+
+
+      ## Headline
+
+      PASS | FAIL'
+    agent: spec-verifier
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
