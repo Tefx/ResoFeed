@@ -61588,7 +61588,7 @@ phases:
       ,\"web/tests/e2e\"],\"headline\":\"PASS\"}\n\n## Headline\nPASS"
   - id: urda-browser-regression-post-fix-retest
     name: Post-fix browser regression, live artifact, and layout retest
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -61873,6 +61873,8 @@ phases:
     depends_on:
     - urda-browser-regression-batched-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-14T19:24:45.395054+00:00'
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
