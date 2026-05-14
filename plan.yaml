@@ -59239,6 +59239,136 @@ phases:
 
       PASS | FAIL'
     agent: frontend-engineer
+  - id: urda-search-feed-inspector-owner-resonate-polish-fix
+    name: Repair bracket actions, Search, mobile feed, Inspector link, owner-token
+      heading, and Resonate a11y
+    status: pending
+    description: 'step_type: implementation
+
+      tags: ["ui", "accessibility"]
+
+
+      Complete frontend visual/layout/accessibility repair for audit issues 7, 8,
+      9, 10, 11, 12, and 14.
+
+
+      Scope and required outcomes:
+
+      - Issue 7: `.bracket-action:hover` and `:focus-visible` use DESIGN token-based
+      stark inversion or equally hard highlight immediately; keep visible focus outline
+      independent of inversion; no transition/transform/shadow.
+
+      - Issue 8: remove user-visible Search architecture/design explanation copy (`Lexical
+      and metadata retrieval only; results stay source-backed.`). Preserve compact
+      per-result provenance such as `match: lexical index` and `provenance: source-backed`.
+
+      - Issue 9: align Search filter labels and controls as stable pairs at 1280px
+      desktop; avoid checkbox layout shifting the result-limit select.
+
+      - Issue 10: make mobile feed metadata legible while compact; preserve source,
+      age, extraction/provenance, and time-group signals without over-truncated fragments
+      like `src: si...`.
+
+      - Issue 11: style Inspector original link with muted/token palette/archival
+      metadata treatment, not browser-default blue underline.
+
+      - Issue 12: tune Owner Token Prompt heading to chrome/prompt scale; keep local
+      gate anatomy and do not introduce account/login/onboarding language.
+
+      - Issue 14: keep visible Resonate glyph unchanged, but include item context
+      in repeated button accessible names, e.g. `Resonate item: <title>` / `Remove
+      resonance: <title>`.
+
+
+      Known risks / Gate Preview:
+
+      1. Do not remove allowed Search provenance; only remove architecture-note prose.
+
+      2. Do not spend accent token on fetch/bracket actions; accent remains scarce
+      and for Resonate state.
+
+      3. Do not add friendly SaaS copy, onboarding, settings, unread/archive/counts,
+      or AI-magic trust palette.
+
+      4. Accessibility changes must improve screen-reader disambiguation without changing
+      visible visual grammar.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered DOM/computed-style/screenshot or test-renderer
+      proof for each visual and accessibility claim.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic or styling that produces observable
+      output varying by UI state/input.'
+    verification: '- Expected-red visual/a11y tests from `urda-visual-a11y-expected-red-browser-tests`
+      turn green for issues 7, 8, 9, 10, 11, 12, and 14.
+
+      - Computed-style evidence shows bracket-action hover/focus inversion and Inspector
+      link token styling.
+
+      - Browser/screenshot evidence shows aligned Search filters and legible mobile
+      feed metadata.
+
+      - Accessibility evidence shows unique Resonate accessible names while visible
+      glyph remains unchanged.
+
+      - Product-copy scan confirms Search architecture note and forbidden SaaS/onboarding
+      copy are not visible.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Visual/A11y Repair Evidence
+
+      **Issues covered**: 7, 8, 9, 10, 11, 12, 14
+
+
+      ### Files changed
+
+      - <file>
+
+
+      ### Rendered/computed evidence by issue
+
+      - Issue 7 bracket hover/focus: <computed styles / screenshot>
+
+      - Issue 8 Search note removed, provenance preserved: <DOM/text evidence>
+
+      - Issue 9 Search filter alignment: <screenshot/measurements>
+
+      - Issue 10 mobile feed metadata legibility: <screenshot/DOM text>
+
+      - Issue 11 Inspector link token style: <computed style>
+
+      - Issue 12 owner token heading scale: <computed style/screenshot>
+
+      - Issue 14 Resonate accessible names: <accessibility snapshot>
+
+
+      ### Forbidden copy/scope check
+
+      - Internal architecture slogans visible: NO/YES
+
+      - SaaS onboarding/account/settings/unread/archive concepts added: NO/YES
+
+
+      ## Headline
+
+      PASS | FAIL'
+    depends_on:
+    - urda-source-ledger-controls-diagnostics-layout-fix
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
