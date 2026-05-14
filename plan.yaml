@@ -59197,7 +59197,7 @@ phases:
   steps:
   - id: urda-expose-source-diagnostics-and-ingest-runtime-contract
     name: Expose source diagnostics and preserve manual ingest/fetch runtime contract
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags: ["integration"]
@@ -59337,6 +59337,122 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-14T17:31:55.586384+00:00'
+    done_at: '2026-05-14T17:42:37.267990+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — Read. Key insight: issues
+      1/2/4 require Source Ledger manual ingest/fetch controls and raw row diagnostics;
+      backend currently did not expose `last_fetch_error`.
+
+      - docs/ARCHITECTURE.md — Read. Key insight: `POST /api/ingest` and `POST /api/sources/{id}/fetch`
+      accept only `{}`, reject query params, share one in-process ingest guard, return
+      architecture `ingest` envelopes, and conflict details include `ingest_running=true`,
+      `scope=all`, `retry_allowed=true`.
+
+      - docs/DESIGN.md — Read. Key insight: Source Ledger must render literal raw
+      `err: <diagnostic>` adjacent to source rows; backend timestamps remain RFC3339
+      UTC and UI derives HH:MM:SS only locally.
+
+      - internal/resofeed/urda_backend_runtime_expected_red_test.go — Read. Key insight:
+      expected-red tests assert `last_fetch_error` in `GET /api/sources`, architecture
+      ingest envelopes for both manual paths, source fetch updated source payload,
+      and structured conflict details.
+
+
+      ## Backend Runtime Repair Evidence
+
+      **Issues covered**: 1, 2, 4
+
+
+      ### Files changed
+
+      - internal/resofeed/types.go
+
+      - internal/resofeed/http.go
+
+      - internal/resofeed/ingest.go
+
+      - internal/resofeed/mcp.go
+
+
+      ### Contract proof
+
+      - `GET /api/sources` diagnostic shape: `Source` now includes nullable `last_fetch_error`,
+      populated from `sources.last_fetch_error`.
+
+      - `POST /api/ingest` body/response proof: `go test ./internal/resofeed -run
+      ''TestURDA''` passed; response includes `"ingest":{"scope":"all","source_id":null,"status":...,"started_at":"<RFC3339>","completed_at":"<RFC3339>","duration_ms":...,"sources_attempted":...,"sources_succeeded":...,"sources_failed":...,"items_upserted":...,"errors":[]}`.
+
+      - `POST /api/sources/{id}/fetch` body/response proof: targeted URDA tests passed;
+      response includes `"ingest":{"scope":"source","source_id":"src_urda_fetch_ok",...}`
+      and updated `"source":{"id":"src_urda_fetch_ok","last_fetch_status":"ok","last_fetch_at":"<RFC3339>","last_fetch_error":null,...}`.
+
+
+      ### Failure-path proof
+
+      - conflict 409: `TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails`
+      passed; details are `{"ingest_running":true,"scope":"all","retry_allowed":true}`
+      with message `ingest already running`.
+
+      - bad body/query: `TestURDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody`
+      passed.
+
+      - missing/deleted source: existing package test `TestManualRSSFetchSourceFetchMissingDeletedAndInactiveReturnNotFound`
+      passed via `go test ./internal/resofeed`.
+
+      - source error diagnostic: `TestURDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors`
+      passed; operational RSS failure returns HTTP 200 with source-scoped error and
+      persisted diagnostic.
+
+
+      ### Forbidden scope check
+
+      - Queues/jobs/ledgers/sync/sidecars added: NO.
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      - `gofmt -w internal/resofeed/types.go internal/resofeed/http.go internal/resofeed/mcp.go
+      internal/resofeed/ingest.go` — exit 0
+
+      - `go test ./internal/resofeed -run ''TestURDA''` — exit 0
+
+      - `go test ./internal/resofeed` — exit 0
+
+      - `go test -race ./internal/resofeed -run ''TestURDA|TestManualRSSFetchSharedGuard''`
+      — exit 0
+
+      - `go build ./cmd/resofeed` — exit 0
+
+      - Orchestrator merge: `git merge --squash vectl/step-urda-expose-source-diagnostics-and-ingest-runtime-contract
+      && git commit -m "[vectl] step-urda-expose-source-diagnostics-and-ingest-runtime-contract
+      completed"` — exit 0, commit `0c3c8cb`
+
+      - Mainline final-state verification after merge: `go test ./internal/resofeed
+      -run ''TestURDA'' && go test ./internal/resofeed && go test -race ./internal/resofeed
+      -run ''TestURDA|TestManualRSSFetchSharedGuard'' && go build ./cmd/resofeed`
+      — exit 0 (`go test` outputs ok for targeted, full package, and race targeted
+      commands)
+
+
+      ## Deviation Records
+
+      - none
+
+
+      ## Commit
+
+      - Worker commit: `4092e2d backend: expose ingest diagnostics envelope`
+
+      - Mainline squash commit: `0c3c8cb [vectl] step-urda-expose-source-diagnostics-and-ingest-runtime-contract
+      completed`
+
+
+      ## Headline
+
+      PASS'
   - id: urda-backend-runtime-green-retest
     name: Retest backend/runtime manual ingest and source diagnostics green
     status: pending
