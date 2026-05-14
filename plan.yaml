@@ -58384,6 +58384,72 @@ phases:
     depends_on:
     - urda-contract-issue-matrix
     agent: golang-developer
+  - id: urda-source-ledger-expected-red-browser-tests
+    name: Add expected-red Source Ledger browser tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add browser/Svelte tests, limited to tests and fixtures, for audit issues 1,
+      2, 4, 5, 6, and 13.
+
+
+      Required expected-red coverage:
+
+      - Issue 1: Source Ledger header renders `.bracket-action--run-ingest` with exact
+      `[RUN INGEST]`, switches to `[INGESTING...]` with stable hitbox, calls `POST
+      /api/ingest`, and renders terse completion/conflict/error feedback.
+
+      - Issue 2: every source row renders a `.bracket-action--fetch` `[FETCH]`, switches
+      to `[FETCHING...]` with stable hitbox, calls `POST /api/sources/{id}/fetch`,
+      and works on mobile.
+
+      - Issue 4: raw `err:` diagnostics from source data render inline adjacent to
+      affected row, clamped with accessible full text.
+
+      - Issue 5: row layout has stable columns for name, URL, status/error, and right-aligned
+      actions on desktop and mobile.
+
+      - Issue 6: visible `[IMPORT OPML]` is keyboard reachable with button semantics
+      and explicit accessible name while file input remains reachable.
+
+      - Issue 13: delete confirmation does not change row height/bounds.
+
+
+      This is pre-implementation expected-red coverage. Success means the failing
+      assertions expose the design/runtime gaps without product-code changes.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Tests MUST render the actual Source Ledger DOM/component and assert visible
+      DOM output; view-model-only checks are insufficient.'
+    verification: '- Test files/fixtures only; no product implementation changes.
+
+      - Tests assert actual rendered Source Ledger DOM in desktop and mobile dimensions.
+
+      - Expected-red evidence lists failures for issues 1, 2, 4, 5, 6, and 13 or explains
+      already-green coverage.
+
+      - Tests use exact labels `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`,
+      `[IMPORT OPML]`.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\n## Expected-Red\
+      \ Source Ledger Browser Test Report\n- Modified files limited to tests/fixtures:\
+      \ YES/NO\n- Desktop rendered DOM assertions:\n  - <assertions>\n- Mobile rendered\
+      \ DOM assertions:\n  - <assertions>\n- Expected failures / exposed gaps by issue:\n\
+      \  - Issue 1: <gap>\n  - Issue 2: <gap>\n  - Issue 4: <gap>\n  - Issue 5: <gap>\n\
+      \  - Issue 6: <gap>\n  - Issue 13: <gap>\n- Downstream owner: urda-source-ledger-controls-diagnostics-layout-fix\n\
+      \n## Headline\nPASS_EXPECTED_RED | FAIL"
+    depends_on:
+    - urda-contract-issue-matrix
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
