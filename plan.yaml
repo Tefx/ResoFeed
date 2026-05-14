@@ -59684,6 +59684,92 @@ phases:
     depends_on:
     - urda-browser-regression-and-layout-retest
     agent: uiux-auditor
+  - id: urda-frontend-ui-audit-gate
+    name: Gate frontend UI runtime design audit repair
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the frontend/UI audit
+      remediation phase can proceed to final strict closure.
+
+
+      Gate blocks if:
+
+      - Any audit issue 1-14 lacks rendered/browser proof or accepted non-intersection
+      rationale.
+
+      - uiux-auditor handoff is missing or FAIL.
+
+      - Source Ledger manual controls do not use the real runtime API contract or
+      introduce queues/jobs/ledgers/sync/settings/folders/tags.
+
+      - Visual/layout claims rely only on tests without screenshots, computed style,
+      DOM, or accessibility artifacts.
+
+      - Keyboard/accessibility regressions remain for `[IMPORT OPML]`, `[RUN INGEST]`,
+      `[FETCH]`, or Resonate buttons.
+
+
+      Gate Decision Basis must map every issue to evidence and OPEN/BLOCK recommendation.'
+    verification: '- Phase-check protecting final closure.
+
+      - Review all implementation, preview sync, browser retest, and uiux-auditor
+      evidence.
+
+      - Gate may OPEN only if each issue is PROVEN fixed or has explicit non-intersection
+      evidence.
+
+      - Confirms no forbidden ResoFeed UI/runtime concepts were introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Issue Closure Basis
+
+      | Issue | Browser proof | UIUX verdict | Remaining status | Blocks final closure?
+      |
+
+      |---|---|---|---|---|
+
+
+      ## Forbidden Scope Review
+
+      - accounts/onboarding/settings/folders/tags/unread/archive/sync/queues/job dashboards/vector/RAG/sidecars
+      introduced: <none or details>
+
+
+      ## Gate Decision
+
+      OPEN | BLOCK'
+    depends_on:
+    - urda-source-ledger-controls-diagnostics-layout-fix
+    - urda-search-feed-inspector-owner-resonate-polish-fix
+    - urda-ui-preview-manual-ingest-sync
+    - urda-browser-regression-and-layout-retest
+    - urda-uiux-multimodal-design-audit
+    agent: gate-reviewer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
