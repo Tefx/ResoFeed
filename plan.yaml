@@ -58213,7 +58213,7 @@ phases:
       SQLite DBs, and `.venv` were not committed.'
 - id: ui-runtime-design-audit-contract-tests
   name: UI Runtime Design Audit — Contract Matrix and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Every issue 1-14 from docs/audits/ui-runtime-design-audit-2026-05-15.md has
     explicit owner, acceptance criteria, expected-red/proof coverage, and authority
     aligned to docs/ARCHITECTURE.md and docs/DESIGN.md before remediation starts.
@@ -58901,7 +58901,7 @@ phases:
       \ and documented.\n- verdict: PASS\n- blockers: []\n\n## Headline\nPASS_EXPECTED_RED"
   - id: urda-contract-tests-gate
     name: Gate UI runtime audit contract and expected-red coverage
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -58989,9 +58989,206 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-14T17:13:47.500547+00:00'
+    done_at: '2026-05-14T17:30:01.613909+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — READ. Key passage: findings
+      1-14 explicitly define the runtime/design gaps, including missing `[RUN INGEST]`,
+      missing row `[FETCH]`, preview drift, raw `err:` diagnostics, stable Source
+      Ledger geometry, OPML button semantics, bracket hover/focus inversion, Search
+      prose/layout, mobile metadata truncation, Inspector link styling, owner-token
+      heading scale, delete-confirm geometry, and repeated Resonate accessible names.
+
+      - docs/DESIGN.md — READ. Key passage: Source Ledger contract requires flat manual
+      controls only in Source Ledger; `[RUN INGEST]` and `[FETCH]` are immediate commands,
+      not durable jobs; forbidden folders/tags/job dashboards/queues/activity ledgers/sync
+      controls; manual controls must use named 44px bracket buttons and stable geometry.
+
+      - docs/ARCHITECTURE.md — READ. Key passage: architecture requires one Go process,
+      SQLite only, lexical retrieval only, no accounts/OAuth/sync/vector/RAG; manual
+      ingest/fetch must share one in-process concurrency guard, reject overlap with
+      `409 conflict`, and must not persist queues/job tables/command history/ingest
+      ledgers.
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+      | urda-contract-tests-gate | PASS | Strong: mandatory refs read; expected-red
+      Go/browser tests inspected and rerun; frontend check green; browser tests produce
+      rendered DOM/computed-style/screenshot/attachment evidence | Expected-red failures
+      remain implementation obligations, but they align with declared audit gaps and
+      are not blockers for opening implementation |
+
+
+      ## Verification Run
+
+      | Command | Exit Code | Interpretation |
+
+      |---|---:|---|
+
+      | `go test ./internal/resofeed -run ''TestURDA''` | 1 | Expected red. Failures
+      align with backend/manual-ingest contract gaps: missing `last_fetch_error`,
+      non-architecture ingest envelopes, missing conflict details. |
+
+      | `npm --prefix web run check` | 0 | Frontend type/Svelte diagnostics clean.
+      |
+
+      | `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --reporter=line` | 1 | Expected red. 5 failures align with issues 1, 2, 4/5,
+      6, 13. Browser artifacts include screenshots/videos/traces. |
+
+      | `npm --prefix web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts
+      --reporter=line` | 1 | Expected red. 2 tests expose issue 3 and issues 7-14
+      via rendered preview/app DOM, screenshots, computed styles, and JSON proof attachments.
+      |
+
+      | mainline final-state verification: `git diff --quiet main..vectl/step-urda-contract-tests-gate`
+      | 0 | Gate branch made no repo changes; no merge needed. |
+
+      | mainline final-state verification: `vectl_validate` | 0 | Plan valid — 0 errors,
+      0 warnings. |
+
+
+      ## Artifacts Modified
+
+      None intentionally. Verification generated `.test-artifacts` churn; it was restored/removed.
+      Final gate worktree branch was clean. No product/test/doc files modified. No
+      commit created because there were no repository changes to commit; fabricating
+      an empty commit would violate the gate instruction.
+
+
+      ## Issue Coverage Check
+
+      | Issue | Covered by tests/proof? | Implementation owner? | Gate owner? | Blocking
+      gap? |
+
+      |---|---|---|---|---|
+
+      | 1 | Yes: `source-ledger-controls...spec.ts:111-125`; Go envelope support also
+      probed | source-ledger-run-ingest-repair; backend-manual-ingest-wireup | Runtime
+      UI gate | No |
+
+      | 2 | Yes: `source-ledger-controls...spec.ts:127-146`; Go source fetch response
+      test | source-ledger-row-fetch-repair; source-fetch-api-integration | Runtime
+      UI/API gate | No |
+
+      | 3 | Yes: `urda-visual-a11y...spec.ts:213-229`, rendered `docs/ui-preview.html`
+      | ui-preview-source-ledger-contract-sync | Static doc/render gate | No |
+
+      | 4 | Yes: Go `last_fetch_error` test and UI inline diagnostic test | source-ledger-raw-error-api-and-ui
+      | API/UI gate | No |
+
+      | 5 | Yes: UI stable columns/actions assertions at desktop/mobile | source-ledger-row-grid-repair
+      | Visual/regression gate | No |
+
+      | 6 | Yes: role/name/focus OPML import button test | opml-import-button-semantics
+      | Accessibility gate | No |
+
+      | 7 | Yes: computed hover/focus style proof | bracket-action-token-state-repair
+      | CSS/a11y gate | No |
+
+      | 8 | Yes: rendered Search architecture-note absence check currently red | search-visible-copy-cleanup
+      | UI copy gate | No |
+
+      | 9 | Yes: rendered label/control bounding-box alignment proof | search-filter-layout-repair
+      | Visual/a11y gate | No |
+
+      | 10 | Yes: mobile rendered feed metadata screenshot/measurement proof | mobile-feed-metadata-legibility
+      | Mobile visual gate | No |
+
+      | 11 | Yes: Inspector original-link computed style proof | inspector-original-link-token-style
+      | Visual/a11y gate | No |
+
+      | 12 | Yes: owner-token heading computed typography proof | owner-token-prompt-heading-scale
+      | Visual/a11y gate | No |
+
+      | 13 | Yes: row bounding box before/after delete confirmation | source-ledger-delete-confirmation-geometry
+      | Runtime visual gate | No |
+
+      | 14 | Yes: repeated Resonate accessible-name uniqueness/context proof | resonate-accessible-name-disambiguation
+      | Accessibility gate | No |
+
+
+      ## Wiring Audit (W1-W8 or equivalent)
+
+      - W1 Audit-to-test coverage: PASS. All 14 audit issues have direct expected-red
+      coverage or backend fixture/proof coverage.
+
+      - W2 Test-to-owner mapping: PASS. Closure matrix lists implementation owners
+      and verification/gate owners for every issue.
+
+      - W3 Expected-red alignment: PASS. Rerun failures match declared gaps; no unexpected
+      dependency/bootstrap failure remained.
+
+      - W4 Product-code purity: PASS for this gate. No product/test code was edited
+      during review; final worktree clean. Inspected expected-red artifacts are tests/fixtures,
+      not implementation changes.
+
+      - W5 Forbidden concept guardrail: PASS. Inspected tests/fixtures do not introduce
+      accounts, OAuth, sync/merge controls, vector/RAG, job dashboards, queues, activity
+      ledgers, settings dashboards, folders/tags/unread/archive flows, or sidecar
+      workers as product surfaces. `sync`/`async` matches are language/runtime terms,
+      not product sync primitives.
+
+      - W6 Architecture guard coverage: PASS. Backend tests explicitly cover strict
+      `{}` body, no idempotency key, ingest envelope, source fetch envelope, source-scoped
+      errors, and global `409 conflict` details.
+
+      - W7 Browser/render authenticity: PASS. UI tests use Playwright-rendered DOM,
+      role/name locators, bounding boxes, computed styles, screenshots, and JSON attachments;
+      they cannot pass solely on static string assertions for visual/a11y claims.
+
+      - W8 Downstream gate readiness: PASS. Closure matrix provides owner steps and
+      gate steps for all 14 issues; unresolved behavior is expected implementation
+      work, not proof-gap blocker.
+
+
+      ## Escape Hatch Audit
+
+      Scoped search/review found no `@invar:allow` annotations or equivalent escape
+      hatches in the inspected URDA expected-red tests/fixtures. Broad repository
+      search produced only prior audit/meta references and unrelated language terms;
+      no relevant URDA escape hatch was identified.
+
+
+      ## Gate Decision Basis
+
+      - unresolved statuses: expected-red product gaps for issues 1-14 remain intentionally
+      open for implementation.
+
+      - closure_path for each unresolved item: each issue has a downstream owner and
+      gate/retest path per the issue coverage table.
+
+      - final recommendation: OPEN
+
+
+      ## Behavioral Proof Register / Gate Decision
+
+      headline: OPEN
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      verdict: PASS
+
+      blockers: []
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Headline
+
+      OPEN'
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
-  status: locked
+  status: pending
   gate: Backend/API/runtime repair is complete for audit-backed source diagnostics
     and manual-ingest/fetch runtime behavior; runnable `resofeed serve` and CLI surface
     preservation evidence are collected before frontend closure proceeds.
