@@ -58222,7 +58222,7 @@ phases:
   steps:
   - id: urda-contract-issue-matrix
     name: Lock UI runtime design audit issue matrix
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -58325,6 +58325,209 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-14T16:40:23.472411+00:00'
+    done_at: '2026-05-14T16:52:59.514241+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — READ. Key passage: lines
+      111-600 enumerate exactly 14 runtime UI findings, including P0 Source Ledger
+      missing `[RUN INGEST]`, P0 missing row `[FETCH]`, preview drift, raw `err:`
+      omission, geometry/accessibility/styling defects, and repeated Resonate accessible-name
+      ambiguity.
+
+      - docs/DESIGN.md — READ. Key passage: Source Ledger contract requires global
+      `[RUN INGEST]`, per-row `[FETCH]`, raw `err:` diagnostics, stable columns/hitboxes,
+      button semantics, terminal-like bracket action inversion, and forbids queues/job
+      dashboards/activity ledgers/sync controls (lines 525-558, 560-583, 627-665,
+      667-678).
+
+      - docs/ARCHITECTURE.md — READ. Key passage: one Go binary/one SQLite/no sidecars
+      or queues (lines 11-19, 43-68), global ingest/fetch concurrency guard and no
+      durable queue/job/ledger (lines 191-201, 393-399), and manual endpoints `POST
+      /api/ingest` and `POST /api/sources/{id}/fetch` with `409 conflict` behavior
+      (lines 727-849, 938-982).
+
+
+      Blocking gate satisfied:
+
+      - Called read on each required file before analysis.
+
+      - Identified key passages relevant to all 14 issues.
+
+      - Understood current spec expectations from audit + DESIGN + ARCHITECTURE.
+
+
+      No repository file changes were needed for this evidence/artifact contract step;
+      branch diff against main was empty (`git diff --quiet main..vectl/step-urda-contract-issue-matrix`
+      exit 0). Mainline final-state verification: `vectl_validate` PASS — 0 errors,
+      0 warnings. No commit hash is reported for the evidence-only artifact.
+
+
+      ## Issue Coverage Matrix
+
+      | Issue | Severity | Acceptance owner step(s) | Verification/gate step(s) |
+      Authority refs | Forbidden-scope guardrail |
+
+      |---|---|---|---|---|---|
+
+      | 1. Global Source Ledger `[RUN INGEST]` | P0 | source-ledger-run-ingest-repair;
+      backend-manual-ingest-wireup if not already present | Runtime UI gate: Source
+      Ledger header has `.bracket-action--run-ingest`; clicking calls `POST /api/ingest`;
+      button text becomes `[INGESTING...]`; conflict/error/success text is terse;
+      no layout shift | Audit lines 113-147; DESIGN lines 525-548, 560-583, 635-637;
+      ARCH lines 727-849, 950, 973 | Do not create jobs, queues, job dashboard, activity
+      ledger, command history, sidecar worker, or sync primitive |
+
+      | 2. Row-level `[FETCH]` | P0 | source-ledger-row-fetch-repair; source-fetch-api-integration
+      | Runtime UI/API gate: every active source row has named `[FETCH]` button; calls
+      `POST /api/sources/{id}/fetch`; active text `[FETCHING...]`; same hitbox; updates
+      row `last_fetch` or raw `err:` | Audit lines 148-181; DESIGN lines 525-548,
+      558, 560-583; ARCH lines 727-849, 951, 973 | No queue/retry panel/job table;
+      no second source management concept |
+
+      | 3. `docs/ui-preview.html` manual ingest/fetch drift | P1 | ui-preview-source-ledger-contract-sync
+      | Static doc gate: preview includes `last_ingest`, `[RUN INGEST]`, per-row `[FETCH]`,
+      and raw row error fixture matching DESIGN DOM contract | Audit lines 183-215;
+      DESIGN lines 525-583, 635-637 | Preview must not imply background-only refresh
+      or dashboard/job semantics |
+
+      | 4. Raw `err:` diagnostics inline | P1 | source-ledger-raw-error-api-and-ui
+      | API/UI gate: source diagnostic is exposed to UI; affected row renders literal
+      `err:` adjacent to row; desktop clamps with title/details; mobile max two lines
+      | Audit lines 217-258; DESIGN lines 533-555, 583; ARCH lines 177, 401-410, 748-755
+      | Do not replace with friendly copy, toast, remediation card, or separate diagnostics
+      dashboard |
+
+      | 5. Source Ledger stable row geometry | P1 | source-ledger-row-grid-repair
+      | Visual/regression gate: name, URL, status/error, and actions are stable columns;
+      `[FETCHING...]`, `[INGESTING...]`, delete confirmation, and raw errors do not
+      push metadata or change row bounds | Audit lines 259-290; DESIGN lines 525-555,
+      583, 676-678 | No sortable spreadsheet, drag ordering, categories, folders,
+      or settings-density workaround |
+
+      | 6. Keyboard/button semantic `[IMPORT OPML]` | P1 | opml-import-button-semantics
+      | Accessibility gate: visible `[IMPORT OPML]` is a keyboard-focusable named
+      button or equivalent button control; file input remains keyboard reachable;
+      active state `[IMPORTING OPML...]` retains dimensions | Audit lines 292-333;
+      DESIGN lines 536-539, 558, 603, 637, 645 | Do not convert OPML import into onboarding
+      wizard, backup manager, or settings panel |
+
+      | 7. Bracket action hover/focus inversion | P2 | bracket-action-token-state-repair
+      | CSS/a11y gate: `.bracket-action:hover` and `:focus-visible` use immediate
+      token-based inversion or equally stark highlight plus visible focus outline;
+      no transitions/transforms/shadows | Audit lines 334-361; DESIGN lines 165-194,
+      583, 671-678 | No SaaS pill buttons, fades, transform lifts, accent misuse,
+      or tiny text-only hitboxes |
+
+      | 8. Remove Search architecture-note prose | P2 | search-visible-copy-cleanup
+      | UI copy gate: Search no longer renders architecture/design explanation prose;
+      result provenance remains compact operational metadata (`match`, `provenance`)
+      | Audit lines 363-397; DESIGN lines 318, 613-619, 647, 664; ARCH lines 477-489
+      | Do not add RAG/semantic-answer UI, architecture slogans, or extra top-level
+      nav |
+
+      | 9. Search filter label/control alignment | P2 | search-filter-layout-repair
+      | Visual/a11y gate: desktop filter labels and controls align as stable pairs
+      at 1280px; checkbox/select layout does not disconnect following select; keyboard
+      labels remain associated | Audit lines 399-429; DESIGN lines 316, 362-369, 613-619
+      | No settings-dashboard expansion, sliders, or spreadsheet-style bloat |
+
+      | 10. Mobile feed metadata legibility | P1 | mobile-feed-metadata-legibility
+      | Mobile visual gate at 390x844: metadata remains compact but readable and preserves
+      source, age, extraction/provenance, and time group; no fragments like `src:
+      si... · 1...` | Audit lines 431-464; DESIGN lines 379-389, 471-493, 641-644
+      | Do not add unread counts, density settings, metadata pills, archive/queue-clearing
+      flows, or shrink tap targets below 44px |
+
+      | 11. Inspector original-link token styling | P2 | inspector-original-link-token-style
+      | Visual/a11y gate: original link uses muted/token archival metadata styling,
+      remains screen-reader readable, and avoids default browser blue underline unless
+      token-approved | Audit lines 466-502; DESIGN lines 511-523, 640 | No recommendation
+      modules, ads, decorative link styling, or accent-token overuse |
+
+      | 12. Owner Token Prompt heading scale | P2 | owner-token-prompt-heading-scale
+      | Visual/a11y gate: prompt anatomy is product label + terse `Enter owner token`
+      line with chrome/prompt typography; no account/login/onboarding visual hierarchy
+      | Audit lines 504-531; DESIGN lines 429-437, 651 | Do not add account registration,
+      profiles, password reset, OAuth, onboarding wizard, or cloud-auth language |
+
+      | 13. Delete confirmation must not shift row geometry | P2 | source-ledger-delete-confirmation-geometry
+      | Runtime visual gate: clicking `[DELETE]` and showing confirmation preserves
+      row height/bounds; fixed action area or reserved geometry; named destructive
+      confirmation remains terse | Audit lines 533-567; DESIGN lines 549-558, 676
+      | Do not add modal workflow, archive bin, undo activity feed, or deletion ledger
+      |
+
+      | 14. Resonate repeated-control accessible names | P2 | resonate-accessible-name-disambiguation
+      | Accessibility gate: repeated feed-row Resonate buttons retain visible glyph
+      but have unique contextual accessible names including item title/state; strict
+      role/name locator can disambiguate | Audit lines 569-600; DESIGN lines 495-510,
+      493 | Do not change Resonate into ranking slider, unread state, or non-star
+      accent pattern |
+
+
+      ## Authority Adjudication
+
+      - Source Ledger manual controls authority: Current decision is that `[RUN INGEST]`
+      in the Source Ledger header and per-source `[FETCH]` on each source row are
+      required. DESIGN.md is explicit that Source Ledger is the only UI location for
+      lightweight manual ingestion controls, with global `[RUN INGEST]`, source-level
+      `[FETCH]`, text replacement active states, raw conflict/error text, named buttons,
+      stable hitboxes, and no durable job/queue semantics. ARCHITECTURE.md provides
+      matching HTTP endpoints and the in-process global ingest concurrency guard.
+
+      - Prior conflicting disposition, if any: Any earlier regression-audit disposition
+      treating missing manual controls as acceptable is superseded for this repair
+      by current DESIGN.md + ARCHITECTURE.md + the 2026-05-15 runtime audit. The acceptable
+      implementation is manual controls without queues, ledgers, sidecars, or dashboards.
+
+
+      Forbidden downstream concepts guardrail:
+
+      - Do not plan or create accounts, SaaS onboarding, OAuth/RBAC, vector/RAG features,
+      folders/tags/source hierarchy, unread counts, archive flows, settings sliders/dashboards,
+      drag ordering, sidecar workers, queues, job dashboards, ingest ledgers, activity
+      ledgers, sync/merge systems, backup-management UI, or second Source Ledger URL
+      paste fields.
+
+
+      behavioral_proof_register:
+
+      - Issue 1: NEEDS_TEST — requires runtime click/API/concurrency proof.
+
+      - Issue 2: NEEDS_TEST — requires runtime per-row fetch proof.
+
+      - Issue 3: PROVEN_BY_STATIC_GATE_ON_REPAIR — static preview inspection sufficient
+      after repair.
+
+      - Issue 4: NEEDS_TEST — requires seeded source error rendered in UI.
+
+      - Issue 5: NEEDS_TEST — requires visual/DOM geometry measurement.
+
+      - Issue 6: NEEDS_TEST — requires keyboard/a11y proof.
+
+      - Issue 7: NEEDS_TEST — requires computed style or visual focus/hover proof.
+
+      - Issue 8: NEEDS_TEST — requires runtime Search UI proof or static component
+      assertion.
+
+      - Issue 9: NEEDS_TEST — requires desktop layout screenshot/measurement.
+
+      - Issue 10: NEEDS_TEST — requires mobile viewport screenshot/measurement.
+
+      - Issue 11: NEEDS_TEST — requires computed style proof.
+
+      - Issue 12: NEEDS_TEST — requires prompt visual/computed typography proof.
+
+      - Issue 13: NEEDS_TEST — requires before/after row bounds proof.
+
+      - Issue 14: NEEDS_TEST — requires accessibility-tree/role-name proof.
+
+
+      ## Headline
+
+      PASS'
   - id: urda-backend-runtime-expected-red-tests
     name: Add expected-red backend/runtime tests for manual ingest and raw source
       diagnostics
