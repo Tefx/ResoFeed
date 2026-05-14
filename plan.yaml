@@ -58661,7 +58661,7 @@ phases:
     claimed_at: '2026-05-14T16:53:37.736325+00:00'
   - id: urda-visual-a11y-expected-red-browser-tests
     name: Add expected-red visual, layout, accessibility, and preview tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -58733,6 +58733,8 @@ phases:
     depends_on:
     - urda-contract-issue-matrix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-14T16:53:43.063566+00:00'
   - id: urda-contract-tests-gate
     name: Gate UI runtime audit contract and expected-red coverage
     status: pending
