@@ -60086,3 +60086,119 @@ phases:
     depends_on:
     - urda-final-spec-and-product-boundary-review
     agent: blind-tester
+  - id: urda-strict-final-gate
+    name: Strict final gate for UI runtime design audit remediation
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: full-plan-check
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), perform the strict final gate for
+      the runtime UI design audit remediation.
+
+
+      Gate blocks unless:
+
+      - Every issue 1-14 from `docs/audits/ui-runtime-design-audit-2026-05-15.md`
+      is PROVEN fixed with evidence or has explicit accepted non-intersection rationale.
+
+      - `urda-uiux-multimodal-design-audit` produced PASS or accepted PASS_WITH_DEBT
+      with non-blocking rationale.
+
+      - `urda-final-black-box-runtime-ui-smoke` passes the runnable UI and CLI preservation
+      matrix.
+
+      - `urda-final-spec-and-product-boundary-review` finds no blocker-class DESIGN/ARCHITECTURE
+      divergence.
+
+      - `docs/ui-preview.html` drift from issue 3 is closed.
+
+      - No forbidden ResoFeed features or runtime shapes were introduced.
+
+
+      The final gate decision must include a structured behavioral proof register
+      and issue coverage table. OPEN is invalid if any blocker-class behavioral runtime/UI
+      obligation is NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING without remediation
+      ownership.'
+    verification: '- Full-plan-check final gate.
+
+      - Reviews issue closure matrix, spec/product-boundary review, black-box runtime
+      smoke, frontend gate, backend gate, and uiux-auditor handoff.
+
+      - OPEN only if all 14 audit issues are proven fixed or explicitly non-intersecting
+      and no forbidden product/runtime concepts were introduced.
+
+      - Evidence includes gate_decision_basis for unresolved statuses and final OPEN/BLOCK
+      recommendation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Strict Final Gate Review
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: UI Runtime Design Audit Final Closure
+
+
+      ### Evidence reviewed
+
+      | Evidence source | Status | Concerns |
+
+      |---|---|---|
+
+      | urda-final-issue-closure-matrix | <status> | <concerns> |
+
+      | urda-final-spec-and-product-boundary-review | <status> | <concerns> |
+
+      | urda-final-black-box-runtime-ui-smoke | <status> | <concerns> |
+
+      | urda-uiux-multimodal-design-audit | <status> | <concerns> |
+
+      | urda-frontend-ui-audit-gate | <status> | <concerns> |
+
+      | urda-backend-runtime-gate | <status> | <concerns> |
+
+
+      ### Final issue coverage
+
+      | Issue | Final status | Evidence ref | Blocks? |
+
+      |---|---|---|---|
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ### Forbidden Product/Runtime Boundary
+
+      - accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/merge/queues/job
+      dashboards/sidecars introduced: <none or details>
+
+
+      ### Gate Decision
+
+      OPEN | BLOCK'
+    depends_on:
+    - urda-final-issue-closure-matrix
+    - urda-final-spec-and-product-boundary-review
+    - urda-final-black-box-runtime-ui-smoke
+    agent: gate-reviewer
