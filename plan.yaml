@@ -59188,7 +59188,7 @@ phases:
       OPEN'
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
-  status: in_progress
+  status: done
   gate: Backend/API/runtime repair is complete for audit-backed source diagnostics
     and manual-ingest/fetch runtime behavior; runnable `resofeed serve` and CLI surface
     preservation evidence are collected before frontend closure proceeds.
@@ -59826,7 +59826,7 @@ phases:
       :false}\n\n## Headline\nPASS_WITH_DEBT"
   - id: urda-backend-runtime-gate
     name: Gate backend/runtime UI audit repair
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -59912,9 +59912,198 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-14T17:59:37.800112+00:00'
+    done_at: '2026-05-14T18:07:42.408112+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — READ. Issues 1, 2, and
+      4 require `[RUN INGEST]` calling real manual ingest, row `[FETCH]` calling per-source
+      fetch, and raw `err:` diagnostics exposed from backend/API for Source Ledger
+      rendering (lines 113-147, 148-181, 217-257).
+
+      - docs/ARCHITECTURE.md — READ. Contract requires one Go `resofeed serve` runtime,
+      no sidecars/accounts/queues, API auth on `/api/*`, concurrency guard across
+      background/global/source ingest with 409 conflict and no queued jobs, and source
+      diagnostics persisted on canonical rows (lines 11-19, 45-68, 191-201, 393-410,
+      598-614).
+
+      - docs/DESIGN.md — READ. Source Ledger requires global `[RUN INGEST]`, source
+      `[FETCH]`, adjacent raw `err:` diagnostics, no queues/jobs/activity ledgers/settings
+      dashboards, and stable button/hitbox semantics for downstream frontend (lines
+      525-558, 560-583).
+
+      - internal/resofeed/urda_backend_runtime_expected_red_test.go — READ. Tests
+      prove `last_fetch_error` in `/api/sources`, strict empty `{}` manual ingest/fetch
+      requests, source fetch OK/failure envelopes, and overlap conflict details (lines
+      14-42, 44-75, 77-114, 116-173).
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+      | urda-backend-runtime-gate | OPEN | High: mandatory refs read, code surfaces
+      inspected, targeted/full/race/build/liveness rerun passed | Note: frontend remediation
+      still must render these APIs; this gate only validates backend/runtime readiness.
+      |
+
+
+      ## Runtime Proof Obligations
+
+      | Audit issue | Behavior claim | Evidence ref | Status | Closure path |
+
+      |---|---|---|---|---|
+
+      | 1 | global manual ingest endpoint runnable | `http.go:242-247`, `http.go:480-488`;
+      `urda_backend_runtime_expected_red_test.go:44-75`; smoke `POST /api/ingest {}`
+      => 200 with `ingest.scope=all`; `go test ./internal/resofeed -run ''TestURDA''`
+      exit 0 | PROVEN | Frontend can wire `[RUN INGEST]` to `POST /api/ingest` with
+      empty JSON body. |
+
+      | 2 | per-source fetch endpoint runnable | `http.go:291-295`, `http.go:490-508`;
+      `ingest.go:94-123`; `urda_backend_runtime_expected_red_test.go:77-114`; smoke
+      missing source failure => 404 | PROVEN | Frontend can wire row `[FETCH]` to
+      `POST /api/sources/{id}/fetch`; success/failure covered by integration tests.
+      |
+
+      | 4 | raw source diagnostics exposed | `types.go:42-53`; `http.go:772-797`;
+      `mcp.go:469-494`; `urda_backend_runtime_expected_red_test.go:14-42` | PROVEN
+      | Frontend can render `source.last_fetch_error` literally as adjacent `err:`
+      diagnostic. |
+
+
+      ## Wiring Audit (W1-W8 or equivalent)
+
+      - W1 Audit issue -> backend API: issue 1 maps to `POST /api/ingest`; issue 2
+      maps to `POST /api/sources/{id}/fetch`; issue 4 maps to `GET /api/sources` `last_fetch_error`.
+
+      - W2 API routing: `apiHandler.ServeHTTP` routes manual ingest and source fetch
+      before generic source delete/source paths (`http.go:242-247`, `291-295`).
+
+      - W3 Request contract: both manual endpoints require auth, reject query params,
+      require `Content-Type: application/json`, and accept exactly `{}` (`http.go:235-246`,
+      `291-295`, `715-728`).
+
+      - W4 Response contract: manual responses use `IngestResponse` + `IngestRunResult`
+      with scope, timestamps, counts, and source-scoped errors (`http.go:925-954`,
+      `815-844`).
+
+      - W5 Runtime concurrency: background/global/source fetch share `ingestGuard`;
+      conflict returns instead of queueing (`ingest.go:33-35`, `71-100`; `manual_fetch_contract.go:84-100`).
+
+      - W6 Source diagnostics: SQL selects and JSON struct include `last_fetch_error`
+      for HTTP and MCP source resources (`types.go:45-53`, `http.go:776-791`, `mcp.go:473-488`).
+
+      - W7 Behavioral tests: URDA tests cover raw diagnostic exposure, strict request
+      rejection, source OK/failure, and conflict (`urda_backend_runtime_expected_red_test.go:14-173`).
+
+      - W8 Downstream frontend readiness: backend now exposes the exact raw data/actions
+      required by `docs/DESIGN.md`; no backend blocker remains for Source Ledger UI
+      implementation.
+
+
+      ## Escape Hatch Audit
+
+      - Searched Go files for `@invar:allow`, `type ignore`, TODO/FIXME, panic/stub-like
+      escapes.
+
+      - No `@invar:allow` or equivalent production escape hatch found.
+
+      - `panic` matches only `.audit-artifacts/seed_fixture.go`, outside production/backend
+      runtime path.
+
+      - No blocker-class escape hatch identified.
+
+
+      ## CLI/Liveness Matrix Review
+
+      - `go run ./cmd/resofeed --help` exit 0: only `serve` and `owner-token reset`
+      surfaced; no worker/job/sync/admin/manual-ingest CLI command.
+
+      - `go run ./cmd/resofeed serve --help` exit 0: flags preserved as `-addr`, `-db`,
+      `-openrouter-model`, `-owner-token`, `-public-url`.
+
+      - `go run ./cmd/resofeed owner-token reset --help` exit 0: offline reset remains
+      scoped to `--db` and `--confirm-reset`.
+
+      - Real serve smoke rerun exit 0 with redacted dummy `OPENROUTER_KEY`: static
+      `/` => 200; unauth `/mcp` => 401 JSON; authenticated `/api/doctor` => 200 `text/plain`;
+      `/api/sources` => `{"sources":[]}`; `POST /api/ingest {}` => 200 ingest envelope;
+      missing per-source fetch => 404; query/body failure paths => 400.
+
+      - This distinguishes runtime smoke from fixture-injected tests. Per-source success/failure
+      main paths are covered by httptest integration using real `httptest` RSS servers
+      in `TestURDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors`.
+
+
+      ## Forbidden Scope Scan
+
+      - queues/jobs/ledgers/sync/sidecars/accounts/settings dashboards found: none
+      in production behavior.
+
+      - Search hits for these terms are contract comments/tests forbidding expansion
+      (`manual_fetch_contract.go:84-114`, `manual_fetch_contract_test.go:64-87`, `ingest.go:82-84`)
+      or unrelated standard `sync` package imports.
+
+      - No persistent queue/job table/activity ledger/sync coordinator/sidecar/account
+      feature introduced.
+
+
+      ## Behavioral Proof Register / Gate Decision
+
+      headline: OPEN
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      verdict: PASS
+
+      blockers: []
+
+      orchestrator_action_hint: COMPLETE
+
+
+      Verification Run (Command + Exit Code):
+
+      - `go test ./internal/resofeed -run ''TestURDA''` => exit 0, output `ok resofeed/internal/resofeed
+      0.563s`
+
+      - `go test ./internal/resofeed` => exit 0, output `ok resofeed/internal/resofeed
+      0.873s`
+
+      - `go test -race ./internal/resofeed -run ''TestURDA|TestManualRSSFetchSharedGuard''`
+      => exit 0, output `ok resofeed/internal/resofeed 1.704s`
+
+      - `go build ./cmd/resofeed` => exit 0
+
+      - CLI/help/liveness smoke commands above => exit 0
+
+      - Mainline final-state verification: `git diff --quiet main..vectl/step-urda-backend-runtime-gate`
+      exit 0; `go test ./internal/resofeed -run ''TestURDA'' && go build ./cmd/resofeed`
+      exit 0; `vectl_validate` PASS — 0 errors, 0 warnings.
+
+
+      Artifacts Modified:
+
+      - None retained. Temporary smoke artifacts were removed; final branch clean.
+      No commit hash fabricated for this review-only gate.
+
+
+      Programmatic Handoff:
+
+      {"headline":"OPEN","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_open_allowed":true,"verdict":"PASS","blockers":[],"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}
+
+
+      ## Gate Decision
+
+      OPEN'
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
-  status: locked
+  status: pending
   gate: Frontend repair closes Source Ledger controls, raw diagnostics, layout geometry,
     keyboard semantics, design-token hover/focus, search/feed/inspector/owner/resonate
     UI issues, and docs/ui-preview.html drift with rendered browser and multimodal
