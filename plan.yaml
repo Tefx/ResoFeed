@@ -59618,7 +59618,7 @@ phases:
       \n### Headline\nPASS"
   - id: urda-serve-liveness-and-cli-surface-matrix
     name: Mode D liveness and CLI surface preservation matrix for serve runtime
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -59738,6 +59738,8 @@ phases:
     depends_on:
     - urda-backend-runtime-green-retest
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-14T17:49:19.667884+00:00'
   - id: urda-backend-runtime-gate
     name: Gate backend/runtime UI audit repair
     status: pending
