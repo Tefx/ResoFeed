@@ -1,0 +1,24 @@
+{
+  "ingest": {
+    "scope": "source",
+    "source_id": "src_01",
+    "status": "completed",
+    "started_at": "2026-05-09T14:02:00Z",
+    "completed_at": "2026-05-09T14:02:03Z",
+    "duration_ms": 3000,
+    "sources_attempted": 1,
+    "sources_succeeded": 1,
+    "sources_failed": 0,
+    "items_upserted": 4,
+    "errors": []
+  },
+  "source": {
+    "id": "src_01",
+    "url": "https://example.com/feed.xml",
+    "title": "Example",
+    "last_fetch_at": "2026-05-09T14:02:03Z",
+    "last_fetch_status": "ok",
+    "is_active": true,
+    "revision": 2
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "ingest": {
+    "scope": "all",
+    "source_id": null,
+    "status": "completed_with_errors",
+    "started_at": "2026-05-09T14:00:00Z",
+    "completed_at": "2026-05-09T14:00:12Z",
+    "duration_ms": 12000,
+    "sources_attempted": 12,
+    "sources_succeeded": 11,
+    "sources_failed": 1,
+    "items_upserted": 37,
+    "errors": [
+      {
+        "source_id": "src_02",
+        "code": "rss_fetch_error",
+        "message": "feed returned HTTP 502"
+      }
+    ]
+  }
+}

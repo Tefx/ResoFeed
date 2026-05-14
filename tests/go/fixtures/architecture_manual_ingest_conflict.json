@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": "conflict",
+    "message": "ingest already running",
+    "details": {
+      "ingest_running": true,
+      "scope": "all",
+      "retry_allowed": true
+    }
+  }
+}
