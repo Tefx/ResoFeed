@@ -60114,7 +60114,7 @@ phases:
   - id: urda-source-ledger-controls-diagnostics-layout-fix
     name: Repair Source Ledger manual controls, diagnostics, row geometry, and OPML
       semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags: ["integration", "ui", "accessibility"]
@@ -60270,6 +60270,184 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-14T18:08:44.507348+00:00'
+    done_at: '2026-05-14T18:26:41.676581+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — issues 1/2 require `[RUN
+      INGEST]` and per-row `[FETCH]`; issues 4/5 require raw `err:` diagnostics and
+      stable name/url/status/actions columns; issue 6 requires keyboard button semantics
+      for `[IMPORT OPML]`; issue 13 requires delete confirmation without row shift.
+
+      - docs/DESIGN.md — Source Ledger contract: flat rows, exact bracket labels,
+      44px targets, immediate POST controls, raw diagnostics, no queues/jobs/settings/folders/tags/unread/archive.
+
+      - docs/ARCHITECTURE.md — `POST /api/ingest` and `POST /api/sources/{id}/fetch`
+      accept JSON `{}` with no query params; conflicts return `409 conflict` / `ingest
+      already running`; manual triggers must not create durable jobs/queues/ledgers.
+
+      - web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      — expected rendered DOM selectors and states for `.bracket-action--run-ingest`,
+      `.bracket-action--fetch`, `.source-ledger__name`, `.source-ledger__url`, `.source-ledger__status--error`,
+      `.source-ledger__actions`, OPML button role, and row geometry.
+
+
+      ## Source Ledger Repair Evidence
+
+      **Issues covered**: 1, 2, 4, 5, 6, 13
+
+
+      ## Action Summary
+
+      - Added Source Ledger header `[IMPORT OPML]` button and `[RUN INGEST]` button
+      with stable text-only bracket action sizing.
+
+      - Added per-source `[FETCH]` controls and pending `[FETCHING...]` state.
+
+      - Wired UI callbacks through `+page.svelte` to `ResoFeedApiClient.runIngest()`
+      and `fetchSource()`.
+
+      - Normalized architecture ingest envelopes into existing frontend manual-fetch
+      result contracts.
+
+      - Added `last_fetch_error` rendering as raw `err:` row diagnostics with title
+      exposure.
+
+      - Reworked Source Ledger row layout into name / URL / status / right-aligned
+      actions columns.
+
+      - Kept delete confirmation inside the reserved action area to preserve row bounds.
+
+      - Worker commit: `a175723 fix source ledger manual controls`
+
+      - Mainline squash commit: `dc47a8f [vectl] step-urda-source-ledger-controls-diagnostics-layout-fix
+      completed`
+
+
+      ### Files changed
+
+      - web/src/app.css
+
+      - web/src/lib/api-client.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+
+      ### Rendered desktop evidence
+
+      - Screenshot/DOM artifact: `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      rendered DOM assertions passed under Chromium.
+
+      - `[RUN INGEST]` state proof: e2e Issue 1 passed; exact `[RUN INGEST]`, pending
+      `[INGESTING...]`, stable bounding box, POST `/api/ingest`.
+
+      - `[FETCH]` row proof: e2e Issue 2 passed; every desktop row exposed exact `[FETCH]`,
+      pending `[FETCHING...]`, stable bounding box, POST `/api/sources/src_long_diagnostic/fetch`.
+
+      - raw `err:` diagnostic proof: e2e Issues 4/5 passed; `.source-ledger__status.source-ledger__status--error`
+      contained literal long diagnostic and `title`.
+
+      - row geometry before/after pending/delete: e2e Issue 13 passed; delete confirmation
+      row bounding box equality asserted.
+
+
+      ### Rendered mobile evidence
+
+      - Screenshot/DOM artifact: `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      mobile viewport assertions passed at `390x844`.
+
+      - mobile fetch controls present: e2e Issue 2 passed for `{ width: 390, height:
+      844 }`.
+
+      - touch target sizes: bracket buttons use `min-height: 44px`; pending action
+      widths are fixed for hitbox stability.
+
+
+      ### API integration evidence
+
+      **Command or test exercising the full path**:
+
+      ```text
+
+      npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe
+
+      ```
+
+      **Actual output**:
+
+      ```text
+
+      Running 5 tests using 1 worker
+
+      5 passed (4.2s)
+
+      Exit Code: 0
+
+      ```
+
+
+      ### Failure-path proof
+
+      - ingest conflict: `ResoFeedApiClient.manualRssFetchRequest()` preserves `409
+      conflict` as `err: ingest already running`; `npm --prefix web run test:render
+      -- manual-rss-fetch-contract.test.ts` passed 3 tests.
+
+      - source fetch error: e2e fixture returned failed source fetch with long timeout
+      error; rendered row showed raw `err:` diagnostic with full `title`.
+
+
+      ### Forbidden scope check
+
+      - Queues/jobs/ledgers/sync/sidecars/settings/folders/tags/unread/archive added:
+      NO.
+
+
+      ## Verification Run (Command + Exit Code)
+
+      - Worker: `npm --prefix web run check` — Exit Code: 0; `svelte-check found 0
+      errors and 0 warnings`.
+
+      - Worker: `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe` — Exit Code: 0; `5 passed`.
+
+      - Worker: `npm --prefix web run build` — Exit Code: 0; Vite/SvelteKit build
+      completed.
+
+      - Worker: `npm --prefix web run test:render -- manual-rss-fetch-contract.test.ts`
+      — Exit Code: 0; `3 passed`.
+
+      - Mainline final-state verification after merge: `npm --prefix web run check
+      && npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe && npm --prefix web run build && npm --prefix web
+      run test:render -- manual-rss-fetch-contract.test.ts` — Exit Code: 0; check
+      passed, Source Ledger e2e `5 passed`, build completed, render tests `3 passed`.
+
+
+      ## Artifacts Modified
+
+      - web/src/app.css
+
+      - web/src/lib/api-client.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+
+      ## Deviation Records
+
+      - none
+
+
+      ## Headline
+
+      PASS'
   - id: urda-search-feed-inspector-owner-resonate-polish-fix
     name: Repair bracket actions, Search, mobile feed, Inspector link, owner-token
       heading, and Resonate a11y
