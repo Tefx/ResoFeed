@@ -59779,3 +59779,82 @@ phases:
     introduced.
   depends_on:
   - ui-runtime-design-audit-frontend-repair
+  steps:
+  - id: urda-final-issue-closure-matrix
+    name: Finalize issue-by-issue runtime UI audit closure matrix
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+
+      Create the final closure register for all audit issues 1-14 after backend/runtime
+      and frontend phases.
+
+
+      Required register fields:
+
+      - issue number and audit severity;
+
+      - repair owner step(s);
+
+      - verification evidence refs;
+
+      - uiux-auditor verdict ref;
+
+      - runtime/liveness evidence ref where applicable;
+
+      - final status: PROVEN, NEEDS_TEST, UNPROVEN, UNCERTAIN_BLOCKING, or NON_INTERSECTING;
+
+      - closure path for every non-PROVEN status;
+
+      - gate_decision_basis.
+
+
+      This is a proof-closure step, not implementation. It must not patch code or
+      docs.
+
+
+      OPEN recommendation is forbidden if any blocker-class behavioral/runtime/UI
+      obligation remains NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING without explicit
+      remediation ownership.'
+    verification: '- Full-plan-check protecting final gate.
+
+      - Register includes all 14 issues exactly once with evidence refs from contract,
+      backend, frontend, browser retest, uiux audit, and liveness steps.
+
+      - Any unresolved status has a concrete remediation/retest owner or explicit
+      non-intersection evidence.
+
+      - No issue is dismissed as merely pre-existing or out-of-scope disposition.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Final Closure Register
+
+      | Issue | Severity | Repair owner(s) | Verification refs | UIUX ref | Runtime
+      ref | Status | Closure path | Gate decision basis |
+
+      |---|---|---|---|---|---|---|---|---|
+
+
+      ## Unresolved Obligations
+
+      - <none or list with owner>
+
+
+      ## Headline
+
+      PASS | FAIL'
+    agent: spec-verifier
