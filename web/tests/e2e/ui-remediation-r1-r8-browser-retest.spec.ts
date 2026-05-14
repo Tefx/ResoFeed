@@ -79,9 +79,10 @@ async function waitForDirtyCorpusLifecycle(page: Page): Promise<void> {
 async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
   await runSteerCommand(page, 'source ledger', 'source ledger');
-  await page.getByLabel('import OPML').setInputFiles(opmlPath);
+  await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await waitForDirtyCorpusLifecycle(page);
   await page.reload();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();

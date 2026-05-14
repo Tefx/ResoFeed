@@ -197,7 +197,8 @@
         bind:this={importInput}
         type="file"
         accept=".opml,.xml,text/xml,application/xml"
-        aria-label="import OPML"
+        aria-hidden="true"
+        tabindex="-1"
         onchange={() => void importSelectedFile()}
       />
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>

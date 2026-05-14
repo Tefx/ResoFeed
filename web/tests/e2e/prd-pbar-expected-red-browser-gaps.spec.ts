@@ -30,11 +30,12 @@ async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string }, o
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   const emptyLedger = page.getByText('No sources. Paste RSS URL in Steer.');
   if (await emptyLedger.isVisible().catch(() => false)) {
-    await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+    await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
   }
   const feedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await steer(page, 'today');
   await expect(feedItem).toBeVisible({ timeout: 10_000 });
 }

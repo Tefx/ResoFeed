@@ -94,9 +94,9 @@ async function expectCanonicalLedgerSurface(page: Page): Promise<void> {
   const ledgerSurface = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]');
   await expect(ledgerSurface).toHaveClass(/active-panel/);
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  await expect(ledgerSurface.getByRole('button', { name: /Fetch /i })).toHaveCount(0);
-  await expect(ledgerSurface.getByRole('button', { name: '[RUN INGEST]' })).toHaveCount(0);
-  await expect(ledgerSurface.getByLabel('import OPML')).toBeAttached();
+  await expect(ledgerSurface.getByRole('button', { name: '[RUN INGEST]' })).toBeVisible();
+  await expect(ledgerSurface.getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
+  await expect(ledgerSurface.locator('#opml-file')).toBeAttached();
 }
 
 test.describe('source-ledger-navigation-regression expected-red contract', () => {

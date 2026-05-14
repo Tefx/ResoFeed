@@ -43,14 +43,15 @@ async function prepareImportedFeed(page: Page, ownerToken: string, opmlPath: str
   await enterOwnerToken(page, ownerToken);
   await pointerClick(page, page.getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav');
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toBeVisible();
-  await expectHitTarget(page, page.locator('label[for="opml-file"]'), 'OPML import label', { minHeight: 20 });
+  await expectHitTarget(page, page.getByRole('button', { name: '[IMPORT OPML]' }), 'OPML import button', { minHeight: 44 });
   if (await page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/).isVisible()) return;
   if (!(await page.getByText(/ResoFeed E2E Local Source · /).isVisible())) {
-    await page.getByLabel('import OPML').setInputFiles(opmlPath);
+    await page.locator('#opml-file').setInputFiles(opmlPath);
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
   }
   if (!(await page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/).isVisible())) {
-    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
     await triggerFixtureIngest(page);
     await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
   }
@@ -221,7 +222,7 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
 
 test('ui-navigation-hover-inspector-repair hit-target diagnostics: nav clicks never leave the wrong panel active', async ({ page, runInfo, ownerToken }) => {
   await prepareImportedFeed(page, ownerToken, path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expectHitTarget(page, page.locator('label[for="opml-file"]'), 'OPML import action must be a touch-safe hit target', { minHeight: 44 });
+  await expectHitTarget(page, page.getByRole('button', { name: '[IMPORT OPML]' }), 'OPML import action must be a touch-safe hit target', { minHeight: 44 });
   await pointerClick(page, page.getByRole('button', { name: 'TODAY' }), 'TODAY nav repair probe');
   const feedOpen = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await pointerClick(page, feedOpen, 'Inspector open repair probe');

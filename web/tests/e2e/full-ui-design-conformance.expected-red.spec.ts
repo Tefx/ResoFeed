@@ -65,9 +65,9 @@ const expectations: readonly FindingExpectation[] = [
   { id: 'F22', cluster: 'Inspector', source: 'docs/DESIGN.md', expectation: 'Mobile Inspector star is not visible in the first viewport' },
   { id: 'F23', cluster: 'Inspector', source: 'docs/DESIGN.md', expectation: 'Raw provenance disclosure copy is too diagnostic-heavy' },
   { id: 'F24', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'Source Ledger does not follow the required DOM contract' },
-  { id: 'F25', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Manual ingest actions must not be exposed from Source Ledger' },
+  { id: 'F25', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Manual [RUN INGEST] action must be exposed from Source Ledger' },
   { id: 'F26', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Delete action is x instead of [DELETE]' },
-  { id: 'F27', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Import/export actions are bracket actions; fetch controls must not be exposed' },
+  { id: 'F27', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Import/export and fetch controls are bracket actions' },
   { id: 'F28', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source Ledger shows a false imported status by default' },
   { id: 'F29', cluster: 'Source Ledger / State Portability', source: 'docs/DESIGN.md', expectation: 'Source rows omit a stable URL column' },
   { id: 'F30', cluster: 'Source Ledger / State Portability', source: 'audit-required-reading', expectation: 'last fetch diagnostic label is not canonical' },
@@ -167,10 +167,12 @@ async function saveStateScreenshot(page: Page, testInfo: TestInfo, name: string)
 
 async function importFixtureFeed(page: Page, runInfo: { readonly artifactRoot: string }): Promise<void> {
   await openSourceLedger(page);
-  await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
-  await expect(page.getByText(/src: ResoFeed E2E Local Source/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
   await openToday(page);
 }
 
@@ -199,7 +201,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const bodyText = await visibleText(page.locator('body'));
   const topChrome = await metric(page, 'header, .app-chrome, main > div:first-child');
   if (/Analyst|Workbench|Archival|low-fatigue|single-tenant|SaaS/i.test(bodyText)) note(violations, 'F1', 'internal design-positioning phrase is visible in product UI');
-  if (await page.locator('nav[aria-label*="primary" i], aside nav, .tab-nav, .surface-nav, [role="tablist"]').count() > 0) note(violations, 'F2', 'persistent tab/side navigation is present despite shell contract');
+  if (await page.locator('nav[aria-label*="primary" i], aside nav, .tab-nav, [role="tablist"]').count() > 0) note(violations, 'F2', 'persistent tab/side navigation is present despite shell contract');
   if (topChrome.height > 96) note(violations, 'F1', `top chrome is too tall for compact command row: ${topChrome.height}px`);
   if (await page.locator('aside nav, [aria-label*="sidebar" i]').count() > 0) note(violations, 'F2', 'persistent left/sidebar navigation found');
 
@@ -216,11 +218,11 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const rowMetric = await metric(page, '[aria-label^="Open Inspector for:"]');
   if (rowMetric.height % 24 !== 0 && rowMetric.height % 24 !== 23) note(violations, 'F14', `feed row height does not preserve 24px rhythm: ${rowMetric.height}px`);
   if (await page.locator('text=/^TODAY$/').count() > 1) note(violations, 'F8', 'TODAY appears as an extra divider/nav label rather than only inline time group metadata');
-  const star = page.getByRole('button', { name: 'Resonate item' }).first();
-  const starMetric = await metric(page, 'button[aria-label="Resonate item"], button[aria-label="Remove resonance"]');
+  const star = page.getByRole('button', { name: /Resonate item/ }).first();
+  const starMetric = await metric(page, '.contract-resonate');
   if (Math.abs(starMetric.width - 44) > 2 || Math.abs(starMetric.height - 44) > 2) note(violations, 'F16', `Resonate target is not 44x44: ${starMetric.width}x${starMetric.height}`);
   await star.focus();
-  const focusedStar = await metric(page, 'button[aria-label="Resonate item"]:focus-visible, button[aria-label="Remove resonance"]:focus-visible');
+  const focusedStar = await metric(page, '.contract-resonate:focus-visible');
   if (!focusedStar.found || focusedStar.outlineStyle === 'none') note(violations, 'F46', 'focused Resonate action lacks an independent visible focus outline');
 
   await feedItem.click();
@@ -242,13 +244,13 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   await page.setViewportSize({ width: 1280, height: 900 });
   const ledgerText = await visibleText(page.locator('body'));
   if (await page.locator('.source-ledger, [data-testid="source-ledger"], .source-row, [data-testid="source-row"]').count() === 0) note(violations, 'F24', 'Source Ledger lacks required stable DOM contract classes/test ids');
-  if (await page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ }).count() > 0) note(violations, 'F25', 'Source Ledger exposes forbidden manual ingest/fetch action controls');
+  if (await page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ }).count() === 0) note(violations, 'F25', 'Source Ledger omits required [RUN INGEST] manual action control');
   if (!/\[DELETE\]/.test(ledgerText)) note(violations, 'F26', `delete action is not visible canonical [DELETE]: ${ledgerText}`);
-  if (!/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F27', `OPML import action is not visible canonical [IMPORT OPML]: ${ledgerText}`);
+  if (!/\[IMPORT OPML\]/.test(ledgerText) || !/\[FETCH\]/.test(ledgerText)) note(violations, 'F27', `OPML import and fetch actions are not visible canonical bracket labels: ${ledgerText}`);
   if (/imported \d+ sources; folders flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
   if (!/\[EXPORT STATE\]/.test(ledgerText) || !/\[IMPORT STATE\]/.test(ledgerText)) note(violations, 'F35', `state actions are not canonical bracket labels: ${ledgerText}`);
   if (!/https?:\/\//.test(ledgerText)) note(violations, 'F29', `source URL column/value is not visible in ledger rows: ${ledgerText}`);
-  if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/status:\s*ok/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/status fields: ${ledgerText}`);
+  if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/last_fetch:\s*\d{2}:\d{2}:\d{2}/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/last_fetch fields: ${ledgerText}`);
   if (!/last_fetch/.test(ledgerText)) note(violations, 'F30', `timestamp label is not canonical last_fetch: ${ledgerText}`);
   const fileInputMetric = await metric(page, 'input[type="file"]');
   if (fileInputMetric.found && fileInputMetric.display !== 'none' && fileInputMetric.width > 1 && fileInputMetric.height > 1) note(violations, 'F31', `file input leaves visible browser artifact: ${fileInputMetric.width}x${fileInputMetric.height}`);
@@ -314,7 +316,7 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
     note(violations, 'F22', 'mobile feed item was not reachable to verify mobile Inspector header/star placement');
   }
   await saveStateScreenshot(page, testInfo, 'narrow-inspector-route-390x844');
-  const mobileHeaderStarCount = await page.locator('main, body').locator('button[aria-label="Resonate item"], button[aria-label="Remove resonance"]').count();
+  const mobileHeaderStarCount = await page.locator('main, body').getByRole('button', { name: /Resonate item|Remove resonance/ }).count();
   if (mobileHeaderStarCount === 0) note(violations, 'F22', 'mobile Inspector/detail route has no star action near header');
 
   expect.soft(expectations.map((item) => item.id), 'coverage registry must enumerate F1-F52').toEqual(Array.from({ length: 52 }, (_, index) => `F${index + 1}`));

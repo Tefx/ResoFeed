@@ -39,9 +39,10 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
 async function importRegressionFixture(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
   await runSteerCommand(page, 'source ledger', 'source ledger');
-  await page.getByLabel('import OPML').setInputFiles(opmlPath);
+  await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await triggerFixtureIngest(page);
   await expect(page.getByText(/src: Inspector Readable Regression Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
   await runSteerCommand(page, 'today', 'today');

@@ -120,10 +120,11 @@ async function seedFeedFromOpml(page: Page, opmlPath: string): Promise<void> {
   await assertSurface(page, 'ledger');
   const sourceRow = page.getByText(/ResoFeed E2E Local Source ·/);
   if (!(await sourceRow.first().isVisible().catch(() => false))) {
-    await page.getByLabel('import OPML').setInputFiles(opmlPath);
+    await page.locator('#opml-file').setInputFiles(opmlPath);
     await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   }
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await triggerFixtureIngest(page);
   await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
 }
@@ -196,11 +197,12 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await captureArtifact(page, testInfo, manifest, 'first-use', 'Accepted token with no sources; first-use copy in normal shell.');
 
   await assertUnobstructedClick(page.getByRole('button', { name: 'SOURCE LEDGER' }));
-  await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'source-ledger', 'Ledger active with OPML import receipt and flattened source row.');
 
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await triggerFixtureIngest(page);
   await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
 

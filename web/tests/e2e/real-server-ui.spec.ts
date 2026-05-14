@@ -5,7 +5,7 @@ import path from 'node:path';
 import type { Page, TestInfo } from 'playwright/test';
 
 import { test, expect } from './fixtures';
-import { E2E_FAKE_OPENROUTER_KEY } from './e2e-contract';
+import { E2E_FAKE_OPENROUTER_KEY, fixtureOpml } from './e2e-contract';
 
 test.use({ trace: 'on', screenshot: 'on' });
 
@@ -50,24 +50,6 @@ async function waitForHTTP(url: string): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error(`fixture server did not become ready at ${url}`);
-}
-
-async function triggerFixtureIngest(page: Page): Promise<void> {
-  const result = await page.evaluate(async () => {
-    const token = window.localStorage.getItem('resofeed.ownerToken');
-    const response = await window.fetch('/api/ingest', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token ?? ''}`,
-        'Content-Type': 'application/json'
-      },
-      body: '{}'
-    });
-    return { ok: response.ok, status: response.status, body: await response.text() };
-  });
-  if (!result.ok && result.status !== 409) {
-    throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
-  }
 }
 
 async function startPolicyFixtureServer(feedXml: string): Promise<{ child: ChildProcess; url: string }> {
@@ -164,6 +146,63 @@ async function roundTripStateThroughLedgerFooter(page: Page, testInfo: TestInfo)
   expect(fs.existsSync(exportedStatePath), 'state export download was saved').toBe(true);
   await page.locator('#state-json-file').setInputFiles(exportedStatePath);
   await expect(page.getByText('import complete')).toBeVisible();
+}
+
+type AuditArtifactName =
+  | 'today-populated-item'
+  | 'inspector'
+  | 'search'
+  | 'doctor'
+  | 'mobile-feed'
+  | 'mobile-inspector'
+  | 'mobile-source-ledger';
+
+type AuditMetric = {
+  readonly screenshot: string;
+  readonly accessibilitySnapshot: string;
+  readonly viewport: { readonly width: number; readonly height: number };
+  readonly visibleText: string;
+};
+
+type AuditNetworkRecord = {
+  readonly method: string;
+  readonly url: string;
+  readonly status?: number;
+  readonly failure?: string;
+};
+
+type AuditConsoleRecord = {
+  readonly type: string;
+  readonly text: string;
+};
+
+function auditDir(testInfo: TestInfo): string {
+  const outDir = path.join(testInfo.outputDir, 'real-server-live-audit-proof');
+  fs.mkdirSync(outDir, { recursive: true });
+  return outDir;
+}
+
+async function writeAuditJson(testInfo: TestInfo, name: string, value: unknown): Promise<string> {
+  const outPath = path.join(auditDir(testInfo), `${name}.json`);
+  await fs.promises.writeFile(outPath, JSON.stringify(value, null, 2), 'utf8');
+  await testInfo.attach(`${name}.json`, { path: outPath, contentType: 'application/json' });
+  return outPath;
+}
+
+async function captureAuditState(page: Page, testInfo: TestInfo, name: AuditArtifactName, metrics: Record<AuditArtifactName, AuditMetric>): Promise<void> {
+  const outDir = auditDir(testInfo);
+  const screenshot = path.join(outDir, `${name}.png`);
+  const accessibilitySnapshot = path.join(outDir, `${name}.aria.txt`);
+  await page.screenshot({ path: screenshot, fullPage: true });
+  await fs.promises.writeFile(accessibilitySnapshot, await page.locator('body').ariaSnapshot(), 'utf8');
+  await testInfo.attach(`${name}.png`, { path: screenshot, contentType: 'image/png' });
+  await testInfo.attach(`${name}.aria.txt`, { path: accessibilitySnapshot, contentType: 'text/plain' });
+  metrics[name] = {
+    screenshot,
+    accessibilitySnapshot,
+    viewport: page.viewportSize() ?? { width: 0, height: 0 },
+    visibleText: (await page.locator('body').innerText()).replace(/\s+/g, ' ').slice(0, 1000)
+  };
 }
 
 type ItemSummary = {
@@ -291,15 +330,12 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await openSourceLedger(page);
   await expect(page.getByText('No sources. Paste RSS URL in Steer.')).toBeVisible();
 
-  await page
-    .getByLabel('import OPML')
-    .setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
-  await expect(page.getByText(/src: 127\.0\.0\.1:\d+.*status: not_fetched/)).toBeVisible();
+  await expect(page.locator('.source-ledger__row', { hasText: /127\.0\.0\.1:\d+/ })).toContainText('last_fetch: not_fetched');
 
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
-  await triggerFixtureIngest(page);
-  await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
   await expect(page.getByText('[DELETE]')).toBeVisible();
 
   await roundTripStateThroughLedgerFooter(page, testInfo);
@@ -339,6 +375,128 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   }
 });
 
+test('ci-safe real server live audit proof produces complete browser artifacts without API route fixtures', async ({
+  browser,
+  request,
+  runInfo,
+  ownerToken
+}, testInfo) => {
+  const liveAuditFeedXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Live Audit Source</title>
+    <link>https://live-audit.example.test/</link>
+    <description>Deterministic live audit RSS fixture.</description>
+    <item>
+      <title>Live audit item one</title>
+      <link>https://live-audit.example.test/items/one</link>
+      <guid>live-audit-item-one</guid>
+      <pubDate>Fri, 15 May 2026 12:00:00 GMT</pubDate>
+      <description>Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.</description>
+    </item>
+  </channel>
+</rss>`;
+  const feedServer = await startPolicyFixtureServer(liveAuditFeedXml);
+  const isolated = await startIsolatedServer(runInfo, E2E_FAKE_OPENROUTER_KEY);
+  const context = await browser.newContext({ baseURL: isolated.baseURL });
+  const page = await context.newPage();
+  const metrics = {} as Record<AuditArtifactName, AuditMetric>;
+  const network: AuditNetworkRecord[] = [];
+  const consoleMessages: AuditConsoleRecord[] = [];
+
+  page.on('console', (message) => {
+    consoleMessages.push({ type: message.type(), text: message.text() });
+  });
+  page.on('response', (response) => {
+    const url = response.url();
+    if (url.includes('/api/')) network.push({ method: response.request().method(), url, status: response.status() });
+  });
+  page.on('requestfailed', (failedRequest) => {
+    const url = failedRequest.url();
+    if (url.includes('/api/')) network.push({ method: failedRequest.method(), url, failure: failedRequest.failure()?.errorText ?? 'request failed' });
+  });
+
+  try {
+    await enterOwnerToken(page, ownerToken);
+    await openSourceLedger(page);
+    await page.locator('#opml-file').setInputFiles({
+      name: 'live-audit.opml',
+      mimeType: 'text/xml',
+      buffer: Buffer.from(fixtureOpml(feedServer.url), 'utf8')
+    });
+    await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
+
+    const apiFeedAfterIngest = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/feed/today?limit=20');
+    expect(apiFeedAfterIngest.items.some((item) => item.title === 'Live audit item one')).toBe(true);
+
+    await openToday(page);
+    const liveAuditItem = page.getByRole('button', { name: 'Open Inspector for: Live audit item one' });
+    await expect(liveAuditItem).toBeVisible();
+    await captureAuditState(page, testInfo, 'today-populated-item', metrics);
+
+    await liveAuditItem.click();
+    await expect(page.getByRole('heading', { name: 'Live audit item one' })).toBeFocused();
+    await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('why: fresh from configured source');
+    await captureAuditState(page, testInfo, 'inspector', metrics);
+
+    const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+    await steer.fill('search Live audit');
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.getByRole('heading', { name: 'SEARCH' })).toBeVisible();
+    await page.getByRole('button', { name: 'search', exact: true }).click();
+    await expect(page.locator('#search-status')).toContainText('1 results');
+    await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Live audit item one');
+    await captureAuditState(page, testInfo, 'search', metrics);
+
+    await steer.fill('/doctor');
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.getByRole('heading', { name: '/doctor' })).toBeVisible();
+    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter:');
+    await captureAuditState(page, testInfo, 'doctor', metrics);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openToday(page);
+    await expect(page.getByRole('button', { name: 'Open Inspector for: Live audit item one' })).toBeVisible();
+    await captureAuditState(page, testInfo, 'mobile-feed', metrics);
+
+    await page.getByRole('button', { name: 'Open Inspector for: Live audit item one' }).click({ force: true });
+    await expect(page.getByRole('heading', { name: 'Live audit item one' })).toBeVisible();
+    await captureAuditState(page, testInfo, 'mobile-inspector', metrics);
+
+    await steer.fill('source ledger');
+    await steer.press('Enter');
+    await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
+    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/);
+    await captureAuditState(page, testInfo, 'mobile-source-ledger', metrics);
+
+    const apiSearchAfterBrowserSearch = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/search?q=Live%20audit&limit=20');
+    expect(apiSearchAfterBrowserSearch.items.some((item) => item.title === 'Live audit item one')).toBe(true);
+    expect(network.some((entry) => entry.url.includes('/api/ingest') && entry.status === 200)).toBe(true);
+    expect(network.some((entry) => entry.url.includes('/api/search') && entry.status === 200)).toBe(true);
+  } finally {
+    await writeAuditJson(testInfo, 'metrics', metrics);
+    await writeAuditJson(testInfo, 'console-log', consoleMessages);
+    await writeAuditJson(testInfo, 'network-log', network);
+    await context.close();
+    if (isolated.child.pid) {
+      try {
+        process.kill(isolated.child.pid, 'SIGTERM');
+      } catch {
+        // Process already exited; artifacts remain useful.
+      }
+    }
+    if (feedServer.child.pid) {
+      try {
+        process.kill(feedServer.child.pid, 'SIGTERM');
+      } catch {
+        // Process already exited.
+      }
+    }
+  }
+});
+
 test('@parity browser-led API/MCP parity probes share one real server fixture', async ({
   browser,
   request,
@@ -373,11 +531,10 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 
   await openSourceLedger(page);
-  await page.getByLabel('import OPML').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
-  await triggerFixtureIngest(page);
-  await expect(page.getByText(/src: ResoFeed E2E Local Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
   await openToday(page);
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 
@@ -554,9 +711,8 @@ test('@llm-deterministic browser-led accepted steering changes ranking, filterin
     await expect(page.getByRole('status')).toContainText(/source added: 127\.0\.0\.1|background ingest/i);
 
     await openSourceLedger(page);
-    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]|\[FETCH\]|\[FETCHING\.\.\.\]/ })).toHaveCount(0);
-    await triggerFixtureIngest(page);
-    await expect(page.getByText(/src: Policy Ranking Fixture · status: ok · last_fetch:/)).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '[RUN INGEST]' }).click();
+    await expect(page.locator('.source-ledger__row', { hasText: 'Policy Ranking Fixture' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
 
     await openToday(page);
     await expect(page.getByRole('button', { name: 'Open Inspector for: Crypto token launch' })).toBeVisible();

@@ -171,7 +171,10 @@ test.describe('expected-red Source Ledger manual controls, diagnostics, and geom
     await expect(importButton).toHaveClass(/bracket-action/);
     await page.keyboard.press('Tab');
     await expect(importButton, 'keyboard tab order must reach visible [IMPORT OPML]').toBeFocused();
-    await expect(ledger.locator('input[type="file"][accept*="xml"]')).toHaveAccessibleName(/import OPML/i);
+    const fileInput = ledger.locator('input[type="file"][accept*="xml"]');
+    await expect(fileInput, 'hidden file input must remain programmatically reachable by stable selector').toHaveAttribute('id', 'opml-file');
+    await expect(fileInput, 'hidden file input must not duplicate the visible OPML button accessible name').not.toHaveAccessibleName(/import OPML/i);
+    await expect(fileInput, 'hidden file input is implementation plumbing outside the accessibility tree').toHaveAttribute('aria-hidden', 'true');
   });
 
   test('Issue 13: delete confirmation preserves Source Ledger row bounds', async ({ page, ownerToken }) => {

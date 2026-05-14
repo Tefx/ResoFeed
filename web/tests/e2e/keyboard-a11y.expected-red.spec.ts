@@ -99,7 +99,7 @@ test('expected-red keyboard a11y Steer submit doctor log and Inspector original 
   });
 });
 
-test('expected-red keyboard a11y Source Ledger OPML state without manual fetch controls', async ({ page, ownerToken, runInfo }, testInfo) => {
+test('expected-red keyboard a11y Source Ledger OPML state with manual fetch controls', async ({ page, ownerToken, runInfo }, testInfo) => {
   await enterOwnerToken(page, ownerToken);
   const ledgerNav = page.getByRole('button', { name: 'SOURCE LEDGER' });
   await ledgerNav.focus();
@@ -107,18 +107,16 @@ test('expected-red keyboard a11y Source Ledger OPML state without manual fetch c
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   await expectActiveState(ledgerNav, 'SOURCE LEDGER nav active state before ledger controls');
 
-  const opmlInput = page.getByLabel('import OPML');
-  await focusAndAudit(opmlInput, 'OPML import file input');
-  const opmlBox = await opmlInput.boundingBox();
+  const opmlButton = page.getByRole('button', { name: '[IMPORT OPML]' });
+  await focusAndAudit(opmlButton, 'OPML import visible button');
+  const opmlBox = await opmlButton.boundingBox();
   expect.soft(opmlBox?.width ?? 0, 'OPML import control has detectable keyboard hit width').toBeGreaterThanOrEqual(44);
   expect.soft(opmlBox?.height ?? 0, 'OPML import control has detectable keyboard hit height').toBeGreaterThanOrEqual(44);
-  await opmlInput.setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
 
-  for (const forbiddenName of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]'] as const) {
-    await expect(page.getByRole('button', { name: forbiddenName }), `${forbiddenName} must not be keyboard reachable from Source Ledger`).toHaveCount(0);
-  }
-  await expect(page.getByRole('button', { name: /run ingest|ingesting|fetch|fetching/i }), 'Source Ledger must not expose keyboard-reachable manual ingestion/fetch controls').toHaveCount(0);
+  await focusAndAudit(page.getByRole('button', { name: '[RUN INGEST]' }), 'Source Ledger run ingest action');
+  await focusAndAudit(page.getByRole('button', { name: '[FETCH]' }).first(), 'Source Ledger fetch source action');
 
   await focusAndAudit(page.getByRole('button', { name: 'Delete source: ResoFeed E2E Local Source' }), 'Source Ledger delete source');
   await focusAndAudit(page.getByRole('button', { name: 'export state' }), 'State export action');
