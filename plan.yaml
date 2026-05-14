@@ -59455,7 +59455,7 @@ phases:
       PASS'
   - id: urda-backend-runtime-green-retest
     name: Retest backend/runtime manual ingest and source diagnostics green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -59558,6 +59558,64 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-14T17:42:59.175795+00:00'
+    done_at: '2026-05-14T17:48:55.811578+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — read. Key insight: audit issues 1, 2, and 4 require Source Ledger `[RUN\
+      \ INGEST]`, row `[FETCH]`, and raw inline `err:` diagnostics; likely backend\
+      \ fix area for issue 4 was exposing `last_fetch_error` in Source JSON.\n- docs/ARCHITECTURE.md\
+      \ — read. Key insight: background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`\
+      \ share one in-process guard; HTTP manual triggers must reject overlap with\
+      \ `409 conflict`, accept JSON `{}` only, and must not create queues/jobs/ledgers.\n\
+      - docs/DESIGN.md — read. Key insight: Source Ledger must expose global `[RUN\
+      \ INGEST]`, per-source `[FETCH]`, raw `err: <diagnostic>` adjacent to affected\
+      \ source rows, and no durable job/queue/activity dashboard behavior.\n- internal/resofeed/urda_backend_runtime_expected_red_test.go\
+      \ — read. Key insight: expected-red coverage verifies `/api/sources` includes\
+      \ `last_fetch_error`, manual ingest/source fetch strict empty-body/query contracts,\
+      \ source-scoped fetch success/failure envelopes, and conflict details.\n\n##\
+      \ Verification Report\n**Tester**: integration-verifier\n**Scope**: backend/runtime\
+      \ manual ingest and source diagnostics\n**Independence Level**: L1\n\n### Commands\
+      \ executed\n```text\n$ go test ./internal/resofeed -run 'TestURDA'\nok  \tresofeed/internal/resofeed\t\
+      0.564s\nEXIT=0\n\n$ go test ./internal/resofeed\nok  \tresofeed/internal/resofeed\t\
+      0.480s\nEXIT=0\n\n$ go test -race ./internal/resofeed -run 'TestURDA|TestManualRSSFetchSharedGuard'\n\
+      ok  \tresofeed/internal/resofeed\t1.711s\nEXIT=0\n\n$ go build ./cmd/resofeed\n\
+      EXIT=0\n\n$ go test -v ./internal/resofeed -run 'TestURDA|TestManualRSSFetchSharedGuard'\n\
+      All URDA/manual guard tests PASS.\n```\n\nMainline final-state verification\
+      \ after no-op branch diff:\n```text\n$ git diff --quiet main..vectl/step-urda-backend-runtime-green-retest\
+      \ --\nbranch_diff_exit=0\n$ go test ./internal/resofeed -run 'TestURDA' && go\
+      \ test ./internal/resofeed && go test -race ./internal/resofeed -run 'TestURDA|TestManualRSSFetchSharedGuard'\
+      \ && go build ./cmd/resofeed\nok resofeed/internal/resofeed (cached)\nok resofeed/internal/resofeed\
+      \ (cached)\nok resofeed/internal/resofeed (cached)\nEXIT=0\n```\n\n### Main\
+      \ path evidence\n- `GET /api/sources` diagnostic JSON excerpt: `TestURDASourceLedgerSourcesExposeRawDiagnosticsForRows`\
+      \ passed after asserting `source.last_fetch_error == \"err: timeout while fetching\
+      \ upstream feed\"` from `GET /api/sources`.\n- manual ingest success path: `TestURDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody`\
+      \ passed; helper asserts `{ \"ingest\": { \"scope\": \"all\", \"status\": non-empty,\
+      \ \"started_at\": RFC3339, \"completed_at\": RFC3339, \"errors\": [] } }`.\n\
+      - per-source fetch success/path: `TestURDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors`\
+      \ passed; helper asserts `{ \"ingest\": { \"scope\": \"source\", \"source_id\"\
+      : \"src_urda_fetch_ok\" }, \"source\": { \"id\": \"src_urda_fetch_ok\", \"last_fetch_status\"\
+      : \"ok\", \"last_fetch_at\": RFC3339 } }`.\n\n### Failure path evidence\n- conflict\
+      \ 409: `TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails` passed;\
+      \ asserts HTTP `409`, error code `conflict`, message containing `ingest already\
+      \ running`, and details `{ingest_running: true, scope: \"all\", retry_allowed:\
+      \ true}`.\n- invalid body/query: verbose subtests passed for both global ingest\
+      \ and source fetch rejecting query parameters and rejecting `{ \"idempotency_key\"\
+      : \"forbidden\" }` body with HTTP `400`.\n- missing/deleted source: full package\
+      \ run `go test ./internal/resofeed` passed, including existing source fetch\
+      \ missing/deleted/inactive coverage.\n\n### Issues Found\n| Severity | Description\
+      \ | Location | Reproduction |\n|---|---|---|---|\n| None | No blocker-class\
+      \ backend/runtime failures observed in required commands. | N/A | N/A |\n\n\
+      ### Behavioral Proof Register / Gate Decision\nheadline: PASS\nproof_gap_status:\
+      \ NONE\nblocking_status: CLOSED\ngate_open_allowed: true\nverdict: PASS\nblockers:\
+      \ []\norchestrator_action_hint: COMPLETE\nstep_intent: retest_green\nexpected_result:\
+      \ green\nobserved_result: green\nproduct_implementation_files_modified: false\n\
+      artifacts_modified: none; generated `./resofeed` binary from `go build ./cmd/resofeed`\
+      \ was removed by verifier, final branch clean.\nbehavioral_proof_register:\n\
+      \  raw_diagnostics: PROVEN via `TestURDASourceLedgerSourcesExposeRawDiagnosticsForRows`\n\
+      \  manual_ingest_envelope: PROVEN via `TestURDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody`\n\
+      \  source_fetch_envelope: PROVEN via `TestURDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors`\n\
+      \  conflict_guard: PROVEN via `TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails`\
+      \ and race run\n  no_queue_no_ledger_behavior: PROVEN via `TestManualRSSFetchSharedGuardRejectsManualOverlapAndDoesNotPersistArtifacts`\n\
+      \n### Headline\nPASS"
   - id: urda-serve-liveness-and-cli-surface-matrix
     name: Mode D liveness and CLI surface preservation matrix for serve runtime
     status: pending
