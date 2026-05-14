@@ -61588,7 +61588,7 @@ phases:
       ,\"web/tests/e2e\"],\"headline\":\"PASS\"}\n\n## Headline\nPASS"
   - id: urda-browser-regression-post-fix-retest
     name: Post-fix browser regression, live artifact, and layout retest
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -61875,6 +61875,27 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-14T19:24:45.395054+00:00'
+    done_at: '2026-05-14T19:36:15.722074+00:00'
+    evidence: 'PASS: independent post-fix browser regression retest passed; check/build/go
+      build/full-ui/source-ledger/visual/real-server e2e all exit 0; live artifacts
+      and real API proof complete; issues 1-14 and B1-B3 proven; blockers empty; gate_open_allowed
+      true.
+
+
+      Mainline final-state verification (orchestrator, main worktree, 2026-05-15):
+
+      - `npm --prefix web run check` exited 0; svelte-check found 0 errors and 0 warnings.
+
+      - `npm --prefix web run build` exited 0; Vite/SvelteKit production build completed.
+
+      - `go build ./cmd/resofeed` exited 0.
+
+      - `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe` exited 0; 2 passed.
+
+      - `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe`
+      exited 0; 7 passed.'
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
