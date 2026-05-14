@@ -58524,6 +58524,94 @@ phases:
     depends_on:
     - urda-contract-issue-matrix
     agent: frontend-engineer
+  - id: urda-contract-tests-gate
+    name: Gate UI runtime audit contract and expected-red coverage
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the UI runtime design
+      audit contract/test phase is ready for implementation.
+
+
+      Gate Preview (what this gate WILL reject):
+
+      1. Any audit issue 1-14 missing from the closure matrix.
+
+      2. Any expected-red/proof step that modifies product implementation code.
+
+      3. Any plan/test language that reintroduces forbidden ResoFeed concepts: accounts,
+      sync/merge, queues/job dashboards, vector/RAG, settings dashboards, folders/tags/unread/archive,
+      sidecar workers.
+
+      4. Any Source Ledger manual-ingest plan that omits ARCHITECTURE concurrency
+      guard and no-queue/no-ledger constraints.
+
+      5. Any UI test that can pass without rendered DOM or browser-style evidence
+      for visual/layout/accessibility claims.
+
+
+      Independence: gate-reviewer must not be the same agent as test/contract authors.'
+    verification: '- Phase-check protecting downstream implementation gates.
+
+      - All 14 issues have owner steps and verification/gate mappings.
+
+      - Expected-red/proof coverage exists or has explicit already-green disposition
+      for every issue.
+
+      - Evidence includes a structured gate decision basis with OPEN/BLOCK recommendation
+      and unresolved behavioral obligations.
+
+      - No forbidden product concepts or runtime surfaces are planned.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Issue Coverage Check
+
+      | Issue | Covered by tests/proof? | Implementation owner? | Gate owner? | Blocking
+      gap? |
+
+      |---|---|---|---|---|
+
+
+      ## Gate Decision Basis
+
+      - unresolved statuses: <none or list>
+
+      - closure_path for each unresolved item: <path>
+
+      - final recommendation: OPEN | BLOCK
+
+
+      ## Headline
+
+      OPEN | BLOCK'
+    depends_on:
+    - urda-contract-issue-matrix
+    - urda-backend-runtime-expected-red-tests
+    - urda-source-ledger-expected-red-browser-tests
+    - urda-visual-a11y-expected-red-browser-tests
+    agent: gate-reviewer
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
   status: locked
