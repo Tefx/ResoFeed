@@ -59444,6 +59444,143 @@ phases:
     depends_on:
     - urda-source-ledger-controls-diagnostics-layout-fix
     agent: doc-reviewer
+  - id: urda-browser-regression-and-layout-retest
+    name: Retest UI runtime audit fixes in real browser
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+
+      As an INDEPENDENT TESTER (integration-verifier), run the UI/browser regression
+      suite after frontend repairs.
+
+
+      Required coverage:
+
+      - Reproduce the audit setup from `docs/audits/ui-runtime-design-audit-2026-05-15.md`
+      against a real built frontend and real `resofeed serve` binary.
+
+      - Verify all audit metrics/failures are closed for issues 1-14.
+
+      - Capture desktop and mobile screenshots matching the original audit surfaces:
+      Owner Token Prompt, Today feed, Inspector, Source Ledger, Steer add-source,
+      Search, `/doctor`, mobile feed, mobile Inspector, mobile Source Ledger.
+
+      - Verify Source Ledger manual ingest/fetch calls reach the real HTTP API and
+      display pending/success/conflict/error states.
+
+      - Verify accessibility snapshots/roles for `[IMPORT OPML]`, `[RUN INGEST]`,
+      `[FETCH]`, and repeated Resonate buttons.
+
+
+      Finding issues is a successful verification outcome; report blockers with reproduction
+      details rather than patching.'
+    verification: '- Expected result: green.
+
+      - Build real frontend and Go binary, start `resofeed serve` with isolated audit
+      DB and owner token, then run browser checks for all 14 issues.
+
+      - Evidence includes artifact paths for screenshots, DOM/accessibility snapshots,
+      computed-style measurements, and metrics JSON.
+
+      - Any remaining blocker-class issue is mapped to a remediation owner before
+      phase gate opens.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Browser Regression Retest Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: all UI runtime design audit issues 1-14
+
+      **Independence Level**: L1
+
+
+      ### Build/start commands
+
+      ```
+
+      <actual commands>
+
+      ```
+
+
+      ### Artifact paths
+
+      - screenshots: <paths>
+
+      - metrics JSON: <path>
+
+      - accessibility snapshots: <paths>
+
+      - console/network logs: <paths>
+
+
+      ### Issue-by-issue verdicts
+
+      | Issue | Verdict | Evidence ref | Notes |
+
+      |---|---|---|---|
+
+      | 1 | PASS/FAIL | <ref> | <notes> |
+
+      | 2 | PASS/FAIL | <ref> | <notes> |
+
+      | 3 | PASS/FAIL | <ref> | <notes> |
+
+      | 4 | PASS/FAIL | <ref> | <notes> |
+
+      | 5 | PASS/FAIL | <ref> | <notes> |
+
+      | 6 | PASS/FAIL | <ref> | <notes> |
+
+      | 7 | PASS/FAIL | <ref> | <notes> |
+
+      | 8 | PASS/FAIL | <ref> | <notes> |
+
+      | 9 | PASS/FAIL | <ref> | <notes> |
+
+      | 10 | PASS/FAIL | <ref> | <notes> |
+
+      | 11 | PASS/FAIL | <ref> | <notes> |
+
+      | 12 | PASS/FAIL | <ref> | <notes> |
+
+      | 13 | PASS/FAIL | <ref> | <notes> |
+
+      | 14 | PASS/FAIL | <ref> | <notes> |
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-source-ledger-controls-diagnostics-layout-fix
+    - urda-search-feed-inspector-owner-resonate-polish-fix
+    - urda-ui-preview-manual-ingest-sync
+    agent: integration-verifier
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
