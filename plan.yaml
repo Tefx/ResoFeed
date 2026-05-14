@@ -58761,6 +58761,109 @@ phases:
 
       PASS | FAIL'
     agent: golang-developer
+  - id: urda-backend-runtime-green-retest
+    name: Retest backend/runtime manual ingest and source diagnostics green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: local-check
+
+
+      As an INDEPENDENT TESTER (integration-verifier), retest backend/runtime repairs
+      for audit issues 1, 2, and 4 after implementation.
+
+
+      Focus:
+
+      - Raw source diagnostics are present in API output and can support literal `err:`
+      UI rendering.
+
+      - Manual global ingest and per-source fetch endpoints keep ARCHITECTURE request/response
+      contracts.
+
+      - Conflict/no-queue/no-ledger behavior remains intact.
+
+      - This protects downstream frontend Source Ledger repair and final runtime liveness
+      gates.
+
+
+      Finding issues is a successful verification outcome; report blockers rather
+      than patching.'
+    verification: '- Expected result: green.
+
+      - Run targeted backend/API tests for sources, manual ingest, per-source fetch,
+      source diagnostics, conflict guard, invalid body/query, and missing/deleted
+      source.
+
+      - Evidence must include both main-path and highest-risk failure-path outputs.
+
+      - Any blocker-class issue must have explicit remediation path before frontend
+      phase proceeds.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: backend/runtime manual ingest and source diagnostics
+
+      **Independence Level**: L1
+
+
+      ### Commands executed
+
+      ```
+
+      <actual commands>
+
+      ```
+
+
+      ### Main path evidence
+
+      - `GET /api/sources` diagnostic JSON excerpt: <excerpt>
+
+      - manual ingest success path: <output>
+
+      - per-source fetch success/path: <output>
+
+
+      ### Failure path evidence
+
+      - conflict 409: <output>
+
+      - invalid body/query: <output>
+
+      - missing/deleted source: <output>
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-expose-source-diagnostics-and-ingest-runtime-contract
+    agent: integration-verifier
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
   status: locked
