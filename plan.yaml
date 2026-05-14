@@ -60850,7 +60850,7 @@ phases:
       PASS'
   - id: urda-browser-regression-and-layout-retest
     name: Retest UI runtime audit fixes in real browser
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -60985,6 +60985,8 @@ phases:
     - urda-search-feed-inspector-owner-resonate-polish-fix
     - urda-ui-preview-manual-ingest-sync
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-14T18:42:39.415696+00:00'
   - id: urda-uiux-multimodal-design-audit
     name: Run native multimodal UIUX audit for runtime design audit closure
     status: pending
