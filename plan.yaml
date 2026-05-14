@@ -61241,7 +61241,7 @@ phases:
     agent: gate-reviewer
   - id: urda-browser-regression-batched-fix
     name: Batched browser regression and live artifact fix
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -61475,6 +61475,117 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-14T19:04:24.761831+00:00'
+    done_at: '2026-05-14T19:24:25.119746+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — READ.\
+      \ Key passages: one Go deployable/one SQLite/owner-token boundary; manual ingest/fetch\
+      \ use one in-process guard and must not create queues/jobs/ledgers.\n- docs/DESIGN.md\
+      \ — READ. Key passages: Source Ledger includes `[RUN INGEST]`, `[FETCH]`, `[IMPORT\
+      \ OPML]`, state actions; 44px touch targets; manual ingestion is immediate text\
+      \ replacement, not jobs/queues.\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Key passages: live audit required Source Ledger/OPML/Search/Doctor/mobile\
+      \ coverage; OPML visible action must be real keyboard button, not label-only.\n\
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — READ. Key\
+      \ passages: OPML import helper used strict `getByLabel('import OPML')`; Source\
+      \ Ledger assertions conflicted with required manual controls and were corrected\
+      \ under deviation.\n- web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ — READ. Key passages: fixture-routed Source Ledger checks assert `[RUN INGEST]`,\
+      \ `[FETCH]`, raw `err:`, stable geometry, OPML semantics.\n- web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ — READ. Key passages: fixture-routed `page.route('**/api/**')` visual/a11y\
+      \ coverage retained; real-server proof added separately.\n\n## Batched Fix Evidence\n\
+      ### B1 OPML a11y ambiguity\n- Root cause: visible `[IMPORT OPML]` button and\
+      \ hidden file input both exposed OPML import accessible names, making Playwright\
+      \ strict label lookup ambiguous.\n- Files changed:\n  - `web/src/routes/components/SourceLedger.svelte`\n\
+      \  - e2e specs/helpers now use `#opml-file` for programmatic file selection\
+      \ and assert the visible `[IMPORT OPML]` button owns keyboard semantics.\n-\
+      \ Repair: hidden file input now has `aria-hidden=\"true\"` and `tabindex=\"\
+      -1\"`; visible button remains the keyboard/pointer control and calls `.click()`\
+      \ on the input.\n- Sibling search for duplicate OPML accessible labels:\n```text\n\
+      $ rg -n \"getByLabel\\('import OPML'\\)|aria-label=\\\"import OPML\\\"|for=\\\
+      \"opml-file\\\"\" web/src web/tests/e2e\n<no output>\n```\n- Exact focused command\
+      \ output:\n```text\n$ npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe\n5 passed\n```\n\n### B2 Live real-server smoke\
+      \ completeness\n- Root cause: existing real-server smoke depended on old fixture\
+      \ flow and did not guarantee a deterministic named audit item plus complete\
+      \ browser artifact proof.\n- Files changed:\n  - `web/tests/e2e/real-server-ui.spec.ts`\n\
+      - Repair: added `ci-safe real server live audit proof produces complete browser\
+      \ artifacts without API route fixtures`, which starts real `resofeed serve`,\
+      \ imports OPML through the real file input, clicks real `[RUN INGEST]`, verifies\
+      \ API feed/search, and records screenshots/a11y snapshots/metrics/console/network\
+      \ logs.\n- Live artifact set produced by the proof test:\n  - Today item: `today-populated-item.png`\
+      \ / `.aria.txt`\n  - Inspector: `inspector.png` / `.aria.txt`\n  - Search: `search.png`\
+      \ / `.aria.txt`\n  - Doctor: `doctor.png` / `.aria.txt`\n  - mobile feed: `mobile-feed.png`\
+      \ / `.aria.txt`\n  - mobile Inspector: `mobile-inspector.png` / `.aria.txt`\n\
+      \  - mobile Source Ledger: `mobile-source-ledger.png` / `.aria.txt`\n  - metrics\
+      \ JSON: `metrics.json`\n  - accessibility snapshots: one `.aria.txt` per state\
+      \ above\n  - console logs: `console-log.json`\n  - network logs: `network-log.json`\n\
+      - Exact command output:\n```text\n$ npm --prefix web run test:e2e -- real-server-ui.spec.ts\
+      \ --project=chromium-ci-safe\n9 passed (8.4s)\n```\n\n### B3 Real API/manual\
+      \ ingest/fetch proof\n- Proof path: `real-server-ui.spec.ts` now uses a real\
+      \ isolated Go server, a real local RSS fixture server, OPML import, visible\
+      \ `[RUN INGEST]`, `/api/feed/today`, `/api/search`, `/api/doctor`, browser surfaces,\
+      \ and captured network records proving `/api/ingest` and `/api/search` 200 responses.\n\
+      - Evidence that fixture routing is not sole integration proof:\n```text\n$ rg\
+      \ -n \"page\\.route\\('\\*\\*/api/\\*\\*'|real server live audit proof|/api/ingest|/api/sources/.*/fetch\"\
+      \ web/tests/e2e\nweb/tests/e2e/real-server-ui.spec.ts:378:test('ci-safe real\
+      \ server live audit proof produces complete browser artifacts without API route\
+      \ fixtures', async ({\nweb/tests/e2e/real-server-ui.spec.ts:476:    expect(network.some((entry)\
+      \ => entry.url.includes('/api/ingest') && entry.status === 200)).toBe(true);\n\
+      ...fixture-routed specs remain for component/visual coverage...\n```\n\n###\
+      \ Forbidden scope check\n- Queues/jobs/ledgers/sync/sidecars/accounts/settings\
+      \ dashboards/folders/tags/unread/archive/vector/RAG added: NO\n- Boundary proof:\
+      \ changes are limited to Source Ledger OPML semantics and e2e proof paths; no\
+      \ runtime product concepts or storage/schema/process additions.\n\n## Verification\
+      \ Run\n- Worker: `npm --prefix web run check` — exit 0; `svelte-check found\
+      \ 0 errors and 0 warnings`\n- Worker: `npm --prefix web run build` — exit 0;\
+      \ Vite/SvelteKit production build completed and wrote `web/build`\n- Worker:\
+      \ `go build ./cmd/resofeed` — exit 0\n- Worker: `npm --prefix web run test:e2e\
+      \ -- full-ui-design-conformance.expected-red.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; `2 passed (3.9s)`\n- Worker: `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0; `5 passed (4.7s)`\n- Worker: `npm --prefix\
+      \ web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; `2 passed (3.7s)`\n- Worker: `npm --prefix web run test:e2e -- real-server-ui.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0; `9 passed (8.4s)`\n- Mainline merge:\
+      \ `git merge --squash vectl/step-urda-browser-regression-batched-fix && git\
+      \ commit -m \"[vectl] step-urda-browser-regression-batched-fix completed\"`\
+      \ — exit 0, commit `e1999e6`\n- Mainline final-state verification: `npm --prefix\
+      \ web run check && npm --prefix web run build && go build ./cmd/resofeed &&\
+      \ npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts\
+      \ --project=chromium-ci-safe && npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe && npm --prefix web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ --project=chromium-ci-safe && npm --prefix web run test:e2e -- real-server-ui.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0; full-ui `2 passed`, Source Ledger `5\
+      \ passed`, visual/a11y `2 passed`, real-server UI `9 passed`.\n\n## Deviation\
+      \ Records\n- type: test_error; artifact: `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`;\
+      \ changed assertions that incorrectly said Source Ledger manual ingest/fetch\
+      \ controls must not be exposed; why: contradicted DESIGN.md Source Ledger contract\
+      \ requiring `[RUN INGEST]` and `[FETCH]`; impact: test now enforces required\
+      \ controls.\n- type: test_error; artifact: `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\
+      \ and OPML-related e2e helpers; changed hidden file input expectation from accessible\
+      \ label to stable programmatic selector; why: hidden input must not compete\
+      \ with visible `[IMPORT OPML]` button; impact: strict accessible-label ambiguity\
+      \ removed.\n- type: test_error; artifact: `web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts`;\
+      \ narrowed stale selectors for allowed `.surface-nav` and contextual Resonate\
+      \ labels; why: existing product semantics allow the RESOFEED surface menu and\
+      \ unique star accessible names; impact: avoids false failures while preserving\
+      \ coverage.\n\n## Action Summary\n- Removed duplicate hidden OPML accessible\
+      \ label while preserving visible `[IMPORT OPML]` button semantics.\n- Added\
+      \ real-server live audit proof for deterministic `Live audit item one` through\
+      \ documented OPML/manual ingest/API/browser flows.\n- Updated fixture-routed\
+      \ e2e tests/helpers so they no longer depend on duplicate file-input labels\
+      \ or obsolete “no manual controls” expectations.\n\n## Artifacts Modified\n\
+      - `web/src/routes/components/SourceLedger.svelte`\n- `web/tests/e2e/*.spec.ts`\
+      \ and `web/tests/e2e/keyboard-a11y-helpers.ts` OPML/manual-ingest proof selectors\n\
+      - Worker commit: `516512e fix browser regression audit proof`\n- Mainline squash\
+      \ commit: `e1999e6 [vectl] step-urda-browser-regression-batched-fix completed`\n\
+      \n## Programmatic Handoff\n{\"status\":\"SUCCESS\",\"commit\":\"516512e\",\"\
+      branch\":\"vectl/step-urda-browser-regression-batched-fix\",\"verification\"\
+      :[\"npm --prefix web run check\",\"npm --prefix web run build\",\"go build ./cmd/resofeed\"\
+      ,\"npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts\
+      \ --project=chromium-ci-safe\",\"npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe\",\"npm --prefix web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ --project=chromium-ci-safe\",\"npm --prefix web run test:e2e -- real-server-ui.spec.ts\
+      \ --project=chromium-ci-safe\"],\"artifacts_modified\":[\"web/src/routes/components/SourceLedger.svelte\"\
+      ,\"web/tests/e2e\"],\"headline\":\"PASS\"}\n\n## Headline\nPASS"
   - id: urda-browser-regression-post-fix-retest
     name: Post-fix browser regression, live artifact, and layout retest
     status: pending
