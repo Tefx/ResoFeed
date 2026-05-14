@@ -60451,7 +60451,7 @@ phases:
   - id: urda-search-feed-inspector-owner-resonate-polish-fix
     name: Repair bracket actions, Search, mobile feed, Inspector link, owner-token
       heading, and Resonate a11y
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       tags: ["ui", "accessibility"]
@@ -60580,6 +60580,125 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-14T18:27:11.213770+00:00'
+    done_at: '2026-05-14T18:42:15.432442+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — read issues 7,8,9,10,11,12,14:
+      bracket inversion, Search architecture-note removal, Search filter alignment,
+      mobile metadata legibility, Inspector link token styling, Owner Token Prompt
+      heading scale, contextual Resonate names.
+
+      - docs/DESIGN.md — read token/accessibility contract: bracket hover/focus inversion
+      uses text/background tokens; accent reserved for active Resonate; Owner Token
+      Prompt is local owner-token gate; mobile feed metadata remains flat inline monospace;
+      Resonate visible glyph remains ☆/★ with accessible labels.
+
+      - web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts — read assertions
+      for computed styles, Search note absence/provenance retention, label-control
+      measurements, mobile metadata clipping, Inspector link style, heading size,
+      and unique Resonate labels.
+
+
+      ## Visual/A11y Repair Evidence
+
+      **Issues covered**: 7, 8, 9, 10, 11, 12, 14
+
+
+      ### Files changed
+
+      - web/src/app.css
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+
+      ### Rendered/computed evidence by issue
+
+      - Issue 7 bracket hover/focus: implemented token inversion `background: var(--rf-color-text)`
+      and `color: var(--rf-color-background)` with independent focus outline; no transition/transform
+      added.
+
+      - Issue 8 Search note removed, provenance preserved: removed visible `Lexical
+      and metadata retrieval only; results stay source-backed.`; retained per-result
+      `match: lexical index` and `provenance: source-backed`.
+
+      - Issue 9 Search filter alignment: changed desktop filter grid to stable label/control
+      pairs; scoped E2E Issues 7-14 passed.
+
+      - Issue 10 mobile feed metadata legibility: mobile metadata now wraps visibly
+      and source text is not ellipsized/clipped.
+
+      - Issue 11 Inspector link token style: Inspector links now use muted metadata
+      typography and no default underline, with focus-visible outline.
+
+      - Issue 12 owner token heading scale: `#owner-token-heading` uses chrome typography.
+
+      - Issue 14 Resonate accessible names: Feed/Search/Inspector labels now include
+      item title context while visible glyph remains unchanged.
+
+
+      ### Forbidden copy/scope check
+
+      - Internal architecture slogans visible: NO for Search architecture note in
+      web/src.
+
+      - SaaS onboarding/settings/unread/archive/counts/vector/RAG copy added: NO.
+
+
+      ## Verification Run (Command + Exit Code)
+
+      - Worker: `npm --prefix web run check` — Exit 0.
+
+      - Worker: `npm --prefix web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts
+      --project=chromium-ci-safe --grep "Issues 7-14"` — Exit 0.
+
+      - Worker: `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe` — Exit 0.
+
+      - Worker: `npm --prefix web run build` — Exit 0.
+
+      - Worker full visual command initially failed only because concurrent issue
+      3 (`docs/ui-preview.html`) was not yet merged; issue 3 was owned by `urda-ui-preview-manual-ingest-sync`
+      and completed separately.
+
+      - Mainline merge: `git merge --squash vectl/step-urda-search-feed-inspector-owner-resonate-polish-fix
+      && git commit -m "[vectl] step-urda-search-feed-inspector-owner-resonate-polish-fix
+      completed"` — exit 0, commit `34baf6a`.
+
+      - Mainline final-state verification after merging both visual polish and UI
+      preview fix: `npm --prefix web run check && npm --prefix web run test:e2e --
+      urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe
+      && npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe && npm --prefix web run build` — exit 0; visual/a11y
+      e2e `2 passed`, Source Ledger regression e2e `5 passed`, build completed.
+
+
+      ## Deviation Records
+
+      - none
+
+
+      ## Action Summary
+
+      Implemented scoped UI/style/a11y repairs for issues 7,8,9,10,11,12,14 and preserved
+      Source Ledger regression. Previous full-file failure was a concurrent dependency
+      on issue 3; after the preview sync step merged, full mainline verification passed.
+
+
+      ## Artifacts Modified
+
+      - Worker commit: 8038519 `fix UI polish accessibility regressions`
+
+      - Mainline squash commit: 34baf6a `[vectl] step-urda-search-feed-inspector-owner-resonate-polish-fix
+      completed`
+
+
+      ## Headline
+
+      PASS'
   - id: urda-ui-preview-manual-ingest-sync
     name: Sync docs/ui-preview.html to manual ingest and fetch design contract
     status: done
