@@ -61088,7 +61088,7 @@ phases:
 
       PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
-    - urda-browser-regression-and-layout-retest
+    - urda-browser-regression-post-fix-retest
     agent: uiux-auditor
   - id: urda-frontend-ui-audit-gate
     name: Gate frontend UI runtime design audit repair
