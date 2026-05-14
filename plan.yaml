@@ -58531,7 +58531,7 @@ phases:
   - id: urda-backend-runtime-expected-red-tests
     name: Add expected-red backend/runtime tests for manual ingest and raw source
       diagnostics
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -58589,6 +58589,8 @@ phases:
     depends_on:
     - urda-contract-issue-matrix
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-14T16:53:32.294900+00:00'
   - id: urda-source-ledger-expected-red-browser-tests
     name: Add expected-red Source Ledger browser tests
     status: pending
