@@ -58236,3 +58236,12 @@ phases:
     UIUX evidence.
   depends_on:
   - ui-runtime-design-audit-backend-runtime-repair
+- id: ui-runtime-design-audit-final-closure
+  name: UI Runtime Design Audit — Final Closure and Strict Gate
+  status: locked
+  gate: Final closure blocks unless every audit issue 1-14 has issue-by-issue proof,
+    screenshot/runtime evidence, UIUX auditor verdict, CLI/runnable liveness proof
+    where applicable, doc-preview sync evidence, and no forbidden ResoFeed concepts
+    introduced.
+  depends_on:
+  - ui-runtime-design-audit-frontend-repair
