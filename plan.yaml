@@ -59081,6 +59081,164 @@ phases:
     UIUX evidence.
   depends_on:
   - ui-runtime-design-audit-backend-runtime-repair
+  steps:
+  - id: urda-source-ledger-controls-diagnostics-layout-fix
+    name: Repair Source Ledger manual controls, diagnostics, row geometry, and OPML
+      semantics
+    status: pending
+    description: 'step_type: implementation
+
+      tags: ["integration", "ui", "accessibility"]
+
+
+      Complete Source Ledger UI repair for audit issues 1, 2, 4, 5, 6, and 13 within
+      the existing Svelte/static web surface.
+
+
+      Scope and required outcomes:
+
+      - Issue 1: Render global `.bracket-action--run-ingest` button with exact `[RUN
+      INGEST]` in Source Ledger header/action cluster; call `POST /api/ingest`; while
+      pending, keep same hitbox and show `[INGESTING...]`; on completion/conflict/error
+      show terse raw feedback and return to `[RUN INGEST]`.
+
+      - Issue 2: Render source-row `.bracket-action--fetch` button with exact `[FETCH]`;
+      call `POST /api/sources/{id}/fetch`; while pending show `[FETCHING...]` with
+      stable hitbox; update row `last_fetch` or raw `err:` diagnostics; cover mobile
+      Source Ledger too.
+
+      - Issue 4: Render raw `err: <diagnostic>` strings adjacent to affected rows
+      using `.source-ledger__status--error`; clamp/ellipsis desktop, at most two-line
+      mobile wrapping, with full diagnostic via `title` or accessible details.
+
+      - Issue 5: Rework Source Ledger rows into stable documented columns: name, URL,
+      status/error, right-aligned actions. Pending/error text must not push source
+      metadata.
+
+      - Issue 6: Convert visible `[IMPORT OPML]` action to a real keyboard-reachable
+      `<button type="button">` with explicit accessible name while keeping the file
+      input keyboard accessible.
+
+      - Issue 13: Delete confirmation must preserve row geometry; reserve/fix action
+      area so row bounds do not shift on confirmation.
+
+
+      Known risks / Gate Preview:
+
+      1. Manual ingest/fetch must remain immediate HTTP commands, not jobs/queues/dashboards.
+
+      2. Bracket actions must stay text-only monospace controls; no pills, shadows,
+      transforms, spinners, progress bars, or accent-token misuse.
+
+      3. UI-only `last_ingest: HH:MM:SS` / `last_fetch: HH:MM:SS` strings must be
+      derived display only, never persisted or sent as canonical API state.
+
+      4. Mobile must preserve 44 CSS px touch targets and visible controls.
+
+      5. Source Ledger must remain flat; no folders, tags, pause/resume toggles, retry
+      panels, settings, drag ordering, or second URL paste field.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered DOM evidence for desktop and mobile Source Ledger
+      states. Component logic without visible DOM output is insufficient.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs.'
+    verification: '- Expected-red Source Ledger tests from `urda-source-ledger-expected-red-browser-tests`
+      turn green.
+
+      - Real or mocked API integration proves `POST /api/ingest` and `POST /api/sources/{id}/fetch`
+      are called with `{}` and no query params.
+
+      - Desktop and mobile rendered evidence shows `[RUN INGEST]`, `[FETCH]`, raw
+      `err:` diagnostics, stable row geometry, keyboard-reachable `[IMPORT OPML]`,
+      and no delete-confirmation row shift.
+
+      - Failure path proof covers ingest conflict and source fetch error.
+
+      - No forbidden Source Ledger features or job/queue/ledger/sync concepts are
+      introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Source Ledger Repair Evidence
+
+      **Issues covered**: 1, 2, 4, 5, 6, 13
+
+
+      ### Files changed
+
+      - <file>
+
+
+      ### Rendered desktop evidence
+
+      - Screenshot/DOM artifact: <path>
+
+      - `[RUN INGEST]` state proof: <evidence>
+
+      - `[FETCH]` row proof: <evidence>
+
+      - raw `err:` diagnostic proof: <evidence>
+
+      - row geometry before/after pending/delete: <measurements>
+
+
+      ### Rendered mobile evidence
+
+      - Screenshot/DOM artifact: <path>
+
+      - mobile fetch controls present: <evidence>
+
+      - touch target sizes: <measurements>
+
+
+      ### API integration evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact command/test>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Path exercised**: SourceLedger.svelte -> API client/fetch -> `resofeed serve`
+      HTTP endpoint
+
+
+      ### Forbidden scope check
+
+      - queues/jobs/ledgers/sync/settings/folders/tags added: NO/YES
+
+
+      ## Headline
+
+      PASS | FAIL'
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
