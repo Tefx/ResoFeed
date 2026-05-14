@@ -59188,7 +59188,7 @@ phases:
       OPEN'
 - id: ui-runtime-design-audit-backend-runtime-repair
   name: UI Runtime Design Audit — Backend and Runtime Repair
-  status: pending
+  status: in_progress
   gate: Backend/API/runtime repair is complete for audit-backed source diagnostics
     and manual-ingest/fetch runtime behavior; runnable `resofeed serve` and CLI surface
     preservation evidence are collected before frontend closure proceeds.
@@ -59197,7 +59197,7 @@ phases:
   steps:
   - id: urda-expose-source-diagnostics-and-ingest-runtime-contract
     name: Expose source diagnostics and preserve manual ingest/fetch runtime contract
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       tags: ["integration"]
@@ -59335,6 +59335,8 @@ phases:
 
       PASS | FAIL'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-14T17:31:55.586384+00:00'
   - id: urda-backend-runtime-green-retest
     name: Retest backend/runtime manual ingest and source diagnostics green
     status: pending
