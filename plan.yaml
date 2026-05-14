@@ -58864,6 +58864,128 @@ phases:
     depends_on:
     - urda-expose-source-diagnostics-and-ingest-runtime-contract
     agent: integration-verifier
+  - id: urda-serve-liveness-and-cli-surface-matrix
+    name: Mode D liveness and CLI surface preservation matrix for serve runtime
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      Independence Level: L3
+
+
+      As a BLACK-BOX TESTER (blind-tester Mode D), verify the runnable `resofeed serve`
+      surface after backend/runtime repair.
+
+
+      This is required because the audit reproduction uses the real `resofeed serve`
+      binary and manual ingest/fetch are HTTP runtime operations.
+
+
+      CLI Surface Preservation Protocol matrix:
+
+      - Build/start the real binary with documented serve flags: `--addr`, `--public-url`,
+      `--db`, `--owner-token`; use `OPENROUTER_KEY` only from runtime env and redact
+      secrets.
+
+      - Confirm no new CLI flags or commands are required for manual ingest/fetch
+      UI repair.
+
+      - Confirm `resofeed serve` starts, binds the requested address, serves static
+      UI, and accepts authenticated `/api/*` requests.
+
+      - Confirm `POST /api/ingest` and `POST /api/sources/{id}/fetch` work through
+      the running server and preserve documented conflict behavior.
+
+      - Confirm `/api/doctor` remains reachable as raw text and no forbidden UI/runtime
+      surfaces are introduced.
+
+
+      Do not inspect implementation internals except as needed to build/run; this
+      is runnable-surface proof.'
+    verification: '- Entry point starts and stays alive long enough for authenticated
+      HTTP probes.
+
+      - Exact launch command and redacted environment are captured.
+
+      - CLI matrix confirms documented flags still work and no new flags/commands
+      are required.
+
+      - At least one documented request reaches the real `resofeed serve` entrypoint
+      end-to-end: `/api/sources`, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`
+      where a source fixture exists.
+
+      - Conflict behavior is probed or explicitly fixture-blocked with rationale.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Mode D Liveness Report
+
+      **Tester**: blind-tester
+
+      **Scope**: `resofeed serve` runtime and CLI surface preservation
+
+      **Independence Level**: L3
+
+
+      ### Build and launch
+
+      ```
+
+      <exact build and launch commands with secrets redacted>
+
+      ```
+
+
+      ### CLI Surface Preservation Matrix
+
+      | Surface | Expected | Actual | Verdict |
+
+      |---|---|---|---|
+
+      | `resofeed serve --addr` | preserved | <actual> | PASS/FAIL |
+
+      | `--public-url` | preserved | <actual> | PASS/FAIL |
+
+      | `--db` | preserved | <actual> | PASS/FAIL |
+
+      | `--owner-token` | preserved | <actual> | PASS/FAIL |
+
+      | no new manual-ingest CLI flag | preserved | <actual> | PASS/FAIL |
+
+
+      ### Runtime probes
+
+      | Probe | Command/request | Actual output | Verdict |
+
+      |---|---|---|---|
+
+      | static UI | <request> | <output> | PASS/FAIL |
+
+      | `/api/sources` | <request> | <output> | PASS/FAIL |
+
+      | `POST /api/ingest` | <request> | <output> | PASS/FAIL |
+
+      | `POST /api/sources/{id}/fetch` | <request> | <output> | PASS/FAIL |
+
+      | `/api/doctor` | <request> | <output> | PASS/FAIL |
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-backend-runtime-green-retest
+    agent: blind-tester
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
   status: locked
