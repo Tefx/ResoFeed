@@ -60850,7 +60850,7 @@ phases:
       PASS'
   - id: urda-browser-regression-and-layout-retest
     name: Retest UI runtime audit fixes in real browser
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -60987,6 +60987,68 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-14T18:42:39.415696+00:00'
+    done_at: '2026-05-14T19:03:36.597039+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Key: original audit used real `resofeed serve`, screenshots/metrics\
+      \ under `.test-artifacts/ui-audit`, and listed issues 1-14, especially missing\
+      \ `[RUN INGEST]`, missing row `[FETCH]`, raw `err:` diagnostics, OPML semantics,\
+      \ hover/focus, Search layout/copy, mobile metadata, Inspector link, Owner Token\
+      \ heading, delete geometry, and repeated Resonate names.\n- docs/DESIGN.md —\
+      \ READ. Key: Source Ledger requires `[RUN INGEST]`, `[FETCH]`, raw `err:` diagnostics,\
+      \ stable 44px named buttons, no spinners, no queues/job dashboards, terminal-style\
+      \ bracket actions, and operational labels only.\n- docs/ARCHITECTURE.md — READ.\
+      \ Key: one Go `resofeed serve` binary, one SQLite DB, single owner token for\
+      \ `/api/*`, and one in-process ingest concurrency guard returning `409 conflict`\
+      \ for overlapping manual ingest/fetch.\n- web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ — READ. Key: covers Issues 1, 2, 4, 5, 6, 13 but uses `page.route('**/api/**')`\
+      \ fixture responses for manual ingest/fetch; therefore it is not full real-API\
+      \ proof.\n- web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ — READ. Key: covers Issue 3 and Issues 7-14 but also uses fixture API routing\
+      \ for app data; generates style/screenshot JSON proof attachments.\n\n## Browser\
+      \ Regression Retest Report\n**Tester**: integration-verifier\n**Scope**: all\
+      \ UI runtime design audit issues 1-14\n**Independence Level**: L1\n**step_intent**:\
+      \ retest_green\n**expected_result**: green\n**observed_result**: red\n**verdict**:\
+      \ FAIL\n\n## Verification Run (Command + Exit Code)\n| Command | Exit | Raw\
+      \ Evidence |\n|---|---:|---|\n| `npm --prefix web run check && npm --prefix\
+      \ web run build && go build ./cmd/resofeed` | 0 | `svelte-check found 0 errors\
+      \ and 0 warnings`; Vite build `✓ built`; Go build completed with no stderr.\
+      \ |\n| `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` | 0 | `Running 5 tests`; `5 passed (4.6s)`. |\n\
+      | `npm --prefix web run test:e2e -- urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ --project=chromium-ci-safe` | 0 | `Running 2 tests`; `2 passed (3.6s)`. |\n\
+      | `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` | 1 | `1 failed`; strict mode: `getByLabel('import\
+      \ OPML') resolved to 2 elements`: visible `[IMPORT OPML]` button and hidden\
+      \ file input `import OPML`. |\n| live browser/API smoke against real `resofeed\
+      \ serve` | 1 | Failed waiting for `Live audit item one`; partial screenshots\
+      \ produced before failure. Server log: `serving ResoFeed on 127.0.0.1:61252`;\
+      \ stderr empty. |\n\n## Blockers Found\n- B1: Broader audit e2e failed on OPML\
+      \ accessible-label strict-mode ambiguity.\n- B2: Required live end-to-end artifact\
+      \ set incomplete: live smoke captured Owner Prompt and Source Ledger ingest/fetch\
+      \ states but failed before Today populated item / Inspector / Search / Doctor\
+      \ / mobile screenshots.\n- B3: Targeted green specs are fixture-routed (`page.route('**/api/**')`)\
+      \ and are insufficient alone for real API/manual ingest/fetch integration proof.\n\
+      \n## Issue-by-issue verdict summary\n- Issues 3 and 7-14: targeted visual/a11y\
+      \ spec green; however several remain PASS_WITH_DEBT or NEEDS_TEST until real\
+      \ live artifact set completes.\n- Issues 1,2,4,5,6,13: targeted Source Ledger\
+      \ spec green; real Source Ledger partial smoke exists, but metrics/network/a11y\
+      \ artifacts incomplete.\n- Issue 6: explicit broader audit blocker from OPML\
+      \ accessible-label ambiguity.\n\n## Behavioral Proof Register / Gate Decision\n\
+      headline: FAIL\nproof_gap_status: BLOCKING\nblocking_status: OPEN\ngate_open_allowed:\
+      \ false\nverdict: FAIL\nblockers:\n  - B1 broader audit e2e failed\n  - B2 complete\
+      \ live screenshot/a11y/metrics set not produced\n  - B3 targeted green tests\
+      \ use fixture API routes for integration seams\norchestrator_action_hint: DO_NOT_COMPLETE\n\
+      product_implementation_files_modified: false\n\n## Batched remediation created\n\
+      Planner created a single batched remediation path, so this verification step\
+      \ is completed as a blocker-reporting step and downstream work is owned by:\n\
+      - Fix step: `urda-browser-regression-batched-fix`\n- Retest step: `urda-browser-regression-post-fix-retest`\n\
+      - Rewired downstream gates: `urda-uiux-multimodal-design-audit`, `urda-frontend-ui-audit-gate`\
+      \ now depend on post-fix retest.\n\n## Artifacts Modified\n- No product implementation\
+      \ files modified.\n- No tests/docs/plan/orchestrator files intentionally modified\
+      \ by verifier.\n- Untracked evidence artifacts were created under `.test-artifacts/...`\
+      \ in the isolated worktree only and will be cleaned with worktree removal.\n\
+      - No commit was created because this was verify-only and no product changes\
+      \ were made.\n\n## Headline\nFAIL_RECORDED_WITH_BATCHED_REMEDIATION"
   - id: urda-uiux-multimodal-design-audit
     name: Run native multimodal UIUX audit for runtime design audit closure
     status: pending
