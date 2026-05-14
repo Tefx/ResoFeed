@@ -59581,6 +59581,109 @@ phases:
     - urda-search-feed-inspector-owner-resonate-polish-fix
     - urda-ui-preview-manual-ingest-sync
     agent: integration-verifier
+  - id: urda-uiux-multimodal-design-audit
+    name: Run native multimodal UIUX audit for runtime design audit closure
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+
+      As `uiux-auditor`, perform a native multimodal implementation audit after frontend
+      repairs. This is the mandatory downstream UI/UX audit gate for all visual, design-token,
+      layout, accessibility, and runtime UI behavior findings.
+
+
+      Scope:
+
+      - Compare real rendered artifacts against `docs/DESIGN.md`, `docs/ui-preview.html`,
+      and the original audit findings.
+
+      - Use desktop and mobile screenshots, browser accessibility snapshots, computed-style
+      measurements, and runtime interaction artifacts.
+
+      - Verify all issues 1-14 are closed or have explicit non-blocking/non-intersection
+      evidence accepted by the auditor.
+
+      - Pay special attention to Source Ledger manual controls, raw diagnostics, stable
+      geometry, bracket-action hover/focus inversion, mobile metadata legibility,
+      Search copy/layout, Inspector link styling, Owner Token Prompt scale, and Resonate
+      accessible names.
+
+
+      Output must be a parseable PASS / PASS_WITH_DEBT / FAIL handoff with issue-by-issue
+      verdicts. Handler-only or unit-test-only evidence is insufficient.'
+    verification: '- uiux-auditor reviews rendered screenshots/images or equivalent
+      visual/spatial artifacts for all required states/viewports.
+
+      - Evidence includes desktop and mobile Source Ledger, Search, feed, Inspector,
+      Owner Token Prompt, and relevant interaction states.
+
+      - Audit returns parseable PASS/PASS_WITH_DEBT/FAIL and issue-by-issue verdict
+      table.
+
+      - Any PASS_WITH_DEBT includes explicit non-blocking or non-intersection rationale;
+      blocker-class findings require remediation ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## UIUX Audit Handoff
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: runtime UI design audit issues 1-14
+
+
+      ### Rendered artifacts reviewed
+
+      - Desktop screenshots: <paths>
+
+      - Mobile screenshots: <paths>
+
+      - Accessibility snapshots: <paths>
+
+      - Computed-style/measurement JSON: <paths>
+
+
+      ### Issue-by-issue verdicts
+
+      | Issue | Verdict | Evidence ref | Design ref | Notes |
+
+      |---|---|---|---|---|
+
+
+      ### Cross-cutting design checks
+
+      - forbidden UI concepts absent: PASS/FAIL
+
+      - bracket actions terminal-like: PASS/FAIL
+
+      - touch targets >=44px where required: PASS/FAIL
+
+      - raw `err:` diagnostics preserved: PASS/FAIL
+
+      - no layout shift in interaction states: PASS/FAIL
+
+
+      ### Handoff
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-browser-regression-and-layout-retest
+    agent: uiux-auditor
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
