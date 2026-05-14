@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { ImportOpmlResponse, ItemDetail, ItemSummary, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
+  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -308,6 +308,21 @@
     return response;
   }
 
+  async function runIngest(): Promise<RunIngestSuccessResponse> {
+    const response = await apiClient().runIngest();
+    if (!response.ok) throw new Error(`err: ${response.body.error.message}`);
+    sources = (await apiClient().sources()).sources;
+    items = (await apiClient().today()).items;
+    return response.body;
+  }
+
+  async function fetchSource(source: Source): Promise<FetchSourceSuccessResponse> {
+    const response = await apiClient().fetchSource(source.id);
+    if (!response.ok) throw new Error(`err: ${response.body.error.message}`);
+    sources = (await apiClient().sources()).sources;
+    return response.body;
+  }
+
   async function exportState(): Promise<StateBundleV1> {
     return apiClient().exportState();
   }
@@ -439,6 +454,8 @@
         sources={sources}
         onDeleteSource={deleteSource}
         onImportOpml={importOpml}
+        onRunIngest={runIngest}
+        onFetchSource={fetchSource}
         onExportState={exportState}
         onImportState={importState}
         suppressStatusRole={steerFeedback.kind === 'receipt'}

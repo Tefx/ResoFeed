@@ -68,6 +68,7 @@ export interface Source {
   title: string;
   last_fetch_at: Rfc3339UtcString | null;
   last_fetch_status: LastFetchStatus;
+  last_fetch_error?: string | null;
   is_active: boolean;
   revision: number;
 }
@@ -233,9 +234,26 @@ export interface ManualRssFetchErrorBody {
 export type ManualFetchStatus = 'idle' | 'fetching' | 'ok' | 'rss_fetch_error' | 'not_found';
 
 export interface ManualFetchSourceError {
-  source_id: OpaqueId;
+  source_id: OpaqueId | null;
   code: string;
   message: string;
+}
+
+export type IngestRunStatus = 'completed' | 'completed_with_errors' | 'failed';
+
+export interface IngestRunResult {
+  scope: 'all' | 'source';
+  source_id: OpaqueId | null;
+  status: IngestRunStatus;
+  started_at: Rfc3339UtcString;
+  completed_at: Rfc3339UtcString;
+  duration_ms?: number;
+  sources_attempted: number;
+  sources_succeeded: number;
+  sources_failed: number;
+  items_discovered?: number;
+  items_upserted: number;
+  errors: ManualFetchSourceError[];
 }
 
 export interface ManualFetchResult {
@@ -247,6 +265,7 @@ export interface ManualFetchResult {
   items_discovered: number;
   items_upserted: number;
   errors: ManualFetchSourceError[];
+  completed_at?: Rfc3339UtcString;
 }
 
 export type RunIngestSuccessResponse = ManualFetchResult;

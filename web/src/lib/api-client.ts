@@ -4,6 +4,7 @@ import type {
   ErrorBody,
   FeedTodayResponse,
   FetchSourceSuccessResponse,
+  IngestRunResult,
   ImportOpmlResponse,
   InspectRequest,
   InspectResponse,
@@ -52,6 +53,11 @@ export class ResoFeedApiError extends Error {
 
 const emptyDetails: ErrorBody['error']['details'] = {};
 
+interface IngestEnvelope {
+  ingest: IngestRunResult;
+  source?: unknown;
+}
+
 function fallbackError(code: ApiErrorCode, message: string): ErrorBody {
   return { error: { code, message, details: emptyDetails } };
 }
@@ -72,6 +78,21 @@ function isManualRssFetchErrorBody(value: ManualRssFetchErrorBody): boolean {
     typeof value.error?.details === 'object' &&
     value.error.details !== null
   );
+}
+
+function normalizeIngestEnvelope(body: IngestEnvelope, operation: RunIngestSuccessResponse['operation']): RunIngestSuccessResponse {
+  const ingest = body.ingest;
+  return {
+    operation,
+    source_id: ingest.source_id,
+    completed: ingest.status === 'completed',
+    sources_total: ingest.sources_attempted,
+    sources_fetched: ingest.sources_succeeded,
+    items_discovered: ingest.items_discovered ?? ingest.items_upserted,
+    items_upserted: ingest.items_upserted,
+    errors: ingest.errors,
+    completed_at: ingest.completed_at
+  };
 }
 
 async function parseJson<T>(response: Response): Promise<T> {
@@ -163,13 +184,15 @@ export class ResoFeedApiClient {
   }
 
   async runIngest(): Promise<ManualRssFetchApiResult<RunIngestSuccessResponse>> {
-    return this.manualRssFetchRequest<RunIngestSuccessResponse>('/api/ingest');
+    const result = await this.manualRssFetchRequest<IngestEnvelope>('/api/ingest');
+    return result.ok ? { ...result, body: normalizeIngestEnvelope(result.body, 'ingest') } : result;
   }
 
   async fetchSource(sourceId: OpaqueId): Promise<ManualRssFetchApiResult<FetchSourceSuccessResponse>> {
-    return this.manualRssFetchRequest<FetchSourceSuccessResponse>(
+    const result = await this.manualRssFetchRequest<IngestEnvelope>(
       `/api/sources/${encodeURIComponent(sourceId)}/fetch`
     );
+    return result.ok ? { ...result, body: normalizeIngestEnvelope(result.body, 'source_fetch') } : result;
   }
 
   async search(params: SearchRequestParams): Promise<SearchResponse> {

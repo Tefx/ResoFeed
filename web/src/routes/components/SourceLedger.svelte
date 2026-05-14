@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { ImportOpmlResponse, Source } from '$lib/api-contract';
+  import { tick } from 'svelte';
+  import type { FetchSourceSuccessResponse, ImportOpmlResponse, RunIngestSuccessResponse, Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
   import StatePortability from './StatePortability.svelte';
 
@@ -7,6 +8,8 @@
     sources: Source[];
     onDeleteSource: (source: Source) => Promise<void> | void;
     onImportOpml: (opml: string) => Promise<ImportOpmlResponse | void> | ImportOpmlResponse | void;
+    onRunIngest?: () => Promise<RunIngestSuccessResponse>;
+    onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
     onExportState: () => Promise<StateBundleV1>;
     onImportState: (bundle: StateBundleV1) => Promise<void> | void;
     suppressStatusRole?: boolean;
@@ -16,13 +19,20 @@
     sources,
     onDeleteSource,
     onImportOpml,
+    onRunIngest = async () => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 0, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [] }),
+    onFetchSource = async (source: Source) => ({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
     onImportState,
     suppressStatusRole = false
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
   let statusText = $state('');
+  let isImportingOpml = $state(false);
+  let isRunningIngest = $state(false);
+  let fetchingSourceId = $state<string | null>(null);
+  let sourceFeedbackById = $state<Record<string, string>>({});
   let importInput = $state<HTMLInputElement | undefined>();
+  const hasGlobalIngestFeedback = $derived(statusText.startsWith('last_ingest:') || statusText === 'ingest complete');
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -51,15 +61,84 @@
     return title || compactSourceUrl(source.url);
   }
 
-  function sourceLedgerSummary(source: Source, lastFetch: string | null): string {
-    const parts = [`src: ${sourceLedgerLabel(source)}`, `status: ${source.last_fetch_status}`, `last_fetch: ${lastFetch ?? 'not_fetched'}`];
-    return parts.join(' · ');
+  function statusTextForSource(source: Source, lastFetch: string | null): string {
+    const feedback = sourceFeedbackById[source.id];
+    if (feedback) return feedback;
+    if (hasGlobalIngestFeedback) return `last_fetch: ${lastFetch ?? 'not_fetched'}`;
+    if (source.last_fetch_error) return rawErrorText(source.last_fetch_error);
+    if (source.last_fetch_status === 'rss_fetch_error') return 'err: rss_fetch_error';
+    return `last_fetch: ${lastFetch ?? 'not_fetched'}`;
+  }
+
+  function rawErrorText(message: string): string {
+    const trimmed = message.trim();
+    return trimmed.toLowerCase().startsWith('err:') ? trimmed : `err: ${trimmed}`;
+  }
+
+  function setSourceFeedback(sourceId: string, text: string | null): void {
+    if (text) {
+      sourceFeedbackById = { ...sourceFeedbackById, [sourceId]: text };
+      return;
+    }
+    const { [sourceId]: _removed, ...remaining } = sourceFeedbackById;
+    sourceFeedbackById = remaining;
+  }
+
+  function pendingFrame(): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, 120));
+  }
+
+  function openImportPicker(): void {
+    importInput?.click();
+  }
+
+  async function runIngest(): Promise<void> {
+    if (isRunningIngest) return;
+    isRunningIngest = true;
+    statusText = '';
+    try {
+      await tick();
+      statusText = 'ingest complete';
+      const result = await onRunIngest();
+      const completedAt = formatTime(result.completed_at);
+      statusText = result.completed
+        ? `last_ingest: ${completedAt ?? 'complete'}`
+        : rawErrorText(result.errors[0]?.message ?? 'ingest failed');
+    } catch (error) {
+      statusText = error instanceof Error ? error.message : 'err: ingest failed';
+    } finally {
+      isRunningIngest = false;
+    }
+  }
+
+  async function fetchSource(source: Source): Promise<void> {
+    if (fetchingSourceId) return;
+    fetchingSourceId = source.id;
+    setSourceFeedback(source.id, null);
+    try {
+      await tick();
+      const result = await onFetchSource(source);
+      await pendingFrame();
+      const completedAt = formatTime(result.completed_at ?? source.last_fetch_at);
+      const errorMessage = result.errors.find((candidate) => candidate.source_id === source.id || candidate.source_id === null)?.message;
+      setSourceFeedback(
+        source.id,
+        result.completed
+          ? `last_fetch: ${completedAt ?? 'complete'}`
+          : rawErrorText(errorMessage ?? source.last_fetch_error ?? 'fetch failed')
+      );
+    } catch (error) {
+      setSourceFeedback(source.id, error instanceof Error ? error.message : 'err: fetch failed');
+    } finally {
+      fetchingSourceId = null;
+    }
   }
 
   async function importSelectedFile(): Promise<void> {
     const file = importInput?.files?.[0];
     if (!file) return;
-    statusText = 'importing OPML';
+    isImportingOpml = true;
+    statusText = '';
     try {
       const result = await onImportOpml(await file.text());
       statusText = result
@@ -70,6 +149,8 @@
       statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
         ? `imported ${sources.length} sources; folders flattened`
         : error instanceof Error ? error.message : 'err: import failed';
+    } finally {
+      isImportingOpml = false;
     }
   }
 
@@ -88,9 +169,10 @@
     return [
       `source: ${sourceLedgerLabel(source)}`,
       `fetch_state: ${source.last_fetch_status}`,
+      source.last_fetch_error && !hasGlobalIngestFeedback ? `fetch_error: ${rawErrorText(source.last_fetch_error)}` : null,
       `fetched_at: ${lastFetch ?? 'not_fetched'}`,
       `feed_url: ${source.url}`
-    ].join('\n');
+    ].filter(Boolean).join('\n');
   }
 
   function toggleDiagnosticFromKeyboard(event: KeyboardEvent): void {
@@ -107,6 +189,19 @@
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-heading">
   <div class="source-ledger-head source-ledger__header">
     <h2 id="source-ledger-heading" class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h2>
+    <div class="source-ledger__header-actions">
+      <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
+      <input
+        id="opml-file"
+        class="source-ledger-file visually-hidden"
+        bind:this={importInput}
+        type="file"
+        accept=".opml,.xml,text/xml,application/xml"
+        aria-label="import OPML"
+        onchange={() => void importSelectedFile()}
+      />
+      <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
+    </div>
   </div>
   {#if sources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
@@ -115,11 +210,20 @@
       {#each sources as source (source.id)}
         {@const lastFetch = formatTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
-        {@const sourceSummary = sourceLedgerSummary(source, lastFetch)}
+        {@const rowStatusText = statusTextForSource(source, lastFetch)}
+        {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
-          <div class="source-ledger-copy"><span>{sourceSummary}</span></div>
+          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`}>src: {sourceLabel}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url}>url: {source.url}</div>
-          <span class="source-ledger__actions"><button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>{#if confirmingSourceId === source.id}<button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM DELETE]</button>{/if}</span>
+          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
+          <span class="source-ledger__actions">
+            <button type="button" class="bracket-action bracket-action--fetch" disabled={fetchingSourceId !== null} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
+            {#if confirmingSourceId === source.id}
+              <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
+            {:else}
+              <button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
+            {/if}
+          </span>
           <details class="source-diagnostic-details">
             <summary aria-label={`diagnostic details for ${sourceLabel}`} onkeydown={toggleDiagnosticFromKeyboard}>[DETAILS]</summary>
             <pre>{sourceDiagnosticText(source, lastFetch)}</pre>
@@ -129,16 +233,6 @@
     </ul>
   {/if}
   <div class="source-ledger-footer">
-    <label class="bracket-action" for="opml-file">[IMPORT OPML]</label>
-    <input
-      id="opml-file"
-      class="source-ledger-file visually-hidden"
-      bind:this={importInput}
-      type="file"
-      accept=".opml,.xml,text/xml,application/xml"
-      aria-label="import OPML"
-      onchange={() => void importSelectedFile()}
-    />
     {#if statusText}
       <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
     {/if}
