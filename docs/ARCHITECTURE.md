@@ -194,6 +194,10 @@ Coordination rules:
 - use SQLite transactions for state changes;
 - keep state export/import as direct backup/restore transactions inside `internal/resofeed`; do not introduce a state merger, conflict resolver, sync coordinator, or receipt-portability module;
 - isolate source-level ingestion failures;
+- coordinate background ingest, global manual ingest, and per-source manual fetch through one in-process ingest concurrency guard owned by `ingest.go`;
+- permit at most one ingest/fetch operation to run at a time across the process: background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch` must never overlap;
+- reject HTTP manual triggers with `409 conflict` when the guard is already held; background ticks may be ignored/skipped while an ingest is already running;
+- do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 
 ### 3.4 Shared Types Rule
@@ -369,19 +373,40 @@ Responsibilities:
 - validate OpenRouter response JSON before saving;
 - update diagnostic fields for failures.
 
+Extraction semantics:
+
+- article extraction is best-effort and remains inside the single Go runtime;
+- extraction first selects readable source text from semantic HTML containers in this order: `<article>`, `itemprop="articleBody"`, `<main>`, common content containers such as `article-body`, `article-content`, `post-content`, `entry-content`, `story-body`, and `content-body`, then `<body>` as fallback;
+- HTML block boundaries must be preserved before readable-text sanitation so one boilerplate paragraph does not discard valid article paragraphs;
+- navigation, headers, footers, sidebars, forms, scripts, styles, JSON-LD metadata, diagnostic-token residue, and known readable boilerplate are removed before persistence;
+- `extraction_status='full'` is valid only when non-empty cleaned article text is persisted in `extracted_text`;
+- if linked-article extraction fails but RSS text exists, the item remains visible with `extraction_status='partial_extraction'` and source text understood as RSS excerpt text.
+
 Runtime limits:
 
 - background ingest interval default: 15 minutes;
-- source fetch timeout: 20 seconds per source;
+- source fetch timeout: 20 seconds per source, including per-source manual fetches;
 - OpenRouter request timeout: 45 seconds;
 - OpenRouter retry policy: at most one retry for network/429/5xx failures;
 - failed OpenRouter responses must not block item visibility.
 
+Concurrency semantics:
+
+- exactly one ingest/fetch operation may run at a time in the Go process;
+- the same non-overlap rule applies to the background ingest loop, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`;
+- if an HTTP manual trigger arrives while ingestion is already running, it must return `409 conflict` and must not enqueue, persist, or retry the requested work;
+- if a background ingest tick fires while another ingest/fetch is running, it may be ignored/skipped rather than queued;
+- persistent queues, job tables, command-history rows, ingest ledgers, and cross-process schedulers are forbidden.
+
 Failure contract:
 
 - feed failure affects only that source;
-- extraction failure maps to `partial extraction` or `original unavailable` where appropriate;
-- OpenRouter/model failure maps to `summary unavailable` or `/doctor` model diagnostics;
+- per-source manual fetch failure returns a request-level error result for that source and also updates source diagnostics where applicable;
+- global manual ingest may complete with source-level failures; source failures are reported in the response summary rather than aborting successful sources;
+- extraction failure maps to `partial_extraction` or `original_unavailable` where appropriate;
+- OpenRouter/model failure maps to `summary_unavailable`, `model_latency_error`, or `/doctor` model diagnostics;
+- extraction status and model status are separate: an item may have model-backed summary metadata while source text is only an RSS excerpt;
+- timeout of the 20-second source fetch limit maps to an RSS/source fetch diagnostic and leaves no persistent pending job;
 - no failure path creates an elaborate UI degradation mode.
 
 ### 5.2 Ranking and Daily Feed
@@ -600,7 +625,7 @@ Common JSON error body:
 }
 ```
 
-Allowed error codes: `unauthorized`, `bad_request`, `not_found`, `internal`.
+Allowed error codes: `unauthorized`, `bad_request`, `not_found`, `conflict`, `internal`.
 
 Canonical JSON type rules:
 
@@ -613,7 +638,7 @@ Canonical JSON type rules:
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `error.code` | string enum | Yes | No | `unauthorized`, `bad_request`, `not_found`, `internal` |
+| `error.code` | string enum | Yes | No | `unauthorized`, `bad_request`, `not_found`, `conflict`, `internal` |
 | `error.message` | string | Yes | No | terse human-readable message |
 | `error.details` | object | Yes | No | `{}` when no structured details exist |
 
@@ -698,6 +723,130 @@ Canonical JSON type rules:
 | `to` | `YYYY-MM-DD` string | Yes | Yes | inclusive date upper bound or null |
 | `resonated` | boolean | Yes | Yes | resonance filter or null |
 | `limit` | integer | Yes | No | effective limit after defaults/max validation |
+
+Manual ingest request schemas:
+
+`POST /api/ingest` request body:
+
+```json
+{}
+```
+
+`POST /api/sources/{id}/fetch` request body:
+
+```json
+{}
+```
+
+Manual ingest request rules:
+
+- request bodies must be valid JSON objects;
+- the only accepted body shape is an empty object `{}`;
+- `idempotency_key` is intentionally not accepted because manual ingest triggers do not create durable command receipts, queues, or jobs;
+- query parameters are not accepted on either endpoint.
+
+`IngestErrorDetail`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `source_id` | string | Yes | Yes | source id when error is source-scoped; `null` for global trigger errors |
+| `code` | string enum | Yes | No | `rss_fetch_error`, `timeout`, `internal` |
+| `message` | string | Yes | No | terse diagnostic suitable for inline `err: <diagnostic>` display |
+
+`IngestRunResult`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `scope` | string enum | Yes | No | `all` for `POST /api/ingest`, `source` for `POST /api/sources/{id}/fetch` |
+| `source_id` | string | Yes | Yes | requested source id for source fetch; `null` for global ingest |
+| `status` | string enum | Yes | No | `completed`, `completed_with_errors`, or `failed` |
+| `started_at` | RFC3339 string | Yes | No | request execution start time |
+| `completed_at` | RFC3339 string | Yes | No | request execution completion time |
+| `duration_ms` | integer | Yes | No | elapsed request duration in milliseconds |
+| `sources_attempted` | integer | Yes | No | number of sources attempted |
+| `sources_succeeded` | integer | Yes | No | number of sources fetched successfully |
+| `sources_failed` | integer | Yes | No | number of source fetch failures |
+| `items_upserted` | integer | Yes | No | number of item rows inserted or updated |
+| `errors` | array of `IngestErrorDetail` | Yes | No | empty array when no source-level errors occurred |
+
+Manual ingest success response schemas:
+
+Operational RSS fetch failures are successful HTTP requests whose ingest result records source-level failure. Network timeouts, RSS/Atom parse errors, upstream feed HTTP errors, and similar per-source fetch failures return HTTP `200 OK` with `status: "failed"` or `status: "completed_with_errors"` and a populated `errors` array. Only transport, authentication, request validation, missing/deleted/inactive source lookup, concurrency-guard, or unexpected runtime failures use the standard 4xx/5xx `ErrorBody` shape.
+
+If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `200 OK` immediately with `status: "completed"`, `sources_attempted: 0`, `sources_succeeded: 0`, `sources_failed: 0`, `items_upserted: 0`, and `errors: []`.
+
+`POST /api/ingest` returns:
+
+```json
+{
+  "ingest": {
+    "scope": "all",
+    "source_id": null,
+    "status": "completed_with_errors",
+    "started_at": "2026-05-09T14:00:00Z",
+    "completed_at": "2026-05-09T14:00:12Z",
+    "duration_ms": 12000,
+    "sources_attempted": 12,
+    "sources_succeeded": 11,
+    "sources_failed": 1,
+    "items_upserted": 37,
+    "errors": [
+      {
+        "source_id": "src_02",
+        "code": "rss_fetch_error",
+        "message": "feed returned HTTP 502"
+      }
+    ]
+  }
+}
+```
+
+`POST /api/sources/{id}/fetch` returns:
+
+```json
+{
+  "ingest": {
+    "scope": "source",
+    "source_id": "src_01",
+    "status": "completed",
+    "started_at": "2026-05-09T14:02:00Z",
+    "completed_at": "2026-05-09T14:02:03Z",
+    "duration_ms": 3000,
+    "sources_attempted": 1,
+    "sources_succeeded": 1,
+    "sources_failed": 0,
+    "items_upserted": 4,
+    "errors": []
+  },
+  "source": {
+    "id": "src_01",
+    "url": "https://example.com/feed.xml",
+    "title": "Example",
+    "last_fetch_at": "2026-05-09T14:02:03Z",
+    "last_fetch_status": "ok",
+    "is_active": true,
+    "revision": 2
+  }
+}
+```
+
+Manual ingest conflict response schema:
+
+The ingest concurrency guard is global across background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`; conflict responses therefore always report `details.scope: "all"`, including when the holder is the background ingest loop.
+
+```json
+{
+  "error": {
+    "code": "conflict",
+    "message": "ingest already running",
+    "details": {
+      "ingest_running": true,
+      "scope": "all",
+      "retry_allowed": true
+    }
+  }
+}
+```
 
 HTTP query validation contract:
 
@@ -798,6 +947,8 @@ Endpoint contracts:
 | `GET /api/sources` | none | `200` | `{ "sources": [Source] }` |
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
+| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if any ingest/fetch is already running |
+| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if any ingest/fetch is already running |
 | `GET /api/search` | optional query params listed in the search query rules | `200` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` |
 | `GET /api/steer/active` | none | `200` | `{ "rules": [SteerRule] }`; intended for inline steering receipts only, not a rule-management UI |
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
@@ -819,6 +970,7 @@ HTTP error matrix:
 | invalid state bundle schema or field shape | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
+| manual ingest/fetch requested while any ingest/fetch is already running | `409` | `conflict` | `{ "ingest_running": true, "scope": "all", "retry_allowed": true }` |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
 Idempotency rules:
@@ -827,6 +979,7 @@ Idempotency rules:
 - source delete is idempotent by source id;
 - OPML import is deduplicated by source URL;
 - state import atomically restores the validated state bundle and does not require `idempotency_key`;
+- manual ingest/fetch triggers do not use `idempotency_key` and must not create durable command receipts, queues, or job rows;
 - retrying the same mutation with the same `idempotency_key` returns the original result class and `already_applied: true` when applicable;
 - new idempotency keys represent new intended operations.
 
@@ -913,7 +1066,9 @@ Responsibilities:
 - show an owner-token prompt on first open before calling `/api/*`;
 - store the owner token in browser-local storage as `resofeed.ownerToken` and send it as `Authorization: Bearer <OWNER_TOKEN>` on every `/api/*` request;
 - keep Steer as the primary command surface for URL subscription, steering, search command entry, and `/doctor`; the current web UI routes `/doctor` to `GET /api/doctor` rather than posting it to `/api/steer`;
+- expose `TODAY` and `SOURCE LEDGER` through a discreet `RESOFEED` surface menu when the design chooses low-chrome navigation; persistent visible top-level links are not required;
 - expose flat Source Ledger without folders/tags/settings-dashboard behavior;
+- expose lightweight Source Ledger manual controls for `POST /api/ingest` and `POST /api/sources/{id}/fetch` as immediate bracket actions only; these controls must not create durable jobs, queues, command histories, activity ledgers, retry dashboards, sync/merge concepts, or additional source-management surfaces;
 - expose state export/import as terse actions, not backup-management UI;
 - show fallback/status labels plainly.
 
@@ -921,7 +1076,8 @@ Forbidden:
 
 - Tailwind or component UI libraries unless the design contract changes;
 - visual concepts not in `docs/DESIGN.md`;
-- extra dashboard surfaces for diagnostics, source management, or settings.
+- extra dashboard surfaces for diagnostics, source management, manual ingest/fetch, or settings;
+- UI state models that imply persisted ingest jobs, queued retries, activity feeds, or portable manual-ingest receipts.
 
 ## 9. Minimal File Shape
 
@@ -943,9 +1099,15 @@ internal/resofeed/doctor.go
 web/
 ```
 
-`state.go` owns only state bundle validation plus transactional backup/restore. It must not own merging, conflict resolution, sync orchestration, or portable agent receipts.
+Module ownership rules:
 
-Do not introduce repositories, factories, DI containers, event buses, plugin registries, service catalogs, storage interfaces, state mergers, conflict resolvers, sync coordinators, or provider abstraction layers without a new architecture decision and a real second implementation.
+- `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, the in-process ingest concurrency guard, and the non-overlap semantics for background/manual ingestion.
+- `internal/resofeed/http.go` owns HTTP routing, owner-token enforcement, request validation, response serialization, and mapping `ingest.go` outcomes to the `POST /api/ingest` and `POST /api/sources/{id}/fetch` contracts.
+- `http.go` must not own ingest business logic, queues, job lifecycle, retry scheduling, or source fetch state beyond request/response translation.
+- `ingest.go` must not own HTTP status codes or JSON wire formatting beyond exposing typed outcomes that `http.go` can translate.
+- `state.go` owns only state bundle validation plus transactional backup/restore. It must not own merging, conflict resolution, sync orchestration, or portable agent receipts.
+
+Do not introduce repositories, factories, DI containers, event buses, plugin registries, service catalogs, storage interfaces, state mergers, conflict resolvers, sync coordinators, provider abstraction layers, persistent ingest queues, or job tables without a new architecture decision and a real second implementation.
 
 ## 10. Verification Targets
 
@@ -1004,6 +1166,40 @@ Diagnostics check:
 curl -i http://127.0.0.1:8080/api/doctor \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 # expect 200 text/plain
+```
+
+Manual ingest checks:
+
+```bash
+curl -i -X POST http://127.0.0.1:8080/api/ingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# expect 200 JSON body: {"ingest":{"scope":"all",...}}
+
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# expect 200 JSON body: {"ingest":{"scope":"source",...},"source":{...}}
+```
+
+Manual ingest conflict check:
+
+Run the first command in a separate terminal or against a deliberately slow source to easily reproduce this.
+
+```bash
+curl -i -X POST http://127.0.0.1:8080/api/ingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# when the first request is still running, expect 409 JSON error:
+# {"error":{"code":"conflict","message":"ingest already running",...}}
 ```
 
 State roundtrip check:

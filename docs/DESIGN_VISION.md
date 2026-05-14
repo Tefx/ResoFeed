@@ -34,8 +34,9 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 ## 7. Layout & Surfaces
 - **Desktop (Desk Review):** A split-pane layout. A unified scrolling feed on the left (or center), and an "Inspector" pane on the right when an item is clicked. No left-hand navigation sidebar.
 - **Mobile (Commute Review):** A single-column vertical timeline. Edge-to-edge content cards. The "Steer" input is anchored as a sticky bottom bar or floating action button.
+- **Surface Access:** Utility surfaces may sit behind a discreet `RESOFEED` menu. `SOURCE LEDGER` can be discoverable through that menu instead of being a persistent always-visible nav link.
 - **Agent Handoffs:** Items delivered by external agents receive a subtle visual "Receipt Pill" but live within the same unified feed.
-- **The Source Ledger:** A barebones, flat list of subscribed URLs accessible via a discreet menu. No folders, no tags, no drag-and-drop. It is a strictly read/delete-only text roster, not a settings dashboard. OPML imports are instantly flattened.
+- **The Source Ledger:** A barebones, flat list of subscribed URLs accessible via the `RESOFEED` menu. No folders, no tags, no drag-and-drop. It is a strictly read/delete/fetch text roster, not a settings dashboard. OPML imports are instantly flattened. Manual ingestion lives here only as lightweight bracket actions: global `[RUN INGEST]` in the ledger header and per-source `[FETCH]` on source rows. These actions must not become jobs, queues, retry dashboards, or activity ledgers.
 
 ## 8. Feed Lifecycle & Pagination
 - **Persistent Feed:** The feed is durable by default. There is no automatic expiration or midnight deletion mechanism. Users shouldn't lose their feed if they miss a few days.
@@ -73,11 +74,14 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 - **Focus:** Strict 3px solid outline using primary UI text color.
 - **Steer (Lightweight Intent):** Steer is a simple directional input for shaping the feed. It has basic states (default, focused, submitting) and avoids multi-step feedback loops. It trades strict determinism for pure simplicity. No multi-turn clarification workflows or configuration lists.
 - **Resonate:** The star icon uses a snappy, non-bouncy transition.
+- **Manual Fetch:** Source Ledger commands behave like terminal-synchronous text. `[FETCH]` becomes `[FETCHING...]`; `[RUN INGEST]` becomes `[INGESTING...]`; success updates `last_fetch: HH:MM:SS` or `last_ingest: HH:MM:SS`; failure prints raw `err: <diagnostic>` inline. No spinners, no pulsing dots, no toast notifications, no CSS animation, and no accent color.
 
 ## 12. Component Inventory
 - **Item Card:** Combines inline metadata line (source, time), inline time-group badge, Serif Title, clamped Summary snippet, and the Resonate action.
 - **Steer Input:** A simple text input for natural language commands.
 - **Inspector Pane:** The detailed reading view.
+- **Source Ledger Row:** Flat source name, URL, adjacent fetch status, right-aligned bracket actions (`[FETCH]`, `[DELETE]`) that do not shift source metadata when the action text changes.
+- **Global Ingest Action:** Header-level `[RUN INGEST]` command paired with `last_ingest` status; it is a manual override for all sources, not a dashboard job monitor.
 
 ## 13. Functional Mapping (PRD to UI)
 | PRD Requirement | UI/UX Representation |
@@ -85,7 +89,10 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 | **Inspect** | Clicking an Item Card opens the Inspector Pane. |
 | **Resonate** | A prominent, unambiguous Star toggle (`[☆]`) on every Item Card, plus double-tap gesture and a star in the Inspector when in single-column mobile view. |
 | **Steer** | A lightweight Command Bar / Sticky input for natural language intents, or pasting raw RSS URLs to subscribe. |
+| **Surface access** | `RESOFEED` opens a discreet menu containing utility surface entries such as `TODAY` and `SOURCE LEDGER`; this keeps chrome low without removing navigation. |
 | **Diagnostics** | `/doctor` renders raw system health as plain text inside the existing Steer/feedback surface. |
+| **Manual Source Fetch** | Source Ledger row action `[FETCH]`; active state `[FETCHING...]`; success updates `last_fetch`; failure prints raw `err:` beside the source. No queue, retry dashboard, or activity record. |
+| **Manual Global Ingest** | Source Ledger header action `[RUN INGEST]`; active state `[INGESTING...]`; success updates `last_ingest`; conflict returns terse raw feedback. |
 | **State Portability** | Export/import appears as terse text actions covering active sources, active steering rules, and currently resonated items without a settings dashboard. |
 | **No Inbox-Zero / Anxiety** | Absence of counters, bold/unseen typography. |
 | **Persistent Feed** | Time-grouped pagination; older items remain accessible without auto-deletion. |

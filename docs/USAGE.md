@@ -140,18 +140,22 @@ http://127.0.0.1:8080
 
 On first open, paste the owner token printed at startup or supplied with `--owner-token`. The browser stores it locally as `resofeed.ownerToken` and sends it as `Authorization: Bearer <OWNER_TOKEN>` for every `/api/*` request.
 
+The top chrome stays sparse. Use the `RESOFEED` menu to reach utility surfaces such as `TODAY` and `SOURCE LEDGER`; those entries may be hidden while the menu is closed.
+
 Deleting `localStorage['resofeed.ownerToken']` or clearing browser storage only forgets the browser-local copy. It does not rotate or reset the server-side owner token stored as a SQLite hash. If the browser has a stale token, the UI should prompt for the current owner token again after `401 unauthorized`.
 
 ### 6. Add sources
 
 - Paste an RSS/Atom URL into Steer; or
-- import OPML from the Source Ledger.
+- open `RESOFEED` → `SOURCE LEDGER` and import OPML.
 
-OPML folders are ignored and flattened immediately.
+OPML folders are ignored and flattened immediately. Source Ledger does not provide a second URL paste field; URL subscription remains a Steer action.
 
 ### 7. Let ingestion run
 
 ResoFeed fetches sources, extracts content when possible, summarizes items with OpenRouter, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes.
+
+If you want an immediate refresh, open `RESOFEED` → `SOURCE LEDGER` and use `[RUN INGEST]` for all active sources or `[FETCH]` on one source row. These are lightweight one-shot controls: they show terse pending/success/error text and do not create jobs, queues, or activity history.
 
 Use an always-on host if mobile access or external-agent workflows should continue while your laptop sleeps.
 
@@ -483,13 +487,13 @@ Source Ledger run/fetch controls, or manual UI-only actions.
 A first useful session should require only this loop:
 
 1. Add or import sources.
-2. Wait for enough items to process.
+2. Either wait for the background ingest loop or use Source Ledger `[RUN INGEST]` / `[FETCH]` for an immediate lightweight refresh.
 3. Scan `TODAY`.
 4. Open one item to Inspect it.
 5. Resonate with one item if it has durable value.
 6. Optionally Steer future behavior.
 
-You should not need folders, tags, archive rules, ranking sliders, delivery-channel configuration, or agent setup to get value.
+You should not need folders, tags, archive rules, ranking sliders, delivery-channel configuration, job dashboards, or agent setup to get value.
 
 ## The Three Core Actions
 
@@ -577,7 +581,8 @@ Important behavior:
 - repeated versions of the same article should not appear as separate equal-priority items;
 - multiple reports of one story may be grouped, but each original source item remains accessible;
 - high-volume sources are not silently suppressed unless you explicitly steer behavior;
-- unavailable extraction or summary states remain visible instead of hiding the item.
+- unavailable extraction or summary states remain visible instead of hiding the item;
+- `source excerpt` in a feed row means the source text came from the RSS excerpt, not necessarily that LLM summary generation failed.
 
 ## Inspector
 
@@ -588,23 +593,27 @@ It should expose:
 - title;
 - source;
 - original link;
+- source-text status;
+- summary provenance;
 - summary and core insight when available;
 - extracted text when available;
 - provenance and extraction status;
 - duplicate/story context when relevant;
 - Resonate action.
 
-Fallback labels should be direct and plain:
+Fallback and provenance labels should be direct and plain:
 
+- `source text: RSS excerpt only` — linked-article extraction was blocked or incomplete, but RSS excerpt text was available;
+- `summary provenance: model-backed` — OpenRouter produced validated summary fields, even if the source text was only an RSS excerpt;
+- `summary provenance: feed excerpt fallback` — no model-backed summary/core insight is available and the UI is showing source excerpt text;
 - `summary unavailable` — the model did not produce a usable summary;
-- `partial extraction` — full article extraction was blocked or incomplete;
 - `original unavailable` — source link is dead or malformed;
 - `model latency/error` — visible through `/doctor`;
 - `RSS fetch error` — visible through `/doctor`.
 
 ## Source Ledger and OPML
 
-Source management uses Steer plus a flat Source Ledger.
+Source management uses Steer plus a flat Source Ledger. Open it from the `RESOFEED` menu.
 
 ### Add a source
 
@@ -614,17 +623,29 @@ Paste the RSS/Atom URL into Steer:
 https://example.com/feed.xml
 ```
 
-There is no separate add-source wizard.
+There is no separate add-source wizard and no second URL paste field inside Source Ledger.
 
 ### Import OPML
 
-Use the Source Ledger import action to import OPML.
+Use the Source Ledger `[IMPORT OPML]` action to import OPML.
 
 Rules:
 
 - folder structures are ignored;
 - all feeds become one flat source list;
 - no tags, categories, pause/resume toggles, drag ordering, or source scoring sliders are created.
+
+### Refresh sources manually
+
+Use `[RUN INGEST]` in the Source Ledger header to fetch all active sources, or `[FETCH]` on a single source row.
+
+Rules:
+
+- only one ingest/fetch operation runs at a time;
+- conflicts return terse raw feedback such as `err: ingest already running`;
+- pending states use text replacement (`[INGESTING...]`, `[FETCHING...]`), not spinners or progress dashboards;
+- source errors appear as raw `err: <diagnostic>` text and in `/doctor` diagnostics;
+- no jobs, queues, retry dashboards, command histories, activity ledgers, or sync/merge state are created.
 
 ### Delete a source
 
@@ -873,6 +894,7 @@ ResoFeed intentionally excludes:
 - save-for-later as a separate primitive;
 - folders, tags, source categories, and ranking sliders;
 - settings dashboards;
+- manual-ingest job queues, retry dashboards, command histories, activity ledgers, or sync/merge controls;
 - moderation consoles or holding queues;
 - built-in Telegram/Slack/email ownership;
 - dwell-time, viewport, or scroll-depth tracking as preference signals;
@@ -889,14 +911,17 @@ ResoFeed intentionally excludes:
 
 ### A source is not updating
 
+- Open `RESOFEED` → `SOURCE LEDGER` and try `[FETCH]` on the affected source, or `[RUN INGEST]` for all active sources.
+- If the control reports a conflict, wait for the current ingest/fetch operation to finish and retry later.
 - Run `/doctor` and check RSS fetch errors.
 - Verify the source URL still serves RSS/Atom.
 - Other sources should continue updating even if one source fails.
 
 ### Summary is missing or weak
 
-- Check whether the item shows `summary unavailable` or `partial extraction`.
-- Open the original link when extraction is blocked or paywalled.
+- Check whether the item shows `summary unavailable`, `summary provenance: feed excerpt fallback`, or `source text: RSS excerpt only`.
+- `source text: RSS excerpt only` means full article extraction was unavailable; it can still appear with `summary provenance: model-backed` when OpenRouter successfully summarized the RSS excerpt.
+- Open the original link when full extraction is blocked or paywalled.
 - Run `/doctor` if many summaries fail at once.
 
 ### Search does not find an expected item

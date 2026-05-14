@@ -1,8 +1,17 @@
 # ResoFeed Regression Audit - 2026-05-12
 
-Status: failed, with major functional and UI/UX regressions still open.
+Status: historical failed audit. Current cleanup status: superseded/closed where later closure artifacts provide proof.
 
 This document records the post-fix regression audit run on 2026-05-12. It is a new audit artifact and intentionally does not update `docs/audits/prd-behavior-audit-2026-05-11.md`.
+
+## Current Cleanup Note (2026-05-13)
+
+This document is historical evidence from the 2026-05-12 regression run. Do not treat its original failure summary or acceptance blockers as current state without checking later closure artifacts.
+
+- REG-2026-05-12-01 Source Ledger manual controls: the earlier no-control/ban interpretation is superseded. Current authority allows lightweight `[RUN INGEST]` / `[INGESTING...]` and per-source `[FETCH]` / `[FETCHING...]` bracket actions when anti-dashboard guards hold.
+- REG-2026-05-12-02 MCP empty resources: the historical `null` array finding is closed by later runtime proof showing `{"sources":[]}` and `{"rules":[]}`. See `.audit-artifacts/regression_audit_full_runtime_retest/mcp_empty_resources_and_auth.json`, `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md`, and `docs/audits/mcp-capability-audit-2026-05-12.md`.
+
+Sections below retain original audit observations for traceability; closure status is superseded where explicitly noted.
 
 ## Scope
 
@@ -44,15 +53,13 @@ Confirmed working:
 
 ### REG-2026-05-12-01 - Source Ledger manual ingest and fetch controls authority conflict
 
-Adjudication status: superseded by `docs/audits/regression-audit-2026-05-12-contract-matrix.md` and `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md`.
+Adjudication status: updated. The 2026-05-12 ban on Source Ledger `[RUN INGEST]` / `[FETCH]` controls is superseded by the 2026-05-13 product decision recorded in `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md`, `docs/DESIGN.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, `docs/UI_REGRESSION_CONTRACT.md`, and `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`.
 
-The original audit text below is retained as historical evidence of what the audit expected at run time, but it is not authoritative implementation guidance. Canonical architecture/design authority keeps Source Ledger as view/delete/import/export/details only; source addition remains via Steer and refresh is handled by background ingest. Do not restore Source Ledger `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]` controls.
+Current authoritative guidance: Source Ledger may expose lightweight manual controls, but only as flat bracket actions. `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, and `[FETCHING...]` are allowed when they remain immediate operational commands backed by the documented ingest/fetch HTTP paths. They must not create dashboards, queues, job tables, retry panels, command histories, activity ledgers, sync/merge controls, source hierarchies, settings panels, or a second source URL paste field.
 
-Severity: P1.
+Severity: P1 historical finding; current closure condition changed from “controls absent” to “lightweight controls present without dashboard drift.”
 
-Current server and isolated server both fail to expose the required manual source operations. The Source Ledger shows `[DELETE]`, `[DETAILS]`, `[IMPORT OPML]`, `[EXPORT STATE]`, and `[IMPORT STATE]`, but does not show a global `[RUN INGEST]` control or per-source `[FETCH]` controls.
-
-Evidence:
+Historical evidence:
 
 - `05-current-source-ledger.png`
 - `09-isolated-source-ledger-after-add.png`
@@ -63,52 +70,58 @@ Evidence:
   - `Isolated Source Ledger exposes global [RUN INGEST] control`
   - `Isolated Source Ledger exposes per-source [FETCH] control`
 
-Historical audit rationale, now adjudicated as a product/design authority conflict:
+Historical audit rationale, now accepted under a narrower boundary:
 
-- `docs/PRD.md` requires the Source Ledger to expose manual ingestion controls, one global and one per source.
+- `docs/PRD.md` requires Source Ledger to expose lightweight manual ingestion controls, one global and one per source.
 - `docs/PRD.md` AC-18 defines global manual ingest and per-source manual fetch behavior.
-- `docs/DESIGN.md` defines Source Ledger as the only location for manual ingestion controls, with canonical labels `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, and `[FETCHING...]`.
-- `docs/ui-preview.html` shows `[RUN INGEST]` in the ledger header and `[FETCH]` on each source row.
+- `docs/DESIGN.md` defines Source Ledger as the only UI location for these manual controls, with canonical labels `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, and `[FETCHING...]`.
+- `docs/ARCHITECTURE.md` defines the corresponding HTTP actions and non-overlap guard while forbidding persisted jobs/queues/ledgers.
 
 Impact:
 
-- A user can add a new feed, but cannot complete the intended first-session flow through the UI because they cannot trigger ingest/fetch from Source Ledger.
-- The audit had to call the backend ingest API directly to continue validating feed rendering, search, Inspector, LLM summary, and MCP behavior.
-- This is not just a cosmetic issue. It blocks the PRD source-management workflow.
+- A user can add a new feed through Steer and then explicitly trigger ingest/fetch from Source Ledger without waiting for the background loop.
+- The implementation must still preserve the flat ledger boundary and avoid settings/dashboard behavior.
 
-Rejected historical fix, retained only to explain the conflict:
+Current required fix:
 
 - Reinstate Source Ledger props/actions for `runIngest` and per-source `fetchSource`.
 - Render `[RUN INGEST]` with `last_ingest` status.
 - Render per-source `[FETCH]`, `[FETCHING...]`, raw `err: <diagnostic>`, and updated `last_fetch` state without row layout shift.
+- Replace old negative tests that required these controls to be absent with positive reachability/state tests plus anti-dashboard negative assertions.
 
-### REG-2026-05-12-02 - MCP empty resources serialize arrays as null
+### REG-2026-05-12-02 - MCP empty resources serialized arrays as null during the historical audit
 
-Severity: P2.
+Severity: P2 historical; current status: CLOSED_BY_LATER_RUNTIME_PROOF.
 
-On an empty isolated database, MCP resource reads return `null` for array fields:
+During the 2026-05-12 isolated audit, empty MCP resource reads returned `null` for array fields:
 
-- `resofeed://sources` returns `{ "sources": null }`
-- `resofeed://rules/active` returns `{ "rules": null }`
+- `resofeed://sources` returned `{ "sources": null }`
+- `resofeed://rules/active` returned `{ "rules": null }`
 
-Evidence:
+Evidence from the historical run:
 
 - `observations.json` failures:
   - `Isolated MCP empty sources resource returns [] not null`
   - `Isolated MCP empty active rules resource returns [] not null`
-- Code path: `internal/resofeed/mcp.go` initializes `var sources []Source`; `internal/resofeed/ranking.go` initializes `var rules []SteerRule`.
+- Historical code path cited at the time: `internal/resofeed/mcp.go` initialized `var sources []Source`; `internal/resofeed/ranking.go` initialized `var rules []SteerRule`.
 
-Why this violates the contract:
+Why this violated the contract at the time:
 
 - `docs/ARCHITECTURE.md` defines `resofeed://sources` as JSON `{ "sources": [Source] }`.
 - `docs/ARCHITECTURE.md` defines `resofeed://rules/active` as JSON `{ "rules": [SteerRule] }`.
 
-Impact:
+Impact at the time:
 
-- Authorized agents must handle `null` and `[]` as different shapes even though the resource schema says arrays.
-- This weakens HTTP/MCP parity and creates avoidable client branching.
+- Authorized agents had to handle `null` and `[]` as different shapes even though the resource schema says arrays.
+- This weakened HTTP/MCP parity and created avoidable client branching.
 
-Expected fix:
+Closure evidence:
+
+- `.audit-artifacts/regression_audit_full_runtime_retest/mcp_empty_resources_and_auth.json` records empty MCP resources as `{"sources":[]}` and `{"rules":[]}`.
+- `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md` records REG-2026-05-12-02 as closed by real integration proof.
+- `docs/audits/mcp-capability-audit-2026-05-12.md` now marks the related MCP-2 finding `CLOSED_BY_LATER_RUNTIME_PROOF`.
+
+Historical expected fix, now closed:
 
 - Initialize empty slices before marshaling resource responses.
 
@@ -279,26 +292,28 @@ Expected fix:
 
 ## MCP Capability Notes
 
-Tested MCP operations:
+Historical tested MCP operations in this audit run:
 
-- Missing auth returns HTTP 401: pass.
-- `tools/list` exposes expected tools: pass.
-- Empty resources shape: fail for `sources` and `rules` because arrays serialize as `null`.
-- `search_items` finds the ingested fixture: pass.
-- `read_item` returns provenance but lacks expected extracted detail text for the audited full fixture: fail.
-- `resonate_item` mutates and replays idempotently: pass.
-- `search_items` missing query rejects with invalid params: pass.
+- Missing auth returned HTTP 401: pass.
+- `tools/list` exposed expected tools: pass.
+- Empty resources shape failed at the time for `sources` and `rules` because arrays serialized as `null`.
+- `search_items` found the ingested fixture: pass.
+- `read_item` returned provenance but lacked expected extracted detail text for the audited full fixture: fail.
+- `resonate_item` mutated and replayed idempotently: pass.
+- `search_items` missing query rejected with invalid params: pass.
 
-Remaining MCP blockers:
+Current closure status:
 
-- Normalize empty resources to arrays.
-- Ensure `read_item` provides detail text whenever the item is marked as full extraction.
+- Empty MCP resource arrays are closed by later runtime proof showing `{"sources":[]}` and `{"rules":[]}`.
+- MCP `read_item` detail parity is closed by later runtime proof with an `extracted_text` marker.
+
+Historical MCP blockers from this section are therefore not current blockers unless a later regression reopens them.
 
 ## UX Review Addendum
 
 An additional UI/UX review was performed against the audit screenshots. It identified these open design issues:
 
-- Source Ledger manual `[RUN INGEST]` and `[FETCH]` expectation is superseded by the REG-01 authority adjudication; those controls must remain absent.
+- Source Ledger manual `[RUN INGEST]` and `[FETCH]` controls are now accepted under the lightweight bracket-action boundary; implement them without dashboard/job/activity drift.
 - Mobile utility surfaces still need stricter inactive-panel containment.
 - Search should have one visible submit action.
 - Current feed metadata is too diagnostic and repetitive.
@@ -309,7 +324,7 @@ Lower-priority polish:
 
 - Search filters can be tighter and more clearly grouped on desktop.
 - Mobile Search results can reduce metadata height to preserve first-screen result density.
-- Mobile Source Ledger should group destructive `[DELETE]` after safer row actions.
+- Mobile Source Ledger should group destructive `[DELETE]` after safer row actions such as `[FETCH]` and `[DETAILS]`.
 - Mobile `/doctor` is correctly raw, but repeated diagnostics could be formatted into cleaner key/value lines without turning it into a dashboard.
 
 Appears fixed or improved compared with earlier rounds:
@@ -322,10 +337,12 @@ Appears fixed or improved compared with earlier rounds:
 
 ## Acceptance Status
 
-Do not treat this round as green. The highest-priority remaining blockers are:
+Historical status at the time of the 2026-05-12 run: this round was not green. The list below preserves the original priority order for traceability, with current cleanup status added:
 
-1. Preserve Source Ledger boundary: do not restore `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]`; keep negative UI assertions active.
-2. Fix mobile inactive panel containment for Search, Source Ledger, and `/doctor`.
-3. Normalize MCP empty resource arrays.
-4. Investigate current live LLM failures and avoid counting fallback-only current summaries as live LLM success.
-5. Fix MCP `read_item` extracted detail behavior for full items.
+1. Restore lightweight Source Ledger `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, and `[FETCHING...]` controls under the flat bracket-action boundary, and replace old absence assertions with anti-dashboard assertions. **Current status: superseded into current authority / expected behavior.**
+2. Fix mobile inactive panel containment for Search, Source Ledger, and `/doctor`. **Current status: closed by later UI regression closure artifacts.**
+3. Normalize MCP empty resource arrays. **Current status: CLOSED_BY_LATER_RUNTIME_PROOF via `mcp_empty_resources_and_auth.json`.**
+4. Investigate current live LLM failures and avoid counting fallback-only current summaries as live LLM success. **Current status: repo-owned fallback honesty closed; live provider success remains non-blocking external/provider debt.**
+5. Fix MCP `read_item` extracted detail behavior for full items. **Current status: closed by later MCP `read_item` runtime proof.**
+
+Do not treat this historical acceptance section as current blocker state without consulting the later closure artifacts named in the Current Cleanup Note.

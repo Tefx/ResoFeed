@@ -619,9 +619,13 @@ func stableID(prefix string, value string) string {
 }
 
 var articleTagRE = regexp.MustCompile(`(?is)<article\b[^>]*>([\s\S]*?)</article>`)
+var articleBodyItempropRE = regexp.MustCompile(`(?is)<(?:div|section|main|article)\b[^>]*\bitemprop\s*=\s*["']?articleBody["']?[^>]*>([\s\S]*?)</(?:div|section|main|article)>`)
+var mainTagRE = regexp.MustCompile(`(?is)<main\b[^>]*>([\s\S]*?)</main>`)
+var contentContainerRE = regexp.MustCompile(`(?is)<(?:div|section|main)\b[^>]*\b(?:id|class)\s*=\s*["'][^"']*(?:article-body|article-content|post-content|entry-content|story-body|content-body)[^"']*["'][^>]*>([\s\S]*?)</(?:div|section|main)>`)
 var bodyTagRE = regexp.MustCompile(`(?is)<body\b[^>]*>([\s\S]*?)</body>`)
 var executableHTMLRE = regexp.MustCompile(`(?is)<(?:script|style|noscript|svg)\b[^>]*>[\s\S]*?</(?:script|style|noscript|svg)>`)
 var structuralBoilerplateHTMLRE = regexp.MustCompile(`(?is)<(?:nav|header|footer|aside|form)\b[^>]*>[\s\S]*?</(?:nav|header|footer|aside|form)>`)
+var htmlBlockBoundaryRE = regexp.MustCompile(`(?is)<\s*/?\s*(?:address|article|blockquote|br|dd|details|dialog|div|dl|dt|figcaption|figure|h[1-6]|hr|li|main|ol|p|pre|section|table|tbody|td|tfoot|th|thead|tr|ul)\b[^>]*>`)
 var htmlTagRE = regexp.MustCompile(`<[^>]+>`)
 var whitespaceRE = regexp.MustCompile(`\s+`)
 var diagnosticTokenRE = regexp.MustCompile(`(?i)\b(?:model_latency_error|summary_unavailable|partial_extraction|original_unavailable)\b`)
@@ -632,14 +636,31 @@ func textFromHTML(value string) string {
 	value = removeEnclosureMetadata(value)
 	value = executableHTMLRE.ReplaceAllString(value, " ")
 	value = structuralBoilerplateHTMLRE.ReplaceAllString(value, " ")
+	value = htmlBlockBoundaryRE.ReplaceAllString(value, "\n")
 	value = htmlTagRE.ReplaceAllString(value, " ")
 	value = decodeHTMLEntities(value)
 	value = executableHTMLRE.ReplaceAllString(value, " ")
+	value = htmlBlockBoundaryRE.ReplaceAllString(value, "\n")
 	value = htmlTagRE.ReplaceAllString(value, " ")
 	value = removeJSONLDObjects(value)
 	value = cssCustomPropertyRE.ReplaceAllString(value, " ")
 	value = removePollutedSentences(value)
-	return strings.TrimSpace(whitespaceRE.ReplaceAllString(value, " "))
+	return normalizeReadableTextLines(value)
+}
+
+func normalizeReadableTextLines(value string) string {
+	value = strings.ReplaceAll(value, "\r\n", "\n")
+	value = strings.ReplaceAll(value, "\r", "\n")
+	lines := strings.Split(value, "\n")
+	kept := make([]string, 0, len(lines))
+	for _, line := range lines {
+		line = strings.TrimSpace(whitespaceRE.ReplaceAllString(line, " "))
+		if line == "" {
+			continue
+		}
+		kept = append(kept, line)
+	}
+	return strings.Join(kept, "\n")
 }
 
 func removeEnclosureMetadata(value string) string {
@@ -706,6 +727,15 @@ func readableHTMLFragment(value string) string {
 	if match := articleTagRE.FindStringSubmatch(value); len(match) == 2 {
 		return match[1]
 	}
+	if match := articleBodyItempropRE.FindStringSubmatch(value); len(match) == 2 {
+		return match[1]
+	}
+	if match := mainTagRE.FindStringSubmatch(value); len(match) == 2 {
+		return match[1]
+	}
+	if match := contentContainerRE.FindStringSubmatch(value); len(match) == 2 {
+		return match[1]
+	}
 	if match := bodyTagRE.FindStringSubmatch(value); len(match) == 2 {
 		return match[1]
 	}
@@ -717,6 +747,22 @@ func decodeHTMLEntities(value string) string {
 }
 
 func removePollutedSentences(value string) string {
+	value = strings.ReplaceAll(strings.ReplaceAll(value, "\r\n", "\n"), "\r", "\n")
+	lines := strings.Split(value, "\n")
+	if len(lines) > 1 {
+		cleanLines := make([]string, 0, len(lines))
+		for _, line := range lines {
+			cleaned := removePollutedSentencesLine(line)
+			if strings.TrimSpace(cleaned) != "" {
+				cleanLines = append(cleanLines, cleaned)
+			}
+		}
+		return strings.Join(cleanLines, "\n")
+	}
+	return removePollutedSentencesLine(value)
+}
+
+func removePollutedSentencesLine(value string) string {
 	parts := regexp.MustCompile(`(?m)([^.!?]+[.!?]?)`).FindAllString(value, -1)
 	if len(parts) == 0 {
 		if diagnosticTokenRE.MatchString(value) {

@@ -140,8 +140,8 @@ The system does not "protect" the user from their own choices. If a user subscri
 AI is treated as fundamental infrastructure (like electricity). We do not build complex UI degradation states, elaborate error screens, or secondary fallback modes for the rare event that the LLM API goes down.
 
 However, the system **must** support and document a strict canonical fallback taxonomy to maintain operational transparency:
-- `summary unavailable`: When the AI fails to generate a summary, show the raw feed excerpt.
-- `partial extraction`: When full extraction is blocked (paywall/anti-bot), show the RSS excerpt with a `partial` warning label and a link to the original.
+- `summary unavailable`: When the AI fails to generate a summary, show the raw feed excerpt when available.
+- `partial extraction`: Internal/source-quality state used when full extraction is blocked (paywall/anti-bot) but RSS excerpt text exists; user-facing copy must describe this as source-text provenance such as `source text: RSS excerpt only` or compact `source excerpt`, not as model failure.
 - `original unavailable`: When the source link is dead or malformed.
 - `model latency/error`: Exposed only in the `/doctor` command.
 - `RSS fetch error`: Exposed only in the `/doctor` command.
@@ -267,9 +267,12 @@ Source management adheres to a "Steer + Flat Ledger" hybrid pattern to strictly 
 
 Requirements:
 
-- **Source Addition:** Pasting an RSS URL directly into the existing `Steer` command input is the primary way to subscribe. There is no dedicated "Add Source" wizard.
+- **Source Addition:** Pasting an RSS URL directly into the existing `Steer` command input is the primary way to subscribe. There is no dedicated "Add Source" wizard and no second URL-entry field inside Source Ledger.
+- **Source Ledger Access:** Source Ledger may be reached through a discreet `RESOFEED` surface menu. `SOURCE LEDGER` does not need to be a persistent always-visible top-level link as long as the menu entry is keyboard and pointer reachable.
 - **Source Ledger:** Source management is restricted to a strictly flat, barebones "Source Ledger" view.
-- **No Hierarchies:** The ledger ONLY supports viewing the source name/URL and deleting it. There are no folders, no tags, no pause/resume toggles, no drag-and-drop ordering, and no complex settings panels.
+- **Manual Fetch Controls:** The Source Ledger explicitly may expose lightweight manual ingestion controls: one global `[RUN INGEST]` control that runs ingestion for all active sources and one per-source `[FETCH]` control that fetches a single source. These controls are operational commands, not a job dashboard.
+- **No Hierarchies:** The ledger supports viewing the source name/URL, deleting it, viewing source diagnostics/details, importing OPML, exporting/importing portable state, and running the lightweight manual controls above. There are no folders, no tags, no pause/resume toggles, no drag-and-drop ordering, and no complex settings panels.
+- **No Job Surface:** Manual controls must not create persistent jobs, queues, retry panels, command history, activity ledgers, sync/merge concepts, or portable manual-ingest receipts.
 - **OPML Import:** OPML files can be imported via the ledger, but all folder structures within the OPML must be ignored and flattened instantly upon import.
 
 ### 7.3 Duplicate and story handling
@@ -291,7 +294,9 @@ Requirements:
 
 - if full content is unavailable, the item **must** remain visible when appropriate rather than silently disappearing;
 - extraction limitations **must** be visible as source-quality/provenance information (see Fallback Taxonomy);
-- unusually large, inaccessible, or paywalled content **must** degrade gracefully;
+- source text quality **must** be described separately from summary/model status: a model-backed summary may still be based on RSS excerpt text when full article extraction is unavailable;
+- unusually large, inaccessible, paywalled, or boilerplate-heavy content **must** degrade gracefully;
+- extractor sanitation **must** preserve valid article paragraphs while removing navigation, sidebars, footer/header content, executable metadata, and obvious newsletter/privacy boilerplate;
 - summary quality expectations **must** adapt to available source quality.
 
 ### 7.5 Item understanding outputs
@@ -471,7 +476,8 @@ ResoFeed summaries **must** expose extraction limitations to enable objective ve
 
 Requirements:
 
-- users **must** be able to tell when a summary is based on full content versus partial/excerpt-only content;
+- users **must** be able to tell when a summary is based on full article text versus RSS excerpt source text;
+- source-text labels **must not** imply model failure when `model_status='ok'`; use plain provenance such as `source text: RSS excerpt only` alongside separate summary provenance such as `summary provenance: model-backed`;
 - uncertainty, disagreement, or extraction limitations **must** be visible when material;
 - source provenance **must** remain accessible from summaries and search results;
 - summaries **must** avoid unsupported synthesis across unrelated sources.
@@ -566,7 +572,7 @@ Given multiple sources report the same story, when ResoFeed transparently cluste
 
 ### AC-14 Summary transparency
 
-Given source extraction is partial, unavailable, contradictory, or low-confidence, when ResoFeed presents a summary, then the summary must reveal the relevant limitation rather than appearing fully authoritative.
+Given source extraction is partial, unavailable, contradictory, or low-confidence, when ResoFeed presents a summary, then the summary must reveal the relevant limitation without implying that model-backed summary generation failed. Source-text provenance (for example, RSS excerpt only) and summary provenance (model-backed versus fallback) must remain visually distinct.
 
 ### AC-15 First useful session
 
@@ -579,6 +585,20 @@ Given the user requests a complete state export, when executed, the system must 
 ### AC-17 Diagnostics Output
 
 Given the user inputs `/doctor` in the Steer input, when processed, the system must output raw system health data (including RSS fetch errors and LLM API latency) in plain text.
+
+### AC-18 Manual fetch controls
+
+Given the Source Ledger exposes a global `[RUN INGEST]` control, when the user triggers it and no ingest is already running, then the system must attempt ingestion for active sources and return a success result that lets the UI update the global last-ingest status.
+
+Given the Source Ledger exposes a per-source `[FETCH]` control, when the user triggers it and no ingest is already running, then the system must attempt that source fetch and return a success result that lets the UI update that source's last-fetch status.
+
+Given any ingest or fetch operation is already running, when the user triggers `[RUN INGEST]` or `[FETCH]`, then the system must reject the request with a terse conflict result and must not queue, persist, or retry the requested work.
+
+Given a manual fetch encounters an RSS/network/source error, when the request completes, then the system must return an error result with terse diagnostic details suitable for inline `err: <diagnostic>` display and `/doctor` diagnostics.
+
+Given a manual fetch exceeds the architecture's source fetch timeout, when the request completes, then the system must report the timeout as a fetch error and must not leave a persistent job, queue item, activity entry, or pending UI state behind.
+
+Given Source Ledger renders these controls, when viewed in desktop or mobile web, then the controls must remain lightweight bracket actions and must not introduce folders, tags, source hierarchy, job dashboards, retry panels, settings screens, or activity ledgers.
 
 ## 16. Ownership Boundaries
 

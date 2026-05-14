@@ -79,7 +79,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });
     expect(within(list).getByText(expectedRedItem.title)).toBeVisible();
-    expect(within(list).getAllByLabelText('Extraction: partial_extraction')[0]).toHaveTextContent('partial');
+    expect(within(list).getAllByLabelText('Extraction: partial_extraction')[0]).toHaveTextContent('source excerpt');
   });
 
   it('renders search and state portability fixtures from API client responses', async () => {

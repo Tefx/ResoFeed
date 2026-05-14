@@ -1,29 +1,33 @@
 # Regression Audit Focused Deep Review — regression-audit-focused-deep-review
 
-headline: PASS_WITH_DEBT
-verdict: PASS_WITH_DEBT
-gate_open_allowed: true
-orchestrator_action_hint: PROCEED_TO_FINAL_GATE
+headline: PASS_WITH_DEBT_AND_REG01_SUPERSESSION
+verdict: PASS_WITH_DEBT_FOR_NON_REG01_EVIDENCE_REG01_SUPERSEDED
+gate_open_allowed: true_for_non_reg01_evidence
+orchestrator_action_hint: USE_CURRENT_REG01_AUTHORITY
 blocking_status: CLOSED
 proof_gap_status: NON_BLOCKING
 blockers: []
 product_implementation_files_modified: false
 
+## Current Cleanup Note (2026-05-13)
+
+This artifact is historical focused deep-review evidence. Its original REG-01 analysis treated Source Ledger manual ingest/fetch controls as forbidden. Current Source Ledger authority supersedes that basis: lightweight `[RUN INGEST]` / `[INGESTING...]` and per-source `[FETCH]` / `[FETCHING...]` bracket actions are allowed/expected with anti-dashboard guards.
+
 ## refs Read Confirmation (MANDATORY)
 
 - `.agents/instructions.md` — read. Key passage: canonical docs are law; one Go binary, one SQLite DB, OpenRouter JSON transformer only, owner token boundary, no per-agent registry, no vector/RAG/sync/service-layer/folders/tags/unread/archive/settings creep.
-- `docs/ARCHITECTURE.md` — read. Key passage: `resofeed serve` is the single runtime process serving static UI, JSON HTTP, MCP at `/mcp`, and background ingest; every `/api/*` and `/mcp` request requires one owner token; MCP resources/tools reuse HTTP product operations; state portability excludes receipts/history/sync; search is SQLite/FTS lexical only.
-- `docs/PRD.md` — read. Key passage: Source management is Steer + flat Source Ledger; delegated agents use the same Inspect/Resonate/Steer/retrieve concepts; unauthorized agent action must fail at auth boundary without queues; fallback taxonomy places model/RSS operational errors in `/doctor`.
-- `docs/DESIGN.md` — read. Key passage: Source Ledger anatomy is title, OPML import, flat rows, delete, and state export/import; URL subscription routes back to Steer; Search is lexical; `/doctor` is raw text, not a dashboard; feed rows and Inspector must stay dense, source-backed, and non-diagnostic.
-- `docs/DESIGN_VISION.md` — read. Key passage: high-density analyst workbench; AI failure degrades plainly; Source Ledger is a barebones flat read/delete roster; no account/onboarding/folders/tags/settings/numeric inbox mechanics.
+- `docs/ARCHITECTURE.md` — read. Key passage: `resofeed serve` is the single runtime process serving static UI, JSON HTTP, MCP at `/mcp`, and background ingest; every `/api/*` and `/mcp` request requires one owner token; MCP resources/tools reuse HTTP product operations; state portability excludes receipts/history/sync; search is SQLite/FTS lexical only; manual ingest/fetch HTTP actions are immediate and non-persistent.
+- `docs/PRD.md` — read. Key passage: Source management is Steer + flat Source Ledger; Source Ledger may expose lightweight manual ingest/fetch bracket actions under an anti-dashboard boundary; delegated agents use the same Inspect/Resonate/Steer/Retrieve concepts; fallback taxonomy places model/RSS operational errors in `/doctor`.
+- `docs/DESIGN.md` — read. Key passage: Source Ledger anatomy includes flat rows, delete/details/import/state actions, and lightweight manual controls; Search is lexical; `/doctor` is raw text, not a dashboard; feed rows and Inspector must stay dense, source-backed, and non-diagnostic.
+- `docs/DESIGN_VISION.md` — read. Key passage: high-density analyst workbench; AI failure degrades plainly; Source Ledger is a barebones flat roster; no account/onboarding/folders/tags/settings/numeric inbox mechanics.
 - `docs/USAGE.md` — read. Key passage: static UI may load unauthenticated, but `/api/*` and MCP require `Authorization: Bearer <OWNER_TOKEN>`; Source addition is Steer or OPML; `/doctor` must be raw diagnostics and redact OpenRouter secrets; MCP uses Streamable HTTP at `/mcp`.
-- `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-spec-conformance-review.md` — read. Key passage: prior spec conformance gate found REG-01..09 conforming, with only non-blocking REG-06 live-provider debt and product implementation files unmodified.
-- `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md` — read. Key passage: full runtime retest passed Go tests, frontend checks, focused Playwright, real `bin/resofeed serve`, owner-token HTTP/MCP, empty MCP arrays, and `read_item`; REG-06 was honestly classified as provider/auth debt, not fallback success.
+- `docs/audits/artifacts/regression-audit-2026-05-12c/regression-audit-spec-conformance-review.md` — read. Key passage: prior spec conformance gate is historical for REG-01 and superseded by current Source Ledger manual-control authority; non-REG-01 findings and REG-06 debt classification remain useful.
+- `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md` — read. Key passage: full runtime retest passed Go tests, frontend checks, real `bin/resofeed serve`, owner-token HTTP/MCP, empty MCP arrays, and `read_item`; REG-01 no-control evidence is historical/superseded; REG-06 was honestly classified as provider/auth debt, not fallback success.
 - `.audit-artifacts/regression_audit_full_runtime_retest/mcp_empty_resources_and_auth.json` — read. Key passage: unauthenticated `/api/sources` returned `401` canonical body; authorized MCP resources returned `{"sources":[]}` and `{"rules":[]}` with JSON MIME text content.
 - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/gate-reviewer-final-gate.md` — read. Key passage: backend/MCP/LLM gate approved with non-blocking OpenRouter provider/account debt; real bound binary proof existed for `/api/doctor`, `/api/feed/today`, `/mcp read_item`, and MCP sources; no scoped `invar:allow` escape hatches.
 - `.audit-artifacts/regression_backend_mcp_llm_liveness_probe/report.json` — read. Key passage: probe status `PASS`, failures `[]`, `/api/doctor` and `/api/feed/today` status 200, `/mcp read_item` status 200 with full-text marker true, OpenRouter preflight status 404 classified `provider_or_auth`, raw secret absent.
-- `docs/audits/artifacts/regression-audit-2026-05-12c/regression-frontend-surface-gate.md` — read. Key passage: frontend gate passed REG-01/03/05/07/08/09 with Playwright and source evidence; no forbidden Source Ledger run/fetch controls and no scoped escape hatches.
-- `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md` — read. Key passage: Source Ledger manual `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]` controls are explicitly forbidden; ledger remains visibility/delete/import/export/details only.
+- `docs/audits/artifacts/regression-audit-2026-05-12c/regression-frontend-surface-gate.md` — read. Key passage: frontend gate is historical/superseded for REG-01 no-control evidence; REG-03/05/07/08/09 Playwright/source evidence remains useful.
+- `docs/audits/artifacts/regression-audit-2026-05-12c/source-ledger-reg-01-adjudication.md` — read. Key passage: prior ban is superseded; Source Ledger manual `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]` controls are allowed/expected as lightweight bracket actions with anti-dashboard guards.
 
 ## Focused Deep Review Report
 
@@ -36,7 +40,7 @@ review_areas:
 
 ### Gate Decision
 
-[PASS] with non-blocking debt. Gate may open for `regression-audit-final-gate` because no blocker-class systemic regression was found and the remaining proof gap is already isolated to external OpenRouter provider/account availability, not repo-owned wiring or fallback honesty.
+[PASS_WITH_REG01_SUPERSESSION] with non-blocking debt. Gate may open for non-REG-01 regression evidence because no blocker-class systemic regression was found and the remaining non-REG-01 proof gap is isolated to external OpenRouter provider/account availability, not repo-owned wiring or fallback honesty. REG-01's historical no-control basis is superseded by current Source Ledger authority and must use updated positive-control proof.
 
 ### Verification Run (Command + Exit Code)
 
@@ -46,20 +50,20 @@ review_areas:
 | `go test ./...` | 0 | `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed 0.743s`. Covers backend/MCP/idempotency contract tests including MCP auth, empty arrays, read_item detail, and idempotent retry paths. |
 | `npm run check` before dependency bootstrap | 127 | Failed with `sh: svelte-kit: command not found`; this verified frontend dependencies were missing in the isolated worktree. |
 | `npm ci && npm run check` | 0 | `npm ci` installed local transient dependencies; `svelte-check found 0 errors and 0 warnings`. `node_modules` not committed. |
-| `npx playwright test --config ./playwright.config.ts web/tests/e2e/regression-audit-ui-expected-red.spec.ts --project=chromium-ci-safe` | 0 | Production Vite build completed; `6 passed (6.6s)` for REG-01, REG-03, REG-05, REG-07, REG-08, REG-09. Transient `.test-artifacts` output cleaned and not committed. |
+| `npx playwright test --config ./playwright.config.ts web/tests/e2e/regression-audit-ui-expected-red.spec.ts --project=chromium-ci-safe` | 0 | Production Vite build completed; `6 passed (6.6s)` under the historical REG-01 no-control interpretation plus REG-03/05/07/08/09. Current REG-01 authority supersedes the no-control portion of that suite. |
 | `rg -n '@invar:allow\|invar:allow' cmd internal web/src web/tests docs/ARCHITECTURE.md docs/PRD.md docs/DESIGN.md docs/DESIGN_VISION.md docs/USAGE.md .agents/instructions.md` | 1 | No output; no scoped source/ref escape hatches. |
-| `rg -n '\[RUN INGEST\]\|\[INGESTING\.\.\.\]\|\[FETCH\]\|\[FETCHING\.\.\.\]' web/src/routes web/src/lib -g '!**/__tests__/**'` | 1 | No output; no forbidden Source Ledger manual ingest/fetch labels in non-test frontend source. |
+| Historical Source Ledger absence scan | 1 | Historical-only no-output result from the old REG-01 interpretation. Current Source Ledger acceptance requires lightweight manual controls plus anti-dashboard guards. |
 | `rg -n 'OAuth\|RBAC\|account registration\|vector database\|vector DB\|embedding\|built-in RAG\|semantic answer\|sync coordinator\|state merger\|conflict resolver\|event bus\|service layer\|per-agent registry\|folders\|tags\|unread\|archive\|mark all read' cmd internal web/src web/tests docs/ARCHITECTURE.md docs/PRD.md docs/DESIGN.md docs/DESIGN_VISION.md docs/USAGE.md .agents/instructions.md` | 0 | Matches were either canonical negative requirements/docs/tests or benign implementation comments such as `Inspector.svelte` boilerplate stripping; no new product implementation feature surface found. |
 
 ### Review Area Findings
 
-#### wiring_completeness: PASS
+#### wiring_completeness: PASS_WITH_REG01_SUPERSESSION
 
 - Source Ledger is reachable from real rendered UI via surface menu in `web/src/routes/+page.svelte:384-389`, which exposes `TODAY` and `SOURCE LEDGER` buttons only.
-- Source Ledger receives only `delete/import/export/import-state` callbacks in `web/src/routes/+page.svelte:438-445`; no manual ingest/fetch callbacks are passed.
-- The rendered Source Ledger component exposes rows, URL, delete confirmation, diagnostics details, OPML import, and state portability in `web/src/routes/components/SourceLedger.svelte:107-145`.
-- API client behavior still has owner-token headers on all product requests (`web/src/lib/api-client.ts:209-215`) and specific Source Ledger calls use `/api/sources`, `DELETE /api/sources/{id}`, `/api/sources/import-opml`, `/api/state/export`, and `/api/state/import` (`api-client.ts:149-163,187-197`). `runIngest`/`fetchSource` helpers exist (`api-client.ts:165-173`) but are not wired into Source Ledger UI; this is not a Source Ledger regression.
-- Real rendered proof: focused Playwright REG suite passed 6/6; REG-01 explicitly asserts no Source Ledger buttons named `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]` (`web/tests/e2e/regression-audit-ui-expected-red.spec.ts:179-198`).
+- Historical REG-01 wiring caveat: this review originally treated absence of manual ingest/fetch callbacks as proof. Current authority supersedes that criterion and requires lightweight manual bracket actions wired only to immediate ingest/fetch HTTP paths.
+- The rendered Source Ledger component evidence in this artifact remains useful for flat rows, URL, delete confirmation, diagnostics details, OPML import, and state portability.
+- API client behavior still has owner-token headers on all product requests (`web/src/lib/api-client.ts:209-215`). Current Source Ledger implementation proof must verify `runIngest`/`fetchSource` helpers are used only for direct immediate controls and do not create dashboard/job/activity/settings/sync surfaces.
+- Historical Playwright REG-01 no-control assertions are superseded. Current REG-01 tests must assert control presence/reachability/state plus anti-dashboard guards.
 
 #### runtime_mcp_api: PASS
 
@@ -104,19 +108,19 @@ issues:
     gate_intersection: "Non-blocking because current gate asks for focused regression proof and Chromium Playwright directly covers the specified mobile utility/search/receipt/diagnostic regressions."
     remediation_owner: "frontend QA"
     verification: "Optional future cross-browser run for mobile utility route containment and Search submit uniqueness."
-  - severity: tech_debt
-    description: "Historical audit/harness artifacts still mention superseded manual Source Ledger fetch/run expectations, although current adjudication and tests reject them."
+  - severity: supersession_note
+    description: "Historical audit/harness artifacts, including this review's original REG-01 wiring notes, treated manual Source Ledger fetch/run controls as absent/forbidden. Current authority supersedes that basis and requires lightweight controls with anti-dashboard guards."
     related_finding: "REG-2026-05-12-01 historical drift"
-    gate_intersection: "Non-blocking because current Source Ledger adjudication, implementation, and negative guards are aligned; risk is future copy/paste confusion."
+    gate_intersection: "Non-blocking for non-REG-01 findings; current REG-01 closure must use updated positive-control proof."
     remediation_owner: "docs/audit maintainer"
-    verification: "Keep `source-ledger-reg-01-adjudication.md` and negative tests active; optionally annotate stale artifacts as superseded."
+    verification: "Use current Source Ledger adjudication and contract matrix; do not keep old no-control tests active as current REG-01 proof."
 
 ### Behavioral Proof Register
 
 | Behavior | Proof status | Proof type | Evidence |
 | --- | --- | --- | --- |
-| Source Ledger controls reachable from real rendered UI | PROVEN | Real browser render + source wiring | `+page.svelte:384-389,438-445`; `SourceLedger.svelte:107-145`; Playwright 6 passed. |
-| Source Ledger has no manual run/fetch controls | PROVEN | Static scan + rendered negative assertions | Forbidden control `rg` exit 1; `regression-audit-ui-expected-red.spec.ts:193-196`; adjudication lines 7-31. |
+| Source Ledger controls reachable from real rendered UI | SUPERSEDED_FOR_REG01_NO_CONTROL_CRITERION | Historical browser render + source wiring | Current authority requires lightweight manual controls; this artifact's no-control criterion is not current proof. |
+| Source Ledger flat boundary with manual controls | REQUIRED_BY_CURRENT_AUTHORITY | Current docs/adjudication | `[RUN INGEST]` / `[FETCH]` controls are allowed only as flat immediate bracket actions with anti-dashboard guards. |
 | UI client sends owner-token auth on API calls | PROVEN | Source inspection | `api-client.ts:199-215`; static UI auth prompt source `+page.svelte:358-360`. |
 | `/mcp` owner-token boundary rejects unauthenticated calls | PROVEN | Runtime artifact + tests + source | `mcp_empty_resources_and_auth.json:2-5`; `mcp.go:311-324`; `mcp_integration_test.go:25-28`. |
 | Empty MCP `sources` and `rules` arrays serialize as `[]` | PROVEN | Real MCP resource proof | `mcp_empty_resources_and_auth.json:12-20`; `mcp.go:363-383,478-491`. |
@@ -157,15 +161,15 @@ Notes:
 ```json
 {
   "status": "SUCCESS",
-  "headline": "PASS_WITH_DEBT",
-  "verdict": "PASS_WITH_DEBT",
-  "gate_open_allowed": true,
-  "orchestrator_action_hint": "PROCEED_TO_FINAL_GATE",
+  "headline": "PASS_WITH_DEBT_AND_REG01_SUPERSESSION",
+  "verdict": "PASS_WITH_DEBT_FOR_NON_REG01_EVIDENCE_REG01_SUPERSEDED",
+  "gate_open_allowed": "true_for_non_reg01_evidence",
+  "orchestrator_action_hint": "USE_CURRENT_REG01_AUTHORITY",
   "blocking_status": "CLOSED",
   "proof_gap_status": "NON_BLOCKING",
   "blockers": [],
   "review_areas": {
-    "wiring_completeness": "PASS",
+    "wiring_completeness": "PASS_WITH_REG01_SUPERSESSION",
     "runtime_mcp_api": "PASS",
     "ui_accessibility": "PASS",
     "diagnostic_placement": "PASS",

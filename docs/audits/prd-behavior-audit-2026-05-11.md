@@ -4,7 +4,7 @@ Date: 2026-05-11
 Target: `http://127.0.0.1:8080/`
 Scope: end-user behavior testing against `docs/PRD.md` and `docs/DESIGN.md`, expanding beyond UI pixel review into actual workflows: Inspect, Resonate, Search, Steer, Source addition, manual ingest, Doctor, state portability, and mobile route behavior.
 
-Staleness note: this historical audit predates the REG-2026-05-12-01 Source Ledger authority adjudication. Any `[RUN INGEST]`, `[FETCH]`, or manual Source Ledger ingest/fetch expectation in this artifact is stale/conflicting and must not be copied into implementation scope. Current authority keeps Source Ledger to view/delete/import/export/details/diagnostics, source addition via Steer, and refresh via background ingest.
+Staleness note: this historical audit predates two later Source Ledger authority changes. The 2026-05-12 adjudication temporarily rejected `[RUN INGEST]` / `[FETCH]`, but that ban is now superseded by the 2026-05-13 product decision allowing lightweight manual Source Ledger controls. Treat this artifact as historical evidence; current implementation scope comes from `docs/DESIGN.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, and the updated REG-01 adjudication.
 
 ## Verdict
 

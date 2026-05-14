@@ -188,7 +188,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       'href',
       expectedRedItem.url
     );
-    expect(within(inspector).getByText('partial: excerpt only')).toBeVisible();
+    expect(within(inspector).getByText('source text: RSS excerpt only')).toBeVisible();
     expect(within(inspector).getByText('why: fresh from configured source')).toBeVisible();
     expect(within(inspector).queryByRole('button', { name: 'Resonate item' })).not.toBeInTheDocument();
     await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());

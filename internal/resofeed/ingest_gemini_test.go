@@ -72,6 +72,73 @@ func TestExtractionStatusMappingCoversFullPartialAndOriginalUnavailable(t *testi
 	}
 }
 
+func TestExtractArticleTextPrefersSemanticReadableContainers(t *testing.T) {
+	t.Parallel()
+
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body>
+			<nav>top nav should not leak</nav>
+			<main>
+				<aside>sidebar should not leak</aside>
+				<div itemprop="articleBody">
+					<p>Semantic container article lead.</p>
+					<p>Semantic container article detail.</p>
+				</div>
+				<footer>footer should not leak</footer>
+			</main>
+		</body></html>`)
+	}))
+	defer page.Close()
+
+	text, status := extractArticleText(context.Background(), page.URL, "fallback excerpt")
+	if status != extractionStatusFull {
+		t.Fatalf("status = %q, want %q with text %q", status, extractionStatusFull, text)
+	}
+	for _, want := range []string{"Semantic container article lead.", "Semantic container article detail."} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("extracted text %q missing %q", text, want)
+		}
+	}
+	for _, unwanted := range []string{"top nav should not leak", "sidebar should not leak", "footer should not leak"} {
+		if strings.Contains(text, unwanted) {
+			t.Fatalf("extracted text %q contains boilerplate %q", text, unwanted)
+		}
+	}
+}
+
+func TestExtractArticleTextPreservesParagraphBoundariesForReadableSanitation(t *testing.T) {
+	t.Parallel()
+
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body>
+			<article>
+				<p>The company said the new policy changes how moderators review appeals.</p>
+				<p>Engineers will ship the migration in phases after reviewing safety data.</p>
+				<p>Sign up for our newsletter and review our privacy policy.</p>
+			</article>
+		</body></html>`)
+	}))
+	defer page.Close()
+
+	text, status := extractArticleText(context.Background(), page.URL, "fallback excerpt")
+	if status != extractionStatusFull {
+		t.Fatalf("status = %q, want %q with text %q", status, extractionStatusFull, text)
+	}
+	for _, want := range []string{
+		"The company said the new policy changes how moderators review appeals.",
+		"Engineers will ship the migration in phases after reviewing safety data.",
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("extracted text %q missing %q", text, want)
+		}
+	}
+	for _, unwanted := range []string{"Sign up for our newsletter", "privacy policy"} {
+		if strings.Contains(text, unwanted) {
+			t.Fatalf("extracted text %q contains boilerplate %q", text, unwanted)
+		}
+	}
+}
+
 func TestIngestOnceIsolatesSourceFailuresAndMapsModelFailure(t *testing.T) {
 	ctx := context.Background()
 	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

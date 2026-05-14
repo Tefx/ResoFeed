@@ -280,7 +280,7 @@
   }
 
   function extractionDisclosure(value: InspectableItem): string {
-    if (value.extraction_status === 'partial_extraction') return 'partial: excerpt only';
+    if (value.extraction_status === 'partial_extraction') return 'source text: RSS excerpt only';
     if (value.extraction_status === 'original_unavailable') return 'original unavailable';
     if (value.extraction_status === 'summary_unavailable') return 'summary unavailable';
     return 'full';
@@ -295,7 +295,7 @@
   function summaryProvenanceDisclosure(value: InspectableItem): string {
     const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
     if (hasModelText) return 'summary provenance: model-backed';
-    const fallback = summaryText(value) ? 'fallback excerpt-only' : 'fallback unavailable';
+    const fallback = summaryText(value) ? 'feed excerpt fallback' : 'fallback unavailable';
     return `summary provenance: ${fallback}`;
   }
 

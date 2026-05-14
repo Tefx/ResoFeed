@@ -4,9 +4,9 @@ Status: contract lock only. This document defines the launch, matrix, artifact, 
 
 ## Source Basis
 
-- `docs/ARCHITECTURE.md`: ResoFeed is one `cmd/resofeed` deployable serving static UI, JSON HTTP, MCP Streamable HTTP, and background ingest against one SQLite database. OpenRouter secrets are runtime-only inputs from `OPENROUTER_KEY` or local `.env`, never CLI flags or committed artifacts.
-- `docs/DESIGN.md` and `docs/ui-preview.html`: UI verification must preserve dense but legible chrome, owner-token prompt, first-use empty state, Steer, Today feed, Inspector, Source Ledger, `/doctor`, raw feedback, 44px controls, visible focus, and non-layout-shifting states.
-- `docs/PRD.md`: the core loop is Inspect, Resonate, Steer; first useful session uses RSS/OPML, Today, inspect, star, and optional steering without accounts, folders, archive, unread mechanics, or delivery-channel setup.
+- `docs/ARCHITECTURE.md`: ResoFeed is one `cmd/resofeed` deployable serving static UI, JSON HTTP, MCP Streamable HTTP, and background ingest against one SQLite database. OpenRouter secrets are runtime-only inputs from `OPENROUTER_KEY` or local `.env`, never CLI flags or committed artifacts. Manual ingest/fetch HTTP actions are immediate requests guarded by one in-process ingest lock; they must not become queues, jobs, command histories, activity ledgers, or sync primitives.
+- `docs/DESIGN.md` and `docs/ui-preview.html`: UI verification must preserve dense but legible chrome, owner-token prompt, first-use empty state, Steer, discreet `RESOFEED` surface menu, Today feed, Inspector, Source Ledger, `/doctor`, raw feedback, 44px controls, visible focus, non-layout-shifting states, and lightweight Source Ledger `[RUN INGEST]` / `[FETCH]` bracket actions.
+- `docs/PRD.md`: the core loop is Inspect, Resonate, Steer; first useful session uses RSS/OPML, Today, inspect, star, optional steering, and optional lightweight Source Ledger manual ingest/fetch without accounts, folders, archive, unread mechanics, dashboards, or delivery-channel setup.
 - `.agents/instructions.md`: contract work must defend the one-binary/one-SQLite/OpenRouter-runtime-secret/no-sync/no-vector/no-account boundaries.
 
 ## Playwright Launch Contract
@@ -68,13 +68,15 @@ These cases must run without live LLM credentials and must explicitly clear `OPE
 1. **Real server/UI boot**: static UI loads from the Go binary; `/api/*` is unauthorized before token entry; no mocked API server.
 2. **First-use owner token**: prompt appears before API calls, token input receives initial focus, invalid token shows `err: owner token rejected`, accepted token stores `resofeed.ownerToken`, and focus moves to Steer or first feed item.
 3. **First-use empty state**: no sources renders the specified lines (`Paste RSS URL in Steer or import OPML.`, `Inspect opens the item.`, `Star preserves durable value.`, `Steer is optional correction.`) inside the normal shell.
-4. **Source/feed operations**: paste RSS URL via Steer or import OPML fixture, verify flat Source Ledger rows, deletion confirmation/error states, OPML folder flattening evidence, no folders/tags/settings affordances.
-5. **Source Ledger boundary**: verify Source Ledger exposes view/delete/import/export/details/diagnostics only; it must not render `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, or `[FETCHING...]` controls. Source addition remains through Steer, and refresh evidence comes from the background ingest loop.
-6. **Today/feed**: `GET /api/feed/today` backs the Today surface, covers loading, empty, populated, grouped, partial, summary-unavailable, selected, hover, focus, and keyboard-open Inspector states.
-7. **Inspect/retrieve/search**: opening an item retrieves detail, marks human Inspect through the real API when required, displays provenance/original link/extracted or excerpt text, and lexical search covers query/source/date/resonated filters plus strict query validation errors.
-8. **LLM failure/mock boundary**: CI-safe tests simulate missing/invalid OpenRouter startup/runtime paths deterministically by absence or invalid value only, asserting startup skip/failure or fallback taxonomy without committed secrets or network LLM calls.
-9. **API/MCP parity probes**: authenticated HTTP and MCP probes compare equivalent product operations for Today/list candidates, search, read item, inspect, resonate, steer, report delivery, auth failure, idempotency, and strict schema validation.
-10. **Visual/UX invariants**: screenshots verify dense archival layout, muted palette, rare accent star, visible focus, no decorative gradients/mascots/skeletons, responsive desktop split vs mobile Inspector route, no clipping/overflow with long RSS strings, and no layout shift on hover/focus/selected/loading/error states.
+4. **Surface menu/navigation**: the `RESOFEED` menu is visible after token acceptance, opens through real pointer and keyboard input, exposes `TODAY` and `SOURCE LEDGER`, and activates the correct surface without leaving the wrong panel active.
+5. **Source/feed operations**: paste RSS URL via Steer or import OPML fixture, verify flat Source Ledger rows, deletion confirmation/error states, OPML folder flattening evidence, no folders/tags/settings affordances.
+6. **Source Ledger manual controls**: verify Source Ledger exposes lightweight `[RUN INGEST]` and per-source `[FETCH]` bracket actions; pending states render `[INGESTING...]` / `[FETCHING...]`; success updates `last_ingest` / `last_fetch`; source-level errors and conflicts render terse raw `err:`/conflict feedback; row/header geometry and 44px hit targets remain stable.
+7. **Source Ledger anti-dashboard boundary**: verify manual controls do not create or expose job queues, retry dashboards, command histories, activity ledgers, sync/merge controls, portable manual-ingest receipts, source hierarchy, folders, tags, pause/resume toggles, or a second source URL paste field.
+8. **Today/feed**: `GET /api/feed/today` backs the Today surface, covers loading, empty, populated, grouped, partial, summary-unavailable, selected, hover, focus, and keyboard-open Inspector states.
+9. **Inspect/retrieve/search**: opening an item retrieves detail, marks human Inspect through the real API when required, displays provenance/original link/extracted or excerpt text, and lexical search covers query/source/date/resonated filters plus strict query validation errors.
+10. **LLM failure/mock boundary**: CI-safe tests simulate missing/invalid OpenRouter startup/runtime paths deterministically by absence or invalid value only, asserting startup skip/failure or fallback taxonomy without committed secrets or network LLM calls.
+11. **API/MCP parity probes**: authenticated HTTP and MCP probes compare equivalent product operations for Today/list candidates, search, read item, inspect, resonate, steer, report delivery, auth failure, idempotency, and strict schema validation.
+12. **Visual/UX invariants**: screenshots verify dense archival layout, muted palette, rare accent star, visible focus, no decorative gradients/mascots/skeletons, responsive desktop split vs mobile Inspector route, no clipping/overflow with long RSS strings, and no layout shift on hover/focus/selected/loading/error states.
 
 ## Live OpenRouter Smoke Boundary
 
@@ -116,6 +118,7 @@ The harness contract must not introduce or rely on:
 - product behavior not already specified by architecture/design/PRD;
 - accounts, OAuth, profiles, registration, or multi-user concepts;
 - sync/merge/conflict-resolution coordinators or portable activity ledgers;
-- sidecar workers, queue/job systems, extra admin processes, or mocked product runtimes;
+- sidecar workers, queue/job systems, extra admin processes, mocked product runtimes, or persisted manual-ingest jobs;
+- manual-ingest retry dashboards, command histories, activity feeds, or portable manual-ingest receipts;
 - vector DBs, embeddings, RAG answer surfaces, or semantic search;
 - folders, tags, unread counts, archive flows, settings sliders, dashboards, decorative gradients, mascots, skeleton loaders, or friendly SaaS copy.
