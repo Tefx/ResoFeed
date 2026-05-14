@@ -61176,6 +61176,240 @@ phases:
     - urda-browser-regression-and-layout-retest
     - urda-uiux-multimodal-design-audit
     agent: gate-reviewer
+  - id: urda-browser-regression-batched-fix
+    name: Batched browser regression and live artifact fix
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: defect_repair
+
+      verification_scope: phase-check
+
+      tags: ["integration", "uiux", "browser-regression"]
+
+
+      Batched fix for ALL blockers reported by `urda-browser-regression-and-layout-retest`.
+      This is one consolidated remediation step; do not patch only one symptom and
+      leave sibling blocker families behind.
+
+
+      ## Test-to-Fix Context (ALL blockers)
+
+
+      ### B1 — OPML accessible-label ambiguity
+
+      - Failing command: `npm --prefix web run test:e2e -- full-ui-design-conformance.expected-red.spec.ts
+      --project=chromium-ci-safe`
+
+      - Failure: Playwright strict mode: `getByLabel(''import OPML'') resolved to
+      2 elements`: visible `[IMPORT OPML]` button and hidden file input labelled `import
+      OPML`.
+
+      - Required repair: remove strict accessible-label ambiguity while preserving
+      visible `[IMPORT OPML]` keyboard button semantics. The hidden file input must
+      remain programmatically reachable for activation/import flow without competing
+      for the same accessible label.
+
+      - Preserve DESIGN.md Source Ledger semantics: `[RUN INGEST]`, `[FETCH]`, `[IMPORT
+      OPML]`, raw `err:` diagnostics, and stable geometry.
+
+
+      ### B2 — live real-server smoke incomplete
+
+      - Real `resofeed serve` browser/API smoke captured Owner Prompt and Source Ledger
+      ingest/fetch states but failed waiting for `Live audit item one` after ingest.
+
+      - Missing required artifact set: Today populated item, Inspector, Search, Doctor,
+      mobile feed, mobile Inspector, mobile Source Ledger screenshots, metrics JSON,
+      accessibility snapshots, console/network logs.
+
+      - Required repair: determine whether the real server cannot produce the audit
+      item because of a product data/fixture flow defect. If yes, repair the smallest
+      product/runtime path consistent with the documented APIs/imports. If no, create
+      a robust live audit fixture/probe path that uses documented APIs/imports and
+      records deterministic artifacts without weakening product contracts.
+
+
+      ### B3 — targeted green specs are fixture-routed
+
+      - `source-ledger-controls-diagnostics-layout.expected-red.spec.ts` and `urda-visual-a11y-expected-red-browser-tests.spec.ts`
+      passed but use `page.route(''**/api/**'')` fixture responses.
+
+      - Required repair: keep useful fixture checks, but add/repair the real API/manual
+      ingest/fetch proof path so downstream retest cannot rely only on `page.route`
+      fixtures for integration seams.
+
+
+      ## Scope and guardrails
+
+      - Touch paths likely include `web/src/**`, `web/tests/e2e/**`, and only the
+      minimal Go/runtime/API fixture path if B2 proves a product data-flow defect.
+
+      - Preserve ResoFeed architecture: one Go binary (`cmd/resofeed`), one SQLite
+      DB, owner-token boundary, HTTP API product operations.
+
+      - FORBIDDEN: queues, job dashboards, activity ledgers, sync/merge, accounts/OAuth,
+      vector/RAG, settings dashboards, folders/tags/unread/archive, sidecar workers.
+
+      - Do not alter completed step meanings or broaden product scope.
+
+
+      ## Gate Preview (what downstream gates WILL reject)
+
+      1. OPML strict-mode ambiguity remains or `[IMPORT OPML]` loses keyboard/button
+      semantics.
+
+      2. Live artifact proof still stops before Today item, Inspector, Search, Doctor,
+      mobile states, metrics JSON, accessibility snapshots, console logs, or network
+      logs.
+
+      3. Integration claims rely only on `page.route(''**/api/**'')` fixtures without
+      real `resofeed serve` API/manual ingest/fetch evidence.
+
+      4. Any forbidden ResoFeed product/runtime concept is introduced.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic or deterministic test/probe behavior
+      that processes real inputs and produces outputs that vary based on those inputs.
+      Private stub classes or hardcoded-only smoke artifacts do not satisfy this requirement.'
+    verification: '- Main path: OPML import remains keyboard-reachable through the
+      visible `[IMPORT OPML]` control and Playwright strict label lookup no longer
+      resolves multiple elements.
+
+      - Runtime path: real `resofeed serve` with isolated DB/owner token can deterministically
+      produce at least one audit item through documented APIs/imports/manual ingest/fetch
+      flow, or evidence identifies and repairs the product data-flow defect without
+      weakening contracts.
+
+      - Integration path: browser evidence includes real API/manual ingest/fetch proof
+      in addition to any `page.route` fixture specs.
+
+      - Boundary proof: no forbidden ResoFeed runtime/product concepts were introduced;
+      one-binary/SQLite/owner-token invariants remain intact.
+
+      - Evidence includes exact command outputs for focused e2e/API checks and sibling
+      search notes for OPML label ambiguity and route-fixture-only reliance.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+      - web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Fix Evidence
+
+
+      ### B1 OPML a11y ambiguity
+
+      - Root cause:
+
+      - Files changed:
+
+      - Sibling search for duplicate OPML accessible labels:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+      - Exact focused command output:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+
+      ### B2 Real-server live artifact path
+
+      - Root cause: product data/fixture flow defect OR audit probe determinism gap
+
+      - Chosen repair path and why it preserves product contracts:
+
+      - Exact `resofeed serve` launch command:
+
+      ```
+
+      <paste command and output>
+
+      ```
+
+      - Exact API/import/manual ingest/fetch commands or browser actions used:
+
+      ```
+
+      <paste command/actions and output>
+
+      ```
+
+      - Artifact manifest produced/updated:
+
+      ```
+
+      <paths or pending retest-owned artifacts>
+
+      ```
+
+
+      ### B3 Fixture-routed spec balancing
+
+      - Remaining `page.route(''**/api/**'')` usage and why each fixture is still
+      acceptable:
+
+      ```
+
+      <paste search output and justification>
+
+      ```
+
+      - Real API/manual ingest/fetch proof added or repaired:
+
+      ```
+
+      <paste command/output or test path>
+
+      ```
+
+
+      ### Boundary Guardrail Confirmation
+
+      - No queues/job dashboards/activity ledgers/sync/merge/accounts/OAuth/vector/RAG/settings/folders/tags/unread/archive/sidecar
+      workers introduced: YES/NO with evidence
+
+      - One Go binary + one SQLite + owner-token boundary preserved: YES/NO with evidence
+
+
+      ### Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-browser-regression-and-layout-retest
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
