@@ -58986,6 +58986,92 @@ phases:
     depends_on:
     - urda-backend-runtime-green-retest
     agent: blind-tester
+  - id: urda-backend-runtime-gate
+    name: Gate backend/runtime UI audit repair
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether backend/runtime repair
+      can feed the frontend audit remediation safely.
+
+
+      Gate blocks if:
+
+      - source diagnostics are still unavailable for raw `err:` rendering;
+
+      - manual ingest/fetch endpoints drift from ARCHITECTURE request/response contracts;
+
+      - `resofeed serve` liveness or CLI surface preservation evidence is missing;
+
+      - any queue/job dashboard/activity ledger/sync/sidecar/account feature was introduced;
+
+      - evidence lacks both main-path and failure-path proof.
+
+
+      Decision basis must map runtime proof obligations for audit issues 1, 2, and
+      4 to evidence refs.'
+    verification: '- Phase-check protecting frontend Source Ledger implementation
+      and final closure.
+
+      - Reviews all backend implementation, retest, liveness, and CLI matrix evidence.
+
+      - Confirms no forbidden runtime/product concepts were introduced.
+
+      - Final decision basis is OPEN only if blocker-class runtime obligations are
+      PROVEN or have explicit non-intersection evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ## Runtime Proof Obligations
+
+      | Audit issue | Behavior claim | Evidence ref | Status | Closure path |
+
+      |---|---|---|---|---|
+
+      | 1 | global manual ingest endpoint runnable | <ref> | PROVEN/UNPROVEN | <path>
+      |
+
+      | 2 | per-source fetch endpoint runnable | <ref> | PROVEN/UNPROVEN | <path>
+      |
+
+      | 4 | raw source diagnostics exposed | <ref> | PROVEN/UNPROVEN | <path> |
+
+
+      ## Forbidden Scope Scan
+
+      - queues/jobs/ledgers/sync/sidecars/accounts/settings dashboards found: <none
+      or details>
+
+
+      ## Gate Decision
+
+      OPEN | BLOCK'
+    depends_on:
+    - urda-expose-source-diagnostics-and-ingest-runtime-contract
+    - urda-backend-runtime-green-retest
+    - urda-serve-liveness-and-cli-surface-matrix
+    agent: gate-reviewer
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
   status: locked
