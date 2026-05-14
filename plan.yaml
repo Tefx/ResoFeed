@@ -60103,7 +60103,7 @@ phases:
       OPEN'
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
-  status: pending
+  status: in_progress
   gate: Frontend repair closes Source Ledger controls, raw diagnostics, layout geometry,
     keyboard semantics, design-token hover/focus, search/feed/inspector/owner/resonate
     UI issues, and docs/ui-preview.html drift with rendered browser and multimodal
@@ -60114,7 +60114,7 @@ phases:
   - id: urda-source-ledger-controls-diagnostics-layout-fix
     name: Repair Source Ledger manual controls, diagnostics, row geometry, and OPML
       semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       tags: ["integration", "ui", "accessibility"]
@@ -60268,6 +60268,8 @@ phases:
 
       PASS | FAIL'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-14T18:08:44.507348+00:00'
   - id: urda-search-feed-inspector-owner-resonate-polish-fix
     name: Repair bracket actions, Search, mobile feed, Inspector link, owner-token
       heading, and Resonate a11y
