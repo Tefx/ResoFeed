@@ -80,7 +80,7 @@
   <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
       <label for="search-query">Plain text query</label>
-      <input id="search-query" bind:value={searchQuery} aria-describedby="search-status search-contract-note" />
+      <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
       <button type="submit">search</button>
     </div>
     <details class="search-secondary-filters" open={!compactFilters}>
@@ -140,7 +140,7 @@
           <button
             class="contract-resonate"
             type="button"
-            aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
+            aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
             aria-pressed={item.is_resonated ? 'true' : 'false'}
             disabled={pendingResonanceId === item.id}
             onclick={() => void toggleResonance(item)}
@@ -154,5 +154,4 @@
       <p>no results</p>
     {/if}
   </div>
-  <p id="search-contract-note" class="contract-muted">Lexical and metadata retrieval only; results stay source-backed.</p>
 </section>

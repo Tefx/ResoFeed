@@ -240,8 +240,8 @@ a:focus,
 
 .bracket-action:hover:not(:disabled),
 .bracket-action:focus-visible:not(:disabled) {
-  color: var(--rf-color-text);
-  background: transparent;
+  color: var(--rf-color-background);
+  background: var(--rf-color-text);
   outline: 2px solid var(--rf-color-focus);
   outline-offset: 2px;
 }
@@ -395,6 +395,11 @@ a:focus,
   max-width: 560px;
   gap: var(--rf-space-sm);
   margin-block-end: var(--rf-space-sm);
+}
+
+#owner-token-heading {
+  margin-block: var(--rf-space-sm);
+  font: var(--rf-typography-chrome);
 }
 
 .resofeed-shell {
@@ -643,8 +648,12 @@ a:focus,
 }
 
 .search-secondary-grid {
-  grid-template-columns: max-content minmax(0, 1fr) max-content minmax(12ch, 0.5fr);
+  grid-template-columns: max-content minmax(14ch, 1fr) max-content minmax(14ch, 1fr) max-content minmax(10ch, 0.5fr);
   margin-block-start: var(--rf-space-sm);
+}
+
+.search-secondary-grid .contract-checkbox {
+  grid-column: span 2;
 }
 
 .search-secondary-filters summary {
@@ -671,7 +680,7 @@ a:focus,
   transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
 }
 
-.contract-resonate[aria-label='Remove resonance'] {
+.contract-resonate[aria-pressed='true'] {
   border-color: var(--rf-color-accent);
   color: var(--rf-color-accent-contrast);
   background: var(--rf-color-accent);
@@ -717,6 +726,20 @@ a:focus,
 
 .contract-inspector h2:focus {
   outline: 0;
+}
+
+.contract-inspector a {
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.contract-inspector a:hover,
+.contract-inspector a:focus-visible {
+  color: var(--rf-color-text);
+  outline: 2px solid var(--rf-color-focus);
+  outline-offset: 2px;
 }
 
 .inspector-header-row {
@@ -853,6 +876,27 @@ a:focus,
 
   .contract-feed-item .contract-feed-summary {
     -webkit-line-clamp: 1;
+  }
+
+  .contract-feed-meta {
+    flex-wrap: wrap;
+    row-gap: 0;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .contract-feed-meta span {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .contract-feed-meta .feed-meta-source {
+    flex-basis: 100%;
+  }
+
+  .contract-time-label {
+    margin-inline-start: 0;
   }
 
   .contract-search-form {

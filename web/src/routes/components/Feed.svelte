@@ -56,7 +56,7 @@
         <button
           class="contract-resonate"
           type="button"
-          aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
+          aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
           aria-pressed={item.is_resonated ? 'true' : 'false'}
           disabled={pendingResonanceId === item.id}
           onclick={() => void toggleResonance(item)}
