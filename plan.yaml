@@ -61241,7 +61241,7 @@ phases:
     agent: gate-reviewer
   - id: urda-browser-regression-batched-fix
     name: Batched browser regression and live artifact fix
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -61473,6 +61473,8 @@ phases:
     depends_on:
     - urda-browser-regression-and-layout-retest
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-14T19:04:24.761831+00:00'
   - id: urda-browser-regression-post-fix-retest
     name: Post-fix browser regression, live artifact, and layout retest
     status: pending
