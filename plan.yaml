@@ -59369,6 +59369,81 @@ phases:
     depends_on:
     - urda-source-ledger-controls-diagnostics-layout-fix
     agent: frontend-engineer
+  - id: urda-ui-preview-manual-ingest-sync
+    name: Sync docs/ui-preview.html to manual ingest and fetch design contract
+    status: pending
+    description: "step_type: implementation\nsimple_feature_exception:\n  approved:\
+      \ true\n  conditions_met:\n    - single_static_preview_fixture\n    - no_runtime_state_semantics_changed\n\
+      \    - no_cross_module_coordination\n    - obvious_existing_pattern\n  pattern_reference:\
+      \ docs/ui-preview.html Source Ledger preview fixture and docs/DESIGN.md Source\
+      \ Ledger DOM contract\n\nUpdate the static preview fixture for audit issue 3\
+      \ after the live Source Ledger repair contract is clear.\n\nRequired outcomes:\n\
+      - `docs/ui-preview.html` Source Ledger preview includes `last_ingest: HH:MM:SS`.\n\
+      - It shows global `[RUN INGEST]` in the header/action area.\n- It shows row-level\
+      \ `[FETCH]` alongside source rows.\n- It shows row-level raw `err:` diagnostic\
+      \ display.\n- Remove or correct stale copy implying refresh is handled only\
+      \ by background ingest.\n- Keep preview aligned to `docs/DESIGN.md`; do not\
+      \ introduce new product concepts or controls.\n\nThis qualifies for the simple-feature\
+      \ exception because it is a static preview fixture update following an already-authoritative\
+      \ design pattern; no runtime logic, storage, API, or cross-module state semantics\
+      \ are introduced."
+    verification: '- Static preview contains `[RUN INGEST]`, `[FETCH]`, `last_ingest:
+      HH:MM:SS`, and at least one raw `err:` row example.
+
+      - Stale background-ingest-only copy is absent.
+
+      - Preview remains free of forbidden Source Ledger features (folders/tags/settings/queues/job
+      dashboards/sync/merge controls).
+
+      - Evidence cites before/after snippets from docs/ui-preview.html.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Preview Sync Evidence
+
+      **Issue covered**: 3
+
+
+      ### Before/after snippets
+
+      - Before: <snippet>
+
+      - After: <snippet>
+
+
+      ### Required preview elements
+
+      - `[RUN INGEST]`: PRESENT/ABSENT
+
+      - `[FETCH]`: PRESENT/ABSENT
+
+      - `last_ingest: HH:MM:SS`: PRESENT/ABSENT
+
+      - raw `err:` row diagnostic: PRESENT/ABSENT
+
+      - stale background-ingest-only copy removed: YES/NO
+
+
+      ### Forbidden scope check
+
+      - folders/tags/settings/queues/job dashboards/sync/merge controls added: NO/YES
+
+
+      ## Headline
+
+      PASS | FAIL'
+    depends_on:
+    - urda-source-ledger-controls-diagnostics-layout-fix
+    agent: doc-reviewer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
