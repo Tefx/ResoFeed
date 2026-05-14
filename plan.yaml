@@ -58227,3 +58227,12 @@ phases:
     preservation evidence are collected before frontend closure proceeds.
   depends_on:
   - ui-runtime-design-audit-contract-tests
+- id: ui-runtime-design-audit-frontend-repair
+  name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
+  status: locked
+  gate: Frontend repair closes Source Ledger controls, raw diagnostics, layout geometry,
+    keyboard semantics, design-token hover/focus, search/feed/inspector/owner/resonate
+    UI issues, and docs/ui-preview.html drift with rendered browser and multimodal
+    UIUX evidence.
+  depends_on:
+  - ui-runtime-design-audit-backend-runtime-repair
