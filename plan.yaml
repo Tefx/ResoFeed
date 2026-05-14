@@ -61173,7 +61173,8 @@ phases:
     - urda-source-ledger-controls-diagnostics-layout-fix
     - urda-search-feed-inspector-owner-resonate-polish-fix
     - urda-ui-preview-manual-ingest-sync
-    - urda-browser-regression-and-layout-retest
+    - urda-browser-regression-batched-fix
+    - urda-browser-regression-post-fix-retest
     - urda-uiux-multimodal-design-audit
     agent: gate-reviewer
   - id: urda-browser-regression-batched-fix
