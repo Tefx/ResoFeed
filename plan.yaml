@@ -58211,3 +58211,11 @@ phases:
 
       - Transient Playwright artifacts, `.test-artifacts`, built binaries, node_modules,
       SQLite DBs, and `.venv` were not committed.'
+- id: ui-runtime-design-audit-contract-tests
+  name: UI Runtime Design Audit — Contract Matrix and Expected-Red Tests
+  status: pending
+  gate: Every issue 1-14 from docs/audits/ui-runtime-design-audit-2026-05-15.md has
+    explicit owner, acceptance criteria, expected-red/proof coverage, and authority
+    aligned to docs/ARCHITECTURE.md and docs/DESIGN.md before remediation starts.
+  depends_on:
+  - regression-audit-remediation-independent-retest-and-closure
