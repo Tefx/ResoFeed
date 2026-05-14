@@ -60451,7 +60451,7 @@ phases:
   - id: urda-search-feed-inspector-owner-resonate-polish-fix
     name: Repair bracket actions, Search, mobile feed, Inspector link, owner-token
       heading, and Resonate a11y
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       tags: ["ui", "accessibility"]
@@ -60578,6 +60578,8 @@ phases:
     depends_on:
     - urda-source-ledger-controls-diagnostics-layout-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-14T18:27:11.213770+00:00'
   - id: urda-ui-preview-manual-ingest-sync
     name: Sync docs/ui-preview.html to manual ingest and fetch design contract
     status: pending
