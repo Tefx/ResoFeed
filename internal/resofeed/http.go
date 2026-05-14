@@ -478,12 +478,13 @@ func (h apiHandler) handleSources(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h apiHandler) handleManualIngest(w http.ResponseWriter, r *http.Request) {
+	started := time.Now().UTC()
 	result, err := ManualIngest(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM})
 	if err != nil {
 		writeManualFetchError(w, "", err)
 		return
 	}
-	writeJSON(w, ManualFetchHTTPStatusOK, result)
+	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{ManualFetchResult: result, Ingest: newIngestRunResult(result, "all", nil, started, time.Now().UTC())})
 }
 
 func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Request) {
@@ -493,12 +494,18 @@ func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Reque
 		writeAPIError(w, ManualFetchHTTPStatusNotFound, ManualFetchErrorCodeNotFound, "not found", map[string]any{"id": r.URL.Path})
 		return
 	}
+	started := time.Now().UTC()
 	result, err := ManualFetchSource(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM}, sourceID)
 	if err != nil {
 		writeManualFetchError(w, sourceID, err)
 		return
 	}
-	writeJSON(w, ManualFetchHTTPStatusOK, result)
+	source, err := loadSourceForResponse(r.Context(), h.cfg.DB, sourceID)
+	if err != nil {
+		writeManualFetchError(w, sourceID, err)
+		return
+	}
+	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{ManualFetchResult: result, Ingest: newIngestRunResult(result, "source", &sourceID, started, time.Now().UTC()), Source: &source})
 }
 
 func (h apiHandler) handleDeleteSource(w http.ResponseWriter, r *http.Request) {
@@ -766,7 +773,7 @@ func listSources(ctx context.Context, db *sql.DB) ([]Source, error) {
 	if db == nil {
 		return nil, errors.New("list sources: db required")
 	}
-	rows, err := db.QueryContext(ctx, `select id, url, title, last_fetch_at, last_fetch_status, is_active, revision from sources where is_active = 1 order by id`)
+	rows, err := db.QueryContext(ctx, `select id, url, title, last_fetch_at, last_fetch_status, last_fetch_error, is_active, revision from sources where is_active = 1 order by id`)
 	if err != nil {
 		return nil, fmt.Errorf("list sources: %w", err)
 	}
@@ -775,16 +782,67 @@ func listSources(ctx context.Context, db *sql.DB) ([]Source, error) {
 	for rows.Next() {
 		var source Source
 		var lastFetch sql.NullString
-		if err := rows.Scan(&source.ID, &source.URL, &source.Title, &lastFetch, &source.LastFetchStatus, &source.IsActive, &source.Revision); err != nil {
+		var lastFetchError sql.NullString
+		if err := rows.Scan(&source.ID, &source.URL, &source.Title, &lastFetch, &source.LastFetchStatus, &lastFetchError, &source.IsActive, &source.Revision); err != nil {
 			return nil, fmt.Errorf("scan source: %w", err)
 		}
 		source.LastFetchAt = timePtrFromNull(lastFetch)
+		source.LastFetchError = stringPtrFromNull(lastFetchError)
 		sources = append(sources, source)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate sources: %w", err)
 	}
 	return sources, nil
+}
+
+func loadSourceForResponse(ctx context.Context, db *sql.DB, sourceID string) (Source, error) {
+	if db == nil {
+		return Source{}, errors.New("load source response: db required")
+	}
+	var source Source
+	var lastFetch sql.NullString
+	var lastFetchError sql.NullString
+	err := db.QueryRowContext(ctx, `select id, url, title, last_fetch_at, last_fetch_status, last_fetch_error, is_active, revision from sources where id = ? and is_active = 1`, sourceID).Scan(&source.ID, &source.URL, &source.Title, &lastFetch, &source.LastFetchStatus, &lastFetchError, &source.IsActive, &source.Revision)
+	if err != nil {
+		return Source{}, fmt.Errorf("load source response %q: %w", sourceID, err)
+	}
+	source.LastFetchAt = timePtrFromNull(lastFetch)
+	source.LastFetchError = stringPtrFromNull(lastFetchError)
+	return source, nil
+}
+
+func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string, started time.Time, completed time.Time) IngestRunResult {
+	errors := make([]IngestErrorDetail, 0, len(result.Errors))
+	for _, sourceErr := range result.Errors {
+		id := sourceErr.SourceID
+		errors = append(errors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Message: sourceErr.Message})
+	}
+	sourcesFailed := len(errors)
+	status := "completed"
+	if sourcesFailed > 0 {
+		status = "completed_with_errors"
+		if result.SourcesTotal == sourcesFailed || scope == "source" {
+			status = "failed"
+		}
+	}
+	duration := completed.Sub(started).Milliseconds()
+	if duration < 0 {
+		duration = 0
+	}
+	return IngestRunResult{
+		Scope:            scope,
+		SourceID:         sourceID,
+		Status:           status,
+		StartedAt:        started.Format(time.RFC3339),
+		CompletedAt:      completed.Format(time.RFC3339),
+		DurationMS:       int(duration),
+		SourcesAttempted: result.SourcesTotal,
+		SourcesSucceeded: result.SourcesFetched,
+		SourcesFailed:    sourcesFailed,
+		ItemsUpserted:    result.ItemsUpserted,
+		Errors:           errors,
+	}
 }
 
 func stateErrorField(err error) string {
@@ -817,7 +875,7 @@ func writeMutationError(w http.ResponseWriter, id string, err error) {
 
 func writeManualFetchError(w http.ResponseWriter, id string, err error) {
 	if errors.Is(err, errManualFetchConflict) {
-		writeAPIError(w, ManualFetchHTTPStatusConflict, ManualFetchErrorCodeConflict, "ingest already running", nil)
+		writeAPIError(w, ManualFetchHTTPStatusConflict, ManualFetchErrorCodeConflict, "ingest already running", map[string]any{"ingest_running": true, "scope": "all", "retry_allowed": true})
 		return
 	}
 	if errors.Is(err, sql.ErrNoRows) || strings.Contains(strings.ToLower(err.Error()), "no rows") {
@@ -862,6 +920,37 @@ type ItemResponse struct {
 // response constructors must initialize an empty slice when no rows exist.
 type SourcesResponse struct {
 	Sources []Source `json:"sources"`
+}
+
+// IngestResponse is the architecture envelope for POST /api/ingest and
+// POST /api/sources/{id}/fetch. Source is present only for source-scoped fetches.
+type IngestResponse struct {
+	ManualFetchResult
+	Ingest IngestRunResult `json:"ingest"`
+	Source *Source         `json:"source,omitempty"`
+}
+
+// IngestRunResult summarizes one synchronous manual ingest/fetch operation.
+type IngestRunResult struct {
+	Scope            string              `json:"scope"`
+	SourceID         *string             `json:"source_id"`
+	Status           string              `json:"status"`
+	StartedAt        string              `json:"started_at"`
+	CompletedAt      string              `json:"completed_at"`
+	DurationMS       int                 `json:"duration_ms"`
+	SourcesAttempted int                 `json:"sources_attempted"`
+	SourcesSucceeded int                 `json:"sources_succeeded"`
+	SourcesFailed    int                 `json:"sources_failed"`
+	ItemsUpserted    int                 `json:"items_upserted"`
+	Errors           []IngestErrorDetail `json:"errors"`
+}
+
+// IngestErrorDetail is a source-scoped operational failure detail suitable for
+// raw Source Ledger err: rendering without friendly-copy translation.
+type IngestErrorDetail struct {
+	SourceID *string `json:"source_id"`
+	Code     string  `json:"code"`
+	Message  string  `json:"message"`
 }
 
 // SearchResponse is GET /api/search.

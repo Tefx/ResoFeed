@@ -48,6 +48,7 @@ type Source struct {
 	Title           string     `json:"title"`
 	LastFetchAt     *time.Time `json:"last_fetch_at"`
 	LastFetchStatus string     `json:"last_fetch_status"`
+	LastFetchError  *string    `json:"last_fetch_error"`
 	IsActive        bool       `json:"is_active"`
 	Revision        int64      `json:"revision"`
 }

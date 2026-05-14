@@ -470,7 +470,7 @@ func listSourcesForMCP(ctx context.Context, db *sql.DB) ([]Source, error) {
 	if db == nil {
 		return nil, errors.New("list MCP sources: db is nil")
 	}
-	rows, err := db.QueryContext(ctx, `select id, url, title, last_fetch_at, last_fetch_status, is_active, revision from sources where is_active = 1 order by id`)
+	rows, err := db.QueryContext(ctx, `select id, url, title, last_fetch_at, last_fetch_status, last_fetch_error, is_active, revision from sources where is_active = 1 order by id`)
 	if err != nil {
 		return nil, fmt.Errorf("list MCP sources: %w", err)
 	}
@@ -479,10 +479,12 @@ func listSourcesForMCP(ctx context.Context, db *sql.DB) ([]Source, error) {
 	for rows.Next() {
 		var source Source
 		var lastFetch sql.NullString
-		if err := rows.Scan(&source.ID, &source.URL, &source.Title, &lastFetch, &source.LastFetchStatus, &source.IsActive, &source.Revision); err != nil {
+		var lastFetchError sql.NullString
+		if err := rows.Scan(&source.ID, &source.URL, &source.Title, &lastFetch, &source.LastFetchStatus, &lastFetchError, &source.IsActive, &source.Revision); err != nil {
 			return nil, fmt.Errorf("scan MCP source: %w", err)
 		}
 		source.LastFetchAt = timePtrFromNull(lastFetch)
+		source.LastFetchError = stringPtrFromNull(lastFetchError)
 		sources = append(sources, source)
 	}
 	if err := rows.Err(); err != nil {
