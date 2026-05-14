@@ -58219,3 +58219,11 @@ phases:
     aligned to docs/ARCHITECTURE.md and docs/DESIGN.md before remediation starts.
   depends_on:
   - regression-audit-remediation-independent-retest-and-closure
+- id: ui-runtime-design-audit-backend-runtime-repair
+  name: UI Runtime Design Audit — Backend and Runtime Repair
+  status: locked
+  gate: Backend/API/runtime repair is complete for audit-backed source diagnostics
+    and manual-ingest/fetch runtime behavior; runnable `resofeed serve` and CLI surface
+    preservation evidence are collected before frontend closure proceeds.
+  depends_on:
+  - ui-runtime-design-audit-contract-tests
