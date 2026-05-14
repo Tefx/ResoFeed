@@ -59858,3 +59858,98 @@ phases:
 
       PASS | FAIL'
     agent: spec-verifier
+  - id: urda-final-spec-and-product-boundary-review
+    name: Verify final UI repairs against architecture, design, and product boundaries
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+
+      As spec-verifier, independently verify final remediation against `docs/ARCHITECTURE.md`,
+      `docs/DESIGN.md`, `docs/ui-preview.html`, and the audit.
+
+
+      Focus:
+
+      - DESIGN.md Source Ledger contract is satisfied for `[RUN INGEST]`, `[FETCH]`,
+      raw `err:` diagnostics, row geometry, keyboard semantics, bracket-action tokens,
+      and no layout shift.
+
+      - ARCHITECTURE.md one-binary runtime, single SQLite, ingest guard, no queue/job/ledger/sync,
+      and HTTP contract semantics are preserved.
+
+      - Search remains lexical/provenance-backed but does not expose architecture/design
+      explanation prose as user copy.
+
+      - Owner Token Prompt remains local-token gate and does not become account/onboarding/password-reset
+      UI.
+
+      - Preview/docs reflect the implemented manual ingest/fetch shape without stale
+      background-only guidance.
+
+
+      This is NOT a generic tests-pass check; it is adversarial divergence hunting
+      with requirement-by-requirement verdicts.'
+    verification: '- Evidence table maps each relevant DESIGN/ARCHITECTURE requirement
+      to implementation or artifact refs.
+
+      - Verdicts use CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND, AMBIGUOUS_SPEC,
+      or SPEC_POSSIBLY_STALE.
+
+      - Behavioral precedence/runtime claims are flagged NEEDS_TEST unless supported
+      by runtime evidence.
+
+      - Any DIVERGES/PARTIAL/NEEDS_TEST item has closure path before final gate can
+      open.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Spec Conformance Report
+
+      **Scope**: UI runtime design audit remediation
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+      |---|---|---|---|---|
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation/Artifact | Verdict | Notes
+      |
+
+      |---|---|---|---|---|---|
+
+
+      ## Product Boundary Scan
+
+      - forbidden accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job
+      dashboards/sidecars introduced: <none or details>
+
+
+      ## Top Risks
+
+      - <none or list>
+
+
+      ## Headline
+
+      PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - urda-final-issue-closure-matrix
+    agent: spec-verifier
