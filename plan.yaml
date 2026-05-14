@@ -59826,7 +59826,7 @@ phases:
       :false}\n\n## Headline\nPASS_WITH_DEBT"
   - id: urda-backend-runtime-gate
     name: Gate backend/runtime UI audit repair
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -59910,6 +59910,8 @@ phases:
     - urda-backend-runtime-green-retest
     - urda-serve-liveness-and-cli-surface-matrix
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-14T17:59:37.800112+00:00'
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
   status: locked
