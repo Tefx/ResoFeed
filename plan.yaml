@@ -64611,3 +64611,136 @@ phases:
       \ bounding-box regression.\n- Worktree generated tracked `.test-artifacts` were\
       \ restored; only untracked test artifacts remained and will be discarded with\
       \ worktree cleanup.\n\n### Gaps/Notes\n- none"
+  - id: urda-uiux-multimodal-design-audit-persist
+    name: Persist superseding UIUX multimodal design audit artifact
+    status: pending
+    description: "step_type: verification\nverification_scope: full-plan-check\nIndependence\
+      \ Level: L2\nagent_source: default\n\nAs an INDEPENDENT UIUX AUDITOR (`uiux-auditor`),\
+      \ produce and persist the missing superseding UIUX/multimodal/front-end closure\
+      \ artifact required by the blocked strict final gate.\n\nThis is an evidence-governance\
+      \ remediation step only. Do NOT modify product code. The only planned repository\
+      \ write is a persisted audit artifact under `docs/audits/`, named exactly or\
+      \ clearly equivalently to `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`.\n\
+      \nRequired audit scope:\n1. Perform an independent rendered/screenshot-first\
+      \ multimodal audit sufficient to satisfy the `urda-uiux-multimodal-design-audit`\
+      \ final-gate precondition.\n2. Review and cite prior closure evidence from:\n\
+      \   - `urda-final-spec-boundary-blockers-uiux-audit` for R6/R7/R18 rendered\
+      \ UI proof.\n   - `urda-final-spec-boundary-blockers-retest` for keyboard/frontend\
+      \ retests, Source Ledger R6/R7/R18 proof, stale receipt copy R12 proof, and\
+      \ forbidden-surface scans.\n   - `urda-final-black-box-runtime-ui-smoke` for\
+      \ black-box runtime smoke, screenshots, accessibility/mobile evidence, public\
+      \ workflow proof, and CLI preservation.\n   - The blocked `urda-strict-final-gate`\
+      \ evidence blockers BLOCKER-1 and BLOCKER-2.\n3. Explicitly state whether the\
+      \ prior persisted frontend FAIL/BLOCK artifact `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`\
+      \ is superseded, and on what evidence.\n4. Include screenshots/rendered artifacts,\
+      \ accessibility/mobile evidence, or exact artifact references sufficient for\
+      \ a final gate reviewer to verify the multimodal closure without relying on\
+      \ unstored chat-only claims.\n5. Include a behavioral proof register mapping\
+      \ each relevant UI/runtime obligation to PROVEN, PASS_WITH_DEBT accepted with\
+      \ non-blocking rationale, or BLOCKED with remediation path.\n\nSupersession\
+      \ decision requirements:\n- If superseding the prior FAIL/BLOCK artifact, identify\
+      \ the prior blocker(s), the newer evidence artifact(s), and why the newer evidence\
+      \ is stronger and final-gate-eligible.\n- If not superseding any portion, mark\
+      \ the remaining portion BLOCKED and provide explicit remediation ownership rather\
+      \ than allowing silent gate progression.\n\n## Completion Criteria (stub exclusion)\n\
+      This is a VERIFICATION/evidence-remediation step. Stub-only or prose-only completion\
+      \ is NOT acceptable. Completion requires an actual persisted audit artifact\
+      \ under `docs/audits/` with concrete evidence references and a PASS/PASS_WITH_DEBT/BLOCKED\
+      \ decision basis."
+    verification: '- full-plan-check evidence remediation protecting `urda-strict-final-gate-rerun`.
+
+      - Persisted artifact exists under `docs/audits/` as `urda-uiux-multimodal-design-audit-2026-05-15.md`
+      or clearly equivalent.
+
+      - Artifact contains rendered/screenshot-first audit evidence or exact persisted
+      screenshot/a11y/mobile artifact references.
+
+      - Artifact explicitly decides whether `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`
+      is superseded, with evidence from keyboard/frontend retests, Source Ledger R6/R7/R18
+      evidence, R12 stale-copy proof, black-box smoke, screenshots/a11y/mobile proof,
+      and product-boundary scans.
+
+      - Artifact includes PASS, accepted PASS_WITH_DEBT, or BLOCKED with gate decision
+      basis and no unresolved silent evidence gaps.
+
+      - No product code is modified.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Persisted UIUX Multimodal Closure Artifact
+
+
+      **Artifact path**: `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`
+      or equivalent.
+
+      **Product code modified**: NO (required)
+
+
+      ## Rendered / Screenshot-First Evidence
+
+
+      - Desktop evidence references:
+
+      - Mobile evidence references:
+
+      - Accessibility snapshot references:
+
+      - Screenshot or visual artifact references:
+
+
+      ## Prior FAIL/BLOCK Supersession Decision
+
+
+      **Prior artifact reviewed**: `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`
+
+      **Superseded?**: YES | PARTIAL | NO
+
+      **Evidence basis**:
+
+      - Keyboard/frontend retests:
+
+      - Source Ledger R6/R7/R18 evidence:
+
+      - R12 stale receipt copy evidence:
+
+      - Black-box smoke evidence:
+
+      - Screenshots/a11y/mobile evidence:
+
+
+      ## Behavioral Proof Register
+
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+
+      ## Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT (accepted, non-blocking rationale included)
+
+      - [ ] BLOCKED
+
+
+      ## Gate Handoff
+
+      State exactly whether the strict final gate may use this artifact to satisfy
+      the missing `urda-uiux-multimodal-design-audit` precondition.'
+    depends_on:
+    - urda-strict-final-gate
+    - urda-final-spec-boundary-blockers-uiux-audit
+    - urda-final-spec-boundary-blockers-retest
+    - urda-final-black-box-runtime-ui-smoke
+    agent: uiux-auditor
