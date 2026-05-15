@@ -79471,3 +79471,76 @@ phases:
     - srde2e-real-system-e2e-regression
     - srde2e-visual-a11y-regression-proof
     agent: doc-reviewer
+  - id: srde2e-software-architect-fresh-review
+    name: Run software-architect fresh architecture review
+    status: pending
+    description: 'As software-architect, perform a fresh read-only architecture review
+      after implementation and E2E proof.
+
+
+      Scope: Steer classifier, HTTP/MCP preview/commit/undo parity, AC-4 invariant
+      conflict handling, lexical-only search/no-RAG, Source Ledger runtime controls,
+      processing language low-chrome controls, split-scroll/mobile behavior, and KISS
+      boundaries.
+
+
+      Acceptance checklist:
+
+      - [ ] Verify single Go binary, SQLite/FTS5 only, flat internal/resofeed file
+      shape, and no sidecar worker/service/repository/DI/event-bus drift.
+
+      - [ ] Verify preview is read-only, commit reruns classification, undo is target-specific,
+      and idempotency boundaries are correct.
+
+      - [ ] Verify no command history, global undo stack, activity ledger, job dashboard,
+      queue, sync/merge coordinator, accounts, vector DB, embeddings, RAG, or semantic
+      answer engine was introduced.
+
+      - [ ] Verify UI/backend/MCP consumer surfaces share the same resolved facts
+      and do not re-derive contradictory route semantics.
+
+      - [ ] Produce findings with blocker/should_fix/suggestion/tech_debt severity
+      and grep hints for every blocker/should_fix.
+
+
+      If findings exist, this review is still valuable evidence; downstream remediation
+      steps own closure.'
+    verification: '- [ ] phase-check protecting remediation and clean re-review.
+
+      - [ ] Architecture review report covers all scope items and cites evidence.
+
+      - [ ] All blocker/should_fix findings include locations, reproduction/verification
+      path, and grep/search hints.
+
+      - [ ] Review explicitly states CLEAN or lists required remediation ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Software Architect Fresh Review
+
+      | Severity | Finding | Location | Evidence | Grep hint | Required remediation
+      |
+
+      |---|---|---|---|---|---|
+
+
+      **Verdict**: CLEAN | FINDINGS_PRESENT
+
+      '
+    depends_on:
+    - srde2e-real-system-e2e-regression
+    - srde2e-visual-a11y-regression-proof
+    - srde2e-documentation-sync
+    agent: software-architect
