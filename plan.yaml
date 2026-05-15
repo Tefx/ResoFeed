@@ -70099,7 +70099,7 @@ phases:
       - [x] `/api/doctor` emits exactly `search_fts: stale since <RFC3339_UTC>` or
       `search_fts: ok`.
 
-      - [ ] Reprocess shares the ingest/fetch operation exclusivity guard and creates
+      - [x] Reprocess shares the ingest/fetch operation exclusivity guard and creates
       no durable job/queue/ledger.
 
 
