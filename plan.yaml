@@ -75275,7 +75275,7 @@ phases:
       \ during cleanup to leave no retained worktree changes.\n\n## Gaps/Notes\nnone"
   - id: plse-blind-http-mcp-parity-delivery
     name: Blind test HTTP MCP parity and delivery endpoint
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -75324,6 +75324,238 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T17:52:29.597605+00:00'
+    done_at: '2026-05-15T18:10:26.207062+00:00'
+    evidence: '## Black-Box Parity Report
+
+
+      ### refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — verified public contract passages: HTTP/MCP thin transports
+      share product operations; owner token required for every `/api/*` and `/mcp`;
+      `actor_id` is provenance-not-auth; processing language/reprocess HTTP/MCP parity;
+      delivery/report_delivery idempotency; no registry/activity/job/sync artifacts.
+
+
+      ## Closure Signals
+
+      headline: PASS
+
+      verdict: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      blockers: []
+
+      product_implementation_files_modified: false
+
+
+      ### Probe Matrix
+
+      | Surface | Expected | Actual | Verdict |
+
+      |---|---|---|---|
+
+      | HTTP auth | `401 unauthorized` before operation | `401 {"error":{"code":"unauthorized","message":"owner
+      token required"}}` | PASS |
+
+      | HTTP auth / actor_id-not-auth | actor_id alone grants no access | `401 unauthorized`
+      | PASS |
+
+      | MCP auth | `401 unauthorized` before JSON-RPC handling | `401 unauthorized`
+      | PASS |
+
+      | Language parity | HTTP set visible through MCP; MCP set visible through HTTP
+      | HTTP `zh`, MCP `zh`; MCP `en`, HTTP `en` | PASS |
+
+      | Language idempotency | replay `already_applied:true`; mismatch fingerprint
+      error | documented semantics matched | PASS |
+
+      | Reprocess parity | HTTP/MCP same result shape/semantics | both returned `reprocess`
+      counts/status/errors and `already_applied` | PASS |
+
+      | Search echo parity | HTTP/MCP equivalent `query` echo | both echoed q/source/from/to/resonated/limit
+      | PASS |
+
+      | Delivery state parity | HTTP delivery and MCP report_delivery update same
+      item | `external_surfaced_at` moved from `12:34:56Z` to `13:00:00Z` and was
+      visible cross-transport | PASS |
+
+      | Delivery idempotency | replay/mismatch semantics | replay true; mismatch fingerprint
+      error | PASS |
+
+      | Forbidden durable surfaces | no registry/activity/job/sync visible | endpoints
+      404; state export only sources/rules/resonated_items | PASS |
+
+
+      ### Actual Outputs
+
+      Runtime command launched real `resofeed serve` with local OPML/feed fixture
+      imported through public API only. Created item `item_e6aa81da623a8f176df2cbbce27075a4`.
+
+
+      Auth excerpts:
+
+      ```json
+
+      GET /api/runtime/language without Authorization -> HTTP 401
+
+      {"error":{"code":"unauthorized","message":"owner token required","details":{}}}
+
+      PUT /api/runtime/language with actor_id but no Authorization -> HTTP 401
+
+      POST /mcp initialize without Authorization -> HTTP 401
+
+      ```
+
+
+      Language excerpts:
+
+      ```json
+
+      GET /api/runtime/language -> {"language":{"code":"en","label":"English"},"already_applied":false}
+
+      PUT /api/runtime/language zh -> {"language":{"code":"zh","label":"中文"},"already_applied":false}
+
+      PUT replay -> {"already_applied":true}
+
+      PUT mismatch -> HTTP 400 {"field":"idempotency_key","reason":"request_fingerprint_mismatch"}
+
+      MCP get_processing_language -> {"language":{"code":"zh","label":"中文"}}
+
+      MCP set_processing_language en -> {"language":{"code":"en","label":"English"}}
+
+      HTTP GET after MCP set -> {"language":{"code":"en","label":"English"}}
+
+      ```
+
+
+      Search excerpts:
+
+      ```json
+
+      HTTP /api/search?q=sqlite&limit=7 -> items:[item_e6aa81da...], query:{"q":"sqlite","limit":7}
+
+      MCP search_items {"query":"sqlite","limit":7} -> same item and query echo
+
+      ```
+
+
+      Delivery excerpts:
+
+      ```json
+
+      HTTP delivery -> {"external_surfaced_at":"2026-05-16T12:34:56Z","already_applied":false}
+
+      HTTP replay -> {"already_applied":true}
+
+      HTTP mismatch -> HTTP 400 request_fingerprint_mismatch
+
+      MCP read_item after HTTP delivery -> external_surfaced_at:"2026-05-16T12:34:56Z"
+
+      MCP report_delivery -> external_surfaced_at:"2026-05-16T13:00:00Z"
+
+      MCP replay -> already_applied:true
+
+      MCP mismatch -> JSON-RPC error with bad_request request_fingerprint_mismatch
+
+      HTTP read after MCP delivery -> external_surfaced_at:"2026-05-16T13:00:00Z"
+
+      ```
+
+
+      Reprocess excerpts:
+
+      ```json
+
+      HTTP reprocess -> {"status":"completed_with_errors","language":"en","items_attempted":1,"items_updated":0,"items_indexed":1,"items_failed":1,"fts_rebuilt":true,"errors":[{"code":"model_latency_error"}]}
+
+      HTTP replay -> already_applied:true
+
+      HTTP mismatch -> HTTP 400 request_fingerprint_mismatch
+
+      MCP reprocess_library -> same reprocess shape/counts/errors with already_applied:false
+
+      ```
+
+
+      Forbidden surfaces/state export excerpts:
+
+      ```json
+
+      /api/delivery-registry, /api/activity, /api/activity-ledger, /api/jobs, /api/sync,
+      /api/runtime/jobs -> HTTP 404
+
+      /api/state/export -> schema_version, sources, steer_rules, resonated_items only
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | status | gate_decision_basis |
+
+      |---|---|---|---|
+
+      | ARCH auth | Owner token required; actor_id not auth | PROVEN | PASS |
+
+      | ARCH language parity | HTTP/MCP language share state | PROVEN | PASS |
+
+      | ARCH idempotency | replay/mismatch semantics | PROVEN | PASS |
+
+      | ARCH search | equivalent query echo | PROVEN | PASS |
+
+      | ARCH delivery/report_delivery | shared item state mutation | PROVEN | PASS
+      |
+
+      | ARCH reprocess | HTTP/MCP response shape and semantics equivalent | PROVEN
+      | PASS |
+
+      | ARCH forbidden durable surfaces | no delivery registry/activity ledger/job/sync
+      visible | PROVEN | PASS |
+
+
+      ## Checklist Closure
+
+      - Description checklist items toggled by blind tester.
+
+      - Verification checklist items marked `[x]` by orchestrator after validating
+      evidence.
+
+
+      ## Files changed
+
+      none
+
+
+      ## Commit hash(es)
+
+      none (verify-only; no retained changes; final worktree clean)
+
+
+      ## Verification
+
+      - `npm --prefix web install && npm --prefix web run build && go build -o <tmp>/resofeed
+      ./cmd/resofeed` — PASS.
+
+      - Black-box audit script launched documented `resofeed serve`, imported local
+      OPML/feed through HTTP, exercised HTTP and MCP public interfaces, and exited
+      PASS.
+
+      - `git status --short` after audit/checklist — clean.
+
+
+      ## Gaps/Notes
+
+      Reprocess used a fake OpenRouter key and produced documented `completed_with_errors`/`model_latency_error`;
+      parity was judged on public response shape, counts, replay/mismatch behavior,
+      and absence of durable job/ledger surfaces. No product implementation files
+      were read or modified.'
   - id: plse-reprocess-failure-stale-fts-proof
     name: Verify reprocess failure stale FTS and recovery diagnostics
     status: claimed
