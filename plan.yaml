@@ -71408,7 +71408,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Original backend-core processing-language tests pass after remediation.
+      - [x] Original backend-core processing-language tests pass after remediation.
 
       - [ ] New guard exclusivity proof is green and cites exact test names or command
       output.
