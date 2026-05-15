@@ -69225,7 +69225,7 @@ phases:
 
       - [x] Tests cover unknown JSON body field rejection for new mutating endpoints.
 
-      - [ ] Tests cover live receipt replay, mismatch, TTL expiration, and expired-row
+      - [x] Tests cover live receipt replay, mismatch, TTL expiration, and expired-row
       replacement.
 
       - [ ] Tests cover reprocess counts: attempted = updated + unavailable + failed.
