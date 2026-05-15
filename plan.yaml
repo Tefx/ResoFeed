@@ -74540,7 +74540,7 @@ phases:
 
       - [x] Language/reprocess rendered tests now pass green.
 
-      - [ ] API client type tests pass.
+      - [x] API client type tests pass.
 
       - [ ] Source identifier preservation and split-scroll tests pass.
 
