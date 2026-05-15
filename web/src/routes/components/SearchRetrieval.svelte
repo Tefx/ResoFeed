@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ItemSummary, SearchResponse } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type ItemSummary, type SearchResponse } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
@@ -24,6 +24,7 @@
   let statusText = $state('');
   let pendingResonanceId = $state<string | null>(null);
   let lastHandledSeedQuery = '';
+  const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
 
   $effect(() => {
     if (!query) {
@@ -118,7 +119,7 @@
             onclick={() => void openInspector(item)}
           >
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
-              <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
+              <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span>
               <span aria-hidden="true">·</span>
               <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
               {#if shouldShowTimeGroup(results, index)}

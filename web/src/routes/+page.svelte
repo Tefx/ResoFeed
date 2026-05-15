@@ -51,8 +51,8 @@
   let reprocessTrigger = $state<HTMLButtonElement | undefined>();
   let reprocessConfirm = $state<HTMLButtonElement | undefined>();
   let shellElement = $state<HTMLElement | undefined>();
-  let feedPane = $state<HTMLElement | undefined>();
-  let inspectorPane = $state<HTMLElement | undefined>();
+  let feedPaneElement = $state<HTMLElement | undefined>();
+  let detailPaneElement = $state<HTMLElement | undefined>();
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -84,6 +84,17 @@
     if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
     if (pathname.startsWith('/items/')) return 'inspector';
     return 'feed';
+  }
+
+  function itemIdForPath(pathname: string): string | null {
+    if (!pathname.startsWith('/items/')) return null;
+    const encoded = pathname.slice('/items/'.length).split('/')[0];
+    if (!encoded) return null;
+    try {
+      return decodeURIComponent(encoded);
+    } catch {
+      return encoded;
+    }
   }
 
   function canonicalPathForSurface(surface: Surface): string | null {
@@ -124,12 +135,12 @@
 
   function applySplitScrollContainment(): void {
     // DESIGN.md requires independent keyboard-scrollable Feed and Inspector panes; runtime style preserves that behavior in rendered test environments that do not apply app.css.
-    if (feedPane) feedPane.style.overflowY = 'auto';
-    if (inspectorPane) inspectorPane.style.overflowY = 'auto';
+    if (feedPaneElement) feedPaneElement.style.overflowY = 'auto';
+    if (detailPaneElement) detailPaneElement.style.overflowY = 'auto';
   }
 
   $effect(() => {
-    if (feedPane || inspectorPane) applySplitScrollContainment();
+    if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
   });
 
   function formatRawApiError(error: unknown, fallback: string): string {
@@ -158,7 +169,7 @@
       processingLanguage = languageResponse.language;
       setDocumentLanguage(languageResponse.language.code);
       agentSteeringRules = await loadAgentSteeringRules(client);
-      selectedItemId = feedResponse.items[0]?.id ?? null;
+      selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       if (shouldPersistOwnerToken) window.localStorage.setItem(tokenStorageKey, token);
       if (syncRoute) replaceSurfaceFromLocation();
@@ -224,6 +235,8 @@
       const response = await apiClient(token).item(itemId);
       selectedItemDetail = response.item;
       inspectorState = 'ready';
+      await tick();
+      if (detailPaneElement) detailPaneElement.scrollTop = 0;
     } catch (error) {
       inspectorState = 'error';
       inspectorError = error instanceof Error ? error.message : 'err: item unavailable';
@@ -235,7 +248,10 @@
     selectedItemDetail = null;
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
-    if (inspectorPane) inspectorPane.scrollTop = 0;
+    if (detailPaneElement) detailPaneElement.scrollTop = 0;
+    if (isNarrow && window.location.pathname !== `/items/${encodeURIComponent(item.id)}`) {
+      window.history.pushState({}, '', `/items/${encodeURIComponent(item.id)}`);
+    }
     try {
       await apiClient().inspect(item.id);
     } catch {
@@ -576,10 +592,8 @@
     {/if}
 
     <div class="shell-grid" data-surface={currentSurface}>
-      <span id="feed-pane-scroll-label" class="visually-hidden">TODAY surface independent scroll</span>
-      <span id="inspector-pane-scroll-label" class="visually-hidden">INSPECTOR independent scroll</span>
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex: DESIGN.md requires independently keyboard-scrollable pane containers. -->
-      <section bind:this={feedPane} id="today-feed" class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface" aria-labelledby="feed-pane-scroll-label" tabindex="0" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface independent scroll" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent">
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
@@ -587,11 +601,9 @@
         {/if}
       </section>
 
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex: DESIGN.md requires independently keyboard-scrollable pane containers. -->
-      <aside bind:this={inspectorPane} class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-labelledby="inspector-pane-scroll-label" tabindex="0" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
-        {#if currentSurface === 'inspector'}
-          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
-        {/if}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
+      <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR independent scroll" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
           <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}

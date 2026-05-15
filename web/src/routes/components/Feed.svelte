@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ItemSummary } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type ItemSummary } from '$lib/api-contract';
   import { compareItemsByTimeGroup, itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
@@ -11,6 +11,7 @@
 
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
+  const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item) || left.index - right.index)
@@ -42,7 +43,7 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate="no">src: {item.source_title}</span>
+            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span>
             · <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
             · <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
             · <span aria-label={`Summary provenance: ${itemSummaryProvenanceLabel(item)}`}>{itemSummaryProvenanceLabel(item)}</span>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import type { GroupedSourceItem, ItemDetail, ItemSummary, Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type GroupedSourceItem, type ItemDetail, type ItemSummary, type Source } from '$lib/api-contract';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
@@ -27,6 +27,11 @@
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let handledFocusRequestId = $state(-1);
+  const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
+  const itemUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('url') ? 'no' : undefined;
+  const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
+  const canonicalUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.canonical_url') ? 'no' : undefined;
+  const originalUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.original_url') ? 'no' : undefined;
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     if (status === 'full') return 'full';
@@ -381,6 +386,18 @@
     return `src: ${value.source_title} · ${extraction}${tier}`;
   }
 
+  function provenanceSourceUrl(value: InspectableItem): string | null {
+    return 'provenance' in value ? value.provenance.source_url : null;
+  }
+
+  function provenanceCanonicalUrl(value: InspectableItem): string | null {
+    return 'provenance' in value ? value.provenance.canonical_url : null;
+  }
+
+  function provenanceOriginalUrl(value: InspectableItem): string {
+    return 'provenance' in value ? value.provenance.original_url : value.url;
+  }
+
   function summaryProvenanceDisclosure(value: InspectableItem): string {
     const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
     if (hasModelText) return 'summary provenance: model-backed';
@@ -416,7 +433,9 @@
   {/if}
   {#if item}
     <div class="inspector-header-row">
-      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${provenanceDisclosure(item)}`}>{provenanceDisclosure(item)}</p>
+      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${provenanceDisclosure(item)}`}>
+        <span translate={sourceTitleTranslate}>src: {item.source_title}</span> · {extractionLabel(item.extraction_status)}{item.value_tier ? ` · ${item.value_tier}` : ''}
+      </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
@@ -424,10 +443,29 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate="no">original link</a></p>
-    {#if 'provenance' in item}
-      <p class="contract-muted" translate="no">{item.provenance.source_url}</p>
-    {/if}
+    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link</a></p>
+    <dl class="contract-provenance-anchors" aria-label="Source identifiers">
+      <div>
+        <dt>url</dt>
+        <dd><a href={item.url} target="_blank" rel="noreferrer noopener" translate={itemUrlTranslate}>{item.url}</a></dd>
+      </div>
+      {#if provenanceSourceUrl(item)}
+        <div>
+          <dt>source url</dt>
+          <dd><a href={provenanceSourceUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{provenanceSourceUrl(item)}</a></dd>
+        </div>
+      {/if}
+      {#if provenanceCanonicalUrl(item)}
+        <div>
+          <dt>canonical url</dt>
+          <dd><a href={provenanceCanonicalUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={canonicalUrlTranslate}>{provenanceCanonicalUrl(item)}</a></dd>
+        </div>
+      {/if}
+      <div>
+        <dt>original link</dt>
+        <dd><a href={provenanceOriginalUrl(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{provenanceOriginalUrl(item)}</a></dd>
+      </div>
+    </dl>
     <p class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
@@ -444,11 +482,11 @@
         <ol class="contract-grouped-sources__list">
           {#each groupedItems as sourceItem (sourceItem.item_id)}
             <li class="contract-grouped-sources__item" aria-label={`Grouped source item: ${sourceItem.source_title}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
-              <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener">{sourceItem.source_title}</a>
+              <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener" translate={sourceTitleTranslate}>{sourceItem.source_title}</a>
               <span class="contract-muted"> — {sourceItem.title}</span>
               <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>
               {#if sourceItem.source_url}
-                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceItem.source_title}`}>feed</a>
+                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceItem.source_title}`} translate={sourceUrlTranslate}>feed</a>
               {/if}
             </li>
           {/each}

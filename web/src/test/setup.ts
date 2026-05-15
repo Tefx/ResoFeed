@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import '../app.css';
 import { cleanup } from '@testing-library/svelte';
 import { afterEach } from 'vitest';
 import '../app.css';

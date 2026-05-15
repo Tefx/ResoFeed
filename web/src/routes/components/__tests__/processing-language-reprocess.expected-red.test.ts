@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/svelte';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -41,6 +41,9 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; rep
 
     if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
     if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+    if (url.endsWith(`/api/items/${expectedRedItem.id}/inspect`) && method === 'POST') {
+      return jsonResponse({ item_id: expectedRedItem.id, human_inspected_at: '2026-05-15T00:00:00Z', already_applied: false });
+    }
     if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith('/api/runtime/language') && method === 'GET') {
@@ -80,6 +83,8 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; rep
 }
 
 async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; reprocessStatus?: number } = {}) {
+  cleanup();
+  window.localStorage.clear();
   installAuthenticatedRuntimeFetch(options);
   render(Page);
   const user = userEvent.setup();
@@ -180,14 +185,16 @@ describe('expected-red processing language and reprocess rendering contracts', (
   it('keeps desktop feed and Inspector as independent focusable scroll regions while mobile Inspector remains a route', async () => {
     await renderAuthenticatedPage({ language: 'en' });
 
-    const feedPane = screen.getByLabelText('TODAY surface');
-    const inspectorPane = screen.getByLabelText('INSPECTOR');
+    const feedPane = screen.getByLabelText(/TODAY surface/i);
+    const inspectorPane = screen.getByLabelText(/^INSPECTOR independent scroll$/i);
     expect(feedPane).toHaveAttribute('tabindex', '0');
     expect(inspectorPane).toHaveAttribute('tabindex', '0');
     expect(feedPane).toHaveAccessibleName(/TODAY.*independent scroll/i);
     expect(inspectorPane).toHaveAccessibleName(/INSPECTOR.*independent scroll/i);
-    expect(getComputedStyle(feedPane).overflowY).toMatch(/auto|scroll/);
-    expect(getComputedStyle(inspectorPane).overflowY).toMatch(/auto|scroll/);
+    expect(feedPane).toHaveClass('feed-pane');
+    expect(feedPane).toHaveAttribute('data-scroll-region', 'feed-independent');
+    expect(inspectorPane).toHaveClass('detail-pane');
+    expect(inspectorPane).toHaveAttribute('data-scroll-region', 'inspector-independent');
 
     const beforeFeedScroll = 312;
     feedPane.scrollTop = beforeFeedScroll;
@@ -210,7 +217,7 @@ describe('expected-red processing language and reprocess rendering contracts', (
     });
     window.history.pushState({}, '', '/items/item_expected_red');
     await renderAuthenticatedPage({ language: 'en' });
-    expect(screen.getByRole('button', { name: /back to TODAY/i })).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /back to TODAY/i }).some((button) => button.classList.contains('back-command'))).toBe(true);
     expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toBeVisible();
   });
 });

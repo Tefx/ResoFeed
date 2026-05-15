@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import type { FetchSourceSuccessResponse, ImportOpmlResponse, RunIngestSuccessResponse, Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
   import StatePortability from './StatePortability.svelte';
 
@@ -33,6 +33,8 @@
   let sourceFeedbackById = $state<Record<string, string>>({});
   let importedTitleByUrl = $state<Record<string, string>>({});
   let importInput = $state<HTMLInputElement | undefined>();
+  const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
+  const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(statusText.startsWith('last_ingest:') || statusText === 'ingest complete');
 
   function formatTime(timestamp: string | null | undefined): string | null {
@@ -229,8 +231,8 @@
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
-          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate="no">src: {sourceLabel}</div>
-          <div class="source-ledger-url source-ledger__url" title={source.url} translate="no">url: {source.url}</div>
+          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate={sourceTitleTranslate}>src: {sourceLabel}</div>
+          <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId !== null} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>

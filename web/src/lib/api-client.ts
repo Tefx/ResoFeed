@@ -22,6 +22,7 @@ import type {
   RunIngestSuccessResponse,
   RulesResponse,
   SearchResponse,
+  SetProcessingLanguageRequest,
   SourcesResponse,
   StateBundleV1,
   SteerRequest,
@@ -266,7 +267,7 @@ export class ResoFeedApiClient {
 
   async setProcessingLanguage(
     language: ProcessingLanguage,
-    request?: Partial<Omit<ReprocessLibraryRequest, 'language'>>
+    request?: Partial<Omit<SetProcessingLanguageRequest, 'language'>>
   ): Promise<ProcessingLanguageResponse> {
     const response = await this.request<unknown>(runtimeEndpoints.setLanguage.replace('PUT ', ''), {
       method: 'PUT',
@@ -276,7 +277,7 @@ export class ResoFeedApiClient {
         actor_kind: request?.actor_kind ?? 'human',
         actor_id: request?.actor_id ?? 'owner',
         idempotency_key: request?.idempotency_key ?? mutationKey('language', language)
-      })
+      } satisfies SetProcessingLanguageRequest)
     });
     if (!isProcessingLanguageResponse(response)) {
       throw new ResoFeedApiError(500, fallbackError('internal', 'invalid processing language response'));
