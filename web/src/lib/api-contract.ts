@@ -483,6 +483,123 @@ export const sourceLedgerManualFetchRenderContract: SourceLedgerManualFetchRende
   ]
 };
 
+/**
+ * Frontend acceptance contract lock for route/fixture tests only.
+ *
+ * These declarations intentionally pin state expectations without implementing
+ * rendered UI behavior. They are derived from docs/DESIGN.md Steer Input,
+ * Source Ledger, Search and Retrieval, Desktop Split Scroll, Language Control,
+ * Reprocess Library Action, and docs/UI_REGRESSION_CONTRACT.md hit-target and
+ * negative UX assertions.
+ */
+export type LiveRegionLevel = 'off' | 'polite' | 'assertive';
+
+export type SteerRoutePreviewState =
+  | 'idle-reserved-blank'
+  | 'focused-empty'
+  | 'previewing-route'
+  | 'submitting'
+  | 'applied'
+  | 'rejected';
+
+export interface SteerRoutePreviewStateExpectation {
+  readonly state: SteerRoutePreviewState;
+  readonly previewSlotReserved: boolean;
+  readonly visiblePreviewText: string | null;
+  readonly forbiddenVisibleText: readonly string[];
+  readonly inputAriaDescribedBy: 'steer-route-preview-status';
+  readonly previewLiveRegion: LiveRegionLevel;
+  readonly receiptLiveRegion: LiveRegionLevel;
+  readonly errorLiveRegion: LiveRegionLevel;
+}
+
+export type SourceLedgerActionLabel =
+  | '[RUN INGEST]'
+  | '[INGESTING...]'
+  | '[FETCH]'
+  | '[FETCHING...]'
+  | '[DETAILS]'
+  | '[DELETE]'
+  | '[IMPORT OPML]'
+  | '[IMPORTING OPML...]'
+  | '[EXPORT STATE]'
+  | '[EXPORTING STATE...]'
+  | '[IMPORT STATE]'
+  | '[IMPORTING STATE...]';
+
+export interface BracketHitTargetExpectation {
+  readonly minWidthCssPx: 44;
+  readonly minHeightCssPx: 44;
+  readonly proof: readonly ['center-point', 'safe-interior-offset', 'elementFromPoint-topmost'];
+  readonly disabledKeepsBounds: true;
+  readonly noPointerObstruction: true;
+}
+
+export interface SourceLedgerControlExpectation {
+  readonly label: SourceLedgerActionLabel;
+  readonly role: 'button' | 'native-details-summary' | 'keyboard-reachable-file-input';
+  readonly accessibleName: string;
+  readonly hitTarget: BracketHitTargetExpectation;
+  readonly liveRegion: LiveRegionLevel;
+}
+
+export interface SourceLedgerDetailsDisclosureExpectation {
+  readonly triggerLabel: '[DETAILS]';
+  readonly semantics: 'native-details-summary-or-button-with-aria-expanded';
+  readonly collapsedByDefault: true;
+  readonly diagnosticPlacement: 'labelled-disclosure-not-primary-copy';
+  readonly rawErrorPrefixPreserved: 'err:';
+}
+
+export type SearchRetrievalMode = 'lexical-fts-only' | 'find-alias-warning-only';
+
+export interface SearchRetrievalFixtureExpectation {
+  readonly mode: SearchRetrievalMode;
+  readonly acceptedInputs: readonly ['plain text', 'source', 'time', 'resonated'];
+  readonly forbiddenConcepts: readonly ['RAG chat', 'semantic answer engine', 'embeddings', 'vector DB'];
+  readonly findAliasBehavior: 'warn-only-route-to-lexical-search';
+  readonly warningLiveRegion: 'polite';
+}
+
+export interface SplitScrollFixtureExpectation {
+  readonly desktop: {
+    readonly feedRegion: 'independent-focusable-scroll-region';
+    readonly inspectorRegion: 'independent-focusable-scroll-region';
+    readonly feedTabIndex: 0;
+    readonly inspectorTabIndex: 0;
+    readonly selectingItemPreservesFeedScroll: true;
+    readonly selectingItemResetsInspectorScrollTop: true;
+  };
+  readonly mobile: {
+    readonly inspectorPresentation: 'full-screen-route';
+    readonly backBehavior: 'returns-focus-and-preserves-feed-scroll';
+    readonly inspectorStarAllowed: 'mobile-route-only';
+  };
+}
+
+export type ProcessingControlLabel = 'LANG: EN' | 'LANG: ZH' | '语言: 英文' | '语言: 中文' | '[REPROCESS LIBRARY]' | '[重处理资料库]';
+
+export interface ProcessingLanguageLowChromeExpectation {
+  readonly labels: readonly ProcessingControlLabel[];
+  readonly controlStyle: 'bracket-action-or-equivalent-low-chrome-text-action';
+  readonly languageStates: readonly ['English', 'Chinese', 'updating', 'failed'];
+  readonly reprocessStates: readonly ['default', 'confirming', 'running', 'complete', 'conflict', 'failed'];
+  readonly runningDisablesWith: 'aria-disabled-not-native-disabled';
+  readonly liveRegion: 'polite';
+  readonly forbiddenConcepts: readonly ['settings dashboard', 'job dashboard', 'activity log', 'queue view', 'onboarding wizard', 'preference center'];
+}
+
+export interface FrontendAcceptanceContractLock {
+  readonly steerRoutePreviewStates: readonly SteerRoutePreviewStateExpectation[];
+  readonly sourceLedgerControls: readonly SourceLedgerControlExpectation[];
+  readonly sourceLedgerDetailsDisclosure: SourceLedgerDetailsDisclosureExpectation;
+  readonly searchRetrieval: readonly SearchRetrievalFixtureExpectation[];
+  readonly splitScroll: SplitScrollFixtureExpectation;
+  readonly processingLanguageLowChrome: ProcessingLanguageLowChromeExpectation;
+  readonly negativeUxForbiddenConcepts: readonly string[];
+  readonly runtimeRenderingIntentionallyAbsent: true;
+}
+
 export type ApiResult<T> =
   | { ok: true; status: 200; body: T }
   | { ok: false; status: 400 | 401 | 404 | 500; body: ErrorBody };
