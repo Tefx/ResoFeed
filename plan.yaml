@@ -77653,7 +77653,7 @@ phases:
       - [ ] `go test ./...` passes after remediation, with B1 regression tests named
       and reviewed.
 
-      - [ ] B1/R6 verdict is CONFORMS or otherwise BLOCKING with exact remaining divergence.
+      - [x] B1/R6 verdict is CONFORMS or otherwise BLOCKING with exact remaining divergence.
 
       - [ ] Frontend dependency bootstrap is run when needed before `npm --prefix
       web run build`, and build/runtime proof is recorded.
