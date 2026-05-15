@@ -69925,6 +69925,109 @@ phases:
 
       - Idempotency/replay proof:'
     agent: golang-developer
+  - id: plhm-mcp-runtime-parity
+    name: Complete MCP language reprocess delivery parity
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: integration
+
+
+      Complete the implementation within existing MCP Streamable HTTP boundaries.
+      Wire MCP resources/tools to the same core operations as HTTP.
+
+
+      YOUR SCOPE:
+
+      - resource `resofeed://runtime/language`
+
+      - tools `get_processing_language`, `set_processing_language`, `reprocess_library`
+
+      - tool `report_delivery`
+
+      - `search_items` output including `query` echo
+
+      - JSON-RPC conflict and request_fingerprint_mismatch error data shapes
+
+      - owner-token auth before tool/resource handling
+
+
+      Integration path: `/mcp` auth/session -> MCP schema validation -> core operation
+      -> canonical JSON/MCP response.
+
+
+      ## Gate Preview (what gate WILL reject)
+
+      - [ ] MCP exposes product concepts unavailable to HTTP/humans.
+
+      - [ ] Missing query echo in `search_items`.
+
+      - [ ] Per-call language override added.
+
+      - [ ] `actor_id` used as auth.
+
+      - [ ] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] Implementation has substantive MCP tool/resource behavior, not only schema
+      stubs.
+
+      - [ ] Outputs vary by request inputs, current language, receipt state, and operation
+      guard.
+
+      - [ ] HTTP and MCP state changes are equivalent.'
+    verification: '- [ ] MCP expected-red parity tests pass green.
+
+      - [ ] Tests exercise public `/mcp` Streamable HTTP path or project MCP harness,
+      not only direct functions.
+
+      - [ ] JSON-RPC error data matches HTTP conflict/mismatch details exactly where
+      specified.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact MCP command/test>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Path exercised**: /mcp -> auth/schema -> core operation -> MCP response
+
+
+      ## Implementation Evidence
+
+      - Resources/tools added/updated:
+
+      - Parity matrix:
+
+      - Error shape proof:'
+    agent: golang-developer
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
