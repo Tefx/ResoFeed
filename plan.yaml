@@ -80534,7 +80534,7 @@ phases:
       - [x] Provide targeted command/test evidence for the steering precedence and
       response-shape regressions.
 
-      - [ ] Document any residual issue with explicit non-intersection evidence; do
+      - [x] Document any residual issue with explicit non-intersection evidence; do
       not label blocker-class debt as merely pre-existing or out-of-scope.'
     verification: '- [ ] B1 main path: non-conflicting delegated-agent steering is
       accepted while conflicting delegated-agent steering is rejected against active
