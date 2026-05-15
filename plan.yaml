@@ -78835,7 +78835,7 @@ phases:
       - [x] Pin classifier/preview/undo function signatures without adding completed
       mutation logic.
 
-      - [ ] Pin strict request/response JSON field names, nullable fields, and idempotency
+      - [x] Pin strict request/response JSON field names, nullable fields, and idempotency
       boundaries for preview vs commit vs undo.
 
       - [ ] Explicitly document no vector DB, embeddings, semantic answer, RAG, command
