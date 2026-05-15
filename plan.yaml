@@ -77875,6 +77875,78 @@ phases:
 
       '
     agent: golang-developer
+  - id: srdct-frontend-contract-lock
+    name: Lock frontend route preview state and fixture contract
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: type_defs, interfaces, stubs, fixtures
+
+
+      Lock the frontend acceptance contract for Steer input route preview states,
+      Source Ledger details controls, 44px bracket action hit targets, split-scroll/mobile
+      Inspector behavior, and processing-language low-chrome controls. Use web/src/lib/api-contract.ts,
+      web/src/lib/api-client.ts, web/src/routes/components test fixtures, or adjacent
+      contract-only fixtures. Do not complete rendered UI behavior in this step.
+
+
+      Authoritative refs:
+
+      - docs/DESIGN.md Steer Input, Steer Route Preview, Source Ledger, Search and
+      Retrieval, Desktop Split Scroll
+
+      - docs/UI_REGRESSION_CONTRACT.md hit-target, keyboard/a11y, negative UX assertions
+
+
+      Acceptance checklist:
+
+      - [ ] Pin route preview states including idle reserved-but-blank preview, no
+      visible [IDLE] chip, no duplicate hint, aria-describedby, and live-region levels.
+
+      - [ ] Pin Source Ledger action labels [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      OPML/state actions, details disclosure semantics, and 44px hit-target fixture
+      expectations.
+
+      - [ ] Pin lexical-only search/no-RAG and warning-only find alias frontend fixture
+      expectations.
+
+      - [ ] Pin desktop independent Feed/Inspector scroll and mobile full-screen Inspector
+      route fixture expectations.
+
+      - [ ] Pin low-chrome processing language/reprocess control expectations with
+      no settings/job/activity/dashboard concepts.'
+    verification: '- [ ] Contract-only frontend changes define fixture/state expectations
+      without completing rendered UI behavior.
+
+      - [ ] Fixture contract covers every Steer, Source Ledger, split-scroll, mobile,
+      and negative UX item listed in the description.
+
+      - [ ] Evidence cites key passages from every ref.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Frontend Contract Evidence
+
+      - Contract/fixture files changed:
+
+      - States and controls pinned:
+
+      - Runtime rendering intentionally absent:
+
+      - Forbidden UI concepts guarded:
+
+      '
+    agent: frontend-engineer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
