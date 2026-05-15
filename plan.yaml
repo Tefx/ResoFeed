@@ -78437,7 +78437,7 @@ phases:
       and left untracked by the worker; no residual UI blocker known.'
   - id: plfinal-ui-final-blocker-retest-gate
     name: Final UI blocker retest gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       step_intent: retest_green
@@ -78690,6 +78690,8 @@ phases:
     depends_on:
     - plfinal-ui-final-blocker-remediation
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-15T20:51:01.850643+00:00'
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
   status: locked
