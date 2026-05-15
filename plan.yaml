@@ -72348,7 +72348,7 @@ phases:
 
       - [x] prove `/api/doctor` returns `search_fts: ok` or stale line.
 
-      - [ ] keep evidence secret-safe.
+      - [x] keep evidence secret-safe.
 
 
       ## Completion Criteria (checklist)
