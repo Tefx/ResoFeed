@@ -78856,6 +78856,88 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: srdf-source-ledger-details-hit-targets
+    name: Complete Source Ledger details disclosure and bracket hit targets
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete Source Ledger UI behavior within the existing flat ledger surface.
+      Do not add a settings dashboard, job dashboard, activity ledger, source hierarchy,
+      second URL field, or retry panel.
+
+
+      Target paths: web/src/routes/components/SourceLedger.svelte, web/src/routes/+page.svelte,
+      web/src/lib/api-client.ts, and focused tests.
+
+
+      Acceptance checklist:
+
+      - [ ] Render canonical bracket actions [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      [IMPORT OPML], [EXPORT STATE], and [IMPORT STATE] with exact uppercase labels.
+
+      - [ ] [DETAILS] uses native disclosure or aria-expanded/aria-controls and exposes
+      terse diagnostics without moving row bounds.
+
+      - [ ] Bracket actions preserve 44px minimum real hit targets in default, hover,
+      focus, disabled, [INGESTING...], [FETCHING...], and error states.
+
+      - [ ] Raw diagnostics preserve err: prefix, clamp/wrap per DESIGN.md, and expose
+      full text via title or accessible disclosure.
+
+      - [ ] [RUN INGEST] and [FETCH] are immediate low-chrome runtime operations,
+      not durable jobs or queues.
+
+      - [ ] Focus returns to next row or Ledger heading after deletion.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires visible DOM output and real pointer/keyboard activation
+      proof.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
+    verification: '- [ ] Source Ledger component/E2E tests pass for details disclosure,
+      hit targets, actions, diagnostics, and deletion focus behavior.
+
+      - [ ] Real hit-target evidence proves elementFromPoint/topmost-element clickability
+      and 44px minimum targets.
+
+      - [ ] Rendered evidence shows Source Ledger with manual controls and [DETAILS]
+      expanded/collapsed.
+
+      - [ ] Negative scan confirms no jobs, queues, dashboards, settings, activity
+      logs, folders/tags, sync/merge, or second URL field.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Source Ledger Rendered Evidence
+
+      - Files changed:
+
+      - Commands/tests run:
+
+      - Hit-target proof output:
+
+      - Details disclosure DOM/screenshot:
+
+      - Negative UX scan:
+
+      '
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
