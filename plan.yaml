@@ -67377,3 +67377,215 @@ phases:
       worktree status was clean.
 
       - No blockers.'
+  - id: ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
+    name: Fix mobile Inspector grouped duplicate source disclosure on served app
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      priority: HIGH
+
+      work_type: defect_repair
+
+      verification_scope: phase-check
+
+      failure_provenance: introduced_or_unclosed_runtime_gap
+
+      failure_disposition: blocking-now
+
+
+      Fix the black-box fresh-review blocker B1 for the real served mobile UI path.
+      Treat the black-box public served-app failure as authoritative over the earlier
+      UIUX multimodal PASS, because the blind-tester exercised the built Svelte assets
+      through the single Go binary runtime with a clean SQLite DB, owner token, documented
+      HTTP OPML import, runtime ingest, and Playwright against the served UI.
+
+
+      ## Blocking failure context
+
+      - Real public runtime path used: Svelte assets built, Go binary built, `resofeed
+      serve` started with a clean SQLite DB and owner token, OPML imported via documented
+      HTTP API, runtime ingest fetched local RSS, and Playwright drove the served
+      UI.
+
+      - Mobile Inspector for the primary duplicate story showed only `src: Fresh Runtime
+      A · full`.
+
+      - Mobile Inspector omitted `Fresh Runtime B` even though the feed contained
+      both same-URL grouped source items.
+
+      - Public failure excerpt: `mobile Inspector did not disclose both grouped sources`.
+
+      - Artifact references from the isolated worktree evidence: `.audit-artifacts/ui-runtime-fresh-review-black-box-liveness/07-mobile-inspector-390x844.png`
+      and `.audit-artifacts/ui-runtime-fresh-review-black-box-liveness/probe-output-failure.json`.
+
+
+      ## Scope
+
+      Touch the frontend Inspector/runtime data rendering path needed to disclose
+      all grouped same-URL source items on the mobile public served-app Inspector.
+      Preserve the existing backend/API duplicate-source semantics unless fresh investigation
+      proves the served UI receives incomplete grouped-source data; if so, document
+      the exact frontend/backend boundary evidence before making the smallest required
+      fix.
+
+
+      Likely touch paths:
+
+      - `web/src/routes/components/Inspector.svelte`
+
+      - `web/src/routes/components/Feed.svelte` or item data plumbing only if the
+      selected story/detail handoff drops grouped source items on mobile
+
+      - `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` only to strengthen
+      public-runtime/mobile coverage; do not weaken or delete existing assertions
+
+
+      ## Test-to-fix forwarding
+
+      The fix must close the exact public symptom: on a 390x844 mobile viewport, selecting/opening
+      the primary same-URL duplicate story in the real served UI Inspector must disclose
+      both `Fresh Runtime A` and `Fresh Runtime B` grouped source items, not only
+      the primary source. Do not rely solely on the previous e2e assertion path that
+      produced FR-04 PASS.
+
+
+      ## Known contradictory evidence to handle
+
+      - `ui-runtime-fresh-review-uiux-multimodal-audit` reported FR-04 PASS from existing
+      Playwright proof logs.
+
+      - The new black-box served-app evidence FAILS on the public mobile Inspector
+      path and is authoritative for remediation.
+
+      - Completion requires explaining why the existing proof path missed the public
+      served-app failure or how the runtime path diverged.
+
+
+      ## Accessibility and design constraints
+
+      - Preserve Inspector accessibility semantics and keyboard/screen-reader reachability.
+
+      - Preserve mobile 390x844 layout density and do not introduce folders, tags,
+      unread counts, archive bins, onboarding, settings dashboards, accounts, vector/RAG
+      services, sidecars, queues, or sync/merge concepts.
+
+      - Preserve ResoFeed architecture: one Go binary, one SQLite DB, strict owner-token
+      boundary, and flat frontend/runtime shape.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Agent checklist (toggle before completion)
+
+      - [ ] Reproduced or inspected the black-box failure context and identified why
+      the mobile served-app Inspector omitted `Fresh Runtime B`.
+
+      - [ ] Fixed the grouped duplicate Inspector disclosure so the mobile public
+      runtime path can show both `Fresh Runtime A` and `Fresh Runtime B` for same-URL
+      grouped items.
+
+      - [ ] Preserved or strengthened `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`;
+      no existing assertion was weakened, skipped, or deleted.
+
+      - [ ] Preserved accessibility coverage for the Inspector disclosure and mobile
+      390x844 layout behavior.
+
+      - [ ] Documented why the prior UIUX/Playwright PASS did not prove the failing
+      public served-app path.
+
+      - [ ] Confirmed no forbidden ResoFeed architecture or product concept was introduced.'
+    verification: '- [ ] Fix evidence names the exact cause of the mobile served-app
+      Inspector omission and the code path changed.
+
+      - [ ] Targeted frontend/build/e2e checks still pass without weakening `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.
+
+      - [ ] Inspector disclosure remains accessible and visually compatible with 390x844
+      mobile layout.
+
+      - [ ] Evidence explicitly confirms both `Fresh Runtime A` and `Fresh Runtime
+      B` are exposed by the mobile Inspector for the same-URL grouped duplicate story.
+
+      - [ ] No forbidden ResoFeed runtime, storage, auth, sync, navigation, or UI
+      concepts were introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+
+      ## Fix Evidence
+
+
+      **Root cause of mobile served-app omission**:
+
+      ```
+
+      <why Fresh Runtime B was omitted while Fresh Runtime A appeared>
+
+      ```
+
+
+      **Files changed**:
+
+      ```
+
+      <paths and summary>
+
+      ```
+
+
+      **Test-to-fix forwarding**:
+
+      - Black-box symptom addressed: mobile Inspector on real served app showed only
+      `Fresh Runtime A · full` and omitted `Fresh Runtime B` for same-URL grouped
+      items.
+
+      - Existing e2e assertions weakened/skipped/deleted: YES/NO (must be NO; explain
+      if any test changed).
+
+
+      **Commands run**:
+
+      ```
+
+      <actual commands and exit status>
+
+      ```
+
+
+      **Accessibility/mobile preservation evidence**:
+
+      ```
+
+      <Inspector accessibility and 390x844 layout evidence>
+
+      ```
+
+
+      **Architecture/product boundary confirmation**:
+
+      ```
+
+      <no forbidden concepts introduced>
+
+      ```'
+    depends_on:
+    - ui-runtime-fresh-review-black-box-liveness
+    agent: frontend-engineer
