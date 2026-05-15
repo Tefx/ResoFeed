@@ -67729,7 +67729,7 @@ phases:
       - [x] Preserved or strengthened `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`;
       no existing assertion was weakened, skipped, or deleted.
 
-      - [ ] Preserved accessibility coverage for the Inspector disclosure and mobile
+      - [x] Preserved accessibility coverage for the Inspector disclosure and mobile
       390x844 layout behavior.
 
       - [ ] Documented why the prior UIUX/Playwright PASS did not prove the failing
