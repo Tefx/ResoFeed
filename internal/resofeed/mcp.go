@@ -209,33 +209,16 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		return DeliveryReportResult{}, fieldError("delivered_at")
 	}
 	var result DeliveryReportResult
+	req := DeliveryReportRequest{DeliveredAt: input.DeliveredAt.UTC(), MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
 	applied, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "report_delivery", input.ItemID, struct {
 		DeliveredAt time.Time `json:"delivered_at"`
 		ActorKind   ActorKind `json:"actor_kind"`
 		ActorID     string    `json:"actor_id"`
-	}{DeliveredAt: input.DeliveredAt.UTC(), ActorKind: ActorKindAgent, ActorID: input.ActorID}, &result, func() (DeliveryReportResult, error) {
+	}{DeliveredAt: req.DeliveredAt, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (DeliveryReportResult, error) {
 		if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
 			return DeliveryReportResult{}, err
 		}
-		_, err := db.ExecContext(ctx, `
-insert into item_state (item_id, is_resonated, external_surfaced_at, last_actor_kind, last_actor_id)
-values (?, 0, ?, ?, ?)
-on conflict(item_id) do update set
-  external_surfaced_at = coalesce(item_state.external_surfaced_at, excluded.external_surfaced_at),
-  last_actor_kind = excluded.last_actor_kind,
-  last_actor_id = excluded.last_actor_id`, input.ItemID, input.DeliveredAt.UTC().Format(time.RFC3339Nano), string(ActorKindAgent), input.ActorID)
-		if err != nil {
-			return DeliveryReportResult{}, fmt.Errorf("report MCP delivery: %w", err)
-		}
-		var stored string
-		if err := db.QueryRowContext(ctx, `select external_surfaced_at from item_state where item_id = ?`, input.ItemID).Scan(&stored); err != nil {
-			return DeliveryReportResult{}, fmt.Errorf("read delivery state: %w", err)
-		}
-		externalAt, err := parseDBTime(stored)
-		if err != nil {
-			return DeliveryReportResult{}, fmt.Errorf("parse delivery timestamp: %w", err)
-		}
-		return DeliveryReportResult{ItemID: input.ItemID, ExternalSurfacedAt: externalAt, AlreadyApplied: !externalAt.Equal(input.DeliveredAt.UTC())}, nil
+		return ReportDelivery(ctx, db, input.ItemID, req)
 	})
 	if err != nil {
 		return DeliveryReportResult{}, err

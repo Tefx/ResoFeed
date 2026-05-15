@@ -188,6 +188,7 @@ func TestHTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend(t *testing.T) {
 		{name: "item detail", method: http.MethodGet, path: "/api/items/item_http_01?trace=1"},
 		{name: "inspect mutation", method: http.MethodPost, path: "/api/items/item_http_01/inspect?trace=1"},
 		{name: "resonance mutation", method: http.MethodPost, path: "/api/items/item_http_01/resonance?trace=1"},
+		{name: "delivery mutation", method: http.MethodPost, path: "/api/items/item_http_01/delivery?trace=1"},
 		{name: "steer mutation", method: http.MethodPost, path: "/api/steer?trace=1"},
 		{name: "opml import mutation", method: http.MethodPost, path: "/api/sources/import-opml?trace=1"},
 		{name: "state import mutation", method: http.MethodPost, path: "/api/state/import?trace=1"},
@@ -315,6 +316,45 @@ func TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer(t *testing.T) {
 	})
 }
 
+func TestHTTPDeliveryRouteValidationIdempotencyAndCoreState(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	seedHTTPHandlerCorpus(t, ctx, db, now)
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+	path := "/api/items/item_http_01/delivery"
+
+	unknown := postHTTPJSON[ErrorBody](t, router, path, `{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-09T00:00:00Z","idempotency_key":"http-delivery-unknown","channel":"telegram"}`, http.StatusBadRequest)
+	if unknown.Error.Details["field"] != "channel" {
+		t.Fatalf("unknown delivery field details = %#v, want channel", unknown.Error.Details)
+	}
+	badTime := postHTTPJSON[ErrorBody](t, router, path, `{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-09T01:00:00+01:00","idempotency_key":"http-delivery-bad-time"}`, http.StatusBadRequest)
+	if badTime.Error.Details["field"] != "delivered_at" {
+		t.Fatalf("bad delivery timestamp details = %#v, want delivered_at", badTime.Error.Details)
+	}
+
+	body := `{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-09T00:00:00Z","idempotency_key":"http-delivery-001"}`
+	first := postHTTPJSON[DeliveryReportResult](t, router, path, body, http.StatusOK)
+	if first.ItemID != "item_http_01" || first.AlreadyApplied || !first.ExternalSurfacedAt.Equal(time.Date(2026, 5, 9, 0, 0, 0, 0, time.UTC)) {
+		t.Fatalf("first delivery = %+v, want fresh delivery timestamp", first)
+	}
+	replay := postHTTPJSON[DeliveryReportResult](t, router, path, body, http.StatusOK)
+	if !replay.AlreadyApplied || !replay.ExternalSurfacedAt.Equal(first.ExternalSurfacedAt) {
+		t.Fatalf("delivery replay = %+v, want stored timestamp %+v with already_applied", replay, first.ExternalSurfacedAt)
+	}
+	mismatch := postHTTPJSON[ErrorBody](t, router, path, `{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-10T00:00:00Z","idempotency_key":"http-delivery-001"}`, http.StatusBadRequest)
+	if mismatch.Error.Details["field"] != "idempotency_key" || mismatch.Error.Details["reason"] != "request_fingerprint_mismatch" {
+		t.Fatalf("delivery mismatch details = %#v", mismatch.Error.Details)
+	}
+	var storedAt, actorKind, actorID string
+	if err := db.QueryRowContext(ctx, `select external_surfaced_at, last_actor_kind, last_actor_id from item_state where item_id = 'item_http_01'`).Scan(&storedAt, &actorKind, &actorID); err != nil {
+		t.Fatalf("read delivery state: %v", err)
+	}
+	if storedAt != "2026-05-09T00:00:00Z" || actorKind != "agent" || actorID != "briefing-agent" {
+		t.Fatalf("delivery state = %q %q %q", storedAt, actorKind, actorID)
+	}
+}
+
 func TestStaticRootServesHTMLAccessGate(t *testing.T) {
 	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
 	recorder := httptest.NewRecorder()
@@ -356,13 +396,6 @@ func postHTTPJSON[T any](t *testing.T, router http.Handler, path string, body st
 	var parsed T
 	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
 		t.Fatalf("unmarshal %s response: %v; body=%s", path, err, recorder.Body.String())
-	}
-	if wantStatus == http.StatusBadRequest {
-		if errBody, ok := any(parsed).(ErrorBody); ok {
-			if errBody.Error.Details["field"] != "idempotency_key" {
-				t.Fatalf("bad_request field = %#v, want idempotency_key", errBody.Error.Details["field"])
-			}
-		}
 	}
 	return parsed
 }

@@ -377,6 +377,10 @@ func (h apiHandler) handleSetRuntimeLanguage(w http.ResponseWriter, r *http.Requ
 	}
 	response, err := SetProcessingLanguage(r.Context(), h.cfg.DB, req)
 	if err != nil {
+		if errors.Is(err, errManualFetchConflict) {
+			writeGuardConflict(w, "reprocess", "library")
+			return
+		}
 		writeRuntimeMutationError(w, err)
 		return
 	}
@@ -391,13 +395,17 @@ func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Reques
 	response, err := ReprocessLibrary(r.Context(), h.cfg.DB, h.cfg.LLM, req)
 	if err != nil {
 		if errors.Is(err, errManualFetchConflict) {
-			writeAPIError(w, http.StatusConflict, "conflict", "operation already running", map[string]any{"operation_running": true, "operation": "reprocess", "scope": "library", "retry_allowed": true})
+			writeGuardConflict(w, "reprocess", "library")
 			return
 		}
 		writeRuntimeMutationError(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, response)
+}
+
+func writeGuardConflict(w http.ResponseWriter, operation string, scope any) {
+	writeAPIError(w, http.StatusConflict, "conflict", "operation already running", map[string]any{"operation_running": true, "operation": operation, "scope": scope, "retry_allowed": true})
 }
 
 func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
@@ -461,7 +469,53 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, result)
 		return
 	}
+	if len(parts) == 2 && r.Method == http.MethodPost && parts[1] == "delivery" {
+		req, ok := readDeliveryReportBody(w, r)
+		if !ok || !validateMutationFields(w, req.MutationRequestFields) {
+			return
+		}
+		if !h.itemExists(w, r, parts[0]) {
+			return
+		}
+		var result DeliveryReportResult
+		applied, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "report_delivery", parts[0], struct {
+			DeliveredAt time.Time `json:"delivered_at"`
+			ActorKind   ActorKind `json:"actor_kind"`
+			ActorID     string    `json:"actor_id"`
+		}{DeliveredAt: req.DeliveredAt.UTC(), ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (DeliveryReportResult, error) {
+			return ReportDelivery(r.Context(), h.cfg.DB, parts[0], req)
+		})
+		if err != nil {
+			writeMutationError(w, parts[0], err)
+			return
+		}
+		if applied {
+			result.AlreadyApplied = true
+		}
+		writeJSON(w, http.StatusOK, result)
+		return
+	}
 	writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": r.URL.Path})
+}
+
+func readDeliveryReportBody(w http.ResponseWriter, r *http.Request) (DeliveryReportRequest, bool) {
+	var wire struct {
+		DeliveredAt string `json:"delivered_at"`
+		MutationRequestFields
+	}
+	if !readJSONBody(w, r, &wire) {
+		return DeliveryReportRequest{}, false
+	}
+	if wire.DeliveredAt == "" {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "delivered_at"})
+		return DeliveryReportRequest{}, false
+	}
+	deliveredAt, err := time.Parse(time.RFC3339, wire.DeliveredAt)
+	if err != nil || deliveredAt.Location() != time.UTC || deliveredAt.Format(time.RFC3339) != wire.DeliveredAt {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "delivered_at"})
+		return DeliveryReportRequest{}, false
+	}
+	return DeliveryReportRequest{DeliveredAt: deliveredAt, MutationRequestFields: wire.MutationRequestFields}, true
 }
 
 func (h apiHandler) itemExists(w http.ResponseWriter, r *http.Request, itemID string) bool {

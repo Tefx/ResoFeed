@@ -21,9 +21,15 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 	if err := validateMutationRequestFields(req.MutationRequestFields); err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
+	release, acquired := tryAcquireIngestGuard(ctx)
+	if !acquired {
+		return ReprocessLibraryResponse{}, errManualFetchConflict
+	}
+	defer releaseGuardRecover(release, &retErr, "reprocess library")
+
 	var response ReprocessLibraryResponse
 	applied, err := withIdempotencyReceipt(ctx, db, req.IdempotencyKey, req.ActorID, "reprocess_library", "", reprocessFingerprintPayload(req), &response, func() (ReprocessLibraryResponse, error) {
-		return reprocessLibraryFresh(ctx, db, llm)
+		return reprocessLibraryUnlocked(ctx, db, llm)
 	})
 	if err != nil {
 		return ReprocessLibraryResponse{}, err

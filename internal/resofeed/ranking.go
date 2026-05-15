@@ -324,6 +324,42 @@ on conflict(item_id) do update set
 	return ResonanceResult{ItemID: itemID, IsResonated: req.Resonated, AlreadyApplied: false}, nil
 }
 
+// ReportDelivery records that an owner-authorized human or agent externally
+// surfaced an item. It updates only current item_state for duplicate-loop
+// prevention; delivery channels, activity ledgers, queues, and portable receipts
+// are intentionally out of scope.
+func ReportDelivery(ctx context.Context, db *sql.DB, itemID string, req DeliveryReportRequest) (DeliveryReportResult, error) {
+	if db == nil {
+		return DeliveryReportResult{}, errors.New("report delivery: db is nil")
+	}
+	if strings.TrimSpace(itemID) == "" {
+		return DeliveryReportResult{}, errors.New("report delivery: item id is empty")
+	}
+	if req.DeliveredAt.IsZero() {
+		return DeliveryReportResult{}, fieldError("delivered_at")
+	}
+	deliveredAt := req.DeliveredAt.UTC()
+	_, err := db.ExecContext(ctx, `
+insert into item_state (item_id, is_resonated, external_surfaced_at, last_actor_kind, last_actor_id)
+values (?, 0, ?, ?, ?)
+on conflict(item_id) do update set
+  external_surfaced_at = excluded.external_surfaced_at,
+  last_actor_kind = excluded.last_actor_kind,
+  last_actor_id = excluded.last_actor_id`, itemID, deliveredAt.Format(time.RFC3339Nano), string(req.ActorKind), req.ActorID)
+	if err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("report delivery: %w", err)
+	}
+	var stored string
+	if err := db.QueryRowContext(ctx, `select external_surfaced_at from item_state where item_id = ?`, itemID).Scan(&stored); err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("read delivery state: %w", err)
+	}
+	externalAt, err := parseDBTime(stored)
+	if err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("parse delivery timestamp: %w", err)
+	}
+	return DeliveryReportResult{ItemID: itemID, ExternalSurfacedAt: externalAt, AlreadyApplied: !externalAt.Equal(deliveredAt)}, nil
+}
+
 func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCandidate, error) {
 	var item ItemSummary
 	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
