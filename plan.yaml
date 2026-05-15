@@ -77526,7 +77526,7 @@ phases:
       - [x] DOM/a11y evidence confirms language control, reprocess control, and source
       identifiers are present with expected labels/roles and no translation drift.
 
-      - [ ] Evidence explicitly states whether frontend dependency bootstrap was required
+      - [x] Evidence explicitly states whether frontend dependency bootstrap was required
       and includes `npm --prefix web install` before build if node_modules was absent.
 
       - [ ] Behavioral proof register marks each blocker-class UI/design obligation
