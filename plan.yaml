@@ -14,21 +14,20 @@ context: New capability implementation plan for the approved ResoFeed processing
   reprocess-library, runtime metadata, HTTP/MCP parity, delivery, FTS/search, doctor
   diagnostics, and frontend contract delta. Architecture basis readiness is READY;
   Contract-First Fit is HIGH per user-provided spec-readiness audit.
-project_guidance: 'ResoFeed project guidance: docs/ARCHITECTURE.md and docs/DESIGN.md
-  are canonical. Preserve the one-deployable Go binary (`cmd/resofeed`) serving static
-  assets, JSON HTTP, MCP Streamable HTTP at `/mcp`, and background ingest loop. Use
-  one SQLite database with FTS5 only; no vector DB, embeddings, RAG, sync coordinator,
-  state merger, conflict resolver, activity ledger, command history, reading history,
-  portable agent receipts, service/repository/DI/event-bus layering, or sidecar workers.
-  OpenRouter is JSON-in/JSON-out utility only and never owns durable state or writes
-  DB directly. Owner token is the sole auth boundary; `actor_id` is provenance/idempotency
-  only. HTTP and MCP must expose equivalent product operations and strict validation,
-  including unknown JSON body fields as `400 bad_request`. Processing language is
-  runtime metadata excluded from state export/import; source identifiers/provenance
-  must remain exact and non-localized. UI must follow DESIGN.md: low-chrome analyst
-  workbench, no settings dashboard/onboarding wizard, bracket actions, split desktop
-  feed/Inspector scroll, source identifiers marked `translate="no"` or equivalent,
-  and no forbidden SaaS/product concepts.'
+project_guidance: 'ResoFeed implementation constraints: docs/ARCHITECTURE.md and docs/DESIGN.md
+  are authoritative. Preserve the single Go binary cmd/resofeed serving static assets,
+  JSON HTTP, MCP Streamable HTTP, and background ingest; use SQLite + FTS5 only; do
+  not add vector databases, embeddings, RAG, sidecar workers, sync/merge coordinators,
+  accounts, OAuth, per-agent registries, settings dashboards, job dashboards, activity
+  ledgers, rule builders, folders/tags/unread/archive flows, or source hierarchy.
+  Keep Go domain logic flat in internal/resofeed/*.go without Java-style service/repository
+  layers or DI containers. Owner token is the sole auth boundary; actor_id is attribution/idempotency
+  only. Steer must preserve freshness, source diversity, provenance transparency,
+  and minimalism; conflicting steering requests get closest allowable interpretation
+  with terse explanation. Search is lexical/metadata/FTS only; `find` is warning-only
+  lexical alias. Frontend must follow DESIGN.md and UI_REGRESSION_CONTRACT.md including
+  bracket actions, 44px hit targets, live regions, Source Ledger disclosure semantics,
+  desktop split-scroll, and mobile Inspector route behavior.'
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
