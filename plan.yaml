@@ -75118,7 +75118,7 @@ phases:
       - [x] Read language, set language, trigger reprocess on controlled fixture data,
       observe result counts.
 
-      - [ ] Query search and doctor after reprocess.
+      - [x] Query search and doctor after reprocess.
 
       - [ ] If browser is used, capture rendered language/reprocess UI visible state.
 
