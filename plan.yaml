@@ -70259,7 +70259,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-backend-green-retest
     name: Retest backend core expected-red suite to green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -70385,6 +70385,55 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T14:52:02.758754+00:00'
+    done_at: '2026-05-15T15:02:06.550886+00:00'
+    evidence: "## refs Read Confirmation\n- `docs/ARCHITECTURE.md`: READ via `read`\
+      \ before implementation/testing.\n  - Key passages: lines 23-27 define processing\
+      \ language as runtime-local metadata, one stored processed language per item,\
+      \ source identifiers preserved, and explicit non-durable reprocess.\n  - Key\
+      \ passages: lines 173-185 state `runtime_metadata` and `agent_receipts` are\
+      \ not exported/imported, while `search_fts` is derived.\n  - Key passages: lines\
+      \ 215-240 define processing-language responsibilities across core/sqlite/OpenRouter\
+      \ and require `target_language` and rebuildable FTS.\n\n## Backend Core Retest\
+      \ Report\nstep_intent: retest_green\nexpected_result: green\nobserved_result:\
+      \ targeted backend-core command green; broad Go suite has downstream-owned HTTP/MCP\
+      \ failures\nfailure_alignment: broad failures align with explicitly excluded\
+      \ downstream HTTP/MCP phase ownership, not backend storage/core retest scope\n\
+      verdict: PASS\nblockers: []\nproduct_implementation_files_modified: false\n\
+      gate_open_allowed: true\norchestrator_action_hint: COMPLETE\nuncertainty_sources:\
+      \ broad `go test ./...` still fails until downstream HTTP/MCP phase work lands.\n\
+      \n### Verification Run\n| Command | Exit | Relevant stdout/stderr |\n|---|---:|---|\n\
+      | `go test -v ./internal/resofeed -run 'Test(PLCTRuntimeMetadataMigrationsAndDefaultLanguageContract|PLCTStateExportImportExcludesRuntimeMetadataAndReceipts|PLCTRuntimeLanguageHTTPStrictValidationAndReceiptTTL|PLCTReprocessEndpointCountsStaleMarkerAndStrictValidation|PLCTDoctorReportsStaleFTSMarker|PLCTTargetLanguageFTSIncludesCoreInsight|PLCTOpenRouterReceivesEffectiveTargetLanguage|RuntimeMetadataProcessingLanguageDefaultsAndValidation|RuntimeMetadataStateExportImportExcludesMetadataAndReceipts|ReceiptLiveTTLReplayMismatchAndExpiredReplacement|ReceiptConcurrentReuseSerializesSingleApply|ProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems|ProcessingLanguageSearchFTSIncludesCoreInsight|OpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret|ReprocessLibraryAccountingSourcePrecedenceAndFTS|ReprocessLibraryTimeoutLeavesStaleMarker)$'`\
+      \ | 0 | `PASS`, `ok resofeed/internal/resofeed 0.717s`; includes PASS lines\
+      \ for receipt TTL/mismatch, reprocess timeout stale marker, FTS core insight,\
+      \ doctor stale diagnostics, OpenRouter target language, state export exclusion.\
+      \ |\n| `go test -v ./...` | 1 | Targeted backend-core tests still PASS. Broad\
+      \ failures: `TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface`\
+      \ missing MCP runtime language resource/tools; `TestPLCTDeliveryEndpointStrictValidationAndIdempotency`\
+      \ got `404` for `/api/items/item_plct_delivery/delivery`, expected route behavior.\
+      \ |\n\n### Ownership classification table\n| Failure | Classification | Owning\
+      \ step | Storage-core blocker? | Evidence |\n|---|---|---|---:|---|\n| `TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface`\
+      \ | downstream HTTP/MCP blocker | `plhm-mcp-runtime-parity` | no | Missing `resofeed://runtime/language`,\
+      \ `get_processing_language`, `set_processing_language`, `reprocess_library`,\
+      \ search query echo/error envelope parity. |\n| `TestPLCTDeliveryEndpointStrictValidationAndIdempotency`\
+      \ | downstream HTTP/MCP blocker | `plhm-http-runtime-endpoints` | no | `/api/items/item_plct_delivery/delivery`\
+      \ returned `404 not_found`; delivery endpoint routing is explicitly excluded\
+      \ from this storage-core retest. |\n| Frontend rendering | downstream frontend\
+      \ blocker | `plfu-*` | no | Not exercised by Go backend command; no frontend\
+      \ failure observed. |\n\n### Behavioral Proof Register\nbehavioral_proof_register:\n\
+      \  runtime_metadata_migrations_and_default_language: PROVEN\n  live_receipt_ttl_replay_mismatch_expiration:\
+      \ PROVEN\n  processing_language_future_ingest_no_history_rewrite: PROVEN\n \
+      \ openrouter_target_language_prompt: PROVEN\n  reprocess_accounting_and_fts_rebuild:\
+      \ PROVEN\n  reprocess_timeout_stale_fts_failure_path: PROVEN\n  fts_search_core_insight_behavior:\
+      \ PROVEN\n  doctor_stale_fts_diagnostics: PROVEN\n  state_export_import_excludes_runtime_metadata_and_receipts:\
+      \ PROVEN\n  downstream_http_delivery_endpoint: NEEDS_TEST\n  downstream_mcp_language_reprocess_parity:\
+      \ NEEDS_TEST\n  frontend_runtime_consumption: NEEDS_TEST\n\n## Artifacts Modified\n\
+      - Product implementation files modified: none.\n- Files changed in isolated\
+      \ worktree: none (`git status --short --branch` returned only `## vectl/step-plsc-backend-green-retest`).\n\
+      - Commit hash(es): none (verification-only; no changes made).\n\n## Spec link\n\
+      - `docs/ARCHITECTURE.md`\n\n## Gaps/Notes\n- Broad suite failure is real and\
+      \ remains blocking for downstream HTTP/MCP phase gates, but does not close this\
+      \ backend-core gate negatively under the step disposition rule.\n- Verification\
+      \ checklist was marked complete after evidence validation."
   - id: plsc-core-wiring-audit
     name: Audit backend core wiring and public symbol reachability
     status: claimed
