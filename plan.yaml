@@ -76090,7 +76090,7 @@ phases:
 
       - [ ] Blind parity/delivery probes passed.
 
-      - [ ] Reprocess failure/stale FTS proof passed.
+      - [x] Reprocess failure/stale FTS proof passed.
 
       - [ ] Full-plan runtime check passed or all intersecting blockers have remediation
       ownership.
