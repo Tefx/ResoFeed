@@ -63057,7 +63057,7 @@ phases:
   steps:
   - id: urda-final-issue-closure-matrix
     name: Finalize issue-by-issue runtime UI audit closure matrix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63135,6 +63135,216 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T03:20:39.959511+00:00'
+    done_at: '2026-05-15T03:25:29.382762+00:00'
+    evidence: '**Headline**: PASS
+
+      **Blocking Status**: CLOSED
+
+      **Proof-Gap Status**: NONE
+
+      **Verdict**: PASS
+
+      **Blockers**: []
+
+      **Orchestrator Action Hint**: COMPLETE_GATE
+
+
+      Verification-only audit. No files were changed and no commit was made. Worktree
+      status was clean; branch was not merged because it contained only stale plan
+      state relative to main.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — READ. Key passage: original
+      audit enumerates issues 1-14; examples include issue 1 requiring `[RUN INGEST]`
+      and pending `[INGESTING...]` behavior, issue 2 requiring row `[FETCH]` and `[FETCHING...]`
+      behavior, issue 8 forbidding visible internal architecture explanation copy
+      in Search, and issue 14 requiring distinct accessible names for repeated Resonate
+      controls.
+
+      - docs/DESIGN.md — READ. Key passage: Source Ledger anatomy requires global
+      `[RUN INGEST]`, row `[FETCH]`, raw diagnostics, stable row/action geometry,
+      keyboard buttons, and no queue/dashboard concepts; required DOM contract for
+      manual controls is specified; bracket hover/focus inversion and no transitions
+      are specified; Owner Token Prompt anatomy and accessibility plus Feed/Resonate/Inspector/Search
+      contracts are specified.
+
+      - docs/ARCHITECTURE.md — READ. Key passage: one Go binary and one SQLite database
+      decisions; no vector/RAG search, accounts, sidecar processes, queues, sync/merge,
+      or dashboards; manual global ingest and per-source fetch must share a single
+      in-process ingest guard and reject overlaps with 409 conflict.
+
+      - docs/ui-preview.html — READ. Key passage: post-remediation preview includes
+      `.source-ledger` with `last_ingest: 14:00:00`, `[RUN INGEST]`, `[IMPORT OPML]`,
+      `[EXPORT STATE]`, `[IMPORT STATE]`, row `[FETCH]`, delete actions, and raw `err:`
+      row example; bracket hover/focus inversion appears; Inspector original link
+      preview is compact metadata `original ↗`.
+
+      - docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — READ. Key passage:
+      prior gate verdict was FAIL/BLOCK because focused Source Ledger and visual/a11y
+      checks passed for issues 1-14 except the broader keyboard-a11y suite failed
+      before reaching expected `TODAY` / `SOURCE LEDGER` role buttons; later remediation/retest/UIUX
+      evidence closed this gap.
+
+
+      ## Supplemental Evidence Read
+
+      - Runtime harness / blind liveness / manual RSS fetch gate artifacts proving
+      `resofeed serve`, `/api/ingest`, `/api/sources/{id}/fetch`, 409 overlap, no
+      queue/job table, and frontend/render tests.
+
+      - Final keyboard/a11y remediation proof proving exact targeted keyboard suite
+      passed and blockers empty.
+
+      - Current frontend retest proof register marking relevant frontend/UI behaviors
+      PROVEN.
+
+      - Final broad UIUX audit and full-plan verification/deep-review artifacts indicating
+      no remaining blocker-class proof gap.
+
+
+      ## Final Closure Register
+
+      | Issue | Severity | Repair owner(s) | Verification refs | UIUX ref | Runtime
+      ref | Status | Closure path | Gate decision basis |
+
+      |---|---|---|---|---|---|---|---|---|
+
+      | 1 | P0 | manual-rss-fetch implementation/retest/gate; keyboard-a11y final
+      gate | Original audit issue 1; DESIGN Source Ledger/manual control contract;
+      source-ledger controls spec; prior URDA gate | manual-rss-fetch UIUX audit;
+      visual parity retest; row parity retest | remediation retest; blind liveness
+      | PROVEN | Closed by live `/api/ingest` proof, UI control/pending-state proof,
+      409 guard proof, and final keyboard suite closure. | Required control exists,
+      posts to real path, stable pending hitbox covered, no queue/dashboard drift.
+      |
+
+      | 2 | P0 | manual-rss-fetch implementation/retest/gate; keyboard-a11y final
+      gate | Original audit issue 2; DESIGN Source Ledger/manual control contract;
+      source-ledger controls spec | manual-rss-fetch UIUX audit; row parity retest
+      | remediation retest; blind liveness | PROVEN | Closed by live `/api/sources/{id}/fetch`
+      proof, desktop/mobile row control proof, stable pending hitbox proof, and no
+      queue/job proof. | Per-source fetch is immediate, flat, guarded, and browser/a11y-covered.
+      |
+
+      | 3 | P1 | preview artifact update / frontend retest | Original audit issue
+      3; `docs/ui-preview.html`; URDA visual test | row parity retest; final broad
+      UIUX report | static/render proof | PROVEN | Closed by preview now rendering
+      `[RUN INGEST]`, `[FETCH]`, `last_ingest`, and raw `err:` examples. | Static
+      artifact contract is current and tested. |
+
+      | 4 | P1 | manual-rss-fetch diagnostics/row-parity retest | Original audit issue
+      4; DESIGN diagnostics; source-ledger controls spec; frontend proof register
+      | manual-rss-fetch UIUX audit; row parity retest | remediation retest; blind
+      liveness | PROVEN | Closed by API diagnostic/error result proof plus rendered
+      inline `err:` status/title proof. | Raw diagnostics exposed without friendly-copy
+      replacement and without row drift. |
+
+      | 5 | P1 | manual-rss-fetch row-parity retest; frontend gate retest | Original
+      audit issue 5; DESIGN stable geometry; source-ledger controls spec; row parity
+      retest | row parity retest PASS after earlier visual parity failure | browser
+      layout proof | PROVEN | Earlier row-shape blocker superseded by row-parity retest
+      PASS. | Stable columns/action geometry are browser-proven. |
+
+      | 6 | P1 | frontend Source Ledger OPML semantics; keyboard-a11y final gate |
+      Original audit issue 6; DESIGN OPML/button contract; source-ledger controls
+      spec | final UIUX accessibility labels | keyboard/a11y proof | PROVEN | Closed
+      by visible `[IMPORT OPML]` named button proof and hidden input plumbing proof.
+      | Prior keyboard blocker closed by final keyboard suite. |
+
+      | 7 | P2 | manual-rss-fetch style remediation; frontend visual/a11y retest |
+      Original audit issue 7; DESIGN bracket tokens; URDA visual test | visual parity
+      retest; manual-rss-fetch UIUX audit | browser computed-style proof | PROVEN
+      | Closed by hover/focus inversion, immediate transition, no transform, visible
+      focus proof. | Terminal-style bracket behavior is covered. |
+
+      | 8 | P2 | frontend search copy cleanup / visual retest | Original audit issue
+      8; DESIGN Search; URDA visual test | final broad UIUX report (broad lexical-scope
+      only) | browser absence proof | PROVEN | Closed by issue-specific URDA browser
+      check that fails if architecture note is visible. | User-visible copy obligation
+      has a specific passing test. |
+
+      | 9 | P2 | frontend search layout remediation / visual retest | Original audit
+      issue 9; DESIGN Search dense organization; URDA visual test; frontend proof
+      register | final broad UIUX Search PASS | browser alignment proof | PROVEN |
+      Closed by label/control alignment computed proof and current frontend retest.
+      | Search filter layout no longer has blocker-class visual misalignment. |
+
+      | 10 | P1 | frontend mobile feed metadata remediation / final keyboard-design
+      suite | Original audit issue 10; DESIGN Feed Item mobile; URDA visual test;
+      final keyboard gate proof | broad UIUX did not recapture mobile; issue-specific
+      proof comes from URDA/browser/final tests | runtime fixture/server proof | PROVEN
+      | Closed by mobile metadata proof requiring readable source/extraction/time-group
+      signals and no nowrap hidden over-truncation. | Mobile proof exists outside
+      broad UIUX desktop limitation. |
+
+      | 11 | P2 | frontend Inspector link styling/focus remediation; final keyboard
+      gate | Original audit issue 11; DESIGN Inspector; UI preview original link;
+      URDA visual test; final keyboard gate | final broad UIUX link/provenance PASS
+      | runtime fixture/server keyboard proof | PROVEN | Closed by style proof rejecting
+      browser default blue/underline and final keyboard/original-link focus proof.
+      | Link styling and keyboard focus blocker are closed. |
+
+      | 12 | P2 | frontend Owner Token Prompt styling; frontend gate retest | Original
+      audit issue 12; DESIGN Owner Token Prompt; URDA visual test; frontend proof
+      register | final broad UIUX no account/onboarding drift | render/e2e proof |
+      PROVEN | Closed by chrome-scale heading proof and owner-token render/conformance
+      tests. | Prompt remains terse local gate without oversized default heading/account
+      language. |
+
+      | 13 | P2 | frontend Source Ledger delete geometry / source-ledger controls
+      retest | Original audit issue 13; DESIGN stable row/hitbox; source-ledger controls
+      spec | row parity no-regression | browser row-bounds proof | PROVEN | Closed
+      by delete-confirmation row bounding-box equality proof. | Row geometry remains
+      stable during destructive confirmation. |
+
+      | 14 | P2 | frontend Resonate accessible-name remediation; keyboard/final UI
+      retest | Original audit issue 14; DESIGN Resonate; URDA visual test; keyboard
+      spec; frontend proof register | final broad UIUX accessibility labels | runtime
+      fixture/server proof | PROVEN | Closed by unique accessible-name/title-context
+      proof plus final keyboard star/Inspector suite. | Repeated controls are distinguishable
+      while glyph behavior remains intact. |
+
+
+      ## behavioral_proof_register
+
+      - Manual global ingest is live, guarded, flat, and UI-exposed: PROVEN.
+
+      - Per-source fetch is live, guarded, flat, and UI-exposed: PROVEN.
+
+      - Source Ledger diagnostics/geometry/OPML/delete states satisfy UI contract:
+      PROVEN.
+
+      - Visual/a11y issues 7-14 are browser-tested: PROVEN.
+
+      - Prior keyboard/a11y blocker is closed: PROVEN.
+
+      - Runtime liveness for final plan remains intact: PROVEN.
+
+
+      ## Unresolved Obligations
+
+      - none
+
+
+      ## Gate Decision
+
+      - headline: PASS
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE_GATE
+
+      - gate_decision_basis: all 14 original URDA issues are present exactly once
+      in the register and classified PROVEN; prior keyboard/a11y blocker has an explicit
+      later PASS closure artifact; runtime/liveness obligations for manual ingest/fetch
+      are proven by black-box and live harness artifacts; no issue is dismissed as
+      pre-existing or out-of-scope.'
   - id: urda-final-spec-and-product-boundary-review
     name: Verify final UI repairs against architecture, design, and product boundaries
     status: pending
