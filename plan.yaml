@@ -71890,7 +71890,7 @@ phases:
 
       - [x] `actor_id` used as auth.
 
-      - [ ] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
+      - [x] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
 
       - [ ] JSON-RPC error envelopes omit required nested data or drift from HTTP
       conflict/mismatch details where specified.
