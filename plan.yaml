@@ -78772,6 +78772,90 @@ phases:
     and no forbidden UI concepts.
   depends_on:
   - steer-delta-backend-http-mcp-runtime
+  steps:
+  - id: srdf-steer-preview-ui-state-aria
+    name: Complete Steer route preview UI state and ARIA behavior
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete the frontend behavior within existing contract fixtures from srdct-frontend-contract-lock
+      and expected-red tests from srdct-frontend-expected-red-tests. Use backend API
+      shapes opened by srdb-backend-gate.
+
+
+      Target paths: web/src/routes/+page.svelte, web/src/lib/api-client.ts, web/src/lib/api-contract.ts,
+      and focused Steer-related component/test files only.
+
+
+      Acceptance checklist:
+
+      - [ ] Idle preview row reserves height but is visually blank: no [IDLE] chip,
+      no duplicate placeholder hint, no visible filled status bar.
+
+      - [ ] Input uses aria-describedby pointing to preview region; preview/receipt
+      updates use polite live region except invalid add and failed undo use assertive.
+
+      - [ ] Route echo states render [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE],
+      [INVALID] with exact copy and non-color status markers.
+
+      - [ ] Enter executes read-only search/doctor or commits an already-previewed
+      write; Escape cancels pending preview/clears unsent text without moving focus.
+
+      - [ ] Write-action preview/commit/undo boundaries are explicit; [UNDO] appears
+      only when API response includes a revocable target id.
+
+      - [ ] find alias warning says lexical SEARCH/no semantic retrieval and no RAG/chat/answer
+      UI appears.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires logic correctness and visible DOM output. Evidence MUST
+      include rendered output (DOM snapshot, screenshot, or test renderer output).
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
+    verification: '- [ ] Component and/or E2E tests for Steer route preview states
+      pass green.
+
+      - [ ] Rendered evidence shows idle, add valid, add invalid, search/find warning,
+      doctor, steer rule proposal, success receipt, and undo states.
+
+      - [ ] Accessibility evidence confirms aria-describedby, live-region levels,
+      focus retention, keyboard behavior, and non-color markers.
+
+      - [ ] Negative scan confirms no RAG/chat/semantic answer UI or duplicate hint/[IDLE]
+      chip.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      ## Rendered UI Evidence
+
+      - Files changed:
+
+      - Commands/tests run:
+
+      - DOM snapshots/screenshots:
+
+      - Accessibility proof:
+
+      - Forbidden UI concept scan:
+
+      '
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
