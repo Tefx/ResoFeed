@@ -80177,7 +80177,7 @@ phases:
     agent: wiring-auditor
   - id: srdb-spec-conformance
     name: Verify backend spec conformance for Steer and search delta
-    status: pending
+    status: claimed
     description: 'Spec conformance verification via adversarial divergence hunting.
       This is NOT "do tests pass" — it is "does backend runtime match the specs?"
 
@@ -80240,6 +80240,8 @@ phases:
     - srdb-http-steer-preview-commit-undo
     - srdb-mcp-steer-parity
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T22:27:37.971879+00:00'
   - id: srdb-backend-gate
     name: Gate backend Steer runtime implementation
     status: pending
