@@ -78289,7 +78289,7 @@ phases:
       - [x] Source Ledger `[FETCH]` controls keep visible text `[FETCH]` and accessible
       names `Fetch source <source title>`.
 
-      - [ ] Source Ledger diagnostic details render collapsed by default without row
+      - [x] Source Ledger diagnostic details render collapsed by default without row
       inflation.
 
       - [ ] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
