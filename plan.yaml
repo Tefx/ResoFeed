@@ -74057,7 +74057,7 @@ phases:
 
       - [x] settings dashboard/preference center/onboarding wizard.
 
-      - [ ] progress dashboard/job queue/activity log for reprocess.
+      - [x] progress dashboard/job queue/activity log for reprocess.
 
       - [ ] language treated as per-item translation toggle.
 
