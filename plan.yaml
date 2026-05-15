@@ -76449,7 +76449,7 @@ phases:
       - [x] Behavioral precedence claims are flagged as NEEDS_TEST unless runtime
       proof exists.
 
-      - [ ] Every blocker-class divergence has remediation ownership.'
+      - [x] Every blocker-class divergence has remediation ownership.'
     verification: '- [ ] Full spec conformance report is complete and evidence-bound.
 
       - [ ] No unresolved blocker-class divergence remains without closure path.
