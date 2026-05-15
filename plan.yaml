@@ -69359,7 +69359,7 @@ phases:
       - [x] Tests are expected red before implementation and expose UI/API client
       gaps without product-code changes.
 
-      - [ ] Rendered output checks verify visible controls and no settings dashboard/onboarding
+      - [x] Rendered output checks verify visible controls and no settings dashboard/onboarding
       wizard.
 
       - [ ] Source identifiers are asserted as literal non-translated provenance anchors.
