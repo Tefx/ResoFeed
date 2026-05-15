@@ -79412,3 +79412,62 @@ phases:
     depends_on:
     - srde2e-real-system-e2e-regression
     agent: blind-tester
+  - id: srde2e-documentation-sync
+    name: Sync documentation after Steer delta implementation
+    status: pending
+    description: 'Sync documentation with final implemented behavior only if implementation
+      changed behavior or filenames beyond existing clean docs. If docs already match,
+      provide a no-op evidence report with cited proof.
+
+
+      Acceptance checklist:
+
+      - [ ] README/usage docs, architecture, design, PRD, and UI regression contract
+      remain consistent with implemented route preview/commit/undo, Source Ledger
+      details/actions, lexical-only search, AC-4 conflicts, split-scroll/mobile route,
+      and processing language controls.
+
+      - [ ] Remove or flag any stale doc references to unimplemented or forbidden
+      behavior.
+
+      - [ ] Do not weaken design/architecture constraints to match a bad implementation.
+
+      - [ ] Preserve npx @google/design.md lint cleanliness for docs/DESIGN.md if
+      changed.'
+    verification: '- [ ] phase-check protecting final closure gate.
+
+      - [ ] Documentation sync evidence states changed files or no-op rationale.
+
+      - [ ] Docs remain aligned with implementation and authoritative constraints.
+
+      - [ ] If DESIGN.md changed, design lint output is included and clean.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Doc Sync Evidence
+
+      - Files changed or no-op rationale:
+
+      - Design lint output if applicable:
+
+      - Spec/implementation alignment notes:
+
+      '
+    depends_on:
+    - srde2e-real-system-e2e-regression
+    - srde2e-visual-a11y-regression-proof
+    agent: doc-reviewer
