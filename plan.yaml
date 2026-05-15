@@ -72431,7 +72431,7 @@ phases:
     claimed_at: '2026-05-15T15:45:57.039937+00:00'
   - id: plhm-runtime-wiring-audit
     name: Audit HTTP MCP runtime wiring completeness
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -72514,6 +72514,8 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-15T15:46:13.536257+00:00'
   - id: plhm-runtime-spec-conformance
     name: Verify HTTP MCP runtime spec conformance
     status: claimed
