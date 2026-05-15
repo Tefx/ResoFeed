@@ -69085,7 +69085,7 @@ phases:
       - [x] HTTP and MCP schemas are pinned with strict unknown-body/query validation
       and idempotency replay/mismatch semantics.
 
-      - [ ] Reprocess source precedence and FTS stale marker/doctor contracts are
+      - [x] Reprocess source precedence and FTS stale marker/doctor contracts are
       pinned.
 
       - [ ] Frontend API type contract includes language/reprocess and source-identifier
