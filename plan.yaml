@@ -75360,7 +75360,7 @@ phases:
 
       - [x] Evidence covers main path and highest-risk failure path.
 
-      - [ ] No automatic startup recovery/job queue is introduced or required.
+      - [x] No automatic startup recovery/job queue is introduced or required.
 
       - [ ] Counts and stale marker semantics match docs exactly.'
     verification: '- [ ] Failure-path integration proof passes or reports blockers
