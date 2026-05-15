@@ -73723,7 +73723,7 @@ phases:
       Files changed: none'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
-  status: in_progress
+  status: done
   gate: Frontend gate blocks unless language/reprocess controls, API client types,
     source identifier preservation, split scroll behavior, rendered UI proof, and
     UIUX audit pass against DESIGN.md.
@@ -74924,7 +74924,7 @@ phases:
       \ restored; final status clean."
   - id: plfu-frontend-gate
     name: Gate processing language frontend UI
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -75001,9 +75001,91 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T17:39:54.278507+00:00'
+    done_at: '2026-05-15T17:44:54.325627+00:00'
+    evidence: "## refs Read Confirmation\n- CONSTITUTION.md — NOT PRESENT in isolated\
+      \ worktree.\n- docs/DESIGN.md — read by gate reviewer. Key passages: language\
+      \ is global not per-item; `LANG: EN/ZH`, aria-live, `<html lang>`; reprocess\
+      \ is bracket action only, no wizard/dashboard/queue/activity log; source identifiers\
+      \ remain unchanged with `translate=\"no\"`; desktop Feed/Inspector split scroll\
+      \ and mobile full-screen Inspector.\n- docs/ARCHITECTURE.md — read by gate reviewer.\
+      \ Key passages: frontend owns presentation/scroll containment; owner-token required\
+      \ on `/api/*`; runtime language/reprocess contracts; no arbitrary per-item language\
+      \ overrides; no settings dashboards, queues, jobs, activity feeds.\n- AGENTS.md\
+      \ — NOT READ: absent in isolated gate worktree.\n\n## Gate Review Report\nheadline:\
+      \ PASS\nverdict: PASS\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nblockers: []\n\n## Execution review\n\
+      Independent verification passed after installing locked frontend dependencies\
+      \ with `npm --prefix web ci`. Gate reviewer inspected implementation and tests\
+      \ for language/reprocess/split-scroll/source identifier obligations:\n- `web/src/routes/+page.svelte`\
+      \ renders global language and reprocess controls, sets `document.documentElement.lang`,\
+      \ uses live regions, and maintains independent scroll containers.\n- `web/src/routes/components/Feed.svelte`,\
+      \ `Inspector.svelte`, and `SourceLedger.svelte` mark source/provenance anchors\
+      \ with `translate=\"no\"` via runtime contract.\n- `web/tests/e2e/processing-language-source-split-scroll.spec.ts`\
+      \ provides browser-level proof for split scroll, focusability, non-translation\
+      \ markers, preserved feed scroll, Inspector reset, and mobile route behavior.\n\
+      \n## UIUX evidence reviewed\nRendered/browser proof is present and current:\n\
+      - Focused Playwright browser run passed: 2/2 tests in `processing-language-source-split-scroll.spec.ts`.\n\
+      - Existing tracked Playwright artifact families include screenshots, DOM dumps,\
+      \ and a11y JSON under `.test-artifacts/playwright/test-output/**`.\n- Render\
+      \ tests exercise visible controls, accessible names, aria-live regions, focus\
+      \ management, negative forbidden-surface assertions, and source identifier markup.\n\
+      \n## Design/spec conformance reviewed\nNo blocker-class divergence found against\
+      \ required DESIGN/ARCHITECTURE sections. The implementation keeps language as\
+      \ a global control, reprocess as a terse bracket action, source identifiers\
+      \ literal/non-translated, desktop panes independently scrollable, and mobile\
+      \ Inspector route behavior intact. No settings dashboard, onboarding wizard,\
+      \ progress dashboard, queue, activity log, or per-item translation toggle was\
+      \ found in product UI code.\n\n## behavioral_proof_register\n- obligation: frontend\
+      \ green retest\n  status: PROVEN\n  evidence: `npm --prefix web run check` passed;\
+      \ focused render/API tests passed; e2e passed; build passed.\n  uncertainty:\
+      \ NONE\n- obligation: global language control rendered and accessible\n  status:\
+      \ PROVEN\n  evidence: `processing-language-reprocess.expected-red.test.ts`;\
+      \ `+page.svelte`.\n  uncertainty: NONE\n- obligation: html lang follows runtime\
+      \ language\n  status: PROVEN\n  evidence: render tests and `+page.svelte`.\n\
+      \  uncertainty: NONE\n- obligation: reprocess action is terse bracket action\
+      \ with confirm/running/complete/conflict/failure states\n  status: PROVEN\n\
+      \  evidence: render tests and `+page.svelte`.\n  uncertainty: NONE\n- obligation:\
+      \ source identifiers unchanged and non-translatable\n  status: PROVEN\n  evidence:\
+      \ render tests, e2e tests, Feed/Inspector/SourceLedger components.\n  uncertainty:\
+      \ NONE\n- obligation: desktop split scroll\n  status: PROVEN\n  evidence: e2e\
+      \ verifies focusable independent scroll panes, CSS overflow, feed scroll preservation,\
+      \ Inspector reset.\n  uncertainty: NONE\n- obligation: mobile Inspector route\
+      \ preserved\n  status: PROVEN\n  evidence: e2e verifies `/items/...` route,\
+      \ back to TODAY, visible mobile Inspector/resonate, feed scroll restoration.\n\
+      \  uncertainty: NONE\n- obligation: forbidden language/reprocess surfaces absent\n\
+      \  status: PROVEN\n  evidence: render tests and forbidden-concept grep scan\
+      \ found only negative tests/contracts, no product UI implementation.\n  uncertainty:\
+      \ NONE\n\n## Rendered/browser-vs-fixture assessment\nFocused render tests are\
+      \ fixture-backed component/page tests and prove DOM/a11y behavior for language/reprocess\
+      \ states. Playwright e2e run is real browser proof for split scroll, focusability,\
+      \ mobile route, and source non-translation markup. It uses routed API fixtures\
+      \ but validates rendered browser behavior rather than only static fixture assertions.\
+      \ Existing `.test-artifacts/playwright/test-output/**` contains retained screenshot/DOM/a11y\
+      \ artifacts from broader UIUX runs.\n\n## Escape hatch / forbidden UI concept\
+      \ scan\n- Scan for `@invar:allow`, settings dashboard, progress dashboard, activity\
+      \ log, per-item translation, translation toggle, preference center, onboarding\
+      \ wizard, queue, job dashboard, retry panel, side-by-side, `translation_failed`\
+      \ in `web/src` found only negative tests/contract constants/comments; no product\
+      \ UI surface implementation.\n- Focused `+page.svelte` forbidden scan returned\
+      \ no matches for `translation_failed`, per-item translation, settings/preferences,\
+      \ progress dashboard, activity log, or queue.\n- No `@invar:allow` found in\
+      \ scanned frontend source.\n\n## Checklist Closure\n- Description checklist\
+      \ items toggled by gate reviewer.\n- Verification checklist items marked `[x]`\
+      \ by orchestrator after validating PASS report.\n\n## Files changed\nnone\n\n\
+      ## Commit hash(es)\nnone (verify-only; no retained changes; final worktree clean)\n\
+      \n## Verification\n- `npm --prefix web ci` — exit 0; installed missing frontend\
+      \ dependencies from lockfile.\n- `npm --prefix web run check` — exit 0; `svelte-check\
+      \ found 0 errors and 0 warnings`.\n- `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — exit 0; 3 files / 10 tests passed.\n- `npm --prefix web run test:e2e --\
+      \ processing-language-source-split-scroll.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; 2 browser tests passed.\n- `npm --prefix web run build` — exit 0;\
+      \ production build completed.\n- Generated test-artifact churn from Playwright\
+      \ was restored with `git restore .test-artifacts`; final worktree clean.\n\n\
+      ## Required remediation if blocked\nnone"
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
-  status: locked
+  status: pending
   gate: System gate blocks unless real end-to-end HTTP, MCP, UI, reprocess, stale
     FTS, and delivery parity are proven through public/runnable surfaces with no mock-only
     evidence.
