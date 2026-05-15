@@ -2,6 +2,11 @@ import type { ItemSummary, Rfc3339UtcString } from '$lib/api-contract';
 import { itemDisplayExcerpt, itemDisplayTimestamp } from '$lib/api-contract';
 
 type TimeGroup = 'TODAY' | 'YESTERDAY' | 'EARLIER';
+const timeGroupOrder: Record<TimeGroup, number> = {
+  TODAY: 0,
+  YESTERDAY: 1,
+  EARLIER: 2
+};
 
 function decodeEntities(text: string): string {
   if (typeof document === 'undefined') return text;
@@ -83,6 +88,19 @@ export function itemAgeLabel(item: ItemSummary, now = new Date()): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d`;
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }).toLowerCase();
+}
+
+export function compareItemsByTimeGroup(left: ItemSummary, right: ItemSummary, now = new Date()): number {
+  const leftGroup = itemTimeGroup(left, now);
+  const rightGroup = itemTimeGroup(right, now);
+  const groupDelta = timeGroupOrder[leftGroup] - timeGroupOrder[rightGroup];
+  if (groupDelta !== 0) return groupDelta;
+
+  const leftTimestamp = itemTimestamp(left);
+  const rightTimestamp = itemTimestamp(right);
+  const leftTime = leftTimestamp ? new Date(leftTimestamp).getTime() : 0;
+  const rightTime = rightTimestamp ? new Date(rightTimestamp).getTime() : 0;
+  return rightTime - leftTime;
 }
 
 export function itemExtractionLabel(status: ItemSummary['extraction_status']): string {

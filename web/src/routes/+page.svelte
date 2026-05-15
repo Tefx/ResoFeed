@@ -41,6 +41,7 @@
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
+  let surfaceMenuOpen = $state(false);
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -79,7 +80,7 @@
     const headingIdBySurface: Record<Surface, string> = {
       feed: 'feed-heading',
       inspector: 'inspector-heading',
-      ledger: 'source-ledger-heading',
+      ledger: 'source-ledger-title',
       search: 'search-heading',
       doctor: 'doctor-heading'
     };
@@ -90,7 +91,7 @@
     return new ResoFeedApiClient({ ownerToken: token });
   }
 
-  async function loadShellData(token: string, syncRoute = true): Promise<void> {
+  async function loadShellData(token: string, syncRoute = true, focusAfterLoad = true): Promise<void> {
     loadState = 'loading';
     apiError = null;
 
@@ -116,6 +117,9 @@
       }
       await tick();
       const activeText = document.activeElement?.textContent?.trim();
+      if (!focusAfterLoad) {
+        return;
+      }
       if (currentSurface !== 'feed') {
         await focusActiveSurface(currentSurface);
       } else if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
@@ -235,6 +239,7 @@
   }
 
   function openSurfaceFromMenu(surface: Surface): void {
+    surfaceMenuOpen = false;
     showSurface(surface);
   }
 
@@ -356,7 +361,7 @@
     if (storedToken) {
       ownerToken = storedToken;
       promptState = 'accepted';
-      void loadShellData(storedToken);
+      void loadShellData(storedToken, true, false);
     }
 
     return () => {
@@ -371,7 +376,7 @@
   {#if !hasOwnerToken}
     <OwnerTokenPrompt state={promptState} onAccepted={handleOwnerTokenAccepted} />
   {:else}
-    <a class="skip-link" href="#today-feed">skip to feed</a>
+    <a class="skip-link" href="#today-feed" tabindex="-1">skip to feed</a>
     <header class="shell-command">
       <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
         <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
@@ -393,8 +398,8 @@
           <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
         {/if}
       </form>
-      <details class="surface-nav" aria-label="RESOFEED surface menu" open>
-        <summary class="contract-label surface-nav-label" tabindex="-1" onclick={(event) => event.preventDefault()}>RESOFEED</summary>
+      <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen}>
+        <summary class="contract-label surface-nav-label">RESOFEED</summary>
         <div class="surface-nav-menu">
           <button
             type="button"
@@ -435,7 +440,7 @@
     {/if}
 
     <div class="shell-grid" data-surface={currentSurface}>
-      <section id="today-feed" class="feed-pane" class:active-panel={currentSurface === 'feed'} aria-labelledby="feed-heading" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
+      <section id="today-feed" class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface" aria-labelledby="feed-heading" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ItemSummary } from '$lib/api-contract';
-  import { itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { compareItemsByTimeGroup, itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -11,6 +11,10 @@
 
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
+  const groupedItems = $derived(items
+    .map((item, index) => ({ item, index }))
+    .sort((left, right) => compareItemsByTimeGroup(left.item, right.item) || left.index - right.index)
+    .map(({ item }) => item));
 
   async function openInspector(item: ItemSummary): Promise<void> {
     await onSelect(item);
@@ -29,7 +33,7 @@
 <section class="contract-region" aria-labelledby="feed-heading">
   <h2 id="feed-heading" class="visually-hidden" tabindex="-1">Today feed items</h2>
   <div role="list" aria-label="Today feed items">
-    {#each items as item, index (item.id)}
+    {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
         <button
           class="contract-feed-open"
@@ -46,7 +50,7 @@
             {#if item.external_surfaced_at}
               · <span aria-label="Externally surfaced by agent">agent:external</span>
             {/if}
-            {#if shouldShowTimeGroup(items, index)}
+            {#if shouldShowTimeGroup(groupedItems, index)}
               <span class="contract-time-label">{itemTimeGroup(item)}</span>
             {/if}
           </p>
