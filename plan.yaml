@@ -74958,7 +74958,7 @@ phases:
       - [x] UIUX audit is PASS or PASS_WITH_DEBT with non-blocking/non-intersecting
       debt only.
 
-      - [ ] Frontend spec conformance has no blocker-class divergence.
+      - [x] Frontend spec conformance has no blocker-class divergence.
 
       - [ ] Gate decision basis maps UI behavioral obligations to PROVEN or BLOCK.'
     verification: '- [ ] All frontend phase steps completed with adequate evidence.
