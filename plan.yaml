@@ -82485,7 +82485,7 @@ phases:
 
       Failure inventory to close:
 
-      - [ ] `persists owner token only after authenticated bootstrap succeeds and
+      - [x] `persists owner token only after authenticated bootstrap succeeds and
       never after rejection`: accepted token is persisted to `window.localStorage.getItem(''resofeed.ownerToken'')`;
       rejected token is never persisted.
 
