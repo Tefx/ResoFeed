@@ -70084,7 +70084,7 @@ phases:
 
       Failure-mode checklist:
 
-      - [ ] source URLs/feed URLs are never used as article reprocess input.
+      - [x] source URLs/feed URLs are never used as article reprocess input.
 
       - [x] prior stored target-language fields are never used as source text.
 
