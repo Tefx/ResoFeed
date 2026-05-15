@@ -71638,7 +71638,7 @@ phases:
       \ storage proof. No source files or orchestrator state files were edited manually."
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
-  status: pending
+  status: in_progress
   gate: Runtime integration gate blocks unless HTTP and MCP language/reprocess/delivery
     parity, strict validation, and runnable `resofeed serve` liveness evidence are
     green.
@@ -71647,7 +71647,7 @@ phases:
   steps:
   - id: plhm-http-runtime-endpoints
     name: Complete HTTP language reprocess delivery and validation endpoints
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -71815,6 +71815,8 @@ phases:
     refs:
     - docs/ARCHITECTURE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T15:30:12.449796+00:00'
   - id: plhm-mcp-runtime-parity
     name: Complete MCP language reprocess delivery parity
     status: pending
