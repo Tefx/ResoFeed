@@ -69770,7 +69770,7 @@ phases:
 
       - [x] stale receipt vs new request precedence follows live TTL rules.
 
-      - [ ] partial-write or SQLite error paths are transactional.
+      - [x] partial-write or SQLite error paths are transactional.
 
       - [ ] concurrent access scenario for receipt reuse is documented and tested.
 
