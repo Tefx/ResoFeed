@@ -69082,7 +69082,7 @@ phases:
       - [x] Runtime metadata keys and state export/import exclusion are explicitly
       pinned.
 
-      - [ ] HTTP and MCP schemas are pinned with strict unknown-body/query validation
+      - [x] HTTP and MCP schemas are pinned with strict unknown-body/query validation
       and idempotency replay/mismatch semantics.
 
       - [ ] Reprocess source precedence and FTS stale marker/doctor contracts are
