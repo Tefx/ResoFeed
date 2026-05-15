@@ -71727,7 +71727,7 @@ phases:
 
       - [x] delivery registry/activity ledger/portable receipt/sync/job introduced.
 
-      - [ ] language set rewrites historical rows or rebuilds FTS automatically.
+      - [x] language set rewrites historical rows or rebuilds FTS automatically.
 
       - [ ] handler-only proof without real HTTP route execution.
 
