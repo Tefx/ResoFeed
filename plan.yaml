@@ -69917,7 +69917,7 @@ phases:
 
       State semantics:
 
-      - [ ] `processing_language` persists runtime-local default and absent means
+      - [x] `processing_language` persists runtime-local default and absent means
       effective `en`.
 
       - [ ] language changes affect future ingest/reprocess only; existing rows and
