@@ -1,0 +1,216 @@
+import { render, screen, waitFor, within } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
+import Page from '../../+page.svelte';
+import Feed from '../Feed.svelte';
+import Inspector from '../Inspector.svelte';
+import SourceLedger from '../SourceLedger.svelte';
+import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
+import type { ItemDetail } from '$lib/api-contract';
+
+const ownerToken = 'rfeed_expected_red_language_reprocess_0000000000000000';
+
+const expectedRedDetail: ItemDetail = {
+  ...expectedRedItem,
+  feed_excerpt: 'English fixture excerpt that represents stored target-language content.',
+  extracted_text: 'English fixture article body that should be replaced only by explicit reprocess.',
+  provenance: {
+    source_url: expectedRedSource.url,
+    canonical_url: expectedRedItem.url,
+    original_url: expectedRedItem.url,
+    story_key: expectedRedItem.story_key,
+    duplicate_of_item_id: null,
+    grouped_source_items: []
+  }
+};
+
+function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(body), {
+    status: init.status ?? 200,
+    headers: { 'Content-Type': 'application/json', ...init.headers }
+  });
+}
+
+function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; reprocessStatus?: number } = {}) {
+  const language = options.language ?? 'en';
+  const reprocessStatus = options.reprocessStatus ?? 200;
+  const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? 'GET';
+
+    if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
+    if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+    if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
+    if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
+    if (url.endsWith('/api/runtime/language') && method === 'GET') {
+      return jsonResponse({ language: { code: language, label: language === 'zh' ? '中文' : 'English' } });
+    }
+    if (url.endsWith('/api/runtime/language') && method === 'PUT') {
+      return jsonResponse({ language: { code: 'zh', label: '中文' }, already_applied: false });
+    }
+    if (url.endsWith('/api/runtime/reprocess-library') && method === 'POST') {
+      if (reprocessStatus === 409) {
+        return jsonResponse({ error: { code: 'conflict', message: 'ingest already running', details: {} } }, { status: 409 });
+      }
+      if (reprocessStatus === 500) {
+        return jsonResponse({ error: { code: 'internal', message: 'reprocess failed', details: {} } }, { status: 500 });
+      }
+      return jsonResponse({
+        reprocess: {
+          status: 'completed',
+          language: 'zh',
+          started_at: '2026-05-15T00:00:00Z',
+          completed_at: '2026-05-15T00:00:01Z',
+          items_attempted: 1,
+          items_updated: 1,
+          items_indexed: 1,
+          items_unavailable: 0,
+          items_failed: 0,
+          fts_rebuilt: true,
+          errors: []
+        },
+        already_applied: false
+      });
+    }
+    return jsonResponse({ error: { code: 'not_found', message: `not found: ${method} ${url}`, details: {} } }, { status: 404 });
+  });
+  vi.stubGlobal('fetch', fetcher);
+  return fetcher;
+}
+
+async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; reprocessStatus?: number } = {}) {
+  installAuthenticatedRuntimeFetch(options);
+  render(Page);
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText('Owner token'), ownerToken);
+  await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
+  await waitFor(() => expect(screen.getByLabelText('Steer or paste RSS URL')).toBeVisible());
+  return { user };
+}
+
+describe('expected-red processing language and reprocess rendering contracts', () => {
+  it('renders global LANG control, updates <html lang>, announces success/failure, and avoids forbidden surfaces', async () => {
+    const { user } = await renderAuthenticatedPage({ language: 'en' });
+
+    const domSnapshot = document.body.innerHTML;
+    expect(domSnapshot).toContain('LANG: EN');
+
+    const languageControl = screen.getByRole('button', {
+      name: /processing language.*English.*set.*Chinese/i
+    });
+    expect(languageControl).toBeVisible();
+    expect(languageControl).toHaveClass('bracket-action');
+    expect(document.documentElement).toHaveAttribute('lang', 'en');
+
+    await user.click(languageControl);
+
+    await waitFor(() => expect(document.documentElement).toHaveAttribute('lang', 'zh-CN'));
+    expect(screen.getByRole('status', { name: /processing language/i })).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('status', { name: /processing language/i })).toHaveTextContent(/Language set to 中文|语言已设为中文/);
+    expect(screen.queryByRole('heading', { name: /settings|preferences|onboarding/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /translate this item|show original|side-by-side/i })).not.toBeInTheDocument();
+  });
+
+  it('renders reprocess bracket-action default, confirmation, running, complete, conflict, and failure states with live output', async () => {
+    const { user } = await renderAuthenticatedPage({ language: 'zh' });
+
+    const action = screen.getByRole('button', {
+      name: /Reprocess existing library and rebuild search index/i
+    });
+    expect(action).toHaveTextContent('[重处理资料库]');
+    expect(action).toHaveClass('bracket-action');
+    expect(screen.getByText(/Source identifiers remain unchanged|来源标识保持不变/)).toBeVisible();
+
+    await user.click(action);
+    const confirm = screen.getByRole('button', { name: /Confirm reprocess/i });
+    expect(confirm).toHaveFocus();
+    expect(confirm).toHaveTextContent(/?\[CONFIRM REPROCESS\]|?\[确认重处理\]/);
+    expect(screen.getByRole('button', { name: /Cancel reprocess/i })).toHaveTextContent(/\[CANCEL\]|\[取消\]/);
+
+    await user.click(confirm);
+    const running = await screen.findByRole('button', { name: /reprocess/i });
+    expect(running).toHaveTextContent(/\[REPROCESSING\.\.\.\]|\[重处理中\.\.\.\]/);
+    expect(running).toHaveAttribute('aria-disabled', 'true');
+    expect(running).not.toHaveAttribute('disabled');
+
+    await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/reprocess complete|重处理完成/));
+    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveAttribute('aria-live', 'polite');
+
+    installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 409 });
+    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: ingest already running'));
+
+    installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 500 });
+    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: reprocess failed'));
+  });
+
+  it('marks source identifiers as literal non-translated provenance anchors across feed, inspector, and ledger renders', () => {
+    render(Feed, {
+      props: {
+        items: [expectedRedItem],
+        selectedItemId: expectedRedItem.id,
+        onSelect: async () => {},
+        onResonanceToggle: async () => {}
+      }
+    });
+    expect(screen.getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
+    expect(screen.getByText('src: Example Source')).toHaveTextContent('src: Example Source');
+
+    render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split' } });
+    const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });
+    expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
+    expect(within(inspector).getByText(expectedRedSource.url)).toHaveAttribute('translate', 'no');
+
+    render(SourceLedger, {
+      props: {
+        sources: [expectedRedSource],
+        onDeleteSource: async () => {},
+        onImportOpml: async () => {},
+        onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-15T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }),
+        onImportState: async () => {}
+      }
+    });
+    expect(screen.getByText(`url: ${expectedRedSource.url}`)).toHaveAttribute('translate', 'no');
+  });
+
+  it('keeps desktop feed and Inspector as independent focusable scroll regions while mobile Inspector remains a route', async () => {
+    await renderAuthenticatedPage({ language: 'en' });
+
+    const feedPane = screen.getByLabelText('TODAY surface');
+    const inspectorPane = screen.getByLabelText('INSPECTOR');
+    expect(feedPane).toHaveAttribute('tabindex', '0');
+    expect(inspectorPane).toHaveAttribute('tabindex', '0');
+    expect(feedPane).toHaveAccessibleName(/TODAY.*independent scroll/i);
+    expect(inspectorPane).toHaveAccessibleName(/INSPECTOR.*independent scroll/i);
+    expect(getComputedStyle(feedPane).overflowY).toMatch(/auto|scroll/);
+    expect(getComputedStyle(inspectorPane).overflowY).toMatch(/auto|scroll/);
+
+    const beforeFeedScroll = 312;
+    feedPane.scrollTop = beforeFeedScroll;
+    await userEvent.click(screen.getByRole('button', { name: `Open Inspector for: ${expectedRedItem.title}` }));
+    expect(feedPane.scrollTop).toBe(beforeFeedScroll);
+    expect(inspectorPane.scrollTop).toBe(0);
+
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (query: string) => ({
+        matches: query.includes('max-width'),
+        media: query,
+        onchange: null,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        dispatchEvent: () => false
+      })
+    });
+    window.history.pushState({}, '', '/items/item_expected_red');
+    await renderAuthenticatedPage({ language: 'en' });
+    expect(screen.getByRole('button', { name: /back to TODAY/i })).toBeVisible();
+    expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toBeVisible();
+  });
+});
