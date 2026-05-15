@@ -2,6 +2,7 @@ package resofeed
 
 import (
 	"context"
+	"database/sql"
 	"strings"
 	"testing"
 	"time"
@@ -98,4 +99,51 @@ func TestSteeringConflictReceiptHasNoChangedRules(t *testing.T) {
 	if !strings.Contains(strings.ToLower(result.Receipt.Message), "fresh") {
 		t.Fatalf("message = %q, want freshness conflict", result.Receipt.Message)
 	}
+}
+
+func TestDelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedActiveSteerRuleForPrecedence(t, ctx, db, "rule_human_sqlite", "Push more SQLite runtime reports.", ActorKindHuman, "owner")
+
+	conflicting, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Hide sqlite reports", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: "briefing-agent", IdempotencyKey: "agent-conflicting-sqlite"}})
+	if err != nil {
+		t.Fatalf("ApplySteering conflicting agent rule returned error: %v", err)
+	}
+	if conflicting.Receipt.InterpretedAs != "human_precedence" || len(conflicting.Receipt.ChangedRules) != 0 {
+		t.Fatalf("conflicting agent result = %+v, want human_precedence with no changed rules", conflicting)
+	}
+	if !strings.Contains(strings.ToLower(conflicting.Receipt.Message), "conflicting") || !strings.Contains(strings.ToLower(conflicting.Receipt.Message), "human steering") {
+		t.Fatalf("conflicting agent message = %q, want conflict-specific human precedence", conflicting.Receipt.Message)
+	}
+	if got := countActiveSteerRulesForActor(t, ctx, db, ActorKindAgent); got != 0 {
+		t.Fatalf("active agent rules after conflicting steer = %d, want 0", got)
+	}
+
+	nonConflicting, err := ApplySteering(ctx, db, nil, SteerRequest{Command: "Push more postgresql replication notes", MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: "briefing-agent", IdempotencyKey: "agent-nonconflicting-postgresql"}})
+	if err != nil {
+		t.Fatalf("ApplySteering non-conflicting agent rule returned error: %v", err)
+	}
+	if nonConflicting.Receipt.InterpretedAs == "human_precedence" || len(nonConflicting.Receipt.ChangedRules) != 1 {
+		t.Fatalf("non-conflicting agent result = %+v, want one accepted changed rule and no blanket human_precedence", nonConflicting)
+	}
+	if got := countActiveSteerRulesForActor(t, ctx, db, ActorKindAgent); got != 1 {
+		t.Fatalf("active agent rules after non-conflicting steer = %d, want 1", got)
+	}
+}
+
+func seedActiveSteerRuleForPrecedence(t *testing.T, ctx context.Context, db *sql.DB, id string, text string, actorKind ActorKind, actorID string) {
+	t.Helper()
+	if _, err := db.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, created_at, created_by_actor_kind, created_by_actor_id, revision) values (?, ?, 1, ?, ?, ?, 1)`, id, text, time.Now().UTC().Format(time.RFC3339Nano), string(actorKind), actorID); err != nil {
+		t.Fatalf("seed active steer rule: %v", err)
+	}
+}
+
+func countActiveSteerRulesForActor(t *testing.T, ctx context.Context, db *sql.DB, actorKind ActorKind) int {
+	t.Helper()
+	var count int
+	if err := db.QueryRowContext(ctx, `select count(*) from steer_rules where is_active = 1 and created_by_actor_kind = ?`, string(actorKind)).Scan(&count); err != nil {
+		t.Fatalf("count active steer rules for actor: %v", err)
+	}
+	return count
 }

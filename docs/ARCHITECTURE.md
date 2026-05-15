@@ -1165,7 +1165,9 @@ Endpoint contracts:
 | `POST /api/items/{id}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
 | `POST /api/items/{id}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
 | `POST /api/items/{id}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
+| `POST /api/steer/preview` | JSON `{ "command": "...", "actor_kind": "human"|"agent", "actor_id": "owner" }`; no `idempotency_key`; `command` max `4000` bytes | `200` | `{ "preview": { "route_kind": "policy"|"source"|"search"|"doctor"|"invariant_conflict"|"unknown", "interpreted_as": "...", "will_mutate": false, "changed_rules": [SteerRule], "message": "..." } }`; read-only classification, no receipts or state writes |
 | `POST /api/steer` | JSON `{ "command": "...", "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }`; `command` max `4000` bytes | `200` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` |
+| `POST /api/steer/undo` | JSON `{ "target_kind": "steer_rule"|"source", "target_id": "...", "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `SteerUndoResult`; target-specific undo only, no global undo stack or command history |
 | `GET /api/sources` | none | `200` | `{ "sources": [Source] }` |
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
@@ -1377,7 +1379,9 @@ Tools:
 | `read_item` | `{ "item_id": "item_01" }` | `{ "item": ItemDetail }` | No | `GET /api/items/{id}` |
 | `mark_inspected` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "human_inspected_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/inspect` |
 | `resonate_item` | `{ "item_id": "item_01", "resonated": true, "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "is_resonated": true, "already_applied": false }` | Yes | `POST /api/items/{id}/resonance` |
+| `preview_steer` | `{ "command": "find sqlite", "actor_id": "agent-name" }`; no `idempotency_key` | `{ "preview": SteerPreview }` | No | `POST /api/steer/preview` |
 | `steer` | `{ "command": "Push more technical documents.", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` | Yes | `POST /api/steer` |
+| `undo_steer` | `{ "target_kind": "steer_rule"|"source", "target_id": "...", "actor_id": "agent-name", "idempotency_key": "..." }` | `SteerUndoResult` | Yes | `POST /api/steer/undo` |
 | `report_delivery` | `{ "item_id": "item_01", "actor_id": "agent-name", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `{ "item_id": "item_01", "external_surfaced_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/delivery` |
 
 MCP schema rules:

@@ -274,8 +274,8 @@ func TestHumanSteeringAffectsRankingAndSupersedesAgentSteering(t *testing.T) {
 	if err != nil {
 		t.Fatalf("agent ApplySteering returned error: %v", err)
 	}
-	if len(agentResult.Receipt.ChangedRules) != 0 || !strings.Contains(agentResult.Receipt.Message, "human steering") {
-		t.Fatalf("agent receipt = %+v, want human precedence rejection", agentResult.Receipt)
+	if len(agentResult.Receipt.ChangedRules) != 1 || strings.Contains(agentResult.Receipt.Message, "human steering") {
+		t.Fatalf("agent receipt = %+v, want non-conflicting delegated-agent steering accepted", agentResult.Receipt)
 	}
 }
 

@@ -99,11 +99,11 @@ func TestSteeringHTTPAndMCPUseSharedOpenRouterPathWithRetrySafety(t *testing.T) 
 
 	mcpFirst := mcpToolJSON[SteerResult](t, router, "steer", map[string]any{"command": "Push source-backed kernel papers.", "actor_id": "briefing-agent", "idempotency_key": "mcp-openrouter-steer-001"})
 	mcpSecond := mcpToolJSON[SteerResult](t, router, "steer", map[string]any{"command": "Push source-backed kernel papers.", "actor_id": "briefing-agent", "idempotency_key": "mcp-openrouter-steer-001"})
-	if mcpFirst.Receipt.InterpretedAs != "human_precedence" || len(mcpFirst.Receipt.ChangedRules) != 0 || mcpSecond.Receipt.Message != mcpFirst.Receipt.Message {
-		t.Fatalf("MCP agent steer receipts = first %+v second %+v, want safe human-precedence replay", mcpFirst.Receipt, mcpSecond.Receipt)
+	if mcpFirst.Receipt.InterpretedAs != "openrouter_policy_update" || len(mcpFirst.Receipt.ChangedRules) != 1 || mcpSecond.Receipt.ChangedRules[0].ID != mcpFirst.Receipt.ChangedRules[0].ID {
+		t.Fatalf("MCP agent steer receipts = first %+v second %+v, want non-conflicting agent rule accepted and replayed", mcpFirst.Receipt, mcpSecond.Receipt)
 	}
-	if got := llm.calls(); got != 1 {
-		t.Fatalf("MCP OpenRouter calls after human precedence/idempotent retry = %d, want still 1", got)
+	if got := llm.calls(); got != 2 {
+		t.Fatalf("MCP OpenRouter calls after accepted agent/idempotent retry = %d, want 2", got)
 	}
 }
 
@@ -123,9 +123,10 @@ func TestInvalidOpenRouterSteeringProposalRejectedWithoutBreakingHumanPrecedence
 	if len(human.Receipt.ChangedRules) != 1 {
 		t.Fatalf("human receipt = %+v, want active human steering rule", human.Receipt)
 	}
+	llm.out = OpenRouterSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Hide verified sqlite research."}, Message: "openrouter steering updated"}
 	agent := mcpToolJSON[SteerResult](t, router, "steer", map[string]any{"command": "Override with funding announcements.", "actor_id": "agent", "idempotency_key": "agent-openrouter-precedence-001"})
 	if len(agent.Receipt.ChangedRules) != 0 || !strings.Contains(agent.Receipt.Message, "human steering") {
-		t.Fatalf("agent receipt = %+v, want human precedence safe rejection", agent.Receipt)
+		t.Fatalf("agent receipt = %+v, want conflict-specific human precedence safe rejection", agent.Receipt)
 	}
 }
 

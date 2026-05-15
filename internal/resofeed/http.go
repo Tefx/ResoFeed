@@ -744,7 +744,7 @@ func (h apiHandler) handleManualIngest(w http.ResponseWriter, r *http.Request) {
 		writeManualFetchError(w, "", err)
 		return
 	}
-	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{ManualFetchResult: result, Ingest: newIngestRunResult(result, "all", nil, started, time.Now().UTC())})
+	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{Ingest: newIngestRunResult(result, "all", nil, started, time.Now().UTC())})
 }
 
 func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Request) {
@@ -765,7 +765,7 @@ func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Reque
 		writeManualFetchError(w, sourceID, err)
 		return
 	}
-	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{ManualFetchResult: result, Ingest: newIngestRunResult(result, "source", &sourceID, started, time.Now().UTC()), Source: &source})
+	writeJSON(w, ManualFetchHTTPStatusOK, IngestResponse{Ingest: newIngestRunResult(result, "source", &sourceID, started, time.Now().UTC()), Source: &source})
 }
 
 func (h apiHandler) handleDeleteSource(w http.ResponseWriter, r *http.Request) {
@@ -1234,7 +1234,6 @@ type SourcesResponse struct {
 // IngestResponse is the architecture envelope for POST /api/ingest and
 // POST /api/sources/{id}/fetch. Source is present only for source-scoped fetches.
 type IngestResponse struct {
-	ManualFetchResult
 	Ingest IngestRunResult `json:"ingest"`
 	Source *Source         `json:"source,omitempty"`
 }

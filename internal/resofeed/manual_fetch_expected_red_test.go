@@ -62,9 +62,9 @@ func TestManualRSSFetchGlobalIngestZeroSourcesReturnsCompletedZeroCounts(t *test
 	db := newContractDB(t, ctx)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
 
-	result := manualFetchJSON[ManualFetchResult](t, router, ManualIngestHTTPPath, ManualFetchRequestBody, ManualFetchHTTPStatusOK)
+	result := manualFetchJSON[IngestResponse](t, router, ManualIngestHTTPPath, ManualFetchRequestBody, ManualFetchHTTPStatusOK)
 
-	if result.Operation != ManualFetchOperationIngest || result.SourceID != nil || !result.Completed || result.SourcesTotal != 0 || result.SourcesFetched != 0 || result.ItemsDiscovered != 0 || result.ItemsUpserted != 0 || len(result.Errors) != 0 {
+	if result.Ingest.Scope != "all" || result.Ingest.SourceID != nil || result.Ingest.Status != "completed" || result.Ingest.SourcesAttempted != 0 || result.Ingest.SourcesSucceeded != 0 || result.Ingest.ItemsUpserted != 0 || len(result.Ingest.Errors) != 0 {
 		t.Fatalf("manual ingest zero-source result = %+v, want completed ingest with zero counts and errors=[]", result)
 	}
 }
@@ -101,13 +101,13 @@ func TestManualRSSFetchOperationalSourceFailuresReturnRequestLevelOK(t *testing.
 	seedManualFetchSource(t, ctx, db, "manual_src_rss_error", feed.URL+"/feed.xml", true)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
 
-	result := manualFetchJSON[ManualFetchResult](t, router, "/api/sources/manual_src_rss_error/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
+	result := manualFetchJSON[IngestResponse](t, router, "/api/sources/manual_src_rss_error/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
 
-	if result.Operation != ManualFetchOperationSourceFetch || result.SourceID == nil || *result.SourceID != "manual_src_rss_error" || !result.Completed || result.SourcesTotal != 1 || result.SourcesFetched != 0 || len(result.Errors) != 1 {
+	if result.Ingest.Scope != "source" || result.Ingest.SourceID == nil || *result.Ingest.SourceID != "manual_src_rss_error" || result.Ingest.Status != "failed" || result.Ingest.SourcesAttempted != 1 || result.Ingest.SourcesSucceeded != 0 || len(result.Ingest.Errors) != 1 {
 		t.Fatalf("manual source RSS error result = %+v, want request-level 200 with one source-level error", result)
 	}
-	if result.Errors[0].SourceID != "manual_src_rss_error" || result.Errors[0].Code != sourceStatusFetchError || result.Errors[0].Message == "" {
-		t.Fatalf("manual source RSS error entry = %+v, want rss_fetch_error with message", result.Errors[0])
+	if result.Ingest.Errors[0].SourceID == nil || *result.Ingest.Errors[0].SourceID != "manual_src_rss_error" || result.Ingest.Errors[0].Code != sourceStatusFetchError || result.Ingest.Errors[0].Message == "" {
+		t.Fatalf("manual source RSS error entry = %+v, want rss_fetch_error with message", result.Ingest.Errors[0])
 	}
 }
 
@@ -181,11 +181,11 @@ func TestManualRSSFetchGuardReleasesAfterSuccessOperationalErrorAndRecoveredFail
 	seedManualFetchSource(t, ctx, db, "manual_src_guard", feed.URL+"/feed.xml", true)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
 
-	manualFetchJSON[ManualFetchResult](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
+	manualFetchJSON[IngestResponse](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
 	status = http.StatusInternalServerError
-	manualFetchJSON[ManualFetchResult](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
+	manualFetchJSON[IngestResponse](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
 	status = http.StatusOK
-	manualFetchJSON[ManualFetchResult](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
+	manualFetchJSON[IngestResponse](t, router, "/api/sources/manual_src_guard/fetch", ManualFetchRequestBody, ManualFetchHTTPStatusOK)
 	assertManualFetchDurableArtifactsAbsent(t, ctx, db)
 }
 

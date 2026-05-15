@@ -199,6 +199,7 @@ type urdaIngestErrorDetail struct {
 func assertArchitectureIngestRun(t *testing.T, body []byte, scope string, sourceID *string) urdaIngestResponse {
 	t.Helper()
 
+	assertManualIngestTopLevelKeys(t, body, sourceID != nil)
 	var parsed urdaIngestResponse
 	if err := json.Unmarshal(body, &parsed); err != nil {
 		t.Fatalf("unmarshal ARCHITECTURE ingest response: %v; body=%s", err, string(body))
@@ -219,6 +220,39 @@ func assertArchitectureIngestRun(t *testing.T, body []byte, scope string, source
 		t.Fatalf("ingest.completed_at = %q, want RFC3339: %v; body=%s", parsed.Ingest.CompletedAt, err, string(body))
 	}
 	return parsed
+}
+
+func assertManualIngestTopLevelKeys(t *testing.T, body []byte, wantSource bool) {
+	t.Helper()
+
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(body, &raw); err != nil {
+		t.Fatalf("unmarshal manual ingest top-level object: %v; body=%s", err, string(body))
+	}
+	want := map[string]bool{"ingest": true}
+	if wantSource {
+		want["source"] = true
+	}
+	if len(raw) != len(want) {
+		t.Fatalf("manual ingest top-level keys = %v, want exactly %v; body=%s", mapKeys(raw), mapBoolKeys(want), string(body))
+	}
+	for key := range raw {
+		if !want[key] {
+			t.Fatalf("manual ingest response contains undocumented top-level field %q; body=%s", key, string(body))
+		}
+	}
+}
+
+func mapKeys[V any](values map[string]V) []string {
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+func mapBoolKeys(values map[string]bool) []string {
+	return mapKeys(values)
 }
 
 func assertArchitectureSourceFetchResponse(t *testing.T, body []byte, sourceID string, sourceStatus string) urdaIngestResponse {

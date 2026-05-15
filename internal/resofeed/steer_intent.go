@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-// ErrSteerContractOnly marks signatures reserved by the acceptance contract.
-// It exists so callers cannot mistake this step's stubs for completed runtime
-// business logic.
-var ErrSteerContractOnly = errors.New("steer contract only: runtime mutation not implemented in this step")
-
 // ClassifySteerRoute pins the Go-side classifier signature for Steer preview,
 // commit routing, lexical search aliasing, /doctor, source subscription, policy
 // updates, and invariant-conflict receipts. It performs only local route

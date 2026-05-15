@@ -98,9 +98,6 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 	if conflictsWithInvariants(command) {
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: invariantConflictMessage()}}, nil
 	}
-	if req.ActorKind == ActorKindAgent && hasActiveHumanLikeRules(ctx, db) {
-		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "human_precedence", ChangedRules: []SteerRule{}, Message: "not applied: active human steering takes precedence"}}, nil
-	}
 	if isVagueAddAlias(command) {
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "unknown", ChangedRules: []SteerRule{}, Message: "not applied: RSS URL required for add source"}}, nil
 	}
@@ -136,7 +133,41 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 			proposal.Message = translated.Message
 		}
 	}
+	if req.ActorKind == ActorKindAgent {
+		conflicts, err := proposalConflictsWithActiveHumanSteering(ctx, db, proposal)
+		if err != nil {
+			return SteerResult{}, err
+		}
+		if conflicts {
+			return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "human_precedence", ChangedRules: []SteerRule{}, Message: "not applied: active human steering takes precedence over conflicting delegated-agent steering"}}, nil
+		}
+	}
 	return applySteeringRules(ctx, db, proposal, req.ActorKind, req.ActorID)
+}
+
+func proposalConflictsWithActiveHumanSteering(ctx context.Context, db *sql.DB, proposal OpenRouterSteeringOutput) (bool, error) {
+	if db == nil || len(proposal.RuleTexts) == 0 {
+		return false, nil
+	}
+	rules, err := loadActiveSteerRules(ctx, db)
+	if err != nil {
+		return false, err
+	}
+	for _, proposed := range proposal.RuleTexts {
+		proposed = strings.TrimSpace(proposed)
+		if proposed == "" || conflictsWithInvariants(proposed) {
+			continue
+		}
+		for _, active := range rules {
+			if active.CreatedByActorKind == nil || *active.CreatedByActorKind != string(ActorKindHuman) || !active.IsActive {
+				continue
+			}
+			if steeringRulesConflict(proposed, active.RuleText) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 func parseSearchSteerCommand(command string) (string, bool) {
@@ -607,6 +638,36 @@ func steeringFiltersOut(candidate rankedCandidate, rules []SteerRule) bool {
 	return false
 }
 
+func steeringRulesConflict(candidateRule string, humanRule string) bool {
+	candidateFilter := isFilterRule(candidateRule)
+	humanFilter := isFilterRule(humanRule)
+	if candidateFilter == humanFilter {
+		return false
+	}
+	return steeringKeywordsOverlap(candidateRule, humanRule)
+}
+
+func steeringKeywordsOverlap(left string, right string) bool {
+	leftKeywords := steeringKeywords(left)
+	if len(leftKeywords) == 0 {
+		return false
+	}
+	rightKeywords := steeringKeywords(right)
+	if len(rightKeywords) == 0 {
+		return false
+	}
+	seen := make(map[string]struct{}, len(leftKeywords))
+	for _, keyword := range leftKeywords {
+		seen[keyword] = struct{}{}
+	}
+	for _, keyword := range rightKeywords {
+		if _, ok := seen[keyword]; ok {
+			return true
+		}
+	}
+	return false
+}
+
 func isFilterRule(ruleText string) bool {
 	lower := strings.ToLower(ruleText)
 	phrases := []string{"filter", "filter out", "hide", "suppress", "exclude", "reduce", "less", "downrank", "deprioritize"}
@@ -799,17 +860,4 @@ func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) 
 		return nil, fmt.Errorf("iterate active steering rules: %w", err)
 	}
 	return rules, nil
-}
-
-func hasActiveHumanLikeRules(ctx context.Context, db *sql.DB) bool {
-	rules, err := loadActiveSteerRules(ctx, db)
-	if err != nil {
-		return false
-	}
-	for _, rule := range rules {
-		if rule.CreatedByActorKind == nil || *rule.CreatedByActorKind == string(ActorKindHuman) {
-			return true
-		}
-	}
-	return false
 }
