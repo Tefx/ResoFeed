@@ -74622,7 +74622,7 @@ phases:
 
       - [x] language control English and Chinese states.
 
-      - [ ] reprocess default/confirming/running/conflict/complete or failed states.
+      - [x] reprocess default/confirming/running/conflict/complete or failed states.
 
       - [ ] source identifiers visibly literal and non-translated.
 
