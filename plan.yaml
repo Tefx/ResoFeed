@@ -68217,7 +68217,7 @@ phases:
 
       ## Agent checklist (toggle before completion)
 
-      - [ ] Audited fresh post-fix rendered mobile UI at 390x844; did not reuse stale
+      - [x] Audited fresh post-fix rendered mobile UI at 390x844; did not reuse stale
       pre-fix artifact as closure evidence.
 
       - [ ] Confirmed the mobile Inspector for the grouped same-URL story visibly
