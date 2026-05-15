@@ -74036,7 +74036,7 @@ phases:
       - [x] Frontend type/client anchors for processing language and reprocess must
       be consumed by rendered controls here.
 
-      - [ ] Runtime language route state must affect visible control text and document
+      - [x] Runtime language route state must affect visible control text and document
       language attributes.
 
       - [ ] Reprocess active/conflict behavior must render a terse conflict/failure
