@@ -65418,3 +65418,113 @@ phases:
     evidence with ResoFeed architecture boundaries preserved.
   depends_on:
   - ui-runtime-design-audit-final-closure
+  steps:
+  - id: ui-runtime-fresh-review-contract-red-tests
+    name: Lock fresh audit acceptance and add expected-red runtime UI tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Create/extend acceptance-defining tests only for the fresh audit findings FR-01,
+      FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10. Do not modify product implementation
+      in this step.
+
+
+      Authoritative findings:
+
+      - FR-01/FR-10: RESOFEED surface menu must be closed by default, keyboard reachable,
+      and toggle TODAY/SOURCE LEDGER visibility on desktop and mobile.
+
+      - FR-02: time-group labels must be contiguous chronological groups or derived
+      from an explicit grouped feed model; no TODAY > YESTERDAY > TODAY sequence.
+
+      - FR-04: primary Inspector story surface must disclose grouped duplicate/source
+      items and provenance.
+
+      - FR-05: visible [FETCH] text stays unchanged, but each source fetch button
+      has a contextual accessible name.
+
+      - FR-06: collapsed [DETAILS] must not inflate every Source Ledger row.
+
+      - FR-07: Source Ledger DOM contract must use aria-labelledby="source-ledger-title"
+      with h1#source-ledger-title unless DESIGN.md changes.
+
+      - FR-09: mobile feed metadata must remain a flat inline monospace line using
+      truncation/ellipsis, not multi-line wrapping.
+
+
+      Touch paths:
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts or an equivalent
+      focused e2e test file
+
+      - web/tests/e2e/fixtures or existing fixture helpers only if needed
+
+
+      Spec-Fixture Conformance (MANDATORY): test fixtures must use the exact documented
+      UI/DOM shapes from docs/DESIGN.md and the runtime boundary from docs/ARCHITECTURE.md;
+      do not introduce convenience-only fields that hide duplicate-story or source-ledger
+      failures.
+
+
+      ## Completion Criteria
+
+      - [ ] Expected-red browser/runtime tests cover all eight actionable fresh audit
+      findings by ID.
+
+      - [ ] Test-only scope is preserved; product source files outside tests/fixtures
+      are not modified.
+
+      - [ ] Tests record exposed_gaps for the current implementation and identify
+      downstream implementation steps.
+
+      - [ ] Test fixture includes desktop and 390x844 mobile coverage for the surface
+      menu, Source Ledger, and feed metadata.
+
+      - [ ] Duplicate-story fixture includes at least one primary item and one duplicate
+      source item sharing story_key.'
+    verification: '- [ ] Expected-red test command is documented and exposes FR-01,
+      FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10 before implementation.
+
+      - [ ] Evidence confirms modified files are limited to tests and test fixtures/helpers.
+
+      - [ ] Evidence includes expected_failures or exposed_gaps mapped one-to-one
+      to the fresh audit IDs.
+
+      - [ ] Evidence cites the downstream implementation step IDs that will close
+      each exposed gap.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Definition Evidence
+
+      - Tests added/updated: <paths>
+
+      - Command executed: <exact command>
+
+      - Expected failures/exposed gaps by audit ID: <FR-01...>
+
+      - Product implementation files changed: <must be none>
+
+      - Downstream implementation owners: ui-runtime-fresh-review-shell-feed-ledger-fix,
+      ui-runtime-fresh-review-duplicate-source-api-fix, ui-runtime-fresh-review-duplicate-source-inspector-fix'
+    agent: frontend-engineer
