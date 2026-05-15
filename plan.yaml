@@ -71866,7 +71866,7 @@ phases:
       - [x] Missing `resofeed://runtime/language` resource and processing-language
       tools are owned here.
 
-      - [ ] Missing `reprocess_library` MCP tool is owned here.
+      - [x] Missing `reprocess_library` MCP tool is owned here.
 
       - [x] `search_items` dropping `SearchQueryEcho`/query echo is owned here.
 
