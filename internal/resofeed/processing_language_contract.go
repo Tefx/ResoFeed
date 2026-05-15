@@ -1,10 +1,6 @@
 package resofeed
 
-import (
-	"context"
-	"database/sql"
-	"time"
-)
+import "time"
 
 const (
 	// RuntimeMetadataKeyProcessingLanguage stores the runtime-local default
@@ -159,29 +155,3 @@ type MCPReprocessLibraryInput struct {
 // search_items. The MCP tool must return the same SearchResponse envelope as
 // GET /api/search, not a candidate-list-only envelope.
 type MCPSearchItemsResponse = SearchResponse
-
-// RuntimeLanguageContract pins the public function signatures to be implemented
-// by runtime language code. This is a contract-only anchor, not a DI container
-// or alternate storage abstraction.
-type RuntimeLanguageContract interface {
-	GetProcessingLanguage(ctx context.Context, db *sql.DB) (ProcessingLanguageInfo, error)
-	SetProcessingLanguage(ctx context.Context, db *sql.DB, req SetProcessingLanguageRequest) (ProcessingLanguageResponse, error)
-	ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req ReprocessLibraryRequest) (ReprocessLibraryResponse, error)
-}
-
-// RequestFingerprintContract documents receipt fingerprint semantics for all
-// body-accepting receipt-backed mutations: compute from the validated request,
-// store with the live receipt snapshot, replay same-key/same-fingerprint, reject
-// live same-key/different-fingerprint, and ignore/delete/replace expired rows in
-// the same transaction before accepting the reused key.
-type RequestFingerprintContract struct {
-	IdempotencyKey     string `json:"idempotency_key"`
-	RequestFingerprint string `json:"request_fingerprint"`
-	Operation          string `json:"operation"`
-}
-
-// ReprocessSourcePrecedence pins fresh source retrieval order for reprocess:
-// use items.canonical_url first when it is a valid HTTP(S) URL, then items.url.
-// Never use sources.url, items.source_url, public provenance.source_url, or
-// existing target-language item text as reprocess source material.
-var ReprocessSourcePrecedence = []string{"items.canonical_url", "items.url"}

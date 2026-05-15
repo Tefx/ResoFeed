@@ -14,6 +14,11 @@ import (
 
 var idempotencyReceiptMu sync.Mutex
 
+// withIdempotencyReceipt is the single implementation of receipt-backed request
+// fingerprint semantics: fingerprints are computed from the validated operation
+// payload, live same-key/same-fingerprint calls replay the stored snapshot,
+// live same-key/different-fingerprint calls are rejected, and expired rows are
+// deleted transactionally before the key is accepted as fresh.
 func withIdempotencyReceipt[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, fingerprintPayload any, target *T, apply func() (T, error)) (bool, error) {
 	if db == nil {
 		return false, errors.New("idempotency receipt: db is nil")
