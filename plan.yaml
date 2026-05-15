@@ -63347,7 +63347,7 @@ phases:
       pre-existing or out-of-scope.'
   - id: urda-final-spec-and-product-boundary-review
     name: Verify final UI repairs against architecture, design, and product boundaries
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63442,6 +63442,95 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T03:28:21.283407+00:00'
+    done_at: '2026-05-15T03:40:20.991627+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Key passages: original audit found Source Ledger missing `[RUN INGEST]`,\
+      \ missing row `[FETCH]`, missing raw `err:` row diagnostics, geometry issues,\
+      \ keyboard-semantic OPML import defect, weak bracket hover/focus, search architecture\
+      \ prose, and delete row shift.\n- docs/ARCHITECTURE.md — READ. Key passages:\
+      \ one Go deployable and one SQLite DB; no accounts/OAuth/reset UI; ingest guard\
+      \ forbids overlap and queues/jobs/ledgers/sync; HTTP manual ingest/fetch contracts\
+      \ and 409 conflict shape; strict query validation; frontend boundary forbids\
+      \ job/queue/activity/sync UI.\n- docs/DESIGN.md — READ. Key passages: product\
+      \ copy must not expose internal metaphors; Owner Token Prompt is local gate\
+      \ not account/login/onboarding; Source Ledger requires `[RUN INGEST]`, `[FETCH]`,\
+      \ raw diagnostics, stable rows, uppercase bracket labels, no queues/jobs, DOM/CSS\
+      \ contracts, no layout shift, no bracket transitions, and manual ingest controls\
+      \ only in Source Ledger.\n- docs/ui-preview.html — READ. Key passage: preview\
+      \ Source Ledger contains `last_ingest`, `[RUN INGEST]`, row `[FETCH]`, and raw\
+      \ `err: timeout contacting source`, matching manual ingest/fetch shape absent\
+      \ in original audit.\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md\
+      \ — READ. Key passage: prior gate was FAIL/BLOCK because keyboard-a11y suite\
+      \ failed before reaching ledger controls due missing expected `TODAY` / `SOURCE\
+      \ LEDGER` role buttons.\n\n## Spec Conformance Report\nScope: UI runtime design\
+      \ audit remediation.\n\n## Result\nThe independent spec/product-boundary review\
+      \ executed and returned `FAIL` as a review verdict. Per batched-fix protocol,\
+      \ the review itself is complete only after remediation ownership was created.\
+      \ Planner remediation has now created closure path steps:\n- `urda-final-spec-boundary-blockers-fix`\n\
+      - `urda-final-spec-boundary-blockers-retest`\nand rewired downstream `urda-final-black-box-runtime-ui-smoke`\
+      \ and `urda-strict-final-gate` to depend on the retest.\n\n## Findings / Evidence\
+      \ Table Summary\n- R1 Source Ledger global `[RUN INGEST]`: CONFORMS.\n- R2 row\
+      \ `[FETCH]`: CONFORMS.\n- R3 raw `err:` diagnostics: CONFORMS.\n- R4 Source\
+      \ Ledger row geometry: CONFORMS for inspected run/fetch/error paths; delete-confirmation\
+      \ proof tracked separately.\n- R5 OPML keyboard button: CONFORMS.\n- R6 bracket\
+      \ action tokens: PARTIAL — `[DELETE]`/`[CONFIRM]` use bespoke `.source-ledger-delete`\
+      \ / `.source-ledger-confirm` classes and lack canonical `.bracket-action` inversion.\n\
+      - R7 no layout shift: NEEDS_TEST — no current runtime/bounding-box proof that\
+      \ delete confirmation has zero row shift after previous 1px drift.\n- R8 lexical/provenance\
+      \ search: CONFORMS.\n- R9 no architecture/design prose in search UI: CONFORMS.\n\
+      - R10 Owner Token Prompt remains local-token gate: CONFORMS.\n- R11 First Use:\
+      \ UNPROVEN in this continuation; prior audit reportedly passed.\n- R12 preview/docs/manual\
+      \ ingest guidance: PARTIAL — `docs/ui-preview.html` reflects manual ingest/fetch,\
+      \ but `internal/resofeed/ranking.go` still has user-visible stale copy `background\
+      \ ingest will pick it up`.\n- R13 one binary / one SQLite / no sidecars: CONFORMS.\n\
+      - R14 ingest guard / 409 / no queue/job/ledger: CONFORMS by static code and\
+      \ Go tests; no live slow-source curl in this audit.\n- R15 strict HTTP query\
+      \ validation: CONFORMS.\n- R16 lexical retrieval/no vector/RAG: CONFORMS.\n\
+      - R17 forbidden product surfaces: CONFORMS in product surfaces scanned.\n- R18\
+      \ state portability active labels: DIVERGES — `StatePortability.svelte` uses\
+      \ `[EXPORTING...]` and `[IMPORTING...]` instead of exact `[EXPORTING STATE...]`\
+      \ and `[IMPORTING STATE...]`.\n\n## Product Boundary Scan\n- Forbidden accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job\
+      \ dashboards/sidecars introduced: none found as product surfaces.\n- Additional\
+      \ drift found: stale receipt copy, noncanonical delete/confirm bracket styling,\
+      \ and exact state import/export active labels.\n\n## Behavioral Proof Register\n\
+      - step_intent: post_implementation_verification\n- expected_result: green\n\
+      - observed_result: red\n- failure_alignment: expected gap\n- product_implementation_files_modified:\
+      \ no\n- verdict: FAIL\n- blockers:\n  - R6 PARTIAL: `[DELETE]`/`[CONFIRM]` are\
+      \ not canonical bracket-action buttons with inversion.\n  - R7 NEEDS_TEST: no\
+      \ current proof that delete confirmation no longer shifts Source Ledger row\
+      \ bounds.\n  - R12 PARTIAL: steering receipt still contains stale background-only\
+      \ guidance.\n  - R18 DIVERGES: state import/export active bracket labels are\
+      \ not exact spec tokens.\n- gate_open_allowed: false\n- orchestrator_action_hint:\
+      \ DO_NOT_COMPLETE for final gate; remediation ownership created before completing\
+      \ this review step.\n- closure_path:\n  - `urda-final-spec-boundary-blockers-fix`\
+      \ fixes R6/R7/R12/R18.\n  - `urda-final-spec-boundary-blockers-retest` must\
+      \ prove closures before black-box smoke and strict final gate can proceed.\n\
+      \n## Top Risks\n- Spec-visible drift remains in small but explicit UI tokens:\
+      \ `[DELETE]` styling/semantics and `[EXPORTING STATE...]` / `[IMPORTING STATE...]`.\n\
+      - Stale “background ingest will pick it up” receipt undercuts manual ingest/fetch\
+      \ remediation.\n- Passing E2E does not cover every no-layout-shift state; delete\
+      \ confirmation requires direct bounding-box regression proof.\n\n## Headline\n\
+      FAIL as review verdict; COMPLETE as review/issue-discovery step because batched\
+      \ fix and retest ownership now exist and downstream gates are blocked on the\
+      \ retest.\n\n## Commit hash(es)\n- none (verify-only, no changes)\n\n## Files\
+      \ changed\n- none. Worktree verified clean after generated Playwright artifacts\
+      \ were reverted/cleaned.\n\n## Verification\n- Static refs and implementation\
+      \ inspections performed by spec-verifier.\n- `git status --short` before verification:\
+      \ clean.\n- `go test ./...` — PASS (`resofeed/internal/resofeed 0.955s`; cmd\
+      \ has no tests).\n- Initial `npm --prefix web run check` — FAIL infrastructure:\
+      \ `svelte-kit: command not found`; `web/node_modules/.bin` missing.\n- `npm\
+      \ --prefix web ci` — completed, with npm audit warnings (3 low, 1 moderate,\
+      \ 1 high).\n- `npm --prefix web run check` after install — PASS; `svelte-check\
+      \ found 0 errors and 0 warnings`.\n- `npm --prefix web run test:e2e -- --project=chromium-ci-safe\
+      \ keyboard-a11y.expected-red.spec.ts urda-visual-a11y-expected-red-browser-tests.spec.ts`\
+      \ — PASS; 6 tests passed in 7.6s.\n- Final worktree `git status --porcelain`\
+      \ produced no output.\n\n## Gaps/Notes\n- Do not open final gate until R6, R7,\
+      \ R12, and R18 are closed by `urda-final-spec-boundary-blockers-retest` or explicitly\
+      \ waived by spec owner.\n- No product code/docs were intentionally changed by\
+      \ the verifier; dependency install only populated ignored `web/node_modules`.\n\
+      - Planner evidence: added `urda-final-spec-boundary-blockers-fix`, added `urda-final-spec-boundary-blockers-retest`,\
+      \ updated `urda-final-black-box-runtime-ui-smoke` dependency, and updated `urda-strict-final-gate`\
+      \ dependency/gate language."
   - id: urda-final-black-box-runtime-ui-smoke
     name: Final black-box runtime UI smoke with CLI preservation confirmation
     status: pending
