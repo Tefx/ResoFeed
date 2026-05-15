@@ -61307,7 +61307,7 @@ phases:
       implementation files.'
   - id: urda-frontend-ui-audit-gate
     name: Gate frontend UI runtime design audit repair
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -61392,6 +61392,8 @@ phases:
     - urda-browser-regression-post-fix-retest
     - urda-uiux-multimodal-design-audit
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T01:49:57.327593+00:00'
   - id: urda-browser-regression-batched-fix
     name: Batched browser regression and live artifact fix
     status: done
