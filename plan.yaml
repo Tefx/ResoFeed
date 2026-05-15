@@ -77796,3 +77796,10 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T19:33:16.853695+00:00'
+- id: steer-delta-contract-lock-and-expected-red-tests
+  name: Steer Delta Contract Lock and Expected-Red Tests
+  status: locked
+  gate: Gate blocks unless Steer route/undo/API/MCP/UI delta contracts are pinned
+    and expected-red tests expose current gaps without product implementation.
+  depends_on:
+  - processing-language-finalization
