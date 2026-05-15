@@ -65528,3 +65528,140 @@ phases:
       - Downstream implementation owners: ui-runtime-fresh-review-shell-feed-ledger-fix,
       ui-runtime-fresh-review-duplicate-source-api-fix, ui-runtime-fresh-review-duplicate-source-inspector-fix'
     agent: frontend-engineer
+  - id: ui-runtime-fresh-review-shell-feed-ledger-fix
+    name: Fix fresh audit shell, feed, Source Ledger, and mobile UI findings
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: ["integration", "uiux", "fresh-audit-remediation"]
+
+
+      Complete the implementation within existing ResoFeed frontend boundaries for
+      FR-01, FR-02, FR-05, FR-06, FR-07, FR-09, and FR-10. This step follows the acceptance
+      tests from ui-runtime-fresh-review-contract-red-tests.
+
+
+      Scope and touch paths:
+
+      - web/src/routes/+page.svelte — make RESOFEED menu closed by default, keyboard
+      reachable, and toggleable on desktop/mobile without persistent TODAY/SOURCE
+      LEDGER controls.
+
+      - web/src/routes/components/Feed.svelte and web/src/routes/components/item-anatomy.ts
+      — make time-group labels contiguous/chronological or explicit-group-model based;
+      no TODAY > YESTERDAY > TODAY recurrence.
+
+      - web/src/routes/components/SourceLedger.svelte — add contextual accessible
+      names for per-source [FETCH], match Source Ledger DOM contract id/heading, and
+      keep [DETAILS] compact.
+
+      - web/src/app.css — preserve flat mobile metadata and compact Source Ledger
+      row geometry without reducing 44px touch targets.
+
+
+      ResoFeed boundary guardrails:
+
+      - Do not add accounts, settings dashboards, folders, tags, unread/archive flows,
+      queues, job dashboards, sync/merge controls, sidecars, vector/RAG surfaces,
+      or new source-add fields.
+
+      - Keep manual ingest controls immediate bracket actions only.
+
+      - Keep visible [FETCH], [RUN INGEST], TODAY, SOURCE LEDGER, and RESOFEED copy
+      terse and canonical.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. RESOFEED menu still rendered open by default or summary skipped by Tab.
+
+      2. TODAY/SOURCE LEDGER visible before opening the menu on desktop or mobile.
+
+      3. Time labels repeating out of chronological group order.
+
+      4. [FETCH] buttons sharing the accessible name "[FETCH]" only.
+
+      5. [DETAILS] consuming a full extra Source Ledger row by default.
+
+      6. Source Ledger aria-labelledby/id not matching source-ledger-title.
+
+      7. Mobile metadata wrapping into multiple y positions instead of a flat inline
+      line.
+
+      8. Any forbidden ResoFeed concept added while fixing these findings.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      - [ ] Logic correctness: state and grouping computations produce correct values.
+
+      - [ ] Rendering completeness: visible DOM matches the design contract on desktop
+      and mobile.
+
+      - [ ] Evidence includes rendered output or test-renderer/browser output for
+      required states.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] This is an IMPLEMENTATION step; stub-only completion is not acceptable.
+
+      - [ ] Each deliverable contains substantive behavior that processes actual app
+      state and produces outputs that vary based on inputs.
+
+      - [ ] Private placeholder or hardcoded-only UI paths do not satisfy this step.'
+    verification: '- [ ] FR-01 and FR-10 are fixed in desktop and 390x844 mobile browser
+      output: menu closed by default, summary keyboard reachable, menu items only
+      visible after opening.
+
+      - [ ] FR-02 is fixed: fresh fixture cannot produce TODAY > YESTERDAY > TODAY
+      or other reopened time groups.
+
+      - [ ] FR-05 is fixed: every source-level [FETCH] button keeps visible text and
+      has a source-specific accessible name.
+
+      - [ ] FR-06 is fixed: collapsed [DETAILS] no longer inflates every ledger row;
+      desktop and mobile row-height evidence is captured.
+
+      - [ ] FR-07 is fixed: rendered Source Ledger matches the documented aria-labelledby/source-ledger-title
+      DOM contract.
+
+      - [ ] FR-09 is fixed: mobile feed metadata remains one flat inline line with
+      truncation/ellipsis evidence.
+
+      - [ ] No forbidden product concepts or non-ResoFeed runtime surfaces are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+      - Findings fixed: FR-01, FR-02, FR-05, FR-06, FR-07, FR-09, FR-10
+
+      - Files changed: <paths>
+
+      - Rendered/browser evidence: <screenshots, DOM snapshots, or trace paths>
+
+      - Commands run: <exact commands>
+
+      - Forbidden boundary check: <confirm no accounts/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job
+      dashboards/sidecars>
+
+      - Remaining gaps: <none or explicit>'
+    depends_on:
+    - ui-runtime-fresh-review-contract-red-tests
+    agent: frontend-engineer
