@@ -76092,7 +76092,7 @@ phases:
 
       - [x] Reprocess failure/stale FTS proof passed.
 
-      - [ ] Full-plan runtime check passed or all intersecting blockers have remediation
+      - [x] Full-plan runtime check passed or all intersecting blockers have remediation
       ownership.
 
       - [ ] E2E wiring audit has no unresolved blockers.'
