@@ -71134,7 +71134,7 @@ phases:
       are consumed, removed/de-exported, or explicitly downstream-owned with named
       owner steps; no storage-core orphan remains.
 
-      - [ ] Doctor diagnostic proof covers stale, ok, and runtime-language redaction
+      - [x] Doctor diagnostic proof covers stale, ok, and runtime-language redaction
       states before runtime exposure.
 
       - [ ] Downstream HTTP/MCP/frontend blockers remain assigned to their existing
