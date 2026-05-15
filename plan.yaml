@@ -74047,7 +74047,7 @@ phases:
 
       - [x] Completion requires visible DOM output for language and reprocess controls.
 
-      - [ ] Component that only computes data but does not render controls is incomplete.
+      - [x] Component that only computes data but does not render controls is incomplete.
 
       - [x] Evidence includes DOM snapshot, browser capture, or test-renderer output
       for required states.
