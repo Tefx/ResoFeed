@@ -74624,7 +74624,7 @@ phases:
 
       - [x] reprocess default/confirming/running/conflict/complete or failed states.
 
-      - [ ] source identifiers visibly literal and non-translated.
+      - [x] source identifiers visibly literal and non-translated.
 
       - [ ] desktop split Feed/Inspector scroll containers.
 
