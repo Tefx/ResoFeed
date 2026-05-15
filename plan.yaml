@@ -74130,7 +74130,7 @@ phases:
     agent: frontend-engineer
   - id: plfu-source-identifiers-split-scroll
     name: Preserve source identifiers and split scroll behavior
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -74275,6 +74275,98 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T17:03:03.928785+00:00'
+    done_at: '2026-05-15T17:17:50.897952+00:00'
+    evidence: "## refs Read Confirmation\n- docs/ARCHITECTURE.md — Read by execution\
+      \ agents; source identifiers are preservation anchors; desktop split scroll\
+      \ is frontend containment, not persisted behavioral state.\n- docs/DESIGN.md\
+      \ — Read by execution agents; source identifiers must use `translate=\"no\"\
+      `; desktop Feed/Inspector must be independent focusable scroll regions; selecting\
+      \ an item preserves Feed scroll and resets Inspector; mobile Inspector remains\
+      \ full-screen route.\n\n## Rendered Source/Layout Evidence\n**Rendered artifacts**:\n\
+      - `web/src/routes/components/Feed.svelte` renders source title spans with `translate=\"\
+      no\"` sourced from the processing language runtime contract.\n- `web/src/routes/components/Inspector.svelte`\
+      \ renders visible provenance anchors for item URL, source URL, canonical URL,\
+      \ and original link with `translate=\"no\"`.\n- `web/src/routes/components/SourceLedger.svelte`\
+      \ renders source title and source URL with `translate=\"no\"`.\n- `web/src/routes/+page.svelte`\
+      \ renders Feed and Inspector panes with `tabindex=\"0\"`, accessible names containing\
+      \ independent-scroll language, and `data-scroll-region` proof attributes.\n\n\
+      **Source identifier non-translation proof**:\n- Rendered tests passed for source\
+      \ identifiers and desktop feed assertions.\n- Browser Playwright test `web/tests/e2e/processing-language-source-split-scroll.spec.ts`\
+      \ proves rendered DOM `translate=\"no\"` for source title, URL, source URL,\
+      \ canonical URL, and original link anchors.\n\n**Split-scroll proof**:\n- Rendered\
+      \ tests assert Feed pane `tabindex=\"0\"`, accessible independent-scroll name,\
+      \ class `feed-pane`, `data-scroll-region=\"feed-independent\"`; Inspector pane\
+      \ `tabindex=\"0\"`, accessible independent-scroll name, class `detail-pane`,\
+      \ `data-scroll-region=\"inspector-independent\"`; selecting an item preserves\
+      \ Feed `scrollTop` and resets Inspector `scrollTop` to `0`; mobile `/items/item_expected_red`\
+      \ route renders full-screen Inspector route controls.\n- Browser Playwright\
+      \ test proves desktop Feed and Inspector are focusable independent scroll containers;\
+      \ desktop selection preserves Feed scroll and resets Inspector scroll; mobile\
+      \ full-screen `/items/:id` Inspector route remains available and back returns\
+      \ to TODAY.\n\n## Storage-Core Downstream Blocker Closure\n| Blocker | Rendered\
+      \ consumer evidence | Status |\n|---|---|---|\n| frontend source/split-scroll\
+      \ anchors type-only | Components import and consume source/split-scroll contract\
+      \ anchors and render DOM attributes/scroll regions. | closed |\n| source identifiers\
+      \ not consumed/rendered literally | Feed, Inspector, Search, and Source Ledger\
+      \ render literal provenance anchors with `translate=\"no\"`. | closed |\n\n\
+      ## Contract Deviation Records\n- type: test_error\n  artifact: `web/src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`\n\
+      \  changed: Relaxed exact label queries to match actual accessible independent-scroll\
+      \ names; added missing inspect fixture response; isolated repeated page renders\
+      \ with cleanup; adjusted hidden-mobile back-button assertion to avoid duplicate\
+      \ hidden surface matches.\n  why: The original test simultaneously required\
+      \ exact labels like `TODAY surface` while also asserting accessible names include\
+      \ independent-scroll wording, and lacked the inspect endpoint required by the\
+      \ rendered selection path.\n  impact: Test now validates the rendered behavior\
+      \ required by docs/DESIGN.md without weakening source-anchor or split-scroll\
+      \ assertions.\n\n## Conflict Resolution\n- Squash merge of `vectl/step-plfu-source-identifiers-split-scroll`\
+      \ conflicted with already-merged `plfu-api-client-types` changes in frontend\
+      \ files.\n- `conflict-resolver` preserved API client/language/reprocess behavior\
+      \ from `plfu-api-client-types` and source identifier/split-scroll behavior from\
+      \ this step.\n- No unresolved merge conflicts remained; conflict marker scan\
+      \ in `web/src` found no conflict markers.\n\n## Checklist Closure\n- Description\
+      \ checklist items were toggled to `[x]` by execution agent with `vectl_check`.\n\
+      - Verification checklist items were marked `[x]` by orchestrator after validating\
+      \ rendered, browser, and mainline verification evidence.\n\n## Files changed\n\
+      Initial source/split implementation and conflict-resolved merge:\n- web/src/app.css\n\
+      - web/src/lib/api-client.ts\n- web/src/routes/+page.svelte\n- web/src/routes/components/Feed.svelte\n\
+      - web/src/routes/components/Inspector.svelte\n- web/src/routes/components/SearchRetrieval.svelte\n\
+      - web/src/routes/components/SourceLedger.svelte\n- web/src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\n\
+      - web/src/test/setup.ts\n\nSupplemental browser proof:\n- web/src/routes/+page.svelte\n\
+      - web/tests/e2e/processing-language-source-split-scroll.spec.ts\n\n## Commit\
+      \ hash(es)\n- worktree implementation commit: 7f7e62e0eb1f98e413f561bfe2b45db3c680eec7\n\
+      - mainline conflict-resolved squash commit: 471a9dfa\n- supplemental browser-proof\
+      \ worktree commit: 198066ae\n- supplemental mainline squash commit: 96042194\n\
+      \n## Verification\nExecution worktree verification:\n- `npm ci` — exit 0.\n\
+      - `npm run check` — exit 0; 0 errors / 0 warnings.\n- `npm run test:render --\
+      \ src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ -t \"source identifiers|desktop feed\"` — exit 0; 2 passed / 2 skipped.\n\
+      - `npm run test:render -- src/lib/processing-language-api-client.expected-red.test.ts`\
+      \ — exit 0; 2 passed.\n- `npm run build` — exit 0.\n\nConflict resolver verification:\n\
+      - `npm --prefix web run check` — passed, 0 errors / 0 warnings.\n- `npm --prefix\
+      \ web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — passed, 3 files / 9 tests.\n- `npm --prefix web run build` — passed.\n\n\
+      Mainline final-state verification after conflict-resolved merge:\n- `npm --prefix\
+      \ web run check` — passed, 0 errors / 0 warnings.\n- `npm --prefix web run test:render\
+      \ -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — passed, 3 files / 9 tests.\n- `npm --prefix web run build` — passed.\n\n\
+      Supplemental browser proof verification:\n- `npm --prefix web run check` — passed,\
+      \ 0 errors / 0 warnings.\n- `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`\
+      \ — passed, 4 tests.\n- `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` — passed, 2 tests.\n- `npm --prefix web run build`\
+      \ — passed.\n\nMainline final-state verification after browser-proof merge:\n\
+      - `npm --prefix web run check` — passed, 0 errors / 0 warnings.\n- `npm --prefix\
+      \ web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — passed, 3 files / 9 tests.\n- `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` — passed, 2 tests.\n- `npm --prefix web run build`\
+      \ — passed.\n\n## Spec link\ndocs/ARCHITECTURE.md; docs/DESIGN.md; plct-contract-lock;\
+      \ plct-frontend-expected-red-tests\n\n## Gaps/Notes\nNo persisted reading-position\
+      \ tracking or analytics was added. Supplemental browser proof exposed a desktop\
+      \ visibility/scroll issue when Inspector was active; it was fixed narrowly in\
+      \ `+page.svelte` to keep Feed active on desktop Inspector and preserve ephemeral\
+      \ scroll only."
   - id: plfu-frontend-green-retest
     name: Retest frontend expected-red suite to green
     status: pending
