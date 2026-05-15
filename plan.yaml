@@ -71701,7 +71701,7 @@ phases:
       implement route registration, strict validation, idempotency replay/mismatch,
       delivered_at validation, and core operation call.
 
-      - [ ] HTTP language mutation guard/reprocess-active duplicate behavior is owned
+      - [x] HTTP language mutation guard/reprocess-active duplicate behavior is owned
       here; expose core conflict semantics through HTTP without adding queues/jobs/ledgers.
 
       - [ ] HTTP reprocess route and operation guard conflict response behavior is
