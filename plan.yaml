@@ -69763,7 +69763,7 @@ phases:
 
       - [x] relative vs absolute DB path behavior remains unchanged.
 
-      - [ ] missing `processing_language` falls back to effective `en`.
+      - [x] missing `processing_language` falls back to effective `en`.
 
       - [ ] explicit clear/null overwrite semantics are impossible for required metadata
       values unless contract permits deletion of stale marker.
