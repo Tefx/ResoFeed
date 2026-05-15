@@ -69774,7 +69774,7 @@ phases:
 
       - [x] concurrent access scenario for receipt reuse is documented and tested.
 
-      - [ ] cleanup/reset semantics between tests are explicit.
+      - [x] cleanup/reset semantics between tests are explicit.
 
       - [ ] receipt storage has bounded live semantics; expired rows are ignored/deleted/replaced.
 
