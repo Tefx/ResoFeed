@@ -66531,7 +66531,7 @@ phases:
       error: \"\""
   - id: ui-runtime-fresh-review-black-box-liveness
     name: Black-box UI runtime liveness and runnable surface proof
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -66656,6 +66656,186 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T08:12:13.959787+00:00'
+    done_at: '2026-05-15T09:19:32.949753+00:00'
+    evidence: 'step_intent: black_box_liveness_verification
+
+      expected_result: green
+
+      observed_result: red
+
+      failure_alignment: known blocker
+
+      verdict: FAIL
+
+      blockers:
+
+      - B1: grouped duplicate Inspector disclosure is still absent on the real mobile
+      UI path
+
+      headline: FAIL
+
+      proof_gap_status: BLOCKING
+
+      blocking_status: OPEN
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE
+
+
+      ## refs Read Confirmation
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — Fresh review requires
+      real served app/browser flows and lists FR-04: grouped duplicate source item
+      must be exposed from the primary Inspector, not only searchable.
+
+      - docs/DESIGN.md — UI contract requires owner-token prompt, discreet RESOFEED
+      menu, flat Source Ledger, mobile flat metadata, and Inspector source-list disclosure
+      for grouped stories.
+
+      - docs/ARCHITECTURE.md — Runtime contract is one Go deployable started with
+      resofeed serve, serving static Svelte UI, JSON HTTP API, MCP, background ingest,
+      and one SQLite DB.
+
+
+      ## Black-Box Runtime Liveness Evidence
+
+      Tester: blind-tester
+
+      Independence Level: L3
+
+
+      Build/start commands:
+
+      - npm ci && npm run build
+
+      - go build -o .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/resofeed
+      ./cmd/resofeed
+
+      - node .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/probe.mjs
+
+      - .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/resofeed serve
+      --addr 127.0.0.1:60700 --public-url http://127.0.0.1:60700 --db .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/runtime.sqlite3
+      --owner-token <redacted>
+
+
+      Runtime output summary:
+
+      - npm ci: added 150 packages; audited 151 packages.
+
+      - npm run build: vite build completed; adapter-static wrote site to build.
+
+      - go build: completed with no stdout/stderr.
+
+      - server.log: owner token explicit stored hash; serving ResoFeed on 127.0.0.1:60700;
+      shutdown complete.
+
+
+      Browser actions and artifacts:
+
+      - Owner token acceptance: PASS — token prompt rendered, browser submitted owner
+      token, localStorage owner token confirmed; artifact .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/01-owner-token-prompt.png.
+
+      - RESOFEED menu desktop/mobile: PASS — desktop detailsOpen=false with SOURCE
+      LEDGER/TODAY hidden before open; mobile menuOpen=false; artifacts 02-source-ledger-desktop.png
+      and 06-mobile-feed-390x844.png.
+
+      - Today feed time labels/mobile metadata: PASS — ingested fixture rendered Today
+      feed with TODAY/YESTERDAY/EARLIER; mobile metadata measured as a flat 16px inline
+      line; artifacts 04-today-feed-desktop.png and 06-mobile-feed-390x844.png.
+
+      - Source Ledger DOM/actions: PASS — Source Ledger rendered with aria-labelledby
+      source-ledger-title, two [FETCH] buttons, both 44px high and named Fetch source
+      127.0.0.1:<fixture-port>; artifact 02-source-ledger-desktop.png.
+
+      - Runtime request/command path: PASS — OPML import returned imported=2 skipped=0
+      folders_flattened=true; global ingest returned status completed, sources_fetched=2,
+      items_upserted=4; source fetch buttons clicked through browser.
+
+      - Inspector grouped source disclosure: FAIL — mobile Inspector for the primary
+      duplicate story showed only `src: Fresh Runtime A · full` and did not disclose
+      `Fresh Runtime B`, despite feed containing both grouped/same-URL source items.
+      Artifacts: .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/07-mobile-inspector-390x844.png
+      and probe-output-failure.json.
+
+
+      Forbidden-surface scan:
+
+      - No settings dashboard, job dashboard, queue, folders, tags, unread, mark-all-read,
+      or archive surface text was observed.
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | ARCHITECTURE §1/§2 | Single Go binary starts via resofeed serve and binds
+      HTTP UI | Process starts, serves /, stays alive during browser checks | server.log
+      + build/start commands | PROVEN | none | server bound and completed browser
+      run |
+
+      | DESIGN Owner Token Prompt | Browser accepts owner token before API access
+      | Token prompt accepts configured token and stores browser token | 01-owner-token-prompt.png,
+      ownerTokenAccepted true | PROVEN | none | real browser interaction |
+
+      | DESIGN App Shell | RESOFEED menu is discreet, not permanently open | TODAY/SOURCE
+      LEDGER hidden until menu interaction on desktop/mobile | detailsOpen=false,
+      menuOpen=false | PROVEN | none | public DOM/browser state |
+
+      | DESIGN Source Ledger | Ledger exposes flat source rows and named source [FETCH]
+      buttons | Imported sources render with contextual accessible fetch names and
+      44px targets | 02-source-ledger-desktop.png, fetchButtons | PROVEN | none |
+      real imported sources and browser actions |
+
+      | ARCHITECTURE HTTP/API | Documented runtime request reaches real runtime path
+      | OPML import and ingest operate against clean SQLite and local RSS | importOPML
+      200, ingest 200 | PROVEN | none | documented public API through served app context
+      |
+
+      | DESIGN Feed lifecycle | Today feed shows time labels in chronological groups
+      | Fixture items show Today/Yesterday/Earlier after ingest | 04-today-feed-desktop.png,
+      timeLabels | PROVEN | none | real ingested RSS feed rendered |
+
+      | DESIGN Mobile layout | Mobile feed metadata remains flat inline | 390x844
+      metadata line does not wrap/inflate | 06-mobile-feed-390x844.png, metaHeight
+      16 | PROVEN | none | browser viewport measurement |
+
+      | DESIGN Inspector grouped-story sources / Fresh Review FR-04 | Primary grouped
+      story Inspector discloses every source item/provenance | Inspector should show
+      both Fresh Runtime A and Fresh Runtime B for shared-URL duplicate | 07-mobile-inspector-390x844.png,
+      failure text | UNPROVEN | Fix grouped source disclosure on mobile Inspector
+      and rerun black-box probe | BLOCKING: required fresh-audit fix still fails through
+      public UI |
+
+      | DESIGN forbidden surfaces | No sidecar/job/settings/folder/tag/unread/archive
+      UI appears | Browser text scan finds none | forbiddenHits empty | PROVEN | none
+      | public UI scan |
+
+
+      ## Remediation ownership created
+
+      - Planner added `ui-runtime-fresh-review-mobile-inspector-grouped-source-fix`.
+
+      - Planner added `ui-runtime-fresh-review-black-box-liveness-rerun`.
+
+      - Planner rewired `ui-runtime-fresh-review-final-gate` to require the rerun.
+
+
+      ## Commit hash(es)
+
+      - none — verification-only generated artifacts were not committed.
+
+
+      ## Gaps/Notes
+
+      - Blocking failure is public and reproducible from the generated probe in the
+      isolated worktree: .audit-artifacts/ui-runtime-fresh-review-black-box-liveness/probe.mjs.
+
+      - This original verification is completed with failed evidence only to hand
+      off blocker ownership to the new remediation chain.'
   - id: ui-runtime-fresh-review-final-gate
     name: Final gate for fresh runtime UI review remediation
     status: pending
