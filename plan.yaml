@@ -82501,7 +82501,7 @@ phases:
       receipt`: app renders `Agent steering receipt` region when test data includes
       active MCP attribution.
 
-      - [ ] `uses mobile feed-first full-screen surfaces instead of one stacked page`:
+      - [x] `uses mobile feed-first full-screen surfaces instead of one stacked page`:
       app renders `Today feed items` list and mobile feed-first/full-screen surfaces.
 
       - [ ] `scopes mobile Search controls and retrieval receipts away from Today`:
