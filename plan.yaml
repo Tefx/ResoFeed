@@ -65757,3 +65757,102 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-contract-red-tests
     agent: golang-developer
+  - id: ui-runtime-fresh-review-duplicate-source-inspector-fix
+    name: Render grouped duplicate source disclosure in Inspector
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: ["integration", "uiux", "fresh-audit-remediation"]
+
+
+      Complete the frontend Inspector rendering needed to close FR-04 after ui-runtime-fresh-review-duplicate-source-api-fix
+      supplies grouped source/provenance data.
+
+
+      Scope and touch paths:
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/lib/api-contract.ts and web/src/lib/api-client.ts only if needed to
+      consume the backend contract from ui-runtime-fresh-review-duplicate-source-api-fix
+
+      - web/src/app.css only if a compact disclosure style is needed
+
+
+      Rendering requirements:
+
+      - The primary story Inspector must expose grouped duplicate/source items as
+      a terse source-list disclosure.
+
+      - The disclosure must preserve source names, original links/provenance where
+      provided, and accessible names.
+
+      - Do not require users to run search to discover grouped duplicate source items.
+
+      - Keep the UI dense and archival; do not add dashboards, folders, tags, unread/archive
+      states, activity feeds, or sync/merge concepts.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      - [ ] Logic correctness: grouped source data from the API is consumed without
+      inventing state.
+
+      - [ ] Rendering completeness: Inspector produces visible DOM for grouped sources
+      and provenance.
+
+      - [ ] Evidence includes rendered output for the duplicate-story fixture.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] This is an IMPLEMENTATION step; stub-only completion is not acceptable.
+
+      - [ ] The disclosure changes based on actual grouped source data, not hardcoded
+      examples.'
+    verification: '- [ ] FR-04 is fixed in rendered Inspector output: grouped duplicate/source
+      items are visible from the primary story surface.
+
+      - [ ] Disclosure evidence includes source identity and provenance/original-link
+      data where available.
+
+      - [ ] Search remains available but is not the only path to the duplicate source
+      item.
+
+      - [ ] No forbidden source-management, sync, archive, unread, folder, tag, or
+      dashboard concept appears.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Inspector Implementation Evidence
+
+      - Findings fixed: FR-04 frontend Inspector disclosure
+
+      - Files changed: <paths>
+
+      - Rendered evidence: <screenshot/DOM/trace path>
+
+      - API field consumed from backend step: <field>
+
+      - Commands run: <exact commands>
+
+      - Boundary check: <confirm no folders/tags/unread/archive/sync/dashboard concepts>'
+    depends_on:
+    - ui-runtime-fresh-review-contract-red-tests
+    - ui-runtime-fresh-review-duplicate-source-api-fix
+    agent: frontend-engineer
