@@ -73187,8 +73187,8 @@ phases:
       \ from a shared guard conflict detail helper.\n- [x] MCP JSON-RPC error `data`\
       \ for the affected runtime errors contains only nested `error` data required\
       \ by the architecture examples.\n- [x] MCP conflict mappings include actual\
-      \ guard holder operation/scope and remain parity-compatible with HTTP.\n- [\
-      \ ] Exported stale `SearchItemsForMCP` no-query-echo helper is removed or proven\
+      \ guard holder operation/scope and remain parity-compatible with HTTP.\n- [x]\
+      \ Exported stale `SearchItemsForMCP` no-query-echo helper is removed or proven\
       \ private/safe with a real runtime caller.\n- [ ] No forbidden durable job/queue/ledger/sync/per-agent\
       \ authorization surface is introduced."
     verification: '- [ ] Focused Go tests or equivalent assertions cover HTTP `409
