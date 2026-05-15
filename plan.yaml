@@ -70945,6 +70945,11 @@ phases:
       Wire MCP resources/tools to the same core operations as HTTP.
 
 
+      This step owns downstream MCP blockers discovered during storage-core verification.
+      It is blocking for `plhm-http-mcp-green-retest`, `plhm-runtime-wiring-audit`,
+      `plhm-runtime-spec-conformance`, and `plhm-runtime-gate`.
+
+
       YOUR SCOPE:
 
       - resource `resofeed://runtime/language`
@@ -70953,15 +70958,40 @@ phases:
 
       - tool `report_delivery`
 
-      - `search_items` output including `query` echo
+      - `search_items` output including `query` echo / `SearchQueryEcho`
 
-      - JSON-RPC conflict and request_fingerprint_mismatch error data shapes
+      - JSON-RPC conflict, bad_request, and request_fingerprint_mismatch error data
+      shapes, including nested error envelope parity where specified
 
       - owner-token auth before tool/resource handling
+
+      - no per-call language override for inspect/search/retrieve or delivery tools
+
+      - parity with HTTP for language mutation guard, active reprocess duplicate/conflict
+      behavior, delivery idempotency replay/mismatch, and terse receipt semantics
 
 
       Integration path: `/mcp` auth/session -> MCP schema validation -> core operation
       -> canonical JSON/MCP response.
+
+
+      ## Downstream blocker ownership from storage-core verification
+
+      - [ ] Missing `resofeed://runtime/language` resource and processing-language
+      tools are owned here.
+
+      - [ ] Missing `reprocess_library` MCP tool is owned here.
+
+      - [ ] `search_items` dropping `SearchQueryEcho`/query echo is owned here.
+
+      - [ ] MCP error envelope divergence is owned here.
+
+      - [ ] MCP language mutation guard/reprocess active duplicate behavior is owned
+      here.
+
+      - [ ] Declaration-only MCP-facing contract anchors must be consumed by this
+      implementation or intentionally de-exported only if the authoritative contract
+      permits it.
 
 
       ## Gate Preview (what gate WILL reject)
@@ -70976,6 +71006,9 @@ phases:
 
       - [ ] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
 
+      - [ ] JSON-RPC error envelopes omit required nested data or drift from HTTP
+      conflict/mismatch details where specified.
+
 
       ## Completion Criteria (stub exclusion)
 
@@ -70985,54 +71018,79 @@ phases:
       - [ ] Outputs vary by request inputs, current language, receipt state, and operation
       guard.
 
-      - [ ] HTTP and MCP state changes are equivalent.'
-    verification: '- [ ] MCP expected-red parity tests pass green.
+      - [ ] HTTP and MCP state changes are equivalent.
+
+      - [ ] Storage-core downstream-owned MCP blockers are all closed or converted
+      into explicit runtime gate blockers with evidence.'
+    verification: '- [ ] MCP expected-red parity tests pass green for runtime language
+      resource/tools, reprocess_library, report_delivery, search_items query echo,
+      and error envelopes.
 
       - [ ] Tests exercise public `/mcp` Streamable HTTP path or project MCP harness,
       not only direct functions.
 
       - [ ] JSON-RPC error data matches HTTP conflict/mismatch details exactly where
-      specified.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      specified.
+
+      - [ ] Evidence proves every storage-core downstream-owned MCP blocker is now
+      implemented or remains explicitly blocking in the runtime phase.'
+    evidence_template: '## Integration Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
-
 
       If no refs were provided, state: "No refs for this step."
 
-
-      ## Integration Evidence
 
       **Command or test exercising the full path**:
 
       ```
 
-      <exact MCP command/test>
+      <exact MCP harness command/test name>
 
       ```
+
 
       **Actual output**:
 
       ```
 
-      <paste output>
+      <stdout/stderr or test runner output>
 
       ```
 
-      **Path exercised**: /mcp -> auth/schema -> core operation -> MCP response
+
+      **Path exercised**: /mcp auth/session -> schema validation -> core operation
+      -> JSON-RPC/MCP response
 
 
-      ## Implementation Evidence
+      ## Storage-Core Downstream Blocker Closure
 
-      - Resources/tools added/updated:
+      | Blocker from storage-core verification | MCP evidence | Status |
 
-      - Parity matrix:
+      |---|---|---|
 
-      - Error shape proof:'
+      | runtime language resource/tools missing | <evidence> | closed/blocking |
+
+      | reprocess_library missing | <evidence> | closed/blocking |
+
+      | search_items query echo missing | <evidence> | closed/blocking |
+
+      | JSON-RPC error envelope divergence | <evidence> | closed/blocking |
+
+      | no per-call language override/parity | <evidence> | closed/blocking |
+
+
+      ## Forbidden Surface Scan
+
+      - [ ] No jobs/queues/ledgers/sync/merge/delivery registry/per-agent auth introduced.'
+    refs:
+    - docs/ARCHITECTURE.md
     agent: golang-developer
   - id: plhm-http-mcp-green-retest
     name: Retest HTTP and MCP expected-red suites to green
