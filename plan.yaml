@@ -80110,7 +80110,7 @@ phases:
       No product files modified.'
   - id: srdb-wiring-audit
     name: Audit backend public wiring and forbidden architecture drift
-    status: claimed
+    status: done
     description: 'Wiring completeness audit: verify every new or changed backend public
       symbol, handler, MCP tool, and config/state path is reachable at runtime without
       introducing forbidden architecture.
@@ -80190,6 +80190,15 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-15T22:27:45.066724+00:00'
+    done_at: '2026-05-15T22:38:52.743771+00:00'
+    evidence: 'DETECTED_ISSUES_BATCHED: Wiring auditor returned FAIL with blocker:
+      dead exported production stub `ErrSteerContractOnly` remains in internal/resofeed/steer_intent.go
+      with stub/runtime-not-implemented wording and no runtime caller. Audit also
+      produced static reachability evidence for HTTP routes, MCP tools, shared type
+      consumers, forbidden architecture drift, and W1-W8 matrix; gate_open_allowed=false
+      and orchestrator_action_hint=DO_NOT_COMPLETE. Planner created batched remediation
+      step `srdb-backend-spec-wiring-remediation` and combined retest `srdb-backend-spec-wiring-retest`;
+      backend gate dependencies now require the retest to pass.'
   - id: srdb-spec-conformance
     name: Verify backend spec conformance for Steer and search delta
     status: done
