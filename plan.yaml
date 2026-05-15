@@ -68860,3 +68860,11 @@ phases:
     UIUX audit pass against DESIGN.md.
   depends_on:
   - processing-language-http-mcp-runtime
+- id: processing-language-system-e2e
+  name: Processing Language System E2E and Parity
+  status: locked
+  gate: System gate blocks unless real end-to-end HTTP, MCP, UI, reprocess, stale
+    FTS, and delivery parity are proven through public/runnable surfaces with no mock-only
+    evidence.
+  depends_on:
+  - processing-language-frontend-ui
