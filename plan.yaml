@@ -63574,6 +63574,7 @@ phases:
       PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
     - urda-final-spec-and-product-boundary-review
+    - urda-final-spec-boundary-blockers-retest
     agent: blind-tester
   - id: urda-strict-final-gate
     name: Strict final gate for UI runtime design audit remediation
