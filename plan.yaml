@@ -79481,7 +79481,7 @@ phases:
       - [x] The Behavioral Proof Register names AC-4 plus the corrected/restored requirement
       reference and records the closure path for the former AC-19 mismatch.
 
-      - [ ] No product runtime implementation work is performed in this step.'
+      - [x] No product runtime implementation work is performed in this step.'
     verification: '- [ ] Source citations identify whether AC-19 is invalid, replaced
       by an existing authoritative AC, or restored by a minimal spec/doc correction.
 
