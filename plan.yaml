@@ -74735,7 +74735,7 @@ phases:
     claimed_at: '2026-05-15T17:26:30.594752+00:00'
   - id: plfu-frontend-spec-conformance
     name: Verify frontend DESIGN and architecture conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -74802,6 +74802,82 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T17:26:25.181371+00:00'
+    done_at: '2026-05-15T17:38:55.967998+00:00'
+    evidence: "## Spec/Design Conformance Report\n\n### refs Read Confirmation\n-\
+      \ docs/DESIGN.md — Language Control requires terse global LANG control, states,\
+      \ aria-live, html lang, and no settings/preference/onboarding UI.\n- docs/DESIGN.md\
+      \ — Reprocess Library Action requires bracket action, confirmation/running/conflict/failure\
+      \ states, aria-disabled while running, live results, and no job/progress/dashboard/queue/activity\
+      \ UI.\n- docs/DESIGN.md — Source Identifiers require URL/source title/source\
+      \ URL/canonical URL/original link unchanged with `translate=\"no\"` or equivalent.\n\
+      - docs/DESIGN.md — Desktop Split Scroll requires independent focusable Feed/Inspector\
+      \ scroll regions; mobile Inspector remains full-screen route with preserved\
+      \ feed scroll.\n- docs/ARCHITECTURE.md — Frontend must read persisted runtime\
+      \ language after owner token, set html lang, expose one runtime language/reprocess\
+      \ operation, preserve owner-token Authorization, source identifiers, split scroll,\
+      \ and forbidden dashboard/job concepts.\n\n## Closure Signals\nheadline: PASS\n\
+      verdict: PASS\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nblockers: []\n\nProcedural note:\
+      \ the original verifier response reported `blocking_status: OPEN` only because\
+      \ `vectl_check` hit a CAS conflict after product validation. The orchestrator\
+      \ refreshed plan state and toggled the remaining validated checklist items;\
+      \ no product-code conformance blocker existed.\n\n## Evidence Table\n| Requirement\
+      \ | Spec Section | Implementation/Artifact | Verdict | Notes |\n|---|---|---|---|---|\n\
+      | Language control is terse global LANG control, not settings/dashboard/per-item\
+      \ selector | DESIGN Language Control; ARCH §8 | `web/src/routes/+page.svelte`;\
+      \ grep found no forbidden settings/preference/wizard/progress/dashboard/translation\
+      \ toggle copy in Svelte sources | CONFORMS | Renders `LANG: EN` / `语言: 中文` as\
+      \ bracket-action button with global processing state only. |\n| Language control\
+      \ states and aria rules: English/Chinese/updating/failed, accessible name, html\
+      \ lang, aria-live | DESIGN Language Control; ARCH §8 | `+page.svelte`; render\
+      \ test `processing-language-reprocess.expected-red.test.ts` | CONFORMS | Runtime\
+      \ sets document lang `en`/`zh-CN`; status line has `aria-live=\"polite\"`; failure\
+      \ uses terse err copy. |\n| Frontend API client uses owner-token auth and strict\
+      \ language/reprocess endpoints | ARCH frontend boundary | `web/src/lib/api-client.ts`;\
+      \ `processing-language-api-client.expected-red.test.ts` | CONFORMS | GET/PUT\
+      \ language and POST reprocess include Authorization bearer and contract bodies.\
+      \ |\n| Reprocess action is bracket-style with warning and confirmation/running/complete/conflict/failed\
+      \ states | DESIGN Reprocess Library Action | `+page.svelte`; render tests |\
+      \ CONFORMS | Default, confirm, cancel, running, complete, conflict, failed live\
+      \ states covered. |\n| Reprocess must not become job/progress dashboard, queue,\
+      \ wizard, activity log | DESIGN Reprocess; ARCH §5.6/§8 | grep forbidden terms\
+      \ in `web/src/*.svelte` returned no files | CONFORMS | No blocker-class forbidden\
+      \ surface found. |\n| Source identifiers preserve literal provenance with non-translation\
+      \ markup/equivalent | DESIGN Source Identifiers; ARCH §8 | Feed, Inspector,\
+      \ SourceLedger components; render tests; E2E tests | CONFORMS | Source title,\
+      \ item URL, source URL, canonical URL, original link rendered with `translate=\"\
+      no\"` where present. |\n| Desktop Feed and Inspector are independent focusable\
+      \ scroll regions; selection preserves feed scroll and resets Inspector | DESIGN\
+      \ Desktop Split Scroll; ARCH §8 | `+page.svelte`; `processing-language-source-split-scroll.spec.ts`\
+      \ | CONFORMS | E2E proves tabindex, aria labels, overflow-y auto, independent\
+      \ focus, feed scroll preservation, inspector reset. |\n| Mobile Inspector is\
+      \ full-screen route with preserved Feed scroll | DESIGN Desktop Split Scroll;\
+      \ ARCH §8 | `+page.svelte`; E2E tests | CONFORMS | E2E proves `/items` route,\
+      \ back to TODAY, preserved window scroll. |\n\n## behavioral_proof_register\n\
+      - obligation: language_control_runtime_update\n  status: PROVEN\n  evidence:\
+      \ render tests passed; code sets html lang and live status.\n  uncertainty:\
+      \ NONE\n- obligation: reprocess_state_machine_and_live_feedback\n  status: PROVEN\n\
+      \  evidence: render tests cover default/confirm/running/complete/conflict/failure;\
+      \ code uses aria-disabled while running.\n  uncertainty: NONE\n- obligation:\
+      \ source_identifier_non_translation_rendering\n  status: PROVEN\n  evidence:\
+      \ render test and Playwright E2E passed; Inspector/Feed/Ledger apply `translate=\"\
+      no\"`.\n  uncertainty: NONE\n- obligation: desktop_split_scroll_independence\n\
+      \  status: PROVEN\n  evidence: Playwright E2E passed for independent focus/scroll\
+      \ and selection behavior.\n  uncertainty: NONE\n- obligation: mobile_inspector_route_preserves_feed_scroll\n\
+      \  status: PROVEN\n  evidence: Playwright E2E passed for mobile route/back behavior.\n\
+      \  uncertainty: NONE\n\n## Coverage Summary\n- DIVERGES/PARTIAL/NEEDS_TEST:\
+      \ none for frontend spec/design conformance.\n- Closure paths: none required.\n\
+      \n## Checklist Closure\n- Product checklist items verified by spec-verifier;\
+      \ remaining checklist items toggled by orchestrator after CAS conflict.\n- Verification\
+      \ checklist items marked `[x]` by orchestrator after validating report.\n\n\
+      ## Files changed\nnone\n\n## Commit hash(es)\nnone (verify-only; no changes)\n\
+      \n## Verification\n- `npm --prefix web ci` — dependencies installed for isolated\
+      \ worktree.\n- `npm --prefix web run check` — PASS, 0 errors / 0 warnings.\n\
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — PASS, 3 files / 10 tests.\n- `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` — PASS, 2 tests.\n- Generated `.test-artifacts`\
+      \ restored; final status clean."
   - id: plfu-frontend-gate
     name: Gate processing language frontend UI
     status: pending
