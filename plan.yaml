@@ -70555,7 +70555,7 @@ phases:
 
       FOCUS AREAS:
 
-      - [ ] naming and exact enum values (`en`, `zh`, statuses, error codes) for backend-core
+      - [x] naming and exact enum values (`en`, `zh`, statuses, error codes) for backend-core
       data and operation results.
 
       - [ ] boundary values and TTL/time formats (24h receipts, RFC3339 UTC stale
