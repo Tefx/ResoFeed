@@ -80553,6 +80553,134 @@ phases:
     - srdb-spec-conformance
     - srdb-wiring-audit
     agent: golang-developer
+  - id: srdb-backend-spec-wiring-retest
+    name: Retest backend spec and wiring closure
+    status: pending
+    description: 'Combined independent retest for srdb-backend-spec-wiring-remediation.
+      This retest closes the two concurrent verifier failures together and protects
+      srdb-backend-gate, frontend follow-on work, and E2E architecture closure from
+      inheriting unresolved backend contract/runtime drift.
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), validate from fresh evidence that
+      the remediation closed both srdb-spec-conformance and srdb-wiring-audit blocker
+      families.
+
+
+      Scope:
+
+      - Spec conformance closure for R4 delegated-agent steering precedence.
+
+      - Spec/source alignment closure for R1/R3/R11 steer preview/undo HTTP and MCP
+      surfaces.
+
+      - Spec/code/test closure for R13 manual ingest/fetch response-shape contract.
+
+      - Wiring closure for ErrSteerContractOnly dead exported production stub.
+
+
+      Required machine-readable closure fields must be included exactly once in evidence:
+
+      - headline: PASS | PASS_WITH_DEBT | FAIL
+
+      - verdict: OPEN | BLOCKED
+
+      - blockers: list of remaining blocker IDs/descriptions, empty when verdict is
+      OPEN
+
+      - proof_gap_status: NONE | NON_BLOCKING_ONLY | BLOCKING_GAPS_REMAIN
+
+      - blocking_status: CLEAR | BLOCKED
+
+      - gate_open_allowed: true | false
+
+      - orchestrator_action_hint: proceed_to_gate | create_followup_remediation |
+      request_human_clarification
+
+
+      Behavioral proof register required for each blocker family:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Required checklist
+
+      - [ ] Read each ref and cite the key passage or explain NOT READ with reason
+      in evidence.
+
+      - [ ] Re-run or review targeted evidence proving delegated-agent steering uses
+      conflict-specific comparison.
+
+      - [ ] Verify both conflicting and non-conflicting delegated-agent steering cases
+      are covered by tests.
+
+      - [ ] Verify ARCH/source/runtime agreement for /api/steer/preview, /api/steer/undo,
+      preview_steer, and undo_steer.
+
+      - [ ] Verify manual ingest/fetch response-shape regression tests prove the documented
+      envelope exactly.
+
+      - [ ] Verify ErrSteerContractOnly is removed or justified with real runtime
+      reachability; no dead exported production stub remains.
+
+      - [ ] Produce the exact machine-readable closure fields listed above.
+
+      - [ ] Set gate_open_allowed=false if any blocker-class proof gap remains.'
+    verification: '- [ ] Retest is a phase-check protecting srdb-backend-gate and
+      downstream frontend/E2E gates.
+
+      - [ ] Machine-readable closure fields are present and internally consistent.
+
+      - [ ] All four blocker families are PROVEN or have explicit non-intersection
+      evidence; otherwise verdict is BLOCKED.
+
+      - [ ] gate_open_allowed is true only when blocking_status is CLEAR and proof_gap_status
+      is NONE or NON_BLOCKING_ONLY.
+
+      - [ ] If issues remain, evidence gives orchestrator_action_hint=create_followup_remediation
+      and identifies exact remaining blockers.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf any remediation evidence artifact\
+      \ or phase contract artifact is used, list it with key passage.\n\n## Combined\
+      \ Spec + Wiring Closure Report\n\n```yaml\nheadline: \"PASS|PASS_WITH_DEBT|FAIL\"\
+      \nverdict: \"OPEN|BLOCKED\"\nblockers:\n  - \"<remaining blocker or empty list>\"\
+      \nproof_gap_status: \"NONE|NON_BLOCKING_ONLY|BLOCKING_GAPS_REMAIN\"\nblocking_status:\
+      \ \"CLEAR|BLOCKED\"\ngate_open_allowed: false\norchestrator_action_hint: \"\
+      proceed_to_gate|create_followup_remediation|request_human_clarification\"\n\
+      ```\n\n## Behavioral Proof Register\n\n| requirement_ref | behavior_claim |\
+      \ runtime_proof_expected | evidence_ref | status | closure_path | gate_decision_basis\
+      \ |\n| --- | --- | --- | --- | --- | --- | --- |\n| R4 | Delegated-agent steering\
+      \ rejects only conflicts with active human steering | Tests cover conflicting\
+      \ and non-conflicting agent steering | <file/test/output> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n| R1/R3/R11 | HTTP/MCP steer preview/undo contract matches\
+      \ implemented runtime | ARCH table/source/runtime agreement and tests | <doc/test/output>\
+      \ | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <basis> |\n| R13\
+      \ | Manual ingest/fetch response envelope matches documented contract | Strict\
+      \ response-shape regression output | <doc/test/output> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <path> | <basis> |\n| Wiring B4 | No dead exported production ErrSteerContractOnly\
+      \ stub remains | Static reachability/removal proof | <grep/static/output> |\
+      \ PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path> | <basis> |\n\n## Commands\
+      \ / Evidence Reviewed\n```\n<paste exact commands or artifacts reviewed>\n```\n\
+      \n## Decision Basis\n- [ ] All blocker-class behavioral obligations are PROVEN,\
+      \ or non-intersection evidence is explicit.\n- [ ] No NEEDS_TEST, UNPROVEN,\
+      \ or UNCERTAIN_BLOCKING item is bypassed by an OPEN verdict.\n- [ ] srdb-backend-gate\
+      \ may run only if gate_open_allowed=true."
+    depends_on:
+    - srdb-backend-spec-wiring-remediation
+    agent: gate-reviewer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
