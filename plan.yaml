@@ -75132,7 +75132,7 @@ phases:
 
       - [x] Source identifiers remain exact in output.
 
-      - [ ] Actual commands/output/artifact paths are included.'
+      - [x] Actual commands/output/artifact paths are included.'
     verification: '- [ ] Real vertical slice succeeds through public runtime surfaces.
 
       - [ ] Output proves language/reprocess/search/doctor behavior end-to-end.
