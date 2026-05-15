@@ -334,7 +334,13 @@ type SteerResult struct {
 // like other mutating operations and is bounded to the supplied undo_handle; it
 // must not consult or append to a global undo stack or command history.
 type SteerUndoRequest struct {
-	UndoHandle SteerUndoHandle `json:"undo_handle"`
+	// TargetKind/TargetID are the HTTP commit-undo request fields. Undo remains
+	// target-specific and never consults a global command history. UndoHandle is
+	// retained for existing MCP/protected contract compatibility and is normalized
+	// to the flat target fields by HTTP/MCP callers.
+	TargetKind string          `json:"target_kind,omitempty"`
+	TargetID   string          `json:"target_id,omitempty"`
+	UndoHandle SteerUndoHandle `json:"undo_handle,omitempty"`
 	MutationRequestFields
 }
 

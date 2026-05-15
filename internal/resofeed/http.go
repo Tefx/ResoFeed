@@ -573,31 +573,94 @@ func (h apiHandler) itemExists(w http.ResponseWriter, r *http.Request, itemID st
 
 func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 	var req SteerRequest
-	if !readJSONBody(w, r, &req) || !validateMutationFields(w, req.MutationRequestFields) {
+	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
 		return
 	}
 	if req.Command == "" || len([]byte(req.Command)) > 4000 {
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "command"})
 		return
 	}
+	route := ClassifySteerRoute(req.Command)
 	var result SteerResult
 	_, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "steer", "", struct {
-		Command   string    `json:"command"`
-		ActorKind ActorKind `json:"actor_kind"`
-		ActorID   string    `json:"actor_id"`
-	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
-		return ApplySteering(r.Context(), h.cfg.DB, h.cfg.LLM, req)
+		Command   string         `json:"command"`
+		ActorKind ActorKind      `json:"actor_kind"`
+		ActorID   string         `json:"actor_id"`
+		RouteKind SteerRouteKind `json:"route_kind"`
+	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID, RouteKind: route}, &result, func() (SteerResult, error) {
+		return h.commitSteeringByRoute(r.Context(), req, route)
 	})
 	if err != nil {
-		var fieldErr mcpFieldError
-		if errors.As(err, &fieldErr) {
-			writeFieldError(w, fieldErr)
-			return
-		}
-		writeInternal(w)
+		writeSteerMutationError(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
+}
+
+func (h apiHandler) commitSteeringByRoute(ctx context.Context, req SteerRequest, route SteerRouteKind) (SteerResult, error) {
+	command := strings.TrimSpace(req.Command)
+	switch route {
+	case SteerRouteDoctor:
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "doctor", ChangedRules: []SteerRule{}, Message: "not applied: use GET /api/doctor for read-only diagnostics"}}, nil
+	case SteerRouteSearch:
+		return ApplySteering(ctx, h.cfg.DB, h.cfg.LLM, req)
+	case SteerRouteInvariantConflict:
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: invariantConflictMessage()}}, nil
+	case SteerRouteUnknown:
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "unknown", ChangedRules: []SteerRule{}, Message: "not applied: RSS URL required for add source"}}, nil
+	case SteerRouteSource:
+		sourceURL, ok := sourceURLFromSteerCommand(command)
+		if !ok {
+			return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "unknown", ChangedRules: []SteerRule{}, Message: "not applied: RSS URL required for add source"}}, nil
+		}
+		return applyHTTPSourceURLSteering(ctx, h.cfg.DB, sourceURL)
+	case SteerRoutePolicy:
+		return ApplySteering(ctx, h.cfg.DB, h.cfg.LLM, req)
+	default:
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "unknown", ChangedRules: []SteerRule{}, Message: "not applied: no safe product-valid steering rule remained"}}, nil
+	}
+}
+
+func applyHTTPSourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (SteerResult, error) {
+	if db == nil {
+		return SteerResult{}, errors.New("apply http source steering: db is nil")
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return SteerResult{}, fmt.Errorf("begin source steering transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	now := time.Now().UTC().Format(time.RFC3339Nano)
+	identity := sourceIdentity(sourceURL)
+	var id string
+	var active bool
+	var revision int64
+	err = tx.QueryRowContext(ctx, `select id, is_active, revision from sources where url = ?`, sourceURL).Scan(&id, &active, &revision)
+	if err == nil {
+		if active {
+			if err := tx.Commit(); err != nil {
+				return SteerResult{}, fmt.Errorf("commit active source no-op: %w", err)
+			}
+			return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source already active: " + identity + "; no change"}}, nil
+		}
+		revision++
+		if _, err := tx.ExecContext(ctx, `update sources set is_active = 1, revision = ? where id = ?`, revision, id); err != nil {
+			return SteerResult{}, fmt.Errorf("reactivate source through steering: %w", err)
+		}
+	} else if errors.Is(err, sql.ErrNoRows) {
+		id = stableTextID("src", sourceURL)
+		revision = 1
+		if _, err := tx.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1)`, id, sourceURL, identity, now); err != nil {
+			return SteerResult{}, fmt.Errorf("add source through steering: %w", err)
+		}
+	} else {
+		return SteerResult{}, fmt.Errorf("read source by url: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return SteerResult{}, fmt.Errorf("commit source steering transaction: %w", err)
+	}
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "add_source", ChangedRules: []SteerRule{}, Message: "source added: " + identity + "; visible in SOURCE LEDGER; use [RUN INGEST] or row [FETCH] there for immediate refresh"}, UndoHandle: &SteerUndoHandle{RouteKind: SteerRouteSource, Target: &SteerTarget{Kind: "source", ID: id}, Revision: &revision}}, nil
 }
 
 func (h apiHandler) handleSteerUndo(w http.ResponseWriter, r *http.Request) {
@@ -605,22 +668,52 @@ func (h apiHandler) handleSteerUndo(w http.ResponseWriter, r *http.Request) {
 	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
 		return
 	}
+	if !normalizeSteerUndoRequest(w, &req) {
+		return
+	}
 	var result SteerUndoResult
 	replayed, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "undo_steer", "", struct {
-		UndoHandle SteerUndoHandle `json:"undo_handle"`
-		ActorKind  ActorKind       `json:"actor_kind"`
-		ActorID    string          `json:"actor_id"`
-	}{UndoHandle: req.UndoHandle, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerUndoResult, error) {
+		TargetKind string    `json:"target_kind"`
+		TargetID   string    `json:"target_id"`
+		ActorKind  ActorKind `json:"actor_kind"`
+		ActorID    string    `json:"actor_id"`
+	}{TargetKind: req.TargetKind, TargetID: req.TargetID, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerUndoResult, error) {
 		return UndoSteering(r.Context(), h.cfg.DB, req)
 	})
 	if err != nil {
-		writeRuntimeMutationError(w, err)
+		writeSteerMutationError(w, err)
 		return
 	}
 	if replayed || (result.Target != nil && !result.Undone) {
 		result.AlreadyApplied = true
 	}
 	writeJSON(w, http.StatusOK, result)
+}
+
+func normalizeSteerUndoRequest(w http.ResponseWriter, req *SteerUndoRequest) bool {
+	if req.TargetKind == "" && req.TargetID == "" && req.UndoHandle.Target != nil {
+		req.TargetKind = req.UndoHandle.Target.Kind
+		req.TargetID = req.UndoHandle.Target.ID
+	}
+	if req.TargetKind == "" {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "target_kind"})
+		return false
+	}
+	if req.TargetID == "" {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "target_id"})
+		return false
+	}
+	if req.TargetKind != "source" && req.TargetKind != "steer_rule" {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "target_kind"})
+		return false
+	}
+	req.UndoHandle.Target = &SteerTarget{Kind: req.TargetKind, ID: req.TargetID}
+	if req.TargetKind == "source" {
+		req.UndoHandle.RouteKind = SteerRouteSource
+	} else {
+		req.UndoHandle.RouteKind = SteerRoutePolicy
+	}
+	return true
 }
 
 func (h apiHandler) handleActiveSteeringRules(w http.ResponseWriter, r *http.Request) {
@@ -957,6 +1050,20 @@ func writeRuntimeMutationError(w http.ResponseWriter, err error) {
 	var fieldErr mcpFieldError
 	if errors.As(err, &fieldErr) {
 		writeFieldError(w, fieldErr)
+		return
+	}
+	writeInternal(w)
+}
+
+func writeSteerMutationError(w http.ResponseWriter, err error) {
+	var fieldErr mcpFieldError
+	if errors.As(err, &fieldErr) {
+		writeFieldError(w, fieldErr)
+		return
+	}
+	var notFound mcpNotFoundError
+	if errors.As(err, &notFound) {
+		writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": notFound.id})
 		return
 	}
 	writeInternal(w)
