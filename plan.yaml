@@ -81430,7 +81430,7 @@ phases:
   steps:
   - id: srdf-steer-preview-ui-state-aria
     name: Complete Steer route preview UI state and ARIA behavior
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -81511,6 +81511,8 @@ phases:
 
       '
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T23:28:47.846499+00:00'
   - id: srdf-source-ledger-details-hit-targets
     name: Complete Source Ledger details disclosure and bracket hit targets
     status: claimed
