@@ -78949,7 +78949,7 @@ phases:
       was not run by worker.'
   - id: srdct-frontend-contract-lock
     name: Lock frontend route preview state and fixture contract
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -79021,6 +79021,73 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T21:00:11.922442+00:00'
+    done_at: '2026-05-15T21:09:56.852323+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): 872c4dfd ([vectl] step-srdct-frontend-contract-lock completed);
+      worktree commit b979ff2f.
+
+
+      Files changed: web/src/lib/api-contract.ts; web/src/test/frontend-acceptance-contract-lock.ts;
+      web/src/lib/frontend-acceptance-contract-lock.test.ts.
+
+
+      Refs Read Confirmation:
+
+      - docs/DESIGN.md — cited terse Steer states and aria-live receipts/failures;
+      Source Ledger labels [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state
+      actions, 44px hit targets, no jobs/queues/dashboards; lexical search only; desktop
+      split scroll; mobile Inspector full-screen route; low-chrome processing-language/reprocess
+      controls.
+
+      - docs/UI_REGRESSION_CONTRACT.md — cited hit-target tests with real pointer
+      activation/elementFromPoint; keyboard/a11y roles/names/live regions; negative
+      assertions banning RAG/vector, dashboard/job/activity drift, inert controls,
+      obstructed hit targets, settings/onboarding/SaaS copy.
+
+      - docs/ARCHITECTURE.md — cited SQLite FTS5 lexical retrieval only; no embeddings/vector/RAG;
+      one ingest/fetch/reprocess guard with 409 and no persistent jobs/queues/activity
+      ledgers; desktop split scroll and mobile Inspector route; processing language
+      runtime state not portable state.
+
+
+      Frontend contract evidence:
+
+      - Added frontend acceptance contract types and fixture expectations for Steer
+      route preview states, Source Ledger controls, 44px bracket actions, details
+      disclosure, lexical-only search/no-RAG, find alias warnings, desktop independent
+      Feed/Inspector scroll, mobile full-screen Inspector route, and low-chrome processing
+      language/reprocess controls.
+
+      - Contract-only: no rendered UI behavior completed.
+
+      - Guarded forbidden UI concepts: settings dashboard, job dashboard, activity
+      log, queue view, onboarding wizard, preference center, folders/tags/unread counts/mark-all-read/archive
+      bins, sync/merge, vector/RAG, semantic answer engine, AI-magic/SaaS copy.
+
+
+      Mainline verification:
+
+      - git merge --squash vectl/step-srdct-frontend-contract-lock passed.
+
+      - git diff --cached --check passed.
+
+      - npm --prefix web run check passed with svelte-check 0 errors and 0 warnings.
+
+      - npm --prefix web exec -- vitest run src/lib/frontend-acceptance-contract-lock.test.ts
+      passed; test run reported 2 files passed, 10 tests passed.
+
+      - git show --check --oneline HEAD passed after commit 872c4dfd.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: npm install/audit vulnerabilities are pre-existing dependency triage
+      and not blocking this contract-only step. Real browser/rendered UI behavior
+      intentionally unobserved because this step is contract-only.'
   - id: srdct-backend-expected-red-tests
     name: Add backend expected-red Steer HTTP MCP and policy tests
     status: pending
