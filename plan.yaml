@@ -69920,7 +69920,7 @@ phases:
       - [x] `processing_language` persists runtime-local default and absent means
       effective `en`.
 
-      - [ ] language changes affect future ingest/reprocess only; existing rows and
+      - [x] language changes affect future ingest/reprocess only; existing rows and
       FTS are not auto-rewritten.
 
       - [ ] OpenRouter receives `target_language`; Go validates JSON before persistence.
