@@ -79848,7 +79848,7 @@ phases:
       - [x] POST /api/steer/undo accepts only target_kind/target_id/actor_kind/actor_id/idempotency_key,
       is target-specific, and is idempotent for already inactive source/rule targets.
 
-      - [ ] Search and doctor routes remain read-only and are executed through GET
+      - [x] Search and doctor routes remain read-only and are executed through GET
       /api/search and GET /api/doctor where appropriate.
 
       - [ ] Unknown fields and invalid bodies return documented bad_request details.
