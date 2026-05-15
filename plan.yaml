@@ -79638,7 +79638,7 @@ phases:
       - [x] The absent AC-19 reference is either removed/replaced by an exact authoritative
       AC or restored by a minimal source-backed spec/doc correction.
 
-      - [ ] All blocker-class proof gaps list explicit closure paths.
+      - [x] All blocker-class proof gaps list explicit closure paths.
 
       - [ ] gate_open_allowed is true only if blocking_status is CLOSED and no blocker-class
       proof gaps remain.
