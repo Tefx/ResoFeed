@@ -71029,7 +71029,7 @@ phases:
     agent: gate-reviewer
   - id: plsc-storage-core-blocker-fix
     name: Fix storage-core language guard and orphan anchors
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -71210,6 +71210,134 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T15:08:19.917260+00:00'
+    done_at: '2026-05-15T15:17:12.602086+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key insight from subagent: processing-language
+      mutation is runtime metadata; reprocess/ingest/fetch share a single in-process
+      exclusivity guard; `search_fts_stale_since` must surface as `/doctor` stale/ok;
+      `/doctor` must not expose item text/source text/API keys/raw model output.
+
+      - `docs/DESIGN.md`: READ. Key insight from subagent: language is global operational
+      state, not per-item toggle/settings dashboard; reprocess is explicit; source
+      identifiers remain unchanged; downstream UI/MCP/frontend controls remain outside
+      storage-core scope.
+
+
+      ## Remediation Evidence
+
+
+      **Language guard closure**:
+
+      - `internal/resofeed/runtime_metadata.go:27` changes `SetProcessingLanguage`
+      to named returns so guard-release recovery can propagate errors.
+
+      - `internal/resofeed/runtime_metadata.go:40` acquires `tryAcquireIngestGuard`
+      before the idempotency wrapper and before `storeRuntimeMetadata`.
+
+      - `internal/resofeed/ingest.go:234` is the same guard used by ingest/fetch.
+
+      - `internal/resofeed/reprocess.go:38` confirms reprocess uses the same guard.
+
+      - Test: `TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess`
+      in `internal/resofeed/runtime_metadata_receipts_test.go` proves active guard
+      conflicts for manual ingest, source fetch, reprocess, and language mutation,
+      and proves no language metadata write happens while held.
+
+
+      **Orphan anchor disposition**:
+
+      | Anchor | Disposition |
+
+      |---|---|
+
+      | `RuntimeLanguageContract` | Removed from `processing_language_contract.go`;
+      real functions remain direct flat package functions. |
+
+      | `RequestFingerprintContract` | Removed; single implementation ownership documented
+      on `withIdempotencyReceipt` in `internal/resofeed/idempotency.go:17`. |
+
+      | `ReprocessSourcePrecedence` | Removed; runtime behavior remains in `reprocessCandidateURLs`
+      at `internal/resofeed/reprocess.go:224`. |
+
+
+      **Doctor proof**:
+
+      - Added `internal/resofeed/doctor_search_fts_test.go`.
+
+      - `TestDoctorSearchFTSStatusLineOKStaleAndRuntimeLanguageRedaction` covers ok
+      line via `DoctorSearchFTSOKLinePrefix`, stale line via `DoctorSearchFTSStaleLinePrefix`,
+      and runtime-language redaction/no leakage of processing_language, `zh`, target-language
+      item text, raw model output, or secret markers.
+
+
+      **Downstream preservation statement**:
+
+      - Did not implement MCP runtime language/reprocess tools/resources, MCP search
+      echo/nested JSON-RPC errors, HTTP delivery endpoint fixes, frontend API/client/runtime
+      controls, or UI changes.
+
+      - Existing downstream failures remain owned by `plhm-mcp-runtime-parity`, `plhm-http-runtime-endpoints`,
+      and `plfu-*` steps.
+
+
+      ## Mainline Final-State Verification
+
+      After squash merge to main:
+
+      - `gofmt -w internal/resofeed/runtime_metadata.go internal/resofeed/processing_language_contract.go
+      internal/resofeed/idempotency.go internal/resofeed/runtime_metadata_receipts_test.go
+      internal/resofeed/doctor_search_fts_test.go` — exit 0.
+
+      - `go test ./internal/resofeed -run ''Test(SetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess|DoctorSearchFTSStatusLineOKStaleAndRuntimeLanguageRedaction|RuntimeMetadataProcessingLanguageDefaultsAndValidation|ReceiptLiveTTLReplayMismatchAndExpiredReplacement|ProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems|PLCTReprocessEndpointCountsStaleMarkerAndStrictValidation|PLCTDoctorReportsStaleFTSMarker)''`
+      — exit 0; output includes `ok resofeed/internal/resofeed 0.541s`.
+
+      - `go test -race ./internal/resofeed -run ''Test(SetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess|ReceiptConcurrentReuseSerializesSingleApply)''`
+      — exit 0; output includes `ok resofeed/internal/resofeed 1.579s`.
+
+      - `go build ./cmd/resofeed` — exit 0.
+
+      - `git grep -n -E ''RuntimeLanguageContract|RequestFingerprintContract|ReprocessSourcePrecedence''
+      -- internal/resofeed` — no matches (guard command exited successfully because
+      no matches found).
+
+
+      ## Commit hash(es)
+
+      - Worker branch commit: `bbe3b9ed35681e8e35d97478bab04737d4e342dd` — `fix processing
+      language storage guard`.
+
+      - Main squash merge commit: `d2a508f1` — `[vectl] step-plsc-storage-core-blocker-fix
+      completed`.
+
+
+      ## Files changed
+
+      - `internal/resofeed/runtime_metadata.go`
+
+      - `internal/resofeed/runtime_metadata_receipts_test.go`
+
+      - `internal/resofeed/doctor_search_fts_test.go`
+
+      - `internal/resofeed/processing_language_contract.go`
+
+      - `internal/resofeed/idempotency.go`
+
+
+      ## Spec link
+
+      - `docs/ARCHITECTURE.md` operation exclusivity, processing-language runtime
+      metadata, reprocess stale FTS diagnostic, and no-forbidden-abstraction constraints.
+
+
+      ## Gaps/Notes
+
+      - Full backend package test still fails on explicitly downstream-owned MCP/HTTP
+      endpoint blockers; not fixed in this storage-core step.
+
+      - `go build ./cmd/resofeed` produced/updated an untracked `resofeed` binary
+      in the main worktree; no product source files were left unstaged by mainline
+      verification.'
   - id: plsc-storage-core-blocker-retest
     name: Retest storage-core blocker remediation
     status: pending
