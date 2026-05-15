@@ -78878,7 +78878,7 @@ phases:
     claimed_at: '2026-05-15T21:00:04.881389+00:00'
   - id: srdct-frontend-contract-lock
     name: Lock frontend route preview state and fixture contract
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -78948,6 +78948,8 @@ phases:
 
       '
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T21:00:11.922442+00:00'
   - id: srdct-backend-expected-red-tests
     name: Add backend expected-red Steer HTTP MCP and policy tests
     status: pending
