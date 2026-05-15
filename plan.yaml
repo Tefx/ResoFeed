@@ -66932,7 +66932,7 @@ phases:
       - [x] Black-box liveness rerun evidence proves the single Go binary runnable
       UI surface and the 390x844 mobile Inspector grouped-source disclosure.
 
-      - [ ] Rerun artifact/text evidence shows both `Fresh Runtime A` and `Fresh Runtime
+      - [x] Rerun artifact/text evidence shows both `Fresh Runtime A` and `Fresh Runtime
       B` in the mobile Inspector for the same-URL grouped duplicate story.
 
       - [ ] No forbidden architecture/product boundary changes are present.
