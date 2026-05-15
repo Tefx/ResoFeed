@@ -81542,7 +81542,7 @@ phases:
       - [x] Raw diagnostics preserve err: prefix, clamp/wrap per DESIGN.md, and expose
       full text via title or accessible disclosure.
 
-      - [ ] [RUN INGEST] and [FETCH] are immediate low-chrome runtime operations,
+      - [x] [RUN INGEST] and [FETCH] are immediate low-chrome runtime operations,
       not durable jobs or queues.
 
       - [ ] Focus returns to next row or Ledger heading after deletion.
