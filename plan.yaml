@@ -79468,7 +79468,7 @@ phases:
       - [x] docs/PRD.md is cited for AC-4 and for the corrected/restored requirement
       reference; if AC-19 remains absent, the evidence explicitly says so.
 
-      - [ ] docs/ARCHITECTURE.md is cited to prove the resolution does not violate
+      - [x] docs/ARCHITECTURE.md is cited to prove the resolution does not violate
       ResoFeed architecture invariants.
 
       - [ ] docs/DESIGN.md and docs/UI_REGRESSION_CONTRACT.md are cited for any UI/source-ledger/manual-fetch
