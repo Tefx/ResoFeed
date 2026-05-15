@@ -72228,7 +72228,7 @@ phases:
       outside the conflict scope; they were left untouched.'
   - id: plhm-http-mcp-green-retest
     name: Retest HTTP and MCP expected-red suites to green
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -72315,6 +72315,8 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T15:45:50.712122+00:00'
   - id: plhm-runtime-liveness-probe
     name: Probe runnable HTTP and MCP surfaces
     status: pending
