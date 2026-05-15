@@ -79949,7 +79949,7 @@ phases:
       - [x] undo_steer requires target_kind, target_id, actor_id, and idempotency_key,
       and returns SteerUndoResult plus receipt with target-specific semantics.
 
-      - [ ] MCP exposes no agent-only concepts, no per-agent registry, and no additional
+      - [x] MCP exposes no agent-only concepts, no per-agent registry, and no additional
       product primitives beyond HTTP/UI operations.
 
       - [ ] MCP search remains lexical via search_items and does not imply semantic/RAG
