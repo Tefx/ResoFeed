@@ -65999,3 +65999,139 @@ phases:
     - ui-runtime-fresh-review-duplicate-source-api-fix
     - ui-runtime-fresh-review-duplicate-source-inspector-fix
     agent: integration-verifier
+  - id: ui-runtime-fresh-review-uiux-multimodal-audit
+    name: UIUX multimodal audit of fresh runtime remediation
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an independent native multimodal UI/UX auditor, compare rendered desktop
+      and mobile artifacts against docs/DESIGN.md and the fresh audit closure obligations.
+
+
+      Scope:
+
+      - FR-01/FR-10 RESOFEED menu closed/toggleable/reachable on desktop and mobile.
+
+      - FR-02 feed group label order and rhythm.
+
+      - FR-04 Inspector grouped source disclosure.
+
+      - FR-05 source [FETCH] accessible names.
+
+      - FR-06 Source Ledger compact row geometry.
+
+      - FR-07 Source Ledger DOM contract.
+
+      - FR-09 mobile flat inline metadata.
+
+
+      Required artifacts:
+
+      - Desktop feed/Inspector screenshot.
+
+      - Desktop Source Ledger screenshot.
+
+      - Mobile feed screenshot at 390x844.
+
+      - Mobile Source Ledger screenshot at 390x844.
+
+      - Accessibility/DOM name evidence for menu summary, menu buttons, [FETCH], and
+      source-ledger-title.
+
+
+      ## Completion Criteria
+
+      - [ ] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
+
+      - [ ] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
+
+      - [ ] Every fresh audit finding has a multimodal verdict and evidence reference.
+
+      - [ ] Any remaining blocker or should-fix gap includes a remediation owner and
+      closure path.'
+    verification: '- [ ] Multimodal audit includes rendered screenshots/images or
+      equivalent visual/spatial artifacts for desktop and 390x844 mobile states.
+
+      - [ ] Audit explicitly verifies FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
+      and FR-10.
+
+      - [ ] Audit verifies no forbidden ResoFeed UI concepts were introduced.
+
+      - [ ] Parseable headline is PASS or PASS_WITH_DEBT with no blocker-class unresolved
+      findings before final gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Multimodal Audit Report
+
+      **Auditor**: uiux-auditor
+
+      **Independence Level**: L2
+
+
+      ### Artifacts reviewed
+
+      - Desktop feed/Inspector: <path>
+
+      - Desktop Source Ledger: <path>
+
+      - Mobile feed 390x844: <path>
+
+      - Mobile Source Ledger 390x844: <path>
+
+      - DOM/accessibility snapshot: <path>
+
+
+      ### Finding verdicts
+
+      | Finding | Visual/DOM evidence | Verdict | Notes |
+
+      |---|---|---|---|
+
+      | FR-01 | <path> | PASS/FAIL | <notes> |
+
+      | FR-02 | <path> | PASS/FAIL | <notes> |
+
+      | FR-04 | <path> | PASS/FAIL | <notes> |
+
+      | FR-05 | <path> | PASS/FAIL | <notes> |
+
+      | FR-06 | <path> | PASS/FAIL | <notes> |
+
+      | FR-07 | <path> | PASS/FAIL | <notes> |
+
+      | FR-09 | <path> | PASS/FAIL | <notes> |
+
+      | FR-10 | <path> | PASS/FAIL | <notes> |
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    depends_on:
+    - ui-runtime-fresh-review-green-retest
+    agent: uiux-auditor
