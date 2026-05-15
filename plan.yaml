@@ -72228,7 +72228,7 @@ phases:
       outside the conflict scope; they were left untouched.'
   - id: plhm-http-mcp-green-retest
     name: Retest HTTP and MCP expected-red suites to green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -72317,6 +72317,107 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T15:45:50.712122+00:00'
+    done_at: '2026-05-15T15:53:34.659816+00:00'
+    evidence: '## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: HTTP/MCP runtime contract tests
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ in isolated worktree. Key passage confirmed:
+      architecture requires thin transports where HTTP and MCP validate auth/payloads
+      and call the same product operations; MCP must expose equivalent language/reprocess
+      operations; persisted processing language is runtime metadata; explicit reprocess
+      must rewrite readable fields/rebuild FTS without durable queues.
+
+      - `CONSTITUTION.md`: NOT READ: absent in isolated worktree root.
+
+
+      ### Test Execution
+
+      Command 1:
+
+      `go test -v ./internal/resofeed -run ''Test(PLCTRuntimeMetadataMigrationsAndDefaultLanguageContract|PLCTRuntimeLanguageHTTPStrictValidationAndReceiptTTL|PLCTDeliveryEndpointStrictValidationAndIdempotency|PLCTReprocessEndpointCountsStaleMarkerAndStrictValidation|PLCTDoctorReportsStaleFTSMarker|PLCTTargetLanguageFTSIncludesCoreInsight|PLCTOpenRouterReceivesEffectiveTargetLanguage|MCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface|HTTPQueryValidationRejectsUnknownAndDuplicateParameters|HTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend|HTTPAuthRunsBeforeQueryValidationDetails|HTTPMutationUnknownQueryRejectsBeforeStateWrite|HTTPMutationIdempotencyReplaysInspectResonanceAndSteer|HTTPDeliveryRouteValidationIdempotencyAndCoreState|HTTPRequiresOwnerTokenAndCanonicalError|HTTPFeedTodayQueryValidationUsesStrictContract|HTTPSearchQueryValidationUsesStrictContract)$''`
+
+      Exit: 0
+
+      Output excerpt: PASS for MCP parity, PLCT runtime language, delivery endpoint,
+      reprocess endpoint, doctor stale marker, HTTP query validation; `ok resofeed/internal/resofeed
+      0.597s`.
+
+
+      Command 2:
+
+      `go test -v ./internal/resofeed`
+
+      Exit: 0
+
+      Output excerpt: PASS for `TestHTTPHandlersExerciseCorePaths`, `TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface`,
+      `TestHTTPAndMCPTransportParityForCoreOperations`, reprocess tests; `ok resofeed/internal/resofeed
+      0.809s`.
+
+
+      Command 3:
+
+      `git status --short` — exit 0, empty.
+
+      Command 4:
+
+      `git diff --stat` — exit 0, empty.
+
+
+      ### Issues Found
+
+      - None blocking.
+
+      - No product code modified.
+
+      - No empty commit created because worktree had no file changes.
+
+
+      ### Behavioral Proof Register
+
+      - HTTP language/reprocess/delivery/search/doctor tests: PROVEN
+
+      - MCP language/reprocess/report_delivery/search_items tests: PROVEN
+
+      - Strict validation unknown fields: PROVEN
+
+      - Strict validation duplicate/unknown query params: PROVEN
+
+      - Strict validation bad delivered_at: PROVEN
+
+      - Auth failures: PROVEN
+
+      - Idempotency replay/mismatch: PROVEN
+
+      - Reprocess conflict/replay semantics: PROVEN
+
+      - HTTP/MCP equivalent state mutation for language and delivery: PROVEN
+
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      Commit hash(es): none
+
+      Files changed: none'
   - id: plhm-runtime-liveness-probe
     name: Probe runnable HTTP and MCP surfaces
     status: claimed
