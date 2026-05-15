@@ -55,16 +55,16 @@ function renderCanonicalLedger(): HTMLElement {
 }
 
 describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () => {
-  it('does not render manual ingest or per-source fetch controls in the Source Ledger', () => {
+  it('renders manual ingest and per-source fetch controls in the Source Ledger', () => {
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(within(ledger).queryByRole('button', { name: '[RUN INGEST]' })).not.toBeInTheDocument();
-    expect(within(ledger).queryByRole('button', { name: /fetch/i })).not.toBeInTheDocument();
+    expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeInTheDocument();
+    expect(within(ledger).getByRole('button', { name: '[FETCH]' })).toBeInTheDocument();
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example' })).toHaveTextContent('[DELETE]');
   });
 
-  it('keeps manual fetch progress controls absent without spinner or progress animation affordance', () => {
+  it('keeps manual fetch progress free of spinner or progress animation affordance at rest', () => {
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
@@ -80,7 +80,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).queryByText(/last_ingest:/)).not.toBeInTheDocument();
-    expect(ledger.querySelector('.source-ledger-copy')).toHaveTextContent('last_fetch: 10:25:31');
+    expect(ledger.querySelector('.source-ledger__status')).toHaveTextContent('last_fetch: 10:25:31');
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
   });
 
@@ -111,9 +111,10 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(ledger.querySelector('ul')).toHaveClass('contract-list');
     expect(ledger.querySelector('.source-ledger-row')).toHaveClass('source-ledger-row');
     expect(within(ledger).getByText('[DETAILS]')).toHaveTextContent(/^\[[A-Z]+\]$/);
-    expect(within(ledger).queryByText('[RUN INGEST]')).not.toBeInTheDocument();
-    expect(within(ledger).queryByText('[FETCH]')).not.toBeInTheDocument();
-    expect(within(ledger).getByText('[DELETE]')).toHaveClass('source-ledger-delete');
+    expect(within(ledger).getByText('[RUN INGEST]')).toHaveClass('bracket-action');
+    expect(within(ledger).getByText('[FETCH]')).toHaveClass('bracket-action');
+    expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
+    expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
     expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
     expect(ledger.querySelector('[class*="spinner"], [class*="progress"], [class*="animate"]')).toBeNull();
   });
@@ -123,13 +124,14 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     const row = ledger.querySelector('.source-ledger-row');
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent('src: simonwillison.net/feed.xml · status: ok · last_fetch: 10:25:31 url: https://simonwillison.net/atom/everything [DELETE] [DETAILS]');
+    expect(row).toHaveTextContent(/src: simonwillison\.net\/feed\.xml\s+url: https:\/\/simonwillison\.net\/atom\/everything\s+last_fetch: 10:25:31\s+\[FETCH\]\s+\[DELETE\]\s+\[DETAILS\]/);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
-    expect(row?.children).toHaveLength(4);
+    expect(row?.children).toHaveLength(5);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');
     expect(row?.children[1]).toHaveClass('source-ledger-url');
-    expect(row?.children[2]).toHaveClass('source-ledger__actions');
-    expect(row?.children[2]?.children[0]).toHaveClass('source-ledger-delete');
-    expect(row?.children[3]).toHaveClass('source-diagnostic-details');
+    expect(row?.children[2]).toHaveClass('source-ledger__status');
+    expect(row?.children[3]).toHaveClass('source-ledger__actions');
+    expect(row?.children[3]?.children[1]).toHaveClass('bracket-action--delete');
+    expect(row?.children[4]).toHaveClass('source-diagnostic-details');
   });
 });

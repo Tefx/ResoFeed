@@ -235,9 +235,9 @@
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" disabled={fetchingSourceId !== null} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
             {#if confirmingSourceId === source.id}
-              <button type="button" class="source-ledger-confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
+              <button type="button" class="bracket-action bracket-action--confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
             {:else}
-              <button type="button" class="source-ledger-delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
+              <button type="button" class="bracket-action bracket-action--delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
             {/if}
           </span>
           <details class="source-diagnostic-details">

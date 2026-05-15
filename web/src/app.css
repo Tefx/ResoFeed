@@ -239,6 +239,7 @@ a:focus,
 }
 
 .bracket-action:hover:not(:disabled),
+.bracket-action:focus:not(:disabled),
 .bracket-action:focus-visible:not(:disabled) {
   color: var(--rf-color-background);
   background: var(--rf-color-text);
@@ -268,42 +269,10 @@ a:focus,
   justify-content: center;
 }
 
-.source-ledger-delete {
-  appearance: none;
-  width: auto;
-  height: 44px;
-  min-height: 44px;
-  border: 0;
-  padding: 0 10px;
-  color: var(--rf-color-danger);
-  background: transparent;
-  font: var(--rf-typography-metadata);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.source-ledger-delete,
-.source-ledger-confirm {
+.bracket-action--delete,
+.bracket-action--confirm {
   width: 12ch;
-}
-
-.source-ledger-delete:hover,
-.source-ledger-delete:focus-visible,
-.source-ledger-confirm:hover,
-.source-ledger-confirm:focus-visible {
-  color: var(--rf-color-danger);
-  background: transparent;
-  outline: 2px solid var(--rf-color-focus);
-  outline-offset: 2px;
-}
-
-.source-ledger-confirm {
-  min-height: 44px;
-  border: 0;
-  padding: 0 10px;
-  color: var(--rf-color-danger);
-  background: transparent;
+  justify-content: center;
 }
 
 .source-diagnostic-details {

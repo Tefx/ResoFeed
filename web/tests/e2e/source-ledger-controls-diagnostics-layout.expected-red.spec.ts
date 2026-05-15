@@ -177,6 +177,28 @@ test.describe('expected-red Source Ledger manual controls, diagnostics, and geom
     await expect(fileInput, 'hidden file input is implementation plumbing outside the accessibility tree').toHaveAttribute('aria-hidden', 'true');
   });
 
+  test('R6: delete and confirm are canonical bracket actions with terminal hover/focus inversion', async ({ page, ownerToken }) => {
+    const requests: ManualRequest[] = [];
+    await openSourceLedger(page, ownerToken, requests);
+
+    const row = page.locator('.source-ledger__row', { hasText: 'Long Diagnostic Source' }).first();
+    const deleteButton = row.getByRole('button', { name: 'Delete source: Long Diagnostic Source' });
+    await expect(deleteButton).toHaveClass(/bracket-action/);
+    await expect(deleteButton).toHaveClass(/bracket-action--delete/);
+    await deleteButton.hover();
+    await expect(deleteButton).toHaveCSS('background-color', 'rgb(36, 35, 30)');
+    await expect(deleteButton).toHaveCSS('color', 'rgb(243, 240, 231)');
+
+    await deleteButton.click();
+    const confirmButton = row.getByRole('button', { name: 'confirm delete source: Long Diagnostic Source' });
+    await expect(confirmButton).toHaveText('[CONFIRM]');
+    await expect(confirmButton).toHaveClass(/bracket-action/);
+    await expect(confirmButton).toHaveClass(/bracket-action--confirm/);
+    await confirmButton.focus();
+    await expect(confirmButton).toHaveCSS('background-color', 'rgb(36, 35, 30)');
+    await expect(confirmButton).toHaveCSS('color', 'rgb(243, 240, 231)');
+  });
+
   test('Issue 13: delete confirmation preserves Source Ledger row bounds', async ({ page, ownerToken }) => {
     const requests: ManualRequest[] = [];
     await openSourceLedger(page, ownerToken, requests);
