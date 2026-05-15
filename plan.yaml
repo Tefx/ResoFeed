@@ -73409,7 +73409,7 @@ phases:
       - evidence_ref\n- status (`PROVEN`, `NEEDS_TEST`, `UNPROVEN`, or `BLOCK`)\n\
       - closure_path\n- gate_decision_basis\n\n`plhm-runtime-gate` may open only when\
       \ all blocker-class obligations here are `PROVEN` or explicitly non-intersecting.\n\
-      \n## Completion Criteria (checklist)\n- [ ] `go test ./...` passes with output\
+      \n## Completion Criteria (checklist)\n- [x] `go test ./...` passes with output\
       \ included.\n- [ ] HTTP conflict/error details are field-exact and include actual\
       \ operation/scope where required.\n- [ ] MCP JSON-RPC `error.data` shape matches\
       \ architecture examples without extra top-level drift fields.\n- [ ] `SearchItemsForMCP`\
