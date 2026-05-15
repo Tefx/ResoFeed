@@ -73180,7 +73180,7 @@ phases:
       \n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only\
       \ completion is NOT acceptable. Each deliverable MUST contain substantive logic\
       \ that processes actual guard/error/search inputs and produces outputs that\
-      \ vary based on those inputs.\n\n## Completion Criteria (checklist)\n- [ ] HTTP\
+      \ vary based on those inputs.\n\n## Completion Criteria (checklist)\n- [x] HTTP\
       \ manual ingest/fetch/reprocess conflict responses are field-exact against the\
       \ documented `operation already running` shape.\n- [ ] Runtime language/reprocess\
       \ conflicts report the actual running operation and scope or obtain those details\
