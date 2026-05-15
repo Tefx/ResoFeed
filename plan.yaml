@@ -80276,14 +80276,24 @@ phases:
 
       - KISS single-binary/SQLite/flat-file architecture.
 
+      - Closure of the batched backend spec/wiring remediation for srdb-spec-conformance
+      and srdb-wiring-audit failures.
+
 
       Behavioral proof register and gate decision basis are mandatory. OPEN is invalid
       if unresolved runtime obligations are NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING
-      without explicit non-intersection.'
+      without explicit non-intersection. The gate MUST NOT run/open until srdb-backend-spec-wiring-retest
+      has completed with gate_open_allowed=true.'
     verification: '- [ ] phase-check protecting steer-delta-frontend-ui-source-ledger-split-scroll.
 
-      - [ ] All backend implementation, liveness, wiring, and spec-conformance steps
-      completed with evidence.
+      - [ ] All backend implementation, liveness, wiring, spec-conformance, remediation,
+      and combined retest steps completed with evidence.
+
+      - [ ] srdb-backend-spec-wiring-retest evidence includes headline, verdict, blockers,
+      proof_gap_status, blocking_status, gate_open_allowed, and orchestrator_action_hint.
+
+      - [ ] Gate decision basis treats OPEN as invalid unless srdb-backend-spec-wiring-retest
+      has gate_open_allowed=true.
 
       - [ ] Runnable surface evidence identifies entrypoint/startup path, exact launch
       command, transport proof, and at least one documented request through the real
@@ -80296,30 +80306,73 @@ phases:
       integration.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
+
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
-
-      - AGENTS.md — key passage or "NOT READ: <reason>"
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
 
-      ## Gate Decision Basis
-
-      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates
-      | rationale |
-
-      |---|---|---|---|---|
+      If no refs for a reviewed sub-step, state: "No refs for this sub-step."
 
 
-      ## Gate Decision
+      ## Gate Review Report
 
-      - [ ] OPEN
 
-      - [ ] BLOCKED
+      **Reviewer**: gate-reviewer (independent of phase implementation)
 
-      '
+      **Phase**: steer-delta-backend-http-mcp-runtime
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### Execution Review
+
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | srdb-backend-spec-wiring-remediation | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+      | srdb-backend-spec-wiring-retest | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | <notes> |
+
+
+      ### Required Retest Closure Fields Reviewed
+
+      ```yaml
+
+      headline: "<from retest>"
+
+      verdict: "<from retest>"
+
+      blockers: []
+
+      proof_gap_status: "<from retest>"
+
+      blocking_status: "<from retest>"
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: "<from retest>"
+
+      ```
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: Phase passes gate, srdb-backend-spec-wiring-retest gate_open_allowed=true,
+      proceed to frontend phase.
+
+      - [ ] BLOCKED: Issues must be resolved before proceeding.
+
+
+      ### Blocking Issues
+
+      - <list or none>'
     depends_on:
     - srdb-classifier-policy-runtime
     - srdb-http-steer-preview-commit-undo
@@ -80327,6 +80380,8 @@ phases:
     - srdb-runtime-liveness-seam-proof
     - srdb-wiring-audit
     - srdb-spec-conformance
+    - srdb-backend-spec-wiring-remediation
+    - srdb-backend-spec-wiring-retest
     agent: gate-reviewer
   - id: srdb-backend-spec-wiring-remediation
     name: Batched backend spec and wiring remediation
