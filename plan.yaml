@@ -69228,7 +69228,7 @@ phases:
       - [x] Tests cover live receipt replay, mismatch, TTL expiration, and expired-row
       replacement.
 
-      - [ ] Tests cover reprocess counts: attempted = updated + unavailable + failed.
+      - [x] Tests cover reprocess counts: attempted = updated + unavailable + failed.
 
       - [ ] Tests cover stale FTS doctor lines and target-language FTS over `core_insight`.
 
