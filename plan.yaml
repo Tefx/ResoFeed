@@ -76927,3 +76927,181 @@ phases:
     - plfinal-wiring-and-architecture-audit
     - plfinal-black-box-acceptance
     agent: gate-reviewer
+  - id: plfinal-batched-rendered-proof-and-reprocess-remediation
+    name: Batched rendered proof and reprocess remediation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: defect_repair
+
+      rework_risk: MEDIUM
+
+
+      Batched remediation/fix ownership for concurrent finalization failures from
+      `plfinal-design-readiness-review` and `plfinal-full-spec-conformance-audit`.
+      Own ALL blocker/should_fix items from both failed reviews in one implementation-capable
+      pass; do not create serial fix/retest churn.
+
+
+      Authoritative baselines: docs/ARCHITECTURE.md and docs/DESIGN.md remain law;
+      preserve single Go binary, one SQLite DB, strict no-sync/no-merge portable state,
+      owner-token boundary, and dense/low-chrome UI design. CONSTITUTION.md was checked
+      and is absent in this repository.
+
+
+      ## why_previous_gate_failed
+
+      - `plfinal-design-readiness-review` failed because rendered UI behavior verification
+      was requested but no rendered UI/DOM/a11y evidence was supplied; design-reviewer
+      is a DESIGN.md contract auditor, not the correct implementation UI audit boundary.
+
+      - `plfinal-full-spec-conformance-audit` failed because B1/R6 found backend behavior
+      divergence in fresh-fetch timeout/canceled failure handling, and B2/R14-R16
+      could not prove frontend runtime behavior because the isolated verification
+      environment lacked Vite (`npm --prefix web run build` failed with `vite: command
+      not found`).
+
+
+      ## why_previous_review_missed_or_could_not_prove_it
+
+      - The DESIGN.md lint/contract review could prove the design spec itself, but
+      could not prove rendered implementation behavior; the correct closure agent
+      is `uiux-auditor` with actual DOM/a11y/screenshots.
+
+      - The spec audit could run Go tests, but frontend runtime proof was blocked
+      by a bare worktree missing dependency bootstrap. Prior black-box acceptance
+      showed `npm --prefix web install` followed by `npm --prefix web run build` can
+      pass, so treat the Vite miss as verification-environment/proof-gap unless this
+      step finds a product dependency defect.
+
+
+      ## Blockers and should_fix items to own
+
+      ### PROOF-GAP-001 / B2: rendered UI proof gap
+
+      - Required rendered checks: language control is terse/low-chrome; bracket-style
+      non-dashboard reprocess action; source identifiers are not translated; desktop
+      split-scroll behavior; mobile Inspector behavior; no onboarding/settings/AI-magic
+      copy drift.
+
+      - Ownership in this step: prepare/fix any implementation issues discovered while
+      reproducing locally, and hand off explicit runtime proof requirements to downstream
+      `uiux-auditor` and `spec-verifier` closure steps.
+
+
+      ### B1 / R6: backend fresh-fetch failure must clear stale readable fields
+
+      - Primary code path: `internal/resofeed/reprocess.go` fresh-fetch timeout/canceled/OpenRouter
+      failure handling can increment failure and continue without `storeReprocessItem`,
+      leaving old readable fields in place.
+
+      - Required product behavior: fresh fetch/OpenRouter failures clear or overwrite
+      readable fields and fallback title so rows cannot display mixed-language stale
+      readable content; FTS must stay consistent with the cleared/overwritten readable
+      fields.
+
+      - Add/update focused Go regression tests for timeout, context cancellation,
+      and fresh-fetch failure paths. Tests must assert old readable title/summary/content
+      and FTS-searchable text are not retained after failure.
+
+
+      ### DOC-INPUT-001: isolated worktree AGENTS.md read issue
+
+      - Classify with evidence: either repair the prompt/ref path so verification
+      agents can read the repository guidance in isolated worktrees, or record explicit
+      non-blocking disposition if the fallback `.agents/instructions.md` provides
+      equivalent guidance. Do not leave it as `pre-existing` or `out-of-scope` disposition.
+
+
+      ### NEEDS_TEST ledger to preserve for downstream closure
+
+      - Language set is future-only and must not rewrite existing item rows or FTS.
+
+      - Human-over-agent steering precedence.
+
+      - Desktop split-scroll runtime behavior.
+
+      - Source identifier DOM non-translation.
+
+
+      ## Proof-environment expectations for downstream verification
+
+      - If `web/node_modules` is absent, run `npm --prefix web install` before `npm
+      --prefix web run build`.
+
+      - Build failure from missing Vite alone is a verification-environment proof
+      gap; product dependency defect only if dependency bootstrap cannot make the
+      documented build pass.
+
+      - Verification closure must include `go test ./...` and frontend runtime/browser
+      proof, not only static or lint checks.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] `why_previous_gate_failed` and `why_previous_review_missed_or_could_not_prove_it`
+      are included in evidence with concrete references to both failed steps.
+
+      - [ ] B1 backend behavior is fixed in `internal/resofeed/reprocess.go` or equivalent
+      focused backend path without introducing sync/merge, vector/RAG, sidecar worker,
+      settings dashboard, or multi-user auth concepts.
+
+      - [ ] Regression tests cover timeout, cancellation, and fresh-fetch/OpenRouter
+      failure clearing/overwriting old readable fields and maintaining FTS consistency.
+
+      - [ ] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
+      evidence.
+
+      - [ ] Runtime proof obligations for language future-only/no row rewrite, steering
+      precedence, UI language/reprocess/source/split-scroll/mobile Inspector are explicitly
+      handed to closure steps.
+
+      - [ ] Frontend dependency bootstrap expectation (`npm --prefix web install`
+      before build when needed) is documented for closure evidence.
+
+      - [ ] No serial fix/retest churn or extra remediation siblings are introduced.'
+    verification: '- [ ] Main path: focused Go tests pass for reprocess fresh-fetch
+      success and failure behavior.
+
+      - [ ] Failure path: timeout/canceled/OpenRouter fresh-fetch failure tests prove
+      old readable fields are cleared/overwritten and FTS cannot retain stale readable
+      text.
+
+      - [ ] Proof path: evidence records both failed finalization reviews, why they
+      failed, and why previous agents could not prove rendered/runtime behavior.
+
+      - [ ] Environment path: evidence distinguishes missing dependency bootstrap
+      from product build failure and includes the `npm --prefix web install` requirement
+      for closure.
+
+      - [ ] Disposition path: DOC-INPUT-001 has repaired prompt/ref path or explicit
+      non-blocking non-intersection evidence.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\
+      \n\n## Batched Remediation Evidence\n\n### why_previous_gate_failed\n- `plfinal-design-readiness-review`:\
+      \ <why PROOF-GAP-001 blocked final gate>\n- `plfinal-full-spec-conformance-audit`:\
+      \ <why B1/B2 blocked final gate>\n\n### why_previous_review_missed_or_could_not_prove_it\n\
+      - design-reviewer boundary: <why rendered UI proof required uiux-auditor>\n\
+      - spec-verifier environment: <why missing Vite was dependency bootstrap/proof-gap\
+      \ or product defect>\n\n### B1 Regression Evidence\n- Tests added/updated: <test\
+      \ names>\n- Commands executed:\n  ```\n  <go test command and output>\n  ```\n\
+      - Timeout failure assertion: <old readable fields cleared/overwritten + FTS\
+      \ consistency proof>\n- Canceled failure assertion: <old readable fields cleared/overwritten\
+      \ + FTS consistency proof>\n- Fresh-fetch/OpenRouter failure assertion: <old\
+      \ readable fields cleared/overwritten + FTS consistency proof>\n\n### DOC-INPUT-001\
+      \ Disposition\n- Repaired prompt/ref path OR non-blocking classification: <evidence>\n\
+      - Non-intersection with final gate: <why this cannot block remaining required\
+      \ proof>\n\n### Closure Handoff\n- Runtime proof obligations handed off: <language\
+      \ future-only/no row rewrite, steering precedence, UI language/reprocess/source/split-scroll/mobile\
+      \ Inspector>\n- Frontend bootstrap instruction: `npm --prefix web install` before\
+      \ `npm --prefix web run build` if `web/node_modules` is absent.\n\n### Headline\n\
+      - [ ] PASS: B1 fixed and all proof gaps have downstream closure ownership\n\
+      - [ ] FAIL: any blocker remains unowned or regression tests are missing"
+    depends_on:
+    - plfinal-design-readiness-review
+    - plfinal-full-spec-conformance-audit
+    agent: golang-developer
