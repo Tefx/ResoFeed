@@ -80015,7 +80015,7 @@ phases:
       semantic retrieval, or new product primitive; search_items remains lexical.'
   - id: srdb-runtime-liveness-seam-proof
     name: Prove backend runtime liveness and seam behavior
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (integration-verifier), run a local-check
       that protects the backend runtime gate and downstream frontend integration.
 
@@ -80095,6 +80095,19 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T22:27:25.066075+00:00'
+    done_at: '2026-05-15T22:35:12.151552+00:00'
+    evidence: 'PASS: real cmd/resofeed seam proof exercised actual runtime paths with
+      a test owner token and SQLite DB. Evidence included server command using `cmd/resofeed
+      serve --addr 127.0.0.1:50051 --db .verification-runtime/runtime.sqlite3 --owner-token
+      ...`, HTTP preview outputs for valid add, invalid add, find alias, and natural-language
+      rule proposal; HTTP commit and undo outputs with concrete undo_handle/target-specific
+      undo; MCP preview_steer, steer, and undo_steer over real `/mcp`; GET /api/search
+      lexical output plus `rag=true` rejection; GET /api/doctor read-only runtime
+      health. Commands exited 0: real server seam proof, targeted Go tests for MCP
+      real listener/HTTP Steer/source duplicate/undo failure/lexical search, and clean
+      git status. Verdict fields: headline=PASS, verdict=PASS, blockers=[], proof_gap_status=NONE,
+      blocking_status=CLOSED, gate_open_allowed=true, orchestrator_action_hint=COMPLETE.
+      No product files modified.'
   - id: srdb-wiring-audit
     name: Audit backend public wiring and forbidden architecture drift
     status: claimed
