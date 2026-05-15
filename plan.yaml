@@ -66916,7 +66916,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] All phase steps completed with adequate evidence, including the B1 fix,
+      - [x] All phase steps completed with adequate evidence, including the B1 fix,
       post-fix black-box rerun, and post-fix UIUX rerun.
 
       - [ ] Green retest evidence covers every fresh audit finding.
