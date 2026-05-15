@@ -75805,7 +75805,7 @@ phases:
     agent: integration-verifier
   - id: plse-e2e-wiring-audit
     name: Audit end-to-end wiring and absence of stubs
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -75888,6 +75888,8 @@ phases:
     - plse-real-language-reprocess-vertical-slice
     - plse-blind-http-mcp-parity-delivery
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-15T18:11:28.866218+00:00'
   - id: plse-system-e2e-gate
     name: Gate processing language system E2E and parity
     status: pending
