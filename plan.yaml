@@ -79216,6 +79216,81 @@ phases:
     - srdf-split-scroll-mobile-route
     - srdf-processing-language-low-chrome-controls
     agent: spec-verifier
+  - id: srdf-frontend-gate
+    name: Gate frontend Steer delta UI implementation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the frontend
+      UI phase can open for final real-system E2E.
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - Steer route preview deterministic echo, ARIA, write/commit/undo boundaries,
+      no RAG/chat/semantic UI.
+
+      - Source Ledger details and bracket action hit-targets with no dashboard/job/activity
+      drift.
+
+      - Desktop independent split-scroll and mobile Inspector route.
+
+      - Processing language/reprocess as low-chrome architecture-owned runtime controls
+      only.
+
+
+      Behavioral proof register and gate decision basis are mandatory. OPEN is invalid
+      if unresolved UI/runtime obligations are NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING
+      without explicit non-intersection.'
+    verification: '- [ ] phase-check protecting steer-delta-e2e-architecture-review-closure.
+
+      - [ ] All frontend implementation, UIUX audit, and spec/design conformance steps
+      completed with evidence.
+
+      - [ ] Rendered evidence covers required states/viewports and visual/spatial
+      artifacts.
+
+      - [ ] No unresolved blocker-class UI, a11y, design, or forbidden-concept issue
+      remains without remediation ownership.
+
+      - [ ] Gate decision basis is OPEN only when frontend is ready for real-system
+      E2E.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates
+      | rationale |
+
+      |---|---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED
+
+      '
+    depends_on:
+    - srdf-steer-preview-ui-state-aria
+    - srdf-source-ledger-details-hit-targets
+    - srdf-split-scroll-mobile-route
+    - srdf-processing-language-low-chrome-controls
+    - srdf-uiux-native-audit
+    - srdf-frontend-spec-conformance
+    agent: gate-reviewer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
