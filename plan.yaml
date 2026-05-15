@@ -69925,7 +69925,7 @@ phases:
 
       - [x] OpenRouter receives `target_language`; Go validates JSON before persistence.
 
-      - [ ] `items.title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`
+      - [x] `items.title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`
       are the single stored processed readable version.
 
       - [ ] URLs/source titles/source URLs/canonical/original URLs remain exact provenance
