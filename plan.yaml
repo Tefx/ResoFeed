@@ -70479,7 +70479,7 @@ phases:
       - [x] Runtime metadata keys are read/written only through approved backend-core
       paths.
 
-      - [ ] Backend-core `ProcessingLanguage`, receipt, reprocess, FTS/search, and
+      - [x] Backend-core `ProcessingLanguage`, receipt, reprocess, FTS/search, and
       doctor symbols are consumed by core operations/tests or assigned to a downstream
       owner.
 
