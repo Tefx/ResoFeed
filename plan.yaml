@@ -73381,7 +73381,7 @@ phases:
       was introduced.'
   - id: plhm-runtime-blocker-retest
     name: Retest HTTP MCP runtime blocker remediation
-    status: claimed
+    status: done
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       verification_scope: phase-check\nprotects_gate: plhm-runtime-gate\nagent_source:\
       \ project\n\nAs an INDEPENDENT VERIFIER, retest the batched remediation from\
@@ -73545,6 +73545,141 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T16:12:48.140309+00:00'
+    done_at: '2026-05-15T16:17:01.943390+00:00'
+    evidence: '## Verification Report
+
+      ### refs Read Confirmation
+
+      - READ `docs/ARCHITECTURE.md`. Key passages: one Go process and thin transports;
+      guarded operation conflict shape; MCP nested JSON-RPC conflict shape; `search_items`
+      query echo requirement.
+
+      - READ `docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md`. Key passages: HTTP search
+      response includes query echo; MCP `search_items` reuses HTTP query echo semantics;
+      no durable reprocess job/queue/activity ledger.
+
+      - `CONSTITUTION.md`: NOT READ, file not found in isolated worktree.
+
+
+      ### Test Execution
+
+      Command: `go test ./...`
+
+      Exit: 0
+
+      Output:
+
+      - `? resofeed/cmd/resofeed [no test files]`
+
+      - `ok resofeed/internal/resofeed 1.165s`
+
+
+      Targeted retest command:
+
+      `go test -v ./internal/resofeed -run ''TestPLHM|TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency|TestHTTPAndMCPTransportParityForCoreOperations|TestOpenRouterRuntimeWiringLiveHTTPAndMCPDoctor''`
+
+      Exit: 0
+
+      Output excerpt:
+
+      - PASS `TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency`
+
+      - PASS `TestHTTPAndMCPTransportParityForCoreOperations`
+
+      - PASS `TestPLHMHTTPGuardConflictsUseExactArchitectureShape`
+
+      - PASS `TestPLHMMCPGuardConflictUsesActualHolderAndNestedOnlyData`
+
+      - PASS `TestPLHMMCPRuntimeFieldErrorsUseNestedOnlyData`
+
+
+      Liveness/parity command:
+
+      `go test -v ./internal/resofeed -run ''TestHTTPHandlersExerciseCorePaths|TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor''`
+
+      Exit: 0
+
+      Output excerpt:
+
+      - PASS `TestHTTPHandlersExerciseCorePaths`
+
+      - PASS `TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor`
+
+      - HTTP `/api/doctor` output included `rss: ok`, OpenRouter configured/resolved
+      model lines, `search_fts: ok`, and ingest last_run.
+
+      - MCP `resofeed://system/doctor` output matched the same live doctor surface.
+
+
+      MCP public query-echo command:
+
+      `go test -v ./internal/resofeed -run ''TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface''`
+
+      Exit: 0
+
+      Output excerpt: PASS.
+
+
+      ### Field-Exact Shape Evidence
+
+      - HTTP conflict proof: `internal/resofeed/plhm_runtime_blocker_remediation_test.go`
+      acquires guard holder fetch/source and asserts HTTP 409, `error.code=conflict`,
+      message `operation already running`, exactly four details fields, and `operation=fetch`,
+      `scope=source`, `retry_allowed=true`, `operation_running=true` across manual
+      ingest, manual fetch, runtime language, and runtime reprocess.
+
+      - MCP conflict proof: same file acquires guard holder ingest/all and asserts
+      JSON-RPC error code -32000, message `operation already running`, and `error.data`
+      contains only nested error with details `operation=ingest`, `scope=all`.
+
+      - Implementation seam: `internal/resofeed/mcp.go` `nestedMCPErrorData` returns
+      only `{ "error": ... }`; conflict path uses `guardConflictDetails(err)` and
+      `guardConflictDetailMap(details)`.
+
+
+      ### Stale Helper Evidence
+
+      - `SearchItemsForMCP` search returned no files found, so stale no-query-echo
+      helper is removed.
+
+      - Runtime caller is `SearchItemsResponseForMCP` via `mcp.go` tools/call `search_items`
+      path, returning `SearchResponse{Items, Query}`.
+
+      - Public MCP parity test passed and asserts `search_items` query echo for q/source/from/to/resonated/limit.
+
+
+      ### Behavioral Proof Register
+
+      - full Go suite remains green: PROVEN, `go test ./...` exit 0, gate decision
+      OPEN.
+
+      - HTTP conflict/error details field-exact and actual holder operation/scope:
+      PROVEN, `TestPLHMHTTPGuardConflictsUseExactArchitectureShape`, gate decision
+      OPEN.
+
+      - MCP JSON-RPC `error.data` nested-only with actual holder operation/scope:
+      PROVEN, `TestPLHMMCPGuardConflictUsesActualHolderAndNestedOnlyData`, gate decision
+      OPEN.
+
+      - stale `SearchItemsForMCP` path gone and live query echo remains: PROVEN, grep
+      no files found + public MCP query-echo test, gate decision OPEN.
+
+      - previous HTTP/MCP green and liveness remain valid: PROVEN, targeted liveness/parity
+      commands exit 0, gate decision OPEN.
+
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      Commit hash(es): `8a154945a4d0e95bc285d79ca88eba0f951a8281`; no new commit created
+      because verify-only run made no worktree changes.
+
+      Files changed: none'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
