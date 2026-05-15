@@ -75291,7 +75291,7 @@ phases:
 
       Required probes:
 
-      - [ ] HTTP `GET/PUT /api/runtime/language` and MCP `get/set_processing_language`
+      - [x] HTTP `GET/PUT /api/runtime/language` and MCP `get/set_processing_language`
       produce equivalent state.
 
       - [ ] HTTP `POST /api/runtime/reprocess-library` and MCP `reprocess_library`
