@@ -70305,7 +70305,7 @@ phases:
       processing-language ingest, OpenRouter target language, reprocess accounting,
       FTS/search core, doctor stale diagnostics, and state export/import exclusion.
 
-      - [ ] Receipt mismatch/expiration and reprocess stale-FTS failure paths are
+      - [x] Receipt mismatch/expiration and reprocess stale-FTS failure paths are
       exercised with actual command output.
 
       - [ ] Any broad-command failure is classified by ownership: `storage-core blocker`,
