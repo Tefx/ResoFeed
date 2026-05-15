@@ -77523,7 +77523,7 @@ phases:
       - [x] Rendered screenshot or equivalent visual artifact is captured for mobile
       Inspector behavior.
 
-      - [ ] DOM/a11y evidence confirms language control, reprocess control, and source
+      - [x] DOM/a11y evidence confirms language control, reprocess control, and source
       identifiers are present with expected labels/roles and no translation drift.
 
       - [ ] Evidence explicitly states whether frontend dependency bootstrap was required
