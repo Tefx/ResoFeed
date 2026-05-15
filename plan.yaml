@@ -69725,7 +69725,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
-  status: in_progress
+  status: done
   gate: Core backend gate blocks unless SQLite metadata/receipts, language state,
     OpenRouter target-language input, reprocess semantics, and FTS/doctor behavior
     are implemented and independently verified.
@@ -70920,7 +70920,7 @@ phases:
       the gate. Remediation is now explicit and blocking before `plsc-core-gate`.'
   - id: plsc-core-gate
     name: Gate processing language storage and core backend
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -71029,6 +71029,96 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T15:22:42.505101+00:00'
+    done_at: '2026-05-15T15:28:52.203132+00:00'
+    evidence: "## refs Read Confirmation\n- `docs/ARCHITECTURE.md`: READ via `read`\
+      \ before review. Key passages used:\n  - Lines 23-26: processing language is\
+      \ runtime-local, one processed language per item, and explicit reprocess must\
+      \ not introduce queues/ledgers/sync.\n  - Lines 421-428: receipt TTL/fingerprint\
+      \ behavior requires live-only uniqueness, mismatch rejection, and expired-row\
+      \ replacement.\n  - Lines 497-514: `processing_language`/`search_fts_stale_since`\
+      \ are runtime metadata; FTS must index stored target-language text and clear\
+      \ stale markers only after successful rebuild.\n  - Lines 799-805: reprocess\
+      \ must fetch canonical item URL then item URL, must not use source/feed URLs\
+      \ or prior stored target-language fields.\n- `CONSTITUTION.md`: NOT READ: no\
+      \ `CONSTITUTION.md` found in worktree.\n\n## Storage-Core Gate Review Report\n\
+      Headline: [PASS] Storage/backend-core obligations are proven sufficiently to\
+      \ expose to downstream HTTP/MCP/runtime implementation work.\nBlocking Status:\
+      \ No unresolved storage-core blockers found. Downstream HTTP/MCP/frontend blockers\
+      \ remain and are explicitly not waived.\nProof-Gap Status: No storage-core proof\
+      \ gap remains for receipts, reprocess source precedence, FTS stale/ok marker,\
+      \ doctor redaction, or language persistence.\nVerdict: OPEN for storage-core\
+      \ gate only.\n\n## Backend-core proof register\n- Receipts TTL/fingerprint:\
+      \ PROVEN. Code refs `internal/resofeed/idempotency.go`; tests `runtime_metadata_receipts_test.go`\
+      \ and `plct_backend_expected_red_test.go`.\n- Processing language persistence/default/guard:\
+      \ PROVEN. Code refs `runtime_metadata.go`; tests `runtime_metadata_receipts_test.go`.\n\
+      - Reprocess source precedence and no prior-language reuse: PROVEN. Code refs\
+      \ `reprocess.go`; tests `reprocess_test.go` reject feed URL and prior source\
+      \ text.\n- Reprocess accounting/failure handling: PROVEN. Code refs `reprocess.go`;\
+      \ tests `reprocess_test.go`.\n- FTS rebuild/stale marker tied to success/failure:\
+      \ PROVEN. Code refs `reprocess.go`, `doctor.go`; tests `reprocess_test.go`,\
+      \ `doctor_search_fts_test.go`, `plct_backend_expected_red_test.go`.\n- FTS target-language\
+      \ content/core insight inclusion: PROVEN. Code refs `search.go`, `migrations.go`;\
+      \ test `plct_backend_expected_red_test.go`.\n\n## Wiring audit W1-W8/equivalent\n\
+      - W1 Required ref/spec alignment: PASS. `docs/ARCHITECTURE.md` read and cited.\n\
+      - W2 Schema/migration anchors: PASS. `runtime_metadata`, `agent_receipts.request_fingerprint`,\
+      \ and `search_fts.core_insight` are in migrations.\n- W3 Core public symbols\
+      \ consumed/owned: PASS for storage-core. `ReprocessLibrary`, `SetProcessingLanguage`,\
+      \ idempotency helper, FTS rebuild, and doctor status are covered by core tests\
+      \ and HTTP contract tests; MCP registration gaps are downstream-owned.\n- W4\
+      \ Receipt contract wiring: PASS. Single helper implements live replay, mismatch\
+      \ rejection, expired delete/replace; tested under serial and concurrent reuse.\n\
+      - W5 Reprocess wiring: PASS. Uses operation guard, current language, canonical/item\
+      \ URL precedence, per-item transactions, final FTS rebuild.\n- W6 Doctor/FTS\
+      \ status wiring: PASS. `/doctor` reports `search_fts: ok` or `search_fts: stale\
+      \ since ...`; stale marker redaction and language-content omission tested.\n\
+      - W7 Escape hatches/stubs: PASS. Scoped scan found no `@invar:allow` or stub\
+      \ anchors in source.\n- W8 Boundary/downstream ownership: PASS_WITH_DOWNSTREAM_BLOCKERS.\
+      \ Missing MCP tools/resources and one HTTP delivery route failure are correctly\
+      \ classified as downstream-owned blockers before `plhm-runtime-gate`, not storage-core\
+      \ blockers.\n\n## Escape hatch audit\n- Command: `rg -n '@invar:allow|invar:allow'\
+      \ cmd internal web/src web/tests docs/ARCHITECTURE.md docs/DESIGN.md docs/PRD.md\
+      \ .agents 2>/dev/null; code=$?; printf 'rg_exit=%s\\n' \"$code\"; exit 0`\n\
+      \  - Wrapper exit code 0; `rg_exit=1`; no scoped matches.\n- Stub/anchor command:\
+      \ `rg -n 'LANGUAGE_|REPROCESS_|DELIVERY_|ORPHAN|TODO|FIXME|panic\\(\"TODO|unimplemented|stub-only|stub\
+      \ only' cmd internal 2>/dev/null; code=$?; printf 'rg_exit=%s\\n' \"$code\"\
+      ; exit 0`\n  - Wrapper exit code 0; `rg_exit=1`; no scoped matches.\n\n## Downstream\
+      \ blocker register\n- `plhm-mcp-runtime-parity`: BLOCKS downstream runtime gate,\
+      \ not this storage-core gate. Evidence: broad `go test ./internal/resofeed`\
+      \ fails `TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface`;\
+      \ missing `resofeed://runtime/language`, `get_processing_language`, `set_processing_language`,\
+      \ `reprocess_library`; MCP error-envelope/query echo gaps.\n- `plhm-http-runtime-endpoints`:\
+      \ BLOCKS downstream runtime gate, not this storage-core gate. Evidence: broad\
+      \ `go test ./internal/resofeed` fails `TestPLCTDeliveryEndpointStrictValidationAndIdempotency`;\
+      \ `/api/items/{id}/delivery` returned 404 instead of strict-validation 400 for\
+      \ unknown `channel`.\n- `plfu-frontend-gate`: BLOCKS frontend gate before product\
+      \ exposure if frontend runtime/render consumption is absent or unproven. No\
+      \ frontend liveness claim was used for this storage-core gate.\n\n## Verification\n\
+      - `go test ./internal/resofeed` — exit 1, classified as expected downstream-owned\
+      \ failures only: MCP runtime parity and HTTP delivery endpoint.\n- `go test\
+      \ ./internal/resofeed -run 'Test(RuntimeMetadata|Receipt|Reprocess|DoctorSearch|PLCTRuntimeMetadata|PLCTStateExportImport|PLCTRuntimeLanguage|PLCTReprocess|PLCTDoctor|PLCTTargetLanguage|PLCTOpenRouterReceives|ProcessingLanguage)'`\
+      \ — exit 0; output `ok resofeed/internal/resofeed 0.405s`.\n- `go test -race\
+      \ ./internal/resofeed -run 'Test(RuntimeMetadata|Receipt|Reprocess|DoctorSearch|PLCTRuntimeMetadata|PLCTStateExportImport|PLCTRuntimeLanguage|PLCTReprocess|PLCTDoctor|PLCTTargetLanguage|PLCTOpenRouterReceives|ProcessingLanguage)'`\
+      \ — exit 0; output `ok resofeed/internal/resofeed 1.979s`.\n- `go build ./cmd/resofeed`\
+      \ — exit 0; generated binary removed; final worktree clean.\n- `git status --short\
+      \ --branch` — exit 0; output `## vectl/step-plsc-core-gate`.\n\n## Gate decision\n\
+      Gate decision: OPEN.\nRationale: storage-core obligations are proven by code\
+      \ review plus targeted passing tests; broad failures are limited to downstream\
+      \ HTTP/MCP surfaces explicitly assigned to later owner steps/gates.\n\n## Machine-readable\
+      \ closure\nheadline: \"[PASS] Storage/backend-core gate open; downstream runtime/frontend\
+      \ blockers remain assigned\"\nverdict: \"OPEN\"\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: \"Open storage-core gate only; keep plhm-mcp-runtime-parity,\
+      \ plhm-http-runtime-endpoints, and plfu-frontend-gate blockers assigned to downstream\
+      \ gates.\"\nblocking_status: \"no storage-core blockers; downstream-owned blockers\
+      \ remain before plhm-runtime-gate/plfu-frontend-gate\"\nbehavioral_proof_register:\n\
+      \  receipts: PROVEN\n  reprocess: PROVEN\n  fts: PROVEN\n  language_persistence:\
+      \ PROVEN\nuncertainty_sources:\n  - No live frontend/render evidence reviewed;\
+      \ classified downstream-owned.\n  - Broad package tests still include downstream\
+      \ expected-red tests and fail accordingly.\n\n## Commit hash(es), Files changed\n\
+      - Commit hash(es): none (verification-only; no changes made).\n- Files changed:\
+      \ none.\n\n## Spec link\n- `docs/ARCHITECTURE.md`.\n\n## Gaps/Notes\n- Scoped\
+      \ forbidden-architecture scan returned no new jobs/queues/ledgers/sync/vector/repository\
+      \ architecture.\n- Gate opened only for storage-core; downstream runtime/frontend\
+      \ gates remain blocking."
   - id: plsc-storage-core-blocker-fix
     name: Fix storage-core language guard and orphan anchors
     status: done
@@ -71548,7 +71638,7 @@ phases:
       \ storage proof. No source files or orchestrator state files were edited manually."
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
-  status: locked
+  status: pending
   gate: Runtime integration gate blocks unless HTTP and MCP language/reprocess/delivery
     parity, strict validation, and runnable `resofeed serve` liveness evidence are
     green.
