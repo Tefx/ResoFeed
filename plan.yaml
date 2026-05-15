@@ -79823,7 +79823,7 @@ phases:
       unchanged.'
   - id: srdb-http-steer-preview-commit-undo
     name: Complete HTTP Steer preview commit and undo runtime
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -79911,6 +79911,23 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T22:15:20.890309+00:00'
+    done_at: '2026-05-15T22:25:14.325537+00:00'
+    evidence: 'Completed HTTP Steer preview/commit/undo runtime. Squash merge commit:
+      7fbb3086. Worker commit: 41841ce55cf82970c900367c4b5629ab50b46f26. Files changed:
+      internal/resofeed/http.go, internal/resofeed/types.go, internal/resofeed/http_steer_runtime_test.go.
+      Mainline verification after merge: `go test ./internal/resofeed` OK; `go test
+      ./...` OK; `go test -race ./internal/resofeed -run ''TestSRDCT|TestHTTPSteer''
+      -count=1` OK; `go build ./...` OK. Evidence: preview route is authenticated,
+      strict-schema, rejects idempotency_key, and test snapshots prove no writes to
+      product/receipt/search state; commit reruns classification, requires idempotency_key,
+      applies source/rule writes transactionally, returns terse receipts and concrete
+      undo handles; undo accepts flat target_kind/target_id/actor_kind/actor_id/idempotency_key,
+      is target-specific, idempotent for inactive targets, and rejects fingerprint
+      conflicts, missing/unsupported targets, and invalid schemas with bad_request
+      details. Contract deviation accepted: type=contract_gap for SteerUndoRequest/types
+      to add flat target_kind/target_id while retaining undo_handle compatibility.
+      No command history, undo stack, queue/job/activity ledger, sync/merge, settings,
+      vector/embedding/RAG, services/repositories/DI/event bus introduced.'
   - id: srdb-mcp-steer-parity
     name: Complete MCP Steer preview commit undo parity
     status: claimed
