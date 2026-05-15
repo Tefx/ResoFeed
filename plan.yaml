@@ -69362,7 +69362,7 @@ phases:
       - [x] Rendered output checks verify visible controls and no settings dashboard/onboarding
       wizard.
 
-      - [ ] Source identifiers are asserted as literal non-translated provenance anchors.
+      - [x] Source identifiers are asserted as literal non-translated provenance anchors.
 
       - [ ] Split scroll behavior is covered for desktop and mobile route behavior
       remains intact.
