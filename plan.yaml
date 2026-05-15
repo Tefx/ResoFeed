@@ -73184,7 +73184,7 @@ phases:
       \ manual ingest/fetch/reprocess conflict responses are field-exact against the\
       \ documented `operation already running` shape.\n- [x] Runtime language/reprocess\
       \ conflicts report the actual running operation and scope or obtain those details\
-      \ from a shared guard conflict detail helper.\n- [ ] MCP JSON-RPC error `data`\
+      \ from a shared guard conflict detail helper.\n- [x] MCP JSON-RPC error `data`\
       \ for the affected runtime errors contains only nested `error` data required\
       \ by the architecture examples.\n- [ ] MCP conflict mappings include actual\
       \ guard holder operation/scope and remain parity-compatible with HTTP.\n- [\
