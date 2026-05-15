@@ -71083,6 +71083,55 @@ phases:
 
       **Stubs used**: NONE required'
     agent: integration-verifier
+  - id: plse-blind-http-mcp-parity-delivery
+    name: Blind test HTTP MCP parity and delivery endpoint
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As a black-box tester using public docs and public interfaces, verify HTTP/MCP
+      parity for processing language, reprocess, search query echo, item delivery/report_delivery,
+      owner-token auth, actor_id provenance-not-auth, and idempotency replay/mismatch.
+
+
+      Scope declaration: phase-check protecting system E2E gate.
+
+
+      Required probes:
+
+      - [ ] HTTP `GET/PUT /api/runtime/language` and MCP `get/set_processing_language`
+      produce equivalent state.
+
+      - [ ] HTTP `POST /api/runtime/reprocess-library` and MCP `reprocess_library`
+      produce equivalent result shape/semantics.
+
+      - [ ] HTTP search and MCP `search_items` include equivalent `query` echo.
+
+      - [ ] HTTP delivery and MCP `report_delivery` update the same item state and
+      replay/mismatch semantics.
+
+      - [ ] Missing/invalid owner token fails before operation; `actor_id` alone grants
+      no access.
+
+      - [ ] No delivery registry/activity ledger/job/sync artifact is visible.'
+    verification: '- [ ] Public HTTP/MCP parity probes pass with actual request/response
+      bodies.
+
+      - [ ] Delivery/report_delivery parity is proven through item state.
+
+      - [ ] Auth/idempotency failure probes produce documented errors.'
+    evidence_template: "## Black-Box Parity Report\n\n### refs Read Confirmation (MANDATORY)\n\
+      For each ref in this step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
+      \ <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\n\
+      \n### Probe Matrix\n| Surface | Request | Expected | Actual | Verdict |\n\n\
+      ### Actual Outputs\n``` \n<paste HTTP/MCP outputs>\n```\n\n### Behavioral Proof\
+      \ Register\n| requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref\
+      \ | status | closure_path | gate_decision_basis |\n|---|---|---|---|---|---|---|"
+    depends_on:
+    - plse-real-language-reprocess-vertical-slice
+    agent: blind-tester
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
