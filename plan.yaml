@@ -73411,7 +73411,7 @@ phases:
       \ all blocker-class obligations here are `PROVEN` or explicitly non-intersecting.\n\
       \n## Completion Criteria (checklist)\n- [x] `go test ./...` passes with output\
       \ included.\n- [x] HTTP conflict/error details are field-exact and include actual\
-      \ operation/scope where required.\n- [ ] MCP JSON-RPC `error.data` shape matches\
+      \ operation/scope where required.\n- [x] MCP JSON-RPC `error.data` shape matches\
       \ architecture examples without extra top-level drift fields.\n- [ ] `SearchItemsForMCP`\
       \ stale no-query-echo path is gone or provably private/safe with a real caller.\n\
       - [ ] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
