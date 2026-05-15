@@ -75824,7 +75824,7 @@ phases:
 
       - [x] New HTTP routes and MCP tools/resources are reachable from runtime registries.
 
-      - [ ] Frontend API client calls correspond to actual routes.
+      - [x] Frontend API client calls correspond to actual routes.
 
       - [ ] No `_Runtime*`, `_Stub*`, `_Placeholder*`, or hardcoded placeholder implementation
       remains wired.
