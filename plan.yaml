@@ -72256,12 +72256,12 @@ phases:
       params, bad delivered_at, auth failures, idempotency replay/mismatch, and conflicts.
 
       - [x] Evidence includes actual commands and outputs.'
-    verification: '- [ ] HTTP and MCP contract test commands pass.
+    verification: '- [x] HTTP and MCP contract test commands pass.
 
-      - [ ] At least one test proves HTTP/MCP equivalent state mutation for language
+      - [x] At least one test proves HTTP/MCP equivalent state mutation for language
       and delivery.
 
-      - [ ] At least one test proves `reprocess_library` conflict/replay semantics.'
+      - [x] At least one test proves `reprocess_library` conflict/replay semantics.'
     evidence_template: '## Verification Report
 
       **Tester**: integration-verifier
