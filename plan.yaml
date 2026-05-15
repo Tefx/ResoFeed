@@ -74657,7 +74657,7 @@ phases:
       \ created."
   - id: plfu-uiux-multimodal-audit
     name: Audit language reprocess and split-scroll UIUX
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -74733,6 +74733,50 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T17:26:30.594752+00:00'
+    done_at: '2026-05-15T17:39:16.685494+00:00'
+    evidence: "## UIUX Audit Report\n\n### refs Read Confirmation\n- docs/DESIGN.md\
+      \ — Language Control uses bracket action, no settings dashboard. Reprocess uses\
+      \ bracket action with exact states. Source identifiers use `translate=\"no\"\
+      `. Desktop has independent split scroll. Mobile has full-screen inspector route.\n\
+      - docs/ARCHITECTURE.md — single-tenant boundaries and forbidden product concepts\
+      \ remain applicable; no sync/queue/job/dashboard/per-agent auth concepts should\
+      \ be introduced.\n\n## Closure Signals\nheadline: PASS\nverdict: PASS\nproof_gap_status:\
+      \ NONE\nblocking_status: CLOSED\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nblockers: []\n\n### Artifacts Reviewed\n- Desktop screenshots/DOM:\
+      \ split-scroll E2E test outputs verifying layout and independent tabindex/scroll\
+      \ capabilities.\n- Mobile screenshots/DOM: mobile inspector route E2E test output\
+      \ verifying full-page navigation and feed scroll restoration.\n- A11y captures/equivalent:\
+      \ source identifiers verified to have `translate=\"no\"`; render tests verify\
+      \ language/reprocess roles/live-region/focus behavior.\n\n### Verdict Matrix\n\
+      | Surface | Expected | Evidence | Verdict | Notes |\n|---|---|---|---|---|\n\
+      | Language Control | Terse bracket-style button (`LANG: EN` / `LANG: ZH`) |\
+      \ component tests passed | PASS | No settings dashboard present. |\n| Reprocess\
+      \ | `[REPROCESS LIBRARY]` and states | component tests passed | PASS | Bracket\
+      \ action used; no progress bar/dashboard. |\n| Source Identifiers | Unchanged,\
+      \ non-translated | `translate=\"no\"` attribute verified by Playwright | PASS\
+      \ | DOM verification in E2E test. |\n| Desktop Split Scroll | Independent vertical\
+      \ scroll, focusable | Playwright scroll evaluation test passed | PASS | Both\
+      \ panes `tabindex=\"0\"`, `overflow-y: auto`. |\n| Mobile Inspector | Full screen\
+      \ route, maintains feed scroll | Playwright routing test passed | PASS | Feed\
+      \ scroll restored after back. |\n\n## behavioral_proof_register\n- obligation:\
+      \ Language Control states\n  status: PROVEN\n  evidence: `npm --prefix web run\
+      \ test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`\n\
+      \  uncertainty: NONE\n- obligation: Reprocess states\n  status: PROVEN\n  evidence:\
+      \ same render test command\n  uncertainty: NONE\n- obligation: Source identifiers\
+      \ visibly literal\n  status: PROVEN\n  evidence: `npm --prefix web run test:e2e\
+      \ -- tests/e2e/processing-language-source-split-scroll.spec.ts --project=chromium-ci-safe`\n\
+      \  uncertainty: NONE\n- obligation: Desktop split Feed/Inspector\n  status:\
+      \ PROVEN\n  evidence: same Playwright E2E command\n  uncertainty: NONE\n- obligation:\
+      \ Mobile Inspector route\n  status: PROVEN\n  evidence: same Playwright E2E\
+      \ command\n  uncertainty: NONE\n\n## Checklist Closure\n- Description checklist\
+      \ items toggled by auditor.\n- Verification checklist items marked `[x]` by\
+      \ orchestrator after validating PASS report.\n\n## Files changed\nnone\n\n##\
+      \ Commit hash(es)\nnone (verify-only; no changes)\n\n## Verification\n- `npm\
+      \ --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`\
+      \ — 5 passed per auditor evidence.\n- `npm --prefix web run test:e2e -- tests/e2e/processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` — 2 passed per auditor evidence.\n\n## Gaps/Notes\n\
+      No UI/UX blockers. Evidence relies on rendered DOM/test output and E2E assertions\
+      \ as equivalent rendered artifacts rather than committed screenshot files."
   - id: plfu-frontend-spec-conformance
     name: Verify frontend DESIGN and architecture conformance
     status: done
