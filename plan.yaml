@@ -62222,7 +62222,7 @@ phases:
       exited 0; 7 passed.'
   - id: urda-keyboard-a11y-nav-batched-fix
     name: Batched keyboard navigation and accessibility role fix
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       priority: HIGH
@@ -62328,6 +62328,70 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T02:28:54.255812+00:00'
+    done_at: '2026-05-15T02:54:58.990547+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md\
+      \ — Read. Key passage: gate failed because broader keyboard-a11y suite failed\
+      \ before reaching ledger controls due to missing expected TODAY / SOURCE LEDGER\
+      \ role buttons.\n- docs/DESIGN.md — Read. Key passage: App Shell menu items\
+      \ must be real buttons/links with accessible names; Source Ledger `[RUN INGEST]`,\
+      \ `[FETCH]`, `[IMPORT OPML]` must be named keyboard-reachable buttons; Resonate\
+      \ must be 44px with keyboard activation and stateful label/glyph.\n- docs/ARCHITECTURE.md\
+      \ — Read. Key passage: one Go deployable, one SQLite DB, no queues/jobs/sync/vector/RAG;\
+      \ manual ingest/fetch use in-process guard and must not create durable jobs.\n\
+      - web/tests/e2e/keyboard-a11y.expected-red.spec.ts — Read. Key passage: tests\
+      \ require Tab focus on role button TODAY then SOURCE LEDGER, Space/Enter activation,\
+      \ Source Ledger controls reachability, and Resonate keyboard toggle proof.\n\
+      - web/tests/e2e/keyboard-a11y-helpers.ts — Read. Key passage: helper expected\
+      \ SOURCE LEDGER role button to open the ledger, then OPML import, `[RUN INGEST]`,\
+      \ `[FETCH]`, delete, export/import state controls to be keyboard-audited.\n\n\
+      ## Fix Evidence\n- Commit hash(es):\n  - worker branch: `6d553938aecb0e56a62314c9235fbfb7aff78fca`\n\
+      \  - main squash merge: `7ac26d8` (`[vectl] step-urda-keyboard-a11y-nav-batched-fix\
+      \ completed`)\n- Files changed:\n  - `web/src/routes/+page.svelte` — exposed\
+      \ TODAY and SOURCE LEDGER as always-present role buttons after Steer; added\
+      \ `aria-pressed`/active state; preserved RESOFEED surface-menu compatibility;\
+      \ stabilized mobile back-command rendering; fixed Inspector focus request timing.\n\
+      \  - `web/src/app.css` — adjusted surface nav layout/focus styling and made\
+      \ back-command CSS-driven for stable responsive geometry.\n  - `web/src/routes/components/SourceLedger.svelte`\
+      \ — preserves OPML source title for rendered row label after import and removes\
+      \ duplicate title text from diagnostic payload.\n  - `web/src/routes/components/StatePortability.svelte`\
+      \ — focuses and labels state JSON file input as `Choose state JSON` for keyboard/a11y\
+      \ proof.\n  - `web/tests/e2e/keyboard-a11y-helpers.ts` — scopes imported-source\
+      \ matching to Source Ledger rows and keyboard-activates `[RUN INGEST]` before\
+      \ returning to TODAY.\n  - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts`\
+      \ — updates Resonate selectors to accept item-context accessible names while\
+      \ still proving state label prefix and keyboard activation.\n- Failure(s) closed:\n\
+      \  - TODAY role-button focus: closed; Tab from Steer reaches role button TODAY\
+      \ and exposes active state.\n  - SOURCE LEDGER role-button focus: closed; Tab\
+      \ reaches role button SOURCE LEDGER and Space/Enter activation opens ledger.\n\
+      \  - Source Ledger controls keyboard reachability: closed; `[IMPORT OPML]`,\
+      \ `[RUN INGEST]`, row `[FETCH]`, delete, export/import state controls reached/proved\
+      \ by suite.\n  - Resonate keyboard/a11y: closed; 44px target, keyboard toggle,\
+      \ glyph/state, and contextual accessible names preserved.\n- Accessible role/name/focus\
+      \ changes made:\n  - Replaced hidden-on-closed menu dependency with always-open\
+      \ RESOFEED details menu containing real TODAY and SOURCE LEDGER buttons.\n \
+      \ - Added `aria-pressed` plus data-state for active surface state.\n  - Prevented\
+      \ RESOFEED summary click from collapsing always-visible navigation buttons while\
+      \ preserving legacy selector compatibility.\n  - Moved Inspector focus request\
+      \ before async item detail loading to avoid focus races.\n  - Focuses state\
+      \ file input when `[IMPORT STATE]` is keyboard-activated.\n- Verification commands\
+      \ and outputs:\n  - Worker worktree: `npm --prefix web ci` exited 0.\n  - Worker\
+      \ worktree: `npm --prefix web run check` exited 0; svelte-check found 0 errors\
+      \ and 0 warnings.\n  - Worker worktree: `npm --prefix web run test:e2e -- keyboard-a11y.expected-red.spec.ts\
+      \ source-ledger-controls-diagnostics-layout.expected-red.spec.ts urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ --reporter=line` exited 0; 11 passed.\n  - Mainline final-state verification\
+      \ after squash merge:\n    - `npm --prefix web run check` exited 0; svelte-check\
+      \ found 0 errors and 0 warnings.\n    - `npm --prefix web run build` exited\
+      \ 0; Vite/SvelteKit production build completed.\n    - `go build ./cmd/resofeed`\
+      \ exited 0.\n    - `npm --prefix web run test:e2e -- keyboard-a11y.expected-red.spec.ts\
+      \ source-ledger-controls-diagnostics-layout.expected-red.spec.ts urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ --project=chromium-ci-safe` exited 0; 11 passed.\n- Spec link:\n  - `docs/DESIGN.md`\
+      \ App Shell, Resonate Button, Source Ledger, State Portability keyboard/accessibility\
+      \ contracts.\n  - `docs/ARCHITECTURE.md` manual ingest/fetch concurrency and\
+      \ forbidden queue/job/sync/vector boundaries.\n- Product-boundary confirmation:\
+      \ no SaaS onboarding/settings/folders/tags/unread/archive/sync/queues/jobs/vector/RAG\
+      \ concepts introduced.\n- Gaps/Notes: No unresolved implementation gaps. Generated\
+      \ Playwright artifacts were cleaned before worker commit; mainline verification\
+      \ artifacts remain uncommitted runtime/test outputs."
   - id: urda-keyboard-a11y-nav-post-fix-retest
     name: Post-fix keyboard navigation and UI accessibility retest
     status: pending
