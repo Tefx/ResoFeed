@@ -79117,7 +79117,7 @@ phases:
       rejects idempotency_key, and does not write sources, steer_rules, item_state,
       agent_receipts, or FTS.
 
-      - [ ] Tests prove route precedence for /doctor, direct URL, /add/add/添加, /search/search/搜索/查,
+      - [x] Tests prove route precedence for /doctor, direct URL, /add/add/添加, /search/search/搜索/查,
       warning-only find alias, invalid vague add, and unmatched STEER RULE proposal.
 
       - [x] Tests prove POST /api/steer reruns classification, requires idempotency_key,
