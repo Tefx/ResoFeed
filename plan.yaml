@@ -69234,12 +69234,12 @@ phases:
 
       - [x] Evidence lists expected failures or exposed gaps and downstream implementation
       owners.'
-    verification: '- [ ] Expected-red backend tests fail for missing implementation
+    verification: '- [x] Expected-red backend tests fail for missing implementation
       for the intended reasons.
 
-      - [ ] No product behavior implementation is included.
+      - [x] No product behavior implementation is included.
 
-      - [ ] Test fixture formats cite docs/ARCHITECTURE.md sections and include at
+      - [x] Test fixture formats cite docs/ARCHITECTURE.md sections and include at
       least one minimal spec-exact fixture.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
