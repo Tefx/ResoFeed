@@ -70568,7 +70568,7 @@ phases:
     claimed_at: '2026-05-15T14:52:16.224279+00:00'
   - id: plsc-core-spec-conformance
     name: Verify backend core spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -70693,6 +70693,116 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T14:52:10.194405+00:00'
+    done_at: '2026-05-15T15:07:08.798688+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ by spec-verifier. Key passages cited: processing
+      language persisted runtime metadata with supported values `en|zh`; runtime metadata
+      and receipts excluded from state export/import; `search_fts_stale_since` RFC3339
+      UTC stale marker; reprocess source precedence; operation exclusivity across
+      ingest/fetch/reprocess and language mutation.
+
+      - `CONSTITUTION.md`: NOT READ: file not found in isolated worktree.
+
+
+      ## Backend Core Spec Conformance Report
+
+      Original verifier verdict: FAIL / blocking_status OPEN / orchestrator_action_hint
+      DO_NOT_COMPLETE.
+
+      This verification report is being completed as an issue-detection artifact only
+      after planner-created remediation ownership, per batched fix protocol. It is
+      not a gate-open signal.
+
+
+      ## Requirements / Evidence Summary
+
+      - CONFORMS: processing language enum/defaults/labels; state export exclusion;
+      24h receipts replay/mismatch/expiration; future ingest target language/no historical
+      rewrite; OpenRouter target_language input; reprocess accounting/source precedence/unavailable
+      clearing; FTS core behavior.
+
+      - PARTIAL: doctor stale diagnostics implementation evidence present; explicit
+      stale/ok/redaction proof required.
+
+      - DIVERGES: language mutation operation guard exclusivity.
+
+
+      ## Storage-core blockers detected
+
+      - B1: `SetProcessingLanguage` / runtime language mutation lacks operation-guard
+      exclusivity required to prevent mixed-language batches while ingest/fetch/reprocess
+      are active. Evidence cited by verifier: `internal/resofeed/runtime_metadata.go:27-47`,
+      `internal/resofeed/http.go:373-383`, `docs/ARCHITECTURE.md` operation exclusivity
+      requirements.
+
+      - B2/proof gap: Doctor stale diagnostic line logic exists, but explicit stale/ok/redaction
+      runtime proof is needed before runtime exposure.
+
+
+      ## Downstream-owned blockers recorded, not storage-core completion failures
+
+      - `plhm-mcp-runtime-parity`: missing MCP runtime language/reprocess tools/resource,
+      search query echo, nested JSON-RPC errors.
+
+      - `plhm-http-runtime-endpoints`: delivery endpoint route/validation/idempotency
+      behavior missing.
+
+
+      ## Remediation ownership created
+
+      Planner added:
+
+      - `plsc-storage-core-blocker-fix` — batched implementation fix for language
+      guard, orphan anchors, and doctor proof.
+
+      - `plsc-storage-core-blocker-retest` — independent retest proving closure.
+
+      - `plsc-core-gate` now depends on `plsc-storage-core-blocker-retest`.
+
+
+      ## Verification commands reported
+
+      - `go test ./internal/resofeed -run ''Test(RuntimeMetadata|Receipt|ReprocessLibrary|ProcessingLanguage|SearchSQL|RankCandidates|SteeringConflict)''`
+      => PASS.
+
+      - `go test ./internal/resofeed` => FAIL due expected-red downstream HTTP/MCP
+      tests (MCP runtime language/reprocess/search and HTTP delivery endpoint), assigned
+      to downstream owners.
+
+      - `git status --short` => no worktree changes.
+
+
+      ## Behavioral proof register
+
+      - language_metadata: PROVEN
+
+      - receipt_ttl: PROVEN
+
+      - future_ingest_target_language: PROVEN
+
+      - reprocess_accounting_precedence_fts: PROVEN
+
+      - doctor_stale_diagnostics: NEEDS_TEST -> owned by `plsc-storage-core-blocker-fix`
+      / `plsc-storage-core-blocker-retest`
+
+      - language_mutation_guard: UNPROVEN -> owned by `plsc-storage-core-blocker-fix`
+      / `plsc-storage-core-blocker-retest`
+
+
+      ## Artifacts Modified
+
+      - Product implementation files modified: none.
+
+      - Files changed in isolated worktree: none.
+
+      - Commit hash(es): none (verification-only; no file changes made).
+
+
+      ## Gaps/Notes
+
+      - This step found blocker-class storage-core divergence and did not greenlight
+      the gate. Remediation is now explicit and blocking before `plsc-core-gate`.'
   - id: plsc-core-gate
     name: Gate processing language storage and core backend
     status: pending
