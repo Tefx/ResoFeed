@@ -74924,7 +74924,7 @@ phases:
       \ restored; final status clean."
   - id: plfu-frontend-gate
     name: Gate processing language frontend UI
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -74999,6 +74999,8 @@ phases:
     - plfu-uiux-multimodal-audit
     - plfu-frontend-spec-conformance
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T17:39:54.278507+00:00'
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
