@@ -72896,6 +72896,135 @@ phases:
     - plhm-runtime-wiring-audit
     - plhm-runtime-spec-conformance
     agent: gate-reviewer
+  - id: plhm-runtime-blocker-remediation
+    name: Remediate HTTP MCP runtime blocker findings
+    status: pending
+    description: "step_type: implementation\nagent_source: project\npriority: HIGH\n\
+      work_type: defect_repair\n\nFix ALL blocker findings from `plhm-runtime-spec-conformance`\
+      \ and `plhm-runtime-wiring-audit` in one batched remediation. Do not split this\
+      \ into serial fix chains.\n\nAuthoritative refs:\n- `docs/ARCHITECTURE.md` —\
+      \ one deployable `resofeed serve`, thin HTTP/MCP transports, shared product\
+      \ operations, single-process ingest/fetch/reprocess guard, exact conflict shape.\n\
+      - `docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md` — MCP parity and processing-language\
+      \ runtime contract.\n\nTouch paths:\n- `internal/resofeed/http.go`\n- `internal/resofeed/mcp.go`\n\
+      - relevant focused Go tests under `internal/resofeed/*test.go`\n- guard-holder\
+      \ implementation only if needed to expose actual running operation/scope without\
+      \ adding new durable state.\n\n## Root Cause vs Symptom\n- Root cause: HTTP\
+      \ and MCP conflict/error mapping drifted from the shared operation-guard contract,\
+      \ and a stale exported MCP search helper survived after runtime switched to\
+      \ the query-echo response helper.\n- Symptoms: manual ingest/fetch conflict\
+      \ uses `ingest already running` / `ingest_running`; runtime language/reprocess\
+      \ and MCP conflict mappings can hardcode `reprocess/library`; MCP JSON-RPC error\
+      \ `data` contains extra top-level fields instead of only nested `data.error`;\
+      \ exported `SearchItemsForMCP` can reintroduce no-query-echo search semantics.\n\
+      - Why this fix is not surface-level: it must ensure conflict details are derived\
+      \ from the actual guard holder or a shared guard conflict detail helper across\
+      \ HTTP and MCP, and remove or make safe the stale search helper rather than\
+      \ only adjusting one observed response.\n\n## Required remediation (ALL of these)\n\
+      1. HTTP conflict exactness:\n   - manual ingest/fetch/reprocess conflicts return\
+      \ HTTP `409`, code `conflict`, message `operation already running`.\n   - `details`\
+      \ contains exactly the documented operation-guard fields: `operation_running`,\
+      \ `operation`, `scope`, `retry_allowed`.\n   - actual holder operation/scope\
+      \ is reported where required; do not hardcode `reprocess/library` when another\
+      \ guarded operation owns the guard.\n2. MCP conflict and JSON-RPC error exactness:\n\
+      \   - MCP conflict mapping passes actual operation/scope through the same guard\
+      \ detail semantics as HTTP.\n   - MCP JSON-RPC `error.data` contains only the\
+      \ nested `error` object required by architecture examples; remove extra top-level\
+      \ `data.field`, `data.reason`, or similar drift for this surface.\n3. Stale\
+      \ MCP search helper closure:\n   - remove exported `SearchItemsForMCP` if it\
+      \ has no runtime caller, or make it private only if a real runtime caller needs\
+      \ it.\n   - the live `search_items` runtime path must continue using `SearchItemsResponseForMCP`\
+      \ (or an equivalent query-echo response path).\n   - grep-style evidence must\
+      \ show no stale no-query-echo path remains for `SearchItemsForMCP(`.\n\n## Architecture\
+      \ guardrails\n- Preserve one Go binary and one process; do not add jobs, queues,\
+      \ sidecar workers, sync/merge coordinators, durable operation ledgers, per-agent\
+      \ auth, or new product concepts.\n- Keep HTTP and MCP as thin transports over\
+      \ shared product operations; do not make MCP special or divergent from HTTP.\n\
+      - Keep helpers file-local unless repeated real use justifies exporting them.\n\
+      \n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION step. Stub-only\
+      \ completion is NOT acceptable. Each deliverable MUST contain substantive logic\
+      \ that processes actual guard/error/search inputs and produces outputs that\
+      \ vary based on those inputs.\n\n## Completion Criteria (checklist)\n- [ ] HTTP\
+      \ manual ingest/fetch/reprocess conflict responses are field-exact against the\
+      \ documented `operation already running` shape.\n- [ ] Runtime language/reprocess\
+      \ conflicts report the actual running operation and scope or obtain those details\
+      \ from a shared guard conflict detail helper.\n- [ ] MCP JSON-RPC error `data`\
+      \ for the affected runtime errors contains only nested `error` data required\
+      \ by the architecture examples.\n- [ ] MCP conflict mappings include actual\
+      \ guard holder operation/scope and remain parity-compatible with HTTP.\n- [\
+      \ ] Exported stale `SearchItemsForMCP` no-query-echo helper is removed or proven\
+      \ private/safe with a real runtime caller.\n- [ ] No forbidden durable job/queue/ledger/sync/per-agent\
+      \ authorization surface is introduced."
+    verification: '- [ ] Focused Go tests or equivalent assertions cover HTTP `409
+      conflict` exact message/details for manual ingest/fetch/reprocess guard collisions.
+
+      - [ ] Focused Go tests or equivalent assertions cover actual operation/scope
+      propagation for runtime language/reprocess and MCP conflict paths.
+
+      - [ ] Focused Go tests or equivalent assertions cover MCP JSON-RPC `error.data`
+      nested-only shape for affected errors.
+
+      - [ ] Search helper cleanup is proven by grep/import evidence and by the live
+      `search_items` query-echo path remaining intact.
+
+      - [ ] `go test ./...` is green after the remediation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - `docs/ARCHITECTURE.md` — key passage or "NOT READ: <reason>"
+
+      - `docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md` — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Remediation Evidence
+
+
+      ### Files changed
+
+      - <file paths>
+
+
+      ### Conflict/error shape closure
+
+      - HTTP conflict exactness evidence: <tests/assertions and output>
+
+      - MCP nested `data.error` evidence: <tests/assertions and output>
+
+      - Actual operation/scope propagation evidence: <tests/assertions and output>
+
+
+      ### Stale helper closure
+
+      - `SearchItemsForMCP(` grep/import evidence: <output>
+
+      - Live `search_items` query-echo path evidence: <output>
+
+
+      ### Architecture guardrail confirmation
+
+      - [ ] No job/queue/ledger/sync/per-agent auth surface added.
+
+      - [ ] HTTP and MCP remain thin transport mappings over shared operations.
+
+
+      ### Commands run
+
+      ```text
+
+      <actual commands and outputs>
+
+      ```
+
+      '
+    depends_on:
+    - plhm-runtime-spec-conformance
+    - plhm-runtime-wiring-audit
+    agent: golang-developer
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
