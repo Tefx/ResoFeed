@@ -79137,7 +79137,7 @@ phases:
       - [x] Tests prove lexical search/no vector/no embedding/no RAG/no generated
       answer boundaries including find alias warning copy.
 
-      - [x] Modified files are limited to tests and fixtures; red is expected until
+      - [ ] Modified files are limited to tests and fixtures; red is expected until
       downstream implementation completes.'
     verification: '- [ ] Expected-red test run exposes the documented backend/API/MCP
       gaps before implementation.
