@@ -78530,7 +78530,7 @@ phases:
       - [x] Product-boundary drift scan confirms no settings/onboarding/SaaS or forbidden
       concepts were introduced.
 
-      - [ ] Final gate decision basis is OPEN only if every UI blocker-class obligation
+      - [x] Final gate decision basis is OPEN only if every UI blocker-class obligation
       is PROVEN.'
     verification: '- [ ] Exact command `npm --prefix web run test:e2e -- --project=chromium-ci-safe
       web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` exits 0.
