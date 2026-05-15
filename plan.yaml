@@ -71725,7 +71725,7 @@ phases:
       - [x] `actor_id` treated as authorization instead of provenance/idempotency
       metadata.
 
-      - [ ] delivery registry/activity ledger/portable receipt/sync/job introduced.
+      - [x] delivery registry/activity ledger/portable receipt/sync/job introduced.
 
       - [ ] language set rewrites historical rows or rebuilds FTS automatically.
 
