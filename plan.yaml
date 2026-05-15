@@ -76446,7 +76446,7 @@ phases:
       - [x] Evidence distinguishes CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND,
       AMBIGUOUS_SPEC, SPEC_POSSIBLY_STALE.
 
-      - [ ] Behavioral precedence claims are flagged as NEEDS_TEST unless runtime
+      - [x] Behavioral precedence claims are flagged as NEEDS_TEST unless runtime
       proof exists.
 
       - [ ] Every blocker-class divergence has remediation ownership.'
