@@ -73416,21 +73416,21 @@ phases:
       \ stale no-query-echo path is gone or provably private/safe with a real caller.\n\
       - [x] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
       - [x] Behavioral proof register supports an OPEN/BLOCK decision for `plhm-runtime-gate`."
-    verification: '- [ ] Full `go test ./...` passes and output is included.
+    verification: '- [x] Full `go test ./...` passes and output is included.
 
-      - [ ] Field-exact HTTP conflict/error shapes are verified against the documented
+      - [x] Field-exact HTTP conflict/error shapes are verified against the documented
       `operation already running` response.
 
-      - [ ] MCP JSON-RPC `error.data` contains only the nested `error` object required
+      - [x] MCP JSON-RPC `error.data` contains only the nested `error` object required
       by architecture examples for the affected errors.
 
-      - [ ] Actual operation/scope propagation is verified for HTTP runtime conflicts
+      - [x] Actual operation/scope propagation is verified for HTTP runtime conflicts
       and MCP conflict mapping.
 
-      - [ ] `SearchItemsForMCP` stale no-query-echo path is removed or proven safe,
+      - [x] `SearchItemsForMCP` stale no-query-echo path is removed or proven safe,
       and live `search_items` query echo remains intact.
 
-      - [ ] Previous HTTP/MCP expected-red suites remain green and runnable HTTP/MCP
+      - [x] Previous HTTP/MCP expected-red suites remain green and runnable HTTP/MCP
       liveness remains valid.'
     evidence_template: '## Verification Report
 
