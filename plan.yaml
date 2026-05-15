@@ -71819,7 +71819,7 @@ phases:
     claimed_at: '2026-05-15T15:30:12.449796+00:00'
   - id: plhm-mcp-runtime-parity
     name: Complete MCP language reprocess delivery parity
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -71978,6 +71978,8 @@ phases:
     refs:
     - docs/ARCHITECTURE.md
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T15:30:22.753203+00:00'
   - id: plhm-http-mcp-green-retest
     name: Retest HTTP and MCP expected-red suites to green
     status: pending
