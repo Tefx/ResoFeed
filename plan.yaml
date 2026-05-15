@@ -77105,3 +77105,134 @@ phases:
     - plfinal-design-readiness-review
     - plfinal-full-spec-conformance-audit
     agent: golang-developer
+  - id: plfinal-uiux-rendered-design-proof
+    name: UIUX rendered DOM and accessibility proof closure
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+
+      As an INDEPENDENT UI/UX IMPLEMENTATION AUDITOR, provide rendered UI/DOM/a11y
+      proof for the design-readiness blocker that `design-reviewer` could not close.
+      This step protects `plfinal-final-gate` by proving the required DESIGN.md behaviors
+      against actual rendered artifacts rather than design-spec lint alone.
+
+
+      Depends on the batched remediation step so any backend/UI fixes and proof-environment
+      instructions are available before rendered audit.
+
+
+      ## why_previous_gate_failed
+
+      - `plfinal-design-readiness-review` blocked because rendered UI behavior verification
+      was requested but no rendered UI/DOM/a11y evidence was supplied.
+
+      - `design-reviewer` is the wrong agent boundary for implementation UI audit;
+      `uiux-auditor` must inspect actual rendered artifacts.
+
+
+      ## why_previous_review_missed_or_could_not_prove_it
+
+      - DESIGN.md lint can prove the design contract is structurally valid, not that
+      the web implementation renders the specified behavior.
+
+      - Missing rendered screenshots/DOM/a11y output left PROOF-GAP-001 open.
+
+
+      ## Required rendered checks
+
+      - Language control remains terse and low-chrome.
+
+      - Reprocess action is bracket-style and does not become a dashboard/settings
+      flow.
+
+      - Source identifiers are displayed as identifiers and are not translated.
+
+      - Desktop split-scroll behavior is present and usable.
+
+      - Mobile Inspector behavior matches DESIGN.md expectations.
+
+      - No onboarding wizard, settings dashboard/sliders, friendly SaaS copy, mascot,
+      or AI-magic copy drift appears.
+
+
+      ## Environment bootstrap
+
+      - If `web/node_modules` is absent, run `npm --prefix web install` before `npm
+      --prefix web run build` or browser/runtime commands.
+
+      - Record whether missing Vite was resolved by dependency bootstrap.
+
+
+      ## Behavioral proof register required
+
+      For each rendered obligation, provide: `requirement_ref`, `behavior_claim`,
+      `runtime_proof_expected`, `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis`.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Rendered screenshot or equivalent visual artifact is captured for desktop
+      language/reprocess/source/split-scroll states.
+
+      - [ ] Rendered screenshot or equivalent visual artifact is captured for mobile
+      Inspector behavior.
+
+      - [ ] DOM/a11y evidence confirms language control, reprocess control, and source
+      identifiers are present with expected labels/roles and no translation drift.
+
+      - [ ] Evidence explicitly states whether frontend dependency bootstrap was required
+      and includes `npm --prefix web install` before build if node_modules was absent.
+
+      - [ ] Behavioral proof register marks each blocker-class UI/design obligation
+      PROVEN or gives an explicit closure path.
+
+      - [ ] Final headline is PASS only if rendered UI proof closes PROOF-GAP-001/B2
+      UI obligations.'
+    verification: '- [ ] UIUX audit uses real rendered UI/DOM/a11y artifacts, not
+      only spec lint or static code review.
+
+      - [ ] Screenshot/DOM/a11y proof covers language control, bracket-style reprocess
+      action, source identifier non-translation, desktop split-scroll, mobile Inspector,
+      and copy drift checks.
+
+      - [ ] Frontend build/runtime proof includes dependency bootstrap when needed.
+
+      - [ ] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\
+      \n\n## UIUX Rendered Proof Report\n\n### why_previous_gate_failed\n<explain\
+      \ PROOF-GAP-001/B2 rendered proof gap>\n\n### why_previous_review_missed_or_could_not_prove_it\n\
+      <explain design-reviewer boundary and missing rendered artifacts>\n\n### Frontend\
+      \ Bootstrap\n- `web/node_modules` present before run: yes/no\n- Commands executed:\n\
+      \  ```\n  npm --prefix web install  # if node_modules absent\n  npm --prefix\
+      \ web run build\n  <browser/runtime command>\n  ```\n- Actual output:\n  ```\n\
+      \  <paste output>\n  ```\n\n### Rendered Artifacts\n| Obligation | Artifact\
+      \ | DOM/a11y evidence | Status |\n| --- | --- | --- | --- |\n| Language control\
+      \ terse/low-chrome | <screenshot/path> | <role/text evidence> | PROVEN/UNPROVEN\
+      \ |\n| Bracket-style reprocess action | <screenshot/path> | <role/text evidence>\
+      \ | PROVEN/UNPROVEN |\n| Source identifiers non-translated | <screenshot/path>\
+      \ | <DOM text evidence> | PROVEN/UNPROVEN |\n| Desktop split-scroll | <screenshot/path>\
+      \ | <layout evidence> | PROVEN/UNPROVEN |\n| Mobile Inspector | <screenshot/path>\
+      \ | <responsive evidence> | PROVEN/UNPROVEN |\n| No onboarding/settings/AI-magic\
+      \ drift | <screenshot/path> | <copy scan evidence> | PROVEN/UNPROVEN |\n\n###\
+      \ Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n| <DESIGN section> | <claim> | <proof> |\
+      \ <artifact> | PROVEN/UNPROVEN | <path> | <OPEN/BLOCK basis> |\n\n### Headline\n\
+      - [ ] PASS: rendered UI proof closes PROOF-GAP-001/B2 UI obligations\n- [ ]\
+      \ FAIL: any required rendered obligation remains UNPROVEN"
+    depends_on:
+    - plfinal-batched-rendered-proof-and-reprocess-remediation
+    agent: uiux-auditor
