@@ -64130,7 +64130,7 @@ phases:
       gate.'
   - id: urda-final-spec-boundary-blockers-retest
     name: Retest final spec/product boundary blocker closures R6 R7 R12 R18
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -64254,6 +64254,105 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T05:00:55.927733+00:00'
+    done_at: '2026-05-15T05:07:24.014160+00:00'
+    evidence: "## Verification Report\n**Tester**: integration-verifier (independent\
+      \ of frontend-engineer)\n**Scope**: R6/R7/R12/R18 final spec/product boundary\
+      \ blocker closure\n**Independence Level**: L2\n**Timestamp**: 2026-05-15T05:05:31Z\n\
+      \n### refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — Lines 11-19,\
+      \ 43, 67, 145-151 confirm one Go deployable, one SQLite DB, no accounts/OAuth/RBAC,\
+      \ no vector/RAG, no sidecar/admin/worker/sync process.\n- docs/DESIGN.md — Lines\
+      \ 525-558 define Source Ledger bracket actions, manual `[RUN INGEST]`/`[FETCH]`,\
+      \ raw diagnostics, delete confirmation, no queues/job dashboards/folders/tags/settings;\
+      \ lines 583-599 require terminal bracket-action inversion and exact `[EXPORTING\
+      \ STATE...]` / `[IMPORTING STATE...]`.\n- docs/ui-preview.html — Lines 671-714\
+      \ show preview Source Ledger with `[RUN INGEST]`, `[FETCH]`, bracket-action\
+      \ delete, and manual-ingest guidance.\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — Lines 334-361 identify weak bracket-action hover/focus inversion; lines\
+      \ 533-567 identify delete confirmation row geometry shift from height 101 to\
+      \ 102.\n- web/src/routes/components/SourceLedger.svelte — Lines 235-241 render\
+      \ `[FETCH]`, `[DELETE]`, `[CONFIRM]` with canonical `bracket-action` plus `bracket-action--delete`/`--confirm`;\
+      \ lines 77-89 render raw `err:` status; lines 208-219 render `[IMPORT OPML]`\
+      \ and `[RUN INGEST]`.\n- web/src/app.css — Lines 228-255 define `.bracket-action`\
+      \ and hover/focus inversion to text/background colors; lines 272-276 reserve\
+      \ equal 12ch width for delete/confirm; lines 159-168 and 200-206 define stable\
+      \ grid row/action layout.\n- internal/resofeed/ranking.go — Lines 645-657 render\
+      \ source-add receipt as `source added: <identity>; visible in SOURCE LEDGER;\
+      \ use [RUN INGEST] or row [FETCH] there for immediate refresh`.\n- web/src/routes/components/StatePortability.svelte\
+      \ — Lines 61-62 render exact active labels `[EXPORTING STATE...]` and `[IMPORTING\
+      \ STATE...]`.\n- web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ — Lines 180-200 assert R6 bracket-action classes and hover/focus inversion;\
+      \ lines 202-211 assert row bounding box equality after delete confirmation.\n\
+      - internal/resofeed/pbar_steer_receipt_remediation_test.go — Lines 24-32 require\
+      \ source identity plus manual Source Ledger `[RUN INGEST]`/`[FETCH]` guidance\
+      \ and forbid stale `background ingest will pick it up`, queue, job dashboard,\
+      \ worker copy.\n\n### Static Verification\n- Bracket action token/class proof:\n\
+      \  - `web/src/routes/components/SourceLedger.svelte:238`: `[CONFIRM]` button\
+      \ has `class=\"bracket-action bracket-action--confirm\"`.\n  - `web/src/routes/components/SourceLedger.svelte:240`:\
+      \ `[DELETE]` button has `class=\"bracket-action bracket-action--delete\"`.\n\
+      \  - `web/src/app.css:241-248`: `.bracket-action:hover`, `.bracket-action:focus`,\
+      \ and `.bracket-action:focus-visible` invert to `background: var(--rf-color-text)`\
+      \ and `color: var(--rf-color-background)`.\n  - `web/src/app.css:272-276`: delete\
+      \ and confirm share fixed width `12ch`.\n  - Static scan for bespoke `.source-ledger-delete`\
+      \ / `.source-ledger-confirm` class hits returned none.\n- State portability\
+      \ active label proof:\n  - `rg -n \"\\[EXPORTING STATE\\.\\.\\.\\]|\\[IMPORTING\
+      \ STATE\\.\\.\\.\\]\" web/src/routes/components/StatePortability.svelte` found\
+      \ exact labels on lines 61-62.\n- Stale copy absence/replacement proof:\n  -\
+      \ `rg -n \"background ingest will pick it up\" internal web/src web/tests cmd`\
+      \ found only `internal/resofeed/pbar_steer_receipt_remediation_test.go:28` as\
+      \ a forbidden negative assertion.\n  - Runtime copy replacement in `internal/resofeed/ranking.go:656`\
+      \ points to `SOURCE LEDGER`, `[RUN INGEST]`, and row `[FETCH]`.\n- Forbidden\
+      \ product/runtime surface scan:\n  - Scan over `cmd internal web/src/routes\
+      \ web/src/lib` found hits only in negative contract/test/comment/guard strings,\
+      \ OPML “folders flattened” receipt, Go `sync` package use, or explicit “must\
+      \ not” comments; no user-facing forbidden surface, separate deployable, sidecar,\
+      \ worker process, account/auth surface, queue/job dashboard, vector/RAG implementation,\
+      \ or settings UI.\n\n### Runtime Verification\n- Commands:\n  - `go test ./internal/resofeed\
+      \ -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction -count=1 -v`\
+      \ → exit 0.\n  - Initial `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\
+      \ → exit 127 because `playwright: command not found`; verified missing `web/node_modules/.bin`,\
+      \ ran `npm --prefix web ci` → exit 0.\n  - Re-run `npm --prefix web run test:e2e\
+      \ -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts` → exit\
+      \ 0, 6 passed.\n  - Temporary proof spec was added and removed only to emit\
+      \ numeric bounds; no tracked changes remain.\n- Delete confirmation bounding\
+      \ boxes:\n  ```\n  before: x=65,y=186,w=1150,h=97\n  after: x=65,y=186,w=1150,h=97\n\
+      \  delta: dx=0,dy=0,dw=0,dh=0\n  ```\n- Hover/focus inversion evidence:\n  -\
+      \ Hover `[DELETE]`: `backgroundColor=\"rgb(36, 35, 30)\"`, `color=\"rgb(243,\
+      \ 240, 231)\"`.\n  - Focus `[CONFIRM]`: `backgroundColor=\"rgb(36, 35, 30)\"\
+      `, `color=\"rgb(243, 240, 231)\"`.\n- Test result summary:\n  - Go PBAR stale\
+      \ receipt regression: PASS, 1 test.\n  - Playwright Source Ledger retest: PASS,\
+      \ 6 tests.\n  - Numeric proof test: PASS, 1 test; emitted `URDA_LAYOUT_PROOF`\
+      \ with zero delta.\n\n### Behavioral Proof Register\n| requirement_ref | behavior_claim\
+      \ | runtime_proof_expected | evidence_ref | status | closure_path | gate_decision_basis\
+      \ |\n| --- | --- | --- | --- | --- | --- | --- |\n| R6 | `[DELETE]` and `[CONFIRM]`\
+      \ use canonical bracket actions and terminal hover/focus inversion | yes | SourceLedger.svelte:238-240;\
+      \ app.css:241-248; Playwright R6 passed; URDA hover/focus colors | PROVEN |\
+      \ none | Static classes plus runtime CSS inversion proven |\n| R7 | Delete confirmation\
+      \ causes zero Source Ledger row layout shift | yes | URDA_LAYOUT_PROOF before/after/delta;\
+      \ Playwright Issue 13 passed | PROVEN | none | Exact delta dx=0,dy=0,dw=0,dh=0\
+      \ |\n| R12 | Stale copy `background ingest will pick it up` absent/replaced\
+      \ with manual Source Ledger guidance | yes | ranking.go:656; PBAR Go test passed;\
+      \ rg hit only negative assertion | PROVEN | none | Runtime receipt copy points\
+      \ to `[RUN INGEST]` / `[FETCH]` |\n| R18 | StatePortability renders exact `[EXPORTING\
+      \ STATE...]` and `[IMPORTING STATE...]` active labels | yes | StatePortability.svelte:61-62;\
+      \ rg exact-label output | PROVEN | none | Exact labels statically present in\
+      \ runtime component |\n\n### Test-Step Semantic Reporting\n- step_intent: retest_green\n\
+      - expected_result: green\n- observed_result: green\n- failure_alignment: none\n\
+      - product_implementation_files_modified: no\n- verdict: PASS\n- blockers: []\n\
+      - gate_open_allowed: true\n- orchestrator_action_hint: COMPLETE\n\n### Commit\
+      \ hash(es)\n- none (verify-only, no changes)\n\n### Files changed\n- none tracked.\
+      \ Final worktree status clean.\n- Test-generated tracked `.test-artifacts` changes\
+      \ were restored. Ignored `web/node_modules`, `web/.svelte-kit`, and `web/build`\
+      \ may exist from dependency install/build.\n\n### Verification\n- `go test ./internal/resofeed\
+      \ -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction -count=1 -v`:\
+      \ PASS; `--- PASS: TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`,\
+      \ `ok resofeed/internal/resofeed 0.498s`.\n- `npm --prefix web run test:e2e\
+      \ -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts`: PASS;\
+      \ `6 passed (6.2s)`.\n- Temporary numeric proof e2e: PASS; `1 passed (2.9s)`\
+      \ and zero layout delta.\n- Static scans described above.\n\n### Gaps/Notes\n\
+      - `npm ci` reported 5 dependency vulnerabilities; not part of this blocker retest.\n\
+      - `.audit-artifacts/pbar-final-closure-matrix.md` contains stale historical\
+      \ text, but required product/runtime/docs refs under test and runtime receipt\
+      \ copy are clean; no product code/docs were modified."
   - id: urda-final-spec-boundary-blockers-uiux-audit
     name: UIUX audit final spec boundary blocker visual closures
     status: done
