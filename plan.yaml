@@ -66381,7 +66381,7 @@ phases:
 
       ## Completion Criteria
 
-      - [x] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
+      - [ ] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
 
       - [x] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
 
@@ -66389,15 +66389,15 @@ phases:
 
       - [x] Any remaining blocker or should-fix gap includes a remediation owner and
       closure path.'
-    verification: '- [ ] Multimodal audit includes rendered screenshots/images or
+    verification: '- [x] Multimodal audit includes rendered screenshots/images or
       equivalent visual/spatial artifacts for desktop and 390x844 mobile states.
 
-      - [ ] Audit explicitly verifies FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
+      - [x] Audit explicitly verifies FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
       and FR-10.
 
-      - [ ] Audit verifies no forbidden ResoFeed UI concepts were introduced.
+      - [x] Audit verifies no forbidden ResoFeed UI concepts were introduced.
 
-      - [ ] Parseable headline is PASS or PASS_WITH_DEBT with no blocker-class unresolved
+      - [x] Parseable headline is PASS or PASS_WITH_DEBT with no blocker-class unresolved
       findings before final gate.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
