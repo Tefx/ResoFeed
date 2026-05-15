@@ -70489,7 +70489,7 @@ phases:
       - [x] Missing HTTP/MCP/frontend registration is recorded as downstream-owned
       and blocking for downstream gates, not as a storage-core wiring failure.
 
-      - [ ] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
+      - [x] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
       production backend-core paths.
 
       - [ ] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
