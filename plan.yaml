@@ -78797,7 +78797,7 @@ phases:
       UI final blocker remediation path.'
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Gate blocks unless Steer route/undo/API/MCP/UI delta contracts are pinned
     and expected-red tests expose current gaps without product implementation.
   depends_on:
@@ -78805,7 +78805,7 @@ phases:
   steps:
   - id: srdct-backend-contract-lock
     name: Lock backend Steer preview undo and invariant contract
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -78874,6 +78874,8 @@ phases:
 
       '
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T21:00:04.881389+00:00'
   - id: srdct-frontend-contract-lock
     name: Lock frontend route preview state and fixture contract
     status: pending
