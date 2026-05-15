@@ -69211,6 +69211,95 @@ phases:
     are implemented and independently verified.
   depends_on:
   - processing-language-contract-tests
+  steps:
+  - id: plsc-runtime-metadata-receipts
+    name: Complete runtime metadata migrations and live receipt semantics
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the implementation within existing flat Go package boundaries for runtime
+      metadata and `agent_receipts` live semantics.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - docs/ARCHITECTURE.md §4.5, §4.7, §4.8, §6 idempotency rules are AUTHORITATIVE.
+
+      - plct-contract-lock and plct-backend-expected-red-tests are protected acceptance
+      anchors.
+
+
+      YOUR SCOPE: runtime metadata migrations/accessors and receipt helpers only.
+      Preserve `runtime_metadata` export/import exclusion. Implement `processing_language`
+      default/effective `en`, supported enum `en|zh`, optional `search_fts_stale_since`,
+      request fingerprints, 24h live TTL, live uniqueness, expired-row transaction
+      handling, replay/mismatch outcomes.
+
+
+      ## Hardened state/persistence acceptance
+
+      - [ ] relative vs absolute DB path behavior remains unchanged.
+
+      - [ ] missing `processing_language` falls back to effective `en`.
+
+      - [ ] explicit clear/null overwrite semantics are impossible for required metadata
+      values unless contract permits deletion of stale marker.
+
+      - [ ] stale receipt vs new request precedence follows live TTL rules.
+
+      - [ ] partial-write or SQLite error paths are transactional.
+
+      - [ ] concurrent access scenario for receipt reuse is documented and tested.
+
+      - [ ] cleanup/reset semantics between tests are explicit.
+
+      - [ ] receipt storage has bounded live semantics; expired rows are ignored/deleted/replaced.
+
+      - [ ] state export/import excludes runtime metadata and receipts.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] This is an IMPLEMENTATION step; stub-only completion is not acceptable.
+
+      - [ ] Logic processes inputs and produces outputs that vary by metadata key,
+      language, request fingerprint, TTL, and receipt state.
+
+      - [ ] No jobs, queues, ledgers, sync records, or portable receipts are introduced.'
+    verification: '- [ ] Targeted tests for runtime metadata and receipt helpers pass.
+
+      - [ ] Failure-path regressions cover expired receipt replacement and request_fingerprint_mismatch.
+
+      - [ ] State export/import tests prove runtime metadata and receipts are excluded.
+
+      - [ ] No forbidden persistence tables or service layers are added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Metadata keys implemented:
+
+      - Receipt TTL/fingerprint behavior evidence:
+
+      - Commands/tests run and outputs:
+
+      - Forbidden concepts search result:'
+    agent: golang-developer
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
