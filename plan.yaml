@@ -75302,7 +75302,7 @@ phases:
       - [x] HTTP delivery and MCP `report_delivery` update the same item state and
       replay/mismatch semantics.
 
-      - [ ] Missing/invalid owner token fails before operation; `actor_id` alone grants
+      - [x] Missing/invalid owner token fails before operation; `actor_id` alone grants
       no access.
 
       - [ ] No delivery registry/activity ledger/job/sync artifact is visible.'
