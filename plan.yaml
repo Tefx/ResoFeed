@@ -70483,7 +70483,7 @@ phases:
       doctor symbols are consumed by core operations/tests or assigned to a downstream
       owner.
 
-      - [ ] Declaration-only contract anchors are classified as `downstream-owned`,
+      - [x] Declaration-only contract anchors are classified as `downstream-owned`,
       `core-consumed`, or `orphan-needs-core-remediation`.
 
       - [ ] Missing HTTP/MCP/frontend registration is recorded as downstream-owned
