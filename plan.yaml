@@ -73748,7 +73748,7 @@ phases:
 
       ## Frontend Completion Criteria (rendering required for consumers)
 
-      - [ ] Client types are consumed by rendered UI tests downstream.
+      - [x] Client types are consumed by rendered UI tests downstream.
 
       - [ ] No settings dashboard, preference center, wizard, progress dashboard,
       or activity log API is introduced.
