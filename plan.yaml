@@ -69575,6 +69575,90 @@ phases:
     - plsc-processing-language-ingest
     - plsc-reprocess-fts-doctor
     agent: integration-verifier
+  - id: plsc-core-wiring-audit
+    name: Audit backend core wiring and public symbol reachability
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Wiring completeness audit for backend core public symbols and storage/runtime
+      paths.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] Every new shared type/function has at least one runtime consumer outside
+      its own helper cluster.
+
+      - [ ] Runtime metadata keys are read/written only through approved runtime paths.
+
+      - [ ] `ProcessingLanguage` and `ReprocessLibraryResult` are consumed by HTTP/MCP/frontend-contract
+      surfaces where intended.
+
+      - [ ] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
+      production paths.
+
+      - [ ] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
+      are introduced.'
+    verification: '- [ ] Wiring audit report lists orphan exports, unconsumed config/metadata
+      fields, unregistered runtime paths, and remaining stubs.
+
+      - [ ] Any orphan/blocker has explicit remediation ownership before the gate.'
+    evidence_template: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Orphan exports**:
+
+      ```
+
+      <grep/import-trace output or none>
+
+      ```
+
+      **Unconsumed metadata/config fields**:
+
+      ```
+
+      <output or none>
+
+      ```
+
+      **Production stubs/placeholders**:
+
+      ```
+
+      <output or none>
+
+      ```
+
+      **Forbidden architecture concepts**:
+
+      ```
+
+      <output or none>
+
+      ```
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plsc-runtime-metadata-receipts
+    - plsc-processing-language-ingest
+    - plsc-reprocess-fts-doctor
+    agent: wiring-auditor
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
