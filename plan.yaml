@@ -74542,7 +74542,7 @@ phases:
 
       - [x] API client type tests pass.
 
-      - [ ] Source identifier preservation and split-scroll tests pass.
+      - [x] Source identifier preservation and split-scroll tests pass.
 
       - [ ] Evidence includes actual commands and rendered artifacts/DOM snapshots.'
     verification: '- [ ] Frontend test command passes for the new language/reprocess/source/split-scroll
