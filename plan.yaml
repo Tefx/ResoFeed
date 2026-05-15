@@ -68223,7 +68223,7 @@ phases:
       - [x] Confirmed the mobile Inspector for the grouped same-URL story visibly
       shows both `Fresh Runtime A` and `Fresh Runtime B`.
 
-      - [ ] Captured or cited a rendered mobile artifact path for the 390x844 state.
+      - [x] Captured or cited a rendered mobile artifact path for the 390x844 state.
 
       - [ ] Captured DOM/accessibility proof that the Inspector disclosure is reachable
       and semantically exposed.
