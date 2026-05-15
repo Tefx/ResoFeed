@@ -71647,7 +71647,7 @@ phases:
   steps:
   - id: plhm-http-runtime-endpoints
     name: Complete HTTP language reprocess delivery and validation endpoints
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -71817,6 +71817,120 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T15:30:12.449796+00:00'
+    done_at: '2026-05-15T15:41:46.683847+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key insight from worker: HTTP is a thin transport;
+      `/api/*` requires owner-token auth; strict unknown/duplicate query/body validation;
+      `/api/items/{id}/delivery`, runtime language, reprocess, search echo, and doctor
+      stale FTS lines are canonical HTTP contracts.
+
+      - `CONSTITUTION.md`: NOT READ: no file found in isolated worktree.
+
+
+      ## Integration Evidence
+
+      Path exercised: HTTP auth/validation -> core language/reprocess/delivery/search/doctor
+      operation -> canonical response/error shape.
+
+
+      Implemented:
+
+      - `/api/items/{id}/delivery` route with strict JSON body validation, UTC `delivered_at`
+      validation, idempotency replay/mismatch, item existence checks, and core `ReportDelivery`
+      call.
+
+      - Delivery state mutation moved into core (`ReportDelivery`) and reused from
+      MCP to keep HTTP thin.
+
+      - Language/reprocess guard conflicts exposed as canonical HTTP `409 conflict`.
+
+      - Reprocess guard acquisition adjusted so duplicate active reprocess requests
+      conflict instead of blocking until replay.
+
+      - Search query echo and doctor stale FTS lines verified by scoped tests.
+
+
+      ## Storage-core downstream blocker closure table
+
+      | Blocker | Status | Evidence |
+
+      |---|---|---|
+
+      | `/api/items/{id}/delivery` returned 404 | CLOSED | `TestPLCTDeliveryEndpointStrictValidationAndIdempotency`,
+      `TestHTTPDeliveryRouteValidationIdempotencyAndCoreState` |
+
+      | HTTP language mutation guard/reprocess-active duplicate behavior | CLOSED
+      | `SetProcessingLanguage` conflict mapping + `TestPLCT*`, `TestRuntimeMetadata*`
+      |
+
+      | HTTP reprocess route and operation guard behavior | CLOSED | `ReprocessLibrary`
+      guard before idempotency + `TestPLCTReprocessEndpointCountsStaleMarkerAndStrictValidation`
+      |
+
+      | HTTP search query echo | CLOSED | `TestHTTPHandlersExerciseCorePaths`, `TestPLCT*`
+      |
+
+      | Declaration-only HTTP-facing anchors | CLOSED | `DeliveryReportRequest` consumed
+      by HTTP/core; runtime constants remain consumed |
+
+
+      ## Mainline Final-State Verification
+
+      After squash merge to main:
+
+      - `go test ./internal/resofeed -run ''TestPLCT|TestHTTPDelivery|TestHTTPHandlersExerciseCorePaths|TestHTTPMutationIdempotencyReplaysInspectResonanceAndSteer|TestHTTPNoQueryEndpointsRejectUnknownAndDuplicateParameters|TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters|TestHTTPAuthRunsBeforeQueryValidationDetails|TestReprocessLibrary|TestDoctor''`
+      — exit 0; output `ok resofeed/internal/resofeed 0.734s`.
+
+      - `go test -race ./internal/resofeed -run ''TestPLCT|TestHTTPDelivery|TestReprocessLibrary|TestRuntimeMetadata''`
+      — exit 0; output `ok resofeed/internal/resofeed 2.100s`.
+
+      - `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-plhm-main
+      ./cmd/resofeed` — exit 0.
+
+
+      ## Worker Verification
+
+      - Targeted HTTP tests/race/build/lint passed in isolated worktree.
+
+      - `go test ./...` exit 1 only due MCP expected-red parity, explicitly out of
+      scope for this HTTP-only step.
+
+
+      ## Artifacts Modified
+
+      - `internal/resofeed/http.go`
+
+      - `internal/resofeed/http_impl_test.go`
+
+      - `internal/resofeed/mcp.go`
+
+      - `internal/resofeed/ranking.go`
+
+      - `internal/resofeed/reprocess.go`
+
+
+      ## Commit hash(es)
+
+      - Worker branch commit: `b098ada4c8ba382bf0b74cb666dbf839690536cd` — `http:
+      wire runtime delivery endpoints`.
+
+      - Main squash merge commit: `448f07a1` — `[vectl] step-plhm-http-runtime-endpoints
+      completed`.
+
+
+      ## Spec link
+
+      - `docs/ARCHITECTURE.md` §§ 5.6, 6, Processing Language and Reprocess HTTP Addendum.
+
+
+      ## Gaps/Notes
+
+      - MCP parity remains intentionally out of this step and was separately assigned
+      to `plhm-mcp-runtime-parity`.
+
+      - No delivery registry, job/queue, sync/merge, vector/RAG, or ledger artifacts
+      were introduced.'
   - id: plhm-mcp-runtime-parity
     name: Complete MCP language reprocess delivery parity
     status: claimed
