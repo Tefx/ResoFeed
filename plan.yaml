@@ -63598,11 +63598,17 @@ phases:
       - `urda-uiux-multimodal-design-audit` produced PASS or accepted PASS_WITH_DEBT
       with non-blocking rationale.
 
+      - `urda-final-spec-boundary-blockers-retest` proves R6, R7, R12, and R18 closed
+      after remediation, including bracket-action styling, delete-confirmation no-layout-shift
+      runtime proof, stale steering receipt copy removal/replacement, exact state
+      portability active labels, and forbidden-surface regression scan.
+
       - `urda-final-black-box-runtime-ui-smoke` passes the runnable UI and CLI preservation
       matrix.
 
-      - `urda-final-spec-and-product-boundary-review` finds no blocker-class DESIGN/ARCHITECTURE
-      divergence.
+      - `urda-final-spec-and-product-boundary-review` findings are remediated or explicitly
+      non-intersecting; the known failed review cannot be treated as gate-opening
+      evidence by itself.
 
       - `docs/ui-preview.html` drift from issue 3 is closed.
 
@@ -63611,15 +63617,19 @@ phases:
 
       The final gate decision must include a structured behavioral proof register
       and issue coverage table. OPEN is invalid if any blocker-class behavioral runtime/UI
-      obligation is NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING without remediation
-      ownership.'
+      obligation is NEEDS_TEST, UNPROVEN, PARTIAL, DIVERGES, or UNCERTAIN_BLOCKING
+      without remediation ownership.'
     verification: '- Full-plan-check final gate.
 
-      - Reviews issue closure matrix, spec/product-boundary review, black-box runtime
-      smoke, frontend gate, backend gate, and uiux-auditor handoff.
+      - Reviews issue closure matrix, spec/product-boundary review, R6/R7/R12/R18
+      remediation retest, black-box runtime smoke, frontend gate, backend gate, and
+      uiux-auditor handoff.
 
       - OPEN only if all 14 audit issues are proven fixed or explicitly non-intersecting
       and no forbidden product/runtime concepts were introduced.
+
+      - R6/R7/R12/R18 cannot be treated as closed unless `urda-final-spec-boundary-blockers-retest`
+      provides PASS evidence with static, runtime, copy, and product-boundary proof.
 
       - Evidence includes gate_decision_basis for unresolved statuses and final OPEN/BLOCK
       recommendation.'
@@ -63690,6 +63700,7 @@ phases:
     depends_on:
     - urda-final-issue-closure-matrix
     - urda-final-spec-and-product-boundary-review
+    - urda-final-spec-boundary-blockers-retest
     - urda-final-black-box-runtime-ui-smoke
     agent: gate-reviewer
   - id: urda-final-spec-boundary-blockers-fix
