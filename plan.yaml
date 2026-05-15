@@ -70920,7 +70920,7 @@ phases:
       the gate. Remediation is now explicit and blocking before `plsc-core-gate`.'
   - id: plsc-core-gate
     name: Gate processing language storage and core backend
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -71027,6 +71027,8 @@ phases:
     - plsc-core-spec-conformance
     - plsc-storage-core-blocker-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T15:22:42.505101+00:00'
   - id: plsc-storage-core-blocker-fix
     name: Fix storage-core language guard and orphan anchors
     status: done
