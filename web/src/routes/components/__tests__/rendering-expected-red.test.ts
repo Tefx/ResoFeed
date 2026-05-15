@@ -142,7 +142,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await user.keyboard('{Enter}');
     expect(onSelect).toHaveBeenCalledWith(expectedRedItem);
 
-    const star = screen.getByRole('button', { name: 'Resonate item' });
+    const star = screen.getByRole('button', { name: `Resonate item: ${expectedRedItem.title}` });
     await user.click(star);
     expect(onResonanceToggle).toHaveBeenCalledWith(expectedRedItem, true);
     expect(screen.queryByRole('region', { name: 'Opened Inspector focus target' })).not.toBeInTheDocument();
@@ -191,7 +191,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     );
     expect(within(inspector).getByText('source text: RSS excerpt only')).toBeVisible();
     expect(within(inspector).getByText('why: fresh from configured source')).toBeVisible();
-    expect(within(inspector).queryByRole('button', { name: 'Resonate item' })).not.toBeInTheDocument();
+    expect(within(inspector).queryByRole('button', { name: `Resonate item: ${expectedRedItem.title}` })).not.toBeInTheDocument();
     await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());
   });
 
@@ -277,7 +277,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const inspector = screen.getByRole('complementary', { name: expectedRedItem.title });
     const headerRow = inspector.querySelector('.inspector-header-row');
     const heading = within(inspector).getByRole('heading', { name: expectedRedItem.title });
-    const star = within(inspector).getByRole('button', { name: 'Resonate item' });
+    const star = within(inspector).getByRole('button', { name: `Resonate item: ${expectedRedItem.title}` });
 
     expect(headerRow).toContainElement(star);
     expect(Boolean(star.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
@@ -391,7 +391,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'back to TODAY' })[0]).toBeVisible());
     expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toHaveTextContent('Full extracted text shown only in Inspector.');
-    expect(screen.getAllByRole('button', { name: 'Resonate item' }).length).toBeGreaterThan(1);
+    expect(screen.getAllByRole('button', { name: `Resonate item: ${expectedRedItem.title}` }).length).toBeGreaterThan(1);
 
     const steer = screen.getByLabelText('Steer or paste RSS URL');
     await user.type(steer, 'source ledger');
@@ -448,7 +448,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
-    expect(within(ledger).getByText(/src: Example Source · status: ok/)).toBeVisible();
+    expect(within(ledger).getByText('src: Example Source')).toBeVisible();
+    expect(within(ledger).getByText('url: https://example.com/feed.xml')).toBeVisible();
+    expect(within(ledger).getByText('last_fetch: 00:00:00')).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
     expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
     expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
@@ -467,7 +469,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     ).toBeVisible();
 
     await user.click(within(portability).getByRole('button', { name: '[IMPORT STATE]' }));
-    expect(within(portability).getByLabelText('import state JSON')).toHaveClass('visually-hidden');
+    expect(within(portability).getByLabelText('Choose state JSON')).toHaveClass('visually-hidden');
 
     await user.click(within(portability).getByRole('button', { name: '[EXPORT STATE]' }));
     expect(within(portability).getByRole('status')).toHaveTextContent('exported state.json');
@@ -512,7 +514,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     await user.click(within(result).getByRole('button', { name: `Inspect search result: ${expectedRedFallbackItem.title}` }));
     expect(onSelect).toHaveBeenCalledWith(expectedRedFallbackItem);
-    await user.click(within(result).getByRole('button', { name: 'Resonate item' }));
+    await user.click(within(result).getByRole('button', { name: `Resonate item: ${expectedRedFallbackItem.title}` }));
     expect(onResonanceToggle).toHaveBeenCalledWith(expectedRedFallbackItem, true);
   });
 });

@@ -58,6 +58,8 @@ interface IngestEnvelope {
   source?: unknown;
 }
 
+type ManualFetchSuccessBody = IngestEnvelope | RunIngestSuccessResponse;
+
 function fallbackError(code: ApiErrorCode, message: string): ErrorBody {
   return { error: { code, message, details: emptyDetails } };
 }
@@ -80,7 +82,14 @@ function isManualRssFetchErrorBody(value: ManualRssFetchErrorBody): boolean {
   );
 }
 
-function normalizeIngestEnvelope(body: IngestEnvelope, operation: RunIngestSuccessResponse['operation']): RunIngestSuccessResponse {
+function isIngestEnvelope(body: ManualFetchSuccessBody): body is IngestEnvelope {
+  return 'ingest' in body;
+}
+
+function normalizeIngestEnvelope(body: ManualFetchSuccessBody, operation: RunIngestSuccessResponse['operation']): RunIngestSuccessResponse {
+  if (!isIngestEnvelope(body)) {
+    return body.operation === operation ? body : { ...body, operation };
+  }
   const ingest = body.ingest;
   return {
     operation,
@@ -184,12 +193,12 @@ export class ResoFeedApiClient {
   }
 
   async runIngest(): Promise<ManualRssFetchApiResult<RunIngestSuccessResponse>> {
-    const result = await this.manualRssFetchRequest<IngestEnvelope>('/api/ingest');
+    const result = await this.manualRssFetchRequest<ManualFetchSuccessBody>('/api/ingest');
     return result.ok ? { ...result, body: normalizeIngestEnvelope(result.body, 'ingest') } : result;
   }
 
   async fetchSource(sourceId: OpaqueId): Promise<ManualRssFetchApiResult<FetchSourceSuccessResponse>> {
-    const result = await this.manualRssFetchRequest<IngestEnvelope>(
+    const result = await this.manualRssFetchRequest<ManualFetchSuccessBody>(
       `/api/sources/${encodeURIComponent(sourceId)}/fetch`
     );
     return result.ok ? { ...result, body: normalizeIngestEnvelope(result.body, 'source_fetch') } : result;

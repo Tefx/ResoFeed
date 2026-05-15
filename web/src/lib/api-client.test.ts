@@ -74,7 +74,10 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(itemDisplayExcerpt(expectedRedFallbackItem)).toBe('Source-backed feed excerpt for list/search fallback.');
 
     render(SourceLedger, { props: { sources: sources.sources, onDeleteSource: async () => {}, onImportOpml: async () => {}, onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
-    expect(screen.getByRole('region', { name: 'SOURCE LEDGER' })).toHaveTextContent('src: Example Source · status: ok');
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    expect(ledger).toHaveTextContent('src: Example Source');
+    expect(ledger).toHaveTextContent('url: https://example.com/feed.xml');
+    expect(ledger).toHaveTextContent('last_fetch: 00:00:00');
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });

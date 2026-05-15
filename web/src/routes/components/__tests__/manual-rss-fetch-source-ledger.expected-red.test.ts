@@ -60,7 +60,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeInTheDocument();
-    expect(within(ledger).getByRole('button', { name: '[FETCH]' })).toBeInTheDocument();
+    expect(within(ledger).getByRole('button', { name: 'Fetch source Example' })).toHaveTextContent('[FETCH]');
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example' })).toHaveTextContent('[DELETE]');
   });
 
@@ -126,12 +126,12 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(row).toBeInstanceOf(HTMLLIElement);
     expect(row).toHaveTextContent(/src: simonwillison\.net\/feed\.xml\s+url: https:\/\/simonwillison\.net\/atom\/everything\s+last_fetch: 10:25:31\s+\[FETCH\]\s+\[DELETE\]\s+\[DETAILS\]/);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
-    expect(row?.children).toHaveLength(5);
+    expect(row?.children).toHaveLength(4);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');
     expect(row?.children[1]).toHaveClass('source-ledger-url');
     expect(row?.children[2]).toHaveClass('source-ledger__status');
     expect(row?.children[3]).toHaveClass('source-ledger__actions');
     expect(row?.children[3]?.children[1]).toHaveClass('bracket-action--delete');
-    expect(row?.children[4]).toHaveClass('source-diagnostic-details');
+    expect(row?.children[3]?.children[2]).toHaveClass('source-diagnostic-details');
   });
 });
