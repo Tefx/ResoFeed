@@ -72343,7 +72343,7 @@ phases:
       - [x] call `GET /api/runtime/language` and one strict-validation failure over
       HTTP.
 
-      - [ ] call MCP `get_processing_language` or resource `resofeed://runtime/language`
+      - [x] call MCP `get_processing_language` or resource `resofeed://runtime/language`
       through `/mcp`.
 
       - [ ] prove `/api/doctor` returns `search_fts: ok` or stale line.
