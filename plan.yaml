@@ -73830,7 +73830,7 @@ phases:
       Files changed: none'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
-  status: pending
+  status: in_progress
   gate: Frontend gate blocks unless language/reprocess controls, API client types,
     source identifier preservation, split scroll behavior, rendered UI proof, and
     UIUX audit pass against DESIGN.md.
@@ -73839,7 +73839,7 @@ phases:
   steps:
   - id: plfu-api-client-types
     name: Update frontend API client types for language reprocess and delivery
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -73972,6 +73972,8 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T16:38:54.912075+00:00'
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
     status: pending
