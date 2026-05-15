@@ -75294,7 +75294,7 @@ phases:
       - [x] HTTP `GET/PUT /api/runtime/language` and MCP `get/set_processing_language`
       produce equivalent state.
 
-      - [ ] HTTP `POST /api/runtime/reprocess-library` and MCP `reprocess_library`
+      - [x] HTTP `POST /api/runtime/reprocess-library` and MCP `reprocess_library`
       produce equivalent result shape/semantics.
 
       - [ ] HTTP search and MCP `search_items` include equivalent `query` echo.
