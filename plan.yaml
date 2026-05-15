@@ -78268,7 +78268,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] All seven listed blocker failures are addressed in the served app path,
+      - [x] All seven listed blocker failures are addressed in the served app path,
       not only in isolated tests.
 
       - [ ] `why_previous_gate_failed` is documented with the DOM/state root cause
