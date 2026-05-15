@@ -77661,7 +77661,7 @@ phases:
       - [x] B2/R14-R16 rendered/runtime proof no longer depends on a bare missing-Vite
       worktree.
 
-      - [ ] NEEDS_TEST ledger items are PROVEN or have explicit closure paths: language
+      - [x] NEEDS_TEST ledger items are PROVEN or have explicit closure paths: language
       future-only/no row rewrite/FTS, steering precedence, desktop split-scroll, source
       identifier non-translation.
 
