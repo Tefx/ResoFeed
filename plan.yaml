@@ -71029,7 +71029,7 @@ phases:
     agent: gate-reviewer
   - id: plsc-storage-core-blocker-fix
     name: Fix storage-core language guard and orphan anchors
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -71208,6 +71208,8 @@ phases:
     - plsc-core-spec-conformance
     - plsc-core-wiring-audit
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T15:08:19.917260+00:00'
   - id: plsc-storage-core-blocker-retest
     name: Retest storage-core blocker remediation
     status: pending
