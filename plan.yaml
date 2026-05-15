@@ -73414,7 +73414,7 @@ phases:
       \ operation/scope where required.\n- [x] MCP JSON-RPC `error.data` shape matches\
       \ architecture examples without extra top-level drift fields.\n- [x] `SearchItemsForMCP`\
       \ stale no-query-echo path is gone or provably private/safe with a real caller.\n\
-      - [ ] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
+      - [x] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
       - [ ] Behavioral proof register supports an OPEN/BLOCK decision for `plhm-runtime-gate`."
     verification: '- [ ] Full `go test ./...` passes and output is included.
 
