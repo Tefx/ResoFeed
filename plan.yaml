@@ -71882,7 +71882,7 @@ phases:
 
       ## Gate Preview (what gate WILL reject)
 
-      - [ ] MCP exposes product concepts unavailable to HTTP/humans.
+      - [x] MCP exposes product concepts unavailable to HTTP/humans.
 
       - [x] Missing query echo in `search_items`.
 
