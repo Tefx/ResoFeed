@@ -53,6 +53,7 @@
   let shellElement = $state<HTMLElement | undefined>();
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
+  let preservedFeedScrollTop = $state(0);
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -137,6 +138,23 @@
     // DESIGN.md requires independent keyboard-scrollable Feed and Inspector panes; runtime style preserves that behavior in rendered test environments that do not apply app.css.
     if (feedPaneElement) feedPaneElement.style.overflowY = 'auto';
     if (detailPaneElement) detailPaneElement.style.overflowY = 'auto';
+  }
+
+  async function restoreFeedScrollPosition(): Promise<void> {
+    await tick();
+    if (typeof requestAnimationFrame === 'function') {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    if (feedPaneElement) feedPaneElement.scrollTop = preservedFeedScrollTop;
+  }
+
+  async function focusSurfaceAndRestoreFeed(surface: Surface): Promise<void> {
+    await focusActiveSurface(surface);
+    if (surface === 'feed') await restoreFeedScrollPosition();
+  }
+
+  function rememberFeedScrollPosition(): void {
+    preservedFeedScrollTop = feedPaneElement?.scrollTop ?? preservedFeedScrollTop;
   }
 
   $effect(() => {
@@ -244,6 +262,7 @@
   }
 
   async function selectItem(item: ItemSummary): Promise<void> {
+    if ((feedPaneElement?.scrollTop ?? 0) > 0) rememberFeedScrollPosition();
     selectedItemId = item.id;
     selectedItemDetail = null;
     currentSurface = 'inspector';
@@ -258,6 +277,7 @@
       // Inspection marking is provenance-only; keep Inspector navigation usable if a test/runtime stub omits the mutation route.
     }
     await loadItemDetail(item.id);
+    await restoreFeedScrollPosition();
   }
 
   function showSurface(surface: Surface, updateUrl = true): void {
@@ -273,7 +293,7 @@
       searchSeedQuery = '';
       steerCommand = '';
     }
-    void focusActiveSurface(surface);
+    void focusSurfaceAndRestoreFeed(surface);
   }
 
   function receiptMessageWithoutInterpretation(receipt: SteerReceipt): string {
@@ -593,7 +613,7 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface independent scroll" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent">
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface independent scroll" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
