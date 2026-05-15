@@ -74538,7 +74538,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Language/reprocess rendered tests now pass green.
+      - [x] Language/reprocess rendered tests now pass green.
 
       - [ ] API client type tests pass.
 
