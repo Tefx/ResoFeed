@@ -70373,7 +70373,7 @@ phases:
       - [x] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
       production paths.
 
-      - [ ] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
+      - [x] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
       are introduced.'
     verification: '- [ ] Wiring audit report lists orphan exports, unconsumed config/metadata
       fields, unregistered runtime paths, and remaining stubs.
