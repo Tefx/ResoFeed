@@ -66487,7 +66487,7 @@ phases:
 
       - [ ] FAIL'
     depends_on:
-    - ui-runtime-fresh-review-green-retest
+    - ui-runtime-fresh-review-full-frontend-green-retest
     agent: blind-tester
   - id: ui-runtime-fresh-review-final-gate
     name: Final gate for fresh runtime UI review remediation
