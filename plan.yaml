@@ -63047,7 +63047,7 @@ phases:
       on evidence above and previously passed mainline retest.'
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
-  status: pending
+  status: in_progress
   gate: Final closure blocks unless every audit issue 1-14 has issue-by-issue proof,
     screenshot/runtime evidence, UIUX auditor verdict, CLI/runnable liveness proof
     where applicable, doc-preview sync evidence, and no forbidden ResoFeed concepts
@@ -63057,7 +63057,7 @@ phases:
   steps:
   - id: urda-final-issue-closure-matrix
     name: Finalize issue-by-issue runtime UI audit closure matrix
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63133,6 +63133,8 @@ phases:
 
       PASS | FAIL'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T03:20:39.959511+00:00'
   - id: urda-final-spec-and-product-boundary-review
     name: Verify final UI repairs against architecture, design, and product boundaries
     status: pending
