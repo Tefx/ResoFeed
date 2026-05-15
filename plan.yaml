@@ -81674,7 +81674,7 @@ phases:
     claimed_at: '2026-05-15T23:28:39.979008+00:00'
   - id: srdf-processing-language-low-chrome-controls
     name: Close processing language and reprocess low-chrome UI gaps
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -81745,6 +81745,107 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T23:28:19.659046+00:00'
+    done_at: '2026-05-15T23:42:06.579367+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — subagent read Language Control, Reprocess Library Action,
+      split-scroll processing-language layout, and Do/Don''ts; key insight: language
+      is a global low-chrome runtime control and reprocess is bracket-action only
+      with no spinner/progress/dashboard/queue/activity surface.
+
+      - docs/ARCHITECTURE.md — subagent read §3.5, §5.6, §8; key insight: frontend
+      exposes runtime language/reprocess controls while processing truth belongs to
+      runtime metadata, with no durable jobs/queues/settings panels.
+
+      - AGENTS.md — NOT READ by subagent: file absent in isolated worktree; repository
+      invariants were supplied in dispatch instructions.
+
+      - Existing processing-language tests/components — subagent read `web/src/routes/+page.svelte`,
+      `web/src/routes/components/SourceLedger.svelte`, `web/src/lib/api-client.ts`,
+      `web/src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`,
+      and `web/src/lib/processing-language-api-client.expected-red.test.ts`.
+
+
+      ## Low-Chrome Runtime Control Evidence
+
+      **Commit hash(es)**: worktree commit `f694709e`; main squash merge `daef867e
+      [vectl] step-srdf-processing-language-low-chrome-controls completed`.
+
+      **Files changed**:
+
+      - `web/src/routes/+page.svelte` — aligned rendered feed scroll accessible name
+      while preserving low-chrome language/reprocess controls.
+
+
+      **Spec link**: docs/DESIGN.md / docs/ARCHITECTURE.md / AGENTS.md.
+
+
+      **Commands/tests run**:
+
+      ```
+
+      # subagent worktree
+
+      npm run test:render -- --run src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/processing-language-api-client.expected-red.test.ts
+
+      # Test Files 2 passed (2); Tests 7 passed (7)
+
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+
+      rg -n -i "settings dashboard|progress dashboard|activity log|job queue|preference
+      center|onboarding wizard|per-item language|translation toggle|translate this
+      item|show original|side-by-side|spinner|progress bar|queued|queue view|activity
+      feed" web/src/routes/+page.svelte web/src/routes/components/SourceLedger.svelte
+      web/src/lib/api-client.ts
+
+      # exit 1/no matches
+
+
+      # orchestrator mainline final-state gate
+
+      npm run test:render -- --run src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/processing-language-api-client.expected-red.test.ts
+
+      # Test Files 2 passed (2); Tests 7 passed (7)
+
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+
+      rg -n -i "settings dashboard|progress dashboard|activity log|job queue|preference
+      center|onboarding wizard|per-item language|translation toggle|translate this
+      item|show original|side-by-side|spinner|progress bar|queued|queue view|activity
+      feed" web/src/routes/+page.svelte web/src/routes/components/SourceLedger.svelte
+      web/src/lib/api-client.ts; printf ''exit_code=%s''
+
+      # exit_code=1
+
+      ```
+
+
+      **Rendered DOM/screenshot evidence**:
+
+      - Focused rendered Svelte tests assert live DOM behavior: `LANG: EN` as `.bracket-action`,
+      language button accessible name, `<html lang>` update, `[重处理资料库]`, confirmation
+      actions, `[重处理中...]`, `aria-disabled="true"` without native `disabled`, live
+      `role="status"` result copy, and focusable independent Feed/Inspector regions.
+
+
+      **Forbidden concept scan**:
+
+      - No target-file matches for settings dashboard, progress dashboard, activity
+      log, job queue, preference center, onboarding wizard, per-item language toggle,
+      translation toggle, spinner, progress bar, queue view, or activity feed.
+
+
+      **Gaps/Notes**: NONE. Description and verification checklist items are [x].'
   - id: srdf-uiux-native-audit
     name: Run native multimodal UIUX audit for Steer delta
     status: pending
