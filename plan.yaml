@@ -80526,7 +80526,7 @@ phases:
       - [x] Resolve manual ingest/fetch response-shape contract with source-backed
       code/doc alignment and strict response-shape regression tests.
 
-      - [ ] Remove ErrSteerContractOnly if unused, or justify it with runtime reachability
+      - [x] Remove ErrSteerContractOnly if unused, or justify it with runtime reachability
       proof; no dead exported production stub may remain.
 
       - [ ] Provide static reachability evidence for the stub/export cleanup.
