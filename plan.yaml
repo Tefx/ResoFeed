@@ -78903,7 +78903,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Pin route preview states including idle reserved-but-blank preview, no
+      - [x] Pin route preview states including idle reserved-but-blank preview, no
       visible [IDLE] chip, no duplicate hint, aria-describedby, and live-region levels.
 
       - [x] Pin Source Ledger action labels [RUN INGEST], [FETCH], [DETAILS], [DELETE],
