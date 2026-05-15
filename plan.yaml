@@ -79858,7 +79858,7 @@ phases:
 
       - [x] Preview idempotency_key rejection.
 
-      - [ ] Different fingerprint with same live idempotency_key rejection for commit
+      - [x] Different fingerprint with same live idempotency_key rejection for commit
       and undo.
 
       - [ ] Missing/unsupported undo target behavior.
