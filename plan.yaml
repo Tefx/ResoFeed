@@ -68018,7 +68018,7 @@ phases:
       - [x] Evidence includes actual commands, runtime output, and artifact paths,
       not only "tests pass".
 
-      - [ ] Existing `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` coverage
+      - [x] Existing `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` coverage
       was not weakened and remains green or any failure is reported as blocking.
 
       - [ ] Accessibility and fresh-audit coverage are preserved for FR-01, FR-02,
