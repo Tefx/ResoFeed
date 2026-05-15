@@ -70301,7 +70301,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Backend-core targeted tests pass green for runtime metadata, live receipts,
+      - [x] Backend-core targeted tests pass green for runtime metadata, live receipts,
       processing-language ingest, OpenRouter target language, reprocess accounting,
       FTS/search core, doctor stale diagnostics, and state export/import exclusion.
 
