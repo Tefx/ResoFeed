@@ -73086,7 +73086,7 @@ phases:
 
       - [x] Wiring and spec conformance reports have no unresolved blockers.
 
-      - [ ] Decision basis maps behavioral/runtime obligations to PROVEN or BLOCK.'
+      - [x] Decision basis maps behavioral/runtime obligations to PROVEN or BLOCK.'
     verification: '- [ ] All runtime phase steps completed with adequate evidence.
 
       - [ ] `plhm-runtime-blocker-retest` passed after the batched remediation, proving
