@@ -70258,7 +70258,7 @@ phases:
 
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-backend-green-retest
-    name: Retest backend expected-red suite to green
+    name: Retest backend core expected-red suite to green
     status: claimed
     description: 'step_type: test
 
@@ -70269,44 +70269,65 @@ phases:
       agent_source: project
 
 
-      As an independent verifier, rerun the backend tests introduced in `plct-backend-expected-red-tests`
+      As an independent verifier, rerun the backend-core tests introduced in `plct-backend-expected-red-tests`
       plus focused regressions for runtime metadata, receipt TTL/fingerprint semantics,
-      language ingest, reprocess accounting, FTS/search, doctor stale diagnostics,
-      and state export/import exclusion.
+      language ingest, OpenRouter `target_language`, reprocess accounting, FTS/search
+      core behavior, doctor stale diagnostics, and state export/import exclusion.
 
 
-      Scope declaration: phase-check protecting the backend-core gate and downstream
-      HTTP/MCP runtime gate.
+      Scope declaration: phase-check protecting the backend-core gate only. This step
+      intentionally excludes runtime transport/UI surfaces owned by downstream phases:
+
+      - HTTP route registration, HTTP strict route validation, delivery endpoint routing,
+      language mutation HTTP guards, reprocess HTTP route behavior, operation guard
+      HTTP conflict responses, and HTTP idempotency replay/mismatch are owned by `plhm-http-runtime-endpoints`
+      and verified by the HTTP/MCP runtime phase.
+
+      - MCP resource/tool registration, `resofeed://runtime/language`, `get_processing_language`,
+      `set_processing_language`, `reprocess_library`, `search_items` query echo, JSON-RPC
+      error envelope parity, and no per-call language override are owned by `plhm-mcp-runtime-parity`
+      and verified by the HTTP/MCP runtime phase.
+
+      - Frontend client/runtime route consumption and rendered UI usage are owned
+      by `processing-language-frontend-ui` steps.
+
+
+      Disposition rule: If a broad command also runs downstream HTTP/MCP/frontend
+      contract tests, failures that are solely missing downstream runtime/frontend
+      surfaces MUST be recorded as downstream-owned blockers, not as storage-core
+      blockers. This does not weaken final acceptance because downstream phase gates
+      remain blocking before final completion.
 
 
       ## Completion Criteria (checklist)
 
-      - [ ] Backend expected-red tests now pass green.
+      - [ ] Backend-core targeted tests pass green for runtime metadata, live receipts,
+      processing-language ingest, OpenRouter target language, reprocess accounting,
+      FTS/search core, doctor stale diagnostics, and state export/import exclusion.
 
-      - [x] Failure-path tests run for receipt mismatch/expiration and reprocess stale
-      FTS.
+      - [ ] Receipt mismatch/expiration and reprocess stale-FTS failure paths are
+      exercised with actual command output.
 
-      - [x] Test output includes exact commands and actual output.
+      - [ ] Any broad-command failure is classified by ownership: `storage-core blocker`,
+      `downstream HTTP/MCP blocker`, or `downstream frontend blocker`.
 
-      - [x] Any broad failure has an explicit blocker/remediation path; no `pre-existing`
-      disposition.'
-    verification: '- [ ] `go test ./...` or narrower backend command family passes
-      for the implemented surfaces.
+      - [ ] Downstream-owned failures cite the owning step (`plhm-http-runtime-endpoints`,
+      `plhm-mcp-runtime-parity`, or `plfu-*`) and are not used to fail this storage-core
+      retest unless a backend-core contract is also missing.
 
-      - [ ] Targeted backend contract tests pass green.
+      - [ ] No `pre-existing` or `out-of-scope` disposition is used without explicit
+      non-intersection evidence and downstream ownership.'
+    verification: '- [ ] Backend-core command family passes for implemented storage/core
+      surfaces.
 
       - [ ] Evidence covers both main path and highest-risk failure path for receipts
-      and reprocess/FTS.'
-    evidence_template: '## Verification Report
+      and reprocess/FTS.
 
-      **Tester**: integration-verifier
+      - [ ] Failures in HTTP route/MCP registration/frontend rendering surfaces are
+      recorded as downstream-owned and blocking in their downstream phase, not blocking
+      for storage-core gate unless backend-core behavior is implicated.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
 
-      **Scope**: backend runtime metadata, receipts, language, reprocess, FTS, doctor
-
-      **Independence Level**: L1
-
-
-      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
@@ -70316,31 +70337,47 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ### Test Execution
+      ## Backend Core Retest Report
 
-      - Commands executed:
 
-      ```
-
-      <paste commands>
+      **Commands executed**:
 
       ```
 
-      - Actual output:
-
-      ```
-
-      <paste output>
+      <paste exact commands>
 
       ```
 
 
-      ### Behavioral Proof Register
+      **Actual output**:
 
-      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
-      status | closure_path | gate_decision_basis |
+      ```
 
-      |---|---|---|---|---|---|---|'
+      <paste relevant stdout/stderr>
+
+      ```
+
+
+      ## Ownership Classification for Any Failures
+
+
+      | Failure | Observed command/test | Owner | Blocking storage-core? | Downstream
+      closure path |
+
+      |---|---|---|---|---|
+
+      | <failure> | <test/command> | storage-core / plhm-http-runtime-endpoints /
+      plhm-mcp-runtime-parity / plfu-* | yes/no | <step id and reason> |
+
+
+      ## Headline
+
+      - [ ] PASS: backend-core obligations are green; any remaining failures are downstream-owned
+      with explicit closure path.
+
+      - [ ] FAIL: at least one backend-core obligation remains unresolved.'
+    refs:
+    - docs/ARCHITECTURE.md
     depends_on:
     - plsc-runtime-metadata-receipts
     - plsc-processing-language-ingest
