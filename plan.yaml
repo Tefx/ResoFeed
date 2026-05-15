@@ -75735,7 +75735,7 @@ phases:
 
       - [x] Go tests for all packages.
 
-      - [ ] Frontend install/build/test command family appropriate to repo.
+      - [x] Frontend install/build/test command family appropriate to repo.
 
       - [x] Build `cmd/resofeed` binary.
 
