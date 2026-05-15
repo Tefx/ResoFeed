@@ -74633,7 +74633,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Audit returns parseable PASS/PASS_WITH_DEBT/FAIL handoff.
+      - [x] Audit returns parseable PASS/PASS_WITH_DEBT/FAIL handoff.
 
       - [ ] PASS requires rendered visible controls, not only test summaries.
 
