@@ -65594,7 +65594,7 @@ phases:
       \ were cleaned before commit."
   - id: ui-runtime-fresh-review-shell-feed-ledger-fix
     name: Fix fresh audit shell, feed, Source Ledger, and mobile UI findings
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -65729,6 +65729,8 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-contract-red-tests
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T07:17:54.461733+00:00'
   - id: ui-runtime-fresh-review-duplicate-source-api-fix
     name: Fix grouped duplicate source disclosure data path
     status: claimed
