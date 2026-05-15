@@ -70108,14 +70108,14 @@ phases:
       - [x] Implementation processes real items and produces counts based on inputs.
 
       - [x] Stub-only or no-op reprocess completion is not acceptable.'
-    verification: '- [ ] Targeted reprocess accounting tests pass for success, unavailable,
+    verification: '- [x] Targeted reprocess accounting tests pass for success, unavailable,
       failed, timeout, and stale FTS paths.
 
-      - [ ] Search/FTS tests prove target-language indexing includes `core_insight`.
+      - [x] Search/FTS tests prove target-language indexing includes `core_insight`.
 
-      - [ ] Doctor tests prove stale/ok lines exactly match the contract.
+      - [x] Doctor tests prove stale/ok lines exactly match the contract.
 
-      - [ ] Grep/search evidence shows no job queue, activity ledger, sync, or delivery
+      - [x] Grep/search evidence shows no job queue, activity ledger, sync, or delivery
       registry was introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
