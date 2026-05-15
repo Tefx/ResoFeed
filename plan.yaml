@@ -76844,24 +76844,42 @@ phases:
 
       As an INDEPENDENT REVIEWER, make the final OPEN/BLOCK decision for the complete
       processing-language/reprocess/runtime metadata/HTTP/MCP/frontend implementation
-      plan.
+      plan, including the batched concurrent-finalization remediation path.
 
 
       Gate Preview (what this gate WILL reject):
 
       1. Any unresolved blocker/should-fix from doc sync, spec conformance, design
-      readiness, architecture audit, or black-box acceptance.
+      readiness, architecture audit, black-box acceptance, or batched remediation
+      closure.
 
       2. Missing behavioral proof register for runtime/liveness/idempotency/reprocess/FTS
       obligations.
 
-      3. Documentation drift that changes product scope or contradicts implementation.
+      3. Missing `why_previous_gate_failed` or `why_previous_review_missed_or_could_not_prove_it`
+      evidence for the concurrent finalization failures.
 
-      4. Product-boundary violations: vector/RAG, sync/merge, jobs/queues, ledgers,
+      4. B1/R6 not proven fixed with timeout/canceled/fresh-fetch failure regression
+      tests showing stale readable fields are cleared/overwritten and FTS is consistent.
+
+      5. B2/PROOF-GAP-001 rendered UI proof not supplied by `uiux-auditor` with rendered
+      screenshots/DOM/a11y evidence.
+
+      6. Frontend build/runtime proof that skips dependency bootstrap when `web/node_modules`
+      is absent; `npm --prefix web install` must precede `npm --prefix web run build`
+      in that case.
+
+      7. Unclosed NEEDS_TEST ledger items: language future-only/no row rewrite/FTS
+      rewrite, human-over-agent steering precedence, desktop split-scroll runtime,
+      source identifier DOM non-translation.
+
+      8. Documentation drift that changes product scope or contradicts implementation.
+
+      9. Product-boundary violations: vector/RAG, sync/merge, jobs/queues, ledgers,
       settings dashboards, per-agent auth registries, delivery registries, dual-language
       storage.
 
-      5. Dirty evidence that claims tests passed without commands/output.
+      10. Dirty evidence that claims tests passed without commands/output.
 
 
       ## Completion Criteria (checklist)
@@ -76876,6 +76894,13 @@ phases:
 
       - [ ] Black-box acceptance reviewed.
 
+      - [ ] Batched remediation evidence reviewed, including `why_previous_gate_failed`
+      and `why_previous_review_missed_or_could_not_prove_it`.
+
+      - [ ] UIUX rendered DOM/a11y proof closure reviewed.
+
+      - [ ] Spec conformance closure retest reviewed.
+
       - [ ] Final decision basis lists each unresolved item and why it blocks or does
       not intersect remaining gates.
 
@@ -76886,9 +76911,26 @@ phases:
       - [ ] Decision basis contains requirement/proof refs, evidence refs, unresolved
       statuses, closure paths, and final recommendation.
 
+      - [ ] B1/R6 backend remediation is proven by timeout/canceled/fresh-fetch failure
+      regression tests for stale readable field clearing/overwriting and FTS consistency.
+
+      - [ ] PROOF-GAP-001/B2 UI readiness is proven by uiux-auditor rendered screenshot/DOM/a11y
+      evidence.
+
+      - [ ] Frontend proof includes `npm --prefix web install` before `npm --prefix
+      web run build` when node_modules was absent.
+
+      - [ ] NEEDS_TEST ledger is closed or explicitly blocked with ownership: language
+      future-only/no row rewrite/FTS, steering precedence, desktop split-scroll, source
+      identifier non-translation.
+
+      - [ ] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
+      evidence.
+
       - [ ] No blocker-class implementation, spec, design, wiring, runtime, or doc
       gaps remain unowned.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -76904,28 +76946,67 @@ phases:
 
       ## Final Gate Review Report
 
-      - Execution review:
 
-      - Evidence quality:
+      ### Concurrent Failure Closure Review
 
-      - Outstanding issues:
+      - why_previous_gate_failed evidence reviewed: yes/no
 
-      - Behavioral proof register summary:
+      - why_previous_review_missed_or_could_not_prove_it evidence reviewed: yes/no
 
-      | requirement_ref | behavior_claim | evidence_ref | status | closure_path |
-      gate_decision_basis |
+      - Batched remediation step: PASS/FAIL with concerns
 
-      |---|---|---|---|---|---|
+      - UIUX rendered proof closure: PASS/FAIL with concerns
 
-      - Gate Decision: OPEN | BLOCKED
+      - Spec conformance closure retest: PASS/FAIL with concerns
 
-      - Required remediation if blocked:'
+
+      ### Required Closure Matrix
+
+      | Obligation | Evidence ref | Status | Gate decision basis |
+
+      | --- | --- | --- | --- |
+
+      | B1/R6 stale readable fields + FTS consistency | <ref> | PROVEN/UNPROVEN |
+      OPEN/BLOCK |
+
+      | PROOF-GAP-001/B2 rendered UI proof | <ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
+
+      | Frontend dependency bootstrap/build/runtime | <ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
+
+      | Language future-only/no row rewrite/FTS rewrite | <ref> | PROVEN/UNPROVEN
+      | OPEN/BLOCK |
+
+      | Human-over-agent steering precedence | <ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
+
+      | Desktop split-scroll runtime | <ref> | PROVEN/UNPROVEN | OPEN/BLOCK |
+
+      | Source identifier DOM non-translation | <ref> | PROVEN/UNPROVEN | OPEN/BLOCK
+      |
+
+      | DOC-INPUT-001 disposition | <ref> | NON_BLOCKING/BLOCKING | OPEN/BLOCK |
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: all blocker-class obligations are PROVEN or explicitly non-intersecting
+
+      - [ ] BLOCKED: one or more blocker-class obligations remain open
+
+
+      Blocking issues if any:
+
+      <list>'
     depends_on:
     - plfinal-documentation-sync
     - plfinal-full-spec-conformance-audit
     - plfinal-design-readiness-review
     - plfinal-wiring-and-architecture-audit
     - plfinal-black-box-acceptance
+    - plfinal-uiux-rendered-design-proof
+    - plfinal-spec-conformance-closure-retest
     agent: gate-reviewer
   - id: plfinal-batched-rendered-proof-and-reprocess-remediation
     name: Batched rendered proof and reprocess remediation
