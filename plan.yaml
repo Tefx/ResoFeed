@@ -82293,6 +82293,233 @@ phases:
     - srdf-uiux-native-audit
     - srdf-frontend-spec-conformance
     agent: gate-reviewer
+  - id: srdf-broad-rendering-owner-token-bootstrap-fix
+    name: Batch fix broad rendering owner-token bootstrap failures
+    status: pending
+    description: 'Fix all six mainline broad rendering expected-red failures exposed
+      while closing `srdf-steer-preview-ui-state-aria`.
+
+
+      step_type: implementation
+
+      priority: HIGH
+
+      root_family: owner-token/rendering bootstrap leaves broad rendering tests stuck
+      at Owner Token Prompt after merged frontend surface.
+
+
+      Scope:
+
+      - Repair the frontend owner-token bootstrap/rendering test harness or app bootstrap
+      path so authenticated bootstrap persists the accepted owner token only after
+      success and allows the main application chrome to render for broad rendering
+      expected-red tests.
+
+      - Cover all six failing assertions in `src/routes/components/__tests__/rendering-expected-red.test.ts`
+      as one root-family remediation, not as isolated UI label patches.
+
+      - Preserve completed merged work from `srdf-processing-language-low-chrome-controls`,
+      `srdf-source-ledger-details-hit-targets`, `srdf-split-scroll-mobile-route`,
+      and `srdf-steer-preview-ui-state-aria`.
+
+
+      Failure inventory to close:
+
+      - [ ] `persists owner token only after authenticated bootstrap succeeds and
+      never after rejection`: accepted token is persisted to `window.localStorage.getItem(''resofeed.ownerToken'')`;
+      rejected token is never persisted.
+
+      - [ ] `wires Steer to /api/steer and /doctor to raw text diagnostics`: app escapes
+      Owner Token Prompt and exposes `Steer or paste RSS URL` plus expected Steer/doctor
+      wiring.
+
+      - [ ] `exposes Source Ledger through a non-persistent RESOFEED utility menu`:
+      app escapes Owner Token Prompt and Source Ledger controls are reachable without
+      persistence drift.
+
+      - [ ] `surfaces active MCP agent steering attribution as an inline correction
+      receipt`: app renders `Agent steering receipt` region when test data includes
+      active MCP attribution.
+
+      - [ ] `uses mobile feed-first full-screen surfaces instead of one stacked page`:
+      app renders `Today feed items` list and mobile feed-first/full-screen surfaces.
+
+      - [ ] `scopes mobile Search controls and retrieval receipts away from Today`:
+      app escapes Owner Token Prompt and Search/retrieval controls remain scoped away
+      from Today.
+
+
+      Required diagnostic fields:
+
+      - why_previous_fix_failed: The four frontend branches verified scoped surfaces
+      independently; none owned the broad authenticated bootstrap path that gates
+      all rendered routes in `rendering-expected-red.test.ts` after the merge combination.
+
+      - why_previous_gate_missed_it: Targeted checks passed (`npm run test:render
+      -- steer-route-preview.expected-red.test.ts`, `npm run check`, and forbidden
+      steer UI scan), but the mainline broad verifier `npm run test` was not green;
+      the review missed that owner-token bootstrap is a shared precondition for Source
+      Ledger, split-scroll/mobile, MCP receipt, and Steer route rendering.
+
+      - reversal_risk: A local fix that simply bypasses the prompt or forces labels
+      into the DOM could regress Owner Token Prompt security semantics, rejected-token
+      non-persistence, Source Ledger non-persistence, mobile route scoping, or scoped
+      Steer/source/split UI work. Preserve the owner token boundary from architecture
+      and prove both accepted and rejected bootstrap paths.
+
+
+      ## Gate Preview (what downstream verification WILL reject)
+
+      1. Any remaining `npm run test` failure in `src/routes/components/__tests__/rendering-expected-red.test.ts`.
+
+      2. Any fix that hides the Owner Token Prompt without proving accepted-token
+      persistence and rejected-token non-persistence.
+
+      3. Any regression in scoped Steer preview, Source Ledger controls/details, split-scroll/mobile
+      route, processing language controls, or forbidden UI concept scans.
+
+      4. Any implementation that fabricates DOM labels while bypassing real bootstrap/runtime
+      state.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: owner-token bootstrap state transitions and localStorage
+      persistence semantics are correct.
+
+      2. Rendering completeness: authenticated bootstrap produces visible DOM elements
+      for Today, Steer, Source Ledger, mobile route, and agent receipt states.
+
+      A component or test helper that returns data objects instead of rendered elements
+      does NOT satisfy this step. Evidence MUST include rendered/test output.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or hardcoded prompt
+      bypasses do not satisfy this requirement.
+
+
+      Acceptance checklist:
+
+      - [ ] Root cause is identified at the shared bootstrap/rendering precondition
+      rather than patching six independent symptoms.
+
+      - [ ] Accepted owner token is persisted only after authenticated bootstrap succeeds.
+
+      - [ ] Rejected owner token is not persisted and rejection semantics remain visible/tested.
+
+      - [ ] Broad rendering tests reach authenticated app chrome and route surfaces
+      instead of staying stuck at Owner Token Prompt.
+
+      - [ ] Scoped Steer, Source Ledger, split-scroll/mobile, and processing-language
+      UI work remains intact.
+
+      - [ ] Forbidden UI concepts remain absent.'
+    verification: '- [ ] `npm run test` passes, including all six `src/routes/components/__tests__/rendering-expected-red.test.ts`
+      failures listed in this step.
+
+      - [ ] Focused evidence shows accepted-token persistence and rejected-token non-persistence.
+
+      - [ ] Focused evidence shows authenticated app chrome renders expected Steer,
+      Source Ledger, mobile Today, and agent receipt surfaces.
+
+      - [ ] No scoped regression is introduced for Steer preview, Source Ledger, split-scroll/mobile,
+      processing-language controls, or forbidden UI concepts.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - src/routes/components/__tests__/rendering-expected-red.test.ts — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Fix Evidence
+
+
+      **Root cause**: <shared bootstrap/rendering precondition, with file:line refs>
+
+
+      **why_previous_fix_failed**: <why scoped branch checks missed the broad bootstrap
+      blocker>
+
+
+      **why_previous_gate_missed_it**: <why targeted verification did not catch mainline
+      `npm run test` failure>
+
+
+      **reversal_risk**: <risk introduced by this fix and how it was controlled>
+
+
+      **Six-failure closure table**:
+
+      | Test name | Before symptom | Fix location | Evidence |
+
+      | --- | --- | --- | --- |
+
+      | persists owner token only after authenticated bootstrap succeeds and never
+      after rejection | received null / persistence semantics | <file:line> | <command/output>
+      |
+
+      | wires Steer to /api/steer and /doctor to raw text diagnostics | stuck at Owner
+      Token Prompt | <file:line> | <command/output> |
+
+      | exposes Source Ledger through a non-persistent RESOFEED utility menu | stuck
+      at Owner Token Prompt | <file:line> | <command/output> |
+
+      | surfaces active MCP agent steering attribution as an inline correction receipt
+      | receipt region missing | <file:line> | <command/output> |
+
+      | uses mobile feed-first full-screen surfaces instead of one stacked page |
+      Today feed list missing | <file:line> | <command/output> |
+
+      | scopes mobile Search controls and retrieval receipts away from Today | stuck
+      at Owner Token Prompt | <file:line> | <command/output> |
+
+
+      **Commands run**:
+
+      ```
+
+      <exact commands and outputs>
+
+      ```
+
+
+      **Regression protection**:
+
+      - Scoped Steer checks: <output>
+
+      - Source Ledger checks: <output>
+
+      - Split-scroll/mobile checks: <output>
+
+      - Processing-language/low-chrome checks: <output>
+
+      - Forbidden UI scan: <output>
+
+
+      **Remaining ambiguity / debt**: <none or explicit non-intersection>'
+    depends_on:
+    - srdf-steer-preview-ui-state-aria
+    - srdf-source-ledger-details-hit-targets
+    - srdf-split-scroll-mobile-route
+    - srdf-processing-language-low-chrome-controls
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
