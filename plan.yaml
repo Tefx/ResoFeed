@@ -79863,7 +79863,7 @@ phases:
 
       - [x] Missing/unsupported undo target behavior.
 
-      - [ ] Inactive duplicate source reactivation vs active duplicate no-op semantics.
+      - [x] Inactive duplicate source reactivation vs active duplicate no-op semantics.
 
 
       ## Completion Criteria (stub exclusion)
