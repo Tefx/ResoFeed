@@ -79223,7 +79223,7 @@ phases:
       OPML/state actions, native or aria-expanded/aria-controls disclosure semantics,
       44px bracket hit targets, topmost element clickability, and terse raw diagnostics.
 
-      - [ ] Tests cover absence of jobs, queues, dashboards, settings, activity logs,
+      - [x] Tests cover absence of jobs, queues, dashboards, settings, activity logs,
       folders, tags, rule builders, RAG/chat/semantic answer UI, and duplicate URL
       subscription fields.
 
