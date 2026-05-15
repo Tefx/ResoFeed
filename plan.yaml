@@ -71229,6 +71229,96 @@ phases:
     depends_on:
     - plse-real-language-reprocess-vertical-slice
     agent: integration-verifier
+  - id: plse-full-plan-runtime-check
+    name: Run full-plan runtime verification sweep
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      scope: full-plan-check
+
+
+      Run the broad verification commands that late gates would otherwise rerun, after
+      the runtime and frontend vertical proofs are in place.
+
+
+      Protected downstream gates: processing-language-system-e2e.gate and processing-language-finalization
+      final gate.
+
+
+      Required command families:
+
+      - [ ] Go tests for all packages.
+
+      - [ ] Frontend install/build/test command family appropriate to repo.
+
+      - [ ] Build `cmd/resofeed` binary.
+
+      - [ ] Secret-safe runtime smoke for `/api/runtime/language`, `/api/doctor`,
+      and `/mcp` if environment supports it.
+
+
+      Disposition path:
+
+      - [ ] Any repo-wide or cross-phase failure must be reported as blocker-class
+      if it intersects final gates.
+
+      - [ ] No broad failure may be dismissed as pre-existing without non-intersection
+      evidence and future owner.'
+    verification: '- [ ] Full Go/backend verification command passes or blockers are
+      enumerated.
+
+      - [ ] Full frontend build/test command passes or blockers are enumerated.
+
+      - [ ] Runtime smoke evidence is secret-safe.
+
+      - [ ] All intersecting failures have remediation ownership before finalization.'
+    evidence_template: '## Full-Plan Verification Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Commands Executed
+
+      ```
+
+      <paste commands>
+
+      ```
+
+
+      ### Actual Output
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Gate-Intersection Disposition
+
+      | Finding | Provenance | Remaining gate intersection | Disposition | Owner/closure
+      path |
+
+      |---|---|---|---|---|'
+    depends_on:
+    - plse-blind-http-mcp-parity-delivery
+    - plse-reprocess-failure-stale-fts-proof
+    agent: integration-verifier
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
