@@ -74015,7 +74015,7 @@ phases:
 
       ## Gate Preview (what gate WILL reject)
 
-      - [ ] localized or beautified URLs/source titles/provenance identifiers.
+      - [x] localized or beautified URLs/source titles/provenance identifiers.
 
       - [ ] global page scroll coupling Feed and Inspector on desktop.
 
