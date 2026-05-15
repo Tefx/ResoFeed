@@ -81539,7 +81539,7 @@ phases:
       - [ ] Bracket actions preserve 44px minimum real hit targets in default, hover,
       focus, disabled, [INGESTING...], [FETCHING...], and error states.
 
-      - [ ] Raw diagnostics preserve err: prefix, clamp/wrap per DESIGN.md, and expose
+      - [x] Raw diagnostics preserve err: prefix, clamp/wrap per DESIGN.md, and expose
       full text via title or accessible disclosure.
 
       - [ ] [RUN INGEST] and [FETCH] are immediate low-chrome runtime operations,
