@@ -65409,3 +65409,12 @@ phases:
       ## Programmatic Handoff
 
       `{"status":"PASS","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_recommendation":"OPEN","verdict":"PASS","blockers":[],"gate_open_allowed":true,"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}`'
+- id: ui-runtime-fresh-review-remediation
+  name: UI Runtime Fresh Review Remediation
+  status: pending
+  gate: Final gate cannot open until FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
+    and FR-10 from docs/audits/ui-runtime-fresh-review-2026-05-15.md have implementation,
+    expected-red-to-green proof, UIUX multimodal evidence, and black-box runtime liveness
+    evidence with ResoFeed architecture boundaries preserved.
+  depends_on:
+  - ui-runtime-design-audit-final-closure
