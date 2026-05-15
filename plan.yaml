@@ -79011,6 +79011,77 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: srdf-processing-language-low-chrome-controls
+    name: Close processing language and reprocess low-chrome UI gaps
+    status: pending
+    description: 'step_type: implementation
+
+
+      Audit and complete any remaining frontend gaps where processing language and
+      reprocess controls drift from the latest design contract. This is a bounded
+      delta step, not a new settings surface.
+
+
+      Target paths: web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,
+      web/src/lib/api-client.ts, and existing processing-language component/tests.
+
+
+      Acceptance checklist:
+
+      - [ ] Processing language appears only as low-chrome architecture-owned runtime
+      control in app chrome or /doctor-class utility surface.
+
+      - [ ] Reprocess library action is low-chrome and immediate with terse pending/success/conflict/error
+      copy.
+
+      - [ ] No settings dashboard, progress dashboard, activity log, job queue, preference
+      center, onboarding wizard, or per-item language toggle is introduced.
+
+      - [ ] Existing processing-language tests remain green and updated only for the
+      latest design copy/ARIA if needed.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered DOM evidence for language/reprocess controls or
+      explicit evidence that existing completed implementation already conforms.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
+    verification: '- [ ] Focused processing-language/reprocess UI tests pass green.
+
+      - [ ] Rendered evidence shows low-chrome placement and no settings/job/activity/progress
+      dashboard concepts.
+
+      - [ ] If no code change is needed, evidence cites exact existing rendered DOM
+      and tests proving conformance.
+
+      - [ ] No forbidden product/architecture concept introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Low-Chrome Runtime Control Evidence
+
+      - Files changed or no-op rationale:
+
+      - Commands/tests run:
+
+      - Rendered DOM/screenshot evidence:
+
+      - Forbidden concept scan:
+
+      '
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
