@@ -80032,7 +80032,7 @@ phases:
       - [x] Exercise POST /api/steer/preview for valid add, invalid add, find alias,
       and natural-language rule proposal.
 
-      - [ ] Exercise POST /api/steer commit and POST /api/steer/undo through real
+      - [x] Exercise POST /api/steer commit and POST /api/steer/undo through real
       HTTP paths.
 
       - [ ] Exercise MCP preview_steer, steer, and undo_steer through the real MCP
