@@ -70965,7 +70965,7 @@ phases:
       for storage-core; downstream-owned runtime/frontend gaps are recorded with owner
       steps.
 
-      - [ ] Spec conformance has no unresolved backend-core blocker-class divergence.
+      - [x] Spec conformance has no unresolved backend-core blocker-class divergence.
 
       - [ ] Gate decision basis includes behavioral proof register for receipts, reprocess,
       FTS, and language persistence.
