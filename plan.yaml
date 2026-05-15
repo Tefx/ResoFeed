@@ -73189,7 +73189,7 @@ phases:
       \ by the architecture examples.\n- [x] MCP conflict mappings include actual\
       \ guard holder operation/scope and remain parity-compatible with HTTP.\n- [x]\
       \ Exported stale `SearchItemsForMCP` no-query-echo helper is removed or proven\
-      \ private/safe with a real runtime caller.\n- [ ] No forbidden durable job/queue/ledger/sync/per-agent\
+      \ private/safe with a real runtime caller.\n- [x] No forbidden durable job/queue/ledger/sync/per-agent\
       \ authorization surface is introduced."
     verification: '- [ ] Focused Go tests or equivalent assertions cover HTTP `409
       conflict` exact message/details for manual ingest/fetch/reprocess guard collisions.
