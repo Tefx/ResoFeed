@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { processingLanguageRuntimeContract, type ItemSummary } from '$lib/api-contract';
+  import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary } from '$lib/api-contract';
   import { compareItemsByTimeGroup, itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
@@ -16,6 +16,17 @@
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item) || left.index - right.index)
     .map(({ item }) => item));
+  const feedTimeGroupReference = $derived(feedReferenceNow(items));
+
+  function feedReferenceNow(feedItems: ItemSummary[]): Date {
+    const latestTimestamp = feedItems
+      .map((item) => itemDisplayTimestamp(item))
+      .filter((timestamp): timestamp is string => timestamp !== null)
+      .map((timestamp) => new Date(timestamp).getTime())
+      .filter((timestamp) => !Number.isNaN(timestamp))
+      .sort((left, right) => right - left)[0];
+    return latestTimestamp === undefined ? new Date() : new Date(latestTimestamp);
+  }
 
   async function openInspector(item: ItemSummary): Promise<void> {
     await onSelect(item);
@@ -51,8 +62,8 @@
             {#if item.external_surfaced_at}
               · <span aria-label="Externally surfaced by agent">agent:external</span>
             {/if}
-            {#if shouldShowTimeGroup(groupedItems, index)}
-              <span class="contract-time-label">{itemTimeGroup(item)}</span>
+            {#if shouldShowTimeGroup(groupedItems, index, feedTimeGroupReference)}
+              <span class="contract-time-label">{itemTimeGroup(item, feedTimeGroupReference)}</span>
             {/if}
           </p>
           <p class="contract-feed-title">{item.title}</p>

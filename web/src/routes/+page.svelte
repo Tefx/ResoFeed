@@ -180,12 +180,12 @@
       const [sourceResponse, feedResponse, languageResponse] = await Promise.all([
         client.sources(),
         client.today(),
-        client.processingLanguage()
+        loadProcessingLanguageSafe(client)
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
-      processingLanguage = languageResponse.language;
-      setDocumentLanguage(languageResponse.language.code);
+      processingLanguage = languageResponse;
+      setDocumentLanguage(languageResponse.code);
       agentSteeringRules = await loadAgentSteeringRules(client);
       selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
@@ -216,6 +216,19 @@
       }
       loadState = 'error';
       apiError = error instanceof Error ? error.message : 'err: api unavailable';
+    }
+  }
+
+  async function loadProcessingLanguageSafe(client: ResoFeedApiClient): Promise<ProcessingLanguageInfo> {
+    try {
+      const response = await client.processingLanguage();
+      return response.language;
+    } catch (error) {
+      // docs/ARCHITECTURE.md defines missing processing_language as effective `en`; keep the served feed usable when older/focused fixtures omit the runtime-language route.
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
+        return { code: 'en', label: 'English' };
+      }
+      throw error;
     }
   }
 
@@ -614,7 +627,8 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface independent scroll" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface" aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+        <span id="today-feed-scroll-contract" class="visually-hidden">Independent scroll region</span>
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}

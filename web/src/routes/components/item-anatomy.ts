@@ -123,7 +123,7 @@ export function itemPriorityLabel(item: ItemSummary): string {
   return 'quality: source-backed';
 }
 
-export function shouldShowTimeGroup(items: ItemSummary[], index: number): boolean {
+export function shouldShowTimeGroup(items: ItemSummary[], index: number, now = new Date()): boolean {
   if (index === 0) return true;
-  return itemTimeGroup(items[index]) !== itemTimeGroup(items[index - 1]);
+  return itemTimeGroup(items[index], now) !== itemTimeGroup(items[index - 1], now);
 }
