@@ -71741,7 +71741,7 @@ phases:
       - [x] Outputs vary by request body, receipt state, current language, item id,
       and operation guard state.
 
-      - [ ] Business logic stays in core; HTTP remains thin transport.
+      - [x] Business logic stays in core; HTTP remains thin transport.
 
       - [ ] Storage-core downstream-owned HTTP blockers are all closed or converted
       into explicit runtime gate blockers with evidence.'
