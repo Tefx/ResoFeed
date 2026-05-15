@@ -63533,7 +63533,7 @@ phases:
       \ dependency/gate language."
   - id: urda-final-black-box-runtime-ui-smoke
     name: Final black-box runtime UI smoke with CLI preservation confirmation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63667,6 +63667,106 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T05:07:48.710514+00:00'
+    done_at: '2026-05-15T05:25:19.356653+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Key issues retested: missing `[RUN INGEST]`, row `[FETCH]`, non-keyboard\
+      \ OPML import, Source Ledger geometry/raw diagnostics, Search behavior, Inspector\
+      \ original link, owner-token rejected state, `/doctor`, and mobile feed/Inspector/Source\
+      \ Ledger.\n- docs/ARCHITECTURE.md — READ. Key contract: one Go binary via `resofeed\
+      \ serve`; flags `--addr`, `--public-url`, `--db`, `--openrouter-model`, `--owner-token`;\
+      \ no sidecar worker/admin/manual ingest CLI; protected `/api/*`; manual ingest\
+      \ endpoints `POST /api/ingest` and `POST /api/sources/{id}/fetch`.\n- docs/DESIGN.md\
+      \ — READ. Key UI contract: Source Ledger must expose `[RUN INGEST]`, per-source\
+      \ `[FETCH]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`; owner-token\
+      \ prompt must show `err: owner token rejected`; mobile feed/Inspector/Ledger\
+      \ must remain usable.\n- docs/USAGE.md — READ. Key usage: build with `npm --prefix\
+      \ web run build` and `go build`; run `resofeed serve`; owner token stored browser-local;\
+      \ Source Ledger manual refresh via UI only; `/doctor` via Steer or API; no separate\
+      \ migrate/worker/doctor/admin/sync processes.\n\n## Final Black-Box Runtime\
+      \ UI Smoke\n**Tester**: blind-tester\n**Independence Level**: L3\n\n### Verdict\n\
+      - Headline: PASS\n- Blocking Status: CLOSED\n- Proof-Gap Status: NONE\n- Verdict:\
+      \ PASS\n- Blockers: []\n- Orchestrator Action Hint: COMPLETE\n\n### Commands\n\
+      ```text\nnpm --prefix web install\nnpm --prefix web run build\ngo build -o .test-artifacts/final-smoke/resofeed\
+      \ ./cmd/resofeed\n.test-artifacts/final-smoke/resofeed --help\n.test-artifacts/final-smoke/resofeed\
+      \ serve --help\n.test-artifacts/final-smoke/resofeed owner-token reset --help\n\
+      OPENROUTER_KEY=<redacted> RESOFEED_E2E=1 .test-artifacts/final-smoke/resofeed\
+      \ serve --addr 127.0.0.1:18080 --public-url http://127.0.0.1:18080 --db .test-artifacts/final-smoke/runtime.sqlite3\
+      \ --owner-token <redacted>\nlsof -nP -iTCP:18080 -sTCP:LISTEN\ncurl/browser\
+      \ probes for /, /api/feed/today, /api/steer, /api/ingest, /api/sources/{id}/fetch,\
+      \ /api/search, /api/state/export, /api/doctor, UI upload/export/import, and\
+      \ mobile CDP captures\n```\n\n### CLI Surface Preservation Matrix\n| Command\
+      \ | Surface Listed? | Handler Exists? | --help Works? | Smoke Test | Status\
+      \ |\n|---|---|---|---|---|---|\n| `resofeed serve` | YES — root help lists `serve`\
+      \ | YES — real server launched and bound `127.0.0.1:18080` | YES, exit 0 | `lsof`\
+      \ showed `resofeed` LISTEN; root HTML 200; authenticated API 200 | PASS |\n\
+      | `resofeed owner-token reset` | YES — root help lists `owner-token reset --db\
+      \ PATH --confirm-reset` | YES — deterministic handler response, not unimplemented\
+      \ | YES, exit 0 | invalid DB smoke returned `err: invalid_db: cannot open sqlite\
+      \ database`, exit 2; no no-handler fallback | PASS |\n\n### Documented Flag\
+      \ Matrix\n| Surface | Expected | Actual | Verdict |\n|---|---|---|---|\n| `resofeed\
+      \ serve` one process | one Go binary | one `resofeed` process bound UI/API/MCP\
+      \ address; no sidecar launched | PASS |\n| `--addr` | preserved | present in\
+      \ `serve --help`; used to bind `127.0.0.1:18080` | PASS |\n| `--public-url`\
+      \ | preserved | present in `serve --help`; startup logged public URL | PASS\
+      \ |\n| `--db` | preserved | present in `serve --help`; isolated DB used | PASS\
+      \ |\n| `--owner-token` | preserved | present in `serve --help`; explicit token\
+      \ accepted; wrong browser token rejected | PASS |\n| no new manual ingest/fetch\
+      \ CLI | preserved | manual ingest/fetch available through UI/API; no extra CLI\
+      \ needed or listed | PASS |\n\n### Public workflow probes\n| Workflow | Public\
+      \ evidence | Network/console evidence | Verdict |\n|---|---|---|---|\n| Owner\
+      \ token rejected-token state | browser state/screenshot showed `err: owner token\
+      \ rejected` | `/api/feed/today` without auth returned 401 JSON | PASS |\n| Authenticate\
+      \ with owner token | browser state/screenshot showed feed after token entry\
+      \ | authenticated `/api/feed/today` returned 200 JSON | PASS |\n| Source Ledger\
+      \ `[RUN INGEST]` | UI showed `[RUN INGEST]`, `[INGESTING...]`, then `last_ingest`\
+      \ | `manual-ingest.json` completed with `sources_succeeded:1`, `items_upserted:20`\
+      \ | PASS |\n| Source Ledger row `[FETCH]` | UI showed `[FETCHING...]`, then\
+      \ `[FETCH]` restored and `last_fetch` updated | `manual-fetch-api.json` completed\
+      \ and source status `ok` | PASS |\n| OPML import button focus/activation | UI\
+      \ upload imported source and showed `folders flattened` receipt | sources API\
+      \ confirmed new source | PASS |\n| State export/import reachability | UI showed\
+      \ `exported state.json` and `import complete` | state export JSON had `schema_version:\
+      \ resofeed.state.v1` and active sources | PASS |\n| Search | Search surface\
+      \ returned 2 lexical/provenance-backed results | CDP network included `GET /api/search?q=Claude`\
+      \ 200 | PASS |\n| Feed | Today feed rendered items | `/api/feed/today` 200 |\
+      \ PASS |\n| Inspector original link | Inspector displayed `original link` |\
+      \ `/api/items/<id>` 200 | PASS |\n| `/doctor` | `/doctor` raw diagnostics rendered\
+      \ `openrouter:` lines | captured text/plain diagnostics; no key material observed\
+      \ | PASS |\n| mobile feed | 390x844 mobile viewport showed feed | CDP-rendered\
+      \ live page | PASS |\n| mobile Inspector | mobile viewport showed full-screen\
+      \ Inspector with back link/star/original link | CDP-rendered live page | PASS\
+      \ |\n| mobile Source Ledger | mobile viewport showed `[RUN INGEST]`, per-row\
+      \ `[FETCH]`, OPML/state actions | CDP-rendered live page | PASS |\n\n### Artifacts\n\
+      - Persisted gate-review artifact committed: `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`.\n\
+      - Original temporary artifacts captured under `.test-artifacts/final-smoke/`\
+      \ included screenshots, browser state text, mobile AX snapshots, network summaries,\
+      \ curl/header outputs, command help output, and server logs.\n- Temporary artifacts\
+      \ were removed after the persisted audit artifact was created.\n\n### Behavioral\
+      \ Proof Register\n- step_intent: post_implementation_verification\n- expected_result:\
+      \ green\n- observed_result: green\n- failure_alignment: none\n- product_implementation_files_modified:\
+      \ no\n- verdict: PASS\n- blockers: []\n- gate_open_allowed: true\n- orchestrator_action_hint:\
+      \ COMPLETE\n- uncertainty_sources:\n  - Worktree needed `npm --prefix web install`\
+      \ because baseline web dependencies were missing; npm reported 5 dependency\
+      \ vulnerabilities, not evaluated as product runtime behavior in this smoke.\n\
+      \  - `/doctor` output after state import showed `rss: errors=2` / `not_fetched`\
+      \ for restored sources before final direct fetch; direct fetch then proved fetch\
+      \ handler works and returns source status `ok`.\n\n### Commit hash(es)\n- Worktree\
+      \ evidence commit: `5b825d56b45ad9b008dd7c74c006987660fccb51`\n- Main squash\
+      \ merge commit: `3eca3f7` (`[vectl] step-urda-final-black-box-runtime-ui-smoke\
+      \ completed`)\n\n### Files changed\n- `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`\n\
+      - No product implementation files changed.\n\n### Verification\n- Build: PASS\
+      \ after installing missing web dependencies.\n- CLI help: PASS for root, `serve\
+      \ --help`, and `owner-token reset --help`.\n- Runtime launch: PASS; `resofeed`\
+      \ bound `127.0.0.1:18080`.\n- Auth: PASS; invalid token rejected, valid owner\
+      \ token accepted.\n- API liveness: PASS; root 200 HTML, unauth API 401 JSON,\
+      \ auth feed/search/doctor/state/fetch/ingest returned expected public responses.\n\
+      - UI smoke: PASS for desktop and mobile required workflows.\n- Mainline artifact\
+      \ verification after squash merge: `git show --name-only --oneline -1 -- docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`\
+      \ showed commit `3eca3f7` and the audit artifact; `git diff --quiet HEAD --\
+      \ docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md` passed.\n\
+      \n### Gaps/Notes\n- No implementation source was inspected by blind-tester.\n\
+      - No vectl tools or plan state were used by blind-tester.\n- No product fix\
+      \ was attempted."
   - id: urda-strict-final-gate
     name: Strict final gate for UI runtime design audit remediation
     status: pending
