@@ -80858,7 +80858,7 @@ phases:
       - [x] Re-run or review targeted evidence proving delegated-agent steering uses
       conflict-specific comparison.
 
-      - [ ] Verify both conflicting and non-conflicting delegated-agent steering cases
+      - [x] Verify both conflicting and non-conflicting delegated-agent steering cases
       are covered by tests.
 
       - [x] Verify ARCH/source/runtime agreement for /api/steer/preview, /api/steer/undo,
