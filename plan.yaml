@@ -69617,7 +69617,7 @@ phases:
 
       - [x] Expected-red tests cover backend, MCP, and frontend surfaces.
 
-      - [ ] Evidence cites docs/ARCHITECTURE.md and docs/DESIGN.md key passages.
+      - [x] Evidence cites docs/ARCHITECTURE.md and docs/DESIGN.md key passages.
 
       - [ ] No unresolved blocker-class contract gaps remain before implementation.'
     verification: '- [ ] All phase steps completed with adequate evidence.
