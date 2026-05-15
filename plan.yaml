@@ -67719,7 +67719,7 @@ phases:
 
       ## Agent checklist (toggle before completion)
 
-      - [ ] Reproduced or inspected the black-box failure context and identified why
+      - [x] Reproduced or inspected the black-box failure context and identified why
       the mobile served-app Inspector omitted `Fresh Runtime B`.
 
       - [ ] Fixed the grouped duplicate Inspector disclosure so the mobile public
