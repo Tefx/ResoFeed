@@ -70533,6 +70533,82 @@ phases:
 
       - Commands/tests run and outputs:'
     agent: frontend-engineer
+  - id: plfu-language-reprocess-controls
+    name: Render language control and reprocess library action
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete rendered UI implementation for the processing-language control and
+      explicit library reprocess action according to DESIGN.md.
+
+
+      YOUR SCOPE:
+
+      - Terse language control: `LANG: EN` / `LANG: ZH` or localized equivalent.
+
+      - `<html lang>` set to `en` or `zh-CN` from authenticated runtime language.
+
+      - aria-live success/failure messages.
+
+      - `[REPROCESS LIBRARY]` confirmation, running, conflict, complete, failed states.
+
+      - Terse bracket actions with no spinner/progress dashboard/wizard/settings panel.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      - [ ] Completion requires visible DOM output for language and reprocess controls.
+
+      - [ ] Component that only computes data but does not render controls is incomplete.
+
+      - [ ] Evidence includes DOM snapshot, browser capture, or test-renderer output
+      for required states.
+
+
+      ## Gate Preview (what gate WILL reject)
+
+      - [ ] settings dashboard/preference center/onboarding wizard.
+
+      - [ ] progress dashboard/job queue/activity log for reprocess.
+
+      - [ ] language treated as per-item translation toggle.
+
+      - [ ] missing accessible names or live-region announcements.'
+    verification: '- [ ] Rendered frontend tests pass for language states and reprocess
+      states.
+
+      - [ ] Evidence includes visible rendered controls and accessibility assertions.
+
+      - [ ] Conflict/error states render raw terse text and preserve focus rules.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Rendered Implementation Evidence
+
+      - Files changed:
+
+      - Rendered states captured:
+
+      - DOM/test-renderer/browser artifact paths:
+
+      - API interaction proof:
+
+      - Commands/tests run and outputs:'
+    depends_on:
+    - plfu-api-client-types
+    agent: frontend-engineer
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
