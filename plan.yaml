@@ -77655,7 +77655,7 @@ phases:
 
       - [x] B1/R6 verdict is CONFORMS or otherwise BLOCKING with exact remaining divergence.
 
-      - [ ] Frontend dependency bootstrap is run when needed before `npm --prefix
+      - [x] Frontend dependency bootstrap is run when needed before `npm --prefix
       web run build`, and build/runtime proof is recorded.
 
       - [ ] B2/R14-R16 rendered/runtime proof no longer depends on a bare missing-Vite
