@@ -74197,14 +74197,14 @@ phases:
 
       - [x] source/split-scroll anchors remain type-only and unconsumed by rendered
       UI.'
-    verification: '- [ ] Rendered tests pass for `translate="no"` or equivalent on
+    verification: '- [x] Rendered tests pass for `translate="no"` or equivalent on
       all source identifier classes.
 
-      - [ ] Browser tests prove desktop independent scroll and mobile route behavior.
+      - [x] Browser tests prove desktop independent scroll and mobile route behavior.
 
-      - [ ] No persisted scroll/depth state is added.
+      - [x] No persisted scroll/depth state is added.
 
-      - [ ] Evidence proves source/split-scroll contract anchors are consumed by rendered
+      - [x] Evidence proves source/split-scroll contract anchors are consumed by rendered
       UI, not left type-only.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
