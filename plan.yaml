@@ -73082,7 +73082,7 @@ phases:
 
       - [ ] HTTP/MCP green retest passed.
 
-      - [ ] Blind liveness probe passed with public HTTP and MCP evidence.
+      - [x] Blind liveness probe passed with public HTTP and MCP evidence.
 
       - [ ] Wiring and spec conformance reports have no unresolved blockers.
 
