@@ -72252,7 +72252,7 @@ phases:
 
       - [x] MCP language/reprocess/report_delivery/search_items tests pass green.
 
-      - [ ] Strict validation tests cover unknown fields, duplicate/unknown query
+      - [x] Strict validation tests cover unknown fields, duplicate/unknown query
       params, bad delivered_at, auth failures, idempotency replay/mismatch, and conflicts.
 
       - [ ] Evidence includes actual commands and outputs.'
