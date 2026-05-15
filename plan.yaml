@@ -77650,7 +77650,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] `go test ./...` passes after remediation, with B1 regression tests named
+      - [x] `go test ./...` passes after remediation, with B1 regression tests named
       and reviewed.
 
       - [x] B1/R6 verdict is CONFORMS or otherwise BLOCKING with exact remaining divergence.
