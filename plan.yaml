@@ -79478,7 +79478,7 @@ phases:
       AC or makes a minimal source-backed docs/spec correction; it does not invent
       product behavior.
 
-      - [ ] The Behavioral Proof Register names AC-4 plus the corrected/restored requirement
+      - [x] The Behavioral Proof Register names AC-4 plus the corrected/restored requirement
       reference and records the closure path for the former AC-19 mismatch.
 
       - [ ] No product runtime implementation work is performed in this step.'
