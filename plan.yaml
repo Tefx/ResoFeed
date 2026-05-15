@@ -69367,7 +69367,7 @@ phases:
       - [x] Split scroll behavior is covered for desktop and mobile route behavior
       remains intact.
 
-      - [ ] Tests preserve DESIGN.md bracket-action anatomy and accessibility rules.'
+      - [x] Tests preserve DESIGN.md bracket-action anatomy and accessibility rules.'
     verification: '- [ ] Expected-red frontend tests fail for intended missing UI/API
       behavior.
 
