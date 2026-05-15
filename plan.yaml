@@ -72360,13 +72360,13 @@ phases:
       - [x] At least one MCP operation reaches the real `/mcp` route.
 
       - [x] Actual commands and outputs are pasted, not summarized.'
-    verification: '- [ ] Runtime launch command succeeds.
+    verification: '- [x] Runtime launch command succeeds.
 
-      - [ ] HTTP probe returns expected status/body.
+      - [x] HTTP probe returns expected status/body.
 
-      - [ ] MCP probe returns expected resource/tool body.
+      - [x] MCP probe returns expected resource/tool body.
 
-      - [ ] Evidence proves no handler-only or mock-only route proof.'
+      - [x] Evidence proves no handler-only or mock-only route proof.'
     evidence_template: '## Verification Report
 
       **Tester**: blind-tester
