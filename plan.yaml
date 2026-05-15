@@ -81545,7 +81545,7 @@ phases:
       - [x] [RUN INGEST] and [FETCH] are immediate low-chrome runtime operations,
       not durable jobs or queues.
 
-      - [ ] Focus returns to next row or Ledger heading after deletion.
+      - [x] Focus returns to next row or Ledger heading after deletion.
 
 
       ## Frontend Completion Criteria (rendering required)
