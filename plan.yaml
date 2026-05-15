@@ -79742,7 +79742,7 @@ phases:
       /search/search/搜索/查, warning-only find alias, invalid vague add, and unmatched
       STEER RULE proposal.
 
-      - [ ] Deterministic routes do not call OpenRouter; OpenRouter is used only for
+      - [x] Deterministic routes do not call OpenRouter; OpenRouter is used only for
       unmatched natural-language steering proposals.
 
       - [ ] Source URL validation is syntactic only and never guesses/fetches RSS
