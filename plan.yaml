@@ -81533,7 +81533,7 @@ phases:
       - [x] Render canonical bracket actions [RUN INGEST], [FETCH], [DETAILS], [DELETE],
       [IMPORT OPML], [EXPORT STATE], and [IMPORT STATE] with exact uppercase labels.
 
-      - [ ] [DETAILS] uses native disclosure or aria-expanded/aria-controls and exposes
+      - [x] [DETAILS] uses native disclosure or aria-expanded/aria-controls and exposes
       terse diagnostics without moving row bounds.
 
       - [ ] Bracket actions preserve 44px minimum real hit targets in default, hover,
