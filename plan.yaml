@@ -77318,21 +77318,21 @@ phases:
       before build when needed) is documented for closure evidence.
 
       - [x] No serial fix/retest churn or extra remediation siblings are introduced.'
-    verification: '- [ ] Main path: focused Go tests pass for reprocess fresh-fetch
+    verification: '- [x] Main path: focused Go tests pass for reprocess fresh-fetch
       success and failure behavior.
 
-      - [ ] Failure path: timeout/canceled/OpenRouter fresh-fetch failure tests prove
+      - [x] Failure path: timeout/canceled/OpenRouter fresh-fetch failure tests prove
       old readable fields are cleared/overwritten and FTS cannot retain stale readable
       text.
 
-      - [ ] Proof path: evidence records both failed finalization reviews, why they
+      - [x] Proof path: evidence records both failed finalization reviews, why they
       failed, and why previous agents could not prove rendered/runtime behavior.
 
-      - [ ] Environment path: evidence distinguishes missing dependency bootstrap
+      - [x] Environment path: evidence distinguishes missing dependency bootstrap
       from product build failure and includes the `npm --prefix web install` requirement
       for closure.
 
-      - [ ] Disposition path: DOC-INPUT-001 has repaired prompt/ref path or explicit
+      - [x] Disposition path: DOC-INPUT-001 has repaired prompt/ref path or explicit
       non-blocking non-intersection evidence.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
