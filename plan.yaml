@@ -77304,7 +77304,7 @@ phases:
       focused backend path without introducing sync/merge, vector/RAG, sidecar worker,
       settings dashboard, or multi-user auth concepts.
 
-      - [ ] Regression tests cover timeout, cancellation, and fresh-fetch/OpenRouter
+      - [x] Regression tests cover timeout, cancellation, and fresh-fetch/OpenRouter
       failure clearing/overwriting old readable fields and maintaining FTS consistency.
 
       - [ ] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
