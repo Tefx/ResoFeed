@@ -80531,7 +80531,7 @@ phases:
 
       - [x] Provide static reachability evidence for the stub/export cleanup.
 
-      - [ ] Provide targeted command/test evidence for the steering precedence and
+      - [x] Provide targeted command/test evidence for the steering precedence and
       response-shape regressions.
 
       - [ ] Document any residual issue with explicit non-intersection evidence; do
