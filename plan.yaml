@@ -62051,6 +62051,112 @@ phases:
       - `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
       urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe`
       exited 0; 7 passed.'
+  - id: urda-keyboard-a11y-nav-batched-fix
+    name: Batched keyboard navigation and accessibility role fix
+    status: pending
+    description: 'step_type: implementation
+
+      priority: HIGH
+
+
+      Fix ALL keyboard/a11y navigation blockers found by `urda-frontend-ui-audit-gate`;
+      do not fix only the first failing assertion.
+
+
+      ## Blocking failure context to close
+
+      1. `web/tests/e2e/keyboard-a11y.expected-red.spec.ts:25` failed because `getByRole(''button'',
+      { name: ''TODAY'' })` was not found/focused.
+
+      2. `web/tests/e2e/keyboard-a11y-helpers.ts:37` failed because `getByRole(''button'',
+      { name: ''SOURCE LEDGER'' })` timed out.
+
+      3. `web/tests/e2e/keyboard-a11y.expected-red.spec.ts:105` failed because `SOURCE
+      LEDGER` role button was not found for focus.
+
+      4. Gate reviewer marked Source Ledger `[RUN INGEST]`, row `[FETCH]`, `[IMPORT
+      OPML]` keyboard reachability, and Resonate keyboard/accessibility as `UNCERTAIN_BLOCKING`
+      because the keyboard suite failed before it could prove these surfaces.
+
+      5. Focused source-ledger and visual/a11y tests passed, and blind-tester Mode
+      D liveness passed with real runtime/no fixtures; liveness is NOT the blocker.
+      The blocker is keyboard navigation / role-button expectation closure plus downstream
+      Source Ledger / Resonate keyboard proof.
+
+
+      ## Scope
+
+      - Repair the frontend semantics, accessible names, focusability, and keyboard
+      activation paths needed for the role-button expectations above.
+
+      - Preserve ResoFeed design language from `docs/DESIGN.md`: functional labels
+      including `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, and bracket-action
+      controls.
+
+      - Preserve source-ledger controls and Resonate keyboard activation while keeping
+      actual runtime behavior unchanged except for accessibility/focus semantics required
+      by the tests.
+
+      - Update tests only if the expectation is stale relative to DESIGN.md/ARCHITECTURE.md;
+      otherwise make product UI conform to the existing expected-red keyboard contract.
+
+
+      ## Product-boundary guardrails
+
+      Do NOT introduce or imply forbidden ResoFeed concepts: SaaS onboarding, settings
+      panels/sliders, folders, tags, unread counts, archive/archive bins, drag-and-drop
+      ordering, sync coordinators, queues/jobs/sidecar workers/admin processes, vector
+      databases, embeddings, or RAG/semantic search.
+
+      Do NOT convert Source Ledger manual fetch/ingest into a queue/job/sync model.
+      OPML remains import/export only, not state restore.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. `TODAY` and `SOURCE LEDGER` are visually present but not exposed as role
+      `button` with exact accessible names.
+
+      2. Source Ledger `[RUN INGEST]`, row `[FETCH]`, `[IMPORT OPML]`, or Resonate
+      controls remain unreachable or unactivatable by keyboard.
+
+      3. Fix relies on fixture-only/liveness-only evidence instead of the real failing
+      keyboard suite.
+
+      4. Any forbidden product/runtime concept is introduced while repairing accessibility.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      UI must provide substantive, rendered keyboard/focus behavior in the real app,
+      not hardcoded test-only shims.'
+    verification: '- Main path: the exact failed keyboard suite reaches and proves
+      `TODAY` and `SOURCE LEDGER` role-button focus expectations.
+
+      - Failure path: Source Ledger `[RUN INGEST]`, row `[FETCH]`, `[IMPORT OPML]`,
+      and Resonate keyboard/accessibility are no longer `UNCERTAIN_BLOCKING` due to
+      early selector/focus failure.
+
+      - Boundary proof: no forbidden UI/product/runtime concepts were introduced and
+      no liveness/server behavior is changed beyond accessible keyboard semantics.
+
+      - Evidence names every file changed and explains whether each change addresses
+      accessible role, accessible name, tab order/focus, or keyboard activation.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y-helpers.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## Fix Evidence\n- Files changed:\n\
+      - Failure(s) closed:\n  - TODAY role-button focus:\n  - SOURCE LEDGER role-button\
+      \ focus:\n  - Source Ledger controls keyboard reachability:\n  - Resonate keyboard/a11y:\n\
+      - Accessible role/name/focus changes made:\n- Product-boundary confirmation:\
+      \ no SaaS onboarding/settings/folders/tags/unread/archive/sync/queues/jobs/vector/RAG\
+      \ concepts introduced.\n- Remaining gaps, if any:\n"
+    depends_on:
+    - urda-frontend-ui-audit-gate
+    agent: frontend-engineer
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
