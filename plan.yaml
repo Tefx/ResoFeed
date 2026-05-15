@@ -77669,18 +77669,18 @@ phases:
 
       - [x] Final headline is PASS only if no blocker-class conformance or proof gap
       remains open.'
-    verification: '- [ ] B1/R6 is re-audited against implementation and regression
+    verification: '- [x] B1/R6 is re-audited against implementation and regression
       tests for timeout/canceled/fresh-fetch failure clearing stale readable fields
       and FTS consistency.
 
-      - [ ] B2/R14-R16 frontend runtime proof is re-run with dependency bootstrap
+      - [x] B2/R14-R16 frontend runtime proof is re-run with dependency bootstrap
       when needed.
 
-      - [ ] Language future-only/no row rewrite, human-over-agent steering precedence,
+      - [x] Language future-only/no row rewrite, human-over-agent steering precedence,
       desktop split-scroll runtime, and source identifier DOM non-translation are
       PROVEN or assigned explicit closure paths.
 
-      - [ ] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
+      - [x] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
