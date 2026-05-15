@@ -70618,15 +70618,15 @@ phases:
       - [x] declaration-only exported anchors: classify as core orphan requiring current
       remediation only if no downstream consumer step owns them; otherwise cite downstream
       owner.'
-    verification: '- [ ] Evidence table maps each backend-core requirement to implementation
+    verification: '- [x] Evidence table maps each backend-core requirement to implementation
       file:line and verdict.
 
-      - [ ] DIVERGES/PARTIAL/NEEDS_TEST items have explicit closure paths and ownership
+      - [x] DIVERGES/PARTIAL/NEEDS_TEST items have explicit closure paths and ownership
       classification.
 
-      - [ ] No blocker-class backend-core spec drift proceeds to runtime integration.
+      - [x] No blocker-class backend-core spec drift proceeds to runtime integration.
 
-      - [ ] HTTP/MCP/frontend divergences are listed as downstream-owned blockers
+      - [x] HTTP/MCP/frontend divergences are listed as downstream-owned blockers
       for their phase gates, not storage-core blockers unless they reveal missing
       core behavior.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
