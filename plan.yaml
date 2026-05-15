@@ -70772,8 +70772,13 @@ phases:
 
 
       Complete the implementation within existing HTTP routing/handler boundaries.
-      Wire core operations from the previous phase into JSON HTTP without moving business
-      logic into `http.go`.
+      Wire core operations from the storage-core phase into JSON HTTP without moving
+      business logic into `http.go`.
+
+
+      This step owns downstream runtime blockers discovered during storage-core verification.
+      It is blocking for `plhm-http-mcp-green-retest`, `plhm-runtime-wiring-audit`,
+      `plhm-runtime-spec-conformance`, and `plhm-runtime-gate`.
 
 
       YOUR SCOPE:
@@ -70792,14 +70797,46 @@ phases:
 
       - strict query/body/content-type validation for these surfaces
 
+      - language mutation guard conflicts when reprocess is active or duplicate active
+      operation exists
+
+      - reprocess active duplicate behavior and idempotency replay/mismatch through
+      the HTTP transport
+
+      - operation guard and receipt mismatch/error response parity with backend-core
+      semantics
+
 
       Integration path: HTTP auth/validation -> core language/reprocess/delivery/search/doctor
       operation -> canonical response/error shape.
 
 
+      ## Downstream blocker ownership from storage-core verification
+
+      - [ ] Missing `/api/items/{id}/delivery` route returning 404 is owned here;
+      implement route registration, strict validation, idempotency replay/mismatch,
+      delivered_at validation, and core operation call.
+
+      - [ ] HTTP language mutation guard/reprocess-active duplicate behavior is owned
+      here; expose core conflict semantics through HTTP without adding queues/jobs/ledgers.
+
+      - [ ] HTTP reprocess route and operation guard conflict response behavior is
+      owned here.
+
+      - [ ] HTTP search query echo is owned here if not already provided by runtime
+      HTTP.
+
+      - [ ] Declaration-only HTTP-facing contract anchors must be consumed by this
+      implementation or intentionally de-exported only if the authoritative contract
+      permits it.
+
+
       ## Gate Preview (what gate WILL reject)
 
       - [ ] unknown JSON request body fields not rejected as `400 bad_request`.
+
+      - [ ] duplicate/unknown query parameters not rejected according to HTTP contract
+      rules.
 
       - [ ] `actor_id` treated as authorization instead of provenance/idempotency
       metadata.
@@ -70810,6 +70847,8 @@ phases:
 
       - [ ] handler-only proof without real HTTP route execution.
 
+      - [ ] `/api/items/{id}/delivery` still returns 404 for the documented route.
+
 
       ## Completion Criteria (stub exclusion)
 
@@ -70818,56 +70857,79 @@ phases:
       - [ ] Outputs vary by request body, receipt state, current language, item id,
       and operation guard state.
 
-      - [ ] Business logic stays in core; HTTP remains thin transport.'
+      - [ ] Business logic stays in core; HTTP remains thin transport.
+
+      - [ ] Storage-core downstream-owned HTTP blockers are all closed or converted
+      into explicit runtime gate blockers with evidence.'
     verification: '- [ ] Targeted HTTP contract tests pass for success, validation
       errors, auth, replay, mismatch, TTL/crash-loss semantics, delivery, doctor stale
       lines, and conflict.
 
-      - [ ] Real handler/route tests exercise full HTTP request/response path.
+      - [ ] Real handler/route tests exercise full HTTP request/response path for
+      `/api/items/{id}/delivery`, runtime language, reprocess, search query echo,
+      and doctor stale lines.
 
-      - [ ] No forbidden ledger/job/sync/delivery registry artifacts are introduced.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
+      - [ ] No forbidden ledger/job/sync/delivery registry artifacts are introduced.
+
+      - [ ] Evidence proves every storage-core downstream-owned HTTP blocker is now
+      implemented or remains explicitly blocking in the runtime phase.'
+    evidence_template: '## Integration Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
-
 
       If no refs were provided, state: "No refs for this step."
 
-
-      ## Integration Evidence
 
       **Command or test exercising the full path**:
 
       ```
 
-      <exact command/test>
+      <exact HTTP route/handler command or test name>
 
       ```
+
 
       **Actual output**:
 
       ```
 
-      <paste output>
+      <stdout/stderr or test runner output>
 
       ```
 
-      **Path exercised**: HTTP route -> auth/validation -> core operation -> response
+
+      **Path exercised**: HTTP auth/validation -> core operation -> canonical response/error
+      shape
 
 
-      ## Implementation Evidence
+      ## Storage-Core Downstream Blocker Closure
 
-      - Files changed:
+      | Blocker from storage-core verification | Route/test evidence | Status |
 
-      - Routes added/updated:
+      |---|---|---|
 
-      - Validation matrix:
+      | `/api/items/{id}/delivery` returned 404 | <evidence> | closed/blocking |
 
-      - Idempotency/replay proof:'
+      | language mutation guard/reprocess active duplicate behavior | <evidence> |
+      closed/blocking |
+
+      | reprocess route/operation guard/idempotency replay mismatch | <evidence> |
+      closed/blocking |
+
+      | search query echo | <evidence> | closed/blocking |
+
+
+      ## Forbidden Surface Scan
+
+      - [ ] No jobs/queues/ledgers/sync/merge/delivery registry/per-agent auth introduced.'
+    refs:
+    - docs/ARCHITECTURE.md
     agent: golang-developer
   - id: plhm-mcp-runtime-parity
     name: Complete MCP language reprocess delivery parity
