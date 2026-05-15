@@ -129,6 +129,25 @@ async function writeProof(testInfo: TestInfo, name: string, proof: unknown): Pro
 }
 
 function itemDetail(item: ItemFixture): Record<string, unknown> {
+  const groupedSourceItems = items
+    .filter((candidate) => candidate.story_key !== null && candidate.story_key === item.story_key)
+    .map((candidate) => ({
+      item_id: candidate.id,
+      source_id: candidate.source_id,
+      source_title: candidate.source_title,
+      source_url: sources.find((source) => source.id === candidate.source_id)?.url ?? 'https://unknown.example.test/rss.xml',
+      url: candidate.url,
+      canonical_url: candidate.url,
+      title: candidate.title,
+      published_at: candidate.published_at,
+      first_seen_at: candidate.first_seen_at,
+      extraction_status: candidate.extraction_status,
+      model_status: candidate.model_status,
+      story_key: candidate.story_key,
+      duplicate_of_item_id: candidate.duplicate_of_item_id,
+      is_selected_item: candidate.id === item.id
+    }));
+
   return {
     ...item,
     feed_excerpt: `${item.title} feed excerpt`,
@@ -138,7 +157,8 @@ function itemDetail(item: ItemFixture): Record<string, unknown> {
       canonical_url: item.url,
       original_url: item.url,
       story_key: item.story_key,
-      duplicate_of_item_id: item.duplicate_of_item_id
+      duplicate_of_item_id: item.duplicate_of_item_id,
+      grouped_source_items: groupedSourceItems
     }
   };
 }
@@ -256,6 +276,16 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     await expect(inspector, 'Inspector must disclose primary source provenance').toContainText('Primary Wire');
     await expect(inspector, 'Inspector must disclose duplicate/source item provenance').toContainText('Duplicate Ledger');
     await expect(inspector, 'Inspector must expose shared story_key provenance').toContainText('story-shared-runtime-review');
+    await writeProof(testInfo, 'fr-04-rendered-inspector-grouped-sources', await inspector.locator('.contract-grouped-sources').evaluate((element) => ({
+      text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      summary: element.querySelector('summary')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      accessibleName: element.querySelector('summary')?.getAttribute('aria-label') ?? '',
+      sourceLinks: Array.from(element.querySelectorAll('a')).map((anchor) => ({
+        text: anchor.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        href: anchor.getAttribute('href') ?? '',
+        ariaLabel: anchor.getAttribute('aria-label')
+      }))
+    })));
   });
 
   test('FR-05/FR-07: Source Ledger DOM contract and contextual [FETCH] accessible names hold at desktop and mobile', async ({ page }, testInfo) => {

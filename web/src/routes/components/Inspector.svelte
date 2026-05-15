@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import type { ItemDetail, ItemSummary } from '$lib/api-contract';
+  import type { GroupedSourceItem, ItemDetail, ItemSummary } from '$lib/api-contract';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
@@ -279,6 +279,31 @@
     return lines.join('\n');
   }
 
+  function groupedSourceItems(value: InspectableItem): GroupedSourceItem[] {
+    if (!('provenance' in value)) return [];
+    return value.provenance.grouped_source_items ?? [];
+  }
+
+  function groupedSourcesLabel(items: GroupedSourceItem[]): string {
+    return `Grouped story with ${items.length} source ${items.length === 1 ? 'item' : 'items'}`;
+  }
+
+  function groupedSourceHref(sourceItem: GroupedSourceItem): string {
+    return [sourceItem.url, sourceItem.canonical_url, sourceItem.source_url]
+      .find((candidate): candidate is string => Boolean(candidate?.match(/^https?:\/\//))) ?? 'https://example.invalid/unavailable';
+  }
+
+  function groupedSourceMeta(sourceItem: GroupedSourceItem): string {
+    const parts = [
+      sourceItem.is_selected_item ? 'selected' : 'grouped',
+      sourceItem.story_key ? `story_key: ${sourceItem.story_key}` : null,
+      sourceItem.duplicate_of_item_id ? `duplicate_of: ${sourceItem.duplicate_of_item_id}` : 'duplicate_of: none',
+      sourceItem.extraction_status,
+      sourceItem.model_status
+    ];
+    return parts.filter((part): part is string => part !== null).join(' · ');
+  }
+
   function extractionDisclosure(value: InspectableItem): string {
     if (value.extraction_status === 'partial_extraction') return 'source text: RSS excerpt only';
     if (value.extraction_status === 'original_unavailable') return 'original unavailable';
@@ -345,6 +370,24 @@
     <p><strong>core insight:</strong> {coreInsightText(item)}</p>
     <p class="inspector-reading">{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>
+    {@const groupedItems = groupedSourceItems(item)}
+    {#if groupedItems.length > 0}
+      <details class="contract-grouped-sources" open>
+        <summary aria-label={groupedSourcesLabel(groupedItems)}>{groupedSourcesLabel(groupedItems)}</summary>
+        <ol class="contract-grouped-sources__list">
+          {#each groupedItems as sourceItem (sourceItem.item_id)}
+            <li class="contract-grouped-sources__item" aria-label={`Grouped source item: ${sourceItem.source_title}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
+              <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener">{sourceItem.source_title}</a>
+              <span class="contract-muted"> — {sourceItem.title}</span>
+              <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>
+              {#if sourceItem.source_url}
+                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceItem.source_title}`}>feed</a>
+              {/if}
+            </li>
+          {/each}
+        </ol>
+      </details>
+    {/if}
     {#if item.story_key || item.duplicate_of_item_id}
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}

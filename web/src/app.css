@@ -756,6 +756,39 @@ a:focus,
   padding-block-start: var(--rf-space-sm);
 }
 
+.contract-grouped-sources {
+  margin-block: var(--rf-space-md) var(--rf-space-sm);
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+}
+
+.contract-grouped-sources summary {
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--rf-color-text);
+}
+
+.contract-grouped-sources__list {
+  display: grid;
+  gap: var(--rf-space-xs);
+  margin: 0;
+  padding-inline-start: var(--rf-space-lg);
+}
+
+.contract-grouped-sources__item {
+  max-width: 76ch;
+  overflow-wrap: anywhere;
+}
+
+.contract-grouped-sources__meta {
+  display: block;
+  color: var(--rf-color-muted);
+}
+
+.contract-grouped-sources__feed {
+  margin-inline-start: var(--rf-space-sm);
+}
+
 .contract-diagnostics {
   max-width: 100%;
   overflow-wrap: anywhere;
