@@ -76326,7 +76326,7 @@ phases:
       - [x] README/usage examples match actual language/reprocess/delivery/API/MCP
       interfaces if they mention them.
 
-      - [ ] docs/ARCHITECTURE.md remains consistent with implemented runtime metadata,
+      - [x] docs/ARCHITECTURE.md remains consistent with implemented runtime metadata,
       receipts, reprocess, FTS, HTTP/MCP, delivery, and frontend behavior.
 
       - [ ] docs/DESIGN.md remains consistent with rendered language/reprocess/source
