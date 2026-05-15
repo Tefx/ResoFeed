@@ -69300,6 +69300,83 @@ phases:
 
       - Forbidden concepts search result:'
     agent: golang-developer
+  - id: plsc-processing-language-ingest
+    name: Complete processing language backend and OpenRouter input
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the implementation within existing signatures/stubs for runtime processing
+      language and future ingest. Use the contract from plct-contract-lock and tests
+      from plct-backend-expected-red-tests.
+
+
+      YOUR SCOPE: language enum/validation, read/set core operations, OpenRouter target-language
+      input, ingest persistence of one target-language item version, and stored item
+      readable/search/display behavior. Do not create a second translation pipeline
+      or store original/translated pairs.
+
+
+      State semantics:
+
+      - [ ] `processing_language` persists runtime-local default and absent means
+      effective `en`.
+
+      - [ ] language changes affect future ingest/reprocess only; existing rows and
+      FTS are not auto-rewritten.
+
+      - [ ] OpenRouter receives `target_language`; Go validates JSON before persistence.
+
+      - [ ] `items.title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`
+      are the single stored processed readable version.
+
+      - [ ] URLs/source titles/source URLs/canonical/original URLs remain exact provenance
+      anchors.
+
+      - [ ] No `translation_failed` status is introduced.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] Implementation has substantive logic; no hardcoded language-only stubs.
+
+      - [ ] Outputs vary by stored processing language and input item data.
+
+      - [ ] Existing extraction/model failure taxonomy is preserved.'
+    verification: '- [ ] Targeted ingest/language tests pass for `en` and `zh`.
+
+      - [ ] Regression covers language change not rewriting historical items.
+
+      - [ ] OpenRouter request tests prove target-language input is included without
+      persisting secrets.
+
+      - [ ] Source provenance fields remain unchanged in item responses.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Language operations implemented:
+
+      - OpenRouter target-language proof:
+
+      - Stored item/provenance proof:
+
+      - Commands/tests run and outputs:'
+    depends_on:
+    - plsc-runtime-metadata-receipts
+    agent: golang-developer
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
