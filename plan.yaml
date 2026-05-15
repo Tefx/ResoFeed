@@ -78916,7 +78916,7 @@ phases:
       - [x] Pin desktop independent Feed/Inspector scroll and mobile full-screen Inspector
       route fixture expectations.
 
-      - [ ] Pin low-chrome processing language/reprocess control expectations with
+      - [x] Pin low-chrome processing language/reprocess control expectations with
       no settings/job/activity/dashboard concepts.'
     verification: '- [ ] Contract-only frontend changes define fixture/state expectations
       without completing rendered UI behavior.
