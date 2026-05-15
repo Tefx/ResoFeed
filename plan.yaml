@@ -65856,3 +65856,146 @@ phases:
     - ui-runtime-fresh-review-contract-red-tests
     - ui-runtime-fresh-review-duplicate-source-api-fix
     agent: frontend-engineer
+  - id: ui-runtime-fresh-review-green-retest
+    name: Retest fresh audit fixes to green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an independent tester, rerun the fresh audit acceptance tests and focused
+      build/test commands after implementation. This phase-check protects the final
+      fresh-audit gate and must produce a behavioral proof register for all actionable
+      findings.
+
+
+      Scope:
+
+      - FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, FR-10 from docs/audits/ui-runtime-fresh-review-2026-05-15.md.
+
+      - The implementation steps ui-runtime-fresh-review-shell-feed-ledger-fix, ui-runtime-fresh-review-duplicate-source-api-fix,
+      and ui-runtime-fresh-review-duplicate-source-inspector-fix.
+
+
+      Required proof register fields for each finding:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Completion Criteria
+
+      - [ ] Fresh audit expected-red tests now pass green.
+
+      - [ ] Build/test commands include frontend and relevant Go/API coverage.
+
+      - [ ] Behavioral proof register marks every blocker/should-fix finding PROVEN
+      or gives explicit blocking remediation.
+
+      - [ ] Any discovered issue is mapped to a remediation owner rather than dismissed
+      as pre-existing or out-of-scope.'
+    verification: '- [ ] `npm --prefix web run build` or the project-equivalent frontend
+      build passes.
+
+      - [ ] Fresh-audit focused Playwright/runtime tests pass green for FR-01, FR-02,
+      FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
+
+      - [ ] Relevant Go tests for grouped duplicate/source disclosure pass if backend/API
+      code changed.
+
+      - [ ] Evidence includes desktop and 390x844 mobile screenshots or DOM/metric
+      artifacts.
+
+      - [ ] Behavioral proof register includes closure_path and gate_decision_basis
+      for every finding.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Report
+
+      **Tester**: integration-verifier
+
+      **Independence Level**: L2
+
+
+      ### Commands executed
+
+      ```
+
+      <actual commands>
+
+      ```
+
+
+      ### Fresh Audit Closure Matrix
+
+      | Finding | Command/artifact | Verdict | Notes |
+
+      |---|---|---|---|
+
+      | FR-01 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-02 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-04 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-05 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-06 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-07 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-09 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+      | FR-10 | <evidence_ref> | PROVEN/UNPROVEN | <notes> |
+
+
+      ### Behavioral Proof Register
+
+      <requirement_ref, behavior_claim, runtime_proof_expected, evidence_ref, status,
+      closure_path, gate_decision_basis for each finding>
+
+
+      ### Headline
+
+      - [ ] PASS: all fresh-audit blocker/should-fix findings are proven closed
+
+      - [ ] FAIL: blocker/proof gap remains and remediation owner is identified'
+    depends_on:
+    - ui-runtime-fresh-review-shell-feed-ledger-fix
+    - ui-runtime-fresh-review-duplicate-source-api-fix
+    - ui-runtime-fresh-review-duplicate-source-inspector-fix
+    agent: integration-verifier
