@@ -77942,6 +77942,294 @@ phases:
 
       Gaps/Notes: None blocking; final gate may consume this as green conformance
       closure evidence.'
+  - id: plfinal-ui-final-blocker-remediation
+    name: Batched UI final blocker remediation
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: defect_repair
+
+      source_gate: plfinal-final-gate
+
+      source_gate_artifact: 038eb8c5
+
+      failed_command: npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+
+      Fix ALL seven UI final proof blockers discovered by `plfinal-final-gate` in
+      one batched remediation pass. This step is authorized only to repair the rendered
+      UI contract failures listed below; do not add product scope, onboarding flows,
+      settings dashboards, SaaS copy, folders/tags/unread/archive behavior, sync/merge
+      concepts, vector/RAG behavior, per-agent auth registries, delivery registries,
+      or any design-token drift outside docs/DESIGN.md.
+
+
+      Authoritative constraints:
+
+      - `docs/DESIGN.md` and `docs/ARCHITECTURE.md` are law for UI surface shape,
+      product boundaries, and single-deployable constraints.
+
+      - `AGENTS.md` forbids settings/onboarding/SaaS drift and requires functional
+      labels: `RESOFEED`, `TODAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`.
+
+      - Preserve the single Go binary + Svelte frontend architecture; do not introduce
+      sidecar runtimes or unrelated product concepts.
+
+
+      Likely implicated touch paths:
+
+      - `web/src/routes/+page.svelte` — RESOFEED surface menu, TODAY/SOURCE LEDGER
+      switching, route/surface state.
+
+      - `web/src/routes/components/Feed.svelte` and feed anatomy helpers — `.contract-feed-item`,
+      `.contract-feed-meta`, chronological labels, mobile metadata.
+
+      - `web/src/routes/components/Inspector.svelte` — grouped duplicate/source disclosure
+      and provenance.
+
+      - `web/src/routes/components/SourceLedger.svelte` — `[FETCH]` accessible names,
+      Source Ledger DOM contract, diagnostic/details row structure.
+
+      - `web/src/app.css` — mobile metadata truncation and Source Ledger row/details
+      geometry.
+
+
+      ## Gate Preview (what the final UI retest WILL reject)
+
+      1. Any of the seven named Playwright failures still reproduces.
+
+      2. DOM contract repairs that only satisfy desktop while mobile remains missing
+      or wrapped.
+
+      3. Visual/a11y repairs that change product scope, copy tone, or introduce settings/onboarding/SaaS
+      patterns.
+
+      4. Hidden hardcoded fixture-only behavior that does not render the served app
+      path.
+
+      5. Claiming closure without rerunning the exact failing command and collecting
+      rendered artifacts.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### 1. FR-01/FR-10 surface menu and utility panel contract
+
+      Failure message: `expect(locator).toHaveClass(expected) failed`; locator `.utility-surface[aria-label="TODAY
+      surface"]`; expected `/active-panel/`; element not found.
+
+      Expected: after menu navigation SOURCE LEDGER then TODAY, TODAY utility surface
+      exists and has `active-panel` on desktop and mobile.
+
+      Observed: no `.utility-surface[aria-label="TODAY surface"]`.
+
+      Artifact: `.test-artifacts/playwright/test-output/ui-runtime-fresh-review-re-af178-EDGER-on-desktop-and-mobile-chromium-ci-safe/`;
+      gate report artifact `038eb8c5`.
+
+      Required remediation: make the RESOFEED menu closed by default, keyboard reachable,
+      and capable of toggling TODAY/SOURCE LEDGER while preserving utility surface
+      DOM and active-panel semantics.
+
+
+      ### 2. FR-02 contiguous chronological time labels
+
+      Failure message: expected `["TODAY", "YESTERDAY"]`; received `[]` from `.contract-feed-meta`
+      label extraction.
+
+      Expected: feed metadata exposes contiguous chronological labels; never TODAY
+      > YESTERDAY > TODAY.
+
+      Observed: no matching `TODAY|YESTERDAY|EARLIER` labels in `.contract-feed-meta`.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: render contract feed metadata labels in chronological
+      contiguous groups without adding unrelated taxonomy.
+
+
+      ### 3. FR-04 primary Inspector grouped story disclosure
+
+      Failure message: timeout waiting for `.contract-feed-item` containing `Primary
+      grouped story keeps every source visible` and role button `/Open Inspector for:/`.
+
+      Expected: seeded feed item renders with Inspector-open button.
+
+      Observed: expected feed item/button not found.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: ensure the primary grouped story renders as `.contract-feed-item`
+      and exposes the Inspector-open button with accessible name matching `/Open Inspector
+      for:/`.
+
+
+      ### 4. B1 mobile Inspector sparse-provenance grouped sources
+
+      Failure message: timeout waiting for `.contract-feed-item` containing `Alpha
+      Today Primary Story` and role button `/Open Inspector for:/`.
+
+      Expected: mobile feed renders same-URL grouped-source fixture item with Inspector-open
+      button.
+
+      Observed: expected mobile feed item/button not found.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: mobile served-app feed must render same-URL grouped-source
+      fixture items and Inspector access, and Inspector details must disclose both
+      Fresh Runtime same-URL grouped sources even when detail provenance is sparse.
+
+
+      ### 5. FR-05/FR-07 Source Ledger `[FETCH]` DOM and accessible-name contract
+
+      Failure message: locator not found for `.source-ledger` button with accessible
+      name `Fetch source Primary Wire`; expected visible text `[FETCH]`.
+
+      Expected: each visible `[FETCH]` button keeps visible text `[FETCH]` and contextual
+      accessible name `Fetch source <source title>` on desktop and mobile.
+
+      Observed: matching Source Ledger fetch control not found.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: keep visible button text exactly `[FETCH]` while setting
+      contextual accessible names from the source title.
+
+
+      ### 6. FR-06 collapsed diagnostic details row contract
+
+      Failure message: `expect(locator).not.toHaveAttribute(expected) failed`; locator
+      `details.source-diagnostic-details`; element not found.
+
+      Expected: first Source Ledger row contains collapsed `details.source-diagnostic-details`
+      without `open` and compact row geometry.
+
+      Observed: diagnostic details element not found.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: render the diagnostic details element in the first Source
+      Ledger row, collapsed by default, without inflating every row.
+
+
+      ### 7. FR-09 mobile flat inline metadata truncation
+
+      Failure message: timeout waiting for `.contract-feed-meta`.
+
+      Expected: mobile feed renders at least one `.contract-feed-meta` with `white-space:
+      nowrap`, `overflow: hidden`, `text-overflow: ellipsis`, and height <= 18px.
+
+      Observed: `.contract-feed-meta` not found.
+
+      Artifact: gate report artifact `038eb8c5`; inspect the Playwright output directory
+      for the exact retry artifact.
+
+      Required remediation: mobile feed metadata must remain a single flat inline
+      monospace line with ellipsis/truncation, not wrapping.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: surface/feed/Inspector/Source Ledger state computation
+      produces correct values.
+
+      2. Rendering completeness: the served app produces visible DOM elements matching
+      the contract selectors and accessible names.
+
+
+      A component that returns data objects instead of Svelte-rendered elements does
+      NOT satisfy this step, even if all data computations are correct. Stub-only
+      or fixture-only completion is NOT acceptable.
+
+
+      ## Completion Criteria
+
+      - [ ] All seven listed blocker failures are addressed in the served app path,
+      not only in isolated tests.
+
+      - [ ] `why_previous_gate_failed` is documented with the DOM/state root cause
+      for each failure family.
+
+      - [ ] TODAY/SOURCE LEDGER surface switching works by keyboard and pointer on
+      desktop and mobile, with the menu closed by default.
+
+      - [ ] Feed items and `.contract-feed-meta` render for seeded desktop/mobile
+      cases with contiguous chronological labels.
+
+      - [ ] Inspector-open controls render with accessible names matching `/Open Inspector
+      for:/` for the grouped-story fixtures.
+
+      - [ ] Inspector provenance discloses grouped duplicate/source items, including
+      sparse-detail same-URL grouped sources.
+
+      - [ ] Source Ledger `[FETCH]` controls keep visible text `[FETCH]` and accessible
+      names `Fetch source <source title>`.
+
+      - [ ] Source Ledger diagnostic details render collapsed by default without row
+      inflation.
+
+      - [ ] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
+
+      - [ ] No settings/onboarding/SaaS/product-boundary drift is introduced.'
+    verification: '- [ ] Exact failing command is rerun locally by the implementer
+      before handoff: `npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.
+
+      - [ ] Evidence includes a seven-test closure matrix with PASS/FAIL for each
+      named blocker.
+
+      - [ ] Evidence includes rendered DOM/screenshots or Playwright artifacts for
+      desktop and mobile states changed by the remediation.
+
+      - [ ] Evidence includes proof that no settings/onboarding/SaaS/product-boundary
+      drift was introduced.
+
+      - [ ] Evidence names any residual UI blocker explicitly; no vague `tests pass`
+      summary is sufficient.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
+      \ READ: <reason>\"\n- web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n\n## why_previous_gate_failed\n-\
+      \ Gate step: plfinal-final-gate\n- Gate report artifact: 038eb8c5\n- Failed\
+      \ command: `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`\n\
+      - Root cause summary by failure family:\n  - FR-01/FR-10: <DOM/state root cause>\n\
+      \  - FR-02/FR-09: <feed metadata root cause>\n  - FR-04/B1: <feed/Inspector\
+      \ provenance root cause>\n  - FR-05/FR-07/FR-06: <Source Ledger root cause>\n\
+      \n## Seven-Test Closure Matrix\n| ID | Test name | Root cause | Files changed\
+      \ | Evidence artifact | Status |\n| --- | --- | --- | --- | --- | --- |\n| 1\
+      \ | FR-01/FR-10 surface menu utility panels | <root cause> | <paths> | <artifact\
+      \ path> | PASS/FAIL |\n| 2 | FR-02 chronological labels | <root cause> | <paths>\
+      \ | <artifact path> | PASS/FAIL |\n| 3 | FR-04 Inspector grouped story | <root\
+      \ cause> | <paths> | <artifact path> | PASS/FAIL |\n| 4 | B1 mobile grouped\
+      \ sources | <root cause> | <paths> | <artifact path> | PASS/FAIL |\n| 5 | FR-05/FR-07\
+      \ Source Ledger FETCH | <root cause> | <paths> | <artifact path> | PASS/FAIL\
+      \ |\n| 6 | FR-06 collapsed details | <root cause> | <paths> | <artifact path>\
+      \ | PASS/FAIL |\n| 7 | FR-09 mobile metadata truncation | <root cause> | <paths>\
+      \ | <artifact path> | PASS/FAIL |\n\n## Exact Command Output\n```text\n<paste\
+      \ stdout/stderr from npm --prefix web run test:e2e -- --project=chromium-ci-safe\
+      \ web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts>\n```\n\n## Rendered\
+      \ Artifact Proof\n- Desktop artifacts: <paths to screenshots/videos/traces/DOM\
+      \ snapshots>\n- Mobile artifacts: <paths to screenshots/videos/traces/DOM snapshots>\n\
+      - Accessibility proof: <accessible names verified>\n\n## Product Boundary Drift\
+      \ Check\n- Settings/onboarding/SaaS copy introduced: YES/NO, evidence: <grep/diff\
+      \ summary>\n- Forbidden product concepts introduced: YES/NO, evidence: <grep/diff\
+      \ summary>\n- DESIGN.md labels preserved: YES/NO, evidence: <examples>\n\n##\
+      \ Residual Gaps\n- <none, or exact blocker IDs remaining>"
+    depends_on:
+    - plfinal-final-gate
+    agent: frontend-engineer
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
   status: locked
