@@ -82497,7 +82497,7 @@ phases:
       app escapes Owner Token Prompt and Source Ledger controls are reachable without
       persistence drift.
 
-      - [ ] `surfaces active MCP agent steering attribution as an inline correction
+      - [x] `surfaces active MCP agent steering attribution as an inline correction
       receipt`: app renders `Agent steering receipt` region when test data includes
       active MCP attribution.
 
