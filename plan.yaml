@@ -75363,12 +75363,12 @@ phases:
       - [x] No automatic startup recovery/job queue is introduced or required.
 
       - [x] Counts and stale marker semantics match docs exactly.'
-    verification: '- [ ] Failure-path integration proof passes or reports blockers
+    verification: '- [x] Failure-path integration proof passes or reports blockers
       with reproduction.
 
-      - [ ] Doctor stale/ok transitions are proven with actual output.
+      - [x] Doctor stale/ok transitions are proven with actual output.
 
-      - [ ] Reprocess accounting invariants are verified under failure conditions.'
+      - [x] Reprocess accounting invariants are verified under failure conditions.'
     evidence_template: '## Verification Report
 
       **Tester**: integration-verifier
