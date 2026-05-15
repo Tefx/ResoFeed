@@ -71707,7 +71707,7 @@ phases:
       - [x] HTTP reprocess route and operation guard conflict response behavior is
       owned here.
 
-      - [ ] HTTP search query echo is owned here if not already provided by runtime
+      - [x] HTTP search query echo is owned here if not already provided by runtime
       HTTP.
 
       - [ ] Declaration-only HTTP-facing contract anchors must be consumed by this
