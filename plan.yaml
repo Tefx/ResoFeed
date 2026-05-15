@@ -71130,7 +71130,7 @@ phases:
       - [x] Tests prove active ingest/fetch/reprocess and language mutation cannot
       create mixed-language batches.
 
-      - [ ] `RuntimeLanguageContract`, `RequestFingerprintContract`, and `ReprocessSourcePrecedence`
+      - [x] `RuntimeLanguageContract`, `RequestFingerprintContract`, and `ReprocessSourcePrecedence`
       are consumed, removed/de-exported, or explicitly downstream-owned with named
       owner steps; no storage-core orphan remains.
 
