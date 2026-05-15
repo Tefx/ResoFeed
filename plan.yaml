@@ -73750,7 +73750,7 @@ phases:
 
       - [x] Client types are consumed by rendered UI tests downstream.
 
-      - [ ] No settings dashboard, preference center, wizard, progress dashboard,
+      - [x] No settings dashboard, preference center, wizard, progress dashboard,
       or activity log API is introduced.
 
       - [ ] Owner token remains the only auth header; `actor_id` is not auth.
