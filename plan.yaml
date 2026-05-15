@@ -78286,7 +78286,7 @@ phases:
       - [x] Inspector provenance discloses grouped duplicate/source items, including
       sparse-detail same-URL grouped sources.
 
-      - [ ] Source Ledger `[FETCH]` controls keep visible text `[FETCH]` and accessible
+      - [x] Source Ledger `[FETCH]` controls keep visible text `[FETCH]` and accessible
       names `Fetch source <source title>`.
 
       - [ ] Source Ledger diagnostic details render collapsed by default without row
