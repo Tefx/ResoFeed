@@ -68921,6 +68921,80 @@ phases:
 
       - Confirmation no behavior logic was implemented:'
     agent: golang-developer
+  - id: plct-backend-expected-red-tests
+    name: Add backend expected-red contract tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define backend expected-red tests before implementation. Scope is tests/fixtures
+      only except minimal test helpers. Cover runtime metadata migrations, `processing_language`
+      default/effective `en`, state export/import exclusion, `search_fts_stale_since`,
+      live `agent_receipts` TTL/fingerprint semantics, OpenRouter target-language
+      input, reprocess per-item accounting and FTS rebuild/stale marker, strict JSON
+      body/query validation, delivery endpoint idempotency, and target-language FTS
+      including `core_insight`.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one fixture MUST use the exact documented external JSON shapes from
+      docs/ARCHITECTURE.md without convenience fields beyond the spec.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Tests are expected red before implementation and expose the contract gaps
+      without product-code changes.
+
+      - [ ] Modified files are limited to tests, fixtures, and minimal test helpers.
+
+      - [ ] Tests cover unknown JSON body field rejection for new mutating endpoints.
+
+      - [ ] Tests cover live receipt replay, mismatch, TTL expiration, and expired-row
+      replacement.
+
+      - [ ] Tests cover reprocess counts: attempted = updated + unavailable + failed.
+
+      - [ ] Tests cover stale FTS doctor lines and target-language FTS over `core_insight`.
+
+      - [ ] Evidence lists expected failures or exposed gaps and downstream implementation
+      owners.'
+    verification: '- [ ] Expected-red backend tests fail for missing implementation
+      for the intended reasons.
+
+      - [ ] No product behavior implementation is included.
+
+      - [ ] Test fixture formats cite docs/ARCHITECTURE.md sections and include at
+      least one minimal spec-exact fixture.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/updated:
+
+      - Expected failures/exposed gaps:
+
+      - Spec-derived minimal fixtures:
+
+      - Product-code changes: NONE expected'
+    depends_on:
+    - plct-contract-lock
+    agent: golang-developer
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
   status: locked
