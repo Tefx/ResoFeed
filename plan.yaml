@@ -68012,7 +68012,7 @@ phases:
       - [x] 390x844 mobile browser proof opens/selects the primary duplicate story
       Inspector.
 
-      - [ ] Fresh evidence shows both `Fresh Runtime A` and `Fresh Runtime B` in the
+      - [x] Fresh evidence shows both `Fresh Runtime A` and `Fresh Runtime B` in the
       mobile Inspector grouped-source disclosure.
 
       - [ ] Evidence includes actual commands, runtime output, and artifact paths,
