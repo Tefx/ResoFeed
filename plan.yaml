@@ -78057,7 +78057,7 @@ phases:
       closure evidence.'
   - id: plfinal-ui-final-blocker-remediation
     name: Batched UI final blocker remediation
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -78343,6 +78343,8 @@ phases:
     depends_on:
     - plfinal-final-gate
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T20:39:42.242968+00:00'
   - id: plfinal-ui-final-blocker-retest-gate
     name: Final UI blocker retest gate
     status: pending
