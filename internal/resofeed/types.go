@@ -326,7 +326,8 @@ type SteeringReceipt struct {
 
 // SteerResult is the canonical steering response envelope.
 type SteerResult struct {
-	Receipt SteeringReceipt `json:"receipt"`
+	Receipt    SteeringReceipt  `json:"receipt"`
+	UndoHandle *SteerUndoHandle `json:"undo_handle,omitempty"`
 }
 
 // SteerUndoRequest is the target-specific undo request body. It is idempotent

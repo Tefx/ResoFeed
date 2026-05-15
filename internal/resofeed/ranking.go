@@ -96,12 +96,15 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "empty", ChangedRules: []SteerRule{}, Message: "err: empty steering command"}}, nil
 	}
 	if conflictsWithInvariants(command) {
-		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: "not fully applied: freshness, coverage, provenance, and minimalism invariants stay enabled"}}, nil
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: invariantConflictMessage()}}, nil
 	}
 	if req.ActorKind == ActorKindAgent && hasActiveHumanLikeRules(ctx, db) {
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "human_precedence", ChangedRules: []SteerRule{}, Message: "not applied: active human steering takes precedence"}}, nil
 	}
-	if parsedURL, ok := parseRSSURL(command); ok {
+	if isVagueAddAlias(command) {
+		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "unknown", ChangedRules: []SteerRule{}, Message: "not applied: RSS URL required for add source"}}, nil
+	}
+	if parsedURL, ok := sourceURLFromSteerCommand(command); ok {
 		return applySourceURLSteering(ctx, db, parsedURL)
 	}
 	if searchQuery, ok := parseSearchSteerCommand(command); ok {
@@ -138,6 +141,10 @@ func ApplySteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequ
 
 func parseSearchSteerCommand(command string) (string, bool) {
 	command = strings.TrimSpace(command)
+	if isLexicalSearchAlias(command) {
+		query, _ := lexicalQueryFromSteerCommand(command)
+		return query, true
+	}
 	if strings.EqualFold(command, "search") {
 		return "", true
 	}
@@ -739,7 +746,12 @@ func applySteeringRules(ctx context.Context, db *sql.DB, proposal OpenRouterStee
 	if len(changed) == 0 {
 		return SteerResult{Receipt: SteeringReceipt{InterpretedAs: "no_safe_policy_change", ChangedRules: []SteerRule{}, Message: "not applied: no safe product-valid steering rule remained"}}, nil
 	}
-	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: proposal.InterpretedAs, ChangedRules: changed, Message: proposal.Message}}, nil
+	var undo *SteerUndoHandle
+	if len(changed) == 1 {
+		revision := changed[0].Revision
+		undo = &SteerUndoHandle{RouteKind: SteerRoutePolicy, Target: &SteerTarget{Kind: "steer_rule", ID: changed[0].ID}, Revision: &revision}
+	}
+	return SteerResult{Receipt: SteeringReceipt{InterpretedAs: proposal.InterpretedAs, ChangedRules: changed, Message: proposal.Message}, UndoHandle: undo}, nil
 }
 
 func normalizeOpenRouterSteeringOutput(proposal OpenRouterSteeringOutput) OpenRouterSteeringOutput {

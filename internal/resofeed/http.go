@@ -294,6 +294,16 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleActiveSteeringRules(w, r)
+	case r.Method == http.MethodPost && r.URL.Path == "/api/steer/preview":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleSteerPreview(w, r)
+	case r.Method == http.MethodPost && r.URL.Path == "/api/steer/undo":
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleSteerUndo(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/steer":
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -317,6 +327,31 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": r.URL.Path})
 	}
+}
+
+func (h apiHandler) handleSteerPreview(w http.ResponseWriter, r *http.Request) {
+	var req SteerPreviewRequest
+	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") {
+		return
+	}
+	if req.ActorKind != ActorKindHuman && req.ActorKind != ActorKindAgent {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "actor_kind"})
+		return
+	}
+	if req.ActorID == "" || len([]byte(req.ActorID)) > 128 {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "actor_id"})
+		return
+	}
+	if req.Command == "" || len([]byte(req.Command)) > 4000 {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "command"})
+		return
+	}
+	result, err := PreviewSteering(r.Context(), h.cfg.DB, h.cfg.LLM, req)
+	if err != nil {
+		writeRuntimeMutationError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, result)
 }
 
 func (h apiHandler) authorized(r *http.Request) bool {
@@ -561,6 +596,29 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 		}
 		writeInternal(w)
 		return
+	}
+	writeJSON(w, http.StatusOK, result)
+}
+
+func (h apiHandler) handleSteerUndo(w http.ResponseWriter, r *http.Request) {
+	var req SteerUndoRequest
+	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
+		return
+	}
+	var result SteerUndoResult
+	replayed, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "undo_steer", "", struct {
+		UndoHandle SteerUndoHandle `json:"undo_handle"`
+		ActorKind  ActorKind       `json:"actor_kind"`
+		ActorID    string          `json:"actor_id"`
+	}{UndoHandle: req.UndoHandle, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerUndoResult, error) {
+		return UndoSteering(r.Context(), h.cfg.DB, req)
+	})
+	if err != nil {
+		writeRuntimeMutationError(w, err)
+		return
+	}
+	if replayed || (result.Target != nil && !result.Undone) {
+		result.AlreadyApplied = true
 	}
 	writeJSON(w, http.StatusOK, result)
 }
