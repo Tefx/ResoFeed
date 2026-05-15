@@ -71629,3 +71629,63 @@ phases:
     depends_on:
     - plfinal-documentation-sync
     agent: spec-verifier
+  - id: plfinal-design-readiness-review
+    name: Run DESIGN and readiness review
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: project
+
+
+      Independent DESIGN/readiness review after implementation and doc sync. Verify
+      rendered UI behavior, docs/DESIGN.md language/reprocess/source/split-scroll
+      obligations, accessibility, and readiness for final gate.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Language control remains terse and low-chrome.
+
+      - [ ] Reprocess action is bracket-style and non-dashboard.
+
+      - [ ] Source identifiers are non-translated provenance anchors.
+
+      - [ ] Desktop split scroll and mobile Inspector behavior remain intact.
+
+      - [ ] No onboarding wizard/settings dashboard/AI-magic trust palette/product
+      copy drift is introduced.
+
+      - [ ] Readiness finding list has no blocker/should-fix gaps, or each has explicit
+      remediation owner.'
+    verification: '- [ ] DESIGN/readiness review provides PASS/PASS_WITH_DEBT/FAIL
+      verdict.
+
+      - [ ] All blocker/should-fix readiness gaps have closure paths.
+
+      - [ ] Final gate can consume the review evidence directly.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## DESIGN/Readiness Review
+
+      - Artifacts reviewed:
+
+      - Findings by severity:
+
+      - Readiness verdict:
+
+      - Closure paths:'
+    depends_on:
+    - plfinal-documentation-sync
+    agent: design-reviewer
