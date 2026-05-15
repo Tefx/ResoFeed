@@ -69032,7 +69032,7 @@ phases:
       - None.'
 - id: processing-language-contract-tests
   name: Processing Language Contract Lock and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Contract and expected-red phase blocks unless runtime metadata, receipts,
     language/reprocess HTTP/MCP, delivery, FTS/search, doctor, and frontend UI obligations
     are pinned with expected-red proof before implementation.
@@ -69585,7 +69585,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plct-contract-tests-gate
     name: Gate processing language contract and expected-red tests
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -69662,9 +69662,70 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T12:03:53.667945+00:00'
+    done_at: '2026-05-15T12:10:50.251492+00:00'
+    evidence: 'Gate report repaired and accepted.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — gate reviewed one-binary/SQLite/thin HTTP+MCP, no vector/RAG/sync/queues/settings,
+      processing language/reprocess, unknown JSON fields, MCP parity.
+
+      - docs/DESIGN.md — gate reviewed global language control, bracket-style reprocess
+      action, translate=no source identifiers, desktop split scroll, no settings dashboard/language
+      wizard.
+
+      - AGENTS.md — NOT READ in isolated worktree because absent.
+
+      - CONSTITUTION.md — NOT READ because not present.
+
+
+      ## Gate Review Report
+
+      - headline: PASS
+
+      - verdict: PASS
+
+      - proof_gap_status: NONE
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - blockers: []
+
+      - Step evidence reviewed: contract lock artifacts, backend expected-red tests,
+      MCP expected-red tests, frontend expected-red tests, spec-exact state fixture.
+
+      - Missing blockers: none.
+
+      - Expected-red coverage matrix: receipts, language/reprocess HTTP, MCP parity,
+      delivery, stale FTS/doctor, unknown JSON fields, frontend rendering, forbidden
+      concepts all mapped to PROVEN expected-red coverage or contract prohibitions.
+
+      - Decision: OPEN.
+
+
+      ## Verification
+
+      - npm --prefix web ci — exit 0 in gate worktree.
+
+      - npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/processing-language-api-client.expected-red.test.ts — exit 1 expected-red;
+      failures aligned to missing API client methods, LANG control, reprocess action,
+      translate=no, focusable split-scroll.
+
+      - go test ./internal/resofeed -run ''TestPLCT|TestMCPExpectedRed'' — exit 1
+      expected-red; failures aligned to missing runtime language HTTP/MCP, delivery,
+      stale FTS/doctor, FTS core_insight, OpenRouter target_language.
+
+      - git status --short in gate worktree — clean; no files modified.
+
+
+      Checklist: all completion and verification checklist items are [x].'
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
-  status: locked
+  status: pending
   gate: Core backend gate blocks unless SQLite metadata/receipts, language state,
     OpenRouter target-language input, reprocess semantics, and FTS/doctor behavior
     are implemented and independently verified.
