@@ -74637,7 +74637,7 @@ phases:
 
       - [x] PASS requires rendered visible controls, not only test summaries.
 
-      - [ ] Any UI/UX blocker has exact remediation ownership.'
+      - [x] Any UI/UX blocker has exact remediation ownership.'
     verification: '- [ ] Screenshots or equivalent rendered artifacts cover required
       UI states.
 
