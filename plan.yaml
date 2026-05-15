@@ -71689,3 +71689,64 @@ phases:
     depends_on:
     - plfinal-documentation-sync
     agent: design-reviewer
+  - id: plfinal-wiring-and-architecture-audit
+    name: Run final wiring and architecture boundary audit
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: project
+
+
+      Final independent audit of runtime wiring, flat package architecture, concurrency
+      boundaries, and forbidden concept absence.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] One Go binary remains the only deployable process.
+
+      - [ ] SQLite+FTS5 remains the only durable state/search backend.
+
+      - [ ] No vector DB, embeddings, RAG, sync coordinator, state merger, conflict
+      resolver, job queue, activity ledger, delivery registry, or per-agent auth registry
+      exists.
+
+      - [ ] Direct `internal/resofeed` functions and SQL remain the implementation
+      shape; no repository/service/DI/event-bus layering is introduced.
+
+      - [ ] Reprocess/ingest/fetch concurrency guard is consistent across HTTP and
+      MCP.
+
+      - [ ] Runtime metadata, receipts, FTS stale marker, and state export/import
+      boundaries are correct.'
+    verification: '- [ ] Final wiring/architecture audit reports PASS/PASS_WITH_DEBT/FAIL.
+
+      - [ ] Any blocker-class architecture violation has remediation ownership.
+
+      - [ ] Audit includes concrete file/path evidence, not only assertions.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Wiring/Architecture Audit
+
+      - Runtime entrypoint evidence:
+
+      - Concurrency guard evidence:
+
+      - Forbidden concept scan:
+
+      - Architecture boundary findings:
+
+      - Verdict: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plfinal-documentation-sync
+    agent: software-architect
