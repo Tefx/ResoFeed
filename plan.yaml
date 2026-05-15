@@ -79745,7 +79745,7 @@ phases:
       - [x] Deterministic routes do not call OpenRouter; OpenRouter is used only for
       unmatched natural-language steering proposals.
 
-      - [ ] Source URL validation is syntactic only and never guesses/fetches RSS
+      - [x] Source URL validation is syntactic only and never guesses/fetches RSS
       URLs during preview.
 
       - [ ] AC-4 invariant conflicts preserve freshness, coverage/source diversity,
