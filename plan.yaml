@@ -75326,7 +75326,7 @@ phases:
     claimed_at: '2026-05-15T17:52:29.597605+00:00'
   - id: plse-reprocess-failure-stale-fts-proof
     name: Verify reprocess failure stale FTS and recovery diagnostics
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -75421,6 +75421,8 @@ phases:
     depends_on:
     - plse-real-language-reprocess-vertical-slice
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T17:52:37.284625+00:00'
   - id: plse-full-plan-runtime-check
     name: Run full-plan runtime verification sweep
     status: pending
