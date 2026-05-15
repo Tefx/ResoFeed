@@ -71340,7 +71340,7 @@ phases:
       verification.'
   - id: plsc-storage-core-blocker-retest
     name: Retest storage-core blocker remediation
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -71459,6 +71459,8 @@ phases:
     depends_on:
     - plsc-storage-core-blocker-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T15:17:39.340460+00:00'
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
