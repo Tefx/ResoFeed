@@ -78938,6 +78938,79 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: srdf-split-scroll-mobile-route
+    name: Complete desktop split scroll and mobile Inspector route behavior
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete layout/runtime behavior for independent desktop Feed/Inspector scroll
+      and mobile full-screen Inspector route.
+
+
+      Target paths: web/src/routes/+page.svelte, web/src/routes/components/Feed.svelte,
+      web/src/routes/components/Inspector.svelte, and focused tests.
+
+
+      Acceptance checklist:
+
+      - [ ] Desktop Feed and Inspector are independent focusable vertical scroll regions
+      with accessible names.
+
+      - [ ] Scrolling Feed does not move Inspector; scrolling Inspector does not move
+      Feed.
+
+      - [ ] Selecting a Feed item preserves Feed scroll and resets Inspector reading
+      container to top.
+
+      - [ ] Mobile keeps Feed as main surface and opens Inspector as a full-screen
+      route with preserved Feed scroll.
+
+      - [ ] Active/selected semantic state agrees with visible panel state.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires browser-level or rendered DOM evidence for desktop and mobile
+      states.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
+    verification: '- [ ] Split-scroll E2E tests pass on desktop viewport with independent
+      scroll proof.
+
+      - [ ] Mobile Inspector route E2E tests pass with Feed scroll preservation proof.
+
+      - [ ] Accessibility evidence confirms focusable named regions and active/selected
+      semantic consistency.
+
+      - [ ] Visual evidence shows desktop split and mobile route states without layout
+      shift.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      ## Split-Scroll Evidence
+
+      - Files changed:
+
+      - Commands/tests run:
+
+      - Desktop scroll positions before/after:
+
+      - Mobile route evidence:
+
+      - Screenshots/DOM snapshots:
+
+      '
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
