@@ -27,7 +27,7 @@ type ServeConfig struct {
 }
 
 // ErrorBody is the canonical JSON error envelope for HTTP API failures.
-// Allowed error codes are unauthorized, bad_request, not_found, and internal.
+// Allowed error codes are unauthorized, bad_request, not_found, conflict, and internal.
 type ErrorBody struct {
 	Error APIError `json:"error"`
 }

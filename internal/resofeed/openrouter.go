@@ -295,11 +295,12 @@ func stripJSONFence(text string) string {
 // OpenRouterSummaryInput is the summary transform request. It is populated only
 // after source text or fallback feed text exists.
 type OpenRouterSummaryInput struct {
-	ItemID        string `json:"item_id"`
-	Title         string `json:"title"`
-	SourceTitle   string `json:"source_title"`
-	URL           string `json:"url"`
-	AvailableText string `json:"available_text"`
+	ItemID         string             `json:"item_id"`
+	Title          string             `json:"title"`
+	SourceTitle    string             `json:"source_title"`
+	URL            string             `json:"url"`
+	AvailableText  string             `json:"available_text"`
+	TargetLanguage ProcessingLanguage `json:"target_language"`
 }
 
 // OpenRouterSummaryOutput is validated before saving summary metadata.

@@ -3,7 +3,7 @@ export type Rfc3339UtcString = string;
 export type CalendarDateString = string;
 export type OpaqueId = string;
 
-export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'internal';
+export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'conflict' | 'internal';
 
 export interface ErrorBody {
   error: {
@@ -16,6 +16,7 @@ export interface ErrorBody {
 export type ExtractionStatus = 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
 export type ModelStatus = 'ok' | 'summary_unavailable' | 'model_latency_error';
 export type ActorKind = 'human' | 'agent';
+export type ProcessingLanguage = 'en' | 'zh';
 
 export interface ItemSummary {
   id: OpaqueId;
@@ -109,6 +110,124 @@ export interface SearchQueryEcho {
   resonated: boolean | null;
   limit: number;
 }
+
+export interface ProcessingLanguageInfo {
+  code: ProcessingLanguage;
+  /** Contract labels: en -> English, zh -> 中文. */
+  label: 'English' | '中文';
+}
+
+export interface ProcessingLanguageResponse {
+  language: ProcessingLanguageInfo;
+  already_applied?: boolean;
+}
+
+export interface SetProcessingLanguageRequest {
+  language: ProcessingLanguage;
+  actor_kind: ActorKind;
+  actor_id: string;
+  idempotency_key: string;
+}
+
+export type ReprocessStatus = 'completed' | 'completed_with_errors' | 'failed';
+
+export type ReprocessErrorCode =
+  | 'rss_fetch_error'
+  | 'model_latency_error'
+  | 'summary_unavailable'
+  | 'original_unavailable'
+  | 'timeout'
+  | 'internal';
+
+export interface ReprocessErrorDetail {
+  item_id: OpaqueId | null;
+  code: ReprocessErrorCode;
+  /** Terse diagnostic, max 200 chars. */
+  message: string;
+}
+
+export interface ReprocessLibraryRequest {
+  actor_kind: ActorKind;
+  actor_id: string;
+  idempotency_key: string;
+}
+
+export interface ReprocessLibraryResult {
+  status: ReprocessStatus;
+  language: ProcessingLanguage;
+  started_at: Rfc3339UtcString;
+  completed_at: Rfc3339UtcString;
+  items_attempted: number;
+  items_updated: number;
+  items_indexed: number;
+  items_unavailable: number;
+  items_failed: number;
+  fts_rebuilt: boolean;
+  errors: ReprocessErrorDetail[];
+}
+
+export interface ReprocessLibraryResponse {
+  reprocess: ReprocessLibraryResult;
+  already_applied: boolean;
+}
+
+export interface DeliveryReportRequest {
+  actor_kind: ActorKind;
+  actor_id: string;
+  delivered_at: Rfc3339UtcString;
+  idempotency_key: string;
+}
+
+export interface DeliveryReportResponse {
+  item_id: OpaqueId;
+  external_surfaced_at: Rfc3339UtcString;
+  already_applied: boolean;
+}
+
+export const processingLanguageRuntimeContract = {
+  endpoints: {
+    getLanguage: 'GET /api/runtime/language',
+    setLanguage: 'PUT /api/runtime/language',
+    reprocessLibrary: 'POST /api/runtime/reprocess-library',
+    reportDelivery: 'POST /api/items/{id}/delivery',
+    searchEcho: 'GET /api/search',
+    doctorFTS: 'GET /api/doctor'
+  },
+  mcp: {
+    resource: 'resofeed://runtime/language',
+    tools: ['get_processing_language', 'set_processing_language', 'reprocess_library', 'report_delivery', 'search_items']
+  },
+  runtimeMetadata: {
+    processingLanguageKey: 'processing_language',
+    effectiveDefault: 'en',
+    searchFTSStaleSinceKey: 'search_fts_stale_since',
+    exportImport: 'excluded'
+  },
+  strictValidation: {
+    unknownJsonBodyFields: '400 bad_request',
+    unknownOrDuplicateQueryParams: '400 bad_request',
+    idempotencyReplay: 'same live key and same request fingerprint replays stored result',
+    idempotencyMismatch: 'same live key and different request fingerprint returns bad_request'
+  },
+  sourceIdentifierNonTranslation: [
+    'url',
+    'source_title',
+    'provenance.source_url',
+    'provenance.canonical_url',
+    'provenance.original_url'
+  ],
+  forbiddenPatterns: [
+    'settings-dashboard',
+    'per-item-language-toggle',
+    'side-by-side-translation',
+    'translation_failed-state',
+    'durable-reprocess-job',
+    'queue',
+    'activity-ledger',
+    'sync-merge-protocol',
+    'vector-index'
+  ]
+} as const;
 
 export interface StateBundleV1 {
   schema_version: 'resofeed.state.v1';
