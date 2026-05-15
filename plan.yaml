@@ -74681,7 +74681,7 @@ phases:
     agent: uiux-auditor
   - id: plfu-frontend-spec-conformance
     name: Verify frontend DESIGN and architecture conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -74746,6 +74746,8 @@ phases:
     - plfu-language-reprocess-controls
     - plfu-source-identifiers-split-scroll
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T17:26:25.181371+00:00'
   - id: plfu-frontend-gate
     name: Gate processing language frontend UI
     status: pending
