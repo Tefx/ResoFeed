@@ -73053,7 +73053,7 @@ phases:
       Files changed: none.'
   - id: plhm-runtime-gate
     name: Gate processing language HTTP MCP runtime integration
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -73132,6 +73132,8 @@ phases:
     - plhm-runtime-spec-conformance
     - plhm-runtime-blocker-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T16:17:29.855450+00:00'
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
     status: done
