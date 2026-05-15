@@ -73762,7 +73762,7 @@ phases:
 
       - [x] Outputs vary by API response/error state.
 
-      - [ ] Declaration-only client anchors are either consumed by runtime client/rendered
+      - [x] Declaration-only client anchors are either consumed by runtime client/rendered
       controls or explicitly justified/de-exported.'
     verification: '- [ ] Frontend type/client tests pass for language/reprocess response
       and error shapes.
