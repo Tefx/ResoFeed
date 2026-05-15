@@ -76579,7 +76579,7 @@ phases:
       resolver, job queue, activity ledger, delivery registry, or per-agent auth registry
       exists.
 
-      - [ ] Direct `internal/resofeed` functions and SQL remain the implementation
+      - [x] Direct `internal/resofeed` functions and SQL remain the implementation
       shape; no repository/service/DI/event-bus layering is introduced.
 
       - [ ] Reprocess/ingest/fetch concurrency guard is consistent across HTTP and
