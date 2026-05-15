@@ -66919,7 +66919,7 @@ phases:
       - [x] All phase steps completed with adequate evidence, including the B1 fix,
       post-fix black-box rerun, and post-fix UIUX rerun.
 
-      - [ ] Green retest evidence covers every fresh audit finding.
+      - [x] Green retest evidence covers every fresh audit finding.
 
       - [ ] UIUX multimodal audit evidence covers desktop and mobile rendered states
       and is reconciled with the later black-box failure.
