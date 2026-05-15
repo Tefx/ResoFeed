@@ -80097,7 +80097,7 @@ phases:
     claimed_at: '2026-05-15T22:27:25.066075+00:00'
   - id: srdb-wiring-audit
     name: Audit backend public wiring and forbidden architecture drift
-    status: pending
+    status: claimed
     description: 'Wiring completeness audit: verify every new or changed backend public
       symbol, handler, MCP tool, and config/state path is reachable at runtime without
       introducing forbidden architecture.
@@ -80175,6 +80175,8 @@ phases:
     - srdb-http-steer-preview-commit-undo
     - srdb-mcp-steer-parity
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-15T22:27:45.066724+00:00'
   - id: srdb-spec-conformance
     name: Verify backend spec conformance for Steer and search delta
     status: claimed
