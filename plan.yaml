@@ -81557,16 +81557,16 @@ phases:
       ## Completion Criteria (stub exclusion)
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
-    verification: '- [ ] Source Ledger component/E2E tests pass for details disclosure,
+    verification: '- [x] Source Ledger component/E2E tests pass for details disclosure,
       hit targets, actions, diagnostics, and deletion focus behavior.
 
-      - [ ] Real hit-target evidence proves elementFromPoint/topmost-element clickability
+      - [x] Real hit-target evidence proves elementFromPoint/topmost-element clickability
       and 44px minimum targets.
 
-      - [ ] Rendered evidence shows Source Ledger with manual controls and [DETAILS]
+      - [x] Rendered evidence shows Source Ledger with manual controls and [DETAILS]
       expanded/collapsed.
 
-      - [ ] Negative scan confirms no jobs, queues, dashboards, settings, activity
+      - [x] Negative scan confirms no jobs, queues, dashboards, settings, activity
       logs, folders/tags, sync/merge, or second URL field.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
