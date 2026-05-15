@@ -76573,7 +76573,7 @@ phases:
 
       - [x] One Go binary remains the only deployable process.
 
-      - [ ] SQLite+FTS5 remains the only durable state/search backend.
+      - [x] SQLite+FTS5 remains the only durable state/search backend.
 
       - [ ] No vector DB, embeddings, RAG, sync coordinator, state merger, conflict
       resolver, job queue, activity ledger, delivery registry, or per-agent auth registry
