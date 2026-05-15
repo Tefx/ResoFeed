@@ -78918,13 +78918,13 @@ phases:
 
       - [x] Pin low-chrome processing language/reprocess control expectations with
       no settings/job/activity/dashboard concepts.'
-    verification: '- [ ] Contract-only frontend changes define fixture/state expectations
+    verification: '- [x] Contract-only frontend changes define fixture/state expectations
       without completing rendered UI behavior.
 
-      - [ ] Fixture contract covers every Steer, Source Ledger, split-scroll, mobile,
+      - [x] Fixture contract covers every Steer, Source Ledger, split-scroll, mobile,
       and negative UX item listed in the description.
 
-      - [ ] Evidence cites key passages from every ref.'
+      - [x] Evidence cites key passages from every ref.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
