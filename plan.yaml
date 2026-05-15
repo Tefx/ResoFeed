@@ -74699,7 +74699,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Language control anatomy, states, aria rules, and no-settings-dashboard
+      - [x] Language control anatomy, states, aria rules, and no-settings-dashboard
       rule are checked.
 
       - [ ] Reprocess bracket action anatomy and no job/progress-dashboard rule are
