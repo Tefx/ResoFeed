@@ -80405,7 +80405,7 @@ phases:
     agent: gate-reviewer
   - id: srdb-backend-spec-wiring-remediation
     name: Batched backend spec and wiring remediation
-    status: claimed
+    status: pending
     description: 'Batched remediation for the concurrent semantic failures reported
       by srdb-spec-conformance and srdb-wiring-audit. Work type: defect_repair with
       blocker-class gate intersection; provenance may be mixed, but disposition is
@@ -80628,8 +80628,6 @@ phases:
     - srdb-spec-conformance
     - srdb-wiring-audit
     agent: golang-developer
-    claimed_by: golang-developer
-    claimed_at: '2026-05-15T22:39:25.235217+00:00'
   - id: srdb-backend-spec-wiring-retest
     name: Retest backend spec and wiring closure
     status: pending
