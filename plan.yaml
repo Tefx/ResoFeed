@@ -74008,7 +74008,7 @@ phases:
 
       - [x] Visible DOM contains non-translated provenance anchors.
 
-      - [ ] Browser/test-renderer proof shows split scroll behavior.
+      - [x] Browser/test-renderer proof shows split scroll behavior.
 
       - [ ] Component-only data/view-model changes are insufficient.
 
