@@ -69585,7 +69585,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plct-contract-tests-gate
     name: Gate processing language contract and expected-red tests
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -69660,6 +69660,8 @@ phases:
     - plct-mcp-expected-red-tests
     - plct-frontend-expected-red-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T12:03:53.667945+00:00'
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
   status: locked
