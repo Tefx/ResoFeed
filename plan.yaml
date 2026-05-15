@@ -78057,7 +78057,7 @@ phases:
       closure evidence.'
   - id: plfinal-ui-final-blocker-remediation
     name: Batched UI final blocker remediation
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -78345,6 +78345,96 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T20:39:42.242968+00:00'
+    done_at: '2026-05-15T20:50:33.447551+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): 9e22d58b ([vectl] step-plfinal-ui-final-blocker-remediation
+      completed); worktree commit 3ed31e5d.
+
+
+      Files changed: web/src/routes/+page.svelte; web/src/routes/components/Feed.svelte;
+      web/src/routes/components/item-anatomy.ts.
+
+
+      Refs Read Confirmation:
+
+      - docs/DESIGN.md — frontend-engineer cited RESOFEED menu with TODAY/SOURCE LEDGER,
+      inline feed labels in metadata, and Source Ledger [FETCH] contextual aria-label
+      expectations.
+
+      - docs/ARCHITECTURE.md — frontend-engineer cited one Go binary/Svelte UI boundary,
+      no settings/onboarding/sync/vector drift, and missing processing language defaults
+      to en.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; fallback .agents/instructions.md
+      read and used for functional label / no settings/onboarding/SaaS drift rules.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — frontend-engineer
+      read exact seven blocker assertions and selectors/accessibility names.
+
+
+      why_previous_gate_failed / root causes:
+
+      - Surface/menu: TODAY surface used a non-exact aria-label and fixture shell
+      loading prevented stable active-panel transitions.
+
+      - Feed/Inspector/Ledger DOM: focused proof fixture omitted /api/runtime/language;
+      shell data loading failed before rendering feed items and ledger rows.
+
+      - Chronological labels: labels used wall-clock new Date(), causing seeded May
+      15/14 fixtures to drift over time.
+
+      - Source Ledger/details/mobile metadata failures were downstream of served shell
+      not rendering active data surfaces.
+
+
+      Seven-test closure matrix:
+
+      - FR-01/FR-10 surface menu desktop/mobile: PASS.
+
+      - FR-02 contiguous time labels: PASS.
+
+      - FR-04 grouped Inspector disclosure: PASS.
+
+      - B1 mobile same-URL grouped sources: PASS.
+
+      - FR-05/FR-07 Source Ledger FETCH names: PASS.
+
+      - FR-06 collapsed details row: PASS.
+
+      - FR-09 mobile metadata truncation: PASS.
+
+
+      Mainline verification:
+
+      - git merge --squash vectl/step-plfinal-ui-final-blocker-remediation passed.
+
+      - git diff --cached --check passed.
+
+      - npm --prefix web run build passed.
+
+      - npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+      passed: 7 passed (6.0s).
+
+      - git show --check --oneline HEAD passed after commit 9e22d58b.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Design/product-boundary check:
+
+      - No settings/onboarding/SaaS/product-boundary drift introduced.
+
+      - Functional labels preserved: RESOFEED, TODAY, SOURCE LEDGER, INSPECTOR, /doctor.
+
+      - No unapproved visual token changes or new product surfaces.
+
+
+      Gaps/Notes: Playwright proof artifacts were generated under .test-artifacts/playwright/test-output/ui-runtime-fresh-review-*
+      and left untracked by the worker; no residual UI blocker known.'
   - id: plfinal-ui-final-blocker-retest-gate
     name: Final UI blocker retest gate
     status: pending
