@@ -70055,7 +70055,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-reprocess-fts-doctor
     name: Complete reprocess library FTS and doctor semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -70162,6 +70162,8 @@ phases:
     - plsc-runtime-metadata-receipts
     - plsc-processing-language-ingest
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T14:22:10.537103+00:00'
   - id: plsc-backend-green-retest
     name: Retest backend expected-red suite to green
     status: pending
