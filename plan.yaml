@@ -70494,13 +70494,13 @@ phases:
 
       - [x] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
       are introduced.'
-    verification: '- [ ] Wiring audit report lists backend-core orphan exports, unconsumed
+    verification: '- [x] Wiring audit report lists backend-core orphan exports, unconsumed
       metadata fields, core operation consumers, and any remaining backend-core stubs.
 
-      - [ ] Any true backend-core orphan/blocker has explicit remediation ownership
+      - [x] Any true backend-core orphan/blocker has explicit remediation ownership
       before the gate.
 
-      - [ ] Missing HTTP/MCP route/tool/frontend consumption is explicitly mapped
+      - [x] Missing HTTP/MCP route/tool/frontend consumption is explicitly mapped
       to downstream owner steps and remains blocking for downstream gates.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
