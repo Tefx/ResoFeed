@@ -72250,7 +72250,7 @@ phases:
 
       - [x] HTTP language/reprocess/delivery/search/doctor tests pass green.
 
-      - [ ] MCP language/reprocess/report_delivery/search_items tests pass green.
+      - [x] MCP language/reprocess/report_delivery/search_items tests pass green.
 
       - [ ] Strict validation tests cover unknown fields, duplicate/unknown query
       params, bad delivered_at, auth failures, idempotency replay/mismatch, and conflicts.
