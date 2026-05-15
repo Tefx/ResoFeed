@@ -26,6 +26,17 @@ const sourceWithFetchTime: Source = {
   revision: 2
 };
 
+const sourceWithLongDiagnostic: Source = {
+  id: 'src_err',
+  url: 'https://diagnostic.example.com/feed.xml',
+  title: 'Diagnostic Source',
+  last_fetch_at: null,
+  last_fetch_status: 'rss_fetch_error',
+  last_fetch_error: 'err: timeout while fetching https://diagnostic.example.com/feed.xml after 20s with a very long raw diagnostic',
+  is_active: true,
+  revision: 3
+};
+
 function renderLedger(props?: Partial<ManualFetchSourceLedgerProps>): void {
   render(ManualSourceLedger, {
     props: {
@@ -62,6 +73,16 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeInTheDocument();
     expect(within(ledger).getByRole('button', { name: 'Fetch source Example' })).toHaveTextContent('[FETCH]');
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example' })).toHaveTextContent('[DELETE]');
+  });
+
+  it('renders the canonical Source Ledger bracket actions with exact uppercase labels', () => {
+    renderLedger();
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    for (const label of ['[RUN INGEST]', '[FETCH]', '[DETAILS]', '[DELETE]', '[IMPORT OPML]', '[EXPORT STATE]', '[IMPORT STATE]']) {
+      expect(within(ledger).getByText(label)).toHaveTextContent(label);
+    }
+    expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export state\]|\[import state\]/);
   });
 
   it('keeps manual fetch progress free of spinner or progress animation affordance at rest', () => {
@@ -101,6 +122,35 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     expect(ledger.querySelector('.source-diagnostic-details')).not.toHaveAttribute('open');
     expect(ledger).not.toHaveTextContent(/sorry|oops|we couldn't|try again later|hang tight/i);
     expect(details.closest('[role="alert"], [role="status"], .card, .toast')).toBeNull();
+  });
+
+  it('preserves raw err diagnostics and exposes the full diagnostic through title and disclosure text', async () => {
+    const user = userEvent.setup();
+    renderLedger({ sources: [sourceWithLongDiagnostic] });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    const status = ledger.querySelector('.source-ledger__status--error');
+    expect(status).toHaveTextContent(/^err: timeout while fetching/);
+    expect(status).toHaveAttribute('title', sourceWithLongDiagnostic.last_fetch_error);
+
+    await user.click(within(ledger).getByText('[DETAILS]'));
+    expect(within(ledger).getByText(/fetch_error: err: timeout while fetching/)).toBeVisible();
+  });
+
+  it('returns focus to the next row after source deletion and to the Ledger heading for the final row', async () => {
+    const user = userEvent.setup();
+    const onDeleteSource = vi.fn(async () => {});
+    renderLedger({ sources: [sourceWithFetchTime, { ...sourceWithFetchTime, id: 'src_next', title: 'Next Source', url: 'https://next.example.com/feed.xml' }], onDeleteSource });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example' }));
+    await user.click(within(ledger).getByRole('button', { name: 'confirm delete source: Example' }));
+    expect(onDeleteSource).toHaveBeenCalledWith(sourceWithFetchTime);
+    expect(within(ledger).getByRole('button', { name: 'Fetch source Next Source' })).toHaveFocus();
+
+    await user.click(within(ledger).getByRole('button', { name: 'Delete source: Next Source' }));
+    await user.click(within(ledger).getByRole('button', { name: 'confirm delete source: Next Source' }));
+    expect(within(ledger).getByRole('heading', { name: 'SOURCE LEDGER' })).toHaveFocus();
   });
 
   it('keeps the visual contract: bracket labels, ledger row shape, uppercase text, and no animation affordance', () => {

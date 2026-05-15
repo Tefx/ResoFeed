@@ -32,10 +32,13 @@
   let fetchingSourceId = $state<string | null>(null);
   let sourceFeedbackById = $state<Record<string, string>>({});
   let importedTitleByUrl = $state<Record<string, string>>({});
+  let deletedSourceIds = $state<ReadonlySet<string>>(new Set());
   let importInput = $state<HTMLInputElement | undefined>();
+  let ledgerHeading = $state<HTMLHeadingElement | undefined>();
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(statusText.startsWith('last_ingest:') || statusText === 'ingest complete');
+  const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -120,7 +123,7 @@
         ? `last_ingest: ${completedAt ?? 'complete'}`
         : rawErrorText(result.errors[0]?.message ?? 'ingest failed');
     } catch (error) {
-      statusText = error instanceof Error ? error.message : 'err: ingest failed';
+      statusText = error instanceof Error ? rawErrorText(error.message) : 'err: ingest failed';
     } finally {
       isRunningIngest = false;
     }
@@ -143,7 +146,7 @@
           : rawErrorText(errorMessage ?? source.last_fetch_error ?? 'fetch failed')
       );
     } catch (error) {
-      setSourceFeedback(source.id, error instanceof Error ? error.message : 'err: fetch failed');
+      setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : 'err: fetch failed');
     } finally {
       fetchingSourceId = null;
     }
@@ -165,21 +168,34 @@
     } catch (error) {
       statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
         ? `imported ${sources.length} sources; folders flattened`
-        : error instanceof Error ? error.message : 'err: import failed';
+        : error instanceof Error ? rawErrorText(error.message) : 'err: import failed';
     } finally {
       isImportingOpml = false;
     }
   }
 
   async function confirmDelete(source: Source): Promise<void> {
+    const sourceIndex = visibleSources.findIndex((candidate) => candidate.id === source.id);
     statusText = `deleting ${source.title}`;
     try {
       await onDeleteSource(source);
       confirmingSourceId = null;
+      deletedSourceIds = new Set([...deletedSourceIds, source.id]);
       statusText = `deleted ${source.title}`;
+      await focusAfterDeletion(source.id, sourceIndex);
     } catch (error) {
-      statusText = error instanceof Error ? error.message : 'err: delete failed';
+      statusText = error instanceof Error ? rawErrorText(error.message) : 'err: delete failed';
     }
+  }
+
+  async function focusAfterDeletion(deletedSourceId: string, deletedIndex: number): Promise<void> {
+    await tick();
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.source-ledger__row'))
+      .filter((row) => row.dataset.sourceId !== deletedSourceId);
+    const focusTarget = rows[Math.max(0, deletedIndex)]?.querySelector<HTMLElement>('.bracket-action--fetch')
+      ?? rows[rows.length - 1]?.querySelector<HTMLElement>('.bracket-action--fetch')
+      ?? ledgerHeading;
+    focusTarget?.focus();
   }
 
   function sourceDiagnosticText(source: Source, lastFetch: string | null): string {
@@ -205,7 +221,7 @@
 
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-title">
   <div class="source-ledger-head source-ledger__header">
-    <h1 id="source-ledger-title" class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
+    <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <div class="source-ledger__header-actions">
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
       <input
@@ -221,16 +237,16 @@
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
     </div>
   </div>
-  {#if sources.length === 0}
+  {#if visibleSources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
   {:else}
     <ul class="contract-list source-ledger__list">
-      {#each sources as source (source.id)}
+      {#each visibleSources as source (source.id)}
         {@const lastFetch = formatTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
-        <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
+        <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
           <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate={sourceTitleTranslate}>src: {sourceLabel}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
