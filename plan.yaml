@@ -76088,7 +76088,7 @@ phases:
 
       - [x] Real vertical slice passed.
 
-      - [ ] Blind parity/delivery probes passed.
+      - [x] Blind parity/delivery probes passed.
 
       - [x] Reprocess failure/stale FTS proof passed.
 
