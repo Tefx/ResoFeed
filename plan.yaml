@@ -80873,18 +80873,18 @@ phases:
       - [x] Produce the exact machine-readable closure fields listed above.
 
       - [x] Set gate_open_allowed=false if any blocker-class proof gap remains.'
-    verification: '- [ ] Retest is a phase-check protecting srdb-backend-gate and
+    verification: '- [x] Retest is a phase-check protecting srdb-backend-gate and
       downstream frontend/E2E gates.
 
-      - [ ] Machine-readable closure fields are present and internally consistent.
+      - [x] Machine-readable closure fields are present and internally consistent.
 
-      - [ ] All four blocker families are PROVEN or have explicit non-intersection
+      - [x] All four blocker families are PROVEN or have explicit non-intersection
       evidence; otherwise verdict is BLOCKED.
 
-      - [ ] gate_open_allowed is true only when blocking_status is CLEAR and proof_gap_status
+      - [x] gate_open_allowed is true only when blocking_status is CLEAR and proof_gap_status
       is NONE or NON_BLOCKING_ONLY.
 
-      - [ ] If issues remain, evidence gives orchestrator_action_hint=create_followup_remediation
+      - [x] If issues remain, evidence gives orchestrator_action_hint=create_followup_remediation
       and identifies exact remaining blockers.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
