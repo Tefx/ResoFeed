@@ -71738,7 +71738,7 @@ phases:
 
       - [x] Implementation has substantive handler validation and route wiring.
 
-      - [ ] Outputs vary by request body, receipt state, current language, item id,
+      - [x] Outputs vary by request body, receipt state, current language, item id,
       and operation guard state.
 
       - [ ] Business logic stays in core; HTTP remains thin transport.
