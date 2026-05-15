@@ -76645,7 +76645,7 @@ phases:
 
       - [x] Evidence includes actual public commands/browser artifacts.
 
-      - [ ] No implementation source assumptions are required.
+      - [x] No implementation source assumptions are required.
 
       - [ ] Findings classify blocker/should_fix/suggestion/tech_debt with reproduction.'
     verification: '- [ ] Black-box acceptance report covers HTTP, MCP, and UI surfaces.
