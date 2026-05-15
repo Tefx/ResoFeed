@@ -66706,7 +66706,7 @@ phases:
     agent: gate-reviewer
   - id: ui-runtime-fresh-review-full-frontend-test-remediation
     name: Remediate full frontend npm test stale render-contract failures
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -66879,6 +66879,8 @@ phases:
     - ui-runtime-fresh-review-duplicate-source-api-fix
     - ui-runtime-fresh-review-duplicate-source-inspector-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T07:50:36.963471+00:00'
   - id: ui-runtime-fresh-review-full-frontend-green-retest
     name: Retest full frontend suite and fresh audit acceptance after B1 remediation
     status: pending
