@@ -64087,6 +64087,7 @@ phases:
       \n**Confidence**: high/medium/low"
     depends_on:
     - urda-final-spec-boundary-blockers-fix
+    - urda-final-spec-boundary-blockers-uiux-audit
     agent: integration-verifier
   - id: urda-final-spec-boundary-blockers-uiux-audit
     name: UIUX audit final spec boundary blocker visual closures
