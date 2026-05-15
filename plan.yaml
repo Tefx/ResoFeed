@@ -81515,7 +81515,7 @@ phases:
     claimed_at: '2026-05-15T23:28:47.846499+00:00'
   - id: srdf-source-ledger-details-hit-targets
     name: Complete Source Ledger details disclosure and bracket hit targets
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -81597,6 +81597,139 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T23:28:29.010930+00:00'
+    done_at: '2026-05-15T23:48:15.474452+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — subagent read Source Ledger flat-surface bracket actions,
+      native/accessible details, raw `err:` diagnostics, 44px hit targets, and no
+      jobs/queues/settings/source hierarchy.
+
+      - docs/UI_REGRESSION_CONTRACT.md — subagent read hit-target proof requirements
+      using real browser `elementFromPoint`, Source Ledger manual controls/details/diagnostics,
+      and negative UX concepts.
+
+      - docs/ARCHITECTURE.md — subagent read manual ingest/fetch as immediate HTTP
+      operations with in-process concurrency guard and no durable jobs, queues, histories,
+      ledgers, sync/merge.
+
+      - AGENTS.md — NOT READ by subagent: file absent in isolated worktree; repository
+      invariants were supplied in dispatch instructions.
+
+      - CONSTITUTION.md — NOT READ: file absent in isolated worktree.
+
+
+      ## Source Ledger Rendered Evidence
+
+      **Commit hash(es)**: worktree commit `51ec5a47`; main squash merge `d9071a87
+      [vectl] step-srdf-source-ledger-details-hit-targets completed`.
+
+      **Files changed**:
+
+      - `web/src/routes/components/SourceLedger.svelte`
+
+      - `web/src/routes/+page.svelte` conflict resolved by preserving mainline `TODAY
+      surface independent scroll` accessible name; no net change from this branch
+      remained there.
+
+      - `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`
+
+
+      **Spec link**: docs/DESIGN.md / docs/UI_REGRESSION_CONTRACT.md / docs/ARCHITECTURE.md
+      / AGENTS.md.
+
+
+      **Commands/tests run**:
+
+      ```
+
+      # subagent worktree
+
+      npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+
+      # 9 tests passed
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe
+
+      # 6 passed
+
+      npm run test:e2e -- source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      --project=chromium-ci-safe --grep "Source Ledger exposes|forbidden source-management"
+
+      # 2 passed
+
+      rg forbidden UX terms in SourceLedger/+page/api-client
+
+      # exit 1/no output
+
+
+      # conflict resolver
+
+      npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+
+      # 9 passed
+
+      npm run check
+
+      # 0 errors / 0 warnings
+
+
+      # orchestrator mainline final-state gate
+
+      npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+
+      # Test Files 1 passed; Tests 9 passed
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe
+
+      # 6 passed
+
+      npm run test:e2e -- source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      --project=chromium-ci-safe --grep "Source Ledger exposes|forbidden source-management"
+
+      # 2 passed
+
+      ```
+
+
+      **Hit-target proof output**:
+
+      - `.test-artifacts/playwright/screenshots/source-ledger-hit-target-proof.json`:
+      `[RUN INGEST]`, `[FETCH]`, `[DELETE]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT
+      STATE]`, and `[DETAILS]` all height 44px, visible, pointer-events auto where
+      applicable, and `topmost: true` via `elementFromPoint`.
+
+
+      **Details disclosure DOM/screenshot**:
+
+      - `.test-artifacts/playwright/screenshots/source-ledger-details-expanded.png`:
+      `[DETAILS]` proof `{ width: 73.453125, height: 44, topmost: true, nativeDetails:
+      true }`.
+
+
+      **Negative UX scan**:
+
+      - No forbidden UI copy for job dashboards, ingest queues, settings dashboard,
+      activity ledger, sync/merge, second URL field, retry panel, or source hierarchy.
+
+      - Scoped Playwright negative UX test passed.
+
+
+      **Gaps/Notes**:
+
+      - NONE for this step. Resolver broad E2E run found split-scroll/steer-preview
+      failures; these are owned by concurrently completed steps `srdf-split-scroll-mobile-route`
+      and `srdf-steer-preview-ui-state-aria` and are not Source Ledger blockers after
+      scoped mainline verification. Verification checklist items are [x].'
   - id: srdf-split-scroll-mobile-route
     name: Complete desktop split scroll and mobile Inspector route behavior
     status: claimed
