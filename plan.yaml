@@ -72543,7 +72543,7 @@ phases:
       - [x] `actor_id` provenance-not-auth and owner-token auth boundary are explicitly
       verified.
 
-      - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has an explicit closure path.'
+      - [x] Any DIVERGES/PARTIAL/NEEDS_TEST item has an explicit closure path.'
     verification: '- [ ] Evidence table maps HTTP/MCP requirements to implementation
       and runtime proof.
 
