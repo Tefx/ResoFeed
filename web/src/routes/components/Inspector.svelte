@@ -424,7 +424,10 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener">original link</a></p>
+    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate="no">original link</a></p>
+    {#if 'provenance' in item}
+      <p class="contract-muted" translate="no">{item.provenance.source_url}</p>
+    {/if}
     <p class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
@@ -457,7 +460,7 @@
     {/if}
     <details class="contract-source-details">
       <summary>source details</summary>
-      <pre>{sourceDetailsPayload(item)}</pre>
+      <pre translate="no">{sourceDetailsPayload(item)}</pre>
     </details>
   {:else}
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">No item selected</h2>

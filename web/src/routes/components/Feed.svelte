@@ -42,7 +42,7 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`}>src: {item.source_title}</span>
+            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate="no">src: {item.source_title}</span>
             · <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
             · <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
             · <span aria-label={`Summary provenance: ${itemSummaryProvenanceLabel(item)}`}>{itemSummaryProvenanceLabel(item)}</span>

@@ -229,8 +229,8 @@
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row">
-          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`}>src: {sourceLabel}</div>
-          <div class="source-ledger-url source-ledger__url" title={source.url}>url: {source.url}</div>
+          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate="no">src: {sourceLabel}</div>
+          <div class="source-ledger-url source-ledger__url" title={source.url} translate="no">url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId !== null} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>

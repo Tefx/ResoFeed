@@ -6,6 +6,11 @@
   background: var(--rf-color-background);
 }
 
+.feed-pane,
+.detail-pane {
+  overflow-y: auto;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -401,7 +406,7 @@ a:focus,
 
 .shell-command {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(32ch, auto);
   gap: var(--rf-space-md);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-border);
@@ -461,6 +466,36 @@ a:focus,
   outline-offset: 2px;
 }
 
+.runtime-language-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rf-space-sm);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.runtime-language-warning,
+.runtime-reprocess-status {
+  font: var(--rf-typography-metadata);
+}
+
+.runtime-reprocess-status {
+  min-height: 20px;
+  margin: 0;
+  padding: 0 var(--rf-space-md) var(--rf-space-sm);
+  color: var(--rf-color-muted);
+}
+
+.bracket-action--language {
+  width: 11ch;
+  justify-content: center;
+}
+
+.bracket-action--reprocess {
+  width: 22ch;
+  justify-content: center;
+}
+
 .back-command {
   display: none;
   border-color: var(--rf-color-border);
@@ -486,6 +521,8 @@ a:focus,
 
 .feed-pane {
   border-inline-end: 1px solid var(--rf-color-border);
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
 }
 
 .feed-pane h1 {
@@ -503,6 +540,8 @@ a:focus,
 
 .detail-pane {
   min-height: 100%;
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
 }
 
 .visually-hidden {

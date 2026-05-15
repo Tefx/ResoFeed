@@ -12,8 +12,12 @@ import type {
   ManualRssFetchApiResult,
   ManualRssFetchErrorBody,
   OpaqueId,
+  ProcessingLanguage,
+  ProcessingLanguageResponse,
   ResonanceRequest,
   ResonanceResponse,
+  ReprocessLibraryRequest,
+  ReprocessLibraryResponse,
   RestoreResult,
   RunIngestSuccessResponse,
   RulesResponse,
@@ -23,6 +27,7 @@ import type {
   SteerRequest,
   SteerResponse
 } from '$lib/api-contract';
+import { processingLanguageRuntimeContract } from '$lib/api-contract';
 
 export interface ResoFeedApiClientOptions {
   ownerToken: string;
@@ -40,10 +45,10 @@ export interface SearchRequestParams {
 }
 
 export class ResoFeedApiError extends Error {
-  readonly status: 400 | 401 | 404 | 500;
+  readonly status: 400 | 401 | 404 | 409 | 500;
   readonly body: ErrorBody;
 
-  constructor(status: 400 | 401 | 404 | 500, body: ErrorBody) {
+  constructor(status: 400 | 401 | 404 | 409 | 500, body: ErrorBody) {
     super(`err: ${body.error.code}: ${body.error.message}`);
     this.name = 'ResoFeedApiError';
     this.status = status;
@@ -52,6 +57,7 @@ export class ResoFeedApiError extends Error {
 }
 
 const emptyDetails: ErrorBody['error']['details'] = {};
+const runtimeEndpoints = processingLanguageRuntimeContract.endpoints;
 
 interface IngestEnvelope {
   ingest: IngestRunResult;
@@ -106,6 +112,40 @@ function normalizeIngestEnvelope(body: ManualFetchSuccessBody, operation: RunIng
 
 async function parseJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isProcessingLanguage(value: unknown): value is ProcessingLanguage {
+  return value === 'en' || value === 'zh';
+}
+
+function isProcessingLanguageResponse(value: unknown): value is ProcessingLanguageResponse {
+  if (!isRecord(value) || !isRecord(value.language)) return false;
+  const { code, label } = value.language;
+  return isProcessingLanguage(code) && (label === 'English' || label === '中文') &&
+    (value.already_applied === undefined || typeof value.already_applied === 'boolean');
+}
+
+function isReprocessLibraryResponse(value: unknown): value is ReprocessLibraryResponse {
+  if (!isRecord(value) || !isRecord(value.reprocess) || typeof value.already_applied !== 'boolean') return false;
+  const result = value.reprocess;
+  return (
+    (result.status === 'completed' || result.status === 'completed_with_errors' || result.status === 'failed') &&
+    isProcessingLanguage(result.language) &&
+    typeof result.started_at === 'string' &&
+    typeof result.completed_at === 'string' &&
+    typeof result.items_attempted === 'number' &&
+    typeof result.items_updated === 'number' &&
+    typeof result.items_indexed === 'number' &&
+    typeof result.items_unavailable === 'number' &&
+    typeof result.items_failed === 'number' &&
+    typeof result.fts_rebuilt === 'boolean' &&
+    Array.isArray(result.errors) &&
+    result.errors.every((error) => isRecord(error) && (typeof error.item_id === 'string' || error.item_id === null) && typeof error.code === 'string' && typeof error.message === 'string')
+  );
 }
 
 function mutationKey(prefix: string, id: string): string {
@@ -216,6 +256,50 @@ export class ResoFeedApiClient {
     return this.request<SearchResponse>(`/api/search${suffix}`);
   }
 
+  async processingLanguage(): Promise<ProcessingLanguageResponse> {
+    const response = await this.request<unknown>(runtimeEndpoints.getLanguage.replace('GET ', ''));
+    if (!isProcessingLanguageResponse(response)) {
+      throw new ResoFeedApiError(500, fallbackError('internal', 'invalid processing language response'));
+    }
+    return response;
+  }
+
+  async setProcessingLanguage(
+    language: ProcessingLanguage,
+    request?: Partial<Omit<ReprocessLibraryRequest, 'language'>>
+  ): Promise<ProcessingLanguageResponse> {
+    const response = await this.request<unknown>(runtimeEndpoints.setLanguage.replace('PUT ', ''), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language,
+        actor_kind: request?.actor_kind ?? 'human',
+        actor_id: request?.actor_id ?? 'owner',
+        idempotency_key: request?.idempotency_key ?? mutationKey('language', language)
+      })
+    });
+    if (!isProcessingLanguageResponse(response)) {
+      throw new ResoFeedApiError(500, fallbackError('internal', 'invalid processing language response'));
+    }
+    return response;
+  }
+
+  async reprocessLibrary(request?: Partial<ReprocessLibraryRequest>): Promise<ReprocessLibraryResponse> {
+    const response = await this.request<unknown>(runtimeEndpoints.reprocessLibrary.replace('POST ', ''), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actor_kind: request?.actor_kind ?? 'human',
+        actor_id: request?.actor_id ?? 'owner',
+        idempotency_key: request?.idempotency_key ?? mutationKey('reprocess', 'library')
+      } satisfies ReprocessLibraryRequest)
+    });
+    if (!isReprocessLibraryResponse(response)) {
+      return response as ReprocessLibraryResponse;
+    }
+    return response;
+  }
+
   async exportState(): Promise<StateBundleV1> {
     return this.request<StateBundleV1>('/api/state/export');
   }
@@ -301,6 +385,6 @@ export class ResoFeedApiClient {
     } catch {
       body = fallbackError('internal', 'unexpected api error');
     }
-    throw new ResoFeedApiError(response.status as 400 | 401 | 404 | 500, body);
+    throw new ResoFeedApiError(response.status as 400 | 401 | 404 | 409 | 500, body);
   }
 }

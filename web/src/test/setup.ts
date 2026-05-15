@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/svelte';
 import { afterEach } from 'vitest';
+import '../app.css';
 
 if (typeof window.localStorage?.getItem !== 'function') {
   const storage = new Map<string, string>();

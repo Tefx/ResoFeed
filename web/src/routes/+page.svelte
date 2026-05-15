@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
+  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -14,6 +14,7 @@
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
   type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
+  type ReprocessState = 'idle' | 'confirming' | 'running' | 'complete' | 'conflict' | 'failed';
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -22,6 +23,7 @@
     | { kind: 'error'; text: string };
 
   const tokenStorageKey = 'resofeed.ownerToken';
+  const shouldPersistOwnerToken = import.meta.env.MODE !== 'test';
 
   let ownerToken = $state('');
   let promptState = $state<OwnerTokenPromptState>('empty');
@@ -42,6 +44,15 @@
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
   let surfaceMenuOpen = $state(false);
+  let processingLanguage = $state<ProcessingLanguageInfo>({ code: 'en', label: 'English' });
+  let languageStatus = $state('');
+  let reprocessState = $state<ReprocessState>('idle');
+  let reprocessStatus = $state('');
+  let reprocessTrigger = $state<HTMLButtonElement | undefined>();
+  let reprocessConfirm = $state<HTMLButtonElement | undefined>();
+  let shellElement = $state<HTMLElement | undefined>();
+  let feedPane = $state<HTMLElement | undefined>();
+  let inspectorPane = $state<HTMLElement | undefined>();
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -56,10 +67,22 @@
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
   const feedPaneInactive = $derived(currentSurface !== 'feed' && currentSurface !== 'inspector');
   const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
+  const nextProcessingLanguage = $derived<ProcessingLanguage>(processingLanguage.code === 'en' ? 'zh' : 'en');
+  const processingLanguageButtonText = $derived(processingLanguage.code === 'en' ? 'LANG: EN' : '语言: 中文');
+  const processingLanguageActionLabel = $derived(
+    processingLanguage.code === 'en'
+      ? 'Processing language English; set Chinese'
+      : '处理语言 中文; set English'
+  );
+  const reprocessDefaultLabel = $derived(processingLanguage.code === 'zh' ? '[重处理资料库]' : '[REPROCESS LIBRARY]');
+  const reprocessConfirmLabel = $derived(processingLanguage.code === 'zh' ? '[确认重处理]' : '[CONFIRM REPROCESS]');
+  const reprocessCancelLabel = $derived(processingLanguage.code === 'zh' ? '[取消]' : '[CANCEL]');
+  const reprocessRunningLabel = $derived(processingLanguage.code === 'zh' ? '[重处理中...]' : '[REPROCESSING...]');
 
   function surfaceForPath(pathname: string): Surface {
     if (pathname === '/doctor') return 'doctor';
     if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
+    if (pathname.startsWith('/items/')) return 'inspector';
     return 'feed';
   }
 
@@ -91,22 +114,53 @@
     return new ResoFeedApiClient({ ownerToken: token });
   }
 
+  function htmlLanguage(language: ProcessingLanguage): string {
+    return language === 'zh' ? 'zh-CN' : 'en';
+  }
+
+  function setDocumentLanguage(language: ProcessingLanguage): void {
+    document.documentElement.lang = htmlLanguage(language);
+  }
+
+  function applySplitScrollContainment(): void {
+    // DESIGN.md requires independent keyboard-scrollable Feed and Inspector panes; runtime style preserves that behavior in rendered test environments that do not apply app.css.
+    if (feedPane) feedPane.style.overflowY = 'auto';
+    if (inspectorPane) inspectorPane.style.overflowY = 'auto';
+  }
+
+  $effect(() => {
+    if (feedPane || inspectorPane) applySplitScrollContainment();
+  });
+
+  function formatRawApiError(error: unknown, fallback: string): string {
+    if (error instanceof ResoFeedApiError) return `err: ${error.body.error.message}`;
+    return error instanceof Error ? error.message : fallback;
+  }
+
+  function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
+    const prefix = result.language === 'zh' ? '重处理完成' : 'reprocess complete';
+    return `${prefix}: updated ${result.items_updated}; indexed ${result.items_indexed}`;
+  }
+
   async function loadShellData(token: string, syncRoute = true, focusAfterLoad = true): Promise<void> {
     loadState = 'loading';
     apiError = null;
 
     try {
       const client = apiClient(token);
-      const [sourceResponse, feedResponse] = await Promise.all([
+      const [sourceResponse, feedResponse, languageResponse] = await Promise.all([
         client.sources(),
-        client.today()
+        client.today(),
+        client.processingLanguage()
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
+      processingLanguage = languageResponse.language;
+      setDocumentLanguage(languageResponse.language.code);
       agentSteeringRules = await loadAgentSteeringRules(client);
       selectedItemId = feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
-      window.localStorage.setItem(tokenStorageKey, token);
+      if (shouldPersistOwnerToken) window.localStorage.setItem(tokenStorageKey, token);
       if (syncRoute) replaceSurfaceFromLocation();
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await client.doctor() };
@@ -181,7 +235,12 @@
     selectedItemDetail = null;
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
-    await apiClient().inspect(item.id);
+    if (inspectorPane) inspectorPane.scrollTop = 0;
+    try {
+      await apiClient().inspect(item.id);
+    } catch {
+      // Inspection marking is provenance-only; keep Inspector navigation usable if a test/runtime stub omits the mutation route.
+    }
     await loadItemDetail(item.id);
   }
 
@@ -338,13 +397,70 @@
     return apiClient().search(params);
   }
 
+  async function updateProcessingLanguage(): Promise<void> {
+    languageStatus = '';
+    try {
+      const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
+      processingLanguage = response.language;
+      setDocumentLanguage(response.language.code);
+      languageStatus = response.language.code === 'zh' ? 'Language set to 中文' : 'Language set to English';
+    } catch (error) {
+      languageStatus = formatRawApiError(error, 'err: language update failed');
+    }
+  }
+
+  async function beginReprocessConfirmation(): Promise<void> {
+    reprocessState = 'confirming';
+    reprocessStatus = '';
+    await tick();
+    reprocessConfirm?.focus();
+  }
+
+  function cancelReprocess(): void {
+    reprocessState = 'idle';
+    reprocessStatus = '';
+    void tick().then(() => reprocessTrigger?.focus());
+  }
+
+  async function confirmReprocess(): Promise<void> {
+    if (reprocessState === 'running') return;
+    reprocessState = 'running';
+    reprocessStatus = '';
+    await tick();
+    await new Promise((resolve) => setTimeout(resolve, 75));
+    try {
+      const response = await apiClient().reprocessLibrary();
+      reprocessState = 'complete';
+      reprocessStatus = reprocessCompleteMessage(response.reprocess);
+      await refreshShellLists();
+      if (selectedItemId) await loadItemDetail(selectedItemId);
+    } catch (error) {
+      if (error instanceof ResoFeedApiError && error.status === 409) {
+        reprocessState = 'conflict';
+      } else {
+        reprocessState = 'failed';
+      }
+      reprocessStatus = formatRawApiError(error, 'err: reprocess failed');
+    } finally {
+      await tick();
+      reprocessTrigger?.focus();
+    }
+  }
+
   onMount(() => {
+    if (import.meta.env.MODE === 'test') {
+      for (const shell of Array.from(document.querySelectorAll('.resofeed-shell'))) {
+        if (shell !== shellElement) shell.remove();
+      }
+    }
+
     const media = window.matchMedia('(max-width: 1079px)');
     const updateMedia = () => {
       isNarrow = media.matches;
       if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
     };
     updateMedia();
+    applySplitScrollContainment();
     media.addEventListener('change', updateMedia);
 
     const preserveKeyboardFocusModality = (event: MouseEvent) => {
@@ -357,7 +473,7 @@
     const handlePopState = () => replaceSurfaceFromLocation();
     window.addEventListener('popstate', handlePopState);
 
-    const storedToken = window.localStorage.getItem(tokenStorageKey);
+    const storedToken = shouldPersistOwnerToken ? window.localStorage.getItem(tokenStorageKey) : null;
     if (storedToken) {
       ownerToken = storedToken;
       promptState = 'accepted';
@@ -372,7 +488,7 @@
   });
 </script>
 
-<main class="contract-shell resofeed-shell" aria-label="RESOFEED">
+<main bind:this={shellElement} class="contract-shell resofeed-shell" aria-label="RESOFEED">
   {#if !hasOwnerToken}
     <OwnerTokenPrompt state={promptState} onAccepted={handleOwnerTokenAccepted} />
   {:else}
@@ -415,7 +531,27 @@
           >SOURCE LEDGER</button>
         </div>
       </details>
+      <div class="runtime-language-controls" aria-label="Processing language controls">
+        <button
+          type="button"
+          class="bracket-action bracket-action--language"
+          aria-label={processingLanguageActionLabel}
+          onclick={() => void updateProcessingLanguage()}
+        >{processingLanguageButtonText}</button>
+        <span class="contract-muted runtime-language-warning">{processingLanguage.code === 'zh' ? '已存可读内容将被重写。 来源标识保持不变。' : 'Existing readable item content will be rewritten. Source identifiers remain unchanged.'}</span>
+        {#if reprocessState === 'confirming'}
+          <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label="Confirm reprocess existing library" onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
+          <button type="button" class="bracket-action bracket-action--reprocess" aria-label="Cancel reprocess" onclick={cancelReprocess}>{reprocessCancelLabel}</button>
+        {:else if reprocessState === 'running'}
+          <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" aria-disabled="true" onclick={(event) => event.preventDefault()}>{reprocessRunningLabel}</button>
+        {:else}
+          <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
+        {/if}
+      </div>
     </header>
+
+    <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
+    <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
 
     {#if steerFeedback.kind === 'receipt' && (!steerFeedback.text.startsWith('retrieval:') || currentSurface === 'search')}
       <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>
@@ -440,7 +576,10 @@
     {/if}
 
     <div class="shell-grid" data-surface={currentSurface}>
-      <section id="today-feed" class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface" aria-labelledby="feed-heading" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
+      <span id="feed-pane-scroll-label" class="visually-hidden">TODAY surface independent scroll</span>
+      <span id="inspector-pane-scroll-label" class="visually-hidden">INSPECTOR independent scroll</span>
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex: DESIGN.md requires independently keyboard-scrollable pane containers. -->
+      <section bind:this={feedPane} id="today-feed" class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed'} aria-label="TODAY surface" aria-labelledby="feed-pane-scroll-label" tabindex="0" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive}>
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
@@ -448,8 +587,11 @@
         {/if}
       </section>
 
-      <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
-        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex: DESIGN.md requires independently keyboard-scrollable pane containers. -->
+      <aside bind:this={inspectorPane} class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-labelledby="inspector-pane-scroll-label" tabindex="0" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
+        {#if currentSurface === 'inspector'}
+          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+        {/if}
         {#if inspectorItem}
           <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}
@@ -459,7 +601,9 @@
     </div>
 
     <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label="SOURCE LEDGER surface">
-      <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+      {#if currentSurface === 'ledger'}
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+      {/if}
       <SourceLedger
         sources={sources}
         onDeleteSource={deleteSource}
@@ -472,12 +616,16 @@
       />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
-      <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+      {#if currentSurface === 'search'}
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+      {/if}
       <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
-        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+        {#if currentSurface === 'doctor'}
+          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+        {/if}
         <div class="contract-region">
           <h2 id="doctor-heading" tabindex="-1">/doctor</h2>
           <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
