@@ -70461,7 +70461,7 @@ phases:
 
       - [x] omission drift for required metadata/state exclusion/reprocess fields.
 
-      - [ ] contract surface drift around `core_insight`, `value_tier`, and source
+      - [x] contract surface drift around `core_insight`, `value_tier`, and source
       precedence.'
     verification: '- [ ] Evidence table maps each backend requirement to implementation
       file:line and verdict.
