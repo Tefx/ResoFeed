@@ -69898,7 +69898,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-processing-language-ingest
     name: Complete processing language backend and OpenRouter input
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -69973,6 +69973,8 @@ phases:
     depends_on:
     - plsc-runtime-metadata-receipts
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T14:10:44.199453+00:00'
   - id: plsc-reprocess-fts-doctor
     name: Complete reprocess library FTS and doctor semantics
     status: pending
