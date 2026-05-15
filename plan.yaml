@@ -72681,7 +72681,7 @@ phases:
 
       - [x] HTTP and MCP call the same core operations rather than duplicating semantics.
 
-      - [ ] `search_items` and HTTP search share query echo behavior.
+      - [x] `search_items` and HTTP search share query echo behavior.
 
       - [ ] No production stub/private placeholder remains wired as runtime dependency.
 
