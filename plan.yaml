@@ -75350,7 +75350,7 @@ phases:
 
       - [x] `/api/doctor` reports stale FTS while marker exists.
 
-      - [ ] rerun/recovery path clears stale marker after successful rebuild.
+      - [x] rerun/recovery path clears stale marker after successful rebuild.
 
       - [ ] search continues to execute during stale interim with documented mixed-language
       caveat.
