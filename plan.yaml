@@ -72420,7 +72420,7 @@ phases:
       Files changed: none'
   - id: plhm-runtime-liveness-probe
     name: Probe runnable HTTP and MCP surfaces
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -72530,6 +72530,137 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T15:45:57.039937+00:00'
+    done_at: '2026-05-15T15:54:00.399203+00:00'
+    evidence: '## Verification Report
+
+      **Headline**: PASS
+
+      **Blocking Status**: CLOSED
+
+      **Proof-Gap Status**: NONE
+
+      **Verdict**: PASS
+
+      **Blockers**: []
+
+      **Orchestrator Action Hint**: COMPLETE
+
+
+      ### refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key passage confirmed: ResoFeed is one binary
+      started with `resofeed serve` serving static app, JSON HTTP API, MCP Streamable
+      HTTP at `/mcp`, and background ingest loop; every `/api/*` and `/mcp` request
+      requires owner-token authority; `/api/doctor` must report `search_fts: ok` or
+      stale.
+
+      - `CONSTITUTION.md`: checked and not present in isolated worktree.
+
+
+      ### Runtime Proof
+
+      Build command/output:
+
+      - `npm --prefix web install; npm --prefix web run build; go build -o ./bin/resofeed
+      ./cmd/resofeed; ./bin/resofeed --help || true; ./bin/resofeed serve --help ||
+      true`
+
+      - Output included successful web build, CLI help, and `resofeed serve` help.
+      npm reported 5 vulnerabilities but no build/runtime failure.
+
+
+      Server start and port proof:
+
+      - Secret evidence redacted: `OPENROUTER_KEY=<redacted>; OWNER_TOKEN=<redacted
+      synthetic token length=43>`.
+
+      - Launch command redacted: `./bin/resofeed serve --addr 127.0.0.1:18080 --public-url
+      http://127.0.0.1:18080 --db .audit-liveness/runtime-liveness.sqlite3 --openrouter-model
+      openai/gpt-4.1-mini --owner-token <redacted>`.
+
+      - `lsof -nP -iTCP:18080 -sTCP:LISTEN` showed `resofeed` listening on `127.0.0.1:18080`.
+
+      - Process alive after 3s: yes.
+
+
+      HTTP runtime language:
+
+      - `curl -sS -i GET /api/runtime/language` returned `HTTP/1.1 200 OK` and body
+      `{"language":{"code":"en","label":"English"},"already_applied":false}`.
+
+
+      HTTP strict-validation failure:
+
+      - `curl -sS -i GET /api/search?limit=101` returned `HTTP/1.1 400 Bad Request`
+      and body `{"error":{"code":"bad_request","message":"bad request","details":{"field":"limit"}}}`.
+
+
+      Doctor / FTS proof:
+
+      - `curl -sS -i GET /api/doctor` returned `HTTP/1.1 200 OK` and text including
+      `search_fts: ok`.
+
+
+      MCP real `/mcp` transport proof:
+
+      - `curl -sS -i MCP initialize /mcp` returned `HTTP/1.1 200 OK` with JSON-RPC
+      initialize result.
+
+      - `curl -sS -i MCP direct tools/call get_processing_language /mcp` returned
+      `HTTP/1.1 200 OK` with text payload `{"language":{"code":"en","label":"English"},"already_applied":false}`.
+
+
+      Redacted serve log excerpt:
+
+      - `owner token explicit: stored hash`
+
+      - `serving ResoFeed on 127.0.0.1:18080 (public-url http://127.0.0.1:18080)`
+
+
+      ### Behavioral Proof Register
+
+      - build_or_use_project_binary: PROVEN
+
+      - serve_entrypoint_starts_with_test_sqlite_db: PROVEN
+
+      - secret_safe_owner_token_and_openrouter_handling: PROVEN
+
+      - process_stays_alive_after_3_seconds: PROVEN
+
+      - tcp_port_bound_real_transport: PROVEN
+
+      - http_get_api_runtime_language_reaches_real_route: PROVEN
+
+      - http_strict_validation_failure_reaches_real_route: PROVEN
+
+      - mcp_get_processing_language_reaches_real_mcp_route: PROVEN
+
+      - api_doctor_reports_search_fts_ok_or_stale: PROVEN
+
+      - vulnerabilities_triggered: None observed; no 500s, crashes, or unhandled errors
+      during required probes.
+
+
+      Surface Area Tested:
+
+      - CLI: `resofeed serve`
+
+      - TCP: `127.0.0.1:18080`
+
+      - HTTP: `GET /api/runtime/language`, `GET /api/search?limit=101`, `GET /api/doctor`
+
+      - MCP: `POST /mcp` JSON-RPC `initialize`, `POST /mcp` JSON-RPC `tools/call get_processing_language`
+
+
+      Commit hash(es): `0303d42f7350f0044e2f78cfb307531123b396e6`; no new commit created
+      because liveness audit required no repository changes and empty commits were
+      forbidden.
+
+      Files changed: none; generated build/audit artifacts were removed; final worktree
+      status was clean.
+
+      Gaps/Notes: npm audit vulnerabilities were reported during install but did not
+      affect required runtime liveness probes.'
   - id: plhm-runtime-wiring-audit
     name: Audit HTTP MCP runtime wiring completeness
     status: claimed
