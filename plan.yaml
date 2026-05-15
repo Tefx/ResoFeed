@@ -70107,7 +70107,7 @@ phases:
 
       - [x] Implementation processes real items and produces counts based on inputs.
 
-      - [ ] Stub-only or no-op reprocess completion is not acceptable.'
+      - [x] Stub-only or no-op reprocess completion is not acceptable.'
     verification: '- [ ] Targeted reprocess accounting tests pass for success, unavailable,
       failed, timeout, and stale FTS paths.
 
