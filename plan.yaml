@@ -74010,7 +74010,7 @@ phases:
 
       - [x] Browser/test-renderer proof shows split scroll behavior.
 
-      - [ ] Component-only data/view-model changes are insufficient.
+      - [x] Component-only data/view-model changes are insufficient.
 
 
       ## Gate Preview (what gate WILL reject)
