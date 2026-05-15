@@ -70997,6 +70997,92 @@ phases:
     evidence.
   depends_on:
   - processing-language-frontend-ui
+  steps:
+  - id: plse-real-language-reprocess-vertical-slice
+    name: Run real language and reprocess vertical slice
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Early system vertical slice after backend/runtime/frontend phases: wire one
+      complete public path from rendered UI or HTTP command through runtime language
+      state, item processing/reprocess, FTS/search/doctor, and observable output using
+      real implementations.
+
+
+      Scope declaration: phase-check protecting final system gate.
+
+
+      Required proof:
+
+      - [ ] Build and launch real `resofeed serve` with test DB.
+
+      - [ ] Authenticate with owner token.
+
+      - [ ] Read language, set language, trigger reprocess on controlled fixture data,
+      observe result counts.
+
+      - [ ] Query search and doctor after reprocess.
+
+      - [ ] If browser is used, capture rendered language/reprocess UI visible state.
+
+      - [ ] No stubs, mocks, or placeholder runtime dependencies at layer boundaries.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Evidence shows input submitted -> route/tool matched -> core operation
+      executed -> DB/FTS state changed -> output returned/rendered.
+
+      - [ ] Source identifiers remain exact in output.
+
+      - [ ] Actual commands/output/artifact paths are included.'
+    verification: '- [ ] Real vertical slice succeeds through public runtime surfaces.
+
+      - [ ] Output proves language/reprocess/search/doctor behavior end-to-end.
+
+      - [ ] Evidence includes actual output, not only test pass summary.'
+    evidence_template: '## Vertical Slice Evidence
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Entry point**: <HTTP/API/MCP/UI>
+
+      **Command executed**:
+
+      ```
+
+      <paste exact commands>
+
+      ```
+
+      **Layers traversed**: entry -> auth -> transport -> core -> SQLite/FTS -> output
+
+      **Observable output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Rendered artifacts**:
+
+      **Stubs used**: NONE required'
+    agent: integration-verifier
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
