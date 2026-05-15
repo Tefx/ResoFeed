@@ -68005,7 +68005,7 @@ phases:
 
       ## Agent checklist (toggle before completion)
 
-      - [ ] Real served-app runtime path was used, including built assets, single
+      - [x] Real served-app runtime path was used, including built assets, single
       Go binary/server, clean DB, owner token, documented HTTP import, and runtime
       ingest.
 
