@@ -70609,6 +70609,82 @@ phases:
     depends_on:
     - plfu-api-client-types
     agent: frontend-engineer
+  - id: plfu-source-identifiers-split-scroll
+    name: Preserve source identifiers and split scroll behavior
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete rendered UI changes for source identifier preservation and desktop
+      split-scroll/feed-inspector behavior.
+
+
+      YOUR SCOPE:
+
+      - Mark URL, source title, source URL, canonical URL, and original link elements
+      with `translate="no"` or equivalent.
+
+      - Ensure source identifiers remain literal provenance anchors under localized
+      UI chrome.
+
+      - Preserve desktop Feed and Inspector as independent scroll containers.
+
+      - Selecting an item keeps Feed scroll stable and resets Inspector reading container
+      to top.
+
+      - Preserve mobile full-screen Inspector route with feed scroll preservation.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      - [ ] Visible DOM contains non-translated provenance anchors.
+
+      - [ ] Browser/test-renderer proof shows split scroll behavior.
+
+      - [ ] Component-only data/view-model changes are insufficient.
+
+
+      ## Gate Preview (what gate WILL reject)
+
+      - [ ] localized or beautified URLs/source titles/provenance identifiers.
+
+      - [ ] global page scroll coupling Feed and Inspector on desktop.
+
+      - [ ] mobile Inspector behavior regression.
+
+      - [ ] persisted reading-position tracking or analytics.'
+    verification: '- [ ] Rendered tests pass for `translate="no"` or equivalent on
+      all source identifier classes.
+
+      - [ ] Browser tests prove desktop independent scroll and mobile route behavior.
+
+      - [ ] No persisted scroll/depth state is added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Rendered Implementation Evidence
+
+      - Files changed:
+
+      - Source identifier DOM proof:
+
+      - Split-scroll browser proof:
+
+      - Mobile route proof:
+
+      - Commands/tests run and outputs:'
+    agent: frontend-engineer
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
