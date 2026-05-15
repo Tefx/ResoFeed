@@ -71813,3 +71813,98 @@ phases:
     depends_on:
     - plfinal-documentation-sync
     agent: blind-tester
+  - id: plfinal-final-gate
+    name: Final gate for processing language implementation
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER, make the final OPEN/BLOCK decision for the complete
+      processing-language/reprocess/runtime metadata/HTTP/MCP/frontend implementation
+      plan.
+
+
+      Gate Preview (what this gate WILL reject):
+
+      1. Any unresolved blocker/should-fix from doc sync, spec conformance, design
+      readiness, architecture audit, or black-box acceptance.
+
+      2. Missing behavioral proof register for runtime/liveness/idempotency/reprocess/FTS
+      obligations.
+
+      3. Documentation drift that changes product scope or contradicts implementation.
+
+      4. Product-boundary violations: vector/RAG, sync/merge, jobs/queues, ledgers,
+      settings dashboards, per-agent auth registries, delivery registries, dual-language
+      storage.
+
+      5. Dirty evidence that claims tests passed without commands/output.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Documentation sync reviewed.
+
+      - [ ] Full spec conformance audit reviewed.
+
+      - [ ] DESIGN/readiness review reviewed.
+
+      - [ ] Wiring/architecture audit reviewed.
+
+      - [ ] Black-box acceptance reviewed.
+
+      - [ ] Final decision basis lists each unresolved item and why it blocks or does
+      not intersect remaining gates.
+
+      - [ ] OPEN only when every blocker-class obligation is PROVEN or explicitly
+      non-intersecting.'
+    verification: '- [ ] Final gate review completed with OPEN or BLOCK decision.
+
+      - [ ] Decision basis contains requirement/proof refs, evidence refs, unresolved
+      statuses, closure paths, and final recommendation.
+
+      - [ ] No blocker-class implementation, spec, design, wiring, runtime, or doc
+      gaps remain unowned.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Gate Review Report
+
+      - Execution review:
+
+      - Evidence quality:
+
+      - Outstanding issues:
+
+      - Behavioral proof register summary:
+
+      | requirement_ref | behavior_claim | evidence_ref | status | closure_path |
+      gate_decision_basis |
+
+      |---|---|---|---|---|---|
+
+      - Gate Decision: OPEN | BLOCKED
+
+      - Required remediation if blocked:'
+    depends_on:
+    - plfinal-documentation-sync
+    - plfinal-full-spec-conformance-audit
+    - plfinal-design-readiness-review
+    - plfinal-wiring-and-architecture-audit
+    - plfinal-black-box-acceptance
+    agent: gate-reviewer
