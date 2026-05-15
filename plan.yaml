@@ -65733,7 +65733,7 @@ phases:
     claimed_at: '2026-05-15T07:17:54.461733+00:00'
   - id: ui-runtime-fresh-review-duplicate-source-api-fix
     name: Fix grouped duplicate source disclosure data path
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -65825,6 +65825,67 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T07:17:46.428246+00:00'
+    done_at: '2026-05-15T07:29:55.229764+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-fresh-review-2026-05-15.md\
+      \ — NOT READ in original isolated worktree because file was absent there; after\
+      \ this gap was discovered, orchestrator committed the audit input on main as\
+      \ `43adef6` so subsequent worktrees can read it.\n- docs/DESIGN.md — READ. Inspector\
+      \ requires source-list disclosure for grouped stories; feed item grouped duplicates\
+      \ must preserve access to every source item/provenance.\n- docs/ARCHITECTURE.md\
+      \ — READ. SQLite is the single durable store; `items.story_key`/`duplicate_of_item_id`\
+      \ preserve grouping, and direct duplicates must remain retrievable through item\
+      \ detail/provenance.\n- .agents/instructions.md — READ. Enforced one Go binary,\
+      \ one SQLite DB, lexical-only retrieval, owner-token boundary, no sync/merge/activity\
+      \ ledger.\n- web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — READ.\
+      \ FR-04 expects primary Inspector to disclose “Grouped story with 2 source items”,\
+      \ both Primary Wire and Duplicate Ledger, and shared story_key.\n- internal/resofeed/types.go\
+      \ — READ. ItemDetail/Provenance are canonical detail JSON boundary.\n- internal/resofeed/search.go\
+      \ — READ. ReadItemDetail owns GET `/api/items/{id}` and MCP read_item detail/provenance\
+      \ path.\n- internal/resofeed/http.go — READ. GET `/api/items/{id}` returns `ItemResponse{Item:\
+      \ detail}` through owner-token-protected API handler.\n- internal/resofeed/http_impl_test.go\
+      \ / json_contract_test.go — READ. Existing HTTP and JSON contract tests are\
+      \ backend/API acceptance surfaces.\n- internal/resofeed/migrations.go — READ.\
+      \ Existing SQLite `items` table stores `story_key`, `duplicate_of_item_id`,\
+      \ source/item provenance; no migration/storage added.\n\n## Backend/API Implementation\
+      \ Evidence\n- Findings fixed: FR-04 backend/data path now returns SQLite-backed\
+      \ grouped source disclosure from primary item detail.\n- Files changed:\n  -\
+      \ `internal/resofeed/types.go`\n  - `internal/resofeed/search.go`\n  - `internal/resofeed/json_contract_test.go`\n\
+      \  - `internal/resofeed/http_impl_test.go`\n  - `web/src/lib/api-contract.ts`\n\
+      \  - follow-up mainline type regression fix: `web/src/routes/components/__tests__/rendering-expected-red.test.ts`\n\
+      - Contract field(s): `item.provenance.grouped_source_items: GroupedSourceItem[]`,\
+      \ with item/source identity, source URL, item URL/canonical URL, title, timestamps,\
+      \ statuses, story_key, duplicate_of_item_id, and `is_selected_item`.\n- API\
+      \ sample shape:\n  ```json\n  {\n    \"item\": {\n      \"id\": \"item_today_primary_story\"\
+      ,\n      \"story_key\": \"story-shared-runtime-review\",\n      \"provenance\"\
+      : {\n        \"story_key\": \"story-shared-runtime-review\",\n        \"grouped_source_items\"\
+      : [\n          {\"item_id\":\"item_today_primary_story\",\"source_title\":\"\
+      Primary Wire\",\"is_selected_item\":true},\n          {\"item_id\":\"item_today_duplicate_story\"\
+      ,\"source_title\":\"Duplicate Ledger\",\"duplicate_of_item_id\":\"item_today_primary_story\"\
+      ,\"is_selected_item\":false}\n        ]\n      }\n    }\n  }\n  ```\n- Boundary\
+      \ check: SQLite-only item/source state; no new storage; no vector/RAG/search\
+      \ changes; no sync/merge/activity/job concept; existing `/api/items/{id}` owner-token\
+      \ path preserved in single Go binary.\n\n## Commit hash(es)\n- Worktree commit:\
+      \ `efa7294a1e3f3b2fe558654718f5e8a2eb56f1c0`\n- Worktree follow-up commit: `669585a2b6aa7ecf2aaca4151fd5e2566b23b36e`\n\
+      - Main squash merge commit: `373cf9a` (`[vectl] step-ui-runtime-fresh-review-duplicate-source-api-fix\
+      \ completed`)\n- Main follow-up squash commit: `3ca6b45` (`[vectl] step-ui-runtime-fresh-review-duplicate-source-api-fix\
+      \ follow-up`)\n\n## Files changed\n- `internal/resofeed/types.go`\n- `internal/resofeed/search.go`\n\
+      - `internal/resofeed/json_contract_test.go`\n- `internal/resofeed/http_impl_test.go`\n\
+      - `web/src/lib/api-contract.ts`\n- `web/src/routes/components/__tests__/rendering-expected-red.test.ts`\n\
+      \n## Verification\nWorktree verification:\n- `gofmt -w internal/resofeed/types.go\
+      \ internal/resofeed/search.go internal/resofeed/json_contract_test.go internal/resofeed/http_impl_test.go`\
+      \ — exit 0.\n- `go test ./internal/resofeed -run TestHTTPItemDetailDisclosesGroupedSourceItems\
+      \ -v` — PASS.\n- `go test ./internal/resofeed` — PASS.\n- `go test ./...` —\
+      \ PASS.\n- `go build ./...` — PASS.\n- `go test -race ./internal/resofeed` —\
+      \ PASS.\n- `golangci-lint run` — 0 issues.\nFollow-up type-regression verification:\n\
+      - `npm --prefix web run check` — PASS after adding `grouped_source_items: []`\
+      \ to three existing TypeScript test fixtures.\n- `go test ./internal/resofeed\
+      \ -run TestHTTPItemDetailDisclosesGroupedSourceItems -v` — PASS.\n- `go test\
+      \ ./internal/resofeed` — PASS.\nMainline final-state verification after both\
+      \ squash merges:\n- `go test ./...` — PASS.\n- `go build ./...` — PASS.\n- `npm\
+      \ --prefix web run check` — PASS; svelte-check found 0 errors and 0 warnings.\n\
+      \n## Gaps/Notes\n- Frontend Inspector rendering intentionally remains for `ui-runtime-fresh-review-duplicate-source-inspector-fix`.\n\
+      - The fresh review audit file was untracked/absent from earlier worktrees; it\
+      \ is now committed on main as `43adef6` for subsequent steps."
   - id: ui-runtime-fresh-review-duplicate-source-inspector-fix
     name: Render grouped duplicate source disclosure in Inspector
     status: pending
