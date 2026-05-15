@@ -76340,12 +76340,12 @@ phases:
 
       This step may update docs as needed during execution; the planner is not modifying
       docs now.'
-    verification: '- [ ] Documentation diff, if any, matches implemented behavior
+    verification: '- [x] Documentation diff, if any, matches implemented behavior
       and does not widen scope.
 
-      - [ ] All changed docs cite actual runtime/API/MCP/UI behavior.
+      - [x] All changed docs cite actual runtime/API/MCP/UI behavior.
 
-      - [ ] Forbidden product concepts remain absent.'
+      - [x] Forbidden product concepts remain absent.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
