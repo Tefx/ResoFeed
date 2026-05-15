@@ -1,10 +1,10 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Partially implemented target contract
+Status: Implemented runtime contract
 Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
 
-Status note: the pre-existing core contract is implemented where runtime behavior already matches this document. Processing-language, reprocess, runtime metadata, HTTP/MCP schema, OpenRouter prompt, FTS, and UI language/split-scroll sections are implementation targets until their corresponding runtime changes land.
+Status note: the core runtime, processing-language, reprocess, runtime metadata, HTTP/MCP schema, OpenRouter prompt, FTS, delivery, and UI language/split-scroll contracts described here are implemented behavior as of the final documentation sync. Future changes must keep this file aligned with runtime behavior rather than treating these sections as aspirational targets.
 
 ## 1. Decisions
 
@@ -1241,7 +1241,8 @@ Idempotency rules:
   "language": {
     "code": "en",
     "label": "English"
-  }
+  },
+  "already_applied": false
 }
 ```
 
@@ -1332,7 +1333,7 @@ Endpoint additions:
 
 | Method/path | Request | Success | Response |
 |---|---|---:|---|
-| `GET /api/runtime/language` | none | `200` | `{ "language": ProcessingLanguageInfo }` |
+| `GET /api/runtime/language` | none | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": false }` |
 | `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
 | `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if ingest/fetch/reprocess is already running |
 
@@ -1422,13 +1423,13 @@ MCP item/search/detail resources and tools return the same stored historical ite
 
 Additional resource:
 
-- `resofeed://runtime/language` — JSON `{ "language": ProcessingLanguageInfo }`.
+- `resofeed://runtime/language` — JSON `{ "language": ProcessingLanguageInfo, "already_applied": false }`.
 
 Additional tools:
 
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
-| `get_processing_language` | `{}` | `{ "language": ProcessingLanguageInfo }` | No | `GET /api/runtime/language` |
+| `get_processing_language` | `{}` | `{ "language": ProcessingLanguageInfo, "already_applied": false }` | No | `GET /api/runtime/language` |
 | `set_processing_language` | `{ "language": "en"|"zh", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` | Yes | `PUT /api/runtime/language` |
 | `reprocess_library` | `{ "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }` | Yes | `POST /api/runtime/reprocess-library` |
 

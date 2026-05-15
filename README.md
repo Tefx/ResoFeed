@@ -38,6 +38,9 @@ If `--owner-token` is omitted, first startup generates an owner token, stores on
 - No separate `migrate`, `worker`, `doctor`, `admin`, or `sync` processes.
 - SQLite + FTS5 is the only durable storage/search backend.
 - OpenRouter is used only for summaries and steering translation; it does not own state or orchestration.
+- Runtime processing language is controlled through `GET/PUT /api/runtime/language` and MCP `get_processing_language` / `set_processing_language`; it is persisted as runtime metadata and excluded from portable state.
+- Existing-library reprocess is an immediate owner-authorized operation through `POST /api/runtime/reprocess-library` and MCP `reprocess_library`; it rebuilds FTS and reports live receipt/idempotency status without durable jobs, queues, or activity logs.
+- Delivery handoff is reported through `POST /api/items/{id}/delivery` and MCP `report_delivery`; it records `external_surfaced_at` with live idempotency/fingerprint protection, not a delivery registry.
 - State export/import covers active sources, active steering rules, and currently resonated items only.
 - No accounts, teams, OAuth, folders, tags, unread-count flows, archive bins, vector search, embeddings, built-in RAG, or notification-channel ownership.
 

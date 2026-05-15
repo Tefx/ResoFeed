@@ -1,6 +1,6 @@
 # Processing Language Contract Lock
 
-Status: acceptance-only contract artifact. This file pins public shapes and non-goals before product behavior implementation. It does not authorize business logic, queues, dashboards, sync, semantic search, or alternate storage.
+Status: implemented contract artifact. This file pins public shapes and non-goals for the runtime language, reprocess, delivery, and query echo behavior. It does not authorize business logic, queues, dashboards, sync, semantic search, or alternate storage.
 
 ## Runtime metadata
 
@@ -10,7 +10,7 @@ Status: acceptance-only contract artifact. This file pins public shapes and non-
 
 ## HTTP schemas
 
-- `GET /api/runtime/language` -> `{ "language": { "code": "en"|"zh", "label": "English"|"中文" } }`.
+- `GET /api/runtime/language` -> `{ "language": { "code": "en"|"zh", "label": "English"|"中文" }, "already_applied": false }`.
 - `PUT /api/runtime/language` body -> `{ "language": "en"|"zh", "actor_kind": "human"|"agent", "actor_id": string, "idempotency_key": string }`; no query params; unknown body fields reject with `400 bad_request`.
 - `POST /api/runtime/reprocess-library` body -> `{ "actor_kind": "human"|"agent", "actor_id": string, "idempotency_key": string }`; no query params; result envelope `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`.
 - `POST /api/items/{id}/delivery` body -> `{ "actor_kind": "human"|"agent", "actor_id": string, "delivered_at": RFC3339_UTC, "idempotency_key": string }`; result envelope `{ "item_id": string, "external_surfaced_at": RFC3339_UTC, "already_applied": boolean }`.
@@ -19,7 +19,7 @@ Status: acceptance-only contract artifact. This file pins public shapes and non-
 
 ## MCP parity
 
-- Resource: `resofeed://runtime/language` -> `{ "language": ProcessingLanguageInfo }`.
+- Resource/tool read: `resofeed://runtime/language` and `get_processing_language` -> `{ "language": ProcessingLanguageInfo, "already_applied": false }`.
 - Tools: `get_processing_language`, `set_processing_language`, `reprocess_library`, `report_delivery`, and `search_items` reuse HTTP shapes and idempotency/query echo semantics.
 - MCP has no per-call language override. It returns stored item/search/detail text as-is, with source identifiers preserved exactly.
 

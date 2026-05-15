@@ -159,6 +159,16 @@ If you want an immediate refresh, open `RESOFEED` → `SOURCE LEDGER` and use `[
 
 Use an always-on host if mobile access or external-agent workflows should continue while your laptop sleeps.
 
+### 8. Runtime processing language and reprocess
+
+ResoFeed has one runtime processing language for the local owner runtime. It supports `en` and `zh`, defaults to `en` when unset, and is persisted as `runtime_metadata.processing_language`. This runtime metadata is not included in state export/import.
+
+Changing language affects future ingestion and UI/MCP language metadata immediately, but it does not rewrite existing stored item text or rebuild FTS by itself. To rewrite existing stored readable item fields into the current language, use the explicit `[REPROCESS LIBRARY]` / `[重处理资料库]` action or the API/MCP operations documented below.
+
+Reprocess is an immediate owner-authorized operation. It preserves source identifiers, rewrites stored readable item fields where source text is available, rebuilds FTS when completion reaches the final indexing step, and reports counts in the response. It does not create a durable job, queue, dashboard, retry panel, activity log, sync record, or portable receipt. If reprocess fails before the final FTS rebuild, `/api/doctor` reports `search_fts: stale since <RFC3339_UTC>` until a later successful rebuild clears the marker.
+
+The web UI renders the control tersely as `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`; updates are announced through live status text and `<html lang>` follows `en` or `zh-CN`. Source identifiers such as URLs, source titles, source URLs, canonical URLs, and original links remain unchanged and are marked non-translatable in the DOM where rendered.
+
 ## HTTP Command Reference
 
 All `/api/*` HTTP requests use the owner token from startup output or the explicit `--owner-token` value. Static UI assets can load without the token so the browser can show the token prompt.
@@ -324,6 +334,29 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 }
 ```
 
+### Report external delivery
+
+Use delivery reporting when a human or authorized external agent actually surfaces an item outside the ResoFeed UI. This updates `external_surfaced_at` for duplicate-surfacing avoidance. It does not create a delivery-channel registry, delivery dashboard, job, queue, sync record, or activity ledger.
+
+```bash
+curl -sS -X POST "http://127.0.0.1:8080/api/items/ITEM_ID/delivery" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-09T00:00:00Z","idempotency_key":"delivery-ITEM_ID-001"}'
+```
+
+Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
+
+```json
+{
+  "item_id": "ITEM_ID",
+  "external_surfaced_at": "2026-05-09T00:00:00Z",
+  "already_applied": false
+}
+```
+
+Reusing the same live `idempotency_key` with the same request fingerprint returns the stored result with `already_applied: true`. Reusing the same live key with a different fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
+
 ### List sources
 
 ```bash
@@ -409,6 +442,80 @@ Supported query parameters:
 | `resonated` | `true` or `false`. |
 | `limit` | Result cap. Defaults to `50`; maximum `100`. |
 
+The response always includes a `query` echo envelope containing the effective `q`, `source`, `from`, `to`, `resonated`, and `limit` values. Invalid, duplicate, or unknown query parameters return `400 bad_request` with `details.field` naming the rejected parameter.
+
+### Get or set runtime processing language
+
+```bash
+curl -sS "http://127.0.0.1:8080/api/runtime/language" \
+  -H "Authorization: Bearer <OWNER_TOKEN>"
+```
+
+Example response:
+
+```json
+{
+  "language": {
+    "code": "en",
+    "label": "English"
+  },
+  "already_applied": false
+}
+```
+
+Set the runtime language for future processing:
+
+```bash
+curl -sS -X PUT "http://127.0.0.1:8080/api/runtime/language" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"language-zh-001"}'
+```
+
+Example response:
+
+```json
+{
+  "language": {
+    "code": "zh",
+    "label": "中文"
+  },
+  "already_applied": false
+}
+```
+
+Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. If ingest, fetch, or reprocess is already running, it returns `409 conflict` with the standard operation-guard details. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
+
+### Reprocess existing library
+
+```bash
+curl -sS -X POST "http://127.0.0.1:8080/api/runtime/reprocess-library" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"reprocess-library-001"}'
+```
+
+Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
+
+```json
+{
+  "reprocess": {
+    "status": "completed",
+    "language": "zh",
+    "items_attempted": 12,
+    "items_updated": 12,
+    "items_indexed": 12,
+    "items_unavailable": 0,
+    "items_failed": 0,
+    "fts_rebuilt": true,
+    "errors": []
+  },
+  "already_applied": false
+}
+```
+
+Reprocess accepts no query parameters, uses the current persisted processing language, and shares the same global operation guard as manual ingest/fetch. A conflicting ingest/fetch/reprocess returns `409 conflict`; a duplicate key during an active run also returns conflict. After completion, same-key/same-fingerprint replay returns the stored result with `already_applied: true`; same-key/different-fingerprint replay returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`. Timeout results that can be serialized return HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and an error code of `timeout`.
+
 ### Export state
 
 ```bash
@@ -465,6 +572,7 @@ openrouter: provider_reachable=unknown configured_model=account_default
 openrouter: model_resolved=false resolved_model=unknown
 openrouter: item_transform_failures=0
 fallback_provenance: item_transform_failures=0 summary=none
+search_fts: ok
 ingest: last_run=2026-05-09T00:00:00Z
 ```
 
@@ -713,6 +821,7 @@ Expected diagnostic content includes:
 - extraction failures;
 - last ingestion run information;
 - other raw status lines useful for debugging.
+- `search_fts: ok` or `search_fts: stale since <RFC3339_UTC>` after reprocess begins or fails before final FTS rebuild.
 
 `/doctor` is plain text. It is not a dashboard, chart surface, friendly remediation wizard, or settings page.
 
@@ -779,7 +888,8 @@ Target resources:
 - `resofeed://feed/today` — current eligible feed view;
 - `resofeed://rules/active` — current steering policy;
 - `resofeed://system/doctor` — raw diagnostics;
-- `resofeed://sources` — flat Source Ledger.
+- `resofeed://sources` — flat Source Ledger;
+- `resofeed://runtime/language` — current runtime processing language.
 
 ### Tools
 
@@ -794,6 +904,9 @@ Target tools:
 | `resonate_item` | Forward or toggle a human-authorized resonance action. |
 | `steer` | Forward a natural-language steering instruction. |
 | `report_delivery` | Report that an item was externally surfaced or delivered. |
+| `get_processing_language` | Read the persisted runtime processing language. |
+| `set_processing_language` | Set the runtime processing language for future processing. |
+| `reprocess_library` | Explicitly reprocess existing library items in the current runtime language and rebuild FTS on successful completion. |
 
 Schema source of truth: `docs/ARCHITECTURE.md §7 MCP Surface` defines required fields, defaults, limits, and exact output schemas for all MCP resources and tools. Examples below are abridged.
 
@@ -875,11 +988,105 @@ Example tool calls and responses:
 }
 ```
 
+```json
+{
+  "tool": "search_items",
+  "arguments": {
+    "query": "sqlite",
+    "source": null,
+    "from": null,
+    "to": null,
+    "resonated": null,
+    "limit": 20
+  }
+}
+```
+
+```json
+{
+  "items": [],
+  "query": {
+    "q": "sqlite",
+    "source": null,
+    "from": null,
+    "to": null,
+    "resonated": null,
+    "limit": 20
+  }
+}
+```
+
+```json
+{
+  "tool": "get_processing_language",
+  "arguments": {}
+}
+```
+
+```json
+{
+  "language": {
+    "code": "en",
+    "label": "English"
+  },
+  "already_applied": false
+}
+```
+
+```json
+{
+  "tool": "set_processing_language",
+  "arguments": {
+    "language": "zh",
+    "actor_id": "briefing-agent",
+    "idempotency_key": "briefing-agent-language-zh-001"
+  }
+}
+```
+
+```json
+{
+  "language": {
+    "code": "zh",
+    "label": "中文"
+  },
+  "already_applied": false
+}
+```
+
+```json
+{
+  "tool": "reprocess_library",
+  "arguments": {
+    "actor_id": "briefing-agent",
+    "idempotency_key": "briefing-agent-reprocess-001"
+  }
+}
+```
+
+```json
+{
+  "reprocess": {
+    "status": "completed",
+    "language": "zh",
+    "items_attempted": 12,
+    "items_updated": 12,
+    "items_indexed": 12,
+    "items_unavailable": 0,
+    "items_failed": 0,
+    "fts_rebuilt": true,
+    "errors": []
+  },
+  "already_applied": false
+}
+```
+
 Agent rules:
 
 - silent candidate evaluation must not mark an item inspected;
 - delivered/surfaced items should be reported so ResoFeed avoids duplicate resurfacing;
 - repeated requests with the same idempotency key should not duplicate mutation effects;
+- repeated requests with the same live idempotency key but different request fingerprints fail with `bad_request` / `request_fingerprint_mismatch` rather than overwriting the stored receipt result;
 - human corrections take precedence over agent-mediated signals.
 
 ## What ResoFeed Deliberately Does Not Do
@@ -929,6 +1136,7 @@ ResoFeed intentionally excludes:
 - Try exact words from the title/source/summary.
 - Filter by source or resonance status if available.
 - Remember that search is lexical/metadata based, not semantic chat.
+- Run `/doctor` and check whether it reports `search_fts: stale since ...`; if so, a reprocess run failed before the final FTS rebuild and search may reflect stale indexed rows until a later successful reprocess clears the marker.
 
 ### An external agent repeats an item
 
