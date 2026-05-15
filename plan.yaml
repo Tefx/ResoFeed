@@ -68836,3 +68836,11 @@ phases:
     are pinned with expected-red proof before implementation.
   depends_on:
   - ui-runtime-fresh-review-remediation
+- id: processing-language-storage-core
+  name: Processing Language Storage and Core Backend
+  status: locked
+  gate: Core backend gate blocks unless SQLite metadata/receipts, language state,
+    OpenRouter target-language input, reprocess semantics, and FTS/doctor behavior
+    are implemented and independently verified.
+  depends_on:
+  - processing-language-contract-tests
