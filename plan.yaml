@@ -80015,7 +80015,7 @@ phases:
       semantic retrieval, or new product primitive; search_items remains lexical.'
   - id: srdb-runtime-liveness-seam-proof
     name: Prove backend runtime liveness and seam behavior
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT TESTER (integration-verifier), run a local-check
       that protects the backend runtime gate and downstream frontend integration.
 
@@ -80093,6 +80093,8 @@ phases:
     - srdb-http-steer-preview-commit-undo
     - srdb-mcp-steer-parity
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T22:27:25.066075+00:00'
   - id: srdb-wiring-audit
     name: Audit backend public wiring and forbidden architecture drift
     status: pending
