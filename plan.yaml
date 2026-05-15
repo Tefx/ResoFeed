@@ -72663,7 +72663,7 @@ phases:
       affect required runtime liveness probes.'
   - id: plhm-runtime-wiring-audit
     name: Audit HTTP MCP runtime wiring completeness
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -72748,6 +72748,133 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-15T15:46:13.536257+00:00'
+    done_at: '2026-05-15T15:59:28.191922+00:00'
+    evidence: '## Wiring Audit Report
+
+      ### refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key passages cited: one Go binary, one SQLite
+      DB, thin HTTP/MCP transports, single owner token; `serve` starts HTTP/MCP/ingest;
+      direct calls only; no queues, ledgers, sync, DI, service/repository layers;
+      HTTP API and MCP surface must expose same runtime language behavior.
+
+      - `AGENTS.md`: NOT READ in isolated worktree; auditor reported no `AGENTS.md`
+      present via glob and used session-provided AGENTS instructions.
+
+      - `CONSTITUTION.md`: NOT READ: absent in isolated worktree.
+
+
+      Original auditor verdict: FAIL. This step is being completed as an issue-detection
+      report after planner-created remediation ownership. It is not a runtime gate-open
+      signal.
+
+
+      ## Wiring audit W1-W13 / Findings Summary
+
+      - W13 entry-to-effect trace: WIRED.
+
+      - W1 dead export scan: FAIL due stale `SearchItemsForMCP` helper.
+
+      - W2 schema field trace: PASS_WITH_DEBT.
+
+      - W3 CLI param E2E coverage: PASS.
+
+      - W4 CLI command registration: PASS.
+
+      - W5 contract strength scan: PASS/not applicable.
+
+      - W6 config field consumption: PASS.
+
+      - W7 escape hatch concentration: PASS.
+
+      - W8 dependency-import alignment: PASS.
+
+      - W8b undeclared imports: PASS.
+
+      - W9 transitive entrypoint reachability: PASS.
+
+      - W10 protocol shadow detection: PASS_WITH_DEBT.
+
+      - W11 type cast authenticity: PASS.
+
+      - W12 frontend route-render integrity: NOT_IN_SCOPE.
+
+
+      ## Blocking Finding
+
+      - Severity: BLOCKER
+
+      - Finding: Dead exported MCP search helper preserves stale no-query-echo response
+      shape.
+
+      - Evidence: `internal/resofeed/mcp.go:100-112` defines exported `SearchItemsForMCP`
+      returning `TodayFeedResponse`, dropping `SearchQueryEcho`. Grep for `SearchItemsForMCP(`
+      found only this definition. Runtime `search_items` correctly calls `SearchItemsResponseForMCP`
+      at `mcp.go:476`.
+
+      - Impact: stale exported production helper can be mistakenly wired later and
+      violate search query echo parity.
+
+      - Closure: remove `SearchItemsForMCP` or make it private only if a real runtime
+      caller needs it; verify grep for `SearchItemsForMCP(` has no stale no-echo path.
+
+
+      ## HTTP/MCP wiring evidence reported
+
+      - HTTP routes registered via `http.go:56-61`, owner-token protected via `apiHandler.ServeHTTP`
+      and auth gate.
+
+      - MCP registered at `/mcp`, owner-token protected before JSON-RPC dispatch.
+
+      - HTTP and MCP language/reprocess/delivery/search paths share core operations.
+
+      - Forbidden architecture concept scan found no new delivery registry, job queue,
+      activity ledger, sync/merge module, DI container, or service layer.
+
+
+      ## Behavioral Proof Register
+
+      - http_routes_registered_and_owner_token_protected: NEEDS_TEST with static evidence.
+
+      - mcp_resources_tools_registered_and_owner_token_protected: NEEDS_TEST with
+      static evidence.
+
+      - http_mcp_same_core_operations: NEEDS_TEST with static evidence.
+
+      - search_items_http_search_query_echo_parity: NEEDS_TEST with static evidence;
+      stale helper blocker remains.
+
+      - no_runtime_stub_placeholder_wired: UNPROVEN by static scan only.
+
+      - forbidden_architecture_concepts_absent: NEEDS_TEST with static evidence.
+
+
+      ## Remediation ownership created
+
+      Planner added:
+
+      - `plhm-runtime-blocker-remediation` — batched fix for stale helper and HTTP/MCP
+      conflict/error shape exactness.
+
+      - `plhm-runtime-blocker-retest` — independent retest proving helper safety/removal
+      and exact shapes.
+
+      - `plhm-runtime-gate` now depends on `plhm-runtime-blocker-retest`.
+
+
+      verdict: FAIL as report; remediation required before runtime gate.
+
+      blockers: stale `SearchItemsForMCP` no-query-echo helper now owned by `plhm-runtime-blocker-remediation`
+      and `plhm-runtime-blocker-retest`.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE before remediation; report completed
+      only as issue-detection artifact.
+
+      Commit hash(es): none by auditor; no file changes and no empty commit created.
+
+      Files changed: none.'
   - id: plhm-runtime-spec-conformance
     name: Verify HTTP MCP runtime spec conformance
     status: done
