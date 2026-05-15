@@ -73025,6 +73025,170 @@ phases:
     - plhm-runtime-spec-conformance
     - plhm-runtime-wiring-audit
     agent: golang-developer
+  - id: plhm-runtime-blocker-retest
+    name: Retest HTTP MCP runtime blocker remediation
+    status: pending
+    description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
+      verification_scope: phase-check\nprotects_gate: plhm-runtime-gate\nagent_source:\
+      \ project\n\nAs an INDEPENDENT VERIFIER, retest the batched remediation from\
+      \ `plhm-runtime-blocker-remediation` from a fresh perspective. Finding remaining\
+      \ blockers is a successful verification outcome; do not mark this retest green\
+      \ unless all checklist items below are proven.\n\nThis retest protects `plhm-runtime-gate`;\
+      \ the runtime gate must not open until this retest proves the HTTP/MCP runtime\
+      \ blockers are fixed without regressing previous green/liveness evidence.\n\n\
+      ## Required proof areas\n1. Full Go suite:\n   - run `go test ./...` and paste\
+      \ output.\n2. Field-exact HTTP conflict/error shapes:\n   - verify manual ingest/fetch/reprocess\
+      \ conflicts use HTTP `409`, code `conflict`, message `operation already running`,\
+      \ and details `{operation_running, operation, scope, retry_allowed}`.\n   -\
+      \ verify actual running operation/scope is surfaced for language/reprocess conflicts\
+      \ instead of stale hardcoded values.\n3. MCP JSON-RPC shape exactness:\n   -\
+      \ verify affected MCP errors use `error.data` containing only nested `error`\
+      \ data required by architecture examples.\n   - verify MCP conflict details\
+      \ include actual guard holder operation/scope.\n4. Stale search helper closure:\n\
+      \   - verify `SearchItemsForMCP` is removed, or if privatized/retained, has\
+      \ a real runtime caller and cannot return stale no-query-echo search responses.\n\
+      \   - verify live `search_items` still returns query echo via the runtime path.\n\
+      5. Regression preservation:\n   - previous HTTP/MCP green behavior remains green.\n\
+      \   - runnable `resofeed serve` HTTP/MCP liveness proof remains valid for the\
+      \ changed surfaces.\n\n## Behavioral Proof Register (required)\nFor each blocker-class\
+      \ obligation, record:\n- requirement_ref\n- behavior_claim\n- runtime_proof_expected\n\
+      - evidence_ref\n- status (`PROVEN`, `NEEDS_TEST`, `UNPROVEN`, or `BLOCK`)\n\
+      - closure_path\n- gate_decision_basis\n\n`plhm-runtime-gate` may open only when\
+      \ all blocker-class obligations here are `PROVEN` or explicitly non-intersecting.\n\
+      \n## Completion Criteria (checklist)\n- [ ] `go test ./...` passes with output\
+      \ included.\n- [ ] HTTP conflict/error details are field-exact and include actual\
+      \ operation/scope where required.\n- [ ] MCP JSON-RPC `error.data` shape matches\
+      \ architecture examples without extra top-level drift fields.\n- [ ] `SearchItemsForMCP`\
+      \ stale no-query-echo path is gone or provably private/safe with a real caller.\n\
+      - [ ] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
+      - [ ] Behavioral proof register supports an OPEN/BLOCK decision for `plhm-runtime-gate`."
+    verification: '- [ ] Full `go test ./...` passes and output is included.
+
+      - [ ] Field-exact HTTP conflict/error shapes are verified against the documented
+      `operation already running` response.
+
+      - [ ] MCP JSON-RPC `error.data` contains only the nested `error` object required
+      by architecture examples for the affected errors.
+
+      - [ ] Actual operation/scope propagation is verified for HTTP runtime conflicts
+      and MCP conflict mapping.
+
+      - [ ] `SearchItemsForMCP` stale no-query-echo path is removed or proven safe,
+      and live `search_items` query echo remains intact.
+
+      - [ ] Previous HTTP/MCP expected-red suites remain green and runnable HTTP/MCP
+      liveness remains valid.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: HTTP/MCP runtime blocker remediation retest
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - `docs/ARCHITECTURE.md` — key passage or "NOT READ: <reason>"
+
+      - `docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md` — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```text
+
+      <actual commands, including go test ./...>
+
+      ```
+
+      - Output summary:
+
+      ```text
+
+      <actual output excerpts>
+
+      ```
+
+
+      ### Field-Exact Shape Evidence
+
+      - HTTP conflict response sample/assertion:
+
+      ```json
+
+      <actual shape or test assertion output>
+
+      ```
+
+      - MCP error `data` sample/assertion:
+
+      ```json
+
+      <actual shape or test assertion output>
+
+      ```
+
+      - Actual operation/scope propagation proof:
+
+      ```text
+
+      <evidence>
+
+      ```
+
+
+      ### Stale Helper Evidence
+
+      - `SearchItemsForMCP(` search/import evidence:
+
+      ```text
+
+      <output>
+
+      ```
+
+      - Live `search_items` query echo proof:
+
+      ```json
+
+      <output>
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | <ref> | <claim> | <proof> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN/BLOCK
+      | <path> | <basis> |
+
+
+      ### Headline
+
+      - [ ] **PASS**: No blocking issues found and all blocker obligations are PROVEN.
+
+      - [ ] **FAIL**: Blocking issues or proof gaps remain.
+
+
+      **Confidence**: high/medium/low
+
+      '
+    depends_on:
+    - plhm-runtime-blocker-remediation
+    agent: integration-verifier
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
