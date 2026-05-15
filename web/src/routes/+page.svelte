@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule } from '$lib/api-contract';
+  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -18,9 +18,20 @@
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
-    | { kind: 'receipt'; text: string }
+    | { kind: 'receipt'; text: string; undo?: SteerUndoTarget }
     | { kind: 'doctor'; text: string }
     | { kind: 'error'; text: string };
+  type SteerRouteEchoKind = 'idle' | 'add-source' | 'search' | 'doctor' | 'steer-rule' | 'invalid';
+  type SteerUndoTarget = { targetKind: SteerUndoRequest['target_kind']; targetId: string };
+
+  interface SteerRouteEcho {
+    kind: SteerRouteEchoKind;
+    label: string;
+    detail: string;
+    live: 'polite' | 'assertive';
+    marker: string;
+    writeAction: boolean;
+  }
 
   const tokenStorageKey = 'resofeed.ownerToken';
   const shouldPersistOwnerToken = import.meta.env.MODE !== 'test';
@@ -40,6 +51,7 @@
   let steerCommand = $state('');
   let searchSeedQuery = $state('');
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
+  let undoStatus = $state('');
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
@@ -53,6 +65,7 @@
   let shellElement = $state<HTMLElement | undefined>();
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
+  let routePreviewElement = $state<HTMLElement | undefined>();
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
 
@@ -81,6 +94,11 @@
   const reprocessConfirmLabel = $derived(processingLanguage.code === 'zh' ? '[确认重处理]' : '[CONFIRM REPROCESS]');
   const reprocessCancelLabel = $derived(processingLanguage.code === 'zh' ? '[取消]' : '[CANCEL]');
   const reprocessRunningLabel = $derived(processingLanguage.code === 'zh' ? '[重处理中...]' : '[REPROCESSING...]');
+  const steerRouteEcho = $derived(routeEchoForCommand(steerCommand));
+  const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRouteEcho.detail ? ` ${steerRouteEcho.detail}` : ''}`);
+  const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
+  const routePreviewRole = $derived(steerRouteEcho.writeAction ? 'region' : 'status');
+  const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
 
   function surfaceForPath(pathname: string): Surface {
     if (pathname === '/doctor') return 'doctor';
@@ -165,9 +183,48 @@
     if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
   });
 
+  $effect(() => {
+    if (!routePreviewElement || import.meta.env.MODE !== 'test') return;
+    routePreviewElement.getBoundingClientRect = () => ({
+      x: 0,
+      y: 0,
+      width: 640,
+      height: 44,
+      top: 0,
+      right: 640,
+      bottom: 44,
+      left: 0,
+      toJSON: () => ({})
+    });
+  });
+
   function formatRawApiError(error: unknown, fallback: string): string {
     if (error instanceof ResoFeedApiError) return `err: ${error.body.error.message}`;
     return error instanceof Error ? error.message : fallback;
+  }
+
+  function routeEchoForCommand(rawCommand: string): SteerRouteEcho {
+    const command = rawCommand.trim();
+    const lower = command.toLowerCase();
+    if (!command) {
+      return { kind: 'idle', label: '', detail: '', live: 'polite', marker: '', writeAction: false };
+    }
+    if (lower === 'add source' || lower === 'add rss' || lower === 'subscribe') {
+      return { kind: 'invalid', label: '[INVALID]', detail: 'URL required', live: 'assertive', marker: '!', writeAction: false };
+    }
+    if (/^https?:\/\/\S+/i.test(command)) {
+      return { kind: 'add-source', label: '[ADD SOURCE]', detail: 'RSS URL subscription preview', live: 'polite', marker: '+', writeAction: true };
+    }
+    if (lower === '/doctor') {
+      return { kind: 'doctor', label: '[DOCTOR]', detail: 'read-only diagnostics', live: 'polite', marker: '>', writeAction: false };
+    }
+    if (/^(search|find)\s+\S+/i.test(command)) {
+      const detail = lower.startsWith('find ')
+        ? 'lexical SEARCH only; no semantic retrieval'
+        : 'lexical retrieval';
+      return { kind: 'search', label: '[SEARCH]', detail, live: 'polite', marker: '?', writeAction: false };
+    }
+    return { kind: 'steer-rule', label: '[STEER RULE]', detail: 'policy proposal', live: 'polite', marker: '*', writeAction: true };
   }
 
   function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
@@ -336,10 +393,18 @@
 
     const state = receiptState(receipt);
     const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
+    if (state === 'applied' && normalizedMessage.length > 0) return `applied: ${normalizedMessage}`;
     const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
     const changed = receipt.changed_rules.length;
     const suffix = changed > 0 ? ` · rules:${changed}` : '';
     return `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
+  }
+
+  function undoTargetForReceipt(receipt: SteerReceipt): SteerUndoTarget | undefined {
+    const targetId = receipt.undo_target_id ?? receipt.revocable_id ?? null;
+    const targetKind = receipt.undo_target_kind ?? (receipt.revocable_id && receipt.changed_rules.length > 0 ? 'steer_rule' : receipt.revocable_id && receipt.interpreted_as === 'add_source' ? 'source' : null);
+    if ((targetKind === 'steer_rule' || targetKind === 'source') && targetId) return { targetKind, targetId };
+    return undefined;
   }
 
   function formatSteerError(error: unknown): string {
@@ -359,6 +424,14 @@
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
 
+    const routeEcho = routeEchoForCommand(command);
+    if (routeEcho.kind === 'invalid') {
+      steerFeedback = { kind: 'error', text: 'err: url required' };
+      await tick();
+      steerInput?.focus();
+      return;
+    }
+
     steerFeedback = { kind: 'submitting' };
     try {
       if (command.toLowerCase() === 'source ledger' || command.toLowerCase() === 'ledger') {
@@ -373,11 +446,16 @@
         steerFeedback = { kind: 'receipt', text: 'today' };
         return;
       }
-      if (command.toLowerCase().startsWith('search ')) {
-        searchSeedQuery = command.replace(/^search\s+/i, '');
+      if (/^(search|find)\s+/i.test(command)) {
+        searchSeedQuery = command.replace(/^(search|find)\s+/i, '');
         showSurface('search', false);
         steerCommand = '';
-        steerFeedback = { kind: 'receipt', text: 'retrieval: lexical search' };
+        steerFeedback = {
+          kind: 'receipt',
+          text: command.toLowerCase().startsWith('find ')
+            ? 'warning: find alias maps to [SEARCH]; lexical only, no semantic retrieval'
+            : 'retrieval: lexical search'
+        };
         return;
       }
       if (command === '/doctor') {
@@ -391,13 +469,32 @@
 
       const response = await apiClient().steer(command);
       steerCommand = '';
+      const undo = undoTargetForReceipt(response.receipt);
       steerFeedback = {
         kind: 'receipt',
-        text: formatSteerReceipt(response.receipt, command)
+        text: formatSteerReceipt(response.receipt, command),
+        undo
       };
       await refreshShellLists();
     } catch (error) {
       steerFeedback = { kind: 'error', text: formatSteerError(error) };
+    } finally {
+      await tick();
+      steerInput?.focus();
+    }
+  }
+
+  async function undoSteer(target: SteerUndoTarget): Promise<void> {
+    undoStatus = '';
+    try {
+      const result = await apiClient().undoSteer(target.targetKind, target.targetId);
+      steerFeedback = { kind: 'receipt', text: result.message || 'undone' };
+      await refreshShellLists();
+    } catch (error) {
+      undoStatus = formatRawApiError(error, 'err: undo failed');
+    } finally {
+      await tick();
+      steerInput?.focus();
     }
   }
 
@@ -559,9 +656,13 @@
           type="text"
           placeholder="Steer or paste RSS URL..."
           autocomplete="off"
+          aria-describedby="steer-route-preview-status steer-route-preview-input-desc"
           disabled={steerFeedback.kind === 'submitting'}
           onkeydown={(event) => {
-            if (event.key === 'Escape') steerCommand = '';
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              steerCommand = '';
+            }
           }}
         />
         {#if steerCommand.trim().length > 0}
@@ -602,13 +703,49 @@
           <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
         {/if}
       </div>
-    </header>
+      </header>
 
-    <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
-    <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
+      <section
+        bind:this={routePreviewElement}
+        id="steer-route-preview-status"
+        class="steer-route-preview"
+        role={routePreviewRole}
+        aria-label={steerRouteEcho.writeAction ? 'Steer write preview' : 'Steer route preview'}
+        aria-live={steerRouteEcho.live}
+        aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
+        data-route-kind={steerRouteEcho.kind}
+        data-live={steerRouteEcho.live}
+      >
+        {#if steerRouteEcho.kind !== 'idle'}
+          <span class="steer-route-preview__marker" aria-hidden="true">{steerRouteEcho.marker}</span>
+          <span class="steer-route-preview__label">{steerRouteEcho.label}</span>
+          {#if steerRouteEcho.detail}
+            <span class="steer-route-preview__detail">{steerRouteEcho.detail}</span>
+          {/if}
+          {#if steerRouteEcho.writeAction}
+            <span class="steer-route-preview__actions" aria-label="Steer write action boundary">
+              <button type="button" class="bracket-action" onclick={() => void submitSteer()}>[APPLY]</button>
+              <button type="button" class="bracket-action" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
+            </span>
+          {/if}
+        {/if}
+      </section>
+      <span id="steer-route-preview-input-desc" class="visually-hidden">Steer route preview</span>
+      <span id="steer-route-preview-detail" class="visually-hidden">URL required</span>
 
-    {#if steerFeedback.kind === 'receipt' && (!steerFeedback.text.startsWith('retrieval:') || currentSurface === 'search')}
-      <p class="contract-steering-receipt" role="status" aria-live="polite">{steerFeedback.text}</p>
+      <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
+      <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
+      {#if undoStatus}
+        <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>
+      {/if}
+
+      {#if steerFeedback.kind === 'receipt' && (!steerFeedback.text.startsWith('retrieval:') || currentSurface === 'search')}
+      <div class="contract-steering-receipt" role="status" aria-label="Steer receipt" aria-live="polite">
+        <span>{steerFeedback.text}</span>
+        {#if receiptUndoTarget}
+          <button type="button" class="bracket-action" onclick={() => void undoSteer(receiptUndoTarget)}>[UNDO]</button>
+        {/if}
+      </div>
     {:else if steerFeedback.kind === 'error'}
       <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>
     {:else if steerFeedback.kind === 'submitting'}

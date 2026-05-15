@@ -310,10 +310,46 @@ export interface SteerReceipt {
   interpreted_as: string;
   changed_rules: SteerRule[];
   message: string;
+  revocable_id?: OpaqueId | null;
+  undo_target_kind?: 'steer_rule' | 'source' | null;
+  undo_target_id?: OpaqueId | null;
 }
 
 export interface SteerResponse {
   receipt: SteerReceipt;
+}
+
+export type SteerPreviewRouteKind = 'policy' | 'source' | 'search' | 'doctor' | 'invariant_conflict' | 'unknown';
+
+export interface SteerPreview {
+  route_kind: SteerPreviewRouteKind;
+  interpreted_as: string;
+  will_mutate: boolean;
+  changed_rules: SteerRule[];
+  message: string;
+}
+
+export interface SteerPreviewRequest {
+  command: string;
+  actor_kind: ActorKind;
+  actor_id: string;
+}
+
+export interface SteerPreviewResponse {
+  preview: SteerPreview;
+}
+
+export interface SteerUndoRequest extends InspectRequest {
+  target_kind: 'steer_rule' | 'source';
+  target_id: OpaqueId;
+}
+
+export interface SteerUndoResult {
+  target_kind: 'steer_rule' | 'source';
+  target_id: OpaqueId;
+  undone: boolean;
+  message: string;
+  already_applied: boolean;
 }
 
 export interface RulesResponse {

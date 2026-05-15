@@ -366,11 +366,57 @@ a:focus,
 }
 
 .contract-steering-receipt {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--rf-space-sm);
   margin: 0;
   padding: var(--rf-space-sm);
   color: var(--rf-color-muted);
   background: var(--rf-color-surface);
   font: var(--rf-typography-chrome);
+}
+
+.steer-route-preview {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--rf-space-sm);
+  margin: 0;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: 0 var(--rf-space-md);
+  color: var(--rf-color-muted);
+  background: var(--rf-color-background);
+  font: var(--rf-typography-chrome);
+}
+
+.steer-route-preview[data-route-kind='idle'] {
+  color: transparent;
+}
+
+.steer-route-preview__marker {
+  min-inline-size: 1ch;
+  color: var(--rf-color-text);
+}
+
+.steer-route-preview__label {
+  color: var(--rf-color-text);
+  letter-spacing: 0.08em;
+}
+
+.steer-route-preview__detail {
+  color: var(--rf-color-muted);
+}
+
+.steer-route-preview[data-route-kind='invalid'] .steer-route-preview__label,
+.steer-route-preview[data-route-kind='invalid'] .steer-route-preview__marker {
+  color: var(--rf-color-danger);
+}
+
+.steer-route-preview__actions {
+  display: inline-flex;
+  gap: var(--rf-space-xs);
+  margin-inline-start: auto;
 }
 
 .contract-token-form {

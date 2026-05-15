@@ -25,8 +25,12 @@ import type {
   SetProcessingLanguageRequest,
   SourcesResponse,
   StateBundleV1,
+  SteerPreviewRequest,
+  SteerPreviewResponse,
   SteerRequest,
-  SteerResponse
+  SteerResponse,
+  SteerUndoRequest,
+  SteerUndoResult
 } from '$lib/api-contract';
 import { processingLanguageRuntimeContract } from '$lib/api-contract';
 
@@ -210,6 +214,36 @@ export class ResoFeedApiClient {
         idempotency_key: request?.idempotency_key ?? mutationKey('steer', 'owner'),
         command
       } satisfies SteerRequest)
+    });
+  }
+
+  async previewSteer(command: string, request?: Partial<Omit<SteerPreviewRequest, 'command'>>): Promise<SteerPreviewResponse> {
+    return this.request<SteerPreviewResponse>('/api/steer/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actor_kind: request?.actor_kind ?? 'human',
+        actor_id: request?.actor_id ?? 'owner',
+        command
+      } satisfies SteerPreviewRequest)
+    });
+  }
+
+  async undoSteer(
+    targetKind: SteerUndoRequest['target_kind'],
+    targetId: string,
+    request?: Partial<Omit<SteerUndoRequest, 'target_kind' | 'target_id'>>
+  ): Promise<SteerUndoResult> {
+    return this.request<SteerUndoResult>('/api/steer/undo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actor_kind: request?.actor_kind ?? 'human',
+        actor_id: request?.actor_id ?? 'owner',
+        idempotency_key: request?.idempotency_key ?? mutationKey('steer-undo', targetId),
+        target_kind: targetKind,
+        target_id: targetId
+      } satisfies SteerUndoRequest)
     });
   }
 
