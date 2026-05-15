@@ -73134,7 +73134,7 @@ phases:
     agent: gate-reviewer
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\npriority: HIGH\n\
       work_type: defect_repair\n\nFix ALL blocker findings from `plhm-runtime-spec-conformance`\
       \ and `plhm-runtime-wiring-audit` in one batched remediation. Do not split this\
@@ -73261,6 +73261,8 @@ phases:
     - plhm-runtime-spec-conformance
     - plhm-runtime-wiring-audit
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T16:00:03.991299+00:00'
   - id: plhm-runtime-blocker-retest
     name: Retest HTTP MCP runtime blocker remediation
     status: pending
