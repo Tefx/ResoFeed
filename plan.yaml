@@ -69659,6 +69659,83 @@ phases:
     - plsc-processing-language-ingest
     - plsc-reprocess-fts-doctor
     agent: wiring-auditor
+  - id: plsc-core-spec-conformance
+    name: Verify backend core spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Spec conformance verification via adversarial divergence hunting. This is NOT
+      only "tests pass"; it verifies backend core implementation matches docs/ARCHITECTURE.md
+      for runtime metadata, receipts, language storage, OpenRouter target-language
+      input, reprocess accounting, FTS/search, and doctor stale diagnostics.
+
+
+      Scope declaration: phase-check protecting backend core gate and downstream runtime/API
+      gates.
+
+
+      FOCUS AREAS:
+
+      - [ ] naming and exact enum values (`en`, `zh`, statuses, error codes).
+
+      - [ ] boundary values and TTL/time formats (24h receipts, RFC3339 UTC stale
+      marker).
+
+      - [ ] omission drift for required metadata/state exclusion/reprocess fields.
+
+      - [ ] contract surface drift around `core_insight`, `value_tier`, and source
+      precedence.'
+    verification: '- [ ] Evidence table maps each backend requirement to implementation
+      file:line and verdict.
+
+      - [ ] DIVERGES/PARTIAL/NEEDS_TEST items have explicit closure paths.
+
+      - [ ] No blocker-class backend spec drift proceeds to runtime integration.'
+    evidence_template: '## Spec Conformance Report
+
+      **Phase**: processing-language-storage-core
+
+      **Spec source**: docs/ARCHITECTURE.md
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+
+      ## Coverage Summary
+
+      - Total requirements:
+
+      - Top risks:
+
+      - Suggested tests:'
+    depends_on:
+    - plsc-runtime-metadata-receipts
+    - plsc-processing-language-ingest
+    - plsc-reprocess-fts-doctor
+    agent: spec-verifier
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
