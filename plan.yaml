@@ -69091,7 +69091,7 @@ phases:
       - [x] Frontend API type contract includes language/reprocess and source-identifier
       non-translation obligations.
 
-      - [ ] Forbidden architecture concepts remain explicitly out of scope.'
+      - [x] Forbidden architecture concepts remain explicitly out of scope.'
     verification: '- [ ] Contract step remains acceptance-only with no product behavior
       implementation.
 
