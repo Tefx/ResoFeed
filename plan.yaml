@@ -66921,7 +66921,7 @@ phases:
 
       - [x] Green retest evidence covers every fresh audit finding.
 
-      - [ ] UIUX multimodal audit evidence covers desktop and mobile rendered states
+      - [x] UIUX multimodal audit evidence covers desktop and mobile rendered states
       and is reconciled with the later black-box failure.
 
       - [ ] Post-fix UIUX rerun evidence includes a rendered 390x844 mobile artifact,
