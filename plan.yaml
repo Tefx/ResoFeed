@@ -64254,7 +64254,7 @@ phases:
     agent: integration-verifier
   - id: urda-final-spec-boundary-blockers-uiux-audit
     name: UIUX audit final spec boundary blocker visual closures
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -64354,3 +64354,55 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T03:52:48.873329+00:00'
+    done_at: '2026-05-15T05:00:33.621091+00:00'
+    evidence: "## UIUX Audit Report\n\n### refs Read Confirmation (MANDATORY)\n- docs/DESIGN.md\
+      \ — Verified bracket-action contract: transparent enlarged hitbox at rest and\
+      \ stark color inversion/hard highlight on hover/focus.\n- docs/ARCHITECTURE.md\
+      \ — Verified frontend boundary constraints and state-portability scope.\n- web/src/routes/components/SourceLedger.svelte\
+      \ — Verified `[DELETE]` and `[CONFIRM]` button text implementation uses canonical\
+      \ bracket actions without extra wrappers.\n- web/src/routes/components/StatePortability.svelte\
+      \ — Verified active text literals: `[EXPORTING STATE...]` and `[IMPORTING STATE...]`.\n\
+      - web/src/app.css — Verified `.bracket-action:hover:not(:disabled)` and focus-visible\
+      \ inversion behavior.\n- web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ — Verified spatial layout checks including `Issue 13: delete confirmation\
+      \ preserves Source Ledger row bounds`.\n\n### Rendered Evidence\n- Source Ledger\
+      \ `[DELETE]` default/hover/focus: verified by E2E test `R6: delete and confirm\
+      \ are canonical bracket actions with terminal hover/focus inversion`, which\
+      \ invokes hover/focus and asserts CSS background/text inversion.\n- Source Ledger\
+      \ `[CONFIRM]` default/hover/focus: verified by same E2E test; `[CONFIRM]` appears,\
+      \ focuses, and inverts properly.\n- Delete confirmation bounding boxes:\n  ```\n\
+      \  before: captured via row.boundingBox() by E2E test\n  after: captured via\
+      \ row.boundingBox() after confirmation state\n  delta: dx=0, dy=0, dw=0, dh=0\
+      \ (strict equality assertion passed)\n  ```\n- State Portability active-label\
+      \ evidence:\n  ```\n  export label: [EXPORTING STATE...]\n  import label: [IMPORTING\
+      \ STATE...]\n  ```\n\n### Forbidden Concept Scan\n- Forbidden UI/product concepts\
+      \ checked: accounts, onboarding wizards, friendly SaaS copy, settings sliders,\
+      \ folders, tags, unread/archive flows, drag-and-drop ordering, vector/RAG surfaces,\
+      \ sync/merge UI, sidecar/worker/admin-process UI, multi-user auth.\n- Result:\
+      \ CLEAN. No forbidden concepts found in the remediated files.\n\n### Behavioral\
+      \ Proof Register\n- requirement_ref: R6\n  behavior_claim: `[DELETE]` and `[CONFIRM]`\
+      \ labels have canonical bracket-action visual and semantic behavior, including\
+      \ hover/focus inversion.\n  runtime_proof_expected: yes\n  evidence_ref: `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\
+      \ (R6 test) and `web/src/app.css`\n  status: PROVEN\n  closure_path: none\n\
+      \  gate_decision_basis: E2E passing CSS state checks.\n- requirement_ref: R7\n\
+      \  behavior_claim: Delete confirmation produces no Source Ledger row layout\
+      \ shift.\n  runtime_proof_expected: yes\n  evidence_ref: `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\
+      \ (Issue 13 test)\n  status: PROVEN\n  closure_path: none\n  gate_decision_basis:\
+      \ E2E strictly asserts `boundingBox().toEqual(before)` on the row after confirmation\
+      \ button trigger.\n- requirement_ref: R18\n  behavior_claim: State Portability\
+      \ active labels render exactly `[EXPORTING STATE...]` and `[IMPORTING STATE...]`.\n\
+      \  runtime_proof_expected: yes\n  evidence_ref: `web/src/routes/components/StatePortability.svelte`\n\
+      \  status: PROVEN\n  closure_path: none\n  gate_decision_basis: component string\
+      \ literals exactly match expected states.\n\n### Gate Decision\n- headline:\
+      \ PASS\n- proof_gap_status: NONE\n- blocking_status: CLOSED\n- verdict: PASS\n\
+      - blockers: []\n- gate_open_allowed: true\n- orchestrator_action_hint: COMPLETE\n\
+      \n### Commit hash(es)\n- none (verify-only, no changes)\n\n### Files changed\n\
+      - none\n\n### Verification\n- UIUX auditor reported E2E `source-ledger-controls-diagnostics-layout.expected-red.spec.ts`\
+      \ passed 6/6 for R6/R7/R18 dynamic behaviors.\n- Source/component/CSS inspections\
+      \ mapped strict implementation to `docs/DESIGN.md` guidelines.\n- Orchestrator\
+      \ already ran mainline Playwright after the fix merge: `npx playwright test\
+      \ --config ./playwright.config.ts source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` — PASS; 6 passed including R6 inversion and R7\
+      \ bounding-box regression.\n- Worktree generated tracked `.test-artifacts` were\
+      \ restored; only untracked test artifacts remained and will be discarded with\
+      \ worktree cleanup.\n\n### Gaps/Notes\n- none"
