@@ -79130,7 +79130,7 @@ phases:
       - [x] Tests prove MCP preview_steer, steer, and undo_steer parity with HTTP
       without agent-only concepts.
 
-      - [ ] Tests prove PRD AC-4 conflicts return closest allowable interpretation
+      - [x] Tests prove PRD AC-4 conflicts return closest allowable interpretation
       with terse explanation while preserving freshness, coverage/source diversity,
       provenance transparency, and minimalism.
 
