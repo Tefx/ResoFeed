@@ -72340,7 +72340,7 @@ phases:
       - [x] start `resofeed serve` with test SQLite DB and owner token/OpenRouter
       secret handling that redacts secrets.
 
-      - [ ] call `GET /api/runtime/language` and one strict-validation failure over
+      - [x] call `GET /api/runtime/language` and one strict-validation failure over
       HTTP.
 
       - [ ] call MCP `get_processing_language` or resource `resofeed://runtime/language`
