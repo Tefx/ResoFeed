@@ -70362,7 +70362,7 @@ phases:
 
       REQUIRED CHECKS:
 
-      - [ ] Every new shared type/function has at least one runtime consumer outside
+      - [x] Every new shared type/function has at least one runtime consumer outside
       its own helper cluster.
 
       - [x] Runtime metadata keys are read/written only through approved runtime paths.
