@@ -75094,7 +75094,7 @@ phases:
   steps:
   - id: plse-real-language-reprocess-vertical-slice
     name: Run real language and reprocess vertical slice
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -75179,6 +75179,100 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T17:45:47.992272+00:00'
+    done_at: '2026-05-15T17:52:00.979915+00:00'
+    evidence: "## Vertical Slice Evidence\n\n### refs Read Confirmation\n- docs/ARCHITECTURE.md\
+      \ — one binary `resofeed serve`; `/api/*` requires owner token; processing language\
+      \ persists in `runtime_metadata`; explicit reprocess rewrites stored readable\
+      \ item fields and rebuilds FTS while preserving source identifiers.\n- docs/DESIGN.md\
+      \ — browser not used; relevant passage says processing language is global operational\
+      \ state and may appear in low-chrome app chrome or `/doctor`-class utility surface,\
+      \ not a settings dashboard.\n\n## Closure Signals\nheadline: PASS\nverdict:\
+      \ PASS\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nblockers: []\nproduct_implementation_files_modified:\
+      \ false\n\n**Entry point**: HTTP/API\n**Command executed**:\n```bash\nmkdir\
+      \ -p artifacts/plse-vertical-slice/run-1778867312\ngo build -o bin/resofeed\
+      \ ./cmd/resofeed\nOPENROUTER_KEY=test-openrouter-key-vertical-slice ./bin/resofeed\
+      \ serve --addr 127.0.0.1:18081 --db artifacts/plse-vertical-slice/run-1778867312/slice.sqlite3\
+      \ --owner-token owner-token-vertical-slice-1234567890\npython3 <seed sqlite\
+      \ source/item/search_fts fixture>\ncurl http://127.0.0.1:18081/api/runtime/language\n\
+      curl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" http://127.0.0.1:18081/api/runtime/language\n\
+      curl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" \"http://127.0.0.1:18081/api/search?q=alpha-before-token&limit=5\"\
+      \ncurl -X PUT -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\"\
+      \ -H \"Content-Type: application/json\" --data '{\"language\":\"zh\",\"actor_kind\"\
+      :\"human\",\"actor_id\":\"owner\",\"idempotency_key\":\"lang-slice-001\"}' http://127.0.0.1:18081/api/runtime/language\n\
+      curl -X POST -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\"\
+      \ -H \"Content-Type: application/json\" --data '{\"actor_kind\":\"human\",\"\
+      actor_id\":\"owner\",\"idempotency_key\":\"reprocess-slice-001\"}' http://127.0.0.1:18081/api/runtime/reprocess-library\n\
+      curl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" http://127.0.0.1:18081/api/items/item-alpha-001\n\
+      curl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" \"http://127.0.0.1:18081/api/search?q=alpha-before-token&limit=5\"\
+      \ncurl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" --get\
+      \ --data-urlencode \"q=Exact Source Ω\" --data-urlencode \"limit=5\" http://127.0.0.1:18081/api/search\n\
+      curl -H \"Authorization: Bearer owner-token-vertical-slice-1234567890\" http://127.0.0.1:18081/api/doctor\n\
+      ```\n**Layers traversed**: HTTP -> owner-token auth -> route handlers -> runtime\
+      \ language/reprocess/search/doctor core -> SQLite runtime_metadata/items/search_fts\
+      \ -> JSON/text output\n\n**Observable output**:\n```text\nINITIAL_UNAUTH_DOCTOR_HTTP=401\n\
+      FINAL_UNAUTH_DOCTOR_HTTP=401\n\nHTTP/1.1 401 Unauthorized\n{\"error\":{\"code\"\
+      :\"unauthorized\",\"message\":\"owner token required\",\"details\":{}}}\n\n\
+      {\"language\":{\"code\":\"en\",\"label\":\"English\"},\"already_applied\":false}\n\
+      \n{\"items\":[{\"id\":\"item-alpha-001\",\"source_id\":\"source-exact-001\"\
+      ,\"source_title\":\"Exact Source Ω\",\"url\":\"urn:resofeed:item-alpha\",\"\
+      title\":\"Alpha Before\",\"summary\":\"alpha-before-token summary\",...}],\"\
+      query\":{\"q\":\"alpha-before-token\",...}}\n\n{\"language\":{\"code\":\"zh\"\
+      ,\"label\":\"中文\"},\"already_applied\":false}\n\n{\"reprocess\":{\"status\"\
+      :\"completed_with_errors\",\"language\":\"zh\",\"items_attempted\":1,\"items_updated\"\
+      :0,\"items_indexed\":1,\"items_unavailable\":1,\"items_failed\":0,\"fts_rebuilt\"\
+      :true,\"errors\":[{\"item_id\":\"item-alpha-001\",\"code\":\"original_unavailable\"\
+      ,\"message\":\"original unavailable\"}]},\"already_applied\":false}\n\n{\"item\"\
+      :{\"id\":\"item-alpha-001\",\"source_id\":\"source-exact-001\",\"source_title\"\
+      :\"Exact Source Ω\",\"url\":\"urn:resofeed:item-alpha\",\"title\":\"urn:resofeed:item-alpha\"\
+      ,\"summary\":null,\"feed_excerpt\":null,\"extracted_text\":null,\"provenance\"\
+      :{\"source_url\":\"https://feeds.example.test/rss.xml\",\"original_url\":\"\
+      urn:resofeed:item-alpha\",...}}}\n\n{\"items\":[],\"query\":{\"q\":\"alpha-before-token\"\
+      ,...}}\n\n{\"items\":[{\"id\":\"item-alpha-001\",\"source_id\":\"source-exact-001\"\
+      ,\"source_title\":\"Exact Source Ω\",\"url\":\"urn:resofeed:item-alpha\",\"\
+      title\":\"urn:resofeed:item-alpha\",...}],\"query\":{\"q\":\"Exact Source Ω\"\
+      ,...}}\n\ndoctor:\nsearch_fts: ok\nopenrouter: item=item-alpha-001 source=source-exact-001\
+      \ status=summary_unavailable title=urn:resofeed:item-alpha\nextraction: item=item-alpha-001\
+      \ source=source-exact-001 status=original_unavailable title=urn:resofeed:item-alpha\n\
+      \nsqlite verification:\n{\"item_id\":\"item-alpha-001\",\"title\":\"urn:resofeed:item-alpha\"\
+      ,\"summary\":null,\"feed_excerpt\":null,\"extracted_text\":null,\"extraction_status\"\
+      :\"original_unavailable\",\"model_status\":\"summary_unavailable\",\"source_id\"\
+      :\"source-exact-001\",\"source_title\":\"Exact Source Ω\",\"source_url\":\"\
+      https://feeds.example.test/rss.xml\",\"fts_rows\":1,\"processing_language\"\
+      :\"zh\"}\n```\n**Rendered artifacts**: not used; browser path was not selected.\n\
+      **Stubs used**: NONE. Controlled fixture data was seeded into the real SQLite\
+      \ DB; runtime exercised real HTTP handlers, auth, core functions, DB mutations,\
+      \ FTS rebuild, search, and doctor.\n\n## behavioral_proof_register\n- obligation:\
+      \ Build and launch real resofeed serve with test DB\n  status: PROVEN\n  evidence:\
+      \ `go build -o bin/resofeed ./cmd/resofeed` exited 0; `resofeed serve` returned\
+      \ live unauthenticated `/api/doctor` HTTP 401.\n  uncertainty: NONE\n- obligation:\
+      \ Authenticate with owner token\n  status: PROVEN\n  evidence: unauthenticated\
+      \ `/api/runtime/language` returned 401; same surface with Authorization bearer\
+      \ returned language JSON.\n  uncertainty: NONE\n- obligation: Read language,\
+      \ set language, trigger reprocess, observe counts\n  status: PROVEN\n  evidence:\
+      \ GET language returned `en`; PUT language returned `zh`; POST reprocess returned\
+      \ `language:\"zh\"`, `items_attempted:1`, `items_indexed:1`, `items_unavailable:1`,\
+      \ `fts_rebuilt:true`.\n  uncertainty: NONE\n- obligation: Query search and doctor\
+      \ after reprocess\n  status: PROVEN\n  evidence: old token search returned `items:[]`;\
+      \ exact source search returned `item-alpha-001`; doctor returned `search_fts:\
+      \ ok` and item diagnostics.\n  uncertainty: NONE\n- obligation: Source identifiers\
+      \ remain exact\n  status: PROVEN\n  evidence: output preserved `source_id:\"\
+      source-exact-001\"`, `source_title:\"Exact Source Ω\"`, `source_url:\"https://feeds.example.test/rss.xml\"\
+      `, `original_url:\"urn:resofeed:item-alpha\"`.\n  uncertainty: NONE\n- obligation:\
+      \ No stubs/mocks/placeholders at layer boundaries\n  status: PROVEN\n  evidence:\
+      \ real binary, HTTP server, SQLite file, runtime handlers, reprocess core, FTS,\
+      \ search, and doctor were used. No test doubles or mocked route/core/DB seams\
+      \ were used.\n  uncertainty: OpenRouter live summarization was not claimed;\
+      \ fixture intentionally exercised the original-unavailable reprocess branch.\n\
+      \n## Checklist Closure\n- Description checklist items toggled by integration\
+      \ verifier.\n- Verification checklist items marked `[x]` by orchestrator after\
+      \ validating evidence.\n\n## Files changed\nnone\n\n## Commit hash(es)\nnone\
+      \ (verify-only; no retained changes)\n\n## Verification\n- `go build -o bin/resofeed\
+      \ ./cmd/resofeed` — exit 0.\n- HTTP vertical slice script — exit 0.\n- `git\
+      \ status --short --branch` after cleanup — clean on `vectl/step-plse-real-language-reprocess-vertical-slice`.\n\
+      - Temporary artifact paths during run: `artifacts/plse-vertical-slice/run-1778867312/final-serve.stdout.log`,\
+      \ `artifacts/plse-vertical-slice/run-1778867312/final-serve.stderr.log`; removed\
+      \ during cleanup to leave no retained worktree changes.\n\n## Gaps/Notes\nnone"
   - id: plse-blind-http-mcp-parity-delivery
     name: Blind test HTTP MCP parity and delivery endpoint
     status: pending
