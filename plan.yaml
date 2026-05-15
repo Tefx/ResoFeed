@@ -69223,7 +69223,7 @@ phases:
 
       - [x] Modified files are limited to tests, fixtures, and minimal test helpers.
 
-      - [ ] Tests cover unknown JSON body field rejection for new mutating endpoints.
+      - [x] Tests cover unknown JSON body field rejection for new mutating endpoints.
 
       - [ ] Tests cover live receipt replay, mismatch, TTL expiration, and expired-row
       replacement.
