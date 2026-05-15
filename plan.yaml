@@ -75297,7 +75297,7 @@ phases:
       - [x] HTTP `POST /api/runtime/reprocess-library` and MCP `reprocess_library`
       produce equivalent result shape/semantics.
 
-      - [ ] HTTP search and MCP `search_items` include equivalent `query` echo.
+      - [x] HTTP search and MCP `search_items` include equivalent `query` echo.
 
       - [ ] HTTP delivery and MCP `report_delivery` update the same item state and
       replay/mismatch semantics.
