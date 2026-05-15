@@ -78906,7 +78906,7 @@ phases:
       - [ ] Pin route preview states including idle reserved-but-blank preview, no
       visible [IDLE] chip, no duplicate hint, aria-describedby, and live-region levels.
 
-      - [ ] Pin Source Ledger action labels [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      - [x] Pin Source Ledger action labels [RUN INGEST], [FETCH], [DETAILS], [DELETE],
       OPML/state actions, details disclosure semantics, and 44px hit-target fixture
       expectations.
 
