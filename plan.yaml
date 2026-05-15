@@ -77947,6 +77947,97 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: srdct-backend-expected-red-tests
+    name: Add backend expected-red Steer HTTP MCP and policy tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add backend expected-red tests only. Product implementation code is out of scope
+      for this step.
+
+
+      Target paths:
+
+      - internal/resofeed/*steer*_expected_red_test.go or adjacent Go tests
+
+      - internal/resofeed/http_impl_test.go only for test additions
+
+      - internal/resofeed/mcp_expected_red_test.go only for test additions
+
+
+      Acceptance checklist:
+
+      - [ ] Tests prove POST /api/steer/preview is authenticated, strict-schema, read-only,
+      rejects idempotency_key, and does not write sources, steer_rules, item_state,
+      agent_receipts, or FTS.
+
+      - [ ] Tests prove route precedence for /doctor, direct URL, /add/add/添加, /search/search/搜索/查,
+      warning-only find alias, invalid vague add, and unmatched STEER RULE proposal.
+
+      - [ ] Tests prove POST /api/steer reruns classification, requires idempotency_key,
+      exposes undo only for revocable source/rule writes, and preserves request-fingerprint
+      idempotency.
+
+      - [ ] Tests prove POST /api/steer/undo is target-specific, idempotent for already
+      inactive targets, and never behaves as last-action/global undo.
+
+      - [ ] Tests prove MCP preview_steer, steer, and undo_steer parity with HTTP
+      without agent-only concepts.
+
+      - [ ] Tests prove PRD AC-4 conflicts return closest allowable interpretation
+      with terse explanation while preserving freshness, coverage/source diversity,
+      provenance transparency, and minimalism.
+
+      - [ ] Tests prove lexical search/no vector/no embedding/no RAG/no generated
+      answer boundaries including find alias warning copy.
+
+      - [ ] Modified files are limited to tests and fixtures; red is expected until
+      downstream implementation completes.'
+    verification: '- [ ] Expected-red test run exposes the documented backend/API/MCP
+      gaps before implementation.
+
+      - [ ] Test scope is limited to tests/fixtures; no product runtime logic changed.
+
+      - [ ] Evidence lists expected_failures or exposed_gaps and names downstream
+      owner srdb-classifier-policy-runtime and srdb-http-steer-preview-commit-undo.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/updated:
+
+      - Command executed:
+
+      ```
+
+      <actual go test command>
+
+      ```
+
+      - Expected failures/exposed gaps:
+
+      - Product files untouched except tests/fixtures confirmation:
+
+      - Downstream implementation owners:
+
+      '
+    depends_on:
+    - srdct-backend-contract-lock
+    agent: golang-developer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
