@@ -78295,20 +78295,20 @@ phases:
       - [x] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
 
       - [x] No settings/onboarding/SaaS/product-boundary drift is introduced.'
-    verification: '- [ ] Exact failing command is rerun locally by the implementer
+    verification: '- [x] Exact failing command is rerun locally by the implementer
       before handoff: `npm --prefix web run test:e2e -- --project=chromium-ci-safe
       web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.
 
-      - [ ] Evidence includes a seven-test closure matrix with PASS/FAIL for each
+      - [x] Evidence includes a seven-test closure matrix with PASS/FAIL for each
       named blocker.
 
-      - [ ] Evidence includes rendered DOM/screenshots or Playwright artifacts for
+      - [x] Evidence includes rendered DOM/screenshots or Playwright artifacts for
       desktop and mobile states changed by the remediation.
 
-      - [ ] Evidence includes proof that no settings/onboarding/SaaS/product-boundary
+      - [x] Evidence includes proof that no settings/onboarding/SaaS/product-boundary
       drift was introduced.
 
-      - [ ] Evidence names any residual UI blocker explicitly; no vague `tests pass`
+      - [x] Evidence names any residual UI blocker explicitly; no vague `tests pass`
       summary is sufficient.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
