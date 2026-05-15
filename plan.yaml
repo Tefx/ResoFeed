@@ -80529,7 +80529,7 @@ phases:
       - [x] Remove ErrSteerContractOnly if unused, or justify it with runtime reachability
       proof; no dead exported production stub may remain.
 
-      - [ ] Provide static reachability evidence for the stub/export cleanup.
+      - [x] Provide static reachability evidence for the stub/export cleanup.
 
       - [ ] Provide targeted command/test evidence for the steering precedence and
       response-shape regressions.
