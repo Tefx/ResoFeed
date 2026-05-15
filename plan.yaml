@@ -80519,7 +80519,7 @@ phases:
       - [x] Add or update tests for conflicting agent-vs-human steering and non-conflicting
       delegated-agent steering.
 
-      - [ ] Resolve ARCH/source contract status for /api/steer/preview, /api/steer/undo,
+      - [x] Resolve ARCH/source contract status for /api/steer/preview, /api/steer/undo,
       preview_steer, and undo_steer; public runtime surfaces are either documented
       or removed from the contract surface.
 
