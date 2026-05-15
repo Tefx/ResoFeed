@@ -72353,7 +72353,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Entry point starts and stays alive long enough for probes.
+      - [x] Entry point starts and stays alive long enough for probes.
 
       - [ ] At least one HTTP operation reaches the real route.
 
