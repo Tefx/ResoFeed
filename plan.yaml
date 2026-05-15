@@ -71745,17 +71745,17 @@ phases:
 
       - [x] Storage-core downstream-owned HTTP blockers are all closed or converted
       into explicit runtime gate blockers with evidence.'
-    verification: '- [ ] Targeted HTTP contract tests pass for success, validation
+    verification: '- [x] Targeted HTTP contract tests pass for success, validation
       errors, auth, replay, mismatch, TTL/crash-loss semantics, delivery, doctor stale
       lines, and conflict.
 
-      - [ ] Real handler/route tests exercise full HTTP request/response path for
+      - [x] Real handler/route tests exercise full HTTP request/response path for
       `/api/items/{id}/delivery`, runtime language, reprocess, search query echo,
       and doctor stale lines.
 
-      - [ ] No forbidden ledger/job/sync/delivery registry artifacts are introduced.
+      - [x] No forbidden ledger/job/sync/delivery registry artifacts are introduced.
 
-      - [ ] Evidence proves every storage-core downstream-owned HTTP blocker is now
+      - [x] Evidence proves every storage-core downstream-owned HTTP blocker is now
       implemented or remains explicitly blocking in the runtime phase.'
     evidence_template: '## Integration Evidence
 
