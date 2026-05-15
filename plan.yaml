@@ -76301,7 +76301,7 @@ phases:
       none'
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
-  status: in_progress
+  status: done
   gate: Finalization gate blocks unless docs are synchronized, full spec/design/wiring/deep-review
     audits are complete, the failed final gate UI blockers from plfinal-final-gate
     are remediated, and plfinal-ui-final-blocker-retest-gate proves all seven UI final
@@ -78437,7 +78437,7 @@ phases:
       and left untracked by the worker; no residual UI blocker known.'
   - id: plfinal-ui-final-blocker-retest-gate
     name: Final UI blocker retest gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       step_intent: retest_green
@@ -78692,9 +78692,112 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T20:51:01.850643+00:00'
+    done_at: '2026-05-15T20:59:13.662320+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): none — retest gate reported no file changes to merge; UI remediation
+      code was already merged in 9e22d58b.
+
+
+      Files changed: none by this retest gate.
+
+
+      Refs Read Confirmation:
+
+      - docs/DESIGN.md — uiux-auditor cited product copy rule and operational labels
+      (RESOFEED, TODAY, YESTERDAY, SOURCE LEDGER, INSPECTOR, /doctor, raw status strings).
+
+      - docs/ARCHITECTURE.md — uiux-auditor cited one deployable Go process serving
+      the static SvelteKit app.
+
+      - AGENTS.md — uiux-auditor cited one SQLite DB / FTS5 only and no vector/RAG
+      semantic search.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — uiux-auditor cited
+      the exposed gaps mapping including FR-01/FR-10.
+
+
+      Semantic closure:
+
+      - headline: PASS.
+
+      - proof_gap_status: NONE.
+
+      - blocking_status: CLOSED.
+
+      - verdict: PASS.
+
+      - blockers: [].
+
+      - gate_open_allowed: true.
+
+      - orchestrator_action_hint: COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Exact retest command:
+
+      - npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+      completed with 7 passed (6.6s), exit code 0.
+
+
+      Seven-test closure matrix:
+
+      - FR-01/FR-10: PASS — RESOFEED menu closed by default, keyboard reachable, toggles
+      TODAY/SOURCE LEDGER; artifact references fr-01-fr-10 surface menu JSON.
+
+      - FR-02: PASS — FeedTimeGroupReference relative check, labels contiguous (TODAY/YESTERDAY);
+      artifact references fr-02 time-label sequence JSON.
+
+      - FR-04: PASS — Inspector discloses grouped sources; artifact references fr-04
+      rendered inspector grouped sources JSON.
+
+      - B1: PASS — same-url grouped sources disclose in Inspector; artifact references
+      b1 mobile runtime same-url grouped sources JSON.
+
+      - FR-05/FR-07: PASS — Source Ledger fetch buttons have contextual aria labels;
+      artifact references fr-05/fr-07 ledger DOM JSON.
+
+      - FR-06: PASS — DETAILS controls do not inflate rows, collapsed heights measured
+      45px; artifact references fr-06 collapsed-details row heights JSON.
+
+      - FR-09: PASS — mobile contract-feed-meta nowrap/hidden/ellipsis and 16px height;
+      artifact references fr-09 mobile feed metadata style JSON.
+
+
+      Rendered/a11y artifact review:
+
+      - Playwright artifacts generated contextual names such as aria-label="Source
+      feed for Primary Wire" and accessible name "Grouped story with 2 source items".
+
+      - No desktop/mobile rendering regressions found.
+
+
+      Product-boundary drift scan:
+
+      - No settings/onboarding/SaaS drift found.
+
+      - Fix scope limited to processingLanguage API fallback/default to en and relative
+      feed-time calculation.
+
+
+      Mainline verification:
+
+      - Orchestrator had already run the exact failing command on main after merging
+      UI remediation: 7 passed (6.0s), plus npm --prefix web run build passed.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: No remaining UI-FINAL blocker known. This retest gate clears the
+      UI final blocker remediation path.'
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
-  status: locked
+  status: pending
   gate: Gate blocks unless Steer route/undo/API/MCP/UI delta contracts are pinned
     and expected-red tests expose current gaps without product implementation.
   depends_on:
