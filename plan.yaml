@@ -74006,7 +74006,7 @@ phases:
 
       ## Frontend Completion Criteria (rendering required)
 
-      - [ ] Visible DOM contains non-translated provenance anchors.
+      - [x] Visible DOM contains non-translated provenance anchors.
 
       - [ ] Browser/test-renderer proof shows split scroll behavior.
 
