@@ -74635,7 +74635,7 @@ phases:
 
       - [x] Audit returns parseable PASS/PASS_WITH_DEBT/FAIL handoff.
 
-      - [ ] PASS requires rendered visible controls, not only test summaries.
+      - [x] PASS requires rendered visible controls, not only test summaries.
 
       - [ ] Any UI/UX blocker has exact remediation ownership.'
     verification: '- [ ] Screenshots or equivalent rendered artifacts cover required
