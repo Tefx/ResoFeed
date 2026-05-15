@@ -76495,7 +76495,7 @@ phases:
     agent: spec-verifier
   - id: plfinal-design-readiness-review
     name: Run DESIGN and readiness review
-    status: pending
+    status: claimed
     description: 'step_type: deep_review
 
       agent_source: project
@@ -76553,6 +76553,8 @@ phases:
     depends_on:
     - plfinal-documentation-sync
     agent: design-reviewer
+    claimed_by: design-reviewer
+    claimed_at: '2026-05-15T19:01:23.326181+00:00'
   - id: plfinal-wiring-and-architecture-audit
     name: Run final wiring and architecture boundary audit
     status: pending
