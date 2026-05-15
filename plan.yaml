@@ -70658,6 +70658,12 @@ phases:
       through HTTP/MCP/runtime surfaces.
 
 
+      Scope declaration: phase-check gate for storage/core only. This gate MUST NOT
+      require downstream HTTP route registration, MCP tool/resource registration,
+      or frontend client/rendering consumption to already exist. Those are blocking
+      obligations in later phases and must be cited with their owning step if observed.
+
+
       Gate Preview (what this gate WILL reject):
 
       1. Missing receipt TTL/fingerprint proof or stale expired-row handling.
@@ -70669,48 +70675,78 @@ phases:
       4. Any introduction of jobs, queues, ledgers, sync/merge, vector/RAG, or layered
       repository/service architecture.
 
-      5. Stub-only implementations or unconsumed public symbols.
+      5. Stub-only backend-core implementations or backend-core public symbols with
+      neither core consumption nor downstream ownership.
+
+      6. Misclassifying missing HTTP/MCP/frontend runtime surfaces as `pre-existing`
+      or `out-of-scope` rather than downstream-owned blockers.
 
 
       ## Completion Criteria (checklist)
 
-      - [ ] Backend green retest passed.
+      - [ ] Backend-core green retest passed or only downstream-owned runtime/frontend
+      failures remain with explicit owner steps.
 
-      - [ ] Wiring audit has PASS or accepted non-blocking/non-intersecting debt only.
+      - [ ] Wiring audit has PASS or accepted non-blocking/non-intersecting debt only
+      for storage-core; downstream-owned runtime/frontend gaps are recorded with owner
+      steps.
 
-      - [ ] Spec conformance has no unresolved blocker-class divergence.
+      - [ ] Spec conformance has no unresolved backend-core blocker-class divergence.
 
       - [ ] Gate decision basis includes behavioral proof register for receipts, reprocess,
-      FTS, and language persistence.'
-    verification: '- [ ] All phase steps completed with adequate evidence.
+      FTS, and language persistence.
 
-      - [ ] Gate decision basis maps unresolved items to BLOCK or explicit non-intersection.
+      - [ ] Gate decision basis lists downstream HTTP/MCP/frontend blockers and confirms
+      they remain blocking before `plhm-runtime-gate` or `plfu-frontend-gate`.'
+    verification: '- [ ] All storage-core phase steps completed with adequate evidence.
 
-      - [ ] OPEN recommendation is allowed only if backend core obligations are PROVEN
-      or have accepted non-intersection evidence.'
+      - [ ] Gate decision basis maps unresolved items to BLOCK, downstream-owned blocker,
+      or explicit non-intersection.
+
+      - [ ] OPEN recommendation is allowed only if backend-core obligations are PROVEN
+      and downstream-owned runtime/frontend gaps are explicitly assigned to later
+      blocking steps/gates.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
-
 
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Gate Review Report
+      ## Storage-Core Gate Review Report
 
-      - Execution review:
 
-      - Issues identified:
+      **Backend-core proof register**:
 
-      - Behavioral proof register reviewed:
+      | Obligation | Evidence ref | Status | Gate decision basis |
 
-      - Gate Decision: OPEN | BLOCKED
+      |---|---|---|---|
 
-      - Required remediation if blocked:'
+      | <obligation> | <step/evidence> | PROVEN / BLOCK / NEEDS_TEST | <basis> |
+
+
+      **Downstream blocker register**:
+
+      | Downstream blocker | Owner step | Downstream gate | Why not storage-core blocker
+      |
+
+      |---|---|---|---|
+
+      | <blocker> | <step id> | <gate id> | <non-intersection evidence> |
+
+
+      ## Gate Decision
+
+      - [ ] OPEN: storage-core obligations are proven and downstream blockers remain
+      owned by later gates.
+
+      - [ ] BLOCKED: unresolved storage-core blocker remains.'
+    refs:
+    - docs/ARCHITECTURE.md
     depends_on:
     - plsc-backend-green-retest
     - plsc-core-wiring-audit
