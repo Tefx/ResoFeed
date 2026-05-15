@@ -69486,6 +69486,95 @@ phases:
     - plsc-runtime-metadata-receipts
     - plsc-processing-language-ingest
     agent: golang-developer
+  - id: plsc-backend-green-retest
+    name: Retest backend expected-red suite to green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an independent verifier, rerun the backend tests introduced in `plct-backend-expected-red-tests`
+      plus focused regressions for runtime metadata, receipt TTL/fingerprint semantics,
+      language ingest, reprocess accounting, FTS/search, doctor stale diagnostics,
+      and state export/import exclusion.
+
+
+      Scope declaration: phase-check protecting the backend-core gate and downstream
+      HTTP/MCP runtime gate.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Backend expected-red tests now pass green.
+
+      - [ ] Failure-path tests run for receipt mismatch/expiration and reprocess stale
+      FTS.
+
+      - [ ] Test output includes exact commands and actual output.
+
+      - [ ] Any broad failure has an explicit blocker/remediation path; no `pre-existing`
+      disposition.'
+    verification: '- [ ] `go test ./...` or narrower backend command family passes
+      for the implemented surfaces.
+
+      - [ ] Targeted backend contract tests pass green.
+
+      - [ ] Evidence covers both main path and highest-risk failure path for receipts
+      and reprocess/FTS.'
+    evidence_template: '## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: backend runtime metadata, receipts, language, reprocess, FTS, doctor
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <paste commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|'
+    depends_on:
+    - plsc-runtime-metadata-receipts
+    - plsc-processing-language-ingest
+    - plsc-reprocess-fts-doctor
+    agent: integration-verifier
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
