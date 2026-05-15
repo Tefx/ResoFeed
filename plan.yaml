@@ -78829,7 +78829,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Define or confirm SteerRouteKind, SteerPreview, SteeringReceipt, SteerUndoHandle,
+      - [x] Define or confirm SteerRouteKind, SteerPreview, SteeringReceipt, SteerUndoHandle,
       and SteerUndoResult shapes match docs exactly.
 
       - [ ] Pin classifier/preview/undo function signatures without adding completed
