@@ -83,6 +83,10 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		outcome, err := processReprocessItem(runCtx, item, llm, language)
 		if err != nil {
 			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+				outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out")
+				if storeErr := storeReprocessItem(context.WithoutCancel(ctx), db, item.id, outcome); storeErr != nil {
+					return ReprocessLibraryResponse{}, storeErr
+				}
 				result.ItemsFailed++
 				appendReprocessError(&result, &item.id, ReprocessErrorTimeout, "item processing timed out")
 				continue
@@ -241,6 +245,14 @@ func reprocessCandidateURLs(item reprocessItem) []string {
 	return candidates
 }
 
+func fallbackReprocessSourceURL(item reprocessItem) string {
+	candidates := reprocessCandidateURLs(item)
+	if len(candidates) > 0 {
+		return candidates[0]
+	}
+	return item.url
+}
+
 func isHTTPArticleURL(raw string) bool {
 	parsed, err := url.Parse(strings.TrimSpace(raw))
 	if err != nil || parsed.Host == "" {
@@ -303,8 +315,28 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 	if err != nil {
 		return fmt.Errorf("reprocess item %q: update: %w", itemID, err)
 	}
+	if err := refreshSearchIndexForItemTx(ctx, tx, itemID); err != nil {
+		return fmt.Errorf("reprocess item %q: refresh FTS: %w", itemID, err)
+	}
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("reprocess item %q: commit: %w", itemID, err)
+	}
+	return nil
+}
+
+func refreshSearchIndexForItemTx(ctx context.Context, tx *sql.Tx, itemID string) error {
+	if _, err := tx.ExecContext(ctx, `delete from search_fts where item_id = ?`, itemID); err != nil {
+		return fmt.Errorf("clear search index row: %w", err)
+	}
+	_, err := tx.ExecContext(ctx, `
+insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance)
+select i.id, i.title, coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.extracted_text, ''),
+       coalesce(i.source_url, s.url, '') || ' ' || coalesce(i.url, '') || ' ' || coalesce(i.canonical_url, '') || ' ' || coalesce(i.story_key, '') || ' ' || coalesce(i.duplicate_of_item_id, '') || ' ' || coalesce(i.value_tier, '')
+from items i
+left join sources s on s.id = i.source_id
+where i.id = ?`, itemID)
+	if err != nil {
+		return fmt.Errorf("populate search index row: %w", err)
 	}
 	return nil
 }

@@ -42,6 +42,7 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	seedReprocessItem(t, ctx, db, "item_fallback", "src_reprocess", server.URL+"/original-fallback", server.URL+"/canonical-miss")
 	seedReprocessItem(t, ctx, db, "item_unavailable", "src_reprocess", server.URL+"/unavailable", "")
 	seedReprocessItem(t, ctx, db, "item_failed", "src_reprocess", server.URL+"/failed", "")
+	assertReprocessIndexReady(t, ctx, db)
 
 	llm := &reprocessMatrixLLM{failURLSubstring: "/failed"}
 	resp, err := ReprocessLibrary(ctx, db, llm, ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "reprocess-matrix"}})
@@ -77,6 +78,8 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 	assertClearedReprocessFields(t, ctx, db, "item_unavailable", server.URL+"/unavailable", extractionStatusOriginalNA, modelStatusSummaryNA)
 	assertClearedReprocessFields(t, ctx, db, "item_failed", server.URL+"/failed", extractionStatusOriginalNA, modelStatusLatencyError)
+	assertNoStaleReadableFTS(t, ctx, db, "item_unavailable")
+	assertNoStaleReadableFTS(t, ctx, db, "item_failed")
 
 	var staleCount int
 	if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleCount); err != nil {
@@ -94,7 +97,7 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 }
 
-func TestReprocessLibraryTimeoutLeavesStaleMarker(t *testing.T) {
+func TestReprocessLibraryTimeoutClearsReadableFieldsAndItemFTS(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -105,6 +108,8 @@ func TestReprocessLibraryTimeoutLeavesStaleMarker(t *testing.T) {
 
 	seedSource(t, ctx, db, "src_reprocess_timeout", server.URL+"/feed.xml", "Timeout Source")
 	seedReprocessItem(t, ctx, db, "item_timeout", "src_reprocess_timeout", server.URL+"/slow", "")
+	assertReprocessIndexReady(t, ctx, db)
+	assertStaleReadableFTS(t, ctx, db, "item_timeout")
 	runCtx, cancel := context.WithTimeout(ctx, 20*time.Millisecond)
 	defer cancel()
 	resp, err := reprocessLibraryFresh(runCtx, db, &reprocessMatrixLLM{})
@@ -121,6 +126,35 @@ func TestReprocessLibraryTimeoutLeavesStaleMarker(t *testing.T) {
 	if _, err := time.Parse(time.RFC3339, staleSince); err != nil {
 		t.Fatalf("stale marker is not RFC3339 UTC: %q", staleSince)
 	}
+	assertClearedReprocessFields(t, ctx, db, "item_timeout", server.URL+"/slow", extractionStatusOriginalNA, modelStatusLatencyError)
+	assertNoStaleReadableFTS(t, ctx, db, "item_timeout")
+}
+
+func TestReprocessLibraryCanceledFetchClearsReadableFieldsAndItemFTS(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	runCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cancel()
+		<-r.Context().Done()
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_reprocess_canceled", server.URL+"/feed.xml", "Canceled Source")
+	seedReprocessItem(t, ctx, db, "item_canceled", "src_reprocess_canceled", server.URL+"/blocked", "")
+	assertReprocessIndexReady(t, ctx, db)
+	assertStaleReadableFTS(t, ctx, db, "item_canceled")
+
+	resp, err := reprocessLibraryFresh(runCtx, db, &reprocessMatrixLLM{})
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusFailed || resp.Reprocess.FTSRebuilt || resp.Reprocess.ItemsIndexed != 0 || resp.Reprocess.ItemsFailed != 1 {
+		t.Fatalf("canceled result = %+v, want failed without FTS rebuild and one failed item", resp.Reprocess)
+	}
+	assertClearedReprocessFields(t, ctx, db, "item_canceled", server.URL+"/blocked", extractionStatusOriginalNA, modelStatusLatencyError)
+	assertNoStaleReadableFTS(t, ctx, db, "item_canceled")
 }
 
 type reprocessMatrixLLM struct {
@@ -159,6 +193,38 @@ func assertClearedReprocessFields(t *testing.T, ctx context.Context, db *sql.DB,
 	if title != wantTitle || summary.Valid || coreInsight.Valid || feedExcerpt.Valid || extractedText.Valid || extractionStatus != wantExtractionStatus || modelStatus != wantModelStatus {
 		t.Fatalf("cleared item %s = title:%q summary:%v core:%v feed:%v extracted:%v extraction:%q model:%q, want title %q and null readable fields", itemID, title, summary.Valid, coreInsight.Valid, feedExcerpt.Valid, extractedText.Valid, extractionStatus, modelStatus, wantTitle)
 	}
+}
+
+func assertReprocessIndexReady(t *testing.T, ctx context.Context, db *sql.DB) {
+	t.Helper()
+	if err := rebuildSearchIndex(ctx, db); err != nil {
+		t.Fatalf("rebuild initial search index: %v", err)
+	}
+}
+
+func assertStaleReadableFTS(t *testing.T, ctx context.Context, db *sql.DB, itemID string) {
+	t.Helper()
+	if count := reprocessFTSCount(t, ctx, db, itemID, "PRIOR"); count == 0 {
+		t.Fatalf("precondition: FTS for %s did not contain prior readable text", itemID)
+	}
+}
+
+func assertNoStaleReadableFTS(t *testing.T, ctx context.Context, db *sql.DB, itemID string) {
+	t.Helper()
+	for _, query := range []string{"PRIOR", `"prior-tier"`} {
+		if count := reprocessFTSCount(t, ctx, db, itemID, query); count != 0 {
+			t.Fatalf("FTS for %s retained stale query %q with count %d", itemID, query, count)
+		}
+	}
+}
+
+func reprocessFTSCount(t *testing.T, ctx context.Context, db *sql.DB, itemID string, query string) int {
+	t.Helper()
+	var count int
+	if err := db.QueryRowContext(ctx, `select count(*) from search_fts where item_id = ? and search_fts match ?`, itemID, query).Scan(&count); err != nil {
+		t.Fatalf("query FTS for %s/%q: %v", itemID, query, err)
+	}
+	return count
 }
 
 func Example_reprocessAttemptInvariant() {
