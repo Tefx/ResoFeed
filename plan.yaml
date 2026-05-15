@@ -79127,7 +79127,7 @@ phases:
       - [x] Tests prove POST /api/steer/undo is target-specific, idempotent for already
       inactive targets, and never behaves as last-action/global undo.
 
-      - [ ] Tests prove MCP preview_steer, steer, and undo_steer parity with HTTP
+      - [x] Tests prove MCP preview_steer, steer, and undo_steer parity with HTTP
       without agent-only concepts.
 
       - [ ] Tests prove PRD AC-4 conflicts return closest allowable interpretation
