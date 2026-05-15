@@ -80852,7 +80852,7 @@ phases:
 
       ## Required checklist
 
-      - [ ] Read each ref and cite the key passage or explain NOT READ with reason
+      - [x] Read each ref and cite the key passage or explain NOT READ with reason
       in evidence.
 
       - [ ] Re-run or review targeted evidence proving delegated-agent steering uses
