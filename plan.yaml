@@ -68021,7 +68021,7 @@ phases:
       - [x] Existing `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` coverage
       was not weakened and remains green or any failure is reported as blocking.
 
-      - [ ] Accessibility and fresh-audit coverage are preserved for FR-01, FR-02,
+      - [x] Accessibility and fresh-audit coverage are preserved for FR-01, FR-02,
       FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
 
       - [ ] No forbidden ResoFeed architecture/product/runtime concept is observed.'
