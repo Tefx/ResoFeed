@@ -81445,22 +81445,22 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Idle preview row reserves height but is visually blank: no [IDLE] chip,
+      - [x] Idle preview row reserves height but is visually blank: no [IDLE] chip,
       no duplicate placeholder hint, no visible filled status bar.
 
-      - [ ] Input uses aria-describedby pointing to preview region; preview/receipt
+      - [x] Input uses aria-describedby pointing to preview region; preview/receipt
       updates use polite live region except invalid add and failed undo use assertive.
 
-      - [ ] Route echo states render [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE],
+      - [x] Route echo states render [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE],
       [INVALID] with exact copy and non-color status markers.
 
-      - [ ] Enter executes read-only search/doctor or commits an already-previewed
+      - [x] Enter executes read-only search/doctor or commits an already-previewed
       write; Escape cancels pending preview/clears unsent text without moving focus.
 
-      - [ ] Write-action preview/commit/undo boundaries are explicit; [UNDO] appears
+      - [x] Write-action preview/commit/undo boundaries are explicit; [UNDO] appears
       only when API response includes a revocable target id.
 
-      - [ ] find alias warning says lexical SEARCH/no semantic retrieval and no RAG/chat/answer
+      - [x] find alias warning says lexical SEARCH/no semantic retrieval and no RAG/chat/answer
       UI appears.
 
 
@@ -81473,16 +81473,16 @@ phases:
       ## Completion Criteria (stub exclusion)
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
-    verification: '- [ ] Component and/or E2E tests for Steer route preview states
+    verification: '- [x] Component and/or E2E tests for Steer route preview states
       pass green.
 
-      - [ ] Rendered evidence shows idle, add valid, add invalid, search/find warning,
+      - [x] Rendered evidence shows idle, add valid, add invalid, search/find warning,
       doctor, steer rule proposal, success receipt, and undo states.
 
-      - [ ] Accessibility evidence confirms aria-describedby, live-region levels,
+      - [x] Accessibility evidence confirms aria-describedby, live-region levels,
       focus retention, keyboard behavior, and non-color markers.
 
-      - [ ] Negative scan confirms no RAG/chat/semantic answer UI or duplicate hint/[IDLE]
+      - [x] Negative scan confirms no RAG/chat/semantic answer UI or duplicate hint/[IDLE]
       chip.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
