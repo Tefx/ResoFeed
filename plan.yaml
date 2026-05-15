@@ -78628,6 +78628,71 @@ phases:
     - srdb-http-steer-preview-commit-undo
     - srdb-mcp-steer-parity
     agent: wiring-auditor
+  - id: srdb-spec-conformance
+    name: Verify backend spec conformance for Steer and search delta
+    status: pending
+    description: 'Spec conformance verification via adversarial divergence hunting.
+      This is NOT "do tests pass" — it is "does backend runtime match the specs?"
+
+
+      Scope: docs/ARCHITECTURE.md §3.6, §5.3, §5.4, §6, §7 and docs/PRD.md AC-4/AC-19.
+
+
+      Acceptance checklist:
+
+      - [ ] Build a requirements register for preview, commit, undo, route precedence,
+      OpenRouter boundary, lexical search, find alias, invalid add, AC-4 conflict
+      handling, and MCP parity.
+
+      - [ ] Cite spec section and implementation file/line for every requirement.
+
+      - [ ] Flag behavioral precedence claims as NEEDS_TEST unless runtime evidence
+      proves them.
+
+      - [ ] Classify all findings as CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND,
+      AMBIGUOUS_SPEC, or SPEC_POSSIBLY_STALE.
+
+      - [ ] Provide closure path for every NEEDS_TEST, PARTIAL, DIVERGES, NOT_FOUND,
+      or AMBIGUOUS_SPEC item.'
+    verification: '- [ ] phase-check protecting backend gate and frontend integration.
+
+      - [ ] Requirements register maps each backend Steer/search requirement to evidence.
+
+      - [ ] No DIVERGES/PARTIAL/NOT_FOUND/UNCERTAIN_BLOCKING item lacks remediation
+      or explicit non-intersection.
+
+      - [ ] Gate decision basis is suitable for backend gate review.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Spec Conformance Report
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      |---|---|---|---|---|---|
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Top Risks
+
+      '
+    depends_on:
+    - srdb-http-steer-preview-commit-undo
+    - srdb-mcp-steer-parity
+    agent: spec-verifier
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
