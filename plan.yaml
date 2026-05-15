@@ -78519,7 +78519,7 @@ phases:
       - [x] The seven-test closure matrix marks all seven failures PASS with artifact
       references.
 
-      - [ ] Desktop and mobile rendered artifacts are reviewed for changed surfaces.
+      - [x] Desktop and mobile rendered artifacts are reviewed for changed surfaces.
 
       - [ ] A11y names for Inspector-open and `[FETCH]` controls are verified from
       the rendered app, not inferred.
