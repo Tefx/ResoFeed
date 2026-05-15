@@ -70093,7 +70093,7 @@ phases:
 
       - [x] `items_attempted = items_updated + items_unavailable + items_failed`.
 
-      - [ ] FTS stale marker remains if rebuild does not complete and clears only
+      - [x] FTS stale marker remains if rebuild does not complete and clears only
       after successful rebuild.
 
       - [ ] `/api/doctor` emits exactly `search_fts: stale since <RFC3339_UTC>` or
