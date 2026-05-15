@@ -70315,7 +70315,7 @@ phases:
       `plhm-mcp-runtime-parity`, or `plfu-*`) and are not used to fail this storage-core
       retest unless a backend-core contract is also missing.
 
-      - [ ] No `pre-existing` or `out-of-scope` disposition is used without explicit
+      - [x] No `pre-existing` or `out-of-scope` disposition is used without explicit
       non-intersection evidence and downstream ownership.'
     verification: '- [ ] Backend-core command family passes for implemented storage/core
       surfaces.
