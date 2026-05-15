@@ -69772,7 +69772,7 @@ phases:
 
       - [x] partial-write or SQLite error paths are transactional.
 
-      - [ ] concurrent access scenario for receipt reuse is documented and tested.
+      - [x] concurrent access scenario for receipt reuse is documented and tested.
 
       - [ ] cleanup/reset semantics between tests are explicit.
 
