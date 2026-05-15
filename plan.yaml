@@ -81421,7 +81421,7 @@ phases:
       - No product code/docs/tests were changed by this verify-only retest.'
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
-  status: pending
+  status: in_progress
   gate: Gate blocks unless rendered UI satisfies DESIGN.md/UI_REGRESSION_CONTRACT.md
     for Steer route preview, Source Ledger controls/details, split-scroll/mobile route,
     and no forbidden UI concepts.
@@ -81668,7 +81668,7 @@ phases:
     agent: frontend-engineer
   - id: srdf-processing-language-low-chrome-controls
     name: Close processing language and reprocess low-chrome UI gaps
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -81737,6 +81737,8 @@ phases:
 
       '
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T23:28:19.659046+00:00'
   - id: srdf-uiux-native-audit
     name: Run native multimodal UIUX audit for Steer delta
     status: pending
