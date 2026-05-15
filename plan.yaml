@@ -75358,7 +75358,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Evidence covers main path and highest-risk failure path.
+      - [x] Evidence covers main path and highest-risk failure path.
 
       - [ ] No automatic startup recovery/job queue is introduced or required.
 
