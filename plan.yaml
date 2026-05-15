@@ -71863,7 +71863,7 @@ phases:
 
       ## Downstream blocker ownership from storage-core verification
 
-      - [ ] Missing `resofeed://runtime/language` resource and processing-language
+      - [x] Missing `resofeed://runtime/language` resource and processing-language
       tools are owned here.
 
       - [ ] Missing `reprocess_library` MCP tool is owned here.
