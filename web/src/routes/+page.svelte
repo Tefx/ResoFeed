@@ -41,7 +41,6 @@
   let agentSteeringRules = $state<SteerRule[]>([]);
   let currentSurface = $state<Surface>('feed');
   let isNarrow = $state(false);
-  let surfaceMenu = $state<HTMLDetailsElement | undefined>();
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -73,7 +72,6 @@
   function replaceSurfaceFromLocation(): void {
     const routeSurface = surfaceForPath(window.location.pathname);
     if (routeSurface !== currentSurface) currentSurface = routeSurface;
-    void focusActiveSurface(routeSurface);
   }
 
   async function focusActiveSurface(surface = currentSurface): Promise<void> {
@@ -178,9 +176,9 @@
     selectedItemId = item.id;
     selectedItemDetail = null;
     currentSurface = 'inspector';
+    inspectorFocusRequestId += 1;
     await apiClient().inspect(item.id);
     await loadItemDetail(item.id);
-    inspectorFocusRequestId += 1;
   }
 
   function showSurface(surface: Surface, updateUrl = true): void {
@@ -238,7 +236,6 @@
 
   function openSurfaceFromMenu(surface: Surface): void {
     showSurface(surface);
-    if (surfaceMenu) surfaceMenu.open = false;
   }
 
   async function submitSteer(): Promise<void> {
@@ -396,11 +393,21 @@
           <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
         {/if}
       </form>
-      <details class="surface-nav" aria-label="RESOFEED surface menu" bind:this={surfaceMenu}>
-        <summary class="contract-label" aria-label="RESOFEED surface menu">RESOFEED</summary>
+      <details class="surface-nav" aria-label="RESOFEED surface menu" open>
+        <summary class="contract-label surface-nav-label" tabindex="-1" onclick={(event) => event.preventDefault()}>RESOFEED</summary>
         <div class="surface-nav-menu">
-          <button type="button" aria-current={currentSurface === 'feed' ? 'page' : undefined} onclick={() => openSurfaceFromMenu('feed')}>TODAY</button>
-          <button type="button" aria-current={currentSurface === 'ledger' ? 'page' : undefined} onclick={() => openSurfaceFromMenu('ledger')}>SOURCE LEDGER</button>
+          <button
+            type="button"
+            aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
+            data-state={currentSurface === 'feed' ? 'active' : undefined}
+            onclick={() => openSurfaceFromMenu('feed')}
+          >TODAY</button>
+          <button
+            type="button"
+            aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'}
+            data-state={currentSurface === 'ledger' ? 'active' : undefined}
+            onclick={() => openSurfaceFromMenu('ledger')}
+          >SOURCE LEDGER</button>
         </div>
       </details>
     </header>
@@ -437,9 +444,7 @@
       </section>
 
       <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
-        {#if isNarrow}
-          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
-        {/if}
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
           <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}
@@ -449,7 +454,7 @@
     </div>
 
     <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label="SOURCE LEDGER surface">
-      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+      <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
       <SourceLedger
         sources={sources}
         onDeleteSource={deleteSource}
@@ -462,12 +467,12 @@
       />
     </section>
     <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
-      {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+      <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
       <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
-        {#if isNarrow}<button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>{/if}
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         <div class="contract-region">
           <h2 id="doctor-heading" tabindex="-1">/doctor</h2>
           <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>

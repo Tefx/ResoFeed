@@ -58,15 +58,15 @@ test('expected-red keyboard a11y feed row star inspector activation and selected
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).not.toHaveClass(/active-panel/);
   await expect(page.locator('.contract-feed-item', { has: rowOpen })).toHaveAttribute('aria-current', 'true');
 
-  const star = page.getByRole('button', { name: 'Resonate item' }).first();
+  const star = page.getByRole('button', { name: /^Resonate item/ }).first();
   await focusAndAudit(star, 'Feed Resonate star');
   const starBox = await star.boundingBox();
   expect.soft(starBox?.width ?? 0, 'Resonate target width is at least 44 CSS px').toBeGreaterThanOrEqual(44);
   expect.soft(starBox?.height ?? 0, 'Resonate target height is at least 44 CSS px').toBeGreaterThanOrEqual(44);
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: 'Remove resonance' }).first()).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Remove resonance' }).first()).toContainText('★');
-  await expectActiveState(page.getByRole('button', { name: 'Remove resonance' }).first(), 'Resonate active star state');
+  await expect(page.getByRole('button', { name: /^Remove resonance/ }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Remove resonance/ }).first()).toContainText('★');
+  await expectActiveState(page.getByRole('button', { name: /^Remove resonance/ }).first(), 'Resonate active star state');
 
   await attachRoleAriaSnapshot(page, testInfo, 'feed-row-star-role-aria-output.json');
   await testInfo.attach('feed-row-star-keyboard-a11y.png', {

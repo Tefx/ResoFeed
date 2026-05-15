@@ -36,14 +36,18 @@ export async function enterOwnerToken(page: Page, ownerToken: string): Promise<v
 export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): Promise<void> {
   await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  const sourceText = page.getByText(/ResoFeed E2E Local Source/);
+  const sourceText = page.getByTestId('source-row').filter({ hasText: /ResoFeed E2E Local Source/ });
   if (!(await sourceText.isVisible().catch(() => false))) {
     await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
     await expect(sourceText).toBeVisible({ timeout: 15_000 });
   }
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  const runIngest = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(runIngest).toBeVisible();
   await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await runIngest.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
   await page.getByRole('button', { name: 'TODAY' }).click();
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 }

@@ -31,6 +31,7 @@
   let isRunningIngest = $state(false);
   let fetchingSourceId = $state<string | null>(null);
   let sourceFeedbackById = $state<Record<string, string>>({});
+  let importedTitleByUrl = $state<Record<string, string>>({});
   let importInput = $state<HTMLInputElement | undefined>();
   const hasGlobalIngestFeedback = $derived(statusText.startsWith('last_ingest:') || statusText === 'ingest complete');
 
@@ -57,8 +58,20 @@
   }
 
   function sourceLedgerLabel(source: Source): string {
-    const title = source.title.trim();
+    const title = (importedTitleByUrl[source.url] ?? source.title).trim();
     return title || compactSourceUrl(source.url);
+  }
+
+  function opmlTitleMap(opml: string): Record<string, string> {
+    const document = new DOMParser().parseFromString(opml, 'application/xml');
+    if (document.querySelector('parsererror')) return {};
+    return Array.from(document.querySelectorAll('outline'))
+      .reduce<Record<string, string>>((titles, outline) => {
+        const url = outline.getAttribute('xmlUrl') ?? outline.getAttribute('xmlurl');
+        const title = outline.getAttribute('title') ?? outline.getAttribute('text');
+        if (url && title?.trim()) titles[url] = title.trim();
+        return titles;
+      }, {});
   }
 
   function statusTextForSource(source: Source, lastFetch: string | null): string {
@@ -140,7 +153,9 @@
     isImportingOpml = true;
     statusText = '';
     try {
-      const result = await onImportOpml(await file.text());
+      const opml = await file.text();
+      const result = await onImportOpml(opml);
+      importedTitleByUrl = { ...importedTitleByUrl, ...opmlTitleMap(opml) };
       statusText = result
         ? `imported ${result.imported || result.skipped} sources; folders flattened`
         : 'imported sources; folders flattened';
@@ -167,7 +182,7 @@
 
   function sourceDiagnosticText(source: Source, lastFetch: string | null): string {
     return [
-      `source: ${sourceLedgerLabel(source)}`,
+      `source_url: ${source.url}`,
       `fetch_state: ${source.last_fetch_status}`,
       source.last_fetch_error && !hasGlobalIngestFeedback ? `fetch_error: ${rawErrorText(source.last_fetch_error)}` : null,
       `fetched_at: ${lastFetch ?? 'not_fetched'}`,
