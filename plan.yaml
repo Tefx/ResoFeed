@@ -76571,7 +76571,7 @@ phases:
 
       REQUIRED CHECKS:
 
-      - [ ] One Go binary remains the only deployable process.
+      - [x] One Go binary remains the only deployable process.
 
       - [ ] SQLite+FTS5 remains the only durable state/search backend.
 
