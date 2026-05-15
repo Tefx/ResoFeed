@@ -69092,12 +69092,12 @@ phases:
       non-translation obligations.
 
       - [x] Forbidden architecture concepts remain explicitly out of scope.'
-    verification: '- [ ] Contract step remains acceptance-only with no product behavior
+    verification: '- [x] Contract step remains acceptance-only with no product behavior
       implementation.
 
-      - [ ] All contract surfaces requested by the user are represented.
+      - [x] All contract surfaces requested by the user are represented.
 
-      - [ ] Public signatures/schemas match docs/ARCHITECTURE.md and DESIGN.md exactly
+      - [x] Public signatures/schemas match docs/ARCHITECTURE.md and DESIGN.md exactly
       where specified.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
