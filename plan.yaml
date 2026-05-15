@@ -74961,11 +74961,11 @@ phases:
       - [x] Frontend spec conformance has no blocker-class divergence.
 
       - [x] Gate decision basis maps UI behavioral obligations to PROVEN or BLOCK.'
-    verification: '- [ ] All frontend phase steps completed with adequate evidence.
+    verification: '- [x] All frontend phase steps completed with adequate evidence.
 
-      - [ ] Rendered screenshots/DOM/a11y artifacts are present for required states.
+      - [x] Rendered screenshots/DOM/a11y artifacts are present for required states.
 
-      - [ ] OPEN recommendation is allowed only if frontend obligations are PROVEN
+      - [x] OPEN recommendation is allowed only if frontend obligations are PROVEN
       or explicitly non-intersecting.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
