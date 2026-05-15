@@ -76633,7 +76633,7 @@ phases:
 
       - [x] reprocess is explicit, bounded, and does not expose a job/progress dashboard.
 
-      - [ ] delivery/report_delivery idempotency and provenance work.
+      - [x] delivery/report_delivery idempotency and provenance work.
 
       - [ ] search/FTS and doctor stale/ok diagnostics are publicly observable.
 
