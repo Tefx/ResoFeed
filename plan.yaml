@@ -70350,7 +70350,7 @@ phases:
     claimed_at: '2026-05-15T14:34:58.078693+00:00'
   - id: plsc-core-wiring-audit
     name: Audit backend core wiring and public symbol reachability
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -70432,6 +70432,8 @@ phases:
     - plsc-processing-language-ingest
     - plsc-reprocess-fts-doctor
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-15T14:35:11.861032+00:00'
   - id: plsc-core-spec-conformance
     name: Verify backend core spec conformance
     status: claimed
