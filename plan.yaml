@@ -76058,7 +76058,7 @@ phases:
       blocking_findings\":[],\"static_only\":true}"
   - id: plse-system-e2e-gate
     name: Gate processing language system E2E and parity
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -76137,6 +76137,8 @@ phases:
     - plse-full-plan-runtime-check
     - plse-e2e-wiring-audit
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T18:18:47.633579+00:00'
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
