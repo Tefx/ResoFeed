@@ -69041,7 +69041,7 @@ phases:
   steps:
   - id: plct-contract-lock
     name: Lock processing language runtime contract
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -69125,6 +69125,70 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T11:30:00.400177+00:00'
+    done_at: '2026-05-15T11:44:25.490364+00:00'
+    evidence: 'Contract lock step completed and merged.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed runtime_metadata stores processing_language/search_fts_stale_since
+      excluded from export/import; HTTP/MCP language/reprocess parity and receipt
+      fingerprint semantics are specified.
+
+      - docs/DESIGN.md — subagent confirmed Language Control is global operational
+      state, Reprocess Library Action is terse bracket action, Source Identifiers
+      use translate="no" or equivalent.
+
+      - AGENTS.md — NOT READ in isolated worktree because AGENTS.md was absent there;
+      project guidance was injected by orchestrator in dispatch prompt.
+
+
+      ## Contract Lock Evidence
+
+      - Contract files/stubs touched: docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md; internal/resofeed/processing_language_contract.go;
+      internal/resofeed/openrouter.go; internal/resofeed/types.go; web/src/lib/api-contract.ts.
+
+      - Surfaces pinned: runtime metadata keys; ProcessingLanguage and ProcessingLanguageInfo;
+      ReprocessLibraryResult/status/error enums; receipt TTL/fingerprint semantics;
+      HTTP endpoint constants/request/response shapes; MCP contract anchors; delivery
+      report parity; search query echo; doctor stale FTS prefixes; OpenRouter target_language
+      input; frontend language/reprocess/source identifier obligations.
+
+      - Explicit non-goals preserved: no settings dashboard, per-item language toggle,
+      side-by-side translation, translation_failed state, durable jobs, queues, ledgers,
+      sync/merge, vector DB, embeddings, RAG, delivery-channel registry, or per-agent
+      auth registry.
+
+      - Confirmation no behavior logic was implemented: added public types/constants/doc
+      contract notes and an interface signature anchor only; no HTTP route dispatch,
+      MCP dispatch, SQLite mutation, reprocess execution, or doctor behavior was implemented.
+
+      - Worktree commit: 96e82a9b5c7a1610dfed184ae5e5084bb9f8f071.
+
+      - Mainline squash commit: 8e722065.
+
+      - Checklist closure: all completion and verification checklist items are [x].
+
+
+      ## Mainline verification after merge
+
+      - gofmt -w internal/resofeed/processing_language_contract.go internal/resofeed/openrouter.go
+      internal/resofeed/types.go — exit 0
+
+      - go test ./... — exit 0
+
+      - go build ./cmd/resofeed — exit 0
+
+      - golangci-lint run — exit 0 (0 issues)
+
+      - npm --prefix web run check — exit 0, 0 errors/0 warnings
+
+      - npm --prefix web run build — exit 0
+
+
+      Gaps/Notes: npm dependency audit findings were reported by subagent during npm
+      ci and were not addressed because dependency remediation is outside this contract-purity
+      step.'
   - id: plct-backend-expected-red-tests
     name: Add backend expected-red contract tests
     status: pending
