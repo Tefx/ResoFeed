@@ -74049,7 +74049,7 @@ phases:
 
       - [ ] Component that only computes data but does not render controls is incomplete.
 
-      - [ ] Evidence includes DOM snapshot, browser capture, or test-renderer output
+      - [x] Evidence includes DOM snapshot, browser capture, or test-renderer output
       for required states.
 
 
