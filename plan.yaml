@@ -74055,7 +74055,7 @@ phases:
 
       ## Gate Preview (what gate WILL reject)
 
-      - [ ] settings dashboard/preference center/onboarding wizard.
+      - [x] settings dashboard/preference center/onboarding wizard.
 
       - [ ] progress dashboard/job queue/activity log for reprocess.
 
