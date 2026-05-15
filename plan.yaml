@@ -69940,7 +69940,7 @@ phases:
 
       - [x] Outputs vary by stored processing language and input item data.
 
-      - [ ] Existing extraction/model failure taxonomy is preserved.'
+      - [x] Existing extraction/model failure taxonomy is preserved.'
     verification: '- [ ] Targeted ingest/language tests pass for `en` and `zh`.
 
       - [ ] Regression covers language change not rewriting historical items.
