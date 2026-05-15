@@ -66381,7 +66381,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
+      - [x] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
 
       - [x] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
 
