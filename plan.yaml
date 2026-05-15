@@ -68852,3 +68852,11 @@ phases:
     green.
   depends_on:
   - processing-language-storage-core
+- id: processing-language-frontend-ui
+  name: Processing Language Frontend UI
+  status: locked
+  gate: Frontend gate blocks unless language/reprocess controls, API client types,
+    source identifier preservation, split scroll behavior, rendered UI proof, and
+    UIUX audit pass against DESIGN.md.
+  depends_on:
+  - processing-language-http-mcp-runtime
