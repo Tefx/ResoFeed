@@ -68015,7 +68015,7 @@ phases:
       - [x] Fresh evidence shows both `Fresh Runtime A` and `Fresh Runtime B` in the
       mobile Inspector grouped-source disclosure.
 
-      - [ ] Evidence includes actual commands, runtime output, and artifact paths,
+      - [x] Evidence includes actual commands, runtime output, and artifact paths,
       not only "tests pass".
 
       - [ ] Existing `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` coverage
