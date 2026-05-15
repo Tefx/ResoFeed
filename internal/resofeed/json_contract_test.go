@@ -89,6 +89,94 @@ func TestItemDetailJSONIncludesRequiredNullableDetailFields(t *testing.T) {
 	}
 }
 
+func TestSteerContractJSONShapesPinPreviewReceiptAndUndo(t *testing.T) {
+	t.Parallel()
+
+	preview := SteerPreview{
+		RouteKind:          SteerRouteSearch,
+		InterpretedAs:      "search",
+		ChangedRules:       []SteerRule{},
+		Message:            "search: 0 results for \"sqlite\"",
+		LexicalSearchQuery: nil,
+		UndoHandle:         nil,
+		WillMutate:         false,
+	}
+	previewData, err := json.Marshal(preview)
+	if err != nil {
+		t.Fatalf("marshal SteerPreview: %v", err)
+	}
+	previewFields := decodeObject(t, previewData)
+	for _, key := range []string{"route_kind", "interpreted_as", "changed_rules", "message", "lexical_search_query", "undo_handle", "will_mutate"} {
+		if _, ok := previewFields[key]; !ok {
+			t.Fatalf("SteerPreview JSON omitted key %q: %s", key, previewData)
+		}
+	}
+	assertPresentNull(t, previewFields, "lexical_search_query")
+	assertPresentNull(t, previewFields, "undo_handle")
+
+	receipt := SteeringReceipt{InterpretedAs: "invariant_conflict", ChangedRules: []SteerRule{}, Message: "not fully applied"}
+	receiptData, err := json.Marshal(receipt)
+	if err != nil {
+		t.Fatalf("marshal SteeringReceipt: %v", err)
+	}
+	receiptFields := decodeObject(t, receiptData)
+	for _, key := range []string{"interpreted_as", "changed_rules", "message"} {
+		if _, ok := receiptFields[key]; !ok {
+			t.Fatalf("SteeringReceipt JSON omitted key %q: %s", key, receiptData)
+		}
+	}
+	if _, ok := receiptFields["undo_handle"]; ok {
+		t.Fatalf("SteeringReceipt JSON includes undo_handle; undo is a separate target-specific contract: %s", receiptData)
+	}
+
+	revision := int64(3)
+	undo := SteerUndoResult{
+		RouteKind:      SteerRouteSource,
+		Target:         &SteerTarget{Kind: "source", ID: "src_01"},
+		Undone:         true,
+		RestoredRule:   nil,
+		RestoredSource: nil,
+		Message:        "source restored",
+		AlreadyApplied: false,
+	}
+	undoHandle := SteerUndoHandle{RouteKind: SteerRouteSource, Target: &SteerTarget{Kind: "source", ID: "src_01"}, Revision: &revision}
+	undoData, err := json.Marshal(struct {
+		Undo       SteerUndoResult `json:"undo"`
+		UndoHandle SteerUndoHandle `json:"undo_handle"`
+	}{Undo: undo, UndoHandle: undoHandle})
+	if err != nil {
+		t.Fatalf("marshal SteerUndo contracts: %v", err)
+	}
+	envelope := decodeObject(t, undoData)
+	undoFields := decodeRawObject(t, envelope["undo"])
+	for _, key := range []string{"route_kind", "target", "undone", "restored_rule", "restored_source", "message", "already_applied"} {
+		if _, ok := undoFields[key]; !ok {
+			t.Fatalf("SteerUndoResult JSON omitted key %q: %s", key, undoData)
+		}
+	}
+	assertPresentNull(t, undoFields, "restored_rule")
+	assertPresentNull(t, undoFields, "restored_source")
+}
+
+func TestClassifySteerRoutePinsLexicalAliasesAndInvariantConflicts(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		command string
+		want    SteerRouteKind
+	}{
+		{command: "/doctor", want: SteerRouteDoctor},
+		{command: "search sqlite", want: SteerRouteSearch},
+		{command: "https://example.com/feed.xml", want: SteerRouteSource},
+		{command: "hide all fresh items", want: SteerRouteInvariantConflict},
+		{command: "push more technical documents", want: SteerRoutePolicy},
+	} {
+		if got := ClassifySteerRoute(tc.command); got != tc.want {
+			t.Fatalf("ClassifySteerRoute(%q) = %q, want %q", tc.command, got, tc.want)
+		}
+	}
+}
+
 func decodeObject(t *testing.T, data []byte) map[string]json.RawMessage {
 	t.Helper()
 

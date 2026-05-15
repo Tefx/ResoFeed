@@ -194,6 +194,75 @@ type SearchQueryEcho struct {
 	Limit     int     `json:"limit"`
 }
 
+// SteerRouteKind is the contract-level classifier output for Steer input before
+// a caller decides whether to preview, commit, or undo. It is a route selector,
+// not an implementation registry: the single Go binary still handles all routes
+// through flat internal/resofeed functions and SQLite current state.
+type SteerRouteKind string
+
+const (
+	// SteerRoutePolicy is a future-behavior steering rule change.
+	SteerRoutePolicy SteerRouteKind = "policy"
+	// SteerRouteSource is an RSS/Atom source subscription command pasted into Steer.
+	SteerRouteSource SteerRouteKind = "source"
+	// SteerRouteSearch is a lexical retrieval alias from the Steer command surface.
+	SteerRouteSearch SteerRouteKind = "search"
+	// SteerRouteDoctor is the /doctor diagnostics alias from the Steer command surface.
+	SteerRouteDoctor SteerRouteKind = "doctor"
+	// SteerRouteInvariantConflict is a deterministic safety/product-invariant receipt.
+	SteerRouteInvariantConflict SteerRouteKind = "invariant_conflict"
+	// SteerRouteUnknown is used when no product-valid route is available.
+	SteerRouteUnknown SteerRouteKind = "unknown"
+)
+
+// SteerPreviewRequest is the contract-only request body for a non-mutating
+// Steer route preview. It intentionally has no idempotency_key: preview performs
+// no durable mutation and must create no agent receipt, command history, job,
+// queue, global undo stack, or activity ledger.
+type SteerPreviewRequest struct {
+	Command   string    `json:"command"`
+	ActorKind ActorKind `json:"actor_kind"`
+	ActorID   string    `json:"actor_id"`
+}
+
+// SteerTarget identifies the concrete current-state row a reversible committed
+// Steer action may affect. Target-specific undo is intentionally scoped to one
+// source or one steering rule; it is not a global command-history stack.
+type SteerTarget struct {
+	Kind string `json:"kind"`
+	ID   string `json:"id"`
+}
+
+// SteerUndoHandle is an inline, nullable contract object for reversible Steer
+// receipts/previews. target is null when there is no reversible target. The
+// handle is provenance for one target-specific undo attempt only; it is not
+// portable state, a command ledger, or an activity feed.
+type SteerUndoHandle struct {
+	RouteKind SteerRouteKind `json:"route_kind"`
+	Target    *SteerTarget   `json:"target"`
+	Revision  *int64         `json:"revision"`
+}
+
+// SteerPreview is the canonical non-mutating preview response shape for Steer.
+// changed_rules is always present and empty when no policy rule would change;
+// lexical_search_query and undo_handle are present as null when inapplicable.
+// Preview may classify lexical search aliases, source additions, policy changes,
+// /doctor, and invariant conflicts, but must not write SQLite state or receipts.
+type SteerPreview struct {
+	RouteKind          SteerRouteKind   `json:"route_kind"`
+	InterpretedAs      string           `json:"interpreted_as"`
+	ChangedRules       []SteerRule      `json:"changed_rules"`
+	Message            string           `json:"message"`
+	LexicalSearchQuery *SearchQueryEcho `json:"lexical_search_query"`
+	UndoHandle         *SteerUndoHandle `json:"undo_handle"`
+	WillMutate         bool             `json:"will_mutate"`
+}
+
+// SteerPreviewResult is the preview response envelope.
+type SteerPreviewResult struct {
+	Preview SteerPreview `json:"preview"`
+}
+
 // ActorKind distinguishes human, agent, and system provenance. It is not an
 // authorization model; the owner token is the universal delegation boundary.
 type ActorKind string
@@ -244,8 +313,11 @@ type SteerRequest struct {
 	MutationRequestFields
 }
 
-// SteeringReceipt is inline transparency, not a rule-management UI or
-// portable activity ledger.
+// SteeringReceipt is inline transparency, not a rule-management UI or portable
+// activity ledger. The architecture contract keeps the committed /api/steer
+// receipt to interpreted_as, changed_rules, and message; target-specific undo
+// uses SteerUndoHandle/SteerUndoResult instead of expanding this into a command
+// history or global undo stack.
 type SteeringReceipt struct {
 	InterpretedAs string      `json:"interpreted_as"`
 	ChangedRules  []SteerRule `json:"changed_rules"`
@@ -255,6 +327,28 @@ type SteeringReceipt struct {
 // SteerResult is the canonical steering response envelope.
 type SteerResult struct {
 	Receipt SteeringReceipt `json:"receipt"`
+}
+
+// SteerUndoRequest is the target-specific undo request body. It is idempotent
+// like other mutating operations and is bounded to the supplied undo_handle; it
+// must not consult or append to a global undo stack or command history.
+type SteerUndoRequest struct {
+	UndoHandle SteerUndoHandle `json:"undo_handle"`
+	MutationRequestFields
+}
+
+// SteerUndoResult is the canonical target-specific undo response. restored_rule
+// and restored_source are present as null when the undo target is of the other
+// kind or when no state was restored; already_applied follows the live receipt
+// replay boundary for the undo request idempotency key.
+type SteerUndoResult struct {
+	RouteKind      SteerRouteKind `json:"route_kind"`
+	Target         *SteerTarget   `json:"target"`
+	Undone         bool           `json:"undone"`
+	RestoredRule   *SteerRule     `json:"restored_rule"`
+	RestoredSource *Source        `json:"restored_source"`
+	Message        string         `json:"message"`
+	AlreadyApplied bool           `json:"already_applied"`
 }
 
 // DeleteSourceResult is the DELETE /api/sources/{id} response.
