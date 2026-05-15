@@ -72335,7 +72335,7 @@ phases:
 
       REQUIRED runtime proof:
 
-      - [ ] build or use the project binary.
+      - [x] build or use the project binary.
 
       - [ ] start `resofeed serve` with test SQLite DB and owner token/OpenRouter
       secret handling that redacts secrets.
