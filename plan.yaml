@@ -74039,7 +74039,7 @@ phases:
       - [x] Runtime language route state must affect visible control text and document
       language attributes.
 
-      - [ ] Reprocess active/conflict behavior must render a terse conflict/failure
+      - [x] Reprocess active/conflict behavior must render a terse conflict/failure
       state without inventing jobs, queues, progress dashboards, or activity logs.
 
 
