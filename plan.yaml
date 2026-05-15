@@ -65665,3 +65665,95 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-contract-red-tests
     agent: frontend-engineer
+  - id: ui-runtime-fresh-review-duplicate-source-api-fix
+    name: Fix grouped duplicate source disclosure data path
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: ["integration", "backend", "fresh-audit-remediation"]
+
+
+      Complete the backend/API data path needed to close FR-04: grouped duplicate/source
+      items that share a story_key must remain accessible from the primary story/Inspector
+      path, not only through search.
+
+
+      Scope and touch paths:
+
+      - internal/resofeed/*.go files that own item detail, story grouping, or HTTP
+      item inspect/detail responses.
+
+      - web/src/lib/api-contract.ts if the existing typed contract lacks the grouped
+      source item/provenance field.
+
+      - Tests may be adjusted only to reflect the expected-red acceptance from ui-runtime-fresh-review-contract-red-tests.
+
+
+      Data semantics:
+
+      - Preserve every original source item and provenance for grouped stories.
+
+      - Do not treat duplicate/story grouping as sync, merge, archive, unread state,
+      or an activity ledger.
+
+      - Do not add new storage beyond the existing SQLite source/item state needed
+      for this disclosure.
+
+      - Return enough source item identity/provenance for the frontend Inspector to
+      display a terse source-list disclosure.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] This is an IMPLEMENTATION step; stub-only completion is not acceptable.
+
+      - [ ] The API output varies based on actual grouped story data, not hardcoded
+      sample rows.
+
+      - [ ] Duplicate/source disclosure data comes from SQLite-backed item/story state
+      and preserves provenance.'
+    verification: '- [ ] Backend/API tests prove a primary item with grouped duplicates
+      returns every grouped source item or equivalent provenance disclosure data.
+
+      - [ ] Search remains lexical/FTS and no vector/RAG/sync/merge/job concept is
+      introduced.
+
+      - [ ] API response remains owner-token protected through the existing single
+      Go binary HTTP path.
+
+      - [ ] Evidence identifies the exact contract field consumed by the frontend
+      Inspector step.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Backend/API Implementation Evidence
+
+      - Findings fixed: FR-04 backend/data path
+
+      - Files changed: <paths>
+
+      - Contract field(s): <names and shape>
+
+      - Test command(s): <exact commands>
+
+      - API sample: <redacted JSON showing grouped source disclosure>
+
+      - Boundary check: <confirm SQLite-only, owner-token, one Go binary, no sync/vector/RAG/jobs>'
+    depends_on:
+    - ui-runtime-fresh-review-contract-red-tests
+    agent: golang-developer
