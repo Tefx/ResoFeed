@@ -66971,7 +66971,7 @@ phases:
       - None.'
   - id: ui-runtime-fresh-review-full-frontend-green-retest
     name: Retest full frontend suite and fresh audit acceptance after B1 remediation
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -67146,3 +67146,5 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-full-frontend-test-remediation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T08:05:59.296785+00:00'
