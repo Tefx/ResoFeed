@@ -75807,7 +75807,7 @@ phases:
     claimed_at: '2026-05-15T18:11:36.042065+00:00'
   - id: plse-e2e-wiring-audit
     name: Audit end-to-end wiring and absence of stubs
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -75892,6 +75892,92 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-15T18:11:28.866218+00:00'
+    done_at: '2026-05-15T18:17:49.406700+00:00'
+    evidence: "## Wiring Audit Report\n\n### refs Read Confirmation\n- docs/ARCHITECTURE.md\
+      \ — one binary started with `resofeed serve` serves static SvelteKit, JSON HTTP\
+      \ API, MCP `/mcp`, and background ingestion loop; one SQLite DB; no services/queues/vector/RAG.\n\
+      - docs/DESIGN.md — dense analyst workbench UI with owner-token prompt, Source\
+      \ Ledger, Inspector, and functional chrome.\n- AGENTS.md — NOT READ: absent\
+      \ in isolated worktree root.\n- CONSTITUTION.md — NOT READ: absent in isolated\
+      \ worktree root.\n\n## Closure Signals\nheadline: PASS\nverdict: PASS\nproof_gap_status:\
+      \ NON_BLOCKING\nblocking_status: CLOSED\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nblockers: []\nproduct_implementation_files_modified: false\n\n###\
+      \ Protocol checklist\n| Protocol | Status | Evidence |\n|---|---|---|\n| W13\
+      \ Entry-to-Effect Trace | PASS | `cmd/resofeed/main.go` -> `internal/resofeed/db.go`\
+      \ -> `runServe` opens DB/migrates/token/LLM and calls `ServeHTTPAndIngestRuntime`\
+      \ -> `net.Listen`/`http.Server.Serve`/`RunIngestLoop`. |\n| W1 Dead Export Scan\
+      \ | PASS | Public runtime exports used by router/MCP/client paths; no orphan\
+      \ runtime surface found in scoped paths. |\n| W2 Schema Field Trace | PASS |\
+      \ Runtime language constants, HTTP routes, core read/write, frontend endpoints,\
+      \ client calls all traced. |\n| W3 CLI Param E2E Coverage | PASS_STATIC | `serve`\
+      \ flags flow to listener, DB, OpenRouter client, auth config. |\n| W4 CLI Command\
+      \ Registration | PASS | `Main` registers only `serve` and allowed offline owner-token\
+      \ reset; root main delegates to `resofeed.Main`. |\n| W5 Contract Strength Scan\
+      \ | NON_INTERSECTING | No Python-style `@pre/@post`; strict validators are direct\
+      \ HTTP/MCP JSON decoders. |\n| W6 Config Field Consumption | PASS | `ServeConfig`\
+      \ fields consumed by startup/runtime. |\n| W7 Escape Hatch Concentration | PASS_WITH_NOTE\
+      \ | No `@invar:allow`; `map[string]any` limited to JSON/MCP schema/error envelopes.\
+      \ |\n| W8 Dependency-Import Alignment | PASS | Go/frontend production deps align\
+      \ with manifests. |\n| W9 Transitive Entry-Point Reachability | PASS | Runtime\
+      \ chain reaches listener/server/DB/LLM/ingest. |\n| W10 Protocol Shadow Detection\
+      \ | PASS | Production `LLMClient` boundary wired to `NewOpenRouterClient`; test\
+      \ fakes isolated. |\n| W11 Type Cast Authenticity | PASS | No production `as\
+      \ any`, `@ts-ignore`, or protocol laundering found in runtime wiring paths.\
+      \ |\n| W12 Frontend Route-Render Integrity | PASS | `+page.svelte` route mapping\
+      \ renders actual components and route transitions. |\n\n**Runtime entrypoint\
+      \ trace**:\n- `cmd/resofeed/main.go` calls `resofeed.Main`.\n- `internal/resofeed/db.go`\
+      \ handles `serve`, validates flags/secret, calls `runServe`, opens SQLite, runs\
+      \ migrations, resolves owner token, creates `NewOpenRouterClient`, builds `HTTPServerConfig`,\
+      \ invokes `ServeHTTPAndIngestRuntime`.\n- `http.go` registers `/api/`, `/mcp`,\
+      \ `/` static UI fallback, listens with `net.Listen`, starts `http.Server.Serve`,\
+      \ waits readiness before background ingest.\n- `ingest.go` contains real `RunIngestLoop`\
+      \ over `IngestOnce`.\n\n**HTTP/MCP/frontend wiring matrix**:\nHTTP `/api/feed/today`,\
+      \ `/api/search`, `/api/items/{id}`, inspect/resonance/delivery, steer, sources/import/fetch,\
+      \ ingest, state export/import, doctor, runtime language/reprocess all trace\
+      \ from router to real core functions and matching frontend client where applicable.\
+      \ MCP `/mcp` JSON-RPC dispatch lists and calls tools/resources mapped to real\
+      \ functions. Static web serves `web/build` when present with Svelte route-render\
+      \ wiring.\n\n**Stub/placeholder scan**:\nScans for `_Runtime`, `_Stub`, `_Placeholder`,\
+      \ `Stub`, `Placeholder`, `not implemented`, `panic(`, `TODO`, and lower-case\
+      \ placeholder/stub/fake/mock across `internal/resofeed`, `cmd/resofeed`, and\
+      \ `web/src` found only non-blocking comments, SQL placeholder variables, UI\
+      \ placeholder attributes, unreachable guard after canonical error throw, or\
+      \ test fakes in test files. No production stub/placeholder implementation remains\
+      \ wired.\n\n**Forbidden concept scan**:\nCLI exposes only `serve` plus allowed\
+      \ offline owner-token reset. SQLite schema has current-state tables and lexical\
+      \ FTS only; no delivery registry/job/ledger/reprocess job/sync/vector tables.\
+      \ Ingest guard is in-memory, not durable queue/job state. Forbidden keyword\
+      \ hits were comments denying those concepts or Go sync primitives, not product\
+      \ surfaces.\n\n**Headline**: PASS\n\n## Findings\n- severity: NONE\n  finding:\
+      \ No blocking orphan route/tool/client mismatch found.\n  call_chain: `main.go`\
+      \ -> `resofeed.Main` -> `runServe` -> `ServeHTTPAndIngestRuntime` -> `NewRouter`\
+      \ -> HTTP/MCP handlers -> direct core/SQLite/OpenRouter calls.\n  impact: Gate\
+      \ can proceed.\n\n## behavioral_proof_register\n- obligation: cmd_resofeed_runtime_components\n\
+      \  status: PROVEN\n  evidence: static call chain reaches listener, server, `/api`,\
+      \ `/mcp`, static handler, and ingest loop.\n  uncertainty: Static-only; separate\
+      \ live runtime proofs exist in prior system steps.\n- obligation: http_mcp_registry_reachability\n\
+      \  status: PROVEN\n  evidence: HTTP switch cases and MCP dispatch/list/read/call\
+      \ traced.\n  uncertainty: Static-only.\n- obligation: frontend_client_routes_match_backend\n\
+      \  status: PROVEN\n  evidence: frontend client endpoints match HTTP routes;\
+      \ dynamic runtime-language endpoints match contract.\n  uncertainty: Static-only.\n\
+      - obligation: no_stub_placeholder_wired\n  status: PROVEN\n  evidence: scan\
+      \ found no production `_Runtime*`, `_Stub*`, `_Placeholder*` wired.\n  uncertainty:\
+      \ NONE\n- obligation: forbidden_architecture_surfaces_absent\n  status: PROVEN\n\
+      \  evidence: CLI registration, schema, ingest guard, manual fetch contract and\
+      \ search comments confirm no forbidden surfaces.\n  uncertainty: NONE\n- obligation:\
+      \ W5_pre_post_contracts\n  status: NON_INTERSECTING\n  evidence: no pre/post\
+      \ contract system; strict validators implemented directly.\n  uncertainty: NONE\n\
+      \n## Checklist Closure\n- Description checklist items toggled by wiring auditor.\n\
+      - Verification checklist items marked `[x]` by orchestrator after validating\
+      \ report.\n\n## Files changed\nnone\n\n## Commit hash(es)\nnone (verify-only;\
+      \ no retained git changes; no empty commit created)\n\n## Verification\n- Static\
+      \ reads/scans over architecture/design docs, runtime entrypoints, HTTP/MCP/core\
+      \ files, frontend client/contract/page files.\n- Route/API/client grep, MCP\
+      \ tool/resource grep, stub/placeholder grep, forbidden architecture concept\
+      \ grep, dependency/import grep.\n- Final worktree status clean.\n\n## Programmatic\
+      \ Handoff\n{\"status\":\"SUCCESS\",\"verdict\":\"PASS\",\"action_hint\":\"COMPLETE\"\
+      ,\"artifacts_modified\":\"none\",\"product_implementation_files_modified\":false,\"\
+      blocking_findings\":[],\"static_only\":true}"
   - id: plse-system-e2e-gate
     name: Gate processing language system E2E and parity
     status: pending
