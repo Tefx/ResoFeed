@@ -78227,6 +78227,92 @@ phases:
     proof.
   depends_on:
   - steer-delta-contract-lock-and-expected-red-tests
+  steps:
+  - id: srdb-classifier-policy-runtime
+    name: Complete classifier and AC-4 policy runtime
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete the implementation within existing signatures from srdct-backend-contract-lock
+      and tests from srdct-backend-expected-red-tests.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - internal/resofeed/types.go or flat steer_intent.go from srdct-backend-contract-lock
+      — signatures/types/docstrings are AUTHORITATIVE.
+
+      - internal/resofeed/*steer*_expected_red_test.go from srdct-backend-expected-red-tests
+      — assertions are PROTECTED.
+
+
+      YOUR SCOPE: fill in missing classifier and policy-runtime behavior only in flat
+      internal/resofeed files. Do not add services, repositories, DI containers, queues,
+      dashboards, vector search, embeddings, RAG, command history, or global undo
+      state.
+
+
+      Acceptance checklist:
+
+      - [ ] Route precedence matches docs exactly for /doctor, direct URL, /add/add/添加,
+      /search/search/搜索/查, warning-only find alias, invalid vague add, and unmatched
+      STEER RULE proposal.
+
+      - [ ] Deterministic routes do not call OpenRouter; OpenRouter is used only for
+      unmatched natural-language steering proposals.
+
+      - [ ] Source URL validation is syntactic only and never guesses/fetches RSS
+      URLs during preview.
+
+      - [ ] AC-4 invariant conflicts preserve freshness, coverage/source diversity,
+      provenance transparency, and minimalism via closest allowable interpretation
+      plus terse explanation.
+
+      - [ ] Lexical search boundary forbids vector DB, embeddings, semantic answer
+      generation, RAG copy, and hidden retrieval expansion.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs.'
+    verification: '- [ ] Targeted Go tests for classifier, lexical search aliasing,
+      invalid add, OpenRouter boundary, and AC-4 conflict behavior pass.
+
+      - [ ] Main path evidence shows a valid URL/add/search/doctor route produces
+      documented output.
+
+      - [ ] Failure path evidence shows vague add and conflicting steer requests produce
+      documented diagnostics without mutation.
+
+      - [ ] No forbidden architecture concepts or dependencies were introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Tests run and output:
+
+      - Main path proof:
+
+      - Highest-risk failure path proof:
+
+      - Forbidden concept scan result:
+
+      '
+    agent: golang-developer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
