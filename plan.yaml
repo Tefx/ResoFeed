@@ -70912,6 +70912,83 @@ phases:
     - plfu-language-reprocess-controls
     - plfu-source-identifiers-split-scroll
     agent: spec-verifier
+  - id: plfu-frontend-gate
+    name: Gate processing language frontend UI
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER, assess whether frontend language/reprocess/source/split-scroll
+      work meets DESIGN.md and architecture boundaries.
+
+
+      Gate Preview (what this gate WILL reject):
+
+      1. UI controls not rendered or lacking visual/a11y evidence.
+
+      2. Settings dashboard, onboarding wizard, progress dashboard, queue, activity
+      log, or per-item translation toggle.
+
+      3. Source identifiers translated/localized/beautified or missing non-translation
+      markup/equivalent.
+
+      4. Desktop split scroll or mobile Inspector regressions.
+
+      5. UIUX audit missing parseable PASS handoff.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Frontend green retest passed.
+
+      - [ ] UIUX audit is PASS or PASS_WITH_DEBT with non-blocking/non-intersecting
+      debt only.
+
+      - [ ] Frontend spec conformance has no blocker-class divergence.
+
+      - [ ] Gate decision basis maps UI behavioral obligations to PROVEN or BLOCK.'
+    verification: '- [ ] All frontend phase steps completed with adequate evidence.
+
+      - [ ] Rendered screenshots/DOM/a11y artifacts are present for required states.
+
+      - [ ] OPEN recommendation is allowed only if frontend obligations are PROVEN
+      or explicitly non-intersecting.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      - Execution review:
+
+      - UIUX evidence reviewed:
+
+      - Design/spec conformance reviewed:
+
+      - Issues identified:
+
+      - Gate Decision: OPEN | BLOCKED
+
+      - Required remediation if blocked:'
+    depends_on:
+    - plfu-frontend-green-retest
+    - plfu-uiux-multimodal-audit
+    - plfu-frontend-spec-conformance
+    agent: gate-reviewer
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
