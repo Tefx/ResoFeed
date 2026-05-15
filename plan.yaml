@@ -79402,7 +79402,7 @@ phases:
       downstream phases remain locked until those pass.'
   - id: srdct-ac19-traceability-remediation
     name: Resolve AC-19 traceability and proof-register mismatch
-    status: pending
+    status: claimed
     description: 'step_type: remediation
 
 
@@ -79562,6 +79562,8 @@ phases:
     depends_on:
     - srdct-foundation-gate
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-15T21:50:54.174847+00:00'
   - id: srdct-foundation-gate-retest
     name: Retest foundation gate after AC traceability remediation
     status: pending
