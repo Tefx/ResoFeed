@@ -69297,12 +69297,12 @@ phases:
       registries/jobs/ledgers.
 
       - [x] Auth and schema errors are covered at the public `/mcp` surface.'
-    verification: '- [ ] Expected-red MCP tests fail for intended missing parity surfaces.
+    verification: '- [x] Expected-red MCP tests fail for intended missing parity surfaces.
 
-      - [ ] Tests require public MCP Streamable HTTP behavior, not direct function-only
+      - [x] Tests require public MCP Streamable HTTP behavior, not direct function-only
       proof.
 
-      - [ ] No product implementation is included.'
+      - [x] No product implementation is included.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
