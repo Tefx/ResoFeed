@@ -71404,6 +71404,87 @@ phases:
     - plse-real-language-reprocess-vertical-slice
     - plse-blind-http-mcp-parity-delivery
     agent: wiring-auditor
+  - id: plse-system-e2e-gate
+    name: Gate processing language system E2E and parity
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      review_depth: THOROUGH
+
+
+      As an INDEPENDENT REVIEWER, assess whether the full system behavior is ready
+      for documentation sync and deep review.
+
+
+      Gate Preview (what this gate WILL reject):
+
+      1. Missing real public-surface proof for HTTP/MCP/UI/runtime.
+
+      2. Mock-only parity evidence.
+
+      3. Missing stale FTS failure/recovery proof.
+
+      4. Broad full-plan check failures without remediation ownership.
+
+      5. Any product-boundary violation: jobs, queues, ledgers, sync/merge, vector/RAG,
+      settings dashboards, delivery registries.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Real vertical slice passed.
+
+      - [ ] Blind parity/delivery probes passed.
+
+      - [ ] Reprocess failure/stale FTS proof passed.
+
+      - [ ] Full-plan runtime check passed or all intersecting blockers have remediation
+      ownership.
+
+      - [ ] E2E wiring audit has no unresolved blockers.'
+    verification: '- [ ] All system E2E phase steps completed with adequate evidence.
+
+      - [ ] Gate decision basis includes requirement_ref, behavior_claim, evidence_ref,
+      status, closure_path, and gate_decision_basis for runtime obligations.
+
+      - [ ] OPEN recommendation is allowed only if blocker-class public-surface obligations
+      are PROVEN or explicitly non-intersecting.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      - Execution review:
+
+      - Public-surface proof reviewed:
+
+      - Full-plan check reviewed:
+
+      - Issues identified:
+
+      - Gate Decision: OPEN | BLOCKED
+
+      - Required remediation if blocked:'
+    depends_on:
+    - plse-real-language-reprocess-vertical-slice
+    - plse-blind-http-mcp-parity-delivery
+    - plse-reprocess-failure-stale-fts-proof
+    - plse-full-plan-runtime-check
+    - plse-e2e-wiring-audit
+    agent: gate-reviewer
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
