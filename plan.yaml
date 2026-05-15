@@ -78913,7 +78913,7 @@ phases:
       - [x] Pin lexical-only search/no-RAG and warning-only find alias frontend fixture
       expectations.
 
-      - [ ] Pin desktop independent Feed/Inspector scroll and mobile full-screen Inspector
+      - [x] Pin desktop independent Feed/Inspector scroll and mobile full-screen Inspector
       route fixture expectations.
 
       - [ ] Pin low-chrome processing language/reprocess control expectations with
