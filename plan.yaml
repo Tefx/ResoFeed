@@ -78805,7 +78805,7 @@ phases:
   steps:
   - id: srdct-backend-contract-lock
     name: Lock backend Steer preview undo and invariant contract
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -78876,6 +78876,77 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T21:00:04.881389+00:00'
+    done_at: '2026-05-15T21:09:39.376345+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): 9a770be7 ([vectl] step-srdct-backend-contract-lock completed);
+      worktree commit 06dc5dd3.
+
+
+      Files changed: internal/resofeed/types.go; internal/resofeed/steer_intent.go;
+      internal/resofeed/json_contract_test.go.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — cited one deployable/SQLite/lexical-only decisions,
+      flat internal/resofeed shape and no queues/jobs/event bus, steering conflict
+      contract, search forbids semantic/vector/generated answers, HTTP strict JSON/query/idempotency
+      rules, and MCP parity/no per-agent registry.
+
+      - docs/PRD.md — cited AC-4 strict policy execution; AC-19 was NOT PRESENT in
+      the file; steering precedence/invariant conflict explanation and lexical/no-RAG
+      search boundary were cited.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; fallback .agents/instructions.md
+      read for single binary, SQLite+FTS5, flat internal/resofeed shape, no sync/merge/activity
+      ledger, owner-token boundary, and steering conflict receipt rules.
+
+
+      Contract evidence:
+
+      - Added/pinned SteerRouteKind, SteerPreviewRequest, SteerPreview, SteerPreviewResult,
+      SteerUndoHandle, SteerUndoRequest, SteerUndoResult, and SteerTarget.
+
+      - Confirmed SteeringReceipt remains documented three-field shape: interpreted_as,
+      changed_rules, message.
+
+      - Nullable JSON fields pinned by tests: lexical_search_query, undo_handle, restored_rule,
+      restored_source.
+
+      - Preview has no idempotency_key; commit/undo use MutationRequestFields.
+
+      - PreviewSteering, CommitSteering, and UndoSteering are contract stubs returning
+      ErrSteerContractOnly; no completed route mutation logic added.
+
+      - ClassifySteerRoute only classifies local route kinds and writes no state.
+
+      - Explicitly preserves no vector DB, embeddings, semantic answer, RAG, command
+      history, global undo stack, jobs, queues, sync state, or activity ledger.
+
+
+      Mainline verification:
+
+      - git merge --squash vectl/step-srdct-backend-contract-lock passed.
+
+      - git diff --cached --check passed.
+
+      - go test ./... passed.
+
+      - go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-contract-build-main
+      ./cmd/resofeed passed.
+
+      - git show --check --oneline HEAD passed after commit 9a770be7.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: AC-19 was absent from docs/PRD.md; no inferred AC-19 behavior was
+      invented. Contract-only change adds no goroutines/concurrent code; go test -race
+      was not run by worker.'
   - id: srdct-frontend-contract-lock
     name: Lock frontend route preview state and fixture contract
     status: claimed
