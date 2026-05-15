@@ -77236,3 +77236,223 @@ phases:
     depends_on:
     - plfinal-batched-rendered-proof-and-reprocess-remediation
     agent: uiux-auditor
+  - id: plfinal-spec-conformance-closure-retest
+    name: Spec conformance closure retest for reprocess and runtime proofs
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+
+      As an INDEPENDENT SPEC VERIFIER, rerun targeted finalization conformance closure
+      for B1/B2 and the NEEDS_TEST ledger after the batched remediation step. This
+      protects `plfinal-final-gate` by closing implementation divergence and runtime
+      proof gaps with properly bootstrapped frontend dependencies.
+
+
+      ## why_previous_gate_failed
+
+      - `plfinal-full-spec-conformance-audit` found B1/R6 divergence: fresh-fetch
+      timeout/canceled/OpenRouter failures could leave stale readable fields and FTS
+      text in place.
+
+      - B2/R14-R16 remained a blocking proof gap because frontend runtime proof was
+      blocked by `vite: command not found` in a bare isolated worktree.
+
+      - Additional NEEDS_TEST items were left open: language set future-only/no row
+      rewrite or FTS rewrite; human-over-agent steering precedence; desktop split-scroll
+      runtime; source identifier DOM non-translation.
+
+
+      ## why_previous_review_missed_or_could_not_prove_it
+
+      - The prior spec audit could not distinguish frontend product failure from missing
+      dependency bootstrap until the verification environment installs web dependencies.
+
+      - It did not have post-remediation B1 regression evidence for timeout/canceled/fresh-fetch
+      failure clearing old readable fields and FTS consistency.
+
+
+      ## Required checks
+
+      - Re-audit B1/R6 against backend code and regression tests.
+
+      - Re-audit B2/R14-R16 using bootstrapped frontend build/runtime proof.
+
+      - Close or explicitly disposition each NEEDS_TEST item with runtime evidence:
+      language set future-only should not rewrite existing rows/FTS; human-over-agent
+      steering precedence; desktop split-scroll runtime; source identifier DOM non-translation.
+
+      - Confirm DOC-INPUT-001 is repaired or non-blocking with non-intersection evidence.
+
+
+      ## Environment bootstrap
+
+      - If `web/node_modules` is absent, run `npm --prefix web install` before `npm
+      --prefix web run build`.
+
+      - Treat `vite: command not found` after skipped install as verifier environment
+      error, not product conformance evidence.
+
+
+      ## Behavioral proof register required
+
+      For each blocker/NEEDS_TEST obligation, provide: `requirement_ref`, `behavior_claim`,
+      `runtime_proof_expected`, `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis`.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] `go test ./...` passes after remediation, with B1 regression tests named
+      and reviewed.
+
+      - [ ] B1/R6 verdict is CONFORMS or otherwise BLOCKING with exact remaining divergence.
+
+      - [ ] Frontend dependency bootstrap is run when needed before `npm --prefix
+      web run build`, and build/runtime proof is recorded.
+
+      - [ ] B2/R14-R16 rendered/runtime proof no longer depends on a bare missing-Vite
+      worktree.
+
+      - [ ] NEEDS_TEST ledger items are PROVEN or have explicit closure paths: language
+      future-only/no row rewrite/FTS, steering precedence, desktop split-scroll, source
+      identifier non-translation.
+
+      - [ ] DOC-INPUT-001 has repaired prompt/ref path or explicit non-blocking non-intersection
+      evidence.
+
+      - [ ] Final headline is PASS only if no blocker-class conformance or proof gap
+      remains open.'
+    verification: '- [ ] B1/R6 is re-audited against implementation and regression
+      tests for timeout/canceled/fresh-fetch failure clearing stale readable fields
+      and FTS consistency.
+
+      - [ ] B2/R14-R16 frontend runtime proof is re-run with dependency bootstrap
+      when needed.
+
+      - [ ] Language future-only/no row rewrite, human-over-agent steering precedence,
+      desktop split-scroll runtime, and source identifier DOM non-translation are
+      PROVEN or assigned explicit closure paths.
+
+      - [ ] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec Conformance Closure Report
+
+
+      ### why_previous_gate_failed
+
+      <explain B1/B2 and NEEDS_TEST blockers>
+
+
+      ### why_previous_review_missed_or_could_not_prove_it
+
+      <explain missing post-remediation regression evidence and missing frontend dependency
+      bootstrap>
+
+
+      ### Commands Executed
+
+      ```bash
+
+      go test ./...
+
+      # if web/node_modules absent:
+
+      npm --prefix web install
+
+      npm --prefix web run build
+
+      <runtime/browser proof commands>
+
+      ```
+
+
+      ### B1/R6 Regression Review
+
+      - Tests reviewed: <names>
+
+      - Timeout failure clears/overwrites readable fields: PROVEN/UNPROVEN with evidence
+
+      - Canceled failure clears/overwrites readable fields: PROVEN/UNPROVEN with evidence
+
+      - Fresh-fetch/OpenRouter failure clears/overwrites readable fields: PROVEN/UNPROVEN
+      with evidence
+
+      - FTS consistency after failure: PROVEN/UNPROVEN with evidence
+
+      - Verdict: CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST
+
+
+      ### B2/R14-R16 Runtime Proof Review
+
+      - Dependency bootstrap status: <installed/not needed/failed>
+
+      - Build output: <paste output or artifact ref>
+
+      - Runtime/browser evidence refs: <refs>
+
+      - Verdict: CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST
+
+
+      ### NEEDS_TEST Ledger Closure
+
+      | Obligation | Evidence | Status | Closure path |
+
+      | --- | --- | --- | --- |
+
+      | Language set future-only/no existing row rewrite/FTS rewrite | <evidence>
+      | PROVEN/UNPROVEN | <path> |
+
+      | Human-over-agent steering precedence | <evidence> | PROVEN/UNPROVEN | <path>
+      |
+
+      | Desktop split-scroll runtime | <evidence> | PROVEN/UNPROVEN | <path> |
+
+      | Source identifier DOM non-translation | <evidence> | PROVEN/UNPROVEN | <path>
+      |
+
+      | DOC-INPUT-001 worktree guidance read path | <evidence> | NON_BLOCKING/BLOCKING
+      | <path> |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | <spec ref> | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | <OPEN/BLOCK basis> |
+
+
+      ### Headline
+
+      - [ ] PASS: all blocker-class conformance/proof gaps are closed
+
+      - [ ] FAIL: any blocker-class conformance/proof gap remains open'
+    depends_on:
+    - plfinal-batched-rendered-proof-and-reprocess-remediation
+    agent: spec-verifier
