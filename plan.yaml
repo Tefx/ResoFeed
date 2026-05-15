@@ -73134,7 +73134,7 @@ phases:
     agent: gate-reviewer
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
-    status: claimed
+    status: done
     description: "step_type: implementation\nagent_source: project\npriority: HIGH\n\
       work_type: defect_repair\n\nFix ALL blocker findings from `plhm-runtime-spec-conformance`\
       \ and `plhm-runtime-wiring-audit` in one batched remediation. Do not split this\
@@ -73263,6 +73263,122 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T16:00:03.991299+00:00'
+    done_at: '2026-05-15T16:12:24.321714+00:00'
+    evidence: '## refs Read Confirmation
+
+      - READ `docs/ARCHITECTURE.md`: key passages confirmed one-process guard and
+      no queues/jobs/ledgers; exact HTTP conflict body with `operation already running`
+      and `operation_running/operation/scope/retry_allowed`; runtime reprocess conflicts
+      must report actual holder operation/scope; MCP JSON-RPC `data.error` nested-only
+      conflict shape.
+
+      - READ `docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md`: key passages confirmed runtime
+      metadata is local/non-portable, HTTP/MCP parity and `search_items` query echo,
+      and non-goals forbidding durable jobs/queues/ledgers/sync/per-agent auth/vector/RAG.
+
+
+      ## Remediation Evidence
+
+      ### Files changed
+
+      - `internal/resofeed/ingest.go`
+
+      - `internal/resofeed/http.go`
+
+      - `internal/resofeed/mcp.go`
+
+      - `internal/resofeed/reprocess.go`
+
+      - `internal/resofeed/runtime_metadata.go`
+
+      - `internal/resofeed/plhm_runtime_blocker_remediation_test.go`
+
+      - focused existing tests updated for canonical shapes.
+
+
+      ### Conflict/error shape closure
+
+      - Added shared in-process guard holder details and conflict helpers.
+
+      - HTTP manual ingest/fetch/runtime language/reprocess now emit `409`, `conflict`,
+      `operation already running`, and exactly documented guard detail keys.
+
+      - MCP conflict mapping now uses actual guard holder operation/scope and `error.data`
+      now contains only nested `error`.
+
+
+      ### Stale helper closure
+
+      - Removed exported stale `SearchItemsForMCP`.
+
+      - Live `search_items` remains routed through `SearchItemsResponseForMCP` with
+      `SearchResponse{Items, Query}`.
+
+      - Worker grep evidence: `SearchItemsForMCP|ingest_running|ingest already running`
+      returned no files; `SearchItemsResponseForMCP|Query: echo|case "search_items"`
+      showed the live query-echo path.
+
+
+      ### Architecture guardrail confirmation
+
+      - No durable job/queue/ledger/sync/per-agent auth/vector/RAG or new product
+      surface introduced.
+
+      - HTTP and MCP remain thin transport mappings over shared operations.
+
+
+      ## Mainline Final-State Verification
+
+      After squash merge to main:
+
+      - `go test ./internal/resofeed -run ''TestPLHM|TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess|TestURDAManualIngestFetchRuntimeOverlapReturnsTerseConflict''`
+      — exit 0; output `ok resofeed/internal/resofeed 0.503s`.
+
+      - `go test -race ./internal/resofeed -run ''TestPLHM|TestURDAManualIngestFetchRuntimeOverlapReturnsTerseConflict|TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess''`
+      — exit 0; output `ok resofeed/internal/resofeed 1.723s`.
+
+      - `go build ./...` — exit 0.
+
+      - `go test ./...` — exit 0; output includes no-test packages and `ok resofeed/internal/resofeed
+      0.850s`.
+
+
+      ## Worker Verification
+
+      - `gofmt -w ...` => exit 0.
+
+      - Focused runtime blocker tests => exit 0.
+
+      - Race focused tests => exit 0.
+
+      - `go build ./...` => exit 0.
+
+      - `golangci-lint run` => exit 0.
+
+      - `go test ./...` => exit 0.
+
+
+      ## Commit hash(es)
+
+      - Worker branch commit: `a7ccc08bf6f43d9e11281804c3aeb01a565ce530`.
+
+      - Main squash merge commit: `3310c9aa` — `[vectl] step-plhm-runtime-blocker-remediation
+      completed`.
+
+
+      ## Files changed
+
+      10 files changed, including `internal/resofeed/plhm_runtime_blocker_remediation_test.go`
+      and runtime HTTP/MCP/guard implementation files.
+
+
+      ## Gaps/Notes
+
+      - All blocker findings from `plhm-runtime-spec-conformance` and `plhm-runtime-wiring-audit`
+      were addressed in one batched remediation.
+
+      - No forbidden durable job/queue/ledger/sync/per-agent authorization surface
+      was introduced.'
   - id: plhm-runtime-blocker-retest
     name: Retest HTTP MCP runtime blocker remediation
     status: pending
