@@ -80304,25 +80304,25 @@ phases:
       if unresolved runtime obligations are NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING
       without explicit non-intersection. The gate MUST NOT run/open until srdb-backend-spec-wiring-retest
       has completed with gate_open_allowed=true.'
-    verification: '- [ ] phase-check protecting steer-delta-frontend-ui-source-ledger-split-scroll.
+    verification: '- [x] phase-check protecting steer-delta-frontend-ui-source-ledger-split-scroll.
 
-      - [ ] All backend implementation, liveness, wiring, spec-conformance, remediation,
+      - [x] All backend implementation, liveness, wiring, spec-conformance, remediation,
       and combined retest steps completed with evidence.
 
-      - [ ] srdb-backend-spec-wiring-retest evidence includes headline, verdict, blockers,
+      - [x] srdb-backend-spec-wiring-retest evidence includes headline, verdict, blockers,
       proof_gap_status, blocking_status, gate_open_allowed, and orchestrator_action_hint.
 
-      - [ ] Gate decision basis treats OPEN as invalid unless srdb-backend-spec-wiring-retest
+      - [x] Gate decision basis treats OPEN as invalid unless srdb-backend-spec-wiring-retest
       has gate_open_allowed=true.
 
-      - [ ] Runnable surface evidence identifies entrypoint/startup path, exact launch
+      - [x] Runnable surface evidence identifies entrypoint/startup path, exact launch
       command, transport proof, and at least one documented request through the real
       entrypoint.
 
-      - [ ] No unresolved blocker-class behavioral obligation remains without remediation
+      - [x] No unresolved blocker-class behavioral obligation remains without remediation
       ownership.
 
-      - [ ] Gate decision basis is OPEN only when backend runtime is ready for frontend
+      - [x] Gate decision basis is OPEN only when backend runtime is ready for frontend
       integration.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
