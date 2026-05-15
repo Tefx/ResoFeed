@@ -66383,7 +66383,7 @@ phases:
 
       - [x] Rendered artifacts are inspected against DESIGN.md, not only test assertions.
 
-      - [ ] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
+      - [x] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
 
       - [ ] Every fresh audit finding has a multimodal verdict and evidence reference.
 
