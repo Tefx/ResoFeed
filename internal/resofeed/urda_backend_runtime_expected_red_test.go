@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -158,11 +157,11 @@ func TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails(t *testing.T)
 		if err := json.Unmarshal(second.Body.Bytes(), &parsed); err != nil {
 			t.Fatalf("unmarshal conflict body: %v; body=%s", err, second.Body.String())
 		}
-		if parsed.Error.Code != "conflict" || !strings.Contains(parsed.Error.Message, "ingest already running") {
-			t.Fatalf("conflict error = %+v, want UI-compatible raw source 'err: ingest already running'", parsed.Error)
+		if parsed.Error.Code != "conflict" || parsed.Error.Message != "operation already running" {
+			t.Fatalf("conflict error = %+v, want operation guard conflict", parsed.Error)
 		}
-		if parsed.Error.Details["ingest_running"] != true || parsed.Error.Details["scope"] != "all" || parsed.Error.Details["retry_allowed"] != true {
-			t.Fatalf("conflict details = %#v, want ARCHITECTURE details ingest_running=true scope=all retry_allowed=true", parsed.Error.Details)
+		if parsed.Error.Details["operation_running"] != true || parsed.Error.Details["operation"] != "ingest" || parsed.Error.Details["scope"] != "all" || parsed.Error.Details["retry_allowed"] != true {
+			t.Fatalf("conflict details = %#v, want ARCHITECTURE guard details", parsed.Error.Details)
 		}
 	case first := <-firstDone:
 		assertStatus(t, first, http.StatusOK)

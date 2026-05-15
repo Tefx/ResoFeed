@@ -93,9 +93,9 @@ func TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess(t *te
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		t.Fatal("precondition: operation guard already held")
+	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	if err != nil {
+		t.Fatalf("precondition: operation guard already held: %v", err)
 	}
 	guardHeld := true
 	t.Cleanup(func() {
@@ -125,7 +125,7 @@ func TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess(t *te
 		t.Fatalf("SetProcessingLanguage while guard held err=%v, want conflict", err)
 	}
 	var stored string
-	err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&stored)
+	err = db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&stored)
 	if !errors.Is(err, sql.ErrNoRows) {
 		t.Fatalf("processing language was written while operation guard held: value=%q err=%v", stored, err)
 	}

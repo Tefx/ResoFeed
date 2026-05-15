@@ -57,9 +57,12 @@ func TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface
 	mismatchLangResp := expectedRedMCPToolCall(t, baseURL, "set_processing_language", map[string]any{"language": "en", "actor_id": "briefing-agent", "idempotency_key": "mcp-lang-expected-red-001"})
 	expectedRedAssertNestedMCPError(t, mismatchLangResp, -32602, "bad_request", "idempotency_key", "request_fingerprint_mismatch", "set_processing_language fingerprint mismatch")
 
-	ingestGuard.Lock()
+	release, err := tryAcquireIngestGuard(context.Background(), "ingest", "all")
+	if err != nil {
+		t.Fatalf("hold operation guard: %v", err)
+	}
 	conflictResp := expectedRedMCPToolCall(t, baseURL, "reprocess_library", map[string]any{"actor_id": "briefing-agent", "idempotency_key": "mcp-reprocess-expected-red-conflict"})
-	ingestGuard.Unlock()
+	release()
 	expectedRedAssertNestedMCPConflict(t, conflictResp, "reprocess_library guarded-operation conflict")
 
 	reprocessResp := expectedRedMCPToolCall(t, baseURL, "reprocess_library", map[string]any{"actor_id": "briefing-agent", "idempotency_key": "mcp-reprocess-expected-red-001"})

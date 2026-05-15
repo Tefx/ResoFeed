@@ -57,11 +57,11 @@ func TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency(t *testing.T) {
 	}
 
 	missingQuery := mcpCall(t, handler, "search_items", map[string]any{"limit": 20})
-	if missingQuery.Error == nil || missingQuery.Error.Data["field"] != "query" {
+	if missingQuery.Error == nil || nestedMCPErrorField(missingQuery.Error.Data) != "query" {
 		t.Fatalf("missing search query error = %+v, want field=query", missingQuery.Error)
 	}
 	missingKey := mcpCall(t, handler, "resonate_item", map[string]any{"item_id": "mcp_item_01", "resonated": true, "actor_id": "briefing-agent"})
-	if missingKey.Error == nil || missingKey.Error.Data["field"] != "idempotency_key" {
+	if missingKey.Error == nil || nestedMCPErrorField(missingKey.Error.Data) != "idempotency_key" {
 		t.Fatalf("missing idempotency error = %+v, want field=idempotency_key", missingKey.Error)
 	}
 
@@ -408,6 +408,19 @@ func mcpRequestJSON(t *testing.T, handler http.Handler, payload map[string]any) 
 		t.Fatalf("unmarshal MCP response: %v; body=%s", err, recorder.Body.String())
 	}
 	return resp
+}
+
+func nestedMCPErrorField(data map[string]any) string {
+	inner, ok := data["error"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	details, ok := inner["details"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	field, _ := details["field"].(string)
+	return field
 }
 
 func mcpHTTPPost(t *testing.T, url string, payload map[string]any) mcpResponse {

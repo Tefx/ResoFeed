@@ -95,22 +95,6 @@ func ListCandidateItemsForMCP(ctx context.Context, db *sql.DB, input MCPListCand
 	return TodayFeedResponse{Items: items}, nil
 }
 
-// SearchItemsForMCP applies lexical/metadata search; no embeddings, vector DB,
-// RAG answers, or semantic chat surface are part of this contract.
-func SearchItemsForMCP(ctx context.Context, db *sql.DB, input MCPSearchItemsInput) (TodayFeedResponse, error) {
-	if input.Query == "" {
-		return TodayFeedResponse{}, fieldError("query")
-	}
-	if err := validateDateRange(input.From, input.To); err != nil {
-		return TodayFeedResponse{}, err
-	}
-	items, _, err := SearchItems(ctx, db, SearchQuery{Q: input.Query, Source: input.Source, From: input.From, To: input.To, Resonated: input.Resonated, Limit: normalizeLimit(input.Limit, 20, 50)})
-	if err != nil {
-		return TodayFeedResponse{}, fmt.Errorf("search MCP items: %w", err)
-	}
-	return TodayFeedResponse{Items: items}, nil
-}
-
 // SearchItemsResponseForMCP applies the same lexical search operation as
 // GET /api/search and preserves the normalized SearchQueryEcho envelope.
 func SearchItemsResponseForMCP(ctx context.Context, db *sql.DB, input MCPSearchItemsInput) (SearchResponse, error) {
@@ -658,8 +642,8 @@ func mcpErrFromError(err error) *mcpError {
 		}
 		return &mcpError{Code: -32602, Message: "invalid request", Data: nestedMCPErrorData("bad_request", message, details)}
 	}
-	if errors.Is(err, errManualFetchConflict) {
-		return &mcpError{Code: -32000, Message: "operation already running", Data: nestedMCPErrorData("conflict", "operation already running", map[string]any{"operation_running": true, "operation": "reprocess", "scope": "library", "retry_allowed": true})}
+	if details, ok := guardConflictDetails(err); ok {
+		return &mcpError{Code: -32000, Message: "operation already running", Data: nestedMCPErrorData("conflict", "operation already running", guardConflictDetailMap(details))}
 	}
 	var notFound mcpNotFoundError
 	if errors.As(err, &notFound) {
@@ -672,11 +656,7 @@ func nestedMCPErrorData(code string, message string, details map[string]any) map
 	if details == nil {
 		details = map[string]any{}
 	}
-	data := map[string]any{"error": map[string]any{"code": code, "message": message, "details": details}}
-	for key, value := range details {
-		data[key] = value
-	}
-	return data
+	return map[string]any{"error": map[string]any{"code": code, "message": message, "details": details}}
 }
 
 func decodeRaw(data json.RawMessage, target any) error {

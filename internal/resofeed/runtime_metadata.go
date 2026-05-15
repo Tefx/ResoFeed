@@ -37,9 +37,9 @@ func SetProcessingLanguage(ctx context.Context, db *sql.DB, req SetProcessingLan
 	if req.IdempotencyKey == "" || len([]byte(req.IdempotencyKey)) > 200 {
 		return ProcessingLanguageResponse{}, fieldError("idempotency_key")
 	}
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		return ProcessingLanguageResponse{}, errManualFetchConflict
+	release, err := tryAcquireIngestGuard(ctx, "reprocess", "library")
+	if err != nil {
+		return ProcessingLanguageResponse{}, err
 	}
 	defer releaseGuardRecover(release, &retErr, "set processing language")
 

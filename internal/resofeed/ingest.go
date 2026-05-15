@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -30,9 +31,33 @@ const (
 	modelStatusLatencyError    = "model_latency_error"
 )
 
-var ingestGuard sync.Mutex
+var ingestGuardState guardedOperationState
 
-var errManualFetchConflict = errors.New("manual fetch conflict: ingest already running")
+var errManualFetchConflict = errors.New("operation already running")
+
+type guardedOperationState struct {
+	mu     sync.Mutex
+	holder atomic.Value
+}
+
+type operationGuardDetails struct {
+	Operation string
+	Scope     any
+}
+
+type operationGuardConflictError struct {
+	details operationGuardDetails
+}
+
+func (e operationGuardConflictError) Error() string { return errManualFetchConflict.Error() }
+
+func (e operationGuardConflictError) Is(target error) bool {
+	return target == errManualFetchConflict
+}
+
+func (e operationGuardConflictError) guardDetails() operationGuardDetails {
+	return e.details
+}
 
 // IngestConfig defines the background ingestion loop inside the single Go
 // process. Defaults are 15 minute loop interval, 20 second source timeout, and
@@ -70,12 +95,12 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 
 // IngestOnce performs one ingestion pass over active sources.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
+	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	if err != nil {
 		return nil
 	}
 	defer releaseGuardRecover(release, &retErr, "ingest once")
-	_, err := ingestOnceUnlocked(ctx, db, cfg)
+	_, err = ingestOnceUnlocked(ctx, db, cfg)
 	return err
 }
 
@@ -83,9 +108,9 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 // in-process guard as background ingestion and never creates durable queue/job
 // state when another operation is already running.
 func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret ManualFetchResult, retErr error) {
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		return ManualFetchResult{}, errManualFetchConflict
+	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	if err != nil {
+		return ManualFetchResult{}, err
 	}
 	defer releaseGuardRecover(release, &retErr, "manual ingest")
 	return ingestOnceUnlocked(ctx, db, cfg)
@@ -95,9 +120,9 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret Manual
 // source. Missing, deleted, and inactive sources are reported by the caller as
 // not_found; operational RSS failures are source-level result entries.
 func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		return ManualFetchResult{}, errManualFetchConflict
+	release, err := tryAcquireIngestGuard(ctx, "fetch", "source")
+	if err != nil {
+		return ManualFetchResult{}, err
 	}
 	defer releaseGuardRecover(release, &retErr, "manual source fetch")
 
@@ -231,23 +256,48 @@ func DeleteSource(ctx context.Context, db *sql.DB, sourceID string) (DeleteSourc
 	return DeleteSourceResult{SourceID: sourceID, Deleted: true, Revision: revision}, nil
 }
 
-func tryAcquireIngestGuard(ctx context.Context) (func(), bool) {
+func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (func(), error) {
 	select {
 	case <-ctx.Done():
-		return nil, false
+		return nil, ctx.Err()
 	default:
 	}
-	if !ingestGuard.TryLock() {
-		return nil, false
+	if !ingestGuardState.mu.TryLock() {
+		details := ingestGuardState.snapshot()
+		return nil, operationGuardConflictError{details: details}
 	}
+	ingestGuardState.holder.Store(operationGuardDetails{Operation: operation, Scope: scope})
 	released := false
 	return func() {
 		if released {
 			return
 		}
 		released = true
-		ingestGuard.Unlock()
-	}, true
+		ingestGuardState.holder.Store(operationGuardDetails{})
+		ingestGuardState.mu.Unlock()
+	}, nil
+}
+
+func (s *guardedOperationState) snapshot() operationGuardDetails {
+	if holder, ok := s.holder.Load().(operationGuardDetails); ok && holder.Operation != "" {
+		return holder
+	}
+	return operationGuardDetails{Operation: "ingest", Scope: "all"}
+}
+
+func guardConflictDetails(err error) (operationGuardDetails, bool) {
+	var conflict interface{ guardDetails() operationGuardDetails }
+	if errors.As(err, &conflict) {
+		return conflict.guardDetails(), true
+	}
+	if errors.Is(err, errManualFetchConflict) {
+		return operationGuardDetails{Operation: "ingest", Scope: "all"}, true
+	}
+	return operationGuardDetails{}, false
+}
+
+func guardConflictDetailMap(details operationGuardDetails) map[string]any {
+	return map[string]any{"operation_running": true, "operation": details.Operation, "scope": details.Scope, "retry_allowed": true}
 }
 
 func releaseGuardRecover(release func(), retErr *error, label string) {

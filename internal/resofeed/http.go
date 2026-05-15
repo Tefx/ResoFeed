@@ -377,8 +377,8 @@ func (h apiHandler) handleSetRuntimeLanguage(w http.ResponseWriter, r *http.Requ
 	}
 	response, err := SetProcessingLanguage(r.Context(), h.cfg.DB, req)
 	if err != nil {
-		if errors.Is(err, errManualFetchConflict) {
-			writeGuardConflict(w, "reprocess", "library")
+		if details, ok := guardConflictDetails(err); ok {
+			writeGuardConflict(w, details)
 			return
 		}
 		writeRuntimeMutationError(w, err)
@@ -394,8 +394,8 @@ func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Reques
 	}
 	response, err := ReprocessLibrary(r.Context(), h.cfg.DB, h.cfg.LLM, req)
 	if err != nil {
-		if errors.Is(err, errManualFetchConflict) {
-			writeGuardConflict(w, "reprocess", "library")
+		if details, ok := guardConflictDetails(err); ok {
+			writeGuardConflict(w, details)
 			return
 		}
 		writeRuntimeMutationError(w, err)
@@ -404,8 +404,8 @@ func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Reques
 	writeJSON(w, http.StatusOK, response)
 }
 
-func writeGuardConflict(w http.ResponseWriter, operation string, scope any) {
-	writeAPIError(w, http.StatusConflict, "conflict", "operation already running", map[string]any{"operation_running": true, "operation": operation, "scope": scope, "retry_allowed": true})
+func writeGuardConflict(w http.ResponseWriter, details operationGuardDetails) {
+	writeAPIError(w, http.StatusConflict, "conflict", "operation already running", guardConflictDetailMap(details))
 }
 
 func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
@@ -1010,7 +1010,8 @@ func writeMutationError(w http.ResponseWriter, id string, err error) {
 
 func writeManualFetchError(w http.ResponseWriter, id string, err error) {
 	if errors.Is(err, errManualFetchConflict) {
-		writeAPIError(w, ManualFetchHTTPStatusConflict, ManualFetchErrorCodeConflict, "ingest already running", map[string]any{"ingest_running": true, "scope": "all", "retry_allowed": true})
+		details, _ := guardConflictDetails(err)
+		writeGuardConflict(w, details)
 		return
 	}
 	if errors.Is(err, sql.ErrNoRows) || strings.Contains(strings.ToLower(err.Error()), "no rows") {

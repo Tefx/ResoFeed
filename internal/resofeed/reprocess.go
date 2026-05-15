@@ -21,9 +21,9 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 	if err := validateMutationRequestFields(req.MutationRequestFields); err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		return ReprocessLibraryResponse{}, errManualFetchConflict
+	release, err := tryAcquireIngestGuard(ctx, "reprocess", "library")
+	if err != nil {
+		return ReprocessLibraryResponse{}, err
 	}
 	defer releaseGuardRecover(release, &retErr, "reprocess library")
 
@@ -41,9 +41,9 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 }
 
 func reprocessLibraryFresh(ctx context.Context, db *sql.DB, llm LLMClient) (ret ReprocessLibraryResponse, retErr error) {
-	release, acquired := tryAcquireIngestGuard(ctx)
-	if !acquired {
-		return ReprocessLibraryResponse{}, errManualFetchConflict
+	release, err := tryAcquireIngestGuard(ctx, "reprocess", "library")
+	if err != nil {
+		return ReprocessLibraryResponse{}, err
 	}
 	defer releaseGuardRecover(release, &retErr, "reprocess library")
 
