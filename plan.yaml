@@ -79351,3 +79351,64 @@ phases:
       \ | behavior_claim | runtime_proof_expected | evidence_ref | status | closure_path\
       \ | gate_decision_basis |\n|---|---|---|---|---|---|---|\n"
     agent: integration-verifier
+  - id: srde2e-visual-a11y-regression-proof
+    name: Run visual accessibility and hit-target regression proof
+    status: pending
+    description: 'As an INDEPENDENT TESTER (blind-tester), verify UI/a11y behavior
+      from public surfaces without relying on implementation internals.
+
+
+      Acceptance checklist:
+
+      - [ ] Capture screenshot/DOM/a11y evidence for owner-token accepted shell, Steer
+      idle/add/search/find/doctor/rule/invalid/receipt/undo states, Source Ledger
+      controls/details, desktop split-scroll, and mobile Inspector route.
+
+      - [ ] Prove real pointer center/interior activation and topmost element clickability
+      for Steer submit, [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions,
+      menu entries, row open, star, and original links.
+
+      - [ ] Prove keyboard tab/enter/space/escape behavior and visible focus indicators.
+
+      - [ ] Prove active panel semantic state agrees with visible panel state.
+
+      - [ ] Fail on forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
+      concepts.'
+    verification: '- [ ] full-plan-check companion protecting final closure gate.
+
+      - [ ] Visual/spatial artifacts cover required states and viewports.
+
+      - [ ] Hit-target proof uses real elementFromPoint/topmost clickability evidence
+      and 44px minimum measurements.
+
+      - [ ] A11y proof covers tab order, focus, live regions, aria-describedby, details
+      disclosure semantics, and active panel semantics.
+
+      - [ ] Negative UX scan finds no forbidden concepts.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Visual/A11y Regression Evidence
+
+      - Screenshots:
+
+      - DOM/a11y snapshots:
+
+      - Hit-target measurement table:
+
+      - Keyboard path proof:
+
+      - Negative UX scan:
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - srde2e-real-system-e2e-regression
+    agent: blind-tester
