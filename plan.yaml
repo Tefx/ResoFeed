@@ -74000,7 +74000,7 @@ phases:
       request attribution/idempotency metadata.'
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -74128,6 +74128,8 @@ phases:
     depends_on:
     - plfu-api-client-types
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T17:18:17.928255+00:00'
   - id: plfu-source-identifiers-split-scroll
     name: Preserve source identifiers and split scroll behavior
     status: done
