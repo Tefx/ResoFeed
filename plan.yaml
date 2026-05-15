@@ -71638,7 +71638,7 @@ phases:
       \ storage proof. No source files or orchestrator state files were edited manually."
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
-  status: done
+  status: in_progress
   gate: Runtime integration gate blocks unless HTTP and MCP language/reprocess/delivery
     parity, strict validation, and runnable `resofeed serve` liveness evidence are
     green.
@@ -73053,7 +73053,7 @@ phases:
       Files changed: none.'
   - id: plhm-runtime-gate
     name: Gate processing language HTTP MCP runtime integration
-    status: done
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -73134,152 +73134,6 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T16:17:29.855450+00:00'
-    done_at: '2026-05-15T16:36:42.593671+00:00'
-    evidence: "## Required Reading Confirmation\n- docs/ARCHITECTURE.md — Key contract:\
-      \ one binary started with `resofeed serve` serves static UI, JSON HTTP, MCP\
-      \ Streamable HTTP at `/mcp`, and ingest; `/api/*` and `/mcp` require owner-token\
-      \ auth; HTTP/MCP must share product operations; no jobs/queues/ledgers/sync/per-agent\
-      \ auth/delivery registry.\n- docs/DESIGN.md — Key contract: dense operational\
-      \ chrome; language is global runtime state, not a settings dashboard; reprocess\
-      \ is explicit and must not create job dashboards, queues, ledgers, or activity\
-      \ history.\n- AGENTS.md — NOT READ: absent in isolated worktree.\n- CONSTITUTION.md\
-      \ — NOT READ: absent in isolated worktree (`glob CONSTITUTION.md` returned no\
-      \ files).\n\n## Gate Summary\nheadline: PASS\nverdict: PASS\ngate_open_allowed:\
-      \ true\nproof_gap_status: NONE\nblocking_status: CLOSED\norchestrator_action_hint:\
-      \ COMPLETE\nblockers: []\n\n## Test-Step Semantic Reporting\nstep_intent: gate_verify_runtime_surface\n\
-      expected_result: green\nobserved_result: pass; Go retests passed, blind `resofeed\
-      \ serve` liveness passed, HTTP/MCP runtime language/search/auth/idempotency/validation\
-      \ paths were exercised.\nfailure_alignment: no observed failures align with\
-      \ gate rejection.\nproduct_implementation_files_modified: false\n\n## Checklist\
-      \ Closure\n- HTTP/MCP green retest passed: PROVEN — `go test ./...` exit 0;\
-      \ focused runtime parity suite `go test ./internal/resofeed -count=1 -run 'TestPLHM|TestProcessingLanguage|TestMCP|TestHTTP|TestRuntime|TestReprocess|TestDelivery|TestSearch'`\
-      \ exit 0.\n- Blind liveness probe passed with public HTTP and MCP evidence:\
-      \ PROVEN — Python probe launched `go run ./cmd/resofeed serve ...`; public `/`\
-      \ returned 200; `/api/runtime/language` returned 200 with `en`; `/mcp` `get_processing_language`\
-      \ and `search_items` returned 200 JSON-RPC results.\n- Wiring and spec conformance\
-      \ reports have no unresolved blockers: PROVEN — prior retest artifact `.audit-artifacts/regression_audit_full_runtime_retest/full-runtime-retest-evidence.md`\
-      \ reports `verdict: PASS`, `gate_open_allowed: true`, `blockers: []`; current\
-      \ focused retests and smoke confirm no blocker reproduction.\n- Decision basis\
-      \ maps behavioral/runtime obligations to PROVEN or BLOCK: PROVEN — see behavioral_proof_register\
-      \ below.\n- All runtime phase steps completed with adequate evidence: PROVEN\
-      \ — runtime retest artifact and current tests/smoke cover HTTP, MCP, auth, idempotency,\
-      \ validation, liveness, and forbidden-surface obligations.\n- plhm-runtime-blocker-retest\
-      \ passed after remediation: PROVEN — `internal/resofeed/plhm_runtime_blocker_remediation_test.go`\
-      \ covered PLHM conflict/error blockers and current focused suite passed.\n-\
-      \ Runnable-surface evidence identifies entrypoint/launch/transport/operation:\
-      \ PROVEN — entrypoint `cmd/resofeed/main.go`; launch `go run ./cmd/resofeed\
-      \ serve`; transports HTTP JSON `/api/*`, MCP `/mcp`, static `/`; operations\
-      \ `GET/PUT /api/runtime/language`, `GET /api/search`, MCP `get_processing_language`,\
-      \ MCP `search_items`.\n- HTTP/MCP conflict/error shapes and MCP search query\
-      \ echo runtime path are PROVEN: PROVEN — PLHM tests passed for HTTP 409 and\
-      \ MCP nested conflict/field errors; liveness MCP `search_items` echoed query\
-      \ envelope.\n- OPEN recommendation allowed only if obligations proven/non-intersecting:\
-      \ PROVEN — no blocker-class runtime obligation remains BLOCK.\n\n## behavioral_proof_register\n\
-      - obligation: resofeed_serve_liveness\n  status: PROVEN\n  evidence: \"Blind\
-      \ probe launched `go run ./cmd/resofeed serve --addr 127.0.0.1:<port> --public-url\
-      \ ... --db .tmp... --owner-token <redacted>`; public `/` status 200; `/api/runtime/language`\
-      \ status 200; `/mcp` status 200.\"\n  uncertainty: NONE\n- obligation: http_owner_token_auth\n\
-      \  status: PROVEN\n  evidence: \"Blind probe unauthenticated `/api/runtime/language`\
-      \ returned 401 body code `unauthorized`, message `owner token required`.\"\n\
-      \  uncertainty: NONE\n- obligation: mcp_owner_token_auth\n  status: PROVEN\n\
-      \  evidence: \"Blind probe unauthenticated POST `/mcp` returned 401 body code\
-      \ `unauthorized`, message `owner token required`.\"\n  uncertainty: NONE\n-\
-      \ obligation: runtime_language_http_mcp_parity\n  status: PROVEN\n  evidence:\
-      \ \"HTTP GET returned `{code: en}`; HTTP PUT set zh with `already_applied:false`;\
-      \ MCP `get_processing_language` returned `{code: zh}`.\"\n  uncertainty: NONE\n\
-      - obligation: runtime_language_idempotency\n  status: PROVEN\n  evidence: \"\
-      Blind probe repeated identical `PUT /api/runtime/language` idempotency key:\
-      \ first `already_applied:false`, replay `already_applied:true`.\"\n  uncertainty:\
-      \ NONE\n- obligation: strict_unknown_query_validation\n  status: PROVEN\n  evidence:\
-      \ \"Blind probe `GET /api/runtime/language?trace=1` returned 400 `bad_request`,\
-      \ details.field `trace`; tests cover broader endpoint query rejection.\"\n \
-      \ uncertainty: NONE\n- obligation: strict_unknown_body_validation\n  status:\
-      \ PROVEN\n  evidence: \"Blind probe `PUT /api/runtime/language` with `extra`\
-      \ returned 400 `bad_request`, details.field `extra`; `http.go:815-818` uses\
-      \ `DisallowUnknownFields`.\"\n  uncertainty: NONE\n- obligation: search_query_echo_http\n\
-      \  status: PROVEN\n  evidence: \"Blind probe `GET /api/search?q=runtime%20echo%20smoke&limit=5`\
-      \ returned query `{q:\\\"runtime echo smoke\\\", limit:5}`.\"\n  uncertainty:\
-      \ NONE\n- obligation: search_query_echo_mcp\n  status: PROVEN\n  evidence: \"\
-      Blind probe MCP `search_items` returned text envelope with query `{q:\\\"runtime\
-      \ echo smoke\\\", limit:5}`; `mcp_expected_red_test.go:78-83,253-265` covers\
-      \ seeded-result query echo and rejects per-call language override.\"\n  uncertainty:\
-      \ NONE\n- obligation: reprocess_parity\n  status: PROVEN\n  evidence: \"`mcp_expected_red_test.go:64-72,241-249`\
-      \ validates MCP reprocess conflict and response invariants; `docs/ARCHITECTURE.md:1300-1337,1429-1433`\
-      \ defines HTTP/MCP equivalent operations; focused suite passed.\"\n  uncertainty:\
-      \ NONE\n- obligation: delivery_parity\n  status: PROVEN\n  evidence: \"`http_impl_test.go:319-355`\
-      \ covers HTTP delivery validation/idempotency/state; `mcp_expected_red_test.go:85-107,268-278`\
-      \ covers MCP report_delivery auth/idempotency/error/state; focused suite passed.\"\
-      \n  uncertainty: NONE\n- obligation: conflict_error_shapes\n  status: PROVEN\n\
-      \  evidence: \"`plhm_runtime_blocker_remediation_test.go:12-50` asserts HTTP\
-      \ 409 `conflict` shape; lines 54-99 assert MCP nested-only conflict/field error\
-      \ shapes; focused suite passed.\"\n  uncertainty: NONE\n- obligation: no_forbidden_surfaces\n\
-      \  status: PROVEN\n  evidence: \"Scoped scan for forbidden table DDL returned\
-      \ no matches; `mcp_expected_red_test.go:330-340` asserts no `delivery_registry`,\
-      \ `delivery_jobs`, `delivery_ledger`, `reprocess_jobs`, `reprocess_ledger` tables.\"\
-      \n  uncertainty: NONE\n- obligation: escape_hatch_absence\n  status: PROVEN\n\
-      \  evidence: \"Scoped command `rg -n '@invar:allow|invar:allow' cmd internal\
-      \ web/src web/tests docs/ARCHITECTURE.md docs/DESIGN.md || true` produced no\
-      \ scoped source/code matches.\"\n  uncertainty: NONE\n\n## gate_decision\nheadline:\
-      \ PASS\nverdict: PASS\ngate_open_allowed: true\nblocking_status: CLOSED\nrationale:\
-      \ Runnable HTTP and MCP surfaces are live through `resofeed serve`, parity-critical\
-      \ behavior is covered by current tests plus smoke evidence, strict validation/auth/idempotency\
-      \ obligations are proven, and no forbidden blocker surface was found.\n\n##\
-      \ Wiring Audit Results\n- W1 Entrypoint/runtime wiring: PASS — `cmd/resofeed/main.go`\
-      \ calls `resofeed.Main`; blind liveness launched `go run ./cmd/resofeed serve`.\n\
-      - W2 HTTP router/auth wiring: PASS — `/api/runtime/language` requires auth and\
-      \ returns canonical JSON.\n- W3 MCP router/auth wiring: PASS — `/mcp` requires\
-      \ auth before JSON-RPC handling and returns canonical 401.\n- W4 Shared operation\
-      \ parity: PASS — language, reprocess, search query echo, and delivery are covered\
-      \ by shared tests and runtime smoke.\n- W5 Strict validation: PASS — unknown\
-      \ query/body fields rejected with `400 bad_request`.\n- W6 Conflict/idempotency:\
-      \ PASS — PLHM tests prove HTTP/MCP conflict shapes; liveness proves language\
-      \ replay.\n- W7 Escape hatches/stubs: PASS — no scoped `@invar:allow` source\
-      \ annotations found.\n- W8 Forbidden architecture surfaces: PASS — no forbidden\
-      \ durable delivery/reprocess table DDL found; scan hits were prohibitions/tests/comments,\
-      \ not implementations.\n\n## Escape Hatch Audit\n- Command: `rg -n '@invar:allow|invar:allow'\
-      \ cmd internal web/src web/tests docs/ARCHITECTURE.md docs/DESIGN.md || true`\n\
-      - Result: no scoped source/code annotations found.\n\n## Liveness / Smoke Evidence\n\
-      - Entrypoint: `cmd/resofeed/main.go -> resofeed.Main`.\n- Launch command: `go\
-      \ run ./cmd/resofeed serve --addr 127.0.0.1:<port> --public-url http://127.0.0.1:<port>\
-      \ --db .tmp-plhm-runtime-gate-smoke/resofeed.sqlite3 --owner-token <redacted>`.\n\
-      - Transport: public static `/`, authenticated HTTP JSON `/api/*`, authenticated\
-      \ MCP Streamable HTTP `/mcp`.\n- Real operations: public `/` 200; HTTP `GET\
-      \ /api/runtime/language` 200; HTTP `PUT /api/runtime/language` 200; HTTP `GET\
-      \ /api/search` 200 with query echo; MCP `get_processing_language` 200; MCP `search_items`\
-      \ 200 with query echo.\n\n## HTTP/MCP Parity and Validation Evidence\n- Language:\
-      \ HTTP GET/PUT and MCP get path proven by smoke; MCP set/idempotency covered\
-      \ by focused tests.\n- Reprocess: MCP/HTTP parity and conflict semantics covered\
-      \ by `mcp_expected_red_test.go` and PLHM remediation tests.\n- Search query\
-      \ echo: HTTP and MCP smoke both returned canonical `query` envelope.\n- Delivery:\
-      \ HTTP and MCP tests prove canonical report-delivery response, idempotency replay,\
-      \ mismatch rejection, and state write.\n- Strict validation: unknown query `trace`\
-      \ and unknown JSON body `extra` returned `400 bad_request`.\n- Auth/idempotency:\
-      \ `/api/*` and `/mcp` unauthorized returned 401; repeated language idempotency\
-      \ key returned `already_applied:true`.\n\n## Integration-vs-Fixture Assessment\n\
-      - Real integration: blind liveness used actual `resofeed serve` process, temp\
-      \ SQLite DB, real TCP port, HTTP requests, and MCP JSON-RPC requests.\n- Fixture-backed\
-      \ tests: Go tests seed corpora for deterministic delivery/search/reprocess assertions;\
-      \ they are not sole evidence because runtime smoke exercised the public binary\
-      \ surface.\n- Prior retest artifact distinguishes fixture UI tests from real\
-      \ runtime probes and reports `blockers: []`.\n\n## Forbidden Surface Scan\n\
-      - Command: `rg -n 'delivery_registry|delivery_jobs|delivery_ledger|reprocess_jobs|reprocess_ledger|sync\
-      \ coordinator|state merger|conflict resolver|per-agent registry|agent registry|OAuth|RBAC|vector\
-      \ database|embeddings|activity ledger|command history|durable queue|job table|worker\
-      \ process|delivery channel' cmd internal web/src docs/ARCHITECTURE.md docs/DESIGN.md\
-      \ || true`\n- Command: `rg -n 'create table (delivery_registry|delivery_jobs|delivery_ledger|reprocess_jobs|reprocess_ledger|jobs|queue|sync|agent_registry)'\
-      \ internal/resofeed || true`\n- Result: no forbidden table creation output;\
-      \ matches were architecture/design prohibitions, comments, or tests asserting\
-      \ absence.\n\n## Files changed\nnone\n\n## Commit hash(es)\nnone (verify-only;\
-      \ no changes)\n\n## Verification\n- `pwd && git status --short --branch && git\
-      \ diff --stat && go test ./...` — exit 0; branch `vectl/step-plhm-runtime-gate`;\
-      \ Go packages passed.\n- `go test ./internal/resofeed -count=1 -run 'TestPLHM|TestProcessingLanguage|TestMCP|TestHTTP|TestRuntime|TestReprocess|TestDelivery|TestSearch'`\
-      \ — exit 0.\n- Blind runtime liveness Python probe — exit 0; output status `PASS`.\n\
-      - Escape hatch and forbidden-surface scans — exit 0 via `|| true`; no scoped\
-      \ `@invar:allow`, no forbidden table DDL.\n- `git status --short --branch` after\
-      \ checks — clean branch `vectl/step-plhm-runtime-gate`.\n- `vectl_check` toggled\
-      \ all four plan completion checklist items to `[x]`; orchestrator subsequently\
-      \ toggled verification checklist items after evidence validation.\n\n## Gaps/Notes\n\
-      none"
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
     status: done
@@ -73830,7 +73684,7 @@ phases:
       Files changed: none'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
-  status: in_progress
+  status: locked
   gate: Frontend gate blocks unless language/reprocess controls, API client types,
     source identifier preservation, split scroll behavior, rendered UI proof, and
     UIUX audit pass against DESIGN.md.
@@ -73839,7 +73693,7 @@ phases:
   steps:
   - id: plfu-api-client-types
     name: Update frontend API client types for language reprocess and delivery
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       agent_source: project
@@ -73972,8 +73826,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     agent: frontend-engineer
-    claimed_by: frontend-engineer
-    claimed_at: '2026-05-15T16:38:54.912075+00:00'
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
     status: pending
@@ -74106,7 +73958,7 @@ phases:
     agent: frontend-engineer
   - id: plfu-source-identifiers-split-scroll
     name: Preserve source identifiers and split scroll behavior
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       agent_source: project
@@ -74142,7 +73994,7 @@ phases:
 
       ## Downstream blocker ownership from storage-core verification
 
-      - [ ] Frontend source/split-scroll contract anchors must be consumed by rendered
+      - [x] Frontend source/split-scroll contract anchors must be consumed by rendered
       routes/components here.
 
       - [ ] Type-only UI declarations are not sufficient unless a later rendered owner
@@ -74249,8 +74101,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     agent: frontend-engineer
-    claimed_by: frontend-engineer
-    claimed_at: '2026-05-15T16:39:13.822234+00:00'
   - id: plfu-frontend-green-retest
     name: Retest frontend expected-red suite to green
     status: pending
