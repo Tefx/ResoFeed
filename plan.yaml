@@ -70436,7 +70436,7 @@ phases:
       \ checklist was marked complete after evidence validation."
   - id: plsc-core-wiring-audit
     name: Audit backend core wiring and public symbol reachability
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -70566,6 +70566,121 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-15T14:52:16.224279+00:00'
+    done_at: '2026-05-15T15:07:38.839170+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ by wiring-auditor. Key passages cited: one Go
+      process and one SQLite DB; runtime metadata owns `owner_token_sha256`, `processing_language`,
+      and `search_fts_stale_since` and is excluded from state export/import; processing-language/reprocess
+      core owns persisted language, OpenRouter target_language input, item/FTS writes,
+      and no durable jobs/queues; no repositories/factories/DI/event buses/service
+      catalogs/job tables.
+
+      - `CONSTITUTION.md`: NOT READ: no file found in isolated worktree via glob `CONSTITUTION.md`.
+
+
+      ## Backend Core Wiring Audit Report
+
+      Original verifier verdict: FAIL due declaration-only exported backend-core anchors
+      with no runtime/test consumer and no explicit downstream owner. This verification
+      report is being completed as an issue-detection artifact only after planner-created
+      remediation ownership, per batched fix protocol. It is not a gate-open signal.
+
+
+      ## W1-W12 summary
+
+      - Entry-to-effect trace: WIRED for serve/core storage paths; downstream-owned
+      gaps for MCP language parity.
+
+      - Runtime metadata/schema field trace: WIRED for `owner_token_sha256`, `processing_language`,
+      `search_fts_stale_since`, and receipt fingerprints.
+
+      - CLI params/registration/config/dependency alignment: WIRED/PASS statically.
+
+      - Escape hatch / stubs: no production `NotImplemented`, `panic(`, private `_Runtime*`,
+      or forbidden queue/job/ledger/vector/embedding constructs found.
+
+      - Frontend route-render integrity: downstream-owned by `plfu-*`.
+
+
+      ## Storage-core blockers detected
+
+      - `RuntimeLanguageContract` at `internal/resofeed/processing_language_contract.go:163-170`:
+      exported declaration-only orphan, no runtime/test consumer.
+
+      - `RequestFingerprintContract` at `internal/resofeed/processing_language_contract.go:172-181`:
+      exported declaration-only orphan; real implementation is `withIdempotencyReceipt`
+      in `idempotency.go`.
+
+      - `ReprocessSourcePrecedence` at `internal/resofeed/processing_language_contract.go:183-187`:
+      exported var has no runtime consumer; implementation hardcodes equivalent logic
+      in `reprocessCandidateURLs`.
+
+
+      ## Downstream-owned missing runtime/UI surfaces recorded
+
+      - `plhm-mcp-runtime-parity`: MCP `resofeed://runtime/language`, get/set language,
+      reprocess_library, search_items query echo/nested errors.
+
+      - `plhm-http-runtime-endpoints`: HTTP delivery route registration/validation/idempotency.
+
+      - `plfu-api-client-types`, `plfu-language-reprocess-controls`, `plfu-source-identifiers-split-scroll`:
+      frontend runtime consumption.
+
+
+      ## Remediation ownership created
+
+      Planner added:
+
+      - `plsc-storage-core-blocker-fix` — batched implementation fix for orphan anchors
+      plus language guard and doctor proof.
+
+      - `plsc-storage-core-blocker-retest` — independent retest proving closure.
+
+      - `plsc-core-gate` now depends on `plsc-storage-core-blocker-retest`.
+
+
+      ## Verification commands reported
+
+      - Static consumer scans using `rg` over `internal/resofeed` and `cmd/resofeed`
+      identified core consumers and orphan-only declarations.
+
+      - Stub/forbidden abstraction scans found only comments/local placeholder variable
+      names, no production stubs or forbidden DDL/abstractions.
+
+      - `git status --short && git log -1 --oneline` => clean worktree; no code changes.
+
+
+      ## Behavioral proof register
+
+      - processing_language_http_core_path: NEEDS_TEST (static evidence exists)
+
+      - processing_language_ingest_target_language: NEEDS_TEST (static evidence exists)
+
+      - reprocess_item_rewrite_and_fts_rebuild: NEEDS_TEST (static evidence exists)
+
+      - runtime_metadata_export_exclusion: NEEDS_TEST (static evidence exists)
+
+      - mcp_language_reprocess_parity: UNPROVEN, downstream-owned
+
+      - no_production_stub_placeholders: UNPROVEN by static audit only
+
+      - no_forbidden_queue_job_ledger_abstractions: UNPROVEN by static audit only
+
+
+      ## Artifacts Modified
+
+      - Product implementation files modified: none.
+
+      - Files changed in isolated worktree: none.
+
+      - Commit hash(es): none (verification-only; no changes made).
+
+
+      ## Gaps/Notes
+
+      - This step found storage-core orphan blockers and did not greenlight the gate.
+      Remediation is now explicit and blocking before `plsc-core-gate`.'
   - id: plsc-core-spec-conformance
     name: Verify backend core spec conformance
     status: done
