@@ -73803,15 +73803,15 @@ phases:
 
       - [x] Declaration-only client anchors are either consumed by runtime client/rendered
       controls or explicitly justified/de-exported.'
-    verification: '- [ ] Frontend type/client tests pass for language/reprocess response
+    verification: '- [x] Frontend type/client tests pass for language/reprocess response
       and error shapes.
 
-      - [ ] Search query echo type is represented where search API client is used.
+      - [x] Search query echo type is represented where search API client is used.
 
-      - [ ] Client code consumes runtime routes proven by the HTTP/MCP runtime phase
+      - [x] Client code consumes runtime routes proven by the HTTP/MCP runtime phase
       rather than only type declarations.
 
-      - [ ] No forbidden UI state surfaces are added.'
+      - [x] No forbidden UI state surfaces are added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
