@@ -70982,6 +70982,127 @@ phases:
     - plsc-core-spec-conformance
     - plsc-core-wiring-audit
     agent: golang-developer
+  - id: plsc-storage-core-blocker-retest
+    name: Retest storage-core blocker remediation
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      Independent retest for the batched storage-core remediation. Scope declaration:
+      phase-check protecting `plsc-core-gate` and downstream runtime/API/frontend
+      gates.
+
+
+      As an INDEPENDENT TESTER, verify that the remediation from `plsc-storage-core-blocker-fix`
+      closes the storage-core blockers detected by `plsc-core-spec-conformance` and
+      `plsc-core-wiring-audit`.
+
+
+      This retest must prove backend-core readiness only. Missing HTTP/MCP/frontend
+      runtime exposure remains blocker-class but owned by downstream steps and gates;
+      do not reclassify those gaps as storage-core completion failures unless they
+      reveal missing core behavior.
+
+
+      Required proof areas:
+
+      - Backend-core regression suite: original processing-language storage/core tests
+      still pass.
+
+      - Guard exclusivity: language mutation cannot write storage concurrently with
+      active ingest/fetch/reprocess operations in a way that permits mixed-language
+      batches.
+
+      - Orphan anchor closure: `RuntimeLanguageContract`, `RequestFingerprintContract`,
+      and `ReprocessSourcePrecedence` are consumed, removed/de-exported, or assigned
+      to explicit named downstream owner steps; no unowned storage-core orphan remains.
+
+      - Doctor diagnostics: stale, ok, and runtime-language redaction proof is green
+      before runtime exposure.
+
+      - Downstream ownership: MCP gaps remain owned by `plhm-mcp-runtime-parity`;
+      HTTP delivery/runtime endpoint gaps remain owned by `plhm-http-runtime-endpoints`;
+      frontend gaps remain owned by `plfu-*` steps.
+
+
+      ## Behavioral Proof Register (MANDATORY)
+
+      For each blocker/proof obligation, evidence must include:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Original backend-core processing-language tests pass after remediation.
+
+      - [ ] New guard exclusivity proof is green and cites exact test names or command
+      output.
+
+      - [ ] Anchor disposition proof shows no unowned storage-core exported declaration-only
+      orphan remains.
+
+      - [ ] Doctor stale/ok/redaction proof is green.
+
+      - [ ] Downstream HTTP/MCP/frontend blockers are preserved as downstream-owned
+      with owner steps and gates named.'
+    verification: '- [ ] Retest evidence includes exact backend-core command(s) and
+      output summary showing green results.
+
+      - [ ] Retest evidence includes a behavioral proof register for language guard
+      exclusivity, orphan anchor disposition, and doctor stale/ok/redaction.
+
+      - [ ] Retest evidence explicitly maps downstream HTTP/MCP/frontend gaps to `plhm-*`
+      / `plfu-*` owner steps and does not weaken final acceptance.
+
+      - [ ] Retest headline is PASS only if no backend-core blocker-class divergence
+      remains.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of implementation)\n**Scope**: storage-core blocker remediation\n\
+      **Independence Level**: L1\n**Timestamp**: <ISO 8601>\n\n### refs Read Confirmation\
+      \ (MANDATORY)\nFor each ref in this step:\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for\
+      \ this step.\"\n\n### Test Execution\n- Commands executed:\n  ```\n  <actual\
+      \ backend-core test commands>\n  ```\n- Output summary: <key results>\n\n###\
+      \ Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n| ARCHITECTURE operation exclusivity | language\
+      \ mutation guarded against active ingest/fetch/reprocess | targeted concurrency/guard\
+      \ test green | <test/output> | PROVEN / NEEDS_TEST / UNPROVEN | <closure> |\
+      \ <OPEN/BLOCK basis> |\n| wiring audit orphan anchors | no unowned storage-core\
+      \ orphan declarations remain | grep/import/test consumer proof | <evidence>\
+      \ | PROVEN / NEEDS_TEST / UNPROVEN | <closure> | <OPEN/BLOCK basis> |\n| doctor\
+      \ diagnostics | stale/ok/redaction behavior correct before exposure | focused\
+      \ tests green | <test/output> | PROVEN / NEEDS_TEST / UNPROVEN | <closure> |\
+      \ <OPEN/BLOCK basis> |\n\n### Downstream Ownership Preservation\n- MCP: `plhm-mcp-runtime-parity`\
+      \ owns runtime language/reprocess tools/resource, search query echo, nested\
+      \ JSON-RPC errors.\n- HTTP: `plhm-http-runtime-endpoints` owns delivery/runtime\
+      \ route, validation, idempotency behavior.\n- Frontend: `plfu-api-client-types`,\
+      \ `plfu-language-reprocess-controls`, `plfu-source-identifiers-split-scroll`\
+      \ own frontend runtime consumption.\n\n### Headline\n- [ ] PASS: No backend-core\
+      \ blocker remains; downstream blockers are preserved with owner steps.\n- [\
+      \ ] FAIL: Backend-core blocker or proof gap remains.\n\n**Confidence**: high/medium/low"
+    depends_on:
+    - plsc-storage-core-blocker-fix
+    agent: integration-verifier
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
