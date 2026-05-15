@@ -72683,7 +72683,7 @@ phases:
 
       - [x] `search_items` and HTTP search share query echo behavior.
 
-      - [ ] No production stub/private placeholder remains wired as runtime dependency.
+      - [x] No production stub/private placeholder remains wired as runtime dependency.
 
       - [ ] No delivery registry, job queue, activity ledger, sync/merge module, DI
       container, or service layer is introduced.'
