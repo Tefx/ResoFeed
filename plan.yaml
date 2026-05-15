@@ -79082,6 +79082,74 @@ phases:
 
       '
     agent: frontend-engineer
+  - id: srdf-uiux-native-audit
+    name: Run native multimodal UIUX audit for Steer delta
+    status: pending
+    description: 'As an INDEPENDENT UIUX AUDITOR (uiux-auditor), compare real rendered
+      artifacts against DESIGN.md and UI_REGRESSION_CONTRACT.md.
+
+
+      Scope: Steer route preview, Source Ledger details/manual controls, split-scroll/mobile
+      route, processing language/reprocess low-chrome controls, and negative UI assertions.
+
+
+      Acceptance checklist:
+
+      - [ ] Capture desktop and mobile screenshots/DOM snapshots for required states.
+
+      - [ ] Verify route preview idle/add/search/find/doctor/rule/invalid/receipt/undo
+      states against design tokens and copy.
+
+      - [ ] Verify Source Ledger actions/details/hit-targets and manual controls are
+      rendered and reachable.
+
+      - [ ] Verify split-scroll desktop and mobile Inspector route behavior visually/spatially.
+
+      - [ ] Verify no forbidden UI concepts or AI/RAG/chat/semantic answer affordances
+      appear.
+
+      - [ ] Produce parseable PASS/PASS_WITH_DEBT/FAIL handoff with blocker-class
+      issues separated from non-blocking debt.'
+    verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
+
+      - [ ] Rendered screenshots/images/DOM snapshots cover required states/viewports.
+
+      - [ ] PASS handoff is parseable and includes explicit evidence refs.
+
+      - [ ] Any blocker-class UI/design issue has remediation ownership before gate
+      opens.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      ## Native Multimodal Audit Handoff
+
+      **Artifacts**:
+
+      - Desktop:
+
+      - Mobile:
+
+      - DOM/a11y snapshots:
+
+      **Checklist verdicts**:
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL
+
+      '
+    depends_on:
+    - srdf-steer-preview-ui-state-aria
+    - srdf-source-ledger-details-hit-targets
+    - srdf-split-scroll-mobile-route
+    - srdf-processing-language-low-chrome-controls
+    agent: uiux-auditor
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
