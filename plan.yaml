@@ -69191,7 +69191,7 @@ phases:
       step.'
   - id: plct-backend-expected-red-tests
     name: Add backend expected-red contract tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -69263,6 +69263,8 @@ phases:
     depends_on:
     - plct-contract-lock
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T11:45:15.842170+00:00'
   - id: plct-mcp-expected-red-tests
     name: Add MCP parity expected-red contract tests
     status: pending
