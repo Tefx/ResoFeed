@@ -62222,7 +62222,7 @@ phases:
       exited 0; 7 passed.'
   - id: urda-keyboard-a11y-nav-batched-fix
     name: Batched keyboard navigation and accessibility role fix
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       priority: HIGH
@@ -62326,6 +62326,8 @@ phases:
     depends_on:
     - urda-frontend-ui-audit-gate
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T02:28:54.255812+00:00'
   - id: urda-keyboard-a11y-nav-post-fix-retest
     name: Post-fix keyboard navigation and UI accessibility retest
     status: pending
