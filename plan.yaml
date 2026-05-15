@@ -76587,11 +76587,11 @@ phases:
 
       - [x] Runtime metadata, receipts, FTS stale marker, and state export/import
       boundaries are correct.'
-    verification: '- [ ] Final wiring/architecture audit reports PASS/PASS_WITH_DEBT/FAIL.
+    verification: '- [x] Final wiring/architecture audit reports PASS/PASS_WITH_DEBT/FAIL.
 
-      - [ ] Any blocker-class architecture violation has remediation ownership.
+      - [x] Any blocker-class architecture violation has remediation ownership.
 
-      - [ ] Audit includes concrete file/path evidence, not only assertions.'
+      - [x] Audit includes concrete file/path evidence, not only assertions.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
