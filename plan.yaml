@@ -67614,7 +67614,7 @@ phases:
       - No blockers.'
   - id: ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
     name: Fix mobile Inspector grouped duplicate source disclosure on served app
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -67824,6 +67824,8 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-black-box-liveness
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T09:22:08.471591+00:00'
   - id: ui-runtime-fresh-review-black-box-liveness-rerun
     name: Rerun black-box mobile Inspector liveness proof
     status: pending
