@@ -71904,7 +71904,7 @@ phases:
       - [x] Outputs vary by request inputs, current language, receipt state, and operation
       guard.
 
-      - [ ] HTTP and MCP state changes are equivalent.
+      - [x] HTTP and MCP state changes are equivalent.
 
       - [ ] Storage-core downstream-owned MCP blockers are all closed or converted
       into explicit runtime gate blockers with evidence.'
