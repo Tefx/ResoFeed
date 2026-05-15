@@ -70312,6 +70312,78 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: wiring-auditor
+  - id: plhm-runtime-spec-conformance
+    name: Verify HTTP MCP runtime spec conformance
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Spec conformance verification for HTTP and MCP runtime surfaces. Compare implementation
+      against docs/ARCHITECTURE.md endpoint/tool/resource contracts, error matrices,
+      strict validation rules, auth boundary, idempotency semantics, delivery parity,
+      and doctor/search behavior.
+
+
+      Scope declaration: phase-check protecting runtime integration gate and downstream
+      system E2E.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Each new HTTP endpoint and MCP tool/resource has a requirement-row verdict.
+
+      - [ ] Error codes/statuses and JSON-RPC error shapes are checked character/field-exact.
+
+      - [ ] `actor_id` provenance-not-auth and owner-token auth boundary are explicitly
+      verified.
+
+      - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has an explicit closure path.'
+    verification: '- [ ] Evidence table maps HTTP/MCP requirements to implementation
+      and runtime proof.
+
+      - [ ] No blocker-class runtime spec drift proceeds to frontend/system phases.
+
+      - [ ] Gate decision basis can consume this report directly.'
+    evidence_template: '## Spec Conformance Report
+
+      **Phase**: processing-language-http-mcp-runtime
+
+      **Spec source**: docs/ARCHITECTURE.md
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+
+      ## Coverage Summary
+
+      - Total requirements:
+
+      - Top risks:
+
+      - Suggested tests:'
+    depends_on:
+    - plhm-http-runtime-endpoints
+    - plhm-mcp-runtime-parity
+    agent: spec-verifier
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
