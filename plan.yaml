@@ -71420,16 +71420,16 @@ phases:
 
       - [x] Downstream HTTP/MCP/frontend blockers are preserved as downstream-owned
       with owner steps and gates named.'
-    verification: '- [ ] Retest evidence includes exact backend-core command(s) and
+    verification: '- [x] Retest evidence includes exact backend-core command(s) and
       output summary showing green results.
 
-      - [ ] Retest evidence includes a behavioral proof register for language guard
+      - [x] Retest evidence includes a behavioral proof register for language guard
       exclusivity, orphan anchor disposition, and doctor stale/ok/redaction.
 
-      - [ ] Retest evidence explicitly maps downstream HTTP/MCP/frontend gaps to `plhm-*`
+      - [x] Retest evidence explicitly maps downstream HTTP/MCP/frontend gaps to `plhm-*`
       / `plfu-*` owner steps and does not weaken final acceptance.
 
-      - [ ] Retest headline is PASS only if no backend-core blocker-class divergence
+      - [x] Retest headline is PASS only if no backend-core blocker-class divergence
       remains.'
     evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
       \ (independent of implementation)\n**Scope**: storage-core blocker remediation\n\
