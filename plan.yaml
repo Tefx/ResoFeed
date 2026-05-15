@@ -77307,7 +77307,7 @@ phases:
       - [x] Regression tests cover timeout, cancellation, and fresh-fetch/OpenRouter
       failure clearing/overwriting old readable fields and maintaining FTS consistency.
 
-      - [ ] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
+      - [x] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
       evidence.
 
       - [ ] Runtime proof obligations for language future-only/no row rewrite, steering
