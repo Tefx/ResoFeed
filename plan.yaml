@@ -71870,7 +71870,7 @@ phases:
 
       - [ ] `search_items` dropping `SearchQueryEcho`/query echo is owned here.
 
-      - [ ] MCP error envelope divergence is owned here.
+      - [x] MCP error envelope divergence is owned here.
 
       - [ ] MCP language mutation guard/reprocess active duplicate behavior is owned
       here.
