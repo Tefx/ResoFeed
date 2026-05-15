@@ -60103,7 +60103,7 @@ phases:
       OPEN'
 - id: ui-runtime-design-audit-frontend-repair
   name: UI Runtime Design Audit — Frontend, Layout, Accessibility, and Preview Repair
-  status: in_progress
+  status: done
   gate: Frontend repair closes Source Ledger controls, raw diagnostics, layout geometry,
     keyboard semantics, design-token hover/focus, search/feed/inspector/owner/resonate
     UI issues, and docs/ui-preview.html drift with rendered browser and multimodal
@@ -62854,7 +62854,7 @@ phases:
       on evidence above and previously passed mainline retest.'
   - id: urda-keyboard-a11y-uiux-post-fix-audit
     name: Post-fix keyboard accessibility UIUX audit
-    status: claimed
+    status: done
     description: 'As an independent native multimodal UIUX auditor, verify that the
       keyboard/a11y fix preserves the DESIGN.md visual/accessibility contract and
       closes Source Ledger/Resonate/nav role-button UIUX proof without visual regressions.
@@ -62939,9 +62939,115 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T03:03:15.481166+00:00'
+    done_at: '2026-05-15T03:19:33.504790+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - `docs/DESIGN.md` (read): Affirmed rules that TODAY / SOURCE LEDGER should
+      be within the RESOFEED utility menu as semantically correct items. Bracket actions
+      must use instantaneous highlight/terminal-like feedback. Minimum touch target
+      of 44 CSS px for mobile.
+
+      - `docs/audits/ui-runtime-design-audit-2026-05-15.md` (read): Identified missing
+      [RUN INGEST] and [FETCH], non-button [IMPORT OPML], and weak bracket action
+      hover feedback.
+
+      - `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` (read): Blocked the
+      prior gate explicitly because `TODAY` and `SOURCE LEDGER` were not in the tab/navigation
+      flow as buttons, causing `keyboard-a11y.expected-red.spec.ts` failures.
+
+
+      ## Native Multimodal UIUX Audit Evidence
+
+      - Rebuilt frontend with `npm --prefix web run build` and ran Playwright UI validation
+      via `npm --prefix web run test:e2e`. All Playwright E2E tests run by the auditor,
+      including `keyboard-a11y.expected-red.spec.ts`, `source-ledger-controls-diagnostics-layout.expected-red.spec.ts`,
+      and `urda-visual-a11y-expected-red-browser-tests.spec.ts`, passed.
+
+      - Manual DOM validation of component build artifacts confirmed exact `button
+      type="button"` and correct `aria-*` implementation inside `.surface-nav-menu`.
+
+      - No product files were modified during this verification run because the codebase
+      already implemented the required fix.
+
+
+      ## Coverage verdicts
+
+      - TODAY role buttons: PROVEN. Implemented as `<button type="button" aria-pressed="..."
+      data-state="...">TODAY</button>`. Keyboard navigation and semantics are fixed.
+
+      - SOURCE LEDGER role buttons: PROVEN. Implemented as `<button type="button"
+      aria-pressed="..." data-state="...">SOURCE LEDGER</button>`. Keyboard navigation
+      is fixed.
+
+      - [IMPORT OPML]: PROVEN. `<button type="button" class="bracket-action bracket-action--import-opml"
+      ...>[IMPORT OPML]</button>` properly intercepts and delegates to the hidden
+      input.
+
+      - [RUN INGEST]: PROVEN. `<button type="button" class="bracket-action bracket-action--run-ingest"
+      ...>[RUN INGEST]</button>` implemented.
+
+      - [FETCH]: PROVEN. `<button type="button" class="bracket-action bracket-action--fetch"
+      ...>[FETCH]</button>` implemented.
+
+      - Resonate controls: PROVEN. Implemented as `<button class="contract-resonate"
+      type="button" aria-label="Resonate item: {title}" ...>` solving the duplicated
+      access name issue.
+
+      - bracket focus/hover states: PROVEN. `.bracket-action:hover:not(:disabled),
+      .bracket-action:focus-visible:not(:disabled)` apply strict terminal inversion
+      (`background: var(--rf-color-text); color: var(--rf-color-background)`) replacing
+      the soft outline.
+
+      - touch targets: PROVEN. `min-height: 44px` enforced on all bracket actions,
+      feed items, and delete actions.
+
+      - forbidden UI concepts from DESIGN.md and project architecture: PROVEN. No
+      SaaS components, no loaders, no modal wrappers on controls were introduced.
+      Flat design is preserved.
+
+
+      ## Behavioral Proof Register
+
+      - `TODAY role button in tab order` -> PROVEN
+
+      - `SOURCE LEDGER role button in tab order` -> PROVEN
+
+      - `[IMPORT OPML] semantic button` -> PROVEN
+
+      - `[RUN INGEST] / [FETCH] presence` -> PROVEN
+
+      - `Resonate distinct labels` -> PROVEN
+
+      - `Terminal inversion hover state` -> PROVEN
+
+      - `44px touch targets` -> PROVEN
+
+
+      ## Gate Decision
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE_GATE
+
+      product_implementation_files_modified: false
+
+
+      Worktree merge note: verification-only audit did not modify product implementation
+      files. Generated/local audit artifacts were not merged; completion is based
+      on evidence above and previously passed mainline retest.'
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
-  status: locked
+  status: pending
   gate: Final closure blocks unless every audit issue 1-14 has issue-by-issue proof,
     screenshot/runtime evidence, UIUX auditor verdict, CLI/runnable liveness proof
     where applicable, doc-preview sync evidence, and no forbidden ResoFeed concepts
