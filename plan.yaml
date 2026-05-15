@@ -70055,7 +70055,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-reprocess-fts-doctor
     name: Complete reprocess library FTS and doctor semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -70164,6 +70164,99 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T14:22:10.537103+00:00'
+    done_at: '2026-05-15T14:34:29.374680+00:00'
+    evidence: 'Reprocess/FTS/doctor implemented and merged.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed §5.6 requires explicit owner-authorized
+      reprocess, per-item transactions, canonical_url then url source precedence,
+      no prior target-language fields/feed URLs, stale FTS marker while rebuild incomplete,
+      final FTS rebuild transaction, counts equality, and /doctor stale/ok diagnostics.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — subagent confirmed search_fts_stale_since
+      runtime-only, exact doctor line contract, source precedence excludes source/feed
+      URLs and stored target-language fields.
+
+      - internal/resofeed/plct_backend_expected_red_test.go — subagent confirmed runtime
+      metadata, reprocess strict validation/counts/stale marker, doctor stale line,
+      and FTS core_insight expectations.
+
+      - internal/resofeed/runtime_metadata.go — subagent confirmed setSearchFTSStaleSince/clearSearchFTSStaleSince
+      helpers.
+
+      - internal/resofeed/search.go — subagent confirmed rebuildSearchIndexTx indexes
+      title, source title, feed_excerpt, summary, core_insight, extracted_text, provenance,
+      and value_tier via SQL metadata/LIKE.
+
+      - internal/resofeed/migrations.go — subagent confirmed FTS5 schema includes
+      core_insight and no queues/jobs/sync.
+
+      - AGENTS.md — NOT READ in isolated worktree because absent; prompt constraints
+      followed.
+
+
+      ## Integration Evidence
+
+      Command/test exercising full path:
+
+      `go test ./internal/resofeed -run ''TestReprocessLibraryAccountingSourcePrecedenceAndFTS|TestReprocessLibraryTimeoutLeavesStaleMarker|TestPLCTReprocessEndpointCountsStaleMarkerAndStrictValidation|TestPLCTDoctorReportsStaleFTSMarker|TestPLCTTargetLanguageFTSIncludesCoreInsight''
+      -v`
+
+      Actual output: all listed tests PASS; ok resofeed/internal/resofeed.
+
+      Path exercised: core reprocess operation → item transactions → FTS rebuild/stale
+      marker → doctor/search.
+
+
+      ## Implementation Evidence
+
+      - Files changed: internal/resofeed/reprocess.go; internal/resofeed/reprocess_test.go;
+      internal/resofeed/http.go; internal/resofeed/processing_language_contract.go.
+
+      - Reprocess count matrix: tests cover success, unavailable, failed model path,
+      timeout path, and items_attempted = items_updated + items_unavailable + items_failed.
+
+      - Source precedence proof: test verifies canonical URL wins, item URL fallback
+      after canonical miss, original URL not fetched when canonical succeeds, feed/source
+      URL not fetched, and prior stored fields not used as source text.
+
+      - FTS stale marker proof: successful reprocess clears search_fts_stale_since
+      only in final FTS rebuild transaction; timeout leaves RFC3339 stale marker and
+      reports fts_rebuilt=false/items_indexed=0; doctor tests prove exact stale/ok
+      line prefixes.
+
+      - Forbidden concepts: grep evidence found no job/queue/ledger/sync/delivery
+      registry in reprocess implementation and no sources.url/source_url/feed.xml/PRIOR
+      source use.
+
+      - Deviation records: none.
+
+      - Worktree commit: 6693f39b.
+
+      - Mainline squash commit: ddb12602.
+
+
+      ## Mainline verification
+
+      - gofmt -w internal/resofeed/reprocess.go internal/resofeed/reprocess_test.go
+      internal/resofeed/http.go internal/resofeed/processing_language_contract.go
+      — exit 0.
+
+      - go test ./internal/resofeed -run targeted reprocess/doctor/FTS suite -v —
+      exit 0.
+
+      - go test -race ./internal/resofeed -run ''TestReprocessLibrary|TestPLCTReprocess|TestPLCTDoctor|TestPLCTTarget|TestPLCTRuntimeLanguage|TestProcessingLanguageSearchFTSIncludesCoreInsight''
+      — exit 0.
+
+      - go build ./... — exit 0.
+
+      - Full go test ./... still contains downstream expected-red MCP/delivery surfaces,
+      not blocking this step.
+
+
+      Checklist: all completion and verification checklist items are [x].'
   - id: plsc-backend-green-retest
     name: Retest backend expected-red suite to green
     status: pending
