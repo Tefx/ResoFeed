@@ -70961,7 +70961,7 @@ phases:
       - [x] Backend-core green retest passed or only downstream-owned runtime/frontend
       failures remain with explicit owner steps.
 
-      - [ ] Wiring audit has PASS or accepted non-blocking/non-intersecting debt only
+      - [x] Wiring audit has PASS or accepted non-blocking/non-intersecting debt only
       for storage-core; downstream-owned runtime/frontend gaps are recorded with owner
       steps.
 
