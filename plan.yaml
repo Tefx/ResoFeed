@@ -66858,7 +66858,9 @@ phases:
 
       The gate MUST NOT open on the old `ui-runtime-fresh-review-black-box-liveness`
       evidence alone. It must review the post-fix `ui-runtime-fresh-review-black-box-liveness-rerun`
-      evidence and confirm the mobile public served-app Inspector path is proven closed.
+      evidence and the post-fix `ui-runtime-fresh-review-mobile-inspector-uiux-rerun`
+      evidence, confirming that the mobile public served-app Inspector path and the
+      rendered mobile UIUX disclosure path are both proven closed.
 
 
       Gate must BLOCK if any of these remain unresolved:
@@ -66874,6 +66876,11 @@ phases:
 
       - FR-04/B1 rerun evidence does not show both `Fresh Runtime A` and `Fresh Runtime
       B` for the same-URL grouped duplicate story in the 390x844 mobile Inspector.
+
+      - The required post-fix UIUX rerun does not provide a fresh rendered 390x844
+      mobile artifact, accessibility/DOM proof, parseable verdict/headline/blockers,
+      and explicit confirmation that both `Fresh Runtime A` and `Fresh Runtime B`
+      are visible in the mobile Inspector for the grouped same-URL story.
 
       - FR-05 source-level [FETCH] buttons lack contextual accessible names.
 
@@ -66895,9 +66902,11 @@ phases:
       - The black-box served-app failure from `ui-runtime-fresh-review-black-box-liveness`
       is authoritative for B1 remediation.
 
-      - Gate OPEN requires the rerun to prove the public served mobile Inspector path
-      after the fix; older PASS evidence may support regression context but cannot
-      close B1 by itself.
+      - Gate OPEN requires both post-fix reruns: black-box liveness must prove the
+      public served mobile Inspector path, and UIUX rerun must prove the rendered
+      390x844 mobile Inspector disclosure/accessibility path. Older PASS evidence
+      may support regression context but cannot close B1 or the UIUX rerun obligation
+      by itself.
 
 
       Gate decision basis must map requirement refs, artifact/evidence refs reviewed,
@@ -66907,13 +66916,18 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] All phase steps completed with adequate evidence, including the B1 fix
-      and post-fix black-box rerun.
+      - [ ] All phase steps completed with adequate evidence, including the B1 fix,
+      post-fix black-box rerun, and post-fix UIUX rerun.
 
       - [ ] Green retest evidence covers every fresh audit finding.
 
       - [ ] UIUX multimodal audit evidence covers desktop and mobile rendered states
       and is reconciled with the later black-box failure.
+
+      - [ ] Post-fix UIUX rerun evidence includes a rendered 390x844 mobile artifact,
+      accessibility/DOM proof for the Inspector disclosure, parseable verdict/headline/blockers,
+      and explicit confirmation that both `Fresh Runtime A` and `Fresh Runtime B`
+      are visible in the mobile Inspector for the same-URL grouped duplicate story.
 
       - [ ] Black-box liveness rerun evidence proves the single Go binary runnable
       UI surface and the 390x844 mobile Inspector grouped-source disclosure.
@@ -66931,8 +66945,13 @@ phases:
       - [ ] Gate review confirms expected-red tests were defined before implementation
       and now pass green after implementation.
 
-      - [ ] Gate review confirms UIUX multimodal and black-box liveness evidence are
-      present and independently produced.
+      - [ ] Gate review confirms UIUX multimodal, post-fix UIUX rerun, and black-box
+      liveness evidence are present and independently produced.
+
+      - [ ] Gate review confirms the post-fix UIUX rerun includes a rendered 390x844
+      mobile artifact, accessibility/DOM proof for the Inspector disclosure, parseable
+      verdict/headline/blockers, and explicit confirmation that both `Fresh Runtime
+      A` and `Fresh Runtime B` appear in the mobile Inspector.
 
       - [ ] Gate review confirms the post-fix black-box rerun used the real served-app
       path and proves both `Fresh Runtime A` and `Fresh Runtime B` appear in the 390x844
@@ -66981,6 +67000,7 @@ phases:
     - ui-runtime-fresh-review-black-box-liveness
     - ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
     - ui-runtime-fresh-review-black-box-liveness-rerun
+    - ui-runtime-fresh-review-mobile-inspector-uiux-rerun
     agent: gate-reviewer
   - id: ui-runtime-fresh-review-full-frontend-test-remediation
     name: Remediate full frontend npm test stale render-contract failures
