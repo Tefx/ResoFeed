@@ -80790,7 +80790,7 @@ phases:
       blocker-class debt observed in the verified paths.'
   - id: srdb-backend-spec-wiring-retest
     name: Retest backend spec and wiring closure
-    status: claimed
+    status: done
     description: 'Combined independent retest for srdb-backend-spec-wiring-remediation.
       This retest closes the two concurrent verifier failures together and protects
       srdb-backend-gate, frontend follow-on work, and E2E architecture closure from
@@ -80918,6 +80918,191 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T23:07:30.201040+00:00'
+    done_at: '2026-05-15T23:14:34.327625+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — gate-reviewer reported reading §5.3.1 conflict-only
+      delegated-agent override, §6 endpoint table for `POST /api/steer/preview`, `POST
+      /api/steer/undo`, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`, §7
+      MCP `preview_steer`/`undo_steer`, and manual ingest/fetch response envelope.
+
+      - docs/DESIGN.md — gate-reviewer reported reading concise inline Steer receipt/undo
+      expectations and Source Ledger `[RUN INGEST]`/`[FETCH]` immediate-operation
+      expectations.
+
+      - CONSTITUTION.md — NOT READ: file not found in isolated worktree.
+
+      - remediation git artifact `524999fc` and main squash artifact `a920659d` —
+      inspected by gate-reviewer via `git show`.
+
+
+      ## Combined Spec + Wiring Closure Report
+
+
+      ```yaml
+
+      headline: "PASS"
+
+      verdict: "OPEN"
+
+      blockers: []
+
+      proof_gap_status: "NONE"
+
+      blocking_status: "CLEAR"
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: "proceed_to_gate"
+
+      ```
+
+
+      ## Behavioral Proof Register
+
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | R4 | Delegated-agent steering precedence is conflict-specific | targeted runtime/unit
+      proof | `internal/resofeed/ranking.go:136-170`; `internal/resofeed/ranking_search_logic_test.go:104-133`;
+      targeted `go test` PASS | PROVEN | agent proposal compared only against active
+      human rules via `steeringRulesConflict`; non-conflicting agent policy accepted
+      | No blanket rejection remains; tests cover conflicting SQLite hide vs human
+      push and non-conflicting PostgreSQL push |
+
+      | R1/R3/R11 | steer preview/undo HTTP/MCP documented/runtime surfaces align
+      | docs+tests+static/runtime proof | `docs/ARCHITECTURE.md:1168-1170,1382-1384`;
+      `internal/resofeed/http.go:300-355,693-716`; `internal/resofeed/mcp.go:240-271,578-595,812-814`;
+      targeted `go test` PASS | PROVEN | HTTP routes and MCP tools expose preview/undo
+      with read-only preview and target-specific undo | Tool list, request validation,
+      HTTP handlers, MCP handlers, and parity tests align |
+
+      | R13 | manual ingest/fetch response shape matches contract | strict response-shape
+      tests | `docs/ARCHITECTURE.md:947-1055,1174-1175`; `internal/resofeed/http.go:740-768`;
+      `internal/resofeed/urda_backend_runtime_expected_red_test.go:43-74,76-113,199-244`;
+      targeted `go test` PASS | PROVEN | response serializer returns exactly `ingest`
+      for global ingest and `ingest`+`source` for source fetch | Regression tests
+      reject query/body idempotency drift and fail on undocumented top-level fields
+      |
+
+      | wiring | ErrSteerContractOnly dead export is gone or reachable | static reachability
+      proof | `git show 524999fc -- internal/resofeed/steer_intent.go`; `rg -n "ErrSteerContractOnly"
+      --glob "*.go" internal cmd web` exit_code=1/no matches | PROVEN | removed dead
+      exported stub from production Go code | Static search confirms no remaining
+      production/test references |
+
+
+      ## Commands/tests executed
+
+
+      ```
+
+      # gate-reviewer worktree
+
+      git status --short --branch
+
+      git show --stat --oneline --decorate 524999fc
+
+      git show --stat --oneline --decorate a920659d
+
+      git show --name-only --format=fuller 524999fc
+
+      git show --no-ext-diff --unified=40 524999fc -- internal/resofeed/ranking.go
+      internal/resofeed/ranking_search_logic_test.go internal/resofeed/urda_backend_runtime_expected_red_test.go
+      internal/resofeed/steer_intent.go
+
+      go test ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|SRDCT.*Steer|HTTP.*Steer|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails|ManualIngest|ManualFetch|MCP)''
+      -count=1
+
+      go test ./...
+
+      go build ./cmd/resofeed
+
+      go test -race ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails)''
+      -count=1
+
+      rg -n "ErrSteerContractOnly" --glob "*.go" internal cmd web; printf ''exit_code=%s\n''
+      "$?"
+
+      rm "resofeed" && git status --short --branch
+
+
+      # orchestrator mainline final-state gate
+
+      go test ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|SRDCT.*Steer|HTTP.*Steer|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails|ManualIngest|ManualFetch|MCP)''
+      -count=1
+
+      go test ./...
+
+      go build ./cmd/resofeed
+
+      go test -race ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails)''
+      -count=1
+
+      rg -n "ErrSteerContractOnly" --glob "*.go" internal cmd web; printf ''exit_code=%s\n''
+      "$?"
+
+      ```
+
+
+      ## Relevant output
+
+
+      ```
+
+      # gate-reviewer worktree
+
+      git status: ## vectl/step-srdb-backend-spec-wiring-retest
+
+      524999fc fix backend steering and ingest contract drift — 9 files changed, 169
+      insertions(+), 40 deletions(-)
+
+      a920659d [vectl] step-srdb-backend-spec-wiring-remediation completed — 9 files
+      changed, 169 insertions(+), 40 deletions(-)
+
+      targeted go test: ok resofeed/internal/resofeed 0.687s
+
+      go test ./...: ? resofeed/cmd/resofeed [no test files]; ok resofeed/internal/resofeed
+      1.229s
+
+      go build ./cmd/resofeed: exit 0, no output
+
+      race targeted: ok resofeed/internal/resofeed 1.700s
+
+      ErrSteerContractOnly search: exit_code=1
+
+      final git status: ## vectl/step-srdb-backend-spec-wiring-retest
+
+
+      # orchestrator mainline final-state gate
+
+      targeted go test: ok resofeed/internal/resofeed 0.675s
+
+      go test ./...: ? resofeed [no test files]; ? resofeed/cmd/resofeed [no test
+      files]; ok resofeed/internal/resofeed (cached)
+
+      go build ./cmd/resofeed: exit 0
+
+      race targeted: ok resofeed/internal/resofeed 1.812s
+
+      ErrSteerContractOnly search: exit_code=1
+
+      ```
+
+
+      ## Gaps/Notes
+
+
+      - NONE. All four blocker families have direct source/test/static evidence and
+      fresh verification.
+
+      - Required description and verification checklist items are [x].
+
+      - No product code/docs/tests were changed by this verify-only retest.'
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
