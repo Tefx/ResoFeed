@@ -75127,7 +75127,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Evidence shows input submitted -> route/tool matched -> core operation
+      - [x] Evidence shows input submitted -> route/tool matched -> core operation
       executed -> DB/FTS state changed -> output returned/rendered.
 
       - [ ] Source identifiers remain exact in output.
