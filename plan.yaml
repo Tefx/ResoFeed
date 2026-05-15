@@ -70566,7 +70566,7 @@ phases:
       - [x] contract surface drift around `core_insight`, `value_tier`, source precedence,
       language persistence, FTS/search core, and doctor stale diagnostics.
 
-      - [ ] declaration-only exported anchors: classify as core orphan requiring current
+      - [x] declaration-only exported anchors: classify as core orphan requiring current
       remediation only if no downstream consumer step owns them; otherwise cite downstream
       owner.'
     verification: '- [ ] Evidence table maps each backend-core requirement to implementation
