@@ -71416,7 +71416,7 @@ phases:
       - [ ] Anchor disposition proof shows no unowned storage-core exported declaration-only
       orphan remains.
 
-      - [ ] Doctor stale/ok/redaction proof is green.
+      - [x] Doctor stale/ok/redaction proof is green.
 
       - [ ] Downstream HTTP/MCP/frontend blockers are preserved as downstream-owned
       with owner steps and gates named.'
