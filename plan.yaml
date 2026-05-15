@@ -78693,6 +78693,77 @@ phases:
     - srdb-http-steer-preview-commit-undo
     - srdb-mcp-steer-parity
     agent: spec-verifier
+  - id: srdb-backend-gate
+    name: Gate backend Steer runtime implementation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the backend
+      runtime phase can open for frontend integration.
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - Backend-authoritative classification across preview/commit/MCP.
+
+      - Preview read-only guarantee and idempotency boundaries.
+
+      - Lexical-only search and no-RAG/no-vector/no-answer-generation boundary.
+
+      - KISS single-binary/SQLite/flat-file architecture.
+
+
+      Behavioral proof register and gate decision basis are mandatory. OPEN is invalid
+      if unresolved runtime obligations are NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING
+      without explicit non-intersection.'
+    verification: '- [ ] phase-check protecting steer-delta-frontend-ui-source-ledger-split-scroll.
+
+      - [ ] All backend implementation, liveness, wiring, and spec-conformance steps
+      completed with evidence.
+
+      - [ ] Runnable surface evidence identifies entrypoint/startup path, exact launch
+      command, transport proof, and at least one documented request through the real
+      entrypoint.
+
+      - [ ] No unresolved blocker-class behavioral obligation remains without remediation
+      ownership.
+
+      - [ ] Gate decision basis is OPEN only when backend runtime is ready for frontend
+      integration.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates
+      | rationale |
+
+      |---|---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED
+
+      '
+    depends_on:
+    - srdb-classifier-policy-runtime
+    - srdb-http-steer-preview-commit-undo
+    - srdb-mcp-steer-parity
+    - srdb-runtime-liveness-seam-proof
+    - srdb-wiring-audit
+    - srdb-spec-conformance
+    agent: gate-reviewer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
