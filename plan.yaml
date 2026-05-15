@@ -71678,6 +71678,11 @@ phases:
       explicit library reprocess action according to DESIGN.md.
 
 
+      This step owns rendered frontend consumption for language/reprocess runtime
+      routes after `plfu-api-client-types` binds the HTTP contract. It must turn client/runtime
+      state into visible DOM, not only type/view-model objects.
+
+
       YOUR SCOPE:
 
       - Terse language control: `LANG: EN` / `LANG: ZH` or localized equivalent.
@@ -71689,6 +71694,21 @@ phases:
       - `[REPROCESS LIBRARY]` confirmation, running, conflict, complete, failed states.
 
       - Terse bracket actions with no spinner/progress dashboard/wizard/settings panel.
+
+      - Visible handling of HTTP 400/401/409 and request-fingerprint mismatch responses
+      supplied by `plfu-api-client-types`.
+
+
+      ## Downstream blocker ownership from storage-core verification
+
+      - [ ] Frontend type/client anchors for processing language and reprocess must
+      be consumed by rendered controls here.
+
+      - [ ] Runtime language route state must affect visible control text and document
+      language attributes.
+
+      - [ ] Reprocess active/conflict behavior must render a terse conflict/failure
+      state without inventing jobs, queues, progress dashboards, or activity logs.
 
 
       ## Frontend Completion Criteria (rendering required)
@@ -71709,14 +71729,21 @@ phases:
 
       - [ ] language treated as per-item translation toggle.
 
-      - [ ] missing accessible names or live-region announcements.'
+      - [ ] missing accessible names or live-region announcements.
+
+      - [ ] client/runtime route types remain declaration-only and are not consumed
+      by visible controls.'
     verification: '- [ ] Rendered frontend tests pass for language states and reprocess
       states.
 
       - [ ] Evidence includes visible rendered controls and accessibility assertions.
 
-      - [ ] Conflict/error states render raw terse text and preserve focus rules.'
+      - [ ] Conflict/error states render raw terse text and preserve focus rules.
+
+      - [ ] Evidence proves client/runtime route types are consumed by visible controls,
+      not left type-only.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -71728,17 +71755,44 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Rendered Implementation Evidence
+      ## Rendered UI Evidence
 
-      - Files changed:
 
-      - Rendered states captured:
+      **Runtime/client state consumed**: <language/reprocess route state>
 
-      - DOM/test-renderer/browser artifact paths:
+      **Rendered artifacts**:
 
-      - API interaction proof:
+      ```
 
-      - Commands/tests run and outputs:'
+      <paste DOM snapshot, screenshot path, or test-renderer output>
+
+      ```
+
+
+      **States covered**: initial / success / conflict / failed / unauthorized
+
+
+      ## Storage-Core Downstream Blocker Closure
+
+      | Blocker | Rendered consumer evidence | Status |
+
+      |---|---|---|
+
+      | frontend processing language/reprocess anchors type-only | <evidence> | closed/blocking
+      |
+
+      | runtime language state not consumed by UI | <evidence> | closed/blocking |
+
+
+      ## Headline
+
+      - [ ] PASS: controls render visible runtime-backed language/reprocess behavior.
+
+      - [ ] FAIL: controls remain type-only/view-model-only or forbidden UI surface
+      was added.'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     depends_on:
     - plfu-api-client-types
     agent: frontend-engineer
