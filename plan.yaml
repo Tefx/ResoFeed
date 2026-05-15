@@ -79215,7 +79215,7 @@ phases:
       hint, aria-describedby, focus retention, Escape cancel, and correct polite/assertive
       live-region levels.
 
-      - [ ] Tests cover [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE], [INVALID],
+      - [x] Tests cover [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE], [INVALID],
       URL-required invalid add, warning-only find alias, write preview [APPLY]/[CANCEL],
       and receipt [UNDO] visibility only when backend returns revocable id.
 
