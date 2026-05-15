@@ -71493,3 +71493,67 @@ phases:
     remain.
   depends_on:
   - processing-language-system-e2e
+  steps:
+  - id: plfinal-documentation-sync
+    name: Sync documentation for processing language implementation
+    status: pending
+    description: 'step_type: documentation
+
+      agent_source: project
+
+
+      Sync project documentation with implemented behavior after system E2E gate opens.
+      Do not expand product scope; document only implemented contract behavior.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] README/usage examples match actual language/reprocess/delivery/API/MCP
+      interfaces if they mention them.
+
+      - [ ] docs/ARCHITECTURE.md remains consistent with implemented runtime metadata,
+      receipts, reprocess, FTS, HTTP/MCP, delivery, and frontend behavior.
+
+      - [ ] docs/DESIGN.md remains consistent with rendered language/reprocess/source
+      identifier/split-scroll behavior.
+
+      - [ ] Error code tables and examples match actual responses.
+
+      - [ ] No docs introduce settings dashboards, sync, jobs, queues, ledgers, vector/RAG,
+      or per-agent auth concepts.
+
+
+      This step may update docs as needed during execution; the planner is not modifying
+      docs now.'
+    verification: '- [ ] Documentation diff, if any, matches implemented behavior
+      and does not widen scope.
+
+      - [ ] All changed docs cite actual runtime/API/MCP/UI behavior.
+
+      - [ ] Forbidden product concepts remain absent.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Documentation Sync Evidence
+
+      - Docs reviewed:
+
+      - Docs changed:
+
+      - Behavior examples verified:
+
+      - Forbidden scope check:
+
+      - Remaining doc gaps:'
+    agent: doc-reviewer
