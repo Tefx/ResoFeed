@@ -80861,7 +80861,7 @@ phases:
       - [ ] Verify both conflicting and non-conflicting delegated-agent steering cases
       are covered by tests.
 
-      - [ ] Verify ARCH/source/runtime agreement for /api/steer/preview, /api/steer/undo,
+      - [x] Verify ARCH/source/runtime agreement for /api/steer/preview, /api/steer/undo,
       preview_steer, and undo_steer.
 
       - [ ] Verify manual ingest/fetch response-shape regression tests prove the documented
