@@ -71319,6 +71319,91 @@ phases:
     - plse-blind-http-mcp-parity-delivery
     - plse-reprocess-failure-stale-fts-proof
     agent: integration-verifier
+  - id: plse-e2e-wiring-audit
+    name: Audit end-to-end wiring and absence of stubs
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Complete end-to-end wiring audit across cmd/resofeed, internal/resofeed, HTTP,
+      MCP, and web. Verify every new public/runtime surface reaches real implementation
+      and no production entrypoint terminates at a stub.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] `cmd/resofeed` runtime starts real HTTP/MCP/static/background ingest components.
+
+      - [ ] New HTTP routes and MCP tools/resources are reachable from runtime registries.
+
+      - [ ] Frontend API client calls correspond to actual routes.
+
+      - [ ] No `_Runtime*`, `_Stub*`, `_Placeholder*`, or hardcoded placeholder implementation
+      remains wired.
+
+      - [ ] No extra process, worker, service, repository, DI, queue, ledger, sync,
+      vector/RAG, or delivery registry surface exists.'
+    verification: '- [ ] Wiring report proves runtime entrypoints use real implementations.
+
+      - [ ] Orphan route/tool/client mismatches are blockers with remediation owner.
+
+      - [ ] Forbidden architecture concept scan is included and clean.'
+    evidence_template: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Runtime entrypoint trace**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **HTTP/MCP/frontend wiring matrix**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Stub/placeholder scan**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Forbidden concept scan**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plse-real-language-reprocess-vertical-slice
+    - plse-blind-http-mcp-parity-delivery
+    agent: wiring-auditor
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
