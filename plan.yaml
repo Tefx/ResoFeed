@@ -81430,7 +81430,7 @@ phases:
   steps:
   - id: srdf-steer-preview-ui-state-aria
     name: Complete Steer route preview UI state and ARIA behavior
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -81513,6 +81513,163 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T23:28:47.846499+00:00'
+    done_at: '2026-05-15T23:55:51.355746+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — subagent read Steer lightweight intent input, no chat transcript/rule
+      builder, Enter/Escape behavior, polite receipts, assertive raw failures, lexical-only
+      search/no RAG/semantic answer UI.
+
+      - docs/ARCHITECTURE.md — subagent read `POST /api/steer/preview`, `POST /api/steer`,
+      `POST /api/steer/undo`, SQLite FTS5 lexical-only search, and no embeddings/vector/RAG
+      boundary.
+
+      - docs/PRD.md — subagent read Steer as explicit natural-language correction,
+      not casual chat; source addition through Steer; steering must be understandable/reversible.
+
+      - docs/UI_REGRESSION_CONTRACT.md — subagent read Steer submit/doctor/search
+      DOM live-region evidence, keyboard/a11y, no inert controls, negative RAG/chat/semantic
+      answer UI scan.
+
+      - CONSTITUTION.md — NOT READ: no file found in isolated worktree.
+
+
+      ## Rendered UI Evidence
+
+      **Commit hash(es)**: worktree commit `ce202522`; main salvage merge `7eddbe16
+      [vectl] salvage partial progress from step-srdf-steer-preview-ui-state-aria`.
+
+      **Files changed**:
+
+      - `web/src/routes/+page.svelte`
+
+      - `web/src/lib/api-client.ts`
+
+      - `web/src/lib/api-contract.ts`
+
+      - `web/src/app.css`
+
+
+      **Spec link**: docs/DESIGN.md / docs/ARCHITECTURE.md / docs/PRD.md / docs/UI_REGRESSION_CONTRACT.md.
+
+
+      **Commands/tests run**:
+
+      ```
+
+      # subagent worktree
+
+      npm run test:render -- steer-route-preview.expected-red.test.ts
+
+      # 1 passed; 4 tests passed
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm run test:render -- steer-rendered-evidence.tmp.test.ts --reporter=verbose
+
+      # exit 0; temporary evidence test printed DOM snapshots, then deleted before
+      commit
+
+      targeted grep web/src/routes/+page.svelte for RAG|chat|semantic answer|[IDLE]|duplicate
+      hint
+
+      # no matches
+
+      npm run test
+
+      # exit 1 on broader existing non-Steer rendering tests
+
+
+      # orchestrator mainline final-state gate (scoped)
+
+      npm run test:render -- steer-route-preview.expected-red.test.ts
+
+      # Test Files 1 passed; Tests 4 passed
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      rg -n "RAG|chat|semantic answer|\[IDLE\]|duplicate hint" web/src/routes/+page.svelte;
+      printf ''exit_code=%s''
+
+      # exit_code=1
+
+
+      # orchestrator broad verifier disposition
+
+      npm run test
+
+      # FAIL: six rendering-expected-red tests stuck at owner-token prompt / owner-token
+      localStorage bootstrap; remediation ownership created in srdf-broad-rendering-owner-token-bootstrap-fix
+      and srdf-broad-rendering-owner-token-bootstrap-retest, and downstream UIUX/spec/gate
+      now depend on retest.
+
+      ```
+
+
+      **DOM snapshots/screenshots**:
+
+      - Idle: `<section id="steer-route-preview-status" class="steer-route-preview"
+      role="status" aria-label="Steer route preview" aria-live="polite" data-route-kind="idle"><!----></section>`
+
+      - Add valid: `role="region" aria-label="Steer write preview" ... data-route-kind="add-source"`
+      with `+ [ADD SOURCE] RSS URL subscription preview [APPLY] [CANCEL]`.
+
+      - Add invalid: `role="status" aria-live="assertive" data-route-kind="invalid"
+      aria-describedby="steer-route-preview-detail"` with `! [INVALID] URL required`.
+
+      - Search/find: `? [SEARCH] lexical SEARCH only; no semantic retrieval`; receipt
+      warning says find alias maps to `[SEARCH]`; lexical only, no semantic retrieval.
+
+      - Doctor: `/doctor` rendered with `<pre class="contract-diagnostics" role="log"
+      aria-label="/doctor diagnostics">...`.
+
+      - Steer rule proposal: `role="region" aria-label="Steer write preview"` with
+      `* [STEER RULE] policy proposal [APPLY] [CANCEL]`.
+
+      - Success/undo: receipt `role="status" aria-label="Steer receipt" aria-live="polite"`
+      with `[UNDO]` only for revocable id.
+
+
+      **Accessibility proof**:
+
+      - Steer input has `aria-describedby="steer-route-preview-status steer-route-preview-input-desc"`.
+
+      - Idle/normal preview uses `role="status"` and `aria-live="polite"`; invalid
+      add-source uses assertive live region.
+
+      - Receipt uses `role="status" aria-label="Steer receipt" aria-live="polite"`;
+      failed undo uses `role="alert" aria-live="assertive"`.
+
+      - Escape clears unsent text with focus retained; focused test asserts focus
+      after invalid add and Escape.
+
+      - Write boundary explicit via `[APPLY]` and `[CANCEL]`; `[UNDO]` only when response
+      includes revocable id.
+
+      - Non-color markers: `+`, `?`, `>`, `*`, `!` with exact bracket labels.
+
+
+      **Forbidden UI concept scan**:
+
+      - Targeted scan of `web/src/routes/+page.svelte` for `RAG|chat|semantic answer|[IDLE]|duplicate
+      hint` had no matches.
+
+      - Broader repo matches were contract/test declarations, not product UI additions.
+
+
+      **Gaps/Notes**:
+
+      - Scoped step criteria are satisfied and checklist items are [x].
+
+      - Broad `npm run test` remains red due six owner-token/rendering bootstrap failures
+      in `rendering-expected-red.test.ts`; these are blocker-class for downstream
+      gates and are owned by new plan steps `srdf-broad-rendering-owner-token-bootstrap-fix`
+      and `srdf-broad-rendering-owner-token-bootstrap-retest`, which now block UIUX/spec/gate
+      progression.'
   - id: srdf-source-ledger-details-hit-targets
     name: Complete Source Ledger details disclosure and bracket hit targets
     status: done
