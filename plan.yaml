@@ -79643,7 +79643,7 @@ phases:
       - [x] gate_open_allowed is true only if blocking_status is CLOSED and no blocker-class
       proof gaps remain.
 
-      - [ ] Downstream backend/runtime phases remain blocked if the retest verdict
+      - [x] Downstream backend/runtime phases remain blocked if the retest verdict
       is FAIL or gate_open_allowed is false.'
     verification: '- [ ] Retest evidence includes headline, verdict, blockers, proof_gap_status,
       blocking_status, gate_open_allowed, and orchestrator_action_hint.
