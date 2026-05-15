@@ -68828,3 +68828,11 @@ phases:
       ## Gaps/Notes
 
       - None.'
+- id: processing-language-contract-tests
+  name: Processing Language Contract Lock and Expected-Red Tests
+  status: pending
+  gate: Contract and expected-red phase blocks unless runtime metadata, receipts,
+    language/reprocess HTTP/MCP, delivery, FTS/search, doctor, and frontend UI obligations
+    are pinned with expected-red proof before implementation.
+  depends_on:
+  - ui-runtime-fresh-review-remediation
