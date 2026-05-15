@@ -80790,7 +80790,7 @@ phases:
       blocker-class debt observed in the verified paths.'
   - id: srdb-backend-spec-wiring-retest
     name: Retest backend spec and wiring closure
-    status: pending
+    status: claimed
     description: 'Combined independent retest for srdb-backend-spec-wiring-remediation.
       This retest closes the two concurrent verifier failures together and protects
       srdb-backend-gate, frontend follow-on work, and E2E architecture closure from
@@ -80916,6 +80916,8 @@ phases:
     depends_on:
     - srdb-backend-spec-wiring-remediation
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T23:07:30.201040+00:00'
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
