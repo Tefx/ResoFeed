@@ -69898,7 +69898,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-processing-language-ingest
     name: Complete processing language backend and OpenRouter input
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -69975,6 +69975,84 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T14:10:44.199453+00:00'
+    done_at: '2026-05-15T14:21:45.443850+00:00'
+    evidence: 'Processing language ingest implemented and merged.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed processing_language runtime metadata
+      en|zh with absent=en; future ingest uses current language; language changes
+      do not rewrite existing rows/FTS; item readable fields are single stored processed
+      version; provenance URLs/source identifiers remain exact.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — subagent confirmed runtime_metadata
+      remains non-portable; OpenRouter receives target_language; HTTP/MCP/reprocess/delivery
+      are downstream.
+
+      - internal/resofeed/processing_language_contract.go — subagent confirmed language
+      constants/types, FTS stale marker, receipt TTL, no translation_failed taxonomy.
+
+      - internal/resofeed/plct_backend_expected_red_test.go — subagent confirmed OpenRouter
+      TargetLanguage capture, FTS core_insight, stale FTS doctor line, and downstream
+      HTTP/MCP anchors.
+
+      - internal/resofeed/runtime_metadata.go — subagent reused existing Get/Set processing
+      language helpers and receipt-backed set semantics.
+
+      - AGENTS.md — NOT READ in isolated worktree because absent; prompt-provided
+      constraints followed.
+
+
+      ## Implementation Evidence
+
+      - Files changed: internal/resofeed/ingest.go; internal/resofeed/openrouter.go;
+      internal/resofeed/search.go; internal/resofeed/migrations.go; internal/resofeed/doctor.go;
+      internal/resofeed/runtime_metadata.go; internal/resofeed/processing_language_ingest_test.go.
+
+      - Language operations implemented: ingest reads effective runtime processing
+      language; absent remains effective en; Set/Get helpers preserved; existing rows
+      are not rewritten on language change while new items use current language.
+
+      - OpenRouter target-language proof: OpenRouterSummaryInput.TargetLanguage is
+      passed into LLM calls; OpenRouter prompt includes target_language; test proves
+      target_language zh appears in request content and API key is not persisted.
+
+      - Stored item/provenance proof: single stored processed readable fields can
+      be populated; FTS schema/rebuild/upsert includes core_insight; test proves old
+      en row remains unchanged after language switch while new zh row stores zh content;
+      URL/source provenance remains unchanged.
+
+      - Forbidden concepts: no translation_failed status, second translation pipeline,
+      original/translated pair storage, jobs, queues, ledgers, sync, vector search,
+      embeddings, RAG, DI/repository layer, HTTP route handlers, MCP tools, or reprocess
+      execution added.
+
+      - Deviation records: none.
+
+      - Worktree commit: a899d2cd4a8f8c98379518f4d41f3dee2c0cc33d.
+
+      - Mainline squash commit: 59ebef5b.
+
+
+      ## Verification
+
+      - gofmt -w changed Go files — exit 0.
+
+      - go test ./internal/resofeed -run ''TestProcessingLanguage|TestOpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret|TestPLCTTargetLanguageFTSIncludesCoreInsight|TestPLCTOpenRouterReceivesEffectiveTargetLanguage|TestPLCTDoctorReportsStaleFTSMarker|TestRuntimeMetadata''
+      — exit 0.
+
+      - go test -race ./internal/resofeed -run same targeted suite — exit 0.
+
+      - go build ./cmd/resofeed — exit 0.
+
+      - golangci-lint run ./internal/resofeed ./cmd/resofeed — exit 0 (0 issues).
+
+      - Full go test ./... still has expected-red downstream route/tool gaps for HTTP/MCP
+      runtime language/reprocess/delivery, outside this step.
+
+
+      Checklist: all completion and verification checklist items are [x].'
   - id: plsc-reprocess-fts-doctor
     name: Complete reprocess library FTS and doctor semantics
     status: pending
