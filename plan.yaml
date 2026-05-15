@@ -75085,7 +75085,7 @@ phases:
       ## Required remediation if blocked\nnone"
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
-  status: pending
+  status: in_progress
   gate: System gate blocks unless real end-to-end HTTP, MCP, UI, reprocess, stale
     FTS, and delivery parity are proven through public/runnable surfaces with no mock-only
     evidence.
@@ -75094,7 +75094,7 @@ phases:
   steps:
   - id: plse-real-language-reprocess-vertical-slice
     name: Run real language and reprocess vertical slice
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -75177,6 +75177,8 @@ phases:
 
       **Stubs used**: NONE required'
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T17:45:47.992272+00:00'
   - id: plse-blind-http-mcp-parity-delivery
     name: Blind test HTTP MCP parity and delivery endpoint
     status: pending
