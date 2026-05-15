@@ -72540,7 +72540,7 @@ phases:
 
       - [x] Error codes/statuses and JSON-RPC error shapes are checked character/field-exact.
 
-      - [ ] `actor_id` provenance-not-auth and owner-token auth boundary are explicitly
+      - [x] `actor_id` provenance-not-auth and owner-token auth boundary are explicitly
       verified.
 
       - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has an explicit closure path.'
