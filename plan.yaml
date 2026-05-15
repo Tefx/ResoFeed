@@ -75133,11 +75133,11 @@ phases:
       - [x] Source identifiers remain exact in output.
 
       - [x] Actual commands/output/artifact paths are included.'
-    verification: '- [ ] Real vertical slice succeeds through public runtime surfaces.
+    verification: '- [x] Real vertical slice succeeds through public runtime surfaces.
 
-      - [ ] Output proves language/reprocess/search/doctor behavior end-to-end.
+      - [x] Output proves language/reprocess/search/doctor behavior end-to-end.
 
-      - [ ] Evidence includes actual output, not only test pass summary.'
+      - [x] Evidence includes actual output, not only test pass summary.'
     evidence_template: '## Vertical Slice Evidence
 
 
