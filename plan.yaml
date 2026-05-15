@@ -72536,7 +72536,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Each new HTTP endpoint and MCP tool/resource has a requirement-row verdict.
+      - [x] Each new HTTP endpoint and MCP tool/resource has a requirement-row verdict.
 
       - [ ] Error codes/statuses and JSON-RPC error shapes are checked character/field-exact.
 
