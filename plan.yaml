@@ -78274,7 +78274,7 @@ phases:
       - [x] `why_previous_gate_failed` is documented with the DOM/state root cause
       for each failure family.
 
-      - [ ] TODAY/SOURCE LEDGER surface switching works by keyboard and pointer on
+      - [x] TODAY/SOURCE LEDGER surface switching works by keyboard and pointer on
       desktop and mobile, with the menu closed by default.
 
       - [ ] Feed items and `.contract-feed-meta` render for seeded desktop/mobile
