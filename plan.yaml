@@ -71888,7 +71888,7 @@ phases:
 
       - [x] Per-call language override added.
 
-      - [ ] `actor_id` used as auth.
+      - [x] `actor_id` used as auth.
 
       - [ ] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
 
