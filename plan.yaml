@@ -79838,7 +79838,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] POST /api/steer/preview is authenticated, strict-schema, read-only, accepts
+      - [x] POST /api/steer/preview is authenticated, strict-schema, read-only, accepts
       no idempotency_key, and never writes product or receipt state.
 
       - [ ] POST /api/steer reruns classification, requires idempotency_key, applies
