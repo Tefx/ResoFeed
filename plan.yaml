@@ -79635,7 +79635,7 @@ phases:
       - [x] The corrected/restored requirement reference has source-backed Behavioral
       Proof Register coverage.
 
-      - [ ] The absent AC-19 reference is either removed/replaced by an exact authoritative
+      - [x] The absent AC-19 reference is either removed/replaced by an exact authoritative
       AC or restored by a minimal source-backed spec/doc correction.
 
       - [ ] All blocker-class proof gaps list explicit closure paths.
