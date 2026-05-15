@@ -71340,7 +71340,7 @@ phases:
       verification.'
   - id: plsc-storage-core-blocker-retest
     name: Retest storage-core blocker remediation
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -71461,6 +71461,89 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T15:17:39.340460+00:00'
+    done_at: '2026-05-15T15:22:07.285654+00:00'
+    evidence: "## Verification Report\n**Headline**: PASS\n**Blocking Status**: CLOSED\n\
+      **Proof-Gap Status**: NONE for backend-core retest scope\n**Verdict**: PASS\n\
+      **Risk Level**: LOW for storage-core gate; downstream runtime/API/frontend risk\
+      \ preserved\n**Orchestrator Action Hint**: COMPLETE\n\n### refs Read Confirmation\n\
+      - `docs/ARCHITECTURE.md`: READ. Key passage: processing language is persisted\
+      \ runtime metadata, excluded from portable state; reprocess/ingest/fetch must\
+      \ share a single in-process operation guard, and stale FTS during failed reprocess\
+      \ must be exposed through `/doctor`.\n- `docs/DESIGN.md`: READ. Key passage:\
+      \ processing language is global operational state, not per-item display toggle;\
+      \ reprocess is explicit bracket-style action; source identifiers must render\
+      \ unchanged and not be translated.\n\n### Commands Run\n| Command | Exit | Raw\
+      \ Evidence |\n|---|---:|---|\n| `go test -count=1 -v ./internal/resofeed -run\
+      \ 'Test(ProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems|ProcessingLanguageSearchFTSIncludesCoreInsight|SetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess|ReprocessLibraryAccountingSourcePrecedenceAndFTS|ReprocessLibraryTimeoutLeavesStaleMarker|DoctorSearchFTSStatusLineOKStaleAndRuntimeLanguageRedaction)$'`\
+      \ | 0 | PASS for all six named tests; `ok resofeed/internal/resofeed 0.700s`.\
+      \ |\n| `rg -n 'RuntimeLanguageContract|RequestFingerprintContract|ReprocessSourcePrecedence'\
+      \ --glob '!plan.yaml'` | rg exit 1 via wrapper | `NO_MATCHES`. |\n| `git status\
+      \ --short && git rev-parse --abbrev-ref HEAD && git log -1 --oneline` | 0 |\
+      \ clean status; branch `vectl/step-plsc-storage-core-blocker-retest`; HEAD `e8b87532\
+      \ mcp: claim step plsc-storage-core-blocker-retest by integration-verifier`.\
+      \ |\n\n### Evidence Levels\n| Level | Status | Evidence |\n|---|---|---|\n|\
+      \ L0 Static | PROVEN | Relevant test code read in `runtime_metadata_receipts_test.go`,\
+      \ `doctor_search_fts_test.go`, and `reprocess_test.go`. |\n| L1 Contracts |\
+      \ PROVEN | Targeted Go backend-core regression command passed. |\n| L2 Real\
+      \ Wiring | PROVEN for core DB/guard/doctor paths | Tests exercised SQLite contract\
+      \ DB, shared ingest guard, reprocess FTS/stale marker, and doctor output generation.\
+      \ |\n| L3 Live Intelligence | NOT IN SCOPE | No live external service required\
+      \ for storage-core retest. |\n\n## Behavioral Proof Register\n- requirement_ref:\
+      \ `docs/ARCHITECTURE.md` coordination/concurrency rules and step proof area\
+      \ \"Guard exclusivity\"\n  behavior_claim: `SetProcessingLanguage` shares the\
+      \ same operation guard as ingest/fetch/reprocess and does not write metadata\
+      \ while guard is held.\n  runtime_proof_expected: targeted Go test must hold\
+      \ the guard, observe conflicts for ingest/fetch/reprocess/language set, verify\
+      \ no `processing_language` metadata write, then succeed after release.\n  evidence_ref:\
+      \ `TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess` PASS.\n\
+      \  status: PROVEN\n  closure_path: Closed in storage core.\n  gate_decision_basis:\
+      \ Backend-core guard exclusivity is green.\n\n- requirement_ref: step proof\
+      \ area \"Orphan anchor closure\"\n  behavior_claim: `RuntimeLanguageContract`,\
+      \ `RequestFingerprintContract`, and `ReprocessSourcePrecedence` are no longer\
+      \ unowned exported declaration-only storage-core anchors.\n  runtime_proof_expected:\
+      \ repository search excluding plan metadata returns no non-plan declarations/references.\n\
+      \  evidence_ref: `rg ... --glob '!plan.yaml'` produced `NO_MATCHES (rg exit\
+      \ 1)`.\n  status: PROVEN\n  closure_path: Closed; no storage-core orphan found.\n\
+      \  gate_decision_basis: No unowned exported declaration-only anchor remains\
+      \ in non-plan files.\n\n- requirement_ref: `docs/ARCHITECTURE.md` stale FTS\
+      \ diagnostic and runtime secret/language redaction requirements\n  behavior_claim:\
+      \ `/doctor` core output reports OK and stale FTS states without leaking runtime\
+      \ language content or secrets.\n  runtime_proof_expected: targeted Go test must\
+      \ generate OK doctor output, set `search_fts_stale_since`, generate stale output,\
+      \ and assert runtime language/content/secret strings are omitted.\n  evidence_ref:\
+      \ `TestDoctorSearchFTSStatusLineOKStaleAndRuntimeLanguageRedaction` PASS.\n\
+      \  status: PROVEN\n  closure_path: Closed before runtime endpoint exposure.\n\
+      \  gate_decision_basis: Doctor stale/ok/redaction backend behavior is green.\n\
+      \n- requirement_ref: `docs/ARCHITECTURE.md` reprocess source precedence and\
+      \ FTS rebuild rules\n  behavior_claim: Reprocess uses canonical URL before original\
+      \ URL, does not fetch feed URL, avoids prior processed text, rebuilds FTS, and\
+      \ leaves stale marker on timeout.\n  runtime_proof_expected: targeted Go tests\
+      \ must pass for source precedence/accounting/FTS and timeout stale marker.\n\
+      \  evidence_ref: `TestReprocessLibraryAccountingSourcePrecedenceAndFTS` PASS;\
+      \ `TestReprocessLibraryTimeoutLeavesStaleMarker` PASS.\n  status: PROVEN\n \
+      \ closure_path: Closed in storage core.\n  gate_decision_basis: Reprocess storage-core\
+      \ behavior is green.\n\n- requirement_ref: step downstream ownership clause\n\
+      \  behavior_claim: HTTP/MCP/frontend gaps remain blocker-class but are not storage-core\
+      \ completion failures.\n  runtime_proof_expected: evidence names owner steps/gates\
+      \ without weakening final acceptance.\n  evidence_ref: Downstream ownership\
+      \ classification.\n  status: PROVEN\n  closure_path: Preserved for downstream\
+      \ gates.\n  gate_decision_basis: Backend-core pass does not claim runtime/API/frontend\
+      \ completion.\n\n### Downstream Ownership Classification\n- MCP runtime parity\
+      \ gaps: owned by `plhm-mcp-runtime-parity`.\n- HTTP delivery/runtime endpoint\
+      \ gaps: owned by `plhm-http-runtime-endpoints`.\n- Frontend gaps: owned by `plfu-api-client-types`,\
+      \ `plfu-language-reprocess-controls`, and `plfu-source-identifiers-split-scroll`.\n\
+      - These remain outside storage-core retest acceptance and must stay blocker-class\
+      \ for their downstream gates.\n\n### Required Fields\nstep_intent: retest_green\n\
+      expected_result: green\nobserved_result: green for backend-core retest scope\n\
+      failure_alignment: no backend-core blocker-class divergence observed\nverdict:\
+      \ PASS\nblockers: []\ngate_open_allowed: true for storage-core gate only\norchestrator_action_hint:\
+      \ COMPLETE\nproduct implementation files modified: false\nCommit hash(es): none\
+      \ (verification-only; no changes made)\nFiles changed: none\nVerification: targeted\
+      \ backend-core Go suite passed; orphan anchors absent from non-plan files; checklist\
+      \ items toggled via `vectl_check`\nSpec link: `docs/ARCHITECTURE.md`, `docs/DESIGN.md`\n\
+      Gaps/Notes: Full `go test ./internal/resofeed` was not rerun because known downstream-owned\
+      \ HTTP/MCP failures remain; this retest intentionally targeted backend-core\
+      \ storage proof. No source files or orchestrator state files were edited manually."
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
