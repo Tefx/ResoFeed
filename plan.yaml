@@ -75715,7 +75715,7 @@ phases:
       \ no retained product code/docs changes and no empty commit created."
   - id: plse-full-plan-runtime-check
     name: Run full-plan runtime verification sweep
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -75805,6 +75805,84 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T18:11:36.042065+00:00'
+    done_at: '2026-05-15T18:18:23.120297+00:00'
+    evidence: "## Full-Plan Verification Report\n\n### refs Read Confirmation\n- docs/ARCHITECTURE.md\
+      \ — one deployable Go process serves static SvelteKit app, JSON HTTP API, MCP\
+      \ Streamable HTTP at `/mcp`, and background ingestion loop; one SQLite database;\
+      \ runtime language is runtime state, not portable state.\n- docs/DESIGN.md —\
+      \ ResoFeed is a single-tenant RSS intelligence interface with dense archival\
+      \ workbench design tokens and functional chrome.\n- AGENTS.md — NOT READ: absent\
+      \ in isolated worktree.\n- CONSTITUTION.md — NOT READ: absent in isolated worktree.\n\
+      \n## Closure Signals\nheadline: PASS\nverdict: PASS\nproof_gap_status: NONE\n\
+      blocking_status: CLOSED\ngate_open_allowed: true\norchestrator_action_hint:\
+      \ COMPLETE\nblockers: []\nproduct_implementation_files_modified: false\n\n###\
+      \ Commands Executed\n- `go test ./...` — exit 0\n- `go build ./cmd/resofeed`\
+      \ — exit 0\n- `npm --prefix web ci` — exit 0\n- `npm --prefix web run check`\
+      \ — exit 0\n- `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — exit 0\n- `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` — exit 0\n- `npm --prefix web run build` — exit\
+      \ 0\n- Secret-safe runtime smoke with fake local `OPENROUTER_KEY`, dummy owner\
+      \ token, local SQLite DB, and redaction pipeline for `/api/runtime/language`,\
+      \ `/api/doctor`, `/mcp` — exit 0\n- cleanup commands restored generated artifacts;\
+      \ final `git status --short` clean\n\n### Actual Output\n```text\n$ go test\
+      \ ./...\n?    resofeed/cmd/resofeed [no test files]\nok   resofeed/internal/resofeed\
+      \ 1.029s\n```\n```text\n$ go build ./cmd/resofeed\n(no output)\n```\n```text\n\
+      $ npm --prefix web ci\nadded 150 packages, and audited 151 packages in 1s\n\
+      25 packages are looking for funding\n5 vulnerabilities (3 low, 1 moderate, 1\
+      \ high)\n```\n```text\n$ npm --prefix web run check\nsvelte-check found 0 errors\
+      \ and 0 warnings\n```\n```text\n$ npm --prefix web run test:render -- ...\n\
+      Test Files  3 passed (3)\nTests       10 passed (10)\n```\n```text\n$ npm --prefix\
+      \ web run test:e2e -- processing-language-source-split-scroll.spec.ts --project=chromium-ci-safe\n\
+      Running 2 tests using 1 worker\n✓ browser proves source identifiers are non-translatable\
+      \ and desktop panes split scroll independently\n✓ browser keeps mobile full-screen\
+      \ Inspector route and restores feed scroll after back\n2 passed (5.2s)\n```\n\
+      ```text\n$ npm --prefix web run build\nvite build completed\nUsing @sveltejs/adapter-static\n\
+      Wrote site to \"build\"\n✔ done\n```\n```text\n$ runtime smoke\nGET /api/runtime/language\
+      \ => {\"language\":{\"code\":\"en\",\"label\":\"English\"},\"already_applied\"\
+      :false}\nGET /api/doctor => rss: ok ... search_fts: ok ... extraction: ok ...\
+      \ ingest: last_run=never\nPOST /mcp resources/list => JSON-RPC resources including\
+      \ `resofeed://runtime/language`\n```\n\n### Gate-Intersection Disposition\n\
+      | Finding | Provenance | Remaining gate intersection | Disposition | Owner/closure\
+      \ path |\n|---|---|---|---|---|\n| npm install reports 5 dependency vulnerabilities\
+      \ despite successful install | `npm --prefix web ci` output | No direct intersection\
+      \ with named processing-language E2E/finalization command gates because install/build/check/render/e2e\
+      \ all passed; may intersect a future security audit gate if introduced | explicitly_non_blocking_with_non_intersection_evidence\
+      \ | Frontend dependency owner should review with `npm audit` outside this verification\
+      \ gate; not blocking current protected gates |\n| Initial runtime smoke attempts\
+      \ failed before final corrected smoke | First used zsh glob with no match and\
+      \ wrong env var `OPENROUTER_API_KEY`; server reported `invalid_openrouter_key`\
+      \ | No product gate intersection after corrected documented env var `OPENROUTER_KEY`\
+      \ produced successful `/api/runtime/language`, `/api/doctor`, and `/mcp` responses\
+      \ | explicitly_non_blocking_with_non_intersection_evidence | Closed by rerunning\
+      \ with documented `OPENROUTER_KEY`; no product remediation indicated |\n| No\
+      \ repo-wide or cross-phase command failure remains | All required broad command\
+      \ families ultimately exited 0 | None | explicitly_non_blocking_with_non_intersection_evidence\
+      \ | No remediation owner required for current finalization gates |\n\n## behavioral_proof_register\n\
+      - obligation: Go/backend verification\n  status: PROVEN\n  evidence: `go test\
+      \ ./...` exit 0; cmd package no test files, internal package passed.\n  uncertainty:\
+      \ NONE\n- obligation: Backend binary build\n  status: PROVEN\n  evidence: `go\
+      \ build ./cmd/resofeed` exit 0.\n  uncertainty: NONE\n- obligation: Frontend\
+      \ install/check/render/e2e/build\n  status: PROVEN\n  evidence: npm install/check/render/e2e/build\
+      \ command family exited 0.\n  uncertainty: npm ci reported dependency vulnerabilities,\
+      \ non-intersecting with current protected runtime/finalization gates.\n- obligation:\
+      \ Runtime language endpoint\n  status: PROVEN\n  evidence: GET `/api/runtime/language`\
+      \ returned language `en` with `already_applied:false`.\n  uncertainty: NONE\n\
+      - obligation: Doctor endpoint\n  status: PROVEN\n  evidence: GET `/api/doctor`\
+      \ returned diagnostics including `rss: ok`, `search_fts: ok`, `extraction: ok`.\n\
+      \  uncertainty: NONE\n- obligation: MCP endpoint\n  status: PROVEN\n  evidence:\
+      \ POST `/mcp` `resources/list` returned JSON-RPC resources including `resofeed://runtime/language`.\n\
+      \  uncertainty: NONE\n- obligation: Secret-safe runtime evidence\n  status:\
+      \ PROVEN\n  evidence: smoke used fake local OpenRouter key and dummy owner token;\
+      \ output contained no real secret and redaction pipeline applied.\n  uncertainty:\
+      \ NONE\n- obligation: Gate-intersection disposition\n  status: PROVEN\n  evidence:\
+      \ all required command families pass; non-blocking npm audit/dependency debt\
+      \ mapped with non-intersection evidence.\n  uncertainty: NONE\n\n## Checklist\
+      \ Closure\n- Description checklist items toggled by integration verifier.\n\
+      - Verification checklist items marked `[x]` by orchestrator after validating\
+      \ evidence and gate-intersection disposition.\n\n## Files changed\nnone\n\n\
+      ## Commit hash(es)\nnone (verify-only; no retained changes; no empty commit\
+      \ created)"
   - id: plse-e2e-wiring-audit
     name: Audit end-to-end wiring and absence of stubs
     status: done
