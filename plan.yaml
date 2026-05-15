@@ -71750,3 +71750,66 @@ phases:
     depends_on:
     - plfinal-documentation-sync
     agent: software-architect
+  - id: plfinal-black-box-acceptance
+    name: Run final black-box acceptance verification
+    status: pending
+    description: 'step_type: deep_review
+
+      agent_source: project
+
+
+      Final black-box acceptance verification using only public docs and public surfaces.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] owner-token auth is required for all `/api/*` and `/mcp` operations.
+
+      - [ ] language read/set works over HTTP and MCP.
+
+      - [ ] reprocess is explicit, bounded, and does not expose a job/progress dashboard.
+
+      - [ ] delivery/report_delivery idempotency and provenance work.
+
+      - [ ] search/FTS and doctor stale/ok diagnostics are publicly observable.
+
+      - [ ] UI renders language/reprocess controls and preserves source identifiers/split
+      scroll.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Evidence includes actual public commands/browser artifacts.
+
+      - [ ] No implementation source assumptions are required.
+
+      - [ ] Findings classify blocker/should_fix/suggestion/tech_debt with reproduction.'
+    verification: '- [ ] Black-box acceptance report covers HTTP, MCP, and UI surfaces.
+
+      - [ ] All blocker/should-fix findings have remediation ownership.
+
+      - [ ] Secret evidence is redacted.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Black-Box Acceptance Report
+
+      - Commands/browser actions:
+
+      - Actual outputs/artifacts:
+
+      - Findings:
+
+      - Verdict: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plfinal-documentation-sync
+    agent: blind-tester
