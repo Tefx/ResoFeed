@@ -72679,7 +72679,7 @@ phases:
 
       - [x] Every new MCP resource/tool is registered and owner-token protected.
 
-      - [ ] HTTP and MCP call the same core operations rather than duplicating semantics.
+      - [x] HTTP and MCP call the same core operations rather than duplicating semantics.
 
       - [ ] `search_items` and HTTP search share query echo behavior.
 
