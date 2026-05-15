@@ -70434,7 +70434,7 @@ phases:
     agent: wiring-auditor
   - id: plsc-core-spec-conformance
     name: Verify backend core spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -70509,6 +70509,8 @@ phases:
     - plsc-processing-language-ingest
     - plsc-reprocess-fts-doctor
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T14:35:05.018899+00:00'
   - id: plsc-core-gate
     name: Gate processing language storage and core backend
     status: pending
