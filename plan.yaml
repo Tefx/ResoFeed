@@ -66706,7 +66706,7 @@ phases:
     agent: gate-reviewer
   - id: ui-runtime-fresh-review-full-frontend-test-remediation
     name: Remediate full frontend npm test stale render-contract failures
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -66881,6 +66881,94 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T07:50:36.963471+00:00'
+    done_at: '2026-05-15T08:05:31.121119+00:00'
+    evidence: '## Commit hash(es)
+
+      - Worker commit: 61895b31c0b51d11820d224e7db3cd196c9760aa fix frontend runtime
+      test contracts
+
+      - Main squash merge: cdca9c7 [vectl] step-ui-runtime-fresh-review-full-frontend-test-remediation
+      completed
+
+
+      ## Files changed
+
+      - web/src/lib/api-client.ts: narrowed manual RSS fetch success normalization
+      to accept both legacy ingest envelopes and already-normalized success bodies
+      without corrupting the operation.
+
+      - web/src/lib/api-client.test.ts: updated stale Source Ledger render expectation
+      from old combined src/status line to current separate src, url, and last_fetch
+      fields.
+
+      - web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts:
+      updated stale Source Ledger accessibility/DOM expectations for contextual [FETCH]
+      accessible names and current compact details placement.
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts: updated
+      stale render-contract expectations for contextual Resonate accessible names,
+      separate Source Ledger fields, and current state import label.
+
+
+      ## Stale-vs-regression classification
+
+      - Accessible names: stale test expectation — docs/DESIGN.md requires Resonate
+      labels announce state as Resonate item / Remove resonance, and current runtime
+      preserves that state phrase while adding item context for disambiguation; Source
+      Ledger [FETCH] contextual names are required by the DOM contract.
+
+      - Source Ledger rendering: stale test expectation — docs/DESIGN.md Source Ledger
+      anatomy and DOM contract define separate source name, URL, and last_fetch/status
+      fields, not the old combined src/status line.
+
+      - State import label: stale test expectation — docs/DESIGN.md State Portability
+      requires explicit names and keyboard-reachable file inputs; current runtime
+      label Choose state JSON accurately names the file picker action while preserving
+      [IMPORT STATE].
+
+
+      ## Accessibility and fresh-audit coverage preservation
+
+      - Accessibility assertions were preserved/strengthened: tests still query buttons/regions
+      by role and accessible name, including contextual Resonate labels, contextual
+      Source Ledger [FETCH] labels, delete labels, hidden state JSON input label,
+      and Source Ledger aria-labelledby.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts was unchanged by
+      the remediation.
+
+      - Fresh-audit acceptance coverage was not weakened; the e2e spec still proves
+      FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
+
+
+      ## Mainline final-state verification (after squash merge, before completion)
+
+      - npm run test: PASS — svelte-check found 0 errors and 0 warnings; Vitest Test
+      Files 6 passed (6), Tests 39 passed (39).
+
+      - npm run check: PASS — svelte-check found 0 errors and 0 warnings.
+
+      - npm run build: PASS — Vite/SvelteKit production build completed and adapter-static
+      wrote site to build.
+
+      - npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts: PASS — Playwright
+      6 passed, covering FR-01/FR-10, FR-02, FR-04, FR-05/FR-07, FR-06, and FR-09.
+
+
+      ## Spec link
+
+      - docs/DESIGN.md consulted by worker: Overview lines 301-318, Layout lines 370-388,
+      Feed/Resonate accessibility lines 471-510, Source Ledger contract lines 525-583,
+      State Portability lines 585-603.
+
+      - AGENTS.md project boundary instructions were consulted from loaded repository
+      instructions: single Go binary, SQLite-only, owner token boundary, no SaaS/account/folder/tag/unread/archive/sync/vector/RAG
+      concepts.
+
+
+      ## Gaps/Notes
+
+      - None.'
   - id: ui-runtime-fresh-review-full-frontend-green-retest
     name: Retest full frontend suite and fresh audit acceptance after B1 remediation
     status: pending
