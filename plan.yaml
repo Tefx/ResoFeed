@@ -71722,7 +71722,7 @@ phases:
       - [x] duplicate/unknown query parameters not rejected according to HTTP contract
       rules.
 
-      - [ ] `actor_id` treated as authorization instead of provenance/idempotency
+      - [x] `actor_id` treated as authorization instead of provenance/idempotency
       metadata.
 
       - [ ] delivery registry/activity ledger/portable receipt/sync/job introduced.
