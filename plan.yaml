@@ -78841,7 +78841,7 @@ phases:
       - [x] Explicitly document no vector DB, embeddings, semantic answer, RAG, command
       history, global undo stack, jobs, queues, or activity ledger.
 
-      - [ ] Keep contract artifacts within the single Go binary and flat internal/resofeed
+      - [x] Keep contract artifacts within the single Go binary and flat internal/resofeed
       shape.'
     verification: '- [ ] Contract-only diff contains signatures/types/docstrings/stubs
       but no completed route mutation logic.
