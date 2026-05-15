@@ -81513,7 +81513,7 @@ phases:
     agent: frontend-engineer
   - id: srdf-source-ledger-details-hit-targets
     name: Complete Source Ledger details disclosure and bracket hit targets
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -81593,6 +81593,8 @@ phases:
 
       '
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T23:28:29.010930+00:00'
   - id: srdf-split-scroll-mobile-route
     name: Complete desktop split scroll and mobile Inspector route behavior
     status: pending
