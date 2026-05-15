@@ -70288,7 +70288,7 @@ phases:
 
       - [ ] Test output includes exact commands and actual output.
 
-      - [ ] Any broad failure has an explicit blocker/remediation path; no `pre-existing`
+      - [x] Any broad failure has an explicit blocker/remediation path; no `pre-existing`
       disposition.'
     verification: '- [ ] `go test ./...` or narrower backend command family passes
       for the implemented surfaces.
