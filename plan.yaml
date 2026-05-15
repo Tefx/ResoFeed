@@ -79134,7 +79134,7 @@ phases:
       with terse explanation while preserving freshness, coverage/source diversity,
       provenance transparency, and minimalism.
 
-      - [ ] Tests prove lexical search/no vector/no embedding/no RAG/no generated
+      - [x] Tests prove lexical search/no vector/no embedding/no RAG/no generated
       answer boundaries including find alias warning copy.
 
       - [ ] Modified files are limited to tests and fixtures; red is expected until
