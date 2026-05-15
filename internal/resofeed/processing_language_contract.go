@@ -65,7 +65,7 @@ type SetProcessingLanguageRequest struct {
 // MCP get_processing_language/set_processing_language.
 type ProcessingLanguageResponse struct {
 	Language       ProcessingLanguageInfo `json:"language"`
-	AlreadyApplied bool                   `json:"already_applied,omitempty"`
+	AlreadyApplied bool                   `json:"already_applied"`
 }
 
 // ReprocessLibraryRequest is the POST /api/runtime/reprocess-library body. The

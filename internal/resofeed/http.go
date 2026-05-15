@@ -19,6 +19,7 @@ import (
 )
 
 const maxImportBodyBytes = 10 << 20
+const maxRuntimeBodyBytes = 100 << 10
 
 // HTTPServerConfig wires the static web UI, JSON API, and MCP endpoint into the
 // single process. Static assets are public; every /api/* route requires
@@ -248,6 +249,21 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleToday(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/search":
 		h.handleSearch(w, r)
+	case r.Method == http.MethodGet && r.URL.Path == RuntimeLanguageHTTPPath:
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleGetRuntimeLanguage(w, r)
+	case r.Method == http.MethodPut && r.URL.Path == RuntimeLanguageHTTPPath:
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleSetRuntimeLanguage(w, r)
+	case r.Method == http.MethodPost && r.URL.Path == RuntimeReprocessLibraryHTTPPath:
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleReprocessLibrary(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/sources":
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -343,6 +359,45 @@ func (h apiHandler) handleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, SearchResponse{Items: items, Query: echo})
+}
+
+func (h apiHandler) handleGetRuntimeLanguage(w http.ResponseWriter, r *http.Request) {
+	language, err := GetProcessingLanguage(r.Context(), h.cfg.DB)
+	if err != nil {
+		writeInternal(w)
+		return
+	}
+	writeJSON(w, http.StatusOK, ProcessingLanguageResponse{Language: language})
+}
+
+func (h apiHandler) handleSetRuntimeLanguage(w http.ResponseWriter, r *http.Request) {
+	var req SetProcessingLanguageRequest
+	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
+		return
+	}
+	response, err := SetProcessingLanguage(r.Context(), h.cfg.DB, req)
+	if err != nil {
+		writeRuntimeMutationError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, response)
+}
+
+func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Request) {
+	var req ReprocessLibraryRequest
+	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
+		return
+	}
+	response, err := ReprocessLibrary(r.Context(), h.cfg.DB, h.cfg.LLM, req)
+	if err != nil {
+		if errors.Is(err, errManualFetchConflict) {
+			writeAPIError(w, http.StatusConflict, "conflict", "operation already running", map[string]any{"operation_running": true, "operation": "reprocess", "scope": "library", "retry_allowed": true})
+			return
+		}
+		writeRuntimeMutationError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, response)
 }
 
 func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
@@ -692,17 +747,21 @@ func validDate(value string) bool {
 }
 
 func readJSONBody(w http.ResponseWriter, r *http.Request, dst any) bool {
+	return readJSONBodyLimit(w, r, dst, maxImportBodyBytes, "10 MiB")
+}
+
+func readJSONBodyLimit(w http.ResponseWriter, r *http.Request, dst any, limit int64, limitLabel string) bool {
 	if !requireContentType(w, r, map[string]bool{"application/json": true}) {
 		return false
 	}
-	body, ok := readLimitedBody(w, r, maxImportBodyBytes)
+	body, ok := readLimitedBodyLabel(w, r, limit, limitLabel)
 	if !ok {
 		return false
 	}
 	decoder := json.NewDecoder(bytes.NewReader(body))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(dst); err != nil {
-		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "body"})
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": jsonDecodeErrorField(err)})
 		return false
 	}
 	if decoder.Decode(&struct{}{}) != io.EOF {
@@ -754,19 +813,41 @@ func requireContentType(w http.ResponseWriter, r *http.Request, allowed map[stri
 }
 
 func readLimitedBody(w http.ResponseWriter, r *http.Request, limit int64) ([]byte, bool) {
+	return readLimitedBodyLabel(w, r, limit, "10 MiB")
+}
+
+func readLimitedBodyLabel(w http.ResponseWriter, r *http.Request, limit int64, limitLabel string) ([]byte, bool) {
 	reader := http.MaxBytesReader(w, r.Body, limit)
 	defer func() { _ = reader.Close() }()
 	body, err := io.ReadAll(reader)
 	if err != nil {
 		var maxErr *http.MaxBytesError
 		if errors.As(err, &maxErr) {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"limit": "10 MiB"})
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"limit": limitLabel})
 			return nil, false
 		}
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "body"})
 		return nil, false
 	}
 	return body, true
+}
+
+func jsonDecodeErrorField(err error) string {
+	const prefix = "json: unknown field "
+	message := err.Error()
+	if strings.HasPrefix(message, prefix) {
+		return strings.Trim(message[len(prefix):], `"`)
+	}
+	return "body"
+}
+
+func writeRuntimeMutationError(w http.ResponseWriter, err error) {
+	var fieldErr mcpFieldError
+	if errors.As(err, &fieldErr) {
+		writeFieldError(w, fieldErr)
+		return
+	}
+	writeInternal(w)
 }
 
 func listSources(ctx context.Context, db *sql.DB) ([]Source, error) {
