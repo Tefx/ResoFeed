@@ -73080,7 +73080,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] HTTP/MCP green retest passed.
+      - [x] HTTP/MCP green retest passed.
 
       - [x] Blind liveness probe passed with public HTTP and MCP evidence.
 
