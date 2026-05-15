@@ -66387,7 +66387,7 @@ phases:
 
       - [x] Every fresh audit finding has a multimodal verdict and evidence reference.
 
-      - [ ] Any remaining blocker or should-fix gap includes a remediation owner and
+      - [x] Any remaining blocker or should-fix gap includes a remediation owner and
       closure path.'
     verification: '- [ ] Multimodal audit includes rendered screenshots/images or
       equivalent visual/spatial artifacts for desktop and 390x844 mobile states.
