@@ -82489,7 +82489,7 @@ phases:
       never after rejection`: accepted token is persisted to `window.localStorage.getItem(''resofeed.ownerToken'')`;
       rejected token is never persisted.
 
-      - [ ] `wires Steer to /api/steer and /doctor to raw text diagnostics`: app escapes
+      - [x] `wires Steer to /api/steer and /doctor to raw text diagnostics`: app escapes
       Owner Token Prompt and exposes `Steer or paste RSS URL` plus expected Steer/doctor
       wiring.
 
