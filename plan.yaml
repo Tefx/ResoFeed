@@ -69293,7 +69293,7 @@ phases:
 
       - [x] MCP `search_items` output includes `query` echo matching `SearchQueryEcho`.
 
-      - [ ] MCP `report_delivery` matches HTTP delivery semantics and does not create
+      - [x] MCP `report_delivery` matches HTTP delivery semantics and does not create
       registries/jobs/ledgers.
 
       - [ ] Auth and schema errors are covered at the public `/mcp` surface.'
