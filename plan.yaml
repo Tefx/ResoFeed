@@ -81732,7 +81732,7 @@ phases:
       scoped mainline verification. Verification checklist items are [x].'
   - id: srdf-split-scroll-mobile-route
     name: Complete desktop split scroll and mobile Inspector route behavior
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -81805,6 +81805,111 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T23:28:39.979008+00:00'
+    done_at: '2026-05-15T23:50:24.790214+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — subagent read Desktop Split Scroll, mobile full-screen Inspector
+      route, focus, and active-state expectations; key insight: desktop Feed and Inspector
+      are independent focusable scroll regions, selecting Feed preserves Feed scroll
+      and resets Inspector, and mobile opens Inspector as full-screen route with Feed
+      scroll preserved.
+
+      - docs/UI_REGRESSION_CONTRACT.md — subagent read active/selected semantics and
+      required landmarks for main RESOFEED, feed/TODAY, and Inspector; Feed rows expose
+      selected/current via `aria-current`.
+
+
+      ## Split-Scroll Evidence
+
+      **Commit hash(es)**: worktree commit `0f5015514fd13262be2f115155edb05158b9c54c`;
+      main squash merge `2e97178c [vectl] step-srdf-split-scroll-mobile-route completed`.
+
+      **Files changed**:
+
+      - `web/src/routes/+page.svelte`
+
+      - `web/tests/e2e/processing-language-source-split-scroll.spec.ts`
+
+
+      **Spec link**: docs/DESIGN.md / docs/UI_REGRESSION_CONTRACT.md.
+
+
+      **Commands/tests run**:
+
+      ```
+
+      # subagent worktree
+
+      npm ci
+
+      # exit 0
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm run test:e2e -- --project=chromium-ci-safe tests/e2e/processing-language-source-split-scroll.spec.ts
+
+      # 2 passed
+
+
+      # orchestrator mainline final-state gate
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      npm run test:e2e -- --project=chromium-ci-safe tests/e2e/processing-language-source-split-scroll.spec.ts
+
+      # 2 passed
+
+      ```
+
+
+      **Desktop scroll positions before/after**:
+
+      - Feed pane scrolled to 520 before selection and remained equal to pre-select
+      value after selecting Browser proof item 10.
+
+      - Inspector pane scrolled to 360 before selection and reset to 0 after selecting
+      Browser proof item 10.
+
+      - Tests proved both regions have `tabindex="0"`, CSS `overflow-y: auto`, and
+      accessible names.
+
+
+      **Mobile route evidence**:
+
+      - Mobile viewport 390x844.
+
+      - Feed `window.scrollY` set to 520 before opening item.
+
+      - Selecting Browser proof item 12 routed to `/items/browser_proof_item_12`.
+
+      - Inspector visible as full-screen route; Feed pane hidden; mobile Resonate
+      action visible.
+
+      - Back returned to `/`, restored Feed scroll to 520, and removed mobile Feed
+      `aria-current` because Inspector was no longer visible.
+
+
+      **Screenshots/DOM snapshots**:
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/desktop-split-scroll.png`
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/desktop-split-scroll.aria.txt`
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/mobile-inspector-route.png`
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/mobile-inspector-route.aria.txt`
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/mobile-feed-restored.png`
+
+      - `/var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/srdf-split-scroll-mobile-route-evidence/mobile-feed-restored.aria.txt`
+
+
+      **Gaps/Notes**: NONE. Description acceptance checklist and verification checklist
+      are [x].'
   - id: srdf-processing-language-low-chrome-controls
     name: Close processing language and reprocess low-chrome UI gaps
     status: done
