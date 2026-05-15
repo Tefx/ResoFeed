@@ -62157,6 +62157,103 @@ phases:
     depends_on:
     - urda-frontend-ui-audit-gate
     agent: frontend-engineer
+  - id: urda-keyboard-a11y-nav-post-fix-retest
+    name: Post-fix keyboard navigation and UI accessibility retest
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      priority: HIGH
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun the keyboard/a11y navigation
+      proof after `urda-keyboard-a11y-nav-batched-fix`.
+
+
+      This retest is the remediation owner for the gate proof gap reported by `urda-frontend-ui-audit-gate`.
+      The earlier blind-tester Mode D liveness PASS is accepted as non-blocking context
+      only; do not reclassify liveness as the blocker.
+
+
+      ## Required proof
+
+      - Rerun the exact failed keyboard suite: `web/tests/e2e/keyboard-a11y.expected-red.spec.ts`.
+
+      - Confirm `getByRole(''button'', { name: ''TODAY'' })` is found and focusable.
+
+      - Confirm `getByRole(''button'', { name: ''SOURCE LEDGER'' })` is found and
+      focusable.
+
+      - Prove Source Ledger `[RUN INGEST]`, row `[FETCH]`, and `[IMPORT OPML]` are
+      keyboard reachable and activatable where applicable.
+
+      - Prove Resonate controls are keyboard reachable and satisfy accessibility expectations.
+
+      - Rerun relevant focused Source Ledger controls and URDA visual/a11y focused
+      specs that previously passed, to confirm the keyboard fix did not regress them.
+
+
+      ## Behavioral proof fields (MANDATORY)
+
+      Evidence MUST include:
+
+      - verdict: PASS | FAIL
+
+      - blockers: [] or list with reproduction
+
+      - gate_open_allowed: true | false
+
+      - orchestrator_action_hint: COMPLETE_GATE | DO_NOT_COMPLETE
+
+
+      `gate_open_allowed: true` is valid only if the keyboard suite is green and no
+      Source Ledger / Resonate keyboard proof remains `UNCERTAIN_BLOCKING`.'
+    verification: '- `web/tests/e2e/keyboard-a11y.expected-red.spec.ts` passes green
+      after the fix.
+
+      - Focused Source Ledger controls tests pass green, including keyboard proof
+      for `[RUN INGEST]`, row `[FETCH]`, and `[IMPORT OPML]`.
+
+      - URDA visual/a11y focused specs pass green and show no regression in layout/design-token/accessibility
+      behavior.
+
+      - Resonate keyboard/accessibility proof is green or reports concrete blockers
+      with reproduction.
+
+      - Behavioral proof fields are present: `verdict`, `blockers`, `gate_open_allowed`,
+      and `orchestrator_action_hint`.
+
+      - If any blocker remains, evidence explicitly maps it to remediation ownership;
+      do not mark gate-open allowed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — key passage\
+      \ or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y.expected-red.spec.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/tests/e2e/keyboard-a11y-helpers.ts\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\n## Retest Commands\n- Exact keyboard suite command:\n\
+      \  ```\n  <paste command that runs web/tests/e2e/keyboard-a11y.expected-red.spec.ts>\n\
+      \  ```\n- Focused Source Ledger controls command(s):\n  ```\n  <paste command(s)>\n\
+      \  ```\n- URDA visual/a11y focused spec command(s):\n  ```\n  <paste command(s)>\n\
+      \  ```\n\n## Actual Output\n```text\n<paste relevant stdout/stderr, not only\
+      \ \"tests pass\">\n```\n\n## Keyboard/A11y Closure Matrix\n| Surface | Proof\
+      \ | Status |\n| --- | --- | --- |\n| TODAY role-button focus | <artifact/assertion>\
+      \ | PASS/FAIL |\n| SOURCE LEDGER role-button focus | <artifact/assertion> |\
+      \ PASS/FAIL |\n| Source Ledger [RUN INGEST] | <artifact/assertion> | PASS/FAIL\
+      \ |\n| Source Ledger row [FETCH] | <artifact/assertion> | PASS/FAIL |\n| Source\
+      \ Ledger [IMPORT OPML] | <artifact/assertion> | PASS/FAIL |\n| Resonate keyboard/a11y\
+      \ | <artifact/assertion> | PASS/FAIL |\n\n## Behavioral Proof Fields\nverdict:\
+      \ PASS|FAIL\nblockers: []\ngate_open_allowed: true|false\norchestrator_action_hint:\
+      \ COMPLETE_GATE|DO_NOT_COMPLETE\n\n## Regression Assessment\n- Focused Source\
+      \ Ledger controls still green: yes/no\n- URDA visual/a11y focused specs still\
+      \ green: yes/no\n- New forbidden UI/product concepts introduced: yes/no\n"
+    depends_on:
+    - urda-keyboard-a11y-nav-batched-fix
+    agent: integration-verifier
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
