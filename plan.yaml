@@ -79803,3 +79803,90 @@ phases:
     depends_on:
     - srde2e-software-architect-clean-recheck
     agent: integration-verifier
+  - id: srde2e-final-closure-gate
+    name: Final gate for Steer delta implementation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), decide whether the Steer
+      delta implementation is complete.
+
+
+      review_depth: THOROUGH
+
+      cross_cutting_focus:
+
+      - AC-4 invariant conflict handling and AC-19 route echo/write commit/undo.
+
+      - HTTP/MCP/UI parity and backend-authoritative route classification.
+
+      - Lexical-only search, find warning alias, no vector/embedding/RAG/semantic
+      answer UI.
+
+      - Source Ledger details, 44px bracket actions, low-chrome runtime operations.
+
+      - Desktop split-scroll, mobile Inspector route, accessibility, and negative
+      UX assertions.
+
+      - Clean software-architect review after remediation.
+
+
+      OPEN is invalid unless the software-architect clean re-review verdict is CLEAN
+      and all blocker-class behavioral obligations are PROVEN or have explicit non-intersection
+      evidence.'
+    verification: '- [ ] full-plan-check/gate protecting plan completion.
+
+      - [ ] All steps in steer-delta-e2e-architecture-review-closure completed with
+      evidence and refs read confirmation.
+
+      - [ ] Software-architect clean re-review verdict is CLEAN after remediation.
+
+      - [ ] Real-system E2E and visual/a11y proof cover Steer, Source Ledger, split-scroll/mobile,
+      search/no-RAG, and processing language/reprocess surfaces.
+
+      - [ ] Documentation sync is complete or explicitly no-op with evidence.
+
+      - [ ] Gate decision basis lists every unresolved item and blocks if any blocker-class
+      proof obligation remains.
+
+      - [ ] Final decision is OPEN only when no blocker or should_fix remains.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN_VISION.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Final Gate Decision Basis
+
+      | requirement_ref | evidence_ref | unresolved_status | blocks_completion | rationale
+      |
+
+      |---|---|---|---|---|
+
+
+      ## Final Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED
+
+      '
+    depends_on:
+    - srde2e-real-system-e2e-regression
+    - srde2e-visual-a11y-regression-proof
+    - srde2e-documentation-sync
+    - srde2e-software-architect-fresh-review
+    - srde2e-backend-architecture-remediation
+    - srde2e-frontend-architecture-remediation
+    - srde2e-software-architect-clean-recheck
+    - srde2e-full-plan-check
+    agent: gate-reviewer
