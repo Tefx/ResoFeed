@@ -66362,7 +66362,7 @@ phases:
 
       - [ ] FAIL'
     depends_on:
-    - ui-runtime-fresh-review-green-retest
+    - ui-runtime-fresh-review-full-frontend-green-retest
     agent: uiux-auditor
   - id: ui-runtime-fresh-review-black-box-liveness
     name: Black-box UI runtime liveness and runnable surface proof
