@@ -70972,12 +70972,12 @@ phases:
 
       - [x] Gate decision basis lists downstream HTTP/MCP/frontend blockers and confirms
       they remain blocking before `plhm-runtime-gate` or `plfu-frontend-gate`.'
-    verification: '- [ ] All storage-core phase steps completed with adequate evidence.
+    verification: '- [x] All storage-core phase steps completed with adequate evidence.
 
-      - [ ] Gate decision basis maps unresolved items to BLOCK, downstream-owned blocker,
+      - [x] Gate decision basis maps unresolved items to BLOCK, downstream-owned blocker,
       or explicit non-intersection.
 
-      - [ ] OPEN recommendation is allowed only if backend-core obligations are PROVEN
+      - [x] OPEN recommendation is allowed only if backend-core obligations are PROVEN
       and downstream-owned runtime/frontend gaps are explicitly assigned to later
       blocking steps/gates.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
