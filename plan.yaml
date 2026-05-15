@@ -74021,7 +74021,7 @@ phases:
 
       - [x] mobile Inspector behavior regression.
 
-      - [ ] persisted reading-position tracking or analytics.
+      - [x] persisted reading-position tracking or analytics.
 
       - [ ] source/split-scroll anchors remain type-only and unconsumed by rendered
       UI.'
