@@ -64088,3 +64088,103 @@ phases:
     depends_on:
     - urda-final-spec-boundary-blockers-fix
     agent: integration-verifier
+  - id: urda-final-spec-boundary-blockers-uiux-audit
+    name: UIUX audit final spec boundary blocker visual closures
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      Independence Level: L2
+
+      agent_source: default
+
+
+      As an INDEPENDENT UIUX AUDITOR (`uiux-auditor`), audit the rendered/UI contract
+      aspects of `urda-final-spec-boundary-blockers-fix` before final closure can
+      proceed.
+
+
+      Scope refs:
+
+      - `docs/DESIGN.md` — canonical ResoFeed visual language, bracket-action behavior,
+      and forbidden UI concepts.
+
+      - `docs/ARCHITECTURE.md` — single-tenant product/runtime boundaries and forbidden
+      sync/sidecar concepts.
+
+
+      Touch/read focus:
+
+      - `web/src/routes/components/SourceLedger.svelte`
+
+      - `web/src/routes/components/StatePortability.svelte`
+
+      - `web/src/app.css`
+
+
+      Required audit checks:
+
+      1. Rendered Source Ledger destructive actions show canonical bracket-action
+      visual and semantic behavior for exact `[DELETE]` and `[CONFIRM]` labels, including
+      terminal-style hover/focus inversion and keyboard-focus visibility.
+
+      2. Delete confirmation produces no Source Ledger row layout shift. Capture before/after
+      screenshots and bounding-box evidence where possible; report exact measured
+      deltas.
+
+      3. State Portability active labels render exactly `[EXPORTING STATE...]` and
+      `[IMPORTING STATE...]` during active export/import states.
+
+      4. No forbidden `docs/DESIGN.md` UI concepts or ResoFeed product/runtime concepts
+      are introduced while closing these blockers: accounts, onboarding wizards, friendly
+      SaaS copy, settings sliders, folders, tags, unread/archive flows, drag-and-drop
+      ordering, vector/RAG surfaces, sync/merge UI, sidecar/worker/admin-process UI,
+      or multi-user auth.
+
+
+      This audit protects downstream gates: `urda-final-spec-boundary-blockers-retest`,
+      `urda-final-black-box-runtime-ui-smoke`, and `urda-strict-final-gate`. Any unresolved
+      visual/runtime UI obligation must be reported with an explicit remediation path;
+      OPEN final closure is invalid while this audit is missing or BLOCKED.'
+    verification: '- Rendered evidence confirms `[DELETE]` and `[CONFIRM]` use canonical
+      bracket-action visual/semantic behavior with hover/focus inversion.
+
+      - Screenshot and bounding-box evidence confirms delete confirmation causes no
+      material row layout shift; exact deltas are recorded.
+
+      - Rendered or component-state evidence confirms exact `[EXPORTING STATE...]`
+      and `[IMPORTING STATE...]` active labels.
+
+      - Forbidden DESIGN.md/product concepts scan is clean.
+
+      - Audit output includes PASS, PASS_WITH_DEBT, or BLOCKED with explicit gate
+      decision basis for R6, R7, and R18 UI obligations.'
+    evidence_template: "## UIUX Audit Report\n\n### refs Read Confirmation (MANDATORY)\n\
+      For each ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n### Rendered Evidence\n\
+      - Source Ledger screenshot(s) for `[DELETE]` default/hover/focus states:\n \
+      \ ```\n  <artifact paths or embedded descriptions>\n  ```\n- Source Ledger screenshot(s)\
+      \ for `[CONFIRM]` default/hover/focus states:\n  ```\n  <artifact paths or embedded\
+      \ descriptions>\n  ```\n- Delete confirmation bounding boxes:\n  ```\n  before:\
+      \ <x,y,w,h>\n  after: <x,y,w,h>\n  delta: <dx,dy,dw,dh>\n  ```\n- State Portability\
+      \ active-label evidence:\n  ```\n  export label: <observed>\n  import label:\
+      \ <observed>\n  ```\n\n### Forbidden Concept Scan\n- Forbidden UI/product concepts\
+      \ checked: accounts, onboarding wizards, friendly SaaS copy, settings sliders,\
+      \ folders, tags, unread/archive flows, drag-and-drop ordering, vector/RAG, sync/merge\
+      \ UI, sidecar/worker/admin-process UI, multi-user auth.\n- Findings: <none or\
+      \ list>\n\n### Behavioral Proof Register\n| requirement_ref | behavior_claim\
+      \ | runtime_proof_expected | evidence_ref | status | closure_path | gate_decision_basis\
+      \ |\n| --- | --- | --- | --- | --- | --- | --- |\n| R6 | `[DELETE]`/`[CONFIRM]`\
+      \ are canonical bracket actions with inversion | rendered screenshot/focus evidence\
+      \ | <artifact> | PROVEN/NEEDS_TEST/BLOCKED | <path> | <basis> |\n| R7 | delete\
+      \ confirmation has no row layout shift | screenshots + bounding boxes | <artifact>\
+      \ | PROVEN/NEEDS_TEST/BLOCKED | <path> | <basis> |\n| R18 | state portability\
+      \ active labels are exact | rendered/component evidence | <artifact> | PROVEN/NEEDS_TEST/BLOCKED\
+      \ | <path> | <basis> |\n\n### Headline\n- [ ] PASS\n- [ ] PASS_WITH_DEBT (non-blocking\
+      \ debt only, with non-intersection rationale)\n- [ ] BLOCKED (final closure\
+      \ must not proceed)\n"
+    depends_on:
+    - urda-final-spec-boundary-blockers-fix
+    agent: uiux-auditor
