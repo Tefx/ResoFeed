@@ -82520,6 +82520,196 @@ phases:
     - srdf-split-scroll-mobile-route
     - srdf-processing-language-low-chrome-controls
     agent: frontend-engineer
+  - id: srdf-broad-rendering-owner-token-bootstrap-retest
+    name: Retest broad rendering and scoped frontend surfaces after owner-token bootstrap
+      fix
+    status: pending
+    description: 'As an INDEPENDENT TESTER (integration-verifier), retest the batched
+      owner-token/rendering bootstrap remediation from `srdf-broad-rendering-owner-token-bootstrap-fix`
+      from a fresh perspective.
+
+
+      step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: full-plan-check for current frontend mainline plus phase-check
+      for Steer delta frontend gate.
+
+
+      This retest protects downstream `srdf-uiux-native-audit`, `srdf-frontend-spec-conformance`,
+      `srdf-frontend-gate`, and final E2E closure. Finding remaining issues is a successful
+      verification outcome, but this step is complete only when blocker-class red
+      tests have a clear PASS or remediation loop.
+
+
+      Required test execution:
+
+      - [ ] Run `npm run test` on mainline and verify the broad rendering suite is
+      green, including `src/routes/components/__tests__/rendering-expected-red.test.ts`.
+
+      - [ ] Run `npm run test:render -- steer-route-preview.expected-red.test.ts`
+      and verify the scoped Steer route preview remains green.
+
+      - [ ] Run the scoped Source Ledger render checks covering details disclosure
+      and bracket hit targets.
+
+      - [ ] Run the scoped split-scroll/mobile render checks covering feed-first full-screen
+      surfaces and Search scoping away from Today.
+
+      - [ ] Run the scoped processing-language/low-chrome render checks if present
+      in the repo test harness.
+
+      - [ ] Run `npm run check` and verify 0 errors/warnings.
+
+      - [ ] Run the forbidden steer/UI concept scan used by `srdf-steer-preview-ui-state-aria`
+      and verify exit 1/no matches.
+
+
+      Behavioral proof register required for gate decision basis:
+
+      - [ ] requirement_ref: broad rendering owner-token bootstrap; behavior_claim:
+      accepted token persists after successful bootstrap and rejected token never
+      persists; runtime_proof_expected: `npm run test` evidence; evidence_ref: pasted
+      command output; status: PROVEN or explicit blocker; closure_path: pass or new
+      remediation; gate_decision_basis: downstream gate may open only when PROVEN.
+
+      - [ ] requirement_ref: authenticated app chrome renders Steer, Source Ledger,
+      mobile Today, and agent receipt surfaces; behavior_claim: prompt does not trap
+      authenticated tests; runtime_proof_expected: broad and scoped render tests;
+      evidence_ref: pasted command output; status: PROVEN or explicit blocker; closure_path:
+      pass or new remediation; gate_decision_basis: downstream gate may open only
+      when PROVEN.
+
+
+      Acceptance checklist:
+
+      - [ ] Mainline `npm run test` is green.
+
+      - [ ] The six named broad rendering failures are explicitly checked and closed.
+
+      - [ ] Scoped Steer/source/split/processing-language checks show no regression.
+
+      - [ ] `npm run check` remains clean.
+
+      - [ ] Forbidden UI scan remains clean.
+
+      - [ ] Evidence includes actual command output, not only a summary.'
+    verification: '- [ ] full-plan-check protecting current frontend mainline: `npm
+      run test` passes with `rendering-expected-red.test.ts` green.
+
+      - [ ] phase-check protecting frontend gate: scoped Steer, Source Ledger, split-scroll/mobile,
+      and processing-language checks pass or have explicit blocker remediation ownership.
+
+      - [ ] local-check protecting type/static health: `npm run check` reports 0 errors/warnings.
+
+      - [ ] forbidden UI scan reports no forbidden concepts.
+
+      - [ ] Behavioral proof register statuses are PROVEN for bootstrap persistence
+      and authenticated rendering, or a new remediation owner is required before downstream
+      gates open.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - src/routes/components/__tests__/rendering-expected-red.test.ts — key passage
+      or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Evidence
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer fix)
+
+      **Scope**: broad rendering owner-token bootstrap plus scoped Steer/Source Ledger/split-scroll
+      regression checks
+
+      **Independence Level**: L1
+
+
+      ### Commands executed
+
+      ```
+
+      npm run test
+
+      npm run test:render -- steer-route-preview.expected-red.test.ts
+
+      <scoped Source Ledger render command>
+
+      <scoped split-scroll/mobile render command>
+
+      <scoped processing-language/low-chrome command or NOT PRESENT: reason>
+
+      npm run check
+
+      <forbidden UI scan command>
+
+      ```
+
+
+      ### Actual output
+
+      ```
+
+      <paste stdout/stderr for every command; do not write only "passes">
+
+      ```
+
+
+      ### Six-failure closure checklist
+
+      - [ ] Owner token accepted persistence / rejected non-persistence closed.
+
+      - [ ] Steer `/api/steer` and `/doctor` rendering/wiring closed.
+
+      - [ ] Source Ledger RESOFEED utility menu rendering closed.
+
+      - [ ] Active MCP agent steering attribution receipt rendering closed.
+
+      - [ ] Mobile feed-first `Today feed items` rendering closed.
+
+      - [ ] Mobile Search/retrieval scoping away from Today closed.
+
+
+      ### Behavioral proof register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | broad-rendering-owner-token-bootstrap | accepted token persists after success;
+      rejected token never persists | `npm run test` | <output section> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <pass or remediation> | <OPEN/BLOCK basis> |
+
+      | authenticated-rendering-surfaces | authenticated tests render Steer, Source
+      Ledger, mobile Today, and agent receipt surfaces | broad + scoped render tests
+      | <output section> | PROVEN/NEEDS_TEST/UNPROVEN | <pass or remediation> | <OPEN/BLOCK
+      basis> |
+
+
+      ### Headline
+
+      - [ ] PASS: All broad and scoped checks are green.
+
+      - [ ] FAIL: Blocking red tests or proof gaps remain and require a new remediation
+      loop.'
+    depends_on:
+    - srdf-broad-rendering-owner-token-bootstrap-fix
+    agent: integration-verifier
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
