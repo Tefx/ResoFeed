@@ -73415,7 +73415,7 @@ phases:
       \ architecture examples without extra top-level drift fields.\n- [x] `SearchItemsForMCP`\
       \ stale no-query-echo path is gone or provably private/safe with a real caller.\n\
       - [x] Previous HTTP/MCP green and liveness proofs remain valid after the fix.\n\
-      - [ ] Behavioral proof register supports an OPEN/BLOCK decision for `plhm-runtime-gate`."
+      - [x] Behavioral proof register supports an OPEN/BLOCK decision for `plhm-runtime-gate`."
     verification: '- [ ] Full `go test ./...` passes and output is included.
 
       - [ ] Field-exact HTTP conflict/error shapes are verified against the documented
