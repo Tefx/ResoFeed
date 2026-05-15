@@ -78038,6 +78038,102 @@ phases:
     depends_on:
     - srdct-backend-contract-lock
     agent: golang-developer
+  - id: srdct-frontend-expected-red-tests
+    name: Add frontend expected-red route preview ledger split-scroll tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Add frontend expected-red tests only. Product implementation code is out of
+      scope for this step.
+
+
+      Target paths:
+
+      - web/src/routes/components/__tests__/*.test.ts
+
+      - web/tests/e2e/*steer* or *source-ledger* specs
+
+      - web/tests/e2e/keyboard-a11y-helpers.ts only for test helper additions
+
+
+      Spec-Fixture Conformance (MANDATORY): fixtures must use exact documented UI
+      copy and DOM/action labels from DESIGN.md and UI_REGRESSION_CONTRACT.md; do
+      not use convenience labels that production UI would not expose.
+
+
+      Acceptance checklist:
+
+      - [ ] Tests cover idle preview reserved-but-blank, no [IDLE] chip, no duplicate
+      hint, aria-describedby, focus retention, Escape cancel, and correct polite/assertive
+      live-region levels.
+
+      - [ ] Tests cover [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE], [INVALID],
+      URL-required invalid add, warning-only find alias, write preview [APPLY]/[CANCEL],
+      and receipt [UNDO] visibility only when backend returns revocable id.
+
+      - [ ] Tests cover Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      OPML/state actions, native or aria-expanded/aria-controls disclosure semantics,
+      44px bracket hit targets, topmost element clickability, and terse raw diagnostics.
+
+      - [ ] Tests cover absence of jobs, queues, dashboards, settings, activity logs,
+      folders, tags, rule builders, RAG/chat/semantic answer UI, and duplicate URL
+      subscription fields.
+
+      - [ ] Tests cover desktop independent Feed/Inspector scroll regions and mobile
+      full-screen Inspector route with preserved Feed scroll.
+
+      - [ ] Tests cover processing language/reprocess controls as low-chrome architecture-owned
+      runtime operations only.
+
+      - [ ] Modified files are limited to tests and fixtures; red is expected until
+      downstream UI implementation completes.'
+    verification: '- [ ] Expected-red frontend/component/E2E run exposes the documented
+      UI/design gaps before implementation.
+
+      - [ ] Test fixtures cite exact documented copy/labels and include no convenience-only
+      selectors without user-observable fallback.
+
+      - [ ] Evidence lists expected_failures or exposed_gaps and names downstream
+      owners srdf-steer-preview-ui-state-aria, srdf-source-ledger-details-hit-targets,
+      and srdf-split-scroll-mobile-route.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Frontend Evidence
+
+      - Test/spec files added/updated:
+
+      - Commands executed:
+
+      ```
+
+      <actual npm/playwright/vitest commands>
+
+      ```
+
+      - Expected failures/exposed gaps:
+
+      - Spec-exact fixture passages:
+
+      - Product files untouched except tests/fixtures confirmation:
+
+      '
+    depends_on:
+    - srdct-frontend-contract-lock
+    agent: frontend-engineer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
