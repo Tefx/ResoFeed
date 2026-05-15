@@ -77803,6 +77803,78 @@ phases:
     and expected-red tests expose current gaps without product implementation.
   depends_on:
   - processing-language-finalization
+  steps:
+  - id: srdct-backend-contract-lock
+    name: Lock backend Steer preview undo and invariant contract
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: signatures, type_defs, interfaces, stubs
+
+
+      Lock the Go-side acceptance contract for Steer route preview, commit, target-specific
+      undo, lexical search aliasing, and AC-4 invariant-conflict receipts. Use only
+      existing flat internal/resofeed files, preferably internal/resofeed/types.go
+      and a flat steer_intent.go only if needed. Do not add runtime business logic
+      in this step.
+
+
+      Authoritative refs:
+
+      - docs/ARCHITECTURE.md §3.6, §5.3, §5.4, §6, §7
+
+      - docs/PRD.md AC-4 and AC-19
+
+
+      Acceptance checklist:
+
+      - [ ] Define or confirm SteerRouteKind, SteerPreview, SteeringReceipt, SteerUndoHandle,
+      and SteerUndoResult shapes match docs exactly.
+
+      - [ ] Pin classifier/preview/undo function signatures without adding completed
+      mutation logic.
+
+      - [ ] Pin strict request/response JSON field names, nullable fields, and idempotency
+      boundaries for preview vs commit vs undo.
+
+      - [ ] Explicitly document no vector DB, embeddings, semantic answer, RAG, command
+      history, global undo stack, jobs, queues, or activity ledger.
+
+      - [ ] Keep contract artifacts within the single Go binary and flat internal/resofeed
+      shape.'
+    verification: '- [ ] Contract-only diff contains signatures/types/docstrings/stubs
+      but no completed route mutation logic.
+
+      - [ ] Go contract shapes match docs/ARCHITECTURE.md SteerPreview, SteeringReceipt,
+      SteerUndoHandle, and SteerUndoResult fields.
+
+      - [ ] Evidence cites key passages from every ref and confirms KISS constraints
+      are preserved.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Contract Evidence
+
+      - Contract files changed:
+
+      - Public/transport shapes pinned:
+
+      - Runtime logic intentionally absent:
+
+      - KISS constraints preserved:
+
+      '
+    agent: golang-developer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
