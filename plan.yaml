@@ -63533,7 +63533,7 @@ phases:
       \ dependency/gate language."
   - id: urda-final-black-box-runtime-ui-smoke
     name: Final black-box runtime UI smoke with CLI preservation confirmation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63665,6 +63665,8 @@ phases:
     - urda-final-spec-and-product-boundary-review
     - urda-final-spec-boundary-blockers-retest
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-15T05:07:48.710514+00:00'
   - id: urda-strict-final-gate
     name: Strict final gate for UI runtime design audit remediation
     status: pending
