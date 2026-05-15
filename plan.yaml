@@ -69938,7 +69938,7 @@ phases:
 
       - [x] Implementation has substantive logic; no hardcoded language-only stubs.
 
-      - [ ] Outputs vary by stored processing language and input item data.
+      - [x] Outputs vary by stored processing language and input item data.
 
       - [ ] Existing extraction/model failure taxonomy is preserved.'
     verification: '- [ ] Targeted ingest/language tests pass for `en` and `zh`.
