@@ -77517,7 +77517,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Rendered screenshot or equivalent visual artifact is captured for desktop
+      - [x] Rendered screenshot or equivalent visual artifact is captured for desktop
       language/reprocess/source/split-scroll states.
 
       - [ ] Rendered screenshot or equivalent visual artifact is captured for mobile
