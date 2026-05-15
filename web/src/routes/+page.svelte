@@ -467,6 +467,8 @@
     try {
       const response = await apiClient().reprocessLibrary();
       reprocessState = 'complete';
+      await tick();
+      reprocessTrigger?.focus();
       reprocessStatus = reprocessCompleteMessage(response.reprocess);
       await refreshShellLists();
       if (selectedItemId) await loadItemDetail(selectedItemId);
@@ -476,10 +478,9 @@
       } else {
         reprocessState = 'failed';
       }
-      reprocessStatus = formatRawApiError(error, 'err: reprocess failed');
-    } finally {
       await tick();
       reprocessTrigger?.focus();
+      reprocessStatus = formatRawApiError(error, 'err: reprocess failed');
     }
   }
 

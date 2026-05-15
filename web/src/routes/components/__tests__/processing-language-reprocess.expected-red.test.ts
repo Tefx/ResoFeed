@@ -32,8 +32,9 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; reprocessStatus?: number } = {}) {
+function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; reprocessStatus?: number } = {}) {
   const language = options.language ?? 'en';
+  const languageStatus = options.languageStatus ?? 200;
   const reprocessStatus = options.reprocessStatus ?? 200;
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
@@ -47,12 +48,21 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; rep
     if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith('/api/runtime/language') && method === 'GET') {
+      if (languageStatus === 401) {
+        return jsonResponse({ error: { code: 'unauthorized', message: 'owner token rejected', details: {} } }, { status: 401 });
+      }
       return jsonResponse({ language: { code: language, label: language === 'zh' ? '中文' : 'English' } });
     }
     if (url.endsWith('/api/runtime/language') && method === 'PUT') {
+      if (languageStatus === 400) {
+        return jsonResponse({ error: { code: 'bad_request', message: 'request_fingerprint_mismatch', details: { reason: 'request_fingerprint_mismatch' } } }, { status: 400 });
+      }
       return jsonResponse({ language: { code: 'zh', label: '中文' }, already_applied: false });
     }
     if (url.endsWith('/api/runtime/reprocess-library') && method === 'POST') {
+      if (reprocessStatus === 400) {
+        return jsonResponse({ error: { code: 'bad_request', message: 'request_fingerprint_mismatch', details: { reason: 'request_fingerprint_mismatch' } } }, { status: 400 });
+      }
       if (reprocessStatus === 409) {
         return jsonResponse({ error: { code: 'conflict', message: 'ingest already running', details: {} } }, { status: 409 });
       }
@@ -82,7 +92,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; rep
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; reprocessStatus?: number } = {}) {
+async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; reprocessStatus?: number } = {}) {
   cleanup();
   window.localStorage.clear();
   installAuthenticatedRuntimeFetch(options);
@@ -117,6 +127,26 @@ describe('expected-red processing language and reprocess rendering contracts', (
     expect(screen.queryByRole('button', { name: /translate this item|show original|side-by-side/i })).not.toBeInTheDocument();
   });
 
+  it('renders terse HTTP 400 and 401 language failures without replacing controls with settings UI', async () => {
+    const { user } = await renderAuthenticatedPage({ language: 'en', languageStatus: 400 });
+
+    await user.click(screen.getByRole('button', { name: /processing language.*English.*set.*Chinese/i }));
+
+    await waitFor(() => expect(screen.getByRole('status', { name: /processing language/i })).toHaveTextContent('err: request_fingerprint_mismatch'));
+    expect(screen.getByText('LANG: EN')).toHaveClass('bracket-action');
+    expect(screen.queryByRole('heading', { name: /settings|preferences|onboarding/i })).not.toBeInTheDocument();
+
+    cleanup();
+    window.localStorage.clear();
+    installAuthenticatedRuntimeFetch({ languageStatus: 401 });
+    render(Page);
+    await user.type(screen.getByLabelText('Owner token'), ownerToken);
+    await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('err: owner token rejected'));
+    expect(screen.getByLabelText('Owner token')).toHaveFocus();
+  });
+
   it('renders reprocess bracket-action default, confirmation, running, complete, conflict, and failure states with live output', async () => {
     const { user } = await renderAuthenticatedPage({ language: 'zh' });
 
@@ -146,6 +176,12 @@ describe('expected-red processing language and reprocess rendering contracts', (
     await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
     await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: ingest already running'));
+    expect(screen.getByRole('button', { name: /Reprocess existing library/i })).toHaveFocus();
+
+    installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 400 });
+    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: request_fingerprint_mismatch'));
 
     installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 500 });
     await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
