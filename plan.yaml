@@ -69296,7 +69296,7 @@ phases:
       - [x] MCP `report_delivery` matches HTTP delivery semantics and does not create
       registries/jobs/ledgers.
 
-      - [ ] Auth and schema errors are covered at the public `/mcp` surface.'
+      - [x] Auth and schema errors are covered at the public `/mcp` surface.'
     verification: '- [ ] Expected-red MCP tests fail for intended missing parity surfaces.
 
       - [ ] Tests require public MCP Streamable HTTP behavior, not direct function-only
