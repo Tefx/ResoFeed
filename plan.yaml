@@ -70393,77 +70393,123 @@ phases:
       agent_source: project
 
 
-      Wiring completeness audit for backend core public symbols and storage/runtime
+      Wiring completeness audit for backend-core public symbols and storage/runtime
       paths.
+
+
+      Scope declaration: phase-check protecting backend core gate. This step verifies
+      storage/core reachability only; it does not require downstream HTTP route registration,
+      MCP tool/resource registration, or frontend runtime/client consumption to exist
+      before the HTTP/MCP/frontend phases execute.
+
+
+      Ownership boundaries for current audit:
+
+      - Backend-core functions/types produced by `plsc-*` implementation must either
+      be consumed by backend-core tests/operations now or have an explicit downstream
+      owning step.
+
+      - HTTP delivery route registration, runtime language routes, reprocess route
+      wiring, strict HTTP validation, language operation guard conflict behavior,
+      and idempotency replay/mismatch route behavior are owned by `plhm-http-runtime-endpoints`.
+
+      - MCP resource/tool registration, `search_items` query echo, JSON-RPC error
+      envelope parity, and language/reprocess runtime parity are owned by `plhm-mcp-runtime-parity`.
+
+      - Frontend contract/client/runtime consumption is owned by `plfu-api-client-types`,
+      `plfu-language-reprocess-controls`, and `plfu-source-identifiers-split-scroll`.
+
+      - Declaration-only exported contract anchors are acceptable only when evidence
+      identifies their intended downstream consumer. If no downstream consumer is
+      planned, classify as a storage-core orphan requiring de-export or consumption
+      before the storage-core gate.
 
 
       REQUIRED CHECKS:
 
-      - [x] Every new shared type/function has at least one runtime consumer outside
-      its own helper cluster.
+      - [ ] Runtime metadata keys are read/written only through approved backend-core
+      paths.
 
-      - [x] Runtime metadata keys are read/written only through approved runtime paths.
+      - [ ] Backend-core `ProcessingLanguage`, receipt, reprocess, FTS/search, and
+      doctor symbols are consumed by core operations/tests or assigned to a downstream
+      owner.
 
-      - [x] `ProcessingLanguage` and `ReprocessLibraryResult` are consumed by HTTP/MCP/frontend-contract
-      surfaces where intended.
+      - [ ] Declaration-only contract anchors are classified as `downstream-owned`,
+      `core-consumed`, or `orphan-needs-core-remediation`.
 
-      - [x] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
-      production paths.
+      - [ ] Missing HTTP/MCP/frontend registration is recorded as downstream-owned
+      and blocking for downstream gates, not as a storage-core wiring failure.
 
-      - [x] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
+      - [ ] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
+      production backend-core paths.
+
+      - [ ] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
       are introduced.'
-    verification: '- [ ] Wiring audit report lists orphan exports, unconsumed config/metadata
-      fields, unregistered runtime paths, and remaining stubs.
+    verification: '- [ ] Wiring audit report lists backend-core orphan exports, unconsumed
+      metadata fields, core operation consumers, and any remaining backend-core stubs.
 
-      - [ ] Any orphan/blocker has explicit remediation ownership before the gate.'
-    evidence_template: '## Wiring Audit Report
+      - [ ] Any true backend-core orphan/blocker has explicit remediation ownership
+      before the gate.
 
+      - [ ] Missing HTTP/MCP route/tool/frontend consumption is explicitly mapped
+      to downstream owner steps and remains blocking for downstream gates.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
 
-      ### refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
-
 
       If no refs were provided, state: "No refs for this step."
 
 
-      **Orphan exports**:
+      ## Backend Core Wiring Audit Report
+
+
+      **Backend-core consumer scan**:
 
       ```
 
-      <grep/import-trace output or none>
+      <paste grep/import-trace output>
 
       ```
 
-      **Unconsumed metadata/config fields**:
 
-      ```
+      **Declaration-only/export classification**:
 
-      <output or none>
+      | Symbol/anchor | Location | Classification | Owner step | Required action |
 
-      ```
+      |---|---|---|---|---|
 
-      **Production stubs/placeholders**:
+      | <symbol> | <file:line> | core-consumed / downstream-owned / orphan-needs-core-remediation
+      | <step id> | <action> |
 
-      ```
 
-      <output or none>
+      **Downstream-owned missing runtime/UI surfaces**:
 
-      ```
+      | Surface | Missing wiring | Owner step | Downstream gate |
 
-      **Forbidden architecture concepts**:
+      |---|---|---|---|
 
-      ```
+      | HTTP delivery endpoint | route/handler registration | plhm-http-runtime-endpoints
+      | plhm-runtime-gate |
 
-      <output or none>
+      | MCP language/reprocess/search parity | resource/tool/echo/error envelope |
+      plhm-mcp-runtime-parity | plhm-runtime-gate |
 
-      ```
+      | Frontend client/rendering consumption | client/routes/rendered controls |
+      plfu-* | plfu-frontend-gate |
 
-      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+
+      ## Headline
+
+      - [ ] PASS: backend-core wiring is reachable or downstream-owned; no unresolved
+      core orphan remains.
+
+      - [ ] FAIL: backend-core symbol/path remains orphaned with no downstream owner.'
+    refs:
+    - docs/ARCHITECTURE.md
     depends_on:
     - plsc-runtime-metadata-receipts
     - plsc-processing-language-ingest
