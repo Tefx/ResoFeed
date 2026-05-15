@@ -71717,7 +71717,7 @@ phases:
 
       ## Gate Preview (what gate WILL reject)
 
-      - [ ] unknown JSON request body fields not rejected as `400 bad_request`.
+      - [x] unknown JSON request body fields not rejected as `400 bad_request`.
 
       - [ ] duplicate/unknown query parameters not rejected according to HTTP contract
       rules.
