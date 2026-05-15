@@ -69055,6 +69055,77 @@ phases:
     depends_on:
     - plct-contract-lock
     agent: golang-developer
+  - id: plct-frontend-expected-red-tests
+    name: Add frontend expected-red rendering tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define frontend expected-red tests before implementation. Scope is web tests,
+      fixtures, and API client type tests only. Cover language control (`LANG: EN/ZH`
+      or localized equivalent), `<html lang>` update, aria-live success/failure, reprocess
+      bracket action confirmation/running/conflict/complete/failure states, source
+      identifiers with `translate="no"` or equivalent, API client types, and desktop
+      split scroll/feed-inspector behavior.
+
+
+      ## Frontend rendering requirement
+
+      Tests MUST render components/pages, not only data/view-models. Evidence must
+      include DOM snapshots or test-renderer/browser output showing visible language
+      and reprocess controls.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Tests are expected red before implementation and expose UI/API client
+      gaps without product-code changes.
+
+      - [ ] Rendered output checks verify visible controls and no settings dashboard/onboarding
+      wizard.
+
+      - [ ] Source identifiers are asserted as literal non-translated provenance anchors.
+
+      - [ ] Split scroll behavior is covered for desktop and mobile route behavior
+      remains intact.
+
+      - [ ] Tests preserve DESIGN.md bracket-action anatomy and accessibility rules.'
+    verification: '- [ ] Expected-red frontend tests fail for intended missing UI/API
+      behavior.
+
+      - [ ] Tests include rendered DOM/browser evidence requirements.
+
+      - [ ] No frontend implementation is included.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Expected-Red Evidence
+
+      - Test files added/updated:
+
+      - Rendered states covered:
+
+      - Expected failures/exposed gaps:
+
+      - Product-code changes: NONE expected'
+    depends_on:
+    - plct-contract-lock
+    agent: frontend-engineer
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
   status: locked
