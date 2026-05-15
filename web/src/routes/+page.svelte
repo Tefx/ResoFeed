@@ -54,6 +54,7 @@
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
   let preservedFeedScrollTop = $state(0);
+  let preservedWindowScrollY = $state(0);
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -66,6 +67,7 @@
 
   const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
+  const selectedFeedItemId = $derived(!isNarrow || currentSurface === 'inspector' ? selectedItemId : null);
   const feedPaneInactive = $derived(currentSurface !== 'feed' && currentSurface !== 'inspector');
   const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
   const nextProcessingLanguage = $derived<ProcessingLanguage>(processingLanguage.code === 'en' ? 'zh' : 'en');
@@ -146,6 +148,7 @@
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     }
     if (feedPaneElement) feedPaneElement.scrollTop = preservedFeedScrollTop;
+    if (isNarrow && currentSurface === 'feed') window.scrollTo(0, preservedWindowScrollY);
   }
 
   async function focusSurfaceAndRestoreFeed(surface: Surface): Promise<void> {
@@ -155,6 +158,7 @@
 
   function rememberFeedScrollPosition(): void {
     preservedFeedScrollTop = feedPaneElement?.scrollTop ?? preservedFeedScrollTop;
+    if (isNarrow) preservedWindowScrollY = window.scrollY;
   }
 
   $effect(() => {
@@ -275,7 +279,7 @@
   }
 
   async function selectItem(item: ItemSummary): Promise<void> {
-    if ((feedPaneElement?.scrollTop ?? 0) > 0) rememberFeedScrollPosition();
+    rememberFeedScrollPosition();
     selectedItemId = item.id;
     selectedItemDetail = null;
     currentSurface = 'inspector';
@@ -632,7 +636,7 @@
         {#if items.length === 0}
           <FirstUseEmptyState state={firstUseState} />
         {:else}
-          <Feed items={items} selectedItemId={selectedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+          <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
         {/if}
       </section>
 

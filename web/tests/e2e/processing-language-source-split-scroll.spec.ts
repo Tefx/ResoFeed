@@ -1,4 +1,6 @@
-import type { Page, Route } from 'playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import type { Page, Route, TestInfo } from 'playwright/test';
 
 import { test, expect } from './fixtures';
 
@@ -144,7 +146,18 @@ async function shellReady(page: Page): Promise<void> {
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
 }
 
-test('browser proves source identifiers are non-translatable and desktop panes split scroll independently', async ({ page, ownerToken }) => {
+async function captureRenderedEvidence(page: Page, testInfo: TestInfo, name: string): Promise<void> {
+  const evidenceDir = path.join(testInfo.outputDir, 'split-scroll-mobile-route-evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  const screenshotPath = path.join(evidenceDir, `${name}.png`);
+  const ariaPath = path.join(evidenceDir, `${name}.aria.txt`);
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  await fs.promises.writeFile(ariaPath, await page.locator('body').ariaSnapshot(), 'utf8');
+  await testInfo.attach(`${name}.png`, { path: screenshotPath, contentType: 'image/png' });
+  await testInfo.attach(`${name}.aria.txt`, { path: ariaPath, contentType: 'text/plain' });
+}
+
+test('browser proves source identifiers are non-translatable and desktop panes split scroll independently', async ({ page, ownerToken }, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await installApiFixtures(page, ownerToken);
   await page.goto('/');
@@ -188,6 +201,8 @@ test('browser proves source identifiers are non-translatable and desktop panes s
   await expect(page.getByRole('heading', { name: 'Browser proof item 10' })).toBeFocused();
   await expect.poll(async () => inspectorPane.evaluate((node) => node.scrollTop)).toBe(0);
   await expect.poll(async () => feedPane.evaluate((node) => node.scrollTop)).toBe(feedScrollBeforeSelect);
+  await expect(page.locator('.contract-feed-item[aria-current="true"] .contract-feed-title')).toHaveText('Browser proof item 10');
+  await expect(inspectorPane).toHaveClass(/active-panel/u);
 
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   await expect(inspector.locator('.inspector-provenance [translate="no"]')).toHaveText(/src: Do Not Translate Source/);
@@ -199,9 +214,10 @@ test('browser proves source identifiers are non-translatable and desktop panes s
   await expect(sourceIdentifiers.getByRole('link', { name: source.url })).toHaveAttribute('translate', 'no');
   await expect(sourceIdentifiers.getByRole('link', { name: 'https://canonical.example.test/browser-proof-10' })).toHaveAttribute('translate', 'no');
   await expect(sourceIdentifiers.getByRole('link', { name: 'https://original.example.test/browser-proof-10' })).toHaveAttribute('translate', 'no');
+  await captureRenderedEvidence(page, testInfo, 'desktop-split-scroll');
 });
 
-test('browser keeps mobile full-screen Inspector route and restores feed scroll after back', async ({ page, ownerToken }) => {
+test('browser keeps mobile full-screen Inspector route and restores feed scroll after back', async ({ page, ownerToken }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await installApiFixtures(page, ownerToken);
   await page.goto('/');
@@ -221,9 +237,15 @@ test('browser keeps mobile full-screen Inspector route and restores feed scroll 
   await expect(page.getByRole('button', { name: 'back to TODAY' })).toBeVisible();
   await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('Browser proof item 12');
   await expect(page.getByRole('button', { name: 'Resonate item: Browser proof item 12' })).toBeVisible();
+  await expect(page.locator('.detail-pane')).toHaveClass(/active-panel/u);
+  await expect(page.locator('.feed-pane')).toBeHidden();
+  await expect(page.locator('.contract-feed-item[aria-current="true"] .contract-feed-title')).toHaveText('Browser proof item 12');
+  await captureRenderedEvidence(page, testInfo, 'mobile-inspector-route');
 
   await page.getByRole('button', { name: 'back to TODAY' }).click();
   await expect(page).toHaveURL(/\/$/u);
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
   await expect.poll(async () => page.evaluate(() => window.scrollY)).toBe(feedScrollBeforeRoute);
+  await expect(page.locator('.contract-feed-item[aria-current="true"]')).toHaveCount(0);
+  await captureRenderedEvidence(page, testInfo, 'mobile-feed-restored');
 });
