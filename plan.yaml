@@ -71884,7 +71884,7 @@ phases:
 
       - [ ] MCP exposes product concepts unavailable to HTTP/humans.
 
-      - [ ] Missing query echo in `search_items`.
+      - [x] Missing query echo in `search_items`.
 
       - [ ] Per-call language override added.
 
