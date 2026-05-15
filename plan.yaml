@@ -72337,7 +72337,7 @@ phases:
 
       - [x] build or use the project binary.
 
-      - [ ] start `resofeed serve` with test SQLite DB and owner token/OpenRouter
+      - [x] start `resofeed serve` with test SQLite DB and owner token/OpenRouter
       secret handling that redacts secrets.
 
       - [ ] call `GET /api/runtime/language` and one strict-validation failure over
