@@ -62559,7 +62559,7 @@ phases:
       \ surfaces."
   - id: urda-keyboard-a11y-nav-uiux-audit
     name: UIUX audit for keyboard accessibility navigation repair
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -62746,6 +62746,112 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T03:02:24.414215+00:00'
+    done_at: '2026-05-15T03:19:10.997219+00:00'
+    evidence: '## UIUX Keyboard/A11y Audit Report
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - `docs/DESIGN.md` read and confirmed. Checked constraint: "Bracket actions
+      use immediate terminal feedback: transparent enlarged hitbox at rest, stark
+      color inversion...".
+
+      - `docs/audits/ui-runtime-design-audit-2026-05-15.md` read and confirmed. Verified
+      Severity P0 issue 1 "missing [RUN INGEST]" and Severity P1 issue 6 "IMPORT OPML
+      is not keyboard/button semantic" are explicitly targeted by this verification.
+
+      - `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` read and confirmed.
+      Gate blocked due to "missing expected TODAY / SOURCE LEDGER role buttons in
+      keyboard flow".
+
+
+      ### Rendered / Multimodal Artifacts
+
+      - Extracted visual bounds and computed styles via the passing downstream `keyboard-a11y.expected-red.spec.ts`
+      trace metrics.
+
+      - `web/src/app.css` and runtime DOM verification confirms that `[IMPORT OPML]`,
+      `[RUN INGEST]`, and `[FETCH]` are rendered as explicit `<button type="button"
+      class="bracket-action">` elements with no shadow/transform.
+
+      - Target geometry `min-height: 44px; padding: 0 10px;` verified from CSS `app.css`
+      constraints.
+
+
+      ### Blocker-by-Blocker Verdicts
+
+      - TODAY role-button focus/name/selected visual state: PASS. Implemented via
+      `.surface-nav button` and managed via `aria-pressed=''true''`. Keyboard focus
+      activates a rigid 2px outline `outline: 2px solid var(--rf-color-focus)`.
+
+      - SOURCE LEDGER role-button focus/name/selected visual state: PASS. Matches
+      `TODAY` contract. Tab traversal successfully verified.
+
+      - `[IMPORT OPML]`, `[RUN INGEST]`, row `[FETCH]`: PASS. Converted to semantic
+      buttons. The `[IMPORT OPML]` file input control is functionally hidden (`.visually-hidden`)
+      and safely triggered via `onclick` on the button itself.
+
+      - Resonate accessible names and keyboard/touch affordance: PASS. Focus rings
+      appear independent of active state, and Playwright DOM bounds extraction confirms
+      target metrics: `width >= 44px` and `height >= 44px`.
+
+      - bracket actions hover/focus/tactile treatment: PASS. Foreground/background
+      explicitly invert (`color: var(--rf-color-background); background: var(--rf-color-text);`)
+      on `:hover:not(:disabled)` and `:focus-visible:not(:disabled)` complying strictly
+      with terminal-feedback rules.
+
+      - forbidden UI concepts absence: PASS. Source Ledger layout retains flat plain-text
+      design constraint; no progress bars, spinners, or rounded pill overrides exist
+      in the audited components.
+
+
+      ### Explicit Non-Regression Evidence
+
+      - Disabled bracket actions (`[FETCHING...]`, `[INGESTING...]`) do not invert
+      on hover, confirming the CSS rules isolate `:not(:disabled)` properly.
+
+      - `.bracket-action--run-ingest`, `--fetch`, and `--import-opml` enforce `width:
+      15ch;`, `13ch;`, and `16ch;` respectively to prevent Source Ledger grid bounds
+      from shifting during string manipulation.
+
+      - No product source or test modifications were introduced during this audit;
+      pure isolated measurement.
+
+
+      ### Behavioral Proof Register
+
+      - `TODAY role-button semantics`: PROVEN
+
+      - `SOURCE LEDGER role-button semantics`: PROVEN
+
+      - `[IMPORT OPML] visual/tactile behavior`: PROVEN
+
+      - `[RUN INGEST] / [FETCH] layout shift`: PROVEN (Fixed widths prevent jitter)
+
+      - `Resonate spatial hit targets >= 44px`: PROVEN
+
+
+      ### Gate Decision
+
+      headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE_GATE
+
+      product_implementation_files_modified: false
+
+
+      Worktree merge note: verification-only audit did not modify product implementation
+      files. Generated/local audit artifacts were not merged; completion is based
+      on evidence above and previously passed mainline retest.'
   - id: urda-keyboard-a11y-uiux-post-fix-audit
     name: Post-fix keyboard accessibility UIUX audit
     status: claimed
