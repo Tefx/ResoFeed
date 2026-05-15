@@ -74626,7 +74626,7 @@ phases:
 
       - [x] source identifiers visibly literal and non-translated.
 
-      - [ ] desktop split Feed/Inspector scroll containers.
+      - [x] desktop split Feed/Inspector scroll containers.
 
       - [ ] mobile Inspector route and preserved feed behavior.
 
