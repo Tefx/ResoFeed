@@ -8,22 +8,27 @@
 # =============================================================
 version: 1
 project: ResoFeed
-strategy_ref: Contract-first implementation plan derived from docs/ARCHITECTURE.md,
-  docs/PRD.md, docs/DESIGN.md, docs/DESIGN_VISION.md, docs/USAGE.md, and .agents/instructions.md
-  after four-agent documentation review PASS.
-context: 'work_type: new_capability. Architecture basis approved by recent doc/spec/demolition/design
-  review loop. Implementation must proceed contract -> expected-red tests -> implementation
-  -> green retest -> independent audits/gates. Runtime surface preservation applies:
-  `resofeed serve`, HTTP API, MCP Streamable HTTP, static UI, and background ingest
-  loop must be runnable end-to-end.'
-project_guidance: All implementation agents must begin by reading `.agents/instructions.md`,
-  `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/DESIGN.md`, `docs/DESIGN_VISION.md`,
-  and `docs/USAGE.md` sections referenced by their step. Evidence for every step must
-  include the mandatory refs read confirmation with key passages. Preserve the single
-  Go binary, SQLite-only storage, Gemini JSON-transform role, owner-token delegation
-  boundary, active-state JSON backup/restore model, and DESIGN.md UI contract. Do
-  not introduce sync/merge engines, vector DBs/RAG, account systems, repositories/service
-  layers, event buses, settings dashboards, or UI patterns forbidden by the docs.
+strategy_ref: docs/ARCHITECTURE.md §3.5 architecture_basis; docs/DESIGN.md Language
+  Control, Reprocess Library Action, Source Identifiers, Desktop Split Scroll
+context: New capability implementation plan for the approved ResoFeed processing-language,
+  reprocess-library, runtime metadata, HTTP/MCP parity, delivery, FTS/search, doctor
+  diagnostics, and frontend contract delta. Architecture basis readiness is READY;
+  Contract-First Fit is HIGH per user-provided spec-readiness audit.
+project_guidance: 'ResoFeed project guidance: docs/ARCHITECTURE.md and docs/DESIGN.md
+  are canonical. Preserve the one-deployable Go binary (`cmd/resofeed`) serving static
+  assets, JSON HTTP, MCP Streamable HTTP at `/mcp`, and background ingest loop. Use
+  one SQLite database with FTS5 only; no vector DB, embeddings, RAG, sync coordinator,
+  state merger, conflict resolver, activity ledger, command history, reading history,
+  portable agent receipts, service/repository/DI/event-bus layering, or sidecar workers.
+  OpenRouter is JSON-in/JSON-out utility only and never owns durable state or writes
+  DB directly. Owner token is the sole auth boundary; `actor_id` is provenance/idempotency
+  only. HTTP and MCP must expose equivalent product operations and strict validation,
+  including unknown JSON body fields as `400 bad_request`. Processing language is
+  runtime metadata excluded from state export/import; source identifiers/provenance
+  must remain exact and non-localized. UI must follow DESIGN.md: low-chrome analyst
+  workbench, no settings dashboard/onboarding wizard, bracket actions, split desktop
+  feed/Inspector scroll, source identifiers marked `translate="no"` or equivalent,
+  and no forbidden SaaS/product concepts.'
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
