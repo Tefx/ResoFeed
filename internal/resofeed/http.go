@@ -483,7 +483,7 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 			ActorKind   ActorKind `json:"actor_kind"`
 			ActorID     string    `json:"actor_id"`
 		}{DeliveredAt: req.DeliveredAt.UTC(), ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (DeliveryReportResult, error) {
-			return ReportDelivery(r.Context(), h.cfg.DB, parts[0], req)
+			return MarkItemDelivered(r.Context(), h.cfg.DB, parts[0], req)
 		})
 		if err != nil {
 			writeMutationError(w, parts[0], err)

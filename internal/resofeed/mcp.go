@@ -111,6 +111,46 @@ func SearchItemsForMCP(ctx context.Context, db *sql.DB, input MCPSearchItemsInpu
 	return TodayFeedResponse{Items: items}, nil
 }
 
+// SearchItemsResponseForMCP applies the same lexical search operation as
+// GET /api/search and preserves the normalized SearchQueryEcho envelope.
+func SearchItemsResponseForMCP(ctx context.Context, db *sql.DB, input MCPSearchItemsInput) (SearchResponse, error) {
+	if input.Query == "" {
+		return SearchResponse{}, fieldError("query")
+	}
+	if err := validateDateRange(input.From, input.To); err != nil {
+		return SearchResponse{}, err
+	}
+	items, echo, err := SearchItems(ctx, db, SearchQuery{Q: input.Query, Source: input.Source, From: input.From, To: input.To, Resonated: input.Resonated, Limit: normalizeLimit(input.Limit, 20, 50)})
+	if err != nil {
+		return SearchResponse{}, fmt.Errorf("search MCP items: %w", err)
+	}
+	return SearchResponse{Items: items, Query: echo}, nil
+}
+
+// GetProcessingLanguageForMCP returns the authenticated runtime language
+// metadata without accepting per-call overrides.
+func GetProcessingLanguageForMCP(ctx context.Context, db *sql.DB) (ProcessingLanguageResponse, error) {
+	language, err := GetProcessingLanguage(ctx, db)
+	if err != nil {
+		return ProcessingLanguageResponse{}, err
+	}
+	return ProcessingLanguageResponse{Language: language}, nil
+}
+
+// SetProcessingLanguageForMCP maps the MCP schema onto the shared runtime
+// language mutation used by HTTP.
+func SetProcessingLanguageForMCP(ctx context.Context, db *sql.DB, input MCPSetProcessingLanguageInput) (ProcessingLanguageResponse, error) {
+	req := SetProcessingLanguageRequest{Language: input.Language, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	return SetProcessingLanguage(ctx, db, req)
+}
+
+// ReprocessLibraryForMCP maps the MCP schema onto the shared explicit library
+// reprocess operation used by HTTP.
+func ReprocessLibraryForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReprocessLibraryInput) (ReprocessLibraryResponse, error) {
+	req := ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	return ReprocessLibrary(ctx, db, llm, req)
+}
+
 // ReadItemForMCP returns canonical item detail and provenance.
 func ReadItemForMCP(ctx context.Context, db *sql.DB, input MCPReadItemInput) (ItemResponse, error) {
 	if strings.TrimSpace(input.ItemID) == "" {
@@ -215,10 +255,7 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		ActorKind   ActorKind `json:"actor_kind"`
 		ActorID     string    `json:"actor_id"`
 	}{DeliveredAt: req.DeliveredAt, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (DeliveryReportResult, error) {
-		if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
-			return DeliveryReportResult{}, err
-		}
-		return ReportDelivery(ctx, db, input.ItemID, req)
+		return MarkItemDelivered(ctx, db, input.ItemID, req)
 	})
 	if err != nil {
 		return DeliveryReportResult{}, err
@@ -227,6 +264,34 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		result.AlreadyApplied = true
 	}
 	return result, nil
+}
+
+// MarkItemDelivered records external surfacing through the same core mutation
+// used by HTTP delivery and MCP report_delivery. It creates no channel registry,
+// queue, delivery ledger, or portable receipt.
+func MarkItemDelivered(ctx context.Context, db *sql.DB, itemID string, req DeliveryReportRequest) (DeliveryReportResult, error) {
+	if err := ensureItemExists(ctx, db, itemID); err != nil {
+		return DeliveryReportResult{}, err
+	}
+	_, err := db.ExecContext(ctx, `
+insert into item_state (item_id, is_resonated, external_surfaced_at, last_actor_kind, last_actor_id)
+values (?, 0, ?, ?, ?)
+on conflict(item_id) do update set
+  external_surfaced_at = excluded.external_surfaced_at,
+  last_actor_kind = excluded.last_actor_kind,
+  last_actor_id = excluded.last_actor_id`, itemID, req.DeliveredAt.UTC().Format(time.RFC3339Nano), string(req.ActorKind), req.ActorID)
+	if err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("report delivery: %w", err)
+	}
+	var stored string
+	if err := db.QueryRowContext(ctx, `select external_surfaced_at from item_state where item_id = ?`, itemID).Scan(&stored); err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("read delivery state: %w", err)
+	}
+	externalAt, err := parseDBTime(stored)
+	if err != nil {
+		return DeliveryReportResult{}, fmt.Errorf("parse delivery timestamp: %w", err)
+	}
+	return DeliveryReportResult{ItemID: itemID, ExternalSurfacedAt: externalAt, AlreadyApplied: !externalAt.Equal(req.DeliveredAt.UTC())}, nil
 }
 
 type mcpHandler struct {
@@ -365,6 +430,13 @@ func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (
 		if err == nil {
 			payload, err = json.Marshal(SourcesResponse{Sources: sources})
 		}
+	case RuntimeLanguageMCPResourceURI:
+		mimeType = "application/json"
+		var language ProcessingLanguageResponse
+		language, err = GetProcessingLanguageForMCP(ctx, h.db)
+		if err == nil {
+			payload, err = json.Marshal(language)
+		}
 	default:
 		return nil, notFoundError("resource", input.URI)
 	}
@@ -401,7 +473,7 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input MCPSearchItemsInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = SearchItemsForMCP(ctx, h.db, input)
+			result, err = SearchItemsResponseForMCP(ctx, h.db, input)
 		}
 	case "read_item":
 		var input MCPReadItemInput
@@ -435,6 +507,24 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
 			result, err = ReportDeliveryForMCP(ctx, h.db, input)
+		}
+	case "get_processing_language":
+		var input MCPGetProcessingLanguageInput
+		err = decodeRaw(envelope.Arguments, &input)
+		if err == nil {
+			result, err = GetProcessingLanguageForMCP(ctx, h.db)
+		}
+	case "set_processing_language":
+		var input MCPSetProcessingLanguageInput
+		err = decodeRaw(envelope.Arguments, &input)
+		if err == nil {
+			result, err = SetProcessingLanguageForMCP(ctx, h.db, input)
+		}
+	case "reprocess_library":
+		var input MCPReprocessLibraryInput
+		err = decodeRaw(envelope.Arguments, &input)
+		if err == nil {
+			result, err = ReprocessLibraryForMCP(ctx, h.db, h.llm, input)
 		}
 	default:
 		return nil, notFoundError("tool", envelope.Name)
@@ -558,17 +648,35 @@ func mcpErrFromError(err error) *mcpError {
 	}
 	var fieldErr mcpFieldError
 	if errors.As(err, &fieldErr) {
-		data := map[string]any{"field": fieldErr.field}
+		details := map[string]any{"field": fieldErr.field}
 		if fieldErr.reason != "" {
-			data["reason"] = fieldErr.reason
+			details["reason"] = fieldErr.reason
 		}
-		return &mcpError{Code: -32602, Message: "invalid params", Data: data}
+		message := "bad request"
+		if fieldErr.reason == "request_fingerprint_mismatch" {
+			message = "idempotency key reused with different request"
+		}
+		return &mcpError{Code: -32602, Message: "invalid request", Data: nestedMCPErrorData("bad_request", message, details)}
+	}
+	if errors.Is(err, errManualFetchConflict) {
+		return &mcpError{Code: -32000, Message: "operation already running", Data: nestedMCPErrorData("conflict", "operation already running", map[string]any{"operation_running": true, "operation": "reprocess", "scope": "library", "retry_allowed": true})}
 	}
 	var notFound mcpNotFoundError
 	if errors.As(err, &notFound) {
-		return &mcpError{Code: -32004, Message: notFound.kind + " not found", Data: map[string]any{"id": notFound.id}}
+		return &mcpError{Code: -32004, Message: notFound.kind + " not found", Data: nestedMCPErrorData("not_found", "not found", map[string]any{"id": notFound.id})}
 	}
 	return &mcpError{Code: -32603, Message: "internal error"}
+}
+
+func nestedMCPErrorData(code string, message string, details map[string]any) map[string]any {
+	if details == nil {
+		details = map[string]any{}
+	}
+	data := map[string]any{"error": map[string]any{"code": code, "message": message, "details": details}}
+	for key, value := range details {
+		data[key] = value
+	}
+	return data
 }
 
 func decodeRaw(data json.RawMessage, target any) error {
@@ -616,6 +724,9 @@ func mcpToolList() []map[string]any {
 		{"name": "resonate_item", "description": "Set resonance state.", "inputSchema": objectSchema([]string{"item_id", "resonated", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "resonated": map[string]any{"type": "boolean", "description": "Required target resonance state."}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "steer", "description": "Apply natural-language steering.", "inputSchema": objectSchema([]string{"command", "actor_id", "idempotency_key"}, map[string]any{"command": stringSchema("Required natural-language steering command, max 4000 bytes.", 1, 4000), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "report_delivery", "description": "Record external surfacing.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "delivered_at", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "delivered_at": map[string]any{"type": "string", "format": "date-time", "description": "Required RFC3339 time the item was externally surfaced."}, "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "get_processing_language", "description": "Read the runtime processing language.", "inputSchema": objectSchema(nil, map[string]any{})},
+		{"name": "set_processing_language", "description": "Set the runtime processing language for future processing.", "inputSchema": objectSchema([]string{"language", "actor_id", "idempotency_key"}, map[string]any{"language": map[string]any{"type": "string", "enum": []string{"en", "zh"}}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "reprocess_library", "description": "Explicitly reprocess existing library items in the current runtime language.", "inputSchema": objectSchema([]string{"actor_id", "idempotency_key"}, map[string]any{"actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 	}
 }
 
@@ -660,6 +771,7 @@ func mcpResourceList() []map[string]string {
 		{"uri": "resofeed://rules/active", "name": "Active steering rules", "mimeType": "application/json"},
 		{"uri": "resofeed://system/doctor", "name": "Doctor diagnostics", "mimeType": "text/plain"},
 		{"uri": "resofeed://sources", "name": "Sources", "mimeType": "application/json"},
+		{"uri": RuntimeLanguageMCPResourceURI, "name": "Runtime processing language", "mimeType": "application/json"},
 	}
 }
 
