@@ -71638,7 +71638,7 @@ phases:
       \ storage proof. No source files or orchestrator state files were edited manually."
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
-  status: in_progress
+  status: done
   gate: Runtime integration gate blocks unless HTTP and MCP language/reprocess/delivery
     parity, strict validation, and runnable `resofeed serve` liveness evidence are
     green.
@@ -73053,7 +73053,7 @@ phases:
       Files changed: none.'
   - id: plhm-runtime-gate
     name: Gate processing language HTTP MCP runtime integration
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -73134,6 +73134,45 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T16:17:29.855450+00:00'
+    done_at: '2026-05-15T16:57:37.419645+00:00'
+    evidence: 'Recovered and re-applied validated gate completion after plan-state
+      reconciliation.
+
+
+      Gate evidence source: gate-reviewer rerun `ses_1d3872aebffelWjPeI52B8IWuO` returned
+      `status: SUCCESS` with `headline: PASS`, `verdict: PASS`, `gate_open_allowed:
+      true`, `proof_gap_status: NONE`, `blocking_status: CLOSED`, `orchestrator_action_hint:
+      COMPLETE`, and `blockers: []`.
+
+
+      Key verification evidence:
+
+      - `go test ./...` — exit 0 in isolated gate worktree.
+
+      - `go test ./internal/resofeed -count=1 -run ''TestPLHM|TestProcessingLanguage|TestMCP|TestHTTP|TestRuntime|TestReprocess|TestDelivery|TestSearch''`
+      — exit 0.
+
+      - Blind runtime liveness probe launched `go run ./cmd/resofeed serve` with temp
+      SQLite DB and owner token; public `/` returned 200; authenticated `/api/runtime/language`
+      returned 200; authenticated `/mcp` `get_processing_language` and `search_items`
+      returned 200 JSON-RPC results.
+
+      - Strict validation proof: unknown query and unknown JSON body returned `400
+      bad_request`; unauthenticated `/api/*` and `/mcp` returned 401; idempotency
+      replay returned `already_applied:true`.
+
+      - HTTP/MCP parity proof covered language, reprocess, search query echo, delivery,
+      conflict/error shapes, and no forbidden job/queue/ledger/sync/per-agent auth
+      surfaces.
+
+      - Wiring audit W1-W8 all PASS; escape hatch scan found no scoped `@invar:allow`
+      source annotations.
+
+      - Product implementation files modified: false; gate worktree clean; no commit
+      needed for verify-only gate.
+
+
+      All description and verification checklist items are [x].'
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
     status: done
@@ -73684,7 +73723,7 @@ phases:
       Files changed: none'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
-  status: locked
+  status: pending
   gate: Frontend gate blocks unless language/reprocess controls, API client types,
     source identifier preservation, split scroll behavior, rendered UI proof, and
     UIUX audit pass against DESIGN.md.
