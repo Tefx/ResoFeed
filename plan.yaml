@@ -70563,7 +70563,7 @@ phases:
 
       - [x] omission drift for required metadata/state exclusion/reprocess fields.
 
-      - [ ] contract surface drift around `core_insight`, `value_tier`, source precedence,
+      - [x] contract surface drift around `core_insight`, `value_tier`, source precedence,
       language persistence, FTS/search core, and doctor stale diagnostics.
 
       - [ ] declaration-only exported anchors: classify as core orphan requiring current
