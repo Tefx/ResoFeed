@@ -70317,13 +70317,13 @@ phases:
 
       - [x] No `pre-existing` or `out-of-scope` disposition is used without explicit
       non-intersection evidence and downstream ownership.'
-    verification: '- [ ] Backend-core command family passes for implemented storage/core
+    verification: '- [x] Backend-core command family passes for implemented storage/core
       surfaces.
 
-      - [ ] Evidence covers both main path and highest-risk failure path for receipts
+      - [x] Evidence covers both main path and highest-risk failure path for receipts
       and reprocess/FTS.
 
-      - [ ] Failures in HTTP route/MCP registration/frontend rendering surfaces are
+      - [x] Failures in HTTP route/MCP registration/frontend rendering surfaces are
       recorded as downstream-owned and blocking in their downstream phase, not blocking
       for storage-core gate unless backend-core behavior is implicated.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
