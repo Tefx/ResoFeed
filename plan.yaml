@@ -62423,6 +62423,193 @@ phases:
     depends_on:
     - urda-keyboard-a11y-nav-batched-fix
     agent: integration-verifier
+  - id: urda-keyboard-a11y-nav-uiux-audit
+    name: UIUX audit for keyboard accessibility navigation repair
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+      priority: HIGH
+
+
+      As an INDEPENDENT UI/UX AUDITOR (uiux-auditor), validate the keyboard/a11y repair
+      after `urda-keyboard-a11y-nav-post-fix-retest` against the approved DESIGN.md
+      visual/tactile contract and the URDA frontend audit requirements.
+
+
+      This downstream validation gate exists because `urda-keyboard-a11y-nav-batched-fix`
+      changes UI/UX accessibility and keyboard semantics. Standard integration retest
+      evidence is necessary but insufficient; this step must use rendered UI evidence
+      and multimodal/design-contract review to decide whether the keyboard proof gap
+      is closed without visual regressions.
+
+
+      ## Scope
+
+      - Source Ledger / Resonate keyboard accessibility proof closure.
+
+      - DESIGN.md visual/tactile contract preservation for the touched UI surfaces.
+
+      - Non-regression review for bracket actions, Source Ledger controls, Resonate
+      names, and navigation role buttons.
+
+
+      ## Required rendered evidence
+
+      Use real rendered artifacts from the current frontend (screenshots, DOM/accessibility
+      snapshots, terminal/browser captures, or equivalent visual/spatial artifacts)
+      for all relevant states. Evidence must include enough context to compare against
+      DESIGN.md and the URDA audit expectations.
+
+
+      ## Blocker-by-blocker verdicts (MANDATORY)
+
+      Evidence MUST include an issue-by-issue or blocker-by-blocker table with:
+
+      - blocker_id or issue_id
+
+      - source_ref
+
+      - required_behavior
+
+      - rendered_evidence_ref
+
+      - verdict: PASS | FAIL | UNCERTAIN_BLOCKING | NON_BLOCKING_DEBT
+
+      - blockers: [] or concrete blocker list with reproduction
+
+      - gate_open_allowed: true | false
+
+      - orchestrator_action_hint: COMPLETE_GATE | CREATE_FIX_RETEST | DO_NOT_COMPLETE
+
+
+      `gate_open_allowed: true` is valid only when every blocker-class Source Ledger
+      / Resonate keyboard/accessibility obligation is PASS or has explicit non-intersection
+      evidence.
+
+
+      ## Explicit non-regression evidence (MANDATORY)
+
+      Provide before/after or current-state proof that the keyboard/a11y fix did not
+      regress:
+
+      - bracket actions: visible label treatment, focus indication, click/keyboard
+      affordance, and tactile/archival tone
+
+      - Source Ledger controls: `[RUN INGEST]`, row `[FETCH]`, `[IMPORT OPML]`, focus
+      order, activation affordance, and dense-but-legible layout
+
+      - Resonate names: accessible names, visible naming consistency, and non-magical/tactile
+      contract alignment
+
+      - nav role buttons: `TODAY` and `SOURCE LEDGER` role/name/focus behavior plus
+      visual selected/focus state
+
+
+      ## Gate Preview (what this audit WILL reject)
+
+      1. Integration-only proof with no rendered UI artifact.
+
+      2. Keyboard role/name fixes that make the visual contract worse or drift from
+      DESIGN.md.
+
+      3. Missing explicit verdicts for Source Ledger controls, Resonate controls/names,
+      bracket actions, or nav role buttons.
+
+      4. `gate_open_allowed: true` while any blocker-class obligation is UNCERTAIN_BLOCKING
+      or lacks rendered evidence.'
+    verification: '- Native multimodal UIUX audit evidence is present and cites rendered
+      screenshots/snapshots/captures for the keyboard/a11y repaired surfaces.
+
+      - `docs/DESIGN.md`, `docs/audits/ui-runtime-design-audit-2026-05-15.md`, and
+      `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` are read or explicitly
+      marked `NOT READ` with reason in refs confirmation.
+
+      - Issue-by-issue or blocker-by-blocker verdicts are present and include `verdict`,
+      `blockers`, `gate_open_allowed`, and `orchestrator_action_hint`.
+
+      - Bracket actions, Source Ledger controls, Resonate names, and nav role buttons
+      each have explicit non-regression evidence.
+
+      - `gate_open_allowed: true` appears only if no blocker-class keyboard/accessibility
+      or visual/tactile DESIGN.md obligation remains unresolved.'
+    evidence_template: '## UIUX Keyboard/A11y Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — key passage or "NOT
+      READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Rendered / Multimodal Artifacts
+
+      | Artifact | Surface | State | Evidence Ref | Notes |
+
+      |---|---|---|---|---|
+
+      | <screenshot/snapshot/capture> | <surface> | <state> | <path or pasted output>
+      | <notes> |
+
+
+      ### Blocker-by-Blocker Verdicts
+
+      | Blocker / Issue | Source Ref | Required Behavior | Rendered Evidence Ref |
+      Verdict | Blockers | Orchestrator Action Hint |
+
+      |---|---|---|---|---|---|---|
+
+      | <id> | <doc/audit section> | <behavior> | <artifact> | PASS/FAIL/UNCERTAIN_BLOCKING/NON_BLOCKING_DEBT
+      | [] or list | COMPLETE_GATE/CREATE_FIX_RETEST/DO_NOT_COMPLETE |
+
+
+      ### Required Behavioral Fields
+
+      verdict: PASS | FAIL
+
+      blockers: []
+
+      gate_open_allowed: true | false
+
+      orchestrator_action_hint: COMPLETE_GATE | CREATE_FIX_RETEST | DO_NOT_COMPLETE
+
+
+      ### Explicit Non-Regression Evidence
+
+      - Bracket actions: <evidence ref + verdict>
+
+      - Source Ledger controls (`[RUN INGEST]`, row `[FETCH]`, `[IMPORT OPML]`): <evidence
+      ref + verdict>
+
+      - Resonate names / controls: <evidence ref + verdict>
+
+      - Nav role buttons (`TODAY`, `SOURCE LEDGER`): <evidence ref + verdict>
+
+
+      ### Headline
+
+      - [ ] PASS: UIUX keyboard/a11y repair closes blocker-class proof and preserves
+      DESIGN.md visual/tactile contract.
+
+      - [ ] FAIL: Blocker-class UIUX proof gap or visual regression remains.'
+    depends_on:
+    - urda-keyboard-a11y-nav-post-fix-retest
+    agent: uiux-auditor
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
