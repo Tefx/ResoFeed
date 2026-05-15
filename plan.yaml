@@ -73733,7 +73733,7 @@ phases:
 
       ## Downstream blocker ownership from storage-core verification
 
-      - [ ] Frontend contract types not consumed by runtime client/routes is owned
+      - [x] Frontend contract types not consumed by runtime client/routes is owned
       here for API/client surfaces.
 
       - [ ] Search query echo type must be represented where search API client is
