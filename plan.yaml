@@ -75558,7 +75558,7 @@ phases:
       were read or modified.'
   - id: plse-reprocess-failure-stale-fts-proof
     name: Verify reprocess failure stale FTS and recovery diagnostics
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -75655,6 +75655,64 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T17:52:37.284625+00:00'
+    done_at: '2026-05-15T18:10:57.274989+00:00'
+    evidence: "## Verification Report\n**Tester**: integration-verifier\n**Scope**:\
+      \ reprocess failure/stale FTS recovery diagnostics\n**Independence Level**:\
+      \ L2\n\n### refs Read Confirmation\n- docs/ARCHITECTURE.md — lines 777-786 require\
+      \ timeout result `status: failed`, `fts_rebuilt: false`, and raw diagnostics\
+      \ in `/doctor`; lines 790-797 require no automatic startup recovery, stale-marker\
+      \ doctor visibility, search continuity during stale interim, `items_attempted\
+      \ = updated + unavailable + failed`, and `items_indexed=0` when final rebuild\
+      \ does not complete; lines 1190-1194 require `/api/doctor` lines `search_fts:\
+      \ stale since <RFC3339_UTC>` or `search_fts: ok`.\n\n## Closure Signals\nheadline:\
+      \ PASS\nverdict: PASS\nproof_gap_status: NONE\nblocking_status: CLOSED\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\nblockers: []\nproduct_implementation_files_modified:\
+      \ false\n\n### Test Execution\nCommands executed:\n```bash\npwd && git status\
+      \ --short --branch\ngo test -v ./internal/resofeed -run 'TestAuditorReprocess|TestReprocessLibraryAccountingSourcePrecedenceAndFTS|TestReprocessLibraryTimeoutLeavesStaleMarker|TestDoctorSearchFTSStatusLineOKStaleAndRuntimeLanguageRedaction|TestPLCTDoctorReportsStaleFTSMarker|TestPLCTReprocessEndpointCountsStaleMarkerAndStrictValidation'\n\
+      git status --short --branch\n```\nActual output excerpts:\n```text\n=== RUN\
+      \   TestReprocessLibraryAccountingSourcePrecedenceAndFTS\n--- PASS: TestReprocessLibraryAccountingSourcePrecedenceAndFTS\
+      \ (0.01s)\n=== RUN   TestReprocessLibraryTimeoutLeavesStaleMarker\n--- PASS:\
+      \ TestReprocessLibraryTimeoutLeavesStaleMarker (0.16s)\n=== RUN   TestAuditorReprocessStaleFTSFailureRecoveryAndSearchContinuity\n\
+      \    STALE_MARKER_SET=2026-05-09T14:00:00Z\n    DOCTOR_STALE_BODY=\"...search_fts:\
+      \ stale since 2026-05-09T14:00:00Z...\"\n    SEARCH_DURING_STALE_RESULTS=2 caveat=mixed-language/outdated-fts-rows-allowed\n\
+      \    RECOVERY_COUNTS=status:completed_with_errors attempted:2 updated:1 unavailable:1\
+      \ failed:0 indexed:2 fts_rebuilt:true\n    UNAVAILABLE_ITEM_TITLE=\"http://127.0.0.1:57610/article-unavailable\"\
+      \ readable_fields=null\n    DOCTOR_OK_BODY=\"...search_fts: ok...\"\n    FETCH_REQUESTS=map[string]int{\"\
+      /article-ok\":1, \"/article-unavailable\":1}\n--- PASS: TestAuditorReprocessStaleFTSFailureRecoveryAndSearchContinuity\
+      \ (0.01s)\n=== RUN   TestAuditorReprocessTimeoutLeavesStaleMarkerAndNoIndexCounts\n\
+      \    TIMEOUT_RESULT=status:failed attempted:1 updated:0 unavailable:0 failed:1\
+      \ indexed:0 fts_rebuilt:false errors:[...Code:timeout...]\n    TIMEOUT_STALE_MARKER=2026-05-15T17:55:48Z\n\
+      --- PASS: TestAuditorReprocessTimeoutLeavesStaleMarkerAndNoIndexCounts (0.15s)\n\
+      PASS\nok  \tresofeed/internal/resofeed\t0.912s\n```\n\n### Stale Marker Timeline\n\
+      - Marker set: `STALE_MARKER_SET=2026-05-09T14:00:00Z`; timeout path left `TIMEOUT_STALE_MARKER=2026-05-15T17:55:48Z`.\n\
+      - Doctor stale line: `search_fts: stale since 2026-05-09T14:00:00Z`.\n- Rebuild\
+      \ success: `RECOVERY_COUNTS=status:completed_with_errors attempted:2 updated:1\
+      \ unavailable:1 failed:0 indexed:2 fts_rebuilt:true`.\n- Doctor ok line: `search_fts:\
+      \ ok`.\n\n## behavioral_proof_register\n- obligation: controlled unavailable\
+      \ item clears readable fields and falls back title\n  status: PROVEN\n  evidence:\
+      \ `UNAVAILABLE_ITEM_TITLE=\"http://127.0.0.1:57610/article-unavailable\" readable_fields=null`;\
+      \ existing accounting/source-precedence test also passed.\n  uncertainty: NONE\n\
+      - obligation: timeout/fatal path leaves stale marker and no FTS rebuild\n  status:\
+      \ PROVEN\n  evidence: `TIMEOUT_RESULT=status:failed attempted:1 updated:0 unavailable:0\
+      \ failed:1 indexed:0 fts_rebuilt:false`; `TIMEOUT_STALE_MARKER=2026-05-15T17:55:48Z`.\n\
+      \  uncertainty: NONE\n- obligation: `/api/doctor` reports stale then ok transition\n\
+      \  status: PROVEN\n  evidence: stale body included `search_fts: stale since\
+      \ 2026-05-09T14:00:00Z`; recovery body included `search_fts: ok`.\n  uncertainty:\
+      \ NONE\n- obligation: rerun/recovery clears stale marker after successful rebuild\n\
+      \  status: PROVEN\n  evidence: successful recovery counts reported `indexed:2\
+      \ fts_rebuilt:true`, followed by doctor `search_fts: ok`.\n  uncertainty: NONE\n\
+      - obligation: search continues during stale interim with mixed-language caveat\n\
+      \  status: PROVEN\n  evidence: `SEARCH_DURING_STALE_RESULTS=2 caveat=mixed-language/outdated-fts-rows-allowed`\
+      \ while stale marker existed.\n  uncertainty: NONE\n- obligation: no automatic\
+      \ startup recovery/job queue introduced or required\n  status: PROVEN\n  evidence:\
+      \ architecture requires user-triggered rerun and no durable queue; static scan\
+      \ did not identify a reprocess startup recovery/job queue path in implementation\
+      \ surfaces.\n  uncertainty: NONE\n\n## Checklist Closure\n- Description checklist\
+      \ items toggled by verifier.\n- Verification checklist items marked `[x]` by\
+      \ orchestrator after validating evidence.\n\n## Files changed\nnone\n\n## Commit\
+      \ hash(es)\nnone (verify-only; no retained changes)\n\n## Gaps/Notes\nTemporary\
+      \ auditor-only test file was added and removed to produce detailed runtime logs;\
+      \ no retained product code/docs changes and no empty commit created."
   - id: plse-full-plan-runtime-check
     name: Run full-plan runtime verification sweep
     status: pending
