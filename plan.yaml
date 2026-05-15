@@ -72516,7 +72516,7 @@ phases:
     agent: wiring-auditor
   - id: plhm-runtime-spec-conformance
     name: Verify HTTP MCP runtime spec conformance
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -72586,6 +72586,8 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T15:46:05.253482+00:00'
   - id: plhm-runtime-gate
     name: Gate processing language HTTP MCP runtime integration
     status: pending
