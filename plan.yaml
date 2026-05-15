@@ -74710,12 +74710,12 @@ phases:
       - [x] Split scroll desktop and mobile route responsibilities are checked.
 
       - [x] Any divergence has closure path.'
-    verification: '- [ ] Evidence table maps frontend requirements to implementation
+    verification: '- [x] Evidence table maps frontend requirements to implementation
       artifacts and rendered proof.
 
-      - [ ] No blocker-class DESIGN/architecture divergence proceeds to system E2E.
+      - [x] No blocker-class DESIGN/architecture divergence proceeds to system E2E.
 
-      - [ ] NEEDS_TEST items have explicit downstream test/remediation path.'
+      - [x] NEEDS_TEST items have explicit downstream test/remediation path.'
     evidence_template: '## Spec/Design Conformance Report
 
 
