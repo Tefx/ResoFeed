@@ -79913,7 +79913,7 @@ phases:
     claimed_at: '2026-05-15T22:15:20.890309+00:00'
   - id: srdb-mcp-steer-parity
     name: Complete MCP Steer preview commit undo parity
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -79978,6 +79978,8 @@ phases:
     depends_on:
     - srdb-classifier-policy-runtime
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T22:15:27.659336+00:00'
   - id: srdb-runtime-liveness-seam-proof
     name: Prove backend runtime liveness and seam behavior
     status: pending
