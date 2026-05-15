@@ -74061,7 +74061,7 @@ phases:
 
       - [x] language treated as per-item translation toggle.
 
-      - [ ] missing accessible names or live-region announcements.
+      - [x] missing accessible names or live-region announcements.
 
       - [ ] client/runtime route types remain declaration-only and are not consumed
       by visible controls.'
