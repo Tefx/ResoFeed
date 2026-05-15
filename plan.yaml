@@ -69377,6 +69377,115 @@ phases:
     depends_on:
     - plsc-runtime-metadata-receipts
     agent: golang-developer
+  - id: plsc-reprocess-fts-doctor
+    name: Complete reprocess library FTS and doctor semantics
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: integration
+
+
+      Complete the implementation within existing flat Go package boundaries for explicit
+      one-time library reprocess, FTS rebuild/stale marker, search indexing, and `/doctor`
+      stale FTS diagnostics.
+
+
+      UPSTREAM ARTIFACTS:
+
+      - plsc-runtime-metadata-receipts provides runtime metadata/receipt primitives.
+
+      - plsc-processing-language-ingest provides target-language processing primitives.
+
+
+      YOUR SCOPE: `POST /api/runtime/reprocess-library` core operation support, per-item
+      transactions, source precedence `items.canonical_url` then `items.url`, unavailable
+      clearing/fallback-title behavior, final FTS rebuild transaction, stale marker
+      set/clear, counts, timeout/fatal/crash accounting, search over target-language
+      FTS including `core_insight`, and `value_tier` SQL metadata matching if exposed.
+
+
+      Failure-mode checklist:
+
+      - [ ] source URLs/feed URLs are never used as article reprocess input.
+
+      - [ ] prior stored target-language fields are never used as source text.
+
+      - [ ] per-item success, unavailable, failed, timeout, fatal SQLite, and crash-before-response
+      semantics are covered.
+
+      - [ ] `items_attempted = items_updated + items_unavailable + items_failed`.
+
+      - [ ] FTS stale marker remains if rebuild does not complete and clears only
+      after successful rebuild.
+
+      - [ ] `/api/doctor` emits exactly `search_fts: stale since <RFC3339_UTC>` or
+      `search_fts: ok`.
+
+      - [ ] Reprocess shares the ingest/fetch operation exclusivity guard and creates
+      no durable job/queue/ledger.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] Implementation processes real items and produces counts based on inputs.
+
+      - [ ] Stub-only or no-op reprocess completion is not acceptable.'
+    verification: '- [ ] Targeted reprocess accounting tests pass for success, unavailable,
+      failed, timeout, and stale FTS paths.
+
+      - [ ] Search/FTS tests prove target-language indexing includes `core_insight`.
+
+      - [ ] Doctor tests prove stale/ok lines exactly match the contract.
+
+      - [ ] Grep/search evidence shows no job queue, activity ledger, sync, or delivery
+      registry was introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact command/test>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Path exercised**: core reprocess operation → item transactions → FTS rebuild/stale
+      marker → doctor/search
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Reprocess count matrix:
+
+      - Source precedence proof:
+
+      - FTS stale marker proof:'
+    depends_on:
+    - plsc-runtime-metadata-receipts
+    - plsc-processing-language-ingest
+    agent: golang-developer
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
