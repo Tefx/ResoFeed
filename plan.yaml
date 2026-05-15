@@ -69928,7 +69928,7 @@ phases:
       - [x] `items.title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`
       are the single stored processed readable version.
 
-      - [ ] URLs/source titles/source URLs/canonical/original URLs remain exact provenance
+      - [x] URLs/source titles/source URLs/canonical/original URLs remain exact provenance
       anchors.
 
       - [x] No `translation_failed` status is introduced.
