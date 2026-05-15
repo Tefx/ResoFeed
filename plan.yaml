@@ -79402,7 +79402,7 @@ phases:
       downstream phases remain locked until those pass.'
   - id: srdct-ac19-traceability-remediation
     name: Resolve AC-19 traceability and proof-register mismatch
-    status: claimed
+    status: done
     description: 'step_type: remediation
 
 
@@ -79564,6 +79564,17 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-15T21:50:54.174847+00:00'
+    done_at: '2026-05-15T21:55:58.118248+00:00'
+    evidence: 'Completed AC-19 traceability remediation. Added `.audit-artifacts/frontend-gate/ac19-traceability-remediation-proof-register.yaml`
+      mapping the invalid/absent AC-19 gate reference to existing authoritative `docs/PRD.md`
+      AC-18 for manual fetch / Source Ledger obligations while preserving AC-4 coverage.
+      Evidence cited docs/PRD.md AC-4 and AC-18, docs/ARCHITECTURE.md invariants,
+      docs/DESIGN.md Source Ledger/manual fetch wording, docs/UI_REGRESSION_CONTRACT.md
+      manual ingest/fetch UI regression obligations, and `.agents/instructions.md`
+      constraints. No Go/TypeScript/Svelte product runtime files changed; branch diff
+      after rebase listed only the proof-register artifact. Mainline verification:
+      `ruby -e ''require "yaml"; YAML.load_file(".audit-artifacts/frontend-gate/ac19-traceability-remediation-proof-register.yaml");
+      puts "yaml ok"''` returned `yaml ok`. Squash merge commit: 9adcc120.'
   - id: srdct-foundation-gate-retest
     name: Retest foundation gate after AC traceability remediation
     status: pending
