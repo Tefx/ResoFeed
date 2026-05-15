@@ -1,0 +1,25 @@
+{
+  "schema_version": "resofeed.state.v1",
+  "exported_at": "2026-05-09T00:00:00Z",
+  "sources": [
+    {
+      "id": "src_01",
+      "url": "https://example.com/feed.xml",
+      "title": "Example"
+    }
+  ],
+  "steer_rules": [
+    {
+      "id": "rule_01",
+      "rule_text": "Push more technical documents."
+    }
+  ],
+  "resonated_items": [
+    {
+      "item_id": "item_01",
+      "url": "https://example.com/article",
+      "source_url": "https://example.com/feed.xml",
+      "title": "Example article"
+    }
+  ]
+}
