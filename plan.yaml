@@ -69765,7 +69765,7 @@ phases:
 
       - [x] missing `processing_language` falls back to effective `en`.
 
-      - [ ] explicit clear/null overwrite semantics are impossible for required metadata
+      - [x] explicit clear/null overwrite semantics are impossible for required metadata
       values unless contract permits deletion of stale marker.
 
       - [ ] stale receipt vs new request precedence follows live TTL rules.
