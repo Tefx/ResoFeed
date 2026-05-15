@@ -76643,7 +76643,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Evidence includes actual public commands/browser artifacts.
+      - [x] Evidence includes actual public commands/browser artifacts.
 
       - [ ] No implementation source assumptions are required.
 
