@@ -75348,7 +75348,7 @@ phases:
       - [x] timeout/fatal path leaves `fts_rebuilt: false` and `search_fts_stale_since`
       set when rebuild does not complete.
 
-      - [ ] `/api/doctor` reports stale FTS while marker exists.
+      - [x] `/api/doctor` reports stale FTS while marker exists.
 
       - [ ] rerun/recovery path clears stale marker after successful rebuild.
 
