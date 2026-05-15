@@ -62394,7 +62394,7 @@ phases:
       \ artifacts remain uncommitted runtime/test outputs."
   - id: urda-keyboard-a11y-nav-post-fix-retest
     name: Post-fix keyboard navigation and UI accessibility retest
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -62491,6 +62491,72 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T02:55:47.220080+00:00'
+    done_at: '2026-05-15T03:01:41.641223+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md\
+      \ — READ. Key passage: prior gate was `FAIL / BLOCK`; focused Source Ledger\
+      \ and visual/a11y checks passed, but `keyboard-a11y.expected-red.spec.ts` failed\
+      \ because `TODAY` / `SOURCE LEDGER` role buttons were not found in the expected\
+      \ keyboard flow.\n- web/tests/e2e/keyboard-a11y.expected-red.spec.ts — READ.\
+      \ Key passage: suite asserts `getByRole('button', { name: 'TODAY' })` and `getByRole('button',\
+      \ { name: 'SOURCE LEDGER' })` are focused by Tab, Source Ledger activates with\
+      \ Space, OPML/RUN INGEST/FETCH are focus-audited, and Resonate star has 44px\
+      \ target plus Enter toggle.\n- web/tests/e2e/keyboard-a11y-helpers.ts — READ.\
+      \ Key passage: `focusAndAudit` requires visible locator, focused state, visible\
+      \ focus indicator, and no focus-induced layout shift; coverage table explicitly\
+      \ includes Primary nav, Star/Resonate, and Source Ledger controls.\n- docs/DESIGN.md\
+      \ — READ. Key passage: Source Ledger must expose `[RUN INGEST]`, row `[FETCH]`,\
+      \ `[IMPORT OPML]`, and state actions; focus rings must be visible independent\
+      \ of accent state; Resonate target is 44px and toggles by Space/Enter with stateful\
+      \ label.\n\n## Retest Commands\n- Exact keyboard suite command:\n  ```\n  npm\
+      \ --prefix web run test:e2e -- keyboard-a11y.expected-red.spec.ts\n  ```\n-\
+      \ Focused Source Ledger controls command(s):\n  ```\n  npm --prefix web run\
+      \ test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ urda-visual-a11y-expected-red-browser-tests.spec.ts\n  ```\n- URDA visual/a11y\
+      \ focused spec command(s):\n  ```\n  npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ urda-visual-a11y-expected-red-browser-tests.spec.ts\n  ```\n\n## Actual Output\n\
+      ```text\nWorker isolated worktree:\n- Initial `npm --prefix web run test:e2e\
+      \ -- keyboard-a11y.expected-red.spec.ts` exited 127: `sh: playwright: command\
+      \ not found`.\n- `npm --prefix web ci` exited 0; installed missing web dependencies.\n\
+      - `npm --prefix web run test:e2e -- keyboard-a11y.expected-red.spec.ts` exited\
+      \ 0; 4 passed.\n- `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ urda-visual-a11y-expected-red-browser-tests.spec.ts` exited 0; 7 passed.\n\
+      - Generated retest artifacts were committed on isolated branch as `ac01296 test:\
+      \ record keyboard a11y retest artifacts`.\n\nMainline final-state verification:\n\
+      - `npm --prefix web run test:e2e -- keyboard-a11y.expected-red.spec.ts source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ urda-visual-a11y-expected-red-browser-tests.spec.ts --project=chromium-ci-safe`\
+      \ exited 0.\n- Output: 11 passed (keyboard-a11y 4/4, source-ledger controls\
+      \ 5/5, URDA visual/a11y 2/2).\n```\n\n## Keyboard/A11y Closure Matrix\n| Surface\
+      \ | Proof | Status |\n| --- | --- | --- |\n| TODAY role-button focus | `keyboard-a11y.expected-red.spec.ts`\
+      \ used Tab then `getByRole('button', { name: 'TODAY' })` and `toBeFocused()`;\
+      \ worker suite and mainline suite passed. | PASS |\n| SOURCE LEDGER role-button\
+      \ focus | `keyboard-a11y.expected-red.spec.ts` used Tab then `getByRole('button',\
+      \ { name: 'SOURCE LEDGER' })`, `toBeFocused()`, Space activation, and active\
+      \ ledger panel assertions; worker suite and mainline suite passed. | PASS |\n\
+      | `[IMPORT OPML]` keyboard reachability | Keyboard suite focus-audits `[IMPORT\
+      \ OPML]` and imports fixture; focused Source Ledger test asserts Tab reaches\
+      \ visible `[IMPORT OPML]`; worker and mainline suites passed. | PASS |\n| `[RUN\
+      \ INGEST]` keyboard reachability | Keyboard suite focus-audits `[RUN INGEST]`;\
+      \ Source Ledger focused spec asserts visible `[RUN INGEST]`, stable pending\
+      \ hitbox, and POST `/api/ingest`; worker and mainline suites passed. | PASS\
+      \ |\n| row `[FETCH]` keyboard reachability | Keyboard suite focus-audits first\
+      \ row `[FETCH]`; Source Ledger focused spec asserts row `[FETCH]`, stable `[FETCHING...]`\
+      \ hitbox, and POST `/api/sources/{id}/fetch`; worker and mainline suites passed.\
+      \ | PASS |\n| Resonate keyboard/a11y | Keyboard suite focus-audits Resonate\
+      \ star, asserts 44px target, toggles with Enter, verifies `Remove resonance`\
+      \ visible and active state; URDA focused spec validates unique accessible names\
+      \ and glyphs; worker and mainline suites passed. | PASS |\n\n## Behavioral Proof\
+      \ Register\n- verdict: PASS\n- blockers: []\n- gate_open_allowed: true\n- orchestrator_action_hint:\
+      \ COMPLETE_GATE\n- uncertainty_sources: none\n- product_implementation_files_modified:\
+      \ false\n- behavioral_proof_register:\n  - TODAY role-button focus: PROVEN\n\
+      \  - SOURCE LEDGER role-button focus: PROVEN\n  - IMPORT OPML keyboard reachability:\
+      \ PROVEN\n  - RUN INGEST keyboard reachability: PROVEN\n  - row FETCH keyboard\
+      \ reachability: PROVEN\n  - Resonate keyboard/a11y: PROVEN\n\n## Artifacts /\
+      \ merge note\n- Product code/docs: none modified by the retest step.\n- Worker\
+      \ branch changed generated `.test-artifacts/**` only and had stale `plan.yaml`\
+      \ state relative to main; those generated artifacts were not merged into main.\
+      \ Mainline final-state verification reproduced the PASS on current main before\
+      \ completion.\n- No blocker or UNCERTAIN_BLOCKING remains for the retested keyboard/a11y\
+      \ surfaces."
   - id: urda-keyboard-a11y-nav-uiux-audit
     name: UIUX audit for keyboard accessibility navigation repair
     status: pending
