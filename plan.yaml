@@ -80026,7 +80026,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Start the real cmd/resofeed server with a test owner token and SQLite
+      - [x] Start the real cmd/resofeed server with a test owner token and SQLite
       test DB.
 
       - [ ] Exercise POST /api/steer/preview for valid add, invalid add, find alias,
