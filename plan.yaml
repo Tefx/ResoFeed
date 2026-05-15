@@ -69232,7 +69232,7 @@ phases:
 
       - [x] Tests cover stale FTS doctor lines and target-language FTS over `core_insight`.
 
-      - [ ] Evidence lists expected failures or exposed gaps and downstream implementation
+      - [x] Evidence lists expected failures or exposed gaps and downstream implementation
       owners.'
     verification: '- [ ] Expected-red backend tests fail for missing implementation
       for the intended reasons.
