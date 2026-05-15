@@ -75733,7 +75733,7 @@ phases:
 
       Required command families:
 
-      - [ ] Go tests for all packages.
+      - [x] Go tests for all packages.
 
       - [ ] Frontend install/build/test command family appropriate to repo.
 
