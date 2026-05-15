@@ -76627,7 +76627,7 @@ phases:
 
       REQUIRED CHECKS:
 
-      - [ ] owner-token auth is required for all `/api/*` and `/mcp` operations.
+      - [x] owner-token auth is required for all `/api/*` and `/mcp` operations.
 
       - [ ] language read/set works over HTTP and MCP.
 
