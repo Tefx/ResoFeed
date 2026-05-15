@@ -69778,7 +69778,7 @@ phases:
 
       - [x] receipt storage has bounded live semantics; expired rows are ignored/deleted/replaced.
 
-      - [ ] state export/import excludes runtime metadata and receipts.
+      - [x] state export/import excludes runtime metadata and receipts.
 
 
       ## Completion Criteria (stub exclusion)
