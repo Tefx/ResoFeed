@@ -72538,7 +72538,7 @@ phases:
 
       - [x] Each new HTTP endpoint and MCP tool/resource has a requirement-row verdict.
 
-      - [ ] Error codes/statuses and JSON-RPC error shapes are checked character/field-exact.
+      - [x] Error codes/statuses and JSON-RPC error shapes are checked character/field-exact.
 
       - [ ] `actor_id` provenance-not-auth and owner-token auth boundary are explicitly
       verified.
