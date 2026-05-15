@@ -81689,7 +81689,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Processing language appears only as low-chrome architecture-owned runtime
+      - [x] Processing language appears only as low-chrome architecture-owned runtime
       control in app chrome or /doctor-class utility surface.
 
       - [ ] Reprocess library action is low-chrome and immediate with terse pending/success/conflict/error
