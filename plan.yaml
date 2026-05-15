@@ -66971,7 +66971,7 @@ phases:
       - None.'
   - id: ui-runtime-fresh-review-full-frontend-green-retest
     name: Retest full frontend suite and fresh audit acceptance after B1 remediation
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -67148,3 +67148,169 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T08:05:59.296785+00:00'
+    done_at: '2026-05-15T08:11:30.080445+00:00'
+    evidence: 'step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — Required UI/runtime contract includes keyboard-reachable
+      RESOFEED menu, flat Source Ledger manual ingest controls with contextual [FETCH]
+      names, single-line mobile metadata, 44px touch targets, and no weakened accessibility.
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — Fresh audit B1 context
+      covered FR-01/FR-10 menu, FR-02 time label order, FR-04 grouped duplicate disclosure,
+      FR-05 fetch accessible names, FR-06 ledger row density, FR-07 DOM contract ID,
+      and FR-09 mobile metadata wrapping.
+
+      - AGENTS.md — NOT READ: absent from isolated worktree root; read returned file-not-found.
+      Tester used embedded AGENTS content in dispatch for product-boundary awareness.
+
+
+      ## Independent Retest Report
+
+      Tester: integration-verifier
+
+      Scope: B1 full frontend npm test closure plus fresh audit acceptance preservation
+
+      Independence Level: L2
+
+
+      ### Commands executed
+
+      - npm run test
+
+      - npm ci
+
+      - npm run test
+
+      - npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts
+
+      - npm run check
+
+      - npm run build
+
+      - go test ./...
+
+      - git diff -- web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+      - git show --patch cdca9c7 -- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - git status --short
+
+
+      ### Actual output summary
+
+      - Initial npm run test before dependency install failed only with `svelte-kit:
+      command not found`.
+
+      - npm ci: added 150 packages; audited 151 packages.
+
+      - npm run test: svelte-check found 0 errors and 0 warnings; Test Files 6 passed
+      (6); Tests 39 passed (39).
+
+      - npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts: 6 passed;
+      FR-01/FR-10, FR-02, FR-04, FR-05/FR-07, FR-06, and FR-09 all passed.
+
+      - npm run check: svelte-check found 0 errors and 0 warnings.
+
+      - npm run build: Vite/SvelteKit build completed and wrote site to build.
+
+      - go test ./...: cmd/resofeed no test files; internal/resofeed passed.
+
+      - git diff -- web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts: no
+      output.
+
+      - final git status --short: no output.
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 | Full frontend suite is green after stale render-contract expectation
+      remediation | npm run test passes non-empty suite | 6 files/39 tests passed
+      | PROVEN | Full frontend test suite rerun after npm ci | COMPLETE because non-empty
+      suite passed |
+
+      | FR-01/FR-10 | RESOFEED menu closed by default, keyboard reachable, toggles
+      nav on desktop/mobile | Fresh audit E2E acceptance test passes | Playwright
+      test 1 passed | PROVEN | ui-runtime-fresh-review-remediation.spec.ts unchanged;
+      runtime browser test passed | COMPLETE |
+
+      | FR-02 | Time labels remain contiguous chronological groups | Fresh audit E2E
+      acceptance test passes | Playwright test 2 passed | PROVEN | Runtime browser
+      assertion preserved | COMPLETE |
+
+      | FR-04 | Grouped duplicate/source items exposed in Inspector provenance | Fresh
+      audit E2E acceptance test passes | Playwright test 3 passed | PROVEN | Runtime
+      browser assertion preserved | COMPLETE |
+
+      | FR-05/FR-07 | Source Ledger DOM contract and contextual fetch accessible names
+      hold | Fresh audit E2E acceptance test passes | Playwright test 4 passed | PROVEN
+      | Runtime browser accessibility/DOM assertion preserved | COMPLETE |
+
+      | FR-06 | Collapsed details do not inflate every Source Ledger row | Fresh audit
+      E2E acceptance test passes | Playwright test 5 passed | PROVEN | Runtime browser
+      geometry assertion preserved | COMPLETE |
+
+      | FR-09 | Mobile metadata stays single-line with truncation, not wrapping |
+      Fresh audit E2E acceptance test passes | Playwright test 6 passed | PROVEN |
+      Runtime mobile browser assertion preserved | COMPLETE |
+
+      | Frontend check | Svelte/type diagnostics are clean | npm run check passes
+      | svelte-check found 0 errors and 0 warnings | PROVEN | Direct checker run |
+      COMPLETE |
+
+      | Frontend build | Production frontend build succeeds | npm run build passes
+      and writes build | Wrote site to build | PROVEN | Direct production build |
+      COMPLETE |
+
+      | Go/API health | Go API/runtime remains green where contract code changed |
+      go test ./... passes | internal/resofeed passed | PROVEN | Conservative Go/API
+      run because web/src/lib/api-client.ts changed | COMPLETE |
+
+
+      ### Coverage Preservation
+
+      - Fresh-audit acceptance spec web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+      is unchanged.
+
+      - Accessibility assertions were not weakened; inspected diff updates stale expectations
+      toward more contextual accessible names such as Fetch source Example, Resonate
+      item: <title>, and Choose state JSON.
+
+
+      ### Product/runtime change applicability
+
+      - go test ./... passed, run conservatively because remediation history includes
+      web/src/lib/api-client.ts runtime contract changes.
+
+
+      ## Commit hash(es)
+
+      - none — verification-only
+
+
+      ## Gaps/Notes
+
+      - Generated Playwright artifacts were cleaned by the verifier; final retest
+      worktree status was clean.
+
+      - No blockers.'
