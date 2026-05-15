@@ -77520,7 +77520,7 @@ phases:
       - [x] Rendered screenshot or equivalent visual artifact is captured for desktop
       language/reprocess/source/split-scroll states.
 
-      - [ ] Rendered screenshot or equivalent visual artifact is captured for mobile
+      - [x] Rendered screenshot or equivalent visual artifact is captured for mobile
       Inspector behavior.
 
       - [ ] DOM/a11y evidence confirms language control, reprocess control, and source
