@@ -69289,7 +69289,7 @@ phases:
       - [x] Tests are expected red before implementation and expose MCP parity gaps
       without product-code changes.
 
-      - [ ] MCP language/reprocess tools match HTTP response and idempotency semantics.
+      - [x] MCP language/reprocess tools match HTTP response and idempotency semantics.
 
       - [ ] MCP `search_items` output includes `query` echo matching `SearchQueryEcho`.
 
