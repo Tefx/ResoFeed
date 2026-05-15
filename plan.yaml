@@ -69286,7 +69286,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Tests are expected red before implementation and expose MCP parity gaps
+      - [x] Tests are expected red before implementation and expose MCP parity gaps
       without product-code changes.
 
       - [ ] MCP language/reprocess tools match HTTP response and idempotency semantics.
