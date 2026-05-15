@@ -71933,7 +71933,7 @@ phases:
       were introduced.'
   - id: plhm-mcp-runtime-parity
     name: Complete MCP language reprocess delivery parity
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -72094,6 +72094,138 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T15:30:22.753203+00:00'
+    done_at: '2026-05-15T15:45:14.865692+00:00'
+    evidence: '## refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key insight from worker: `/mcp` must require
+      owner-token auth before resource/tool handling; MCP must expose `resofeed://runtime/language`,
+      `get_processing_language`, `set_processing_language`, `reprocess_library`, `report_delivery`;
+      `search_items` must return `{items, query}` with `SearchQueryEcho`; JSON-RPC
+      conflict/mismatch errors require nested `data.error` parity.
+
+      - `CONSTITUTION.md`: NOT READ: file does not exist in isolated worktree.
+
+
+      ## Integration Evidence
+
+      Path exercised by tests: public `/mcp` Streamable HTTP handler through `NewRouter`/`NewMCPHandler`
+      -> owner-token auth -> JSON-RPC schema/tool dispatch -> core operations (`GetProcessingLanguage`,
+      `SetProcessingLanguage`, `ReprocessLibrary`, `SearchItems`, `MarkItemDelivered`)
+      -> JSON/MCP response.
+
+
+      Implemented:
+
+      - MCP runtime language resource and language/reprocess tools.
+
+      - MCP `search_items` returns canonical `SearchResponse` including query echo.
+
+      - Nested JSON-RPC error envelope data for bad_request, conflict, not_found,
+      and fingerprint mismatch while preserving legacy top-level detail fields for
+      existing harness compatibility.
+
+      - Shared delivery mutation through `MarkItemDelivered` for MCP `report_delivery`
+      and HTTP delivery endpoint parity.
+
+      - Owner-token auth remains at `/mcp` handler entry before dispatch; no actor_id
+      auth or per-call language override added.
+
+
+      ## Storage-core Downstream Blocker Closure Table
+
+      | Blocker | Status |
+
+      |---|---|
+
+      | Missing `resofeed://runtime/language` resource and processing-language tools
+      | CLOSED |
+
+      | Missing `reprocess_library` MCP tool | CLOSED |
+
+      | `search_items` dropping `SearchQueryEcho`/query echo | CLOSED |
+
+      | MCP error envelope divergence | CLOSED for tested conflict/bad_request/request_fingerprint_mismatch
+      nested envelopes |
+
+      | MCP language mutation guard/reprocess active duplicate behavior | CLOSED by
+      shared core guard/idempotency paths and public `/mcp` tests |
+
+      | Declaration-only MCP-facing contract anchors | CLOSED by consuming existing
+      contract types/constants |
+
+
+      ## Merge Conflict Resolution
+
+      Initial squash merge conflicted in `internal/resofeed/http.go` and `internal/resofeed/mcp.go`
+      after HTTP branch was merged. `conflict-resolver` resolved conflicts in main
+      and preserved both HTTP and MCP intents.
+
+      - Conflict resolver test: `go test ./internal/resofeed -run ''Test(MCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface|HTTPDeliveryRouteValidationIdempotencyAndCoreState|PLCTDeliveryEndpointStrictValidationAndIdempotency|MCPStreamableHTTPResourcesToolsAuthAndIdempotency|MCPDeliverySuppressesCandidateUntilFreshRelatedDevelopment)$''`
+      — exit 0; output `ok resofeed/internal/resofeed 0.533s`.
+
+      - Conflict marker search found no markers.
+
+      - Resolver commit: `244387e91fc553fb025f14a2419fd9b70018742a` — `[vectl] step-plhm-mcp-runtime-parity
+      completed`.
+
+
+      ## Mainline Final-State Verification
+
+      After resolver-produced merge commit:
+
+      - `gofmt -w internal/resofeed/mcp.go internal/resofeed/http.go` — exit 0.
+
+      - `go test ./...` — exit 0; output includes `ok resofeed/internal/resofeed 0.783s`
+      plus no-test packages.
+
+      - `go build -o /var/folders/rs/6_0h1ssn5439q1yfqy4pykg00000gn/T/opencode/resofeed-plhm-mcp-main
+      ./cmd/resofeed` — exit 0.
+
+      - `go test -race ./internal/resofeed -run ''TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface|TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency|TestPLCTDeliveryEndpointStrictValidationAndIdempotency''`
+      — exit 0; output `ok resofeed/internal/resofeed 1.871s`.
+
+
+      ## Worker Verification
+
+      - `gofmt -w internal/resofeed/mcp.go internal/resofeed/http.go && go test ./...`
+      — exit 0.
+
+      - `go build ./cmd/resofeed` — exit 0.
+
+      - `go test -race ./internal/resofeed -run ''TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface|TestMCPStreamableHTTPResourcesToolsAuthAndIdempotency|TestPLCTDeliveryEndpointStrictValidationAndIdempotency''`
+      — exit 0.
+
+      - `golangci-lint run ./...` — exit 0.
+
+
+      ## Artifacts Modified
+
+      - `internal/resofeed/mcp.go`
+
+      - `internal/resofeed/http.go`
+
+
+      ## Commit Hash(es)
+
+      - Worker branch commit: `a2a70f3f` — `mcp: add runtime parity tools`.
+
+      - Main resolver merge commit: `244387e91fc553fb025f14a2419fd9b70018742a` — `[vectl]
+      step-plhm-mcp-runtime-parity completed`.
+
+
+      ## Spec Link
+
+      - `docs/ARCHITECTURE.md` §§5.6, 6, 7, especially Processing Language MCP Parity
+      and MCP JSON-RPC error examples.
+
+
+      ## Gaps/Notes
+
+      - No new jobs, queues, ledgers, delivery registries, vector/RAG surfaces, or
+      per-agent auth were introduced.
+
+      - The conflict resolver reported unrelated pre-existing dirty worktree files
+      outside the conflict scope; they were left untouched.'
   - id: plhm-http-mcp-green-retest
     name: Retest HTTP and MCP expected-red suites to green
     status: pending
