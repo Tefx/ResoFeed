@@ -79748,7 +79748,7 @@ phases:
       - [x] Source URL validation is syntactic only and never guesses/fetches RSS
       URLs during preview.
 
-      - [ ] AC-4 invariant conflicts preserve freshness, coverage/source diversity,
+      - [x] AC-4 invariant conflicts preserve freshness, coverage/source diversity,
       provenance transparency, and minimalism via closest allowable interpretation
       plus terse explanation.
 
