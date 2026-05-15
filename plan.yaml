@@ -66135,3 +66135,128 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-green-retest
     agent: uiux-auditor
+  - id: ui-runtime-fresh-review-black-box-liveness
+    name: Black-box UI runtime liveness and runnable surface proof
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L3
+
+
+      As a black-box tester, prove the runnable ResoFeed UI surface starts through
+      the documented single Go binary runtime and exposes the fixed behavior through
+      real browser interactions. Use public/runtime interfaces and docs; do not rely
+      on implementation internals.
+
+
+      Runtime surface requirements:
+
+      - Build the Svelte UI/static assets as needed.
+
+      - Build or run the single Go binary `resofeed serve` with a test SQLite DB and
+      owner token.
+
+      - Verify the app starts, remains alive long enough for browser checks, accepts
+      the owner token, and serves the actual UI.
+
+      - Exercise Today, RESOFEED menu, Source Ledger, source fetch buttons, feed time
+      labels, mobile metadata, and grouped duplicate Inspector disclosure through
+      the browser.
+
+
+      ## Completion Criteria
+
+      - [ ] Entry point starts through `resofeed serve` or project-equivalent built
+      binary path.
+
+      - [ ] Browser reaches the real app and accepts an owner token.
+
+      - [ ] At least one documented request/command reaches the real runtime path
+      end-to-end.
+
+      - [ ] Desktop and 390x844 mobile checks prove the fresh-audit fixes through
+      public behavior.
+
+      - [ ] Evidence contains actual commands and actual output, not only "tests pass".'
+    verification: '- [ ] Exact build/start command is recorded for the single Go binary
+      runtime.
+
+      - [ ] Runtime proof confirms the server starts, stays alive during checks, and
+      serves the UI.
+
+      - [ ] Browser proof exercises RESOFEED menu, Today feed, Source Ledger, and
+      Inspector grouped source disclosure.
+
+      - [ ] Desktop and mobile artifacts are attached or referenced.
+
+      - [ ] No sidecar worker, queue, sync service, vector/RAG service, settings dashboard,
+      account flow, folder/tag/unread/archive surface, or job dashboard is observed.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Black-Box Runtime Liveness Evidence
+
+      **Tester**: blind-tester
+
+      **Independence Level**: L3
+
+
+      **Build/start commands**:
+
+      ```
+
+      <actual commands>
+
+      ```
+
+
+      **Runtime output**:
+
+      ```
+
+      <stdout/stderr excerpt with secrets redacted>
+
+      ```
+
+
+      **Browser actions and artifacts**:
+
+      - Owner token acceptance: <artifact>
+
+      - RESOFEED menu desktop/mobile: <artifact>
+
+      - Today feed time labels/mobile metadata: <artifact>
+
+      - Source Ledger DOM/actions: <artifact>
+
+      - Inspector grouped source disclosure: <artifact>
+
+
+      **Forbidden-surface scan**: <observed none or details>
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] FAIL'
+    depends_on:
+    - ui-runtime-fresh-review-green-retest
+    agent: blind-tester
