@@ -71132,6 +71132,103 @@ phases:
     depends_on:
     - plse-real-language-reprocess-vertical-slice
     agent: blind-tester
+  - id: plse-reprocess-failure-stale-fts-proof
+    name: Verify reprocess failure stale FTS and recovery diagnostics
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As an independent verifier, exercise failure-oriented reprocess paths that are
+      difficult to prove with unit tests alone.
+
+
+      Scope declaration: phase-check protecting system E2E gate and final full-plan
+      check.
+
+
+      Required scenarios:
+
+      - [ ] controlled unavailable item clears processed readable fields and falls
+      back title to URL or `Untitled`.
+
+      - [ ] timeout/fatal path leaves `fts_rebuilt: false` and `search_fts_stale_since`
+      set when rebuild does not complete.
+
+      - [ ] `/api/doctor` reports stale FTS while marker exists.
+
+      - [ ] rerun/recovery path clears stale marker after successful rebuild.
+
+      - [ ] search continues to execute during stale interim with documented mixed-language
+      caveat.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Evidence covers main path and highest-risk failure path.
+
+      - [ ] No automatic startup recovery/job queue is introduced or required.
+
+      - [ ] Counts and stale marker semantics match docs exactly.'
+    verification: '- [ ] Failure-path integration proof passes or reports blockers
+      with reproduction.
+
+      - [ ] Doctor stale/ok transitions are proven with actual output.
+
+      - [ ] Reprocess accounting invariants are verified under failure conditions.'
+    evidence_template: '## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: reprocess failure/stale FTS recovery diagnostics
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <paste commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Stale Marker Timeline
+
+      - Marker set:
+
+      - Doctor stale line:
+
+      - Rebuild success:
+
+      - Doctor ok line:
+
+      '
+    depends_on:
+    - plse-real-language-reprocess-vertical-slice
+    agent: integration-verifier
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
   status: locked
