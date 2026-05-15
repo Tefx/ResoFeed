@@ -70091,7 +70091,7 @@ phases:
       - [x] per-item success, unavailable, failed, timeout, fatal SQLite, and crash-before-response
       semantics are covered.
 
-      - [ ] `items_attempted = items_updated + items_unavailable + items_failed`.
+      - [x] `items_attempted = items_updated + items_unavailable + items_failed`.
 
       - [ ] FTS stale marker remains if rebuild does not complete and clears only
       after successful rebuild.
