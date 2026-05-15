@@ -80513,7 +80513,7 @@ phases:
       - [x] Read each ref and cite the key passage or explain NOT READ with reason
       in evidence.
 
-      - [ ] Fix delegated-agent steering precedence with conflict-specific comparison
+      - [x] Fix delegated-agent steering precedence with conflict-specific comparison
       rather than blanket rejection.
 
       - [ ] Add or update tests for conflicting agent-vs-human steering and non-conflicting
