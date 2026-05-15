@@ -74065,14 +74065,14 @@ phases:
 
       - [x] client/runtime route types remain declaration-only and are not consumed
       by visible controls.'
-    verification: '- [ ] Rendered frontend tests pass for language states and reprocess
+    verification: '- [x] Rendered frontend tests pass for language states and reprocess
       states.
 
-      - [ ] Evidence includes visible rendered controls and accessibility assertions.
+      - [x] Evidence includes visible rendered controls and accessibility assertions.
 
-      - [ ] Conflict/error states render raw terse text and preserve focus rules.
+      - [x] Conflict/error states render raw terse text and preserve focus rules.
 
-      - [ ] Evidence proves client/runtime route types are consumed by visible controls,
+      - [x] Evidence proves client/runtime route types are consumed by visible controls,
       not left type-only.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
