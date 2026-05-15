@@ -82455,7 +82455,7 @@ phases:
     agent: gate-reviewer
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
-    status: pending
+    status: claimed
     description: 'Fix all six mainline broad rendering expected-red failures exposed
       while closing `srdf-steer-preview-ui-state-aria`.
 
@@ -82680,6 +82680,8 @@ phases:
     - srdf-split-scroll-mobile-route
     - srdf-processing-language-low-chrome-controls
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T23:56:28.965048+00:00'
   - id: srdf-broad-rendering-owner-token-bootstrap-retest
     name: Retest broad rendering and scoped frontend surfaces after owner-token bootstrap
       fix
