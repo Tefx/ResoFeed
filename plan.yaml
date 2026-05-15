@@ -70459,7 +70459,7 @@ phases:
       - [x] boundary values and TTL/time formats (24h receipts, RFC3339 UTC stale
       marker).
 
-      - [ ] omission drift for required metadata/state exclusion/reprocess fields.
+      - [x] omission drift for required metadata/state exclusion/reprocess fields.
 
       - [ ] contract surface drift around `core_insight`, `value_tier`, and source
       precedence.'
