@@ -75306,12 +75306,12 @@ phases:
       no access.
 
       - [x] No delivery registry/activity ledger/job/sync artifact is visible.'
-    verification: '- [ ] Public HTTP/MCP parity probes pass with actual request/response
+    verification: '- [x] Public HTTP/MCP parity probes pass with actual request/response
       bodies.
 
-      - [ ] Delivery/report_delivery parity is proven through item state.
+      - [x] Delivery/report_delivery parity is proven through item state.
 
-      - [ ] Auth/idempotency failure probes produce documented errors.'
+      - [x] Auth/idempotency failure probes produce documented errors.'
     evidence_template: "## Black-Box Parity Report\n\n### refs Read Confirmation (MANDATORY)\n\
       For each ref in this step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ:\
       \ <reason>\"\n\nIf no refs were provided, state: \"No refs for this step.\"\n\
