@@ -77658,7 +77658,7 @@ phases:
       - [x] Frontend dependency bootstrap is run when needed before `npm --prefix
       web run build`, and build/runtime proof is recorded.
 
-      - [ ] B2/R14-R16 rendered/runtime proof no longer depends on a bare missing-Vite
+      - [x] B2/R14-R16 rendered/runtime proof no longer depends on a bare missing-Vite
       worktree.
 
       - [ ] NEEDS_TEST ledger items are PROVEN or have explicit closure paths: language
