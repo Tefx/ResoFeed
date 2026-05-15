@@ -72776,12 +72776,12 @@ phases:
       verified.
 
       - [x] Any DIVERGES/PARTIAL/NEEDS_TEST item has an explicit closure path.'
-    verification: '- [ ] Evidence table maps HTTP/MCP requirements to implementation
+    verification: '- [x] Evidence table maps HTTP/MCP requirements to implementation
       and runtime proof.
 
-      - [ ] No blocker-class runtime spec drift proceeds to frontend/system phases.
+      - [x] No blocker-class runtime spec drift proceeds to frontend/system phases.
 
-      - [ ] Gate decision basis can consume this report directly.'
+      - [x] Gate decision basis can consume this report directly.'
     evidence_template: '## Spec Conformance Report
 
       **Phase**: processing-language-http-mcp-runtime
