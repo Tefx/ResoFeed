@@ -69364,7 +69364,7 @@ phases:
 
       - [x] Source identifiers are asserted as literal non-translated provenance anchors.
 
-      - [ ] Split scroll behavior is covered for desktop and mobile route behavior
+      - [x] Split scroll behavior is covered for desktop and mobile route behavior
       remains intact.
 
       - [ ] Tests preserve DESIGN.md bracket-action anatomy and accessibility rules.'
