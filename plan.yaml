@@ -75748,7 +75748,7 @@ phases:
       - [x] Any repo-wide or cross-phase failure must be reported as blocker-class
       if it intersects final gates.
 
-      - [ ] No broad failure may be dismissed as pre-existing without non-intersection
+      - [x] No broad failure may be dismissed as pre-existing without non-intersection
       evidence and future owner.'
     verification: '- [ ] Full Go/backend verification command passes or blockers are
       enumerated.
