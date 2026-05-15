@@ -69328,7 +69328,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plct-mcp-expected-red-tests
     name: Add MCP parity expected-red contract tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -69388,6 +69388,65 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T11:45:33.280587+00:00'
+    done_at: '2026-05-15T12:03:16.487298+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED: MCP expected-red tests merged and verified red
+      for intended parity gaps.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed MCP/HTTP parity through /mcp, owner-token-only
+      auth, actor_id as provenance not auth, runtime language resource/tool parity,
+      no per-call language override, search_items query echo, nested JSON-RPC error
+      examples, no durable jobs/registries/ledgers.
+
+      - AGENTS.md — NOT READ in isolated worktree because AGENTS.md was absent.
+
+
+      ## MCP Expected-Red Evidence
+
+      - MCP tests added/updated: internal/resofeed/mcp_expected_red_test.go.
+
+      - Public MCP operations covered: resources/list, resofeed://runtime/language,
+      tools/list, get_processing_language, set_processing_language, reprocess_library,
+      search_items, report_delivery, unauthorized /mcp, missing actor_id, no per-call
+      language override, JSON-RPC conflict/fingerprint mismatch error shapes.
+
+      - Expected failures/exposed gaps: missing runtime language MCP resource/tools,
+      search_items omits query echo, JSON-RPC errors use flat data instead of documented
+      data.error envelope, reprocess_library absent.
+
+      - Product-code changes: none reported; merged file is test only.
+
+      - step_intent: test_define_red.
+
+      - expected_result: red.
+
+      - observed_result: red.
+
+      - failure_alignment: aligned with missing MCP language/reprocess surfaces, query
+      echo parity, and JSON-RPC error-shape gaps; no product behavior implemented.
+
+      - verdict: semantic completion for expected-red test definition.
+
+      - blockers: none for test-definition scope.
+
+      - Worktree commit: b79bd14463fb41e0262c3fc052ccdc0cc09c81a3.
+
+      - Mainline squash commit: d0bcd559.
+
+
+      ## Mainline expected-red verification
+
+      - go test ./internal/resofeed -run TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface
+      -count=1; wrapper captured EXIT_CODE=1 and returned exit 0 because red is expected.
+
+      - Intended failures include missing resofeed://runtime/language, missing get/set_processing_language
+      and reprocess_library tools, missing search_items query echo, and non-nested
+      JSON-RPC error data.
+
+
+      Checklist: all completion and verification checklist items are [x].'
   - id: plct-frontend-expected-red-tests
     name: Add frontend expected-red rendering tests
     status: done
