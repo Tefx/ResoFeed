@@ -79747,3 +79747,59 @@ phases:
     - srde2e-backend-architecture-remediation
     - srde2e-frontend-architecture-remediation
     agent: software-architect
+  - id: srde2e-full-plan-check
+    name: Run full-plan verification sweep for Steer delta closure
+    status: pending
+    description: 'As an INDEPENDENT VERIFIER (integration-verifier), run the broad
+      full-plan check before final gate so late gate review does not discover predictable
+      repo-wide debt first.
+
+
+      Acceptance checklist:
+
+      - [ ] Run the repository''s authoritative Go/backend test command family.
+
+      - [ ] Run the repository''s authoritative frontend/component/E2E command family
+      for the touched web surfaces.
+
+      - [ ] Re-run any design/a11y/visual checks needed for the delta after architecture
+      remediation.
+
+      - [ ] Record failing checks as blocker-class if they intersect the final gate;
+      do not dismiss as pre-existing without non-intersection evidence.
+
+      - [ ] Produce a concise pass/fail matrix with exact commands and outputs.'
+    verification: '- [ ] full-plan-check protecting final closure gate.
+
+      - [ ] Exact commands and outputs are recorded for backend, frontend, E2E, and
+      visual/a11y checks.
+
+      - [ ] All blocker-class failures intersecting final gate have remediation ownership
+      or are resolved.
+
+      - [ ] The sweep passes or provides explicit non-intersection evidence for non-blocking
+      debt only.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Full-Plan Check Matrix
+
+      | Check | Command | Result | Output/Evidence Ref | Blocking? | Closure Path
+      |
+
+      |---|---|---|---|---|---|
+
+      '
+    depends_on:
+    - srde2e-software-architect-clean-recheck
+    agent: integration-verifier
