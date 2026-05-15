@@ -79713,7 +79713,7 @@ phases:
   steps:
   - id: srdb-classifier-policy-runtime
     name: Complete classifier and AC-4 policy runtime
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -79798,6 +79798,29 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T22:02:59.301614+00:00'
+    done_at: '2026-05-15T22:14:49.973587+00:00'
+    evidence: 'Implemented classifier and AC-4 policy runtime with contract-preserving
+      deviation record. Squash merge commit: 471ea87e. Worker commit: f12f591434f3f4a955ef48cffea58f7786a74610.
+      Files changed: internal/resofeed/steer_intent.go, steer_intent_runtime_test.go,
+      ranking.go, types.go, http.go, mcp.go. Mainline verification after merge: `go
+      test ./internal/resofeed -run ''TestSRDCT(HTTPPreview|BackendPreview|HTTPCommit|HTTPUndo|LexicalSearch|MCPSteer|BackendSteer)''
+      -count=1` OK; `go test ./internal/resofeed` OK; `go test ./...` OK; `go build
+      ./...` OK; `go test -race ./internal/resofeed -run ''TestSRDCT(HTTPPreview|BackendPreview|HTTPCommit|HTTPUndo|LexicalSearch|MCPSteer|BackendSteer)|TestSteerPreviewOpenRouterBoundary''
+      -count=1` OK. Main path proof: route precedence tests pass for /doctor, URL/add/添加,
+      search/搜索, find warning, vague add, and unmatched policy proposal; deterministic
+      preview routes do not call OpenRouter and unmatched policy preview calls it
+      exactly once. Failure path proof: AC-4 invariant conflicts return closest-allowable
+      explanation preserving freshness, coverage/source diversity, provenance transparency,
+      and minimalism without changed rules/undo handle; lexical search rejects forbidden
+      non-lexical parameters and find is warning-only lexical. Contract deviation
+      accepted: type=contract_gap for additive `SteerResult.UndoHandle *SteerUndoHandle`
+      in internal/resofeed/types.go; existing receipt contract preserved and no existing
+      type/function removed or renamed. Minimal http.go/mcp.go route/tool additions
+      were needed to exercise protected runtime tests and do not remove downstream
+      HTTP/MCP hardening ownership. Forbidden concept scan found no new services,
+      repositories, DI, event bus, queues, dashboards, vector DB, embeddings, semantic
+      answer engine, RAG, OAuth/accounts, command history, or global undo state; go.mod/go.sum
+      unchanged.'
   - id: srdb-http-steer-preview-commit-undo
     name: Complete HTTP Steer preview commit and undo runtime
     status: pending
