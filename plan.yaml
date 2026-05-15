@@ -77819,3 +77819,11 @@ phases:
     and no forbidden UI concepts.
   depends_on:
   - steer-delta-backend-http-mcp-runtime
+- id: steer-delta-e2e-architecture-review-closure
+  name: Steer Delta E2E Architecture Review Closure
+  status: locked
+  gate: Final closure blocks unless real-system E2E, visual/a11y regression, documentation
+    sync, software-architect fresh review, remediation, clean re-review, and full-plan
+    check are complete with no blocker-class proof gaps.
+  depends_on:
+  - steer-delta-frontend-ui-source-ledger-split-scroll
