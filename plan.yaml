@@ -71697,7 +71697,7 @@ phases:
 
       ## Downstream blocker ownership from storage-core verification
 
-      - [ ] Missing `/api/items/{id}/delivery` route returning 404 is owned here;
+      - [x] Missing `/api/items/{id}/delivery` route returning 404 is owned here;
       implement route registration, strict validation, idempotency replay/mismatch,
       delivered_at validation, and core operation call.
 
