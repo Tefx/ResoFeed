@@ -76585,7 +76585,7 @@ phases:
       - [x] Reprocess/ingest/fetch concurrency guard is consistent across HTTP and
       MCP.
 
-      - [ ] Runtime metadata, receipts, FTS stale marker, and state export/import
+      - [x] Runtime metadata, receipts, FTS stale marker, and state export/import
       boundaries are correct.'
     verification: '- [ ] Final wiring/architecture audit reports PASS/PASS_WITH_DEBT/FAIL.
 
