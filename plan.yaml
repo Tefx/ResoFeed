@@ -70117,6 +70117,116 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: integration-verifier
+  - id: plhm-runtime-liveness-probe
+    name: Probe runnable HTTP and MCP surfaces
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      As a black-box tester, prove the runnable `resofeed serve` entrypoint starts
+      and exposes the new HTTP and MCP surfaces through real transport.
+
+
+      Scope declaration: phase-check protecting deployability-bearing HTTP/MCP runtime
+      gate.
+
+
+      REQUIRED runtime proof:
+
+      - [ ] build or use the project binary.
+
+      - [ ] start `resofeed serve` with test SQLite DB and owner token/OpenRouter
+      secret handling that redacts secrets.
+
+      - [ ] call `GET /api/runtime/language` and one strict-validation failure over
+      HTTP.
+
+      - [ ] call MCP `get_processing_language` or resource `resofeed://runtime/language`
+      through `/mcp`.
+
+      - [ ] prove `/api/doctor` returns `search_fts: ok` or stale line.
+
+      - [ ] keep evidence secret-safe.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Entry point starts and stays alive long enough for probes.
+
+      - [ ] At least one HTTP operation reaches the real route.
+
+      - [ ] At least one MCP operation reaches the real `/mcp` route.
+
+      - [ ] Actual commands and outputs are pasted, not summarized.'
+    verification: '- [ ] Runtime launch command succeeds.
+
+      - [ ] HTTP probe returns expected status/body.
+
+      - [ ] MCP probe returns expected resource/tool body.
+
+      - [ ] Evidence proves no handler-only or mock-only route proof.'
+    evidence_template: '## Verification Report
+
+      **Tester**: blind-tester
+
+      **Scope**: runnable HTTP/MCP liveness
+
+      **Independence Level**: L3 black-box public surface
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Runtime Proof
+
+      - Build command:
+
+      ```
+
+      <paste command/output>
+
+      ```
+
+      - Launch command:
+
+      ```
+
+      <paste redacted command/output>
+
+      ```
+
+      - HTTP probe:
+
+      ```
+
+      <paste request/response>
+
+      ```
+
+      - MCP probe:
+
+      ```
+
+      <paste request/response>
+
+      ```
+
+      - Secret redaction confirmation:
+
+      '
+    depends_on:
+    - plhm-http-runtime-endpoints
+    - plhm-mcp-runtime-parity
+    agent: blind-tester
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
