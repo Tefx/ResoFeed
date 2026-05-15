@@ -71710,7 +71710,7 @@ phases:
       - [x] HTTP search query echo is owned here if not already provided by runtime
       HTTP.
 
-      - [ ] Declaration-only HTTP-facing contract anchors must be consumed by this
+      - [x] Declaration-only HTTP-facing contract anchors must be consumed by this
       implementation or intentionally de-exported only if the authoritative contract
       permits it.
 
