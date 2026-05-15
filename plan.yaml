@@ -80279,7 +80279,7 @@ phases:
       now require the retest to pass.'
   - id: srdb-backend-gate
     name: Gate backend Steer runtime implementation
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the backend
       runtime phase can open for frontend integration.
 
@@ -80403,6 +80403,8 @@ phases:
     - srdb-backend-spec-wiring-remediation
     - srdb-backend-spec-wiring-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T23:15:08.204425+00:00'
   - id: srdb-backend-spec-wiring-remediation
     name: Batched backend spec and wiring remediation
     status: done
