@@ -70970,7 +70970,7 @@ phases:
       - [x] Gate decision basis includes behavioral proof register for receipts, reprocess,
       FTS, and language persistence.
 
-      - [ ] Gate decision basis lists downstream HTTP/MCP/frontend blockers and confirms
+      - [x] Gate decision basis lists downstream HTTP/MCP/frontend blockers and confirms
       they remain blocking before `plhm-runtime-gate` or `plfu-frontend-gate`.'
     verification: '- [ ] All storage-core phase steps completed with adequate evidence.
 
