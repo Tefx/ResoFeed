@@ -77009,7 +77009,7 @@ phases:
       functional/architecture blocker for this acceptance gate.'
   - id: plfinal-final-gate
     name: Final gate for processing language implementation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -77209,6 +77209,94 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T20:22:48.768101+00:00'
+    done_at: '2026-05-15T20:39:08.483240+00:00'
+    evidence: 'status: SUCCESS_AS_BLOCKING_GATE_REPORT
+
+
+      Commit hash(es): 5ae72260 ([vectl] step-plfinal-final-gate completed as BLOCK/FAIL
+      report); worktree commit 038eb8c5.
+
+
+      Files changed: .audit-artifacts/plfinal-final-gate-review.md.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — gate-reviewer cited one binary, SQLite/FTS, OpenRouter
+      utility, processing-language/reprocess/source-identifier/split-scroll contracts.
+
+      - docs/DESIGN.md — gate-reviewer cited low-chrome UI, split-scroll, language/reprocess,
+      translate=no, and no settings/onboarding drift.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; fallback .agents/instructions.md
+      read and cited.
+
+
+      Semantic outcome:
+
+      - Final gate decision: BLOCK / FAIL.
+
+      - Blocking Status: OPEN.
+
+      - Proof-Gap Status: BLOCKING.
+
+      - Verdict: FAIL.
+
+      - gate_open_allowed: false.
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Verified/proven obligations:
+
+      - go test ./... passed.
+
+      - npm --prefix web install && npm --prefix web run build passed, with install
+      preceding build because web/node_modules was absent.
+
+      - Targeted backend closure tests for reprocess/FTS/language/steering passed.
+
+      - npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/processing-language-source-split-scroll.spec.ts
+      passed, 2 tests.
+
+      - Backend B1/R6 stale readable clearing/overwrite and FTS consistency: PROVEN.
+
+      - NEEDS_TEST ledger for language future-only/no row rewrite/FTS, human-over-agent
+      steering, desktop split-scroll, source identifier non-translation: PROVEN.
+
+      - DOC-INPUT-001: NON_BLOCKING; fallback instructions read.
+
+
+      Unresolved blockers discovered:
+
+      - UI-FINAL-001: Fresh UI remediation proof failed 7/7 in web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts.
+
+      - UI-FINAL-002: Fresh runtime UI review blockers remain intersecting: FR-01/FR-10,
+      FR-02, FR-04/B1, FR-05/FR-07, FR-06, FR-09.
+
+
+      Remediation ownership:
+
+      - Planner created `plfinal-ui-final-blocker-remediation` to own all seven UI-FINAL
+      failures.
+
+      - Planner created `plfinal-ui-final-blocker-retest-gate` to retest the exact
+      failing UI suite and provide final blocker-clearing gate evidence.
+
+      - The final gate checklist was rewritten by planner so completion means BLOCK/FAIL
+      issue-discovery with remediation ownership, not a green OPEN gate.
+
+
+      Mainline verification:
+
+      - Orchestrator ran git merge --squash vectl/step-plfinal-final-gate; git diff
+      --cached --check (passed); git commit; git show --check --oneline HEAD (passed).
+
+
+      Gaps/Notes: This step is complete only as a failed gate report. Phase completion
+      remains blocked until `plfinal-ui-final-blocker-retest-gate` passes.'
   - id: plfinal-batched-rendered-proof-and-reprocess-remediation
     name: Batched rendered proof and reprocess remediation
     status: done
