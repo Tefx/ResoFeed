@@ -67938,7 +67938,7 @@ phases:
       - None.'
   - id: ui-runtime-fresh-review-black-box-liveness-rerun
     name: Rerun black-box mobile Inspector liveness proof
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -68155,6 +68155,214 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T09:31:50.507392+00:00'
+    done_at: '2026-05-15T09:49:24.273585+00:00'
+    evidence: 'step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Report
+
+      Tester: blind-tester
+
+      Scope: real served-app mobile Inspector grouped duplicate source disclosure
+
+      Independence Level: L3
+
+
+      ### refs Read Confirmation
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — FR-04 says grouped duplicate/story
+      handling must preserve access to every source item and Inspector must disclose
+      grouped source items; FR-01/02/05/06/07/09/10 define preservation risks.
+
+      - docs/DESIGN.md — Inspector anatomy requires source-list disclosure for grouped
+      stories; mobile requires 390x844-style full-screen Inspector, flat inline metadata,
+      keyboard-reachable RESOFEED menu, contextual source fetch names, and Source
+      Ledger h1#source-ledger-title.
+
+      - docs/ARCHITECTURE.md — one deployable Go process started with resofeed serve;
+      serves static Svelte app, JSON HTTP API, MCP, background ingest, and SQLite;
+      OPML import is POST /api/sources/import-opml; manual ingest is POST /api/ingest.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — covers FR-01/FR-10,
+      FR-02, FR-04, B1 same-URL grouped sources, FR-05/FR-07, FR-06, and FR-09; B1
+      asserts mobile Inspector contains both Fresh Runtime A and Fresh Runtime B.
+
+
+      ### Real Runtime Setup
+
+      Commands executed:
+
+      - npm --prefix web install
+
+      - npm --prefix web run build
+
+      - go build -o .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/bin/resofeed
+      ./cmd/resofeed
+
+      - OPENROUTER_KEY=dummy_black_box_key_not_secret .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/bin/resofeed
+      serve -addr 127.0.0.1:60810 -public-url http://127.0.0.1:60810 -db .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/db/runtime.sqlite3
+      -owner-token <redacted>
+
+      - curl authenticated POST /api/sources/import-opml
+
+      - curl authenticated POST /api/ingest
+
+      - Playwright runtime mobile probe at 390x844 against http://127.0.0.1:60810/
+
+      - npm --prefix web run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts
+      --reporter=line
+
+
+      Runtime output:
+
+      - lsof: resofeed TCP 127.0.0.1:60810 LISTEN.
+
+      - server log: owner token explicit stored hash; serving ResoFeed on 127.0.0.1:60810.
+
+      - import.json: imported=2, skipped=0, folders_flattened=true.
+
+      - ingest.json: sources_attempted=2, sources_succeeded=2, sources_failed=0, items_upserted=2,
+      errors=[].
+
+      - feed.json: items included source_title Fresh Runtime B and Fresh Runtime A
+      with same URL http://127.0.0.1:60811/alpha-today-primary-story.
+
+      - remediation e2e: 7 passed.
+
+
+      ### Mobile Inspector Proof
+
+      Viewport: 390x844
+
+      Story selected: Alpha Today Primary Story / Fresh Runtime A row
+
+      Grouped sources observed: Fresh Runtime A and Fresh Runtime B
+
+      Inspector excerpt:
+
+      INSPECTOR src: Fresh Runtime A · full ... Grouped story with 2 source items
+
+      Fresh Runtime A — Alpha Today Primary Story selected ...
+
+      Fresh Runtime B — Alpha Today Primary Story grouped ...
+
+      Artifact paths:
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/mobile-inspector-proof-primary-a.json
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/mobile-inspector-390x844-primary-a.png
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/import.json
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/ingest.json
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/feed.json
+
+      - .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/proof/e2e-remediation.stdout.txt
+
+
+      ### Accessibility / Fresh-Audit Preservation
+
+      - FR-01/FR-10: remediation e2e passed; runtime probe found RESOFEED menu exists,
+      closed by default, no negative tabindex.
+
+      - FR-02: remediation e2e passed contiguous time label check.
+
+      - FR-04/B1: real runtime Inspector disclosed both same-URL grouped sources.
+
+      - FR-05: runtime Source Ledger fetch accessible names were Fetch source Fresh
+      Runtime B and Fetch source Fresh Runtime A.
+
+      - FR-06: remediation e2e passed collapsed [DETAILS] row-height check; runtime
+      details were not open by default.
+
+      - FR-07: runtime Source Ledger used aria-labelledby="source-ledger-title" and
+      title SOURCE LEDGER.
+
+      - FR-09: runtime mobile metadata proof showed whiteSpace nowrap, overflow hidden,
+      textOverflow ellipsis, height 16.
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1/FR-04 | Mobile Inspector for same-URL primary duplicate discloses both
+      grouped sources | 390x844 served UI shows Fresh Runtime A and Fresh Runtime
+      B | mobile-inspector-proof-primary-a.json | PROVEN | real resofeed serve + OPML
+      + ingest + Playwright | PASS |
+
+      | Runtime architecture | Single Go binary serves UI/API with clean SQLite and
+      owner token | Port bound, root served, authenticated APIs work | lsof-60810.txt,
+      resofeed.log, import/ingest JSON | PROVEN | built assets + built binary | PASS
+      |
+
+      | HTTP import/ingest | Duplicate setup imported via documented HTTP API and
+      runtime ingest fetched local RSS | import 2, ingest 2 sources/2 items, no errors
+      | import.json, ingest.json, feed.json | PROVEN | /api/sources/import-opml, /api/ingest
+      | PASS |
+
+      | FR-01/FR-10 | RESOFEED menu not permanently open and remains reachable | e2e
+      green; runtime menu closed/default semantics observed | e2e-remediation.stdout.txt,
+      mobile proof JSON | PROVEN | acceptance + runtime probe | PASS |
+
+      | FR-02 | Time labels remain contiguous | e2e green | e2e-remediation.stdout.txt
+      | PROVEN | acceptance coverage | PASS |
+
+      | FR-05 | [FETCH] buttons have contextual accessible names | runtime names include
+      source titles; e2e green | mobile proof JSON, e2e stdout | PROVEN | runtime
+      Source Ledger probe | PASS |
+
+      | FR-06 | Collapsed [DETAILS] does not inflate every row | e2e green; runtime
+      details closed | e2e stdout, mobile proof JSON | PROVEN | acceptance + runtime
+      probe | PASS |
+
+      | FR-07 | Source Ledger title DOM contract preserved | runtime aria-labelledby=source-ledger-title;
+      e2e green | mobile proof JSON | PROVEN | runtime Source Ledger probe | PASS
+      |
+
+      | FR-09 | Mobile metadata flat inline line | runtime CSS proof and e2e green
+      | mobile proof JSON, e2e stdout | PROVEN | runtime feed probe | PASS |
+
+      | Forbidden concepts | No forbidden queue/settings/sync/activity-ledger concept
+      observed in tested UI | runtime text scan null for forbidden patterns | mobile
+      proof JSON | PROVEN | runtime UI scan | PASS |
+
+
+      ## Commit hash(es)
+
+      - none — verification-only
+
+
+      ## Gaps/Notes
+
+      - npm --prefix web install was required because vite was initially missing from
+      isolated worktree.
+
+      - Generated artifacts were left uncommitted under .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/.'
   - id: ui-runtime-fresh-review-mobile-inspector-uiux-rerun
     name: Re-audit mobile Inspector grouped-source UIUX after fix
     status: claimed
