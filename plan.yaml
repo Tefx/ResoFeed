@@ -78514,7 +78514,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] The exact failing command exits 0 after remediation.
+      - [x] The exact failing command exits 0 after remediation.
 
       - [x] The seven-test closure matrix marks all seven failures PASS with artifact
       references.
