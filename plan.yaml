@@ -76323,7 +76323,7 @@ phases:
 
       REQUIRED CHECKS:
 
-      - [ ] README/usage examples match actual language/reprocess/delivery/API/MCP
+      - [x] README/usage examples match actual language/reprocess/delivery/API/MCP
       interfaces if they mention them.
 
       - [ ] docs/ARCHITECTURE.md remains consistent with implemented runtime metadata,
