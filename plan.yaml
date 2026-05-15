@@ -77310,7 +77310,7 @@ phases:
       - [x] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
       evidence.
 
-      - [ ] Runtime proof obligations for language future-only/no row rewrite, steering
+      - [x] Runtime proof obligations for language future-only/no row rewrite, steering
       precedence, UI language/reprocess/source/split-scroll/mobile Inspector are explicitly
       handed to closure steps.
 
