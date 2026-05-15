@@ -69076,7 +69076,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Contract artifacts define only public shapes/stubs/docstrings/types; no
+      - [x] Contract artifacts define only public shapes/stubs/docstrings/types; no
       completed behavior logic is added.
 
       - [ ] Runtime metadata keys and state export/import exclusion are explicitly
