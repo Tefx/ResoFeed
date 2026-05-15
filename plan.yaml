@@ -70367,7 +70367,7 @@ phases:
 
       - [x] Runtime metadata keys are read/written only through approved runtime paths.
 
-      - [ ] `ProcessingLanguage` and `ReprocessLibraryResult` are consumed by HTTP/MCP/frontend-contract
+      - [x] `ProcessingLanguage` and `ReprocessLibraryResult` are consumed by HTTP/MCP/frontend-contract
       surfaces where intended.
 
       - [ ] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
