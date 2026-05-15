@@ -77185,7 +77185,7 @@ phases:
     agent: gate-reviewer
   - id: plfinal-batched-rendered-proof-and-reprocess-remediation
     name: Batched rendered proof and reprocess remediation
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -77363,6 +77363,85 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T19:20:00.229871+00:00'
+    done_at: '2026-05-15T19:32:51.506396+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): 8a33b3dd ([vectl] step-plfinal-batched-rendered-proof-and-reprocess-remediation
+      completed); worktree commit 75d2a72c.
+
+
+      Files changed: internal/resofeed/reprocess.go; internal/resofeed/reprocess_test.go.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — golang-developer cited one Go binary/one SQLite/no
+      vector DB/no sidecars, processing-language future-only/explicit reprocess, and
+      failure contract requiring failed fresh-fetch/OpenRouter reprocess paths to
+      clear readable fields and keep FTS aligned.
+
+      - docs/DESIGN.md — golang-developer cited terse language control, bracket-style
+      non-dashboard reprocess action, source identifiers unchanged/translate=no, and
+      desktop split-scroll/mobile Inspector obligations for downstream closure.
+
+      - AGENTS.md — NOT READ: absent from isolated worktree; fallback .agents/instructions.md
+      read and classified as equivalent repository guidance for this implementation;
+      DOC-INPUT-001 classified non-blocking/non-intersecting for implementation.
+
+
+      Batched remediation evidence:
+
+      - why_previous_gate_failed recorded for design-rendered proof gap and spec-verifier
+      B1/B2 failures.
+
+      - why_previous_review_missed_or_could_not_prove_it recorded: design-reviewer
+      cannot prove rendered UI behavior; spec-verifier frontend proof needed dependency
+      bootstrap.
+
+      - B1 fixed: timeout/canceled per-item reprocess now stores a failure outcome
+      using URL fallback title and cleared nullable readable fields; storeReprocessItem
+      refreshes item FTS in the same transaction to prevent stale readable text when
+      full rebuild is skipped.
+
+      - Regression tests updated for timeout, cancellation, fresh-fetch unavailable,
+      and OpenRouter/model failure paths asserting stale readable FTS is gone.
+
+      - Runtime proof hand-off preserved for closure steps: language future-only/no
+      row rewrite, steering precedence, UI language/reprocess/source/split-scroll/mobile
+      Inspector, no product-copy drift.
+
+      - Frontend bootstrap disposition: npm --prefix web run build initially failed
+      with `vite: command not found`; npm --prefix web install then npm --prefix web
+      run build passed, classifying missing Vite as environment/bootstrap proof gap
+      rather than product dependency defect.
+
+
+      Mainline verification:
+
+      - git merge --squash vectl/step-plfinal-batched-rendered-proof-and-reprocess-remediation
+      passed.
+
+      - git diff --cached --check passed.
+
+      - go test ./internal/resofeed -run ''TestReprocessLibrary(AccountingSourcePrecedenceAndFTS|TimeoutClearsReadableFieldsAndItemFTS|CanceledFetchClearsReadableFieldsAndItemFTS)$''
+      -count=1 passed.
+
+      - go test ./... passed.
+
+      - go test -race ./internal/resofeed -run ''TestReprocessLibrary'' -count=1 passed.
+
+      - npm --prefix web run build passed.
+
+      - git show --check --oneline HEAD passed after commit 8a33b3dd.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: Rendered UI/DOM/a11y and final conformance proof remain intentionally
+      owned by downstream closure steps `plfinal-uiux-rendered-design-proof` and `plfinal-spec-conformance-closure-retest`.'
   - id: plfinal-uiux-rendered-design-proof
     name: UIUX rendered DOM and accessibility proof closure
     status: pending
