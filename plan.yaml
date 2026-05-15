@@ -74960,7 +74960,7 @@ phases:
 
       - [x] Frontend spec conformance has no blocker-class divergence.
 
-      - [ ] Gate decision basis maps UI behavioral obligations to PROVEN or BLOCK.'
+      - [x] Gate decision basis maps UI behavioral obligations to PROVEN or BLOCK.'
     verification: '- [ ] All frontend phase steps completed with adequate evidence.
 
       - [ ] Rendered screenshots/DOM/a11y artifacts are present for required states.
