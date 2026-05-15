@@ -72248,7 +72248,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] HTTP language/reprocess/delivery/search/doctor tests pass green.
+      - [x] HTTP language/reprocess/delivery/search/doctor tests pass green.
 
       - [ ] MCP language/reprocess/report_delivery/search_items tests pass green.
 
