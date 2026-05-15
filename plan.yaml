@@ -68021,3 +68021,122 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
     agent: blind-tester
+  - id: ui-runtime-fresh-review-mobile-inspector-uiux-rerun
+    name: Re-audit mobile Inspector grouped-source UIUX after fix
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L1
+
+      priority: HIGH
+
+      work_type: defect_repair
+
+
+      As an independent native multimodal UI/UX auditor, re-audit the mobile Inspector
+      grouped-source disclosure after `ui-runtime-fresh-review-mobile-inspector-grouped-source-fix`.
+      This is the required downstream UI/UX gate for the mobile Inspector disclosure
+      implementation fix; stale pre-fix UIUX evidence cannot close this obligation.
+
+
+      ## Scope
+
+      Audit the rendered mobile public UI for the Inspector disclosure and relevant
+      FR-04 / mobile visual-accessibility behavior after the fix.
+
+
+      Required focus:
+
+      - 390x844 mobile viewport rendered artifact for the primary same-URL grouped
+      duplicate story.
+
+      - Inspector disclosure must visibly expose both `Fresh Runtime A` and `Fresh
+      Runtime B` for the grouped same-URL story.
+
+      - DOM/accessibility proof must show the disclosure is reachable and semantically
+      labeled enough for assistive technology.
+
+      - Preserve ResoFeed design constraints from `docs/DESIGN.md`: dense but legible
+      archival index, functional labels, mobile metadata clarity, no friendly SaaS/onboarding/folders/tags/unread/archive/settings
+      concepts.
+
+      - Preserve ResoFeed architecture constraints from `docs/ARCHITECTURE.md`: one
+      Go binary, one SQLite DB, owner-token boundary, no sidecars/sync/vector/RAG/account
+      concepts.
+
+
+      ## Required artifacts
+
+      - Fresh rendered mobile artifact at 390x844 after the fix.
+
+      - Accessibility/DOM evidence for the Inspector disclosure path after the fix.
+
+      - Parseable verdict/headline and blocker list.
+
+      - Explicit comparison note explaining why this post-fix UIUX rerun supersedes
+      stale pre-fix UIUX evidence for the mobile Inspector grouped-source disclosure.
+
+
+      ## Agent checklist (toggle before completion)
+
+      - [ ] Audited fresh post-fix rendered mobile UI at 390x844; did not reuse stale
+      pre-fix artifact as closure evidence.
+
+      - [ ] Confirmed the mobile Inspector for the grouped same-URL story visibly
+      shows both `Fresh Runtime A` and `Fresh Runtime B`.
+
+      - [ ] Captured or cited a rendered mobile artifact path for the 390x844 state.
+
+      - [ ] Captured DOM/accessibility proof that the Inspector disclosure is reachable
+      and semantically exposed.
+
+      - [ ] Assessed relevant FR-04 and mobile visual/accessibility behavior after
+      the fix.
+
+      - [ ] Returned a parseable headline/verdict/blockers section.
+
+      - [ ] Confirmed no forbidden ResoFeed UI/product/runtime concept was introduced.'
+    verification: '- [ ] UIUX rerun evidence is fresh and post-fix, not a reuse of
+      stale pre-fix UIUX audit evidence.
+
+      - [ ] Rendered mobile artifact at 390x844 is provided and shows the relevant
+      Inspector grouped-source disclosure state.
+
+      - [ ] Evidence explicitly confirms both `Fresh Runtime A` and `Fresh Runtime
+      B` are visible in the mobile Inspector for the grouped same-URL story.
+
+      - [ ] Accessibility/DOM proof demonstrates the Inspector disclosure is reachable
+      and semantically exposed.
+
+      - [ ] Verdict/headline/blockers are parseable and identify PASS, PASS_WITH_BLOCKERS,
+      or FAIL.
+
+      - [ ] FR-04 and relevant mobile visual/accessibility behavior remain compatible
+      with `docs/DESIGN.md` and ResoFeed architecture/product boundaries.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## UIUX Rerun Report\n\
+      \n**Auditor**: uiux-auditor\n**Scope**: post-fix mobile Inspector grouped-source\
+      \ disclosure\n**Viewport**: 390x844\n\n### Rendered Mobile Artifact\n- Artifact\
+      \ path: `<path to fresh 390x844 screenshot/rendered capture>`\n- State captured:\
+      \ primary same-URL grouped duplicate story opened in mobile Inspector\n\n###\
+      \ Accessibility / DOM Proof\n- Command/tool used: `<browser snapshot / accessibility\
+      \ tree / DOM query>`\n- Proof excerpt:\n  ```\n  <paste accessible labels /\
+      \ DOM evidence showing Inspector disclosure reachability and grouped source\
+      \ names>\n  ```\n\n### Grouped Source Disclosure Result\n- `Fresh Runtime A`\
+      \ visible in mobile Inspector: YES | NO\n- `Fresh Runtime B` visible in mobile\
+      \ Inspector: YES | NO\n- Same-URL grouped story confirmed: YES | NO\n\n### FR\
+      \ / Design Checks\n- FR-04 grouped duplicate/source disclosure: PASS | BLOCKED\n\
+      - Mobile visual/accessibility behavior: PASS | BLOCKED\n- Forbidden ResoFeed\
+      \ concept introduced: NO | YES `<details>`\n\n### Headline\n- Verdict: PASS\
+      \ | PASS_WITH_BLOCKERS | FAIL\n- Blockers:\n  - `<blocker id and description,\
+      \ or none>`\n- Summary: `<one-paragraph evidence-bound summary>`"
+    depends_on:
+    - ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
+    agent: uiux-auditor
