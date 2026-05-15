@@ -71729,7 +71729,7 @@ phases:
 
       - [x] language set rewrites historical rows or rebuilds FTS automatically.
 
-      - [ ] handler-only proof without real HTTP route execution.
+      - [x] handler-only proof without real HTTP route execution.
 
       - [ ] `/api/items/{id}/delivery` still returns 404 for the documented route.
 
