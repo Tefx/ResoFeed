@@ -74519,7 +74519,7 @@ phases:
       \ scroll only."
   - id: plfu-frontend-green-retest
     name: Retest frontend expected-red suite to green
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -74601,6 +74601,8 @@ phases:
     - plfu-language-reprocess-controls
     - plfu-source-identifiers-split-scroll
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T17:26:16.530104+00:00'
   - id: plfu-uiux-multimodal-audit
     name: Audit language reprocess and split-scroll UIUX
     status: pending
