@@ -75275,7 +75275,7 @@ phases:
       \ during cleanup to leave no retained worktree changes.\n\n## Gaps/Notes\nnone"
   - id: plse-blind-http-mcp-parity-delivery
     name: Blind test HTTP MCP parity and delivery endpoint
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -75322,6 +75322,8 @@ phases:
     depends_on:
     - plse-real-language-reprocess-vertical-slice
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-15T17:52:29.597605+00:00'
   - id: plse-reprocess-failure-stale-fts-proof
     name: Verify reprocess failure stale FTS and recovery diagnostics
     status: pending
