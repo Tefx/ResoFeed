@@ -72675,7 +72675,7 @@ phases:
 
       REQUIRED CHECKS:
 
-      - [ ] Every new HTTP endpoint is registered and owner-token protected.
+      - [x] Every new HTTP endpoint is registered and owner-token protected.
 
       - [ ] Every new MCP resource/tool is registered and owner-token protected.
 
