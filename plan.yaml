@@ -79930,7 +79930,7 @@ phases:
       vector/embedding/RAG, services/repositories/DI/event bus introduced.'
   - id: srdb-mcp-steer-parity
     name: Complete MCP Steer preview commit undo parity
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -79997,6 +79997,22 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T22:15:27.659336+00:00'
+    done_at: '2026-05-15T22:26:50.901722+00:00'
+    evidence: 'Completed MCP Steer preview/commit/undo parity. Squash merge commit:
+      72991d54. Worker commit after rebase: 88681f849d8d9afcc2d0f029b036f3dd6b2d8ec4
+      (rebased branch merged cleanly). Files changed: internal/resofeed/mcp.go, internal/resofeed/mcp_steer_parity_test.go.
+      Mainline verification after merge: `go test ./internal/resofeed -run ''TestMCPPreviewSteerRejectsIdempotencyKeyByField|TestMCPUndoSteerFlatTargetInputAndUnsupportedKind|TestSRDCTMCPSteerPreviewCommitUndoExpectedRedParity''
+      -count=1` OK; `go test ./internal/resofeed` OK; `go test ./...` OK; `go test
+      -race ./internal/resofeed -run ''TestMCP|TestSRDCTMCP'' -count=1` OK; `go build
+      ./...` OK. Parity proof: preview_steer returns SteerPreviewResult shape, is
+      read-only, requires actor_id and rejects idempotency_key; steer requires actor_id/idempotency_key,
+      reruns classifier through ApplySteering, and preserves HTTP receipt/idempotency
+      semantics; undo_steer accepts flat target_kind/target_id/actor_id/idempotency_key
+      and returns target-specific SteerUndoResult. Failure proof: idempotency_key
+      in preview rejected with bad_request field=idempotency_key; unsupported target_kind=global_history
+      rejected with bad_request field=target_kind. MCP adds no agent registry, per-agent
+      auth, OAuth/accounts, command history, activity ledger, vector/embedding/RAG,
+      semantic retrieval, or new product primitive; search_items remains lexical.'
   - id: srdb-runtime-liveness-seam-proof
     name: Prove backend runtime liveness and seam behavior
     status: pending
