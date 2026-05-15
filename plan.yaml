@@ -74638,13 +74638,13 @@ phases:
       - [x] PASS requires rendered visible controls, not only test summaries.
 
       - [x] Any UI/UX blocker has exact remediation ownership.'
-    verification: '- [ ] Screenshots or equivalent rendered artifacts cover required
+    verification: '- [x] Screenshots or equivalent rendered artifacts cover required
       UI states.
 
-      - [ ] Audit checks design token/bracket action conformance and forbidden UI
+      - [x] Audit checks design token/bracket action conformance and forbidden UI
       concepts.
 
-      - [ ] Audit explicitly checks source identifiers and split-scroll behavior.'
+      - [x] Audit explicitly checks source identifiers and split-scroll behavior.'
     evidence_template: '## UIUX Audit Report
 
 
