@@ -71124,7 +71124,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Language mutation storage writes are protected by operation-guard exclusivity
+      - [x] Language mutation storage writes are protected by operation-guard exclusivity
       or by one proven authoritative guarded wrapper before write.
 
       - [ ] Tests prove active ingest/fetch/reprocess and language mutation cannot
