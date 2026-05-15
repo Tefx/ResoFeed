@@ -76332,7 +76332,7 @@ phases:
       - [x] docs/DESIGN.md remains consistent with rendered language/reprocess/source
       identifier/split-scroll behavior.
 
-      - [ ] Error code tables and examples match actual responses.
+      - [x] Error code tables and examples match actual responses.
 
       - [ ] No docs introduce settings dashboards, sync, jobs, queues, ledgers, vector/RAG,
       or per-agent auth concepts.
