@@ -67938,7 +67938,7 @@ phases:
       - None.'
   - id: ui-runtime-fresh-review-black-box-liveness-rerun
     name: Rerun black-box mobile Inspector liveness proof
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -68153,6 +68153,8 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-15T09:31:50.507392+00:00'
   - id: ui-runtime-fresh-review-mobile-inspector-uiux-rerun
     name: Re-audit mobile Inspector grouped-source UIUX after fix
     status: pending
