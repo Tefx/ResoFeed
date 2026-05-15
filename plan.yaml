@@ -68868,3 +68868,11 @@ phases:
     evidence.
   depends_on:
   - processing-language-frontend-ui
+- id: processing-language-finalization
+  name: Processing Language Finalization and Deep Review
+  status: locked
+  gate: Finalization gate blocks unless docs are synchronized, full spec/design/wiring/deep-review
+    audits are complete, and no unresolved blocker-class behavioral proof obligations
+    remain.
+  depends_on:
+  - processing-language-system-e2e
