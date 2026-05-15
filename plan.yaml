@@ -79630,7 +79630,7 @@ phases:
 
       Gate decision checklist:
 
-      - [ ] AC-4 has source-backed Behavioral Proof Register coverage.
+      - [x] AC-4 has source-backed Behavioral Proof Register coverage.
 
       - [ ] The corrected/restored requirement reference has source-backed Behavioral
       Proof Register coverage.
