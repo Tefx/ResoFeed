@@ -71908,17 +71908,17 @@ phases:
 
       - [x] Storage-core downstream-owned MCP blockers are all closed or converted
       into explicit runtime gate blockers with evidence.'
-    verification: '- [ ] MCP expected-red parity tests pass green for runtime language
+    verification: '- [x] MCP expected-red parity tests pass green for runtime language
       resource/tools, reprocess_library, report_delivery, search_items query echo,
       and error envelopes.
 
-      - [ ] Tests exercise public `/mcp` Streamable HTTP path or project MCP harness,
+      - [x] Tests exercise public `/mcp` Streamable HTTP path or project MCP harness,
       not only direct functions.
 
-      - [ ] JSON-RPC error data matches HTTP conflict/mismatch details exactly where
+      - [x] JSON-RPC error data matches HTTP conflict/mismatch details exactly where
       specified.
 
-      - [ ] Evidence proves every storage-core downstream-owned MCP blocker is now
+      - [x] Evidence proves every storage-core downstream-owned MCP blocker is now
       implemented or remains explicitly blocking in the runtime phase.'
     evidence_template: '## Integration Evidence
 
