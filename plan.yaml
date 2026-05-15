@@ -75111,7 +75111,7 @@ phases:
 
       Required proof:
 
-      - [ ] Build and launch real `resofeed serve` with test DB.
+      - [x] Build and launch real `resofeed serve` with test DB.
 
       - [ ] Authenticate with owner token.
 
