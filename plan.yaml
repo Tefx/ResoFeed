@@ -76440,7 +76440,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Requirements register covers docs/ARCHITECTURE.md and docs/DESIGN.md sections
+      - [x] Requirements register covers docs/ARCHITECTURE.md and docs/DESIGN.md sections
       touched by this plan.
 
       - [ ] Evidence distinguishes CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND,
