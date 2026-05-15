@@ -78910,7 +78910,7 @@ phases:
       OPML/state actions, details disclosure semantics, and 44px hit-target fixture
       expectations.
 
-      - [ ] Pin lexical-only search/no-RAG and warning-only find alias frontend fixture
+      - [x] Pin lexical-only search/no-RAG and warning-only find alias frontend fixture
       expectations.
 
       - [ ] Pin desktop independent Feed/Inspector scroll and mobile full-screen Inspector
