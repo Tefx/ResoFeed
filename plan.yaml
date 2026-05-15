@@ -66334,7 +66334,7 @@ phases:
       \ UIUX/black-box/final gate steps to depend on the new green retest."
   - id: ui-runtime-fresh-review-uiux-multimodal-audit
     name: UIUX multimodal audit of fresh runtime remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -66470,6 +66470,65 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T08:11:59.781158+00:00'
+    done_at: '2026-05-15T09:13:05.643917+00:00'
+    evidence: "status: \"SUCCESS\"\nevidence: |\n  step_intent: uiux_multimodal_verification\n\
+      \  expected_result: green\n  observed_result: green\n  failure_alignment: none\n\
+      \  verdict: PASS\n  blockers: []\n  headline: PASS\n  proof_gap_status: NONE\n\
+      \  blocking_status: CLOSED\n  gate_open_allowed: true\n  orchestrator_action_hint:\
+      \ COMPLETE\n\n  ## refs Read Confirmation\n  - docs/audits/ui-runtime-fresh-review-2026-05-15.md\
+      \ — Read. Contains exact finding IDs, symptoms, screenshots from original audit,\
+      \ and expected visual fixes for FR-01/FR-10, FR-02, FR-04, FR-05, FR-06, FR-07,\
+      \ and FR-09.\n  - docs/DESIGN.md — Read. Contains layout rules for Feed metadata\
+      \ flat lines, compact Source Ledger details height, Inspector disclosure requirements,\
+      \ surface menu discreetness, and manual fetch constraints.\n  - docs/ARCHITECTURE.md\
+      \ — Read. Contains product boundaries (no sync, no queue, one executable, one\
+      \ DB).\n\n  ## UIUX Multimodal Audit Report\n  **Auditor**: uiux-auditor\n \
+      \ **Independence Level**: L2\n\n  ### Artifacts reviewed\n  - Desktop feed/Inspector:\
+      \ `desktop-feed-inspector.png`\n  - Desktop Source Ledger: `desktop-source-ledger.png`\n\
+      \  - Mobile feed 390x844: `mobile-feed.png`\n  - Mobile Source Ledger 390x844:\
+      \ `mobile-source-ledger.png`\n  - DOM/accessibility snapshot: `.test-artifacts/playwright/test-output/ui-runtime-fresh-review-re-af178-EDGER-on-desktop-and-mobile-chromium-ci-safe/attachments/fr-01-fr-10-surface-menu-1280-json-c8ad9a546158daaccf0be7b1bdbe5bc8e1903a53.json`\
+      \ (and 6 others)\n\n  ### Finding verdicts\n  | Finding | Visual/DOM evidence\
+      \ | Verdict | Notes |\n  |---|---|---|---|\n  | FR-01 | `desktop-feed-inspector.png`\
+      \ + `fr-01-fr-10-surface-menu-1280.json` | PASS | The `nav.surface-nav` details\
+      \ menu is now closed by default, requires an open toggle, and allows keyboard\
+      \ focus. |\n  | FR-02 | `fr-02-time-label-sequence.json` | PASS | Feed items\
+      \ with the same time-group fall correctly into contiguous chunks. `TODAY` no\
+      \ longer repeats. |\n  | FR-04 | `desktop-feed-inspector.png` + `fr-04-rendered-inspector-grouped-sources.json`\
+      \ | PASS | Inspector pane successfully discloses grouped duplicates showing\
+      \ their provenance keys and original link hrefs. |\n  | FR-05 | `fr-05-fr-07-ledger-dom-1280.json`\
+      \ | PASS | Each `[FETCH]` button has a unique source-contextual accessible name\
+      \ per the DOM contract. |\n  | FR-06 | `desktop-source-ledger.png` + `fr-06-collapsed-details-row-heights.json`\
+      \ | PASS | Collapsed `[DETAILS]` element does not unnecessarily inflate every\
+      \ source ledger row height. Computed bounding height equals 45px. |\n  | FR-07\
+      \ | `fr-05-fr-07-ledger-dom-1280.json` | PASS | Reverted back to the approved\
+      \ `source-ledger-title` `aria-labelledby` DOM contract. |\n  | FR-09 | `mobile-feed.png`\
+      \ + `fr-09-mobile-feed-metadata-style.json` | PASS | Mobile metadata CSS has\
+      \ been successfully remediated to `white-space: nowrap` and `text-overflow:\
+      \ ellipsis`, measuring an exact `16px` height without multi-line wrapping. |\n\
+      \  | FR-10 | `mobile-feed.png` + `fr-01-fr-10-surface-menu-390.json` | PASS\
+      \ | The mobile menu successfully hides the global surface buttons until opened,\
+      \ aligning with the dense desktop expectation. |\n\n  ### Forbidden UI concepts\
+      \ scan\n  - No folders, tags, unread counts, archives, SaaS tracking, multi-tenant\
+      \ UI, settings gear sliders, onboarding mascot/carousel flows, AI generative\
+      \ UI slop, or separate job dashboards introduced. \n\n  ### Behavioral Proof\
+      \ Register\n  | requirement_ref | behavior_claim | runtime_proof_expected |\
+      \ evidence_ref | status | closure_path | gate_decision_basis |\n  | --- | ---\
+      \ | --- | --- | --- | --- | --- |\n  | FR-01/10 | Menu closed/keyboard reachable\
+      \ | `fr-01-fr-10-surface-menu-*` | e2e test | PROVEN | Complete | Green playwright\
+      \ trace. |\n  | FR-02 | Contiguous feed time grouping | `fr-02-time-label-sequence`\
+      \ | e2e test | PROVEN | Complete | Green playwright trace. |\n  | FR-04 | Inspector\
+      \ duplicate sources | `fr-04-rendered-inspector-grouped-sources` | e2e test\
+      \ | PROVEN | Complete | Green playwright trace. |\n  | FR-05 | Contextual [FETCH]\
+      \ aria labels | `fr-05-fr-07-ledger-dom-*` | e2e test | PROVEN | Complete |\
+      \ Green playwright trace. |\n  | FR-06 | Compact ledger row heights | `fr-06-collapsed-details-row-heights`\
+      \ | e2e test | PROVEN | Complete | Green playwright trace. |\n  | FR-07 | Source\
+      \ Ledger Title DOM contract | `fr-05-fr-07-ledger-dom-*` | e2e test | PROVEN\
+      \ | Complete | Green playwright trace. |\n  | FR-09 | Flat inline mobile metadata\
+      \ line | `fr-09-mobile-feed-metadata-style` | e2e test | PROVEN | Complete |\
+      \ Green playwright trace. |\n\n  ## Commit hash(es)\n  - none — verification-only\n\
+      \n  ## Gaps/Notes\n  - All Playwright end-to-end tests successfully ran and\
+      \ passed, verifying visually/programmatically the required `DESIGN.md` remediation.\n\
+      error: \"\""
   - id: ui-runtime-fresh-review-black-box-liveness
     name: Black-box UI runtime liveness and runnable surface proof
     status: claimed
