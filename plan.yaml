@@ -76501,7 +76501,7 @@ phases:
     claimed_at: '2026-05-15T19:01:33.171290+00:00'
   - id: plfinal-design-readiness-review
     name: Run DESIGN and readiness review
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: project
@@ -76571,6 +76571,80 @@ phases:
     agent: design-reviewer
     claimed_by: design-reviewer
     claimed_at: '2026-05-15T19:01:23.326181+00:00'
+    done_at: '2026-05-15T19:18:44.283885+00:00'
+    evidence: 'status: SUCCESS_AS_ISSUE_DISCOVERY
+
+
+      Commit hash(es): a80c78c2 ([vectl] step-plfinal-design-readiness-review completed
+      as failed review report); worktree commits 3f955580 and 61c72161.
+
+
+      Files changed: audits/plfinal-design-readiness-review.md.
+
+
+      Refs Read Confirmation:
+
+      - docs/DESIGN.md — design-reviewer cited language control terse/non-settings,
+      bracket-style non-dashboard reprocess, untranslated source identifiers with
+      translate="no", independent desktop Feed/Inspector scroll, and mobile Inspector
+      behavior.
+
+      - docs/ARCHITECTURE.md — design-reviewer cited processing language as runtime
+      state, explicit/non-durable reprocess, source identifiers as preservation anchors,
+      and split-scroll as frontend containment.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; fallback .agents/instructions.md
+      read and missing AGENTS.md recorded as DOC-INPUT-001 should-fix/non-product
+      input issue.
+
+
+      Semantic outcome:
+
+      - Headline: FAIL.
+
+      - Proof-Gap Status: BLOCKING.
+
+      - Blocking Status: OPEN.
+
+      - Verdict: BLOCKED.
+
+      - Blockers: PROOF-GAP-001.
+
+      - gate_open_allowed: false.
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Issue ownership / closure:
+
+      - Batched planner remediation created `plfinal-batched-rendered-proof-and-reprocess-remediation`,
+      `plfinal-uiux-rendered-design-proof`, and `plfinal-spec-conformance-closure-retest`.
+
+      - Rendered UI proof gap is owned by `plfinal-uiux-rendered-design-proof` with
+      required UI/DOM/a11y evidence.
+
+      - Design/readiness checklist was rewritten by planner so completion means issue-discovery
+      plus remediation ownership, not a green rendered-UI pass.
+
+
+      Verification:
+
+      - design-reviewer ran `npx @google/design.md lint docs/DESIGN.md`: PASS, 0 errors,
+      0 warnings.
+
+      - Orchestrator merged the audit report artifact and ran mainline verification:
+      git merge --squash vectl/step-plfinal-design-readiness-review; git diff --cached
+      --check (initially failed on trailing whitespace); design-reviewer fixed artifact
+      formatting and reran git diff --check in worktree (passed); orchestrator retried
+      merge, git diff --cached --check passed, committed a80c78c2, and git show --check
+      --oneline HEAD passed.
+
+
+      Gaps/Notes: This step is completed as a failed review report with remediation
+      ownership. It does not assert rendered UI behavior is green; final gate must
+      wait for the new closure steps.'
   - id: plfinal-wiring-and-architecture-audit
     name: Run final wiring and architecture boundary audit
     status: done
