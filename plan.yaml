@@ -74000,7 +74000,7 @@ phases:
       - [x] Type-only UI declarations are not sufficient unless a later rendered owner
       is explicitly cited; otherwise this step must render the behavior.
 
-      - [ ] Runtime/client source identifier fields must remain literal and non-translated
+      - [x] Runtime/client source identifier fields must remain literal and non-translated
       in the DOM.
 
 
