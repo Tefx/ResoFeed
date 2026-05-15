@@ -69032,7 +69032,7 @@ phases:
       - None.'
 - id: processing-language-contract-tests
   name: Processing Language Contract Lock and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Contract and expected-red phase blocks unless runtime metadata, receipts,
     language/reprocess HTTP/MCP, delivery, FTS/search, doctor, and frontend UI obligations
     are pinned with expected-red proof before implementation.
@@ -69041,7 +69041,7 @@ phases:
   steps:
   - id: plct-contract-lock
     name: Lock processing language runtime contract
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -69123,6 +69123,8 @@ phases:
 
       - Confirmation no behavior logic was implemented:'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T11:30:00.400177+00:00'
   - id: plct-backend-expected-red-tests
     name: Add backend expected-red contract tests
     status: pending
