@@ -70283,7 +70283,7 @@ phases:
 
       - [ ] Backend expected-red tests now pass green.
 
-      - [ ] Failure-path tests run for receipt mismatch/expiration and reprocess stale
+      - [x] Failure-path tests run for receipt mismatch/expiration and reprocess stale
       FTS.
 
       - [ ] Test output includes exact commands and actual output.
