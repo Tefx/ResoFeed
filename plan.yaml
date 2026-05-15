@@ -76635,7 +76635,7 @@ phases:
 
       - [x] delivery/report_delivery idempotency and provenance work.
 
-      - [ ] search/FTS and doctor stale/ok diagnostics are publicly observable.
+      - [x] search/FTS and doctor stale/ok diagnostics are publicly observable.
 
       - [ ] UI renders language/reprocess controls and preserves source identifiers/split
       scroll.
