@@ -74707,7 +74707,7 @@ phases:
 
       - [x] Source identifiers preserve literal provenance with non-translation markup/equivalent.
 
-      - [ ] Split scroll desktop and mobile route responsibilities are checked.
+      - [x] Split scroll desktop and mobile route responsibilities are checked.
 
       - [ ] Any divergence has closure path.'
     verification: '- [ ] Evidence table maps frontend requirements to implementation
