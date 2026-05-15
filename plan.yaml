@@ -75826,7 +75826,7 @@ phases:
 
       - [x] Frontend API client calls correspond to actual routes.
 
-      - [ ] No `_Runtime*`, `_Stub*`, `_Placeholder*`, or hardcoded placeholder implementation
+      - [x] No `_Runtime*`, `_Stub*`, `_Placeholder*`, or hardcoded placeholder implementation
       remains wired.
 
       - [ ] No extra process, worker, service, repository, DI, queue, ledger, sync,
