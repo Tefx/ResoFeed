@@ -82218,6 +82218,7 @@ phases:
     - srdf-source-ledger-details-hit-targets
     - srdf-split-scroll-mobile-route
     - srdf-processing-language-low-chrome-controls
+    - srdf-broad-rendering-owner-token-bootstrap-retest
     agent: spec-verifier
   - id: srdf-frontend-gate
     name: Gate frontend Steer delta UI implementation
