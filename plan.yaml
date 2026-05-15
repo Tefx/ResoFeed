@@ -73381,7 +73381,7 @@ phases:
       was introduced.'
   - id: plhm-runtime-blocker-retest
     name: Retest HTTP MCP runtime blocker remediation
-    status: pending
+    status: claimed
     description: "step_type: test\nstep_intent: retest_green\nexpected_result: green\n\
       verification_scope: phase-check\nprotects_gate: plhm-runtime-gate\nagent_source:\
       \ project\n\nAs an INDEPENDENT VERIFIER, retest the batched remediation from\
@@ -73543,6 +73543,8 @@ phases:
     depends_on:
     - plhm-runtime-blocker-remediation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T16:12:48.140309+00:00'
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
