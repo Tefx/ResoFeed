@@ -80328,6 +80328,231 @@ phases:
     - srdb-wiring-audit
     - srdb-spec-conformance
     agent: gate-reviewer
+  - id: srdb-backend-spec-wiring-remediation
+    name: Batched backend spec and wiring remediation
+    status: pending
+    description: 'Batched remediation for the concurrent semantic failures reported
+      by srdb-spec-conformance and srdb-wiring-audit. Work type: defect_repair with
+      blocker-class gate intersection; provenance may be mixed, but disposition is
+      blocking-now because all four blocker families intersect srdb-backend-gate and
+      downstream frontend/E2E gates.
+
+
+      Refs / authoritative sources to read before editing:
+
+      - docs/ARCHITECTURE.md — HTTP endpoint tables, MCP tool tables, manual ingest/fetch
+      response examples, owner-token/agent steering invariants.
+
+      - docs/DESIGN.md — Steer/Undo/Source Ledger UX expectations if the ARCH table
+      update needs source-backed surface confirmation.
+
+      - PRD/source phase artifacts referenced by existing Steer Delta contract steps
+      — conflict-specific delegated-agent steering and preview/commit/undo expectations.
+
+
+      Likely touch paths:
+
+      - internal/resofeed/steer_intent.go
+
+      - internal/resofeed/*steer*.go
+
+      - internal/resofeed/*http*.go or cmd/resofeed HTTP wiring files for /api/steer/preview,
+      /api/steer/undo, and manual ingest/fetch response shape tests
+
+      - internal/resofeed/*mcp*.go for preview_steer / undo_steer parity tests if
+      needed
+
+      - tests or Go test files covering steering precedence, response envelopes, endpoint/tool
+      contract shape, and dead export reachability
+
+      - docs/ARCHITECTURE.md only if source-backed by PRD/DESIGN/current phase artifacts
+
+
+      ## Blockers to fix as ONE coherent batch
+
+
+      ### B1: Delegated-agent steering precedence overrejects non-conflicting agent
+      rules
+
+      Current failure: implementation rejects all agent steering if any active human-like
+      rule exists. Required behavior: delegated-agent steering is rejected only when
+      it conflicts with active human steering; non-conflicting agent rules are allowed.
+      Add/adjust conflict-specific comparison logic and regression tests for both
+      conflicting and non-conflicting agent steering.
+
+
+      ### B2: Steer preview/undo HTTP and MCP surfaces missing from ARCH tables
+
+      Current failure: /api/steer/preview, /api/steer/undo, MCP preview_steer, and
+      MCP undo_steer are implemented/tested and expected by this phase, but missing
+      from authoritative docs/ARCHITECTURE.md endpoint/tool tables. Prefer source-backed
+      ARCH update if PRD/DESIGN/current phase artifacts support these surfaces; otherwise
+      remove from public contract surface and explain why. Do not leave implemented
+      public surfaces undocumented.
+
+
+      ### B3: Manual ingest/fetch response schema diverges from ARCH examples
+
+      Current failure: manual ingest/fetch responses include undocumented top-level
+      legacy fields via anonymous embedded ManualFetchResult while ARCH examples specify
+      {"ingest": IngestRunResult} and source fetch includes source. Required outcome:
+      either remove legacy top-level fields or amend ARCH with an explicit backward-compatible
+      envelope. The choice must be source-backed and include strict response-shape
+      regression tests that would fail on undocumented top-level fields if they are
+      not part of the chosen contract.
+
+
+      ### B4: Dead exported production stub ErrSteerContractOnly
+
+      Current failure: internal/resofeed/steer_intent.go exports ErrSteerContractOnly
+      with "stubs" / "runtime mutation not implemented" text and no runtime caller.
+      Smallest expected fix: remove it if unused. If retained, provide a source-backed
+      justification and reachability proof; otherwise static reachability must show
+      no exported dead production stub remains.
+
+
+      ## Root Cause vs Symptom
+
+      - Root cause: backend contract/runtime drift accumulated across steering semantics,
+      public surface documentation, legacy response compatibility, and dead contract-only
+      symbol cleanup.
+
+      - Symptoms: spec-verifier R4/R1/R3/R11/R13 divergences and wiring-auditor dead
+      export blocker.
+
+      - Why this fix is not surface-level: remediation must reconcile source-backed
+      contracts, runtime behavior, regression tests, and static reachability in one
+      batch so gate review can decide against a single consistent backend contract.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each code deliverable MUST contain substantive logic that processes its inputs
+      and produces outputs that vary based on those inputs. Private or exported contract-only
+      stubs do not satisfy this requirement.
+
+
+      ## Required checklist
+
+      - [ ] Read each ref and cite the key passage or explain NOT READ with reason
+      in evidence.
+
+      - [ ] Fix delegated-agent steering precedence with conflict-specific comparison
+      rather than blanket rejection.
+
+      - [ ] Add or update tests for conflicting agent-vs-human steering and non-conflicting
+      delegated-agent steering.
+
+      - [ ] Resolve ARCH/source contract status for /api/steer/preview, /api/steer/undo,
+      preview_steer, and undo_steer; public runtime surfaces are either documented
+      or removed from the contract surface.
+
+      - [ ] Resolve manual ingest/fetch response-shape contract with source-backed
+      code/doc alignment and strict response-shape regression tests.
+
+      - [ ] Remove ErrSteerContractOnly if unused, or justify it with runtime reachability
+      proof; no dead exported production stub may remain.
+
+      - [ ] Provide static reachability evidence for the stub/export cleanup.
+
+      - [ ] Provide targeted command/test evidence for the steering precedence and
+      response-shape regressions.
+
+      - [ ] Document any residual issue with explicit non-intersection evidence; do
+      not label blocker-class debt as merely pre-existing or out-of-scope.'
+    verification: '- [ ] B1 main path: non-conflicting delegated-agent steering is
+      accepted while conflicting delegated-agent steering is rejected against active
+      human steering.
+
+      - [ ] B1 failure path: regression tests prove blanket rejection is gone and
+      conflict-specific rejection remains.
+
+      - [ ] B2 contract path: ARCH HTTP/MCP tables and implemented runtime surfaces
+      agree for steer preview/undo, with source-backed rationale.
+
+      - [ ] B3 response path: strict response-shape regression tests prove the chosen
+      manual ingest/fetch envelope exactly matches ARCH.
+
+      - [ ] B4 wiring path: static reachability check proves ErrSteerContractOnly
+      is removed or source-backed and reachable.
+
+      - [ ] Evidence includes commands/tests run, outputs summarized, and remaining
+      gaps with blocking/non-blocking disposition.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If any additional phase artifact is used, list it with key passage.
+
+
+      ## Batched Remediation Evidence
+
+
+      **Blocker families addressed**:
+
+      - B1 delegated-agent conflict-specific steering precedence: <summary + files>
+
+      - B2 steer preview/undo HTTP/MCP ARCH/source alignment: <summary + files>
+
+      - B3 manual ingest/fetch response-shape contract: <summary + files>
+
+      - B4 ErrSteerContractOnly dead export cleanup: <summary + files>
+
+
+      **Commands/tests executed**:
+
+      ```
+
+      <paste exact commands>
+
+      ```
+
+
+      **Relevant output**:
+
+      ```
+
+      <paste concise output, not just "tests pass">
+
+      ```
+
+
+      **Response-shape proof**:
+
+      ```
+
+      <strict assertion or serialized examples proving chosen envelope>
+
+      ```
+
+
+      **Static reachability proof for ErrSteerContractOnly**:
+
+      ```
+
+      <grep/go test/static output showing removed or justified reachable>
+
+      ```
+
+
+      **Residual gaps and disposition**:
+
+      - <gap>: blocking-now | blocking-later | non-blocking, with non-intersection
+      evidence if non-blocking
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - srdb-spec-conformance
+    - srdb-wiring-audit
+    agent: golang-developer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
