@@ -76443,7 +76443,7 @@ phases:
       - [x] Requirements register covers docs/ARCHITECTURE.md and docs/DESIGN.md sections
       touched by this plan.
 
-      - [ ] Evidence distinguishes CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND,
+      - [x] Evidence distinguishes CONFORMS, DIVERGES, PARTIAL, NEEDS_TEST, NOT_FOUND,
       AMBIGUOUS_SPEC, SPEC_POSSIBLY_STALE.
 
       - [ ] Behavioral precedence claims are flagged as NEEDS_TEST unless runtime
