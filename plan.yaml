@@ -68365,7 +68365,7 @@ phases:
       - Generated artifacts were left uncommitted under .test-artifacts/ui-runtime-fresh-review-black-box-liveness-rerun/.'
   - id: ui-runtime-fresh-review-mobile-inspector-uiux-rerun
     name: Re-audit mobile Inspector grouped-source UIUX after fix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -68484,3 +68484,105 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T09:31:57.376743+00:00'
+    done_at: '2026-05-15T09:49:40.795589+00:00'
+    evidence: 'step_intent: uiux_multimodal_verification
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## refs Read Confirmation
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — Read section FR-04 P2
+      - Grouped Duplicate Source Item Is Searchable But Not Exposed From The Primary
+      Story Surface.
+
+      - docs/DESIGN.md — Read Inspector Pane section describing source-list disclosure
+      for grouped stories.
+
+      - docs/ARCHITECTURE.md — Read Item and Source_Of_Truth sections describing transparency
+      for grouped siblings.
+
+
+      ## UIUX Rerun Report
+
+      Auditor: uiux-auditor
+
+      Scope: post-fix mobile Inspector grouped-source disclosure
+
+      Viewport: 390x844
+
+
+      ### Rendered Mobile Artifact
+
+      - Artifact path: mobile-inspector.png
+
+      - State captured: primary same-URL grouped duplicate story opened in mobile
+      Inspector
+
+
+      ### Accessibility / DOM Proof
+
+      - Command/tool used: custom Puppeteer script generating DOM tree via page.content()
+      and snapshot via page.accessibility.snapshot().
+
+      - Proof excerpt: `<details class="contract-grouped-sources" open=""><summary
+      aria-label="Grouped story with 2 source items">Grouped story with 2 source items</summary><ol
+      class="contract-grouped-sources__list">...`; the ol explicitly lists Fresh Runtime
+      A and Fresh Runtime B, along with individual provenance attributes and aria-labels.
+
+
+      ### Finding verdicts
+
+      | Finding | Visual/DOM evidence | Verdict | Notes |
+
+      |---|---|---|---|
+
+      | FR-04/B1 mobile Inspector grouped sources | mobile-inspector.png and mobile-inspector-dom.html
+      | PASS | Inspector disclosure correctly renders both items under the grouped
+      primary story. |
+
+
+      ### Forbidden UI concepts scan
+
+      - none observed: disclosure uses a native, semantically correct details tag
+      with an ol list. It does not introduce a secondary story DB, external sync,
+      vector DB retrieval, or SaaS tracking concepts.
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | FR-04 | Grouped duplicates expose all sources | yes | mobile-inspector.png
+      | PROVEN | Inspector | Visible disclosure showing A and B |
+
+
+      ## Commit hash(es)
+
+      - none — verification-only
+
+
+      ## Gaps/Notes
+
+      - None.'
