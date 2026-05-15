@@ -74063,7 +74063,7 @@ phases:
 
       - [x] missing accessible names or live-region announcements.
 
-      - [ ] client/runtime route types remain declaration-only and are not consumed
+      - [x] client/runtime route types remain declaration-only and are not consumed
       by visible controls.'
     verification: '- [ ] Rendered frontend tests pass for language states and reprocess
       states.
