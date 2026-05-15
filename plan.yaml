@@ -74620,7 +74620,7 @@ phases:
 
       Required visual/spatial artifacts:
 
-      - [ ] language control English and Chinese states.
+      - [x] language control English and Chinese states.
 
       - [ ] reprocess default/confirming/running/conflict/complete or failed states.
 
