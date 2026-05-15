@@ -75113,7 +75113,7 @@ phases:
 
       - [x] Build and launch real `resofeed serve` with test DB.
 
-      - [ ] Authenticate with owner token.
+      - [x] Authenticate with owner token.
 
       - [ ] Read language, set language, trigger reprocess on controlled fixture data,
       observe result counts.
