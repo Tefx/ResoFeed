@@ -70454,7 +70454,7 @@ phases:
 
       FOCUS AREAS:
 
-      - [ ] naming and exact enum values (`en`, `zh`, statuses, error codes).
+      - [x] naming and exact enum values (`en`, `zh`, statuses, error codes).
 
       - [ ] boundary values and TTL/time formats (24h receipts, RFC3339 UTC stale
       marker).
