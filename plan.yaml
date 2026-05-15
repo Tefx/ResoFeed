@@ -70466,6 +70466,73 @@ phases:
     UIUX audit pass against DESIGN.md.
   depends_on:
   - processing-language-http-mcp-runtime
+  steps:
+  - id: plfu-api-client-types
+    name: Update frontend API client types for language reprocess and delivery
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete frontend API client/type implementation for the new HTTP contract.
+      Keep frontend as a thin consumer; do not move product truth into web state.
+
+
+      YOUR SCOPE:
+
+      - TypeScript/Svelte API types for `ProcessingLanguageInfo`, `ReprocessLibraryResult`,
+      search `query` echo, and delivery result if client-exposed.
+
+      - Client calls for `GET/PUT /api/runtime/language` and `POST /api/runtime/reprocess-library`.
+
+      - Strict error handling for `400 bad_request`, `401`, `409 conflict`, and terse
+      raw diagnostics.
+
+
+      ## Frontend Completion Criteria (rendering required for consumers)
+
+      - [ ] Client types are consumed by rendered UI tests downstream.
+
+      - [ ] No settings dashboard, preference center, wizard, progress dashboard,
+      or activity log API is introduced.
+
+      - [ ] Owner token remains the only auth header; `actor_id` is not auth.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] Implementation contains substantive client request/response parsing logic.
+
+      - [ ] Outputs vary by API response/error state.'
+    verification: '- [ ] Frontend type/client tests pass for language/reprocess response
+      and error shapes.
+
+      - [ ] Search query echo type is represented where search API client is used.
+
+      - [ ] No forbidden UI state surfaces are added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Types/client methods added:
+
+      - Error handling proof:
+
+      - Commands/tests run and outputs:'
+    agent: frontend-engineer
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
