@@ -79940,7 +79940,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] preview_steer is read-only, requires actor_id, accepts no idempotency_key,
+      - [x] preview_steer is read-only, requires actor_id, accepts no idempotency_key,
       and returns the same SteerPreview shape as HTTP.
 
       - [ ] steer requires actor_id and idempotency_key, reruns classification, and
