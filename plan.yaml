@@ -75085,7 +75085,7 @@ phases:
       ## Required remediation if blocked\nnone"
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
-  status: in_progress
+  status: done
   gate: System gate blocks unless real end-to-end HTTP, MCP, UI, reprocess, stale
     FTS, and delivery parity are proven through public/runnable surfaces with no mock-only
     evidence.
@@ -76058,7 +76058,7 @@ phases:
       blocking_findings\":[],\"static_only\":true}"
   - id: plse-system-e2e-gate
     name: Gate processing language system E2E and parity
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -76139,9 +76139,170 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T18:18:47.633579+00:00'
+    done_at: '2026-05-15T18:23:37.050152+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — one Go binary, one SQLite DB, lexical FTS only, owner-token
+      auth for every `/api/*`, HTTP/MCP parity, reprocess must not create jobs/queues/ledgers/sync/vector/RAG;
+      stale FTS must be exposed through `/doctor`.
+
+      - docs/DESIGN.md — language is global operational state, reprocess is terse
+      bracket action, no settings dashboard/preference center/wizard/progress dashboard/activity
+      log, source identifiers preserved.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree root.
+
+      - CONSTITUTION.md — NOT READ: absent in isolated worktree.
+
+
+      ## Gate Review Report
+
+      headline: PASS_WITH_DEBT
+
+      verdict: PASS
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      blockers: []
+
+
+      Orchestrator disposition: accepted as closable because all blocker-class public-surface
+      obligations are PROVEN; local missing `web/node_modules` in the gate worktree
+      was environment state covered by the preceding full-plan command pass, and npm
+      audit/dependency hygiene is explicitly non-intersecting with the current processing-language
+      E2E/finalization gates.
+
+
+      ## Execution review
+
+      Gate reviewer reviewed source/spec/test evidence and independently ran `go test
+      ./...` and `go build ./cmd/resofeed`, both passing. Frontend local check was
+      not runnable in the gate worktree because `web` dependencies were absent, but
+      the preceding full-plan artifact records frontend install/check/build/test pass;
+      this was classified non-blocking local environment state, not product failure.
+
+
+      ## Public-surface proof reviewed
+
+      - HTTP strict validation/language/delivery/reprocess evidence reviewed in backend
+      contract tests.
+
+      - MCP real-bound parity/language/reprocess/search/delivery/auth evidence reviewed
+      in MCP tests.
+
+      - Runtime HTTP/MCP doctor liveness reviewed in runtime wiring tests.
+
+      - UI and public black-box report reviewed in existing final black-box artifact.
+
+
+      ## Full-plan check reviewed
+
+      Full-plan sweep records `go test`, `go build`, frontend install/build/test,
+      design lint, `go vet`, and runtime smoke PASS. Non-intersecting ownership/disposition
+      exists for npm audit warnings, transient SvelteKit tsconfig warning, and `cmd/resofeed`
+      no-test-files note.
+
+
+      ## Issues identified
+
+      | id | severity | evidence | disposition |
+
+      |---|---|---|---|
+
+      | W1 | warning | isolated worktree frontend deps missing (`svelte-kit: command
+      not found`) | Non-blocking local dependency availability; prior full-plan artifact
+      has frontend pass evidence. |
+
+      | W2 | warning | npm audit warning in full-plan artifact | Dependency hygiene
+      debt, non-intersecting with current gate behavior. |
+
+
+      ## Gate Decision
+
+      OPEN
+
+
+      ## behavioral_proof_register
+
+      | requirement_ref | behavior_claim | evidence_ref | status | closure_path |
+      gate_decision_basis |
+
+      |---|---|---|---|---|---|
+
+      | ARCHITECTURE HTTP/API auth/validation | HTTP public API is owner-token protected
+      and strictly validates bodies/queries. | backend expected-red/contract tests;
+      `go test ./...` PASS | PROVEN | none | public-surface proof exists and tests
+      pass |
+
+      | ARCHITECTURE stale FTS/reprocess | Reprocess reports counts, rebuilds/marks
+      stale FTS, `/doctor` exposes stale/ok state. | reprocess tests; stale FTS proof
+      | PROVEN | none | stale FTS failure/recovery obligation covered |
+
+      | Processing Language MCP parity | MCP exposes language/reprocess/search/delivery
+      parity without per-call override. | MCP tests and black-box parity proof | PROVEN
+      | none | parity/delivery probes passed |
+
+      | DESIGN language/reprocess UI | UI language/reprocess remains low-chrome and
+      avoids settings/dashboard/job UX. | UI tests, UIUX audit, frontend gate proof
+      | PROVEN_WITH_SAMPLE | none | sufficient for documentation/deep-review gate
+      |
+
+      | Product boundary invariants | No jobs, queues, ledgers, sync/merge, vector/RAG,
+      delivery registries. | forbidden scans and architecture tests | PROVEN | none
+      | no blocker-class boundary violation |
+
+      | Full-plan runtime obligation | Broad runtime checks passed or non-intersecting
+      issues have ownership. | full-plan runtime check | PROVEN_WITH_NON_BLOCKING_DEBT
+      | dependency hygiene outside current gate | OPEN allowed because intersecting
+      blockers closed |
+
+
+      ## Checklist Closure
+
+      - Description checklist items toggled by gate reviewer.
+
+      - Verification checklist items marked `[x]` by orchestrator after validating
+      the report and non-intersection disposition.
+
+
+      ## Files changed
+
+      none
+
+
+      ## Commit hash(es)
+
+      none (verify-only; no retained changes)
+
+
+      ## Verification
+
+      - `git status --short --branch` — clean on `vectl/step-plse-system-e2e-gate`.
+
+      - `go test ./...` — PASS.
+
+      - `go build ./cmd/resofeed` — PASS; local binary removed.
+
+      - `npm --prefix web run check` — not runnable in this isolated worktree due
+      missing dependencies, but covered by immediately preceding full-plan check evidence.
+
+      - Source/evidence review completed for Architecture, Design, Processing Language
+      contract, HTTP/MCP tests, reprocess stale FTS tests, full-plan sweep, and black-box
+      public-surface artifact.
+
+
+      ## Required remediation if blocked
+
+      none'
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
-  status: locked
+  status: pending
   gate: Finalization gate blocks unless docs are synchronized, full spec/design/wiring/deep-review
     audits are complete, and no unresolved blocker-class behavioral proof obligations
     remain.
