@@ -66385,7 +66385,7 @@ phases:
 
       - [x] PASS/PASS_WITH_DEBT/FAIL handoff is parseable.
 
-      - [ ] Every fresh audit finding has a multimodal verdict and evidence reference.
+      - [x] Every fresh audit finding has a multimodal verdict and evidence reference.
 
       - [x] Any remaining blocker or should-fix gap includes a remediation owner and
       closure path.'
