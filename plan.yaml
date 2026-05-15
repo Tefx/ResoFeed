@@ -71127,7 +71127,7 @@ phases:
       - [x] Language mutation storage writes are protected by operation-guard exclusivity
       or by one proven authoritative guarded wrapper before write.
 
-      - [ ] Tests prove active ingest/fetch/reprocess and language mutation cannot
+      - [x] Tests prove active ingest/fetch/reprocess and language mutation cannot
       create mixed-language batches.
 
       - [ ] `RuntimeLanguageContract`, `RequestFingerprintContract`, and `ReprocessSourcePrecedence`
