@@ -69613,7 +69613,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Contract artifacts are acceptance-only.
+      - [x] Contract artifacts are acceptance-only.
 
       - [ ] Expected-red tests cover backend, MCP, and frontend surfaces.
 
