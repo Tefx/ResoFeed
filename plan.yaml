@@ -80510,7 +80510,7 @@ phases:
 
       ## Required checklist
 
-      - [ ] Read each ref and cite the key passage or explain NOT READ with reason
+      - [x] Read each ref and cite the key passage or explain NOT READ with reason
       in evidence.
 
       - [ ] Fix delegated-agent steering precedence with conflict-specific comparison
