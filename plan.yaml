@@ -71872,7 +71872,7 @@ phases:
 
       - [x] MCP error envelope divergence is owned here.
 
-      - [ ] MCP language mutation guard/reprocess active duplicate behavior is owned
+      - [x] MCP language mutation guard/reprocess active duplicate behavior is owned
       here.
 
       - [ ] Declaration-only MCP-facing contract anchors must be consumed by this
