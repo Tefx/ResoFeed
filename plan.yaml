@@ -68836,6 +68836,91 @@ phases:
     are pinned with expected-red proof before implementation.
   depends_on:
   - ui-runtime-fresh-review-remediation
+  steps:
+  - id: plct-contract-lock
+    name: Lock processing language runtime contract
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      contract_outputs: signatures, type_defs, interfaces, stubs, schema notes
+
+      agent_source: project
+
+
+      Pin the approved architecture target contract before implementation. Produce
+      acceptance-only Go/API/frontend contract artifacts and stubs for runtime metadata,
+      `ProcessingLanguage`, `ReprocessLibraryResult`, receipt fingerprint semantics,
+      HTTP/MCP endpoint schemas, delivery parity, FTS stale diagnostics, OpenRouter
+      target-language input, and frontend API types. Do not ship business logic.
+
+
+      Authoritative interface anchors:
+
+      - HTTP: `GET/PUT /api/runtime/language`, `POST /api/runtime/reprocess-library`,
+      `POST /api/items/{id}/delivery`, `GET /api/search` query echo, `GET /api/doctor`
+      stale FTS lines.
+
+      - MCP: `resofeed://runtime/language`, `get_processing_language`, `set_processing_language`,
+      `reprocess_library`, `report_delivery`, `search_items` with query echo.
+
+      - Runtime metadata: `processing_language` default/effective `en`, optional `search_fts_stale_since`,
+      runtime-only export/import exclusion.
+
+      - Receipts: live 24h TTL, request fingerprint, live-only idempotency uniqueness,
+      expired rows transactionally ignored/deleted/replaced.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Contract artifacts define only public shapes/stubs/docstrings/types; no
+      completed behavior logic is added.
+
+      - [ ] Runtime metadata keys and state export/import exclusion are explicitly
+      pinned.
+
+      - [ ] HTTP and MCP schemas are pinned with strict unknown-body/query validation
+      and idempotency replay/mismatch semantics.
+
+      - [ ] Reprocess source precedence and FTS stale marker/doctor contracts are
+      pinned.
+
+      - [ ] Frontend API type contract includes language/reprocess and source-identifier
+      non-translation obligations.
+
+      - [ ] Forbidden architecture concepts remain explicitly out of scope.'
+    verification: '- [ ] Contract step remains acceptance-only with no product behavior
+      implementation.
+
+      - [ ] All contract surfaces requested by the user are represented.
+
+      - [ ] Public signatures/schemas match docs/ARCHITECTURE.md and DESIGN.md exactly
+      where specified.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Contract Lock Evidence
+
+      - Contract files/stubs touched:
+
+      - Surfaces pinned:
+
+      - Explicit non-goals preserved:
+
+      - Confirmation no behavior logic was implemented:'
+    agent: golang-developer
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
   status: locked
