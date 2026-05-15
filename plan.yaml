@@ -71875,7 +71875,7 @@ phases:
       - [x] MCP language mutation guard/reprocess active duplicate behavior is owned
       here.
 
-      - [ ] Declaration-only MCP-facing contract anchors must be consumed by this
+      - [x] Declaration-only MCP-facing contract anchors must be consumed by this
       implementation or intentionally de-exported only if the authoritative contract
       permits it.
 
