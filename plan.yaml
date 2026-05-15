@@ -77576,7 +77576,7 @@ phases:
     claimed_at: '2026-05-15T19:33:22.727054+00:00'
   - id: plfinal-spec-conformance-closure-retest
     name: Spec conformance closure retest for reprocess and runtime proofs
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -77796,6 +77796,79 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T19:33:16.853695+00:00'
+    done_at: '2026-05-15T20:21:52.595214+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): 12517b3e ([vectl] step-plfinal-spec-conformance-closure-retest
+      completed); worktree commit eb201ca2.
+
+
+      Files changed: .audit-artifacts/plfinal-spec-conformance-closure-retest.md.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — spec-verifier cited processing-language future-only/reprocess/FTS/source-identifier/split-scroll
+      contracts.
+
+      - docs/DESIGN.md — spec-verifier cited independent scroll, language control/html
+      lang, and source identifiers translate=no.
+
+      - AGENTS.md — NOT READ: absent in isolated worktree; fallback .agents/instructions.md
+      read and DOC-INPUT-001 classified non-blocking/non-intersecting.
+
+
+      Semantic closure:
+
+      - Headline: PASS.
+
+      - Blocking Status: CLOSED.
+
+      - Proof-Gap Status: NONE.
+
+      - Verdict: PASS.
+
+      - Blockers: [].
+
+      - gate_open_allowed: true.
+
+      - orchestrator_action_hint: COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Verification:
+
+      - npm --prefix web install && npm --prefix web run build && go test ./... passed.
+
+      - npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/processing-language-source-split-scroll.spec.ts
+      passed, 2 tests.
+
+      - Targeted B1/steering Go tests passed.
+
+      - Targeted language Go tests passed.
+
+      - B1/R6 CONFORMS: regression tests prove timeout/canceled/unavailable/model-failure
+      paths clear stale readable fields and item FTS.
+
+      - B2/R14-R16 CONFORMS: dependency bootstrap, Vite build, and Chromium runtime
+      proof passed.
+
+      - NEEDS_TEST ledger PROVEN for language future-only/no historical rewrite, steering
+      precedence, desktop split-scroll, and source identifier DOM non-translation.
+
+      - Orchestrator merged audit artifact and ran mainline verification: git merge
+      --squash vectl/step-plfinal-spec-conformance-closure-retest; git diff --cached
+      --check (passed); git commit; git show --check --oneline HEAD (passed).
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: None blocking; final gate may consume this as green conformance
+      closure evidence.'
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
   status: locked
