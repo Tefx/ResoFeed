@@ -69218,7 +69218,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Tests are expected red before implementation and expose the contract gaps
+      - [x] Tests are expected red before implementation and expose the contract gaps
       without product-code changes.
 
       - [x] Modified files are limited to tests, fixtures, and minimal test helpers.
