@@ -79943,7 +79943,7 @@ phases:
       - [x] preview_steer is read-only, requires actor_id, accepts no idempotency_key,
       and returns the same SteerPreview shape as HTTP.
 
-      - [ ] steer requires actor_id and idempotency_key, reruns classification, and
+      - [x] steer requires actor_id and idempotency_key, reruns classification, and
       returns the same SteeringReceipt semantics as HTTP.
 
       - [ ] undo_steer requires target_kind, target_id, actor_id, and idempotency_key,
