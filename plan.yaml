@@ -70800,6 +70800,7 @@ phases:
     - plsc-backend-green-retest
     - plsc-core-wiring-audit
     - plsc-core-spec-conformance
+    - plsc-storage-core-blocker-retest
     agent: gate-reviewer
   - id: plsc-storage-core-blocker-fix
     name: Fix storage-core language guard and orphan anchors
