@@ -70801,6 +70801,187 @@ phases:
     - plsc-core-wiring-audit
     - plsc-core-spec-conformance
     agent: gate-reviewer
+  - id: plsc-storage-core-blocker-fix
+    name: Fix storage-core language guard and orphan anchors
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Batched remediation for storage-core blockers reported by `plsc-core-spec-conformance`
+      and `plsc-core-wiring-audit`.
+
+
+      Scope: storage/core only. Preserve downstream ownership for HTTP/MCP/frontend
+      blockers; do NOT implement downstream runtime endpoints, MCP tools/resources,
+      or frontend controls in this step.
+
+
+      Refs / authorities:
+
+      - `docs/ARCHITECTURE.md` operation exclusivity requirement around processing-language
+      mutation vs ingest/fetch/reprocess.
+
+      - `internal/resofeed/runtime_metadata.go` currently writes runtime language
+      metadata without proving operation-guard acquisition.
+
+      - `internal/resofeed/http.go` currently calls runtime language mutation directly;
+      core fix must either move/guard the core boundary or prove exactly one wrapper
+      prevents concurrent mutation before storage write.
+
+      - `internal/resofeed/processing_language_contract.go` currently contains exported
+      declaration-only anchors that the wiring audit found orphaned.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### B1: Runtime language mutation lacks operation-guard exclusivity
+
+      - Ensure `SetProcessingLanguage` / runtime language mutation cannot write storage
+      while ingest, manual fetch, or reprocess operations are active.
+
+      - Fix at the core operation boundary, or provide a single authoritative wrapper
+      that acquires the same exclusivity guard before any metadata write.
+
+      - Add/adjust tests proving concurrent language mutation is rejected or serialized
+      according to the architecture contract, with no mixed-language batch window.
+
+      - Do not create jobs, queues, ledgers, sync/merge flows, sidecar workers, or
+      layered service/repository architecture.
+
+
+      ### B2: Declaration-only exported orphan anchors in `processing_language_contract.go`
+
+      - Resolve `RuntimeLanguageContract`, `RequestFingerprintContract`, and `ReprocessSourcePrecedence`
+      by de-exporting/removing unused anchors, consuming them in actual core code/tests,
+      or documenting explicit downstream ownership only if a named downstream step
+      truly owns the consumer.
+
+      - `RequestFingerprintContract` must be reconciled with real implementation ownership
+      in `withIdempotencyReceipt` / `idempotency.go`; avoid parallel duplicate contract
+      truth.
+
+      - `ReprocessSourcePrecedence` must not remain an exported declaration-only anchor
+      if `reprocessCandidateURLs` hardcodes the actual runtime behavior.
+
+
+      ### B3: Doctor stale/ok/redaction proof gap before runtime exposure
+
+      - Add focused storage-core tests or proof artifacts for doctor stale diagnostic
+      line states: stale, ok, and redaction by runtime language.
+
+      - This belongs in storage-core because downstream HTTP/MCP/frontend runtime
+      exposure depends on core diagnostic correctness.
+
+
+      ## Downstream-owned blockers to preserve, not fix here
+
+      - MCP runtime language/reprocess tools/resource, search query echo, and nested
+      JSON-RPC errors remain owned by `plhm-mcp-runtime-parity`.
+
+      - HTTP delivery endpoint route/validation/idempotency behavior remains owned
+      by `plhm-http-runtime-endpoints`.
+
+      - Frontend API/client/runtime consumption remains owned by `plfu-api-client-types`,
+      `plfu-language-reprocess-controls`, and `plfu-source-identifiers-split-scroll`.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or declaration-only
+      anchors do not satisfy this requirement.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Language mutation storage writes are protected by operation-guard exclusivity
+      or by one proven authoritative guarded wrapper before write.
+
+      - [ ] Tests prove active ingest/fetch/reprocess and language mutation cannot
+      create mixed-language batches.
+
+      - [ ] `RuntimeLanguageContract`, `RequestFingerprintContract`, and `ReprocessSourcePrecedence`
+      are consumed, removed/de-exported, or explicitly downstream-owned with named
+      owner steps; no storage-core orphan remains.
+
+      - [ ] Doctor diagnostic proof covers stale, ok, and runtime-language redaction
+      states before runtime exposure.
+
+      - [ ] Downstream HTTP/MCP/frontend blockers remain assigned to their existing
+      `plhm-*` / `plfu-*` owner steps and are not weakened or deleted.'
+    verification: '- [ ] Focused backend-core tests for language operation-guard exclusivity
+      pass.
+
+      - [ ] Focused backend-core tests or proof for doctor stale/ok/redaction pass.
+
+      - [ ] Wiring evidence shows the three exported anchors are no longer storage-core
+      orphans or have explicit named downstream ownership.
+
+      - [ ] No downstream HTTP/MCP/frontend ownership is removed, weakened, or silently
+      absorbed into storage-core.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Remediation Evidence
+
+
+      **Language guard closure**:
+
+      - Core entry point or wrapper changed: `<file:line>`
+
+      - Guard behavior proven for ingest/fetch/reprocess vs language mutation: `<test
+      names and outputs>`
+
+
+      **Orphan anchor disposition**:
+
+      | Anchor | Disposition | Runtime/test consumer or owner step |
+
+      | --- | --- | --- |
+
+      | RuntimeLanguageContract | consumed / removed / downstream-owned | <evidence>
+      |
+
+      | RequestFingerprintContract | consumed / removed / downstream-owned | <evidence>
+      |
+
+      | ReprocessSourcePrecedence | consumed / removed / downstream-owned | <evidence>
+      |
+
+
+      **Doctor proof**:
+
+      - stale state proof: `<test/output>`
+
+      - ok state proof: `<test/output>`
+
+      - runtime-language redaction proof: `<test/output>`
+
+
+      **Downstream ownership preserved**:
+
+      - MCP gaps owner: `plhm-mcp-runtime-parity`
+
+      - HTTP gaps owner: `plhm-http-runtime-endpoints`
+
+      - Frontend gaps owners: `plfu-api-client-types`, `plfu-language-reprocess-controls`,
+      `plfu-source-identifiers-split-scroll`'
+    depends_on:
+    - plsc-core-spec-conformance
+    - plsc-core-wiring-audit
+    agent: golang-developer
 - id: processing-language-http-mcp-runtime
   name: Processing Language HTTP MCP Runtime Integration
   status: locked
