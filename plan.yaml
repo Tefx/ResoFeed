@@ -78277,7 +78277,7 @@ phases:
       - [x] TODAY/SOURCE LEDGER surface switching works by keyboard and pointer on
       desktop and mobile, with the menu closed by default.
 
-      - [ ] Feed items and `.contract-feed-meta` render for seeded desktop/mobile
+      - [x] Feed items and `.contract-feed-meta` render for seeded desktop/mobile
       cases with contiguous chronological labels.
 
       - [ ] Inspector-open controls render with accessible names matching `/Open Inspector
