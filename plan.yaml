@@ -79227,7 +79227,7 @@ phases:
       folders, tags, rule builders, RAG/chat/semantic answer UI, and duplicate URL
       subscription fields.
 
-      - [ ] Tests cover desktop independent Feed/Inspector scroll regions and mobile
+      - [x] Tests cover desktop independent Feed/Inspector scroll regions and mobile
       full-screen Inspector route with preserved Feed scroll.
 
       - [ ] Tests cover processing language/reprocess controls as low-chrome architecture-owned
