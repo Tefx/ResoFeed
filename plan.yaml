@@ -69931,7 +69931,7 @@ phases:
       - [ ] URLs/source titles/source URLs/canonical/original URLs remain exact provenance
       anchors.
 
-      - [ ] No `translation_failed` status is introduced.
+      - [x] No `translation_failed` status is introduced.
 
 
       ## Completion Criteria (stub exclusion)
