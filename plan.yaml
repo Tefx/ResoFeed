@@ -66595,7 +66595,8 @@ phases:
     - ui-runtime-fresh-review-shell-feed-ledger-fix
     - ui-runtime-fresh-review-duplicate-source-api-fix
     - ui-runtime-fresh-review-duplicate-source-inspector-fix
-    - ui-runtime-fresh-review-green-retest
+    - ui-runtime-fresh-review-full-frontend-test-remediation
+    - ui-runtime-fresh-review-full-frontend-green-retest
     - ui-runtime-fresh-review-uiux-multimodal-audit
     - ui-runtime-fresh-review-black-box-liveness
     agent: gate-reviewer
