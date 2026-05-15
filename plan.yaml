@@ -65421,7 +65421,7 @@ phases:
   steps:
   - id: ui-runtime-fresh-review-contract-red-tests
     name: Lock fresh audit acceptance and add expected-red runtime UI tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -65530,6 +65530,68 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T07:09:17.934987+00:00'
+    done_at: '2026-05-15T07:17:23.932796+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-fresh-review-2026-05-15.md\
+      \ — NOT READ: file absent in isolated worktree; exact path attempted and docs/audits\
+      \ contained related 2026-05-15 audit files but not this filename.\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ as nearest available runtime UI audit; key insight: prior runtime evidence\
+      \ covered RESOFEED menu, Source Ledger, mobile feed, Inspector, and documented\
+      \ divergences around Source Ledger/manual controls and mobile metadata.\n- docs/DESIGN.md\
+      \ — READ. Key passages: RESOFEED menu may contain TODAY/SOURCE LEDGER and must\
+      \ be keyboard reachable; feed time labels must be inline metadata groups; grouped\
+      \ stories must preserve source provenance; Source Ledger DOM requires `section\
+      \ aria-labelledby=\"source-ledger-title\"` with `h1#source-ledger-title`; `[FETCH]`\
+      \ buttons need contextual accessible names; mobile metadata must be flat inline\
+      \ monospace.\n- docs/ARCHITECTURE.md — READ. Key passages: one Go binary/SQLite\
+      \ boundary; direct duplicates may be grouped but every original source item\
+      \ remains retrievable through item detail/provenance; HTTP item/source schemas\
+      \ define `story_key`, `duplicate_of_item_id`, provenance, and source fields.\n\
+      - .agents/instructions.md — READ. Key passages: DESIGN.md and ARCHITECTURE.md\
+      \ are canonical; no forbidden product concepts; UI chrome labels must stay operational;\
+      \ do not modify plan/orchestrator state.\n- web/tests/e2e/fixtures.ts — READ.\
+      \ Project E2E fixture injects runInfo and ownerToken for Playwright.\n- web/tests/e2e/e2e-contract.ts\
+      \ — READ. Defines E2E owner token/run info and existing feed/OPML fixture contracts.\n\
+      - web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ — READ. Existing expected-red pattern uses route fixtures, bracket action\
+      \ assertions, desktop/mobile checks, and raw diagnostic fixtures.\n- web/tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts\
+      \ — READ. Existing expected-red style records proof attachments and validates\
+      \ runtime visual/a11y gaps against fixture API.\n\n## Expected-Red Test Definition\
+      \ Evidence\n- Tests added/updated: `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`\n\
+      - Command executed: `npm --prefix web run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts`\n\
+      - Expected failures/exposed gaps by audit ID:\n  - FR-01/FR-10: menu open by\
+      \ default; test requires closed default, keyboard reachability, and desktop/mobile\
+      \ TODAY/SOURCE LEDGER toggling.\n  - FR-02: observed labels include TODAY, YESTERDAY,\
+      \ TODAY; test requires contiguous chronological groups.\n  - FR-04: Inspector\
+      \ shows story_key but not grouped story count or duplicate source item disclosure.\n\
+      \  - FR-05: included in Source Ledger DOM/accessibility test; execution currently\
+      \ reaches FR-07 first, so FR-05 will be exercised after FR-07 is fixed.\n  -\
+      \ FR-06: collapsed DETAILS rows measured 97px, exceeding compact non-inflated\
+      \ row threshold.\n  - FR-07: Source Ledger currently uses `aria-labelledby=\"\
+      source-ledger-heading\"`, not `source-ledger-title`.\n  - FR-09: mobile metadata\
+      \ computed white-space is normal, not nowrap with hidden overflow and ellipsis.\n\
+      \  - FR-10: covered with FR-01 desktop/mobile menu visibility/toggle assertions.\n\
+      - Product implementation files changed: none\n- Downstream implementation owners:\
+      \ `ui-runtime-fresh-review-shell-feed-ledger-fix`, `ui-runtime-fresh-review-duplicate-source-api-fix`,\
+      \ `ui-runtime-fresh-review-duplicate-source-inspector-fix`\n\n## Test-Step Semantic\
+      \ Reporting\n- step_intent: test_define_red\n- expected_result: red\n- observed_result:\
+      \ red\n- failure_alignment: intended_gap\n- product_implementation_files_modified:\
+      \ no\n- verdict: PASS\n- blockers: []\n- gate_open_allowed: true\n- orchestrator_action_hint:\
+      \ COMPLETE\n\n## Commit hash(es)\n- Worktree commit: `f5df46683ad35b73ffa67ab1760983e327b0afe7`\n\
+      - Main squash merge commit: `bed1385` (`[vectl] step-ui-runtime-fresh-review-contract-red-tests\
+      \ completed`)\n\n## Files changed\n- `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`\n\
+      \n## Verification\n- Worktree `npm --prefix web run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts`\
+      \ — exit 1; expected red; six focused tests failed against intended current\
+      \ gaps.\n- Worktree `npm --prefix web run check` — exit 0; svelte-check found\
+      \ 0 errors and 0 warnings.\n- Worktree `git status --short --branch` — clean\
+      \ committed isolated branch.\n- Initial worktree E2E attempt before dependency\
+      \ bootstrap failed exit 127 (`playwright` not found); `web/node_modules` was\
+      \ missing, so `npm install` was run in `web/` to restore baseline JS dependencies.\n\
+      - Mainline final-state verification after squash merge: `npm --prefix web run\
+      \ check` — PASS; svelte-check found 0 errors and 0 warnings.\n\n## Gaps/Notes\n\
+      - Exact required audit filename was absent from the worktree; nearest available\
+      \ runtime audit was read and the user-provided authoritative FR list was used\
+      \ as acceptance source.\n- Playwright artifacts generated by expected-red run\
+      \ were cleaned before commit."
   - id: ui-runtime-fresh-review-shell-feed-ledger-fix
     name: Fix fresh audit shell, feed, Source Ledger, and mobile UI findings
     status: pending
