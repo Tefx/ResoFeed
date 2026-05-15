@@ -81711,15 +81711,15 @@ phases:
       ## Completion Criteria (stub exclusion)
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
-    verification: '- [ ] Focused processing-language/reprocess UI tests pass green.
+    verification: '- [x] Focused processing-language/reprocess UI tests pass green.
 
-      - [ ] Rendered evidence shows low-chrome placement and no settings/job/activity/progress
+      - [x] Rendered evidence shows low-chrome placement and no settings/job/activity/progress
       dashboard concepts.
 
-      - [ ] If no code change is needed, evidence cites exact existing rendered DOM
+      - [x] If no code change is needed, evidence cites exact existing rendered DOM
       and tests proving conformance.
 
-      - [ ] No forbidden product/architecture concept introduced.'
+      - [x] No forbidden product/architecture concept introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
