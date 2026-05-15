@@ -77532,7 +77532,7 @@ phases:
       - [x] Behavioral proof register marks each blocker-class UI/design obligation
       PROVEN or gives an explicit closure path.
 
-      - [ ] Final headline is PASS only if rendered UI proof closes PROOF-GAP-001/B2
+      - [x] Final headline is PASS only if rendered UI proof closes PROOF-GAP-001/B2
       UI obligations.'
     verification: '- [ ] UIUX audit uses real rendered UI/DOM/a11y artifacts, not
       only spec lint or static code review.
