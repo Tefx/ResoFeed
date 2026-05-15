@@ -66774,3 +66774,180 @@ phases:
     - ui-runtime-fresh-review-duplicate-source-api-fix
     - ui-runtime-fresh-review-duplicate-source-inspector-fix
     agent: frontend-engineer
+  - id: ui-runtime-fresh-review-full-frontend-green-retest
+    name: Retest full frontend suite and fresh audit acceptance after B1 remediation
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+
+      As an independent tester, verify that B1 is closed by proving the full frontend
+      suite is green while preserving the already-green fresh audit acceptance and
+      runtime build/check evidence.
+
+
+      This retest replaces the failed `ui-runtime-fresh-review-green-retest` as the
+      downstream dependency for remaining fresh-review audits and final gate. It protects:
+
+      - Full frontend test health after stale render-contract expectation remediation.
+
+      - Fresh audit acceptance closure for FR-01, FR-02, FR-04, FR-05, FR-06, FR-07,
+      FR-09, and FR-10.
+
+      - Frontend build/check health.
+
+      - Relevant Go/API health when product code changed outside tests.
+
+
+      Behavioral proof register requirements:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Completion Criteria
+
+      - [ ] Full frontend `npm run test` is green.
+
+      - [ ] Fresh audit acceptance `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts`
+      remains green.
+
+      - [ ] `npm run check` is green.
+
+      - [ ] `npm run build` is green.
+
+      - [ ] Relevant Go/API tests are run and green if the remediation changed Go/API/runtime
+      contract code.
+
+      - [ ] Behavioral proof register marks B1 and the fresh-audit obligations PROVEN
+      or provides explicit blocking remediation ownership.
+
+      - [ ] Evidence distinguishes stale test updates from any product-code regression
+      fixes and confirms accessibility coverage was not weakened.'
+    verification: '- [ ] `npm run test` passes with all frontend tests green.
+
+      - [ ] `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts` passes
+      6/6 or current suite equivalent, preserving FR-01, FR-02, FR-04, FR-05, FR-06,
+      FR-07, FR-09, and FR-10 as PROVEN.
+
+      - [ ] `npm run check` passes.
+
+      - [ ] `npm run build` passes.
+
+      - [ ] Relevant Go/API tests pass if product runtime/API code changed; evidence
+      states `not applicable` only when no such code changed.
+
+      - [ ] Behavioral proof register includes closure_path and gate_decision_basis
+      for B1 and fresh-audit obligations.
+
+      - [ ] Retest evidence confirms no fresh audit acceptance tests or accessibility
+      assertions were weakened.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Independent Retest Report
+
+
+      **Tester**: integration-verifier
+
+      **Scope**: B1 full frontend `npm test` closure plus fresh audit acceptance preservation
+
+      **Independence Level**: L2
+
+
+      ### Commands executed
+
+      ```bash
+
+      npm run test
+
+      npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts
+
+      npm run check
+
+      npm run build
+
+      <Go/API command if applicable, or N/A with reason>
+
+      ```
+
+
+      ### Actual output summary
+
+      ```text
+
+      <paste key runner output, not just "passed">
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 full frontend suite | <claim> | npm run test green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-01/FR-10 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-02 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-04 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-05 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-06/FR-07 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+      | FR-09 | <claim> | fresh audit suite green | <output ref> | PROVEN/UNCERTAIN_BLOCKING
+      | <path> | <basis> |
+
+
+      ### Headline
+
+      - [ ] PASS: B1 and fresh-audit acceptance are green with no weakened coverage.
+
+      - [ ] FAIL: Blocking issue or proof gap remains and needs remediation ownership.'
+    depends_on:
+    - ui-runtime-fresh-review-full-frontend-test-remediation
+    agent: integration-verifier
