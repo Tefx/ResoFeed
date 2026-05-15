@@ -79120,7 +79120,7 @@ phases:
       - [ ] Tests prove route precedence for /doctor, direct URL, /add/add/添加, /search/search/搜索/查,
       warning-only find alias, invalid vague add, and unmatched STEER RULE proposal.
 
-      - [ ] Tests prove POST /api/steer reruns classification, requires idempotency_key,
+      - [x] Tests prove POST /api/steer reruns classification, requires idempotency_key,
       exposes undo only for revocable source/rule writes, and preserves request-fingerprint
       idempotency.
 
