@@ -65411,7 +65411,7 @@ phases:
       `{"status":"PASS","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_recommendation":"OPEN","verdict":"PASS","blockers":[],"gate_open_allowed":true,"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}`'
 - id: ui-runtime-fresh-review-remediation
   name: UI Runtime Fresh Review Remediation
-  status: pending
+  status: in_progress
   gate: Final gate cannot open until FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
     and FR-10 from docs/audits/ui-runtime-fresh-review-2026-05-15.md have implementation,
     expected-red-to-green proof, UIUX multimodal evidence, and black-box runtime liveness
@@ -65421,7 +65421,7 @@ phases:
   steps:
   - id: ui-runtime-fresh-review-contract-red-tests
     name: Lock fresh audit acceptance and add expected-red runtime UI tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -65528,6 +65528,8 @@ phases:
       - Downstream implementation owners: ui-runtime-fresh-review-shell-feed-ledger-fix,
       ui-runtime-fresh-review-duplicate-source-api-fix, ui-runtime-fresh-review-duplicate-source-inspector-fix'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T07:09:17.934987+00:00'
   - id: ui-runtime-fresh-review-shell-feed-ledger-fix
     name: Fix fresh audit shell, feed, Source Ledger, and mobile UI findings
     status: pending
