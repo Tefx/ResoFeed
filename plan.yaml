@@ -69768,7 +69768,7 @@ phases:
       - [x] explicit clear/null overwrite semantics are impossible for required metadata
       values unless contract permits deletion of stale marker.
 
-      - [ ] stale receipt vs new request precedence follows live TTL rules.
+      - [x] stale receipt vs new request precedence follows live TTL rules.
 
       - [ ] partial-write or SQLite error paths are transactional.
 
