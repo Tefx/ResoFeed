@@ -61051,7 +61051,7 @@ phases:
       \ were made.\n\n## Headline\nFAIL_RECORDED_WITH_BATCHED_REMEDIATION"
   - id: urda-uiux-multimodal-design-audit
     name: Run native multimodal UIUX audit for runtime design audit closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -61154,6 +61154,157 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-14T19:36:58.764687+00:00'
+    done_at: '2026-05-15T01:49:38.460174+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — "Scope: ... Verify all
+      issues 1-14 are closed or have explicit non-blocking/non-intersection evidence
+      accepted by the auditor."
+
+      - docs/DESIGN.md — "Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]`
+      are immediate operational commands, not durable jobs... conflict feedback is
+      raw and terse."
+
+      - docs/ui-preview.html — Verified the fixture now renders `<button class="bracket-action
+      bracket-action--run-ingest" type="button">[RUN INGEST]</button>` in the markup.
+
+
+      ## UIUX Audit Handoff
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: runtime UI design audit issues 1-14
+
+
+      ### Rendered artifacts reviewed
+
+      - Desktop screenshots: .audit-artifacts/frontend-gate/current-populated-desktop-full.png
+
+      - Mobile screenshots: .audit-artifacts/frontend-gate/current-mobile-source-ledger.png,
+      .audit-artifacts/frontend-gate/current-mobile-feed.png
+
+      - Accessibility snapshots: DOM tests in tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts
+      and Playwright bounding boxes.
+
+      - Computed-style/measurement JSON: Run via playwright e2e tests successfully
+      asserting no violations.
+
+
+      ### Issue-by-issue verdicts
+
+      | Issue | Verdict | Evidence ref | Design ref | Notes |
+
+      | ----- | ------- | ------------ | ---------- | ----- |
+
+      | 1 | PASS | current-mobile-source-ledger.png | DESIGN.md Source Ledger | `[RUN
+      INGEST]` present. |
+
+      | 2 | PASS | current-mobile-source-ledger.png | DESIGN.md Source Ledger | `[FETCH]`
+      present on rows. |
+
+      | 3 | PASS | ui-preview.html | DESIGN.md | Manual controls updated in preview.
+      |
+
+      | 4 | PASS | E2E `source-ledger-controls...` | DESIGN.md | `err:` diagnostics
+      render inline. |
+
+      | 5 | PASS | E2E `source-ledger-controls...` | DESIGN.md | Geometry stable.
+      |
+
+      | 6 | PASS | E2E `source-ledger-controls...` | DESIGN.md | `[IMPORT OPML]` is
+      button semantic. |
+
+      | 7 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Hover/focus inversion fixed.
+      |
+
+      | 8 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Search UI copy cleaned.
+      |
+
+      | 9 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Filter layout aligned.
+      |
+
+      | 10 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Mobile metadata legible.
+      |
+
+      | 11 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Inspector link uses safe
+      styling. |
+
+      | 12 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Prompt heading fixed.
+      |
+
+      | 13 | PASS | E2E `source-ledger-controls...` | DESIGN.md | Delete confirmation
+      stable. |
+
+      | 14 | PASS | E2E `urda-visual-a11y...` | DESIGN.md | Resonate buttons unique.
+      |
+
+
+      ### Cross-cutting design checks
+
+      - forbidden UI concepts absent: PASS
+
+      - bracket actions terminal-like: PASS
+
+      - touch targets >=44px where required: PASS
+
+      - raw `err:` diagnostics preserved: PASS
+
+      - no layout shift in interaction states: PASS
+
+      - mobile metadata legibility: PASS
+
+      - Search copy/layout: PASS
+
+      - Inspector link styling: PASS
+
+      - Owner Token Prompt scale: PASS
+
+      - Resonate accessible names: PASS
+
+
+      ### Behavioral proof register
+
+      step_intent: verify_green
+
+      expected_result: green
+
+      observed_result: All 14 visual/layout/behavioral design issues are resolved
+      successfully in the latest runtime build and E2E coverage.
+
+      failure_alignment: null
+
+      verdict: PASS
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      files_modified: false
+
+      uncertainty_sources: none
+
+
+      ### Gate decision
+
+      - headline: PASS
+
+      - verdict: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - gate_open_allowed: true
+
+      - blockers: []
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      Files changed: none; audit was verification-only and did not modify product
+      implementation files.'
   - id: urda-frontend-ui-audit-gate
     name: Gate frontend UI runtime design audit repair
     status: pending
