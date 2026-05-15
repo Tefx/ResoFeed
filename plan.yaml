@@ -71731,7 +71731,7 @@ phases:
 
       - [x] handler-only proof without real HTTP route execution.
 
-      - [ ] `/api/items/{id}/delivery` still returns 404 for the documented route.
+      - [x] `/api/items/{id}/delivery` still returns 404 for the documented route.
 
 
       ## Completion Criteria (stub exclusion)
