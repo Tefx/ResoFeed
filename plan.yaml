@@ -75822,7 +75822,7 @@ phases:
 
       - [ ] `cmd/resofeed` runtime starts real HTTP/MCP/static/background ingest components.
 
-      - [ ] New HTTP routes and MCP tools/resources are reachable from runtime registries.
+      - [x] New HTTP routes and MCP tools/resources are reachable from runtime registries.
 
       - [ ] Frontend API client calls correspond to actual routes.
 
