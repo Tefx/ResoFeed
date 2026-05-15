@@ -69615,7 +69615,7 @@ phases:
 
       - [x] Contract artifacts are acceptance-only.
 
-      - [ ] Expected-red tests cover backend, MCP, and frontend surfaces.
+      - [x] Expected-red tests cover backend, MCP, and frontend surfaces.
 
       - [ ] Evidence cites docs/ARCHITECTURE.md and docs/DESIGN.md key passages.
 
