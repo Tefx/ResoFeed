@@ -77317,7 +77317,7 @@ phases:
       - [x] Frontend dependency bootstrap expectation (`npm --prefix web install`
       before build when needed) is documented for closure evidence.
 
-      - [ ] No serial fix/retest churn or extra remediation siblings are introduced.'
+      - [x] No serial fix/retest churn or extra remediation siblings are introduced.'
     verification: '- [ ] Main path: focused Go tests pass for reprocess fresh-fetch
       success and failure behavior.
 
