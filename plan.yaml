@@ -74019,7 +74019,7 @@ phases:
 
       - [x] global page scroll coupling Feed and Inspector on desktop.
 
-      - [ ] mobile Inspector behavior regression.
+      - [x] mobile Inspector behavior regression.
 
       - [ ] persisted reading-position tracking or analytics.
 
