@@ -74705,7 +74705,7 @@ phases:
       - [x] Reprocess bracket action anatomy and no job/progress-dashboard rule are
       checked.
 
-      - [ ] Source identifiers preserve literal provenance with non-translation markup/equivalent.
+      - [x] Source identifiers preserve literal provenance with non-translation markup/equivalent.
 
       - [ ] Split scroll desktop and mobile route responsibilities are checked.
 
