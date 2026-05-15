@@ -63769,7 +63769,7 @@ phases:
       \ was attempted."
   - id: urda-strict-final-gate
     name: Strict final gate for UI runtime design audit remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: full-plan-check
@@ -63896,6 +63896,118 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T05:25:42.944323+00:00'
+    done_at: '2026-05-15T05:36:07.473875+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — READ. Original audit defines issues 1-14, including P0 Source Ledger missing\
+      \ `[RUN INGEST]`/`[FETCH]`, preview drift, raw `err:` diagnostics, OPML keyboard\
+      \ semantics, bracket inversion, Search copy/layout, mobile metadata, Inspector\
+      \ link styling, owner-token heading, delete row shift, and duplicate Resonate\
+      \ names.\n- docs/ARCHITECTURE.md — READ. Key boundary: one `resofeed serve`\
+      \ Go binary, one SQLite DB, owner-token auth, HTTP/MCP same operations, lexical-only\
+      \ retrieval, no accounts/OAuth/RBAC, no sidecar/worker/admin/sync processes.\n\
+      - docs/DESIGN.md — READ. Key contract: Source Ledger must expose `[RUN INGEST]`,\
+      \ per-row `[FETCH]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`; bracket\
+      \ actions are text-only buttons with terminal hover/focus; state portability\
+      \ active labels are exact `[EXPORTING STATE...]` / `[IMPORTING STATE...]`; forbidden\
+      \ folders/tags/queues/sync/settings.\n- docs/ui-preview.html — READ. Preview\
+      \ includes Source Ledger `[RUN INGEST]`, row `[FETCH]`, raw `err:` row, `[EXPORT\
+      \ STATE]`, `[IMPORT STATE]`, closing original issue 3 drift at lines 671-714.\n\
+      - docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md — READ. Persisted\
+      \ black-box smoke verdict PASS; real `resofeed serve` launched with isolated\
+      \ DB; CLI matrix and public workflows passed.\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md\
+      \ — READ. Persisted prior frontend gate verdict is FAIL/BLOCK due keyboard-a11y\
+      \ failures; cannot be used as gate-opening evidence by itself.\n\n## Strict\
+      \ Final Gate Review\n**Reviewer**: gate-reviewer\n**Phase**: UI Runtime Design\
+      \ Audit Final Closure\n\n### Gate result\n- headline: FAIL\n- proof_gap_status:\
+      \ BLOCKING\n- blocking_status: OPEN\n- gate_recommendation: BLOCKED\n- verdict:\
+      \ FAIL\n- gate_open_allowed: false\n- orchestrator_action_hint: DO_NOT_COMPLETE\
+      \ for final closure; remediation ownership created before completing this blocked\
+      \ gate review step.\n\n### Evidence reviewed\n| Evidence source | Status | Concerns\
+      \ |\n|---|---|---|\n| urda-final-issue-closure-matrix | SUMMARY_ONLY_PASS |\
+      \ No persisted artifact found in `docs/audits`; could not independently inspect\
+      \ full matrix. |\n| urda-final-spec-and-product-boundary-review | FAILED_THEN_OWNED\
+      \ | R6/R7/R12/R18 blockers found; not gate-opening evidence by itself. |\n|\
+      \ urda-final-spec-boundary-blockers-fix | PASS_BY_SOURCE_AND_TEST | Source confirms\
+      \ fixes in `SourceLedger.svelte`, `StatePortability.svelte`, `ranking.go`; focused\
+      \ Go/render/Playwright tests passed. |\n| urda-final-spec-boundary-blockers-uiux-audit\
+      \ | SUMMARY_ONLY_PASS | Handoff says PASS, but no persisted artifact found under\
+      \ `docs/audits`. |\n| urda-final-spec-boundary-blockers-retest | SUMMARY_ONLY_PASS_PLUS_CURRENT_RETEST\
+      \ | Focused retest passed; Source Ledger suite passed 6/6; stale receipt scan\
+      \ scoped to source found only negative assertion test. |\n| urda-final-black-box-runtime-ui-smoke\
+      \ | PERSISTED_PASS | `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`\
+      \ provides real black-box runtime evidence. |\n| urda-uiux-multimodal-design-audit\
+      \ | MISSING_BLOCKER | Required by gate, but no persisted artifact or objective\
+      \ handoff status available. |\n| urda-frontend-ui-audit-gate | PERSISTED_FAIL_SUPERSEDED_IN_PART\
+      \ | Artifact says FAIL/BLOCK; focused retest and smoke mitigate parts, but no\
+      \ explicit accepted PASS/PASS_WITH_DEBT frontend/multimodal closure artifact\
+      \ found. |\n| urda-backend-runtime-gate | PARTIAL_CURRENT_EVIDENCE | Current\
+      \ Go focused test and CLI build/help passed; no separate backend gate artifact\
+      \ found in required docs. |\n\n### Final issue coverage table (1-14)\nIssues\
+      \ 1-8, 10-11, 13-14 were classified PROVEN_FIXED; issue 9 and issue 12 were\
+      \ PROVEN_BY_SOURCE_PARTIAL / non-final due missing superseding UIUX/multimodal\
+      \ evidence. Gate reviewer accepted that current product/runtime fixes pass but\
+      \ blocked on evidence completeness, not newly discovered product-code failure.\n\
+      \n### Wiring audit (W1-W8)\nW1 UI-to-API PASS; W2 API-to-runtime PASS; W3 runtime-to-storage\
+      \ PASS; W4 CLI-to-runtime PASS; W5 auth/token path PASS; W6 manual ingest/fetch\
+      \ PASS; W7 state portability PASS; W8 mobile/responsive PASS.\n\n### Escape\
+      \ hatch audit\n- `@invar:allow` scan result: no scoped matches (`rg_exit=1`).\n\
+      - status: PASS; no scoped source/ref escape hatch found.\n\n### CLI executability\
+      \ matrix\n| Command | Surface Listed? | Handler Exists? | --help Works? | Smoke\
+      \ Test | Status |\n|---|---|---|---|---|---|\n| `resofeed serve` | yes | yes\
+      \ | yes, exit 0 | `go build` succeeded; `serve --help` lists documented flags;\
+      \ persisted smoke launched real server | PASS |\n| `resofeed owner-token reset`\
+      \ | yes | yes | yes, exit 0 | persisted smoke invalid DB returned implemented\
+      \ handler error | PASS |\n\n### Smoke/liveness and real-integration evidence\n\
+      - Runnable surface evidence: persisted black-box smoke launched real binary\
+      \ and confirmed root HTML 200, unauthenticated API 401, authenticated API 200,\
+      \ Source Ledger, OPML, state, Search, Feed, Inspector, `/doctor`, and mobile\
+      \ flows.\n- Fixture-vs-real integration distinction: current Playwright Source\
+      \ Ledger retest uses fixture API routes for deterministic UI/geometry; persisted\
+      \ black-box smoke used real `resofeed serve`, isolated SQLite DB, and public\
+      \ API/network evidence.\n\n### Behavioral proof register\n| requirement_ref\
+      \ | behavior_claim | evidence_ref | status | gate_decision_basis |\n|---|---|---|---|---|\n\
+      | R6 | `[DELETE]`/`[CONFIRM]` canonical bracket inversion | `SourceLedger.svelte:237-240`,\
+      \ `app.css:241-248`, Playwright R6 passed | PROVEN | Current browser test passed.\
+      \ |\n| R7 | Delete confirmation no layout shift | Playwright issue 13 passed;\
+      \ handoff bounding boxes dx=0/dy=0/dw=0/dh=0 | PROVEN | Current browser test\
+      \ passed. |\n| R12 | Stale steering receipt removed/replaced | `ranking.go:656`;\
+      \ scoped stale-copy scan only found negative assertion in `pbar_steer_receipt_remediation_test.go:28`\
+      \ | PROVEN | User-visible copy replaced with `[RUN INGEST]`/`[FETCH]` guidance.\
+      \ |\n| R18 | Exact state portability active labels | `StatePortability.svelte:61-62`\
+      \ | PROVEN | Exact spec tokens present. |\n| CLI/runtime | One binary and documented\
+      \ flags preserved | CLI build/help exit 0; smoke artifact | PROVEN | No manual\
+      \ ingest/fetch CLI introduced. |\n| Full UIUX multimodal audit | Required audit\
+      \ produced PASS or accepted PASS_WITH_DEBT | No artifact/status found | UNPROVEN_BLOCKING\
+      \ | Gate precondition missing. |\n\n### Product/runtime boundary scan\n- Forbidden\
+      \ accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job\
+      \ dashboards/sidecars introduced: no blocker found in scoped scan. Hits were\
+      \ contract guards/comments/tests or allowed OPML `folders flattened` copy; no\
+      \ new runtime surface detected.\n\n### Blockers and remediation ownership\n\
+      - BLOCKER-1: Missing required `urda-uiux-multimodal-design-audit` PASS/PASS_WITH_DEBT\
+      \ artifact/status.\n- BLOCKER-2: Persisted `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`\
+      \ remains FAIL/BLOCK without explicit superseding frontend/multimodal closure\
+      \ artifact.\n- Remediation ownership created by planner:\n  - `urda-uiux-multimodal-design-audit-persist`\
+      \ — produces a persisted UIUX/multimodal/front-end closure artifact under `docs/audits/`\
+      \ and explicitly supersedes or explains non-intersection with prior frontend\
+      \ FAIL/BLOCK.\n  - `urda-strict-final-gate-rerun` — reruns strict final gate\
+      \ after the persisted UIUX/multimodal evidence exists.\n\n### Commit hash(es)\n\
+      - none (verify-only, no committed changes)\n\n### Files changed\n- none committed.\
+      \ Final worktree status clean.\n\n### Verification\n- `git status --short --branch`\
+      \ — exit 0; clean after cleanup.\n- `go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`\
+      \ — PASS.\n- `npm --prefix web ci` — PASS; installed missing web deps; reported\
+      \ 5 npm audit vulnerabilities (not evaluated in this gate).\n- `npm --prefix\
+      \ web run check` — PASS; 0 errors, 0 warnings.\n- `npm --prefix web run test:render\
+      \ -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`\
+      \ — PASS; 1 file, 6 tests.\n- `npm --prefix web run build` — PASS.\n- `npm --prefix\
+      \ web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` — PASS; 6/6.\n- `go build -o .test-artifacts/final-gate/resofeed\
+      \ ./cmd/resofeed` plus CLI help checks — PASS.\n- `rg -n '@invar:allow|invar:allow'\
+      \ ...` — no scoped matches.\n- `rg -n 'background ingest will pick it up' internal\
+      \ web/src web/tests cmd` — only negative assertion test hit.\n\n### Gaps/Notes\n\
+      - This step is complete as a blocked gate review with remediation ownership.\
+      \ It is not final OPEN evidence.\n- Downstream `urda-uiux-multimodal-design-audit-persist`\
+      \ and `urda-strict-final-gate-rerun` must close the evidence-governance blockers\
+      \ before final closure."
   - id: urda-final-spec-boundary-blockers-fix
     name: Fix final spec/product boundary blockers R6 R7 R12 R18
     status: done
