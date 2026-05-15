@@ -70492,7 +70492,7 @@ phases:
       - [x] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
       production backend-core paths.
 
-      - [ ] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
+      - [x] No forbidden repository/service/DI/event-bus/job/queue/sync/ledger abstractions
       are introduced.'
     verification: '- [ ] Wiring audit report lists backend-core orphan exports, unconsumed
       metadata fields, core operation consumers, and any remaining backend-core stubs.
