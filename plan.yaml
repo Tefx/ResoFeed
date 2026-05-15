@@ -71137,7 +71137,7 @@ phases:
       - [x] Doctor diagnostic proof covers stale, ok, and runtime-language redaction
       states before runtime exposure.
 
-      - [ ] Downstream HTTP/MCP/frontend blockers remain assigned to their existing
+      - [x] Downstream HTTP/MCP/frontend blockers remain assigned to their existing
       `plhm-*` / `plfu-*` owner steps and are not weakened or deleted.'
     verification: '- [ ] Focused backend-core tests for language operation-guard exclusivity
       pass.
