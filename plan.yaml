@@ -77443,7 +77443,7 @@ phases:
       owned by downstream closure steps `plfinal-uiux-rendered-design-proof` and `plfinal-spec-conformance-closure-retest`.'
   - id: plfinal-uiux-rendered-design-proof
     name: UIUX rendered DOM and accessibility proof closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -77574,6 +77574,77 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T19:33:22.727054+00:00'
+    done_at: '2026-05-15T20:22:11.052333+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): none — UIUX rendered proof step reported no product or artifact
+      file changes to merge; evidence is recorded in vectl completion.
+
+
+      Files changed: none.
+
+
+      Refs Read Confirmation:
+
+      - docs/DESIGN.md — uiux-auditor cited language control as compact `LANG: EN`
+      control with no settings dashboard, bracket-style reprocess action, source identifiers
+      unchanged/translate=no, independent scroll, and mobile full-screen Inspector
+      behavior.
+
+      - docs/ARCHITECTURE.md — uiux-auditor cited processing-language and split-scroll
+      verification additions plus source identifier translate=no expectations.
+
+      - AGENTS.md — uiux-auditor reported read; prior worktrees sometimes lacked AGENTS.md
+      and used fallback .agents/instructions.md, but this step did not report a blocker.
+
+
+      Semantic closure:
+
+      - Headline: PASS.
+
+      - Proof-Gap Status: NONE.
+
+      - Blocking Status: CLOSED.
+
+      - Verdict: PASS.
+
+      - Blockers: [].
+
+      - gate_open_allowed: true.
+
+      - orchestrator_action_hint: COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Verification:
+
+      - Frontend dependency bootstrap required: npm --prefix web install followed
+      by npm --prefix web run build; Vite dependencies resolved and production build
+      completed.
+
+      - Headless browser / Playwright node script run against live instance at desktop
+      1280x800 and mobile 375x667 breakpoints.
+
+      - Rendered proof reported: desktop DOM snapshot verified feed/detail panes with
+      independent overflow-y auto scroll contexts; mobile DOM snapshot verified fixed
+      full-screen detail pane overlay; LANG: EN and [REPROCESS LIBRARY] rendered as
+      terse buttons in runtime-language-controls; source identifiers used translate=no
+      semantics in Feed/Inspector components; no wizard/settings/SaaS/AI-magic copy
+      drift found.
+
+      - Behavioral proof register marked language control, bracket reprocess, source
+      identifier non-translation, desktop split-scroll, and mobile Inspector obligations
+      PROVEN, with no closure path required.
+
+      - Verification checklist was checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state.
+
+
+      Gaps/Notes: No blocking gaps. No files changed; final gate can consume this
+      completion evidence as rendered UI/DOM/a11y closure.'
   - id: plfinal-spec-conformance-closure-retest
     name: Spec conformance closure retest for reprocess and runtime proofs
     status: done
