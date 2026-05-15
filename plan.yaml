@@ -78524,7 +78524,7 @@ phases:
       - [x] A11y names for Inspector-open and `[FETCH]` controls are verified from
       the rendered app, not inferred.
 
-      - [ ] CSS proof confirms mobile metadata nowrap/hidden/ellipsis and height <=
+      - [x] CSS proof confirms mobile metadata nowrap/hidden/ellipsis and height <=
       18px.
 
       - [ ] Product-boundary drift scan confirms no settings/onboarding/SaaS or forbidden
