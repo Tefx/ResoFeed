@@ -73191,19 +73191,19 @@ phases:
       \ Exported stale `SearchItemsForMCP` no-query-echo helper is removed or proven\
       \ private/safe with a real runtime caller.\n- [x] No forbidden durable job/queue/ledger/sync/per-agent\
       \ authorization surface is introduced."
-    verification: '- [ ] Focused Go tests or equivalent assertions cover HTTP `409
+    verification: '- [x] Focused Go tests or equivalent assertions cover HTTP `409
       conflict` exact message/details for manual ingest/fetch/reprocess guard collisions.
 
-      - [ ] Focused Go tests or equivalent assertions cover actual operation/scope
+      - [x] Focused Go tests or equivalent assertions cover actual operation/scope
       propagation for runtime language/reprocess and MCP conflict paths.
 
-      - [ ] Focused Go tests or equivalent assertions cover MCP JSON-RPC `error.data`
+      - [x] Focused Go tests or equivalent assertions cover MCP JSON-RPC `error.data`
       nested-only shape for affected errors.
 
-      - [ ] Search helper cleanup is proven by grep/import evidence and by the live
+      - [x] Search helper cleanup is proven by grep/import evidence and by the live
       `search_items` query-echo path remaining intact.
 
-      - [ ] `go test ./...` is green after the remediation.'
+      - [x] `go test ./...` is green after the remediation.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
