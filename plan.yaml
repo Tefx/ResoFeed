@@ -76329,7 +76329,7 @@ phases:
       - [x] docs/ARCHITECTURE.md remains consistent with implemented runtime metadata,
       receipts, reprocess, FTS, HTTP/MCP, delivery, and frontend behavior.
 
-      - [ ] docs/DESIGN.md remains consistent with rendered language/reprocess/source
+      - [x] docs/DESIGN.md remains consistent with rendered language/reprocess/source
       identifier/split-scroll behavior.
 
       - [ ] Error code tables and examples match actual responses.
