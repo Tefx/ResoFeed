@@ -75345,7 +75345,7 @@ phases:
       - [ ] controlled unavailable item clears processed readable fields and falls
       back title to URL or `Untitled`.
 
-      - [ ] timeout/fatal path leaves `fts_rebuilt: false` and `search_fts_stale_since`
+      - [x] timeout/fatal path leaves `fts_rebuilt: false` and `search_fts_stale_since`
       set when rebuild does not complete.
 
       - [ ] `/api/doctor` reports stale FTS while marker exists.
