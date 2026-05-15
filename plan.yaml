@@ -71868,7 +71868,7 @@ phases:
 
       - [ ] Missing `reprocess_library` MCP tool is owned here.
 
-      - [ ] `search_items` dropping `SearchQueryEcho`/query echo is owned here.
+      - [x] `search_items` dropping `SearchQueryEcho`/query echo is owned here.
 
       - [x] MCP error envelope divergence is owned here.
 
