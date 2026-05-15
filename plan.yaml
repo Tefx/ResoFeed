@@ -70769,6 +70769,82 @@ phases:
     - plfu-language-reprocess-controls
     - plfu-source-identifiers-split-scroll
     agent: integration-verifier
+  - id: plfu-uiux-multimodal-audit
+    name: Audit language reprocess and split-scroll UIUX
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Native multimodal implementation audit against docs/DESIGN.md. Use rendered
+      screenshots/images/DOM/a11y captures for desktop and mobile states.
+
+
+      Scope declaration: phase-check protecting frontend gate and system E2E.
+
+
+      Required visual/spatial artifacts:
+
+      - [ ] language control English and Chinese states.
+
+      - [ ] reprocess default/confirming/running/conflict/complete or failed states.
+
+      - [ ] source identifiers visibly literal and non-translated.
+
+      - [ ] desktop split Feed/Inspector scroll containers.
+
+      - [ ] mobile Inspector route and preserved feed behavior.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Audit returns parseable PASS/PASS_WITH_DEBT/FAIL handoff.
+
+      - [ ] PASS requires rendered visible controls, not only test summaries.
+
+      - [ ] Any UI/UX blocker has exact remediation ownership.'
+    verification: '- [ ] Screenshots or equivalent rendered artifacts cover required
+      UI states.
+
+      - [ ] Audit checks design token/bracket action conformance and forbidden UI
+      concepts.
+
+      - [ ] Audit explicitly checks source identifiers and split-scroll behavior.'
+    evidence_template: '## UIUX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Artifacts Reviewed
+
+      - Desktop screenshots/DOM:
+
+      - Mobile screenshots/DOM:
+
+      - A11y captures:
+
+
+      ### Verdict Matrix
+
+      | Surface | Expected | Evidence | Verdict | Notes |
+
+
+      Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plfu-language-reprocess-controls
+    - plfu-source-identifiers-split-scroll
+    agent: uiux-auditor
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
