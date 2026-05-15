@@ -79471,7 +79471,7 @@ phases:
       - [x] docs/ARCHITECTURE.md is cited to prove the resolution does not violate
       ResoFeed architecture invariants.
 
-      - [ ] docs/DESIGN.md and docs/UI_REGRESSION_CONTRACT.md are cited for any UI/source-ledger/manual-fetch
+      - [x] docs/DESIGN.md and docs/UI_REGRESSION_CONTRACT.md are cited for any UI/source-ledger/manual-fetch
       wording that remains in the proof register.
 
       - [ ] The remediation either maps the proof register to an existing authoritative
