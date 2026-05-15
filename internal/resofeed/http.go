@@ -447,7 +447,7 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var fieldErr mcpFieldError
 		if errors.As(err, &fieldErr) {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": fieldErr.field})
+			writeFieldError(w, fieldErr)
 			return
 		}
 		writeInternal(w)
@@ -867,7 +867,7 @@ func writeNotFoundOrInternal(w http.ResponseWriter, id string, err error) {
 func writeMutationError(w http.ResponseWriter, id string, err error) {
 	var fieldErr mcpFieldError
 	if errors.As(err, &fieldErr) {
-		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": fieldErr.field})
+		writeFieldError(w, fieldErr)
 		return
 	}
 	writeNotFoundOrInternal(w, id, err)
@@ -887,6 +887,14 @@ func writeManualFetchError(w http.ResponseWriter, id string, err error) {
 
 func writeInternal(w http.ResponseWriter) {
 	writeAPIError(w, http.StatusInternalServerError, "internal", "internal error", nil)
+}
+
+func writeFieldError(w http.ResponseWriter, fieldErr mcpFieldError) {
+	details := map[string]any{"field": fieldErr.field}
+	if fieldErr.reason != "" {
+		details["reason"] = fieldErr.reason
+	}
+	writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", details)
 }
 
 func writeAPIError(w http.ResponseWriter, status int, code string, message string, details map[string]any) {

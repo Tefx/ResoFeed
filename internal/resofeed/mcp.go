@@ -547,7 +547,10 @@ func validateDateRange(from *string, to *string) error {
 	return nil
 }
 
-type mcpFieldError struct{ field string }
+type mcpFieldError struct {
+	field  string
+	reason string
+}
 
 func (e mcpFieldError) Error() string { return "invalid MCP field: " + e.field }
 
@@ -560,6 +563,10 @@ func (e mcpNotFoundError) Error() string { return e.kind + " not found: " + e.id
 
 func fieldError(field string) error { return mcpFieldError{field: field} }
 
+func fieldErrorReason(field string, reason string) error {
+	return mcpFieldError{field: field, reason: reason}
+}
+
 func notFoundError(kind string, id string) error { return mcpNotFoundError{kind: kind, id: id} }
 
 func mcpErrFromError(err error) *mcpError {
@@ -568,7 +575,11 @@ func mcpErrFromError(err error) *mcpError {
 	}
 	var fieldErr mcpFieldError
 	if errors.As(err, &fieldErr) {
-		return &mcpError{Code: -32602, Message: "invalid params", Data: map[string]any{"field": fieldErr.field}}
+		data := map[string]any{"field": fieldErr.field}
+		if fieldErr.reason != "" {
+			data["reason"] = fieldErr.reason
+		}
+		return &mcpError{Code: -32602, Message: "invalid params", Data: data}
 	}
 	var notFound mcpNotFoundError
 	if errors.As(err, &notFound) {
