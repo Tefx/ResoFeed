@@ -79851,7 +79851,7 @@ phases:
       - [x] Search and doctor routes remain read-only and are executed through GET
       /api/search and GET /api/doctor where appropriate.
 
-      - [ ] Unknown fields and invalid bodies return documented bad_request details.
+      - [x] Unknown fields and invalid bodies return documented bad_request details.
 
 
       Failure-mode checklist:
