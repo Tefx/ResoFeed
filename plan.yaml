@@ -70086,7 +70086,7 @@ phases:
 
       - [ ] source URLs/feed URLs are never used as article reprocess input.
 
-      - [ ] prior stored target-language fields are never used as source text.
+      - [x] prior stored target-language fields are never used as source text.
 
       - [ ] per-item success, unavailable, failed, timeout, fatal SQLite, and crash-before-response
       semantics are covered.
