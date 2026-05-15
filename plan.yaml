@@ -78843,13 +78843,13 @@ phases:
 
       - [x] Keep contract artifacts within the single Go binary and flat internal/resofeed
       shape.'
-    verification: '- [ ] Contract-only diff contains signatures/types/docstrings/stubs
+    verification: '- [x] Contract-only diff contains signatures/types/docstrings/stubs
       but no completed route mutation logic.
 
-      - [ ] Go contract shapes match docs/ARCHITECTURE.md SteerPreview, SteeringReceipt,
+      - [x] Go contract shapes match docs/ARCHITECTURE.md SteerPreview, SteeringReceipt,
       SteerUndoHandle, and SteerUndoResult fields.
 
-      - [ ] Evidence cites key passages from every ref and confirms KISS constraints
+      - [x] Evidence cites key passages from every ref and confirms KISS constraints
       are preserved.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
