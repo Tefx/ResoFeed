@@ -75122,7 +75122,7 @@ phases:
 
       - [x] If browser is used, capture rendered language/reprocess UI visible state.
 
-      - [ ] No stubs, mocks, or placeholder runtime dependencies at layer boundaries.
+      - [x] No stubs, mocks, or placeholder runtime dependencies at layer boundaries.
 
 
       ## Completion Criteria (checklist)
