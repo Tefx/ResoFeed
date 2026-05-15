@@ -79687,3 +79687,63 @@ phases:
     depends_on:
     - srde2e-software-architect-fresh-review
     agent: frontend-engineer
+  - id: srde2e-software-architect-clean-recheck
+    name: Run fresh software-architect clean re-review
+    status: pending
+    description: 'As software-architect, perform a fresh review after remediation.
+      This must be a clean re-review, not a rubber-stamp of the prior report.
+
+
+      Acceptance checklist:
+
+      - [ ] Re-read authoritative docs and remediation evidence.
+
+      - [ ] Re-test or inspect every prior blocker/should_fix closure path.
+
+      - [ ] Check for regressions in previously green Steer preview/commit/undo, lexical
+      search/no-RAG, Source Ledger, processing language, split-scroll/mobile, and
+      KISS architecture boundaries.
+
+      - [ ] Return CLEAN only if no blocker or should_fix remains.
+
+      - [ ] If new findings appear, list them with severity, location, reproduction,
+      grep hint, and required remediation; orchestrator must create another remediation
+      loop before final gate opens.'
+    verification: '- [ ] phase-check protecting full-plan check and final gate.
+
+      - [ ] Fresh review explicitly re-checks all prior findings and relevant regression
+      surfaces.
+
+      - [ ] Verdict is CLEAN before downstream final gate can open.
+
+      - [ ] Any remaining or new blocker/should_fix has remediation ownership rather
+      than being marked pre-existing/out-of-scope.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Fresh Architecture Re-Review
+
+      | Prior/New Finding | Closure Evidence | Recheck Result | Remaining Risk |
+
+      |---|---|---|---|
+
+
+      **Verdict**: CLEAN | FINDINGS_PRESENT
+
+      '
+    depends_on:
+    - srde2e-backend-architecture-remediation
+    - srde2e-frontend-architecture-remediation
+    agent: software-architect
