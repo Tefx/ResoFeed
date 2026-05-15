@@ -80192,7 +80192,7 @@ phases:
     claimed_at: '2026-05-15T22:27:45.066724+00:00'
   - id: srdb-spec-conformance
     name: Verify backend spec conformance for Steer and search delta
-    status: claimed
+    status: done
     description: 'Spec conformance verification via adversarial divergence hunting.
       This is NOT "do tests pass" — it is "does backend runtime match the specs?"
 
@@ -80257,6 +80257,17 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T22:27:37.971879+00:00'
+    done_at: '2026-05-15T22:38:42.412538+00:00'
+    evidence: 'DETECTED_ISSUES_BATCHED: Spec conformance verifier returned FAIL with
+      blockers: R4 delegated-agent steering precedence overrejects non-conflicting
+      agent rules; R1/R3/R11 HTTP/MCP preview/undo surfaces are implemented and tested
+      but absent from authoritative architecture endpoint/tool tables; R13 manual
+      ingest/fetch response schema includes undocumented top-level legacy fields versus
+      architecture examples. The verifier provided a requirements register and behavioral
+      proof register with blocking_status=OPEN, gate_open_allowed=false, orchestrator_action_hint=DO_NOT_COMPLETE.
+      Planner created batched remediation step `srdb-backend-spec-wiring-remediation`
+      and combined retest `srdb-backend-spec-wiring-retest`; backend gate dependencies
+      now require the retest to pass.'
   - id: srdb-backend-gate
     name: Gate backend Steer runtime implementation
     status: pending
