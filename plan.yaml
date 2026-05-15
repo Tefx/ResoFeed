@@ -75115,7 +75115,7 @@ phases:
 
       - [x] Authenticate with owner token.
 
-      - [ ] Read language, set language, trigger reprocess on controlled fixture data,
+      - [x] Read language, set language, trigger reprocess on controlled fixture data,
       observe result counts.
 
       - [ ] Query search and doctor after reprocess.
