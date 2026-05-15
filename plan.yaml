@@ -69325,7 +69325,7 @@ phases:
     agent: golang-developer
   - id: plct-frontend-expected-red-tests
     name: Add frontend expected-red rendering tests
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -69394,6 +69394,8 @@ phases:
     depends_on:
     - plct-contract-lock
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T11:44:55.825458+00:00'
   - id: plct-contract-tests-gate
     name: Gate processing language contract and expected-red tests
     status: pending
