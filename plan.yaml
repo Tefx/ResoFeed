@@ -74023,7 +74023,7 @@ phases:
 
       - [x] persisted reading-position tracking or analytics.
 
-      - [ ] source/split-scroll anchors remain type-only and unconsumed by rendered
+      - [x] source/split-scroll anchors remain type-only and unconsumed by rendered
       UI.'
     verification: '- [ ] Rendered tests pass for `translate="no"` or equivalent on
       all source identifier classes.
