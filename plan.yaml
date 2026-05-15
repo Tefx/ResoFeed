@@ -82493,7 +82493,7 @@ phases:
       Owner Token Prompt and exposes `Steer or paste RSS URL` plus expected Steer/doctor
       wiring.
 
-      - [ ] `exposes Source Ledger through a non-persistent RESOFEED utility menu`:
+      - [x] `exposes Source Ledger through a non-persistent RESOFEED utility menu`:
       app escapes Owner Token Prompt and Source Ledger controls are reachable without
       persistence drift.
 
