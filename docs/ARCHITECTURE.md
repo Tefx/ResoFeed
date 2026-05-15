@@ -1,8 +1,10 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Implemented current contract
+Status: Partially implemented target contract
 Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
+
+Status note: the pre-existing core contract is implemented where runtime behavior already matches this document. Processing-language, reprocess, runtime metadata, HTTP/MCP schema, OpenRouter prompt, FTS, and UI language/split-scroll sections are implementation targets until their corresponding runtime changes land.
 
 ## 1. Decisions
 
@@ -17,6 +19,12 @@ Contract baseline: these decisions are anchored in the current product/design do
 7. **OpenRouter as the sole LLM backend.** LLM calls use OpenRouter chat completions for summaries and steering translation at `https://openrouter.ai/api/v1/chat/completions`. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes; Go validates every structured output before applying or saving it. Rationale: the user explicitly chose an OpenRouter-only migration while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
 8. **Lexical retrieval only.** Search uses SQLite FTS5 and metadata filters. No embeddings, vector DB, built-in RAG, or semantic answer engine. Rationale: explicitly forbidden by product constraints. Fails only by explicit product reversal.
 9. **Single owner token with auto-generation and CLI-only offline reset.** Static web assets are public to load, but every `/api/*` route and every `/mcp` request requires one owner token. If `--owner-token` is omitted, ResoFeed reuses a stored token hash or generates a token, stores its hash, and prints the token once on first startup. If the plaintext token is lost and only the hash remains, recovery is impossible; reset is an offline DB command that deletes only the stored hash so the next `serve` startup can generate or accept a replacement. No accounts, OAuth, roles, teams, registration flow, HTTP reset endpoint, MCP reset tool, or Settings/UI reset control. Rationale: single-tenant tool with low-friction first run, clear offline credential recovery, and no ambiguous public API reads. Fails if shared/team use or online credential administration becomes product scope.
+
+10. **Persisted processing language is runtime state, not portable state.** ResoFeed stores one default processing language for the local owner runtime. Supported values are `en` and `zh`; absent metadata defaults to `en` to preserve existing behavior. Rationale: language controls article processing, UI chrome, search text, and MCP output, but it is not part of the strict portable-state bundle. Fails if product scope later requires cross-instance preference sync.
+11. **One stored processed language per item.** User-readable item fields are stored in the current processing language rather than as original/translated pairs. Rationale: ResoFeed is an intelligence workbench optimized for summaries, analysis, and search, not a bilingual RSS reader. Trade-off: changing language does not automatically rewrite history; the original article remains available through the original link. Fails if side-by-side original/translation reading becomes a product requirement.
+12. **Source identifiers are preservation anchors.** URLs, source titles, source URLs, canonical URLs, and original links remain unchanged by localization. Rationale: users and agents need exact provenance even when readable item content is processed in another language. Fails if source identity itself becomes user-editable display content.
+13. **Existing library reprocess is explicit and non-durable.** Changing the default language affects future processing only. A user-triggered one-time reprocess may rewrite existing user-readable item content into the current language and rebuild FTS, but it must not introduce a durable job queue, activity ledger, sync protocol, or settings dashboard. Rationale: explicit migration preserves user control while keeping the one-process architecture. Fails if reprocess must continue across process restarts as a managed background job.
+14. **Desktop split scroll is frontend containment, not behavioral state.** The feed and Inspector scroll independently on desktop, while mobile keeps a full-screen Inspector route. Rationale: independent scroll preserves triage context without adding persisted reading-position tracking. Fails if scroll depth becomes a ranking or analytics input, which is out of scope.
 
 ## 2. System Boundary
 
@@ -172,7 +180,7 @@ Out of scope:
 | Current steering policy | `steer_rules` | Yes | User-owned policy state. |
 | Current attention state | `item_state` | Resonance state: yes; inspection/external-surface state: no | Stars are user-owned retrieval state; inspection/external-surface timestamps are operational state. |
 | Agent idempotency receipts | `agent_receipts` | No by default | Required for retry safety/provenance, not a user-facing activity ledger. |
-| Runtime credential metadata | `runtime_metadata` | No | Stores owner-token hash only; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
+| Runtime metadata | `runtime_metadata` | No | Stores owner-token hash, local processing language, and optional runtime diagnostics; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
 | Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. |
 
@@ -203,6 +211,112 @@ Coordination rules:
 ### 3.4 Shared Types Rule
 
 Shared structs belong in `types.go` only when used across HTTP, MCP, storage, ingestion, or frontend response boundaries. Expected shared structs: `Source`, `Item`, `ItemState`, `SteerRule`, and canonical fallback/status values. Keep helper functions file-local until repeated real use justifies moving them.
+
+### 3.5 Architecture Basis: Processing Language and Split-Scroll Delta
+
+This basis is authoritative for planning the persisted language, target-language storage/search, MCP parity, one-time reprocess, and desktop split-scroll change.
+
+```yaml
+architecture_basis:
+  system_layers:
+    - layer: browser_spa
+      responsibility: "Render localized chrome, expose language/reprocess controls, keep desktop feed and Inspector as independent scroll regions."
+    - layer: http_api
+      responsibility: "Authenticate owner token, expose language/reprocess contracts, and return canonical target-language item/search/detail JSON."
+    - layer: mcp_surface
+      responsibility: "Expose the same item/search/detail language behavior and equivalent language/reprocess operations to authorized agents."
+    - layer: resofeed_core
+      responsibility: "Own processing-language semantics, ingestion/reprocess orchestration, OpenRouter prompt inputs, validation, and item/FTS writes."
+    - layer: sqlite
+      responsibility: "Persist runtime language metadata, canonical target-language item rows, provenance identifiers, and rebuildable FTS5 index."
+    - layer: openrouter
+      responsibility: "Pure JSON transformer that receives target_language and returns validated structured item understanding."
+  source_of_truth_matrix:
+    default_processing_language: "runtime_metadata.processing_language; supported values en|zh; absent means en; excluded from state export/import."
+    target_language_item_text: "items.title, items.summary, items.core_insight, items.feed_excerpt, items.extracted_text; each stores the only user-readable processed version."
+    source_identifiers: "sources.url/title and item url/source_url/canonical_url/original_url; preserved unchanged and never localized destructively."
+    searchable_text: "search_fts; rebuildable from current target-language item rows plus preserved provenance identifiers."
+    ui_language: "frontend derives from authenticated runtime language API; html lang and chrome copy follow it."
+    mcp_language: "MCP resources/tools read the same persisted processing language; no per-call language override in this contract."
+  service_catalog:
+    language_read: "Authenticated read of current processing language."
+    language_set: "Authenticated update of processing_language; affects future processing only."
+    ingest_process_item: "Fetch/extract/source fallback then call OpenRouter with target_language and persist target-language item fields."
+    reprocess_existing_library: "Explicit operation that reprocesses existing item readable fields into current language and rebuilds FTS."
+    search: "Lexical FTS over currently stored target-language content."
+    split_scroll_ui: "Frontend-only layout containment; no persisted reading-position state."
+  runtime_contract:
+    language_change: "Persists new processing language and updates UI/MCP output language for chrome/contracts; does not rewrite existing item rows."
+    future_ingest: "Newly processed items use the current processing language."
+    reprocess: "Only explicit user/authorized-agent action rewrites existing user-readable item fields; completion rebuilds FTS."
+    failure_semantics: "Existing model/extraction status values remain authoritative; no translation_failed status is introduced."
+    concurrency: "Reprocess must not run concurrently with ingest/fetch/reprocess operations and must not create durable jobs or queues."
+  state_strata:
+    portable_state: "Only active sources, active steering rules, and currently resonated items. Processing language remains excluded."
+    runtime_metadata: "owner token hash, processing_language, and optional search_fts_stale_since diagnostic marker."
+    derived_state: "search_fts and localized UI dictionaries; rebuildable or static."
+    item_cache: "target-language readable item fields plus preserved provenance identifiers."
+  transport_boundary_rules:
+    http: "HTTP exposes language read/set and reprocess endpoints with strict body/query validation and owner-token auth."
+    mcp: "MCP exposes equivalent language/reprocess operations and returns item/search/detail content in the persisted default language."
+    frontend: "Frontend never sends arbitrary per-item language overrides; it changes the single runtime processing language."
+    openrouter: "OpenRouter receives target_language as input; Go validates returned JSON before persistence."
+  cross_cutting_governance:
+    registries:
+      - name: "runtime_metadata"
+        owner_module: "internal/resofeed runtime/db code"
+        write_policy: "only authenticated language-set and startup/runtime metadata paths write supported keys"
+    lifecycle_ordering:
+      - "Startup runs migrations before reading processing_language."
+      - "Frontend loads owner token, then reads processing_language before rendering localized chrome that depends on API state."
+      - "Reprocess acquires the same operation exclusivity class as ingest/fetch before item rewrites and FTS rebuild."
+    coordination_mechanisms:
+      - "Single-process mutex/guard for ingest/fetch/reprocess exclusivity."
+      - "SQLite transactions for language metadata writes and FTS rebuild consistency."
+    wiring_strategy: "Explicit function calls inside internal/resofeed; no DI container, event bus, sidecar worker, or scheduler service."
+    governance_owner: "internal/resofeed owns runtime language and reprocess; web owns presentation/scroll containment."
+  shared_abstractions:
+    shared_types:
+      - name: "ProcessingLanguage"
+        owner_module: "internal/resofeed/types.go or adjacent flat file"
+        consumers: ["ingest", "http", "mcp", "doctor", "frontend api-contract"]
+        rationale: "Appears in HTTP, MCP, OpenRouter input, and UI contracts; a shared enum prevents zh/en drift."
+      - name: "ReprocessLibraryResult"
+        owner_module: "internal/resofeed/types.go or adjacent flat file"
+        consumers: ["http", "mcp", "doctor/frontend"]
+        rationale: "HTTP and MCP must expose the same reprocess completion counts and failure summary."
+    shared_protocols: "N/A: existing LLMClient interface remains the boundary; it is extended with target-language input rather than replaced."
+    shared_utilities: "N/A: keep flat package helpers local until 3+ concrete consumers justify extraction."
+    decision: "Share only language/result contracts crossing HTTP/MCP/LLM/frontend boundaries; keep layout scrolling and UI dictionaries frontend-local."
+  module_split_recommendations:
+    - module: "internal/resofeed runtime language functions"
+      owner: "internal/resofeed"
+      reason_to_change: "language persistence and validation"
+      dependency_direction: "http/mcp/ingest depend on language functions; language functions do not depend on transports"
+    - module: "internal/resofeed ingest/reprocess functions"
+      owner: "internal/resofeed"
+      reason_to_change: "item processing and FTS rebuild semantics"
+      dependency_direction: "http/mcp call operations; operations call DB/LLM"
+    - module: "web localization and split-scroll surfaces"
+      owner: "web"
+      reason_to_change: "UI copy, accessibility language, scroll containment"
+      dependency_direction: "web consumes HTTP API; web does not own processing truth"
+  ux_surfaces:
+    - surface: "Desktop shell"
+      scope: "independent feed/Inspector scroll, no coupled global page scroll"
+    - surface: "Language control"
+      scope: "terse LANG control, no settings dashboard"
+    - surface: "Reprocess action"
+      scope: "bracket-style explicit operation with warning, no progress dashboard"
+    - surface: "MCP item/search/detail outputs"
+      scope: "agent-facing language parity with HTTP/UI"
+  open_questions:
+    blocking: []
+    non_blocking:
+      - "Exact UI placement of LANG control may be chrome or /doctor-class utility surface as constrained by docs/DESIGN.md."
+      - "Chinese locale for html lang defaults to zh-CN unless UIUX decides a narrower locale."
+  readiness: READY
+```
 
 ## 4. SQLite Shape
 
@@ -297,15 +411,23 @@ Required fields:
 - idempotency key;
 - actor id;
 - operation name;
+- request fingerprint for mutating operations that accept request bodies;
 - optional item id;
 - creation timestamp;
 - compact result snapshot.
 
 Invariants:
 
-- duplicate requests with the same key return the same result class;
+- `idempotency_key` uniqueness is enforced among live receipts across receipt-backed HTTP and MCP mutating operations;
+- a live receipt is one whose row exists and whose `created_at + 24h` has not elapsed;
+- before accepting a reused key after TTL expiration, the implementation must transactionally ignore, delete, or replace the expired receipt row;
+- expired rows must not cause `request_fingerprint_mismatch` or uniqueness failure;
+- for receipt-backed mutating operations that accept request bodies, `request_fingerprint` is required and is computed from the validated operation request so same-key retries can distinguish replay from caller error;
+- while a live receipt exists, the same `idempotency_key` with the same `request_fingerprint` returns the stored result snapshot with `already_applied: true` where the response shape includes that field;
+- while a live receipt exists, the same `idempotency_key` with a different `request_fingerprint` returns HTTP `400 bad_request` or the MCP schema/request-error equivalent;
+- after TTL expiration or crash-loss of the receipt row, the same key may be accepted as a fresh operation if the request is otherwise valid and operation guards allow it;
 - this table is not rendered as an activity feed;
-- receipts exist only to prevent duplicate external surfacing and satisfy agent provenance requirements.
+- receipts exist only to prevent duplicate external surfacing and satisfy agent provenance requirements; they are not a durable job ledger, command history, activity ledger, or portable state.
 
 ### 4.6 `search_fts`
 
@@ -318,7 +440,10 @@ Indexed content:
 - feed excerpt;
 - summary;
 - extracted text;
+- core insight;
 - provenance fields useful for verification.
+
+`search_fts` must include `items.title`, `sources.title`/source title, `items.feed_excerpt`, `items.summary`, `items.extracted_text`, `items.core_insight`, and provenance identifiers useful for verification. `value_tier` is filterable/searchable through ordinary SQL metadata matching when needed; it is not required to be copied into the FTS table.
 
 Invariants:
 
@@ -338,11 +463,15 @@ Required schema contract:
 | `value` | TEXT | not null |
 | `updated_at` | INTEGER | Unix timestamp, not null |
 
-Required keys:
+Recognized keys and presence rules:
 
 | Key | Value format | Export/import? | Purpose |
 |---|---|---:|---|
 | `owner_token_sha256` | lowercase hex SHA-256 digest | No | Verifies `Authorization: Bearer <OWNER_TOKEN>` without storing the plaintext token. |
+| `processing_language` | string enum: `en` or `zh` | No | Default language for future item processing, UI chrome, search text, and MCP output. If missing, the effective language is `en`; implementation may persist `en` on first authenticated read or first write. |
+| `search_fts_stale_since` | RFC3339 UTC string | No | Optional diagnostic key. Present only while FTS is stale after reprocess begins or fails before final rebuild; cleared after successful FTS rebuild. Exposed in `/doctor` diagnostics. |
+
+`runtime_metadata` must never be included in state export/import. `processing_language` is runtime-local even when persisted, and `search_fts_stale_since` is a diagnostic marker rather than portable state.
 
 Owner token contract:
 
@@ -359,6 +488,30 @@ Owner token contract:
 - no HTTP endpoint, MCP tool/resource, Settings page, or UI action may reset the owner token;
 - this table must never be included in Source Ledger/state export.
 
+### 4.8 Processing Language, Localized Item Text, and FTS
+
+Processing language and FTS status are runtime metadata:
+
+| Key | Value format | Export/import? | Purpose |
+|---|---|---:|---|
+| `processing_language` | string enum: `en` or `zh` | No | Default language for future item processing, UI chrome, search text, and MCP output. If missing, effective language is `en`; implementation may persist `en` on first authenticated read or first write. |
+| `search_fts_stale_since` | RFC3339 UTC string | No | Optional diagnostic marker present only while FTS is stale after reprocess begins or fails before rebuild completion; cleared after successful rebuild and exposed in `/doctor`. |
+
+Localized item storage contract:
+
+- `items.title`, `items.summary`, `items.core_insight`, `items.feed_excerpt`, and `items.extracted_text` are user-readable processed text fields in the active processing language at the time of item processing or explicit reprocess;
+- ResoFeed stores only one processed language version per item and does not store original/translated pairs;
+- original item access remains available through `url` / `provenance.original_url`;
+- source identifiers are not localized destructively: `sources.title`, source URL, item URL, canonical URL, original URL, and source provenance identifiers remain exact provenance anchors;
+- changing `processing_language` does not rewrite existing item rows.
+
+FTS contract:
+
+- `search_fts` indexes the currently stored target-language item text (`title`, `feed_excerpt`, `summary`, `extracted_text`, `core_insight`), source title, and preserved provenance identifiers;
+- `value_tier` may be matched through ordinary SQL metadata/LIKE behavior where exposed, but is not required to be part of FTS;
+- one-time library reprocess must rebuild or fully refresh FTS after rewriting item text;
+- state import may rebuild FTS as already allowed by the state portability contract, but processing language itself remains excluded from state bundles;
+- no vector, embedding, semantic-answer, or dual-language index is introduced.
 ## 5. Operation Contracts
 
 ### 5.1 Ingestion
@@ -595,6 +748,67 @@ Restore result schema:
 Invalid state bundles use the standard `400 bad_request` JSON error body from §6. State import does not return merge conflicts because it is not a merge protocol.
 
 Architecture alignment note: broad `docs/DESIGN.md` wording such as “history” means only the minimal current-state bundle above when implemented. It does not permit a general command history, reading history, activity ledger, sync protocol, or conflict-resolution system.
+### 5.6 Processing Language and Existing Library Reprocess
+
+Processing language responsibilities:
+
+- maintain one persisted default processing language for the local runtime;
+- support exactly `en` and `zh` in the current contract;
+- pass the current language into item understanding/summary prompts as target-language instruction;
+- validate OpenRouter JSON as before; language does not create a second translation pipeline;
+- keep existing extraction/model failure semantics (`summary_unavailable`, `model_latency_error`, `original_unavailable`, etc.) and do not introduce `translation_failed`.
+
+Language change behavior:
+
+- setting a new processing language persists the runtime setting and affects future ingestion/reprocess only;
+- existing item rows and FTS are not automatically rewritten when language changes;
+- UI chrome and MCP language metadata may reflect the new language immediately, but item text remains whatever is stored until future ingest or explicit reprocess updates it.
+
+Existing library reprocess behavior:
+
+- reprocess is explicit and owner-authorized;
+- it rewrites existing user-readable item fields into the current processing language where source text is available;
+- it preserves source identifiers exactly;
+- it rebuilds or fully refreshes FTS after item text rewrites;
+- it returns terse counts for attempted, updated, failed/unavailable, and indexed items, where `items_updated` counts successful target-language rewrites only;
+- it must not create durable job rows, queues, sync state, command history, activity ledgers, retry dashboards, or settings panels;
+- it must not run concurrently with background ingest, manual ingest, source fetch, or another reprocess operation.
+
+Failure contract:
+
+- per-item OpenRouter or extraction failures use the same status taxonomy as ingestion;
+- per-item failures are returned as HTTP `200` with `reprocess.status` of `completed_with_errors` or `completed` according to the result counts;
+- if a fresh fetch succeeds but OpenRouter fails, all of the item's processed readable fields (`summary`, `core_insight`, `extracted_text`, `feed_excerpt`) must be set to `null` because they cannot be reliably provided in the target language. To satisfy the non-null `title` schema requirement without mixing languages, `title` must fall back to the URL or a generic 'Untitled' label. Old prior-language fields are fully overwritten;
+- failure to process one item must not destroy that item's existing provenance identifiers;
+- if reprocess partially succeeds, FTS must still reflect the final stored item rows after the operation's completion path;
+- operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global error with `code: "timeout"`, unless the server cannot serialize a response;
+- fatal SQLite or invariant errors before result construction return HTTP `500 internal`;
+- raw diagnostics belong in `/doctor`, not a new reprocess dashboard.
+
+Existing library reprocess transaction and recovery contract:
+
+- the reprocess operation processes items in batches;
+- each item's processing is its own SQLite transaction that updates `title`, `summary`, `core_insight`, `feed_excerpt`, and `extracted_text`;
+- the operation timeout is 10 minutes. If the HTTP/MCP client disconnects before completion, processing continues until completed, timed out, or crashed;
+- if the process crashes, encounters an unrecoverable SQLite error, or times out mid-run, already-committed item transactions remain stored in the new processing language;
+- FTS rebuild runs in one transaction at the end of the operation;
+- if the operation fails before FTS rebuild succeeds, the system does not automatically recover on startup; the user must trigger the reprocess operation again to process remaining items and rebuild FTS. During this stale interim period or during an active reprocess operation, search queries (`GET /api/search` and MCP `search_items`) continue to execute but may return a mix of languages based on the outdated FTS rows. The stale FTS state must be exposed as a clear diagnostic status in `/doctor`;
+- if the server returns a fatal reprocess result, `items_attempted` counts only items whose processing began; unvisited items are not attempted. When the final FTS rebuild does not complete, `fts_rebuilt` is `false`, and `items_indexed` is the number of rows indexed in the successful final rebuild transaction, usually `0`. A crash may produce no HTTP/MCP response; recovery visibility is only the `/doctor` stale FTS diagnostic.
+- unavailable items whose processed readable fields are cleared and whose title falls back to a URL or generic label count in `items_unavailable`, not `items_updated`; `items_attempted` must equal `items_updated` + `items_unavailable` + `items_failed`.
+
+Reprocess input source precedence:
+
+- reprocess must not use existing stored target-language fields (`title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`) as source text to avoid double-translation;
+- reprocess input must fetch fresh source text using canonical storage fields first, in exact order of precedence: `items.canonical_url` if present and valid HTTP/HTTPS, then `items.url` (exposed publicly as both top-level `url` and `provenance.original_url`) if valid HTTP/HTTPS. If a fetch fails (e.g., timeout, 404, refusal), it proceeds to the next candidate in the precedence list;
+- `sources.url`, `items.source_url`, and public `provenance.source_url` must NOT be used to fetch article text for reprocess, as they point to the RSS/Atom feed rather than the specific item;
+- if all fresh fetches fail, reprocess must mark the item as `original_unavailable` and set its processed readable fields (`summary`, `core_insight`, `feed_excerpt`, `extracted_text`) to `null`. It must not fallback to prior-language stored text, because the original feed title is not independently preserved. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
+- this ensures individual item results do not mix languages and avoids double-translation from prior processed text.
+
+Concurrency and background ingest:
+
+- the single-process mutex/guard for ingest/fetch/reprocess exclusivity applies to reprocess;
+- if a background ingest tick fires while a reprocess operation holds the guard, the tick is ignored/skipped rather than queued, exactly mirroring the rule for manual ingest.
+
 ## 6. HTTP Surface
 
 The HTTP API is for the Svelte UI and authorized direct use. These path names and schemas are part of the interface contract.
@@ -634,6 +848,8 @@ Canonical JSON type rules:
 - nullable fields are present with `null` rather than omitted unless otherwise noted;
 - HTTP and MCP reuse the same JSON types unless a tool/resource explicitly overrides them.
 
+Global JSON request body validation rule: for every JSON request body schema in this contract, unknown fields are rejected with HTTP `400 bad_request` and `details: { "field": "<field_name>" }`. This preserves strict contract-test behavior and prevents silent expansion of mutating commands.
+
 `ErrorBody`:
 
 | Field | Type | Required | Nullable | Notes |
@@ -667,7 +883,7 @@ Canonical JSON type rules:
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `feed_excerpt` | string | Yes | Yes | raw feed excerpt when available |
+| `feed_excerpt` | string | Yes | Yes | processed feed excerpt when available |
 | `extracted_text` | string | Yes | Yes | full extracted text when available |
 | `provenance` | object | Yes | No | source URL, canonical URL, grouping/duplicate context |
 
@@ -681,6 +897,8 @@ Canonical JSON type rules:
 | `story_key` | string | Yes | Yes | grouping key, null when not grouped |
 | `duplicate_of_item_id` | string | Yes | Yes | direct duplicate pointer, null when not duplicate |
 
+Public provenance field mapping: `provenance.canonical_url` maps to `items.canonical_url`; `provenance.original_url` maps to `items.url`; `provenance.source_url` maps to the item/source feed URL stored as `items.source_url` where present or `sources.url` for the associated source.
+
 `Source`:
 
 | Field | Type | Required | Nullable | Notes |
@@ -692,6 +910,8 @@ Canonical JSON type rules:
 | `last_fetch_status` | string enum | Yes | No | `ok`, `rss_fetch_error`, `not_fetched` |
 | `is_active` | boolean | Yes | No | false means deleted/inactive |
 | `revision` | integer | Yes | No | monotonic local change value |
+
+Revision contract: `revision` is response metadata only. HTTP and MCP clients do not send `revision`, `If-Match`, or `expected_revision`; there is no current client-visible CAS API. Local mutations execute inside SQLite transactions and return the post-mutation revision. Client-visible conflicts are limited to documented operation-guard conflicts, not stale-revision errors.
 
 `SteerRule`:
 
@@ -832,15 +1052,16 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
 
 Manual ingest conflict response schema:
 
-The ingest concurrency guard is global across background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`; conflict responses therefore always report `details.scope: "all"`, including when the holder is the background ingest loop.
+The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, and `POST /api/runtime/reprocess-library`. Conflict responses indicate the current operation holding the guard.
 
 ```json
 {
   "error": {
     "code": "conflict",
-    "message": "ingest already running",
+    "message": "operation already running",
     "details": {
-      "ingest_running": true,
+      "operation_running": true,
+      "operation": "ingest",
       "scope": "all",
       "retry_allowed": true
     }
@@ -943,17 +1164,34 @@ Endpoint contracts:
 | `GET /api/items/{id}` | path `id` | `200` | `{ "item": ItemDetail }` including extracted text and provenance |
 | `POST /api/items/{id}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
 | `POST /api/items/{id}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
+| `POST /api/items/{id}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
 | `POST /api/steer` | JSON `{ "command": "...", "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }`; `command` max `4000` bytes | `200` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` |
 | `GET /api/sources` | none | `200` | `{ "sources": [Source] }` |
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
-| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if any ingest/fetch is already running |
-| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if any ingest/fetch is already running |
+| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if any ingest/fetch/reprocess operation is already running |
+| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if any ingest/fetch/reprocess operation is already running |
 | `GET /api/search` | optional query params listed in the search query rules | `200` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` |
 | `GET /api/steer/active` | none | `200` | `{ "rules": [SteerRule] }`; intended for inline steering receipts only, not a rule-management UI |
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
 | `POST /api/state/import` | state bundle JSON, max `10 MiB` | `200` | restore result schema |
 | `GET /api/doctor` | none | `200` | `text/plain; charset=utf-8` raw diagnostic lines |
+
+`POST /api/items/{id}/delivery` contract:
+
+- marks that an authorized human or agent surfaced the item outside the ResoFeed UI by setting `item_state.external_surfaced_at` to the required RFC3339 `delivered_at` value;
+- requires owner-token authorization like every `/api/*` route; `actor_id` is provenance/idempotency metadata only and is not an authorization lookup key;
+- accepts only `actor_kind`, `actor_id`, `delivered_at`, and `idempotency_key` in the JSON body; unknown fields return `400 bad_request`;
+- requires `delivered_at` to be an RFC3339 UTC timestamp; malformed timestamps return `400 bad_request` with `details: { "field": "delivered_at" }`;
+- returns `404 not_found` with `details: { "id": "..." }` when the item id is absent or does not identify an existing item;
+- uses the same live `agent_receipts` request-fingerprint rules as other receipt-backed item-state mutations: same live key and same request fingerprint returns the stored response with `already_applied: true`, while same live key and different request fingerprint returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`;
+- does not create a delivery-channel registry, activity ledger, portable receipt, sync record, queue, or job.
+
+`GET /api/doctor` stale FTS diagnostic contract:
+
+- when `runtime_metadata.search_fts_stale_since` is set, diagnostics include the line `search_fts: stale since <RFC3339_UTC>`;
+- when no stale marker exists, diagnostics include the line `search_fts: ok`;
+- diagnostics must not include item text, source text, API keys, or raw model output.
 
 HTTP error matrix:
 
@@ -965,24 +1203,144 @@ HTTP error matrix:
 | malformed JSON body | `400` | `bad_request` | `{ "field": "body" }` |
 | missing required field | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | missing required `idempotency_key` | `400` | `bad_request` | `{ "field": "idempotency_key" }` |
+| unknown JSON request body field | `400` | `bad_request` | `{ "field": "<field_name>" }` |
+| live idempotency receipt exists for same key with different request fingerprint | `400` | `bad_request` | `{ "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }` |
 | bad content type | `400` | `bad_request` | `{ "content_type": "..." }` |
-| request body too large | `400` | `bad_request` | `{ "limit": "10 MiB" }` |
+| request body too large | `400` | `bad_request` | `{ "limit": "10 MiB" }` (or `100 KB` for processing language/reprocess endpoints) |
 | invalid state bundle schema or field shape | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
-| manual ingest/fetch requested while any ingest/fetch is already running | `409` | `conflict` | `{ "ingest_running": true, "scope": "all", "retry_allowed": true }` |
+| manual ingest/fetch/reprocess or language mutation requested while any guarded operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true }` |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
 Idempotency rules:
 
-- item-state mutations and `POST /api/steer` require `idempotency_key`;
+- item-state mutations (`inspect`, `resonance`, and `delivery`) and `POST /api/steer` require `idempotency_key`;
+- receipt-backed mutating operations that accept request bodies store a request fingerprint with the receipt and use the global `idempotency_key` scope defined by `agent_receipts`;
 - source delete is idempotent by source id;
 - OPML import is deduplicated by source URL;
 - state import atomically restores the validated state bundle and does not require `idempotency_key`;
 - manual ingest/fetch triggers do not use `idempotency_key` and must not create durable command receipts, queues, or job rows;
-- retrying the same mutation with the same `idempotency_key` returns the original result class and `already_applied: true` when applicable;
+- retrying the same mutation with the same live `idempotency_key` and same request fingerprint returns the stored result and `already_applied: true` when applicable;
+- retrying with the same live `idempotency_key` but a different request fingerprint returns `400 bad_request`;
 - new idempotency keys represent new intended operations.
 
+### Processing Language and Reprocess HTTP Addendum
+
+`ProcessingLanguageInfo`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `code` | string enum | Yes | No | `en` or `zh` |
+| `label` | string | Yes | No | Human-readable label for the current language. `en` maps to `English` and `zh` maps to `中文`. |
+
+`GET /api/runtime/language` returns:
+
+```json
+{
+  "language": {
+    "code": "en",
+    "label": "English"
+  }
+}
+```
+
+`PUT /api/runtime/language` request body:
+
+```json
+{
+  "language": "zh",
+  "actor_kind": "human",
+  "actor_id": "owner",
+  "idempotency_key": "..."
+}
+```
+
+Rules:
+
+- request body must be a JSON object with `language`, `actor_kind`, `actor_id`, and `idempotency_key` fields;
+- JSON body payload is limited to `100 KB`;
+- accepted values for `language` are `en` and `zh` only;
+- no query parameters are accepted;
+- success persists the runtime default and returns the same response shape as `GET /api/runtime/language` with `already_applied: false`;
+- setting language does not rewrite existing item rows and does not rebuild FTS;
+- if ingest/fetch/reprocess is already running, setting language returns `409 conflict` to avoid mixed-language batches;
+- retrying with the same idempotency key while a live receipt exists returns the same response with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same key is no longer recognized, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
+
+Duplicate idempotency examples for `PUT /api/runtime/language`:
+
+- live receipt replay: same key + same body/fingerprint returns the stored language response with `already_applied: true`;
+- caller error: same key + different language/body fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
+- expired or lost receipt: same valid body/key after TTL expiration or crash-loss is accepted as a fresh operation with `already_applied: false` if the operation guard is free.
+
+`ReprocessErrorDetail`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `item_id` | string | Yes | Yes | `null` for global operation failures, otherwise item ID. |
+| `code` | string enum | Yes | No | `rss_fetch_error`, `model_latency_error`, `summary_unavailable`, `original_unavailable`, `timeout`, `internal`. |
+| `message` | string | Yes | No | Terse diagnostic max 200 chars. |
+
+`ReprocessLibraryResult`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `status` | string enum | Yes | No | `failed` on fatal error, `completed_with_errors` if `items_failed` > 0 or `items_unavailable` > 0, otherwise `completed`. |
+| `language` | string enum | Yes | No | Processing language used for the operation. |
+| `started_at` | RFC3339 string | Yes | No | Start time. |
+| `completed_at` | RFC3339 string | Yes | No | Completion time. |
+| `items_attempted` | integer | Yes | No | Items whose processing began. On completed non-fatal runs this normally equals all items in the `items` table excluding tombstoned items from deleted sources; on fatal timeout/error it excludes unvisited items. `items_attempted` must equal `items_updated` + `items_unavailable` + `items_failed`. |
+| `items_updated` | integer | Yes | No | Items whose stored readable content was successfully rewritten in the target language. Unavailable items that are cleared or fallback-titled count in `items_unavailable`, not here. |
+| `items_indexed` | integer | Yes | No | Rows indexed in the successful final FTS rebuild transaction. If the final rebuild did not complete, this is normally `0`. |
+| `items_unavailable` | integer | Yes | No | Items left without target-language readable output because source/model input was unavailable. |
+| `items_failed` | integer | Yes | No | Items that encountered operational processing failure. |
+| `fts_rebuilt` | boolean | Yes | No | `true` only when the final FTS rebuild transaction succeeds; `false` for timeout/fatal outcomes before rebuild completion. |
+| `errors` | array of `ReprocessErrorDetail` | Yes | No | Max 50 errors returned. Empty when none. |
+
+`POST /api/runtime/reprocess-library` request body:
+
+```json
+{
+  "actor_kind": "human",
+  "actor_id": "owner",
+  "idempotency_key": "..."
+}
+```
+
+Rules:
+
+- request bodies must be valid JSON objects with `actor_kind`, `actor_id`, and `idempotency_key` fields;
+- JSON body payload is limited to `100 KB`;
+- query parameters are not accepted;
+- the operation uses the current persisted processing language;
+- it returns `{ "reprocess": ReprocessLibraryResult, "already_applied": false }` on completion;
+- per-item failures return HTTP `200` with `reprocess.status` set to `completed_with_errors` or `completed` according to the counts;
+- operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global `errors[]` entry whose `code` is `timeout`, unless the server cannot serialize a response;
+- fatal SQLite or invariant failures before result construction return HTTP `500 internal`;
+- if committed item transactions exist but the final FTS rebuild does not complete, `runtime_metadata.search_fts_stale_since` remains set and `/api/doctor` reports stale FTS;
+- if ingest/fetch/reprocess is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "reprocess"|"ingest"|"fetch"`, `details.scope: "library"|"all"|"source"`, and `details.retry_allowed: true`;
+- the endpoint must not create durable jobs, queues, command histories, activity rows, or sync metadata;
+- retrying with the same idempotency key while the operation is still running returns `409 conflict`; retrying after completion while a live receipt exists returns the completed result with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than returning `400` solely because the key was previously used.
+
+Duplicate idempotency examples for `POST /api/runtime/reprocess-library`:
+
+- live receipt replay after completion: same key + same body/fingerprint returns the stored `{ "reprocess": ReprocessLibraryResult, "already_applied": true }` response;
+- caller error: same key + different body fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
+- expired or lost receipt: same valid body/key after TTL expiration or crash-loss is accepted as a fresh operation with `already_applied: false` if the operation guard is free.
+
+Endpoint additions:
+
+| Method/path | Request | Success | Response |
+|---|---|---:|---|
+| `GET /api/runtime/language` | none | `200` | `{ "language": ProcessingLanguageInfo }` |
+| `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
+| `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if ingest/fetch/reprocess is already running |
+
+Canonical item response language rule:
+
+- `GET /api/feed/today`, `GET /api/items/{id}`, and `GET /api/search` return the stored item text as-is;
+- callers must not infer that every historical item matches the current processing language unless it was processed after the latest language change or explicit reprocess;
+- source identifier fields remain exact provenance values and are not localized.
 ## 7. MCP Surface
 
 MCP is required over Remote Streamable HTTP at `/mcp`. MCP tools/resources expose the same product concepts as the UI: inspect, resonate, steer, retrieve, and report delivery.
@@ -1014,12 +1372,12 @@ Tools:
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
 | `list_candidate_items` | `{ "limit": 20 }`, default `20`, max `50` | `{ "items": [ItemSummary] }` | No | feed candidate query |
-| `search_items` | `{ "query": "sqlite", "source": null, "from": null, "to": null, "resonated": null, "limit": 20 }` | `{ "items": [ItemSummary] }` | No | `GET /api/search` |
+| `search_items` | `{ "query": "sqlite", "source": null, "from": null, "to": null, "resonated": null, "limit": 20 }` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` | No | `GET /api/search` |
 | `read_item` | `{ "item_id": "item_01" }` | `{ "item": ItemDetail }` | No | `GET /api/items/{id}` |
 | `mark_inspected` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "human_inspected_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/inspect` |
 | `resonate_item` | `{ "item_id": "item_01", "resonated": true, "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "is_resonated": true, "already_applied": false }` | Yes | `POST /api/items/{id}/resonance` |
 | `steer` | `{ "command": "Push more technical documents.", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` | Yes | `POST /api/steer` |
-| `report_delivery` | `{ "item_id": "item_01", "actor_id": "agent-name", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `{ "item_id": "item_01", "external_surfaced_at": "...", "already_applied": false }` | Yes | item state update + receipt |
+| `report_delivery` | `{ "item_id": "item_01", "actor_id": "agent-name", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `{ "item_id": "item_01", "external_surfaced_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/delivery` |
 
 MCP schema rules:
 
@@ -1033,6 +1391,7 @@ MCP schema rules:
 - `item_id` is a required non-empty string for item-specific tools;
 - `command` max length is `4000` bytes;
 - `limit` defaults and maximums are fixed by the tool table.
+- `report_delivery` reuses the `POST /api/items/{id}/delivery` JSON response contract and idempotency semantics; MCP supplies `actor_id`, `delivered_at`, and `idempotency_key`, while owner-token authorization remains the only authorization boundary.
 
 Tool required fields:
 
@@ -1045,6 +1404,9 @@ Tool required fields:
 | `resonate_item` | `item_id`, `resonated`, `actor_id`, `idempotency_key` | none |
 | `steer` | `command`, `actor_id`, `idempotency_key` | none |
 | `report_delivery` | `item_id`, `actor_id`, `delivered_at`, `idempotency_key` | none |
+| `get_processing_language` | none | none |
+| `set_processing_language` | `language`, `actor_id`, `idempotency_key` | none |
+| `reprocess_library` | `actor_id`, `idempotency_key` | none |
 
 MCP invariants:
 
@@ -1054,6 +1416,77 @@ MCP invariants:
 - tool responses include enough provenance for agents to avoid duplicate loops;
 - MCP does not add delivery-channel ownership such as Telegram, Slack, or email.
 
+### Processing Language MCP Parity
+
+MCP item/search/detail resources and tools return the same stored historical item text as HTTP, which may differ from the current runtime processing language if the item was processed before a language change. MCP does not get a per-call language override in this contract; it follows the persisted runtime processing language for new operations.
+
+Additional resource:
+
+- `resofeed://runtime/language` — JSON `{ "language": ProcessingLanguageInfo }`.
+
+Additional tools:
+
+| Tool | Input schema | Output schema | Mutation? | Equivalent operation |
+|---|---|---|---|---|
+| `get_processing_language` | `{}` | `{ "language": ProcessingLanguageInfo }` | No | `GET /api/runtime/language` |
+| `set_processing_language` | `{ "language": "en"|"zh", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` | Yes | `PUT /api/runtime/language` |
+| `reprocess_library` | `{ "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }` | Yes | `POST /api/runtime/reprocess-library` |
+
+Rules:
+
+- mutating language/reprocess tools require owner-token authority, `actor_id`, and `idempotency_key` like other mutating MCP tools;
+- setting language through MCP affects future processing only and does not rewrite existing item rows;
+- `reprocess_library` is explicit, uses the current persisted language, and must not create durable jobs, queues, or activity feeds;
+- `list_candidate_items`, `search_items`, and `read_item` return stored historical item text as-is, which may differ from the current runtime processing language if the item was processed before a language change; source identifiers remain exact provenance anchors;
+- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` exactly matches the HTTP conflict detail shape: `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true }`;
+- `set_processing_language` MCP idempotency behavior: while a live receipt exists, same key + same request fingerprint returns the stored language response with `already_applied: true`; same key + different request fingerprint returns an MCP schema/request error equivalent to HTTP `400 bad_request`; after crash-loss or TTL expiration, the same valid body/key is accepted as a fresh operation with `already_applied: false` if the operation guard is free;
+- `reprocess_library` MCP idempotency behavior: a duplicate key during an active run returns the JSON-RPC conflict error described above; a duplicate key after completion while a live receipt exists returns the same `ReprocessLibraryResult` payload with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns an MCP schema/request error equivalent to HTTP `400 bad_request`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours, which is permitted as transient runtime state. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the tool accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
+
+MCP JSON-RPC error examples:
+
+Guarded-operation conflict:
+
+```json
+{
+  "error": {
+    "code": -32000,
+    "message": "operation already running",
+    "data": {
+      "error": {
+        "code": "conflict",
+        "message": "operation already running",
+        "details": {
+          "operation_running": true,
+          "operation": "reprocess",
+          "scope": "library",
+          "retry_allowed": true
+        }
+      }
+    }
+  }
+}
+```
+
+Same key with different request fingerprint:
+
+```json
+{
+  "error": {
+    "code": -32602,
+    "message": "invalid request",
+    "data": {
+      "error": {
+        "code": "bad_request",
+        "message": "idempotency key reused with different request",
+        "details": {
+          "field": "idempotency_key",
+          "reason": "request_fingerprint_mismatch"
+        }
+      }
+    }
+  }
+}
+```
 ## 8. Frontend Boundary
 
 Frontend implementation lives in `web/` and must preserve `docs/DESIGN.md`.
@@ -1078,6 +1511,16 @@ Forbidden:
 - visual concepts not in `docs/DESIGN.md`;
 - extra dashboard surfaces for diagnostics, source management, manual ingest/fetch, or settings;
 - UI state models that imply persisted ingest jobs, queued retries, activity feeds, or portable manual-ingest receipts.
+
+Processing-language and split-scroll responsibilities:
+
+- read the persisted processing language after owner-token acceptance and render UI chrome/accessibility labels for `en` or `zh`;
+- set `<html lang>` to `en` or `zh-CN` according to the active UI language unless `docs/DESIGN.md` specifies a narrower locale;
+- expose language as a terse operational control, not a settings dashboard;
+- expose one-time library reprocess as a terse operational/bracket action, not a wizard, progress dashboard, queue, or activity surface;
+- mark source identifiers such as URLs, source titles, source URLs, canonical URLs, and original links as literal provenance anchors and avoid translating or beautifying them; DOM rendering must use `translate="no"` or an equivalent implementation for these source identifier spans/links;
+- keep desktop feed and Inspector as independent vertical scroll regions; selecting an item must not move the feed scroll, while the Inspector reading container resets to top for a newly selected item;
+- keep mobile Inspector as the existing full-screen route with preserved feed scroll.
 
 ## 9. Minimal File Shape
 
@@ -1199,7 +1642,7 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
   -H "Content-Type: application/json" \
   --data '{}'
 # when the first request is still running, expect 409 JSON error:
-# {"error":{"code":"conflict","message":"ingest already running",...}}
+# {"error":{"code":"conflict","message":"operation already running","details":{"operation_running":true,"operation":"ingest","scope":"all","retry_allowed":true}}}
 ```
 
 State roundtrip check:
@@ -1222,6 +1665,45 @@ MCP connection check:
 Connect an MCP Streamable HTTP client to http://127.0.0.1:8080/mcp
 with header Authorization: Bearer <OWNER_TOKEN>.
 Read resofeed://system/doctor and expect text/plain diagnostics.
+```
+
+Processing-language and split-scroll verification additions:
+
+- `runtime_metadata.processing_language` persists `en` or `zh`, defaults to `en` when absent, and is not included in state export/import;
+- `runtime_metadata.search_fts_stale_since` is absent when FTS is current, set while/after reprocess fails before final rebuild, and cleared after successful rebuild;
+- `PUT /api/runtime/language` changes future processing language without rewriting existing item rows or rebuilding FTS;
+- future ingest sends target language to OpenRouter and persists user-readable item text in that target language;
+- source identifiers remain unchanged after language changes and reprocess;
+- source identifier DOM nodes/links use `translate="no"` or equivalent so browser/page translation does not localize provenance anchors;
+- `POST /api/runtime/reprocess-library` explicitly rewrites existing readable item text in the current language and rebuilds FTS without creating durable jobs, queues, or activity ledgers;
+- if a reprocess receipt expires or is lost after restart, resubmitting the same request body and `idempotency_key` while the concurrency guard is free is accepted as a fresh request with `already_applied: false`, not rejected as `400` solely because the key was previously used;
+- operation guard conflicts across manual ingest/fetch/reprocess/language mutation use `409 conflict` details with `operation_running`, `operation`, `scope`, and `retry_allowed`, and MCP returns the matching JSON-RPC error data shape;
+- timeout reprocess outcomes return `reprocess.status: "failed"`, `fts_rebuilt: false`, and error `code: "timeout"` when the server can serialize the response; fatal pre-result SQLite/invariant failures return `500 internal`;
+- `GET /api/search` searches the stored target-language FTS content after reprocess;
+- `GET /api/doctor` reports `search_fts: stale since <RFC3339_UTC>` when the stale marker is set, otherwise `search_fts: ok`, and never includes item text, source text, API keys, or raw model output;
+- MCP `list_candidate_items`, `search_items`, and `read_item` return the same stored target-language item text as HTTP;
+- UI chrome and accessible labels render in English and Chinese, and source identifiers are not translated;
+- desktop feed and Inspector scroll independently; selecting a new item leaves feed scroll stable and resets Inspector scroll to top;
+- mobile Inspector remains a full-screen route.
+
+Processing-language smoke checks:
+
+```bash
+curl -i http://127.0.0.1:8080/api/runtime/language \
+  -H "Authorization: Bearer <OWNER_TOKEN>"
+# expect 200 JSON body: {"language":{"code":"en",...}} unless changed
+
+curl -i -X PUT http://127.0.0.1:8080/api/runtime/language \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"smoke-test-1"}'
+# expect 200 JSON body: {"language":{"code":"zh",...},"already_applied":false}
+
+curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"smoke-test-2"}'
+# expect 200 JSON body: {"reprocess":{"language":"zh","fts_rebuilt":true,...},"already_applied":false}
 ```
 
 ## 11. Open Questions

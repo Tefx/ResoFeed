@@ -394,6 +394,14 @@ Feed lifecycle:
 - Older items remain reachable via pagination or progressive loading.
 - No completion badge, no queue-clear affordance, no mark-all-read action.
 
+### Desktop Split Scroll and Processing Language Layout
+
+Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector reading container to the top for the newly selected item. Both scroll regions MUST be focusable (e.g., `tabindex="0"`) with proper accessible names so keyboard users can scroll them independently.
+
+Mobile keeps the existing single-column behavior: Feed is the main surface and Inspector opens as a full-screen route with preserved Feed scroll.
+
+Processing language is a global operational state, not a per-item display toggle. The language control may appear in low-chrome app chrome or a `/doctor`-class utility surface, but it must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
+
 ## Elevation
 
 Depth is conveyed by z-order, borders, type scale, indentation, and tonal selection—not shadows. Maximum elevation levels:
@@ -425,6 +433,38 @@ Pills are exceptions for compact provenance only. They must not inflate left-fee
 Purpose: hold Steer, feed, and optional Inspector with no settings-sidebar bloat.
 
 Anatomy: top command row, feed viewport, detail pane, and utility surfaces reachable through the `RESOFEED` surface menu. The menu may contain `TODAY` and `SOURCE LEDGER`; those labels do not need to be persistent visible links when the menu is closed. States: default, menu open, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; `RESOFEED` menu summary must be keyboard reachable; menu items must be real buttons/links with accessible names; skip-to-feed link may exist but should be visually quiet.
+
+### Language Control
+
+Purpose: expose the persisted processing language as a terse global pipeline state.
+
+Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It may live in the app chrome or a `/doctor`-class utility surface. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector.
+
+States: English, Chinese, updating, failed. Updating keeps dimensions stable and uses terse text only. Failure uses raw `err: <diagnostic>` copy and the existing feedback-line style.
+
+Keyboard and accessibility: language control is a real button/control with an accessible name that announces the current processing language and the target action. The document `<html lang>` must reflect the active UI language (`en` or `zh-CN` unless a narrower Chinese locale is chosen later). Successful or failed language updates MUST be announced via an `aria-live="polite"` terse status line (e.g., `Language set to English` or `err: language update failed`).
+### Reprocess Library Action
+
+Purpose: explicitly rewrite existing stored user-readable item content into the current processing language and rebuild search indexing.
+
+Anatomy: a terse operational bracket action, preferably `[REPROCESS LIBRARY]` / `[重处理资料库]`, with warning copy such as `Existing readable item content will be rewritten.` / `已存可读内容将被重写。` and `Source identifiers remain unchanged.` / `来源标识保持不变。`
+
+States: default, confirming, running, complete, conflict, failed. Running state uses text replacement only, e.g. `[REPROCESSING...]`; no spinner, progress bar, wizard, dashboard, queue view, or activity log is allowed. Confirming state replaces the default action with two bracket actions: `[CONFIRM REPROCESS]` and `[CANCEL]`. Conflict state uses terse copy `err: ingest already running` (or equivalent).
+
+Keyboard and accessibility: the action must expose its destructive/operational meaning, e.g. `Reprocess existing library and rebuild search index`.
+Focus management across states:
+- `confirming`: keep/place focus on the `[CONFIRM REPROCESS]` action;
+- `running`: use `aria-disabled="true"` instead of the native `disabled` attribute to disable the action without losing keyboard focus;
+- `conflict`, `complete` or `failed`: return focus predictably to the trigger or adjacent text, and announce result via an `aria-live` region.
+Completion/failure messages use live regions and remain terse.
+
+### Source Identifiers
+
+Purpose: preserve trust anchors when item-readable content is processed in another language.
+
+The following identifiers must render unchanged and must not be translated, summarized, transliterated, beautified, or rewritten: URL, source title, source URL, canonical URL, and original link.
+
+Accessibility: source identifiers MUST use `translate="no"` (or equivalent implementation) and remain screen-reader readable as literal provenance anchors.
 
 ### Owner Token Prompt
 
@@ -521,6 +561,10 @@ Note on Resonate Action: To maintain a clean, low-fatigue interface, the Inspect
 Inspector must not include related-content carousels, recommendation modules, or ads. It may expose source provenance and original links plainly.
 
 Keyboard and accessibility: opening Inspector moves focus to the detail heading; closing/back returns focus to the originating feed item and preserves scroll. Original links, grouped sources, source-text status, summary provenance, and provenance labels must be screen-reader readable.
+
+Processing-language addendum: Inspector title, dense summary, core insight, and reading body render stored target-language item content. Original link and source identifiers remain unchanged and visually/semantically act as provenance anchors. Inspector must not show AI-magic translation badges, side-by-side original/translation comparison, or a separate translation failure state; existing source-text and summary-provenance lines remain the trust model.
+
+On desktop, the Inspector is its own scroll container. Opening a different item resets the Inspector scroll position to the top without moving the Feed scroll. On mobile, Inspector remains a full-screen route.
 
 ### Source Ledger
 
@@ -634,7 +678,7 @@ Do:
 - Do keep Source Ledger flat: view source rows, delete, details, OPML import, state export/import, and lightweight manual ingest/fetch only.
 - Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
 - Do represent manual ingest work with text replacement only: `[INGESTING...]`, `[FETCHING...]`, updated timestamps, conflict text, or raw `err:` diagnostics.
-- Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment.
+- Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment.
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
@@ -663,6 +707,25 @@ Don't:
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
 - Don't display internal design-positioning phrases such as “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” as product UI copy.
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
+
+Language and reprocessing guardrails:
+
+Do:
+
+- Do treat language as a global processing state, not a cosmetic per-item display toggle.
+- Do keep language controls terse: `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`.
+- Do localize UI chrome, accessibility labels, and user-readable item content for supported languages.
+- Do preserve source identifiers exactly and mark them as non-translatable where possible.
+- Do expose existing-library reprocess as a terse bracket-style operational action.
+- Do state plainly that reprocess rewrites stored readable content and rebuilds search indexing.
+
+Don't:
+
+- Don't add a settings dashboard, preference center, wizard, progress dashboard, or activity log for language or reprocess.
+- Don't add per-item original/translation toggles or side-by-side bilingual reading surfaces.
+- Don't translate, summarize, beautify, or transliterate URLs, source titles, source URLs, canonical URLs, or original links.
+- Don't introduce `translation_failed` copy or visual state; use existing extraction/model failure semantics.
+- Don't automatically rewrite existing items merely because the user changed language.
 
 ## Micro-interactions & Motion
 
