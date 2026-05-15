@@ -74000,7 +74000,7 @@ phases:
       request attribution/idempotency metadata.'
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -74130,6 +74130,154 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T17:18:17.928255+00:00'
+    done_at: '2026-05-15T17:25:42.393337+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by execution agent; processing language is persisted
+      runtime metadata (`en|zh`) excluded from portable state; frontend derives UI
+      language from authenticated runtime API; reprocess is explicit, non-durable,
+      and must not create jobs/queues/activity logs.
+
+      - docs/DESIGN.md — Read by execution agent; Language Control must render terse
+      `LANG: EN` / `语言: 中文`, set `<html lang>` to `en`/`zh-CN`, and announce success/failure
+      via `aria-live`; Reprocess Library Action must use bracket actions with confirming/running/complete/conflict/failed
+      states, no spinner/dashboard/wizard, and focus returned predictably.
+
+
+      ## Action Summary
+
+      - Hardened rendered reprocess terminal-state focus behavior in `web/src/routes/+page.svelte`
+      so complete/conflict/failed outcomes return focus to the trigger before live-region
+      result announcement.
+
+      - Added rendered coverage for HTTP 400 request-fingerprint mismatch and 401
+      owner-token failure handling, conflict focus preservation, and terse raw error
+      rendering.
+
+
+      ## Rendered UI Evidence
+
+      **Runtime/client state consumed**: `ResoFeedApiClient.processingLanguage()`,
+      `setProcessingLanguage()`, and `reprocessLibrary()` are exercised through rendered
+      `+page.svelte` controls and mocked runtime HTTP responses.
+
+
+      **Rendered artifacts / assertions**:
+
+      - DOM contains `LANG: EN`.
+
+      - `<html lang="en">` after authenticated runtime language load.
+
+      - `<html lang="zh-CN">` after language mutation.
+
+      - Language live region: `role="status" aria-label="processing language" aria-live="polite"`
+      announces `Language set to 中文`.
+
+      - Reprocess default: `[重处理资料库]`.
+
+      - Confirmation: `[确认重处理]` / `[取消]`, with confirm focused.
+
+      - Running: `[重处理中...]` with `aria-disabled="true"` and no native `disabled`.
+
+      - Complete: `重处理完成: updated 1; indexed 1`.
+
+      - Conflict: `err: ingest already running`, focus returned to `[重处理资料库]`.
+
+      - 400 mismatch: `err: request_fingerprint_mismatch`.
+
+      - 401 unauthorized: Owner Token Prompt alert `err: owner token rejected` and
+      token input focused.
+
+
+      **States covered**: initial / language success / language 400 mismatch / unauthorized
+      401 / reprocess confirming / running / complete / conflict 409 / failed 500.
+
+
+      ## Storage-Core Downstream Blocker Closure
+
+      | Blocker | Rendered consumer evidence | Status |
+
+      |---|---|---|
+
+      | frontend processing language/reprocess anchors type-only | `+page.svelte`
+      consumes `processingLanguage`, `setProcessingLanguage`, and `reprocessLibrary`;
+      focused render tests pass. | closed |
+
+      | runtime language state not consumed by UI | tests assert `LANG: EN`, localized
+      Chinese text, and `<html lang>` updates from runtime response. | closed |
+
+      | reprocess active/conflict hidden or represented as job queue | tests assert
+      bracket action states and raw conflict text; no queue/dashboard/activity UI.
+      | closed |
+
+
+      ## Contract Deviation Records
+
+      none
+
+
+      ## Checklist Closure
+
+      - Description checklist items toggled with `vectl_check` by execution agent.
+
+      - Verification checklist items marked `[x]` by orchestrator after validating
+      rendered, accessibility, focus, conflict/error, and mainline verification evidence.
+
+
+      ## Files changed
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+
+
+      ## Commit hash(es)
+
+      - worktree commit: 3b77be79b5522726e39e5b0acfd6ff9760b77b90
+
+      - mainline squash commit: cc5b1e68
+
+
+      ## Verification
+
+      Execution worktree verification:
+
+      - `npm ci` — exit 0.
+
+      - focused render tests after deps — exit 0; 2 files / 6 tests passed.
+
+      - focused render tests after added coverage/fix — exit 0; 2 files / 7 tests
+      passed.
+
+      - `npm run check` — exit 0; 0 errors / 0 warnings.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm --prefix web run check` — passed, 0 errors / 0 warnings.
+
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`
+      — passed, 3 files / 10 tests.
+
+      - `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts
+      --project=chromium-ci-safe` — passed, 2 tests.
+
+      - `npm --prefix web run build` — passed.
+
+
+      ## Spec link
+
+      docs/ARCHITECTURE.md; docs/DESIGN.md; plfu-api-client-types; plct-contract-lock;
+      plct-frontend-expected-red-tests
+
+
+      ## Gaps/Notes
+
+      No settings dashboard, preference center, onboarding wizard, progress dashboard,
+      job queue, activity log, or per-item translation toggle was added. No browser
+      screenshot captured; rendered DOM/test-renderer output and accessibility assertions
+      were used as required evidence.'
   - id: plfu-source-identifiers-split-scroll
     name: Preserve source identifiers and split scroll behavior
     status: done
