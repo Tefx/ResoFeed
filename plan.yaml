@@ -72355,7 +72355,7 @@ phases:
 
       - [x] Entry point starts and stays alive long enough for probes.
 
-      - [ ] At least one HTTP operation reaches the real route.
+      - [x] At least one HTTP operation reaches the real route.
 
       - [ ] At least one MCP operation reaches the real `/mcp` route.
 
