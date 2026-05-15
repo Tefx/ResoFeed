@@ -65411,7 +65411,7 @@ phases:
       `{"status":"PASS","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_recommendation":"OPEN","verdict":"PASS","blockers":[],"gate_open_allowed":true,"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}`'
 - id: ui-runtime-fresh-review-remediation
   name: UI Runtime Fresh Review Remediation
-  status: in_progress
+  status: done
   gate: Final gate cannot open until FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09,
     and FR-10 from docs/audits/ui-runtime-fresh-review-2026-05-15.md have implementation,
     expected-red-to-green proof, UIUX multimodal evidence, and black-box runtime liveness
@@ -66838,7 +66838,7 @@ phases:
       off blocker ownership to the new remediation chain.'
   - id: ui-runtime-fresh-review-final-gate
     name: Final gate for fresh runtime UI review remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -67004,6 +67004,241 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T09:50:17.270496+00:00'
+    done_at: '2026-05-15T09:57:20.722696+00:00'
+    evidence: 'headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Gate Review Report
+
+      Reviewer: gate-reviewer
+
+      Phase: ui-runtime-fresh-review-remediation
+
+
+      ### refs Read Confirmation
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — Original audit required
+      real served-app browser flows and identified FR-01/FR-10 menu, FR-02 time ordering,
+      FR-04 duplicate source Inspector disclosure, FR-05 contextual [FETCH] names,
+      FR-06 [DETAILS] row height, FR-07 Source Ledger label ID, and FR-09 mobile metadata
+      wrapping issues.
+
+      - docs/DESIGN.md — RESOFEED menu may contain TODAY/SOURCE LEDGER only after
+      opening; mobile metadata must remain flat inline; Inspector requires source-list
+      disclosure for grouped stories; Source Ledger requires h1#source-ledger-title
+      and contextual aria-label Fetch source; forbidden concepts include folders/tags/unread/archive/settings
+      dashboards/job queues.
+
+      - docs/ARCHITECTURE.md — One Go binary serves static UI/API/MCP/ingest with
+      one SQLite DB; duplicate/story grouping must preserve every original source
+      item; no sidecars, queues, sync/merge, vector/RAG, accounts, or activity ledgers.
+
+
+      ### B1 Contradictory Evidence Reconciliation
+
+      - Earlier UIUX FR-04 PASS reviewed: YES — original UIUX audit reported FR-04
+      PASS from rendered/e2e proof, but that proof used an older path.
+
+      - Black-box served-app FAIL reviewed: YES — original black-box liveness recorded
+      B1 FAIL: mobile Inspector showed Fresh Runtime A only and omitted Fresh Runtime
+      B on real served app.
+
+      - Post-fix black-box rerun reviewed: YES — rerun records real served runtime
+      at 127.0.0.1:60810, clean DB, HTTP OPML import, POST /api/ingest, 390x844 Playwright
+      probe, and Inspector excerpt containing both Fresh Runtime A and Fresh Runtime
+      B.
+
+      - Post-fix UIUX rerun reviewed: YES — rerun records 390x844 mobile rendered
+      artifact mobile-inspector.png, DOM/accessibility proof for details.contract-grouped-sources,
+      and explicit Fresh Runtime A/B visibility.
+
+      - Decision basis: Old UIUX PASS is supporting context only. The black-box FAIL
+      was authoritative for B1 because it exercised the public served app. Gate closure
+      relies on the two post-fix reruns plus source/test review and a local e2e rerun.
+
+
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+      | ui-runtime-fresh-review-full-frontend-test-remediation | done | adequate |
+      npm run test/check/build/e2e/go test recorded; no fresh-audit spec weakening.
+      |
+
+      | ui-runtime-fresh-review-full-frontend-green-retest | done | adequate | Green
+      retest covers FR-01/10, FR-02, FR-04, FR-05/07, FR-06, FR-09. |
+
+      | ui-runtime-fresh-review-uiux-multimodal-audit | done | adequate for original
+      FR closure, not B1 closure | Reconciled as stale/insufficient for B1 after later
+      served-app failure. |
+
+      | ui-runtime-fresh-review-black-box-liveness | done/failed evidence | excellent
+      failure evidence | Authoritative B1 blocker: Fresh Runtime B absent on public
+      mobile Inspector. |
+
+      | ui-runtime-fresh-review-mobile-inspector-grouped-source-fix | done | adequate
+      | Root cause and code path identified: Inspector had detail-only grouped_source_items
+      and did not receive sibling feed candidates. |
+
+      | ui-runtime-fresh-review-black-box-liveness-rerun | done | strong | Real served-app
+      rerun proves single binary, clean SQLite, OPML import, ingest, 390x844 Inspector,
+      Fresh Runtime A/B visible. |
+
+      | ui-runtime-fresh-review-mobile-inspector-uiux-rerun | done | adequate | Fresh
+      390x844 rendered/DOM evidence recorded; explicit PASS/headline/blockers. |
+
+      | ui-runtime-fresh-review-final-gate | reviewed | complete | Gate decision OPEN.
+      |
+
+
+      ### Wiring audit (W1-W8)
+
+      | Check | Result | Evidence |
+
+      |---|---|---|
+
+      | W1 Feed grouping source data | PASS | e2e defines same-URL Fresh Runtime A/B
+      items; rerun feed.json says both share same URL. |
+
+      | W2 Selected item/detail handoff | PASS | +page derives inspectorItem from
+      selected detail or feed summary; selecting item opens Inspector and loads detail.
+      |
+
+      | W3 Grouped-source candidate plumbing | PASS | +page passes groupedSourceCandidates={items}
+      and sources={sources} into Inspector. |
+
+      | W4 Inspector inference when detail provenance is sparse | PASS | Inspector
+      merges provenance.grouped_source_items with inferred feed candidates via story
+      key, duplicate pointers, and normalized same URL. |
+
+      | W5 Inspector grouped-source disclosure DOM | PASS | Inspector renders details.contract-grouped-sources,
+      aria-label Grouped story with N source items, ordered list, source links, feed
+      links. |
+
+      | W6 Mobile public story path | PASS | post-fix black-box rerun: resofeed serve
+      + clean DB + HTTP OPML import + ingest + 390x844 Playwright selected Alpha Today
+      Primary Story and saw Fresh Runtime A/B. |
+
+      | W7 Regression coverage | PASS | npm --prefix web ci && npm --prefix web run
+      test:e2e -- ui-runtime-fresh-review-remediation.spec.ts --reporter=line exited
+      0; 7 passed. |
+
+      | W8 Boundary/forbidden concepts | PASS | Source review found no queues/sync/vector/RAG/accounts/settings/folders/tags/unread/archive
+      surfaces; architecture remains frontend-only Inspector plumbing plus existing
+      single-binary runtime. |
+
+
+      ### Escape hatch audit
+
+      - CONSTITUTION.md not found.
+
+      - @invar:allow scan over cmd, internal, web/src, web/tests, and relevant docs
+      returned no scoped source/spec escape hatches. Broad matches in plan/audit text
+      were excluded as evidence narratives, not implementation annotations.
+
+
+      ### Smoke/liveness evidence
+
+      - Reviewed post-fix black-box served-app proof: built assets, built Go binary,
+      run resofeed serve on 127.0.0.1:60810 with clean SQLite and owner token, authenticated
+      OPML import, POST /api/ingest, lsof LISTEN, server log serving ResoFeed, feed.json
+      with Fresh Runtime A/B same URL, and 390x844 mobile Inspector proof showing
+      both sources.
+
+      - Independent verification: npm --prefix web ci && npm --prefix web run test:e2e
+      -- ui-runtime-fresh-review-remediation.spec.ts --reporter=line exited 0; Vite/SvelteKit
+      build and 7 passed.
+
+
+      ### Real integration vs fixture/mocked evidence
+
+      - Real served-app proof: post-fix black-box rerun used built Svelte assets,
+      single Go binary, clean SQLite DB, owner token, documented HTTP import/ingest,
+      and browser automation against served UI at 390x844; this closes B1.
+
+      - Rendered UIUX proof: post-fix UIUX rerun used Puppeteer DOM/accessibility
+      snapshot and rendered mobile artifact for Inspector disclosure.
+
+      - Fixture/mocked evidence: local Playwright e2e uses route-fulfilled API fixtures
+      and a mocked sparse-detail same-URL scenario; it is regression/contract preservation
+      evidence, not the sole B1 closure basis.
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | FR-01/FR-10 | RESOFEED menu closed by default, keyboard reachable, TODAY/SOURCE
+      LEDGER hidden until open | desktop/mobile DOM/browser proof | plan reruns +
+      local e2e 7 passed | PROVEN | closed | no blocker |
+
+      | FR-02 | Time labels do not repeat out of chronological group order | contiguous
+      label assertion | green retest + local e2e | PROVEN | closed | no blocker |
+
+      | FR-04/B1 | Primary mobile Inspector discloses grouped same-URL sources Fresh
+      Runtime A and B | real served app 390x844 Inspector | black-box rerun Inspector
+      excerpt includes Fresh Runtime A/B; UIUX rerun DOM proof | PROVEN | closed |
+      authoritative post-fix reruns supersede old contradictory PASS/FAIL |
+
+      | FR-05 | Source [FETCH] accessible names are contextual | Source Ledger DOM/accessibility
+      proof | black-box rerun and e2e | PROVEN | closed | no blocker |
+
+      | FR-06 | Collapsed [DETAILS] does not inflate rows by default | row height/details
+      closed proof | green retest/e2e | PROVEN | closed | no blocker |
+
+      | FR-07 | Source Ledger DOM contract uses source-ledger-title | aria-labelledby
+      proof | black-box rerun and e2e | PROVEN | closed | no blocker |
+
+      | FR-09 | Mobile metadata remains one flat inline line | 390x844 CSS/height
+      proof | black-box rerun and e2e | PROVEN | closed | no blocker |
+
+      | Architecture/Product boundaries | No forbidden runtime shape or UI concept
+      introduced | source review + runtime scan | docs/ARCHITECTURE comparison; Inspector/+page
+      wiring only; no scoped escape hatches | PROVEN | closed | no blocker |
+
+
+      ### Gate Decision
+
+      - Recommendation: OPEN
+
+      - Rationale: All original fresh audit blockers/should-fix items and later B1
+      served-app blocker have post-fix evidence. Authoritative closure evidence is
+      the post-fix black-box served-app rerun plus post-fix mobile UIUX rerun; local
+      e2e verifies regression coverage remains green. No scoped escape hatches or
+      forbidden ResoFeed concepts were found. Generated screenshot/JSON artifacts
+      are not committed but are non-blocking because task instructions allowed uncommitted
+      generated artifacts and recorded commands, output, and textual Inspector proof.
+
+
+      ## Commit hash(es)
+
+      - none — verification-only
+
+
+      ## Gaps/Notes
+
+      - Non-blocking: Generated post-fix rerun artifact files referenced in plan evidence
+      were not present in final gate worktree; allowed by task rules and not blocking.
+
+      - Final gate worktree status reported clean after generated Playwright artifacts
+      were restored.'
   - id: ui-runtime-fresh-review-full-frontend-test-remediation
     name: Remediate full frontend npm test stale render-contract failures
     status: done
