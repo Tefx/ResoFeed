@@ -80523,7 +80523,7 @@ phases:
       preview_steer, and undo_steer; public runtime surfaces are either documented
       or removed from the contract surface.
 
-      - [ ] Resolve manual ingest/fetch response-shape contract with source-backed
+      - [x] Resolve manual ingest/fetch response-shape contract with source-backed
       code/doc alignment and strict response-shape regression tests.
 
       - [x] Remove ErrSteerContractOnly if unused, or justify it with runtime reachability
