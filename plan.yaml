@@ -69734,7 +69734,7 @@ phases:
   steps:
   - id: plsc-runtime-metadata-receipts
     name: Complete runtime metadata migrations and live receipt semantics
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -69822,6 +69822,80 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T12:12:22.600012+00:00'
+    done_at: '2026-05-15T14:10:20.110882+00:00'
+    evidence: 'Runtime metadata and live receipt semantics implemented and merged.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed agent_receipts are live-only with
+      24h TTL/fingerprint mismatch rejection; runtime_metadata.processing_language
+      is runtime-local en|zh with absent=>en; state export/import excludes runtime
+      metadata and receipts.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — subagent confirmed processing_language
+      exclusion, optional search_fts_stale_since, receipt 24h TTL, replay/mismatch/expired
+      replacement.
+
+      - internal/resofeed/processing_language_contract.go — subagent confirmed ProcessingLanguage
+      enum en/zh, default en, ReceiptLiveTTL=24h, metadata keys, request fingerprint
+      contract.
+
+      - internal/resofeed/plct_backend_expected_red_test.go — subagent confirmed expected-red
+      anchors for metadata schema, state export exclusion, language receipt TTL/mismatch;
+      downstream delivery/reprocess failures remain outside this step.
+
+      - AGENTS.md — NOT READ in isolated worktree because absent; prompt-provided
+      AGENTS constraints followed.
+
+
+      ## Implementation Evidence
+
+      - Files changed: internal/resofeed/idempotency.go; internal/resofeed/mcp.go;
+      internal/resofeed/http.go; internal/resofeed/runtime_metadata.go; internal/resofeed/runtime_metadata_receipts_test.go.
+
+      - Metadata keys implemented: processing_language effective en when missing and
+      persisted en|zh validation; search_fts_stale_since set/clear helpers.
+
+      - Receipt TTL/fingerprint behavior evidence: withIdempotencyReceipt serializes
+      receipt reuse, handles live replay, request_fingerprint_mismatch, transactionally
+      deletes expired rows before fresh replacement, and writes snapshots transactionally.
+
+      - State export/import exclusion evidence: test seeds runtime_metadata and agent_receipts
+      and asserts exported state contains no runtime_metadata, processing_language,
+      search_fts_stale_since, agent_receipts, request_fingerprint, or receipt key.
+
+      - Forbidden concepts: no job/queue/ledger/sync/vector/embedding/RAG/service/repository
+      tables or layers added.
+
+      - Deviation records: none.
+
+      - Worktree commit: 38ee50ae.
+
+      - Mainline squash commit: 8d110b66.
+
+
+      ## Verification
+
+      - gofmt -w internal/resofeed/idempotency.go internal/resofeed/mcp.go internal/resofeed/http.go
+      internal/resofeed/runtime_metadata.go internal/resofeed/runtime_metadata_receipts_test.go
+      — exit 0.
+
+      - go test ./internal/resofeed -run ''TestRuntimeMetadata|TestReceipt|TestPLCTStateExportImportExcludesRuntimeMetadataAndReceipts''
+      — exit 0.
+
+      - go test -race ./internal/resofeed -run ''TestReceiptConcurrentReuseSerializesSingleApply|TestReceiptLiveTTLReplayMismatchAndExpiredReplacement''
+      — exit 0.
+
+      - go build ./... — exit 0.
+
+      - golangci-lint run — exit 0 (0 issues).
+
+      - Full go test ./... still has expected-red downstream gaps for HTTP/MCP/FTS/doctor/OpenRouter;
+      not a blocker for this scoped implementation step.
+
+
+      Checklist: all completion and verification checklist items are [x].'
   - id: plsc-processing-language-ingest
     name: Complete processing language backend and OpenRouter input
     status: pending
