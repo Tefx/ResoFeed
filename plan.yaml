@@ -77314,7 +77314,7 @@ phases:
       precedence, UI language/reprocess/source/split-scroll/mobile Inspector are explicitly
       handed to closure steps.
 
-      - [ ] Frontend dependency bootstrap expectation (`npm --prefix web install`
+      - [x] Frontend dependency bootstrap expectation (`npm --prefix web install`
       before build when needed) is documented for closure evidence.
 
       - [ ] No serial fix/retest churn or extra remediation siblings are introduced.'
