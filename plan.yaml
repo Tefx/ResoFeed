@@ -79211,7 +79211,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Tests cover idle preview reserved-but-blank, no [IDLE] chip, no duplicate
+      - [x] Tests cover idle preview reserved-but-blank, no [IDLE] chip, no duplicate
       hint, aria-describedby, focus retention, Escape cancel, and correct polite/assertive
       live-region levels.
 
