@@ -80872,7 +80872,7 @@ phases:
 
       - [x] Produce the exact machine-readable closure fields listed above.
 
-      - [ ] Set gate_open_allowed=false if any blocker-class proof gap remains.'
+      - [x] Set gate_open_allowed=false if any blocker-class proof gap remains.'
     verification: '- [ ] Retest is a phase-check protecting srdb-backend-gate and
       downstream frontend/E2E gates.
 
