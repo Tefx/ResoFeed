@@ -72255,7 +72255,7 @@ phases:
       - [x] Strict validation tests cover unknown fields, duplicate/unknown query
       params, bad delivered_at, auth failures, idempotency replay/mismatch, and conflicts.
 
-      - [ ] Evidence includes actual commands and outputs.'
+      - [x] Evidence includes actual commands and outputs.'
     verification: '- [ ] HTTP and MCP contract test commands pass.
 
       - [ ] At least one test proves HTTP/MCP equivalent state mutation for language
