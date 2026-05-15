@@ -71808,6 +71808,11 @@ phases:
       split-scroll/feed-inspector behavior.
 
 
+      This step owns rendered frontend consumption for source identifier and layout
+      contract anchors. It must prove visible DOM behavior; type-only/view-model-only
+      changes are insufficient.
+
+
       YOUR SCOPE:
 
       - Mark URL, source title, source URL, canonical URL, and original link elements
@@ -71822,6 +71827,21 @@ phases:
       to top.
 
       - Preserve mobile full-screen Inspector route with feed scroll preservation.
+
+      - Consume any frontend contract anchors for source identifiers and split-scroll
+      behavior in rendered routes/components.
+
+
+      ## Downstream blocker ownership from storage-core verification
+
+      - [ ] Frontend source/split-scroll contract anchors must be consumed by rendered
+      routes/components here.
+
+      - [ ] Type-only UI declarations are not sufficient unless a later rendered owner
+      is explicitly cited; otherwise this step must render the behavior.
+
+      - [ ] Runtime/client source identifier fields must remain literal and non-translated
+      in the DOM.
 
 
       ## Frontend Completion Criteria (rendering required)
@@ -71841,14 +71861,21 @@ phases:
 
       - [ ] mobile Inspector behavior regression.
 
-      - [ ] persisted reading-position tracking or analytics.'
+      - [ ] persisted reading-position tracking or analytics.
+
+      - [ ] source/split-scroll anchors remain type-only and unconsumed by rendered
+      UI.'
     verification: '- [ ] Rendered tests pass for `translate="no"` or equivalent on
       all source identifier classes.
 
       - [ ] Browser tests prove desktop independent scroll and mobile route behavior.
 
-      - [ ] No persisted scroll/depth state is added.'
+      - [ ] No persisted scroll/depth state is added.
+
+      - [ ] Evidence proves source/split-scroll contract anchors are consumed by rendered
+      UI, not left type-only.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -71860,17 +71887,59 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Rendered Implementation Evidence
+      ## Rendered Source/Layout Evidence
 
-      - Files changed:
 
-      - Source identifier DOM proof:
+      **Rendered artifacts**:
 
-      - Split-scroll browser proof:
+      ```
 
-      - Mobile route proof:
+      <paste DOM snapshot, screenshot path, or test-renderer output>
 
-      - Commands/tests run and outputs:'
+      ```
+
+
+      **Source identifier non-translation proof**:
+
+      ```
+
+      <paste DOM attributes/assertions>
+
+      ```
+
+
+      **Split-scroll proof**:
+
+      ```
+
+      <paste browser/test output>
+
+      ```
+
+
+      ## Storage-Core Downstream Blocker Closure
+
+      | Blocker | Rendered consumer evidence | Status |
+
+      |---|---|---|
+
+      | frontend source/split-scroll anchors type-only | <evidence> | closed/blocking
+      |
+
+      | source identifiers not consumed/rendered literally | <evidence> | closed/blocking
+      |
+
+
+      ## Headline
+
+      - [ ] PASS: source identifiers and split-scroll behavior are visibly rendered
+      and contract anchors are consumed.
+
+      - [ ] FAIL: behavior remains type-only/view-model-only or forbidden persisted
+      scroll tracking was added.'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     agent: frontend-engineer
   - id: plfu-frontend-green-retest
     name: Retest frontend expected-red suite to green
