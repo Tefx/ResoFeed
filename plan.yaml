@@ -81536,7 +81536,7 @@ phases:
       - [x] [DETAILS] uses native disclosure or aria-expanded/aria-controls and exposes
       terse diagnostics without moving row bounds.
 
-      - [ ] Bracket actions preserve 44px minimum real hit targets in default, hover,
+      - [x] Bracket actions preserve 44px minimum real hit targets in default, hover,
       focus, disabled, [INGESTING...], [FETCHING...], and error states.
 
       - [x] Raw diagnostics preserve err: prefix, clamp/wrap per DESIGN.md, and expose
