@@ -74702,7 +74702,7 @@ phases:
       - [x] Language control anatomy, states, aria rules, and no-settings-dashboard
       rule are checked.
 
-      - [ ] Reprocess bracket action anatomy and no job/progress-dashboard rule are
+      - [x] Reprocess bracket action anatomy and no job/progress-dashboard rule are
       checked.
 
       - [ ] Source identifiers preserve literal provenance with non-translation markup/equivalent.
