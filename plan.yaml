@@ -79952,7 +79952,7 @@ phases:
       - [x] MCP exposes no agent-only concepts, no per-agent registry, and no additional
       product primitives beyond HTTP/UI operations.
 
-      - [ ] MCP search remains lexical via search_items and does not imply semantic/RAG
+      - [x] MCP search remains lexical via search_items and does not imply semantic/RAG
       retrieval.
 
 
