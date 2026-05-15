@@ -80038,7 +80038,7 @@ phases:
       - [x] Exercise MCP preview_steer, steer, and undo_steer through the real MCP
       transport or existing MCP integration harness.
 
-      - [ ] Exercise GET /api/search and GET /api/doctor as read-only paths.
+      - [x] Exercise GET /api/search and GET /api/doctor as read-only paths.
 
       - [ ] Record actual command/output, not only test pass summaries.'
     verification: '- [ ] local-check protecting steer-delta-backend-http-mcp-runtime.gate.
