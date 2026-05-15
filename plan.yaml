@@ -68024,7 +68024,7 @@ phases:
       - [x] Accessibility and fresh-audit coverage are preserved for FR-01, FR-02,
       FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
 
-      - [ ] No forbidden ResoFeed architecture/product/runtime concept is observed.'
+      - [x] No forbidden ResoFeed architecture/product/runtime concept is observed.'
     verification: '- [ ] Exact build/start/import/ingest/browser commands are recorded
       with actual output.
 
