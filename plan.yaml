@@ -66924,7 +66924,7 @@ phases:
       - [x] UIUX multimodal audit evidence covers desktop and mobile rendered states
       and is reconciled with the later black-box failure.
 
-      - [ ] Post-fix UIUX rerun evidence includes a rendered 390x844 mobile artifact,
+      - [x] Post-fix UIUX rerun evidence includes a rendered 390x844 mobile artifact,
       accessibility/DOM proof for the Inspector disclosure, parseable verdict/headline/blockers,
       and explicit confirmation that both `Fresh Runtime A` and `Fresh Runtime B`
       are visible in the mobile Inspector for the same-URL grouped duplicate story.
