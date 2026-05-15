@@ -76629,7 +76629,7 @@ phases:
 
       - [x] owner-token auth is required for all `/api/*` and `/mcp` operations.
 
-      - [ ] language read/set works over HTTP and MCP.
+      - [x] language read/set works over HTTP and MCP.
 
       - [ ] reprocess is explicit, bounded, and does not expose a job/progress dashboard.
 
