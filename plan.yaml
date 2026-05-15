@@ -74045,7 +74045,7 @@ phases:
 
       ## Frontend Completion Criteria (rendering required)
 
-      - [ ] Completion requires visible DOM output for language and reprocess controls.
+      - [x] Completion requires visible DOM output for language and reprocess controls.
 
       - [ ] Component that only computes data but does not render controls is incomplete.
 
