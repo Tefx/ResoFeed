@@ -77444,7 +77444,7 @@ phases:
       owned by downstream closure steps `plfinal-uiux-rendered-design-proof` and `plfinal-spec-conformance-closure-retest`.'
   - id: plfinal-uiux-rendered-design-proof
     name: UIUX rendered DOM and accessibility proof closure
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -77573,6 +77573,8 @@ phases:
     depends_on:
     - plfinal-batched-rendered-proof-and-reprocess-remediation
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-15T19:33:22.727054+00:00'
   - id: plfinal-spec-conformance-closure-retest
     name: Spec conformance closure retest for reprocess and runtime proofs
     status: claimed
