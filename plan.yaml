@@ -69191,7 +69191,7 @@ phases:
       step.'
   - id: plct-backend-expected-red-tests
     name: Add backend expected-red contract tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -69265,6 +69265,67 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T11:45:15.842170+00:00'
+    done_at: '2026-05-15T12:00:43.902283+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED: backend expected-red tests merged and verified
+      red for intended gaps.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — subagent confirmed runtime_metadata processing_language/search_fts_stale_since,
+      state export/import exclusion, agent_receipts live TTL/fingerprint, runtime
+      language/reprocess/delivery endpoint validation, FTS core_insight.
+
+      - AGENTS.md — NOT READ in isolated worktree because AGENTS.md was absent.
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files added/updated: internal/resofeed/plct_backend_expected_red_test.go;
+      tests/go/fixtures/state_architecture_exact_minimal.json.
+
+      - Spec-derived minimal fixture: tests/go/fixtures/state_architecture_exact_minimal.json
+      copies documented state bundle shape without convenience fields.
+
+      - Expected failures/exposed gaps: search_fts lacks core_insight; /api/runtime/language,
+      /api/items/{id}/delivery, /api/runtime/reprocess-library not implemented; /api/doctor
+      lacks search_fts stale/ok lines; OpenRouter target_language not propagated.
+
+      - Product-code changes: none reported by subagent; merged files are test/fixture
+      only.
+
+      - step_intent: test_define_red.
+
+      - expected_result: red.
+
+      - observed_result: red.
+
+      - failure_alignment: aligned with missing implementation for runtime language,
+      delivery, reprocess, FTS core_insight/stale diagnostics, receipt TTL/fingerprint
+      semantics, and OpenRouter target_language propagation.
+
+      - verdict: semantic completion for expected-red test definition.
+
+      - blockers: none for test-definition scope; downstream implementation owners
+      must make these tests green.
+
+      - Worktree commit: 12ec82455b6ec5a9ff0ab9722bc5a2eb98c52d2b.
+
+      - Mainline squash commit: 2fe2df2e.
+
+
+      ## Mainline expected-red verification
+
+      - go test ./internal/resofeed -run ''TestPLCT''; wrapper captured EXIT_CODE=1
+      and returned exit 0 because red is expected.
+
+      - Intended failures included missing runtime language endpoints (404 vs expected
+      strict validation/success), missing delivery endpoint, missing reprocess endpoint,
+      missing doctor stale FTS line, FTS core_insight not indexed, OpenRouter target_language
+      empty.
+
+
+      Checklist: all completion and verification checklist items are [x].'
   - id: plct-mcp-expected-red-tests
     name: Add MCP parity expected-red contract tests
     status: claimed
