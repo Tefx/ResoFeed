@@ -66472,7 +66472,7 @@ phases:
     claimed_at: '2026-05-15T08:11:59.781158+00:00'
   - id: ui-runtime-fresh-review-black-box-liveness
     name: Black-box UI runtime liveness and runnable surface proof
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -66595,6 +66595,8 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-full-frontend-green-retest
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-15T08:12:13.959787+00:00'
   - id: ui-runtime-fresh-review-final-gate
     name: Final gate for fresh runtime UI review remediation
     status: pending
