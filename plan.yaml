@@ -66935,7 +66935,7 @@ phases:
       - [x] Rerun artifact/text evidence shows both `Fresh Runtime A` and `Fresh Runtime
       B` in the mobile Inspector for the same-URL grouped duplicate story.
 
-      - [ ] No forbidden architecture/product boundary changes are present.
+      - [x] No forbidden architecture/product boundary changes are present.
 
       - [ ] Gate decision is OPEN only if every blocker/should-fix finding is PROVEN
       or explicitly non-intersecting with evidence.'
