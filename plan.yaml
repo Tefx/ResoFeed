@@ -68228,7 +68228,7 @@ phases:
       - [x] Captured DOM/accessibility proof that the Inspector disclosure is reachable
       and semantically exposed.
 
-      - [ ] Assessed relevant FR-04 and mobile visual/accessibility behavior after
+      - [x] Assessed relevant FR-04 and mobile visual/accessibility behavior after
       the fix.
 
       - [ ] Returned a parseable headline/verdict/blockers section.
