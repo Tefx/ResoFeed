@@ -75130,7 +75130,7 @@ phases:
       - [x] Evidence shows input submitted -> route/tool matched -> core operation
       executed -> DB/FTS state changed -> output returned/rendered.
 
-      - [ ] Source identifiers remain exact in output.
+      - [x] Source identifiers remain exact in output.
 
       - [ ] Actual commands/output/artifact paths are included.'
     verification: '- [ ] Real vertical slice succeeds through public runtime surfaces.
