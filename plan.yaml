@@ -78134,6 +78134,91 @@ phases:
     depends_on:
     - srdct-frontend-contract-lock
     agent: frontend-engineer
+  - id: srdct-foundation-gate
+    name: Gate contract lock and expected-red coverage
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the Steer
+      delta contract/test phase is ready to unlock implementation.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase pins public HTTP/MCP/UI behavior and tests multiple forbidden product
+      concepts.
+
+      - Incorrect contract drift could cause runtime/API/UI rework.
+
+
+      Gate Preview (what the gate WILL reject):
+
+      - Product runtime logic inside contract-only steps.
+
+      - Expected-red tests that pass because they assert current behavior instead
+      of documented gaps.
+
+      - Missing refs read confirmation or missing exact doc copy for frontend fixtures.
+
+      - Any ambiguity around lexical-only search, find warning alias, no-RAG, no URL
+      guessing, or target-specific undo.
+
+
+      Behavioral proof register required with requirement_ref, behavior_claim, runtime_proof_expected,
+      evidence_ref, status, closure_path, and gate_decision_basis for AC-4 and AC-19.'
+    verification: '- [ ] local-check protecting steer-delta-backend-http-mcp-runtime
+      and steer-delta-frontend-ui-source-ledger-split-scroll gates.
+
+      - [ ] All contract/test steps completed with evidence and refs read confirmation.
+
+      - [ ] Expected-red semantics are explicit: tests expose documented gaps without
+      product implementation.
+
+      - [ ] Behavioral proof register covers AC-4 and AC-19 with closure paths for
+      unresolved items.
+
+      - [ ] Gate decision basis is OPEN only if no contract/test blocker remains.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: steer-delta-contract-lock-and-expected-red-tests
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED
+
+      '
+    depends_on:
+    - srdct-backend-contract-lock
+    - srdct-frontend-contract-lock
+    - srdct-backend-expected-red-tests
+    - srdct-frontend-expected-red-tests
+    agent: gate-reviewer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
