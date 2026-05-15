@@ -74628,7 +74628,7 @@ phases:
 
       - [x] desktop split Feed/Inspector scroll containers.
 
-      - [ ] mobile Inspector route and preserved feed behavior.
+      - [x] mobile Inspector route and preserved feed behavior.
 
 
       ## Completion Criteria (checklist)
