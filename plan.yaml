@@ -67614,7 +67614,7 @@ phases:
       - No blockers.'
   - id: ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
     name: Fix mobile Inspector grouped duplicate source disclosure on served app
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -67826,6 +67826,116 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T09:22:08.471591+00:00'
+    done_at: '2026-05-15T09:31:19.823018+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — FR-04 says grouped duplicate/story
+      handling must preserve access to every source item and primary Inspector should
+      disclose grouped duplicate source items, not require search.
+
+      - docs/DESIGN.md — Inspector anatomy requires source-list disclosure for grouped
+      stories; mobile Inspector is full-screen, with source/provenance readable to
+      screen readers.
+
+      - docs/ARCHITECTURE.md — One Go binary/static Svelte runtime; story grouping
+      must remain transparent and every original source item remains retrievable through
+      item detail/provenance.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — Existing FR-04
+      proof used mocked provenance.grouped_source_items, which did not exercise sparse
+      real runtime detail data plus same-URL mobile grouping.
+
+
+      ## Fix Evidence
+
+      Root cause of mobile served-app omission:
+
+      - Inspector only rendered item.provenance.grouped_source_items. In the failing
+      public runtime path, selected detail exposed primary provenance (Fresh Runtime
+      A) but did not carry both same-URL grouped source rows, while the feed list
+      still had both Fresh Runtime A and Fresh Runtime B. The selected-story handoff
+      did not pass sibling feed items into Inspector, so mobile Inspector could not
+      infer/display Fresh Runtime B.
+
+
+      Files changed:
+
+      - web/src/routes/components/Inspector.svelte — Added typed grouped-source inference
+      from current feed candidates using story key, duplicate pointers, and normalized
+      same-URL matching; preserved existing detail-provenance rendering and accessible
+      disclosure.
+
+      - web/src/routes/+page.svelte — Passed current feed items and sources into Inspector
+      so sparse runtime detail can still disclose same-URL grouped source provenance.
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — Added B1 mobile
+      390x844 coverage for Fresh Runtime A/Fresh Runtime B when detail provenance
+      has zero grouped items.
+
+
+      Test-to-fix forwarding:
+
+      - Black-box symptom addressed: mobile Inspector on real served app showed only
+      Fresh Runtime A · full and omitted Fresh Runtime B for same-URL grouped items.
+
+      - Existing e2e assertions weakened/skipped/deleted: NO — existing FR-04 assertions
+      remain; added a new B1 sparse-detail/mobile same-URL assertion.
+
+      - Prior proof miss explanation: prior UIUX/Playwright PASS used a mocked detail
+      response already containing grouped_source_items, so it proved rendering of
+      supplied grouped data but not the real public served-app path where mobile detail
+      provenance was sparse and same-URL siblings existed only in the feed payload.
+
+
+      Accessibility/design preservation:
+
+      - Preserved existing details.contract-grouped-sources / summary aria-label="Grouped
+      story with 2 source items" disclosure, source links, feed links, and mobile
+      full-screen Inspector behavior.
+
+      - No new visual tokens, forbidden product concepts, sync/storage/auth changes,
+      or architecture changes were introduced.
+
+
+      Worker verification:
+
+      - npm run check: initial FAIL because frontend dependencies were absent (`svelte-kit:
+      command not found`).
+
+      - npm ci: PASS — installed frontend dependencies from lockfile.
+
+      - npm run check: PASS — svelte-check found 0 errors and 0 warnings.
+
+      - npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts: PASS — 7
+      passed, including new B1 mobile Fresh Runtime same-URL test.
+
+
+      Mainline final-state verification after squash merge:
+
+      - npm run test: PASS — svelte-check found 0 errors and 0 warnings; Vitest Test
+      Files 6 passed (6), Tests 39 passed (39).
+
+      - npm run check: PASS — svelte-check found 0 errors and 0 warnings.
+
+      - npm run build: PASS — Vite/SvelteKit production build completed; adapter-static
+      wrote site to build.
+
+      - npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts: PASS — Playwright
+      7 passed, including B1 mobile served-app Inspector sparse-detail same-URL grouped
+      sources.
+
+
+      Commit hash(es):
+
+      - Worker commit: b2aee3d fix mobile inspector grouped sources
+
+      - Main squash merge: 4130358 [vectl] step-ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
+      completed
+
+
+      Gaps/Notes:
+
+      - None.'
   - id: ui-runtime-fresh-review-black-box-liveness-rerun
     name: Rerun black-box mobile Inspector liveness proof
     status: pending
