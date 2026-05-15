@@ -69221,7 +69221,7 @@ phases:
       - [ ] Tests are expected red before implementation and expose the contract gaps
       without product-code changes.
 
-      - [ ] Modified files are limited to tests, fixtures, and minimal test helpers.
+      - [x] Modified files are limited to tests, fixtures, and minimal test helpers.
 
       - [ ] Tests cover unknown JSON body field rejection for new mutating endpoints.
 
