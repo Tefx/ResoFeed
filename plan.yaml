@@ -81746,19 +81746,19 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Desktop Feed and Inspector are independent focusable vertical scroll regions
+      - [x] Desktop Feed and Inspector are independent focusable vertical scroll regions
       with accessible names.
 
-      - [ ] Scrolling Feed does not move Inspector; scrolling Inspector does not move
+      - [x] Scrolling Feed does not move Inspector; scrolling Inspector does not move
       Feed.
 
-      - [ ] Selecting a Feed item preserves Feed scroll and resets Inspector reading
+      - [x] Selecting a Feed item preserves Feed scroll and resets Inspector reading
       container to top.
 
-      - [ ] Mobile keeps Feed as main surface and opens Inspector as a full-screen
+      - [x] Mobile keeps Feed as main surface and opens Inspector as a full-screen
       route with preserved Feed scroll.
 
-      - [ ] Active/selected semantic state agrees with visible panel state.
+      - [x] Active/selected semantic state agrees with visible panel state.
 
 
       ## Frontend Completion Criteria (rendering required)
@@ -81770,15 +81770,15 @@ phases:
       ## Completion Criteria (stub exclusion)
 
       This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable.'
-    verification: '- [ ] Split-scroll E2E tests pass on desktop viewport with independent
+    verification: '- [x] Split-scroll E2E tests pass on desktop viewport with independent
       scroll proof.
 
-      - [ ] Mobile Inspector route E2E tests pass with Feed scroll preservation proof.
+      - [x] Mobile Inspector route E2E tests pass with Feed scroll preservation proof.
 
-      - [ ] Accessibility evidence confirms focusable named regions and active/selected
+      - [x] Accessibility evidence confirms focusable named regions and active/selected
       semantic consistency.
 
-      - [ ] Visual evidence shows desktop split and mobile route states without layout
+      - [x] Visual evidence shows desktop split and mobile route states without layout
       shift.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
