@@ -72750,7 +72750,7 @@ phases:
     claimed_at: '2026-05-15T15:46:13.536257+00:00'
   - id: plhm-runtime-spec-conformance
     name: Verify HTTP MCP runtime spec conformance
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       agent_source: project
@@ -72822,6 +72822,108 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T15:46:05.253482+00:00'
+    done_at: '2026-05-15T15:59:03.752186+00:00'
+    evidence: '## Spec Conformance Report
+
+      ### refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key authority cited by spec-verifier: §1 lines
+      18-21 require thin HTTP/MCP transports sharing product operations and one owner-token
+      boundary; §6 lines 816-821 require every `/api/*` route to require `Authorization:
+      Bearer <OWNER_TOKEN>`; §7 lines 1348-1361 require every `/mcp` request to require
+      owner-token authority and make `actor_id` attribution metadata, not authorization.
+
+
+      ## Requirements Register / Findings Summary
+
+      Original verifier verdict: FAIL. This step is being completed as an issue-detection
+      report after planner-created remediation ownership. It is not a runtime gate-open
+      signal.
+
+
+      Conforming areas reported:
+
+      - HTTP auth boundary: CONFORMS.
+
+      - HTTP strict query validation: CONFORMS.
+
+      - Runtime language and delivery baseline implementation: tests pass but conflict
+      shape gaps exist.
+
+      - MCP auth/resources/tools/actor_id boundary: CONFORMS.
+
+
+      Blockers detected:
+
+      - B1: HTTP manual ingest/fetch conflict body does not match required `operation
+      already running` / `operation_running` / `operation` shape. Implementation reportedly
+      returns `ingest already running` and `{ingest_running, scope, retry_allowed}`
+      at `internal/resofeed/http.go:1011-1014`.
+
+      - B2: Runtime language/reprocess conflict responses cannot report actual running
+      operation/scope; implementation reportedly hardcodes `operation:"reprocess",
+      scope:"library"` at `http.go:380-382` and `http.go:397-399`.
+
+      - B3: MCP JSON-RPC errors include extra top-level `data` fields and hardcoded
+      conflict operation/scope, diverging from field-exact architecture examples at
+      `internal/resofeed/mcp.go:661-679`.
+
+
+      ## Evidence Table
+
+      - `go test ./internal/resofeed` -> PASS.
+
+      - Targeted contract tests for HTTP/MCP auth, strict validation, delivery, reprocess,
+      doctor, and MCP parity -> PASS.
+
+      - Static divergence proof: `http.go:1011-1014` and `mcp.go:661-679` differ from
+      architecture conflict/error examples.
+
+
+      ## Behavioral Proof Register
+
+      - owner_token_auth_boundary: PROVEN
+
+      - actor_id_provenance_not_auth: PROVEN
+
+      - strict_query_validation: PROVEN
+
+      - idempotency_replay_and_fingerprint_mismatch: PROVEN
+
+      - manual_ingest_fetch_conflict_exact_shape: PROVEN_DIVERGES
+
+      - runtime_language_reprocess_conflict_actual_holder_shape: UNPROVEN/DIVERGES
+
+      - MCP_JSON_RPC_error_exact_shape: PROVEN_DIVERGES
+
+      - doctor_search_fts_status: PROVEN
+
+
+      ## Remediation ownership created
+
+      Planner added:
+
+      - `plhm-runtime-blocker-remediation` — batched fix for HTTP/MCP conflict/error
+      exactness and stale helper closure.
+
+      - `plhm-runtime-blocker-retest` — independent retest proving exact shapes and
+      helper safety/removal.
+
+      - `plhm-runtime-gate` now depends on `plhm-runtime-blocker-retest`.
+
+
+      verdict: FAIL as report; remediation required before runtime gate.
+
+      blockers: B1, B2, B3 now owned by `plhm-runtime-blocker-remediation` and `plhm-runtime-blocker-retest`.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE before remediation; report completed
+      only as issue-detection artifact.
+
+      Commit hash(es): none created; HEAD `0303d42f7350f0044e2f78cfb307531123b396e6`.
+
+      Files changed: none.'
   - id: plhm-runtime-gate
     name: Gate processing language HTTP MCP runtime integration
     status: pending
