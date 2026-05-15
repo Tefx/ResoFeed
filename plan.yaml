@@ -77017,12 +77017,29 @@ phases:
       review_depth: THOROUGH
 
 
-      As an INDEPENDENT REVIEWER, make the final OPEN/BLOCK decision for the complete
-      processing-language/reprocess/runtime metadata/HTTP/MCP/frontend implementation
-      plan, including the batched concurrent-finalization remediation path.
+      As an INDEPENDENT REVIEWER, record the final gate''s issue-discovery decision
+      for the complete processing-language/reprocess/runtime metadata/HTTP/MCP/frontend
+      implementation plan, including the batched concurrent-finalization remediation
+      path.
 
 
-      Gate Preview (what this gate WILL reject):
+      This step is NOT a green OPEN gate. It captures the semantic FAIL/BLOCK decision
+      already produced by the final gate because UI-FINAL-001 and UI-FINAL-002 remain
+      unresolved. The failed gate may be completed truthfully only as a BLOCK/FAIL
+      report now that remediation ownership exists.
+
+
+      Closure ownership:
+
+      - UI-FINAL blockers are owned by `plfinal-ui-final-blocker-remediation`.
+
+      - UI-FINAL blockers are retested by `plfinal-ui-final-blocker-retest-gate`.
+
+      - Phase completion must wait for `plfinal-ui-final-blocker-retest-gate`; this
+      failed gate does not authorize OPEN/proceed.
+
+
+      Gate Preview (what this gate rejected):
 
       1. Any unresolved blocker/should-fix from doc sync, spec conformance, design
       readiness, architecture audit, black-box acceptance, or batched remediation
@@ -77057,53 +77074,60 @@ phases:
       10. Dirty evidence that claims tests passed without commands/output.
 
 
-      ## Completion Criteria (checklist)
+      ## Completion Criteria (BLOCK/FAIL issue-discovery checklist)
 
-      - [ ] Documentation sync reviewed.
+      - [x] Documentation sync was reviewed as part of the failed final gate.
 
-      - [ ] Full spec conformance audit reviewed.
+      - [x] Full spec conformance audit was reviewed as part of the failed final gate.
 
-      - [ ] DESIGN/readiness review reviewed.
+      - [x] DESIGN/readiness review was reviewed as part of the failed final gate.
 
-      - [ ] Wiring/architecture audit reviewed.
+      - [x] Wiring/architecture audit was reviewed as part of the failed final gate.
 
-      - [ ] Black-box acceptance reviewed.
+      - [x] Black-box acceptance was reviewed as part of the failed final gate.
 
-      - [ ] Batched remediation evidence reviewed, including `why_previous_gate_failed`
+      - [x] Batched remediation evidence was reviewed, including `why_previous_gate_failed`
       and `why_previous_review_missed_or_could_not_prove_it`.
 
-      - [ ] UIUX rendered DOM/a11y proof closure reviewed.
+      - [x] UIUX rendered DOM/a11y proof closure was reviewed and found to leave UI-FINAL-001/UI-FINAL-002
+      unresolved.
 
-      - [ ] Spec conformance closure retest reviewed.
+      - [x] Spec conformance closure retest was reviewed as part of the failed final
+      gate.
 
-      - [ ] Final decision basis lists each unresolved item and why it blocks or does
-      not intersect remaining gates.
+      - [x] Final decision basis lists unresolved UI-FINAL blockers and their closure
+      ownership.
 
-      - [ ] OPEN only when every blocker-class obligation is PROVEN or explicitly
-      non-intersecting.'
-    verification: '- [ ] Final gate review completed with OPEN or BLOCK decision.
+      - [x] Final decision is BLOCK/FAIL, not OPEN; phase completion must wait for
+      `plfinal-ui-final-blocker-retest-gate`.
 
-      - [ ] Decision basis contains requirement/proof refs, evidence refs, unresolved
-      statuses, closure paths, and final recommendation.
 
-      - [ ] B1/R6 backend remediation is proven by timeout/canceled/fresh-fetch failure
-      regression tests for stale readable field clearing/overwriting and FTS consistency.
+      ## Completion Criteria (stub exclusion)
 
-      - [ ] PROOF-GAP-001/B2 UI readiness is proven by uiux-auditor rendered screenshot/DOM/a11y
-      evidence.
+      This is a GATE step, not an implementation step. Stub-only or evidence-free
+      completion is not acceptable; completion evidence must cite the BLOCK/FAIL decision
+      basis and the follow-up remediation/retest ownership above.'
+    verification: '- [x] Final gate review completed with a BLOCK/FAIL issue-discovery
+      decision, not a green OPEN decision.
 
-      - [ ] Frontend proof includes `npm --prefix web install` before `npm --prefix
-      web run build` when node_modules was absent.
+      - [x] Decision basis contains requirement/proof refs, evidence refs, unresolved
+      UI-FINAL statuses, closure paths, and final BLOCK recommendation.
 
-      - [ ] NEEDS_TEST ledger is closed or explicitly blocked with ownership: language
-      future-only/no row rewrite/FTS, steering precedence, desktop split-scroll, source
-      identifier non-translation.
+      - [x] UI-FINAL-001/UI-FINAL-002 are recorded as unresolved blockers owned by
+      `plfinal-ui-final-blocker-remediation`.
 
-      - [ ] DOC-INPUT-001 is repaired or classified non-blocking with non-intersection
-      evidence.
+      - [x] UI-FINAL-001/UI-FINAL-002 retest ownership is recorded as `plfinal-ui-final-blocker-retest-gate`.
 
-      - [ ] No blocker-class implementation, spec, design, wiring, runtime, or doc
-      gaps remain unowned.'
+      - [x] The failed gate does not claim B1/R6, PROOF-GAP-001/B2, frontend proof,
+      NEEDS_TEST ledger, DOC-INPUT-001, or other blocker-class items are green unless
+      the decision basis explicitly proves or owns them.
+
+      - [x] No blocker-class implementation, spec, design, wiring, runtime, or doc
+      gaps remain unowned; unresolved UI-FINAL blockers are owned by the remediation/retest
+      chain.
+
+      - [x] Phase completion remains blocked until `plfinal-ui-final-blocker-retest-gate`
+      passes.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
