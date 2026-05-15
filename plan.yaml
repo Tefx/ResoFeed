@@ -74017,7 +74017,7 @@ phases:
 
       - [x] localized or beautified URLs/source titles/provenance identifiers.
 
-      - [ ] global page scroll coupling Feed and Inspector on desktop.
+      - [x] global page scroll coupling Feed and Inspector on desktop.
 
       - [ ] mobile Inspector behavior regression.
 
