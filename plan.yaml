@@ -79704,7 +79704,7 @@ phases:
       or code/doc changes were created by the retest.'
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
-  status: in_progress
+  status: done
   gate: Gate blocks unless Go authoritative routing, HTTP preview/commit/undo, MCP
     parity, lexical-only search, and AC-4 conflict semantics are green with runtime
     proof.
@@ -80279,7 +80279,7 @@ phases:
       now require the retest to pass.'
   - id: srdb-backend-gate
     name: Gate backend Steer runtime implementation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the backend
       runtime phase can open for frontend integration.
 
@@ -80405,6 +80405,320 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T23:15:08.204425+00:00'
+    done_at: '2026-05-15T23:27:18.755376+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — gate-reviewer read one-deployable/SQLite/thin HTTP+MCP/lexical-only
+      boundaries; owner-token boundary; endpoint contracts for `/api/steer/preview`,
+      `/api/steer`, `/api/steer/undo`, `/api/ingest`, `/api/sources/{id}/fetch`; MCP
+      `preview_steer`/`steer`/`undo_steer` parity and auth rules.
+
+      - docs/DESIGN.md — gate-reviewer read concise inline Steer receipt/undo, no
+      chat transcript/rule builder/activity ledger, Source Ledger manual ingest/fetch
+      immediate operation, search provenance, and forbidden dashboards/settings/queues.
+
+      - remediation/retest artifacts — gate-reviewer inspected `524999fc`, `a920659d`,
+      and retest closure artifact `c55a3420`; remediation and retest showed PASS/OPEN
+      with `gate_open_allowed: true`.
+
+      - CONSTITUTION.md — NOT READ: no `CONSTITUTION.md` found in isolated worktree.
+
+
+      ## Gate Review Report
+
+
+      **Reviewer**: gate-reviewer (independent of phase implementation) plus supplemental
+      blind-tester Mode D liveness probe
+
+      **Phase**: steer-delta-backend-http-mcp-runtime
+
+
+      ### Machine-Readable Gate Decision
+
+      ```yaml
+
+      headline: "PASS"
+
+      verdict: "OPEN"
+
+      blockers: []
+
+      proof_gap_status: "NONE"
+
+      blocking_status: "CLEAR"
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: "proceed_to_frontend"
+
+      ```
+
+
+      ### Execution Review
+
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+      | srdb-classifier-policy-runtime | ✅ | adequate | Source review shows classifier/preview
+      local route split and tests cover steer paths. |
+
+      | srdb-http-steer-preview-commit-undo | ✅ | excellent | HTTP routes reviewed;
+      live `/api/steer/preview` request succeeded through real binary. |
+
+      | srdb-mcp-steer-parity | ✅ | excellent | MCP handlers reviewed; live `/mcp
+      initialize` and `preview_steer` succeeded. |
+
+      | srdb-runtime-liveness-seam-proof | ✅ | excellent | Built real binary and verified
+      owner-token auth, `/api/doctor`, `/api/steer/preview`, and `/mcp`. |
+
+      | srdb-wiring-audit | ✅ | excellent | W1-W8 passed; no dead `ErrSteerContractOnly`;
+      no scoped `@invar:allow`. |
+
+      | srdb-spec-conformance | ✅ | excellent | Architecture/DESIGN refs read; targeted/full/race
+      tests passed; liveness confirmed surfaces. |
+
+      | srdb-backend-spec-wiring-remediation | ✅ | excellent | `524999fc`/`a920659d`
+      patch reviewed; delegated-agent and ingest-envelope regressions covered. |
+
+      | srdb-backend-spec-wiring-retest | ✅ | excellent | Closure reviewed with required
+      fields and `gate_open_allowed: true`. |
+
+
+      ### Required Retest Closure Fields Reviewed
+
+      ```yaml
+
+      headline: "PASS"
+
+      verdict: "OPEN"
+
+      blockers: []
+
+      proof_gap_status: "NONE"
+
+      blocking_status: "CLEAR"
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: "proceed_to_gate"
+
+      ```
+
+
+      ### Wiring Audit Results (W1-W8)
+
+      - W1 Entrypoint: PASS — one binary entrypoint `cmd/resofeed` delegates to `resofeed.Main`;
+      real liveness used built binary.
+
+      - W2 HTTP route wiring: PASS — `/api/steer/preview`, `/api/steer/undo`, `/api/steer`
+      route order reviewed; live preview returned lexical-only preview.
+
+      - W3 MCP parity wiring: PASS — shared preview/undo functions feed MCP; live
+      `/mcp` `preview_steer` returned same preview shape.
+
+      - W4 Shared classifier/runtime: PASS — `ClassifySteerRoute`/`PreviewSteering`/`ApplySteering`
+      path reviewed.
+
+      - W5 Mutation/idempotency separation: PASS — preview is read-only and mutators
+      retain receipt/idempotency boundaries.
+
+      - W6 Search boundary: PASS — lexical-only/no vector/RAG/generated-answer boundary
+      confirmed by static and live evidence.
+
+      - W7 Escape hatches/dead stubs: PASS — scoped `@invar:allow|invar:allow` scan
+      and `ErrSteerContractOnly` scan had no implementation matches.
+
+      - W8 Architecture shape: PASS — no sidecar/process expansion; one Go binary
+      + SQLite temp DB.
+
+
+      ### Escape Hatch Audit
+
+      - Scoped scan: `rg -n ''@invar:allow|invar:allow'' cmd internal web/src web/tests
+      docs/ARCHITECTURE.md docs/DESIGN.md .agents` → exit 1, no scoped matches.
+
+      - Dead export scan: `rg -n ''ErrSteerContractOnly'' --glob ''*.go'' internal
+      cmd web` → exit 1, no matches.
+
+
+      ### Runnable Surface / Liveness Evidence
+
+      - Gate-reviewer launched compiled `cmd/resofeed` with temp SQLite DB and owner
+      token, verified unauthorized `/api/doctor` 401, authorized `/api/doctor` 200,
+      HTTP `/api/steer/preview` 200 with `route_kind: search`, `interpreted_as: lexical_search`,
+      `will_mutate:false`, MCP `/mcp initialize` 200, and MCP `preview_steer` 200.
+
+      - Supplemental blind-tester Mode D independently built/launched `cmd/resofeed`
+      and verified unauthorized 401, authorized `/api/doctor` 200, HTTP `/api/steer/preview`
+      lexical/read-only/no mutation, MCP initialize 200, MCP `preview_steer` 200,
+      and no vector/RAG/generated-answer behavior.
+
+      - Orchestrator mainline final-state liveness also passed with valid owner token:
+      unauthorized=401, authorized_doctor=200, http_preview=200, mcp_initialize=200,
+      mcp_preview_steer=200, lexical_no_mutation_assertions=pass.
+
+
+      ### Real Integration vs Fixture Evidence
+
+      - Real integration: compiled `cmd/resofeed` binary, temp SQLite DB, actual HTTP
+      transport via `curl` against bound localhost listener.
+
+      - Fixture/in-process tests: `NewRouter`, `NewMCPHandler`, deterministic LLM
+      stubs, and seeded SQLite fixtures used for regression coverage but not treated
+      as liveness proof.
+
+      - Gate OPEN relies on both fixture tests for edge behavior and real binary probes
+      for runtime availability.
+
+
+      ### Behavioral Proof Register
+
+
+      | obligation | status | evidence | gate_decision_basis |
+
+      | --- | --- | --- | --- |
+
+      | Backend-authoritative classification across preview/commit/MCP | PROVEN |
+      source review, targeted tests, live HTTP/MCP preview | Same backend functions
+      feed HTTP and MCP; no frontend-only classifier needed. |
+
+      | Preview read-only guarantee/idempotency | PROVEN | `will_mutate:false`, no
+      receipt/mutation on preview, targeted/race tests | Preview lacks idempotency
+      key and mutators retain receipt boundary. |
+
+      | Lexical-only/no-vector/no-answer-generation boundary | PROVEN | architecture
+      ref, live `find sqlite` preview warning, static boundary scan | No vector DB/RAG
+      path found; live request confirms lexical semantics. |
+
+      | Single-binary/SQLite/flat-file architecture | PROVEN | `cmd/resofeed` built/launched
+      with temp SQLite; architecture refs | No sidecar/worker/admin/sync service introduced.
+      |
+
+      | Batched remediation closure | PROVEN | `a920659d`, `524999fc`, `c55a3420`,
+      full/targeted/race tests and build | Prior retest `gate_open_allowed:true`;
+      current review reran material verification. |
+
+
+      ### Commands/tests executed
+
+      ```
+
+      # gate-reviewer
+
+      go test ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|SRDCT.*Steer|HTTP.*Steer|MCP.*Steer|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails|ManualIngest|ManualFetch|SearchRejectsSemanticExpansion)''
+      -count=1
+
+      go test ./...
+
+      go test -race ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|HTTPSteerPreviewIsReadOnlyAndCommitIsIdempotent|MCPPreviewSteerDoesNotCreateReceiptOrMutateState|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors)''
+      -count=1
+
+      go build -o /var/.../resofeed ./cmd/resofeed
+
+      rg -n ''@invar:allow|invar:allow'' cmd internal web/src web/tests docs/ARCHITECTURE.md
+      docs/DESIGN.md .agents
+
+      rg -n ''ErrSteerContractOnly'' --glob ''*.go'' internal cmd web
+
+      curl probes for `/api/doctor`, `/api/steer/preview`, `/mcp initialize`, `/mcp
+      preview_steer`
+
+
+      # supplemental blind-tester Mode D
+
+      npm --prefix web run build / install+build as needed, go build -o ./bin/resofeed
+      ./cmd/resofeed
+
+      serve real binary on 127.0.0.1:18081 with temp SQLite and owner token
+
+      curl unauthorized/authorized `/api/doctor`, HTTP `/api/steer/preview`, MCP initialize,
+      MCP `preview_steer`
+
+
+      # orchestrator mainline final-state gate
+
+      go test ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|SRDCT.*Steer|HTTP.*Steer|MCP.*Steer|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors|URDAIngestFetchConflictResponseCarriesRawUIMessageDetails|ManualIngest|ManualFetch|SearchRejectsSemanticExpansion)''
+      -count=1
+
+      go test ./...
+
+      go test -race ./internal/resofeed -run ''Test(DelegatedAgentSteeringOnlyRejectedWhenConflictingWithHumanRule|HTTPSteerPreviewIsReadOnlyAndCommitIsIdempotent|MCPPreviewSteerDoesNotCreateReceiptOrMutateState|URDAManualIngestUsesArchitectureIngestRunEnvelopeAndStrictEmptyBody|URDASourceFetchReturnsUpdatedSourceAndSourceScopedErrors)''
+      -count=1
+
+      go build ./cmd/resofeed and real HTTP/MCP liveness via temp binary/DB
+
+      ```
+
+
+      ### Relevant output
+
+      ```
+
+      # gate-reviewer
+
+      targeted go test: ok resofeed/internal/resofeed 0.613s
+
+      go test ./...: ? resofeed/cmd/resofeed [no test files]; ok resofeed/internal/resofeed
+      0.770s
+
+      race targeted: ok resofeed/internal/resofeed 1.712s
+
+      go build ./cmd/resofeed: exit 0
+
+      scoped_invar_allow_rg_exit=1
+
+      err_steer_contract_only_rg_exit=1
+
+      unauthorized /api/doctor: http_status=401
+
+      authorized /api/doctor: rss: ok; search_fts: ok
+
+      /api/steer/preview: route_kind search, interpreted_as lexical_search, will_mutate
+      false
+
+      /mcp initialize: serverInfo name=resofeed version=0.0.0
+
+      /mcp preview_steer: lexical-only warning and will_mutate=false
+
+
+      # supplemental blind-tester Mode D
+
+      headline PASS; verdict OPEN; blockers []; gate_open_allowed true
+
+      unauthorized API request rejected 401; authorized /api/doctor 200; HTTP steer
+      preview 200 lexical_search will_mutate=false; MCP initialize 200; MCP preview_steer
+      200; no vector/RAG/generated-answer behavior
+
+
+      # orchestrator mainline final-state gate
+
+      targeted go test: ok resofeed/internal/resofeed 0.671s
+
+      go test ./...: ? resofeed [no test files]; ? resofeed/cmd/resofeed [no test
+      files]; ok resofeed/internal/resofeed (cached)
+
+      race targeted: ok resofeed/internal/resofeed 1.644s
+
+      real liveness: unauthorized=401, authorized_doctor=200, http_preview=200, mcp_initialize=200,
+      mcp_preview_steer=200, lexical_no_mutation_assertions=pass
+
+      ```
+
+
+      ### Gaps/Notes
+
+      - NONE blocking.
+
+      - An initial orchestrator mainline liveness attempt used a too-short owner token
+      and failed with `invalid_owner_token`; rerun with a valid 32+ character token
+      passed. This is configuration validation, not a product blocker.
+
+      - Required verification checklist items are [x].
+
+      - No product code, docs, or tests were modified by gate/Mode-D verification.'
   - id: srdb-backend-spec-wiring-remediation
     name: Batched backend spec and wiring remediation
     status: done
@@ -81107,7 +81421,7 @@ phases:
       - No product code/docs/tests were changed by this verify-only retest.'
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
-  status: locked
+  status: pending
   gate: Gate blocks unless rendered UI satisfies DESIGN.md/UI_REGRESSION_CONTRACT.md
     for Steer route preview, Source Ledger controls/details, split-scroll/mobile route,
     and no forbidden UI concepts.
