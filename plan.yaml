@@ -73739,7 +73739,7 @@ phases:
       - [x] Search query echo type must be represented where search API client is
       used.
 
-      - [ ] Language/reprocess HTTP response and error shapes must be consumed by
+      - [x] Language/reprocess HTTP response and error shapes must be consumed by
       client code used by rendered controls.
 
       - [ ] Type-only anchors must not remain misleading public exports unless a downstream
