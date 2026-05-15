@@ -62610,6 +62610,91 @@ phases:
     depends_on:
     - urda-keyboard-a11y-nav-post-fix-retest
     agent: uiux-auditor
+  - id: urda-keyboard-a11y-uiux-post-fix-audit
+    name: Post-fix keyboard accessibility UIUX audit
+    status: pending
+    description: 'As an independent native multimodal UIUX auditor, verify that the
+      keyboard/a11y fix preserves the DESIGN.md visual/accessibility contract and
+      closes Source Ledger/Resonate/nav role-button UIUX proof without visual regressions.
+
+
+      Read these refs before auditing:
+
+      - docs/DESIGN.md
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md
+
+      - docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md
+
+
+      Required verdict coverage:
+
+      - TODAY role buttons
+
+      - SOURCE LEDGER role buttons
+
+      - [IMPORT OPML]
+
+      - [RUN INGEST]
+
+      - [FETCH]
+
+      - Resonate controls
+
+      - bracket focus/hover states
+
+      - touch targets
+
+      - forbidden UI concepts from DESIGN.md and project architecture
+
+
+      This is a UI/UX implementation validation gate, not a generic integration retest.
+      Issue/blocker verdicts MUST distinguish PROVEN, NEEDS_TEST, UNPROVEN, and UNCERTAIN_BLOCKING.
+      PASS is allowed only when no blocker or UNCERTAIN_BLOCKING remains.
+
+
+      Verification scope: phase-check protecting the frontend repair gate and downstream
+      finalization/deep-review gates for UI accessibility and visual contract regressions.'
+    verification: '- Evidence includes rendered/browser artifacts or equivalent DOM,
+      accessibility-tree, and computed-style proof for required states and controls.
+
+      - Evidence includes explicit `verdict`, `blockers`, `gate_open_allowed`, and
+      `orchestrator_action_hint` fields.
+
+      - TODAY and SOURCE LEDGER role buttons, [IMPORT OPML], [RUN INGEST], [FETCH],
+      Resonate controls, bracket focus/hover, touch targets, and forbidden UI concepts
+      each have issue/blocker verdicts.
+
+      - PASS only when no blocker, NEEDS_TEST blocker-class gap, UNPROVEN blocker-class
+      gap, or UNCERTAIN_BLOCKING remains.
+
+      - This phase-check protects the frontend repair gate plus downstream finalization/deep-review
+      gates from keyboard accessibility and visual contract regressions.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n## Native Multimodal UIUX Audit Evidence\n\n\
+      **Rendered/browser artifacts or equivalent proof**:\n- <screenshots, DOM/accessibility\
+      \ snapshots, computed-style proof, or terminal/browser artifact paths>\n\n**Coverage\
+      \ verdicts**:\n| Surface/control | Verdict | Blockers | Evidence ref |\n| ---\
+      \ | --- | --- | --- |\n| TODAY role buttons | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| SOURCE LEDGER role buttons | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| [IMPORT OPML] | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| [RUN INGEST] | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| [FETCH] | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| Resonate controls | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| Bracket focus/hover | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| Touch targets | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n| Forbidden UI concepts | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ | <items or none> | <artifact> |\n\n```yaml\nverdict: \"PASS|PASS_WITH_DEBT|FAIL\"\
+      \nblockers:\n  - \"<blocker or empty>\"\ngate_open_allowed: true|false\norchestrator_action_hint:\
+      \ \"open_gate|create_fix_retest|request_missing_evidence\"\n```\n\nPASS criteria:\
+      \ no blocker, NEEDS_TEST blocker-class gap, UNPROVEN blocker-class gap, or UNCERTAIN_BLOCKING\
+      \ remains."
+    depends_on:
+    - urda-keyboard-a11y-nav-post-fix-retest
+    agent: uiux-auditor
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
   status: locked
