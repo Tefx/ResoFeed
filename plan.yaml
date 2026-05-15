@@ -77534,16 +77534,16 @@ phases:
 
       - [x] Final headline is PASS only if rendered UI proof closes PROOF-GAP-001/B2
       UI obligations.'
-    verification: '- [ ] UIUX audit uses real rendered UI/DOM/a11y artifacts, not
+    verification: '- [x] UIUX audit uses real rendered UI/DOM/a11y artifacts, not
       only spec lint or static code review.
 
-      - [ ] Screenshot/DOM/a11y proof covers language control, bracket-style reprocess
+      - [x] Screenshot/DOM/a11y proof covers language control, bracket-style reprocess
       action, source identifier non-translation, desktop split-scroll, mobile Inspector,
       and copy drift checks.
 
-      - [ ] Frontend build/runtime proof includes dependency bootstrap when needed.
+      - [x] Frontend build/runtime proof includes dependency bootstrap when needed.
 
-      - [ ] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
+      - [x] Behavioral proof register supports OPEN/BLOCK decision for `plfinal-final-gate`.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
       \ — key passage or \"NOT READ: <reason>\"\n- AGENTS.md — key passage or \"NOT\
