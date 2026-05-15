@@ -76302,7 +76302,7 @@ phases:
       none'
 - id: processing-language-finalization
   name: Processing Language Finalization and Deep Review
-  status: pending
+  status: in_progress
   gate: Finalization gate blocks unless docs are synchronized, full spec/design/wiring/deep-review
     audits are complete, and no unresolved blocker-class behavioral proof obligations
     remain.
@@ -76311,7 +76311,7 @@ phases:
   steps:
   - id: plfinal-documentation-sync
     name: Sync documentation for processing language implementation
-    status: pending
+    status: claimed
     description: 'step_type: documentation
 
       agent_source: project
@@ -76372,6 +76372,8 @@ phases:
 
       - Remaining doc gaps:'
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-15T18:24:28.281114+00:00'
   - id: plfinal-full-spec-conformance-audit
     name: Run full spec conformance audit
     status: pending
