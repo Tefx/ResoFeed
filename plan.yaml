@@ -69079,7 +69079,7 @@ phases:
       - [x] Contract artifacts define only public shapes/stubs/docstrings/types; no
       completed behavior logic is added.
 
-      - [ ] Runtime metadata keys and state export/import exclusion are explicitly
+      - [x] Runtime metadata keys and state export/import exclusion are explicitly
       pinned.
 
       - [ ] HTTP and MCP schemas are pinned with strict unknown-body/query validation
