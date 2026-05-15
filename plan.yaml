@@ -76423,7 +76423,7 @@ phases:
       top of the committed step delta.'
   - id: plfinal-full-spec-conformance-audit
     name: Run full spec conformance audit
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: project
@@ -76499,6 +76499,93 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-15T19:01:33.171290+00:00'
+    done_at: '2026-05-15T19:19:19.157704+00:00'
+    evidence: 'status: SUCCESS_AS_ISSUE_DISCOVERY
+
+
+      Commit hash(es): none — verify-only conformance audit produced no intentional
+      evidence artifact and made no product implementation changes.
+
+
+      Files changed: none.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — spec-verifier cited runtime contract strict processing-language/reprocess/FTS/HTTP/MCP
+      parity, runtime metadata exclusion from portable state, reprocess no mixed-language
+      stored fields, and FTS stale/doctor requirements.
+
+      - docs/DESIGN.md — spec-verifier cited terse global language/reprocess UI, independent
+      desktop Feed/Inspector scroll, and source identifier non-translation semantics.
+
+      - AGENTS.md — NOT READ: absent from isolated worktree; prompt-injected AGENTS
+      guidance was considered instruction but not file evidence.
+
+
+      Semantic outcome:
+
+      - Headline: FAIL.
+
+      - Proof-Gap Status: BLOCKING.
+
+      - Blocking Status: OPEN.
+
+      - Verdict: FAIL.
+
+      - Blockers: B1, B2.
+
+      - gate_open_allowed: false.
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE.
+
+      - product_implementation_files_modified: no.
+
+
+      Findings:
+
+      - B1 / R6 DIVERGES: internal/resofeed/reprocess.go timeout/canceled fresh-fetch
+      path can continue without storeReprocessItem, leaving old readable fields in
+      place despite the no-mixed-language reprocess contract.
+
+      - B2 / R14-R16 BLOCKING PROOF GAP: frontend runtime proof was blocked in this
+      worktree because `npm --prefix web run build` failed with `sh: vite: command
+      not found`; prior black-box acceptance showed dependency bootstrap (`npm --prefix
+      web install`) can make build runnable, so this is owned as a proof-environment/closure
+      issue unless closure evidence proves otherwise.
+
+      - NEEDS_TEST ledger: language-set future-only/no row rewrite, human-over-agent
+      steering precedence, desktop split-scroll runtime, and source identifier rendered
+      DOM non-translation.
+
+
+      Issue ownership / closure:
+
+      - Batched planner remediation created `plfinal-batched-rendered-proof-and-reprocess-remediation`,
+      `plfinal-uiux-rendered-design-proof`, and `plfinal-spec-conformance-closure-retest`.
+
+      - B1 backend/reprocess fix and regression requirements are owned by `plfinal-batched-rendered-proof-and-reprocess-remediation`.
+
+      - B2 frontend bootstrap/runtime proof and NEEDS_TEST closure are owned by `plfinal-spec-conformance-closure-retest`
+      and `plfinal-uiux-rendered-design-proof`.
+
+      - Spec audit checklist was rewritten by planner so completion means evidence-bound
+      FAIL report plus remediation ownership, not a green pass.
+
+
+      Verification:
+
+      - spec-verifier ran `go test ./...`: PASS (`ok resofeed/internal/resofeed 1.020s`).
+
+      - spec-verifier ran `npm --prefix web run build`: FAIL (`sh: vite: command not
+      found`), classified as blocking proof gap with closure ownership.
+
+      - Orchestrator verified the worktree branch had no code/artifact diff to merge.
+
+
+      Gaps/Notes: This step is completed as a failed conformance report with remediation
+      ownership. It does not assert spec conformance is green; final gate must wait
+      for the new remediation and closure steps.'
   - id: plfinal-design-readiness-review
     name: Run DESIGN and readiness review
     status: done
