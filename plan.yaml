@@ -73742,7 +73742,7 @@ phases:
       - [x] Language/reprocess HTTP response and error shapes must be consumed by
       client code used by rendered controls.
 
-      - [ ] Type-only anchors must not remain misleading public exports unless a downstream
+      - [x] Type-only anchors must not remain misleading public exports unless a downstream
       rendered step consumes them.
 
 
