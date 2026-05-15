@@ -68844,3 +68844,11 @@ phases:
     are implemented and independently verified.
   depends_on:
   - processing-language-contract-tests
+- id: processing-language-http-mcp-runtime
+  name: Processing Language HTTP MCP Runtime Integration
+  status: locked
+  gate: Runtime integration gate blocks unless HTTP and MCP language/reprocess/delivery
+    parity, strict validation, and runnable `resofeed serve` liveness evidence are
+    green.
+  depends_on:
+  - processing-language-storage-core
