@@ -70311,7 +70311,7 @@ phases:
       - [x] Any broad-command failure is classified by ownership: `storage-core blocker`,
       `downstream HTTP/MCP blocker`, or `downstream frontend blocker`.
 
-      - [ ] Downstream-owned failures cite the owning step (`plhm-http-runtime-endpoints`,
+      - [x] Downstream-owned failures cite the owning step (`plhm-http-runtime-endpoints`,
       `plhm-mcp-runtime-parity`, or `plfu-*`) and are not used to fail this storage-core
       retest unless a backend-core contract is also missing.
 
