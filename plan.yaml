@@ -76503,32 +76503,42 @@ phases:
       agent_source: project
 
 
-      Independent DESIGN/readiness review after implementation and doc sync. Verify
-      rendered UI behavior, docs/DESIGN.md language/reprocess/source/split-scroll
-      obligations, accessibility, and readiness for final gate.
+      Independent DESIGN/readiness review after implementation and doc sync. This
+      step is complete as an issue-discovery and ownership review, not as a green
+      rendered-UI proof. The design contract/lint review was completed, and the review
+      produced a FAIL/BLOCKED verdict because rendered UI proof was outside this step''s
+      evidence boundary and is now owned by `plfinal-uiux-rendered-design-proof` after
+      batched remediation.
 
 
       ## Completion Criteria (checklist)
 
-      - [ ] Language control remains terse and low-chrome.
+      - [x] Design contract/lint review completed against docs/DESIGN.md for terse
+      low-chrome language control, bracket-style non-dashboard reprocess action, non-translated
+      source identifiers, desktop split scroll, mobile Inspector behavior, and forbidden
+      copy/product drift.
 
-      - [ ] Reprocess action is bracket-style and non-dashboard.
+      - [x] Rendered UI proof gaps for language control, reprocess action, source
+      identifiers, desktop split scroll, mobile Inspector behavior, and copy drift
+      are explicitly owned by `plfinal-uiux-rendered-design-proof`.
 
-      - [ ] Source identifiers are non-translated provenance anchors.
+      - [x] Blocker/should_fix gaps from the review are explicitly owned by `plfinal-batched-rendered-proof-and-reprocess-remediation`
+      and closure steps `plfinal-uiux-rendered-design-proof` / `plfinal-spec-conformance-closure-retest`.
 
-      - [ ] Desktop split scroll and mobile Inspector behavior remain intact.
+      - [x] Review verdict is FAIL/BLOCKED for final-gate purposes until the new closure
+      steps provide green evidence.
 
-      - [ ] No onboarding wizard/settings dashboard/AI-magic trust palette/product
-      copy drift is introduced.
+      - [x] Final gate must consume this step as a failed review report plus remediation
+      ownership, not as proof that rendered UI behavior already passed.'
+    verification: '- [x] DESIGN/readiness review produced a PASS/PASS_WITH_DEBT/FAIL
+      verdict: FAIL/BLOCKED with blocker/should_fix ownership.
 
-      - [ ] Readiness finding list has no blocker/should-fix gaps, or each has explicit
-      remediation owner.'
-    verification: '- [ ] DESIGN/readiness review provides PASS/PASS_WITH_DEBT/FAIL
-      verdict.
+      - [x] All blocker/should-fix readiness gaps have explicit closure paths through
+      `plfinal-batched-rendered-proof-and-reprocess-remediation`, `plfinal-uiux-rendered-design-proof`,
+      and/or `plfinal-spec-conformance-closure-retest`.
 
-      - [ ] All blocker/should-fix readiness gaps have closure paths.
-
-      - [ ] Final gate can consume the review evidence directly.'
+      - [x] Final gate can consume the review evidence only as a FAIL/BLOCKED issue-discovery
+      report plus required closure steps, not as a green pass assertion.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
