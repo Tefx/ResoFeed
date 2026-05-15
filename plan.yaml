@@ -69725,7 +69725,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
-  status: pending
+  status: in_progress
   gate: Core backend gate blocks unless SQLite metadata/receipts, language state,
     OpenRouter target-language input, reprocess semantics, and FTS/doctor behavior
     are implemented and independently verified.
@@ -69734,7 +69734,7 @@ phases:
   steps:
   - id: plsc-runtime-metadata-receipts
     name: Complete runtime metadata migrations and live receipt semantics
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -69820,6 +69820,8 @@ phases:
 
       - Forbidden concepts search result:'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T12:12:22.600012+00:00'
   - id: plsc-processing-language-ingest
     name: Complete processing language backend and OpenRouter input
     status: pending
