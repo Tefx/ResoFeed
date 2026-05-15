@@ -75120,7 +75120,7 @@ phases:
 
       - [x] Query search and doctor after reprocess.
 
-      - [ ] If browser is used, capture rendered language/reprocess UI visible state.
+      - [x] If browser is used, capture rendered language/reprocess UI visible state.
 
       - [ ] No stubs, mocks, or placeholder runtime dependencies at layer boundaries.
 
