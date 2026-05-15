@@ -73760,7 +73760,7 @@ phases:
 
       - [x] Implementation contains substantive client request/response parsing logic.
 
-      - [ ] Outputs vary by API response/error state.
+      - [x] Outputs vary by API response/error state.
 
       - [ ] Declaration-only client anchors are either consumed by runtime client/rendered
       controls or explicitly justified/de-exported.'
