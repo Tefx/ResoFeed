@@ -79861,7 +79861,7 @@ phases:
       - [x] Different fingerprint with same live idempotency_key rejection for commit
       and undo.
 
-      - [ ] Missing/unsupported undo target behavior.
+      - [x] Missing/unsupported undo target behavior.
 
       - [ ] Inactive duplicate source reactivation vs active duplicate no-op semantics.
 
