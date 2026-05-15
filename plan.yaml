@@ -79303,7 +79303,7 @@ phases:
       and mobile Feed scroll preservation gaps. Squash merge commit: 963f66e4.'
   - id: srdct-foundation-gate
     name: Gate contract lock and expected-red coverage
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the Steer
       delta contract/test phase is ready to unlock implementation.
 
@@ -79388,6 +79388,18 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T21:41:54.485048+00:00'
+    done_at: '2026-05-15T21:50:13.220390+00:00'
+    evidence: 'DETECTED_ISSUES_BATCHED: Independent gate-reviewer returned semantic
+      FAIL with blocker B1: gate required Behavioral Proof Register coverage for AC-4
+      and AC-19, but docs/PRD.md contains no AC-19; gate_open_allowed=false; orchestrator_action_hint=DO_NOT_COMPLETE.
+      Reviewer confirmed expected-red backend/frontend tests were otherwise scoped
+      and valid: backend expected-red exposes missing /api/steer/preview, /api/steer/undo,
+      MCP preview_steer/undo_steer, undo handles, closest-allowable conflict wording,
+      and lexical find warning; frontend expected-red exposes missing Steer route
+      preview/live-region/ARIA and mobile Feed scroll preservation while Source Ledger
+      negative/hit-target checks are present. Planner remediation created batched
+      fix step srdct-ac19-traceability-remediation and retest step srdct-foundation-gate-retest;
+      downstream phases remain locked until those pass.'
   - id: srdct-ac19-traceability-remediation
     name: Resolve AC-19 traceability and proof-register mismatch
     status: pending
