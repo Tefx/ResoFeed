@@ -79704,7 +79704,7 @@ phases:
       or code/doc changes were created by the retest.'
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
-  status: pending
+  status: in_progress
   gate: Gate blocks unless Go authoritative routing, HTTP preview/commit/undo, MCP
     parity, lexical-only search, and AC-4 conflict semantics are green with runtime
     proof.
@@ -79713,7 +79713,7 @@ phases:
   steps:
   - id: srdb-classifier-policy-runtime
     name: Complete classifier and AC-4 policy runtime
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -79796,6 +79796,8 @@ phases:
 
       '
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T22:02:59.301614+00:00'
   - id: srdb-http-steer-preview-commit-undo
     name: Complete HTTP Steer preview commit and undo runtime
     status: pending
