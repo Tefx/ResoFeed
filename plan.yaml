@@ -79113,7 +79113,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Tests prove POST /api/steer/preview is authenticated, strict-schema, read-only,
+      - [x] Tests prove POST /api/steer/preview is authenticated, strict-schema, read-only,
       rejects idempotency_key, and does not write sources, steer_rules, item_state,
       agent_receipts, or FTS.
 
