@@ -78230,6 +78230,261 @@ phases:
     depends_on:
     - plfinal-final-gate
     agent: frontend-engineer
+  - id: plfinal-ui-final-blocker-retest-gate
+    name: Final UI blocker retest gate
+    status: pending
+    description: 'step_type: gate
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L2
+
+      source_gate: plfinal-final-gate
+
+      source_gate_artifact: 038eb8c5
+
+      failed_command: npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+
+      As an INDEPENDENT UI RUNTIME AUDITOR, retest the exact final gate UI blocker
+      command after `plfinal-ui-final-blocker-remediation`. This is the final blocker-clearing
+      UI gate for the failed `plfinal-final-gate` report. Your job is to block if
+      any of the seven UI proof failures remain, if rendered artifacts are missing,
+      or if the remediation introduced settings/onboarding/SaaS/product-boundary drift.
+
+
+      Run exactly:
+
+      `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`
+
+
+      Seven blockers that MUST be green:
+
+      1. FR-01/FR-10: RESOFEED surface menu is closed by default, keyboard reachable,
+      and toggles TODAY/SOURCE LEDGER on desktop and mobile; `.utility-surface[aria-label="TODAY
+      surface"]` exists and has `active-panel` after navigation.
+
+      2. FR-02: `.contract-feed-meta` exposes contiguous chronological labels, expected
+      `["TODAY", "YESTERDAY"]`, never TODAY > YESTERDAY > TODAY.
+
+      3. FR-04: `.contract-feed-item` containing `Primary grouped story keeps every
+      source visible` renders with role button `/Open Inspector for:/`.
+
+      4. B1: mobile `.contract-feed-item` containing `Alpha Today Primary Story` renders
+      with role button `/Open Inspector for:/`, and Inspector discloses both Fresh
+      Runtime same-URL grouped sources when detail provenance is sparse.
+
+      5. FR-05/FR-07: `.source-ledger` fetch controls are visible with text `[FETCH]`
+      and accessible name `Fetch source Primary Wire` or `Fetch source <source title>`
+      on desktop and mobile.
+
+      6. FR-06: first Source Ledger row contains collapsed `details.source-diagnostic-details`
+      without `open` and compact row geometry.
+
+      7. FR-09: mobile `.contract-feed-meta` has `white-space: nowrap`, `overflow:
+      hidden`, `text-overflow: ellipsis`, and height <= 18px.
+
+
+      Gate decision basis requirements:
+
+      - Treat finding issues as successful discovery, but do not OPEN this retest
+      gate unless every blocker-class UI obligation above is PROVEN.
+
+      - Record `NEEDS_TEST`, `UNPROVEN`, or `UNCERTAIN_BLOCKING` with a closure path
+      and blocker ownership; do not bypass them.
+
+      - Use rendered evidence from Playwright artifacts, screenshots/videos/traces/DOM
+      snapshots, and accessibility-role inspection where applicable.
+
+      - Verify no settings/onboarding/SaaS drift or forbidden product concepts were
+      introduced while fixing the UI.
+
+
+      ## Completion Criteria
+
+      - [ ] The exact failing command exits 0 after remediation.
+
+      - [ ] The seven-test closure matrix marks all seven failures PASS with artifact
+      references.
+
+      - [ ] Desktop and mobile rendered artifacts are reviewed for changed surfaces.
+
+      - [ ] A11y names for Inspector-open and `[FETCH]` controls are verified from
+      the rendered app, not inferred.
+
+      - [ ] CSS proof confirms mobile metadata nowrap/hidden/ellipsis and height <=
+      18px.
+
+      - [ ] Product-boundary drift scan confirms no settings/onboarding/SaaS or forbidden
+      concepts were introduced.
+
+      - [ ] Final gate decision basis is OPEN only if every UI blocker-class obligation
+      is PROVEN.'
+    verification: '- [ ] Exact command `npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` exits 0.
+
+      - [ ] Seven-test closure matrix is complete and shows PASS for FR-01/FR-10,
+      FR-02, FR-04, B1, FR-05/FR-07, FR-06, and FR-09.
+
+      - [ ] Rendered desktop/mobile artifacts are attached or cited for the changed
+      UI surfaces.
+
+      - [ ] Accessibility names are verified for `Open Inspector for:` and `Fetch
+      source <source title>` controls.
+
+      - [ ] Drift check proves no settings/onboarding/SaaS or forbidden product concepts
+      were introduced.
+
+      - [ ] Gate decision basis records PROVEN status for each blocker or blocks with
+      explicit ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+
+      ## why_previous_gate_failed
+
+      - Previous gate: plfinal-final-gate
+
+      - Gate report artifact: 038eb8c5
+
+      - Previous failed command: `npm --prefix web run test:e2e -- --project=chromium-ci-safe
+      web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`
+
+      - Semantic reason for BLOCK/FAIL: <explain the UI proof failures and why prior
+      backend/spec/runtime proof did not close them>
+
+
+      ## Exact Retest Command Output
+
+      Command:
+
+      ```bash
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+      ```
+
+      Exit code: <0/nonzero>
+
+      Output:
+
+      ```text
+
+      <paste complete relevant stdout/stderr, including failed-test summary if any>
+
+      ```
+
+
+      ## Seven-Test Closure Matrix
+
+      | ID | Required proof | Status | Artifact(s) | Notes |
+
+      | --- | --- | --- | --- | --- |
+
+      | FR-01/FR-10 | TODAY utility surface exists and active-panel after menu navigation
+      on desktop/mobile | PASS/FAIL | <path> | <notes> |
+
+      | FR-02 | `.contract-feed-meta` labels are contiguous chronological groups |
+      PASS/FAIL | <path> | <notes> |
+
+      | FR-04 | Primary grouped story feed item and Inspector-open button render |
+      PASS/FAIL | <path> | <notes> |
+
+      | B1 | Mobile grouped-source item and sparse-provenance Inspector disclosure
+      render | PASS/FAIL | <path> | <notes> |
+
+      | FR-05/FR-07 | Source Ledger `[FETCH]` visible text and contextual accessible
+      names hold | PASS/FAIL | <path> | <notes> |
+
+      | FR-06 | Source Ledger diagnostic details collapsed by default with compact
+      geometry | PASS/FAIL | <path> | <notes> |
+
+      | FR-09 | Mobile metadata nowrap/hidden/ellipsis and height <= 18px | PASS/FAIL
+      | <path> | <notes> |
+
+
+      ## Rendered Artifact Review
+
+      - Desktop screenshot/video/trace/DOM artifact paths: <paths>
+
+      - Mobile screenshot/video/trace/DOM artifact paths: <paths>
+
+      - Accessibility evidence: <role/name evidence for Inspector and FETCH controls>
+
+      - CSS evidence: <computed style proof for `.contract-feed-meta`>
+
+
+      ## Product Boundary Drift Proof
+
+      - No settings/onboarding/SaaS copy introduced: PASS/FAIL, evidence <grep/diff
+      summary>
+
+      - No folders/tags/unread/archive/settings sliders/drag-and-drop introduced:
+      PASS/FAIL, evidence <grep/diff summary>
+
+      - No vector/RAG/sync/merge/per-agent-auth concepts introduced: PASS/FAIL, evidence
+      <grep/diff summary>
+
+      - DESIGN labels and AGENTS rules preserved: PASS/FAIL, evidence <examples>
+
+
+      ## Gate Decision Basis
+
+      | Requirement ref | Behavior claim | Runtime proof expected | Evidence ref |
+      Status | Closure path | Gate decision basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | FR-01/FR-10 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | FR-02 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | FR-04 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | B1 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | FR-05/FR-07 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | FR-06 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+      | FR-09 | <claim> | <proof> | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | OPEN/BLOCK |
+
+
+      ## Headline
+
+      - [ ] OPEN: all seven final UI blockers are PROVEN closed and no product-boundary
+      drift was introduced.
+
+      - [ ] BLOCKED: one or more UI blockers/proof gaps remain; required ownership
+      is listed above.'
+    depends_on:
+    - plfinal-ui-final-blocker-remediation
+    agent: uiux-auditor
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
   status: locked
