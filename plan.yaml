@@ -66929,7 +66929,7 @@ phases:
       and explicit confirmation that both `Fresh Runtime A` and `Fresh Runtime B`
       are visible in the mobile Inspector for the same-URL grouped duplicate story.
 
-      - [ ] Black-box liveness rerun evidence proves the single Go binary runnable
+      - [x] Black-box liveness rerun evidence proves the single Go binary runnable
       UI surface and the 390x844 mobile Inspector grouped-source disclosure.
 
       - [ ] Rerun artifact/text evidence shows both `Fresh Runtime A` and `Fresh Runtime
