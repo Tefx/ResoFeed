@@ -67722,7 +67722,7 @@ phases:
       - [x] Reproduced or inspected the black-box failure context and identified why
       the mobile served-app Inspector omitted `Fresh Runtime B`.
 
-      - [ ] Fixed the grouped duplicate Inspector disclosure so the mobile public
+      - [x] Fixed the grouped duplicate Inspector disclosure so the mobile public
       runtime path can show both `Fresh Runtime A` and `Fresh Runtime B` for same-URL
       grouped items.
 
