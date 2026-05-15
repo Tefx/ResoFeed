@@ -66260,3 +66260,113 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-green-retest
     agent: blind-tester
+  - id: ui-runtime-fresh-review-final-gate
+    name: Final gate for fresh runtime UI review remediation
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      review_depth: THOROUGH
+
+      independence_level: L2
+
+
+      As an independent gate reviewer, decide whether the fresh runtime UI audit remediation
+      phase can open. This gate protects closure of all blocker/should-fix findings
+      from docs/audits/ui-runtime-fresh-review-2026-05-15.md.
+
+
+      Gate must BLOCK if any of these remain unresolved:
+
+      - FR-01/FR-10 RESOFEED menu is open by default, not keyboard reachable, or shows
+      TODAY/SOURCE LEDGER before opening on desktop/mobile.
+
+      - FR-02 feed time labels can repeat out of chronological group order.
+
+      - FR-04 grouped duplicate/source item is only searchable and not exposed from
+      the primary Inspector story surface.
+
+      - FR-05 source-level [FETCH] buttons lack contextual accessible names.
+
+      - FR-06 Source Ledger collapsed [DETAILS] inflates every row by default.
+
+      - FR-07 Source Ledger DOM contract ID differs from DESIGN.md.
+
+      - FR-09 mobile feed metadata wraps into multiple lines instead of staying flat
+      inline.
+
+      - Any forbidden ResoFeed concept or runtime shape was introduced.
+
+
+      Gate decision basis must map requirement refs, artifact/evidence refs reviewed,
+      unresolved statuses, why unresolved items block or do not intersect remaining
+      gates, and final OPEN/BLOCK recommendation.
+
+
+      ## Completion Criteria
+
+      - [ ] All phase steps completed with adequate evidence.
+
+      - [ ] Green retest evidence covers every fresh audit finding.
+
+      - [ ] UIUX multimodal audit evidence covers desktop and mobile rendered states.
+
+      - [ ] Black-box liveness evidence proves the single Go binary runnable UI surface.
+
+      - [ ] No forbidden architecture/product boundary changes are present.
+
+      - [ ] Gate decision is OPEN only if every blocker/should-fix finding is PROVEN
+      or explicitly non-intersecting with evidence.'
+    verification: '- [ ] Gate review confirms FR-01, FR-02, FR-04, FR-05, FR-06, FR-07,
+      FR-09, and FR-10 are closed with evidence references.
+
+      - [ ] Gate review confirms expected-red tests were defined before implementation
+      and now pass green after implementation.
+
+      - [ ] Gate review confirms UIUX multimodal and black-box liveness evidence are
+      present and independently produced.
+
+      - [ ] Gate review confirms ResoFeed boundaries remain intact: one Go binary,
+      SQLite-only, owner-token boundary, no accounts/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job
+      dashboards/sidecars.
+
+      - [ ] Gate decision basis contains OPEN/BLOCK recommendation and explicit closure
+      paths for any unresolved item.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n## Gate Review Report\n\
+      **Reviewer**: gate-reviewer\n**Phase**: ui-runtime-fresh-review-remediation\n\
+      **Review depth**: THOROUGH\n\n### Execution Review\n| Step ID | Status | Evidence\
+      \ Quality | Concerns |\n|---|---|---|---|\n| ui-runtime-fresh-review-contract-red-tests\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-shell-feed-ledger-fix\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-duplicate-source-api-fix\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-duplicate-source-inspector-fix\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-green-retest\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-uiux-multimodal-audit\
+      \ | <status> | <quality> | <concerns> |\n| ui-runtime-fresh-review-black-box-liveness\
+      \ | <status> | <quality> | <concerns> |\n\n### Fresh Audit Finding Closure\n\
+      | Finding | Evidence refs | Status | Gate decision basis |\n|---|---|---|---|\n\
+      | FR-01 | <refs> | PROVEN/UNPROVEN | <basis> |\n| FR-02 | <refs> | PROVEN/UNPROVEN\
+      \ | <basis> |\n| FR-04 | <refs> | PROVEN/UNPROVEN | <basis> |\n| FR-05 | <refs>\
+      \ | PROVEN/UNPROVEN | <basis> |\n| FR-06 | <refs> | PROVEN/UNPROVEN | <basis>\
+      \ |\n| FR-07 | <refs> | PROVEN/UNPROVEN | <basis> |\n| FR-09 | <refs> | PROVEN/UNPROVEN\
+      \ | <basis> |\n| FR-10 | <refs> | PROVEN/UNPROVEN | <basis> |\n\n### Boundary\
+      \ Review\n- One Go binary preserved: <yes/no>\n- SQLite-only preserved: <yes/no>\n\
+      - Owner-token boundary preserved: <yes/no>\n- Forbidden UI/runtime concepts\
+      \ absent: <yes/no>\n\n### Gate Decision\n- [ ] OPEN: phase passes gate\n- [\
+      \ ] BLOCKED: issues must be resolved before proceeding\n  - Blocking issues:\
+      \ <list>\n  - Required actions: <list>"
+    depends_on:
+    - ui-runtime-fresh-review-contract-red-tests
+    - ui-runtime-fresh-review-shell-feed-ledger-fix
+    - ui-runtime-fresh-review-duplicate-source-api-fix
+    - ui-runtime-fresh-review-duplicate-source-inspector-fix
+    - ui-runtime-fresh-review-green-retest
+    - ui-runtime-fresh-review-uiux-multimodal-audit
+    - ui-runtime-fresh-review-black-box-liveness
+    agent: gate-reviewer
