@@ -78832,7 +78832,7 @@ phases:
       - [x] Define or confirm SteerRouteKind, SteerPreview, SteeringReceipt, SteerUndoHandle,
       and SteerUndoResult shapes match docs exactly.
 
-      - [ ] Pin classifier/preview/undo function signatures without adding completed
+      - [x] Pin classifier/preview/undo function signatures without adding completed
       mutation logic.
 
       - [ ] Pin strict request/response JSON field names, nullable fields, and idempotency
