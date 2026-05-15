@@ -71418,7 +71418,7 @@ phases:
 
       - [x] Doctor stale/ok/redaction proof is green.
 
-      - [ ] Downstream HTTP/MCP/frontend blockers are preserved as downstream-owned
+      - [x] Downstream HTTP/MCP/frontend blockers are preserved as downstream-owned
       with owner steps and gates named.'
     verification: '- [ ] Retest evidence includes exact backend-core command(s) and
       output summary showing green results.
