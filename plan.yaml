@@ -65731,7 +65731,7 @@ phases:
     agent: frontend-engineer
   - id: ui-runtime-fresh-review-duplicate-source-api-fix
     name: Fix grouped duplicate source disclosure data path
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -65821,6 +65821,8 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-contract-red-tests
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-15T07:17:46.428246+00:00'
   - id: ui-runtime-fresh-review-duplicate-source-inspector-fix
     name: Render grouped duplicate source disclosure in Inspector
     status: pending
