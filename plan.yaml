@@ -80029,7 +80029,7 @@ phases:
       - [x] Start the real cmd/resofeed server with a test owner token and SQLite
       test DB.
 
-      - [ ] Exercise POST /api/steer/preview for valid add, invalid add, find alias,
+      - [x] Exercise POST /api/steer/preview for valid add, invalid add, find alias,
       and natural-language rule proposal.
 
       - [ ] Exercise POST /api/steer commit and POST /api/steer/undo through real
