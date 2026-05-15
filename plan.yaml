@@ -67589,3 +67589,220 @@ phases:
     depends_on:
     - ui-runtime-fresh-review-black-box-liveness
     agent: frontend-engineer
+  - id: ui-runtime-fresh-review-black-box-liveness-rerun
+    name: Rerun black-box mobile Inspector liveness proof
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+      verification_scope: phase-check
+
+      independence_level: L3
+
+      priority: HIGH
+
+
+      As an independent black-box tester, rerun the real served-app mobile Inspector
+      proof after `ui-runtime-fresh-review-mobile-inspector-grouped-source-fix`. This
+      retest protects `ui-runtime-fresh-review-final-gate` and must close the public
+      runtime path, not only the existing e2e assertion path.
+
+
+      ## Required runtime path
+
+      Use the same class of proof as the failing blind-test:
+
+      - Build Svelte assets.
+
+      - Build the Go binary or run the project-equivalent single deployable.
+
+      - Start `resofeed serve` with a clean SQLite DB and owner token.
+
+      - Import the duplicate OPML/feed setup through the documented HTTP API.
+
+      - Let runtime ingest fetch local RSS.
+
+      - Use Playwright or equivalent browser automation against the served UI, not
+      component-only tests.
+
+      - Test a 390x844 mobile viewport and the public Inspector path.
+
+
+      ## Required blocker closure
+
+      The mobile Inspector for the primary same-URL duplicate story must disclose
+      both grouped sources:
+
+      - `Fresh Runtime A`
+
+      - `Fresh Runtime B`
+
+
+      It is not sufficient for evidence to show only `src: Fresh Runtime A · full`,
+      and it is not sufficient to cite the older UIUX multimodal PASS. The retest
+      must produce fresh public-runtime evidence after the fix.
+
+
+      ## Accessibility and fresh-audit preservation
+
+      In addition to B1 closure, confirm the fix did not regress fresh-audit coverage
+      for FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, or FR-10, and did not weaken
+      accessibility semantics for the Inspector disclosure, menu, source fetch controls,
+      Source Ledger title contract, or mobile metadata layout.
+
+
+      ## Agent checklist (toggle before completion)
+
+      - [ ] Real served-app runtime path was used, including built assets, single
+      Go binary/server, clean DB, owner token, documented HTTP import, and runtime
+      ingest.
+
+      - [ ] 390x844 mobile browser proof opens/selects the primary duplicate story
+      Inspector.
+
+      - [ ] Fresh evidence shows both `Fresh Runtime A` and `Fresh Runtime B` in the
+      mobile Inspector grouped-source disclosure.
+
+      - [ ] Evidence includes actual commands, runtime output, and artifact paths,
+      not only "tests pass".
+
+      - [ ] Existing `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` coverage
+      was not weakened and remains green or any failure is reported as blocking.
+
+      - [ ] Accessibility and fresh-audit coverage are preserved for FR-01, FR-02,
+      FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
+
+      - [ ] No forbidden ResoFeed architecture/product/runtime concept is observed.'
+    verification: '- [ ] Exact build/start/import/ingest/browser commands are recorded
+      with actual output.
+
+      - [ ] Mobile 390x844 Inspector public-runtime artifact shows both `Fresh Runtime
+      A` and `Fresh Runtime B` for the same-URL grouped duplicate story.
+
+      - [ ] Retest confirms the previous failure `mobile Inspector did not disclose
+      both grouped sources` is closed.
+
+      - [ ] Retest confirms no weakening/regression of `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`
+      or fresh-audit coverage.
+
+      - [ ] Retest confirms Inspector accessibility and mobile layout behavior remain
+      acceptable.
+
+      - [ ] Behavioral proof register maps B1/FR-04 to PROVEN with evidence_ref, closure_path,
+      and gate_decision_basis.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Scope**: real served-app mobile Inspector grouped duplicate source disclosure
+
+      **Independence Level**: L3
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts — key passage or
+      "NOT READ: <reason>"
+
+
+      ### Real Runtime Setup
+
+      **Commands executed**:
+
+      ```
+
+      <build assets, build/run Go binary, start serve, import OPML, trigger/observe
+      ingest, browser run>
+
+      ```
+
+
+      **Runtime output**:
+
+      ```
+
+      <stdout/stderr excerpts proving served runtime path>
+
+      ```
+
+
+      ### Mobile Inspector Proof
+
+      **Viewport**: 390x844
+
+      **Story selected**: <primary duplicate story identifier/title/url>
+
+      **Inspector text excerpt**:
+
+      ```
+
+      <must include Fresh Runtime A and Fresh Runtime B>
+
+      ```
+
+      **Artifacts**:
+
+      - screenshot: <path>
+
+      - structured output: <path>
+
+
+      ### Fresh-Audit Regression Check
+
+      | Finding | Status | Evidence |
+
+      |---|---|---|
+
+      | FR-01/FR-10 menu | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+      | FR-02 time labels | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+      | FR-04 grouped sources | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+      | FR-05 fetch accessible names | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+      | FR-06 compact details | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+      | FR-07 Source Ledger title contract | PROVEN/REGRESSED/UNTESTED | <artifact>
+      |
+
+      | FR-09 mobile metadata | PROVEN/REGRESSED/UNTESTED | <artifact> |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | B1/FR-04 | Mobile served-app Inspector discloses all grouped same-URL duplicate
+      sources including Fresh Runtime A and Fresh Runtime B | real served app at 390x844
+      | <artifact refs> | PROVEN/UNPROVEN | <none or remediation> | <OPEN/BLOCK basis>
+      |
+
+
+      ### Headline
+
+      - [ ] **PASS**: B1/FR-04 public served mobile Inspector path is proven closed
+      and no fresh-audit regressions found.
+
+      - [ ] **FAIL**: B1 remains open or fresh-audit/accessibility regression is blocking.'
+    depends_on:
+    - ui-runtime-fresh-review-mobile-inspector-grouped-source-fix
+    agent: blind-tester
