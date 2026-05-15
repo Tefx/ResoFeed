@@ -68220,7 +68220,7 @@ phases:
       - [x] Audited fresh post-fix rendered mobile UI at 390x844; did not reuse stale
       pre-fix artifact as closure evidence.
 
-      - [ ] Confirmed the mobile Inspector for the grouped same-URL story visibly
+      - [x] Confirmed the mobile Inspector for the grouped same-URL story visibly
       shows both `Fresh Runtime A` and `Fresh Runtime B`.
 
       - [ ] Captured or cited a rendered mobile artifact path for the 390x844 state.
