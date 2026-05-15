@@ -79388,6 +79388,168 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T21:41:54.485048+00:00'
+  - id: srdct-ac19-traceability-remediation
+    name: Resolve AC-19 traceability and proof-register mismatch
+    status: pending
+    description: 'step_type: remediation
+
+
+      Batched source-backed remediation for the foundation gate semantic failure:
+      the gate expected Behavioral Proof Register coverage for AC-4 and AC-19, but
+      the reviewed PRD evidence found AC-4 and AC-18 and no authoritative AC-19.
+
+
+      Scope: resolve the traceability/proof-register mismatch only. This is NOT Steer
+      runtime implementation and MUST NOT modify Go/TypeScript product code.
+
+
+      Required source inspection:
+
+      - docs/PRD.md — identify the exact authoritative acceptance criteria for AC-4
+      and the manual fetch / Source Ledger / Steer-delta-related obligation currently
+      referenced as AC-19.
+
+      - docs/ARCHITECTURE.md — verify that any correction preserves the single Go
+      binary, SQLite/FTS5 lexical-only, LLM-as-transformer, owner token boundary,
+      and no sync/merge/server-side queue invariants.
+
+      - docs/DESIGN.md — verify any UI/source-ledger wording remains aligned with
+      the dense archival workbench design and avoids forbidden SaaS/onboarding/settings
+      concepts.
+
+      - docs/UI_REGRESSION_CONTRACT.md — verify the corrected requirement reference
+      aligns with existing UI regression obligations and does not invent new product
+      behavior.
+
+
+      Resolution options, in order:
+
+      1. If the gate should have referenced an existing authoritative criterion, update
+      the proof-register/gate traceability material to cite the exact existing AC
+      (for example AC-18, only if source-backed) and record why AC-19 was invalid.
+
+      2. If an explicit docs/spec edit is required, constrain it to restoring or adding
+      the missing acceptance criterion with source-backed rationale from the listed
+      docs. Do not invent new product behavior.
+
+      3. If the sources conflict, produce a precise authority-conflict note and leave
+      the gate blocked rather than guessing.
+
+
+      ResoFeed invariant guardrails:
+
+      - Preserve the single Go binary deployment model; do not introduce workers,
+      queues, sidecars, or admin processes.
+
+      - Preserve SQLite + FTS5 lexical search only; do not introduce vector databases,
+      embeddings, semantic search, or RAG.
+
+      - Preserve the owner token delegation boundary; do not introduce user accounts,
+      OAuth, per-agent registries, or settings dashboards.
+
+      - Preserve portable-state limits; do not introduce sync/merge, conflict resolvers,
+      ledgers, command history, or activity feeds.
+
+
+      Acceptance checklist:
+
+      - [ ] docs/PRD.md is cited for AC-4 and for the corrected/restored requirement
+      reference; if AC-19 remains absent, the evidence explicitly says so.
+
+      - [ ] docs/ARCHITECTURE.md is cited to prove the resolution does not violate
+      ResoFeed architecture invariants.
+
+      - [ ] docs/DESIGN.md and docs/UI_REGRESSION_CONTRACT.md are cited for any UI/source-ledger/manual-fetch
+      wording that remains in the proof register.
+
+      - [ ] The remediation either maps the proof register to an existing authoritative
+      AC or makes a minimal source-backed docs/spec correction; it does not invent
+      product behavior.
+
+      - [ ] The Behavioral Proof Register names AC-4 plus the corrected/restored requirement
+      reference and records the closure path for the former AC-19 mismatch.
+
+      - [ ] No product runtime implementation work is performed in this step.'
+    verification: '- [ ] Source citations identify whether AC-19 is invalid, replaced
+      by an existing authoritative AC, or restored by a minimal spec/doc correction.
+
+      - [ ] Proof-register material explicitly covers AC-4 and the corrected/restored
+      requirement reference with behavioral closure fields ready for retest.
+
+      - [ ] Evidence demonstrates no product behavior was guessed or added beyond
+      source-backed acceptance restoration.
+
+      - [ ] ResoFeed invariants are preserved: single Go binary, SQLite/FTS5 lexical-only,
+      no RAG/vector, no jobs/queues/settings dashboards, and owner token boundary.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## AC-19 Traceability Remediation Evidence
+
+
+      **Observed mismatch**: <summarize AC-19 absence / mistaken reference>
+
+      **Authoritative AC-4 citation**: <docs/PRD.md section and passage>
+
+      **Corrected/restored requirement reference**: <AC id or spec/doc correction,
+      with citation>
+
+      **Resolution type**: existing_AC_reference | minimal_spec_restore | authority_conflict_blocked
+
+      **Source-backed rationale**: <why this is the only source-backed resolution>
+
+      **Files changed, if any**: <docs/proof-register/spec files only; no product
+      runtime code>
+
+
+      ## ResoFeed Invariant Check
+
+      - Single Go binary preserved: PASS/FAIL + citation
+
+      - SQLite/FTS5 lexical-only preserved: PASS/FAIL + citation
+
+      - No RAG/vector/semantic search introduced: PASS/FAIL + citation
+
+      - No jobs/queues/settings dashboards introduced: PASS/FAIL + citation
+
+      - Owner token boundary preserved: PASS/FAIL + citation
+
+
+      ## Behavioral Proof Register Patch Summary
+
+      | Requirement Ref | Behavior Claim | Evidence Ref | Status | Closure Path |
+
+      | --- | --- | --- | --- | --- |
+
+      | AC-4 | <claim> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path> |
+
+      | <corrected/restored ref> | <claim> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> |
+
+
+      ## Headline
+
+      - [ ] PASS: AC-19 mismatch resolved with source-backed traceability and no invented
+      behavior
+
+      - [ ] FAIL: Requirement authority remains ambiguous or unresolved'
+    depends_on:
+    - srdct-foundation-gate
+    agent: doc-reviewer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
