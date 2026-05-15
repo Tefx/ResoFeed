@@ -134,6 +134,7 @@ create virtual table if not exists search_fts using fts5(
   source_title,
   feed_excerpt,
   summary,
+  core_insight,
   extracted_text,
   provenance
 );
@@ -142,6 +143,27 @@ create virtual table if not exists search_fts using fts5(
 		{
 			ID:  "002_agent_receipts_request_fingerprint",
 			SQL: `alter table agent_receipts add column request_fingerprint text;`,
+		},
+		{
+			ID: "003_search_fts_core_insight",
+			SQL: `
+drop table if exists search_fts;
+create virtual table search_fts using fts5(
+  item_id unindexed,
+  title,
+  source_title,
+  feed_excerpt,
+  summary,
+  core_insight,
+  extracted_text,
+  provenance
+);
+insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance)
+select i.id, i.title, coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.extracted_text, ''),
+       coalesce(i.source_url, s.url, '') || ' ' || coalesce(i.url, '') || ' ' || coalesce(i.canonical_url, '') || ' ' || coalesce(i.story_key, '') || ' ' || coalesce(i.duplicate_of_item_id, '') || ' ' || coalesce(i.value_tier, '')
+from items i
+left join sources s on s.id = i.source_id;
+`,
 		},
 	}
 }

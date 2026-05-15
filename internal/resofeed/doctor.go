@@ -114,6 +114,11 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, fallbackLines...)
+	searchFTSLine, err := readSearchFTSStatusLine(ctx, db)
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
+	lines = append(lines, searchFTSLine)
 	extractionLines, err := readItemStatusDiagnostics(ctx, db, "extraction", "extraction_status", []string{extractionStatusPartial, extractionStatusOriginalNA, extractionStatusSummaryNA})
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -125,6 +130,18 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		lines = append(lines, "ingest: last_run=never")
 	}
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+func readSearchFTSStatusLine(ctx context.Context, db *sql.DB) (string, error) {
+	var staleSince string
+	err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleSince)
+	if err == nil {
+		return DoctorSearchFTSStaleLinePrefix + staleSince, nil
+	}
+	if err != sql.ErrNoRows {
+		return "", fmt.Errorf("read search FTS stale marker: %w", err)
+	}
+	return DoctorSearchFTSOKLinePrefix, nil
 }
 
 type openRouterHealthMetrics struct {

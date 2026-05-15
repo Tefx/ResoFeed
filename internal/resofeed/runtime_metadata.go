@@ -3,6 +3,7 @@ package resofeed
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"time"
@@ -60,6 +61,9 @@ func readProcessingLanguage(ctx context.Context, db *sql.DB) (ProcessingLanguage
 	var raw string
 	err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&raw)
 	if errors.Is(err, sql.ErrNoRows) {
+		return ProcessingLanguageDefault, nil
+	}
+	if errors.Is(err, driver.ErrSkip) {
 		return ProcessingLanguageDefault, nil
 	}
 	if err != nil {

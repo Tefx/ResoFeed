@@ -278,6 +278,10 @@ type ingestSourceResult struct {
 }
 
 func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
+	language, err := readProcessingLanguage(ctx, db)
+	if err != nil {
+		return ingestSourceResult{}, fmt.Errorf("ingest source: read processing language: %w", err)
+	}
 	timeout := cfg.SourceFetchTimeout
 	if timeout <= 0 {
 		timeout = 20 * time.Second
@@ -295,7 +299,7 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	}
 	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
 	for _, entry := range feed.Items {
-		item, err := buildItem(ctx, source, entry, cfg.LLM)
+		item, err := buildItem(ctx, source, entry, cfg.LLM, language)
 		if err != nil {
 			return result, err
 		}
@@ -410,7 +414,10 @@ func parseFeed(data []byte) (parsedFeed, error) {
 	}
 }
 
-func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClient) (Item, error) {
+func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClient, targetLanguage ProcessingLanguage) (Item, error) {
+	if err := validateProcessingLanguage(targetLanguage); err != nil {
+		return Item{}, fmt.Errorf("build item: target language: %w", err)
+	}
 	if strings.TrimSpace(entry.URL) == "" {
 		entry.URL = source.URL + "#" + stableID("entry", entry.Title+entry.Description)
 	}
@@ -448,7 +455,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage})
 	if err != nil {
 		item.ModelStatus = modelStatusLatencyError
 		sanitizeReadableItem(&item)
@@ -456,6 +463,15 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	}
 	item.ModelStatus = mapModelStatus(out.ModelStatus)
 	if item.ModelStatus == modelStatusOK {
+		if strings.TrimSpace(out.Title) != "" {
+			item.Title = out.Title
+		}
+		if strings.TrimSpace(out.FeedExcerpt) != "" {
+			item.FeedExcerpt = nullableString(out.FeedExcerpt)
+		}
+		if strings.TrimSpace(out.ExtractedText) != "" {
+			item.ExtractedText = nullableString(out.ExtractedText)
+		}
 		item.Summary = nullableString(out.Summary)
 		item.CoreInsight = nullableString(out.CoreInsight)
 		item.ValueTier = nullableString(out.ValueTier)
@@ -529,9 +545,16 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) error {
 	sanitizeReadableItem(&item)
-	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do update set source_url = excluded.source_url, title = excluded.title, summary = excluded.summary, core_insight = excluded.core_insight, value_tier = excluded.value_tier, published_at = excluded.published_at, extraction_status = excluded.extraction_status, model_status = excluded.model_status, feed_excerpt = excluded.feed_excerpt, extracted_text = excluded.extracted_text, canonical_url = excluded.canonical_url, story_key = excluded.story_key, duplicate_of_item_id = excluded.duplicate_of_item_id`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
+	res, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return fmt.Errorf("ingest item %q: %w", item.ID, err)
+	}
+	inserted, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("ingest item %q: rows affected: %w", item.ID, err)
+	}
+	if inserted == 0 {
+		return nil
 	}
 	if err := upsertSearchIndex(ctx, db, item); err != nil {
 		return err
@@ -545,7 +568,7 @@ func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: delete old row: %w", item.ID, err)
 	}
-	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_title, feed_excerpt, summary, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary), stringValue(item.ExtractedText), provenance)
+	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary), stringValue(item.CoreInsight), stringValue(item.ExtractedText), provenance)
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: insert row: %w", item.ID, err)
 	}

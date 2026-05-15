@@ -228,8 +228,8 @@ func rebuildSearchIndexTx(ctx context.Context, tx *sql.Tx) error {
 		return fmt.Errorf("clear search index: %w", err)
 	}
 	_, err := tx.ExecContext(ctx, `
-insert into search_fts (item_id, title, source_title, feed_excerpt, summary, extracted_text, provenance)
-select i.id, i.title, coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.extracted_text, ''),
+insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance)
+select i.id, i.title, coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.extracted_text, ''),
        coalesce(i.source_url, s.url, '') || ' ' || coalesce(i.url, '') || ' ' || coalesce(i.canonical_url, '') || ' ' || coalesce(i.story_key, '') || ' ' || coalesce(i.duplicate_of_item_id, '') || ' ' || coalesce(i.value_tier, '')
 from items i
 left join sources s on s.id = i.source_id`)

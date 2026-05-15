@@ -89,7 +89,7 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 		"task": "summarize_rss_item",
 		"contract": map[string]any{
 			"response_json_only":  true,
-			"fields":              []string{"summary", "core_insight", "value_tier", "model_status"},
+			"fields":              []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
 			"model_status_values": []string{"ok", "summary_unavailable", "model_latency_error"},
 		},
 		"item": input,
@@ -101,6 +101,9 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	out.Summary = strings.TrimSpace(out.Summary)
 	out.CoreInsight = strings.TrimSpace(out.CoreInsight)
 	out.ValueTier = strings.TrimSpace(out.ValueTier)
+	out.Title = strings.TrimSpace(out.Title)
+	out.FeedExcerpt = strings.TrimSpace(out.FeedExcerpt)
+	out.ExtractedText = strings.TrimSpace(out.ExtractedText)
 	out.ModelStatus = strings.TrimSpace(out.ModelStatus)
 	if out.ModelStatus == "" {
 		out.ModelStatus = "ok"
@@ -305,10 +308,13 @@ type OpenRouterSummaryInput struct {
 
 // OpenRouterSummaryOutput is validated before saving summary metadata.
 type OpenRouterSummaryOutput struct {
-	Summary     string `json:"summary"`
-	CoreInsight string `json:"core_insight"`
-	ValueTier   string `json:"value_tier"`
-	ModelStatus string `json:"model_status"`
+	Title         string `json:"title"`
+	FeedExcerpt   string `json:"feed_excerpt"`
+	ExtractedText string `json:"extracted_text"`
+	Summary       string `json:"summary"`
+	CoreInsight   string `json:"core_insight"`
+	ValueTier     string `json:"value_tier"`
+	ModelStatus   string `json:"model_status"`
 }
 
 // OpenRouterSteeringInput asks OpenRouter to translate natural language only
