@@ -79219,7 +79219,7 @@ phases:
       URL-required invalid add, warning-only find alias, write preview [APPLY]/[CANCEL],
       and receipt [UNDO] visibility only when backend returns revocable id.
 
-      - [ ] Tests cover Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      - [x] Tests cover Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE],
       OPML/state actions, native or aria-expanded/aria-controls disclosure semantics,
       44px bracket hit targets, topmost element clickability, and terse raw diagnostics.
 
