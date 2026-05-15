@@ -64744,3 +64744,145 @@ phases:
     - urda-final-spec-boundary-blockers-retest
     - urda-final-black-box-runtime-ui-smoke
     agent: uiux-auditor
+  - id: urda-strict-final-gate-rerun
+    name: Rerun strict final gate after persisted UIUX multimodal closure
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: full-plan-check
+
+      review_depth: THOROUGH
+
+      agent_source: default
+
+
+      As an INDEPENDENT REVIEWER (`gate-reviewer`), rerun the strict final gate after
+      the missing UIUX/multimodal/front-end closure artifact has been persisted.
+
+
+      This rerun is evidence-governance focused. It must decide OPEN/BLOCKED using
+      the new persisted UIUX/multimodal artifact plus all prior strict-final evidence.
+      Do NOT modify product code.
+
+
+      Required review inputs:
+
+      - `urda-uiux-multimodal-design-audit-persist` and its persisted artifact under
+      `docs/audits/`, expected as `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`
+      or clearly equivalent.
+
+      - Prior blocked strict gate evidence from `urda-strict-final-gate`, including
+      BLOCKER-1 and BLOCKER-2.
+
+      - `urda-final-spec-boundary-blockers-uiux-audit` for R6/R7/R18 rendered UI proof.
+
+      - `urda-final-spec-boundary-blockers-retest` for R6/R7/R12/R18 static/runtime
+      retest proof and forbidden-surface scan.
+
+      - `urda-final-black-box-runtime-ui-smoke` and `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`
+      for public black-box runtime, screenshot, a11y/mobile, and CLI preservation
+      evidence.
+
+      - The prior persisted frontend FAIL/BLOCK artifact `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`
+      and the supersession decision in the new UIUX/multimodal artifact.
+
+
+      OPEN is allowed only if:
+
+      1. The missing `urda-uiux-multimodal-design-audit` precondition is satisfied
+      by a persisted PASS or accepted PASS_WITH_DEBT artifact.
+
+      2. The prior persisted frontend FAIL/BLOCK artifact is explicitly superseded
+      or any non-superseded portion is proven non-blocking/non-intersecting with final
+      closure.
+
+      3. R6/R7/R12/R18 remain PROVEN closed by prior retest/UIUX/smoke evidence.
+
+      4. No blocker-class behavioral runtime/UI obligation remains NEEDS_TEST, UNPROVEN,
+      PARTIAL, DIVERGES, or UNCERTAIN_BLOCKING without remediation ownership.
+
+
+      The gate decision must include a structured behavioral proof register, issue
+      coverage table, artifact coverage table, and final OPEN/BLOCKED recommendation.'
+    verification: '- full-plan-check strict final gate rerun.
+
+      - Reviews the new persisted UIUX/multimodal closure artifact and confirms whether
+      it satisfies the missing `urda-uiux-multimodal-design-audit` gate precondition.
+
+      - Reviews the prior persisted frontend FAIL/BLOCK artifact and the new supersession
+      decision; OPEN is invalid if supersession or non-intersection is unsupported.
+
+      - Reviews prior retest, UIUX audit, and black-box smoke evidence for R6/R7/R12/R18
+      and verifies no regression or unresolved blocker-class proof gap remains.
+
+      - Evidence includes gate_decision_basis, behavioral proof register, artifact
+      coverage table, unresolved-status disposition, and final OPEN/BLOCKED recommendation.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - <filename> — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Strict Final Gate Rerun Report
+
+
+      **Reviewer**: gate-reviewer
+
+      **Gate**: urda-strict-final-gate-rerun
+
+
+      ## Artifact Coverage Table
+
+
+      | Artifact | Present? | Verdict / Status | Gate use | Notes |
+
+      | --- | --- | --- | --- | --- |
+
+      | `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md` or equivalent
+      | YES/NO | PASS/PASS_WITH_DEBT/BLOCKED | satisfies missing precondition? | |
+
+      | `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` | YES/NO | prior FAIL/BLOCK
+      | superseded? | |
+
+      | `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md` | YES/NO
+      | PASS/BLOCKED | runtime smoke evidence | |
+
+
+      ## Behavioral Proof Register
+
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+
+      ## Unresolved Status Disposition
+
+
+      List every NEEDS_TEST, UNPROVEN, PARTIAL, DIVERGES, UNCERTAIN_BLOCKING, BLOCKED,
+      or prior FAIL/BLOCK item. For each: OPEN-blocking, non-intersecting with evidence,
+      or remediation-owned.
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED
+
+
+      **gate_open_allowed**: true | false
+
+      **orchestrator_action_hint**: COMPLETE | DO_NOT_COMPLETE'
+    depends_on:
+    - urda-uiux-multimodal-design-audit-persist
+    - urda-final-spec-boundary-blockers-retest
+    - urda-final-spec-boundary-blockers-uiux-audit
+    - urda-final-black-box-runtime-ui-smoke
+    agent: gate-reviewer
