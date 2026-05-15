@@ -69368,12 +69368,12 @@ phases:
       remains intact.
 
       - [x] Tests preserve DESIGN.md bracket-action anatomy and accessibility rules.'
-    verification: '- [ ] Expected-red frontend tests fail for intended missing UI/API
+    verification: '- [x] Expected-red frontend tests fail for intended missing UI/API
       behavior.
 
-      - [ ] Tests include rendered DOM/browser evidence requirements.
+      - [x] Tests include rendered DOM/browser evidence requirements.
 
-      - [ ] No frontend implementation is included.'
+      - [x] No frontend implementation is included.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
