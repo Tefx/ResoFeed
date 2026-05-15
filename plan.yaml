@@ -76647,7 +76647,7 @@ phases:
 
       - [x] No implementation source assumptions are required.
 
-      - [ ] Findings classify blocker/should_fix/suggestion/tech_debt with reproduction.'
+      - [x] Findings classify blocker/should_fix/suggestion/tech_debt with reproduction.'
     verification: '- [ ] Black-box acceptance report covers HTTP, MCP, and UI surfaces.
 
       - [ ] All blocker/should-fix findings have remediation ownership.
