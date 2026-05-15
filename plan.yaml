@@ -69291,7 +69291,7 @@ phases:
 
       - [x] MCP language/reprocess tools match HTTP response and idempotency semantics.
 
-      - [ ] MCP `search_items` output includes `query` echo matching `SearchQueryEcho`.
+      - [x] MCP `search_items` output includes `query` echo matching `SearchQueryEcho`.
 
       - [ ] MCP `report_delivery` matches HTTP delivery semantics and does not create
       registries/jobs/ledgers.
