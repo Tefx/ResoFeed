@@ -78292,7 +78292,7 @@ phases:
       - [x] Source Ledger diagnostic details render collapsed by default without row
       inflation.
 
-      - [ ] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
+      - [x] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
 
       - [ ] No settings/onboarding/SaaS/product-boundary drift is introduced.'
     verification: '- [ ] Exact failing command is rerun locally by the implementer
