@@ -61307,7 +61307,7 @@ phases:
       implementation files.'
   - id: urda-frontend-ui-audit-gate
     name: Gate frontend UI runtime design audit repair
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -61394,6 +61394,175 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T01:49:57.327593+00:00'
+    done_at: '2026-05-15T02:25:46.009626+00:00'
+    evidence: 'Gate review completed and BLOCKED final closure; blocker remediation
+      ownership was created by planner before completing this discovery/gate step.
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — Read by gate-reviewer;
+      key passage: original audit defines issues 1-14 including missing `[RUN INGEST]`,
+      row `[FETCH]`, non-keyboard `[IMPORT OPML]`, weak bracket focus, and duplicate
+      Resonate accessible names.
+
+      - docs/DESIGN.md — Read by gate-reviewer; key passage: Source Ledger requires
+      flat `[RUN INGEST]`, row `[FETCH]`, raw `err:` diagnostics, no jobs/queues/settings/folders/tags/sync,
+      and keyboard-reachable named buttons with 44px hit targets.
+
+      - docs/ARCHITECTURE.md — Read by gate-reviewer; key passage: one Go binary,
+      one SQLite DB, no queues/job tables/activity ledgers/sync/vector/RAG; manual
+      ingest/fetch must use in-process concurrency guard and 409 conflict rather than
+      enqueue.
+
+      - docs/ui-preview.html — Read by gate-reviewer; key passage: current preview
+      Source Ledger includes `last_ingest: 14:00:00`, `[RUN INGEST]`, row `[FETCH]`,
+      and raw `err: timeout contacting source` examples.
+
+
+      ## Gate Review Report
+
+      Gate Decision: BLOCK / FAIL.
+
+      Evidence quality: mixed. Source Ledger/visual checks passed, but keyboard-a11y
+      phase failed.
+
+      Salvaged report artifact committed to main: `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`
+      via `[vectl] salvage gate evidence from urda-frontend-ui-audit-gate`.
+
+      Mainline verification after salvage: `npm --prefix web run check` exited 0;
+      svelte-check found 0 errors and 0 warnings.
+
+
+      ## Issue Closure Basis
+
+      - Issues 3, 4, 5, 7, 8, 9, 10, 11, 12, 13: closed/proven by focused visual,
+      layout, and source-ledger evidence.
+
+      - Issues 1, 2, 6, 14: gate-reviewer classified as blocking proof gaps because
+      keyboard/a11y suite failed before proving Source Ledger manual controls and
+      Resonate keyboard/accessibility closure.
+
+
+      ## Blocking Findings
+
+      - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts:25` failed: `getByRole(''button'',
+      { name: ''TODAY'' })` element not found/focused.
+
+      - `web/tests/e2e/keyboard-a11y-helpers.ts:37` failed: `getByRole(''button'',
+      { name: ''SOURCE LEDGER'' })` timed out.
+
+      - `web/tests/e2e/keyboard-a11y.expected-red.spec.ts:105` failed: `SOURCE LEDGER`
+      role button not found for focus.
+
+      - Source Ledger `[RUN INGEST]`, row `[FETCH]`, `[IMPORT OPML]` keyboard reachability,
+      and Resonate keyboard/accessibility remain `UNCERTAIN_BLOCKING` until keyboard
+      proof is green.
+
+
+      ## Blind Tester Mode D Liveness Probe
+
+      Independent blind-tester liveness probe PASSed with real runtime, no fixtures:
+
+      - real_runtime_used: true
+
+      - fixture_injection_used: false
+
+      - Owner token prompt and unauthenticated API boundary: PASS
+
+      - Today/feed, Source Ledger controls, Inspector/item retrieval, Search: PASS
+
+      - OPML import + ingest + item retrieval + search via public runtime interfaces:
+      PASS
+
+      - forbidden visible concepts absent: PASS
+
+      - gate_open_allowed from liveness-only perspective: true
+
+
+      ## Wiring Audit Results
+
+      - W1 runtime authenticity: PASS for Go tests; browser integration partial where
+      focused tests fixture-inject API.
+
+      - W2 API contract wiring: PARTIAL; runtime liveness proved public API paths,
+      but focused Source Ledger Playwright proof used fixtures.
+
+      - W3 HTTP/MCP parity: N/A for this UI gate.
+
+      - W4 frontend build/render: PASS (`npm --prefix web run check`, `npm --prefix
+      web run build`).
+
+      - W5 browser retest: FAIL due to keyboard-a11y command failure.
+
+      - W6 liveness/smoke: PASS from blind-tester Mode D real runtime; keyboard suite
+      still blocking.
+
+      - W7 escape hatches/secrets: PASS/N/A; no `@invar:allow` found by gate-reviewer.
+
+      - W8 product invariants: PASS_WITH_PROOF_GAP; no forbidden concepts found, but
+      keyboard blockers prevent final closure.
+
+
+      ## Forbidden Scope Review
+
+      - accounts/onboarding/settings/folders/tags/unread/archive/sync/queues/job dashboards/vector/RAG/sidecars
+      introduced: none found by gate-reviewer or blind-tester.
+
+
+      ## CLI Surface Matrix
+
+      - N/A; CLI surface was not touched.
+
+
+      ## Behavioral proof register
+
+      - Source Ledger `[RUN INGEST]`: UNCERTAIN_BLOCKING
+
+      - Source Ledger `[FETCH]`: UNCERTAIN_BLOCKING
+
+      - `[IMPORT OPML]` keyboard reachability: UNCERTAIN_BLOCKING
+
+      - Resonate keyboard/accessibility: UNCERTAIN_BLOCKING
+
+      - issues 3,7-13 visual/layout claims: PROVEN
+
+      - real runtime liveness: PROVEN by blind-tester Mode D
+
+
+      ## Gate Decision
+
+      - headline: FAIL
+
+      - Gate Decision: BLOCK
+
+      - verdict: FAIL
+
+      - proof_gap_status: BLOCKING
+
+      - blocking_status: OPEN
+
+      - gate_open_allowed: false
+
+      - blockers: keyboard/a11y navigation and role-button proof gaps listed above
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE for final closure until remediation/retest
+      passes
+
+
+      ## Remediation ownership created
+
+      Planner added:
+
+      - `urda-keyboard-a11y-nav-batched-fix` — batched frontend-engineer fix for all
+      keyboard/a11y navigation blockers.
+
+      - `urda-keyboard-a11y-nav-post-fix-retest` — integration-verifier retest requiring
+      green keyboard-a11y suite plus focused Source Ledger and URDA visual/a11y specs.
+
+
+      This gate step is completed as a blocker-discovery gate with remediation ownership
+      created; final closure remains blocked until the new fix/retest steps pass.'
   - id: urda-browser-regression-batched-fix
     name: Batched browser regression and live artifact fix
     status: done
