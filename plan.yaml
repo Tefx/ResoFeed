@@ -63047,7 +63047,7 @@ phases:
       on evidence above and previously passed mainline retest.'
 - id: ui-runtime-design-audit-final-closure
   name: UI Runtime Design Audit — Final Closure and Strict Gate
-  status: in_progress
+  status: done
   gate: Final closure blocks unless every audit issue 1-14 has issue-by-issue proof,
     screenshot/runtime evidence, UIUX auditor verdict, CLI/runnable liveness proof
     where applicable, doc-preview sync evidence, and no forbidden ResoFeed concepts
@@ -65007,7 +65007,7 @@ phases:
       - None'
   - id: urda-strict-final-gate-rerun
     name: Rerun strict final gate after persisted UIUX multimodal closure
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: full-plan-check
@@ -65149,3 +65149,263 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T05:40:27.016284+00:00'
+    done_at: '2026-05-15T05:45:50.240669+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - `docs/ARCHITECTURE.md` — READ. Key passages: one deployable Go process, one
+      SQLite DB, lexical retrieval only, single owner-token boundary, no sidecars/admin/sync/vector/RAG;
+      manual ingest/fetch are HTTP/UI operations only (`POST /api/ingest`, `POST /api/sources/{id}/fetch`)
+      with no queues/jobs/activity ledgers.
+
+      - `docs/DESIGN.md` — READ. Key passages: Source Ledger must expose `[RUN INGEST]`,
+      row `[FETCH]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`; bracket
+      actions require terminal-like hover/focus, stable hitboxes, 44px touch targets,
+      raw `err:` diagnostics; state export/import labels require exact `[EXPORTING
+      STATE...]` / `[IMPORTING STATE...]`.
+
+      - `docs/ui-preview.html` — READ. Preview includes Source Ledger header `[RUN
+      INGEST]`, row `[FETCH]`, `last_ingest`, `last_fetch`, and inline raw `err:`
+      example.
+
+      - `docs/audits/ui-runtime-design-audit-2026-05-15.md` — READ. Original audit
+      listed issues 1-14, including missing `[RUN INGEST]`, missing `[FETCH]`, stale
+      preview, raw diagnostics, OPML semantics, bracket inversion, mobile/accessibility
+      and layout defects.
+
+      - `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` — READ. Prior frontend
+      gate was `FAIL / BLOCK` due keyboard-a11y failures finding `TODAY` / `SOURCE
+      LEDGER` role buttons; required supersession before final closure.
+
+      - `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md` — READ.
+      Persisted black-box smoke verdict `PASS`; real `resofeed serve` with isolated
+      SQLite DB; CLI matrix passed; public workflows passed including rejected token,
+      auth, Source Ledger `[RUN INGEST]`, row `[FETCH]`, OPML, state export/import,
+      Search, Feed, Inspector, `/doctor`, and mobile surfaces.
+
+      - `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md` — READ. Persisted
+      UIUX/multimodal artifact verdict `PASS`, R6/R7/R12/R18 verified, and prior frontend
+      FAIL/BLOCK explicitly superseded `YES`.
+
+
+      ## Strict Final Gate Rerun Report
+
+      **Reviewer**: gate-reviewer
+
+      **Gate**: urda-strict-final-gate-rerun
+
+
+      ## Artifact Coverage Table
+
+      | Artifact | Present? | Verdict / Status | Gate use | Notes |
+
+      |---|---|---|---|---|
+
+      | `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md` | YES | PASS
+      | satisfies missing UIUX/multimodal precondition | PASS evidence matrix; R6/R7/R12/R18
+      closure; PASS gate decision. |
+
+      | `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` | YES | prior FAIL/BLOCK
+      | superseded | Prior block superseded by UIUX artifact and e2e rerun 12/12.
+      |
+
+      | `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md` | YES |
+      PASS | runtime smoke evidence | CLI/runtime/public workflow/mobile pass evidence.
+      |
+
+
+      ## Original issue coverage table (1-14)
+
+      | Issue | Status | Evidence | Gate basis |
+
+      |---|---|---|---|
+
+      | 1. Missing `[RUN INGEST]` | CLOSED | Smoke and e2e evidence | Runtime UI and
+      API behavior proven. |
+
+      | 2. Missing row `[FETCH]` | CLOSED | Smoke and e2e evidence | Desktop/mobile
+      row fetch proven. |
+
+      | 3. Preview missing manual ingest/fetch | CLOSED | `docs/ui-preview.html` lines
+      671-714; e2e evidence | Persisted design preview corrected. |
+
+      | 4. Missing raw `err:` diagnostics inline | CLOSED | Preview/e2e evidence |
+      Inline raw diagnostic path proven. |
+
+      | 5. Source Ledger geometry mismatch | CLOSED | e2e evidence | Stable columns/raw
+      diagnostics covered. |
+
+      | 6. `[IMPORT OPML]` not keyboard/button semantic | CLOSED | Smoke/e2e evidence
+      | Named button and import workflow proven. |
+
+      | 7. Weak bracket hover/focus | CLOSED | UIUX/e2e evidence | R6 inversion proven.
+      |
+
+      | 8. Search architecture/design copy visible | CLOSED | Smoke/e2e evidence |
+      Search surface uses operational provenance. |
+
+      | 9. Search filter misalignment | CLOSED | e2e evidence | Visual/a11y checks
+      passed. |
+
+      | 10. Mobile feed metadata over-truncated | CLOSED | Smoke/e2e evidence | Mobile
+      feed readable evidence present. |
+
+      | 11. Inspector original link default blue | CLOSED | Smoke/e2e evidence | Inspector
+      original link runtime path covered. |
+
+      | 12. Owner Token prompt heading too heavy | CLOSED | Smoke/e2e evidence | Prompt/rejected-token
+      state covered. |
+
+      | 13. Delete confirmation layout shift | CLOSED | UIUX/e2e evidence | R7 zero
+      bounding-box delta proven. |
+
+      | 14. Repeated Resonate accessible names | CLOSED | e2e evidence | Visual/a11y
+      issue cluster passed. |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | UIUX precondition | Persisted multimodal/UIUX closure exists | PASS/PASS_WITH_DEBT
+      artifact | `urda-uiux-multimodal-design-audit-2026-05-15.md` | PROVEN | persisted
+      PASS | OPEN allowed. |
+
+      | Prior frontend fail | Prior FAIL/BLOCK superseded | Explicit supersession
+      plus passing tests | UIUX artifact; e2e 12 passed | PROVEN | superseded YES
+      | No non-superseded blocker. |
+
+      | R6 | Bracket hover/focus inversion | CSS/runtime/e2e proof | UIUX and e2e
+      evidence | PROVEN | retest | Closed. |
+
+      | R7 | Delete/confirm no layout shift | zero bbox delta | UIUX and e2e evidence
+      | PROVEN | retest | Closed. |
+
+      | R12 | Stale copy absent/directs to Source Ledger controls | copy scan/runtime
+      receipt | UIUX/smoke evidence | PROVEN | retest + smoke | Closed. |
+
+      | R18 | Exact state active labels | exact string proof | UIUX/smoke evidence
+      | PROVEN | retest + smoke | Closed. |
+
+      | Source Ledger global ingest | `[RUN INGEST]` calls runtime path | visible
+      state + API response | smoke/e2e evidence | PROVEN | black-box + e2e | Closed.
+      |
+
+      | Source Ledger row fetch | `[FETCH]` calls source fetch | visible state + API
+      response | smoke/e2e evidence | PROVEN | black-box + e2e | Closed. |
+
+      | OPML/state/search/feed/inspector/doctor/mobile | Public workflows usable |
+      black-box public interface proof | smoke evidence | PROVEN | black-box smoke
+      | Closed. |
+
+      | Runtime boundary | One binary/no sidecar/no extra CLI | CLI matrix | smoke
+      evidence | PROVEN | black-box smoke | Closed. |
+
+      | Regression gates | Go tests/static checks/build/e2e subset pass | command
+      outputs | verification commands | PROVEN | reviewer rerun | Closed. |
+
+
+      ## Prior FAIL/BLOCK disposition
+
+      - frontend gate artifact superseded: YES
+
+      - basis: `urda-frontend-ui-audit-gate-2026-05-15.md` blocked on keyboard/a11y
+      role-button flow. `urda-uiux-multimodal-design-audit-2026-05-15.md` explicitly
+      marks superseded YES, and rerun of exact frontend audit subset passed 12/12.
+
+      - any non-superseded portion: none found.
+
+
+      ## Product/runtime boundary scan
+
+      - forbidden concepts introduced: none found in reviewed closure artifacts or
+      changed runtime evidence.
+
+      - scan note: boundary-term hits in source/tests were negative contract assertions,
+      comments forbidding sidecars/vector/RAG, or allowed OPML text `folders flattened`;
+      no new product surface, sidecar, sync/merge, vector/RAG, OAuth/RBAC/accounts,
+      settings dashboard, job queue, or activity ledger was evidenced.
+
+
+      ## Gate Decision
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - gate_recommendation: OPEN
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Commit hash(es)
+
+      - none (verify-only, no changes)
+
+
+      ## Files changed
+
+      - none
+
+
+      ## Verification
+
+      - `git status --short --branch && git rev-parse --abbrev-ref HEAD && git rev-parse
+      HEAD` — exit 0; isolated branch clean at `c1cdf9a2bf13bc64dd631b47a009bdbe7e28ec1f`.
+
+      - `go test ./...` — exit 0; `internal/resofeed` passed.
+
+      - Initial `npm --prefix web run check` failed because `svelte-kit` missing;
+      verified baseline dependency state incomplete.
+
+      - `npm --prefix web ci` — exit 0; installed missing declared web dependencies;
+      reported 5 npm audit vulnerabilities (non-blocking note, outside gate scope).
+
+      - `npm --prefix web run check` — exit 0; `svelte-check found 0 errors and 0
+      warnings`.
+
+      - Initial `npm --prefix web run build` parallel attempt failed with transient
+      missing `.svelte-kit/output/server/manifest-full.js`; rerun after sync/e2e build
+      passed.
+
+      - `npm --prefix web run test:e2e -- source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      urda-visual-a11y-expected-red-browser-tests.spec.ts keyboard-a11y.expected-red.spec.ts`
+      — exit 0; 12 passed.
+
+      - `npm --prefix web run build` rerun — exit 0; SvelteKit static build completed
+      and wrote site to `build`.
+
+      - Closure-artifact unresolved-status search found PASS/supersession/R6/R7/R12/R18
+      evidence and no blocking unresolved status in closure artifacts.
+
+      - Boundary-term scan found only negative/contract/test/comment evidence or allowed
+      OPML receipt text, not introduced forbidden product behavior.
+
+      - Temporary generated artifacts cleaned; final worktree status clean.
+
+
+      ## Gaps/Notes
+
+      - No blockers.
+
+      - Non-blocking: `npm ci` reported dependency vulnerabilities (3 low, 1 moderate,
+      1 high); not evaluated because assigned gate scope is final UI/runtime closure.
+
+      - Non-blocking: first standalone build attempt failed during concurrent gate
+      commands, but subsequent e2e-triggered build and explicit build rerun passed
+      after dependency sync; final build status is PASS.
+
+
+      ## Programmatic Handoff
+
+      `{"status":"PASS","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_recommendation":"OPEN","verdict":"PASS","blockers":[],"gate_open_allowed":true,"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}`'
