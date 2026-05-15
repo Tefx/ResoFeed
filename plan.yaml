@@ -78313,6 +78313,94 @@ phases:
 
       '
     agent: golang-developer
+  - id: srdb-http-steer-preview-commit-undo
+    name: Complete HTTP Steer preview commit and undo runtime
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete the HTTP runtime behavior within existing contracts. Use the classifier
+      from srdb-classifier-policy-runtime; do not trust frontend preview for writes.
+
+
+      Target paths: internal/resofeed/http.go, internal/resofeed/types.go, internal/resofeed/idempotency.go,
+      internal/resofeed/state.go, internal/resofeed/migrations.go only if the existing
+      schema lacks required fields.
+
+
+      Acceptance checklist:
+
+      - [ ] POST /api/steer/preview is authenticated, strict-schema, read-only, accepts
+      no idempotency_key, and never writes product or receipt state.
+
+      - [ ] POST /api/steer reruns classification, requires idempotency_key, applies
+      source/rule writes transactionally, returns terse receipts, and exposes undo
+      only for concrete revocable source/rule ids.
+
+      - [ ] POST /api/steer/undo accepts only target_kind/target_id/actor_kind/actor_id/idempotency_key,
+      is target-specific, and is idempotent for already inactive source/rule targets.
+
+      - [ ] Search and doctor routes remain read-only and are executed through GET
+      /api/search and GET /api/doctor where appropriate.
+
+      - [ ] Unknown fields and invalid bodies return documented bad_request details.
+
+
+      Failure-mode checklist:
+
+      - [ ] Preview idempotency_key rejection.
+
+      - [ ] Different fingerprint with same live idempotency_key rejection for commit
+      and undo.
+
+      - [ ] Missing/unsupported undo target behavior.
+
+      - [ ] Inactive duplicate source reactivation vs active duplicate no-op semantics.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs.'
+    verification: '- [ ] Targeted Go HTTP tests for preview/commit/undo strict schemas,
+      idempotency, read-only preview, and undo failure paths pass.
+
+      - [ ] Main path evidence includes actual HTTP handler/request tests for preview,
+      commit, and undo.
+
+      - [ ] Failure path evidence includes preview no-write proof and idempotency
+      fingerprint conflict proof.
+
+      - [ ] No command history, undo stack, queue, job, activity ledger, sync/merge,
+      or settings concept introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## HTTP Runtime Evidence
+
+      - Files changed:
+
+      - Commands/tests run:
+
+      - Preview read-only proof:
+
+      - Commit/undo idempotency proof:
+
+      - Forbidden concept scan:
+
+      '
+    depends_on:
+    - srdb-classifier-policy-runtime
+    agent: golang-developer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
