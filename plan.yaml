@@ -72319,7 +72319,7 @@ phases:
     claimed_at: '2026-05-15T15:45:50.712122+00:00'
   - id: plhm-runtime-liveness-probe
     name: Probe runnable HTTP and MCP surfaces
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -72427,6 +72427,8 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-15T15:45:57.039937+00:00'
   - id: plhm-runtime-wiring-audit
     name: Audit HTTP MCP runtime wiring completeness
     status: pending
