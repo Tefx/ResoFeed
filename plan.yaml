@@ -69776,7 +69776,7 @@ phases:
 
       - [x] cleanup/reset semantics between tests are explicit.
 
-      - [ ] receipt storage has bounded live semantics; expired rows are ignored/deleted/replaced.
+      - [x] receipt storage has bounded live semantics; expired rows are ignored/deleted/replaced.
 
       - [ ] state export/import excludes runtime metadata and receipts.
 
