@@ -69761,7 +69761,7 @@ phases:
 
       ## Hardened state/persistence acceptance
 
-      - [ ] relative vs absolute DB path behavior remains unchanged.
+      - [x] relative vs absolute DB path behavior remains unchanged.
 
       - [ ] missing `processing_language` falls back to effective `en`.
 
