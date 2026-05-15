@@ -75739,7 +75739,7 @@ phases:
 
       - [x] Build `cmd/resofeed` binary.
 
-      - [ ] Secret-safe runtime smoke for `/api/runtime/language`, `/api/doctor`,
+      - [x] Secret-safe runtime smoke for `/api/runtime/language`, `/api/doctor`,
       and `/mcp` if environment supports it.
 
 
