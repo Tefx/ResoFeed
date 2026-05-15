@@ -74519,7 +74519,7 @@ phases:
       \ scroll only."
   - id: plfu-frontend-green-retest
     name: Retest frontend expected-red suite to green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -74603,6 +74603,58 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T17:26:16.530104+00:00'
+    done_at: '2026-05-15T17:38:24.864881+00:00'
+    evidence: "## Verification Report\n**Tester**: integration-verifier\n**Scope**:\
+      \ frontend language/reprocess/rendering/split-scroll\n**Independence Level**:\
+      \ L1\n\n## Test-Step Semantic Reporting\nstep_intent: retest_green\nexpected_result:\
+      \ green\nobserved_result: Required frontend check, targeted render/API tests,\
+      \ targeted Chromium E2E, and build all passed after installing locked frontend\
+      \ dependencies with `npm --prefix web ci`.\nfailure_alignment: none\nverdict:\
+      \ PASS\nblockers: []\nproduct_implementation_files_modified: false\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\n\n## behavioral_proof_register\n\
+      - obligation: Language/reprocess rendered tests now pass green\n  status: PROVEN\n\
+      \  evidence: `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ exited 0; Vitest reported `Test Files 3 passed (3)` and `Tests 10 passed (10)`.\n\
+      \  uncertainty: NONE\n- obligation: API client type tests pass\n  status: PROVEN\n\
+      \  evidence: same targeted render command included `src/lib/processing-language-api-client.expected-red.test.ts`\
+      \ and `src/lib/api-client.test.ts`; 10/10 tests passed.\n  uncertainty: NONE\n\
+      - obligation: Source identifier preservation and split-scroll tests pass\n \
+      \ status: PROVEN\n  evidence: `npm --prefix web run test:e2e -- processing-language-source-split-scroll.spec.ts\
+      \ --project=chromium-ci-safe` exited 0; Playwright reported 2 passed, including\
+      \ desktop source identifier/split-scroll and mobile inspector route/scroll restoration\
+      \ tests.\n  uncertainty: NONE\n- obligation: Frontend static check passes\n\
+      \  status: PROVEN\n  evidence: `npm --prefix web run check` exited 0; `svelte-check\
+      \ found 0 errors and 0 warnings`.\n  uncertainty: NONE\n- obligation: Frontend\
+      \ build passes and emits artifacts\n  status: PROVEN\n  evidence: `npm --prefix\
+      \ web run build` exited 0; Vite/SvelteKit reported `Wrote site to \"build\"\
+      `.\n  uncertainty: NONE\n- obligation: Rendered output proof is present for\
+      \ required UI states\n  status: PROVEN\n  evidence: render tests assert language/reprocess/source/split-scroll\
+      \ states; Playwright asserts desktop feed/inspector independent scroll regions,\
+      \ source/provenance `translate=\"no\"`, mobile `/items/browser_proof_item_12`\
+      \ route, visible back to TODAY, and restored feed scroll.\n  uncertainty: NONE\n\
+      \n### refs Read Confirmation\nNo refs for this step. `CONSTITUTION.md` was not\
+      \ present in the isolated worktree.\n\n### Test Execution\nCommands executed:\n\
+      - `npm --prefix web ci` — exit 0; installed locked frontend dependencies; npm\
+      \ audit reported 5 vulnerabilities.\n- `npm --prefix web run check` — exit 0;\
+      \ 0 errors / 0 warnings.\n- `npm --prefix web run test:render -- src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/lib/processing-language-api-client.expected-red.test.ts src/lib/api-client.test.ts`\
+      \ — exit 0; 3 files / 10 tests passed.\n- `npm --prefix web run test:e2e --\
+      \ processing-language-source-split-scroll.spec.ts --project=chromium-ci-safe`\
+      \ — exit 0; 2 tests passed.\n- `npm --prefix web run build` — exit 0.\n\n###\
+      \ Issues Found\n| Severity | Description | Location | Reproduction |\n|---|---|---|---|\n\
+      | Non-blocking | Fresh isolated worktree lacked frontend node_modules; required\
+      \ npm scripts initially failed until `npm --prefix web ci` installed dependencies.\
+      \ | `web/node_modules` absent | run scripts before npm ci |\n| Non-blocking\
+      \ | `npm --prefix web ci` reported 5 audit vulnerabilities. Outside this verify-only\
+      \ gate. | web dependency tree | `npm --prefix web ci` |\n| Non-blocking | Playwright\
+      \ generated `.test-artifacts`; verifier restored generated artifacts before\
+      \ final status. | `.test-artifacts/playwright` | targeted e2e run |\n\n## Checklist\
+      \ Closure\n- Description checklist items toggled by verifier.\n- Verification\
+      \ checklist items marked `[x]` by orchestrator after validating report.\n\n\
+      ## Files changed\nnone\n\n## Commit hash(es)\nnone (verify-only; no changes)\n\
+      \n## Gaps/Notes\nNo blocking gaps. Final worktree status clean; no empty commit\
+      \ created."
   - id: plfu-uiux-multimodal-audit
     name: Audit language reprocess and split-scroll UIUX
     status: claimed
