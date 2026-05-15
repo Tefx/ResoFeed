@@ -71139,15 +71139,15 @@ phases:
 
       - [x] Downstream HTTP/MCP/frontend blockers remain assigned to their existing
       `plhm-*` / `plfu-*` owner steps and are not weakened or deleted.'
-    verification: '- [ ] Focused backend-core tests for language operation-guard exclusivity
+    verification: '- [x] Focused backend-core tests for language operation-guard exclusivity
       pass.
 
-      - [ ] Focused backend-core tests or proof for doctor stale/ok/redaction pass.
+      - [x] Focused backend-core tests or proof for doctor stale/ok/redaction pass.
 
-      - [ ] Wiring evidence shows the three exported anchors are no longer storage-core
+      - [x] Wiring evidence shows the three exported anchors are no longer storage-core
       orphans or have explicit named downstream ownership.
 
-      - [ ] No downstream HTTP/MCP/frontend ownership is removed, weakened, or silently
+      - [x] No downstream HTTP/MCP/frontend ownership is removed, weakened, or silently
       absorbed into storage-core.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
