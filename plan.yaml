@@ -71892,7 +71892,7 @@ phases:
 
       - [x] MCP mutating tools create jobs/queues/ledgers or durable delivery registries.
 
-      - [ ] JSON-RPC error envelopes omit required nested data or drift from HTTP
+      - [x] JSON-RPC error envelopes omit required nested data or drift from HTTP
       conflict/mismatch details where specified.
 
 
