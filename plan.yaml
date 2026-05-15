@@ -72685,7 +72685,7 @@ phases:
 
       - [x] No production stub/private placeholder remains wired as runtime dependency.
 
-      - [ ] No delivery registry, job queue, activity ledger, sync/merge module, DI
+      - [x] No delivery registry, job queue, activity ledger, sync/merge module, DI
       container, or service layer is introduced.'
     verification: '- [ ] Wiring audit report lists registered routes/tools/resources
       and core operation targets.
