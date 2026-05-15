@@ -79299,3 +79299,55 @@ phases:
     check are complete with no blocker-class proof gaps.
   depends_on:
   - steer-delta-frontend-ui-source-ledger-split-scroll
+  steps:
+  - id: srde2e-real-system-e2e-regression
+    name: Run real-system Steer delta E2E regression
+    status: pending
+    description: 'As an INDEPENDENT TESTER (integration-verifier), run the real single-binary
+      system and prove the full path from browser UI through HTTP/MCP/application
+      logic/SQLite.
+
+
+      Acceptance checklist:
+
+      - [ ] Start cmd/resofeed with test owner token, SQLite DB, static UI, JSON HTTP,
+      MCP Streamable HTTP, and background ingest configuration as applicable.
+
+      - [ ] Browser Steer valid URL add preview commits through backend and shows
+      undo only for revocable id.
+
+      - [ ] Browser invalid add (`添加 tldr`, `订阅 HN`, `add tldr`) returns URL-required
+      copy and no source mutation.
+
+      - [ ] Browser search and find alias execute lexical search/read-only route with
+      warning-only find copy and no RAG/chat/semantic answer UI.
+
+      - [ ] Browser `/doctor` runs read-only diagnostics and does not become a steering
+      rule.
+
+      - [ ] Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions
+      are reachable and unobstructed.
+
+      - [ ] MCP preview_steer/steer/undo_steer parity is exercised or cited from backend
+      runtime proof if unchanged.
+
+      - [ ] Actual command/output and screenshots/DOM evidence are recorded.'
+    verification: '- [ ] full-plan-check protecting final architecture review and
+      closure gate.
+
+      - [ ] Exact server/browser/E2E commands and outputs are recorded.
+
+      - [ ] Real-system proof covers Steer preview→commit→undo, invalid add, lexical
+      search/find warning, doctor, and Source Ledger controls.
+
+      - [ ] Evidence includes actual rendered artifacts, not only unit-test summaries.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/PRD.md — key passage or \"\
+      NOT READ: <reason>\"\n- docs/UI_REGRESSION_CONTRACT.md — key passage or \"NOT\
+      \ READ: <reason>\"\n\n## Real-System E2E Evidence\n**Server command**:\n```\n\
+      <paste command>\n```\n**Browser/E2E commands**:\n```\n<paste commands>\n```\n\
+      **Actual output/artifacts**:\n- \n**Behavioral proof register**:\n| requirement_ref\
+      \ | behavior_claim | runtime_proof_expected | evidence_ref | status | closure_path\
+      \ | gate_decision_basis |\n|---|---|---|---|---|---|---|\n"
+    agent: integration-verifier
