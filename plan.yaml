@@ -72687,13 +72687,13 @@ phases:
 
       - [x] No delivery registry, job queue, activity ledger, sync/merge module, DI
       container, or service layer is introduced.'
-    verification: '- [ ] Wiring audit report lists registered routes/tools/resources
+    verification: '- [x] Wiring audit report lists registered routes/tools/resources
       and core operation targets.
 
-      - [ ] Any unregistered route/tool or duplicate semantics is blocking with remediation
+      - [x] Any unregistered route/tool or duplicate semantics is blocking with remediation
       ownership.
 
-      - [ ] Forbidden architecture concept scan is included.'
+      - [x] Forbidden architecture concept scan is included.'
     evidence_template: '## Wiring Audit Report
 
 
