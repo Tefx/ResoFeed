@@ -79465,7 +79465,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] docs/PRD.md is cited for AC-4 and for the corrected/restored requirement
+      - [x] docs/PRD.md is cited for AC-4 and for the corrected/restored requirement
       reference; if AC-19 remains absent, the evidence explicitly says so.
 
       - [ ] docs/ARCHITECTURE.md is cited to prove the resolution does not violate
