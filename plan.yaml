@@ -76631,7 +76631,7 @@ phases:
 
       - [x] language read/set works over HTTP and MCP.
 
-      - [ ] reprocess is explicit, bounded, and does not expose a job/progress dashboard.
+      - [x] reprocess is explicit, bounded, and does not expose a job/progress dashboard.
 
       - [ ] delivery/report_delivery idempotency and provenance work.
 
