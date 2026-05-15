@@ -68995,6 +68995,66 @@ phases:
     depends_on:
     - plct-contract-lock
     agent: golang-developer
+  - id: plct-mcp-expected-red-tests
+    name: Add MCP parity expected-red contract tests
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define MCP expected-red tests before implementation. Scope is MCP test fixtures/helpers
+      only. Cover `resofeed://runtime/language`, `get_processing_language`, `set_processing_language`,
+      `reprocess_library`, `report_delivery`, `search_items` query echo, owner-token
+      boundary, actor_id as provenance not auth, JSON-RPC conflict/mismatch error
+      shapes, and no per-call language override.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Tests are expected red before implementation and expose MCP parity gaps
+      without product-code changes.
+
+      - [ ] MCP language/reprocess tools match HTTP response and idempotency semantics.
+
+      - [ ] MCP `search_items` output includes `query` echo matching `SearchQueryEcho`.
+
+      - [ ] MCP `report_delivery` matches HTTP delivery semantics and does not create
+      registries/jobs/ledgers.
+
+      - [ ] Auth and schema errors are covered at the public `/mcp` surface.'
+    verification: '- [ ] Expected-red MCP tests fail for intended missing parity surfaces.
+
+      - [ ] Tests require public MCP Streamable HTTP behavior, not direct function-only
+      proof.
+
+      - [ ] No product implementation is included.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## MCP Expected-Red Evidence
+
+      - MCP tests added/updated:
+
+      - Public MCP operations covered:
+
+      - Expected failures/exposed gaps:
+
+      - Product-code changes: NONE expected'
+    depends_on:
+    - plct-contract-lock
+    agent: golang-developer
 - id: processing-language-storage-core
   name: Processing Language Storage and Core Backend
   status: locked
