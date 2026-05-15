@@ -78294,7 +78294,7 @@ phases:
 
       - [x] Mobile metadata CSS proves nowrap/hidden/ellipsis and height <= 18px.
 
-      - [ ] No settings/onboarding/SaaS/product-boundary drift is introduced.'
+      - [x] No settings/onboarding/SaaS/product-boundary drift is introduced.'
     verification: '- [ ] Exact failing command is rerun locally by the implementer
       before handoff: `npm --prefix web run test:e2e -- --project=chromium-ci-safe
       web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.
