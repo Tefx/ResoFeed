@@ -71901,7 +71901,7 @@ phases:
       - [x] Implementation has substantive MCP tool/resource behavior, not only schema
       stubs.
 
-      - [ ] Outputs vary by request inputs, current language, receipt state, and operation
+      - [x] Outputs vary by request inputs, current language, receipt state, and operation
       guard.
 
       - [ ] HTTP and MCP state changes are equivalent.
