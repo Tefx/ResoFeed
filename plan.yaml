@@ -63347,7 +63347,7 @@ phases:
       pre-existing or out-of-scope.'
   - id: urda-final-spec-and-product-boundary-review
     name: Verify final UI repairs against architecture, design, and product boundaries
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -63440,6 +63440,8 @@ phases:
     depends_on:
     - urda-final-issue-closure-matrix
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-15T03:28:21.283407+00:00'
   - id: urda-final-black-box-runtime-ui-smoke
     name: Final black-box runtime UI smoke with CLI preservation confirmation
     status: pending
