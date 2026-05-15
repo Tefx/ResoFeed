@@ -76096,12 +76096,12 @@ phases:
       ownership.
 
       - [x] E2E wiring audit has no unresolved blockers.'
-    verification: '- [ ] All system E2E phase steps completed with adequate evidence.
+    verification: '- [x] All system E2E phase steps completed with adequate evidence.
 
-      - [ ] Gate decision basis includes requirement_ref, behavior_claim, evidence_ref,
+      - [x] Gate decision basis includes requirement_ref, behavior_claim, evidence_ref,
       status, closure_path, and gate_decision_basis for runtime obligations.
 
-      - [ ] OPEN recommendation is allowed only if blocker-class public-surface obligations
+      - [x] OPEN recommendation is allowed only if blocker-class public-surface obligations
       are PROVEN or explicitly non-intersecting.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
