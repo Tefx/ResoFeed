@@ -70486,7 +70486,7 @@ phases:
       - [x] Declaration-only contract anchors are classified as `downstream-owned`,
       `core-consumed`, or `orphan-needs-core-remediation`.
 
-      - [ ] Missing HTTP/MCP/frontend registration is recorded as downstream-owned
+      - [x] Missing HTTP/MCP/frontend registration is recorded as downstream-owned
       and blocking for downstream gates, not as a storage-core wiring failure.
 
       - [ ] No NotImplementedError/stub/private `_Runtime*` placeholder remains in
