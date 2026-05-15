@@ -79550,6 +79550,116 @@ phases:
     depends_on:
     - srdct-foundation-gate
     agent: doc-reviewer
+  - id: srdct-foundation-gate-retest
+    name: Retest foundation gate after AC traceability remediation
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+
+      Retest the foundation gate after srdct-ac19-traceability-remediation. This is
+      an independent gate retest, not a replacement for the original issue-detection
+      gate.
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), reassess whether the Steer Delta
+      contract-lock and expected-red-test foundation can open after the AC-19 traceability/proof-register
+      mismatch has been resolved.
+
+
+      Required review focus:
+
+      - Re-read the remediation evidence and cited source passages.
+
+      - Confirm the Behavioral Proof Register covers AC-4 and the corrected/restored
+      requirement reference.
+
+      - Confirm the former AC-19 reference is no longer an unbacked blocker-class
+      proof obligation.
+
+      - Confirm expected-red backend/frontend contract tests remain scoped to contracts/tests
+      and did not become runtime implementation.
+
+      - Confirm no ResoFeed invariant drift was introduced: single Go binary, SQLite/FTS5
+      lexical-only, no RAG/vector, no jobs/queues/settings dashboards, owner token
+      boundary.
+
+
+      Behavioral proof closure fields required in evidence:
+
+      - headline
+
+      - verdict
+
+      - blockers
+
+      - proof_gap_status
+
+      - blocking_status
+
+      - gate_open_allowed
+
+      - orchestrator_action_hint
+
+
+      Gate decision checklist:
+
+      - [ ] AC-4 has source-backed Behavioral Proof Register coverage.
+
+      - [ ] The corrected/restored requirement reference has source-backed Behavioral
+      Proof Register coverage.
+
+      - [ ] The absent AC-19 reference is either removed/replaced by an exact authoritative
+      AC or restored by a minimal source-backed spec/doc correction.
+
+      - [ ] All blocker-class proof gaps list explicit closure paths.
+
+      - [ ] gate_open_allowed is true only if blocking_status is CLOSED and no blocker-class
+      proof gaps remain.
+
+      - [ ] Downstream backend/runtime phases remain blocked if the retest verdict
+      is FAIL or gate_open_allowed is false.'
+    verification: '- [ ] Retest evidence includes headline, verdict, blockers, proof_gap_status,
+      blocking_status, gate_open_allowed, and orchestrator_action_hint.
+
+      - [ ] Behavioral Proof Register closure maps AC-4 and the corrected/restored
+      requirement reference to source-backed evidence and closure paths.
+
+      - [ ] OPEN recommendation is made only when every blocker-class behavioral obligation
+      is PROVEN or explicitly non-intersecting with remaining gates.
+
+      - [ ] BLOCK recommendation identifies exact remediation still required if any
+      proof gap remains.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/PRD.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n- docs/UI_REGRESSION_CONTRACT.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for this\
+      \ step.\"\n\n## Foundation Gate Retest Report\n\n**Reviewer**: gate-reviewer\n\
+      **Phase**: steer-delta-contract-lock-and-expected-red-tests\n**Retested after**:\
+      \ srdct-ac19-traceability-remediation\n\n### Required Closure Fields\nheadline:\
+      \ PASS|FAIL\nverdict: PASS|FAIL\nblockers:\n  - <blocker id and summary, or\
+      \ []>\nproof_gap_status: CLOSED|OPEN\nblocking_status: CLOSED|OPEN\ngate_open_allowed:\
+      \ true|false\norchestrator_action_hint: COMPLETE_GATE_AND_UNLOCK|DO_NOT_COMPLETE|CREATE_REMEDIATION\n\
+      \n### Behavioral Proof Register Review\n| Requirement Ref | Behavior Claim |\
+      \ Runtime/Contract Proof Expected | Evidence Ref | Status | Closure Path | Gate\
+      \ Decision Basis |\n| --- | --- | --- | --- | --- | --- | --- |\n| AC-4 | <claim>\
+      \ | <expected proof> | <evidence> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK\
+      \ basis> |\n| <corrected/restored ref> | <claim> | <expected proof> | <evidence>\
+      \ | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis> |\n\n### Retest\
+      \ Findings\n| Finding | Severity | Requirement Ref | Blocking? | Required Action\
+      \ |\n| --- | --- | --- | --- | --- |\n| <finding or none> | blocker/should_fix/suggestion\
+      \ | <ref> | YES/NO | <action> |\n\n### Gate Decision Checklist\n- [ ] AC-4 source-backed\
+      \ coverage accepted.\n- [ ] Corrected/restored requirement source-backed coverage\
+      \ accepted.\n- [ ] Former AC-19 mismatch closed without invented behavior.\n\
+      - [ ] No blocker-class proof gaps remain, or all remaining gaps have explicit\
+      \ blocking closure paths.\n- [ ] ResoFeed invariants preserved.\n\n### Decision\n\
+      - [ ] OPEN: Foundation phase may proceed to downstream runtime phases.\n- [\
+      \ ] BLOCKED: Downstream runtime phases must remain locked pending remediation."
+    depends_on:
+    - srdct-ac19-traceability-remediation
+    agent: gate-reviewer
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
