@@ -76616,7 +76616,7 @@ phases:
     agent: software-architect
   - id: plfinal-black-box-acceptance
     name: Run final black-box acceptance verification
-    status: claimed
+    status: done
     description: 'step_type: deep_review
 
       agent_source: project
@@ -76679,6 +76679,93 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-15T18:47:21.045543+00:00'
+    done_at: '2026-05-15T19:00:57.554484+00:00'
+    evidence: 'status: SUCCESS
+
+
+      Commit hash(es): c1420896 ([vectl] step-plfinal-black-box-acceptance completed);
+      worktree commits 6417d954 and 00aa1be0.
+
+
+      Files changed: .audit-artifacts/plfinal-black-box-acceptance/auth_language_response.txt;
+      blackbox_acceptance.json; blackbox_acceptance.py; ui-authenticated.png; ui-menu-open.png;
+      ui-source-ledger.png; ui-token-prompt.png; ui_dom_eval.json; ui_lsof.txt; ui_server.log;
+      unauth_api_response.txt.
+
+
+      Refs Read Confirmation:
+
+      - docs/ARCHITECTURE.md — blind-tester cited owner-token auth for /api/* and
+      /mcp, processing language runtime metadata, explicit bounded reprocess without
+      jobs/queues/dashboards, idempotent/provenance delivery receipts, and source
+      identifier preservation anchors.
+
+      - docs/DESIGN.md — blind-tester cited terse LANG: EN/ZH control, bracket-style
+      [REPROCESS LIBRARY] with warning/no dashboard, non-translated source identifiers,
+      and independent focusable feed/Inspector scroll regions.
+
+
+      Semantic closure:
+
+      - Headline: PASS_WITH_DEBT.
+
+      - Blocking Status: CLOSED.
+
+      - Proof-Gap Status: NON_BLOCKING.
+
+      - Verdict: PASS.
+
+      - Blockers: [].
+
+      - Gate open allowed: true.
+
+      - Orchestrator action hint: COMPLETE.
+
+      - Product implementation files modified: no.
+
+
+      Verification:
+
+      - Built public binary and UI: npm --prefix web install; npm --prefix web run
+      build; go build -o ./bin/resofeed ./cmd/resofeed.
+
+      - Ran black-box harness: python3 .audit-artifacts/plfinal-black-box-acceptance/blackbox_acceptance.py.
+
+      - Exercised HTTP, MCP, and UI public surfaces: owner-token prompt/auth, runtime
+      language read/set, reprocess library, delivery/report_delivery idempotency/provenance,
+      search/FTS, doctor diagnostics, and UI language/reprocess/source/split-scroll
+      surfaces.
+
+      - Evidence artifacts captured under .audit-artifacts/plfinal-black-box-acceptance/.
+
+      - Verification checklist items were checked via planner repair because vectl_check
+      cannot match verification-field checklist items; vectl_vectl_show confirmed
+      checked state before completion.
+
+      - Initial merge verification failed due trailing whitespace in two HTTP response
+      artifacts; blind-tester normalized them, ran git diff --check in worktree (passed),
+      and committed 00aa1be0.
+
+      - Orchestrator ran mainline verification: git merge --squash vectl/step-plfinal-black-box-acceptance;
+      git diff --cached --check (passed); git commit; git show --check --oneline HEAD
+      (passed).
+
+
+      Findings:
+
+      - blocker: none.
+
+      - should_fix: none.
+
+      - suggestion: none.
+
+      - tech_debt: npm install reported 5 dependency vulnerabilities; non-blocking
+      to black-box acceptance and should be triaged separately.
+
+
+      Gaps/Notes: PASS_WITH_DEBT accepted because proof_gap_status is NON_BLOCKING,
+      blockers are empty, and the debt is dependency-triage related rather than a
+      functional/architecture blocker for this acceptance gate.'
   - id: plfinal-final-gate
     name: Final gate for processing language implementation
     status: pending
