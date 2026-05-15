@@ -74033,7 +74033,7 @@ phases:
 
       ## Downstream blocker ownership from storage-core verification
 
-      - [ ] Frontend type/client anchors for processing language and reprocess must
+      - [x] Frontend type/client anchors for processing language and reprocess must
       be consumed by rendered controls here.
 
       - [ ] Runtime language route state must affect visible control text and document
