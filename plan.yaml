@@ -79632,7 +79632,7 @@ phases:
 
       - [x] AC-4 has source-backed Behavioral Proof Register coverage.
 
-      - [ ] The corrected/restored requirement reference has source-backed Behavioral
+      - [x] The corrected/restored requirement reference has source-backed Behavioral
       Proof Register coverage.
 
       - [ ] The absent AC-19 reference is either removed/replaced by an exact authoritative
