@@ -75745,7 +75745,7 @@ phases:
 
       Disposition path:
 
-      - [ ] Any repo-wide or cross-phase failure must be reported as blocker-class
+      - [x] Any repo-wide or cross-phase failure must be reported as blocker-class
       if it intersects final gates.
 
       - [ ] No broad failure may be dismissed as pre-existing without non-intersection
