@@ -79946,7 +79946,7 @@ phases:
       - [x] steer requires actor_id and idempotency_key, reruns classification, and
       returns the same SteeringReceipt semantics as HTTP.
 
-      - [ ] undo_steer requires target_kind, target_id, actor_id, and idempotency_key,
+      - [x] undo_steer requires target_kind, target_id, actor_id, and idempotency_key,
       and returns SteerUndoResult plus receipt with target-specific semantics.
 
       - [ ] MCP exposes no agent-only concepts, no per-agent registry, and no additional
