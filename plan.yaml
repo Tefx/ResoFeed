@@ -68225,7 +68225,7 @@ phases:
 
       - [x] Captured or cited a rendered mobile artifact path for the 390x844 state.
 
-      - [ ] Captured DOM/accessibility proof that the Inspector disclosure is reachable
+      - [x] Captured DOM/accessibility proof that the Inspector disclosure is reachable
       and semantically exposed.
 
       - [ ] Assessed relevant FR-04 and mobile visual/accessibility behavior after
