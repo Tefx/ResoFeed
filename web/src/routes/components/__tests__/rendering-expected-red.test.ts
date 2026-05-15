@@ -27,7 +27,8 @@ const expectedRedDetail: ItemDetail = {
     canonical_url: expectedRedItem.url,
     original_url: expectedRedItem.url,
     story_key: expectedRedItem.story_key,
-    duplicate_of_item_id: null
+    duplicate_of_item_id: null,
+    grouped_source_items: []
   }
 };
 
@@ -213,7 +214,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
         canonical_url: expectedRedItem.url,
         original_url: expectedRedItem.url,
         story_key: 'story-json-ld',
-        duplicate_of_item_id: null
+        duplicate_of_item_id: null,
+        grouped_source_items: []
       }
     };
 
@@ -251,7 +253,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
         canonical_url: expectedRedItem.url,
         original_url: expectedRedItem.url,
         story_key: null,
-        duplicate_of_item_id: null
+        duplicate_of_item_id: null,
+        grouped_source_items: []
       }
     };
 
