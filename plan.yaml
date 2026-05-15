@@ -78532,22 +78532,22 @@ phases:
 
       - [x] Final gate decision basis is OPEN only if every UI blocker-class obligation
       is PROVEN.'
-    verification: '- [ ] Exact command `npm --prefix web run test:e2e -- --project=chromium-ci-safe
+    verification: '- [x] Exact command `npm --prefix web run test:e2e -- --project=chromium-ci-safe
       web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts` exits 0.
 
-      - [ ] Seven-test closure matrix is complete and shows PASS for FR-01/FR-10,
+      - [x] Seven-test closure matrix is complete and shows PASS for FR-01/FR-10,
       FR-02, FR-04, B1, FR-05/FR-07, FR-06, and FR-09.
 
-      - [ ] Rendered desktop/mobile artifacts are attached or cited for the changed
+      - [x] Rendered desktop/mobile artifacts are attached or cited for the changed
       UI surfaces.
 
-      - [ ] Accessibility names are verified for `Open Inspector for:` and `Fetch
+      - [x] Accessibility names are verified for `Open Inspector for:` and `Fetch
       source <source title>` controls.
 
-      - [ ] Drift check proves no settings/onboarding/SaaS or forbidden product concepts
+      - [x] Drift check proves no settings/onboarding/SaaS or forbidden product concepts
       were introduced.
 
-      - [ ] Gate decision basis records PROVEN status for each blocker or blocks with
+      - [x] Gate decision basis records PROVEN status for each blocker or blocks with
       explicit ownership.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
