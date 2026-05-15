@@ -66085,7 +66085,7 @@ phases:
       ## Gaps/Notes\n- None."
   - id: ui-runtime-fresh-review-green-retest
     name: Retest fresh audit fixes to green
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -66228,6 +66228,110 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-15T07:40:28.341649+00:00'
+    done_at: '2026-05-15T07:50:09.545293+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/audits/ui-runtime-fresh-review-2026-05-15.md\
+      \ — READ. Key passages: FR-01 requires RESOFEED menu closed/toggleable and keyboard\
+      \ reachable; FR-02 forbids TODAY > YESTERDAY > TODAY time labels; FR-04 requires\
+      \ grouped duplicate/source disclosure; FR-05 requires contextual `[FETCH]` accessible\
+      \ names; FR-06 requires compact collapsed `[DETAILS]`; FR-07 pins `aria-labelledby=\"\
+      source-ledger-title\"` / `h1#source-ledger-title`; FR-09 requires 390x844 mobile\
+      \ metadata as one flat inline line; FR-10 is mobile manifestation of FR-01.\n\
+      - docs/DESIGN.md — READ. Key passages: desktop shell has no persistent left\
+      \ nav and TODAY/SOURCE LEDGER only after RESOFEED menu opens; mobile metadata\
+      \ must remain flat inline monospace; grouped duplicate/story must preserve every\
+      \ source item/provenance; Inspector must expose grouped-story source-list disclosure;\
+      \ Source Ledger DOM/action contract requires contextual `aria-label=\"Fetch\
+      \ source NYT\"`, `h1#source-ledger-title`, compact rows, and 44px controls.\n\
+      - docs/ARCHITECTURE.md — READ. Key passages: one Go binary serves static UI,\
+      \ JSON API, MCP, and background ingest; one SQLite DB/FTS5 only; thin HTTP/MCP\
+      \ transports share product operations; no sync/coordinator/settings-dashboard\
+      \ expansion.\n- web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts —\
+      \ READ. Acceptance suite asserts FR-01/FR-10, FR-02, FR-04, FR-05/FR-07, FR-06,\
+      \ and FR-09 via Playwright/browser DOM and metric probes at desktop and 390x844\
+      \ mobile.\n- web/package.json — READ. Frontend commands are `build`, `check`,\
+      \ `test`, `test:render`, and `test:e2e`.\n- web/playwright.config.ts — READ.\
+      \ Playwright writes reports/results under `.test-artifacts/playwright`, runs\
+      \ chromium-ci-safe with live OpenRouter tests excluded.\n- web/src/routes/+page.svelte\
+      \ — READ. RESOFEED surface menu is `<details class=\"surface-nav\">` with summary\
+      \ and menu buttons.\n- web/src/routes/components/Feed.svelte and item-anatomy.ts\
+      \ — READ. Feed sorts by time group before rendering labels, making labels contiguous.\n\
+      - web/src/routes/components/Inspector.svelte — READ. Grouped source items render\
+      \ under `.contract-grouped-sources` with source links and story provenance.\n\
+      - web/src/routes/components/SourceLedger.svelte — READ. Source Ledger uses `aria-labelledby=\"\
+      source-ledger-title\"`, `h1#source-ledger-title`, and contextual `Fetch source\
+      \ ${sourceLabel}` labels.\n- internal/resofeed/search.go and HTTP tests — READ.\
+      \ `ReadItemDetail` populates `Provenance.GroupedSourceItems` from same story_key\
+      \ and HTTP tests cover duplicate provenance.\n\n## Retest Report\n**Tester**:\
+      \ integration-verifier\n**Independence Level**: L2\n\n### Commands executed\n\
+      ```text\nnpm run build\nnpm ci\nnpm run build\nnpm test\nnpm run test:e2e --\
+      \ ui-runtime-fresh-review-remediation.spec.ts\nnpm run check\ngo test ./internal/resofeed\n\
+      go test ./...\ngo test ./internal/resofeed -run 'TestHTTPItemDetailDisclosesGroupedSourceItems|TestReadItemDetailKeepsDuplicateOriginalRetrievable'\
+      \ -v\ngit restore -- .test-artifacts && git clean -fd -- .test-artifacts/playwright/html-report/data\
+      \ .test-artifacts/playwright/test-output\n```\n\n### Fresh Audit Closure Matrix\n\
+      | Finding | Command/artifact | Verdict | Notes |\n|---|---|---|---|\n| FR-01\
+      \ | Playwright test 1 at desktop/mobile | PROVEN | Menu closed by default, keyboard\
+      \ reachable, Enter opens menu. |\n| FR-02 | Playwright test 2 | PROVEN | Extracted\
+      \ labels `[\"TODAY\",\"YESTERDAY\"]`; no TODAY > YESTERDAY > TODAY. |\n| FR-04\
+      \ | Playwright test 3 plus targeted Go tests | PROVEN | Grouped-source DOM text\
+      \ and API duplicate provenance tests passed. |\n| FR-05 | Playwright test 4\
+      \ | PROVEN | Source-specific accessible names while visible text remains `[FETCH]`.\
+      \ |\n| FR-06 | Playwright test 5 | PROVEN | Row heights `[45,45]`, <=72px. |\n\
+      | FR-07 | Playwright test 4 | PROVEN | `aria-labelledby=source-ledger-title`\
+      \ and `h1#source-ledger-title` pass. |\n| FR-09 | Playwright test 6 | PROVEN\
+      \ | 390x844 computed style: height=16, nowrap, hidden overflow, ellipsis, monospace.\
+      \ |\n| FR-10 | Playwright test 1 at 390x844 | PROVEN | Mobile menu behavior\
+      \ passed. |\n\n### Behavioral Proof Register\n| requirement_ref | behavior_claim\
+      \ | runtime_proof_expected | evidence_ref | status | closure_path | gate_decision_basis\
+      \ |\n|---|---|---|---|---|---|---|\n| FR-01 | RESOFEED menu closed by default,\
+      \ keyboard reachable, toggles desktop | Chromium DOM interaction at 1280x900\
+      \ | fresh audit e2e test 1 passed | PROVEN | none | Passing L2 browser acceptance.\
+      \ |\n| FR-10 | Same menu behavior at 390x844 mobile | Chromium DOM interaction\
+      \ at 390x844 | fresh audit e2e test 1 passed | PROVEN | none | Passing L2 browser\
+      \ acceptance. |\n| FR-02 | Time-group labels contiguous chronological groups\
+      \ | Browser DOM label sequence | fresh audit e2e test 2 passed | PROVEN | none\
+      \ | Labels `[\"TODAY\",\"YESTERDAY\"]`. |\n| FR-04 | Primary Inspector discloses\
+      \ grouped duplicate/source provenance | Browser Inspector + backend API tests\
+      \ | fresh audit e2e test 3 and targeted Go tests passed | PROVEN | none | UI\
+      \ and API coverage pass. |\n| FR-05 | Per-source `[FETCH]` buttons have contextual\
+      \ accessible names | Browser role lookup by source name | fresh audit e2e test\
+      \ 4 passed | PROVEN | none | Desktop/mobile acceptance pass. |\n| FR-06 | Collapsed\
+      \ `[DETAILS]` does not inflate rows | Browser row height metric | fresh audit\
+      \ e2e test 5 passed | PROVEN | none | DOM metric proof. |\n| FR-07 | Source\
+      \ Ledger DOM contract uses `h1#source-ledger-title` | Browser DOM assertion\
+      \ | fresh audit e2e test 4 passed | PROVEN | none | Desktop/mobile acceptance\
+      \ pass. |\n| FR-09 | Mobile metadata flat inline monospace truncating line |\
+      \ Browser computed style at 390x844 | fresh audit e2e test 6 passed | PROVEN\
+      \ | none | Mobile DOM metric proof. |\n| Frontend full test gate | Frontend\
+      \ render/check suite should be green | `npm test` | `npm test` exit 1; 12 failed\
+      \ / 27 passed | UNPROVEN | `ui-runtime-fresh-review-full-frontend-test-remediation`\
+      \ then `ui-runtime-fresh-review-full-frontend-green-retest` | Blocks downstream\
+      \ gates until remediated. |\n\n### Runtime/Artifact Evidence\n- desktop evidence:\
+      \ Chromium acceptance assertions at 1280x900 for FR-01/FR-05/FR-07 passed.\n\
+      - 390x844 mobile evidence: Chromium acceptance assertions at 390x844 for FR-01/FR-10/FR-05/FR-07/FR-09\
+      \ passed; mobile metadata style `height=16`, `whiteSpace=nowrap`, `overflow=hidden`,\
+      \ `textOverflow=ellipsis`.\n- API/backend evidence: targeted duplicate-source\
+      \ provenance Go tests passed.\n- screenshots/DOM/metrics: Playwright generated\
+      \ DOM/metric proof JSON during run, then generated artifacts restored/cleaned\
+      \ per verify-only instruction.\n\n### Test-Step Semantic Reporting\n- step_intent:\
+      \ retest_green\n- expected_result: green\n- observed_result: red\n- failure_alignment:\
+      \ unexpected\n- product_implementation_files_modified: no\n- verdict: FAIL as\
+      \ final green gate; COMPLETE as issue-discovery retest because remediation ownership\
+      \ now exists\n- blockers:\n  - B1 full frontend `npm test` red (`4 files failed\
+      \ | 2 passed`; `12 failed | 27 passed`).\n- gate_open_allowed: false for final\
+      \ gate until remediation path is completed\n- orchestrator_action_hint: DO_NOT_COMPLETE\
+      \ for final gate; remediation ownership created\n\n### Commit hash(es)\n- none\
+      \ (verify-only, no changes)\n\n### Files changed\n- none; generated `.test-artifacts`\
+      \ changes were restored/cleaned. Final `git status --short`: clean.\n\n### Verification\n\
+      - Fresh audit acceptance: PASS (`6 passed`).\n- Frontend build: PASS after installing\
+      \ missing dependencies with `npm ci`.\n- Svelte check: PASS (`0 errors and 0\
+      \ warnings`).\n- Go/API tests: PASS.\n- Full frontend test command: FAIL (`12\
+      \ failed | 27 passed`).\n\n### Gaps/Notes\n- Worktree-local frontend dependencies\
+      \ were missing initially; retester verified absence and ran `npm ci` once.\n\
+      - `npm ci` reported 5 dependency vulnerabilities; not directly part of FR closure.\n\
+      - Because `npm test` is red, this retest did not open downstream gates. Planner\
+      \ created:\n  - `ui-runtime-fresh-review-full-frontend-test-remediation`\n \
+      \ - `ui-runtime-fresh-review-full-frontend-green-retest`\n  and rewired pending\
+      \ UIUX/black-box/final gate steps to depend on the new green retest."
   - id: ui-runtime-fresh-review-uiux-multimodal-audit
     name: UIUX multimodal audit of fresh runtime remediation
     status: pending
