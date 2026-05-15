@@ -74953,7 +74953,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Frontend green retest passed.
+      - [x] Frontend green retest passed.
 
       - [ ] UIUX audit is PASS or PASS_WITH_DEBT with non-blocking/non-intersecting
       debt only.
