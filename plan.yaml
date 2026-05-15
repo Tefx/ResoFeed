@@ -70308,7 +70308,7 @@ phases:
       - [x] Receipt mismatch/expiration and reprocess stale-FTS failure paths are
       exercised with actual command output.
 
-      - [ ] Any broad-command failure is classified by ownership: `storage-core blocker`,
+      - [x] Any broad-command failure is classified by ownership: `storage-core blocker`,
       `downstream HTTP/MCP blocker`, or `downstream frontend blocker`.
 
       - [ ] Downstream-owned failures cite the owning step (`plhm-http-runtime-endpoints`,
