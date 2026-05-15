@@ -66937,7 +66937,7 @@ phases:
 
       - [x] No forbidden architecture/product boundary changes are present.
 
-      - [ ] Gate decision is OPEN only if every blocker/should-fix finding is PROVEN
+      - [x] Gate decision is OPEN only if every blocker/should-fix finding is PROVEN
       or explicitly non-intersecting with evidence.'
     verification: '- [ ] Gate review confirms FR-01, FR-02, FR-04/B1, FR-05, FR-06,
       FR-07, FR-09, and FR-10 are closed with evidence references.
