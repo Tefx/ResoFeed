@@ -64130,7 +64130,7 @@ phases:
       gate.'
   - id: urda-final-spec-boundary-blockers-retest
     name: Retest final spec/product boundary blocker closures R6 R7 R12 R18
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -64252,6 +64252,8 @@ phases:
     - urda-final-spec-boundary-blockers-fix
     - urda-final-spec-boundary-blockers-uiux-audit
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T05:00:55.927733+00:00'
   - id: urda-final-spec-boundary-blockers-uiux-audit
     name: UIUX audit final spec boundary blocker visual closures
     status: done
