@@ -79150,6 +79150,72 @@ phases:
     - srdf-split-scroll-mobile-route
     - srdf-processing-language-low-chrome-controls
     agent: uiux-auditor
+  - id: srdf-frontend-spec-conformance
+    name: Verify frontend spec and design conformance for Steer delta
+    status: pending
+    description: 'Spec/design conformance verification via adversarial divergence
+      hunting.
+
+
+      Scope: DESIGN.md Steer Input/Route Preview/Source Ledger/Search/Split Scroll,
+      UI_REGRESSION_CONTRACT.md, PRD AC-19, and Architecture frontend boundary.
+
+
+      Acceptance checklist:
+
+      - [ ] Build requirements register for every user-visible state and forbidden
+      UI concept in this delta.
+
+      - [ ] Cite spec section and implementation file/line or rendered artifact for
+      every requirement.
+
+      - [ ] Flag all behavioral/ARIA claims as NEEDS_TEST unless tests or rendered
+      artifacts prove them.
+
+      - [ ] Provide closure path for every DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
+      item.
+
+      - [ ] Verify docs are not contradicted by implementation copy, labels, routes,
+      or accessibility semantics.'
+    verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
+
+      - [ ] Requirements register maps each frontend/design requirement to code or
+      rendered evidence.
+
+      - [ ] No unresolved DIVERGES/PARTIAL/NOT_FOUND/UNCERTAIN_BLOCKING item lacks
+      remediation or explicit non-intersection.
+
+      - [ ] Gate decision basis is suitable for frontend gate review.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      ## Spec/Design Conformance Report
+
+      | R# | Spec Section | Requirement | Implementation/Artifact | Verdict | Notes
+      |
+
+      |---|---|---|---|---|---|
+
+
+      ## Closure Paths
+
+      '
+    depends_on:
+    - srdf-steer-preview-ui-state-aria
+    - srdf-source-ledger-details-hit-targets
+    - srdf-split-scroll-mobile-route
+    - srdf-processing-language-low-chrome-controls
+    agent: spec-verifier
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
