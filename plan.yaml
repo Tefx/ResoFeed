@@ -80035,7 +80035,7 @@ phases:
       - [x] Exercise POST /api/steer commit and POST /api/steer/undo through real
       HTTP paths.
 
-      - [ ] Exercise MCP preview_steer, steer, and undo_steer through the real MCP
+      - [x] Exercise MCP preview_steer, steer, and undo_steer through the real MCP
       transport or existing MCP integration harness.
 
       - [ ] Exercise GET /api/search and GET /api/doctor as read-only paths.
