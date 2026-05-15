@@ -75715,7 +75715,7 @@ phases:
       \ no retained product code/docs changes and no empty commit created."
   - id: plse-full-plan-runtime-check
     name: Run full-plan runtime verification sweep
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       agent_source: project
@@ -75803,6 +75803,8 @@ phases:
     - plse-blind-http-mcp-parity-delivery
     - plse-reprocess-failure-stale-fts-proof
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T18:11:36.042065+00:00'
   - id: plse-e2e-wiring-audit
     name: Audit end-to-end wiring and absence of stubs
     status: claimed
