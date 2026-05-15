@@ -76086,7 +76086,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] Real vertical slice passed.
+      - [x] Real vertical slice passed.
 
       - [ ] Blind parity/delivery probes passed.
 
