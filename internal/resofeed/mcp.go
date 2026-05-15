@@ -84,6 +84,8 @@ type MCPSteerPreviewInput struct {
 
 type MCPSteerUndoInput struct {
 	UndoHandle     SteerUndoHandle `json:"undo_handle"`
+	TargetKind     string          `json:"target_kind"`
+	TargetID       string          `json:"target_id"`
 	ActorID        string          `json:"actor_id"`
 	IdempotencyKey string          `json:"idempotency_key"`
 }
@@ -247,13 +249,17 @@ func UndoSteerForMCP(ctx context.Context, db *sql.DB, input MCPSteerUndoInput) (
 	if err := validateActorAndKey(input.ActorID, input.IdempotencyKey); err != nil {
 		return SteerUndoResult{}, err
 	}
-	req := SteerUndoRequest{UndoHandle: input.UndoHandle, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	undoHandle, err := steerUndoHandleFromMCPInput(input)
+	if err != nil {
+		return SteerUndoResult{}, err
+	}
+	req := SteerUndoRequest{UndoHandle: undoHandle, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
 	var result SteerUndoResult
 	replayed, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "undo_steer", "", struct {
 		UndoHandle SteerUndoHandle `json:"undo_handle"`
 		ActorKind  ActorKind       `json:"actor_kind"`
 		ActorID    string          `json:"actor_id"`
-	}{UndoHandle: input.UndoHandle, ActorKind: ActorKindAgent, ActorID: input.ActorID}, &result, func() (SteerUndoResult, error) {
+	}{UndoHandle: undoHandle, ActorKind: ActorKindAgent, ActorID: input.ActorID}, &result, func() (SteerUndoResult, error) {
 		return UndoSteering(ctx, db, req)
 	})
 	if err != nil {
@@ -263,6 +269,46 @@ func UndoSteerForMCP(ctx context.Context, db *sql.DB, input MCPSteerUndoInput) (
 		result.AlreadyApplied = true
 	}
 	return result, nil
+}
+
+func steerUndoHandleFromMCPInput(input MCPSteerUndoInput) (SteerUndoHandle, error) {
+	if input.TargetKind != "" || input.TargetID != "" {
+		if strings.TrimSpace(input.TargetKind) == "" {
+			return SteerUndoHandle{}, fieldError("target_kind")
+		}
+		if strings.TrimSpace(input.TargetID) == "" {
+			return SteerUndoHandle{}, fieldError("target_id")
+		}
+		routeKind, err := steerRouteKindForUndoTarget(input.TargetKind)
+		if err != nil {
+			return SteerUndoHandle{}, err
+		}
+		return SteerUndoHandle{RouteKind: routeKind, Target: &SteerTarget{Kind: input.TargetKind, ID: input.TargetID}}, nil
+	}
+	if input.UndoHandle.Target == nil {
+		return SteerUndoHandle{}, fieldError("target_kind")
+	}
+	if strings.TrimSpace(input.UndoHandle.Target.Kind) == "" {
+		return SteerUndoHandle{}, fieldError("target_kind")
+	}
+	if strings.TrimSpace(input.UndoHandle.Target.ID) == "" {
+		return SteerUndoHandle{}, fieldError("target_id")
+	}
+	if _, err := steerRouteKindForUndoTarget(input.UndoHandle.Target.Kind); err != nil {
+		return SteerUndoHandle{}, err
+	}
+	return input.UndoHandle, nil
+}
+
+func steerRouteKindForUndoTarget(targetKind string) (SteerRouteKind, error) {
+	switch targetKind {
+	case "steer_rule":
+		return SteerRoutePolicy, nil
+	case "source":
+		return SteerRouteSource, nil
+	default:
+		return "", fieldError("target_kind")
+	}
 }
 
 // ReportDeliveryForMCP records external surfacing for duplicate-loop
@@ -533,6 +579,9 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		if rawHasField(envelope.Arguments, "agent_name") {
 			return nil, fieldError("agent_name")
 		}
+		if rawHasField(envelope.Arguments, "idempotency_key") {
+			return nil, fieldError("idempotency_key")
+		}
 		var input MCPSteerPreviewInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
@@ -762,7 +811,7 @@ func mcpToolList() []map[string]any {
 		{"name": "resonate_item", "description": "Set resonance state.", "inputSchema": objectSchema([]string{"item_id", "resonated", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "resonated": map[string]any{"type": "boolean", "description": "Required target resonance state."}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "preview_steer", "description": "Preview Steer route classification without mutation.", "inputSchema": objectSchema([]string{"command", "actor_id"}, map[string]any{"command": stringSchema("Required natural-language steering command, max 4000 bytes.", 1, 4000), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128)})},
 		{"name": "steer", "description": "Apply natural-language steering.", "inputSchema": objectSchema([]string{"command", "actor_id", "idempotency_key"}, map[string]any{"command": stringSchema("Required natural-language steering command, max 4000 bytes.", 1, 4000), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
-		{"name": "undo_steer", "description": "Undo one target-specific Steer handle.", "inputSchema": objectSchema([]string{"undo_handle", "actor_id", "idempotency_key"}, map[string]any{"undo_handle": map[string]any{"type": "object", "description": "Target-specific undo handle returned by Steer."}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "undo_steer", "description": "Undo one target-specific Steer target.", "inputSchema": objectSchema([]string{"target_kind", "target_id", "actor_id", "idempotency_key"}, map[string]any{"target_kind": map[string]any{"type": "string", "enum": []string{"steer_rule", "source"}, "description": "Required target kind from a Steer undo handle; no global undo stack is consulted."}, "target_id": stringSchema("Required target id from a Steer undo handle.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "report_delivery", "description": "Record external surfacing.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "delivered_at", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required non-empty item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "delivered_at": map[string]any{"type": "string", "format": "date-time", "description": "Required RFC3339 time the item was externally surfaced."}, "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "get_processing_language", "description": "Read the runtime processing language.", "inputSchema": objectSchema(nil, map[string]any{})},
 		{"name": "set_processing_language", "description": "Set the runtime processing language for future processing.", "inputSchema": objectSchema([]string{"language", "actor_id", "idempotency_key"}, map[string]any{"language": map[string]any{"type": "string", "enum": []string{"en", "zh"}}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
