@@ -77665,7 +77665,7 @@ phases:
       future-only/no row rewrite/FTS, steering precedence, desktop split-scroll, source
       identifier non-translation.
 
-      - [ ] DOC-INPUT-001 has repaired prompt/ref path or explicit non-blocking non-intersection
+      - [x] DOC-INPUT-001 has repaired prompt/ref path or explicit non-blocking non-intersection
       evidence.
 
       - [ ] Final headline is PASS only if no blocker-class conformance or proof gap
