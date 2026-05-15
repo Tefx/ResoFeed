@@ -79090,7 +79090,7 @@ phases:
       intentionally unobserved because this step is contract-only.'
   - id: srdct-backend-expected-red-tests
     name: Add backend expected-red Steer HTTP MCP and policy tests
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -79181,6 +79181,15 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T21:22:45.249999+00:00'
+    done_at: '2026-05-15T21:40:06.323927+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED: Added backend expected-red tests in internal/resofeed/srdct_backend_expected_red_test.go.
+      Worktree evidence confirmed refs read, tests-only scope, downstream owners srdb-classifier-policy-runtime
+      and srdb-http-steer-preview-commit-undo, and clean branch diff with no plan.yaml/frontend/product
+      runtime changes. Mainline verification after squash merge: `go test ./internal/resofeed
+      -run ''TestSRDCT'' -count=1` exits 1 with expected documented gaps for missing
+      /api/steer/preview, /api/steer/undo, MCP preview_steer/undo_steer parity, undo
+      handles, closest-allowable conflict wording, and lexical-only find warning.
+      Squash merge commit: 9de2d284.'
   - id: srdct-frontend-expected-red-tests
     name: Add frontend expected-red route preview ledger split-scroll tests
     status: claimed
