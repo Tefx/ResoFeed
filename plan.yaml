@@ -70227,6 +70227,91 @@ phases:
     - plhm-http-runtime-endpoints
     - plhm-mcp-runtime-parity
     agent: blind-tester
+  - id: plhm-runtime-wiring-audit
+    name: Audit HTTP MCP runtime wiring completeness
+    status: pending
+    description: 'step_type: verification
+
+      agent_source: project
+
+
+      Wiring completeness audit for new HTTP routes, MCP resources/tools, route registration,
+      auth middleware, response DTOs, and runtime entrypoint reachability.
+
+
+      REQUIRED CHECKS:
+
+      - [ ] Every new HTTP endpoint is registered and owner-token protected.
+
+      - [ ] Every new MCP resource/tool is registered and owner-token protected.
+
+      - [ ] HTTP and MCP call the same core operations rather than duplicating semantics.
+
+      - [ ] `search_items` and HTTP search share query echo behavior.
+
+      - [ ] No production stub/private placeholder remains wired as runtime dependency.
+
+      - [ ] No delivery registry, job queue, activity ledger, sync/merge module, DI
+      container, or service layer is introduced.'
+    verification: '- [ ] Wiring audit report lists registered routes/tools/resources
+      and core operation targets.
+
+      - [ ] Any unregistered route/tool or duplicate semantics is blocking with remediation
+      ownership.
+
+      - [ ] Forbidden architecture concept scan is included.'
+    evidence_template: '## Wiring Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **HTTP route registration**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **MCP registration**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Core operation call paths**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Forbidden architecture concepts**:
+
+      ```
+
+      <output>
+
+      ```
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - plhm-http-runtime-endpoints
+    - plhm-mcp-runtime-parity
+    agent: wiring-auditor
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
