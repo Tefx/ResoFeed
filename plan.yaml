@@ -81530,7 +81530,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Render canonical bracket actions [RUN INGEST], [FETCH], [DETAILS], [DELETE],
+      - [x] Render canonical bracket actions [RUN INGEST], [FETCH], [DETAILS], [DELETE],
       [IMPORT OPML], [EXPORT STATE], and [IMPORT STATE] with exact uppercase labels.
 
       - [ ] [DETAILS] uses native disclosure or aria-expanded/aria-controls and exposes
