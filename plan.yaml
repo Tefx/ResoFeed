@@ -69785,7 +69785,7 @@ phases:
 
       - [x] This is an IMPLEMENTATION step; stub-only completion is not acceptable.
 
-      - [ ] Logic processes inputs and produces outputs that vary by metadata key,
+      - [x] Logic processes inputs and produces outputs that vary by metadata key,
       language, request fingerprint, TTL, and receipt state.
 
       - [ ] No jobs, queues, ledgers, sync records, or portable receipts are introduced.'
