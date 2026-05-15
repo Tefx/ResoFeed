@@ -79577,7 +79577,7 @@ phases:
       puts "yaml ok"''` returned `yaml ok`. Squash merge commit: 9adcc120.'
   - id: srdct-foundation-gate-retest
     name: Retest foundation gate after AC traceability remediation
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -79685,6 +79685,8 @@ phases:
     depends_on:
     - srdct-ac19-traceability-remediation
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T21:56:34.655486+00:00'
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
