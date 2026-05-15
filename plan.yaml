@@ -75737,7 +75737,7 @@ phases:
 
       - [ ] Frontend install/build/test command family appropriate to repo.
 
-      - [ ] Build `cmd/resofeed` binary.
+      - [x] Build `cmd/resofeed` binary.
 
       - [ ] Secret-safe runtime smoke for `/api/runtime/language`, `/api/doctor`,
       and `/mcp` if environment supports it.
