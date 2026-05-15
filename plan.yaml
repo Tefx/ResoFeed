@@ -70259,7 +70259,7 @@ phases:
       Checklist: all completion and verification checklist items are [x].'
   - id: plsc-backend-green-retest
     name: Retest backend expected-red suite to green
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -70346,6 +70346,8 @@ phases:
     - plsc-processing-language-ingest
     - plsc-reprocess-fts-doctor
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-15T14:34:58.078693+00:00'
   - id: plsc-core-wiring-audit
     name: Audit backend core wiring and public symbol reachability
     status: pending
