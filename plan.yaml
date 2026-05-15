@@ -76303,8 +76303,9 @@ phases:
   name: Processing Language Finalization and Deep Review
   status: in_progress
   gate: Finalization gate blocks unless docs are synchronized, full spec/design/wiring/deep-review
-    audits are complete, and no unresolved blocker-class behavioral proof obligations
-    remain.
+    audits are complete, the failed final gate UI blockers from plfinal-final-gate
+    are remediated, and plfinal-ui-final-blocker-retest-gate proves all seven UI final
+    proof failures closed with no product-boundary drift.
   depends_on:
   - processing-language-system-e2e
   steps:
