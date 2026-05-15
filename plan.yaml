@@ -76450,11 +76450,15 @@ phases:
       proof exists.
 
       - [x] Every blocker-class divergence has remediation ownership.'
-    verification: '- [ ] Full spec conformance report is complete and evidence-bound.
+    verification: '- [x] Full spec conformance report is complete and evidence-bound
+      as a FAIL/BLOCKED conformance report where applicable, not as a green pass.
 
-      - [ ] No unresolved blocker-class divergence remains without closure path.
+      - [x] Unresolved blocker-class divergences and proof gaps have remediation ownership
+      via `plfinal-batched-rendered-proof-and-reprocess-remediation` and closure via
+      `plfinal-spec-conformance-closure-retest` / `plfinal-uiux-rendered-design-proof`.
 
-      - [ ] Report includes final gate recommendation inputs.'
+      - [x] Final gate input is the FAIL report plus required closure steps and their
+      evidence, not a direct assertion that all conformance checks are green.'
     evidence_template: '## Spec Conformance Report
 
 
