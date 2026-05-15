@@ -71410,7 +71410,7 @@ phases:
 
       - [x] Original backend-core processing-language tests pass after remediation.
 
-      - [ ] New guard exclusivity proof is green and cites exact test names or command
+      - [x] New guard exclusivity proof is green and cites exact test names or command
       output.
 
       - [ ] Anchor disposition proof shows no unowned storage-core exported declaration-only
