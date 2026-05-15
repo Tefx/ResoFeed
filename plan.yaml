@@ -69816,6 +69816,115 @@ phases:
     green.
   depends_on:
   - processing-language-storage-core
+  steps:
+  - id: plhm-http-runtime-endpoints
+    name: Complete HTTP language reprocess delivery and validation endpoints
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: integration
+
+
+      Complete the implementation within existing HTTP routing/handler boundaries.
+      Wire core operations from the previous phase into JSON HTTP without moving business
+      logic into `http.go`.
+
+
+      YOUR SCOPE:
+
+      - `GET /api/runtime/language`
+
+      - `PUT /api/runtime/language`
+
+      - `POST /api/runtime/reprocess-library`
+
+      - `POST /api/items/{id}/delivery`
+
+      - `GET /api/search` query echo if not already complete
+
+      - `GET /api/doctor` stale FTS diagnostic lines
+
+      - strict query/body/content-type validation for these surfaces
+
+
+      Integration path: HTTP auth/validation -> core language/reprocess/delivery/search/doctor
+      operation -> canonical response/error shape.
+
+
+      ## Gate Preview (what gate WILL reject)
+
+      - [ ] unknown JSON request body fields not rejected as `400 bad_request`.
+
+      - [ ] `actor_id` treated as authorization instead of provenance/idempotency
+      metadata.
+
+      - [ ] delivery registry/activity ledger/portable receipt/sync/job introduced.
+
+      - [ ] language set rewrites historical rows or rebuilds FTS automatically.
+
+      - [ ] handler-only proof without real HTTP route execution.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      - [ ] Implementation has substantive handler validation and route wiring.
+
+      - [ ] Outputs vary by request body, receipt state, current language, item id,
+      and operation guard state.
+
+      - [ ] Business logic stays in core; HTTP remains thin transport.'
+    verification: '- [ ] Targeted HTTP contract tests pass for success, validation
+      errors, auth, replay, mismatch, TTL/crash-loss semantics, delivery, doctor stale
+      lines, and conflict.
+
+      - [ ] Real handler/route tests exercise full HTTP request/response path.
+
+      - [ ] No forbidden ledger/job/sync/delivery registry artifacts are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Integration Evidence
+
+      **Command or test exercising the full path**:
+
+      ```
+
+      <exact command/test>
+
+      ```
+
+      **Actual output**:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      **Path exercised**: HTTP route -> auth/validation -> core operation -> response
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Routes added/updated:
+
+      - Validation matrix:
+
+      - Idempotency/replay proof:'
+    agent: golang-developer
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
