@@ -67726,7 +67726,7 @@ phases:
       runtime path can show both `Fresh Runtime A` and `Fresh Runtime B` for same-URL
       grouped items.
 
-      - [ ] Preserved or strengthened `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`;
+      - [x] Preserved or strengthened `web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`;
       no existing assertion was weakened, skipped, or deleted.
 
       - [ ] Preserved accessibility coverage for the Inspector disclosure and mobile
