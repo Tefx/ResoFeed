@@ -77668,7 +77668,7 @@ phases:
       - [x] DOC-INPUT-001 has repaired prompt/ref path or explicit non-blocking non-intersection
       evidence.
 
-      - [ ] Final headline is PASS only if no blocker-class conformance or proof gap
+      - [x] Final headline is PASS only if no blocker-class conformance or proof gap
       remains open.'
     verification: '- [ ] B1/R6 is re-audited against implementation and regression
       tests for timeout/canceled/fresh-fetch failure clearing stale readable fields
