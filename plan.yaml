@@ -66599,3 +66599,178 @@ phases:
     - ui-runtime-fresh-review-uiux-multimodal-audit
     - ui-runtime-fresh-review-black-box-liveness
     agent: gate-reviewer
+  - id: ui-runtime-fresh-review-full-frontend-test-remediation
+    name: Remediate full frontend npm test stale render-contract failures
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      work_type: defect_repair
+
+      verification_scope: local-check
+
+      issue_provenance: failed fresh-review retest B1
+
+      issue_disposition: blocking-now because the final gate requires full frontend
+      test health before reopening.
+
+
+      Fix the B1 full frontend `npm test` red reported by `ui-runtime-fresh-review-green-retest`
+      without weakening the fresh-audit acceptance suite.
+
+
+      Scope and ownership:
+
+      - Distinguish stale render-contract/test expectations from real product regressions.
+
+      - Update stale tests to the current `docs/DESIGN.md` and product contract when
+      runtime behavior is correct.
+
+      - Fix product code only when a failing test reveals a true current contract
+      regression.
+
+      - Preserve accessibility coverage; do not reduce assertions to weaker existence-only
+      checks when accessible names, labels, or screen-reader semantics are part of
+      the contract.
+
+      - Do not edit or weaken `ui-runtime-fresh-review-remediation.spec.ts` or the
+      already-green fresh audit acceptance checks.
+
+
+      Known B1 failure fingerprints to address as a batch:
+
+      - Accessible-name expectations still require exact `Resonate item`, while current
+      runtime intentionally exposes contextual names such as `Resonate item: SQLite
+      FTS changes ranking contract`.
+
+      - Source Ledger render tests still expect the old combined `/src: Example Source
+      · status: ok/` line, while current runtime exposes separate `src`, URL, and
+      `last_fetch`/status shape.
+
+      - State import tests still expect label `import state JSON`, while current runtime
+      label is `Choose state JSON`.
+
+
+      Guardrails:
+
+      - Fresh audit green evidence is not a license to leave full-suite red tests
+      unowned.
+
+      - Treat stale tests as stale only after checking the current `docs/DESIGN.md`/product
+      contract and rendered runtime semantics.
+
+      - If any failure is a product regression, fix code rather than editing the test
+      around it.
+
+      - Maintain the ResoFeed boundaries from `AGENTS.md`: single Go binary, SQLite-only,
+      owner token boundary, no SaaS/account/folder/tag/unread/archive/sync/vector/RAG
+      concepts.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic or contract-accurate test updates
+      that process the current rendered UI semantics.
+
+
+      ## Completion Criteria
+
+      - [ ] Every B1 full frontend `npm test` failure is classified as stale test
+      expectation or true product regression with a short rationale.
+
+      - [ ] Stale render-contract expectations are updated to match `docs/DESIGN.md`
+      and current product semantics without weakening accessibility coverage.
+
+      - [ ] Any true product regression discovered by the failures is fixed in product
+      code rather than masked by test edits.
+
+      - [ ] Fresh audit acceptance tests remain unchanged or are only strengthened;
+      no FR-01/FR-02/FR-04/FR-05/FR-06/FR-07/FR-09/FR-10 acceptance coverage is removed.
+
+      - [ ] Full frontend commands `npm run test`, `npm run check`, and `npm run build`
+      are run and results recorded.
+
+      - [ ] Fresh audit Playwright suite `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts`
+      is rerun and remains green.'
+    verification: '- [ ] `npm run test` passes with the B1 full frontend suite green.
+
+      - [ ] `npm run check` passes.
+
+      - [ ] `npm run build` passes.
+
+      - [ ] `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts` still
+      passes and proves FR-01, FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, and FR-10.
+
+      - [ ] Evidence includes a stale-vs-regression classification for accessible
+      names, Source Ledger rendering, and state import label failures.
+
+      - [ ] Evidence confirms no accessibility coverage or fresh-audit acceptance
+      coverage was weakened.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-fresh-review-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## B1 Remediation Evidence
+
+
+      **Failure classification table**:
+
+      | Fingerprint | Stale expectation or product regression? | Contract basis |
+      Change made |
+
+      | --- | --- | --- | --- |
+
+      | Resonate accessible name | <classification> | <DESIGN/product passage> | <test/code
+      change> |
+
+      | Source Ledger render line | <classification> | <DESIGN/product passage> |
+      <test/code change> |
+
+      | State import label | <classification> | <DESIGN/product passage> | <test/code
+      change> |
+
+
+      **Commands and outputs**:
+
+      ```bash
+
+      npm run test
+
+      npm run check
+
+      npm run build
+
+      npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts
+
+      ```
+
+
+      **Coverage preservation statement**:
+
+      - Accessibility assertions preserved/strengthened: <yes/no + details>
+
+      - Fresh audit acceptance suite weakened: <no required; explain if changed>
+
+
+      **Residual gaps**:
+
+      - <none, or explicit owner/closure path>'
+    depends_on:
+    - ui-runtime-fresh-review-shell-feed-ledger-fix
+    - ui-runtime-fresh-review-duplicate-source-api-fix
+    - ui-runtime-fresh-review-duplicate-source-inspector-fix
+    agent: frontend-engineer
