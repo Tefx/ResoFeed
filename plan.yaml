@@ -71539,8 +71539,18 @@ phases:
       agent_source: project
 
 
-      Complete frontend API client/type implementation for the new HTTP contract.
-      Keep frontend as a thin consumer; do not move product truth into web state.
+      Complete frontend API client/type implementation for the new HTTP contract after
+      the runtime HTTP/MCP phase proves the routes. Keep frontend as a thin consumer;
+      do not move product truth into web state.
+
+
+      Phase-boundary dependency: this frontend phase depends on `processing-language-http-mcp-runtime`;
+      this step must consume runtime evidence from `plhm-runtime-gate` before treating
+      route/error shapes as authoritative.
+
+
+      This step owns frontend client/runtime-route consumption blockers discovered
+      during storage-core verification.
 
 
       YOUR SCOPE:
@@ -71550,8 +71560,30 @@ phases:
 
       - Client calls for `GET/PUT /api/runtime/language` and `POST /api/runtime/reprocess-library`.
 
-      - Strict error handling for `400 bad_request`, `401`, `409 conflict`, and terse
-      raw diagnostics.
+      - Client handling for `/api/items/{id}/delivery` only if the UI exposes delivery
+      receipt/reporting behavior through existing product flows.
+
+      - Runtime route consumption for strict `400 bad_request`, `401`, `409 conflict`,
+      request-fingerprint mismatch, and terse raw diagnostics.
+
+      - Consumption of declaration-only frontend contract anchors produced earlier;
+      if an anchor is not needed by rendered UI, de-export or narrow it only if consistent
+      with docs/ARCHITECTURE.md and docs/DESIGN.md.
+
+
+      ## Downstream blocker ownership from storage-core verification
+
+      - [ ] Frontend contract types not consumed by runtime client/routes is owned
+      here for API/client surfaces.
+
+      - [ ] Search query echo type must be represented where search API client is
+      used.
+
+      - [ ] Language/reprocess HTTP response and error shapes must be consumed by
+      client code used by rendered controls.
+
+      - [ ] Type-only anchors must not remain misleading public exports unless a downstream
+      rendered step consumes them.
 
 
       ## Frontend Completion Criteria (rendering required for consumers)
@@ -71568,14 +71600,21 @@ phases:
 
       - [ ] Implementation contains substantive client request/response parsing logic.
 
-      - [ ] Outputs vary by API response/error state.'
+      - [ ] Outputs vary by API response/error state.
+
+      - [ ] Declaration-only client anchors are either consumed by runtime client/rendered
+      controls or explicitly justified/de-exported.'
     verification: '- [ ] Frontend type/client tests pass for language/reprocess response
       and error shapes.
 
       - [ ] Search query echo type is represented where search API client is used.
 
+      - [ ] Client code consumes runtime routes proven by the HTTP/MCP runtime phase
+      rather than only type declarations.
+
       - [ ] No forbidden UI state surfaces are added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
@@ -71587,15 +71626,45 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Implementation Evidence
+      ## Frontend Client Consumption Evidence
 
-      - Files changed:
 
-      - Types/client methods added:
+      **Runtime gate/evidence consumed**: <plhm-runtime-gate evidence ref>
 
-      - Error handling proof:
+      **Runtime contract consumed**: <route/response/error shape>
 
-      - Commands/tests run and outputs:'
+      **Client/type files changed**: <paths>
+
+      **Rendered downstream consumer**: <step/test/component or pending downstream
+      owner>
+
+
+      ## Storage-Core Downstream Blocker Closure
+
+      | Blocker | Evidence | Status |
+
+      |---|---|---|
+
+      | frontend contract types not consumed by runtime client/routes | <evidence>
+      | closed/blocking |
+
+      | search query echo type missing from client use | <evidence> | closed/blocking
+      |
+
+      | type-only anchors misleading/unconsumed | <evidence> | closed/blocking/justified
+      |
+
+
+      ## Headline
+
+      - [ ] PASS: client/runtime route consumption is implemented and ready for rendered
+      UI controls.
+
+      - [ ] FAIL: declaration-only or unconsumed client contract anchor remains without
+      owner.'
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     agent: frontend-engineer
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
