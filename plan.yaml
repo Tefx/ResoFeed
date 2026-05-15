@@ -80867,7 +80867,7 @@ phases:
       - [x] Verify manual ingest/fetch response-shape regression tests prove the documented
       envelope exactly.
 
-      - [ ] Verify ErrSteerContractOnly is removed or justified with real runtime
+      - [x] Verify ErrSteerContractOnly is removed or justified with real runtime
       reachability; no dead exported production stub remains.
 
       - [ ] Produce the exact machine-readable closure fields listed above.
