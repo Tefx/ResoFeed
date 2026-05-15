@@ -79752,7 +79752,7 @@ phases:
       provenance transparency, and minimalism via closest allowable interpretation
       plus terse explanation.
 
-      - [ ] Lexical search boundary forbids vector DB, embeddings, semantic answer
+      - [x] Lexical search boundary forbids vector DB, embeddings, semantic answer
       generation, RAG copy, and hidden retrieval expansion.
 
 
