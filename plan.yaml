@@ -80405,7 +80405,7 @@ phases:
     agent: gate-reviewer
   - id: srdb-backend-spec-wiring-remediation
     name: Batched backend spec and wiring remediation
-    status: claimed
+    status: done
     description: 'Batched remediation for the concurrent semantic failures reported
       by srdb-spec-conformance and srdb-wiring-audit. Work type: defect_repair with
       blocker-class gate intersection; provenance may be mixed, but disposition is
@@ -80630,6 +80630,164 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-15T22:55:42.471463+00:00'
+    done_at: '2026-05-15T23:07:10.190161+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — subagent reported reading §5.3.1 delegated-agent conflict-specific
+      steering precedence plus §6/§7 HTTP/MCP tables for steer preview/undo and manual
+      ingest/fetch envelopes.
+
+      - docs/DESIGN.md — subagent reported reading Steer receipt/reversibility and
+      Source Ledger lightweight bracket-action expectations.
+
+      - docs/PRD.md — subagent reported reading owner/delegated-agent precedence and
+      lightweight Source Ledger RUN INGEST/FETCH expectations.
+
+
+      ## Batched Remediation Evidence
+
+
+      **Commit hash(es)**: 524999fc on `vectl/step-srdb-backend-spec-wiring-remediation`;
+      main already contains squash merge `a920659d [vectl] step-srdb-backend-spec-wiring-remediation
+      completed` from prior merge path.
+
+      **Spec link**: docs/ARCHITECTURE.md / docs/DESIGN.md / docs/PRD.md.
+
+
+      **Files changed**:
+
+      - docs/ARCHITECTURE.md: steer preview/undo HTTP and MCP surfaces plus manual
+      ingest/fetch envelopes.
+
+      - internal/resofeed/ranking.go: conflict-specific delegated-agent steering precedence.
+
+      - internal/resofeed/steer_intent.go: removed dead contract-only stub; commit/undo
+      delegate to runtime logic.
+
+      - internal/resofeed/http.go: manual ingest/fetch response envelope alignment.
+
+      - internal/resofeed/*_test.go: regression coverage for steering precedence,
+      preview/undo parity, and response shape.
+
+
+      **Blocker families addressed**:
+
+      - B1 delegated-agent conflict-specific steering precedence: agent steering is
+      rejected only when proposed rule conflicts with active human steering; non-conflicting
+      agent rule is accepted.
+
+      - B2 steer preview/undo HTTP/MCP ARCH/source alignment: ARCH tables include
+      `/api/steer/preview`, `/api/steer/undo`, `preview_steer`, and `undo_steer`.
+
+      - B3 manual ingest/fetch response-shape contract: runtime emits `{ "ingest":
+      IngestRunResult }` and source fetch emits `{ "ingest": IngestRunResult, "source":
+      Source }`; strict tests reject legacy top-level fields.
+
+      - B4 ErrSteerContractOnly dead export cleanup: symbol removed from Go production
+      code.
+
+
+      **Worktree/mainline verification**:
+
+      ```
+
+      # subagent worktree evidence
+
+      go test ./internal/resofeed -run ''Test(HumanSteeringAffectsRankingAndSupersedesAgentSteering|AgentSteering|ManualIngest|ManualFetch|URDA|MCP|HTTP.*Steer|Steer)''
+      -count=1
+
+      # ok resofeed/internal/resofeed 0.705s
+
+
+      go test ./...
+
+      # ? resofeed/cmd/resofeed [no test files]
+
+      # ok resofeed/internal/resofeed (cached)
+
+
+      go build ./cmd/resofeed
+
+      # exit 0
+
+
+      go test -race ./internal/resofeed -run ''Test(HumanSteeringAffectsRankingAndSupersedesAgentSteering|ManualIngest|ManualFetch|URDA)''
+      -count=1
+
+      # ok resofeed/internal/resofeed 1.749s
+
+
+      rg -n "ErrSteerContractOnly" --glob "*.go" internal cmd web
+
+      # no matches
+
+
+      # orchestrator mainline final-state gate after confirming squash merge already
+      exists on main
+
+      go test ./internal/resofeed -run ''Test(HumanSteeringAffectsRankingAndSupersedesAgentSteering|AgentSteering|ManualIngest|ManualFetch|URDA|MCP|HTTP.*Steer|Steer)''
+      -count=1
+
+      # ok resofeed/internal/resofeed 0.601s
+
+
+      go test ./...
+
+      # ? resofeed [no test files]
+
+      # ? resofeed/cmd/resofeed [no test files]
+
+      # ok resofeed/internal/resofeed (cached)
+
+
+      go build ./cmd/resofeed
+
+      # exit 0
+
+
+      go test -race ./internal/resofeed -run ''Test(HumanSteeringAffectsRankingAndSupersedesAgentSteering|ManualIngest|ManualFetch|URDA)''
+      -count=1
+
+      # ok resofeed/internal/resofeed 1.827s
+
+
+      rg -n "ErrSteerContractOnly" --glob "*.go" internal cmd web
+
+      # no output / no matches
+
+      ```
+
+
+      **Response-shape proof**:
+
+      ```
+
+      internal/resofeed/urda_backend_runtime_expected_red_test.go asserts manual ingest
+      top-level keys exactly {"ingest"} and source fetch keys exactly {"ingest","source"};
+      targeted tests passed.
+
+      internal/resofeed/http.go IngestResponse contains only Ingest plus omitempty
+      Source; no anonymous ManualFetchResult embedding remains.
+
+      ```
+
+
+      **Static reachability proof for ErrSteerContractOnly**:
+
+      ```
+
+      rg -n "ErrSteerContractOnly" --glob "*.go" internal cmd web
+
+      # no output; no Go production/test references remain.
+
+      ```
+
+
+      **Gaps/Notes**:
+
+      - NONE. All checklist items in description and verification are [x]. No remaining
+      blocker-class debt observed in the verified paths.'
   - id: srdb-backend-spec-wiring-retest
     name: Retest backend spec and wiring closure
     status: pending
