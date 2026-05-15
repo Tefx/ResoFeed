@@ -77297,7 +77297,7 @@ phases:
 
       ## Completion Criteria (checklist)
 
-      - [ ] `why_previous_gate_failed` and `why_previous_review_missed_or_could_not_prove_it`
+      - [x] `why_previous_gate_failed` and `why_previous_review_missed_or_could_not_prove_it`
       are included in evidence with concrete references to both failed steps.
 
       - [ ] B1 backend behavior is fixed in `internal/resofeed/reprocess.go` or equivalent
