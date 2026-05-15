@@ -70685,6 +70685,90 @@ phases:
 
       - Commands/tests run and outputs:'
     agent: frontend-engineer
+  - id: plfu-frontend-green-retest
+    name: Retest frontend expected-red suite to green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an independent verifier, rerun frontend expected-red tests after implementation.
+
+
+      Scope declaration: phase-check protecting frontend UI gate and downstream system
+      E2E.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] Language/reprocess rendered tests now pass green.
+
+      - [ ] API client type tests pass.
+
+      - [ ] Source identifier preservation and split-scroll tests pass.
+
+      - [ ] Evidence includes actual commands and rendered artifacts/DOM snapshots.'
+    verification: '- [ ] Frontend test command passes for the new language/reprocess/source/split-scroll
+      suites.
+
+      - [ ] Rendered output proof is present for every required UI state.
+
+      - [ ] Any issue found has blocker/non-blocking disposition and closure path.'
+    evidence_template: '## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: frontend language/reprocess/rendering/split-scroll
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <paste commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+      - Rendered artifacts:
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |'
+    depends_on:
+    - plfu-api-client-types
+    - plfu-language-reprocess-controls
+    - plfu-source-identifiers-split-scroll
+    agent: integration-verifier
 - id: processing-language-system-e2e
   name: Processing Language System E2E and Parity
   status: locked
