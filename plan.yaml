@@ -78797,7 +78797,7 @@ phases:
       UI final blocker remediation path.'
 - id: steer-delta-contract-lock-and-expected-red-tests
   name: Steer Delta Contract Lock and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Gate blocks unless Steer route/undo/API/MCP/UI delta contracts are pinned
     and expected-red tests expose current gaps without product implementation.
   depends_on:
@@ -79577,7 +79577,7 @@ phases:
       puts "yaml ok"''` returned `yaml ok`. Squash merge commit: 9adcc120.'
   - id: srdct-foundation-gate-retest
     name: Retest foundation gate after AC traceability remediation
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -79687,9 +79687,24 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-15T21:56:34.655486+00:00'
+    done_at: '2026-05-15T22:01:56.730550+00:00'
+    evidence: 'Gate retest PASS. Independent gate-reviewer read docs/PRD.md, docs/ARCHITECTURE.md,
+      docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md, `.audit-artifacts/frontend-gate/ac19-traceability-remediation-proof-register.yaml`,
+      and `.agents/instructions.md`. Retest validated the remediation proof register
+      as YAML with required items AC-4 and AC-18; confirmed former AC-19 is invalid/absent
+      and replaced by exact authoritative AC-18; confirmed no source diff/runtime
+      implementation drift; confirmed no scoped `@invar:allow` escape hatches. Checks:
+      backend `go test ./internal/resofeed -run ''TestSRDCT'' -count=1` exits 1 with
+      accepted expected-red contract gaps; `npm --prefix web ci` exits 0; `npm --prefix
+      web run check` exits 0; frontend render expected-red exits 1 for missing Steer
+      route preview; frontend E2E expected-red exits 1 for missing Steer route preview
+      and mobile Feed scroll preservation while Source Ledger target passes. Gate
+      decision: headline=PASS, verdict=PASS, blockers=[], proof_gap_status=NONE, blocking_status=CLOSED,
+      gate_open_allowed=true, orchestrator_action_hint=COMPLETE. No review artifacts
+      or code/doc changes were created by the retest.'
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
-  status: locked
+  status: pending
   gate: Gate blocks unless Go authoritative routing, HTTP preview/commit/undo, MCP
     parity, lexical-only search, and AC-4 conflict semantics are green with runtime
     proof.
