@@ -72860,8 +72860,14 @@ phases:
       - [ ] Decision basis maps behavioral/runtime obligations to PROVEN or BLOCK.'
     verification: '- [ ] All runtime phase steps completed with adequate evidence.
 
+      - [ ] `plhm-runtime-blocker-retest` passed after the batched remediation, proving
+      spec-conformance and wiring-audit blockers are fixed.
+
       - [ ] Runnable-surface evidence identifies entrypoint, launch command, transport,
       and at least one real operation.
+
+      - [ ] HTTP/MCP conflict/error shapes and MCP search query-echo runtime path
+      are PROVEN in the decision basis.
 
       - [ ] OPEN recommendation is allowed only if all blocker-class HTTP/MCP obligations
       are PROVEN or explicitly non-intersecting.'
@@ -72895,6 +72901,7 @@ phases:
     - plhm-runtime-liveness-probe
     - plhm-runtime-wiring-audit
     - plhm-runtime-spec-conformance
+    - plhm-runtime-blocker-retest
     agent: gate-reviewer
   - id: plhm-runtime-blocker-remediation
     name: Remediate HTTP MCP runtime blocker findings
