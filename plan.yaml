@@ -71906,7 +71906,7 @@ phases:
 
       - [x] HTTP and MCP state changes are equivalent.
 
-      - [ ] Storage-core downstream-owned MCP blockers are all closed or converted
+      - [x] Storage-core downstream-owned MCP blockers are all closed or converted
       into explicit runtime gate blockers with evidence.'
     verification: '- [ ] MCP expected-red parity tests pass green for runtime language
       resource/tools, reprocess_library, report_delivery, search_items query echo,
