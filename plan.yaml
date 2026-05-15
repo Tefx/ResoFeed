@@ -78838,7 +78838,7 @@ phases:
       - [x] Pin strict request/response JSON field names, nullable fields, and idempotency
       boundaries for preview vs commit vs undo.
 
-      - [ ] Explicitly document no vector DB, embeddings, semantic answer, RAG, command
+      - [x] Explicitly document no vector DB, embeddings, semantic answer, RAG, command
       history, global undo stack, jobs, queues, or activity ledger.
 
       - [ ] Keep contract artifacts within the single Go binary and flat internal/resofeed
