@@ -79230,7 +79230,7 @@ phases:
       - [x] Tests cover desktop independent Feed/Inspector scroll regions and mobile
       full-screen Inspector route with preserved Feed scroll.
 
-      - [ ] Tests cover processing language/reprocess controls as low-chrome architecture-owned
+      - [x] Tests cover processing language/reprocess controls as low-chrome architecture-owned
       runtime operations only.
 
       - [ ] Modified files are limited to tests and fixtures; red is expected until
