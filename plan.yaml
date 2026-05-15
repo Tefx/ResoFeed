@@ -79303,7 +79303,7 @@ phases:
       and mobile Feed scroll preservation gaps. Squash merge commit: 963f66e4.'
   - id: srdct-foundation-gate
     name: Gate contract lock and expected-red coverage
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the Steer
       delta contract/test phase is ready to unlock implementation.
 
@@ -79386,6 +79386,8 @@ phases:
     - srdct-backend-expected-red-tests
     - srdct-frontend-expected-red-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-15T21:41:54.485048+00:00'
 - id: steer-delta-backend-http-mcp-runtime
   name: Steer Delta Backend HTTP MCP Runtime
   status: locked
