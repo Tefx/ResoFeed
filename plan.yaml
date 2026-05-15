@@ -69941,14 +69941,14 @@ phases:
       - [x] Outputs vary by stored processing language and input item data.
 
       - [x] Existing extraction/model failure taxonomy is preserved.'
-    verification: '- [ ] Targeted ingest/language tests pass for `en` and `zh`.
+    verification: '- [x] Targeted ingest/language tests pass for `en` and `zh`.
 
-      - [ ] Regression covers language change not rewriting historical items.
+      - [x] Regression covers language change not rewriting historical items.
 
-      - [ ] OpenRouter request tests prove target-language input is included without
+      - [x] OpenRouter request tests prove target-language input is included without
       persisting secrets.
 
-      - [ ] Source provenance fields remain unchanged in item responses.'
+      - [x] Source provenance fields remain unchanged in item responses.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
