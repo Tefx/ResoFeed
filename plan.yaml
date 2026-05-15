@@ -70028,6 +70028,95 @@ phases:
 
       - Error shape proof:'
     agent: golang-developer
+  - id: plhm-http-mcp-green-retest
+    name: Retest HTTP and MCP expected-red suites to green
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an independent verifier, rerun HTTP and MCP expected-red suites after runtime
+      implementation.
+
+
+      Scope declaration: phase-check protecting runtime integration gate and downstream
+      frontend/system gates.
+
+
+      ## Completion Criteria (checklist)
+
+      - [ ] HTTP language/reprocess/delivery/search/doctor tests pass green.
+
+      - [ ] MCP language/reprocess/report_delivery/search_items tests pass green.
+
+      - [ ] Strict validation tests cover unknown fields, duplicate/unknown query
+      params, bad delivered_at, auth failures, idempotency replay/mismatch, and conflicts.
+
+      - [ ] Evidence includes actual commands and outputs.'
+    verification: '- [ ] HTTP and MCP contract test commands pass.
+
+      - [ ] At least one test proves HTTP/MCP equivalent state mutation for language
+      and delivery.
+
+      - [ ] At least one test proves `reprocess_library` conflict/replay semantics.'
+    evidence_template: '## Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: HTTP/MCP runtime contract tests
+
+      **Independence Level**: L1
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Test Execution
+
+      - Commands executed:
+
+      ```
+
+      <paste commands>
+
+      ```
+
+      - Actual output:
+
+      ```
+
+      <paste output>
+
+      ```
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|'
+    depends_on:
+    - plhm-http-runtime-endpoints
+    - plhm-mcp-runtime-parity
+    agent: integration-verifier
 - id: processing-language-frontend-ui
   name: Processing Language Frontend UI
   status: locked
