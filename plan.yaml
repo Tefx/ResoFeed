@@ -63794,7 +63794,7 @@ phases:
     agent: gate-reviewer
   - id: urda-final-spec-boundary-blockers-fix
     name: Fix final spec/product boundary blockers R6 R7 R12 R18
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -63965,6 +63965,8 @@ phases:
     depends_on:
     - urda-final-spec-and-product-boundary-review
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T03:43:48.542926+00:00'
   - id: urda-final-spec-boundary-blockers-retest
     name: Retest final spec/product boundary blocker closures R6 R7 R12 R18
     status: pending
