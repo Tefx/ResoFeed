@@ -78401,6 +78401,73 @@ phases:
     depends_on:
     - srdb-classifier-policy-runtime
     agent: golang-developer
+  - id: srdb-mcp-steer-parity
+    name: Complete MCP Steer preview commit undo parity
+    status: pending
+    description: 'step_type: implementation
+
+
+      Complete MCP parity within existing internal/resofeed/mcp.go and shared contract
+      types. Use classifier behavior from srdb-classifier-policy-runtime.
+
+
+      Acceptance checklist:
+
+      - [ ] preview_steer is read-only, requires actor_id, accepts no idempotency_key,
+      and returns the same SteerPreview shape as HTTP.
+
+      - [ ] steer requires actor_id and idempotency_key, reruns classification, and
+      returns the same SteeringReceipt semantics as HTTP.
+
+      - [ ] undo_steer requires target_kind, target_id, actor_id, and idempotency_key,
+      and returns SteerUndoResult plus receipt with target-specific semantics.
+
+      - [ ] MCP exposes no agent-only concepts, no per-agent registry, and no additional
+      product primitives beyond HTTP/UI operations.
+
+      - [ ] MCP search remains lexical via search_items and does not imply semantic/RAG
+      retrieval.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes inputs and produces
+      outputs that vary based on those inputs.'
+    verification: '- [ ] Targeted MCP tests for preview_steer, steer, undo_steer,
+      schema validation, idempotency, and HTTP parity pass.
+
+      - [ ] Main path evidence shows MCP preview/commit/undo outputs match HTTP shapes.
+
+      - [ ] Failure path evidence shows preview rejects idempotency_key and unsupported
+      undo target kind fails as documented.
+
+      - [ ] No agent registry or agent-only product concept introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## MCP Parity Evidence
+
+      - Files changed:
+
+      - Commands/tests run:
+
+      - HTTP↔MCP parity table:
+
+      - Forbidden concept scan:
+
+      '
+    depends_on:
+    - srdb-classifier-policy-runtime
+    agent: golang-developer
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
   status: locked
