@@ -55,8 +55,9 @@ func TestItemDetailJSONIncludesRequiredNullableDetailFields(t *testing.T) {
 		FeedExcerpt:      nil,
 		ExtractedText:    nil,
 		Provenance: Provenance{
-			SourceURL:   "https://example.com/feed.xml",
-			OriginalURL: "https://example.com/article",
+			SourceURL:          "https://example.com/feed.xml",
+			OriginalURL:        "https://example.com/article",
+			GroupedSourceItems: []GroupedSourceItem{},
 		},
 	}
 
@@ -83,6 +84,9 @@ func TestItemDetailJSONIncludesRequiredNullableDetailFields(t *testing.T) {
 	}
 	assertPresentString(t, provenance, "source_url", "https://example.com/feed.xml")
 	assertPresentString(t, provenance, "original_url", "https://example.com/article")
+	if value, ok := provenance["grouped_source_items"]; !ok || string(value) != "[]" {
+		t.Fatalf("ItemDetail JSON provenance grouped_source_items = %s, want []", value)
+	}
 }
 
 func decodeObject(t *testing.T, data []byte) map[string]json.RawMessage {

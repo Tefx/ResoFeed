@@ -44,6 +44,24 @@ export interface Provenance {
   original_url: string;
   story_key: string | null;
   duplicate_of_item_id: OpaqueId | null;
+  grouped_source_items: GroupedSourceItem[];
+}
+
+export interface GroupedSourceItem {
+  item_id: OpaqueId;
+  source_id: OpaqueId;
+  source_title: string;
+  source_url: string;
+  url: string;
+  canonical_url: string | null;
+  title: string;
+  published_at: Rfc3339UtcString | null;
+  first_seen_at: Rfc3339UtcString | null;
+  extraction_status: ExtractionStatus;
+  model_status: ModelStatus;
+  story_key: string | null;
+  duplicate_of_item_id: OpaqueId | null;
+  is_selected_item: boolean;
 }
 
 export interface ItemDetail extends ItemSummary {

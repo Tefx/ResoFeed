@@ -128,14 +128,35 @@ type ItemDetail struct {
 	Provenance         Provenance `json:"provenance"`
 }
 
+// GroupedSourceItem is a terse source-list disclosure for every persisted item
+// sharing an ItemDetail story_key. It is provenance only: grouping does not
+// merge rows, suppress sources, or create sync/activity history.
+type GroupedSourceItem struct {
+	ItemID            string     `json:"item_id"`
+	SourceID          string     `json:"source_id"`
+	SourceTitle       string     `json:"source_title"`
+	SourceURL         string     `json:"source_url"`
+	URL               string     `json:"url"`
+	CanonicalURL      *string    `json:"canonical_url"`
+	Title             string     `json:"title"`
+	PublishedAt       *time.Time `json:"published_at"`
+	FirstSeenAt       *time.Time `json:"first_seen_at"`
+	ExtractionStatus  string     `json:"extraction_status"`
+	ModelStatus       string     `json:"model_status"`
+	StoryKey          *string    `json:"story_key"`
+	DuplicateOfItemID *string    `json:"duplicate_of_item_id"`
+	IsSelectedItem    bool       `json:"is_selected_item"`
+}
+
 // Provenance is included on item detail so summaries, grouping, and search
 // results remain verifiable without hiding original source items.
 type Provenance struct {
-	SourceURL         string  `json:"source_url"`
-	CanonicalURL      *string `json:"canonical_url"`
-	OriginalURL       string  `json:"original_url"`
-	StoryKey          *string `json:"story_key"`
-	DuplicateOfItemID *string `json:"duplicate_of_item_id"`
+	SourceURL          string              `json:"source_url"`
+	CanonicalURL       *string             `json:"canonical_url"`
+	OriginalURL        string              `json:"original_url"`
+	StoryKey           *string             `json:"story_key"`
+	DuplicateOfItemID  *string             `json:"duplicate_of_item_id"`
+	GroupedSourceItems []GroupedSourceItem `json:"grouped_source_items"`
 }
 
 // ItemState is current attention state only. Inspection and external surfacing

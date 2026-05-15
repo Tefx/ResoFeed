@@ -106,6 +106,50 @@ func TestHTTPHandlersExerciseCorePaths(t *testing.T) {
 	})
 }
 
+func TestHTTPItemDetailDisclosesGroupedSourceItems(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 15, 12, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_primary_story", "https://primary.example.test/rss.xml", "Primary Wire")
+	insertSource(t, ctx, db, "src_duplicate_story", "https://duplicate.example.test/rss.xml", "Duplicate Ledger")
+	storyKey := "story-shared-runtime-review"
+	if _, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, story_key, duplicate_of_item_id) values
+		('item_today_primary_story', 'src_primary_story', 'https://primary.example.test/rss.xml', 'https://primary.example.test/story', 'https://primary.example.test/story', 'Primary grouped story keeps every source visible', 'primary summary', 'primary insight', 'high', ?, ?, 'full', 'ok', 'primary excerpt', 'primary text', ?, null),
+		('item_today_duplicate_story', 'src_duplicate_story', 'https://duplicate.example.test/rss.xml', 'https://duplicate.example.test/story-copy', 'https://duplicate.example.test/story-copy', 'Duplicate source item for primary grouped story', 'duplicate summary', 'duplicate insight', 'source-claim', ?, ?, 'full', 'ok', 'duplicate excerpt', 'duplicate text', ?, 'item_today_primary_story')`, now.Format(time.RFC3339), now.Format(time.RFC3339), storyKey, now.Add(-30*time.Minute).Format(time.RFC3339), now.Add(-30*time.Minute).Format(time.RFC3339), storyKey); err != nil {
+		t.Fatalf("insert grouped story items: %v", err)
+	}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/items/item_today_primary_story", nil))
+
+	assertStatus(t, recorder, http.StatusOK)
+	var parsed ItemResponse
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal item detail response: %v; body=%s", err, recorder.Body.String())
+	}
+	grouped := parsed.Item.Provenance.GroupedSourceItems
+	if len(grouped) != 2 {
+		t.Fatalf("grouped source items = %+v, want primary and duplicate", grouped)
+	}
+	wantByID := map[string]string{
+		"item_today_primary_story":   "Primary Wire",
+		"item_today_duplicate_story": "Duplicate Ledger",
+	}
+	for _, sourceItem := range grouped {
+		wantTitle, ok := wantByID[sourceItem.ItemID]
+		if !ok {
+			t.Fatalf("unexpected grouped source item: %+v", sourceItem)
+		}
+		if sourceItem.SourceTitle != wantTitle || sourceItem.StoryKey == nil || *sourceItem.StoryKey != storyKey || sourceItem.SourceURL == "" || sourceItem.URL == "" {
+			t.Fatalf("grouped source item provenance = %+v, want title %q story %q with urls", sourceItem, wantTitle, storyKey)
+		}
+	}
+	if !grouped[0].IsSelectedItem || grouped[1].DuplicateOfItemID == nil || *grouped[1].DuplicateOfItemID != "item_today_primary_story" {
+		t.Fatalf("grouped source ordering/duplicate pointer = %+v", grouped)
+	}
+}
+
 func TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters(t *testing.T) {
 	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
 

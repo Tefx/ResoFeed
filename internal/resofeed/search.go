@@ -162,10 +162,54 @@ where i.id = ?`, itemID)
 	detail.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
 	detail.FeedExcerpt = stringPtrFromNull(feedExcerpt)
 	detail.ExtractedText = stringPtrFromNull(extractedText)
-	detail.Provenance = Provenance{SourceURL: sourceURL.String, CanonicalURL: stringPtrFromNull(canonicalURL), OriginalURL: detail.URL, StoryKey: detail.StoryKey, DuplicateOfItemID: detail.DuplicateOfItemID}
+	groupedSources, err := readGroupedSourceItems(ctx, db, detail.ID, detail.StoryKey)
+	if err != nil {
+		return ItemDetail{}, err
+	}
+	detail.Provenance = Provenance{SourceURL: sourceURL.String, CanonicalURL: stringPtrFromNull(canonicalURL), OriginalURL: detail.URL, StoryKey: detail.StoryKey, DuplicateOfItemID: detail.DuplicateOfItemID, GroupedSourceItems: groupedSources}
 	sanitizeReadableDetail(&detail)
 	normalizeDetailExtractionStatus(&detail)
 	return detail, nil
+}
+
+func readGroupedSourceItems(ctx context.Context, db *sql.DB, selectedItemID string, storyKey *string) ([]GroupedSourceItem, error) {
+	if storyKey == nil || strings.TrimSpace(*storyKey) == "" {
+		return []GroupedSourceItem{}, nil
+	}
+	rows, err := db.QueryContext(ctx, `
+select i.id, i.source_id, coalesce(s.title, ''), coalesce(i.source_url, s.url, ''),
+       i.url, i.canonical_url, i.title, i.published_at, i.first_seen_at,
+       i.extraction_status, i.model_status, i.story_key, i.duplicate_of_item_id
+from items i
+left join sources s on s.id = i.source_id
+where i.story_key = ?
+order by case when i.id = ? then 0 when i.duplicate_of_item_id = ? then 1 else 2 end,
+         coalesce(i.published_at, i.first_seen_at) desc,
+         i.id asc`, *storyKey, selectedItemID, selectedItemID)
+	if err != nil {
+		return nil, fmt.Errorf("read grouped source items: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	items := []GroupedSourceItem{}
+	for rows.Next() {
+		var item GroupedSourceItem
+		var canonicalURL, publishedAt, firstSeenAt, rowStoryKey, duplicateOf sql.NullString
+		if err := rows.Scan(&item.ItemID, &item.SourceID, &item.SourceTitle, &item.SourceURL, &item.URL, &canonicalURL, &item.Title, &publishedAt, &firstSeenAt, &item.ExtractionStatus, &item.ModelStatus, &rowStoryKey, &duplicateOf); err != nil {
+			return nil, fmt.Errorf("scan grouped source item: %w", err)
+		}
+		item.CanonicalURL = stringPtrFromNull(canonicalURL)
+		item.PublishedAt = timePtrFromNull(publishedAt)
+		item.FirstSeenAt = timePtrFromNull(firstSeenAt)
+		item.StoryKey = stringPtrFromNull(rowStoryKey)
+		item.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
+		item.IsSelectedItem = item.ItemID == selectedItemID
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate grouped source items: %w", err)
+	}
+	return items, nil
 }
 
 func normalizeDetailExtractionStatus(detail *ItemDetail) {
