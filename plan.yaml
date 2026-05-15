@@ -64725,7 +64725,7 @@ phases:
       \ worktree cleanup.\n\n### Gaps/Notes\n- none"
   - id: urda-uiux-multimodal-design-audit-persist
     name: Persist superseding UIUX multimodal design audit artifact
-    status: claimed
+    status: done
     description: "step_type: verification\nverification_scope: full-plan-check\nIndependence\
       \ Level: L2\nagent_source: default\n\nAs an INDEPENDENT UIUX AUDITOR (`uiux-auditor`),\
       \ produce and persist the missing superseding UIUX/multimodal/front-end closure\
@@ -64858,6 +64858,153 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-15T05:36:35.623327+00:00'
+    done_at: '2026-05-15T05:40:04.107662+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - `docs/ARCHITECTURE.md` — Confirmed single Go binary, no external DB or sync
+      coordinator.
+
+      - `docs/DESIGN.md` — Key passage: hover/focus must feel terminal-like with immediate
+      inversion or equally stark highlight.
+
+      - `docs/DESIGN_VISION.md` — Confirmed analyst''s workbench product philosophy.
+
+      - `docs/ui-preview.html` — Confirmed layout structural reference.
+
+      - `docs/audits/ui-runtime-design-audit-2026-05-15.md` — Identified original
+      issues needing remediation.
+
+      - `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md` — Prior FAIL/BLOCK:
+      failed before reaching ledger controls because `TODAY` / `SOURCE LEDGER` role
+      buttons were not found in expected tab/navigation flow.
+
+      - `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md` — Mobile
+      Source Ledger included `[IMPORT OPML]`, `[RUN INGEST]`, per-row `[FETCH]`, `[DELETE]`,
+      `[DETAILS]`, `[EXPORT STATE]`, `[IMPORT STATE]` and black-box PASS evidence.
+
+      - `web/src/routes/components/SourceLedger.svelte` — Verified bracket actions
+      logic.
+
+      - `web/src/routes/components/StatePortability.svelte` — Verified exact string
+      constants for R18.
+
+      - `web/src/app.css` — Verified inversion classes for R6 and `12ch` widths for
+      R7.
+
+
+      ## Persisted UIUX Multimodal Closure Artifact
+
+      **Artifact path**: `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`
+
+      **Product code modified**: NO
+
+
+      ## Rendered / Screenshot-First Evidence
+
+      - Desktop evidence references: `docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md`
+      screenshot and CDP/network inventory.
+
+      - Mobile evidence references: `mobile-feed.png`, `mobile-inspector.png`, `mobile-source-ledger.png`
+      referenced in black-box smoke.
+
+      - Accessibility snapshot references: browser state text and CDP AX snapshots
+      referenced in black-box smoke.
+
+      - Screenshot/visual artifact references: persisted smoke artifact captures terminal
+      outputs and screenshot inventories.
+
+
+      ## Prior FAIL/BLOCK Supersession Decision
+
+      **Prior artifact reviewed**: `docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md`
+
+      **Superseded?**: YES
+
+      **Evidence basis**:
+
+      - Keyboard/frontend retests: Playwright Source Ledger suite 6 passed, resolving
+      the previous tab/navigation failure context.
+
+      - Source Ledger R6/R7/R18 evidence: CSS/Svelte verified; no-layout-shift delta
+      `dx=0,dy=0,dw=0,dh=0` passed.
+
+      - R12 stale receipt copy evidence: API/output confirms new `SOURCE LEDGER`,
+      `[RUN INGEST]`, row `[FETCH]` message.
+
+      - Black-box smoke evidence: all public interfaces and CLI matrix passed.
+
+      - Screenshots/a11y/mobile evidence: smoke artifact lists desktop/mobile screenshots
+      and AX/state outputs.
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | evidence_ref | status | gate_decision_basis
+      |
+
+      |---|---|---|---|---|
+
+      | R6 | Bracket action inversion | `web/src/app.css`; Playwright R6 | PROVEN
+      | CSS and runtime inversion proof |
+
+      | R7 | No layout shift | retest evidence | PROVEN | Bounding box delta is 0
+      |
+
+      | R12 | Stale copy removed | API/runtime response and `ranking.go` guidance
+      | PROVEN | Network/API copy uses Source Ledger manual refresh guidance |
+
+      | R18 | State labels exact | `StatePortability.svelte` | PROVEN | Exact `[EXPORTING
+      STATE...]` / `[IMPORTING STATE...]` |
+
+      | UI | A11y/keyboard flow | E2E suite and black-box smoke | PROVEN | Playwright
+      suite and smoke passed |
+
+
+      ## Gate Decision
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: `314f761`
+
+      - Main squash merge commit: `c564600` (`[vectl] step-urda-uiux-multimodal-design-audit-persist
+      completed`)
+
+
+      ## Files changed
+
+      - `docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`
+
+
+      ## Verification
+
+      - UIUX auditor verified CSS/files for design spec adherence, correlated black-box
+      smoke outputs with blocked strict gate evidence, and created/committed superseding
+      UIUX artifact.
+
+      - Mainline artifact verification after squash merge: `git show --name-only --oneline
+      -1 -- docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md` showed commit
+      `c564600` and the artifact; `git diff --quiet HEAD -- docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md`
+      passed.
+
+
+      ## Gaps/Notes
+
+      - None'
   - id: urda-strict-final-gate-rerun
     name: Rerun strict final gate after persisted UIUX multimodal closure
     status: pending
