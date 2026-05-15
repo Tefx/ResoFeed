@@ -78280,7 +78280,7 @@ phases:
       - [x] Feed items and `.contract-feed-meta` render for seeded desktop/mobile
       cases with contiguous chronological labels.
 
-      - [ ] Inspector-open controls render with accessible names matching `/Open Inspector
+      - [x] Inspector-open controls render with accessible names matching `/Open Inspector
       for:/` for the grouped-story fixtures.
 
       - [ ] Inspector provenance discloses grouped duplicate/source items, including
