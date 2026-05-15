@@ -81695,7 +81695,7 @@ phases:
       - [x] Reprocess library action is low-chrome and immediate with terse pending/success/conflict/error
       copy.
 
-      - [ ] No settings dashboard, progress dashboard, activity log, job queue, preference
+      - [x] No settings dashboard, progress dashboard, activity log, job queue, preference
       center, onboarding wizard, or per-item language toggle is introduced.
 
       - [ ] Existing processing-language tests remain green and updated only for the
