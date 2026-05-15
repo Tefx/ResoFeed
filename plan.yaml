@@ -69923,7 +69923,7 @@ phases:
       - [x] language changes affect future ingest/reprocess only; existing rows and
       FTS are not auto-rewritten.
 
-      - [ ] OpenRouter receives `target_language`; Go validates JSON before persistence.
+      - [x] OpenRouter receives `target_language`; Go validates JSON before persistence.
 
       - [ ] `items.title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`
       are the single stored processed readable version.
