@@ -63691,3 +63691,176 @@ phases:
     - urda-final-spec-and-product-boundary-review
     - urda-final-black-box-runtime-ui-smoke
     agent: gate-reviewer
+  - id: urda-final-spec-boundary-blockers-fix
+    name: Fix final spec/product boundary blockers R6 R7 R12 R18
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      priority: HIGH
+
+
+      Fix ALL blockers found by `urda-final-spec-and-product-boundary-review`. This
+      is ONE batched remediation step; do not fix only the first visible issue.
+
+
+      ## Blockers to Fix (ALL of these)
+
+
+      ### R6 PARTIAL — Source Ledger destructive bracket actions
+
+      - `[DELETE]` and `[CONFIRM]` in `web/src/routes/components/SourceLedger.svelte`
+      / `web/src/app.css` are not canonical `.bracket-action` buttons with terminal-style
+      hover/focus inversion.
+
+      - `docs/DESIGN.md` line 637 includes `[DELETE]` as a bracket action.
+
+      - Current classes are `.source-ledger-delete` / `.source-ledger-confirm` and
+      do not invert like bracket actions.
+
+      - Required remediation: make `[DELETE]` and `[CONFIRM]` use canonical bracket-action
+      styling/tokens while preserving Source Ledger semantics, keyboard behavior,
+      and terminal-style hover/focus inversion.
+
+
+      ### R7 NEEDS_TEST — Delete confirmation no-layout-shift proof
+
+      - No current proof that delete confirmation has zero Source Ledger row layout
+      shift.
+
+      - Prior audit found a 1px shift; implementation reserves widths but needs direct
+      bounding-box regression proof.
+
+      - Required remediation: ensure Source Ledger delete confirmation state preserves
+      row geometry and provide/enable a direct bounding-box regression proof path
+      in the downstream retest.
+
+
+      ### R12 PARTIAL — Stale steering receipt copy
+
+      - User-visible steering receipt in `internal/resofeed/ranking.go:645-656` still
+      says `background ingest will pick it up`.
+
+      - This is stale background-only guidance relative to current manual ingest/fetch
+      Source Ledger controls.
+
+      - Required remediation: remove or replace the stale copy with terse manual Source
+      Ledger guidance consistent with `docs/ARCHITECTURE.md` and `docs/DESIGN.md`;
+      do not imply sidecar workers, queues, job dashboards, or background-only behavior.
+
+
+      ### R18 DIVERGES — State portability active labels
+
+      - `web/src/routes/components/StatePortability.svelte:60-62` renders `[EXPORTING...]`
+      / `[IMPORTING...]`.
+
+      - `docs/DESIGN.md` requires exact `[EXPORTING STATE...]` / `[IMPORTING STATE...]`.
+
+      - Required remediation: update active labels to the exact design strings.
+
+
+      ## Scope and guardrails
+
+      - Touch paths are limited to the listed UI/CSS files, the stale receipt copy
+      in `internal/resofeed/ranking.go`, and focused tests/regression harness updates
+      needed to expose these four blocker closures.
+
+      - Do NOT introduce forbidden ResoFeed product surfaces: accounts, onboarding
+      wizards, settings surfaces/sliders, folders, tags, unread/archive flows, vector
+      DBs, RAG, sync/merge, queues, job dashboards, sidecars, workers, admin processes,
+      or multi-user auth.
+
+      - Preserve the one-binary runtime and manual Source Ledger controls.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive UI/copy changes or regression-harness support
+      that processes real state and produces outputs that vary based on user/runtime
+      state.
+
+
+      ## Gate Preview (what the retest/gate WILL reject)
+
+      1. `[DELETE]` or `[CONFIRM]` remaining on bespoke non-inverting classes instead
+      of canonical bracket-action styling.
+
+      2. Any runtime bounding-box evidence showing delete-confirmation row movement,
+      including 1px drift.
+
+      3. Any remaining user-visible phrase `background ingest will pick it up` or
+      equivalent stale background-only guidance.
+
+      4. State portability active labels that differ from exact `[EXPORTING STATE...]`
+      / `[IMPORTING STATE...]`.
+
+      5. Any forbidden product/runtime concept introduced while fixing these blockers.'
+    verification: '- R6: `[DELETE]` and `[CONFIRM]` use canonical bracket-action styling/tokens
+      and demonstrate terminal-style hover/focus inversion without losing semantics.
+
+      - R7: focused regression support exists for delete confirmation no-layout-shift,
+      suitable for Playwright/bounding-box retest.
+
+      - R12: stale `background ingest will pick it up` user-visible copy is removed
+      or replaced with manual Source Ledger guidance; no forbidden runtime/product
+      concepts are introduced.
+
+      - R18: active state portability labels exactly match `[EXPORTING STATE...]`
+      and `[IMPORTING STATE...]`.
+
+      - Scope proof: changed files and tests are limited to the four blocker closures
+      and do not add forbidden ResoFeed surfaces.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/app.css — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/ranking.go — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/StatePortability.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Blocker Closure Evidence
+
+
+      | Blocker | Files changed | Exact change | Proof command/artifact | Status |
+
+      | --- | --- | --- | --- | --- |
+
+      | R6 bracket actions | | | | |
+
+      | R7 no-layout-shift harness/support | | | | |
+
+      | R12 stale copy | | | | |
+
+      | R18 active labels | | | | |
+
+
+      ## Forbidden Surface Check
+
+      List any searched forbidden terms/surfaces and confirm none were introduced.
+
+
+      ## Remaining Gaps
+
+      State any unresolved risk; if none, write `none`.'
+    depends_on:
+    - urda-final-spec-and-product-boundary-review
+    agent: frontend-engineer
