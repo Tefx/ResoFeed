@@ -63864,3 +63864,126 @@ phases:
     depends_on:
     - urda-final-spec-and-product-boundary-review
     agent: frontend-engineer
+  - id: urda-final-spec-boundary-blockers-retest
+    name: Retest final spec/product boundary blocker closures R6 R7 R12 R18
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: full-plan-check
+
+      Independence Level: L2
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (`integration-verifier`), perform a fresh retest of
+      the four blockers from `urda-final-spec-and-product-boundary-review` after `urda-final-spec-boundary-blockers-fix`.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works. Finding issues is a
+      successful verification outcome, but this step can only close green when all
+      blocker-class obligations below are PROVEN.
+
+
+      Required checks:
+
+      1. Static verification that Source Ledger `[DELETE]` and `[CONFIRM]` use canonical
+      bracket-action tokens/classes and terminal-style hover/focus inversion, rather
+      than bespoke `.source-ledger-delete` / `.source-ledger-confirm` behavior that
+      diverges from `.bracket-action`.
+
+      2. Runtime/Playwright bounding-box proof that entering delete confirmation causes
+      zero Source Ledger row layout shift. Capture before/after row bounding boxes
+      and report exact delta; any non-zero material drift is blocker-class.
+
+      3. Static verification that `StatePortability.svelte` renders exact active labels
+      `[EXPORTING STATE...]` and `[IMPORTING STATE...]`.
+
+      4. Static or test proof that stale `background ingest will pick it up` user-visible
+      copy is gone or replaced with terse manual Source Ledger guidance consistent
+      with current manual ingest/fetch controls.
+
+      5. Product-boundary regression scan confirming no forbidden surfaces were introduced:
+      accounts, onboarding, settings, folders, tags, unread, archive, vector, RAG,
+      sync, queues, job dashboards, sidecars, workers, admin processes, multi-user
+      auth, or any extra runtime deployable.
+
+
+      Behavioral proof register required for gate decision:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      This retest protects downstream gates: `urda-final-black-box-runtime-ui-smoke`
+      and `urda-strict-final-gate`. Neither gate may open on unresolved R6/R7/R12/R18
+      statuses.'
+    verification: '- Static proof: `[DELETE]` and `[CONFIRM]` are canonical bracket
+      actions with expected hover/focus inversion behavior and no divergent bespoke
+      styling remains for these actions.
+
+      - Runtime proof: Playwright or equivalent browser automation records Source
+      Ledger row bounding boxes before and during delete confirmation; evidence shows
+      zero layout shift with exact numeric deltas.
+
+      - Static proof: State portability active labels exactly match `[EXPORTING STATE...]`
+      and `[IMPORTING STATE...]`.
+
+      - Copy proof: stale `background ingest will pick it up` copy is absent or replaced
+      with manual Source Ledger guidance, with file/line evidence or targeted test
+      proof.
+
+      - Product-boundary proof: forbidden product/runtime surfaces scan is clean;
+      no accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job
+      dashboards/sidecars/workers were introduced.
+
+      - Gate basis: behavioral proof register marks R6, R7, R12, and R18 PROVEN or
+      blocks with explicit remediation path.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of frontend-engineer)\n**Scope**: R6/R7/R12/R18 final spec/product\
+      \ boundary blocker closure\n**Independence Level**: L2\n**Timestamp**: <ISO\
+      \ 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each ref in this step:\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ui-preview.html — key passage\
+      \ or \"NOT READ: <reason>\"\n- docs/audits/ui-runtime-design-audit-2026-05-15.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/routes/components/SourceLedger.svelte\
+      \ — key passage or \"NOT READ: <reason>\"\n- web/src/app.css — key passage or\
+      \ \"NOT READ: <reason>\"\n- internal/resofeed/ranking.go — key passage or \"\
+      NOT READ: <reason>\"\n- web/src/routes/components/StatePortability.svelte —\
+      \ key passage or \"NOT READ: <reason>\"\n\n### Static Verification\n- Bracket\
+      \ action token/class findings for `[DELETE]` and `[CONFIRM]`:\n  ```\n  <grep\
+      \ or code inspection output>\n  ```\n- State portability active label findings:\n\
+      \  ```\n  <grep or code inspection output>\n  ```\n- Steering receipt copy findings:\n\
+      \  ```\n  <grep/test output proving stale copy absent/replaced>\n  ```\n\n###\
+      \ Runtime/Playwright Bounding-Box Proof\n- Command executed:\n  ```\n  <exact\
+      \ command>\n  ```\n- Before bounding box:\n  ```json\n  <row/action bounding\
+      \ box before confirmation>\n  ```\n- During confirmation bounding box:\n  ```json\n\
+      \  <row/action bounding box during confirmation>\n  ```\n- Numeric delta:\n\
+      \  ```\n  <x/y/width/height deltas; expected all zero or explicitly non-shifting\
+      \ within browser precision>\n  ```\n\n### Forbidden Surface Regression Scan\n\
+      - Commands/searches executed:\n  ```\n  <actual searches>\n  ```\n- Result:\
+      \ <clean or findings>\n\n### Behavioral Proof Register\n| requirement_ref |\
+      \ behavior_claim | runtime_proof_expected | evidence_ref | status | closure_path\
+      \ | gate_decision_basis |\n| --- | --- | --- | --- | --- | --- | --- |\n| R6\
+      \ | | | | | | |\n| R7 | | | | | | |\n| R12 | | | | | | |\n| R18 | | | | | |\
+      \ |\n\n### Headline\n- [ ] PASS: R6/R7/R12/R18 proven closed and no forbidden\
+      \ surfaces introduced\n- [ ] FAIL: blocker-class issue or proof gap remains\n\
+      \n**Confidence**: high/medium/low"
+    depends_on:
+    - urda-final-spec-boundary-blockers-fix
+    agent: integration-verifier
