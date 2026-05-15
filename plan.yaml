@@ -80864,7 +80864,7 @@ phases:
       - [x] Verify ARCH/source/runtime agreement for /api/steer/preview, /api/steer/undo,
       preview_steer, and undo_steer.
 
-      - [ ] Verify manual ingest/fetch response-shape regression tests prove the documented
+      - [x] Verify manual ingest/fetch response-shape regression tests prove the documented
       envelope exactly.
 
       - [ ] Verify ErrSteerContractOnly is removed or justified with real runtime
