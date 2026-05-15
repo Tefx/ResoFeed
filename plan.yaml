@@ -79640,7 +79640,7 @@ phases:
 
       - [x] All blocker-class proof gaps list explicit closure paths.
 
-      - [ ] gate_open_allowed is true only if blocking_status is CLOSED and no blocker-class
+      - [x] gate_open_allowed is true only if blocking_status is CLOSED and no blocker-class
       proof gaps remain.
 
       - [ ] Downstream backend/runtime phases remain blocked if the retest verdict
