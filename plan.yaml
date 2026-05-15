@@ -73732,7 +73732,7 @@ phases:
   steps:
   - id: plfu-api-client-types
     name: Update frontend API client types for language reprocess and delivery
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -73867,6 +73867,137 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T16:57:49.968176+00:00'
+    done_at: '2026-05-15T16:58:23.521827+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by execution agent; key passage: HTTP exposes
+      `GET/PUT /api/runtime/language`, `POST /api/runtime/reprocess-library`, strict
+      `400 bad_request`, `401 unauthorized`, `409 conflict`, and owner-token-only
+      auth; processing language is runtime metadata, not portable state.
+
+      - docs/DESIGN.md — Read by execution agent; key passage: Language control must
+      be terse (`LANG: EN/ZH`), reprocess is bracket-style with warning/live status,
+      no settings dashboard/progress dashboard/activity log, and source identifiers
+      must remain unchanged/non-translated.
+
+
+      ## Frontend Client Consumption Evidence
+
+      **Runtime gate/evidence consumed**: `plhm-runtime-gate` PASS evidence: runnable
+      HTTP/MCP liveness, language/reprocess/search query echo/delivery parity, strict
+      validation, auth, idempotency, and conflict/error shapes were proven.
+
+      **Runtime contract consumed**: `GET/PUT /api/runtime/language`, `POST /api/runtime/reprocess-library`,
+      canonical error bodies including 400/401/409/500, search response `query` echo.
+
+      **Client/type files changed**: `web/src/lib/api-client.ts`, `web/src/routes/+page.svelte`,
+      `web/src/app.css`, `web/src/test/setup.ts`, source identifier render components.
+
+      **Rendered downstream consumer**: `web/src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts`
+      now passes and exercises rendered language/reprocess controls.
+
+
+      ## Storage-Core Downstream Blocker Closure
+
+      | Blocker | Evidence | Status |
+
+      |---|---|---|
+
+      | frontend contract types not consumed by runtime client/routes | `ResoFeedApiClient`
+      consumes processing-language contract endpoint anchors and typed responses.
+      | closed |
+
+      | search query echo type missing from client use | Existing `SearchResponse.query:
+      SearchQueryEcho` remains represented and covered by `api-client.test.ts`. |
+      closed |
+
+      | language/reprocess response and error shapes consumed by client | Page uses
+      `processingLanguage`, `setProcessingLanguage`, and `reprocessLibrary` with success/conflict/failure
+      live output. | closed |
+
+      | type-only anchors misleading/unconsumed | Runtime endpoint anchor is consumed
+      by `api-client.ts`; delivery remains type-only because no rendered UI exposes
+      delivery reporting. | closed |
+
+
+      ## Contract Deviation Records
+
+      none
+
+
+      ## Checklist Closure
+
+      - Description checklist items toggled to `[x]` by execution agent with `vectl_check`.
+
+      - Verification checklist items marked `[x]` by orchestrator after validating
+      execution evidence and mainline verification.
+
+
+      ## Scope Note
+
+      Execution evidence included adjacent rendered UI files because this client step
+      required downstream rendered consumer proof. The dedicated source/split-scroll
+      step remains independently owned and was not considered complete based on this
+      step alone.
+
+
+      ## Files changed
+
+      - web/src/app.css
+
+      - web/src/lib/api-client.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/test/setup.ts
+
+
+      ## Commit hash(es)
+
+      - worktree commit: c3c2f9904b225684670206c481d6acd91c2e2c6a
+
+      - mainline squash commit: 25d8de29
+
+
+      ## Verification
+
+      Execution worktree verification:
+
+      - `npm test -- --run src/lib/processing-language-api-client.expected-red.test.ts
+      src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/api-client.test.ts` — PASS, 3 files / 9 tests.
+
+      - `npm run build` — PASS.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `npm --prefix web run check` — PASS, 0 errors / 0 warnings.
+
+      - `npm --prefix web run test:render -- src/lib/processing-language-api-client.expected-red.test.ts
+      src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/api-client.test.ts` — PASS, 3 files / 9 tests.
+
+      - `npm --prefix web run build` — PASS.
+
+
+      ## Spec link
+
+      docs/ARCHITECTURE.md; docs/DESIGN.md; plhm-runtime-gate; plct-contract-lock;
+      plct-frontend-expected-red-tests
+
+
+      ## Gaps/Notes
+
+      No settings dashboard, preference center, wizard, progress dashboard, or activity
+      log was added. Owner token remains the only auth header; `actor_id` is only
+      request attribution/idempotency metadata.'
   - id: plfu-language-reprocess-controls
     name: Render language control and reprocess library action
     status: pending
