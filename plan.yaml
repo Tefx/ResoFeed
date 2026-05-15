@@ -79124,7 +79124,7 @@ phases:
       exposes undo only for revocable source/rule writes, and preserves request-fingerprint
       idempotency.
 
-      - [ ] Tests prove POST /api/steer/undo is target-specific, idempotent for already
+      - [x] Tests prove POST /api/steer/undo is target-specific, idempotent for already
       inactive targets, and never behaves as last-action/global undo.
 
       - [ ] Tests prove MCP preview_steer, steer, and undo_steer parity with HTTP
