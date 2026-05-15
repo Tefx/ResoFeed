@@ -451,7 +451,7 @@
       <aside class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive}>
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}

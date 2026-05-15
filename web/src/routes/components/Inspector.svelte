@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import type { GroupedSourceItem, ItemDetail, ItemSummary } from '$lib/api-contract';
+  import type { GroupedSourceItem, ItemDetail, ItemSummary, Source } from '$lib/api-contract';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
@@ -14,6 +14,8 @@
   interface Props {
     item: InspectableItem | null;
     mode: InspectorMode;
+    groupedSourceCandidates?: ItemSummary[];
+    sources?: Source[];
     loading?: boolean;
     error?: string | null;
     focusHeading?: boolean;
@@ -21,7 +23,7 @@
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
   }
 
-  let { item, mode, loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
+  let { item, mode, groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let handledFocusRequestId = $state(-1);
@@ -279,21 +281,83 @@
     return lines.join('\n');
   }
 
-  function groupedSourceItems(value: InspectableItem): GroupedSourceItem[] {
-    if (!('provenance' in value)) return [];
-    return value.provenance.grouped_source_items ?? [];
+  type InspectorGroupedSourceItem = GroupedSourceItem;
+
+  function normalizedGroupingUrl(value: string | null | undefined): string | null {
+    if (!value) return null;
+    try {
+      const parsed = new URL(value);
+      parsed.hash = '';
+      parsed.search = '';
+      parsed.pathname = parsed.pathname.replace(/\/$/u, '');
+      return parsed.toString().toLowerCase();
+    } catch {
+      return value.trim().replace(/[?#].*$/u, '').replace(/\/$/u, '').toLowerCase() || null;
+    }
   }
 
-  function groupedSourcesLabel(items: GroupedSourceItem[]): string {
+  function sourceUrlFor(sourceId: string): string {
+    return sources.find((source) => source.id === sourceId)?.url ?? '';
+  }
+
+  function summaryToGroupedSourceItem(candidate: ItemSummary, value: InspectableItem): InspectorGroupedSourceItem {
+    return {
+      item_id: candidate.id,
+      source_id: candidate.source_id,
+      source_title: candidate.source_title,
+      source_url: sourceUrlFor(candidate.source_id),
+      url: candidate.url,
+      canonical_url: candidate.url,
+      title: candidate.title,
+      published_at: candidate.published_at,
+      first_seen_at: candidate.first_seen_at ?? null,
+      extraction_status: candidate.extraction_status,
+      model_status: candidate.model_status,
+      story_key: candidate.story_key,
+      duplicate_of_item_id: candidate.duplicate_of_item_id,
+      is_selected_item: candidate.id === value.id
+    };
+  }
+
+  function sameRuntimeGroup(candidate: ItemSummary, value: InspectableItem): boolean {
+    if (candidate.id === value.id) return true;
+    if (value.story_key && candidate.story_key === value.story_key) return true;
+    if (candidate.duplicate_of_item_id === value.id || value.duplicate_of_item_id === candidate.id) return true;
+    const selectedUrls = [
+      normalizedGroupingUrl(value.url),
+      'provenance' in value ? normalizedGroupingUrl(value.provenance.original_url) : null,
+      'provenance' in value ? normalizedGroupingUrl(value.provenance.canonical_url) : null
+    ].filter((candidateUrl): candidateUrl is string => candidateUrl !== null);
+    return selectedUrls.length > 0 && selectedUrls.includes(normalizedGroupingUrl(candidate.url) ?? '');
+  }
+
+  function groupedSourceItems(value: InspectableItem): InspectorGroupedSourceItem[] {
+    const fromDetail = 'provenance' in value ? (value.provenance.grouped_source_items ?? []) : [];
+    const inferred = groupedSourceCandidates
+      .filter((candidate) => sameRuntimeGroup(candidate, value))
+      .map((candidate) => summaryToGroupedSourceItem(candidate, value));
+    if (fromDetail.length <= 1 && inferred.length <= 1) return [];
+    const byItemId = new Map<string, InspectorGroupedSourceItem>();
+    for (const sourceItem of [...fromDetail, ...inferred]) {
+      byItemId.set(sourceItem.item_id, sourceItem);
+    }
+    return Array.from(byItemId.values()).sort((left, right) => {
+      if (left.item_id === value.id) return -1;
+      if (right.item_id === value.id) return 1;
+      return left.source_title.localeCompare(right.source_title) || left.item_id.localeCompare(right.item_id);
+    });
+  }
+
+  function groupedSourcesLabel(items: InspectorGroupedSourceItem[]): string {
     return `Grouped story with ${items.length} source ${items.length === 1 ? 'item' : 'items'}`;
   }
 
-  function groupedSourceHref(sourceItem: GroupedSourceItem): string {
+  function groupedSourceHref(sourceItem: InspectorGroupedSourceItem): string {
     return [sourceItem.url, sourceItem.canonical_url, sourceItem.source_url]
       .find((candidate): candidate is string => Boolean(candidate?.match(/^https?:\/\//))) ?? 'https://example.invalid/unavailable';
   }
 
-  function groupedSourceMeta(sourceItem: GroupedSourceItem): string {
+  function groupedSourceMeta(sourceItem: InspectorGroupedSourceItem): string {
     const parts = [
       sourceItem.is_selected_item ? 'selected' : 'grouped',
       sourceItem.story_key ? `story_key: ${sourceItem.story_key}` : null,

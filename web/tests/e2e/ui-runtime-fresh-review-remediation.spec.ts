@@ -120,6 +120,70 @@ const items: readonly ItemFixture[] = [
   }
 ] as const;
 
+const runtimeSameUrlSources = [
+  {
+    id: 'src_fresh_runtime_a',
+    url: 'https://fresh-runtime-a.example.test/rss.xml',
+    title: 'Fresh Runtime A',
+    last_fetch_at: '2026-05-15T14:10:00Z',
+    last_fetch_status: 'ok',
+    last_fetch_error: null,
+    is_active: true,
+    revision: 1
+  },
+  {
+    id: 'src_fresh_runtime_b',
+    url: 'https://fresh-runtime-b.example.test/rss.xml',
+    title: 'Fresh Runtime B',
+    last_fetch_at: '2026-05-15T14:11:00Z',
+    last_fetch_status: 'ok',
+    last_fetch_error: null,
+    is_active: true,
+    revision: 1
+  }
+] as const;
+
+const runtimeSameUrlItems: readonly ItemFixture[] = [
+  {
+    id: 'item_fresh_runtime_a_primary',
+    source_id: 'src_fresh_runtime_a',
+    source_title: 'Fresh Runtime A',
+    url: 'https://fresh-runtime.example.test/alpha-today-primary-story',
+    title: 'Alpha Today Primary Story',
+    summary: 'Primary same-URL runtime story from source A.',
+    core_insight: 'The Inspector must disclose both same-URL source rows on mobile.',
+    value_tier: 'high',
+    published_at: '2026-05-15T10:00:00Z',
+    first_seen_at: '2026-05-15T10:00:00Z',
+    extraction_status: 'full',
+    model_status: 'ok',
+    is_resonated: false,
+    human_inspected_at: null,
+    external_surfaced_at: null,
+    story_key: null,
+    duplicate_of_item_id: null
+  },
+  {
+    id: 'item_fresh_runtime_b_same_url',
+    source_id: 'src_fresh_runtime_b',
+    source_title: 'Fresh Runtime B',
+    url: 'https://fresh-runtime.example.test/alpha-today-primary-story',
+    title: 'Alpha Today Primary Story',
+    summary: 'Same URL runtime story from source B.',
+    core_insight: 'The grouped source disclosure must not rely solely on mocked detail provenance.',
+    value_tier: 'high',
+    published_at: '2026-05-15T09:50:00Z',
+    first_seen_at: '2026-05-15T09:50:00Z',
+    extraction_status: 'full',
+    model_status: 'ok',
+    is_resonated: false,
+    human_inspected_at: null,
+    external_surfaced_at: null,
+    story_key: null,
+    duplicate_of_item_id: null
+  }
+] as const;
+
 async function writeProof(testInfo: TestInfo, name: string, proof: unknown): Promise<void> {
   const outputDir = path.join(testInfo.outputDir, 'ui-runtime-fresh-review-remediation-proof');
   fs.mkdirSync(outputDir, { recursive: true });
@@ -188,6 +252,43 @@ async function installContractFixtureApi(page: Page, ownerToken: string): Promis
     }
     if (url.pathname.endsWith('/fetch') && request.method() === 'POST') {
       return route.fulfill({ json: { ingest: { scope: 'source', source_id: 'src_primary_story', status: 'completed', started_at: '2026-05-15T14:00:00Z', completed_at: '2026-05-15T14:00:01Z', duration_ms: 1000, sources_attempted: 1, sources_succeeded: 1, sources_failed: 0, items_upserted: 0, errors: [] }, source: sources[0] } });
+    }
+    return route.fulfill({ status: 404, json: { error: { code: 'not_found', message: 'not found', details: {} } } });
+  });
+}
+
+async function installRuntimeSameUrlApi(page: Page): Promise<void> {
+  await page.unroute('**/api/**');
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.pathname === '/api/feed/today') return route.fulfill({ json: { items: runtimeSameUrlItems } });
+    if (url.pathname === '/api/sources') return route.fulfill({ json: { sources: runtimeSameUrlSources } });
+    if (url.pathname === '/api/steer/active') return route.fulfill({ json: { rules: [] } });
+    if (url.pathname.startsWith('/api/items/') && request.method() === 'GET') {
+      const id = url.pathname.split('/').at(-1) ?? '';
+      const item = runtimeSameUrlItems.find((candidate) => candidate.id === id) ?? runtimeSameUrlItems[0];
+      const source = runtimeSameUrlSources.find((candidate) => candidate.id === item.source_id) ?? runtimeSameUrlSources[0];
+      return route.fulfill({
+        json: {
+          item: {
+            ...item,
+            feed_excerpt: `${item.title} feed excerpt`,
+            extracted_text: `${item.title} extracted article text.`,
+            provenance: {
+              source_url: source.url,
+              canonical_url: item.url,
+              original_url: item.url,
+              story_key: item.story_key,
+              duplicate_of_item_id: item.duplicate_of_item_id,
+              grouped_source_items: []
+            }
+          }
+        }
+      });
+    }
+    if (url.pathname.endsWith('/inspect')) {
+      return route.fulfill({ json: { item_id: runtimeSameUrlItems[0].id, human_inspected_at: '2026-05-15T12:00:00Z', already_applied: false } });
     }
     return route.fulfill({ status: 404, json: { error: { code: 'not_found', message: 'not found', details: {} } } });
   });
@@ -285,6 +386,29 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
         href: anchor.getAttribute('href') ?? '',
         ariaLabel: anchor.getAttribute('aria-label')
       }))
+    })));
+  });
+
+  test('B1: mobile served-app Inspector discloses both Fresh Runtime same-URL grouped sources when detail provenance is sparse', async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await installRuntimeSameUrlApi(page);
+    await page.reload();
+    await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+
+    const primary = page.locator('.contract-feed-item', { hasText: 'Alpha Today Primary Story' }).first();
+    await primary.getByRole('button', { name: /Open Inspector for:/ }).click();
+    const inspector = page.locator('.contract-inspector');
+    await expect(inspector).toBeVisible();
+    await expect(inspector, 'mobile Inspector must still show the primary source provenance').toContainText('Fresh Runtime A');
+    await expect(inspector, 'mobile Inspector must disclose the grouped same-URL source from the runtime feed list').toContainText('Fresh Runtime B');
+    await expect(inspector, 'mobile Inspector must disclose both same-URL source items').toContainText(/Grouped story with 2 source items/i);
+    await writeProof(testInfo, 'b1-mobile-runtime-same-url-grouped-sources', await inspector.locator('.contract-grouped-sources').evaluate((element) => ({
+      viewport: { width: 390, height: 844 },
+      text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      sourceLinks: Array.from(element.querySelectorAll('a')).map((anchor) => anchor.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
+      detailProvidedGroupedItems: 0,
+      feedProvidedSameUrlItems: 2,
+      exposedGap: 'B1 public runtime mobile Inspector must expose both Fresh Runtime A and Fresh Runtime B for same-URL items.'
     })));
   });
 
