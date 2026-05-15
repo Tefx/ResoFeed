@@ -65941,7 +65941,7 @@ phases:
       \ is now committed on main as `43adef6` for subsequent steps."
   - id: ui-runtime-fresh-review-duplicate-source-inspector-fix
     name: Render grouped duplicate source disclosure in Inspector
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -66038,6 +66038,8 @@ phases:
     - ui-runtime-fresh-review-contract-red-tests
     - ui-runtime-fresh-review-duplicate-source-api-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-15T07:32:34.562289+00:00'
   - id: ui-runtime-fresh-review-green-retest
     name: Retest fresh audit fixes to green
     status: pending
