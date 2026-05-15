@@ -63794,7 +63794,7 @@ phases:
     agent: gate-reviewer
   - id: urda-final-spec-boundary-blockers-fix
     name: Fix final spec/product boundary blockers R6 R7 R12 R18
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -63967,6 +63967,167 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T03:43:48.542926+00:00'
+    done_at: '2026-05-15T03:52:32.138756+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - .agents/instructions.md — Canonical docs are `docs/ARCHITECTURE.md` and `docs/DESIGN.md`;
+      Source Ledger must remain flat with no folders/tags/settings/unread/archive
+      surfaces.
+
+      - docs/ARCHITECTURE.md — One binary/one SQLite boundary; manual ingest/fetch
+      uses in-process guard with no queues/jobs/ledgers; state portability is active
+      sources/rules/resonated items only.
+
+      - docs/PRD.md — Source Ledger may expose `[RUN INGEST]` and `[FETCH]`; no jobs,
+      queues, retry dashboards, command histories, activity ledgers, or sync/merge
+      state.
+
+      - docs/DESIGN.md — Bracket actions include `[DELETE]`; `.bracket-action` requires
+      monospace text-only buttons, enlarged hitboxes, terminal hover/focus inversion,
+      no layout shift; State Portability active labels are exact `[EXPORTING STATE...]`
+      / `[IMPORTING STATE...]`.
+
+      - docs/DESIGN_VISION.md — Source Ledger is a barebones flat text roster; `[FETCH]`/`[DELETE]`
+      should not shift source metadata.
+
+      - docs/USAGE.md — Immediate refresh guidance belongs in Source Ledger `[RUN
+      INGEST]` / `[FETCH]`, with no jobs/queues/activity history.
+
+      - docs/ui-preview.html — Preview uses canonical `.bracket-action` styles with
+      immediate hover/focus inversion and `[DELETE]` button in Source Ledger rows.
+
+      - docs/audits/ui-runtime-design-audit-2026-05-15.md — Audit recorded bracket-action
+      hover/focus weakness and delete confirmation row height shift from 101px to
+      102px.
+
+      - web/src/routes/components/SourceLedger.svelte — `[DELETE]`/`[CONFIRM]` used
+      `.source-ledger-delete` / `.source-ledger-confirm` instead of canonical `.bracket-action`.
+
+      - web/src/app.css — Bespoke delete/confirm styles lacked bracket-action inversion;
+      `.bracket-action` already had token-based inversion.
+
+      - internal/resofeed/ranking.go — Source URL steering receipt still said “background
+      ingest will pick it up”.
+
+      - web/src/routes/components/StatePortability.svelte — Active labels rendered
+      `[EXPORTING...]` / `[IMPORTING...]`.
+
+
+      ## Blocker Closure Evidence
+
+      | Blocker | Files changed | Exact change | Proof command/artifact | Status |
+
+      | --- | --- | --- | --- | --- |
+
+      | R6 bracket actions | `web/src/routes/components/SourceLedger.svelte`, `web/src/app.css`,
+      `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      | `[DELETE]` and `[CONFIRM]` now use `bracket-action bracket-action--delete/--confirm`;
+      bespoke non-inverting delete/confirm CSS removed; focused Playwright assertion
+      checks canonical classes and terminal inversion RGB values. | Worktree Playwright
+      command exit 0, 6 passed; mainline Playwright command exit 0, 6 passed. | Closed
+      |
+
+      | R7 no-layout-shift harness/support | `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`,
+      `web/src/app.css` | Direct bounding-box regression remains enabled and now runs
+      with canonical fixed-width bracket actions; action widths stay reserved at `12ch`.
+      | Worktree and mainline Playwright test “Issue 13: delete confirmation preserves
+      Source Ledger row bounds” passed. | Closed |
+
+      | R12 stale copy | `internal/resofeed/ranking.go`, `internal/resofeed/pbar_steer_receipt_remediation_test.go`
+      | Replaced stale “background ingest will pick it up” receipt with `visible in
+      SOURCE LEDGER; use [RUN INGEST] or row [FETCH] there for immediate refresh`;
+      regression forbids stale/background-only and queue/job/worker copy. | Worktree
+      and mainline `go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`
+      exit 0. | Closed |
+
+      | R18 active labels | `web/src/routes/components/StatePortability.svelte` |
+      Export/import active labels changed exactly to `[EXPORTING STATE...]` and `[IMPORTING
+      STATE...]`. | Worktree and mainline `npm run check` exit 0. | Closed |
+
+
+      ## Product Boundary Scan
+
+      - forbidden accounts/onboarding/settings/folders/tags/unread/archive/vector/RAG/sync/queues/job
+      dashboards/sidecars introduced: none.
+
+      - Existing OPML text `folders flattened` remains unchanged and is allowed by
+      the Source Ledger OPML contract.
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: `59613f95e9fa0176526c4979bc6164585d2388ae`
+
+      - Main squash merge commit: `61914c0` (`[vectl] step-urda-final-spec-boundary-blockers-fix
+      completed`)
+
+
+      ## Files changed
+
+      - `internal/resofeed/pbar_steer_receipt_remediation_test.go`
+
+      - `internal/resofeed/ranking.go`
+
+      - `web/src/app.css`
+
+      - `web/src/routes/components/SourceLedger.svelte`
+
+      - `web/src/routes/components/StatePortability.svelte`
+
+      - `web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`
+
+      - `web/tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+
+
+      ## Verification
+
+      Worktree verification reported by frontend-engineer:
+
+      - `npm run check` — exit 0; `svelte-check found 0 errors and 0 warnings`.
+
+      - `npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`
+      — exit 0; 1 file passed, 6 tests passed.
+
+      - `go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`
+      — exit 0.
+
+      - `npx playwright test --config ./playwright.config.ts source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe` — exit 0; 6 passed.
+
+      - `git status --short && git rev-parse HEAD` after worktree commit — clean status;
+      HEAD `59613f95e9fa0176526c4979bc6164585d2388ae`.
+
+
+      Mainline final-state verification after squash merge:
+
+      - `go test ./internal/resofeed -run TestPBARSourceURLSteeringReceiptNamesSourceAndNextAction`
+      — PASS (`ok resofeed/internal/resofeed 0.484s`).
+
+      - `npm run check` in `web` — PASS; `svelte-check found 0 errors and 0 warnings`.
+
+      - `npm run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts`
+      in `web` — PASS; 1 file passed, 6 tests passed.
+
+      - `npm run build` in `web` — PASS; Vite/SvelteKit built production output.
+
+      - `npx playwright test --config ./playwright.config.ts source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      --project=chromium-ci-safe` in `web` — PASS; 6 passed including R6 inversion
+      and R7 bounding-box regression.
+
+
+      ## Gaps/Notes
+
+      - `web/node_modules` was absent in the isolated worktree, so frontend-engineer
+      ran `npm install` there to restore local web dependencies; no dependency files
+      were modified.
+
+      - Mainline Playwright verification produced/restored tracked `.test-artifacts`;
+      untracked local test artifacts remain as pre-existing/generated workspace noise
+      and were not included in the step commit.
+
+      - Downstream `urda-final-spec-boundary-blockers-uiux-audit` and `urda-final-spec-boundary-blockers-retest`
+      remain responsible for independent visual/runtime closure proof before final
+      gate.'
   - id: urda-final-spec-boundary-blockers-retest
     name: Retest final spec/product boundary blocker closures R6 R7 R12 R18
     status: pending
