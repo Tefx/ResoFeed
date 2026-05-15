@@ -80040,7 +80040,7 @@ phases:
 
       - [x] Exercise GET /api/search and GET /api/doctor as read-only paths.
 
-      - [ ] Record actual command/output, not only test pass summaries.'
+      - [x] Record actual command/output, not only test pass summaries.'
     verification: '- [ ] local-check protecting steer-delta-backend-http-mcp-runtime.gate.
 
       - [ ] Entry point starts, accepts at least one documented operation, and produces
