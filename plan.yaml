@@ -65414,6 +65414,208 @@ phases:
       ## Programmatic Handoff
 
       `{"status":"PASS","proof_gap_status":"NONE","blocking_status":"CLOSED","gate_recommendation":"OPEN","verdict":"PASS","blockers":[],"gate_open_allowed":true,"orchestrator_action_hint":"COMPLETE","artifacts_modified":[]}`'
+  - id: urda-historical-evidence-guard-disposition
+    name: Record historical evidence guard disposition for URDA strict gate rerun
+    status: done
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      agent_source: default
+
+
+      Plan-state disposition step for the historical completed-evidence guard on `urda-strict-final-gate-rerun`.
+
+
+      This step does NOT perform product implementation and does NOT create new verification
+      evidence. It records the already-existing same-phase closure basis in validator-recognizable
+      form so global plan validation can distinguish provenance from disposition.
+
+
+      Provenance:
+
+      - The flagged text is historical prior-failure evidence inside `urda-strict-final-gate-rerun`,
+      not an open processing-language blocker.
+
+      - The evidence was already superseded by completed same-phase closure artifacts:
+      `urda-uiux-multimodal-design-audit-persist` and `urda-strict-final-gate-rerun`.
+
+
+      Disposition:
+
+      - blocking-now: NO for processing-language dispatch after durability commit.
+
+      - blocking-later: NO; the following completed phase `ui-runtime-fresh-review-remediation`
+      also closed after the URDA phase.
+
+      - non-blocking: YES, because the prior frontend block was explicitly superseded
+      and the strict rerun evidence contains `headline: PASS`, `gate_recommendation:
+      OPEN`, `blocking_status: CLOSED`, `proof_gap_status: NONE`, and `gate_open_allowed:
+      true`.
+
+
+      ## Completion Criteria
+
+      - [ ] Existing completed evidence cited; no new test/runtime evidence fabricated.
+
+      - [ ] Historical prior-failure provenance is separated from current disposition.
+
+      - [ ] Gate-intersection disposition states whether this blocks current processing-language
+      implementation dispatch.
+
+      - [ ] Evidence records green/OPEN/gate_open_allowed=true closure basis for the
+      historical guard.
+
+      - [ ] No product code or documentation files are modified by this plan-state
+      repair.'
+    verification: '- [ ] Same-phase later disposition exists after `urda-strict-final-gate-rerun`.
+
+      - [ ] Evidence cites the already-completed PASS/OPEN/gate_open_allowed=true
+      closure basis rather than claiming new execution.
+
+      - [ ] Gate-intersection disposition explicitly marks the historical prior-failure
+      evidence as non-blocking for remaining required gates.
+
+      - [ ] `vectl_review(check_refs=true)` or `vectl_validate(check_refs=true)` no
+      longer reports the completed-evidence guard for `urda-strict-final-gate-rerun`.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md — key passage
+      or "NOT READ: <reason>"
+
+      - docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md — key passage
+      or "NOT READ: <reason>"
+
+      - docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — key passage or "NOT
+      READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Historical Evidence Guard Disposition
+
+
+      **Flagged step**: `urda-strict-final-gate-rerun`
+
+      **Disposition basis**: existing completed plan evidence only; no new runtime
+      execution.
+
+
+      ## Gate-Intersection Register
+
+      | item | provenance | disposition | evidence_ref | gate_intersection |
+
+      | --- | --- | --- | --- | --- |
+
+      | historical prior frontend blocked artifact | prior completed evidence | non-blocking,
+      superseded | `urda-uiux-multimodal-design-audit-persist`; `urda-strict-final-gate-rerun`
+      | does not intersect remaining processing-language gates |
+
+
+      ## Closure Decision
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - gate_recommendation: OPEN
+
+      - gate_open_allowed: true
+
+      - dispatch_safety_after_durability_commit: true
+
+
+      ## Files changed
+
+      - plan.yaml only'
+    depends_on:
+    - urda-strict-final-gate-rerun
+    agent: vectl-planner
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/audits/urda-uiux-multimodal-design-audit-2026-05-15.md — READ via existing
+      completed plan evidence in `urda-uiux-multimodal-design-audit-persist` and `urda-strict-final-gate-rerun`;
+      key passage cited there: persisted UIUX/multimodal artifact verdict `PASS`,
+      R6/R7/R12/R18 verified, and prior frontend block explicitly superseded `YES`.
+
+      - docs/audits/urda-final-black-box-runtime-ui-smoke-2026-05-15.md — READ via
+      existing completed plan evidence in `urda-strict-final-gate-rerun`; key passage
+      cited there: persisted black-box smoke verdict `PASS`; real `resofeed serve`
+      with isolated SQLite DB; public workflows passed including Source Ledger `[RUN
+      INGEST]`, row `[FETCH]`, OPML, state export/import, Search, Feed, Inspector,
+      `/doctor`, and mobile surfaces.
+
+      - docs/audits/urda-frontend-ui-audit-gate-2026-05-15.md — READ via existing
+      completed plan evidence in `urda-uiux-multimodal-design-audit-persist` and `urda-strict-final-gate-rerun`;
+      key passage cited there: prior frontend block was superseded by the later UIUX
+      artifact and exact frontend audit subset rerun passed 12/12.
+
+
+      ## Historical Evidence Guard Disposition
+
+
+      **Flagged step**: `urda-strict-final-gate-rerun`
+
+      **Repair type**: later same-phase closure/disposition step recognized by the
+      completed-evidence guard guidance.
+
+      **Evidence source**: existing completed plan evidence only; no new runtime execution
+      and no product-code verification was fabricated.
+
+
+      ## Gate-Intersection Register
+
+      | item | provenance | disposition | evidence_ref | gate_intersection |
+
+      | --- | --- | --- | --- | --- |
+
+      | prior frontend blocked artifact mentioned in `urda-strict-final-gate-rerun`
+      evidence | historical prior completed evidence | non-blocking, superseded |
+      `urda-uiux-multimodal-design-audit-persist` evidence: `headline: PASS`, `blocking_status:
+      CLOSED`, `gate_open_allowed: true`; `urda-strict-final-gate-rerun` evidence:
+      `gate_recommendation: OPEN`, `blockers: []`, `gate_open_allowed: true` | does
+      not intersect remaining processing-language gates because the URDA phase and
+      following `ui-runtime-fresh-review-remediation` phase are completed, and processing-language
+      phases depend only on the closed chain |
+
+      | transient command failures mentioned in `urda-strict-final-gate-rerun` evidence
+      | historical execution notes during the strict rerun | non-blocking, final reruns
+      passed | `urda-strict-final-gate-rerun` verification: `npm --prefix web run
+      check` exit 0, targeted e2e 12 passed, `npm --prefix web run build` rerun exit
+      0 | no remaining gate intersection; final status recorded PASS/OPEN |
+
+
+      ## Closure Decision
+
+      - headline: PASS
+
+      - proof_gap_status: NONE
+
+      - blocking_status: CLOSED
+
+      - gate_recommendation: OPEN
+
+      - gate_open_allowed: true
+
+      - dispatch_safety_after_durability_commit: true
+
+
+      ## Files changed
+
+      - plan.yaml only
+
+
+      ## Notes
+
+      - This is a plan-state guard disposition for historical evidence hygiene. It
+      does not alter processing-language-* steps and does not implement product code.'
 - id: ui-runtime-fresh-review-remediation
   name: UI Runtime Fresh Review Remediation
   status: done
