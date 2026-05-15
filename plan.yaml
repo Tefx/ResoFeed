@@ -68009,7 +68009,7 @@ phases:
       Go binary/server, clean DB, owner token, documented HTTP import, and runtime
       ingest.
 
-      - [ ] 390x844 mobile browser proof opens/selects the primary duplicate story
+      - [x] 390x844 mobile browser proof opens/selects the primary duplicate story
       Inspector.
 
       - [ ] Fresh evidence shows both `Fresh Runtime A` and `Fresh Runtime B` in the
