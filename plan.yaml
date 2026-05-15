@@ -72357,7 +72357,7 @@ phases:
 
       - [x] At least one HTTP operation reaches the real route.
 
-      - [ ] At least one MCP operation reaches the real `/mcp` route.
+      - [x] At least one MCP operation reaches the real `/mcp` route.
 
       - [ ] Actual commands and outputs are pasted, not summarized.'
     verification: '- [ ] Runtime launch command succeeds.
