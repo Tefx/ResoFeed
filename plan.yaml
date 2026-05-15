@@ -79544,3 +79544,71 @@ phases:
     - srde2e-visual-a11y-regression-proof
     - srde2e-documentation-sync
     agent: software-architect
+  - id: srde2e-backend-architecture-remediation
+    name: Remediate backend architecture review findings
+    status: pending
+    description: 'step_type: implementation
+
+
+      Batched remediation for backend/runtime findings from srde2e-software-architect-fresh-review.
+      If the review verdict is CLEAN or contains no backend/runtime findings, provide
+      explicit no-op evidence and do not modify code.
+
+
+      Acceptance checklist:
+
+      - [ ] Address ALL backend/runtime blocker and should_fix findings from the software-architect
+      review, not just the first.
+
+      - [ ] Preserve single Go binary, SQLite/FTS5, flat internal/resofeed files,
+      owner-token boundary, lexical-only search, no-RAG, and no forbidden state surfaces.
+
+      - [ ] For each finding, run the provided grep/search hint and search for sibling
+      instances beyond listed locations.
+
+      - [ ] Provide root cause vs symptom explanation for every blocker-class finding.
+
+      - [ ] If no applicable findings exist, record CLEAN no-op evidence with the
+      review citation.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable
+      for any actual fix.'
+    verification: '- [ ] Every backend/runtime blocker or should_fix from srde2e-software-architect-fresh-review
+      is resolved or explicitly no-op because no applicable findings exist.
+
+      - [ ] Focused regression tests and/or real runtime proof cover each remediated
+      finding.
+
+      - [ ] Sibling search evidence is provided for each blocker/should_fix.
+
+      - [ ] No forbidden architecture/product concept introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PRD.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      ## Backend Architecture Remediation Evidence
+
+      - Review finding IDs addressed or no-op rationale:
+
+      - Root cause vs symptom:
+
+      - Files changed:
+
+      - Grep/sibling search output:
+
+      - Tests/runtime proof:
+
+      '
+    depends_on:
+    - srde2e-software-architect-fresh-review
+    agent: golang-developer
