@@ -78516,7 +78516,7 @@ phases:
 
       - [ ] The exact failing command exits 0 after remediation.
 
-      - [ ] The seven-test closure matrix marks all seven failures PASS with artifact
+      - [x] The seven-test closure matrix marks all seven failures PASS with artifact
       references.
 
       - [ ] Desktop and mobile rendered artifacts are reviewed for changed surfaces.
