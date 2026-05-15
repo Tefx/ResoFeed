@@ -75299,7 +75299,7 @@ phases:
 
       - [x] HTTP search and MCP `search_items` include equivalent `query` echo.
 
-      - [ ] HTTP delivery and MCP `report_delivery` update the same item state and
+      - [x] HTTP delivery and MCP `report_delivery` update the same item state and
       replay/mismatch semantics.
 
       - [ ] Missing/invalid owner token fails before operation; `actor_id` alone grants
