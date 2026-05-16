@@ -89010,7 +89010,7 @@ phases:
 
       - [x] `npm --prefix web run test:render` remains green.
 
-      - [ ] `npm --prefix web run test:e2e` is green, or residual failures are dispositioned
+      - [x] `npm --prefix web run test:e2e` is green, or residual failures are dispositioned
       exactly according to adjudication with ownership.
 
       - [ ] `npm --prefix web run check` remains green.
