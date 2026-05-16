@@ -92217,3 +92217,124 @@ phases:
 
       - [ ] FAIL'
     agent: software-architect
+  - id: azrv-uiux-multimodal-audit
+    name: Run native multimodal UIUX audit for low-chrome and zh repair
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+
+      As uiux-auditor, perform a native multimodal implementation audit against DESIGN.md
+      using real rendered artifacts, not `design-version/` paths. The active static
+      preview artifact is `docs/ui-preview.html`, and runtime screenshots/DOM evidence
+      are required.
+
+
+      Audit required states/viewports:
+
+      - Desktop EN: closed RESOFEED menu, opened RESOFEED menu, Source Ledger with
+      `last_ingest` and `[RUN INGEST]`, Inspector with model-backed summary provenance.
+
+      - Desktop ZH: LANG/reprocess controls, reprocess confirmation/running/complete
+      or mocked equivalent state, localized status/receipt/Inspector chrome, unchanged
+      source identifiers.
+
+      - Mobile/narrow: no persistent forbidden route chrome; menu/surface access remains
+      low-chrome and usable.
+
+      - OPML import: visible import receipt without auto-ingest progress or dashboard
+      behavior.
+
+      - Preview artifact: `docs/ui-preview.html` visually represents current language/reprocess
+      and Source Ledger/Inspector contracts.
+
+
+      UIUX gate rejects:
+
+      - persistent `TODAY`/`SOURCE LEDGER` route labels outside open menu or active
+      content;
+
+      - persistent compact `T`/`SL` route buttons unless explicitly accepted by DESIGN.md;
+
+      - left-aligned `last_ingest` that is not visually grouped with `[RUN INGEST]`;
+
+      - visible `semantic retrieval`/RAG explanatory copy in product chrome;
+
+      - `model: ok` in Inspector header;
+
+      - English-only zh control/receipt/status copy where localized chrome is required;
+
+      - source identifiers visually translated/rewritten.
+
+
+      ## Completion Criteria
+
+      - [ ] Audit includes screenshots or multimodal artifacts for required EN/ZH
+      desktop and mobile states.
+
+      - [ ] Audit produces parseable PASS/PASS_WITH_DEBT/FAIL handoff.
+
+      - [ ] Any findings include severity, surface, artifact reference, and reproduction
+      notes.
+
+      - [ ] PASS requires all blocker-class visual/design obligations to be proven
+      or non-intersecting.'
+    verification: '- [ ] Phase-check protects final closure with native multimodal
+      evidence, not DOM-only assertions.
+
+      - [ ] EN and ZH rendered states are both audited.
+
+      - [ ] Low-chrome navigation, Source Ledger alignment, OPML boundary, Inspector
+      provenance, and preview drift are all covered.
+
+      - [ ] Parseable UIUX verdict is present.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Audit Handoff
+
+      **Verdict**: PASS | PASS_WITH_DEBT | FAIL
+
+
+      ## Artifacts
+
+      | State | Viewport | Artifact | Verdict |
+
+      |---|---|---|---|
+
+      | EN closed menu | desktop | | |
+
+      | EN open menu | desktop | | |
+
+      | Source Ledger header | desktop | | |
+
+      | Inspector provenance | desktop | | |
+
+      | ZH language/reprocess | desktop | | |
+
+      | Mobile low chrome | narrow | | |
+
+      | docs/ui-preview.html | static preview | | |
+
+
+      ## Findings
+
+      | Severity | Finding | Surface | Artifact | Reproduction |
+
+      |---|---|---|---|---|'
+    agent: uiux-auditor
