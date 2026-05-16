@@ -85789,7 +85789,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Rendered/browser-observable artifacts are captured for Source Ledger live
+      - [x] Rendered/browser-observable artifacts are captured for Source Ledger live
       row and Steer preview/commit/undo controls.
 
       - [ ] Source Ledger shows the imported live row, visible controls, and the required
