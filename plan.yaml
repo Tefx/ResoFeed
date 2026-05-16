@@ -88861,7 +88861,7 @@ phases:
       - product_implementation_files_modified: no'
   - id: srde2e-full-plan-e2e-blockers-fix
     name: Execute adjudicated residual full-plan E2E fixes
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -89162,6 +89162,8 @@ phases:
     depends_on:
     - srde2e-e2e-contract-adjudication
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T11:06:30.178507+00:00'
   - id: srde2e-full-plan-e2e-blockers-retest
     name: Retest batched full-plan E2E blocker closure
     status: pending
