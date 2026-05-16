@@ -83805,7 +83805,7 @@ phases:
       \ family: B1/R2, B2/R4, B3/R7, B4/R9, R10.\n- `srdf-uiux-native-audit` blocker\
       \ family: `[ADD SOURCE]`, `[FETCH]`, split scroll/mobile scroll, forbidden JSON-LD\
       \ raw payload, mobile metadata truncation, and claimed 34 Playwright expected-red\
-      \ failures.\n\nRequired command evidence:\n- [x] Run `npm run test`.\n- [ ]\
+      \ failures.\n\nRequired command evidence:\n- [x] Run `npm run test`.\n- [x]\
       \ Run focused E2E covering `source-ledger-steer-split-scroll.expected-red.spec.ts`,\
       \ `processing-language-source-split-scroll.spec.ts`, and `feed-search-anatomy.spec.ts`.\n\
       - [ ] Run Source Ledger controls/hit-target E2E.\n- [ ] Run forbidden concept\
