@@ -97958,16 +97958,16 @@ phases:
 
       - [x] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
       top-chrome status was introduced.'
-    verification: '- [ ] Main path: targeted Vitest and/or browser tests still accept
+    verification: '- [x] Main path: targeted Vitest and/or browser tests still accept
       documented current-operation count/detail payloads.
 
-      - [ ] Failure path: Playwright conflict scenario proves `error.details.current_operation`
+      - [x] Failure path: Playwright conflict scenario proves `error.details.current_operation`
       detail renders contextually.
 
-      - [ ] Duplicate closure: evidence demonstrates the strict-mode duplicate `err:
+      - [x] Duplicate closure: evidence demonstrates the strict-mode duplicate `err:
       ingest already running` status issue is resolved or was selector-only and corrected.
 
-      - [ ] Product guard: no persistent top-chrome status, dashboard, jobs, queues,
+      - [x] Product guard: no persistent top-chrome status, dashboard, jobs, queues,
       activity ledger, settings, sidecar, or service-layer drift is introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
