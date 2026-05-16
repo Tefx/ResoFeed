@@ -84392,7 +84392,7 @@ phases:
       \ concept scan across frontend Svelte/TS user-facing surfaces.\n- [x] If any\
       \ named command is absent due harness drift, provide exact discovery output\
       \ proving absence and run the nearest current command that covers the same user-visible\
-      \ obligation.\n\nRequired rendered artifact evidence:\n- [ ] Source Ledger navigation/menu\
+      \ obligation.\n\nRequired rendered artifact evidence:\n- [x] Source Ledger navigation/menu\
       \ and visible/reachable hit-target behavior.\n- [ ] Source Ledger `[IMPORT OPML]`\
       \ keyboard/file reachability preserved.\n- [ ] TODAY surface selector/rendered\
       \ artifact proof.\n- [ ] Mobile metadata text visibility/truncation proof for\
