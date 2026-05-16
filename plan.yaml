@@ -91079,6 +91079,126 @@ phases:
     criteria and expected-red browser/contract tests before implementation.
   depends_on:
   - steer-delta-e2e-architecture-review-closure
+  steps:
+  - id: azrct-closure-matrix
+    name: Lock repair and zh completeness closure matrix
+    status: pending
+    description: 'step_type: contract
+
+      contract_purity: ENFORCED
+
+      agent_source: project
+
+
+      Build a closure matrix for the recent `uiux-auditor` FAIL, `software-architect`
+      PASS_WITH_DEBT, and Chinese/zh completeness audit. This is a contract step:
+      acceptance definitions, test names, and proof obligations only; do not ship
+      product implementation logic.
+
+
+      Anchors:
+
+      - spec_refs: docs/DESIGN.md Components/App Shell, Language Control, Reprocess
+      Library Action, Inspector Pane, Source Ledger, Do''s and Don''ts; docs/ARCHITECTURE.md
+      §§3.5, 4.7, 4.8, 5.5, 5.6, HTTP/MCP processing-language addenda; docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md.
+
+      - touch_paths: tests/contract or web/tests/e2e contract fixtures only; no production
+      code.
+
+      - harness_refs: existing Playwright E2E harness and Go processing-language tests.
+
+      - authoritative_interface: existing HTTP/MCP processing-language and reprocess
+      endpoints; existing Source Ledger and App Shell DOM contracts.
+
+
+      Closure matrix MUST cover:
+
+      - F1 persistent route labels: `TODAY` and `SOURCE LEDGER` may be visible only
+      inside the open `RESOFEED` menu, except legitimate feed time-group labels/headings
+      or active surface content.
+
+      - F2 Source Ledger header alignment: `last_ingest` must right-align with `[RUN
+      INGEST]` in `.source-ledger__header` without pushing title/action geometry.
+
+      - P1 OPML import boundary: frontend OPML import must not automatically call
+      `runIngest()`; manual `[RUN INGEST]` remains explicit.
+
+      - P2 visible copy: reduce explanatory architecture terms (`semantic retrieval`,
+      `no semantic retrieval`, RAG boundary phrasing) to terse operational copy while
+      preserving safety boundary in tests/specs.
+
+      - P2 compact nav: `T`/`SL` persistent quick buttons require removal or explicit
+      design acceptance; default acceptance is removal from persistent chrome.
+
+      - P2 preview drift: `docs/ui-preview.html` must include current LANG/reprocess
+      surfaces and use `source excerpt`/`excerpt`, not stale `partial` copy where
+      DESIGN prefers excerpt language.
+
+      - P2 Inspector provenance: replace `model: ok` visible header chrome with approved
+      summary provenance/source-text evidence lines.
+
+      - P3 test naming: expected-red names should not imply permanent failure after
+      closure.
+
+      - P3 legacy Gemini naming: classify as naming debt only unless runtime-visible.
+
+      - zh completeness: processing language storage/API/MCP, frontend `LANG: EN/ZH`,
+      receipts, steer preview, Inspector display, reprocess surface, OpenRouter prompt,
+      state backup/restore exclusion, E2E parity, and docs preview coverage.
+
+
+      ## Completion Criteria
+
+      - [ ] Closure matrix maps every listed audit finding to exactly one planned
+      owner step and one independent verification step.
+
+      - [ ] Matrix verdict for Chinese support is explicit: COMPLETE, INCOMPLETE,
+      or UNCERTAIN, with evidence for each required surface.
+
+      - [ ] All zh gaps that affect user-visible product contract have planned repair
+      ownership rather than vague audit-only wording.
+
+      - [ ] Matrix preserves product boundaries: single binary, SQLite only, no sync/merge/history,
+      no settings dashboard, no RAG/vector/semantic-answer product surface.
+
+      - [ ] No production implementation code is changed in this contract step.'
+    verification: '- [ ] Contract-only outputs define finding-by-finding acceptance
+      without product implementation logic.
+
+      - [ ] Each acceptance item is testable through a named browser, Go, spec, or
+      UIUX proof path.
+
+      - [ ] Chinese support assessment covers all seven surfaces requested by the
+      user.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Closure Matrix Evidence
+
+      - Audit finding table with owner step and verification step.
+
+      - zh surface table covering storage/API/MCP, frontend controls/receipts/steer/Inspector,
+      reprocess, OpenRouter prompt, state portability, E2E/contracts, and preview
+      docs.
+
+      - Product-boundary non-goals confirmed.'
+    agent: spec-verifier
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
   status: locked
