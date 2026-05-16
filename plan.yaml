@@ -93698,7 +93698,7 @@ phases:
 
       - [x] Protected AZRCT Playwright E2E is green and output is pasted, not summarized.
 
-      - [ ] Protected Vitest / processing-language preview-facing tests are green
+      - [x] Protected Vitest / processing-language preview-facing tests are green
       and output is pasted, not summarized.
 
       - [ ] Fresh UIUX multimodal audit produces PASS or PASS_WITH_DEBT with no blocker-class
