@@ -82243,7 +82243,7 @@ phases:
       **Gaps/Notes**: NONE. Description and verification checklist items are [x].'
   - id: srdf-uiux-native-audit
     name: Run native multimodal UIUX audit for Steer delta
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT UIUX AUDITOR (uiux-auditor), compare real rendered
       artifacts against DESIGN.md and UI_REGRESSION_CONTRACT.md.
 
@@ -82310,6 +82310,8 @@ phases:
     - srdf-processing-language-low-chrome-controls
     - srdf-broad-rendering-owner-token-bootstrap-retest
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-16T00:15:01.898887+00:00'
   - id: srdf-frontend-spec-conformance
     name: Verify frontend spec and design conformance for Steer delta
     status: claimed
