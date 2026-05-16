@@ -82403,51 +82403,58 @@ phases:
       - Processing language/reprocess as low-chrome architecture-owned runtime controls
       only.
 
+      - Unified closure of the concurrent `srdf-frontend-spec-conformance` and `srdf-uiux-native-audit`
+      blocker families via `srdf-batched-frontend-audit-closure`.
+
 
       Behavioral proof register and gate decision basis are mandatory. OPEN is invalid
-      if unresolved UI/runtime obligations are NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING
-      without explicit non-intersection.'
+      if unresolved UI/runtime obligations are NEEDS_TEST, UNPROVEN, UNCERTAIN_BLOCKING,
+      `STILL_BLOCKED`, or missing rendered artifact evidence without explicit non-intersection.
+
+
+      Acceptance checklist:
+
+      - [ ] Review `srdf-batched-frontend-audit-closure` machine-readable YAML before
+      opening the gate.
+
+      - [ ] Require `gate_open_allowed: true`, `verdict: PASS`, and `remaining_blockers:
+      []` from the batched closure.
+
+      - [ ] Confirm stale-vs-real reconciliation exists for every spec-verifier and
+      uiux-auditor finding.
+
+      - [ ] Confirm rendered artifact, command, and forbidden scan evidence are present
+      for the required frontend surfaces.'
     verification: '- [ ] phase-check protecting steer-delta-e2e-architecture-review-closure.
 
-      - [ ] All frontend implementation, UIUX audit, and spec/design conformance steps
-      completed with evidence.
+      - [ ] All frontend implementation, UIUX audit, spec/design conformance, and
+      batched remediation closure steps completed with evidence.
+
+      - [ ] Batched closure evidence has `verdict: PASS`, `gate_open_allowed: true`,
+      `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses.
 
       - [ ] Rendered evidence covers required states/viewports and visual/spatial
       artifacts.
 
-      - [ ] No unresolved blocker-class UI, a11y, design, or forbidden-concept issue
-      remains without remediation ownership.
+      - [ ] No unresolved blocker-class UI, a11y, design, stale-vs-real, or forbidden-concept
+      issue remains without remediation ownership.
 
       - [ ] Gate decision basis is OPEN only when frontend is ready for real-system
       E2E.'
-    evidence_template: '## refs Read Confirmation (MANDATORY)
-
-      For each ref in this step:
-
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
-
-      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
-
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
-
-
-      ## Gate Decision Basis
-
-      | requirement_ref | evidence_ref | unresolved_status | blocks_remaining_gates
-      | rationale |
-
-      |---|---|---|---|---|
-
-
-      ## Gate Decision
-
-      - [ ] OPEN
-
-      - [ ] BLOCKED
-
-      '
+    evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
+      \ of phase implementation)\n**Phase**: steer-delta-frontend-ui-source-ledger-split-scroll\n\
+      **Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each\
+      \ ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/UI_REGRESSION_CONTRACT.md — key passage or \"NOT READ: <reason>\"\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n### Batched Closure Gate\
+      \ Inputs\n- `srdf-batched-frontend-audit-closure` verdict: PASS/FAIL\n- `gate_open_allowed`:\
+      \ true/false\n- Remaining blockers: <list or []>\n- Per-family statuses with\
+      \ any `STILL_BLOCKED`: <list or none>\n\n### Execution Review\n| Step ID | Status\
+      \ | Evidence Quality | Concerns |\n| --- | --- | --- | --- |\n\n### Gate Decision\n\
+      - [ ] **OPEN**: Phase passes gate; batched closure is PASS and no blockers remain.\n\
+      - [ ] **BLOCKED**: Issues must be resolved before proceeding.\n  - Blocking\
+      \ issues: <list>\n  - Required actions: <what needs to happen>\n"
     depends_on:
     - srdf-steer-preview-ui-state-aria
     - srdf-source-ledger-details-hit-targets
@@ -82456,6 +82463,7 @@ phases:
     - srdf-broad-rendering-owner-token-bootstrap-retest
     - srdf-uiux-native-audit
     - srdf-frontend-spec-conformance
+    - srdf-batched-frontend-audit-closure
     agent: gate-reviewer
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
