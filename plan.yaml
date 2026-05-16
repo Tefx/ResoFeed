@@ -92588,7 +92588,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Evidence table covers all seven zh surfaces with CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
+      - [x] Evidence table covers all seven zh surfaces with CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
       verdicts.
 
       - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit remediation/retest or
