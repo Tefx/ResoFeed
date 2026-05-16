@@ -89321,6 +89321,7 @@ phases:
       ownership.'
     depends_on:
     - srde2e-full-plan-e2e-blockers-fix
+    - srde2e-uiux-full-plan-e2e-blockers-audit
     agent: integration-verifier
   - id: srde2e-uiux-full-plan-e2e-blockers-audit
     name: Audit full-plan UI/UX E2E blocker closure
