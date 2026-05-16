@@ -85798,7 +85798,7 @@ phases:
       - [x] Steer preview/commit/undo controls have unique accessible names and remain
       keyboard/screen-reader usable.
 
-      - [ ] Browser-led MCP parity flow remains accessible through the UI controls.
+      - [x] Browser-led MCP parity flow remains accessible through the UI controls.
 
       - [ ] No unapproved token, layout, copy, chrome, or state invention relative
       to docs/DESIGN.md is introduced.
