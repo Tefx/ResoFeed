@@ -93371,7 +93371,7 @@ phases:
     agent: gate-reviewer
   - id: azrv-batched-verification-failure-remediation
     name: Batched remediation for parallel verification failures
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -93574,6 +93574,63 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T15:09:11.701264+00:00'
+    done_at: '2026-05-16T15:17:17.695243+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- AGENTS.md — NOT READ in isolated\
+      \ worktree; absent.\n- docs/ARCHITECTURE.md — READ: one Go binary + SQLite/FTS5\
+      \ boundary; search forbids semantic/vector retrieval; frontend Source Ledger\
+      \ manual controls must not create jobs/queues/activity ledgers; verification\
+      \ targets forbid folders/tags/settings/RAG.\n- docs/DESIGN.md — READ: Source\
+      \ Ledger must show last_ingest aligned with [RUN INGEST]; last_fetch/last_ingest\
+      \ are display-only HH:MM:SS; Steer/Search copy must remain terse; Source Ledger\
+      \ forbidden concepts include jobs, queues, retry panels, sync/merge.\n- docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md\
+      \ — READ: language/reprocess contract artifacts; frontend obligations require\
+      \ terse bracket operation, no dashboard/queue/activity log; explicit non-goals\
+      \ include vector DB, embeddings, RAG, sync/merge.\n- docs/ui-preview.html —\
+      \ READ: current artifact includes LANG EN, REPROCESS LIBRARY, zh examples, source\
+      \ excerpt/excerpt, and Source Ledger last_ingest beside RUN INGEST.\n- tests/contract/azrct_closure_matrix.yaml\
+      \ — READ and updated stale active text to mark preview drift historical/non-gating\
+      \ and map protected proof files to regression names.\n- Relevant failing render\
+      \ tests — READ and fixed manual-rss-fetch-source-ledger and steer-route-preview.\n\
+      - Protected AZRCT tests — READ and renamed protected static Vitest and Playwright\
+      \ AZRCT files from .expected-red to .regression.\n\n## Batched Remediation Evidence\n\
+      - failures_reconciled: B1 fixed via spec-aligned test updates; B2 renamed protected/final-evidence\
+      \ intersections and documented remaining expected-red names as historical/non-runtime/non-intersecting.\
+      \ UIUX stale claims reconciled by protected AZRCT Playwright passing current\
+      \ artifacts.\n- render_test_changes_or_implementation_fixes:\n  - manual-rss-fetch-source-ledger\
+      \ now asserts DESIGN.md-required header last_ingest grouped with [RUN INGEST]\
+      \ and row last_fetch.\n  - steer-route-preview now expects `find maps to SEARCH;\
+      \ retrieval: lexical search`.\n- expected_red_naming_disposition: RENAMED intersections;\
+      \ protected AZRCT static/e2e files plus two remediated render blockers now use\
+      \ `.regression` filenames/titles. Remaining `.expected-red` names documented\
+      \ in closure matrix as historical/non-runtime/non-intersecting for this final\
+      \ evidence path.\n- stale_matrix_disposition: active closure matrix text updated;\
+      \ preview LANG/reprocess/partial claims now marked superseded/historical, with\
+      \ current docs/ui-preview.html evidence and regression-test mapping.\n- uiux_reconciliation:\
+      \ protected AZRCT Playwright regression passed all 7 current-artifact checks:\
+      \ route labels, Source Ledger alignment, OPML boundary, terse copy, Inspector\
+      \ provenance (`model: ok` absent), zh UI parity, source identifiers.\n- product_boundary_confirmation:\
+      \ no vector/RAG surface, sync/merge/history, job/queue/activity ledger, settings\
+      \ dashboard, new storage, or runtime process introduced.\n\n## Files changed\n\
+      - tests/contract/azrct_closure_matrix.yaml\n- web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.regression.test.ts\
+      \ (renamed from .expected-red)\n- web/src/routes/components/__tests__/steer-route-preview.regression.test.ts\
+      \ (renamed from .expected-red)\n- web/src/test/azrct-contract-fixtures.regression.test.ts\
+      \ (renamed from .expected-red)\n- web/tests/e2e/azrct-audit-zh-repair.regression.spec.ts\
+      \ (renamed from .expected-red)\n\n## Worktree verification (reported by execution\
+      \ agent)\n- `npm run test:render`: exit 0; 12 files passed, 64 tests passed.\n\
+      - `npx vitest run src/test/azrct-contract-fixtures.regression.test.ts src/routes/components/__tests__/manual-rss-fetch-source-ledger.regression.test.ts\
+      \ src/routes/components/__tests__/steer-route-preview.regression.test.ts`: exit\
+      \ 0; 3 files passed, 15 tests passed.\n- `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.regression.spec.ts`:\
+      \ exit 0; build succeeded, 7 Playwright tests passed.\n\n## Mainline final-state\
+      \ verification after squash merge\n- `npm run check` (web/): exit 0; svelte-check\
+      \ found 0 errors and 0 warnings.\n- `npm run test:render` (web/): exit 0; 12\
+      \ files passed, 64 tests passed.\n- `npx vitest run src/test/azrct-contract-fixtures.regression.test.ts`\
+      \ (web/): exit 0; 1 file passed, 2 tests passed.\n- `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.regression.spec.ts\
+      \ --project=chromium-ci-safe` (web/): exit 0; 7 passed.\n- Checklist state verified\
+      \ via vectl_show: all description completion criteria and verification checklist\
+      \ items are checked.\n\n## Commits\n- Worktree commit: 8a1683d1.\n- Main squash\
+      \ merge commit: 67eb39b1 (`[vectl] step-azrv-batched-verification-failure-remediation\
+      \ completed`).\n\n## Gaps/Notes\n- None for this remediation step; independent\
+      \ retest step remains required before final closure."
   - id: azrv-batched-verification-failure-retest
     name: Retest batched verification failures after remediation
     status: pending
