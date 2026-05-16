@@ -264,6 +264,11 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleReprocessLibrary(w, r)
+	case r.Method == http.MethodGet && r.URL.Path == RuntimeOperationHTTPPath:
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleCurrentOperation(w, r)
 	case r.Method == http.MethodGet && r.URL.Path == "/api/sources":
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -439,8 +444,12 @@ func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Reques
 	writeJSON(w, http.StatusOK, response)
 }
 
+func (h apiHandler) handleCurrentOperation(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, CurrentOperationResponse{Operation: currentOperationInfo()})
+}
+
 func writeGuardConflict(w http.ResponseWriter, details operationGuardDetails) {
-	writeAPIError(w, http.StatusConflict, "conflict", "operation already running", guardConflictDetailMap(details))
+	writeAPIError(w, http.StatusConflict, "conflict", "operation already running", guardConflictHTTPDetailMap(details))
 }
 
 func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {

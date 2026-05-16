@@ -25,6 +25,7 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
+	updateCurrentOperation("preparing", nil, "library reprocess preparing")
 	defer releaseGuardRecover(release, &retErr, "reprocess library")
 
 	var response ReprocessLibraryResponse
@@ -45,6 +46,7 @@ func reprocessLibraryFresh(ctx context.Context, db *sql.DB, llm LLMClient) (ret 
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
+	updateCurrentOperation("preparing", nil, "library reprocess preparing")
 	defer releaseGuardRecover(release, &retErr, "reprocess library")
 
 	return reprocessLibraryUnlocked(ctx, db, llm)
@@ -72,13 +74,15 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
-	for _, item := range items {
+	updateCurrentOperation("processing_items", &CurrentOperationCount{Current: 0, Total: len(items)}, "library reprocess processing items")
+	for index, item := range items {
 		if err := runCtx.Err(); err != nil {
 			result.Status = ReprocessStatusFailed
 			appendReprocessError(&result, nil, ReprocessErrorTimeout, "operation timed out")
 			result.CompletedAt = time.Now().UTC()
 			return ReprocessLibraryResponse{Reprocess: result}, nil
 		}
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(items)}, "library reprocess processing item")
 		result.ItemsAttempted++
 		outcome, err := processReprocessItem(runCtx, item, llm, language)
 		if err != nil {
@@ -106,9 +110,11 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		if outcome.unavailable {
 			result.ItemsUnavailable++
 			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
 			continue
 		}
 		result.ItemsUpdated++
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item processed")
 	}
 
 	if err := runCtx.Err(); err != nil {
@@ -117,6 +123,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		result.CompletedAt = time.Now().UTC()
 		return ReprocessLibraryResponse{Reprocess: result}, nil
 	}
+	updateCurrentOperation("rebuilding_search", &CurrentOperationCount{Current: len(items), Total: len(items)}, "library reprocess rebuilding search index")
 	indexed, err := rebuildSearchIndexAndClearStale(runCtx, db)
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
@@ -127,6 +134,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 	if result.ItemsFailed > 0 || result.ItemsUnavailable > 0 {
 		result.Status = ReprocessStatusCompletedWithErrors
 	}
+	updateCurrentOperation("complete", &CurrentOperationCount{Current: len(items), Total: len(items)}, "library reprocess complete")
 	return ReprocessLibraryResponse{Reprocess: result}, nil
 }
 

@@ -101,8 +101,8 @@ func TestPLHMMCPRuntimeFieldErrorsUseNestedOnlyData(t *testing.T) {
 
 func assertGuardDetails(t *testing.T, details map[string]any, operation string, scope string) {
 	t.Helper()
-	if len(details) != 4 {
-		t.Fatalf("guard details = %#v, want exactly 4 fields", details)
+	if len(details) != 4 && len(details) != 5 {
+		t.Fatalf("guard details = %#v, want legacy fields and optional current_operation", details)
 	}
 	if details["operation_running"] != true || details["operation"] != operation || details["scope"] != scope || details["retry_allowed"] != true {
 		t.Fatalf("guard details = %#v, want operation=%s scope=%s", details, operation, scope)

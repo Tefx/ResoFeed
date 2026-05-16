@@ -36,8 +36,9 @@ var ingestGuardState guardedOperationState
 var errManualFetchConflict = errors.New("operation already running")
 
 type guardedOperationState struct {
-	mu     sync.Mutex
-	holder atomic.Value
+	mu      sync.Mutex
+	holder  atomic.Value
+	current currentOperationSnapshot
 }
 
 type operationGuardDetails struct {
@@ -99,6 +100,7 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 	if err != nil {
 		return nil
 	}
+	updateCurrentOperation("loading_sources", nil, "background ingest loading active sources")
 	defer releaseGuardRecover(release, &retErr, "ingest once")
 	_, err = ingestOnceUnlocked(ctx, db, cfg)
 	return err
@@ -112,6 +114,7 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret Manual
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
+	updateCurrentOperation("loading_sources", nil, "manual ingest loading active sources")
 	defer releaseGuardRecover(release, &retErr, "manual ingest")
 	return ingestOnceUnlocked(ctx, db, cfg)
 }
@@ -124,12 +127,14 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
+	updateCurrentOperation("loading_source", nil, "manual source fetch loading source")
 	defer releaseGuardRecover(release, &retErr, "manual source fetch")
 
 	source, err := loadActiveSource(ctx, db, sourceID)
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
+	updateCurrentOperation("fetching_source", &CurrentOperationCount{Current: 0, Total: 1}, "manual source fetch running")
 	result := ManualFetchResult{Operation: ManualFetchOperationSourceFetch, SourceID: &source.ID, Completed: true, SourcesTotal: 1, Errors: []ManualFetchSourceError{}}
 	sourceResult, err := ingestSource(ctx, db, cfg, source)
 	if err != nil {
@@ -145,6 +150,7 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 	result.SourcesFetched = 1
 	result.ItemsDiscovered = sourceResult.itemsDiscovered
 	result.ItemsUpserted = sourceResult.itemsUpserted
+	updateCurrentOperation("source_complete", &CurrentOperationCount{Current: 1, Total: 1}, "manual source fetch complete")
 	return result, nil
 }
 
@@ -175,8 +181,10 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 		return result, fmt.Errorf("ingest once: source rows: %w", err)
 	}
 	result.SourcesTotal = len(sources)
+	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, "ingest fetching active sources")
 
-	for _, source := range sources {
+	for index, source := range sources {
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: index, Total: len(sources)}, "ingest fetching source")
 		sourceResult, err := ingestSource(ctx, db, cfg, source)
 		if err != nil {
 			if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error()); updateErr != nil {
@@ -191,7 +199,9 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 		result.SourcesFetched++
 		result.ItemsDiscovered += sourceResult.itemsDiscovered
 		result.ItemsUpserted += sourceResult.itemsUpserted
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: index + 1, Total: len(sources)}, "ingest source complete")
 	}
+	updateCurrentOperation("complete", &CurrentOperationCount{Current: len(sources), Total: len(sources)}, "ingest complete")
 	return result, nil
 }
 
@@ -267,6 +277,7 @@ func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (fu
 		return nil, operationGuardConflictError{details: details}
 	}
 	ingestGuardState.holder.Store(operationGuardDetails{Operation: operation, Scope: scope})
+	ingestGuardState.current.start(operation, scope)
 	released := false
 	return func() {
 		if released {
@@ -274,6 +285,7 @@ func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (fu
 		}
 		released = true
 		ingestGuardState.holder.Store(operationGuardDetails{})
+		ingestGuardState.current.clear()
 		ingestGuardState.mu.Unlock()
 	}, nil
 }
@@ -298,6 +310,14 @@ func guardConflictDetails(err error) (operationGuardDetails, bool) {
 
 func guardConflictDetailMap(details operationGuardDetails) map[string]any {
 	return map[string]any{"operation_running": true, "operation": details.Operation, "scope": details.Scope, "retry_allowed": true}
+}
+
+func guardConflictHTTPDetailMap(details operationGuardDetails) map[string]any {
+	result := guardConflictDetailMap(details)
+	if current := currentOperationInfo(); current.Running {
+		result["current_operation"] = current
+	}
+	return result
 }
 
 func releaseGuardRecover(release func(), retErr *error, label string) {
@@ -328,6 +348,7 @@ type ingestSourceResult struct {
 }
 
 func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
+	updateCurrentOperation("fetching_feed", nil, "fetching RSS source")
 	language, err := readProcessingLanguage(ctx, db)
 	if err != nil {
 		return ingestSourceResult{}, fmt.Errorf("ingest source: read processing language: %w", err)
@@ -350,7 +371,8 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 		effectiveSource.Title = feed.Title
 	}
 	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
-	for _, entry := range feed.Items {
+	for index, entry := range feed.Items {
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(feed.Items)}, "processing feed items")
 		item, err := buildItem(ctx, effectiveSource, entry, cfg.LLM, language)
 		if err != nil {
 			return result, err
@@ -359,6 +381,7 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 			return result, err
 		}
 		result.itemsUpserted++
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
 	}
 	return result, nil
 }
