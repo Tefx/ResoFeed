@@ -85803,7 +85803,7 @@ phases:
       - [x] No unapproved token, layout, copy, chrome, or state invention relative
       to docs/DESIGN.md is introduced.
 
-      - [ ] Findings are reported as PASS, PASS_WITH_DEBT, or FAIL, with blocker-class
+      - [x] Findings are reported as PASS, PASS_WITH_DEBT, or FAIL, with blocker-class
       issues preventing downstream closure.'
     verification: '- [ ] phase-check protecting srde2e-software-architect-clean-recheck,
       srde2e-full-plan-check, and srde2e-final-closure-gate.
