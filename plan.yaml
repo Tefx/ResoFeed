@@ -85087,73 +85087,180 @@ phases:
     claimed_by: software-architect
     claimed_at: '2026-05-16T07:55:50.054544+00:00'
   - id: srde2e-backend-architecture-remediation
-    name: Remediate backend architecture review findings
+    name: Remediate batched architecture/API contract findings
     status: pending
     description: 'step_type: implementation
 
-
-      Batched remediation for backend/runtime findings from srde2e-software-architect-fresh-review.
-      If the review verdict is CLEAN or contains no backend/runtime findings, provide
-      explicit no-op evidence and do not modify code.
+      agent_source: project (golang-developer discovered in Larva registry)
 
 
-      Acceptance checklist:
+      Batched remediation for ALL current should_fix architecture/API contract findings
+      from `srde2e-software-architect-fresh-review`. This step owns both findings
+      below together; do not split into separate fix steps.
 
-      - [ ] Address ALL backend/runtime blocker and should_fix findings from the software-architect
-      review, not just the first.
 
-      - [ ] Preserve single Go binary, SQLite/FTS5, flat internal/resofeed files,
-      owner-token boundary, lexical-only search, no-RAG, and no forbidden state surfaces.
+      ## Findings to Fix (ALL, not just the first)
 
-      - [ ] For each finding, run the provided grep/search hint and search for sibling
-      instances beyond listed locations.
 
-      - [ ] Provide root cause vs symptom explanation for every blocker-class finding.
+      ### SF1: HTTP/MCP steer idempotency fingerprint parity drift
 
-      - [ ] If no applicable findings exist, record CLEAN no-op evidence with the
-      review citation.
+      Locations: `internal/resofeed/http.go:583-590`, `internal/resofeed/mcp.go:223-230`
+
+      Contract anchors: `docs/ARCHITECTURE.md:1218-1228`, `docs/ARCHITECTURE.md:1373-1384`
+
+      Grep hint: `grep -R "operation.*steer\|RouteKind SteerRouteKind\|withMCPReceipt"
+      internal/resofeed`
+
+      Required remediation:
+
+      - [ ] Extract/shared-normalize the steer receipt fingerprint payload used by
+      HTTP and MCP, or otherwise explicitly align the fingerprint semantics for the
+      same logical steer operation.
+
+      - [ ] Preserve globally scoped `agent_receipts.idempotency_key` behavior without
+      allowing equivalent HTTP/MCP retries to fail as `request_fingerprint_mismatch`.
+
+      - [ ] Add a parity regression test that performs HTTP then MCP with the same
+      actor/key/command and expects replay-equivalent behavior rather than mismatch.
+
+      - [ ] Run the grep hint and search sibling receipt/fingerprint paths for the
+      same drift pattern.
+
+
+      ### SF2: Preview `will_mutate` public contract drift
+
+      Locations: `internal/resofeed/steer_intent.go:38-55`, `docs/ARCHITECTURE.md:1168`
+
+      Grep hint: `grep -R "WillMutate\|will_mutate\|/api/steer/preview" internal/resofeed
+      docs/ARCHITECTURE.md web/src`
+
+      Required remediation:
+
+      - [ ] Decide and document in code/tests whether `will_mutate` means "preview
+      call mutates" or "commit would mutate".
+
+      - [ ] Preserve the no-write/no-receipt guarantee for `/api/steer/preview`.
+
+      - [ ] Prefer the simplest contract-preserving change: if the field means preview
+      mutates, make previews return false and update tests; if it means commit would
+      mutate, update docs/tests explicitly.
+
+      - [ ] Run the grep hint and search backend, docs, and frontend consumers for
+      public contract drift.
+
+
+      ## Architecture Guardrails
+
+      - [ ] Preserve the single Go binary, SQLite/FTS5-only storage, flat `internal/resofeed/`
+      file shape, owner-token boundary, lexical-only search, and no-RAG/no-sync/no-merge
+      product invariants.
+
+      - [ ] Do not introduce new product concepts, sidecar workers, receipt portability,
+      state merge semantics, or agent authorization registries.
+
+      - [ ] Provide root cause vs symptom evidence for both findings.
 
 
       ## Completion Criteria (stub exclusion)
 
-      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable
-      for any actual fix.'
-    verification: '- [ ] Every backend/runtime blocker or should_fix from srde2e-software-architect-fresh-review
-      is resolved or explicitly no-op because no applicable findings exist.
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      The fix must contain substantive Go/backend/API contract logic and tests that
+      vary by input and transport path.'
+    verification: '- [ ] SF1 is resolved by shared/aligned HTTP and MCP steer receipt
+      fingerprint semantics.
 
-      - [ ] Focused regression tests and/or real runtime proof cover each remediated
-      finding.
+      - [ ] SF1 parity regression covers HTTP then MCP same-key/same-command retry
+      and expects replay-equivalent behavior, not `request_fingerprint_mismatch`.
 
-      - [ ] Sibling search evidence is provided for each blocker/should_fix.
+      - [ ] SF2 public `will_mutate` semantics are explicit in docs/tests and preserve
+      no-write/no-receipt preview behavior.
 
-      - [ ] No forbidden architecture/product concept introduced.'
+      - [ ] Both grep hints were run and sibling drift was either fixed or explicitly
+      ruled out with evidence.
+
+      - [ ] Focused Go/backend tests for the changed receipt and preview semantics
+      pass, and any affected frontend/docs consumers remain contract-aligned.
+
+      - [ ] No forbidden ResoFeed architecture/product concept is introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
+      - internal/resofeed/http.go — key passage or "NOT READ: <reason>"
 
-      - AGENTS.md — key passage or "NOT READ: <reason>"
+      - internal/resofeed/mcp.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/steer_intent.go — key passage or "NOT READ: <reason>"
 
 
-      ## Backend Architecture Remediation Evidence
+      If no refs were provided, state: "No refs for this step."
 
-      - Review finding IDs addressed or no-op rationale:
 
-      - Root cause vs symptom:
+      ## Batched Remediation Evidence
+
+
+      ### SF1 HTTP/MCP fingerprint parity
+
+      - Root cause:
+
+      - Symptom:
 
       - Files changed:
 
+      - Shared/aligned fingerprint semantics:
+
+      - Regression test name(s):
+
+      - HTTP→MCP same-key/same-command result:
+
       - Grep/sibling search output:
 
-      - Tests/runtime proof:
 
-      '
+      ### SF2 preview will_mutate contract
+
+      - Contract decision: preview_call_mutates | commit_would_mutate
+
+      - Root cause:
+
+      - Symptom:
+
+      - Files changed:
+
+      - No-write/no-receipt proof:
+
+      - Test/doc updates:
+
+      - Grep/sibling search output:
+
+
+      ## Commands / Tests
+
+      ```sh
+
+      <exact commands and relevant output>
+
+      ```
+
+
+      ## Guardrail Check
+
+      - Single Go binary preserved: yes/no
+
+      - SQLite/FTS5 only preserved: yes/no
+
+      - No RAG/vector/sync/merge/agent auth registry introduced: yes/no
+
+      - Remaining ambiguity: <none or list>'
+    refs:
+    - docs/ARCHITECTURE.md
+    - internal/resofeed/http.go
+    - internal/resofeed/mcp.go
+    - internal/resofeed/steer_intent.go
     depends_on:
     - srde2e-software-architect-fresh-review
-    - srde2e-visual-a11y-blockers-retest
     agent: golang-developer
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
