@@ -84386,7 +84386,7 @@ phases:
       \ tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`.\n\
       - [x] Run `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
       \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
-      \ tests/e2e/hit-target-clickability.spec.ts`.\n- [ ] Run `cd web && npm run\
+      \ tests/e2e/hit-target-clickability.spec.ts`.\n- [x] Run `cd web && npm run\
       \ test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts\
       \ tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.\n- [ ] Run the forbidden\
       \ concept scan across frontend Svelte/TS user-facing surfaces.\n- [ ] If any\
