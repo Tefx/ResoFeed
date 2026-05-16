@@ -96035,12 +96035,12 @@ phases:
 
       - [x] Findings, if any, are documented as blocker/should_fix/suggestion/tech_debt
       with reproduction steps.'
-    verification: '- [ ] phase-check protecting `cos-final-gate`: actual integration/e2e
+    verification: '- [x] phase-check protecting `cos-final-gate`: actual integration/e2e
       evidence proves HTTP, MCP, and frontend operation-status paths work together.
 
-      - [ ] Evidence includes exact commands and pasted output, not only "tests pass".
+      - [x] Evidence includes exact commands and pasted output, not only "tests pass".
 
-      - [ ] Behavioral proof register maps each requirement to PROVEN, NEEDS_TEST,
+      - [x] Behavioral proof register maps each requirement to PROVEN, NEEDS_TEST,
       or explicit blocker/non-intersection disposition.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
