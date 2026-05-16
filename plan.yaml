@@ -83567,7 +83567,7 @@ phases:
       proof and explicit non-intersection with `srdf-frontend-gate` and final E2E
       closure.
 
-      - [ ] Preserve or update focused tests so role/name, Source Ledger active-row
+      - [x] Preserve or update focused tests so role/name, Source Ledger active-row
       disabled behavior, OPML reachability, scroll preservation, forbidden raw-payload
       absence, and mobile metadata visibility are covered.
 
