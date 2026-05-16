@@ -87532,7 +87532,7 @@ phases:
       [APPLY]/[CANCEL] contract, and [UNDO] appears only when a revocable backend
       id exists.
 
-      - [ ] DESIGN.md/UI_REGRESSION_CONTRACT/tests policy ambiguity is resolved without
+      - [x] DESIGN.md/UI_REGRESSION_CONTRACT/tests policy ambiguity is resolved without
       weakening accessibility semantics.
 
       - [ ] B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix
