@@ -85708,7 +85708,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Run the repository''s authoritative Go/backend test command family.
+      - [x] Run the repository''s authoritative Go/backend test command family.
 
       - [ ] Run the repository''s authoritative frontend/component/E2E command family
       for the touched web surfaces.
