@@ -93482,19 +93482,19 @@ phases:
       - [x] No forbidden product boundary is introduced: no accounts, sync coordinator,
       vector DB/RAG surface, state merger, event bus, sidecar worker, or SaaS-style
       chrome.'
-    verification: '- [ ] B1 render-test blocker is closed by rerunning `npm run test:render`
+    verification: '- [x] B1 render-test blocker is closed by rerunning `npm run test:render`
       after the fix and preserving output.
 
-      - [ ] B2 `.expected-red` naming has either concrete rename evidence or explicit
+      - [x] B2 `.expected-red` naming has either concrete rename evidence or explicit
       non-intersection disposition evidence.
 
-      - [ ] Stale closure-matrix/contract wording no longer contradicts active final-gate
+      - [x] Stale closure-matrix/contract wording no longer contradicts active final-gate
       evidence, or is explicitly marked historical/non-gating.
 
-      - [ ] UIUX stale/contradictory findings are reconciled with current artifacts
+      - [x] UIUX stale/contradictory findings are reconciled with current artifacts
       and any true blocker-class finding is fixed.
 
-      - [ ] Product and architecture constraints from AGENTS.md/docs remain intact.'
+      - [x] Product and architecture constraints from AGENTS.md/docs remain intact.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
