@@ -84689,7 +84689,7 @@ phases:
       - [x] MCP preview_steer/steer/undo_steer parity is exercised or cited from backend
       runtime proof if unchanged.
 
-      - [ ] Actual command/output and screenshots/DOM evidence are recorded.'
+      - [x] Actual command/output and screenshots/DOM evidence are recorded.'
     verification: '- [ ] full-plan-check protecting final architecture review and
       closure gate.
 
