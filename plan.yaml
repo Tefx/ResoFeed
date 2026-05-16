@@ -85605,7 +85605,7 @@ phases:
       not match those rendered verification items.'
   - id: srde2e-real-system-e2e-blockers-retest
     name: Retest real-system E2E blocker closure
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -85739,6 +85739,149 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T02:33:56.703872+00:00'
+    done_at: '2026-05-16T05:42:13.471129+00:00'
+    evidence: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: Real-system E2E blocker retest for `srde2e-real-system-e2e-blockers-fix`
+
+      **Independence Level**: L2
+
+
+      ### refs Read Confirmation
+
+      - `docs/ARCHITECTURE.md`: READ. Key insight from verifier: one Go binary (`resofeed
+      serve`) must serve static UI, JSON HTTP, MCP `/mcp`, SQLite, and ingest; HTTP/MCP
+      share product semantics; owner token gates `/api/*` and `/mcp`.
+
+      - `docs/DESIGN.md`: READ. Key insight from verifier: Source Ledger owns `[RUN
+      INGEST]`, OPML import, `[FETCH]`, `last_fetch: HH:MM:SS`; Steer must be lightweight,
+      accessible, and avoid dashboard/duplicate-control regressions.
+
+
+      ### Test Execution
+
+      - Install command/result: `npm ci` in `web` exited 0; `added 150 packages, and
+      audited 151 packages in 992ms`.
+
+      - Real-server command/result: `npm run test:e2e -- real-server-ui.spec.ts --project
+      chromium-ci-safe` exited 0; `Running 9 tests using 1 worker`; `9 passed (10.9s)`
+      in verifier worktree.
+
+      - Server launch evidence: `.test-artifacts/bin/resofeed serve --addr 127.0.0.1:59029
+      --public-url http://127.0.0.1:59029 --db .test-artifacts/playwright/fixtures/resofeed-e2e-1778899010565-32263.sqlite3
+      --owner-token <redacted>`; server logs included `owner token explicit: stored
+      hash`, serving line, and `shutdown complete`.
+
+
+      ### Required Browser Artifacts
+
+      - JSON report: `.test-artifacts/playwright/results/results.json`
+
+      - JUnit report: `.test-artifacts/playwright/results/junit.xml`
+
+      - HTML report: `.test-artifacts/playwright/html-report/index.html`
+
+      - Logs: `.test-artifacts/playwright/server-logs/server.stdout.log`, `.test-artifacts/playwright/server-logs/server.stderr.log`,
+      OpenRouter/RSS fixture logs.
+
+      - Real-server live audit proof: `.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/trace.zip`,
+      `real-server-live-audit-proof/metrics.json`, screenshots/ARIA snapshots for
+      today, inspector, search, doctor, mobile feed, mobile inspector, and mobile
+      source ledger.
+
+
+      ### Behavioral proof register
+
+      - B-RSE2E-01: PROVEN — real-server UI/MCP parity passed via browser-led API/MCP
+      parity probes on one real server fixture.
+
+      - B-RSE2E-02: PROVEN — Source Ledger ingest/control evidence passed; live audit
+      metrics showed `SOURCE LEDGER`, `[IMPORT OPML]`, `[RUN INGEST]`, `src: Live
+      Audit Source`, and `last_fetch: 02:36:53`.
+
+      - B-RSE2E-03: PROVEN — duplicate accessible-name failure no longer reproduced;
+      Steer flows using `page.getByRole(''button'', { name: ''apply'' })` and Source
+      Ledger controls passed.
+
+      - B-RSE2E-04: PROVEN — real-server live audit proof passed with screenshots/ARIA/network
+      logs.
+
+      - Final closure E2E obligation: PROVEN — authoritative command exited 0 with
+      9 passed and blockers empty.
+
+
+      ### Protocol Results
+
+      - P1 Empty Room: PASS — 9 tests executed, 0 skipped, 0 unexpected, 0 flaky.
+
+      - P2 Fake Seam: PASS_FOR_SCOPE — suite launches real Go binary and browser;
+      OpenRouter/RSS are deterministic local external boundaries for CI-safe real-server
+      regression.
+
+      - P8 Caller Reachability: PASS — browser-led UI, HTTP API, and MCP surfaces
+      exercised.
+
+      - P9 Smoke/Liveness: PASS — server bound, returned 401 auth boundary, served
+      UI, and shut down cleanly.
+
+      - P10 Frontend Render: PASS — Vite build completed and Chromium rendered screens
+      with screenshots/ARIA artifacts.
+
+
+      ### Machine-readable closure
+
+      verdict: PASS
+
+      gate_open_allowed: true
+
+      blockers: []
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ### Commit hash(es)
+
+      - Verifier worktree artifact commit: `61b48e2e` (`test: record real-server e2e
+      retest artifacts`)
+
+      - Branch plan-alignment cleanup commit: `85eb2bd7` (excluded plan diff before
+      merge)
+
+      - Mainline artifact merge commit via resolver: `6640d634` (`[vectl] step-srde2e-real-system-e2e-blockers-retest
+      completed`)
+
+
+      ### Files changed
+
+      - Committed generated verification artifacts under `.test-artifacts/` only.
+
+      - No product implementation files modified.
+
+      - No docs modified.
+
+      - `plan.yaml`, `.git/vectl/*`, package files, and unrelated dirty main-worktree
+      files were excluded from artifact commit.
+
+
+      ### Mainline final-state verification after merge
+
+      - `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe` in
+      `web/` exited 0 after artifact merge; output included `9 passed (10.4s)`.
+
+
+      ### Gaps/Notes
+
+      - `npm ci` surfaced npm audit vulnerabilities; not part of this E2E closure
+      criterion and not observed as runtime blocker.
+
+      - No blockers remain; final gate may open from this retest perspective.
+
+      - Acceptance and verification checklist items are `[x]`; verification checklist
+      required planner repair because `vectl_check` could not match verification-field
+      checklist items.'
   - id: srde2e-uiux-audit-source-ledger-steer-controls
     name: Audit Source Ledger and Steer control UI/UX after real-system blocker fix
     status: claimed
