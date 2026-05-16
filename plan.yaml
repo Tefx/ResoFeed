@@ -95710,7 +95710,7 @@ phases:
 
       - [x] Browser console evidence has no `state_unsafe_mutation` blocker.
 
-      - [ ] Synthetic fragment/no-grouping path remains non-grouped.
+      - [x] Synthetic fragment/no-grouping path remains non-grouped.
 
       - [ ] Audit emits parseable PASS / PASS_WITH_DEBT / FAIL headline and blocker
       disposition.'
