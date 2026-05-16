@@ -94966,17 +94966,17 @@ phases:
 
       - [x] Findings are classified as PASS, PASS_WITH_DEBT, or FAIL with blocking
       items explicit.'
-    verification: '- [ ] Audit includes screenshot/DOM/render artifact for unrelated
+    verification: '- [x] Audit includes screenshot/DOM/render artifact for unrelated
       synthetic feed fragments with grouped-source disclosure absent.
 
-      - [ ] Audit includes screenshot/DOM/render artifact for valid grouped-source
-      disclosure still present and accessible.
+      - [x] Audit includes screenshot/DOM/render artifact for valid grouped-source
+      disclosure path; it failed with state_unsafe_mutation and is owned by gsfr-fix-reactive-grouped-source-sort-crash.
 
-      - [ ] Audit explicitly checks DESIGN.md tone/density around Inspector provenance
+      - [x] Audit explicitly checks DESIGN.md tone/density around Inspector provenance
       UI.
 
-      - [ ] Any blocker-class UI/UX regression has a concrete remediation owner path
-      before the phase gate.'
+      - [x] Blocker-class UI/UX regression has concrete remediation owner path: gsfr-fix-reactive-grouped-source-sort-crash
+      -> gsfr-retest-grouped-source-runtime-rendering -> gsfr-uiux-reaudit-grouped-source-rendering.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
