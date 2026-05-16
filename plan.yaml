@@ -93285,23 +93285,23 @@ phases:
 
       - [x] Final decision includes OPEN/BLOCK and explicit closure path for every
       unresolved item.'
-    verification: '- [ ] All original verification/review steps completed with adequate
+    verification: '- [x] All original verification/review steps completed with adequate
       evidence or have an explicit remediation/retest closure path.
 
-      - [ ] `azrv-batched-verification-failure-remediation` completed and addressed
+      - [x] `azrv-batched-verification-failure-remediation` completed and addressed
       all true blockers/should_fix issues from both failed verification outputs.
 
-      - [ ] `azrv-batched-verification-failure-retest` is GREEN and provides gate-usable
+      - [x] `azrv-batched-verification-failure-retest` is GREEN and provides gate-usable
       closure for UIUX stale-audit reconciliation, zh B1/B2, `.expected-red` naming,
       and stale closure-matrix text.
 
-      - [ ] No unresolved blocker or unresolved zh proof gap remains without remediation
+      - [x] No unresolved blocker or unresolved zh proof gap remains without remediation
       ownership.
 
-      - [ ] Final OPEN/BLOCK recommendation includes structured behavioral decision
+      - [x] Final OPEN/BLOCK recommendation includes structured behavioral decision
       basis.
 
-      - [ ] Product boundaries remain intact: single Go binary, SQLite only, no sync/merge/history,
+      - [x] Product boundaries remain intact: single Go binary, SQLite only, no sync/merge/history,
       no SaaS/settings/RAG/vector surfaces.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
