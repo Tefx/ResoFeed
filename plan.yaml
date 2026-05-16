@@ -85250,3 +85250,230 @@ phases:
     - srde2e-software-architect-clean-recheck
     - srde2e-full-plan-check
     agent: gate-reviewer
+  - id: srde2e-real-system-e2e-blockers-fix
+    name: Fix real-system E2E blocker families
+    status: pending
+    description: 'step_type: implementation
+
+      priority: HIGH
+
+      origin: srde2e-real-system-e2e-regression verdict FAIL; gate_open_allowed=false;
+      orchestrator_action_hint=DO_NOT_COMPLETE
+
+
+      Batched remediation for ALL blocker families from the failed real-system E2E
+      regression. Do not create serial one-issue fixes. Treat the original failed
+      E2E as evidence input, not as a step to complete.
+
+
+      Test-to-Fix Context Forwarding:
+
+      - Real binary launched by Playwright harness: `.test-artifacts/bin/resofeed
+      serve --addr 127.0.0.1:57568 --public-url http://127.0.0.1:57568 --db .test-artifacts/playwright/fixtures/resofeed-e2e-1778896771111-11593.sqlite3
+      --owner-token <redacted>`.
+
+      - Dependency install evidence: `npm ci` PASS.
+
+      - Non-blocking operator error: initial invalid Playwright invocation failed
+      due argument order; do not treat this as product blocker.
+
+      - Authoritative failing command: `npm run test:e2e -- real-server-ui.spec.ts
+      --project chromium-ci-safe`.
+
+      - Current result: FAIL; 9 tests run, 4 passed, 5 failed.
+
+      - Previously passing real-system coverage before failure: owner-token gate,
+      source import, `[RUN INGEST]`, feed, inspect, resonate, `/doctor`, lexical search.
+
+      - Backend targeted parity evidence: `go test ./internal/resofeed -run ''Test(MCP|.*Steer|.*steer|.*Undo|.*Preview)''
+      -count=1 -v` PASS.
+
+      - Process cleanup evidence: PASS.
+
+
+      Blockers to fix in this single batch:
+
+      - B-RSE2E-01: Real-server Playwright E2E failed 5/9 tests.
+
+      - B-RSE2E-02: Source Ledger live audit could not find imported `Live Audit Source`
+      row after OPML import + `[RUN INGEST]`; expected `last_fetch: HH:MM:SS`. This
+      blocks Source Ledger controls/ingest evidence.
+
+      - B-RSE2E-03: Duplicate accessible button names `apply` and `[APPLY]` caused
+      Playwright strict-mode failures, blocking valid URL steer preview/commit/undo
+      and browser-led MCP parity flows.
+
+      - B-RSE2E-04: Required full-plan closure gate cannot open because real-system
+      E2E is red.
+
+
+      Likely touch paths / seams:
+
+      - Frontend UI and Playwright surfaces for Source Ledger row rendering, live
+      audit selectors, accessible button names, Steer preview/commit/undo controls,
+      and browser-led MCP parity flows.
+
+      - Backend/runtime only if Source Ledger row absence is proven to be a real ingest/import
+      persistence defect rather than a frontend/test selector or timing issue.
+
+
+      KNOWN RISKS / Gate Preview:
+
+      - The gate WILL reject duplicate accessible names that make Playwright strict-mode
+      selectors ambiguous.
+
+      - The gate WILL reject evidence that uses mocks or component-only tests instead
+      of a real binary + browser path.
+
+      - The gate WILL reject Source Ledger controls evidence unless the imported `Live
+      Audit Source` row appears after OPML import + `[RUN INGEST]` with `last_fetch`
+      formatted as `HH:MM:SS`.
+
+      - The gate WILL reject broad claims of closure unless the real-server E2E command
+      is green and the closure payload has `verdict: PASS`, `gate_open_allowed: true`,
+      and empty blockers.
+
+
+      Root Cause vs Symptom requirements:
+
+      - For B-RSE2E-02, determine whether the root cause is import/ingest persistence,
+      async refresh/timing, row rendering, filtering/sorting, or test selector drift;
+      fix the proven root cause, not only the assertion.
+
+      - For B-RSE2E-03, remove selector ambiguity by making accessible names unique
+      or by aligning markup/test selectors with the documented UI contract; do not
+      hide duplicate real controls from assistive technology unless they are genuinely
+      decorative.
+
+      - For B-RSE2E-01/B-RSE2E-04, close the real-system proof gap by making the real-server
+      browser suite pass; do not bypass by weakening test coverage or gate criteria.
+
+
+      Acceptance checklist:
+
+      - [ ] Fix ALL blocker families B-RSE2E-01 through B-RSE2E-04 in one batch; do
+      not stop after the first green local assertion.
+
+      - [ ] Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
+      boundary, HTTP/MCP/UI operation parity, lexical-only search, no accounts, no
+      sync/merge coordinator, no vector DB, no embeddings, no RAG/semantic answer
+      UI, no dashboard/job/activity surfaces.
+
+      - [ ] Source Ledger real-system flow imports OPML, runs `[RUN INGEST]`, renders
+      `Live Audit Source`, exposes controls, and displays `last_fetch` as `HH:MM:SS`.
+
+      - [ ] Steer preview/commit/undo controls have unambiguous accessible button
+      names and remain keyboard/screen-reader usable.
+
+      - [ ] Browser-led MCP parity flow remains covered through the real-server UI
+      path.
+
+      - [ ] Search sibling instances for duplicate accessible names or Source Ledger
+      live-row timing/selector assumptions beyond the listed failures.
+
+      - [ ] Include exact command output snippets for focused local checks run by
+      the implementer, while leaving final independent closure to the retest step.
+
+      - [ ] If backend/runtime changes are necessary, include targeted Go regression
+      proof and explain why frontend-only remediation was insufficient.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND/RUNTIME IMPLEMENTATION remediation step. Completion requires
+      BOTH logic correctness and rendered browser-observable behavior for the affected
+      Source Ledger and Steer controls.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or hardcoded test-only
+      bypasses do not satisfy this requirement.'
+    verification: '- [ ] local-check protecting srde2e-real-system-e2e-blockers-retest
+      and srde2e-final-closure-gate.
+
+      - [ ] ALL B-RSE2E blocker families are remediated or have evidence showing the
+      exact root cause is outside the changed code and still closed by an equivalent
+      fix.
+
+      - [ ] Focused checks cover Source Ledger OPML import + `[RUN INGEST]` + `Live
+      Audit Source` + `last_fetch: HH:MM:SS`.
+
+      - [ ] Focused checks cover unique accessible button names for Steer preview/commit/undo
+      and browser-led MCP parity paths.
+
+      - [ ] No product invariant from docs/ARCHITECTURE.md or docs/DESIGN.md is weakened.
+
+      - [ ] Implementer evidence includes sibling search results and root-cause-vs-symptom
+      notes for B-RSE2E-02 and B-RSE2E-03.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Fix Evidence
+
+
+      **Original failed step**: srde2e-real-system-e2e-regression
+
+
+      **Blocker coverage matrix**:
+
+      | Blocker | Root cause | Files changed | Sibling search performed | Focused
+      proof | Status |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | B-RSE2E-01 | <root cause> | <paths> | <query/output> | <command/output> |
+      CLOSED/OPEN |
+
+      | B-RSE2E-02 | <root cause> | <paths> | <query/output> | <command/output> |
+      CLOSED/OPEN |
+
+      | B-RSE2E-03 | <root cause> | <paths> | <query/output> | <command/output> |
+      CLOSED/OPEN |
+
+      | B-RSE2E-04 | <root cause> | <paths> | <query/output> | <command/output> |
+      CLOSED/OPEN |
+
+
+      **Exact failing command preserved for retest**:
+
+      ```sh
+
+      npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe
+
+      ```
+
+
+      **Focused commands run by implementer**:
+
+      ```sh
+
+      <paste commands and outputs>
+
+      ```
+
+
+      **Invariant preservation notes**:
+
+      - Single Go binary / SQLite / owner-token / lexical-only / no forbidden product
+      concepts: <evidence>
+
+
+      **Handoff to independent retest**:
+
+      - [ ] Ready for integration-verifier to run real-server browser retest.
+
+      - [ ] No known blocker remains unowned.'
+    agent: frontend-engineer
