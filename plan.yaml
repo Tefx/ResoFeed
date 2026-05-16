@@ -82924,7 +82924,7 @@ phases:
 
       - [x] The six named broad rendering failures are explicitly checked and closed.
 
-      - [ ] Scoped Steer/source/split/processing-language checks show no regression.
+      - [x] Scoped Steer/source/split/processing-language checks show no regression.
 
       - [ ] `npm run check` remains clean.
 
