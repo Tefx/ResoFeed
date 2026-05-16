@@ -91712,6 +91712,89 @@ phases:
     depends_on:
     - azri-frontend-low-chrome-copy-zh-repair
     agent: doc-reviewer
+  - id: azri-implementation-gate
+    name: Gate audit and zh implementation repair
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether implementation and
+      preview sync are ready for independent verification.
+
+
+      Independence: gate-reviewer must not be the same agent as `frontend-engineer`
+      or `doc-reviewer` implementation steps.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches user-visible chrome, output copy, Source Ledger controls, OPML
+      ingest boundary, and zh localization.
+
+      - Prior audits found UIUX FAIL and architecture PASS_WITH_DEBT.
+
+
+      ## Completion Criteria
+
+      - [ ] All implementation phase steps are complete with specific evidence.
+
+      - [ ] Evidence includes screenshots/DOM or static preview snippets for every
+      repaired surface.
+
+      - [ ] No protected expected-red tests were weakened to pass.
+
+      - [ ] No new product-boundary violations were introduced.'
+    verification: '- [ ] Frontend repair and preview sync evidence is complete.
+
+      - [ ] Source Ledger OPML import remains explicit-manual-ingest only.
+
+      - [ ] Closed-menu route chrome, copy, Inspector provenance, and zh UI criteria
+      are satisfied in evidence.
+
+      - [ ] Phase is ready for independent browser, UIUX, spec, and architecture audits.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+      | azri-frontend-low-chrome-copy-zh-repair | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+      | azri-preview-contract-sync | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED'
+    depends_on:
+    - azri-frontend-low-chrome-copy-zh-repair
+    - azri-preview-contract-sync
+    agent: gate-reviewer
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
   status: locked
