@@ -95501,3 +95501,111 @@ phases:
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
     agent: wiring-auditor
+  - id: cos-runtime-e2e-retest
+    name: Run HTTP MCP frontend operation-status e2e retest
+    status: pending
+    description: 'As an INDEPENDENT TESTER (integration-verifier), validate the complete
+      path from guarded-operation snapshot to HTTP, MCP, and rendered UI.
+
+
+      YOUR GOAL IS TO FIND PROBLEMS, not to confirm it works.
+
+
+      Scope:
+
+      - Start the single `cmd/resofeed` binary through the existing runtime/e2e harness.
+
+      - Exercise `GET /api/runtime/operation` idle and running states.
+
+      - Exercise a guarded-operation conflict and verify the response includes `current_operation`
+      when available.
+
+      - Exercise MCP `resofeed://system/operation` and MCP conflict payload parity
+      where supported.
+
+      - Exercise frontend Source Ledger/open `RESOFEED` operations surfaces and prove
+      status appears contextually while idle global top chrome remains clean.
+
+
+      Integration Evidence requirement: paste actual commands/output and the exercised
+      path. Mock-only proof is insufficient.
+
+
+      ## Completion Criteria
+
+      - [ ] HTTP idle/running/conflict path is exercised against a real runtime or
+      equivalent integration harness.
+
+      - [ ] MCP resource/conflict parity is exercised where supported.
+
+      - [ ] Frontend rendered e2e proof shows allowed contextual status and absence
+      from persistent idle top chrome.
+
+      - [ ] Findings, if any, are documented as blocker/should_fix/suggestion/tech_debt
+      with reproduction steps.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: actual integration/e2e
+      evidence proves HTTP, MCP, and frontend operation-status paths work together.
+
+      - [ ] Evidence includes exact commands and pasted output, not only "tests pass".
+
+      - [ ] Behavioral proof register maps each requirement to PROVEN, NEEDS_TEST,
+      or explicit blocker/non-intersection disposition.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Seam-Level Integration Evidence
+
+      **Changed seam path**: HTTP runtime + MCP resource/tool errors + frontend rendered
+      surfaces
+
+
+      **Exact commands executed**:
+
+      ```
+
+      <paste actual commands>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste stdout/stderr or test runner output>
+
+      ```
+
+
+      **Path exercised**: guarded operation guard -> CurrentOperationInfo snapshot
+      -> HTTP/MCP -> frontend Source Ledger/RESOFEED surfaces
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      |---|---|---|---|'
+    depends_on:
+    - cos-backend-operation-snapshot
+    - cos-mcp-operation-parity
+    - cos-frontend-operation-utility-surface
+    agent: integration-verifier
