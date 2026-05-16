@@ -94632,7 +94632,7 @@ phases:
       - [x] `story_key` and `duplicate_of_item_id` grouping remain authoritative and
       preferred.
 
-      - [ ] True same-article URL fallback remains possible only where existing contract/tests
+      - [x] True same-article URL fallback remains possible only where existing contract/tests
       require it.
 
       - [ ] No backend schema, service layer, repository layer, DI, event bus, or
