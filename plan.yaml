@@ -95609,3 +95609,77 @@ phases:
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
     agent: integration-verifier
+  - id: cos-uiux-multimodal-audit
+    name: Run UIUX audit for operation status and utility placement
+    status: pending
+    description: 'As an INDEPENDENT UIUX AUDITOR (uiux-auditor), audit the implemented
+      operation-status and utility-placement surfaces against `docs/DESIGN.md` and
+      preview artifacts.
+
+
+      Scope:
+
+      - Verify current-operation status is text-only, terse, contextual, and limited
+      to Source Ledger/open `RESOFEED` operations surfaces.
+
+      - Verify closed top chrome shows only the minimal `RESOFEED` label/button plus
+      Steer field; no persistent LANG/reprocess/status strip.
+
+      - Verify `LANG: EN` / `LANG: ZH` and `[REPROCESS LIBRARY]` appear only in the
+      opened operations/utility menu or equivalent low-frequency terse surface.
+
+      - Verify reprocess running/conflict states use current-operation text, not dashboard/wizard/progress-timeline
+      UI.
+
+      - Use rendered screenshots/images/terminal captures or equivalent visual/spatial
+      artifacts for required states/viewports.
+
+
+      ## Completion Criteria
+
+      - [ ] Visual/spatial artifacts cover closed top chrome, opened RESOFEED utility
+      menu, Source Ledger running status, and reprocess conflict/running states.
+
+      - [ ] Audit checks dense archival workbench aesthetic, stark rules, no friendly
+      SaaS progress/dashboard treatment.
+
+      - [ ] Audit returns parseable PASS / PASS_WITH_DEBT / FAIL headline with blocker
+      disposition.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: uiux-auditor provides
+      multimodal rendered evidence for required states/viewports.
+
+      - [ ] Evidence proves low-frequency LANG/reprocess controls are not persistent
+      prominent top chrome.
+
+      - [ ] Evidence proves current-operation status is contextual and not an idle
+      global strip/dashboard.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Audit Report
+
+      - Artifacts reviewed/generated:
+
+      - Closed top chrome verdict:
+
+      - Open RESOFEED utility menu verdict:
+
+      - Source Ledger status verdict:
+
+      - Reprocess running/conflict verdict:
+
+      - DESIGN.md conformance notes:
+
+      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - cos-frontend-operation-utility-surface
+    - cos-runtime-e2e-retest
+    agent: uiux-auditor
