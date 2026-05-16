@@ -85562,15 +85562,15 @@ phases:
       - [x] Evidence includes `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,
       `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis` for each
       of SF1 and SF2.'
-    verification: '- [ ] phase-check protecting `srde2e-full-plan-check` and `srde2e-final-closure-gate`.
+    verification: '- [x] phase-check protecting `srde2e-full-plan-check` and `srde2e-final-closure-gate`.
 
-      - [ ] Both architecture/API should_fix findings from `srde2e-software-architect-fresh-review`
+      - [x] Both architecture/API should_fix findings from `srde2e-software-architect-fresh-review`
       are explicitly re-checked with evidence.
 
-      - [ ] Verdict is CLEAN only if SF1 and SF2 are closed and no new blocker/should_fix
+      - [x] Verdict is CLEAN only if SF1 and SF2 are closed and no new blocker/should_fix
       contract drift exists.
 
-      - [ ] Decision basis maps any unresolved item to remediation ownership; final
+      - [x] Decision basis maps any unresolved item to remediation ownership; final
       closure cannot open with unresolved blocker-class or should_fix proof gaps.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
