@@ -92440,24 +92440,24 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Browser/E2E commands and outputs are captured.
+      - [x] Browser/E2E commands and outputs are captured.
 
-      - [ ] Screenshots or DOM snapshots exist for EN closed/open menu, Source Ledger
+      - [x] Screenshots or DOM snapshots exist for EN closed/open menu, Source Ledger
       header, OPML import, Inspector, and zh mode.
 
-      - [ ] Network evidence proves OPML import does not call ingest automatically.
+      - [x] Network evidence proves OPML import does not call ingest automatically.
 
-      - [ ] Evidence explicitly lists any blocker/should_fix findings with reproduction
+      - [x] Evidence explicitly lists any blocker/should_fix findings with reproduction
       steps.'
-    verification: '- [ ] Phase-check protects final closure gate by proving live browser
+    verification: '- [x] Phase-check protects final closure gate by proving live browser
       behavior for all repaired UI/design findings.
 
-      - [ ] At least one real browser proof covers zh mode end-to-end from language
+      - [x] At least one real browser proof covers zh mode end-to-end from language
       set through visible UI state.
 
-      - [ ] OPML no-auto-ingest is proven with network/request evidence.
+      - [x] OPML no-auto-ingest is proven with network/request evidence.
 
-      - [ ] Any issues found are classified as blocker/should_fix/suggestion/tech_debt
+      - [x] Any issues found are classified as blocker/should_fix/suggestion/tech_debt
       with gate-intersection notes.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
