@@ -88860,58 +88860,96 @@ phases:
 
       - product_implementation_files_modified: no'
   - id: srde2e-full-plan-e2e-blockers-fix
-    name: Fix residual full-plan E2E and render blockers after salvage
+    name: Fix final residual 7 full-plan E2E blockers after salvage
     status: claimed
     description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
-      scope: RESIDUAL remediation for blocker-class failures remaining after partial\
-      \ progress was salvaged to main.\n\nThis step remains claimed and is NOT complete.\
-      \ Do not restart from the old step worktree state and do not assume the original\
-      \ 25-failure inventory is current. Partial source/test progress from the previous\
-      \ attempt was salvaged into main in commit 61a8825c (`[vectl] salvage partial\
-      \ progress from step-srde2e-full-plan-e2e-blockers-fix`). The next executor\
-      \ MUST begin from current main and fresh command output.\n\nResidual blocker\
-      \ focus (BOTH required):\n1. Full Playwright E2E residual failures.\n   - Latest\
-      \ known full E2E state after salvage: 10 failed / 61 passed / 2 skipped.\n \
-      \  - Latest output ref: `/Users/tefx/.local/share/opencode/tool-output/tool_e3018def0001W1wIirPlHWnYjz`.\n\
-      \   - Treat this ref as a starting clue, not authoritative live state; re-run\
-      \ or otherwise collect a current residual failure inventory from current main\
-      \ before fixing.\n2. Render/component regression introduced or exposed by the\
-      \ salvaged partial progress.\n   - Resolver validation command failed with 1\
-      \ failed file, 7 failed tests, 29 passed:\n     `npm --prefix web run test:render\
-      \ -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
-      \ src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts\
-      \ src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`\n\
-      \   - This render/component regression is blocker-class because it intersects\
-      \ srde2e-full-plan-e2e-blockers-retest and srde2e-final-closure-gate.\n\nRequired\
-      \ execution order:\n1. Freshly re-baseline from current main, not from any old\
-      \ worktree or stale unmerged state.\n2. Collect the residual failure inventory\
-      \ if needed:\n   - full E2E residual failures from current main, using the latest\
-      \ 10-failure output ref only as a seed;\n   - targeted render/component failures\
-      \ from the exact resolver validation command above.\n3. Fix residuals in the\
-      \ app/test surface without weakening documented contracts.\n4. Run the required\
-      \ command family before handoff and record exact output/disposition.\n\nResidual\
-      \ remediation rules:\n- Do NOT add duplicate implementation work for blocker\
-      \ families already closed by the salvaged commit unless current-main evidence\
-      \ proves they are still failing.\n- Do NOT weaken or delete E2E/render assertions\
-      \ to make tests pass. Test changes are allowed only when they align tests with\
-      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md, and\
-      \ the implemented user-visible contract; record a deviation note with citation.\n\
-      - Preserve ResoFeed invariants from AGENTS.md and docs/ARCHITECTURE.md: single\
-      \ deployable Go binary, SQLite-only storage, lexical search only, no vector\
-      \ DB/embeddings/RAG semantic answer UI, no account/auth model, no sync/merge\
-      \ coordinator.\n- Preserve DESIGN.md chrome and interaction principles: dense\
-      \ archival index, functional labels, Source Ledger/Inspector/Steer language,\
-      \ no SaaS/friendly copy drift.\n- Treat `pre-existing`, `introduced_now`, and\
-      \ `out-of-step-origin` as provenance only, never as dispositions. Any remaining\
-      \ failure that intersects srde2e-final-closure-gate must have blocker disposition\
-      \ and residual ownership.\n\nRequired commands before handoff:\n- `npm --prefix\
-      \ web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
+      scope: FINAL RESIDUAL remediation for the 7 blocker-class full-plan E2E failures\
+      \ remaining after additional partial progress was salvaged to main.\n\nThis\
+      \ step remains claimed and is NOT complete. Do not restart from the old step\
+      \ worktree state and do not assume any previous 25-failure, 10-failure, or partial\
+      \ worktree inventory is current. Partial source/test progress from the previous\
+      \ attempts has already been salvaged into main in commits:\n- 61a8825c (`[vectl]\
+      \ salvage partial progress from step-srde2e-full-plan-e2e-blockers-fix`)\n-\
+      \ 107d1349 (`[vectl] salvage residual UI render fixes from step-srde2e-full-plan-e2e-blockers-fix`)\n\
+      \nMainline verification after commit 107d1349 is newly green for these gates\
+      \ and MUST be preserved:\n- exact targeted render command: 4 files passed, 36\
+      \ tests passed\n- `npm --prefix web run test:render`: 11 files passed, 62 tests\
+      \ passed\n- `npm --prefix web run check`: 0 errors/warnings\n- `npm --prefix\
+      \ web run build`: passed\n\nLatest known full E2E state from the fix worktree\
+      \ evidence remains red: 7 failed / 64 passed / 2 skipped. Treat that as a starting\
+      \ clue only. The next executor MUST begin from current main and collect a fresh\
+      \ current-main full E2E baseline before finalizing fixes.\n\n## Fresh baseline\
+      \ requirement\nBefore finalizing any fix handoff:\n1. Start from current main\
+      \ containing both salvage commits 61a8825c and 107d1349.\n2. Run or otherwise\
+      \ collect a current-main `npm --prefix web run test:e2e` baseline and record\
+      \ exact failing spec/test names.\n3. Compare the fresh inventory against the\
+      \ 7 known residual blockers below.\n4. If the fresh inventory differs, fix the\
+      \ current-main failures and explicitly explain the delta; do not chase stale\
+      \ failures that no longer reproduce.\n\n## Remaining 7 blocker failures to close\n\
+      Fix all blocker-class failures that still reproduce on current main, with special\
+      \ focus on these known residuals:\n\n1. `full-ui-design-conformance.expected-red.spec.ts`\n\
+      \   - Failure: Source Ledger heading is not visible after Steer `source ledger`.\n\
+      \   - Closure expectation: the real rendered Steer-to-Source-Ledger path exposes\
+      \ the documented Source Ledger heading without relying on hidden-only or test-only\
+      \ text.\n\n2. `hit-target-clickability.spec.ts`\n   - Failure: selected Inspect/open\
+      \ row y-position shifts after Playwright scrolls the row into view.\n   - Closure\
+      \ expectation: click target geometry remains stable enough for the documented\
+      \ hit-target assertions after scroll-into-view, without weakening the hit-target\
+      \ contract.\n\n3. `inspector-dirty-corpus.spec.ts`\n   - Failure: Dirty Inspector\
+      \ Corpus fetch accessible name/status mismatch after SourceLedger accessibility\
+      \ collision mitigation.\n   - Closure expectation: accessible names/status labels\
+      \ are unambiguous across Source Ledger and Inspector and still expose the Dirty\
+      \ Inspector Corpus fetch status expected by the spec.\n\n4. `inspector-readable-content-regression.spec.ts`\n\
+      \   - Failure: Inspector Readable Regression Source status remains `rss_fetch_error`\
+      \ instead of visible `status: ok`.\n   - Closure expectation: the fixture/API\
+      \ lifecycle and visible Inspector status converge on `status: ok` for the regression\
+      \ source where the contract requires readable content success.\n\n5. `prd-inspector-preview-conformance.expected-red.spec.ts`\n\
+      \   - Failure: hidden/zero-size first `.contract-resonate` probe reports 0x0.\n\
+      \   - Closure expectation: the first contract-resonate probe used by the PRD\
+      \ conformance test maps to a visible non-zero-size affordance, or the selector/test\
+      \ contract is docs-backed and updated without hiding product semantics.\n\n\
+      6. `ui-remediation-r1-r8-browser-retest.spec.ts`\n   - Failure: Dirty Inspector\
+      \ Corpus API lifecycle status remains `rss_fetch_error`.\n   - Closure expectation:\
+      \ browser retest API lifecycle evidence agrees with the visible Inspector contract\
+      \ and no longer reports the stale/error status for the Dirty Inspector Corpus\
+      \ success path.\n\n7. `ui-runtime-fresh-review-remediation.spec.ts`\n   - Failure:\
+      \ FR-01/FR-10 expects keyboard focus on `RESOFEED` summary, conflicting with\
+      \ the legacy keyboard-a11y quick-nav order currently kept passing.\n   - Closure\
+      \ expectation: resolve the focus-order contract conflict with docs-backed reasoning.\
+      \ Preserve both keyboard accessibility and documented chrome/summary behavior;\
+      \ if one test expectation is stale, record the authoritative docs-backed deviation\
+      \ and update only the stale expectation.\n\n## Required execution order\n1.\
+      \ Freshly re-baseline from current main after commits 61a8825c and 107d1349,\
+      \ not from any old worktree or stale unmerged state.\n2. Confirm the exact residual\
+      \ full E2E inventory from current main.\n3. Fix the remaining 7 blocker families\
+      \ in the app/test surface without weakening documented contracts.\n4. Preserve\
+      \ the already-green targeted render/check/build gates from the post-salvage\
+      \ mainline verification.\n5. Run the required command family before handoff\
+      \ and record exact output/disposition.\n\n## Residual remediation rules\n- Do\
+      \ NOT add duplicate implementation work for blocker families already closed\
+      \ by salvaged commits unless current-main evidence proves they are still failing.\n\
+      - Do NOT weaken or delete E2E/render assertions to make tests pass. Test changes\
+      \ are allowed only when they align tests with docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/UI_REGRESSION_CONTRACT.md, and the implemented user-visible contract;\
+      \ record a deviation note with citation.\n- Preserve ResoFeed invariants from\
+      \ AGENTS.md and docs/ARCHITECTURE.md: single deployable Go binary, SQLite-only\
+      \ storage, lexical search only, no vector DB/embeddings/RAG semantic answer\
+      \ UI, no account/auth model, no sync/merge coordinator.\n- Preserve DESIGN.md\
+      \ chrome and interaction principles: dense archival index, functional labels,\
+      \ Source Ledger/Inspector/Steer language, no SaaS/friendly copy drift.\n- Treat\
+      \ `pre-existing`, `introduced_now`, and `out-of-step-origin` as provenance only,\
+      \ never as dispositions. Any remaining failure that intersects srde2e-final-closure-gate\
+      \ must have blocker disposition and residual ownership.\n\n## Required commands\
+      \ before handoff\nRun from the repository root unless documenting an equivalent\
+      \ working-directory form:\n- `npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
       \ src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts\
       \ src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`\
-      \ MUST pass.\n- `npm run test:render` MUST pass.\n- `npm run test:e2e` MUST\
-      \ pass OR every remaining failure must have explicit blocker/non-blocker gate-intersection\
-      \ disposition and residual ownership.\n- `npm run check` MUST pass.\n- `npm\
-      \ run build` MUST pass.\n\nDownstream dependency preservation:\n- Keep srde2e-uiux-full-plan-e2e-blockers-audit\
+      \ MUST pass.\n- `npm --prefix web run test:render` MUST pass.\n- `npm --prefix\
+      \ web run test:e2e` MUST pass green. If any residual failure remains, it must\
+      \ have explicit blocker/non-blocker gate-intersection disposition and residual\
+      \ ownership, but the goal of this step is full green E2E closure.\n- `npm --prefix\
+      \ web run check` MUST pass.\n- `npm --prefix web run build` MUST pass.\n\n##\
+      \ Downstream dependency preservation\n- Keep srde2e-uiux-full-plan-e2e-blockers-audit\
       \ dependent on this step.\n- Keep srde2e-full-plan-e2e-blockers-retest dependent\
       \ on this step and the UI/UX audit.\n- Do not mark this step complete; completion\
       \ remains orchestrator-owned.\n\n## Completion Criteria (stub exclusion)\nThis\
@@ -88919,80 +88957,187 @@ phases:
       \ MUST contain substantive UI/runtime logic or CSS/markup changes that process\
       \ real app state and produce visible/accessibility outputs that vary based on\
       \ inputs. Private stub or placeholder classes/functions do not satisfy this\
-      \ requirement.\n\n## Completion Checklist\n- [x] Current-main residual failure\
-      \ inventory is collected or explicitly refreshed before code changes are finalized.\n\
-      - [ ] Full E2E residual failures are fixed from the latest current-main inventory,\
-      \ not from stale worktree assumptions.\n- [ ] The targeted render/component\
-      \ regression command passes exactly as listed.\n- [ ] `npm run test:render`\
-      \ passes.\n- [x] `npm run test:e2e` passes, or remaining failures have explicit\
-      \ blocker disposition and residual ownership.\n- [ ] `npm run check` passes.\n\
-      - [ ] `npm run build` passes.\n- [ ] No E2E/render assertions were weakened\
-      \ without docs-backed deviation notes.\n- [ ] ResoFeed architecture/design/UI\
-      \ regression invariants are preserved.\n\n## Gate Preview (what final closure\
-      \ WILL reject)\n1. Fixes based on stale old-worktree state instead of current\
-      \ main after commit 61a8825c.\n2. Any unresolved targeted render/component regression\
-      \ in the listed command.\n3. Passing targeted render checks while full `npm\
-      \ run test:render` remains red.\n4. Full `npm run test:e2e` still red without\
-      \ explicit blocker/non-blocker gate-intersection disposition and residual ownership.\n\
-      5. Selector or assertion weakening that hides product semantics instead of preserving\
-      \ documented Source Ledger/TODAY/Steer/Inspector contracts."
+      \ requirement.\n\n## Completion Checklist\n- [ ] Current-main full E2E baseline\
+      \ is refreshed after commits 61a8825c and 107d1349 before finalizing code changes.\n\
+      - [ ] Fresh residual failure inventory is compared against the 7 known blockers\
+      \ and any delta is explained.\n- [ ] Source Ledger heading visibility after\
+      \ Steer `source ledger` is fixed or docs-backed disposition is recorded.\n-\
+      \ [ ] Inspect/open hit-target geometry remains stable after Playwright scroll-into-view.\n\
+      - [ ] Dirty Inspector Corpus accessible name/status mismatch is fixed without\
+      \ reintroducing SourceLedger a11y collisions.\n- [ ] Inspector Readable Regression\
+      \ Source shows visible `status: ok` where required.\n- [ ] `.contract-resonate`\
+      \ conformance probe resolves to a visible non-zero-size affordance or has a\
+      \ docs-backed selector contract update.\n- [ ] Dirty Inspector Corpus API lifecycle\
+      \ status no longer remains `rss_fetch_error` for the success path.\n- [ ] FR-01/FR-10\
+      \ `RESOFEED` summary focus conflict is resolved with docs-backed accessibility\
+      \ reasoning.\n- [ ] Full `npm --prefix web run test:e2e` passes green, or every\
+      \ residual failure has explicit blocker disposition and residual ownership.\n\
+      - [ ] The exact targeted render command remains green.\n- [ ] `npm --prefix\
+      \ web run test:render` remains green.\n- [ ] `npm --prefix web run check` remains\
+      \ green.\n- [ ] `npm --prefix web run build` remains green.\n- [ ] No E2E/render\
+      \ assertions were weakened without docs-backed deviation notes.\n- [ ] ResoFeed\
+      \ architecture/design/UI regression invariants are preserved.\n\n## Gate Preview\
+      \ (what final closure WILL reject)\n1. Fixes based on stale old-worktree state\
+      \ instead of current main after commits 61a8825c and 107d1349.\n2. Any unresolved\
+      \ targeted render/component regression in the listed command.\n3. Passing targeted\
+      \ render checks while full `npm --prefix web run test:render` regresses.\n4.\
+      \ Full `npm --prefix web run test:e2e` still red without explicit blocker/non-blocker\
+      \ gate-intersection disposition and residual ownership.\n5. Selector or assertion\
+      \ weakening that hides product semantics instead of preserving documented Source\
+      \ Ledger/TODAY/Steer/Inspector contracts.\n6. A focus-order change that breaks\
+      \ legacy keyboard accessibility without a docs-backed resolution of the FR-01/FR-10\
+      \ conflict."
     verification: '- [ ] Fresh re-baselining starts from current main after salvaged
-      commit 61a8825c, not old worktree state.
+      commits 61a8825c and 107d1349, not old worktree state.
 
-      - [ ] Residual full E2E failure inventory is collected from current main, using
-      `/Users/tefx/.local/share/opencode/tool-output/tool_e3018def0001W1wIirPlHWnYjz`
-      only as a seed/reference.
+      - [ ] Current-main `npm --prefix web run test:e2e` baseline is collected before
+      final fix handoff and reports the exact residual spec/test inventory.
 
-      - [ ] Targeted render/component regression inventory is collected from the exact
-      `npm --prefix web run test:render -- ...` command listed in the description.
+      - [ ] Fresh baseline is compared to the known 7 residual blocker list, with
+      any added/closed/different failures explicitly explained.
 
-      - [ ] Residual full E2E failures are fixed or explicitly dispositioned with
-      blocker/non-blocker gate-intersection reasoning and residual ownership.
-
-      - [ ] The exact targeted render command passes.
-
-      - [ ] `npm run test:render` passes.
-
-      - [ ] `npm run test:e2e` passes, or every remaining failure has explicit blocker
+      - [ ] All 7 known residual blocker families are fixed where they still reproduce
+      on current main, or each has explicit blocker/non-blocker gate-intersection
       disposition and residual ownership.
 
-      - [ ] `npm run check` passes.
+      - [ ] `full-ui-design-conformance.expected-red.spec.ts` Source Ledger heading
+      visibility after Steer `source ledger` is proven fixed or dispositioned.
 
-      - [ ] `npm run build` passes.
+      - [ ] `hit-target-clickability.spec.ts` Inspect/open hit-target y-position stability
+      after scroll-into-view is proven fixed or dispositioned.
+
+      - [ ] `inspector-dirty-corpus.spec.ts` Dirty Inspector Corpus accessible name/status
+      mismatch is proven fixed or dispositioned.
+
+      - [ ] `inspector-readable-content-regression.spec.ts` Inspector Readable Regression
+      Source visible `status: ok` is proven fixed or dispositioned.
+
+      - [ ] `prd-inspector-preview-conformance.expected-red.spec.ts` `.contract-resonate`
+      visible non-zero-size contract is proven fixed or dispositioned.
+
+      - [ ] `ui-remediation-r1-r8-browser-retest.spec.ts` Dirty Inspector Corpus API
+      lifecycle status is proven fixed or dispositioned.
+
+      - [ ] `ui-runtime-fresh-review-remediation.spec.ts` FR-01/FR-10 `RESOFEED` focus-order
+      conflict is resolved with docs-backed accessibility reasoning.
+
+      - [ ] The exact targeted render command passes: `npm --prefix web run test:render
+      -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`.
+
+      - [ ] `npm --prefix web run test:render` passes and preserves the 11-file/62-test
+      green gate or records any expanded count accurately.
+
+      - [ ] `npm --prefix web run test:e2e` passes green, or every remaining failure
+      has explicit blocker disposition and residual ownership.
+
+      - [ ] `npm --prefix web run check` passes with 0 errors/warnings.
+
+      - [ ] `npm --prefix web run build` passes.
 
       - [ ] No tests/assertions/selectors were weakened except with docs-backed deviation
       evidence.
 
       - [ ] Downstream srde2e-uiux-full-plan-e2e-blockers-audit and srde2e-full-plan-e2e-blockers-retest
       remain the verification owners after this implementation step.'
-    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
-      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
-      \ — key passage or \"NOT READ: <reason>\"\n- docs/UI_REGRESSION_CONTRACT.md\
-      \ — key passage or \"NOT READ: <reason>\"\n- /Users/tefx/.local/share/opencode/tool-output/tool_e3018def0001W1wIirPlHWnYjz\
-      \ — key residual-failure passage or \"NOT READ: <reason>\"\n\n## Residual Remediation\
-      \ Evidence\n\n**Current-main baseline:**\n- Commit/base checked: <current main\
-      \ commit>\n- Old worktree state used? MUST be NO\n\n**Residual failure inventory\
-      \ before fix:**\n- Full E2E failures: <count and summary>\n- Targeted render\
-      \ failures: <count and summary>\n\n**Fix summary:**\n- Files changed: <list>\n\
-      - Residual blocker families addressed: <list>\n- Assertion/test changes: <none\
-      \ or docs-backed deviation notes>\n\n**Required command outputs:**\n- Targeted\
-      \ render command:\n  ```\n  npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
-      \ src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts\
-      \ src/routes/components/__tests__/steer-route-preview.expected-red.test.ts\n\
-      \  <paste exact output>\n  ```\n- `npm run test:render`:\n  ```\n  <paste exact\
-      \ output>\n  ```\n- `npm run test:e2e`:\n  ```\n  <paste exact output>\n  ```\n\
-      - `npm run check`:\n  ```\n  <paste exact output>\n  ```\n- `npm run build`:\n\
-      \  ```\n  <paste exact output>\n  ```\n\n**Remaining failure disposition (required\
-      \ if any command remains red):**\n| Failure | Provenance | Disposition | Gate\
-      \ intersection | Residual owner |\n| --- | --- | --- | --- | --- |\n| <failure>\
-      \ | pre-existing/introduced_now/out-of-step-origin | blocking-now/blocking-later/non-blocking\
-      \ | <reason> | <step/owner> |\n\n**Handoff headline:** PASS / PASS_WITH_RESIDUAL_OWNERSHIP\
-      \ / BLOCKED"
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fresh Current-Main E2E Baseline
+
+      - Current main commit used: <sha>
+
+      - Salvage commits present: 61a8825c yes/no; 107d1349 yes/no
+
+      - Exact command: `npm --prefix web run test:e2e`
+
+      - Result: <passed/failed>
+
+      - Residual inventory compared to known 7 blockers: <paste summary>
+
+
+      ## Seven-Blocker Closure Register
+
+      | # | Spec/test | Fresh-main status | Fix/disposition | Evidence ref |
+
+      |---|-----------|-------------------|-----------------|--------------|
+
+      | 1 | full-ui-design-conformance.expected-red.spec.ts | | | |
+
+      | 2 | hit-target-clickability.spec.ts | | | |
+
+      | 3 | inspector-dirty-corpus.spec.ts | | | |
+
+      | 4 | inspector-readable-content-regression.spec.ts | | | |
+
+      | 5 | prd-inspector-preview-conformance.expected-red.spec.ts | | | |
+
+      | 6 | ui-remediation-r1-r8-browser-retest.spec.ts | | | |
+
+      | 7 | ui-runtime-fresh-review-remediation.spec.ts | | | |
+
+
+      ## Command Evidence
+
+      - Targeted render command output: <paste exact summary>
+
+      - `npm --prefix web run test:render` output: <paste exact summary>
+
+      - `npm --prefix web run test:e2e` output: <paste exact summary>
+
+      - `npm --prefix web run check` output: <paste exact summary>
+
+      - `npm --prefix web run build` output: <paste exact summary>
+
+
+      ## Disposition Rules
+
+      If any failure remains, include:
+
+      - requirement_ref:
+
+      - behavior_claim:
+
+      - runtime_proof_expected:
+
+      - evidence_ref:
+
+      - status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING
+
+      - closure_path:
+
+      - gate_decision_basis:
+
+      - residual_owner:
+
+
+      ## Headline
+
+      - [ ] PASS: all required render/check/build gates are green and full E2E is
+      green.
+
+      - [ ] PASS_WITH_RESIDUAL_OWNER: only explicitly dispositioned residuals remain
+      with blocker ownership.
+
+      - [ ] FAIL: blocker-class failures remain without ownership or required command
+      evidence is missing.'
     refs:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/UI_REGRESSION_CONTRACT.md
-    - /Users/tefx/.local/share/opencode/tool-output/tool_e3018def0001W1wIirPlHWnYjz
     depends_on:
     - srde2e-full-plan-check
     agent: frontend-engineer
