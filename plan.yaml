@@ -83398,7 +83398,7 @@ phases:
       items are [x].'
   - id: srdf-batched-frontend-audit-remediation
     name: Batch remediate frontend spec and UIUX audit blockers
-    status: claimed
+    status: done
     description: 'Batched remediation for the two concurrent frontend verification
       failures.
 
@@ -83687,6 +83687,103 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T00:30:25.976354+00:00'
+    done_at: '2026-05-16T01:08:43.101118+00:00'
+    evidence: 'Commit hash(es): branch commits b9105342, dfb06886, 9b42e358b019a1548d265d0f9a01180c8bb159b9;
+      main squash commit 21e91e79.
+
+
+      Files changed:
+
+      - web/src/app.css
+
+      - web/src/lib/api-client.test.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SearchRetrieval.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      - web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+
+      - web/src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+      - web/tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+
+      - web/tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+
+
+      Spec link: srdf-batched-frontend-audit-remediation
+
+
+      Mainline final-state verification:
+
+      - `cd web && npm run test`: PASS; svelte-check found 0 errors and 0 warnings;
+      vitest 11 files / 62 tests passed.
+
+      - `cd web && npm run build`: PASS; vite/SvelteKit production build completed
+      and wrote static site.
+
+      - `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/feed-search-anatomy.spec.ts
+      tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts`: PASS; 15 passed
+      (9.5s).
+
+
+      Combined findings register:
+
+      - B1_R2_steer_preview_aria: PROVEN_FIXED by `source-ledger-steer-split-scroll.expected-red.spec.ts`
+      Steer preview route chips/live region test plus unit coverage.
+
+      - B2_R4_search_accessible_name: PROVEN_FIXED by `feed-search-anatomy.spec.ts`
+      and SearchRetrieval/component tests under `npm run test`.
+
+      - B3_R7_source_fetch_disabled_scope: PROVEN_FIXED by Source Ledger controls/hit-target
+      E2E coverage and component tests.
+
+      - B4_R9_opml_input_reachability: PROVEN_FIXED by `source-ledger-controls-diagnostics-layout.expected-red.spec.ts`
+      Issue 6 `[IMPORT OPML]` keyboard/file reachability test.
+
+      - R10_mobile_scroll_reconciliation: PROVEN_FIXED by `source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts`
+      and `source-ledger-steer-split-scroll.expected-red.spec.ts` split-scroll/mobile
+      preservation tests.
+
+      - add_source_chip: PROVEN_FIXED by Steer route focused E2E and component coverage.
+
+      - fetch_control_reachability: PROVEN_FIXED by Source Ledger controls/hit-target
+      E2E.
+
+      - split_scroll_mobile_scroll: PROVEN_FIXED by both split-scroll focused E2E
+      files.
+
+      - jsonld_raw_payload_negative: PROVEN_FIXED by `inspector-dirty-corpus.spec.ts`
+      dirty corpus inspector primary hierarchy test.
+
+      - mobile_metadata_truncation: PROVEN_FIXED by `feed-search-anatomy.spec.ts`
+      desktop/narrow viewport proof.
+
+      - playwright_expected_red_claims: PROVEN_STALE_NON_INTERSECTING for the previously
+      claimed broad expected-red failure count because current mainline focused E2E
+      passes 15/15 and `npm run test` passes 62/62.
+
+
+      Failure context addressed:
+
+      - The OPML `[IMPORT OPML]` path now keeps visible button semantics while preserving
+      reachable file input coverage.
+
+      - The final retry fixed the remaining strict-mode split-scroll test ambiguity
+      by targeting the actual `[data-scroll-region="inspector-independent"]` container
+      and resetting mobile route state before feed-scroll preservation assertions.
+
+
+      Gaps/Notes: none for this implementation step; downstream `srdf-batched-frontend-audit-closure`
+      remains responsible for independent closure evidence and rendered artifact register.'
   - id: srdf-batched-frontend-audit-closure
     name: Retest and close batched frontend spec UIUX blockers
     status: pending
