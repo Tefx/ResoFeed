@@ -85333,7 +85333,7 @@ phases:
     claimed_at: '2026-05-16T08:06:18.903781+00:00'
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
 
@@ -85407,6 +85407,8 @@ phases:
     - srde2e-software-architect-fresh-review
     - srde2e-visual-a11y-blockers-retest
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T08:06:25.704211+00:00'
   - id: srde2e-software-architect-clean-recheck
     name: Re-review batched architecture/API contract remediation
     status: pending
