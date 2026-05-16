@@ -86889,7 +86889,7 @@ phases:
       \ items."
   - id: srde2e-visual-a11y-blockers-fix
     name: Fix visual accessibility blocker families
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: default
@@ -87079,6 +87079,157 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T06:52:25.661408+00:00'
+    done_at: '2026-05-16T07:11:03.582945+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - `docs/DESIGN.md` — read by executor. Key passages: desktop Feed/Inspector
+      must be independent focusable labelled scroll regions; Source Ledger bracket
+      actions require 44px hit targets; State Portability import/export must be terse
+      bracket actions; original links/source identifiers remain reachable provenance
+      anchors.
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — read by executor. Key passages: real hit-target
+      proof must use topmost pointer coordinates; keyboard/a11y contract requires
+      labels, focus visibility, and active-panel semantic agreement; negative scan
+      forbids dashboard/job/activity/sync drift.
+
+      - `docs/ARCHITECTURE.md` — read by executor. Key passages: one deployable Go
+      process, one SQLite DB, no folders/tags/settings dashboards/sync/merge/activity
+      ledgers; desktop split scroll is frontend containment only.
+
+
+      ## Visual/A11Y Blocker Fix Evidence
+
+
+      **Original failed proof**: `srde2e-visual-a11y-regression-proof`
+
+      **Audit artifact context**: `artifacts/srde2e-visual-a11y-regression-proof/`,
+      commit `2ada3dd1` on main; original worktree commit `9400bec43da65e5cfa41dc45c19dcc46bfa53f08`.
+
+
+      ### Blocker closure table
+
+      | Blocker | Files changed | Root cause | Fix summary | Rendered/browser proof
+      |
+
+      | --- | --- | --- | --- | --- |
+
+      | B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN | `Inspector.svelte`, audit script,
+      refreshed artifacts | Generic `summary:has-text("DETAILS")` could resolve to
+      hidden Inspector “source details” before Source Ledger `[DETAILS]`. | Renamed
+      Inspector disclosure to `source provenance`; Source Ledger remains `[DETAILS]`
+      real visible summary. | `node audits/srde2e-visual-a11y-regression-proof.mjs`
+      PASS; audit hit row `[DETAILS]` 73x44, topmost true. |
+
+      | B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET | `SourceLedger.svelte`, refreshed artifacts
+      | Generic `input[type=file]` could resolve to a visually-hidden 1px file input
+      before `[IMPORT STATE]`. | Moved OPML file input after State Portability controls
+      so visible `[IMPORT STATE]` button is first user-facing activation target. |
+      Audit hit row `[IMPORT STATE]` 134x44, topmost true, min44 true. |
+
+      | B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN | `Inspector.svelte`, `app.css`,
+      audit script, refreshed artifacts | Proof selector could hit `main`; Inspector
+      reading container was not explicitly focusable. | Added labelled/focusable Inspector
+      scroll-region marker and CSS scroll containment; audit targets explicit `data-scroll-region`
+      elements. | `desktop-split-scroll-proof.json`: feedTabIndex `0`, inspectorTabIndex
+      `0`, labels present. |
+
+      | B4_ORIGINAL_LINK_BELOW_44PX | `Inspector.svelte`, `app.css`, refreshed artifacts
+      | Original link rendered as metadata text line only, measured 97x14. | Inspector
+      links render as inline-flex 44px-min targets; original link has explicit class/padding.
+      | Audit hit row original link 113x44, topmost true, min44 true. |
+
+
+      ### Sibling search summary
+
+      - Executor searched `web/src/**/*.svelte` for `[DETAILS]`, `<summary`, `type="file"`,
+      `data-scroll-region`, and anchors.
+
+      - Remaining file inputs are behind visible bracket actions; audit proves `[IMPORT
+      OPML]` and `[IMPORT STATE]` resolve to visible 44px buttons.
+
+      - Remaining Inspector/source anchors inherit `.contract-inspector a` 44px min
+      sizing.
+
+      - Feed and Inspector scroll regions expose explicit `data-scroll-region`, labels,
+      and `tabindex="0"`.
+
+
+      ### Verification commands and output snippets
+
+      - `npm run check` in `web/` — PASS: `svelte-check found 0 errors and 0 warnings`.
+
+      - `npm --prefix web run build && go build -o bin/resofeed ./cmd/resofeed` —
+      PASS in executor worktree.
+
+      - `node audits/srde2e-visual-a11y-regression-proof.mjs` — PASS in executor worktree:
+      `PASS: UI/a11y black-box regression proof passed`.
+
+      - `npm run test:render` — FAIL for separate expected-red Steer route-preview
+      contract failures. Gate-intersection was performed; remediation ownership created
+      in `srde2e-steer-route-preview-render-contract-fix` and `srde2e-steer-route-preview-render-contract-retest`
+      before completing this B1-B4 fix.
+
+
+      ### Mainline final-state verification after merge
+
+      - Mainline squash commit: `ec6ef03c` (`[vectl] step-srde2e-visual-a11y-blockers-fix
+      completed`).
+
+      - `npm run check && npm run build` in `web/` — PASS.
+
+      - Initial mainline `node audits/srde2e-visual-a11y-regression-proof.mjs` timed
+      out waiting for the runtime because the root `bin/resofeed` binary had not been
+      freshly built in main.
+
+      - After `mkdir -p bin && go build -o bin/resofeed ./cmd/resofeed`, `node audits/srde2e-visual-a11y-regression-proof.mjs`
+      — PASS: `PASS: UI/a11y black-box regression proof passed`.
+
+
+      ### Passing surface non-regression
+
+      - Audit pass preserved owner-token shell, Steer surfaces, Source Ledger `[RUN
+      INGEST]`/`[FETCH]`/`[DELETE]`, keyboard focus path, Escape behavior, active
+      panel semantics, and forbidden-term negative scan.
+
+      - Refreshed rendered artifacts under `artifacts/srde2e-visual-a11y-regression-proof/`.
+
+
+      ### Commit hash(es)
+
+      - Worktree implementation commit: `cacad05a` (`fix visual a11y blocker targets`)
+
+      - Branch plan-alignment cleanup commit: `e4d752c7` (excluded plan diff before
+      merge)
+
+      - Mainline squash commit: `ec6ef03c`
+
+
+      ### Files changed
+
+      - `web/src/routes/components/SourceLedger.svelte`
+
+      - `web/src/routes/components/Inspector.svelte`
+
+      - `web/src/app.css`
+
+      - `audits/srde2e-visual-a11y-regression-proof.mjs`
+
+      - Refreshed proof artifacts under `artifacts/srde2e-visual-a11y-regression-proof/`
+
+
+      ### Gaps/Notes
+
+      - Product implementation files modified: yes.
+
+      - No forbidden UI/product concepts introduced.
+
+      - Separate Steer route-preview render-test debt is not completed here; it has
+      dedicated downstream remediation ownership.
+
+      - Acceptance and verification checklist items are `[x]`; verification checklist
+      required planner repair because `vectl_check` could not match verification-field
+      checklist items.'
   - id: srde2e-visual-a11y-blockers-retest
     name: Retest visual accessibility blocker closure
     status: pending
