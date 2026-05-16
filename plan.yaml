@@ -91155,7 +91155,7 @@ phases:
       - [x] Matrix verdict for Chinese support is explicit: COMPLETE, INCOMPLETE,
       or UNCERTAIN, with evidence for each required surface.
 
-      - [ ] All zh gaps that affect user-visible product contract have planned repair
+      - [x] All zh gaps that affect user-visible product contract have planned repair
       ownership rather than vague audit-only wording.
 
       - [ ] Matrix preserves product boundaries: single binary, SQLite only, no sync/merge/history,
