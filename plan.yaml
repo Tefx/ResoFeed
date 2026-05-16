@@ -92211,7 +92211,7 @@ phases:
       with docs/ui-preview.html only.'
   - id: azri-implementation-gate
     name: Gate audit and zh implementation repair
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -92292,6 +92292,8 @@ phases:
     - azri-frontend-low-chrome-copy-zh-repair
     - azri-preview-contract-sync
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T14:14:54.331686+00:00'
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
   status: locked
