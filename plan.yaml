@@ -92591,7 +92591,7 @@ phases:
       - [x] Evidence table covers all seven zh surfaces with CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
       verdicts.
 
-      - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit remediation/retest or
+      - [x] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit remediation/retest or
       non-intersection closure path.
 
       - [ ] Product-boundary constraints are checked against AGENTS.md and docs/ARCHITECTURE.md.
