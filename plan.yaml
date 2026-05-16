@@ -97173,7 +97173,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Requirements register covers HTTP, MCP, conflict payload, frontend status
+      - [x] Requirements register covers HTTP, MCP, conflict payload, frontend status
       placement, LANG/reprocess placement, and forbidden durable/dashboard semantics.
 
       - [ ] Evidence cites spec section and implementation file/line for each requirement.
