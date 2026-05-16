@@ -84384,7 +84384,7 @@ phases:
       \ evidence:\n- [x] Run `cd web && npm run test`.\n- [x] Run `cd web && npm run\
       \ test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
       \ tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`.\n\
-      - [ ] Run `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      - [x] Run `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
       \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
       \ tests/e2e/hit-target-clickability.spec.ts`.\n- [ ] Run `cd web && npm run\
       \ test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts\
