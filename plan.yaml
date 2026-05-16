@@ -95481,7 +95481,7 @@ phases:
 
       - [x] Valid grouped story renders grouped-source disclosure without Svelte `state_unsafe_mutation`.
 
-      - [ ] Synthetic feed-fragment no-grouping path remains non-grouped and does
+      - [x] Synthetic feed-fragment no-grouping path remains non-grouped and does
       not regress.
 
       - [ ] Browser console evidence is captured and contains no blocker-class runtime
