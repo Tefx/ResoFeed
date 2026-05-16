@@ -85719,7 +85719,7 @@ phases:
       - [x] Record failing checks as blocker-class if they intersect the final gate;
       do not dismiss as pre-existing without non-intersection evidence.
 
-      - [ ] Produce a concise pass/fail matrix with exact commands and outputs.'
+      - [x] Produce a concise pass/fail matrix with exact commands and outputs.'
     verification: '- [ ] full-plan-check protecting final closure gate.
 
       - [ ] Exact commands and outputs are recorded for backend, frontend, E2E, and
