@@ -84686,7 +84686,7 @@ phases:
       - [x] Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions
       are reachable and unobstructed.
 
-      - [ ] MCP preview_steer/steer/undo_steer parity is exercised or cited from backend
+      - [x] MCP preview_steer/steer/undo_steer parity is exercised or cited from backend
       runtime proof if unchanged.
 
       - [ ] Actual command/output and screenshots/DOM evidence are recorded.'
