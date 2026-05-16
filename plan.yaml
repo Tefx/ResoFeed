@@ -95078,7 +95078,8 @@ phases:
 
       - [ ] Gate decision basis recommends OPEN or records exact remediation actions
       if BLOCKED.'
-    verification: '- [ ] Gate review confirms expected-red → fix → green retest sequence.
+    verification: '- [ ] Gate review confirms expected-red → fix → green retest sequence,
+      including the reactive grouped-source sort crash remediation.
 
       - [ ] Gate review confirms backend grouping contract remains unchanged and authoritative.
 
@@ -95086,7 +95087,7 @@ phases:
       true grouped-source transparency still works.
 
       - [ ] Gate review confirms rendered Inspector evidence satisfies DESIGN.md and
-      no grouped-source false positive remains.
+      no grouped-source false positive or Svelte runtime crash remains.
 
       - [ ] OPEN/BLOCK decision includes explicit behavioral proof register disposition
       for any unresolved item.'
@@ -95095,55 +95096,52 @@ phases:
 
       For each ref in this step:
 
-      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
-
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
-      - internal/resofeed/ingest.go — key passage or "NOT READ: <reason>"
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - internal/resofeed/search.go — key passage or "NOT READ: <reason>"
 
-      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+      If no refs were provided, state: "No refs for this step."
 
 
       ## Gate Review Report
 
-      **Reviewer**: gate-reviewer
 
       **Phase**: grouped-story-fragment-url-regression-repair
 
 
-      ### Execution Review
+      ### Remediation evidence that MUST be reviewed
 
-      | Step ID | Status | Evidence Quality | Concerns |
+      - `gsfr-fix-reactive-grouped-source-sort-crash`
 
-      | --- | --- | --- | --- |
+      - `gsfr-retest-grouped-source-runtime-rendering`
 
-
-      ### Gate Decision Basis
-
-      | requirement_ref | evidence_ref | status | blocks? | rationale | closure_path
-      |
-
-      | --- | --- | --- | --- | --- | --- |
+      - `gsfr-uiux-reaudit-grouped-source-rendering`
 
 
-      ### Gate Decision
+      ### Decision basis
 
-      - [ ] OPEN: repair is complete
+      - [ ] Original UIUX blocker disposition reviewed.
 
-      - [ ] BLOCKED: remediation required
+      - [ ] Non-mutating grouped-source sort fix reviewed.
+
+      - [ ] Runtime/browser retest reviewed.
+
+      - [ ] UIUX re-audit reviewed.
+
+      - [ ] Backend grouping/schema non-change guard reviewed.
 
 
-      Blocking issues, if any:
-
-      - <list>'
+      **Gate Decision**: OPEN | BLOCKED'
     depends_on:
     - gsfr-expected-red-fragment-grouping-test
     - gsfr-backend-grouping-contract-audit
     - gsfr-inspector-fragment-identity-fix
     - gsfr-targeted-regression-retest
     - gsfr-uiux-multimodal-audit
+    - gsfr-fix-reactive-grouped-source-sort-crash
+    - gsfr-retest-grouped-source-runtime-rendering
+    - gsfr-uiux-reaudit-grouped-source-rendering
     agent: gate-reviewer
   - id: gsfr-fix-reactive-grouped-source-sort-crash
     name: Fix reactive grouped-source sort crash
