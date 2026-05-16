@@ -90545,3 +90545,104 @@ phases:
     - srde2e-uiux-full-plan-e2e-blockers-audit
     - srde2e-e2e-contract-adjudication
     agent: software-architect
+  - id: srde2e-final-closure-gate-rerun
+    name: Rerun final closure gate after software-architect CLEAN proof
+    status: pending
+    description: 'Final gate rerun/recheck for Steer Delta E2E Architecture Review
+      Closure after semantic FAIL from `srde2e-final-closure-gate`.
+
+
+      Purpose: this step is the closure owner for the failed final gate. The original
+      final gate may remain as the failed discovery step; this rerun re-evaluates
+      closure after the missing software-architect exact CLEAN proof is produced.
+
+
+      Required inputs:
+
+      - `srde2e-software-architect-clean-verdict-proof` evidence with `reviewer_agent:
+      software-architect` and verdict exactly `CLEAN`, or blockers that must keep
+      the gate closed.
+
+      - Existing full-plan verification evidence from `srde2e-full-plan-check` and
+      `srde2e-full-plan-e2e-blockers-retest`.
+
+      - Existing UIUX audit closure evidence from `srde2e-uiux-full-plan-e2e-blockers-audit`.
+
+      - Existing targeted real-system and visual/a11y retest evidence where relevant.
+
+
+      Gate decision rules:
+
+      - If the software-architect artifact verdict is not exactly `CLEAN`, set `headline:
+      [REJECT] FAIL`, `verdict: FAIL`, `gate_open_allowed: false`, and include the
+      blocker list.
+
+      - If exact CLEAN proof exists, re-evaluate all remaining blockers and proof
+      gaps before opening the gate.
+
+      - Runtime green evidence is not sufficient by itself; B-FCG-001 closes only
+      through the exact software-architect CLEAN artifact.
+
+
+      ## Completion Criteria
+
+      - [ ] Read each ref and cite the key passage or mark `NOT READ: <reason>`.
+
+      - [ ] Confirm `srde2e-software-architect-clean-verdict-proof` evidence contains
+      `reviewer_agent: software-architect`.
+
+      - [ ] Confirm the architect artifact contains verdict exactly `CLEAN` before
+      allowing gate open.
+
+      - [ ] Re-evaluate all remaining blockers, including any blocker list from the
+      architect artifact.
+
+      - [ ] Output gate closure fields: `headline`, `verdict`, `blockers`, `gate_open_allowed`,
+      and `orchestrator_action_hint`.
+
+      - [ ] Keep `gate_open_allowed: false` unless all blocker-class proof obligations
+      are closed.'
+    verification: '- [ ] Evidence includes refs read confirmation for AGENTS.md, docs/ARCHITECTURE.md,
+      and docs/DESIGN.md.
+
+      - [ ] Evidence confirms exact software-architect CLEAN artifact is present before
+      opening the gate.
+
+      - [ ] Evidence re-evaluates any remaining blockers from full-plan retest, UIUX
+      audit, and architect re-review.
+
+      - [ ] Evidence includes exact fields `headline`, `verdict`, `blockers`, `gate_open_allowed`,
+      and `orchestrator_action_hint`.
+
+      - [ ] `gate_open_allowed` is true only when `verdict` is non-failing and `blockers`
+      is empty.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\n## Final Closure Gate Rerun Report\n\nphase: steer-delta-e2e-architecture-review-closure\n\
+      reruns_failed_gate: srde2e-final-closure-gate\nrequired_clean_proof_step: srde2e-software-architect-clean-verdict-proof\n\
+      \n## Required Evidence Inputs Reviewed\n- srde2e-software-architect-clean-verdict-proof:\
+      \ <PASS/FAIL + artifact excerpt showing reviewer_agent and verdict>\n- srde2e-full-plan-check:\
+      \ <PASS/FAIL + key evidence>\n- srde2e-full-plan-e2e-blockers-retest: <PASS/FAIL\
+      \ + key evidence>\n- srde2e-uiux-full-plan-e2e-blockers-audit: <PASS/FAIL +\
+      \ key evidence>\n- srde2e-real-system-e2e-blockers-retest: <PASS/FAIL + key\
+      \ evidence>\n- srde2e-visual-a11y-blockers-retest: <PASS/FAIL + key evidence>\n\
+      \n## Architect CLEAN Proof Requirement\n- [ ] `reviewer_agent: software-architect`\
+      \ present\n- [ ] `verdict: CLEAN` exactly present\n- [ ] Architect blocker list\
+      \ empty\n\n## Gate Closure Fields (MANDATORY)\nheadline: \"[ACCEPT] PASS\" |\
+      \ \"[REJECT] FAIL\"\nverdict: PASS | FAIL\nblockers:\n  - id: <blocker-id>\n\
+      \    severity: blocker\n    description: <blocker description>\n    closure_path:\
+      \ <required next action>\ngate_open_allowed: true | false\norchestrator_action_hint:\
+      \ <open phase / create fix step / rerun specific proof / keep blocked>\n\n##\
+      \ Decision Basis\n- If `verdict: CLEAN` is missing from the software-architect\
+      \ artifact, B-FCG-001 remains blocking.\n- If blockers are non-empty, `gate_open_allowed`\
+      \ MUST be false.\n- If all blocker-class obligations are closed, set `blockers:\
+      \ []` and provide the OPEN/PASS basis."
+    depends_on:
+    - srde2e-software-architect-clean-verdict-proof
+    - srde2e-full-plan-check
+    - srde2e-full-plan-e2e-blockers-retest
+    - srde2e-uiux-full-plan-e2e-blockers-audit
+    - srde2e-real-system-e2e-blockers-retest
+    - srde2e-visual-a11y-blockers-retest
+    agent: gate-reviewer
