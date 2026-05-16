@@ -85187,7 +85187,7 @@ phases:
       - [x] Preserve globally scoped `agent_receipts.idempotency_key` behavior without
       allowing equivalent HTTP/MCP retries to fail as `request_fingerprint_mismatch`.
 
-      - [ ] Add a parity regression test that performs HTTP then MCP with the same
+      - [x] Add a parity regression test that performs HTTP then MCP with the same
       actor/key/command and expects replay-equivalent behavior rather than mismatch.
 
       - [x] Run the grep hint and search sibling receipt/fingerprint paths for the
