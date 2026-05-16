@@ -98356,7 +98356,7 @@ phases:
       - [x] Rerun the targeted Playwright browser current-operation utility/conflict
       path.
 
-      - [ ] Rerun focused Vitest current-operation utility placement coverage if the
+      - [x] Rerun focused Vitest current-operation utility placement coverage if the
       fix touched component logic or fixtures.
 
       - [ ] Capture the original failed assertion and the new passing assertion/output.
