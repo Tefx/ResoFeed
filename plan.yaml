@@ -88994,7 +88994,7 @@ phases:
       - [x] Implementation changes are limited to the adjudicated remediation packet
       and allowed test deviations.
 
-      - [ ] Focus order conflict is resolved exactly as adjudicated.
+      - [x] Focus order conflict is resolved exactly as adjudicated.
 
       - [ ] Nav visible text/selector conflict is resolved exactly as adjudicated.
 
