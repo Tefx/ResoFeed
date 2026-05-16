@@ -83849,25 +83849,25 @@ phases:
       \nA test that discovers remaining issues is valuable, but this closure step\
       \ is complete only with PASS or a complete blocker register that prevents gate\
       \ opening."
-    verification: '- [ ] phase-check protecting `srdf-frontend-gate` and full-plan-check
+    verification: '- [x] phase-check protecting `srdf-frontend-gate` and full-plan-check
       protecting final E2E closure.
 
-      - [ ] `npm run test` evidence is present.
+      - [x] `npm run test` evidence is present.
 
-      - [ ] Focused E2E evidence covers `source-ledger-steer-split-scroll.expected-red.spec.ts`,
+      - [x] Focused E2E evidence covers `source-ledger-steer-split-scroll.expected-red.spec.ts`,
       `processing-language-source-split-scroll.spec.ts`, `feed-search-anatomy.spec.ts`,
       and Source Ledger controls/hit-targets, or documents absent harness names with
       equivalent coverage.
 
-      - [ ] Rendered screenshots/DOM/a11y artifacts cover all required Steer, Source
+      - [x] Rendered screenshots/DOM/a11y artifacts cover all required Steer, Source
       Ledger, split-scroll, mobile, Inspector JSON-LD-negative, and mobile metadata
       surfaces.
 
-      - [ ] Machine-readable YAML closure has `verdict`, `gate_open_allowed`, per-family
+      - [x] Machine-readable YAML closure has `verdict`, `gate_open_allowed`, per-family
       statuses, stale-vs-real reconciliation, command list, artifact list, forbidden
       scan result, reversal risk, and remaining blockers.
 
-      - [ ] Closure is PASS only if no blocker-class spec-verifier or uiux-auditor
+      - [x] Closure is PASS only if no blocker-class spec-verifier or uiux-auditor
       finding remains real and unresolved.'
     evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
       \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/UI_REGRESSION_CONTRACT.md\
