@@ -95714,14 +95714,14 @@ phases:
 
       - [x] Audit emits parseable PASS / PASS_WITH_DEBT / FAIL headline and blocker
       disposition.'
-    verification: '- [ ] phase-check protecting `gsfr-final-gate`: uiux-auditor re-audit
+    verification: '- [x] phase-check protecting `gsfr-final-gate`: uiux-auditor re-audit
       passes or records only explicit non-blocking debt.
 
-      - [ ] Rendered evidence proves valid grouped-source disclosure no longer crashes.
+      - [x] Rendered evidence proves valid grouped-source disclosure no longer crashes.
 
-      - [ ] Evidence proves no false grouping regression for synthetic feed fragments.
+      - [x] Evidence proves no false grouping regression for synthetic feed fragments.
 
-      - [ ] Gate-relevant blocker disposition is explicit.'
+      - [x] Gate-relevant blocker disposition is explicit.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
