@@ -85716,7 +85716,7 @@ phases:
       - [x] Re-run any design/a11y/visual checks needed for the delta after architecture
       remediation.
 
-      - [ ] Record failing checks as blocker-class if they intersect the final gate;
+      - [x] Record failing checks as blocker-class if they intersect the final gate;
       do not dismiss as pre-existing without non-intersection evidence.
 
       - [ ] Produce a concise pass/fail matrix with exact commands and outputs.'
