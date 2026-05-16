@@ -85347,7 +85347,7 @@ phases:
       - [x] Address ALL frontend/UI blocker and should_fix findings from the software-architect
       review, not just the first.
 
-      - [ ] Preserve DESIGN.md/UI_REGRESSION_CONTRACT.md behavior for Steer route
+      - [x] Preserve DESIGN.md/UI_REGRESSION_CONTRACT.md behavior for Steer route
       preview, Source Ledger details/hit targets, split-scroll/mobile route, low-chrome
       processing language controls, and forbidden concept boundaries.
 
