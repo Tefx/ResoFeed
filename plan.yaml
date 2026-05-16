@@ -91373,13 +91373,13 @@ phases:
 
       - [x] Evidence lists `expected_failures` and names the downstream implementation
       step `azri-frontend-low-chrome-copy-zh-repair`.'
-    verification: '- [ ] Expected-red tests expose persistent chrome, alignment, OPML
+    verification: '- [x] Expected-red tests expose persistent chrome, alignment, OPML
       auto-ingest, copy, Inspector provenance, preview drift, and zh parity gaps.
 
-      - [ ] Expected-red evidence distinguishes newly failing gaps from existing green
+      - [x] Expected-red evidence distinguishes newly failing gaps from existing green
       backend coverage.
 
-      - [ ] No production code or docs are changed except allowed test fixtures/contracts.'
+      - [x] No production code or docs are changed except allowed test fixtures/contracts.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
