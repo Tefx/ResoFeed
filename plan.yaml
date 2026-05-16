@@ -83808,7 +83808,7 @@ phases:
       \ failures.\n\nRequired command evidence:\n- [x] Run `npm run test`.\n- [x]\
       \ Run focused E2E covering `source-ledger-steer-split-scroll.expected-red.spec.ts`,\
       \ `processing-language-source-split-scroll.spec.ts`, and `feed-search-anatomy.spec.ts`.\n\
-      - [x] Run Source Ledger controls/hit-target E2E.\n- [ ] Run forbidden concept\
+      - [x] Run Source Ledger controls/hit-target E2E.\n- [x] Run forbidden concept\
       \ scans across frontend Svelte/TS surfaces.\n- [ ] If any named command is not\
       \ present in the repo harness, provide the exact discovery output proving absence\
       \ and run the nearest current harness command that covers the same user-visible\
