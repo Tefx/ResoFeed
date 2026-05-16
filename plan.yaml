@@ -82904,7 +82904,7 @@ phases:
 
       Behavioral proof register required for gate decision basis:
 
-      - [ ] requirement_ref: broad rendering owner-token bootstrap; behavior_claim:
+      - [x] requirement_ref: broad rendering owner-token bootstrap; behavior_claim:
       accepted token persists after successful bootstrap and rejected token never
       persists; runtime_proof_expected: `npm run test` evidence; evidence_ref: pasted
       command output; status: PROVEN or explicit blocker; closure_path: pass or new
