@@ -91158,7 +91158,7 @@ phases:
       - [x] All zh gaps that affect user-visible product contract have planned repair
       ownership rather than vague audit-only wording.
 
-      - [ ] Matrix preserves product boundaries: single binary, SQLite only, no sync/merge/history,
+      - [x] Matrix preserves product boundaries: single binary, SQLite only, no sync/merge/history,
       no settings dashboard, no RAG/vector/semantic-answer product surface.
 
       - [ ] No production implementation code is changed in this contract step.'
