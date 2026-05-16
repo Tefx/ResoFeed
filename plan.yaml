@@ -85364,7 +85364,7 @@ phases:
       sync/merge coordinator, no vector DB, no embeddings, no RAG/semantic answer
       UI, no dashboard/job/activity surfaces.
 
-      - [ ] Source Ledger real-system flow imports OPML, runs `[RUN INGEST]`, renders
+      - [x] Source Ledger real-system flow imports OPML, runs `[RUN INGEST]`, renders
       `Live Audit Source`, exposes controls, and displays `last_fetch` as `HH:MM:SS`.
 
       - [ ] Steer preview/commit/undo controls have unambiguous accessible button
