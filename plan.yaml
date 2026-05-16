@@ -94770,7 +94770,7 @@ phases:
       - Backend/schema status: no Go backend/schema files modified.'
   - id: gsfr-targeted-regression-retest
     name: Run targeted frontend/backend grouped-story regression retest
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -94898,6 +94898,32 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T21:10:10.311788+00:00'
+    done_at: '2026-05-16T21:52:57.836777+00:00'
+    evidence: "verdict: PASS\ngate_open_allowed: true\norchestrator_action_hint: COMPLETE\n\
+      blockers: []\n\n## refs Read Confirmation\n- docs/ARCHITECTURE.md — read. Key\
+      \ passage: story_key/duplicate provenance required and original item provenance\
+      \ remains accessible; direct duplicates may be grouped while every original\
+      \ source item remains retrievable.\n- docs/DESIGN.md — read. Key passage: grouped\
+      \ duplicate/story UI preserves every source item and Inspector source-list disclosure.\n\
+      - web/src/routes/components/Inspector.svelte — read. Key passage: synthetic\
+      \ #entry fragments preserved in normalized grouping URLs; grouped-source disclosure\
+      \ renders only when grouped items exist.\n- internal/resofeed/search.go — read.\
+      \ Key passage: ReadItemDetail keeps duplicates/grouped originals addressable;\
+      \ readGroupedSourceItems uses story_key and returns empty for nil/blank story_key.\n\
+      \n## Retest Evidence\n- Source artifacts modified: none; commit hashes: none.\n\
+      - Commands executed and actual outputs:\n  1. npm run test:render -- --run src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts\
+      \ --reporter=verbose => 3 passed; synthetic fragment no-grouping, authoritative\
+      \ grouping, and same-article fallback cases passed.\n  2. npm run test:e2e --\
+      \ tests/e2e/ui-runtime-fresh-review-remediation.spec.ts --grep \"FR-04|B1\"\
+      \ --project=chromium-ci-safe --reporter=list => 2 passed; served-app grouped-source\
+      \ disclosure still works.\n  3. go test ./internal/resofeed -run 'TestHTTPItemDetailDisclosesGroupedSourceItems|TestReadItemDetailKeepsDuplicateOriginalRetrievable'\
+      \ -count=1 -v => PASS.\n\n## Behavioral Proof Register\n- Synthetic RSS feed-fragment\
+      \ URLs must not create grouped-source disclosure: PROVEN by command 1; no further\
+      \ action.\n- Valid grouped-source disclosure remains green: PROVEN by command\
+      \ 1 and command 2; no further action.\n- Same-article URL fallback remains valid\
+      \ for non-synthetic fragments: PROVEN by command 1; no further action.\n- Backend\
+      \ grouped detail contract: PROVEN by command 3; no further action.\n\nNo NEEDS_TEST,\
+      \ UNPROVEN, or UNCERTAIN_BLOCKING items remain."
   - id: gsfr-uiux-multimodal-audit
     name: Run multimodal Inspector UI audit for grouped-source disclosure
     status: claimed
