@@ -95204,3 +95204,76 @@ phases:
     depends_on:
     - cos-backend-operation-contract-tests
     agent: golang-developer
+  - id: cos-mcp-operation-parity
+    name: Complete MCP current-operation parity
+    status: pending
+    description: 'Complete MCP parity for the current-operation contract.
+
+
+      Scope:
+
+      - Expose `resofeed://system/operation` returning JSON `{ "operation": CurrentOperationInfo
+      }` from the same in-memory snapshot used by HTTP.
+
+      - Ensure MCP guarded-operation conflicts, when MCP supports structured error
+      data for the affected tool, use JSON-RPC error data whose nested details match
+      the HTTP conflict detail shape including legacy flat fields and `current_operation`.
+
+      - Preserve human/agent product parity: MCP gets the same product operation facts
+      as HTTP/UI, not special agent-only concepts.
+
+
+      ## Forbidden Scope
+
+      - No MCP-only durable job model, no task dashboard, no per-agent registry, no
+      command/activity history.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Completion Criteria
+
+      - [ ] MCP resource uses the same snapshot source as HTTP.
+
+      - [ ] MCP conflict payload consistency is covered where MCP structured metadata
+      exists.
+
+      - [ ] MCP parity tests pass without introducing agent-only product concepts.'
+    verification: '- [ ] local-check protecting MCP parity: targeted Go MCP tests
+      prove `resofeed://system/operation` idle/running states.
+
+      - [ ] MCP conflict details match HTTP conflict details for operation guard conflicts
+      where structured metadata is supported.
+
+      - [ ] Evidence confirms no MCP-only job/task/history/agent-registry concept
+      was added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## MCP Parity Evidence
+
+      - Files changed:
+
+      - MCP resource/tool tests run and output:
+
+      - HTTP/MCP conflict details comparison:
+
+      - Parity/non-special-agent confirmation:
+
+      - Unsupported metadata caveat if any:'
+    depends_on:
+    - cos-backend-operation-snapshot
+    agent: golang-developer
