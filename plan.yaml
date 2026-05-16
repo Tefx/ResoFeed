@@ -97953,7 +97953,7 @@ phases:
       - [x] Source Ledger conflict evidence shows the intended contextual status exactly
       once in the relevant assertion scope.
 
-      - [ ] Browser evidence shows current-operation detail, not only the generic
+      - [x] Browser evidence shows current-operation detail, not only the generic
       conflict string.
 
       - [ ] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
