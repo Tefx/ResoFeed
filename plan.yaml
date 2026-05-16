@@ -89553,3 +89553,220 @@ phases:
     depends_on:
     - srde2e-full-plan-e2e-blockers-fix
     agent: uiux-auditor
+  - id: srde2e-e2e-contract-adjudication
+    name: Adjudicate residual full E2E contract conflicts before next fix
+    status: pending
+    description: 'step_type: planning
+
+      work_type: authority_adjudication
+
+      agent_source: project
+
+      analysis_mode: read_only_first
+
+
+      Investigation and contract-adjudication step for the repeated srde2e full-plan
+      E2E remediation loop. This step MUST run before any further implementation attempt
+      because the latest unresolved failures look like contract/test/fixture conflicts
+      and shared-state ordering issues, not only missing UI code.
+
+
+      Scope is analysis-first and read-only with respect to product and test source
+      files. The agent may run or inspect current-main E2E failures after commit 107d1349,
+      inspect current docs/tests/source, and produce a remediation contract. The agent
+      MUST NOT change app code, test code, fixtures, docs, or plan state.
+
+
+      Required inputs and authorities:
+
+      - Current main after salvaged commits 61a8825c and 107d1349.
+
+      - Full E2E evidence from `npm --prefix web run test:e2e` or equivalent current-main
+      failure artifacts.
+
+      - docs/DESIGN.md as the UI/design contract authority.
+
+      - docs/UI_REGRESSION_CONTRACT.md as the UI regression and E2E contract authority.
+
+      - docs/ARCHITECTURE.md as the runtime/data/state authority.
+
+
+      Required adjudication outputs:
+
+      - Per-failure decision for every current-main residual E2E failure: `implementation_bug`,
+      `stale_test`, `fixture_shared_state_issue`, or `mixed`.
+
+      - Exact remediation instructions for the next implementation attempt, including
+      file/test families likely to change and forbidden shortcuts.
+
+      - Allowed test deviations, if any, with docs-backed citations and a clear statement
+      of which expectation is stale.
+
+      - Shared-state/fixture ordering diagnosis for accumulated full-run DB state
+      vs isolated targeted execution.
+
+      - Gate-intersection disposition for every unresolved item; provenance such as
+      pre-existing/out-of-step-origin is not a disposition.
+
+
+      Mandatory decision topics:
+
+      1. Focus order: adjudicate `keyboard-a11y.expected-red.spec.ts` legacy Tab order
+      from Steer to TODAY vs FR-01/FR-10 expectation that RESOFEED summary receives
+      keyboard focus.
+
+      2. Nav visible text: adjudicate legacy selectors expecting visible `TODAY` /
+      `SOURCE LEDGER` text vs F8/current remediation using visible `T` / `SL`.
+
+      3. OPML import/ingest status: adjudicate whether best-effort import ingest means
+      `last_fetch` may legitimately move away from `not_fetched` immediately after
+      import, and how real-server tests should assert this.
+
+      4. Duplicate rows/shared DB state: diagnose duplicate Dirty Inspector Corpus
+      feed rows in accumulated full-run state, including fixture isolation, idempotency,
+      cleanup, and DB reuse ordering.
+
+      5. Hit-target scroll geometry: diagnose why local fixture row y-position changes
+      after Playwright scroll-into-view in accumulated full-run state, and whether
+      remediation belongs in UI geometry, fixture targeting, or test scroll expectations.
+
+
+      Required report shape:
+
+      - Fresh/current-main failure inventory with command or artifact source.
+
+      - Authority matrix mapping each failing assertion to docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md,
+      and docs/ARCHITECTURE.md.
+
+      - Decision matrix with one row per failure: spec/test name, assertion, authority,
+      classification, remediation owner, allowed test deviation, and blocking disposition.
+
+      - Next-step instruction packet for srde2e-full-plan-e2e-blockers-fix.
+
+
+      ## Completion Checklist
+
+      - [ ] Current-main E2E failures after 107d1349 are run or inspected and exact
+      failure names are recorded.
+
+      - [ ] docs/DESIGN.md is cited for focus order, visible chrome/nav text, and
+      UI surface semantics.
+
+      - [ ] docs/UI_REGRESSION_CONTRACT.md is cited for regression selectors, accessibility
+      expectations, hit targets, and fixture/test contract rules.
+
+      - [ ] docs/ARCHITECTURE.md is cited for OPML import, ingest lifecycle, SQLite/shared-state,
+      and single-deployable runtime constraints.
+
+      - [ ] Each residual failure is classified as implementation bug, stale test,
+      fixture/shared-state issue, or mixed.
+
+      - [ ] Focus order conflict is adjudicated with a docs-backed winning expectation
+      and allowed deviation for the stale expectation if applicable.
+
+      - [ ] Nav visible text conflict is adjudicated with a docs-backed visible-label/accessibility-name
+      rule and allowed selector deviation if applicable.
+
+      - [ ] OPML import/ingest `last_fetch` expectation is adjudicated with exact
+      allowed assertions for post-import status.
+
+      - [ ] Duplicate Dirty Inspector Corpus rows are dispositioned with fixture/shared
+      DB isolation or app idempotency remediation instructions.
+
+      - [ ] Hit-target scroll geometry is dispositioned with exact UI/test/fixture
+      remediation instructions.
+
+      - [ ] Next implementation attempt has exact remediation instructions and forbidden
+      shortcuts.
+
+      - [ ] No product code, test code, docs, or plan completion state is modified
+      by this investigation step.'
+    verification: '- [ ] Investigation is read-only/analysis-first and produces no
+      app/test/docs modifications.
+
+      - [ ] Current-main full E2E failure inventory after commit 107d1349 is recorded
+      from a run or current artifact inspection.
+
+      - [ ] Per-failure decision matrix classifies every residual as implementation
+      bug, stale test, fixture/shared-state issue, or mixed.
+
+      - [ ] Decision matrix explicitly covers focus order, nav visible text, OPML
+      import/ingest status, duplicate rows/shared DB state, and hit-target scroll
+      geometry.
+
+      - [ ] Every allowed test deviation is backed by docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md,
+      or docs/ARCHITECTURE.md citations.
+
+      - [ ] Next-step remediation instructions are concrete enough for srde2e-full-plan-e2e-blockers-fix
+      to execute without re-adjudicating contracts.
+
+      - [ ] Any unresolved ambiguity has blocker/non-blocker gate-intersection disposition
+      and ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Current-Main E2E Inventory
+
+      **Command or artifact inspected**:
+
+      ```
+
+      <exact command/output or artifact reference>
+
+      ```
+
+
+      ## Authority Matrix
+
+      | Failure | Assertion | DESIGN.md authority | UI_REGRESSION_CONTRACT.md authority
+      | ARCHITECTURE.md authority |
+
+      |---|---|---|---|---|
+
+
+      ## Decision Matrix
+
+      | Failure | Classification | Remediation owner | Exact remediation instruction
+      | Allowed test deviation | Blocking disposition |
+
+      |---|---|---|---|---|---|
+
+
+      ## Mandatory Topic Dispositions
+
+      - Focus order: <docs-backed decision>
+
+      - Nav visible text: <docs-backed decision>
+
+      - OPML import/ingest status: <docs-backed decision>
+
+      - Duplicate rows/shared DB state: <docs-backed decision>
+
+      - Hit-target scroll geometry: <docs-backed decision>
+
+
+      ## Next-Step Instruction Packet
+
+      <instructions for srde2e-full-plan-e2e-blockers-fix>
+
+
+      ## Headline
+
+      - [ ] PASS: adjudication complete and next implementation attempt can proceed
+
+      - [ ] BLOCKED: external requirement remains genuinely ambiguous'
+    depends_on:
+    - srde2e-full-plan-check
+    agent: software-architect
