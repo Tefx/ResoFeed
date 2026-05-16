@@ -94247,7 +94247,7 @@ phases:
       - [x] The test fixture cites the synthetic URL behavior from `internal/resofeed/ingest.go`
       and grouping authority from `docs/ARCHITECTURE.md`.
 
-      - [ ] Evidence records the expected red failure message or exposed grouped-source
+      - [x] Evidence records the expected red failure message or exposed grouped-source
       disclosure.
 
       - [ ] Product code remains unchanged in this step.'
