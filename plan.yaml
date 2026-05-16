@@ -93214,7 +93214,7 @@ phases:
     skipped_reason: absorbed
   - id: azrv-final-closure-gate
     name: Final gate for audit repair and Chinese support closure
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: full-plan-check
@@ -93369,6 +93369,8 @@ phases:
     - azrv-batched-verification-failure-remediation
     - azrv-batched-verification-failure-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T15:37:07.888584+00:00'
   - id: azrv-batched-verification-failure-remediation
     name: Batched remediation for parallel verification failures
     status: done
