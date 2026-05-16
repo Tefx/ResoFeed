@@ -85968,7 +85968,7 @@ phases:
       - orchestrator_action_hint: DO_NOT_COMPLETE_FINAL_GATE'
   - id: srde2e-final-closure-gate
     name: Final gate for Steer delta implementation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), decide whether the Steer
       delta implementation is complete.
 
@@ -86086,6 +86086,74 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T11:53:00.703045+00:00'
+    done_at: '2026-05-16T12:05:29.315391+00:00'
+    evidence: "headline: [REJECT] FAIL\nverdict: FAIL\nblockers:\n  - id: B-FCG-001\n\
+      \    severity: blocker\n    evidence: \"Command `rg -n 'software-architect|clean\
+      \ re-review|CLEAN|clean architecture' artifacts audits docs .audit-artifacts`\
+      \ found no software-architect CLEAN verdict; only `audits/fuidcr-architecture-blocker-retest.md:3`\
+      \ says `Verdict: PASS`.\"\n    missing_verification_step: \"Provide/read a post-remediation\
+      \ software-architect clean re-review artifact whose verdict is exactly CLEAN\
+      \ for this closure phase.\"\nproof_gap_status: BLOCKING\nblocking_status: OPEN\n\
+      gate_open_allowed: false\norchestrator_action_hint: DO_NOT_COMPLETE\n\n## Gate\
+      \ Review Report\n**Reviewer**: gate-reviewer (independent of phase implementation)\n\
+      **Phase**: steer-delta-e2e-architecture-review-closure\n\n### refs Read Confirmation\
+      \ (MANDATORY)\n- docs/ARCHITECTURE.md — READ. Key passages: one Go process,\
+      \ one SQLite/FTS5, thin HTTP/MCP transports, lexical retrieval only, no vector/RAG/semantic\
+      \ answer, Source Ledger/ingest guard boundaries.\n- docs/DESIGN.md — READ. Key\
+      \ passages: dense operational chrome, RESOFEED/TODAY/SOURCE LEDGER/INSPECTOR\
+      \ labels, 44px action targets, Source Ledger, split-scroll/mobile Inspector,\
+      \ no SaaS/friendly drift.\n- docs/UI_REGRESSION_CONTRACT.md — READ. Key passages:\
+      \ real hit-target/topmost tests, keyboard/a11y coverage, dirty corpus, Source\
+      \ Ledger `[RUN INGEST]`/`[FETCH]`, negative UX assertions.\n- artifacts/audits/srde2e-e2e-contract-adjudication.md\
+      \ — READ. Key passages: prior 7 E2E failures, exact blocker remediation matrix,\
+      \ RESOFEED focus/menu, Source Ledger fetch selector, dirty corpus, stale desktop\
+      \ Inspector star.\n- artifacts/audits/srde2e-full-plan-e2e-blockers-retest.md\
+      \ — READ. Key passages: Verdict PASS; full E2E observed exit 0 with 71 passed\
+      \ / 2 skipped; targeted blocker family 43 passed; check/render/build passed;\
+      \ gate_open_allowed true.\n\n### Execution Review\n- `srde2e-full-plan-e2e-blockers-fix`:\
+      \ completed; evidence strong; no blocking concern.\n- `srde2e-uiux-full-plan-e2e-blockers-audit`:\
+      \ completed; PASS/gate_open_allowed true.\n- `srde2e-full-plan-e2e-blockers-retest`:\
+      \ completed; exact E2E/check/render/build evidence green.\n- `srde2e-real-system-e2e-regression`:\
+      \ incomplete in plan snapshot but behaviorally non-blocking/superseded by later\
+      \ full E2E, Go tests, and UI source-add undo wiring evidence.\n- `software-architect\
+      \ clean re-review`: BLOCKING proof gap; no exact `CLEAN` verdict artifact found.\n\
+      \n### Full-Plan E2E Blocker Closure Decision Basis\n- srde2e-full-plan-e2e-blockers-fix\
+      \ evidence reviewed: YES.\n- srde2e-full-plan-e2e-blockers-retest exact npm\
+      \ run test:e2e output reviewed: YES; independent rerun exit 0 with 71 passed\
+      \ / 2 skipped.\n- Remaining blocker-class failures: B-FCG-001 missing exact\
+      \ software-architect CLEAN verdict.\n- Non-intersection evidence for any remaining\
+      \ failures: not applicable; missing CLEAN verdict is directly in OPEN prerequisites.\n\
+      - Pending `srde2e-real-system-e2e-regression` disposition: behaviorally non-blocking/superseded\
+      \ by full E2E green, source-add undo UI/API tests, and Go tests.\n\n### Wiring\
+      \ Audit Results (W1-W8 or equivalent)\nW1 HTTP/MCP/UI parity PASS; W2 backend\
+      \ route classification PASS; W3 AC-4 invariant conflict handling PASS; W4 AC-19\
+      \ route echo/write commit/undo PASS; W5 lexical-only search/no RAG PASS; W6\
+      \ UI/UX Source Ledger/split-scroll/mobile/a11y PASS; W7 escape hatches PASS;\
+      \ W8 gate prerequisites FAIL due missing exact software-architect CLEAN verdict.\n\
+      \n### Escape Hatch Audit\nScoped `rg '@invar:allow|invar:allow' ...` found no\
+      \ matches.\n\n### Smoke/Liveness and Real Integration Evidence\n`npm --prefix\
+      \ web run test:e2e` after dependency install passed 71 / skipped 2; `npm --prefix\
+      \ web run check` passed; `npm --prefix web run test:render` passed; `go test\
+      \ ./...` passed. Real integration distinction: Playwright `real-server-ui.spec.ts`\
+      \ passed real Go binary owner-token gate, browser-led source import/ingest/feed/inspect/retrieve/search,\
+      \ and API/MCP parity.\n\n### CLI Executability Matrix\nNot applicable: reviewed\
+      \ phase is Steer/UI/API/MCP closure; no CLI surface changes in aa8a512c/c85a181f\
+      \ diff.\n\n### Behavioral Proof Register\nRuntime behaviors are PROVEN except\
+      \ `architect-clean-review`, which is NOT_PROVEN and BLOCKING because no exact\
+      \ software-architect CLEAN verdict artifact was found.\n\n### Gate Decision\n\
+      BLOCKED. Runtime and behavioral proof is strong and green, and the incomplete\
+      \ `srde2e-real-system-e2e-regression` behavioral concern appears superseded\
+      \ by later full E2E plus source-add undo tests. However, OPEN is invalid unless\
+      \ the software-architect clean re-review verdict is CLEAN. That exact prerequisite\
+      \ is not objectively present in available artifacts, so this gate rejects until\
+      \ CLEAN re-review evidence is supplied.\n\n## Verification\n- Gate artifact\
+      \ committed in worktree: `11cb47bb [vectl] add srde2e final closure gate audit`.\n\
+      - Mainline blocked-gate artifact merge: `cea981a1 [vectl] step-srde2e-final-closure-gate\
+      \ blocked`.\n- Plan remediation created by planner: `srde2e-software-architect-clean-verdict-proof`\
+      \ and `srde2e-final-closure-gate-rerun`.\n- Files changed: `artifacts/audits/srde2e-final-closure-gate.md`\
+      \ only.\n- Gaps/Notes: Original final gate intentionally closed as blocker-discovery\
+      \ evidence; downstream newly planned steps own the CLEAN proof and final rerun\
+      \ closure."
   - id: srde2e-real-system-e2e-blockers-fix
     name: Fix real-system E2E blocker families
     status: done
