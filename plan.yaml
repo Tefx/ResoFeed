@@ -97153,7 +97153,7 @@ phases:
       - [x] Preserve terse dense UI; no dashboards, progress bars, queues, job history,
       settings panels, or persistent idle top strip.
 
-      - [ ] Update only frontend tests/fixtures needed to prove the documented shape
+      - [x] Update only frontend tests/fixtures needed to prove the documented shape
       and rendered field consumption.'
     verification: '- [ ] Main path: frontend accepts backend `count: { current, total
       }` payloads and renders terse status detail.
