@@ -85376,7 +85376,7 @@ phases:
       - [x] Search sibling instances for duplicate accessible names or Source Ledger
       live-row timing/selector assumptions beyond the listed failures.
 
-      - [ ] Include exact command output snippets for focused local checks run by
+      - [x] Include exact command output snippets for focused local checks run by
       the implementer, while leaving final independent closure to the retest step.
 
       - [ ] If backend/runtime changes are necessary, include targeted Go regression
