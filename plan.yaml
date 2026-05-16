@@ -89653,7 +89653,7 @@ phases:
       - [x] Evidence includes screenshots, DOM/accessibility snapshots, or equivalent
       visual/spatial artifacts for desktop and mobile-relevant states.
 
-      - [ ] Accessible names, focusability, hit targets, visible labels, row stability,
+      - [x] Accessible names, focusability, hit targets, visible labels, row stability,
       and mobile clipping are assessed directly from rendered output.
 
       - [ ] Any unresolved item has provenance plus disposition; pre-existing/out-of-scope
