@@ -92077,7 +92077,7 @@ phases:
       - [x] Preview no longer contains forbidden product concepts or persistent route
       chrome outside approved contexts.
 
-      - [ ] Preview remains a static artifact only; no runtime dependency or new design-version
+      - [x] Preview remains a static artifact only; no runtime dependency or new design-version
       directory is introduced.'
     verification: '- [ ] Static preview diff shows updated LANG/reprocess/zh surfaces.
 
