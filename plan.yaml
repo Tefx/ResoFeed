@@ -87297,22 +87297,22 @@ phases:
       - [x] Previously passing public-surface visual/a11y checks remain proven.
 
       - [x] Final headline is PASS only when all B1-B4 blockers are closed.'
-    verification: '- [ ] full-plan-check companion protecting final closure gate.
+    verification: '- [x] full-plan-check companion protecting final closure gate.
 
-      - [ ] Expected result is green after remediation.
+      - [x] Expected result is green after remediation.
 
-      - [ ] Visual/spatial artifacts prove all B1-B4 blocker closures with real rendered/browser
+      - [x] Visual/spatial artifacts prove all B1-B4 blocker closures with real rendered/browser
       evidence.
 
-      - [ ] Hit-target proof uses real elementFromPoint/topmost clickability evidence
+      - [x] Hit-target proof uses real elementFromPoint/topmost clickability evidence
       and 44px minimum measurements.
 
-      - [ ] A11y proof covers tab order, focus, labels, live regions, aria-describedby,
+      - [x] A11y proof covers tab order, focus, labels, live regions, aria-describedby,
       details disclosure semantics, and active panel semantics.
 
-      - [ ] Negative UX scan finds no forbidden concepts.
+      - [x] Negative UX scan finds no forbidden concepts.
 
-      - [ ] Behavioral proof register supports final gate OPEN only if every blocker-class
+      - [x] Behavioral proof register supports final gate OPEN only if every blocker-class
       obligation is PROVEN.'
     evidence_template: '## Verification Report
 
