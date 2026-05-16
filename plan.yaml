@@ -97060,3 +97060,137 @@ phases:
     depends_on:
     - cos-wiring-audit
     agent: frontend-engineer
+  - id: cos-retest-current-operation-runtime-ui
+    name: Retest current-operation runtime UI after frontend wiring fix
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      spec_refs:
+
+      - docs/ARCHITECTURE.md#GET /api/runtime/operation
+
+      - docs/ARCHITECTURE.md#guarded-operation conflicts
+
+      - docs/DESIGN.md#Current Operation Status (`current-operation-status`)
+
+      touch_paths:
+
+      - web/src/lib/api-client.ts
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/+page.svelte
+
+      harness_refs:
+
+      - frontend current-operation tests
+
+      - runtime/e2e current-operation checks
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun targeted runtime/UI evidence
+      after the frontend current-operation wiring fix.
+
+
+      Required runtime/UI paths:
+
+      - `GET /api/runtime/operation` payload with `count: { current, total }` is accepted
+      by frontend code.
+
+      - Guarded-operation conflict payload with `current_operation` detail renders
+      more than a generic conflict string.
+
+      - Contextual Source Ledger/open RESOFEED status surfaces show terse phase/count/message/timestamp
+      detail when present.
+
+      - Idle state does not create a persistent global top-chrome status strip.
+
+
+      ## Completion Criteria
+
+      - [ ] Runtime/e2e command or browser test exercises a valid count object payload.
+
+      - [ ] Rendered output includes documented operation fields in contextual surfaces.
+
+      - [ ] Conflict rendering includes current-operation detail when available.
+
+      - [ ] Idle state remains hidden outside contextual surfaces.
+
+      - [ ] Evidence includes exact command and actual output/artifact refs.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: runtime/UI retest
+      is green after frontend wiring fix.
+
+      - [ ] Main path: current-operation count object and detail fields render contextually.
+
+      - [ ] Failure path: conflict state renders current-operation detail and idle
+      global strip remains absent.
+
+      - [ ] Product guard: no dashboard/job/queue/activity surface appears.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Report
+
+
+      **Commands executed**:
+
+      ```
+
+      <actual command(s)>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <stdout/stderr or test runner output>
+
+      ```
+
+
+      **Runtime payload exercised**:
+
+      ```
+
+      <sample operation/conflict JSON including count object>
+
+      ```
+
+
+      **Rendered UI evidence**:
+
+      - Source Ledger contextual status: PASS/FAIL, artifact ref
+
+      - Open RESOFEED operations status: PASS/FAIL, artifact ref
+
+      - Conflict detail: PASS/FAIL, artifact ref
+
+      - Idle top-chrome absence: PASS/FAIL, artifact ref
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - cos-fix-current-operation-frontend-wiring
+    agent: integration-verifier
