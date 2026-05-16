@@ -87638,7 +87638,7 @@ phases:
       \ because `vectl_check` could not match verification-field checklist items."
   - id: srde2e-steer-route-preview-render-contract-retest
     name: Retest Steer route-preview render contract closure
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -87770,3 +87770,168 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T07:24:47.168971+00:00'
+    done_at: '2026-05-16T07:33:49.047342+00:00'
+    evidence: 'status: SUCCESS
+
+      verdict: PASS
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md §3.5 — read. Key passage: browser SPA must render localized
+      chrome and keep desktop feed and Inspector as independent scroll regions; frontend
+      owns split-scroll/UI presentation while preserving source identifiers.
+
+      - docs/DESIGN.md — read. Key passages: Desktop Split Scroll requires independent
+      focusable Feed/Inspector regions; Language Control must be terse; Reprocess
+      action uses bracket actions/live feedback; Source Identifiers render unchanged.
+
+      - docs/UI_REGRESSION_CONTRACT.md — read. Key passages: keyboard/a11y contract
+      requires Steer label, Enter/Escape behavior, aria-live receipt/error, labelled
+      regions; acceptance mapping includes hit-target, keyboard/a11y, manual ingest/fetch,
+      interaction state, inspector hierarchy, negative rules.
+
+      - web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      — read. Key passage: asserts Steer route preview role=status/name, blank idle
+      with aria-describedby, route chips, Escape, assertive invalid URL feedback,
+      revocable-only [UNDO].
+
+      - web/src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      — read. Key passage: asserts idle reserved blank preview, chip classification,
+      invalid URL description, focus/Escape, warning-only find alias, [APPLY]/[CANCEL],
+      revocable [UNDO].
+
+
+      ## Render Retest Evidence
+
+      Commands executed in isolated worktree:
+
+      ```text
+
+      cd /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-steer-route-preview-render-contract-retest/web
+
+      npm run test:render
+
+      npm run test:render -- src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts --reporter
+      verbose
+
+      npm run test:render -- --reporter verbose
+
+      ```
+
+      Actual output summary:
+
+      ```text
+
+      npm run test:render: Test Files 11 passed (11); Tests 62 passed (62)
+
+      Targeted Steer suites: Test Files 2 passed (2); Tests 8 passed (8)
+
+      Verbose full-suite B1-B4/a11y non-regression evidence included passing tests
+      for frontend acceptance, Source Ledger visual contract, reprocess independent
+      scroll, and related contract suites.
+
+      ```
+
+
+      ## Mainline Final-State Verification
+
+      Command executed in main worktree after terminal worker result and before completion:
+
+      ```text
+
+      cd /Users/tefx/Projects/ResoFeed/web
+
+      npm run test:render
+
+      ```
+
+      Output:
+
+      ```text
+
+      Test Files 11 passed (11)
+
+      Tests 62 passed (62)
+
+      ```
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | Steer preview status role/name | role=status named Steer route preview is
+      present in idle and active states | Testing Library role/name queries in render
+      suite | targeted Steer suite output green | PROVEN | closed | OPEN allowed:
+      route-preview status tests green |
+
+      | Steer idle and route-preview cases | idle/preview route cases are green |
+      srdct + route-preview expected-red suites | targeted command: 2 files passed,
+      8 tests passed | PROVEN | closed | OPEN allowed: no Steer route-preview failures
+      remain |
+
+      | Steer chip classification/invalid/apply/cancel/undo | route chips classify
+      ADD SOURCE/SEARCH/DOCTOR/STEER RULE/INVALID; invalid is assertive; apply/cancel/undo
+      contracted | Testing Library interaction tests | targeted verbose output lists
+      classification, invalid, apply/cancel, undo tests passing | PROVEN | closed
+      | OPEN allowed: all blocker-class route-preview cases are green |
+
+      | B1-B4 non-regression | visual/a11y blocker closures remain non-regressed |
+      render suite plus frontend acceptance/visual/a11y contract tests | full render
+      suite 11 files/62 tests passed | PROVEN | closed | OPEN allowed: no regression
+      observed in render gate |
+
+      | Broad/full/final render gate | broad render/Vitest failures intersect full/final
+      gates and must be closed before progression | npm run test:render green | isolated
+      and mainline render suite green | PROVEN | closed | OPEN allowed: full render
+      suite green |
+
+
+      ## Gate-Intersection Disposition
+
+      - Failures intersect broad/full/final render gates: yes. Steer route-preview
+      failures are render/Vitest blockers and intersect srde2e-full-plan-check and
+      srde2e-final-closure-gate.
+
+      - Remaining blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Standard Evidence
+
+      - Commit hash(es): none — verification-only step; no file changes made and branch
+      has no ahead commits.
+
+      - Files changed: none reported by verifier (`git status --short` returned no
+      output in worktree).
+
+      - Verification: isolated `npm run test:render` exit 0; targeted Steer suites
+      exit 0; mainline `npm run test:render` exit 0.
+
+      - Spec link: srde2e-steer-route-preview-render-contract-retest
+
+      - Gaps/Notes: Initial isolated test attempt before dependency bootstrap failed
+      with `sh: vitest: command not found`; verifier ran `npm ci` from existing lockfile,
+      then all required checks passed. No product implementation files modified.
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: green
+
+      - failure_alignment: none
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: no'
