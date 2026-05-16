@@ -94821,7 +94821,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] New synthetic fragment regression is green.
+      - [x] New synthetic fragment regression is green.
 
       - [ ] Existing valid grouped-source disclosure remains green.
 
