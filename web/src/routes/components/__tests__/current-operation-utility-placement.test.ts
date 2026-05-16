@@ -136,8 +136,11 @@ describe('current operation and low-frequency utility placement', () => {
     const blockedNavigation = await openMenu(blocked.user);
     await blocked.user.click(blockedNavigation.getByRole('button', { name: 'SOURCE LEDGER' }));
     await blocked.user.click(screen.getByRole('button', { name: '[RUN INGEST]' }));
-    expect(await screen.findByText('err: operation already running')).toBeVisible();
+    await waitFor(() => {
+      expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*current operation:\s*reprocess\/library/i)).toBeVisible();
+    });
     expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('err: operation already running')).not.toBeInTheDocument();
+    expect(within(screen.getByTestId('source-ledger')).getAllByText(/err: operation already running/i)).toHaveLength(1);
     const blockedMenu = await openMenu(blocked.user);
     expect(blockedMenu.getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
     expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();

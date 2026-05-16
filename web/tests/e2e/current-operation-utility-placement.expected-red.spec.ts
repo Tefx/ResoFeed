@@ -67,6 +67,19 @@ const items: ItemSummary[] = [
   }
 ];
 
+function runningOperation() {
+  return {
+    running: true,
+    kind: 'reprocess',
+    scope: 'library',
+    phase: 'processing_items',
+    count: { current: 2, total: 5 },
+    message: 'library reprocess processing item',
+    started_at: '2026-05-17T11:00:00Z',
+    updated_at: '2026-05-17T11:00:05Z'
+  };
+}
+
 async function fulfillJson(route: Route, payload: unknown, status = 200): Promise<void> {
   await route.fulfill({
     status,
@@ -101,13 +114,29 @@ async function installApiFixtures(
       await fulfillJson(route, { language: { code: 'en', label: 'English' } });
       return;
     }
+    if (path === '/api/runtime/operation') {
+      await fulfillJson(route, { operation: { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
+      return;
+    }
     if (path === '/api/steer/active') {
       await fulfillJson(route, { rules: [] });
       return;
     }
     if (path === '/api/ingest' && request.method() === 'POST') {
       if (options.ingestConflict) {
-        await fulfillJson(route, { error: { code: 'conflict', message: 'ingest already running', details: {} } }, 409);
+        await fulfillJson(route, {
+          error: {
+            code: 'conflict',
+            message: 'ingest already running',
+            details: {
+              operation_running: true,
+              operation: 'reprocess',
+              scope: 'library',
+              retry_allowed: true,
+              current_operation: runningOperation()
+            }
+          }
+        }, 409);
         return;
       }
       if (options.holdIngest) await options.holdIngest;
@@ -208,7 +237,13 @@ test.describe('expected-red contextual operation and utility placement contracts
     await shellReady(page);
     await page.getByRole('button', { name: '[RUN INGEST]' }).click();
 
-    await expect(page.locator('section.source-ledger').getByText('err: ingest already running')).toBeVisible();
+    const ledger = page.locator('section.source-ledger');
+    const contextualConflictStatus = ledger.locator('.source-ledger__header-actions .source-ledger__status').filter({
+      hasText: /err: ingest already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i
+    });
+    await expect(contextualConflictStatus, 'Source Ledger conflict status must include current_operation detail').toHaveCount(1);
+    await expect(contextualConflictStatus).toBeVisible();
+    await expect(ledger.getByText('err: ingest already running'), 'Source Ledger must not duplicate the generic conflict status').toHaveCount(1);
     await attachRenderedEvidence(page, testInfo, 'source-ledger-blocked-operation-visible');
 
     const persistentTopChrome = page.locator('header.shell-command');
@@ -216,6 +251,6 @@ test.describe('expected-red contextual operation and utility placement contracts
 
     const menu = await openSurfaceMenu(page);
     await attachRenderedEvidence(page, testInfo, 'utility-menu-open-blocked-operation-status');
-    await expect(menu.getByText('err: ingest already running'), 'opened RESOFEED operations/utility surface must expose blocked-operation explanation').toBeVisible();
+    await expect(menu.getByText(/err: ingest already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i), 'opened RESOFEED operations/utility surface must expose blocked-operation explanation with current_operation detail').toBeVisible();
   });
 });

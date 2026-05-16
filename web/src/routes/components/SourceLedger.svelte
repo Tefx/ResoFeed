@@ -43,6 +43,7 @@
   const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
   const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
+  const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -249,10 +250,7 @@
   <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <div class="source-ledger__header-actions">
-      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerIngestStatusText}>{headerIngestStatusText}</span>
-      {#if currentOperationStatusText}
-        <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={currentOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={currentOperationStatusText}>{currentOperationStatusText}</span>
-      {/if}
+      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
     </div>
