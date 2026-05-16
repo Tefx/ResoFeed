@@ -91290,7 +91290,7 @@ phases:
       and verification steps own the gaps.'
   - id: azrct-expected-red-browser-and-contract-tests
     name: Add expected-red browser and contract tests for audit and zh gaps
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -91421,6 +91421,62 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T13:26:00.955368+00:00'
+    done_at: '2026-05-16T13:41:49.744176+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/DESIGN.md — Read by execution\
+      \ agent; App Shell only allows TODAY/SOURCE LEDGER inside open RESOFEED menu;\
+      \ Language Control requires html lang en/zh-CN and terse LANG labels; Source\
+      \ Ledger requires right-aligned last_ingest + [RUN INGEST]; Inspector requires\
+      \ summary provenance trust line and no model badge.\n- docs/ARCHITECTURE.md\
+      \ — Read by execution agent; processing_language is runtime metadata excluded\
+      \ from state export/import; reprocess is explicit; no vector/RAG/semantic-answer\
+      \ surface.\n- docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — Read by execution\
+      \ agent; locks HTTP/MCP language/reprocess schemas, processing_language export\
+      \ exclusion, source identifier translate=no obligations, no RAG/queues/settings\
+      \ dashboards.\n- docs/ui-preview.html — Read by execution agent; preview still\
+      \ has stale `partial` labels and lacks LANG/reprocess examples.\n- tests/contract/azrct_closure_matrix.yaml\
+      \ — Read by execution agent; maps F1, F2, P1, P2 visible copy, P2 preview drift,\
+      \ P2 inspector provenance, and zh frontend surfaces to expected-red tests.\n\
+      - web/tests/e2e — Read by execution agent; existing Playwright harness uses\
+      \ fixtures.ts, route interception, owner token localStorage, and chromium-ci-safe.\n\
+      - internal/resofeed/processing_language_ingest_test.go — Read by execution agent;\
+      \ existing backend coverage verifies future zh ingest, source identifier preservation,\
+      \ OpenRouter target_language.\n- internal/resofeed/runtime_metadata_receipts_test.go\
+      \ — Read by execution agent; existing backend coverage verifies processing_language\
+      \ defaults/validation and state export excludes runtime metadata/receipts.\n\
+      - internal/resofeed/reprocess_test.go — Read by execution agent; existing backend\
+      \ coverage verifies reprocess counts/source precedence/FTS behavior.\n\n## Expected-Red\
+      \ Test Evidence\n- Test files changed:\n  - web/tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts\n\
+      \  - web/src/test/azrct-contract-fixtures.expected-red.test.ts\n- Spec-fixture\
+      \ conformance: exact documented state bundle v1 fixture from docs/ARCHITECTURE.md\
+      \ §5.5 with only documented fields; excludes processing_language, runtime_metadata,\
+      \ and receipts.\n- Product implementation files modified: false.\n- Docs modified:\
+      \ false.\n- Test-only scope maintained: true.\n- expected_failures map F1/P2\
+      \ compact nav, F2, P1, P2 visible copy, P2 inspector provenance, P2 preview\
+      \ drift, zh frontend lang control, zh receipts/steer preview, zh inspector display\
+      \ to intended gaps; backend zh state/OpenRouter/reprocess parity cited as existing\
+      \ green coverage.\n\n## Expected-red semantic reporting\n- step_intent: test_define_red\n\
+      - expected_result: red\n- observed_result: red\n- failure_alignment: intended_gap\n\
+      - verdict: PASS\n- blockers: []\n- downstream_implementation_step: azri-frontend-low-chrome-copy-zh-repair\n\
+      \n## Mainline verification after squash merge\n- `npm run check` from repo root\
+      \ failed with Missing script `check`; reran in `web/` as the frontend project\
+      \ root.\n- `npm run check` (workdir web): exit 0; `svelte-check found 0 errors\
+      \ and 0 warnings`.\n- `npx vitest run src/test/azrct-contract-fixtures.expected-red.test.ts`\
+      \ (workdir web): exit 1 expected red; preview drift failure because docs/ui-preview.html\
+      \ lacks LANG/reprocess surface examples.\n- `npm run test:e2e -- azrct-audit-zh-repair.expected-red.spec.ts\
+      \ --project=chromium-ci-safe` (workdir web): exit 1 expected red; 7 failures\
+      \ aligned with intended gaps: persistent T/SL buttons, Source Ledger header\
+      \ action block missing, OPML POST /api/ingest call, `no semantic retrieval`\
+      \ copy, `model: ok` inspector provenance, zh status/steer/receipt localization\
+      \ gaps, zh inspector chrome localization gaps.\n- `go test ./internal/resofeed\
+      \ -run 'Test(RuntimeMetadataProcessingLanguageDefaultsAndValidation|RuntimeMetadataStateExportImportExcludesMetadataAndReceipts|ProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems|OpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret|ReprocessLibraryAccountingSourcePrecedenceAndFTS)'`:\
+      \ exit 0.\n- Checklist state verified via vectl_show: all description completion\
+      \ criteria and verification checklist items are checked.\n\n## Files changed\n\
+      - web/tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts\n- web/src/test/azrct-contract-fixtures.expected-red.test.ts\n\
+      \n## Commits\n- Worktree commit: 3d75fca5 (`test: add expected-red audit zh\
+      \ coverage`).\n- Main squash merge commit: 540a2f2b (`[vectl] step-azrct-expected-red-browser-and-contract-tests\
+      \ completed`).\n\n## Gaps/Notes\n- Expected red is accepted because the step\
+      \ is pre-implementation, the observed failures match declared repair gaps, and\
+      \ no production implementation files were modified."
   - id: azrct-contract-tests-gate
     name: Gate repair contract matrix and expected-red tests
     status: pending
