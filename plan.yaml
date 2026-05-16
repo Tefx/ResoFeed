@@ -95610,7 +95610,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] MCP resource uses the same snapshot source as HTTP.
+      - [x] MCP resource uses the same snapshot source as HTTP.
 
       - [ ] MCP conflict payload consistency is covered where MCP structured metadata
       exists.
