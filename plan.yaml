@@ -93283,7 +93283,7 @@ phases:
 
       - [x] UIUX multimodal audit is reviewed.
 
-      - [ ] Final decision includes OPEN/BLOCK and explicit closure path for every
+      - [x] Final decision includes OPEN/BLOCK and explicit closure path for every
       unresolved item.'
     verification: '- [ ] All original verification/review steps completed with adequate
       evidence or have an explicit remediation/retest closure path.
