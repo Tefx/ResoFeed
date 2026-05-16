@@ -94250,7 +94250,7 @@ phases:
       - [x] Evidence records the expected red failure message or exposed grouped-source
       disclosure.
 
-      - [ ] Product code remains unchanged in this step.'
+      - [x] Product code remains unchanged in this step.'
     verification: '- [ ] Only frontend tests/fixtures changed; no product-code changes
       are included.
 
