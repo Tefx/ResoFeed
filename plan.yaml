@@ -95429,7 +95429,7 @@ phases:
       - [x] No SQLite schema, queue/job/history table, sidecar, or new architectural
       layer is introduced.
 
-      - [ ] Race/concurrency safety for the in-memory snapshot is addressed with existing
+      - [x] Race/concurrency safety for the in-memory snapshot is addressed with existing
       or explicit synchronization.'
     verification: '- [ ] local-check protecting HTTP runtime behavior: targeted Go
       tests for idle, running, conflict, and no-query-param cases pass green.
