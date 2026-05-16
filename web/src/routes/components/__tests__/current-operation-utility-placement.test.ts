@@ -2,6 +2,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/svelt
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
 import Page from '../../+page.svelte';
 import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
 
@@ -14,7 +15,20 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean } = {}) {
+function runningOperation() {
+  return {
+    running: true,
+    kind: 'reprocess',
+    scope: 'library',
+    phase: 'processing_items',
+    count: { current: 2, total: 5 },
+    message: 'library reprocess processing item',
+    started_at: '2026-05-17T11:00:00Z',
+    updated_at: '2026-05-17T11:00:05Z'
+  };
+}
+
+function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown } = {}) {
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? 'GET';
@@ -23,7 +37,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
     if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
-      return jsonResponse({ operation: { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
+      return jsonResponse({ operation: options.operation ?? { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     }
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith('/api/ingest') && method === 'POST') {
@@ -37,7 +51,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
               operation: 'reprocess',
               scope: 'library',
               retry_allowed: true,
-              current_operation: { running: true, kind: 'reprocess', scope: 'library', phase: 'running', count: null, message: 'reprocess running', started_at: '2026-05-17T11:00:00Z', updated_at: '2026-05-17T11:00:00Z' }
+              current_operation: runningOperation()
             }
           }
         }, { status: 409 });
@@ -51,7 +65,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean } = {}) {
+async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown } = {}) {
   cleanup();
   window.localStorage.clear();
   installFetch(options);
@@ -72,6 +86,19 @@ async function openMenu(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('current operation and low-frequency utility placement', () => {
+  it('accepts documented count objects and rejects invalid count shapes', async () => {
+    installFetch({ operation: runningOperation() });
+    await expect(new ResoFeedApiClient({ ownerToken }).currentOperation()).resolves.toMatchObject({
+      operation: { count: { current: 2, total: 5 } }
+    });
+
+    installFetch({ operation: { ...runningOperation(), count: 2 } });
+    await expect(new ResoFeedApiClient({ ownerToken }).currentOperation()).rejects.toBeInstanceOf(ResoFeedApiError);
+
+    installFetch({ operation: { ...runningOperation(), count: { current: '2', total: 5 } } });
+    await expect(new ResoFeedApiClient({ ownerToken }).currentOperation()).rejects.toBeInstanceOf(ResoFeedApiError);
+  });
+
   it('keeps LANG/reprocess and idle operation status out of persistent top chrome until the RESOFEED menu opens', async () => {
     const { user } = await renderAuthenticatedPage();
     const topChrome = document.querySelector('header.shell-command');
@@ -97,7 +124,7 @@ describe('current operation and low-frequency utility placement', () => {
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
     await user.click(screen.getByRole('button', { name: '[RUN INGEST]' }));
     expect(screen.getByRole('button', { name: '[INGESTING...]' })).toBeVisible();
-    expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('[INGESTING...]')).not.toBeVisible();
+    expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('[INGESTING...]')).not.toBeInTheDocument();
     menu = await openMenu(user);
     expect(menu.getByText(/\[INGESTING\.\.\.\]|current operation:\s*ingest/i)).toBeVisible();
     releaseIngest();
@@ -112,6 +139,16 @@ describe('current operation and low-frequency utility placement', () => {
     expect(await screen.findByText('err: operation already running')).toBeVisible();
     expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('err: operation already running')).not.toBeInTheDocument();
     const blockedMenu = await openMenu(blocked.user);
-    expect(blockedMenu.getByText(/err: operation already running.*current operation:\s*reprocess\/library/i)).toBeVisible();
+    expect(blockedMenu.getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+    expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+  });
+
+  it('renders current operation phase, count, message, and timestamps when the menu or Source Ledger is contextual', async () => {
+    const { user } = await renderAuthenticatedPage({ operation: runningOperation() });
+    const menu = await openMenu(user);
+    expect(menu.getByText(/\[REPROCESSING\.\.\.\].*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+
+    await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
+    expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
   });
 });

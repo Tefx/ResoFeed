@@ -12,6 +12,7 @@
     onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
     onExportState: () => Promise<StateBundleV1>;
     onImportState: (bundle: StateBundleV1) => Promise<void> | void;
+    currentOperationStatusText?: string;
     suppressStatusRole?: boolean;
   }
 
@@ -23,6 +24,7 @@
     onFetchSource = async (source: Source) => ({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
     onImportState,
+    currentOperationStatusText = '',
     suppressStatusRole = false
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
@@ -248,6 +250,9 @@
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <div class="source-ledger__header-actions">
       <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerIngestStatusText}>{headerIngestStatusText}</span>
+      {#if currentOperationStatusText}
+        <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={currentOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={currentOperationStatusText}>{currentOperationStatusText}</span>
+      {/if}
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
     </div>

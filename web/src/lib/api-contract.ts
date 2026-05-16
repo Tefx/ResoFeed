@@ -8,12 +8,17 @@ export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'confl
 export type OperationKind = 'ingest' | 'fetch' | 'reprocess';
 export type OperationScope = 'all' | 'source' | 'library' | null;
 
+export interface CurrentOperationCount {
+  current: number;
+  total: number;
+}
+
 export interface CurrentOperationInfo {
   running: boolean;
   kind: OperationKind | null;
   scope: OperationScope;
   phase: string | null;
-  count: number | null;
+  count: CurrentOperationCount | null;
   message: string | null;
   started_at: Rfc3339UtcString | null;
   updated_at: Rfc3339UtcString | null;

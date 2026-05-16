@@ -266,10 +266,24 @@
       (candidate.kind === 'ingest' || candidate.kind === 'fetch' || candidate.kind === 'reprocess' || candidate.kind === null) &&
       (candidate.scope === 'all' || candidate.scope === 'source' || candidate.scope === 'library' || candidate.scope === null) &&
       (typeof candidate.phase === 'string' || candidate.phase === null) &&
-      (typeof candidate.count === 'number' || candidate.count === null) &&
+      (isCurrentOperationCount(candidate.count) || candidate.count === null) &&
       (typeof candidate.message === 'string' || candidate.message === null) &&
       (typeof candidate.started_at === 'string' || candidate.started_at === null) &&
       (typeof candidate.updated_at === 'string' || candidate.updated_at === null)
+    );
+  }
+
+  function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+    const candidate = value as Record<string, unknown>;
+    const { current, total } = candidate;
+    return (
+      Number.isInteger(current) &&
+      Number.isInteger(total) &&
+      typeof current === 'number' &&
+      typeof total === 'number' &&
+      current >= 0 &&
+      total >= 0
     );
   }
 
@@ -289,15 +303,43 @@
     return operation.scope ? `${kind}/${operation.scope}` : kind;
   }
 
+  function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
+    if (!timestamp) return null;
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return timestamp;
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'UTC'
+    }).format(date);
+  }
+
+  function operationDetails(operation: CurrentOperationInfo): string {
+    return [
+      `current operation: ${operationLabel(operation)}`,
+      operation.phase ? `phase: ${operation.phase}` : null,
+      operation.count ? `count: ${operation.count.current}/${operation.count.total}` : null,
+      operation.message ? `msg: ${operation.message}` : null,
+      operation.started_at ? `started: ${operationTimestamp(operation.started_at)}` : null,
+      operation.updated_at ? `updated: ${operationTimestamp(operation.updated_at)}` : null
+    ].filter(Boolean).join(' · ');
+  }
+
   function formatContextualOperation(state: ContextualOperationState): string {
     if (state.kind === 'idle') return '';
     if (state.kind === 'running') {
-      if (state.operation.kind === 'ingest') return '[INGESTING...]';
-      if (state.operation.kind === 'fetch') return '[FETCHING...]';
-      if (state.operation.kind === 'reprocess') return reprocessRunningLabel;
-      return `current operation: ${operationLabel(state.operation)}`;
+      const label = state.operation.kind === 'ingest'
+        ? '[INGESTING...]'
+        : state.operation.kind === 'fetch'
+          ? '[FETCHING...]'
+          : state.operation.kind === 'reprocess'
+            ? reprocessRunningLabel
+            : null;
+      return label ? `${label} · ${operationDetails(state.operation)}` : operationDetails(state.operation);
     }
-    return state.operation ? `${state.text} · current operation: ${operationLabel(state.operation)}` : state.text;
+    return state.operation ? `${state.text} · ${operationDetails(state.operation)}` : state.text;
   }
 
   async function refreshCurrentOperationIfAvailable(): Promise<void> {
@@ -942,6 +984,7 @@
         onFetchSource={fetchSource}
         onExportState={exportState}
         onImportState={importState}
+        currentOperationStatusText={contextualOperationStatusText}
         suppressStatusRole={steerFeedback.kind === 'receipt'}
       />
     </section>

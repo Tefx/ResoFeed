@@ -137,6 +137,19 @@ function isOperationScope(value: unknown): value is CurrentOperationInfo['scope'
   return value === 'all' || value === 'source' || value === 'library' || value === null;
 }
 
+function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
+  if (!isRecord(value)) return false;
+  const { current, total } = value;
+  return (
+    Number.isInteger(current) &&
+    Number.isInteger(total) &&
+    typeof current === 'number' &&
+    typeof total === 'number' &&
+    current >= 0 &&
+    total >= 0
+  );
+}
+
 function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
   if (!isRecord(value)) return false;
   return (
@@ -144,7 +157,7 @@ function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
     isOperationKind(value.kind) &&
     isOperationScope(value.scope) &&
     (typeof value.phase === 'string' || value.phase === null) &&
-    (typeof value.count === 'number' || value.count === null) &&
+    (isCurrentOperationCount(value.count) || value.count === null) &&
     (typeof value.message === 'string' || value.message === null) &&
     (typeof value.started_at === 'string' || value.started_at === null) &&
     (typeof value.updated_at === 'string' || value.updated_at === null)
