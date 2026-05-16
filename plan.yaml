@@ -83786,7 +83786,7 @@ phases:
       remains responsible for independent closure evidence and rendered artifact register.'
   - id: srdf-batched-frontend-audit-closure
     name: Retest and close batched frontend spec UIUX blockers
-    status: pending
+    status: claimed
     description: "As an INDEPENDENT TESTER (integration-verifier), close the unified\
       \ remediation from `srdf-batched-frontend-audit-remediation` with current-mainline\
       \ rendered evidence, E2E evidence, and machine-readable stale-vs-real reconciliation.\n\
@@ -83897,6 +83897,8 @@ phases:
     depends_on:
     - srdf-batched-frontend-audit-remediation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T01:09:22.079339+00:00'
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
