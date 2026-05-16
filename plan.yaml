@@ -86991,15 +86991,15 @@ phases:
       meets the 44px minimum hit-target requirement.
 
       - [x] Passing surfaces from the failed proof remain non-regressed.'
-    verification: '- [ ] Focused rendered/browser proof closes B1, B2, B3, and B4.
+    verification: '- [x] Focused rendered/browser proof closes B1, B2, B3, and B4.
 
-      - [ ] Sibling search evidence covers invisible disclosure targets, obstructed
+      - [x] Sibling search evidence covers invisible disclosure targets, obstructed
       file inputs, unfocusable split-scroll regions, and sub-44px links/buttons.
 
-      - [ ] Previously passing visual/a11y surfaces remain passing or have explicit
+      - [x] Previously passing visual/a11y surfaces remain passing or have explicit
       non-regression evidence.
 
-      - [ ] No forbidden UI/product concepts are introduced.'
+      - [x] No forbidden UI/product concepts are introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
