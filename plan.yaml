@@ -85513,7 +85513,7 @@ phases:
       \ remediation required; no forbidden UI/product concept introduced."
   - id: srde2e-software-architect-clean-recheck
     name: Re-review batched architecture/API contract remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -85637,6 +85637,67 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-16T08:18:18.216836+00:00'
+    done_at: '2026-05-16T08:24:00.252674+00:00'
+    evidence: "status: SUCCESS\nverdict: CLEAN\ngate_open_allowed: true\nblockers:\
+      \ []\nshould_fix: []\n\n## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md\
+      \ — READ. Key passages: live `idempotency_key` uniqueness spans receipt-backed\
+      \ HTTP and MCP mutating operations; same key + same fingerprint replays stored\
+      \ snapshot; same key + different fingerprint rejects. `POST /api/steer/preview`\
+      \ accepts no `idempotency_key`, returns `will_mutate:false`, and is read-only\
+      \ with no receipts/state writes. MCP exposes same product concepts; `preview_steer`\
+      \ is non-mutating/no idempotency key; `steer` is mutating and requires `idempotency_key`.\n\
+      - internal/resofeed/http.go — READ. Key passages: `handleSteerPreview` validates\
+      \ command/actor fields and calls `PreviewSteering`; `handleSteer` classifies\
+      \ route and calls `withIdempotencyReceipt(..., \"steer\", \"\", steerFingerprintPayload(req,\
+      \ route), ...)`.\n- internal/resofeed/mcp.go — READ. Key passages: `SteerForMCP`\
+      \ constructs `SteerRequest`, classifies route, and uses `withMCPReceipt(...,\
+      \ \"steer\", \"\", steerFingerprintPayload(req, route), ...)`; `PreviewSteerForMCP`\
+      \ calls `PreviewSteering` without idempotency; MCP rejects idempotency key for\
+      \ `preview_steer` and requires it for `steer`.\n- internal/resofeed/steer_intent.go\
+      \ — READ. Key passages: preview must not write SQLite state, create receipts,\
+      \ enqueue jobs, or update undo stack; `WillMutate` describes the preview call\
+      \ itself and remains false; `PreviewSteering` classifies routes without assigning\
+      \ `WillMutate`.\n- Additional refs read: internal/resofeed/idempotency.go shared\
+      \ `steerFingerprintPayload`; internal/resofeed/types.go `SteerPreview.WillMutate`\
+      \ public contract; internal/resofeed/srdct_steer_expected_red_test.go regression\
+      \ tests for SF1/SF2.\n\n## Clean Re-review Report\n**Reviewer**: software-architect\
+      \ (independent of golang-developer fix)\n**Fix step reviewed**: srde2e-backend-architecture-remediation\n\
+      \n## Requirements / Behavioral Proof Register\n| Requirement Ref | Behavior\
+      \ Claim | Runtime Proof Expected | Evidence Ref | Status | Closure Path | Gate\
+      \ Decision Basis |\n| --- | --- | --- | --- | --- | --- | --- |\n| SF1 HTTP/MCP\
+      \ idempotency parity | HTTP and MCP `steer` now use the same validated logical\
+      \ fingerprint payload for equivalent commands: command, actor kind, actor id,\
+      \ and route kind under operation `steer` and empty item id. | Same actor/key/command\
+      \ HTTP commit followed by MCP `steer` call replays stored result/equivalent\
+      \ idempotent response and does not return `request_fingerprint_mismatch`. |\
+      \ `http.go`, `mcp.go`, `idempotency.go`, regression `TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch`;\
+      \ isolated and mainline focused tests passed. | PROVEN | Closed | Contract requires\
+      \ global live receipt behavior across HTTP/MCP; runtime code uses shared payload\
+      \ and targeted runtime proof passed. |\n| SF2 preview will_mutate contract |\
+      \ `/api/steer/preview` and MCP `preview_steer` remain read-only preview calls;\
+      \ public `will_mutate` means “this preview call mutates,” so it is false even\
+      \ for source routes whose later commit could mutate. | Source preview returns\
+      \ route `source` with `will_mutate=false`; no durable state count changes and\
+      \ no receipt/write side effect. | docs, `types.go`, `steer_intent.go`, `http.go`,\
+      \ `mcp.go`, regression `TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly`;\
+      \ isolated and mainline focused tests passed. | PROVEN | Closed | Contract,\
+      \ type comments, HTTP/MCP handlers, core preview semantics, and runtime test\
+      \ all align. |\n\n## Findings\n| Severity | Finding | Location | Evidence |\
+      \ Grep hint | Required remediation |\n| --- | --- | --- | --- | --- | --- |\n\
+      | none | none | none | no blocker/should_fix contract drift found | n/a | none\
+      \ |\n\n## Mainline Final-State Verification\n```text\ngo test ./internal/resofeed\
+      \ -run 'TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch|TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly'\n\
+      ok  \tresofeed/internal/resofeed\t0.516s\n\ngo test ./internal/resofeed\nok\
+      \  \tresofeed/internal/resofeed\t(cached)\n```\n\n## Test-step Semantic Reporting\n\
+      - step_intent: retest_green\n- expected_result: green\n- observed_result: green\n\
+      - failure_alignment: n/a\n- verdict: CLEAN\n- blockers: []\n- product_implementation_files_modified:\
+      \ no\n- product_implementation_files_modified_list: []\n\n## Standard Evidence\n\
+      - Commit hash(es): none — read-only re-review; no file changes made and branch\
+      \ has no ahead commits.\n- Files changed: none.\n- Verification/search commands:\
+      \ isolated grep/source review found shared fingerprint and preview contract\
+      \ comments; isolated focused tests and package tests passed; mainline focused\
+      \ tests and package tests passed.\n- Spec link: srde2e-software-architect-clean-recheck\n\
+      - Gaps/Notes: none."
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
     status: pending
