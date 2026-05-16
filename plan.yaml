@@ -85225,7 +85225,7 @@ phases:
       - [x] Do not introduce new product concepts, sidecar workers, receipt portability,
       state merge semantics, or agent authorization registries.
 
-      - [ ] Provide root cause vs symptom evidence for both findings.
+      - [x] Provide root cause vs symptom evidence for both findings.
 
 
       ## Completion Criteria (stub exclusion)
