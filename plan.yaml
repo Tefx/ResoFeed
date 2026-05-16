@@ -83839,7 +83839,7 @@ phases:
       <path/url/screenshot/dom/a11y ref>\"\ncommands:\n  - command: \"<exact command>\"\
       \n    exit_code: 0\n    summary: \"<actual observed result>\"\nforbidden_concept_scan:\
       \ \"PASS|FAIL\"\nreversal_risk: \"LOW|MEDIUM|HIGH\"\nremaining_blockers: []\n\
-      ```\n\nBehavioral proof register and gate decision basis:\n- [ ] requirement_ref:\
+      ```\n\nBehavioral proof register and gate decision basis:\n- [x] requirement_ref:\
       \ frontend spec/UIUX blocker family; behavior_claim: every blocker is fixed\
       \ or proven stale/non-intersecting on current mainline; runtime_proof_expected:\
       \ commands and rendered artifacts listed above; evidence_ref: pasted output\
