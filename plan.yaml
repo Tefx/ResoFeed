@@ -95484,7 +95484,7 @@ phases:
       - [x] Synthetic feed-fragment no-grouping path remains non-grouped and does
       not regress.
 
-      - [ ] Browser console evidence is captured and contains no blocker-class runtime
+      - [x] Browser console evidence is captured and contains no blocker-class runtime
       crash.
 
       - [ ] Evidence identifies exact command/test and actual output, not just a summary.'
