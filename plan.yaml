@@ -95133,7 +95133,7 @@ phases:
       - [x] UIUX audit and targeted retest are PASS or only explicit non-blocking
       debt remains.
 
-      - [ ] Gate decision basis recommends OPEN or records exact remediation actions
+      - [x] Gate decision basis recommends OPEN or records exact remediation actions
       if BLOCKED.'
     verification: '- [ ] Gate review confirms expected-red → fix → green retest sequence,
       including the reactive grouped-source sort crash remediation.
