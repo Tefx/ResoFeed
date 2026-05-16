@@ -1,0 +1,384 @@
+contract_id: azrct-closure-matrix
+title: Lock repair and zh completeness closure matrix
+contract_purity: enforced
+artifact_type: closure_matrix
+scope: acceptance_definitions_test_names_and_proof_obligations_only
+production_code_change_allowed: false
+
+spec_refs:
+  - id: design.app_shell
+    path: docs/DESIGN.md
+    lines: 431-435
+    quote: "The menu may contain `TODAY` and `SOURCE LEDGER`; those labels do not need to be persistent visible links when the menu is closed."
+  - id: design.language_control
+    path: docs/DESIGN.md
+    lines: 437-445
+    quote: "a compact text control ... `LANG: EN` or `LANG: ZH` ... must not open a settings dashboard"
+  - id: design.reprocess
+    path: docs/DESIGN.md
+    lines: 446-459
+    quote: "[REPROCESS LIBRARY] ... Existing readable item content will be rewritten ... no spinner, progress bar, wizard, dashboard, queue view, or activity log"
+  - id: design.inspector
+    path: docs/DESIGN.md
+    lines: 551-565
+    quote: "Source-text status and summary provenance are separate lines of evidence ... `source text: RSS excerpt only` ... `summary provenance: model-backed`."
+  - id: design.source_ledger
+    path: docs/DESIGN.md
+    lines: 569-627
+    quote: "manual `[RUN INGEST]` ... OPML import ... `last_ingest` plus `.bracket-action--run-ingest` to the right side of the header"
+  - id: design.dos_donts
+    path: docs/DESIGN.md
+    lines: 671-729
+    quote: "Don't add ... settings dashboards ... RAG/vector/semantic-answer product surface ... Don't automatically rewrite existing items merely because the user changed language."
+  - id: architecture.processing_basis
+    path: docs/ARCHITECTURE.md
+    lines: 215-319
+    quote: "processing_language ... en|zh ... excluded from state export/import ... Reprocess ... explicit ... no DI container, event bus, sidecar worker"
+  - id: architecture.runtime_metadata
+    path: docs/ARCHITECTURE.md
+    lines: 454-514
+    quote: "processing_language ... Export/import? No ... no vector, embedding, semantic-answer, or dual-language index"
+  - id: architecture.state_portability
+    path: docs/ARCHITECTURE.md
+    lines: 644-750
+    quote: "Portable state bundle includes ... sources, steer_rules, resonated_items ... excludes ... activity logs, or sync metadata"
+  - id: architecture.reprocess
+    path: docs/ARCHITECTURE.md
+    lines: 751-810
+    quote: "setting a new processing language ... affects future ingestion/reprocess only ... must not create durable job rows, queues, sync state"
+  - id: architecture.http_language
+    path: docs/ARCHITECTURE.md
+    lines: 1230-1346
+    quote: "GET /api/runtime/language ... PUT ... POST /api/runtime/reprocess-library ... no query params ... stored item text as-is"
+  - id: architecture.mcp_language
+    path: docs/ARCHITECTURE.md
+    lines: 1424-1448
+    quote: "MCP does not get a per-call language override ... get_processing_language, set_processing_language, reprocess_library"
+  - id: lock.processing_language
+    path: docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md
+    lines: 5-52
+    quote: "runtime_metadata.processing_language ... en|zh ... excluded from state export/import ... No settings dashboard ... no vector DB, embeddings, RAG"
+  - id: preview.current_drift_evidence
+    path: docs/ui-preview.html
+    lines: 637-743
+    quote: "The current preview still renders `partial` in feed/mobile examples and lacks visible LANG/reprocess surfaces."
+
+owner_step_catalog:
+  ui_shell_repair_owner:
+    title: Repair low-chrome App Shell labels and compact navigation
+    scope: web UI shell/chrome only
+  source_ledger_geometry_owner:
+    title: Repair Source Ledger header geometry and explicit ingest/import boundaries
+    scope: web Source Ledger DOM/CSS/API call wiring only
+  product_copy_owner:
+    title: Repair visible product copy and Inspector provenance copy
+    scope: user-visible strings and provenance labels only
+  preview_docs_owner:
+    title: Refresh docs/ui-preview language/reprocess/excerpt artifact
+    scope: static preview artifact only
+  expected_red_rename_owner:
+    title: Rename temporary expected-red tests after closure
+    scope: test filenames/titles only
+  naming_debt_owner:
+    title: Isolate legacy Gemini naming debt from runtime-visible behavior
+    scope: non-runtime-visible naming only
+  zh_runtime_owner:
+    title: Close processing-language storage/API/MCP and state portability gaps
+    scope: Go runtime contracts and tests only
+  zh_frontend_owner:
+    title: Close zh UI controls, receipts, steer preview, Inspector, and reprocess gaps
+    scope: web visible UI and E2E tests only
+  zh_openrouter_owner:
+    title: Close OpenRouter target-language prompt proof
+    scope: LLM request fixture/contract tests only
+
+verification_step_catalog:
+  browser_shell_proof:
+    title: Browser proof for App Shell route-label visibility and compact nav absence
+    harness: Playwright
+    test_name: app-shell-low-chrome-route-labels.spec.ts
+  browser_ledger_geometry_proof:
+    title: Browser proof for Source Ledger header alignment and OPML non-ingest boundary
+    harness: Playwright
+    test_name: source-ledger-header-opml-boundary.spec.ts
+  browser_copy_proof:
+    title: Browser proof for operational copy and Inspector provenance lines
+    harness: Playwright
+    test_name: visible-copy-inspector-provenance.spec.ts
+  spec_preview_proof:
+    title: Static spec proof for docs/ui-preview LANG/reprocess/excerpt freshness
+    harness: spec/static DOM check
+    test_name: ui-preview-language-reprocess-contract.spec.ts
+  test_name_proof:
+    title: Static proof that red-test names no longer encode permanent expected failure
+    harness: spec/static filename-title check
+    test_name: expected-red-closure-naming.spec.ts
+  runtime_naming_proof:
+    title: Static/runtime proof that Gemini naming is not user-visible runtime copy
+    harness: Go + UI static copy scan
+    test_name: legacy-provider-naming-nonruntime.spec.ts
+  go_language_contract_proof:
+    title: Go contract proof for language API/MCP/runtime metadata/state exclusion
+    harness: Go tests
+    test_name: processing_language_runtime_contract_test.go
+  browser_zh_frontend_proof:
+    title: Browser proof for zh chrome, receipts, steer preview, Inspector, and reprocess
+    harness: Playwright
+    test_name: processing-language-zh-ui-parity.spec.ts
+  go_openrouter_prompt_proof:
+    title: Go proof that OpenRouter receives target_language and preserves identifiers
+    harness: Go LLM stub tests
+    test_name: openrouter_target_language_prompt_test.go
+
+audit_findings:
+  - finding_id: F1
+    source_audit: uiux-auditor
+    severity: fail
+    summary: Persistent route labels `TODAY` and `SOURCE LEDGER` visible outside the open `RESOFEED` menu.
+    acceptance:
+      required: "Persistent chrome may show `RESOFEED` and LANG, but `TODAY` and `SOURCE LEDGER` are visible only in the open `RESOFEED` menu, except feed time-group labels/headings or active surface content."
+      must_not: "No persistent top-level `TODAY`, `SOURCE LEDGER`, `T`, or `SL` navigation outside the menu unless a later design acceptance explicitly supersedes this matrix."
+    owner_step: ui_shell_repair_owner
+    verification_step: browser_shell_proof
+    proof_obligations:
+      - Closed menu accessibility snapshot contains no persistent nav link/button named `TODAY`, `SOURCE LEDGER`, `T`, or `SL`.
+      - Open RESOFEED menu snapshot contains real button/link menu items for `TODAY` and `SOURCE LEDGER`.
+      - Feed time-group `TODAY` remains allowed only in feed item metadata/time-group context.
+    product_boundaries_preserved:
+      - no settings dashboard
+      - no extra top-level navigation tab
+
+  - finding_id: F2
+    source_audit: uiux-auditor
+    severity: fail
+    summary: Source Ledger `last_ingest` alignment drifts against `[RUN INGEST]` and can push title/action geometry.
+    acceptance:
+      required: "Within `.source-ledger__header`, title stays in its left column while `last_ingest` and `.bracket-action--run-ingest` are right-aligned as a stable action cluster."
+      must_not: "Changing `last_ingest` width or `[INGESTING...]` text must not push source title or action geometry."
+    owner_step: source_ledger_geometry_owner
+    verification_step: browser_ledger_geometry_proof
+    proof_obligations:
+      - Browser measures `last_ingest` right edge at or immediately before `[RUN INGEST]` left edge with stable baseline alignment.
+      - Header title bounding box is unchanged between default, complete, and running states.
+      - "`[INGESTING...]` expands leftward or stays inside the action cluster without shifting ledger metadata columns."
+    product_boundaries_preserved:
+      - no job dashboard
+      - no ingest queue
+      - no activity ledger
+
+  - finding_id: P1
+    source_audit: software-architect
+    severity: pass_with_debt
+    summary: OPML import boundary must remain explicit and must not automatically run ingest.
+    acceptance:
+      required: "Frontend OPML import calls only `POST /api/sources/import-opml`; `[RUN INGEST]` remains a separate explicit user action for `POST /api/ingest`."
+      must_not: "No automatic `runIngest()` call, queued ingest, or background job triggered by successful OPML import."
+    owner_step: source_ledger_geometry_owner
+    verification_step: browser_ledger_geometry_proof
+    proof_obligations:
+      - Route spy proves OPML import sends exactly one import request and zero `POST /api/ingest` requests.
+      - "UI shows `imported N sources; folders flattened` and leaves `[RUN INGEST]` enabled/explicit."
+    product_boundaries_preserved:
+      - OPML folders flattened only
+      - no sync/import merge protocol
+
+  - finding_id: P2-visible-copy
+    source_audit: uiux-auditor
+    severity: debt
+    summary: Visible copy uses explanatory architecture language such as semantic retrieval/RAG boundary phrasing.
+    acceptance:
+      required: "Visible app copy is terse operational copy; safety boundaries remain in specs/tests, not as product slogans."
+      must_not: "No user-visible `semantic retrieval`, `no semantic retrieval`, `RAG boundary`, `single-tenant`, or architecture-positioning copy in chrome, receipts, empty states, Inspector, Source Ledger, or `/doctor` output unless raw diagnostics require it."
+    owner_step: product_copy_owner
+    verification_step: browser_copy_proof
+    proof_obligations:
+      - Browser text scan over visible UI excludes banned architecture phrases.
+      - Contract/spec tests retain lexical-only/no-RAG non-goal assertions.
+    product_boundaries_preserved:
+      - no RAG/vector/semantic-answer product surface
+
+  - finding_id: P2-compact-nav
+    source_audit: uiux-auditor
+    severity: debt
+    summary: Persistent quick buttons `T`/`SL` need removal or explicit design acceptance.
+    acceptance:
+      required: "Default closure is removal from persistent chrome; if retained later, a DESIGN.md acceptance change must explicitly authorize them."
+      must_not: "No ambiguous abbreviation-only persistent nav controls in the default contract."
+    owner_step: ui_shell_repair_owner
+    verification_step: browser_shell_proof
+    proof_obligations:
+      - Closed-shell snapshot contains no `T`/`SL` quick buttons.
+      - "If a future spec accepts them, test must cite the new DESIGN.md lines and this matrix item must be superseded."
+    product_boundaries_preserved:
+      - low-chrome navigation remains menu-based
+
+  - finding_id: P2-preview-drift
+    source_audit: uiux-auditor
+    severity: debt
+    summary: "`docs/ui-preview.html` lacks current LANG/reprocess surfaces and still uses stale `partial` visible copy where DESIGN prefers excerpt language."
+    acceptance:
+      required: "Preview includes `LANG: EN`/`LANG: ZH` examples, `[REPROCESS LIBRARY]`, and source-text labels `source excerpt`/`excerpt` where user-visible."
+      must_not: "No stale `partial` user-facing preview copy for extraction provenance where DESIGN prefers `source excerpt`/`excerpt`."
+    owner_step: preview_docs_owner
+    verification_step: spec_preview_proof
+    proof_obligations:
+      - Static DOM/text check finds LANG and reprocess surfaces.
+      - "Static DOM/text check finds `source excerpt`/`excerpt` and does not find user-visible `partial` provenance labels."
+    product_boundaries_preserved:
+      - preview remains static doc artifact, not implementation logic
+
+  - finding_id: P2-inspector-provenance
+    source_audit: uiux-auditor
+    severity: debt
+    summary: "Visible Inspector header chrome uses `model: ok` instead of approved source-text and summary provenance evidence lines."
+    acceptance:
+      required: "Inspector renders separate evidence lines such as `source text: RSS excerpt only` and `summary provenance: model-backed`/`feed excerpt fallback`."
+      must_not: "No `model: ok` as visible header chrome; raw model status remains internal/API provenance unless translated into approved summary-provenance copy."
+    owner_step: product_copy_owner
+    verification_step: browser_copy_proof
+    proof_obligations:
+      - "Browser item detail fixture with `partial_extraction` + `model_status: ok` proves the two approved evidence lines render separately."
+      - "Browser text scan proves `model: ok` is absent from visible Inspector chrome."
+    product_boundaries_preserved:
+      - no AI-magic badges
+      - no side-by-side translation state
+
+  - finding_id: P3-test-naming
+    source_audit: uiux-auditor
+    severity: process_debt
+    summary: Expected-red names imply permanent failure after closure.
+    acceptance:
+      required: "Temporary red-test names are renamed or retitled to closure/regression language when the corresponding behavior is fixed."
+      must_not: "No durable test naming that encodes permanent expected failure after the repair is accepted."
+    owner_step: expected_red_rename_owner
+    verification_step: test_name_proof
+    proof_obligations:
+      - "Static test inventory flags remaining `.expected-red.` filenames only when their paired owner step is still open."
+      - Closed behavior tests use regression/contract naming.
+    product_boundaries_preserved:
+      - no product behavior changed by rename-only work
+
+  - finding_id: P3-legacy-gemini-naming
+    source_audit: software-architect
+    severity: naming_debt
+    summary: Legacy Gemini names are debt only unless runtime-visible.
+    acceptance:
+      required: "Classify legacy Gemini identifiers as non-blocking naming debt when confined to internal names, migration history, or non-visible tests."
+      must_not: "No runtime-visible UI, HTTP/MCP response, `/doctor` line, docs preview, or user receipt may expose Gemini as the current provider."
+    owner_step: naming_debt_owner
+    verification_step: runtime_naming_proof
+    proof_obligations:
+      - "Static visible-copy scan excludes `Gemini` from web UI, docs preview, HTTP/MCP schemas, and `/doctor` output fixtures."
+      - Internal-only symbol/file references are catalogued as naming debt, not product divergence.
+    product_boundaries_preserved:
+      - OpenRouter remains sole runtime LLM backend
+
+
+zh_completeness_verdict:
+  verdict: INCOMPLETE
+  rationale: "Authoritative specs define en|zh processing-language behavior, but closure remains incomplete until all user-visible zh surfaces and proof paths below have owner and independent verification closure, especially preview coverage and frontend parity."
+  surfaces:
+    - surface_id: zh-storage-api-mcp
+      required_contract: "Persist `runtime_metadata.processing_language` en|zh; expose strict HTTP language/reprocess endpoints; expose MCP language resource/tools with no per-call override; exclude processing_language from state export/import."
+      current_evidence:
+        - docs/ARCHITECTURE.md:215-263 defines browser/http/mcp/core/sqlite/openrouter responsibilities and source-of-truth matrix.
+        - docs/ARCHITECTURE.md:1230-1346 defines HTTP language/reprocess shapes and canonical item response language rule.
+        - docs/ARCHITECTURE.md:1424-1448 defines MCP parity.
+        - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md:5-24 locks runtime metadata, HTTP schemas, and MCP parity.
+      assessment: UNCERTAIN
+      gap: "This matrix read specs and existing E2E names only; it did not execute Go runtime proof."
+      owner_step: zh_runtime_owner
+      verification_step: go_language_contract_proof
+
+    - surface_id: zh-frontend-lang-control
+      required_contract: "Frontend renders terse `LANG: EN`/`LANG: ZH` or localized equivalent, updates html lang to en/zh-CN, uses live status, and avoids settings dashboard semantics."
+      current_evidence:
+        - docs/DESIGN.md:437-445 defines LANG control anatomy and ARIA/html lang requirements.
+        - docs/ARCHITECTURE.md:1520-1527 defines frontend processing-language responsibilities.
+      assessment: UNCERTAIN
+      gap: "Needs browser proof against current UI; docs/ui-preview.html currently lacks visible LANG surface."
+      owner_step: zh_frontend_owner
+      verification_step: browser_zh_frontend_proof
+
+    - surface_id: zh-receipts-and-steer-preview
+      required_contract: "Receipts, steer preview, and chrome localize user-readable operational text while preserving source identifiers and invariant-conflict safety."
+      current_evidence:
+        - docs/DESIGN.md:506-510 defines steering receipt anatomy.
+        - docs/ARCHITECTURE.md:1168-1169 defines steer preview and steer response shapes.
+        - docs/DESIGN.md:711-729 requires localized UI chrome/accessibility labels and forbids translation_failed/per-item toggles.
+      assessment: UNCERTAIN
+      gap: "Requires zh browser fixtures for preview, applied, rejected, and invariant-conflict receipt copy."
+      owner_step: zh_frontend_owner
+      verification_step: browser_zh_frontend_proof
+
+    - surface_id: zh-inspector-display
+      required_contract: "Inspector title, dense summary, core insight, and reading body render stored target-language item content; source identifiers remain unchanged with provenance anchors."
+      current_evidence:
+        - docs/DESIGN.md:551-565 defines Inspector anatomy and processing-language addendum.
+        - web/tests/e2e/processing-language-source-split-scroll.spec.ts exists and asserts non-translatable source identifiers and split scroll, but this matrix did not run it.
+      assessment: UNCERTAIN
+      gap: "Needs explicit zh item content fixture proving Chinese text renders while URL/source anchors stay unchanged."
+      owner_step: zh_frontend_owner
+      verification_step: browser_zh_frontend_proof
+
+    - surface_id: zh-reprocess-surface
+      required_contract: "Explicit `[REPROCESS LIBRARY]` / `[重处理资料库]` rewrites existing readable content and rebuilds search indexing; no wizard/progress dashboard/queue/activity log."
+      current_evidence:
+        - docs/DESIGN.md:446-459 defines reprocess UI states and focus/live-region behavior.
+        - docs/ARCHITECTURE.md:751-810 defines reprocess behavior, FTS, failure, transaction, and source precedence contracts.
+        - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md:35-47 locks reprocess source/FTS/frontend obligations.
+      assessment: UNCERTAIN
+      gap: "Needs Go contract proof for counts/FTS/source precedence and browser proof for visible surface states."
+      owner_step: zh_frontend_owner
+      verification_step: browser_zh_frontend_proof
+
+    - surface_id: zh-openrouter-prompt
+      required_contract: "OpenRouter receives target_language as prompt/input and returns validated structured item understanding without owning state or writing DB directly; identifiers are preserved."
+      current_evidence:
+        - docs/ARCHITECTURE.md:19 and 96-109 define OpenRouter as sole JSON transformer and secret-safe runtime contract.
+        - docs/ARCHITECTURE.md:215-263 assigns target_language prompt inputs and validation to core/OpenRouter boundary.
+      assessment: UNCERTAIN
+      gap: "Needs LLM stub proof that target_language=`zh` is sent and source identifiers are not localized."
+      owner_step: zh_openrouter_owner
+      verification_step: go_openrouter_prompt_proof
+
+    - surface_id: zh-state-portability-exclusion
+      required_contract: "State backup/restore excludes runtime processing_language and runtime_metadata; portable bundle remains only active sources, active steering rules, and resonated items."
+      current_evidence:
+        - docs/ARCHITECTURE.md:644-750 defines portable state include/exclude lists and no merge protocol.
+        - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md:5-10 repeats processing_language exclusion.
+      assessment: UNCERTAIN
+      gap: "Needs Go backup/restore test proving exported JSON contains no processing_language/runtime_metadata and import does not overwrite local runtime language."
+      owner_step: zh_runtime_owner
+      verification_step: go_language_contract_proof
+
+    - surface_id: zh-e2e-contract-parity
+      required_contract: "Browser and Go contract names cover HTTP/MCP, UI controls, receipts/steer, Inspector, reprocess, prompt, state exclusion, and preview docs."
+      current_evidence:
+        - Existing `web/tests/e2e/processing-language-source-split-scroll.spec.ts` provides a split-scroll/source-identifier proof path.
+      assessment: INCOMPLETE
+      gap: "Need named tests from this matrix added or mapped to current harness; expected-red names should be retired after closure."
+      owner_step: zh_frontend_owner
+      verification_step: browser_zh_frontend_proof
+
+    - surface_id: zh-docs-preview-coverage
+      required_contract: "docs/ui-preview.html reflects current LANG/reprocess surfaces and excerpt language."
+      current_evidence:
+        - docs/ui-preview.html:637-743 contains stale `partial` labels and no LANG/reprocess example in the visible preview artifact.
+      assessment: INCOMPLETE
+      gap: "Static preview artifact must be refreshed; this contract step does not modify docs/ui-preview.html."
+      owner_step: preview_docs_owner
+      verification_step: spec_preview_proof
+
+product_boundary_non_goals_confirmed:
+  - single_binary_only: "No owner or verification step may introduce sidecar workers, durable queues, job dashboards, or separate admin/sync processes."
+  - sqlite_only: "All state/FTS obligations remain SQLite/FTS5; no vector DB, embeddings, semantic-answer, or RAG surface."
+  - no_sync_merge_history: "State portability remains replace-only active sources/rules/stars; no sync, merge, conflict resolver, activity ledger, reading history, or portable receipts."
+  - no_settings_dashboard: "LANG/reprocess/source/state controls remain terse operational controls, not settings/preference/onboarding dashboards."
+  - no_product_implementation_logic: "This artifact only defines matrix acceptance, planned owner steps, independent verification steps, and proof obligations."
+
+closure_rules:
+  - "Each audit_finding entry has exactly one `owner_step` and exactly one `verification_step`."
+  - "Each zh surface has exactly one repair owner and one independent verification step."
+  - "A finding cannot close until its verification step produces browser, Go, spec/static, or UIUX proof named in this artifact."
+  - "If a future spec intentionally accepts divergent behavior, update the authoritative spec first and supersede the affected matrix item with a cited spec line."
