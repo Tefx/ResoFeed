@@ -82331,7 +82331,7 @@ phases:
       - [x] Cite spec section and implementation file/line or rendered artifact for
       every requirement.
 
-      - [ ] Flag all behavioral/ARIA claims as NEEDS_TEST unless tests or rendered
+      - [x] Flag all behavioral/ARIA claims as NEEDS_TEST unless tests or rendered
       artifacts prove them.
 
       - [ ] Provide closure path for every DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
