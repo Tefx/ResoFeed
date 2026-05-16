@@ -85155,7 +85155,7 @@ phases:
       \ now exists for both should_fix findings."
   - id: srde2e-backend-architecture-remediation
     name: Remediate batched architecture/API contract findings
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project (golang-developer discovered in Larva registry)
@@ -85331,6 +85331,63 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-16T08:06:18.903781+00:00'
+    done_at: '2026-05-16T08:16:51.185502+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md\
+      \ — key passages: `/api/steer/preview` is read-only with `will_mutate:false`\
+      \ and no receipts/state writes; receipt-backed mutations use global `agent_receipts.idempotency_key`\
+      \ and same fingerprint replays while different fingerprint rejects; MCP `steer`\
+      \ is equivalent to `POST /api/steer`.\n- internal/resofeed/http.go — key passage:\
+      \ HTTP steer classified the route and had included RouteKind in idempotency\
+      \ fingerprint payload.\n- internal/resofeed/mcp.go — key passage: MCP steer\
+      \ used `withMCPReceipt` but previously omitted route from fingerprint payload.\n\
+      - internal/resofeed/steer_intent.go — key passage: preview is non-mutating/no\
+      \ receipts but source route previously set `preview.WillMutate = true`.\n\n\
+      ## Batched Remediation Evidence\n\n### SF1 HTTP/MCP fingerprint parity\n- Root\
+      \ cause: HTTP and MCP built separate steer fingerprint payload structs; HTTP\
+      \ included `route_kind`, MCP omitted it.\n- Symptom: same global idempotency\
+      \ key for equivalent HTTP→MCP steer requests could compare different fingerprints\
+      \ and return `request_fingerprint_mismatch`.\n- Files changed: `internal/resofeed/idempotency.go`,\
+      \ `internal/resofeed/http.go`, `internal/resofeed/mcp.go`, `internal/resofeed/srdct_steer_expected_red_test.go`.\n\
+      - Shared/aligned fingerprint semantics: added shared `steerFingerprintPayload(req,\
+      \ route)` with `command`, `actor_kind`, `actor_id`, and `route_kind`; both HTTP\
+      \ and MCP classify route and pass the same payload into receipt handling.\n\
+      - Regression test name(s): `TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch`.\n\
+      - HTTP→MCP same-key/same-command result: MCP replay returned stored HTTP receipt\
+      \ without JSON-RPC error and without an additional LLM call; receipt count remained\
+      \ 1.\n- Grep/sibling search output: `grep -R \"operation.*steer\\|RouteKind\
+      \ SteerRouteKind\\|withMCPReceipt\" internal/resofeed` confirmed shared steerFingerprintPayload\
+      \ use and sibling receipt paths reviewed.\n\n### SF2 preview will_mutate contract\n\
+      - Contract decision: preview_call_mutates.\n- Root cause: `PreviewSteering`\
+      \ mixed future commit capability into `will_mutate`, despite preview being public\
+      \ read-only classification.\n- Symptom: source preview returned `will_mutate:true`,\
+      \ conflicting with docs and no-write/no-receipt preview contract.\n- Files changed:\
+      \ `internal/resofeed/steer_intent.go`, `internal/resofeed/types.go`, `internal/resofeed/srdct_steer_expected_red_test.go`.\n\
+      - No-write/no-receipt proof: `TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly`\
+      \ snapshots `sources`, `steer_rules`, `item_state`, `agent_receipts`, and `search_fts`\
+      \ counts before/after source preview and requires equality.\n- Test/doc updates:\
+      \ source preview route tests now expect `will_mutate:false`; code comments document\
+      \ that `WillMutate` describes the preview call itself. Existing architecture\
+      \ docs already stated `will_mutate:false`.\n- Grep/sibling search output: `grep\
+      \ -R \"WillMutate\\|will_mutate\\|/api/steer/preview\" internal/resofeed docs/ARCHITECTURE.md\
+      \ web/src` confirmed backend/docs/frontend consumers remain aligned with boolean\
+      \ field and docs say false/read-only.\n\n## Merge / Mainline Final-State Verification\n\
+      - Worker branch commit: `659fcf60 fix steer transport contract drift`.\n- Main\
+      \ squash merge commit: `b3ed476c [vectl] step-srde2e-backend-architecture-remediation\
+      \ completed`.\n- Branch plan.yaml changes were intentionally excluded from the\
+      \ squash commit; canonical main plan remained orchestrator-owned.\n\nMainline\
+      \ commands:\n```sh\ngo test ./internal/resofeed -run 'TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch|TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly|TestSRDCTHTTPPreviewSteerExpectedRedRoutePrecedenceAndBoundaries'\n\
+      go test ./...\ngo test -race ./internal/resofeed -run 'TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch|TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly'\n\
+      golangci-lint run\n```\nOutput:\n```text\nok  \tresofeed/internal/resofeed\t\
+      0.522s\n?   \tresofeed\t[no test files]\n?   \tresofeed/cmd/resofeed\t[no test\
+      \ files]\nok  \tresofeed/internal/resofeed\t0.843s\nok  \tresofeed/internal/resofeed\t\
+      1.625s\n0 issues.\n```\n\n## Standard Evidence\n- Commit hash(es): worker `659fcf60`;\
+      \ main `b3ed476c`.\n- Files changed: `internal/resofeed/http.go`, `internal/resofeed/idempotency.go`,\
+      \ `internal/resofeed/mcp.go`, `internal/resofeed/srdct_steer_expected_red_test.go`,\
+      \ `internal/resofeed/steer_intent.go`, `internal/resofeed/types.go`.\n- Verification:\
+      \ focused tests, full `go test ./...`, focused race test, and `golangci-lint\
+      \ run` all passed in worktree and mainline.\n- Spec link: srde2e-backend-architecture-remediation\n\
+      - Gaps/Notes: `CONSTITUTION.md` not present in isolated worktree; no forbidden\
+      \ architecture/product concept introduced."
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
     status: claimed
