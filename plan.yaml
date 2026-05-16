@@ -85203,7 +85203,7 @@ phases:
 
       Required remediation:
 
-      - [ ] Decide and document in code/tests whether `will_mutate` means "preview
+      - [x] Decide and document in code/tests whether `will_mutate` means "preview
       call mutates" or "commit would mutate".
 
       - [ ] Preserve the no-write/no-receipt guarantee for `/api/steer/preview`.
