@@ -97373,7 +97373,7 @@ phases:
       this step; they were preserved and not committed by the orchestrator.'
   - id: cos-retest-current-operation-runtime-ui
     name: Retest current-operation runtime UI after frontend wiring fix
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -97505,6 +97505,8 @@ phases:
     depends_on:
     - cos-fix-current-operation-frontend-wiring
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T22:29:42.807231+00:00'
   - id: cos-reaudit-current-operation-wiring
     name: Re-audit current-operation frontend wiring after fix
     status: pending
