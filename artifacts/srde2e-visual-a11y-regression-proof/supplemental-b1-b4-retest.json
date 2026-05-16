@@ -1,0 +1,213 @@
+{
+  "base": "http://127.0.0.1:18181",
+  "checks": {
+    "B1_details": {
+      "geometry": {
+        "label": "DETAILS",
+        "selector": "button:has-text(\"[DETAILS]\"), summary:has-text(\"DETAILS\")",
+        "box": {
+          "x": 1142,
+          "y": 231,
+          "w": 73,
+          "h": 44
+        },
+        "center": {
+          "topTag": "SUMMARY",
+          "topText": "[DETAILS]",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "interior": {
+          "topTag": "SUMMARY",
+          "topText": "[DETAILS]",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "min44": true
+      },
+      "focus": {
+        "label": "DETAILS",
+        "tag": "SUMMARY",
+        "name": "diagnostic details for Supplemental Audit Feed",
+        "tabindex": null,
+        "role": null,
+        "outlineStyle": "none",
+        "outlineWidth": "3px",
+        "boxShadow": "none",
+        "rect": {
+          "w": 73,
+          "h": 44
+        },
+        "focusVisible": false
+      },
+      "afterEnter": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\nSOURCE LEDGER\n[IMPORT OPML]\n[RUN INGEST]\nsrc: Supplemental Audit Feed\nurl: http://127.0.0.1:18182/feed.xml\nlast_fetch: 07:40:14\n[FETCH]\n[DELETE]\n[DETAILS]\nsource_url: http://127.0.0.1:18182/feed.xml\nfetch_state: ok\nfetched_at: 07:40:14\nfeed_url: http://127.0.0.1:18182/feed.xml\n[EXPORT STATE]\n[IMPORT STATE]\nChoose state JSON\nimport replaces active sources, rules, and stars",
+      "afterSpace": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\nSOURCE LEDGER\n[IMPORT OPML]\n[RUN INGEST]\nsrc: Supplemental Audit Feed\nurl: http://127.0.0.1:18182/feed.xml\nlast_fetch: 07:40:14\n[FETCH]\n[DELETE]\n[DETAILS]\n[EXPORT STATE]\n[IMPORT STATE]\nChoose state JSON\nimport replaces active sources, rules, and stars",
+      "keyboardActivated": true
+    },
+    "B2_import_state": {
+      "geometry": {
+        "label": "IMPORT STATE",
+        "selector": "button:has-text(\"[IMPORT STATE]\"), input[type=\"file\"]",
+        "box": {
+          "x": 217,
+          "y": 291,
+          "w": 134,
+          "h": 44
+        },
+        "center": {
+          "topTag": "BUTTON",
+          "topText": "[IMPORT STATE]",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "interior": {
+          "topTag": "BUTTON",
+          "topText": "[IMPORT STATE]",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "min44": true
+      },
+      "focus": {
+        "label": "IMPORT STATE",
+        "tag": "BUTTON",
+        "name": "[IMPORT STATE]",
+        "tabindex": null,
+        "role": null,
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "boxShadow": "none",
+        "rect": {
+          "w": 134,
+          "h": 44
+        },
+        "focusVisible": true
+      },
+      "accessible": true,
+      "nonObstructed": true
+    },
+    "B3_split_scroll": {
+      "before": {
+        "feed": {
+          "tag": "SECTION",
+          "name": "TODAY surface independent scroll",
+          "tabindex": "0",
+          "scrollHeight": 2817,
+          "clientHeight": 713,
+          "scrollable": true,
+          "outlineStyle": "none",
+          "outlineWidth": "3px"
+        },
+        "inspector": {
+          "tag": "ASIDE",
+          "name": "INSPECTOR independent scroll",
+          "tabindex": "0",
+          "scrollHeight": 713,
+          "clientHeight": 713,
+          "scrollable": false,
+          "outlineStyle": "none",
+          "outlineWidth": "3px"
+        },
+        "bodyTop": 0
+      },
+      "afterFeed": {
+        "feedTop": 120,
+        "inspectorTop": 0,
+        "bodyTop": 0
+      },
+      "afterInspector": {
+        "feedTop": 120,
+        "inspectorTop": 0,
+        "bodyTop": 0
+      },
+      "feedFocus": {
+        "label": "feed scroll region",
+        "tag": "SECTION",
+        "name": "TODAY surface independent scroll",
+        "tabindex": "0",
+        "role": null,
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "boxShadow": "none",
+        "rect": {
+          "w": 734,
+          "h": 713
+        },
+        "focusVisible": true
+      },
+      "inspectorFocus": {
+        "label": "inspector scroll region",
+        "tag": "ASIDE",
+        "name": "INSPECTOR independent scroll",
+        "tabindex": "0",
+        "role": null,
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "boxShadow": "none",
+        "rect": {
+          "w": 480,
+          "h": 713
+        },
+        "focusVisible": true
+      }
+    },
+    "B4_original_link": {
+      "geometry": {
+        "label": "original link",
+        "selector": ".contract-inspector a[href], a:has-text(\"original\"), a[href^=\"http\"]",
+        "box": {
+          "x": 799,
+          "y": 298,
+          "w": 113,
+          "h": 44
+        },
+        "center": {
+          "topTag": "A",
+          "topText": "original link",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "interior": {
+          "topTag": "A",
+          "topText": "original link",
+          "ok": true,
+          "pointerEvents": "auto",
+          "visibility": "visible",
+          "activeElement": false
+        },
+        "min44": true
+      },
+      "focus": {
+        "label": "original link",
+        "tag": "A",
+        "name": "original link",
+        "tabindex": null,
+        "role": null,
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "boxShadow": "none",
+        "rect": {
+          "w": 113,
+          "h": 44
+        },
+        "focusVisible": true
+      },
+      "href": "http://127.0.0.1:18182/article-23"
+    }
+  },
+  "seed": {
+    "importStatus": 200,
+    "sourceCount": 1,
+    "firstSource": true
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "base": "http://127.0.0.1:18191",
+  "seed": {
+    "importStatus": 200,
+    "sourceCount": 1
+  },
+  "detailsTabPath": [
+    {
+      "tag": "BUTTON",
+      "text": "[IMPORT OPML]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 115,
+        "h": 44
+      },
+      "focusVisible": true
+    },
+    {
+      "tag": "BUTTON",
+      "text": "[RUN INGEST]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 108,
+        "h": 44
+      },
+      "focusVisible": true
+    },
+    {
+      "tag": "BUTTON",
+      "text": "[FETCH]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 94,
+        "h": 44
+      },
+      "focusVisible": true
+    },
+    {
+      "tag": "BUTTON",
+      "text": "[DELETE]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 86,
+        "h": 44
+      },
+      "focusVisible": true
+    },
+    {
+      "tag": "SUMMARY",
+      "text": "[DETAILS]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 73,
+        "h": 44
+      },
+      "focusVisible": true
+    }
+  ],
+  "detailsKeyboardFocus": {
+    "tag": "SUMMARY",
+    "text": "[DETAILS]",
+    "outlineStyle": "solid",
+    "outlineWidth": "2px",
+    "boxShadow": "none",
+    "rect": {
+      "w": 73,
+      "h": 44
+    },
+    "focusVisible": true,
+    "enterOpened": true
+  },
+  "splitScrollSmallViewport": {
+    "before": {
+      "feed": {
+        "name": "TODAY surface independent scroll",
+        "tabindex": "0",
+        "scrollHeight": 3513,
+        "clientHeight": 233,
+        "scrollable": true
+      },
+      "inspector": {
+        "name": "INSPECTOR independent scroll",
+        "tabindex": "0",
+        "scrollHeight": 290,
+        "clientHeight": 233,
+        "scrollable": true
+      },
+      "bodyTop": 0
+    },
+    "afterFeed": {
+      "feedTop": 150,
+      "inspectorTop": 0,
+      "bodyTop": 0
+    },
+    "afterInspector": {
+      "feedTop": 150,
+      "inspectorTop": 57,
+      "bodyTop": 0
+    }
+  }
+}
