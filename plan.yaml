@@ -85027,7 +85027,7 @@ phases:
       - [x] Verify single Go binary, SQLite/FTS5 only, flat internal/resofeed file
       shape, and no sidecar worker/service/repository/DI/event-bus drift.
 
-      - [ ] Verify preview is read-only, commit reruns classification, undo is target-specific,
+      - [x] Verify preview is read-only, commit reruns classification, undo is target-specific,
       and idempotency boundaries are correct.
 
       - [ ] Verify no command history, global undo stack, activity ledger, job dashboard,
