@@ -89671,7 +89671,7 @@ phases:
       - [x] docs/DESIGN.md is cited for focus order, visible chrome/nav text, and
       UI surface semantics.
 
-      - [ ] docs/UI_REGRESSION_CONTRACT.md is cited for regression selectors, accessibility
+      - [x] docs/UI_REGRESSION_CONTRACT.md is cited for regression selectors, accessibility
       expectations, hit targets, and fixture/test contract rules.
 
       - [ ] docs/ARCHITECTURE.md is cited for OPML import, ingest lifecycle, SQLite/shared-state,
