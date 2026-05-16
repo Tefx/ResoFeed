@@ -92392,7 +92392,7 @@ phases:
   steps:
   - id: azrv-browser-e2e-regression-proof
     name: Run independent browser E2E proof for UI audit repairs and zh parity
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -92532,6 +92532,107 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T14:21:28.460796+00:00'
+    done_at: '2026-05-16T15:00:15.096892+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — READ: App Shell low-chrome constraints; LANG EN/ZH and html
+      lang; Source Ledger right-aligned last_ingest + [RUN INGEST]; Inspector source-text/summary
+      provenance; Do/Don''ts forbid RAG/vector/semantic-answer product chrome.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — READ: processing_language en|zh
+      runtime-only; frontend source identifiers translate=no; no vector DB, RAG, durable
+      jobs, queues, settings dashboard.
+
+      - docs/ui-preview.html — READ: LANG EN button, REPROCESS LIBRARY, zh mobile
+      examples, source excerpt/excerpt labels, no visible partial label.
+
+      - tests/contract/azrct_closure_matrix.yaml — READ: proof obligations for menu,
+      ledger geometry, OPML non-ingest boundary, banned copy, Inspector provenance,
+      zh completeness, preview proof.
+
+      - web/tests/e2e — READ inventory; target suite and related E2E files present.
+
+      - web/tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts — READ: 7 Playwright
+      tests cover closed/open menu, Source Ledger header alignment, OPML import no
+      /api/ingest, banned copy, Inspector provenance, zh UI parity, zh Inspector/source
+      identifier preservation.
+
+      - web/src/test/azrct-contract-fixtures.expected-red.test.ts — READ: fixture
+      excludes processing_language/runtime_metadata and static preview test requires
+      LANG/reprocess/excerpt/no partial.
+
+
+      ## Browser E2E Verification Report
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Behavioral proof register
+
+      - Closed RESOFEED menu has no persistent route chrome: PROVEN by Playwright
+      test 1.
+
+      - Open menu exposes TODAY/SOURCE LEDGER: PROVEN by Playwright test 1 role checks.
+
+      - Source Ledger last_ingest alignment: PROVEN by Playwright test 2.
+
+      - OPML import no /api/ingest and manual RUN INGEST available: PROVEN by Playwright
+      test 3.
+
+      - Copy avoids semantic retrieval/no semantic retrieval/RAG/etc in exercised
+      UI: PROVEN by Playwright test 4.
+
+      - Inspector has no model: ok and source-text/summary-provenance visible: PROVEN
+      by Playwright test 5.
+
+      - zh mode html lang/localized controls/receipts/Inspector/source identifiers:
+      PROVEN by Playwright tests 6-7.
+
+      - docs/ui-preview.html LANG/reprocess/zh/no partial: PROVEN by Vitest static
+      contract test and direct read.
+
+
+      ## Commands executed
+
+      - `npm run check` in web/: exit 0; svelte-check found 0 errors and 0 warnings.
+
+      - `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts
+      --project=chromium-ci-safe` in web/: exit 0; 7 passed.
+
+      - `npx vitest run src/test/azrct-contract-fixtures.expected-red.test.ts` in
+      web/: exit 0; 1 file passed, 2 tests passed.
+
+      - Generated Playwright artifacts were restored/cleaned; final worktree clean.
+
+      - Checklist state verified via vectl_show: all checkboxes checked.
+
+
+      ## Artifact table
+
+      - Terminal command output: PASS.
+
+      - Playwright generated .test-artifacts: generated then cleaned; no uncommitted
+      artifacts retained.
+
+      - Screenshots/DOM artifacts: not retained; passing Playwright assertions used
+      live DOM locators and bounding boxes.
+
+
+      ## Caveats
+
+      - Targeted Playwright spec uses route fixtures, proving real Chromium DOM/frontend
+      network sequencing, not live backend behavior.
+
+
+      ## Files changed
+
+      - none.'
   - id: azrv-zh-spec-conformance-audit
     name: Verify Chinese support and repair spec conformance across HTTP, MCP, OpenRouter,
       state, UI, tests, and preview
