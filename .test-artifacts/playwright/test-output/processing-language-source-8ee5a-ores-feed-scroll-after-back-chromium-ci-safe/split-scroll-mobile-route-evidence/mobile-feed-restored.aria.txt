@@ -1,0 +1,320 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - heading "RESOFEED" [level=1]
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - button "处理语言 中文; set English": "语言: 中文"
+  - text: 已存可读内容将被重写。 来源标识保持不变。
+  - button "Reprocess existing library and rebuild search index": "[重处理资料库]"
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - region "Today feed items":
+      - heading "Today feed items" [level=2]
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 1"':
+            - paragraph: "src: Do Not Translate Source · 14h · full · model-backed · quality: source-backed YESTERDAY"
+            - paragraph: Browser proof item 1
+            - paragraph: Rendered browser fixture summary 1.
+          - 'button "Resonate item: Browser proof item 1"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 2"':
+            - paragraph: "src: Do Not Translate Source · 13h · full · model-backed · value: high"
+            - paragraph: Browser proof item 2
+            - paragraph: Rendered browser fixture summary 2.
+          - 'button "Resonate item: Browser proof item 2"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 3"':
+            - paragraph: "src: Do Not Translate Source · 12h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 3
+            - paragraph: Rendered browser fixture summary 3.
+          - 'button "Resonate item: Browser proof item 3"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 4"':
+            - paragraph: "src: Do Not Translate Source · 11h · full · model-backed · value: high"
+            - paragraph: Browser proof item 4
+            - paragraph: Rendered browser fixture summary 4.
+          - 'button "Resonate item: Browser proof item 4"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 5"':
+            - paragraph: "src: Do Not Translate Source · 10h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 5
+            - paragraph: Rendered browser fixture summary 5.
+          - 'button "Resonate item: Browser proof item 5"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 6"':
+            - paragraph: "src: Do Not Translate Source · 9h · full · model-backed · value: high"
+            - paragraph: Browser proof item 6
+            - paragraph: Rendered browser fixture summary 6.
+          - 'button "Resonate item: Browser proof item 6"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 7"':
+            - paragraph: "src: Do Not Translate Source · 8h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 7
+            - paragraph: Rendered browser fixture summary 7.
+          - 'button "Resonate item: Browser proof item 7"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 8"':
+            - paragraph: "src: Do Not Translate Source · 7h · full · model-backed · value: high"
+            - paragraph: Browser proof item 8
+            - paragraph: Rendered browser fixture summary 8.
+          - 'button "Resonate item: Browser proof item 8"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 9"':
+            - paragraph: "src: Do Not Translate Source · 6h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 9
+            - paragraph: Rendered browser fixture summary 9.
+          - 'button "Resonate item: Browser proof item 9"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 10"':
+            - paragraph: "src: Do Not Translate Source · 5h · full · model-backed · value: high"
+            - paragraph: Browser proof item 10
+            - paragraph: Rendered browser fixture summary 10.
+          - 'button "Resonate item: Browser proof item 10"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 11"':
+            - paragraph: "src: Do Not Translate Source · 4h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 11
+            - paragraph: Rendered browser fixture summary 11.
+          - 'button "Resonate item: Browser proof item 11"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 12"':
+            - paragraph: "src: Do Not Translate Source · 3h · full · model-backed · value: high"
+            - paragraph: Browser proof item 12
+            - paragraph: Rendered browser fixture summary 12.
+          - 'button "Resonate item: Browser proof item 12"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 13"':
+            - paragraph: "src: Do Not Translate Source · 2h · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 13
+            - paragraph: Rendered browser fixture summary 13.
+          - 'button "Resonate item: Browser proof item 13"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 14"':
+            - paragraph: "src: Do Not Translate Source · 1h · full · model-backed · value: high"
+            - paragraph: Browser proof item 14
+            - paragraph: Rendered browser fixture summary 14.
+          - 'button "Resonate item: Browser proof item 14"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 15"':
+            - paragraph: "src: Do Not Translate Source · 29m · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 15
+            - paragraph: Rendered browser fixture summary 15.
+          - 'button "Resonate item: Browser proof item 15"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 16"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · value: high TODAY"
+            - paragraph: Browser proof item 16
+            - paragraph: Rendered browser fixture summary 16.
+          - 'button "Resonate item: Browser proof item 16"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 17"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 17
+            - paragraph: Rendered browser fixture summary 17.
+          - 'button "Resonate item: Browser proof item 17"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 18"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · value: high"
+            - paragraph: Browser proof item 18
+            - paragraph: Rendered browser fixture summary 18.
+          - 'button "Resonate item: Browser proof item 18"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 19"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 19
+            - paragraph: Rendered browser fixture summary 19.
+          - 'button "Resonate item: Browser proof item 19"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 20"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · value: high"
+            - paragraph: Browser proof item 20
+            - paragraph: Rendered browser fixture summary 20.
+          - 'button "Resonate item: Browser proof item 20"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 21"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 21
+            - paragraph: Rendered browser fixture summary 21.
+          - 'button "Resonate item: Browser proof item 21"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 22"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · value: high"
+            - paragraph: Browser proof item 22
+            - paragraph: Rendered browser fixture summary 22.
+          - 'button "Resonate item: Browser proof item 22"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 23"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 23
+            - paragraph: Rendered browser fixture summary 23.
+          - 'button "Resonate item: Browser proof item 23"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 24"':
+            - paragraph: "src: Do Not Translate Source · 1m · full · model-backed · value: high"
+            - paragraph: Browser proof item 24
+            - paragraph: Rendered browser fixture summary 24.
+          - 'button "Resonate item: Browser proof item 24"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 25"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed EARLIER"
+            - paragraph: Browser proof item 25
+            - paragraph: Rendered browser fixture summary 25.
+          - 'button "Resonate item: Browser proof item 25"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 26"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 26
+            - paragraph: Rendered browser fixture summary 26.
+          - 'button "Resonate item: Browser proof item 26"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 27"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 27
+            - paragraph: Rendered browser fixture summary 27.
+          - 'button "Resonate item: Browser proof item 27"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 28"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 28
+            - paragraph: Rendered browser fixture summary 28.
+          - 'button "Resonate item: Browser proof item 28"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 29"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 29
+            - paragraph: Rendered browser fixture summary 29.
+          - 'button "Resonate item: Browser proof item 29"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 30"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 30
+            - paragraph: Rendered browser fixture summary 30.
+          - 'button "Resonate item: Browser proof item 30"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 31"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 31
+            - paragraph: Rendered browser fixture summary 31.
+          - 'button "Resonate item: Browser proof item 31"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 32"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 32
+            - paragraph: Rendered browser fixture summary 32.
+          - 'button "Resonate item: Browser proof item 32"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 33"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 33
+            - paragraph: Rendered browser fixture summary 33.
+          - 'button "Resonate item: Browser proof item 33"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 34"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 34
+            - paragraph: Rendered browser fixture summary 34.
+          - 'button "Resonate item: Browser proof item 34"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 35"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 35
+            - paragraph: Rendered browser fixture summary 35.
+          - 'button "Resonate item: Browser proof item 35"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 36"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 36
+            - paragraph: Rendered browser fixture summary 36.
+          - 'button "Resonate item: Browser proof item 36"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 37"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 37
+            - paragraph: Rendered browser fixture summary 37.
+          - 'button "Resonate item: Browser proof item 37"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 38"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 38
+            - paragraph: Rendered browser fixture summary 38.
+          - 'button "Resonate item: Browser proof item 38"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 39"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 39
+            - paragraph: Rendered browser fixture summary 39.
+          - 'button "Resonate item: Browser proof item 39"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 40"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 40
+            - paragraph: Rendered browser fixture summary 40.
+          - 'button "Resonate item: Browser proof item 40"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 41"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 41
+            - paragraph: Rendered browser fixture summary 41.
+          - 'button "Resonate item: Browser proof item 41"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 42"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 42
+            - paragraph: Rendered browser fixture summary 42.
+          - 'button "Resonate item: Browser proof item 42"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 43"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 43
+            - paragraph: Rendered browser fixture summary 43.
+          - 'button "Resonate item: Browser proof item 43"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 44"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 44
+            - paragraph: Rendered browser fixture summary 44.
+          - 'button "Resonate item: Browser proof item 44"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 45"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 45
+            - paragraph: Rendered browser fixture summary 45.
+          - 'button "Resonate item: Browser proof item 45"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 46"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 46
+            - paragraph: Rendered browser fixture summary 46.
+          - 'button "Resonate item: Browser proof item 46"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 47"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 47
+            - paragraph: Rendered browser fixture summary 47.
+          - 'button "Resonate item: Browser proof item 47"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 48"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 48
+            - paragraph: Rendered browser fixture summary 48.
+          - 'button "Resonate item: Browser proof item 48"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 49"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · quality: source-backed"
+            - paragraph: Browser proof item 49
+            - paragraph: Rendered browser fixture summary 49.
+          - 'button "Resonate item: Browser proof item 49"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Browser proof item 50"':
+            - paragraph: "src: Do Not Translate Source · invalid date · full · model-backed · value: high"
+            - paragraph: Browser proof item 50
+            - paragraph: Rendered browser fixture summary 50.
+          - 'button "Resonate item: Browser proof item 50"': ☆

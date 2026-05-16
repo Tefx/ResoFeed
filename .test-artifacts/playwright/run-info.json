@@ -1,25 +1,25 @@
 {
-  "baseURL": "http://127.0.0.1:59029",
-  "binaryPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/bin/resofeed",
-  "dbPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778899010565-32263.sqlite3",
+  "baseURL": "http://127.0.0.1:56380",
+  "binaryPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/bin/resofeed",
+  "dbPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778945380273-30377.sqlite3",
   "ownerToken": "rfeed_e2e_owner_token_00000000000000000000000000000000",
-  "artifactRoot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright",
+  "artifactRoot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright",
   "server": {
-    "pid": 32369,
-    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/server.stdout.log",
-    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/server.stderr.log"
+    "pid": 30477,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/server.stderr.log"
   },
   "fixtureServer": {
-    "pid": 32266,
-    "url": "http://127.0.0.1:59026/e2e-feed.xml",
-    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/fixture-server.stdout.log",
-    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/fixture-server.stderr.log"
+    "pid": 30380,
+    "url": "http://127.0.0.1:56377/e2e-feed.xml",
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/fixture-server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/fixture-server.stderr.log"
   },
   "openRouterStub": {
-    "endpoint": "http://127.0.0.1:59030",
-    "pid": 32367,
-    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stdout.log",
-    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stderr.log"
+    "endpoint": "http://127.0.0.1:56381",
+    "pid": 30474,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stderr.log"
   },
   "sanitizedEnvironment": {
     "allowedVariables": [
@@ -31,6 +31,6 @@
       "OPENROUTER_KEY"
     ],
     "openRouterKey": "ci-safe-fake-key",
-    "notesPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/sanitized-environment.md"
+    "notesPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/sanitized-environment.md"
   }
 }

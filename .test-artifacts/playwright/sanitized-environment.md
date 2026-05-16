@@ -4,9 +4,9 @@
 - OPENROUTER_KEY: <redacted non-secret sentinel>; ambient OS value not forwarded.
 - OpenRouter endpoint: deterministic local test transport; no external secret or provider call.
 - Owner token: supplied by --owner-token and redacted from logs/artifacts.
-- OPML fixture feed URL: http://127.0.0.1:59026/e2e-feed.xml
-- Fixture feed server stdout: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/fixture-server.stdout.log
-- Fixture feed server stderr: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/server-logs/fixture-server.stderr.log
-- Binary: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/bin/resofeed
-- Database fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778899010565-32263.sqlite3
-- Base URL: http://127.0.0.1:59029
+- OPML fixture feed URL: http://127.0.0.1:56377/e2e-feed.xml
+- Fixture feed server stdout: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/fixture-server.stdout.log
+- Fixture feed server stderr: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/server-logs/fixture-server.stderr.log
+- Binary: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/bin/resofeed
+- Database fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778945380273-30377.sqlite3
+- Base URL: http://127.0.0.1:56380

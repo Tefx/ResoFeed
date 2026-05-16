@@ -3,7 +3,7 @@
   <head><title>ResoFeed E2E OPML</title></head>
   <body>
     <outline text="Folder that must be flattened">
-      <outline text="ResoFeed E2E Local Source" title="ResoFeed E2E Local Source" type="rss" xmlUrl="http://127.0.0.1:59026/e2e-feed.xml" />
+      <outline text="ResoFeed E2E Local Source" title="ResoFeed E2E Local Source" type="rss" xmlUrl="http://127.0.0.1:56377/e2e-feed.xml" />
     </outline>
   </body>
 </opml>

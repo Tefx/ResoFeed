@@ -1,113 +1,40 @@
-<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="10.897761000000001">
-<testsuite name="real-server-ui.spec.ts" timestamp="2026-05-16T02:36:51.252Z" hostname="chromium-ci-safe" tests="9" failures="0" skipped="0" time="6.048" errors="0">
-<testcase name="ci-safe real server/UI boot uses the Go binary and owner-token gate" classname="real-server-ui.spec.ts" time="0.511">
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="6.881561">
+<testsuite name="azrct-audit-zh-repair.regression.spec.ts" timestamp="2026-05-16T15:29:41.118Z" hostname="chromium-ci-safe" tests="7" failures="0" skipped="0" time="2.139" errors="0">
+<testcase name="AZRCT audit and zh repair regression coverage › F1/P2 compact route chrome: closed menu has no persistent TODAY/SOURCE LEDGER/T/SL route controls" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.374">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › F2 Source Ledger header action block aligns last_ingest with RUN INGEST" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.249">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › P1 OPML import updates sources/receipt only and does not call runIngest" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.348">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › P2 copy: steer/search preview and receipts do not render architecture-boundary slogans" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.222">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › P2 Inspector provenance: model: ok header chrome is replaced by approved trust lines" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.21">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › zh UI parity: html lang, LANG/reprocess/status/receipts/steer preview localize" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.473">
+</testcase>
+<testcase name="AZRCT audit and zh repair regression coverage › zh Inspector chrome localizes while source identifiers stay translate=no and unchanged" classname="azrct-audit-zh-repair.regression.spec.ts" time="0.263">
+</testcase>
+</testsuite>
+<testsuite name="processing-language-source-split-scroll.spec.ts" timestamp="2026-05-16T15:29:41.118Z" hostname="chromium-ci-safe" tests="2" failures="0" skipped="0" time="0.702" errors="0">
+<testcase name="browser proves source identifiers are non-translatable and desktop panes split scroll independently" classname="processing-language-source-split-scroll.spec.ts" time="0.368">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-e873a-binary-and-owner-token-gate-chromium-ci-safe/test-finished-1.png]]
+[[ATTACHMENT|../test-output/processing-language-source-cdf49--split-scroll-independently-chromium-ci-safe/attachments/desktop-split-scroll-png-ec1c41b8c8eb768c0a61d8c1d3cf7208260ee46f.png]]
 
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-e873a-binary-and-owner-token-gate-chromium-ci-safe/trace.zip]]
+[[ATTACHMENT|../test-output/processing-language-source-cdf49--split-scroll-independently-chromium-ci-safe/attachments/desktop-split-scroll-aria-txt-b6713ec39161dbb1e0524efc83438695940e5c32.txt]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="ci-safe harness records required artifact paths and sanitized runtime notes" classname="real-server-ui.spec.ts" time="0.002">
+<testcase name="browser keeps mobile full-screen Inspector route and restores feed scroll after back" classname="processing-language-source-split-scroll.spec.ts" time="0.334">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-har-c7408-and-sanitized-runtime-notes-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="ci-safe browser-led source import, background ingest proof, feed, inspect, retrieve, and search" classname="real-server-ui.spec.ts" time="1.236">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-bro-7df57-inspect-retrieve-and-search-chromium-ci-safe/test-finished-1.png]]
+[[ATTACHMENT|../test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/attachments/mobile-inspector-route-png-bbd77102eb5c35ae91b20886747a690a63781dba.png]]
 
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-bro-7df57-inspect-retrieve-and-search-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="ci-safe real server live audit proof produces complete browser artifacts without API route fixtures" classname="real-server-ui.spec.ts" time="1.362">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/today-populated-item-png-d0292c8972f0db4b76cf7ddd6d0bc4c4d7743be4.png]]
+[[ATTACHMENT|../test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/attachments/mobile-inspector-route-aria-txt-16ea6a6a72afa106d92a551e56f09449dc9a4f5f.txt]]
 
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/today-populated-item-aria-txt-5a5baf7f5adc878c707ed32dde6a51b491544845.txt]]
+[[ATTACHMENT|../test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/attachments/mobile-feed-restored-png-31d27fe6728cede65b714537ba8fe720949f24ac.png]]
 
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/inspector-png-53adca8b743425096baeda2846aeb9dd4a2aba42.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/inspector-aria-txt-4ca4826dd1393b756035a66948269c1b629317d8.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/search-png-5ddb144fb72e8418b2a5126476d384e34497b541.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/search-aria-txt-32ef7067f716ca5b58132ae76bd0c1c3906538b5.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/doctor-png-23689ecf38e5a76b57d702355d27ac6e7f1f6ab3.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/doctor-aria-txt-1c2fcc7278c0dfe62407f7219873e936dbc23aef.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-feed-png-deb1cb17e85e1f9f3336e2c8f6ce3f065497dffd.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-feed-aria-txt-085f1bf122546efe11ad321e1f905b91151ced95.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-inspector-png-039fd9c16aec5c199be2f95da7ffbdf6839c01a6.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-inspector-aria-txt-01182b2aabd9acf2a6cb7cca53c886737b12a0a2.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-source-ledger-png-07fbddb55fbb927b0566028792d4a439ec76e23e.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/mobile-source-ledger-aria-txt-47b59dc10b3ee1b21f2360aa9ca3ec58d4ea2df7.txt]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/metrics-json-e0762cf6779ed4d39265699d9ce2a30dcd70c3f3.json]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/console-log-json-9a6535784b756bc046cd363735d6ce3759c8c501.json]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/attachments/network-log-json-a7285c1daa5364c0b25d32b52dcc4cde45d4b67a.json]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="@parity browser-led API/MCP parity probes share one real server fixture" classname="real-server-ui.spec.ts" time="1.21">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui--parity-bro-7ff5c-are-one-real-server-fixture-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui--parity-bro-7ff5c-are-one-real-server-fixture-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="@llm-deterministic ci-safe missing and invalid OPENROUTER_KEY startup paths exit before browser binding" classname="real-server-ui.spec.ts" time="0.019">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-bc0bc-exit-before-browser-binding-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="@llm-deterministic browser-led steering uses deterministic OpenRouter transport and exposes terse receipt" classname="real-server-ui.spec.ts" time="0.334">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-1f00f-t-and-exposes-terse-receipt-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-1f00f-t-and-exposes-terse-receipt-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="@llm-deterministic browser-led accepted steering changes ranking, filtering, and fresh model-health proof" classname="real-server-ui.spec.ts" time="0.996">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-5295d-nd-fresh-model-health-proof-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-5295d-nd-fresh-model-health-proof-chromium-ci-safe/trace.zip]]
-]]>
-</system-out>
-</testcase>
-<testcase name="@llm-deterministic invalid OPENROUTER_KEY browser path fails gracefully with sanitized diagnostics" classname="real-server-ui.spec.ts" time="0.378">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-8ad49--with-sanitized-diagnostics-chromium-ci-safe/test-finished-1.png]]
-
-[[ATTACHMENT|../test-output/real-server-ui--llm-determ-8ad49--with-sanitized-diagnostics-chromium-ci-safe/trace.zip]]
+[[ATTACHMENT|../test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/attachments/mobile-feed-restored-aria-txt-b1a361a848ce13c2a118575324a76ded3089a93a.txt]]
 ]]>
 </system-out>
 </testcase>
