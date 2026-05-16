@@ -85011,7 +85011,7 @@ phases:
       \ edits were needed."
   - id: srde2e-software-architect-fresh-review
     name: Run software-architect fresh architecture review
-    status: pending
+    status: claimed
     description: 'As software-architect, perform a fresh read-only architecture review
       after implementation and E2E proof.
 
@@ -85084,6 +85084,8 @@ phases:
     - srde2e-documentation-sync
     - srde2e-uiux-source-ledger-status-contract-retest
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-16T07:55:50.054544+00:00'
   - id: srde2e-backend-architecture-remediation
     name: Remediate backend architecture review findings
     status: pending
