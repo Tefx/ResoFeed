@@ -92702,7 +92702,7 @@ phases:
     verification: '- [x] Full-plan-check protects final closure by auditing every
       zh surface requested by the user.
 
-      - [ ] Spec conformance report includes requirement refs and implementation file:line
+      - [x] Spec conformance report includes requirement refs and implementation file:line
       refs.
 
       - [x] Unresolved NEEDS_TEST/UNPROVEN items have closure paths and cannot be
