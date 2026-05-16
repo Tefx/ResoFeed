@@ -84366,7 +84366,7 @@ phases:
       register.'
   - id: srdf-batched-frontend-closure-blockers-retest
     name: Retest and close frontend closure blockers after batched fix
-    status: claimed
+    status: done
     description: "As an INDEPENDENT TESTER (integration-verifier), retest the batched\
       \ closure-blocker fix from `srdf-batched-frontend-closure-blockers-fix` and\
       \ decide whether `srdf-frontend-gate` may open.\n\nstep_type: test\nstep_intent:\
@@ -84484,6 +84484,98 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T01:40:32.944204+00:00'
+    done_at: '2026-05-16T01:47:48.279206+00:00'
+    evidence: "## Verification Report\nTester: integration-verifier\nScope: failed\
+      \ frontend closure blocker families after srdf-batched-frontend-closure-blockers-fix\n\
+      Independence Level: L1\nTimestamp: 2026-05-16T09:44:12+08:00\n\n### refs Read\
+      \ Confirmation\n- docs/DESIGN.md — Read by integration-verifier. Source Ledger\
+      \ is flat and must expose `[RUN INGEST]`, `[FETCH]`, `[IMPORT OPML]`, details/delete/state\
+      \ actions with enlarged invisible hitboxes; `RESOFEED` may hide `TODAY`/`SOURCE\
+      \ LEDGER` in a low-chrome menu; mobile feed metadata remains flat/compact with\
+      \ touch targets >=44 CSS px.\n- docs/UI_REGRESSION_CONTRACT.md — Read by integration-verifier.\
+      \ Real hit-target tests must use topmost element/click-coordinate proof, require\
+      \ `[IMPORT OPML]` reachability, Source Ledger manual controls, TODAY/SOURCE\
+      \ LEDGER active-panel semantics, dirty corpus protection, and negative UX forbidden-concept\
+      \ rejection.\n- docs/ARCHITECTURE.md — Read by integration-verifier. One Go\
+      \ process/one SQLite architecture; Source Ledger/manual ingest must not become\
+      \ queues, dashboards, activity ledgers, sync/merge, settings, folders/tags,\
+      \ or multi-user product concepts.\n\n### Machine-Readable Closure\n```yaml\n\
+      verdict: \"PASS\"\ngate_open_allowed: true\norchestrator_action_hint: \"COMPLETE\"\
+      \nblocker_families:\n  B_HT_01_source_ledger_hit_target_clickability: \"PROVEN_FIXED\"\
+      \n  B_ART_01_design_artifact_source_ledger: \"PROVEN_FIXED\"\n  B_TODAY_01_today_selector:\
+      \ \"PROVEN_FIXED\"\n  B_FR09_01_mobile_metadata_truncation: \"PROVEN_FIXED\"\
+      \n  B4_R9_opml_input_reachability: \"PROVEN_FIXED\"\n  playwright_expected_red_claims:\
+      \ \"PROVEN_FIXED\"\nsource_contract_adjudication:\n  - blocker: \"B-HT-01\"\n\
+      \    source_ref: \"docs/UI_REGRESSION_CONTRACT.md Real hit-target contract;\
+      \ docs/DESIGN.md Source Ledger CSS usage contract\"\n    disposition: \"implementation_fixed\"\
+      \n    evidence_ref: \"Source Ledger controls/hit-target shard => 12 passed\"\
+      \n  - blocker: \"B-ART-01\"\n    source_ref: \"docs/UI_REGRESSION_CONTRACT.md\
+      \ Design artifact screenshot manifest and Negative UX assertions\"\n    disposition:\
+      \ \"implementation_fixed\"\n    evidence_ref: \"Design artifact/dirty corpus/runtime\
+      \ fresh review shard => 10 passed\"\n  - blocker: \"B-TODAY-01\"\n    source_ref:\
+      \ \"docs/UI_REGRESSION_CONTRACT.md TODAY menu entry selector / active feed surface\"\
+      \n    disposition: \"implementation_fixed\"\n    evidence_ref: \"hit-target-clickability\
+      \ nav clicks and ui-runtime FR-01 passed\"\n  - blocker: \"B-FR09-01\"\n   \
+      \ source_ref: \"docs/DESIGN.md mobile metadata and docs/UI_REGRESSION_CONTRACT.md\
+      \ negative UX\"\n    disposition: \"implementation_fixed\"\n    evidence_ref:\
+      \ \"ui-runtime-fresh-review-remediation.spec.ts FR-09 passed\"\n  - blocker:\
+      \ \"B4_R9_opml_input_reachability\"\n    source_ref: \"docs/UI_REGRESSION_CONTRACT.md\
+      \ OPML import control; docs/DESIGN.md Source Ledger OPML states\"\n    disposition:\
+      \ \"implementation_fixed\"\n    evidence_ref: \"source-ledger-controls-diagnostics-layout\
+      \ Issue 6 and hit-target-clickability OPML import passed\"\n  - blocker: \"\
+      playwright_expected_red_claims\"\n    source_ref: \"docs/UI_REGRESSION_CONTRACT.md\
+      \ required expected-red browser proofs\"\n    disposition: \"implementation_fixed\"\
+      \n    evidence_ref: \"all required expected-red Playwright shards passed: 6\
+      \ + 12 + 10\"\ncommands:\n  - command: \"cd web && npm ci\"\n    exit_code:\
+      \ 0\n    summary: \"Installed missing web dependencies from package-lock; 150\
+      \ packages added; no manifest changes.\"\n  - command: \"cd web && npm run test\"\
+      \n    exit_code: 0\n    summary: \"svelte-check found 0 errors/0 warnings; Vitest\
+      \ 11 files, 62 tests passed.\"\n  - command: \"cd web && npm run test:e2e --\
+      \ tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts tests/e2e/processing-language-source-split-scroll.spec.ts\
+      \ tests/e2e/feed-search-anatomy.spec.ts\"\n    exit_code: 0\n    summary: \"\
+      Playwright build succeeded; 6 tests passed.\"\n  - command: \"cd web && npm\
+      \ run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/hit-target-clickability.spec.ts\"\n    exit_code: 0\n    summary:\
+      \ \"Playwright build succeeded; 12 tests passed, including Source Ledger hit\
+      \ targets, OPML, diagnostics, and forbidden concepts.\"\n  - command: \"cd web\
+      \ && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ tests/e2e/ui-runtime-fresh-review-remediation.spec.ts\"\n    exit_code: 0\n\
+      \    summary: \"Playwright build succeeded; 10 tests passed, including design\
+      \ artifact manifest, dirty corpus, FR-09 mobile metadata.\"\n  - command: \"\
+      forbidden concept scan over src/routes and src/lib Svelte/TS user-facing surfaces\"\
+      \n    exit_code: 0\n    summary: \"PASS: no forbidden user-facing concept matches\
+      \ after allowed OPML 'folders flattened' exclusions.\"\nrendered_artifacts:\n\
+      \  - surface: \"Source Ledger navigation/menu and visible/reachable hit-target\
+      \ behavior\"\n    artifact_ref: \"hit-target-clickability.spec.ts tests 1-2\
+      \ passed; source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ test 9 passed; artifact paths observed under web/test-results/ui-remediation/.../desktop-source-ledger-with-actions-1280x900.png\
+      \ and narrow-source-ledger-390x844.png\"\n  - surface: \"Source Ledger [IMPORT\
+      \ OPML] keyboard/file reachability preserved\"\n    artifact_ref: \"source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ Issue 6 passed; hit-target-clickability.spec.ts OPML import controls passed\"\
+      \n  - surface: \"TODAY surface selector/rendered artifact proof\"\n    artifact_ref:\
+      \ \"hit-target-clickability.spec.ts nav clicks passed; ui-runtime-fresh-review-remediation.spec.ts\
+      \ FR-01 passed; artifact desktop-authenticated-today-split-pane-1280x900.png\
+      \ observed\"\n  - surface: \"Mobile metadata text visibility/truncation proof\
+      \ for narrow viewport\"\n    artifact_ref: \"ui-runtime-fresh-review-remediation.spec.ts\
+      \ FR-09 passed; feed-search-anatomy narrow viewport passed; artifact narrow-authenticated-feed-390x844.png\
+      \ observed\"\n  - surface: \"Design-artifact negative UX proof with forbidden\
+      \ concepts absent\"\n    artifact_ref: \"design-artifact-negative-ux.spec.ts\
+      \ tests 1-2 passed; forbidden concept scan PASS\"\n  - surface: \"Inspector\
+      \ dirty corpus proof remains green\"\n    artifact_ref: \"inspector-dirty-corpus.spec.ts\
+      \ passed; inline-json-ld inspector artifact observed in test-output during run\"\
+      \nforbidden_concept_scan: \"PASS\"\nremaining_blockers: []\nblockers: []\nreversal_risk:\
+      \ \"LOW\"\nbehavioral_proof_register:\n  - requirement_ref: \"failed frontend\
+      \ closure blocker family\"\n    behavior_claim: \"each blocker is fixed or proven\
+      \ stale/non-intersecting under source-backed contract\"\n    runtime_proof_expected:\
+      \ \"commands and rendered artifacts listed above\"\n    evidence_ref: \"npm\
+      \ run test; three required Playwright shards; forbidden concept scan; observed\
+      \ Playwright screenshot/artifact paths\"\n    status: \"PROVEN\"\n    closure_path:\
+      \ \"PASS opens gate, FAIL requires another batched remediation\"\n```\n\nCommit\
+      \ hash(es): none (verify-only)\nFiles changed: none\nGaps/Notes: No remaining\
+      \ blockers. Initial isolated worktree dependency gap was resolved with `npm\
+      \ ci` without manifest changes; verify-only branch was clean after generated\
+      \ artifact cleanup."
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
