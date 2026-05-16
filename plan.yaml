@@ -97894,7 +97894,7 @@ phases:
       - [x] Operation detail fields are not write-only; each is traced to rendered
       UI/conflict handling or explicit authoritative disposition.
 
-      - [ ] No dashboard/job/queue/activity history/settings/service-layer drift is
+      - [x] No dashboard/job/queue/activity history/settings/service-layer drift is
       present.
 
       - [ ] Audit emits PASS / PASS_WITH_DEBT / FAIL headline and blocker disposition.'
