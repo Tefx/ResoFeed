@@ -720,9 +720,9 @@
         bind:this={routePreviewElement}
         id="steer-route-preview-status"
         class="steer-route-preview"
-        role={steerRouteEcho.kind === 'idle' || steerFeedback.kind === 'submitting' ? undefined : 'status'}
+        role="status"
         aria-label="Steer route preview"
-        aria-live={steerRouteEcho.kind === 'idle' || steerFeedback.kind === 'submitting' ? 'off' : steerRouteEcho.live}
+        aria-live={steerRouteEcho.live}
         aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
         data-route-kind={steerRouteEcho.kind}
         data-live={steerRouteEcho.live}
@@ -735,8 +735,8 @@
           {/if}
           {#if steerRouteEcho.writeAction && steerFeedback.kind !== 'submitting'}
             <span class="steer-route-preview__actions" aria-label="Steer write action boundary">
-              <button type="button" class="bracket-action" aria-label="Commit previewed Steer write action" onclick={() => void submitSteer()}>[APPLY]</button>
-              <button type="button" class="bracket-action" aria-label="Cancel Steer route preview" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
+              <button type="button" class="bracket-action" onclick={() => void submitSteer()}>[APPLY]</button>
+              <button type="button" class="bracket-action" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
             </span>
           {/if}
         {/if}
@@ -758,7 +758,7 @@
       <div class="contract-steering-receipt" role="status" aria-label="Steer receipt" aria-live="polite">
         <span>{steerFeedback.text}</span>
         {#if receiptUndoTarget}
-          <button type="button" class="bracket-action" aria-label="Undo last Steer change" onclick={() => void undoSteer(receiptUndoTarget)}>[UNDO]</button>
+          <button type="button" class="bracket-action" onclick={() => void undoSteer(receiptUndoTarget)}>[UNDO]</button>
         {/if}
       </div>
     {:else if steerFeedback.kind === 'error'}
