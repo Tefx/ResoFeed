@@ -85190,7 +85190,7 @@ phases:
       - [ ] Add a parity regression test that performs HTTP then MCP with the same
       actor/key/command and expects replay-equivalent behavior rather than mismatch.
 
-      - [ ] Run the grep hint and search sibling receipt/fingerprint paths for the
+      - [x] Run the grep hint and search sibling receipt/fingerprint paths for the
       same drift pattern.
 
 
