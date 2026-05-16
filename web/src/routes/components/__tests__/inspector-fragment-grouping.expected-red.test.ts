@@ -83,4 +83,116 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
     expect(inspector.querySelector('.contract-grouped-sources')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('Grouped story with 50 source items')).not.toBeInTheDocument();
   });
+
+  it('keeps backend-authoritative grouped source disclosure transparent', () => {
+    const selectedGroupedItem = unrelatedFragmentItems[0];
+    const duplicateGroupedItem = unrelatedFragmentItems[1];
+    const authoritativeDetail: ItemDetail = {
+      ...selectedGroupedItem,
+      story_key: 'story_authoritative_grouping_fixture',
+      feed_excerpt: 'Selected grouped item feed excerpt.',
+      extracted_text: 'Selected grouped item reading body.',
+      provenance: {
+        source_url: tldrFeedUrl,
+        canonical_url: null,
+        original_url: selectedGroupedItem.url,
+        story_key: 'story_authoritative_grouping_fixture',
+        duplicate_of_item_id: null,
+        grouped_source_items: [
+          {
+            item_id: selectedGroupedItem.id,
+            source_id: selectedGroupedItem.source_id,
+            source_title: selectedGroupedItem.source_title,
+            source_url: tldrFeedUrl,
+            url: selectedGroupedItem.url,
+            canonical_url: null,
+            title: selectedGroupedItem.title,
+            published_at: selectedGroupedItem.published_at,
+            first_seen_at: selectedGroupedItem.first_seen_at ?? null,
+            extraction_status: selectedGroupedItem.extraction_status,
+            model_status: selectedGroupedItem.model_status,
+            story_key: 'story_authoritative_grouping_fixture',
+            duplicate_of_item_id: null,
+            is_selected_item: true
+          },
+          {
+            item_id: duplicateGroupedItem.id,
+            source_id: duplicateGroupedItem.source_id,
+            source_title: duplicateGroupedItem.source_title,
+            source_url: tldrFeedUrl,
+            url: duplicateGroupedItem.url,
+            canonical_url: null,
+            title: duplicateGroupedItem.title,
+            published_at: duplicateGroupedItem.published_at,
+            first_seen_at: duplicateGroupedItem.first_seen_at ?? null,
+            extraction_status: duplicateGroupedItem.extraction_status,
+            model_status: duplicateGroupedItem.model_status,
+            story_key: 'story_authoritative_grouping_fixture',
+            duplicate_of_item_id: selectedGroupedItem.id,
+            is_selected_item: false
+          }
+        ]
+      }
+    };
+
+    render(Inspector, {
+      props: {
+        item: authoritativeDetail,
+        mode: 'desktop-split',
+        groupedSourceCandidates: unrelatedFragmentItems,
+        sources: [tldrSource]
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: authoritativeDetail.title });
+    expect(within(inspector).getByText('Grouped story with 2 source items')).toBeVisible();
+    expect(within(inspector).getByText(selectedGroupedItem.title)).toBeVisible();
+    expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(duplicateGroupedItem.title);
+  });
+
+  it('preserves true same-article URL fallback for non-synthetic fragments', () => {
+    const sameArticleBase = 'https://example.com/research/story';
+    const selectedSameArticle: ItemDetail = {
+      ...unrelatedFragmentItems[0],
+      id: 'item_same_article_selected',
+      source_id: 'src_same_article_primary',
+      source_title: 'Primary Source',
+      url: `${sameArticleBase}?utm_source=feed#comments`,
+      title: 'Same article selected item',
+      feed_excerpt: 'Same article selected excerpt.',
+      extracted_text: 'Same article selected body.',
+      provenance: {
+        source_url: 'https://example.com/feed.xml',
+        canonical_url: null,
+        original_url: `${sameArticleBase}?utm_source=feed#comments`,
+        story_key: null,
+        duplicate_of_item_id: null,
+        grouped_source_items: []
+      }
+    };
+    const sameArticleCandidate: ItemSummary = {
+      ...unrelatedFragmentItems[1],
+      id: 'item_same_article_candidate',
+      source_id: 'src_same_article_secondary',
+      source_title: 'Secondary Source',
+      url: `${sameArticleBase}?ref=rss#section`,
+      title: 'Same article candidate item'
+    };
+
+    render(Inspector, {
+      props: {
+        item: selectedSameArticle,
+        mode: 'desktop-split',
+        groupedSourceCandidates: [selectedSameArticle, sameArticleCandidate],
+        sources: [
+          { ...tldrSource, id: 'src_same_article_primary', url: 'https://example.com/feed.xml', title: 'Primary Source' },
+          { ...tldrSource, id: 'src_same_article_secondary', url: 'https://secondary.example/feed.xml', title: 'Secondary Source' }
+        ]
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: selectedSameArticle.title });
+    expect(within(inspector).getByText('Grouped story with 2 source items')).toBeVisible();
+    expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(sameArticleCandidate.title);
+  });
 });

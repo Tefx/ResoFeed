@@ -297,12 +297,19 @@
     if (!value) return null;
     try {
       const parsed = new URL(value);
-      parsed.hash = '';
+      // RSS entries without item links are synthesized by ingest as
+      // source.URL + "#entry_*"; that fragment is the item identity and must
+      // stay distinct from the feed page for Inspector-only URL fallback.
+      const syntheticFeedEntryFragment = /^#entry_/iu.test(parsed.hash);
+      if (!syntheticFeedEntryFragment) parsed.hash = '';
       parsed.search = '';
       parsed.pathname = parsed.pathname.replace(/\/$/u, '');
       return parsed.toString().toLowerCase();
     } catch {
-      return value.trim().replace(/[?#].*$/u, '').replace(/\/$/u, '').toLowerCase() || null;
+      const trimmed = value.trim();
+      const syntheticFragment = trimmed.match(/#entry_[^?#\s]*/iu)?.[0] ?? '';
+      const withoutSearchAndFragment = trimmed.replace(/[?#].*$/u, '').replace(/\/$/u, '');
+      return `${withoutSearchAndFragment}${syntheticFragment}`.toLowerCase() || null;
     }
   }
 
@@ -343,6 +350,7 @@
 
   function groupedSourceItems(value: InspectableItem): InspectorGroupedSourceItem[] {
     const fromDetail = 'provenance' in value ? (value.provenance.grouped_source_items ?? []) : [];
+    if (fromDetail.length > 1) return sortedGroupedSourceItems(fromDetail, value);
     const inferred = groupedSourceCandidates
       .filter((candidate) => sameRuntimeGroup(candidate, value))
       .map((candidate) => summaryToGroupedSourceItem(candidate, value));
@@ -351,7 +359,11 @@
     for (const sourceItem of [...fromDetail, ...inferred]) {
       byItemId.set(sourceItem.item_id, sourceItem);
     }
-    return Array.from(byItemId.values()).sort((left, right) => {
+    return sortedGroupedSourceItems(Array.from(byItemId.values()), value);
+  }
+
+  function sortedGroupedSourceItems(items: InspectorGroupedSourceItem[], value: InspectableItem): InspectorGroupedSourceItem[] {
+    return items.sort((left, right) => {
       if (left.item_id === value.id) return -1;
       if (right.item_id === value.id) return 1;
       return left.source_title.localeCompare(right.source_title) || left.item_id.localeCompare(right.item_id);
