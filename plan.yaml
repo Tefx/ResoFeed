@@ -92068,7 +92068,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] `docs/ui-preview.html` reflects current live UI surfaces for language,
+      - [x] `docs/ui-preview.html` reflects current live UI surfaces for language,
       reprocess, Source Ledger header alignment, and Inspector provenance.
 
       - [ ] Preview no longer contains stale `partial` labels where `source excerpt`/`excerpt`
