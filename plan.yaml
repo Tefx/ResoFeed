@@ -84121,7 +84121,7 @@ phases:
       - [x] Rendering completeness: Source Ledger, TODAY, mobile metadata, and OPML
       controls produce visible/reachable DOM behavior under the required viewports.
 
-      - [ ] Rendered evidence or updated test fixtures reflect source-backed behavior
+      - [x] Rendered evidence or updated test fixtures reflect source-backed behavior
       from the refs.
 
 
