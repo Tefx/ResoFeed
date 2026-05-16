@@ -86083,6 +86083,7 @@ phases:
     - srde2e-software-architect-clean-recheck
     - srde2e-full-plan-check
     - srde2e-full-plan-e2e-blockers-fix
+    - srde2e-uiux-full-plan-e2e-blockers-audit
     - srde2e-full-plan-e2e-blockers-retest
     agent: gate-reviewer
   - id: srde2e-real-system-e2e-blockers-fix
