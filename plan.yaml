@@ -82569,7 +82569,7 @@ phases:
       - [x] Root cause is identified at the shared bootstrap/rendering precondition
       rather than patching six independent symptoms.
 
-      - [ ] Accepted owner token is persisted only after authenticated bootstrap succeeds.
+      - [x] Accepted owner token is persisted only after authenticated bootstrap succeeds.
 
       - [ ] Rejected owner token is not persisted and rejection semantics remain visible/tested.
 
