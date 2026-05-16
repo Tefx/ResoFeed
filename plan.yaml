@@ -86227,19 +86227,19 @@ phases:
       This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
       Each deliverable MUST contain substantive logic/rendering that processes real
       state and produces output that varies based on that state.'
-    verification: '- [ ] phase-check protecting Source Ledger UI/UX closure and final
+    verification: '- [x] phase-check protecting Source Ledger UI/UX closure and final
       gate.
 
-      - [ ] Evidence shows the main path: global ingest completion renders `last_ingest:
+      - [x] Evidence shows the main path: global ingest completion renders `last_ingest:
       HH:MM:SS` in `.source-ledger__header` or a cited contract-consistent equivalent.
 
-      - [ ] Evidence shows the high-risk failure path: row `last_fetch: HH:MM:SS`
+      - [x] Evidence shows the high-risk failure path: row `last_fetch: HH:MM:SS`
       and Source Ledger controls still work after the header-status fix.
 
-      - [ ] Evidence confirms Steer accessible-name uniqueness and no forbidden design/architecture
+      - [x] Evidence confirms Steer accessible-name uniqueness and no forbidden design/architecture
       concepts were introduced.
 
-      - [ ] Any disagreement with the audit finding is resolved by cited DESIGN.md/ARCHITECTURE.md
+      - [x] Any disagreement with the audit finding is resolved by cited DESIGN.md/ARCHITECTURE.md
       evidence, not silent dismissal.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
