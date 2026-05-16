@@ -87535,7 +87535,7 @@ phases:
       - [x] DESIGN.md/UI_REGRESSION_CONTRACT/tests policy ambiguity is resolved without
       weakening accessibility semantics.
 
-      - [ ] B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix
+      - [x] B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix
       remain non-regressed.'
     verification: '- [ ] Focused render/Vitest proof closes every listed role/name
       and action-name failure fingerprint.
