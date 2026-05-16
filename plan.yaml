@@ -97083,17 +97083,17 @@ phases:
 
       - [x] Audit returns parseable PASS / PASS_WITH_DEBT / FAIL headline with blocker
       disposition.'
-    verification: '- [ ] phase-check protecting `cos-final-gate`: uiux-auditor provides
+    verification: '- [x] phase-check protecting `cos-final-gate`: uiux-auditor provides
       multimodal rendered evidence for required states/viewports after the frontend
       wiring fix.
 
-      - [ ] Evidence proves valid count-object current-operation payloads render terse
+      - [x] Evidence proves valid count-object current-operation payloads render terse
       contextual status details.
 
-      - [ ] Evidence proves low-frequency LANG/reprocess controls are not persistent
+      - [x] Evidence proves low-frequency LANG/reprocess controls are not persistent
       prominent top chrome.
 
-      - [ ] Evidence proves current-operation status is contextual and not an idle
+      - [x] Evidence proves current-operation status is contextual and not an idle
       global strip/dashboard.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
