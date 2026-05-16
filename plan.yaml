@@ -93707,7 +93707,7 @@ phases:
       - [x] Focused zh spec conformance reports B1/B2/stale-matrix items as PROVEN
       or explicitly NON_INTERSECTING.
 
-      - [ ] Final retest verdict is GREEN only when every prior blocker-class item
+      - [x] Final retest verdict is GREEN only when every prior blocker-class item
       has a gate-usable closure path.'
     verification: '- [ ] Full-plan-check protects `azrv-final-closure-gate` by rerunning
       the exact failed command family and protected browser/Vitest suites.
