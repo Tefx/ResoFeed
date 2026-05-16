@@ -94345,7 +94345,7 @@ phases:
       - [x] Schema-change decision is explicit: expected answer is no schema change
       unless audit proves otherwise.
 
-      - [ ] Any discovered backend divergence is recorded as blocking-now and assigned
+      - [x] Any discovered backend divergence is recorded as blocking-now and assigned
       to a follow-up plan repair; do not dismiss as pre-existing.
 
       - [ ] Frontend implementation constraints are clearly handed off to gsfr-inspector-fragment-identity-fix.'
