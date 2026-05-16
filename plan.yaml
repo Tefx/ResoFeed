@@ -85212,7 +85212,7 @@ phases:
       mutates, make previews return false and update tests; if it means commit would
       mutate, update docs/tests explicitly.
 
-      - [ ] Run the grep hint and search backend, docs, and frontend consumers for
+      - [x] Run the grep hint and search backend, docs, and frontend consumers for
       public contract drift.
 
 
