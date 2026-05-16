@@ -97897,7 +97897,7 @@ phases:
       - [x] No dashboard/job/queue/activity history/settings/service-layer drift is
       present.
 
-      - [ ] Audit emits PASS / PASS_WITH_DEBT / FAIL headline and blocker disposition.'
+      - [x] Audit emits PASS / PASS_WITH_DEBT / FAIL headline and blocker disposition.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: wiring-auditor confirms
       B1/B2 are closed.
 
