@@ -85356,7 +85356,7 @@ phases:
 
       - [x] Provide root cause vs symptom explanation for every blocker-class finding.
 
-      - [ ] If no applicable findings exist, record CLEAN no-op evidence with the
+      - [x] If no applicable findings exist, record CLEAN no-op evidence with the
       review citation.
 
 
