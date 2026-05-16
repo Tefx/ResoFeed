@@ -93709,16 +93709,16 @@ phases:
 
       - [x] Final retest verdict is GREEN only when every prior blocker-class item
       has a gate-usable closure path.'
-    verification: '- [ ] Full-plan-check protects `azrv-final-closure-gate` by rerunning
+    verification: '- [x] Full-plan-check protects `azrv-final-closure-gate` by rerunning
       the exact failed command family and protected browser/Vitest suites.
 
-      - [ ] UIUX refresh uses current rendered artifacts and explicitly distinguishes
+      - [x] UIUX refresh uses current rendered artifacts and explicitly distinguishes
       stale claims from true current blockers.
 
-      - [ ] zh conformance B1/B2/stale-matrix closure is independently verified and
+      - [x] zh conformance B1/B2/stale-matrix closure is independently verified and
       gate-usable.
 
-      - [ ] No unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING item remains without
+      - [x] No unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING item remains without
       remediation ownership.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
