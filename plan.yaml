@@ -86981,7 +86981,7 @@ phases:
       - [x] B2 IMPORT STATE uses a visible accessible activation control and no obstructed
       1px target is the user-facing hit target.
 
-      - [ ] B3 desktop Feed and Inspector scroll regions are independently focusable
+      - [x] B3 desktop Feed and Inspector scroll regions are independently focusable
       and labeled with visible focus evidence.
 
       - [ ] B4 Inspector original link, or its documented equivalent activation target,
