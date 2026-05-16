@@ -92079,14 +92079,14 @@ phases:
 
       - [x] Preview remains a static artifact only; no runtime dependency or new design-version
       directory is introduced.'
-    verification: '- [ ] Static preview diff shows updated LANG/reprocess/zh surfaces.
+    verification: '- [x] Static preview diff shows updated LANG/reprocess/zh surfaces.
 
-      - [ ] Static preview diff shows Source Ledger alignment and Inspector provenance
+      - [x] Static preview diff shows Source Ledger alignment and Inspector provenance
       copy matching DESIGN.md.
 
-      - [ ] No new `design-version/` dependency is introduced.
+      - [x] No new `design-version/` dependency is introduced.
 
-      - [ ] No forbidden product concepts are added.'
+      - [x] No forbidden product concepts are added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
