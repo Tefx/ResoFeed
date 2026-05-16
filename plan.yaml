@@ -95712,7 +95712,7 @@ phases:
 
       - [x] Synthetic fragment/no-grouping path remains non-grouped.
 
-      - [ ] Audit emits parseable PASS / PASS_WITH_DEBT / FAIL headline and blocker
+      - [x] Audit emits parseable PASS / PASS_WITH_DEBT / FAIL headline and blocker
       disposition.'
     verification: '- [ ] phase-check protecting `gsfr-final-gate`: uiux-auditor re-audit
       passes or records only explicit non-blocking debt.
