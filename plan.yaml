@@ -86151,7 +86151,7 @@ phases:
       checklist items.'
   - id: srde2e-uiux-source-ledger-status-contract-fix
     name: Fix Source Ledger status DOM contract after UI/UX audit
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -86324,6 +86324,129 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T05:50:00.534901+00:00'
+    done_at: '2026-05-16T06:06:09.462052+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - `docs/DESIGN.md` — read by executor. Key passage cited: Source Ledger Required
+      DOM contract shows `<header class="source-ledger__header">` containing `SOURCE
+      LEDGER`, `<span class="source-ledger__status" aria-live="polite">last_ingest:
+      14:00:00</span>`, and `[RUN INGEST]`; row contract keeps `last_fetch: HH:MM:SS`
+      inside `.source-ledger__row`.
+
+      - `docs/ARCHITECTURE.md` — read by executor. Key passage cited: ResoFeed remains
+      one Go binary, one SQLite/FTS5 database, owner-token bounded, with no accounts,
+      vector/RAG, sync/merge, activity ledger, job queue, or dashboard surfaces.
+
+
+      ## UI/UX Remediation Evidence
+
+
+      **Audit debt addressed**: Source Ledger global ingest status placement / `.source-ledger__header`
+      DOM contract.
+
+
+      **Files changed**:
+
+      ```text
+
+      web/src/routes/components/SourceLedger.svelte
+
+      web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+
+      ```
+
+
+      **Contract citation**:
+
+      - DESIGN.md Source Ledger passage for header status placement: `Required DOM
+      contract for manual ingest controls` places `last_ingest` in `.source-ledger__header`;
+      CSS contract says `.source-ledger__header` must align `last_ingest` plus `.bracket-action--run-ingest`
+      to the right side of the header.
+
+      - ARCHITECTURE.md invariant passage preserved: decisions require one deployable
+      Go process, one SQLite database, lexical retrieval only, and single owner token;
+      out-of-scope includes multi-user accounts, vector search/RAG, folders/tags/settings
+      dashboards, sync, and activity ledgers.
+
+
+      **Rendered/DOM proof from executor**:
+
+      ```text
+
+      HEADER_DOM=<header class="source-ledger-head source-ledger__header"><h1 id="source-ledger-title"
+      class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1> <div class="source-ledger__header-actions"><span
+      aria-live="polite" role="status" class="source-ledger__status" title="last_ingest:
+      14:00:02">last_ingest: 14:00:02</span> ... <button type="button" class="bracket-action
+      bracket-action--run-ingest">[RUN INGEST]</button></div></header>
+
+      ```
+
+
+      **Row behavior proof from executor**:
+
+      ```text
+
+      ROW_DOM=<li class="source-ledger-row source-ledger__row source-row" ...><div
+      class="source-ledger-copy source-ledger__name" ...>src: DOM Source</div> ...
+      <div aria-live="polite" class="source-ledger__status" title="last_fetch: 14:02:05">last_fetch:
+      14:02:05</div> <span class="source-ledger__actions"><button ... aria-label="Fetch
+      source DOM Source">[FETCH]</button> <button ... aria-label="Delete source: DOM
+      Source">[DELETE]</button> ... <summary aria-label="diagnostic details for DOM
+      Source">[DETAILS]</summary>
+
+      ```
+
+
+      **Steer accessible-name uniqueness proof from executor**:
+
+      ```text
+
+      STEER_PREVIEW_ACTION_NAMES=["apply"]
+
+      STEER_PREVIEW_UNIQUE=true
+
+      ```
+
+      No Steer implementation files were modified.
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: `feb333a03c0f70eed941c3abb5049ac2fd21537e` (`fix source ledger
+      ingest status placement`)
+
+      - Mainline squash commit: `630ad74a` (`[vectl] step-srde2e-uiux-source-ledger-status-contract-fix
+      completed`)
+
+
+      ## Mainline verification after merge
+
+      - `npm run check` in `web/` → PASS (`svelte-check found 0 errors and 0 warnings`).
+
+      - `npx vitest run src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      -t "Source Ledger"` → PASS (`1 passed`, `2 passed | 2 skipped`).
+
+      - `npx playwright test tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      -g "Issue 1"` → PASS (`2 passed (4.7s)`).
+
+      - `npm run build` in `web/` → PASS on serial rerun (`✔ done`). A prior parallel
+      build attempt raced with the Playwright-triggered build and failed on a transient
+      `.svelte-kit` artifact; serial rerun passed.
+
+
+      ## Gaps/Notes
+
+      - No DESIGN.md deviation used.
+
+      - No forbidden architecture/UI concepts introduced.
+
+      - Product implementation files modified: yes — `web/src/routes/components/SourceLedger.svelte`;
+      focused test updated: `web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts`.
+
+      - Acceptance and verification checklist items are `[x]`; verification checklist
+      required planner repair because `vectl_check` could not match verification-field
+      checklist items.'
   - id: srde2e-uiux-source-ledger-status-contract-retest
     name: Retest Source Ledger status DOM contract with real rendered flow
     status: pending
