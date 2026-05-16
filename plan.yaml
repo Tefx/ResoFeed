@@ -82599,28 +82599,28 @@ phases:
 
       - [x] Confirm rendered artifact, command, and forbidden scan evidence are present
       for the required frontend surfaces.'
-    verification: '- [ ] phase-check protecting steer-delta-e2e-architecture-review-closure.
+    verification: '- [x] phase-check protecting steer-delta-e2e-architecture-review-closure.
 
-      - [ ] All frontend implementation, UIUX audit, spec/design conformance, original
+      - [x] All frontend implementation, UIUX audit, spec/design conformance, original
       batched remediation closure, closure-blocker fix, and closure-blocker retest
       steps completed with evidence.
 
-      - [ ] Latest closure-blocker retest evidence has `verdict: PASS`, `gate_open_allowed:
+      - [x] Latest closure-blocker retest evidence has `verdict: PASS`, `gate_open_allowed:
       true`, `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses.
 
-      - [ ] Batched closure evidence has `verdict: PASS`, `gate_open_allowed: true`,
+      - [x] Batched closure evidence has `verdict: PASS`, `gate_open_allowed: true`,
       `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses, or is
       superseded by a PASS in `srdf-batched-frontend-closure-blockers-retest` for
       the documented failed-closure blockers.
 
-      - [ ] Rendered evidence covers required states/viewports and visual/spatial
+      - [x] Rendered evidence covers required states/viewports and visual/spatial
       artifacts, including Source Ledger, TODAY, OPML import reachability, mobile
       metadata, and negative-UX/forbidden-concept surfaces.
 
-      - [ ] No unresolved blocker-class UI, a11y, design, stale-vs-real, source-contract-conflict,
+      - [x] No unresolved blocker-class UI, a11y, design, stale-vs-real, source-contract-conflict,
       or forbidden-concept issue remains without remediation ownership.
 
-      - [ ] Gate decision basis is OPEN only when frontend is ready for real-system
+      - [x] Gate decision basis is OPEN only when frontend is ready for real-system
       E2E.'
     evidence_template: "## Gate Review Report\n\n**Reviewer**: gate-reviewer (independent\
       \ of phase implementation)\n**Phase**: steer-delta-frontend-ui-source-ledger-split-scroll\n\
