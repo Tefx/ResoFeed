@@ -96033,7 +96033,7 @@ phases:
       - [x] Frontend rendered e2e proof shows allowed contextual status and absence
       from persistent idle top chrome.
 
-      - [ ] Findings, if any, are documented as blocker/should_fix/suggestion/tech_debt
+      - [x] Findings, if any, are documented as blocker/should_fix/suggestion/tech_debt
       with reproduction steps.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: actual integration/e2e
       evidence proves HTTP, MCP, and frontend operation-status paths work together.
