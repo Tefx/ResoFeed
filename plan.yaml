@@ -95683,3 +95683,105 @@ phases:
     - cos-frontend-operation-utility-surface
     - cos-runtime-e2e-retest
     agent: uiux-auditor
+  - id: cos-spec-doc-conformance
+    name: Verify spec and docs conformance for operation-status implementation
+    status: pending
+    description: 'Spec/doc conformance verification via adversarial divergence hunting.
+
+
+      SCOPE:
+
+      - `docs/ARCHITECTURE.md` CurrentOperationInfo, HTTP endpoint, conflict details,
+      MCP resource/parity, and forbidden durable job/queue/history semantics.
+
+      - `docs/DESIGN.md` RESOFEED utility menu, current-operation status, language
+      control, and reprocess library action placement.
+
+      - Confirm existing docs remain accurate after implementation; only propose doc
+      edits if implementation intentionally changed behavior and the change does not
+      violate approved contracts.
+
+
+      This is NOT "do tests pass" — it is "does the implementation match what the
+      specs say."
+
+
+      Behavioral precedence claims MUST be flagged as NEEDS_TEST with concrete test
+      suggestions, not asserted as CONFORMS without runtime proof.
+
+
+      ## Completion Criteria
+
+      - [ ] Requirements register covers HTTP, MCP, conflict payload, frontend status
+      placement, LANG/reprocess placement, and forbidden durable/dashboard semantics.
+
+      - [ ] Evidence cites spec section and implementation file/line for each requirement.
+
+      - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit blocker/non-blocker
+      disposition and closure path.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: spec-verifier report
+      maps implementation to authoritative architecture/design requirements.
+
+      - [ ] Evidence uses 7-verdict model and blocks on any unresolved blocker-class
+      divergence.
+
+      - [ ] Any doc-sync need is explicitly identified with owner/closure path rather
+      than left implicit.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec Conformance Report
+
+      **Phase**: current-operation-status-and-low-frequency-utility-surface-implementation
+
+      **Spec sources**: docs/ARCHITECTURE.md, docs/DESIGN.md
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+      |---|---|---|---|---|
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      |---|---|---|---|---|---|
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+
+      ## Coverage Summary
+
+      - Total requirements:
+
+      - CONFORMS:
+
+      - DIVERGES/PARTIAL/NEEDS_TEST:
+
+      - Unchecked sections:
+
+
+      ## Top Risks
+
+
+      ## Suggested Tests / Doc-Sync Actions'
+    depends_on:
+    - cos-backend-operation-snapshot
+    - cos-mcp-operation-parity
+    - cos-frontend-operation-utility-surface
+    - cos-runtime-e2e-retest
+    agent: spec-verifier
