@@ -87422,7 +87422,7 @@ phases:
     agent: blind-tester
   - id: srde2e-steer-route-preview-render-contract-fix
     name: Fix Steer route-preview render contract failures
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -87584,6 +87584,58 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T07:11:46.305875+00:00'
+    done_at: '2026-05-16T07:20:23.855303+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- `docs/DESIGN.md` — read by\
+      \ executor. Key passages: Steer Input requires terse receipt/preview behavior,\
+      \ Escape clears unsent text, failed commands use assertive live feedback, and\
+      \ Steering Receipt permits terse undo when reversible.\n- `docs/UI_REGRESSION_CONTRACT.md`\
+      \ — read by executor. Key passages: UI copy must remain terse operational labels;\
+      \ Steer submit and live regions are contract targets; keyboard/a11y roles, labels,\
+      \ live regions, and forbidden drift are acceptance anchors.\n- `docs/ARCHITECTURE.md`\
+      \ — read by executor. Key passages: UI is a thin static surface over shared\
+      \ JSON HTTP operations; no extra product concepts, queues, ledgers, or special\
+      \ agent-only semantics.\n- `web/src/routes/+page.svelte` — read by executor.\
+      \ Key insight: failure source was conditional route-preview `role`/`aria-live`\
+      \ and descriptive `aria-label`s on bracket action buttons.\n- `web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts`\
+      \ — read by executor. Key insight: tests assert `getByRole('status', { name:\
+      \ 'Steer route preview' })`, idle blank/no `[IDLE]`, described input, invalid\
+      \ assertive alert, and `[APPLY]`/`[CANCEL]`/`[UNDO]` literal role names.\n-\
+      \ `web/src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`\
+      \ — read by executor. Key insight: tests assert idle reserved status, route\
+      \ chips, invalid URL description, Escape focus retention, and revocable-only\
+      \ `[UNDO]`.\n\n## Render Contract Fix Evidence\n- Failure fingerprints closed:\n\
+      \  - `srdct-frontend-expected-red-contract.test.ts` line 119: idle preview is\
+      \ now always `role=\"status\"` with accessible name `Steer route preview`.\n\
+      \  - `srdct-frontend-expected-red-contract.test.ts` line 131: same role/name\
+      \ query works for route-chip and invalid-feedback flow.\n  - `steer-route-preview.expected-red.test.ts`\
+      \ line 98: idle reserved blank preview remains queryable as named status with\
+      \ `aria-live=\"polite\"`.\n  - `steer-route-preview.expected-red.test.ts` line\
+      \ 111: route chip classifications remain observable from exact input copy.\n\
+      \  - `steer-route-preview.expected-red.test.ts` line 166: write preview buttons\
+      \ expose literal accessible names `[APPLY]` and `[CANCEL]`; receipt undo exposes\
+      \ `[UNDO]` only when a revocable backend id exists.\n- Policy ambiguity resolution:\
+      \ resolved in favor of literal bracket accessible names for bracket controls\
+      \ by removing overriding descriptive `aria-label`s from `[APPLY]`, `[CANCEL]`,\
+      \ and `[UNDO]`. This aligns with terse operational copy requirements and expected-red\
+      \ role/name tests while preserving native button semantics, visible text parity,\
+      \ keyboard activation, live-region behavior, and `aria-describedby` wiring.\
+      \ The status region keeps `aria-label=\"Steer route preview\"` because tests/docs\
+      \ require a named live preview region while visual text remains blank when idle.\n\
+      - Files changed: `web/src/routes/+page.svelte`.\n\n## Commit hash(es)\n- Worktree\
+      \ implementation commit: `52cf0011d700b997aef08c8edecbcf878bb0134b`\n- Branch\
+      \ plan-alignment cleanup commit: `7cebedce`\n- Mainline squash commit: `c13490fd`\
+      \ (`[vectl] step-srde2e-steer-route-preview-render-contract-fix completed`)\n\
+      \n## Mainline verification after merge\n- `npm run check` in `web/` — PASS:\
+      \ `svelte-check found 0 errors and 0 warnings`.\n- `npm run test:render` in\
+      \ `web/` — PASS: `Test Files 11 passed (11); Tests 62 passed (62)`.\n- `npm\
+      \ run build` in `web/` — PASS (`✔ done`).\n- `mkdir -p bin && go build -o bin/resofeed\
+      \ ./cmd/resofeed && node audits/srde2e-visual-a11y-regression-proof.mjs` — PASS:\
+      \ `PASS: UI/a11y black-box regression proof passed`.\n\n## B1-B4 non-regression\
+      \ evidence\n- Mainline B1-B4 visual/a11y audit passed after this Steer route-preview\
+      \ change.\n\n## Gaps/Notes\n- Product implementation files modified: yes (`web/src/routes/+page.svelte`).\n\
+      - No forbidden architecture/UI concepts introduced.\n- Acceptance and verification\
+      \ checklist items are `[x]`; verification checklist required planner repair\
+      \ because `vectl_check` could not match verification-field checklist items."
   - id: srde2e-steer-route-preview-render-contract-retest
     name: Retest Steer route-preview render contract closure
     status: pending
