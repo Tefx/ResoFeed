@@ -93277,7 +93277,7 @@ phases:
 
       - [x] Browser E2E evidence is reviewed and specific.
 
-      - [ ] zh spec conformance evidence covers all seven user-requested surfaces.
+      - [x] zh spec conformance evidence covers all seven user-requested surfaces.
 
       - [ ] Software architecture boundary audit is reviewed.
 
