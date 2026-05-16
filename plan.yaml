@@ -98367,7 +98367,7 @@ phases:
       - [x] Prove browser-visible output includes current-operation detail beyond
       generic `err: ingest already running` text.
 
-      - [ ] Prove the relevant Source Ledger conflict scope no longer has unintended
+      - [x] Prove the relevant Source Ledger conflict scope no longer has unintended
       duplicate status elements.
 
       - [ ] Confirm no dashboard/job/queue/activity ledger/settings/service-layer/persistent
