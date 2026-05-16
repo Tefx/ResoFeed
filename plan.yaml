@@ -86518,7 +86518,7 @@ phases:
 
       - [x] Steer accessible-name uniqueness remains PROVEN.
 
-      - [ ] Negative scan finds no unapproved tokens/layout/copy/states or forbidden
+      - [x] Negative scan finds no unapproved tokens/layout/copy/states or forbidden
       product concepts.
 
       - [ ] Final headline is PASS only when no blocker-class should_fix remains;
