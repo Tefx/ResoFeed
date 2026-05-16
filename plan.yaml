@@ -84680,7 +84680,7 @@ phases:
       - [x] Browser search and find alias execute lexical search/read-only route with
       warning-only find copy and no RAG/chat/semantic answer UI.
 
-      - [ ] Browser `/doctor` runs read-only diagnostics and does not become a steering
+      - [x] Browser `/doctor` runs read-only diagnostics and does not become a steering
       rule.
 
       - [ ] Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions
