@@ -82922,7 +82922,7 @@ phases:
 
       - [ ] Mainline `npm run test` is green.
 
-      - [ ] The six named broad rendering failures are explicitly checked and closed.
+      - [x] The six named broad rendering failures are explicitly checked and closed.
 
       - [ ] Scoped Steer/source/split/processing-language checks show no regression.
 
