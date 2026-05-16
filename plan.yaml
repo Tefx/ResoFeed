@@ -89574,7 +89574,7 @@ phases:
     agent: uiux-auditor
   - id: srde2e-e2e-contract-adjudication
     name: Adjudicate residual full E2E contract conflicts before next fix
-    status: claimed
+    status: done
     description: 'step_type: planning
 
       work_type: authority_adjudication
@@ -89791,3 +89791,167 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-16T10:46:24.546654+00:00'
+    done_at: '2026-05-16T11:06:02.981664+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/DESIGN.md — read/cited for RESOFEED menu, visible operational labels,
+      Source Ledger, OPML controls, split scroll, Resonate target.
+
+      - docs/UI_REGRESSION_CONTRACT.md — read/cited for regression selectors, keyboard/a11y,
+      hit targets, fixture contracts.
+
+      - docs/ARCHITECTURE.md — read/cited for OPML import, ingest lifecycle, SQLite/shared
+      state, one deployable, source status enums.
+
+
+      ## Current-Main E2E Inventory
+
+      **Command run**:
+
+      ```sh
+
+      npm --prefix web run test:e2e
+
+      ```
+
+      Initial attempt failed: `playwright: command not found`. After verifying missing
+      `web/node_modules/.bin/playwright`, ran `npm --prefix web ci`, then reran E2E.
+
+
+      Result:
+
+      ```text
+
+      7 failed
+
+      - full-ui-design-conformance.expected-red.spec.ts:179
+
+      - hit-target-clickability.spec.ts:162
+
+      - inspector-dirty-corpus.spec.ts:114
+
+      - inspector-readable-content-regression.spec.ts:84
+
+      - prd-inspector-preview-conformance.expected-red.spec.ts:249
+
+      - ui-remediation-r1-r8-browser-retest.spec.ts:182
+
+      - ui-runtime-fresh-review-remediation.spec.ts:350 FR-01/FR-10
+
+      2 skipped
+
+      64 passed
+
+      ```
+
+
+      Isolated probe:
+
+      ```sh
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe inspector-dirty-corpus.spec.ts
+
+      ```
+
+      Still failed on fetch-button selector, confirming that issue is not only accumulated
+      full-run state.
+
+
+      ## Authority Matrix / Decision Matrix
+
+      Full matrices committed in `artifacts/audits/srde2e-e2e-contract-adjudication.md`.
+
+
+      Summary classifications:
+
+      | Failure | Classification | Disposition |
+
+      |---|---|---|
+
+      | full-ui-design-conformance Source Ledger via Steer | mixed | Prefer authoritative
+      RESOFEED menu path; make Steer route deterministic if kept. |
+
+      | hit-target-clickability row y shift | mixed | Test should not compare viewport
+      y after scroll/focus; keep dimension + scroll-container invariance. |
+
+      | inspector-dirty-corpus fetch selector | mixed | Row-scope `[FETCH]`; fix generic
+      `Fetch source source title` label if aria-label emitted. |
+
+      | inspector-readable-content-regression status ok | stale_test / fixture_shared_state_issue
+      | Accept documented terminal source states unless test controls successful fetch.
+      |
+
+      | prd-inspector-preview desktop Inspector star 0x0 | stale_test | Desktop star
+      belongs in selected feed row; Inspector duplicate star is mobile-route only.
+      |
+
+      | ui-remediation-r1-r8 Dirty source status | fixture_shared_state_issue | Do
+      not select sources by duplicate title in shared DB; use URL/id/unique title
+      or cleanup/isolation. |
+
+      | ui-runtime FR-01/FR-10 focus | implementation_bug | RESOFEED trigger must
+      be keyboard focusable; legacy direct-TODAY tab expectation is stale. |
+
+
+      ## Mandatory Topic Dispositions
+
+      - Focus order: winning expectation is `Steer -> RESOFEED trigger -> opened menu
+      entries`; current `tabindex="-1"` is an implementation bug.
+
+      - Nav visible text: visible `TODAY` / `SOURCE LEDGER` wins; visible-only `T`
+      / `SL` is not docs-backed.
+
+      - OPML import/ingest status: post-import may be `not_fetched`, `ok`, or `rss_fetch_error`;
+      require `ok` only after controlled fetch.
+
+      - Duplicate rows/shared DB state: duplicate Dirty Inspector Corpus rows are
+      fixture/shared-state title-selection issues; architecture dedupes by source
+      URL, not title.
+
+      - Hit-target scroll geometry: y-position changed due viewport scroll/focus;
+      remediate test geometry expectations, while preserving UI no-layout-shift requirements.
+
+
+      ## Next-Step Instruction Packet for srde2e-full-plan-e2e-blockers-fix
+
+      See committed report: `artifacts/audits/srde2e-e2e-contract-adjudication.md`.
+
+
+      Key instructions:
+
+      1. Fix RESOFEED keyboard trigger and visible opened menu labels.
+
+      2. Normalize E2E navigation helpers to authoritative RESOFEED menu path.
+
+      3. Repair Source Ledger fetch selector/a11y contract.
+
+      4. Make dynamic fixture tests URL/id based and terminal-state aware.
+
+      5. Fix shared-state ordering via cleanup, unique titles, URL targeting, or per-spec
+      DB isolation.
+
+      6. Adjust hit-target geometry assertion to dimensions + scroll-container stability.
+
+      7. Remove stale desktop Inspector-star requirement.
+
+
+      ## Verification
+
+      - Report commit in worktree: `785411b4 audit: adjudicate srde2e e2e contracts`.
+
+      - Mainline squash merge commit: `0941e34a [vectl] step-srde2e-e2e-contract-adjudication
+      completed`.
+
+      - Mainline merge footprint verified with `git diff --name-only HEAD~1..HEAD`:
+      only `artifacts/audits/srde2e-e2e-contract-adjudication.md`.
+
+      - Final worktree status after agent commit was clean.
+
+      - Product code/test/docs/fixtures were not committed or intentionally modified.
+
+      - Generated `.test-artifacts` from E2E runs were restored/cleaned before commit.
+
+      - Completion checklist items were toggled to `[x]`; verification-field checklist
+      toggling was attempted by the agent but `vectl_check` could not match those
+      verification entries.'
