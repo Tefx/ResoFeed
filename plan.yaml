@@ -89659,7 +89659,7 @@ phases:
       - [x] Any unresolved item has provenance plus disposition; pre-existing/out-of-scope
       is not used as a disposition.
 
-      - [ ] Final recommendation is PASS only if no blocker-class UI/UX obligation
+      - [x] Final recommendation is PASS only if no blocker-class UI/UX obligation
       remains for srde2e-final-closure-gate.'
     verification: '- [ ] UI/UX audit runs after srde2e-full-plan-e2e-blockers-fix.
 
