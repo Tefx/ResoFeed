@@ -85390,7 +85390,7 @@ phases:
       \ architecture/product concept introduced."
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
 
@@ -85466,6 +85466,51 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T08:06:25.704211+00:00'
+    done_at: '2026-05-16T08:17:43.551397+00:00'
+    evidence: "status: SUCCESS\nverdict: CLEAN_NO_OP\n\n## refs Read Confirmation\
+      \ (MANDATORY)\n- docs/DESIGN.md — READ. Key passages: Steer Input is lightweight\
+      \ with no chat transcript/rule builder; receipts inline only; Source Ledger\
+      \ is flat with bracket actions and no queues/dashboards/activity ledgers/settings;\
+      \ split-scroll/mobile and low-chrome language controls specified; forbidden\
+      \ concepts listed.\n- docs/UI_REGRESSION_CONTRACT.md — READ. Key passages: hit-target/keyboard/a11y\
+      \ contract for Steer, Source Ledger, split-scroll, `/doctor`, mobile, and forbidden\
+      \ UI concepts.\n- docs/ARCHITECTURE.md — READ. Key passages: one deployable/one\
+      \ SQLite/thin transports/no forbidden concepts; `/api/steer/preview` has no\
+      \ `idempotency_key`, read-only classification, `will_mutate:false` documented\
+      \ response.\n- AGENTS.md — NOT READ: no AGENTS.md file exists inside isolated\
+      \ worktree path; session-provided project instructions were observed.\n- CONSTITUTION.md\
+      \ — NOT READ: no CONSTITUTION.md file found in isolated worktree.\n\n## Frontend\
+      \ Architecture Remediation Evidence\n- Review finding IDs addressed or no-op\
+      \ rationale:\n  - SF1 backend/API: HTTP/MCP steer idempotency fingerprint parity\
+      \ drift; no frontend/UI blocker or should_fix was listed. Frontend sibling search\
+      \ found `idempotency_key` usage in mutating API clients/tests, but `previewSteer`\
+      \ does not send `idempotency_key`.\n  - SF2 backend/API/docs: `/api/steer/preview`\
+      \ `will_mutate` public contract drift; no frontend/UI blocker or should_fix\
+      \ was listed. Frontend sibling search found only public type declaration `will_mutate:\
+      \ boolean` in `web/src/lib/api-contract.ts`; no UI branch/rendered state depended\
+      \ on changing it.\n  - Therefore this is a CLEAN no-op for frontend/UI remediation\
+      \ directly tied to the prior review.\n- Root cause vs symptom: no blocker-class\
+      \ frontend finding exists; SF1/SF2 root causes are backend/API/docs contract\
+      \ drift. Potential frontend symptoms were checked via searches and no applicable\
+      \ frontend remediation was found.\n- Files changed: none.\n- Grep/sibling search\
+      \ output:\n  - `will_mutate|willMutate` in `web`: 1 match, `web/src/lib/api-contract.ts:327`\
+      \ (`will_mutate: boolean` type only).\n  - `/api/steer/preview|previewSteer|steerPreview`\
+      \ in `web/src`: 2 matches, `web/src/lib/api-client.ts:220-228`; body includes\
+      \ `actor_kind`, `actor_id`, and `command`, with no `idempotency_key`.\n  - `will_mutate|willMutate`\
+      \ in docs: docs/ARCHITECTURE.md documents preview read-only and `will_mutate:false`.\n\
+      \  - Broader `idempot|fingerprint|Fingerprint` search found frontend idempotency\
+      \ uses in mutating API clients/tests and backend tests, but no preview idempotency\
+      \ sender in frontend.\n- Rendered/test proof: no rendered DOM/screenshot required\
+      \ because no actual frontend fix was applicable and no UI files were modified.\n\
+      \n## Mainline Final-State Verification\n```text\ncd /Users/tefx/Projects/ResoFeed/web\
+      \ && npm run check\nsvelte-check found 0 errors and 0 warnings\n```\n\n## Standard\
+      \ Evidence\n- Commit hash(es): none — no applicable frontend/UI findings; no\
+      \ file changes made and branch has no ahead commits.\n- Files changed: none.\n\
+      - Verification: isolated no-op review found no applicable frontend findings;\
+      \ isolated `npm run check` failed due missing `svelte-kit` dependency in isolated\
+      \ worktree, but mainline `npm run check` passed with 0 errors and 0 warnings.\n\
+      - Spec link: srde2e-frontend-architecture-remediation\n- Gaps/Notes: no frontend/UI\
+      \ remediation required; no forbidden UI/product concept introduced."
   - id: srde2e-software-architect-clean-recheck
     name: Re-review batched architecture/API contract remediation
     status: pending
