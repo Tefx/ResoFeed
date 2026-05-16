@@ -84177,6 +84177,124 @@ phases:
     depends_on:
     - srdf-batched-frontend-audit-closure
     agent: frontend-engineer
+  - id: srdf-batched-frontend-closure-blockers-retest
+    name: Retest and close frontend closure blockers after batched fix
+    status: pending
+    description: "As an INDEPENDENT TESTER (integration-verifier), retest the batched\
+      \ closure-blocker fix from `srdf-batched-frontend-closure-blockers-fix` and\
+      \ decide whether `srdf-frontend-gate` may open.\n\nstep_type: test\nstep_intent:\
+      \ retest_green\nexpected_result: green\nverification_scope: phase-check protecting\
+      \ `srdf-frontend-gate` and full-plan-check protecting final frontend E2E closure.\n\
+      agent_source: project\nindependence_level: L1\n\nThis retest covers ALL remaining\
+      \ blocker families from the failed `srdf-batched-frontend-audit-closure`:\n\
+      - B-HT-01: Source Ledger hit-target clickability source-contract conflict.\n\
+      - B-ART-01: design artifact negative UX Source Ledger source-contract conflict.\n\
+      - B-TODAY-01: TODAY surface selector mismatch.\n- B-FR09-01: mobile metadata\
+      \ truncation `white-space`/required text visibility mismatch.\n- B4_R9_opml_input_reachability:\
+      \ broader Source Ledger controls/hit-target command must be green while `[IMPORT\
+      \ OPML]` reachability remains passing.\n- playwright_expected_red_claims: mandatory\
+      \ rendered artifact/hit-target closure commands must be green.\n\nRequired command\
+      \ evidence:\n- [ ] Run `cd web && npm run test`.\n- [ ] Run `cd web && npm run\
+      \ test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`.\n\
+      - [ ] Run `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/hit-target-clickability.spec.ts`.\n- [ ] Run `cd web && npm run\
+      \ test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts\
+      \ tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.\n- [ ] Run the forbidden\
+      \ concept scan across frontend Svelte/TS user-facing surfaces.\n- [ ] If any\
+      \ named command is absent due harness drift, provide exact discovery output\
+      \ proving absence and run the nearest current command that covers the same user-visible\
+      \ obligation.\n\nRequired rendered artifact evidence:\n- [ ] Source Ledger navigation/menu\
+      \ and visible/reachable hit-target behavior.\n- [ ] Source Ledger `[IMPORT OPML]`\
+      \ keyboard/file reachability preserved.\n- [ ] TODAY surface selector/rendered\
+      \ artifact proof.\n- [ ] Mobile metadata text visibility/truncation proof for\
+      \ the required narrow viewport.\n- [ ] Design-artifact negative UX proof with\
+      \ forbidden concepts absent.\n- [ ] Inspector dirty corpus proof remains green.\n\
+      \nMachine-readable closure output is mandatory. Evidence MUST include YAML with\
+      \ exactly these top-level fields:\n```yaml\nverdict: \"PASS|FAIL\"\ngate_open_allowed:\
+      \ true|false\nblocker_families:\n  B_HT_01_source_ledger_hit_target_clickability:\
+      \ \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_ART_01_design_artifact_source_ledger: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_TODAY_01_today_selector: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_FR09_01_mobile_metadata_truncation: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B4_R9_opml_input_reachability: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  playwright_expected_red_claims: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \nsource_contract_adjudication:\n  - blocker: \"<id>\"\n    source_ref: \"<doc\
+      \ section>\"\n    disposition: \"implementation_fixed|test_updated|artifact_updated|stale_non_intersecting|still_blocked\"\
+      \n    evidence_ref: \"<command/artifact>\"\ncommands:\n  - command: \"<exact\
+      \ command>\"\n    exit_code: 0\n    summary: \"<actual observed result>\"\n\
+      rendered_artifacts:\n  - surface: \"<surface/state>\"\n    artifact_ref: \"\
+      <path/url/screenshot/dom/a11y ref>\"\nforbidden_concept_scan: \"PASS|FAIL\"\n\
+      remaining_blockers: []\nreversal_risk: \"LOW|MEDIUM|HIGH\"\n```\n\nBehavioral\
+      \ proof register and gate decision basis:\n- [ ] requirement_ref: failed frontend\
+      \ closure blocker family; behavior_claim: each blocker is fixed or proven stale/non-intersecting\
+      \ under source-backed contract; runtime_proof_expected: commands and rendered\
+      \ artifacts listed above; evidence_ref: pasted command output and artifact paths;\
+      \ status: PROVEN or explicit blocker; closure_path: PASS opens gate, FAIL requires\
+      \ another batched remediation; gate_decision_basis: `srdf-frontend-gate` may\
+      \ open only when `verdict: PASS`, `gate_open_allowed: true`, and `remaining_blockers:\
+      \ []`.\n\nA test that discovers remaining issues is valuable, but this closure\
+      \ step is complete only with PASS or with a complete blocker register that keeps\
+      \ the gate closed."
+    verification: '- [ ] phase-check protecting `srdf-frontend-gate` and full-plan-check
+      protecting final frontend E2E closure.
+
+      - [ ] `cd web && npm run test` evidence is present and green.
+
+      - [ ] Focused E2E evidence is present and green for the source-ledger/processing/feed-search
+      command group.
+
+      - [ ] Focused E2E evidence is present and green for Source Ledger controls,
+      hit-target negative split-scroll, and `hit-target-clickability.spec.ts`.
+
+      - [ ] Focused E2E evidence is present and green for design artifact negative
+      UX, inspector dirty corpus, and runtime fresh review remediation.
+
+      - [ ] Forbidden concept scan evidence is present and PASS.
+
+      - [ ] Rendered artifacts cover Source Ledger, TODAY, mobile metadata, OPML reachability,
+      and negative UX obligations.
+
+      - [ ] Machine-readable YAML closure has `verdict: PASS`, `gate_open_allowed:
+      true`, `remaining_blockers: []`, per-blocker statuses with no `STILL_BLOCKED`,
+      command list, rendered artifact list, forbidden scan result, and reversal risk
+      before the frontend gate may open.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of frontend-engineer)\n**Scope**: failed frontend closure blocker\
+      \ families after `srdf-batched-frontend-closure-blockers-fix`\n**Independence\
+      \ Level**: L1\n**Timestamp**: <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\n\
+      For each ref in this step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\
+      \n- docs/UI_REGRESSION_CONTRACT.md — key passage or \"NOT READ: <reason>\"\n\
+      - docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n\nIf no refs\
+      \ were provided, state: \"No refs for this step.\"\n\n### Test Execution\nCommands\
+      \ executed:\n```text\ncd web && npm run test\ncd web && npm run test:e2e --\
+      \ tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts tests/e2e/processing-language-source-split-scroll.spec.ts\
+      \ tests/e2e/feed-search-anatomy.spec.ts\ncd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/hit-target-clickability.spec.ts\ncd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts\
+      \ tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts\n\
+      <forbidden concept scan command>\n```\n\nOutput summary:\n```text\n<paste exact\
+      \ command outputs and exit codes>\n```\n\n### Rendered Artifact Register\n|\
+      \ Surface | Artifact ref | Status |\n| --- | --- | --- |\n| Source Ledger nav/menu/hit-targets\
+      \ | <path> | PASS/FAIL |\n| OPML import reachability | <path> | PASS/FAIL |\n\
+      | TODAY surface | <path> | PASS/FAIL |\n| Mobile metadata truncation | <path>\
+      \ | PASS/FAIL |\n| Negative UX/forbidden concepts | <path> | PASS/FAIL |\n|\
+      \ Inspector dirty corpus | <path> | PASS/FAIL |\n\n### Machine-Readable Closure\n\
+      ```yaml\nverdict: \"PASS|FAIL\"\ngate_open_allowed: true|false\nblocker_families:\n\
+      \  B_HT_01_source_ledger_hit_target_clickability: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_ART_01_design_artifact_source_ledger: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_TODAY_01_today_selector: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B_FR09_01_mobile_metadata_truncation: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  B4_R9_opml_input_reachability: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  playwright_expected_red_claims: \"PROVEN_FIXED|SOURCE_CONTRACT_UPDATED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \nsource_contract_adjudication: []\ncommands: []\nrendered_artifacts: []\nforbidden_concept_scan:\
+      \ \"PASS|FAIL\"\nremaining_blockers: []\nreversal_risk: \"LOW|MEDIUM|HIGH\"\n\
+      ```\n\n### Headline\n- [ ] PASS: no blocking issues found and gate may open.\n\
+      - [ ] FAIL: blocking issues or proof gaps remain; gate must stay closed."
+    depends_on:
+    - srdf-batched-frontend-closure-blockers-fix
+    agent: integration-verifier
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
