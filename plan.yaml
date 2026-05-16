@@ -85222,7 +85222,7 @@ phases:
       file shape, owner-token boundary, lexical-only search, and no-RAG/no-sync/no-merge
       product invariants.
 
-      - [ ] Do not introduce new product concepts, sidecar workers, receipt portability,
+      - [x] Do not introduce new product concepts, sidecar workers, receipt portability,
       state merge semantics, or agent authorization registries.
 
       - [ ] Provide root cause vs symptom evidence for both findings.
