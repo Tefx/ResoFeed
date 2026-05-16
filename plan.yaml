@@ -97194,3 +97194,135 @@ phases:
     depends_on:
     - cos-fix-current-operation-frontend-wiring
     agent: integration-verifier
+  - id: cos-reaudit-current-operation-wiring
+    name: Re-audit current-operation frontend wiring after fix
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+      spec_refs:
+
+      - docs/ARCHITECTURE.md#CurrentOperationInfo
+
+      - docs/DESIGN.md#Current Operation Status (`current-operation-status`)
+
+      touch_paths:
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/lib/api-client.ts
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/+page.svelte
+
+      harness_refs:
+
+      - cos-wiring-audit original blocker evidence
+
+      - cos-retest-current-operation-runtime-ui artifacts
+
+
+      As an INDEPENDENT WIRING AUDITOR (wiring-auditor), re-audit the frontend current-operation
+      wiring blockers after the fix.
+
+
+      Audit obligations:
+
+      - Confirm frontend `CurrentOperationInfo.count` type/guard matches backend/docs
+      count object shape.
+
+      - Confirm `phase`, `count`, `message`, `started_at`, and `updated_at` are consumed
+      by rendered UI/conflict handling or have explicit authoritative removal. For
+      this remediation, removal is not expected because docs/backend include them.
+
+      - Confirm Source Ledger/open RESOFEED contextual surfaces read current-operation
+      facts from the shared runtime snapshot/conflict detail, not duplicated hardcoded
+      state.
+
+      - Confirm no forbidden durable job/queue/history/dashboard/settings/service-layer
+      concept was introduced.
+
+
+      ## Completion Criteria
+
+      - [ ] Count object shape is accepted by frontend contract/guard and invalid
+      shapes remain rejected.
+
+      - [ ] Operation detail fields are not write-only; each is traced to rendered
+      UI/conflict handling or explicit authoritative disposition.
+
+      - [ ] No dashboard/job/queue/activity history/settings/service-layer drift is
+      present.
+
+      - [ ] Audit emits PASS / PASS_WITH_DEBT / FAIL headline and blocker disposition.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: wiring-auditor confirms
+      B1/B2 are closed.
+
+      - [ ] Evidence traces each current-operation detail field to type guard and
+      rendered UI/conflict consumption.
+
+      - [ ] Evidence records explicit blocker disposition for any remaining write-only
+      or shape mismatch issue.
+
+      - [ ] No forbidden product/runtime surface was introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Wiring Re-Audit Report
+
+
+      **Count shape trace**:
+
+      ```
+
+      <frontend type/guard locations and verdict>
+
+      ```
+
+
+      **Field consumption trace**:
+
+      | Field | Producer | Frontend guard | Rendered/consumed surface | Verdict |
+
+      |---|---|---|---|---|
+
+      | phase | | | | |
+
+      | count | | | | |
+
+      | message | | | | |
+
+      | started_at | | | | |
+
+      | updated_at | | | | |
+
+
+      **Forbidden surface scan**:
+
+      ```
+
+      <evidence for no job/queue/history/dashboard/settings/service-layer drift>
+
+      ```
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - cos-retest-current-operation-runtime-ui
+    agent: wiring-auditor
