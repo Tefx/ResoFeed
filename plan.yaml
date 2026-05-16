@@ -97944,7 +97944,7 @@ phases:
 
       ## Completion Checklist
 
-      - [ ] B1 is closed by either removing real duplicate conflict status rendering
+      - [x] B1 is closed by either removing real duplicate conflict status rendering
       or narrowing/fixing a demonstrably test-only selector ambiguity.
 
       - [ ] B2 is closed by a browser/e2e conflict fixture carrying documented `current_operation`
