@@ -85344,7 +85344,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Address ALL frontend/UI blocker and should_fix findings from the software-architect
+      - [x] Address ALL frontend/UI blocker and should_fix findings from the software-architect
       review, not just the first.
 
       - [ ] Preserve DESIGN.md/UI_REGRESSION_CONTRACT.md behavior for Steer route
