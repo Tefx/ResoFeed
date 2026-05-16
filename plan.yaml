@@ -95995,7 +95995,7 @@ phases:
     claimed_at: '2026-05-16T21:53:34.190244+00:00'
   - id: cos-runtime-e2e-retest
     name: Run HTTP MCP frontend operation-status e2e retest
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (integration-verifier), validate the complete
       path from guarded-operation snapshot to HTTP, MCP, and rendered UI.
 
@@ -96103,6 +96103,39 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T21:53:26.387371+00:00'
+    done_at: '2026-05-16T22:00:57.185196+00:00'
+    evidence: "headline: PASS_WITH_DEBT\nverdict: PASS\nblockers: []\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: COMPLETE\n\n## refs Read Confirmation\n- docs/ARCHITECTURE.md\
+      \ — read. Key passages: single Go binary serves static UI, JSON HTTP, MCP Streamable\
+      \ HTTP, background ingest, and agents connect through same Go binary MCP; concurrency\
+      \ guard is global across ingest/fetch/reprocess.\n- docs/DESIGN.md — read. Key\
+      \ passages: Source Ledger manual controls expose raw/terse conflict feedback\
+      \ and utility surfaces are reachable through RESOFEED menu without settings/sidebar\
+      \ bloat.\n\n## Seam-Level Integration Evidence\n- Changed seam path: guarded\
+      \ operation guard -> CurrentOperationInfo snapshot -> HTTP/MCP -> frontend Source\
+      \ Ledger/RESOFEED surfaces.\n- Source artifacts modified: none; commit hashes:\
+      \ none.\n- Commands and output evidence:\n  1. go test -v ./internal/resofeed\
+      \ -run 'TestCOSBackendCurrentOperation|TestMCPCurrentOperationResource|TestMCPGuardConflict'\
+      \ => PASS ok; includes HTTP idle/running/conflict and MCP resource/conflict\
+      \ tests.\n  2. npm --prefix web test -- current-operation-utility-placement.test.ts\
+      \ => svelte-check 0 errors/0 warnings and 2 render tests passed.\n  3. npm --prefix\
+      \ web run test:e2e -- current-operation-utility-placement.expected-red.spec.ts\
+      \ --project=chromium-ci-safe => 3 passed.\n  4. Direct real-binary HTTP/MCP\
+      \ probe: HTTP_IDLE returned running:false exact shape; HTTP_RUNNING returned\
+      \ running:true kind ingest scope all phase fetching_feed count current/total;\
+      \ HTTP_CONFLICT 409 included details.current_operation; MCP resources/read returned\
+      \ matching operation; MCP reprocess conflict returned JSON-RPC error data with\
+      \ current_operation; final idle returned running:false.\n  5. Direct real-browser\
+      \ UI probe: Source Ledger text contained current operation: ingest [INGESTING...];\
+      \ open RESOFEED menu contained [INGESTING...] LANG: EN [REPROCESS LIBRARY];\
+      \ persistent top chrome reported no idle/running leak.\n\n## Behavioral Proof\
+      \ Register\n- http_idle_state: PROVEN.\n- http_running_state: PROVEN.\n- http_conflict_current_operation:\
+      \ PROVEN.\n- mcp_operation_resource: PROVEN.\n- mcp_conflict_payload_parity:\
+      \ PROVEN.\n- frontend_contextual_status: PROVEN.\n- frontend_menu_status: PROVEN.\n\
+      - frontend_idle_top_chrome_clean: PROVEN.\n\n## Non-blocking findings\n- tech_debt:\
+      \ npm ci reported 5 vulnerabilities; not on operation-status integration path.\n\
+      - suggestion: Playwright operation-placement spec uses API fixtures for some\
+      \ assertions, but this audit included real-binary/browser proof, so non-blocking."
   - id: cos-uiux-multimodal-audit
     name: Run UIUX audit for operation status and utility placement
     status: pending
