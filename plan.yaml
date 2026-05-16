@@ -95117,13 +95117,13 @@ phases:
       sections.
 
       - [x] No frontend product implementation code is changed in this step.'
-    verification: '- [ ] local-check protecting frontend implementation: expected-red
+    verification: '- [x] local-check protecting frontend implementation: expected-red
       tests expose missing/incorrect contextual operation status and utility placement.
 
-      - [ ] Evidence includes rendered DOM/snapshot assertions for visible placement
+      - [x] Evidence includes rendered DOM/snapshot assertions for visible placement
       and absence cases.
 
-      - [ ] Evidence confirms tests are red before implementation and product code
+      - [x] Evidence confirms tests are red before implementation and product code
       was not modified.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
