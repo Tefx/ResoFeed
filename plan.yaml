@@ -88629,3 +88629,232 @@ phases:
       - blockers: []
 
       - product_implementation_files_modified: no'
+  - id: srde2e-full-plan-e2e-blockers-fix
+    name: Fix batched full-plan E2E blocker families
+    status: pending
+    description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
+      scope: ONE BATCHED remediation for blocker-class failures reported by srde2e-full-plan-check.\n\
+      \nFix ALL full-plan E2E blocker families below in one coherent frontend remediation\
+      \ pass. Do not cherry-pick only the first failure. The issue intersects srde2e-final-closure-gate,\
+      \ so remediation ownership is blocking-now regardless of provenance.\n\nAuthoritative\
+      \ refs and invariants:\n- docs/ARCHITECTURE.md — single Go binary, one SQLite\
+      \ DB, no vector DB/embeddings/RAG semantic answer UI, HTTP/MCP/UI expose the\
+      \ same product operations.\n- docs/DESIGN.md — dense archival index aesthetic,\
+      \ functional chrome labels, Source Ledger/Inspector/Steer UI language, no SaaS/friendly\
+      \ copy drift.\n- docs/UI_REGRESSION_CONTRACT.md — runtime UI regression selectors,\
+      \ accessible labels, layout stability, visual/a11y expectations.\n\nFailure\
+      \ inventory to close (ALL required):\n1. Source Ledger per-source [FETCH] missing/not\
+      \ visible.\n   - E2E snippets: getByRole('button', { name: /\\[FETCH\\]|\\[FETCHING\\\
+      .\\.\\.\\]/ }).first() expected visible; element(s) not found.\n   - Affected\
+      \ surfaces: Source Ledger per-source fetch, seeded search/mobile/Inspector setup.\n\
+      \   - Sibling search requirement: inspect every Source Ledger row/action renderer\
+      \ and every seeded setup path that expects per-source fetch.\n2. Source Ledger/TODAY\
+      \ nav role/name/focus/clickability drift.\n   - E2E snippets: getByRole('button',\
+      \ { name: 'SOURCE LEDGER' }) timeout; getByRole('button', { name: 'TODAY' })\
+      \ element not found/focused; nav.surface-nav button:has-text(\"SOURCE LEDGER\"\
+      ) element not found.\n   - Affected surfaces: SOURCE LEDGER/TODAY navigation,\
+      \ active-state proof, keyboard focus.\n   - Sibling search requirement: inspect\
+      \ all nav renderers, mobile/desktop variants, hover/focus handlers, and active-state\
+      \ selectors.\n3. Steer apply accessible-name collision.\n   - E2E snippet: strict\
+      \ mode violation getByRole('button', { name: 'apply' }) resolved to both <button\
+      \ type=\"submit\">apply</button> and <button type=\"button\" class=\"bracket-action\"\
+      >[APPLY]</button>.\n   - Affected surface: Steer submit / preview apply controls.\n\
+      \   - Sibling search requirement: inspect all Steer apply/preview/commit controls\
+      \ for distinct accessible names without weakening documented action labels.\n\
+      4. Inspector content/provenance/source metadata label drift.\n   - E2E snippets:\
+      \ getByLabel('Source: Fixture Source') expected visible; missing Source: Fixture\
+      \ Source; dirty content proof setup blocked.\n   - Affected surface: Inspector\
+      \ source/provenance accessible labeling and content hierarchy.\n   - Sibling\
+      \ search requirement: inspect Inspector label, aria-label, content hierarchy,\
+      \ and provenance/source metadata renderers.\n5. Steer source-add receipt wording\
+      \ mismatch.\n   - E2E failure: expected /source added: .*127\\.0\\.0\\.1|source\
+      \ added: .*e2e-feed\\.xml/i, received applied: source already active: 127.0.0.1:65358;\
+      \ no change.\n   - Affected surface: source-add receipt orientation/background\
+      \ ingest expectations.\n   - Sibling search requirement: inspect Steer source-add\
+      \ receipt copy, idempotent already-active receipts, and E2E fixture/feed activation\
+      \ assumptions.\n6. Source Ledger row grammar/status field drift.\n   - E2E failure:\
+      \ expected text src: Canonical Allowed Source · status: ok · last_fetch: not\
+      \ visible.\n   - Affected surface: Source Ledger row grammar/status.\n   - Sibling\
+      \ search requirement: inspect all Source Ledger row status/last_fetch grammar\
+      \ and responsive variants.\n7. RESOFEED chrome/source-name ambiguity.\n   -\
+      \ E2E failure: getByText('RESOFEED') strict mode violation resolved to 3 elements,\
+      \ including menu summary and source text src: ResoFeed E2E Local Source.\n \
+      \  - Affected surface: RESOFEED chrome / Source Ledger nav selector ambiguity;\
+      \ likely source row text overexposes product word or needs accessible disambiguation.\n\
+      \   - Sibling search requirement: inspect chrome label, source fixture display\
+      \ names, Source Ledger text, and selectors that rely on unambiguous product\
+      \ chrome.\n8. Feed row layout shift on Inspect/open.\n   - E2E failure: selected\
+      \ Inspect/open shifted row bounds; expected row bounding box unchanged, received\
+      \ y changed.\n   - Affected surface: Feed row Inspect/open layout stability.\n\
+      \   - Sibling search requirement: inspect row open/inspect state, hover/focus\
+      \ styling, expanded content placement, and split-scroll interaction.\n9. URDA\
+      \ mobile metadata/source clipping.\n   - E2E failure: Issue 10 mobile metadata\
+      \ row is nowrap/hidden; mobile source text visually clipped: visible=72.640625,\
+      \ full=602.734375.\n   - Affected surface: mobile feed metadata/source text\
+      \ responsive layout.\n   - Sibling search requirement: inspect responsive metadata/source\
+      \ CSS for nowrap/overflow/hidden and all mobile feed variants.\n\nExplicit non-requirements\
+      \ from srde2e-full-plan-check:\n- Do not make npm ci audit warning a fix requirement\
+      \ unless it directly blocks the above families; it is non-blocking dependency\
+      \ debt with no declared audit gate.\n- Do not chase the initial concurrent npm\
+      \ run build failure as a blocker; sequential npm run build passed and the failure\
+      \ was classified as a non-blocking concurrency artifact.\n\nRequired implementation\
+      \ guardrails:\n- Preserve ResoFeed product invariants from AGENTS.md and docs/ARCHITECTURE.md:\
+      \ single deployable, SQLite-only, lexical search only, no RAG/vector/semantic-answer\
+      \ UI, no added account/auth model, no sync/merge coordinator.\n- Preserve docs/DESIGN.md\
+      \ and docs/UI_REGRESSION_CONTRACT.md unless a deviation is explicitly justified\
+      \ by docs and reflected in tests/fixtures.\n- Avoid weakening or deleting E2E\
+      \ assertions to make tests pass. Test changes are allowed only when they align\
+      \ tests with authoritative docs and the implementation, and the deviation rationale\
+      \ is recorded.\n- Search for sibling instances for each family before claiming\
+      \ done; listed snippets are examples, not the full scope.\n- If a test expectation\
+      \ conflicts with docs, record a deviation note with doc citation and keep the\
+      \ selector/user-visible contract deterministic.\n\nRequired local command family\
+      \ before handoff:\n- npm run test:e2e (full suite; expected to move from red\
+      \ to green after this fix)\n- Targeted failing Playwright specs/cases as practical\
+      \ for the nine families above\n- npm run check\n- npm run test:render\n- npm\
+      \ run build\n- Visual/a11y proof script if UI/layout/accessibility surfaces\
+      \ changed\n\n## Completion Criteria (stub exclusion)\nThis is an IMPLEMENTATION\
+      \ step. Stub-only completion is NOT acceptable. Each deliverable MUST contain\
+      \ substantive UI/runtime logic or CSS/markup changes that process real app state\
+      \ and produce visible/accessibility outputs that vary based on inputs. Private\
+      \ stub or placeholder classes/functions do not satisfy this requirement.\n\n\
+      ## Gate Preview (what final closure WILL reject)\n1. Any remaining blocker-class\
+      \ npm run test:e2e failure in the nine families above.\n2. Selector fixes that\
+      \ hide or weaken product semantics instead of preserving documented Source Ledger/TODAY/Steer/Inspector\
+      \ contracts.\n3. Passing narrow targeted specs while the full npm run test:e2e\
+      \ suite still fails without explicit non-intersection disposition.\n4. Missing\
+      \ sibling-search evidence for related nav, Source Ledger, Inspector, Steer,\
+      \ feed row, and mobile metadata variants."
+    verification: '- [ ] All nine blocker families from srde2e-full-plan-check are
+      addressed in one batched frontend remediation.
+
+      - [ ] Sibling searches were performed and documented for each blocker family.
+
+      - [ ] No tests were weakened unless a docs-backed deviation record explains
+      the change.
+
+      - [ ] ResoFeed architecture/design invariants are preserved.
+
+      - [ ] npm run test:e2e was run or attempted with exact output recorded.
+
+      - [ ] Targeted failing Playwright specs/cases were run as practical with exact
+      output recorded.
+
+      - [ ] npm run check passed or any failure has blocker-class disposition.
+
+      - [ ] npm run test:render passed or any failure has blocker-class disposition.
+
+      - [ ] npm run build passed sequentially or any failure has blocker-class disposition.
+
+      - [ ] Visual/a11y proof script was rerun if UI/layout/accessibility changed,
+      with exact output recorded.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      ## Batched Full-Plan E2E Remediation Evidence
+
+
+      **Original blocker source**: srde2e-full-plan-check
+
+
+      ### Blocker Family Closure Matrix
+
+      | # | Family | Files changed | Sibling search performed | Targeted proof | Status
+      |
+
+      |---|--------|---------------|--------------------------|----------------|--------|
+
+      | 1 | Source Ledger [FETCH] | | | | PASS/FAIL |
+
+      | 2 | SOURCE LEDGER/TODAY nav | | | | PASS/FAIL |
+
+      | 3 | Steer apply accessible-name collision | | | | PASS/FAIL |
+
+      | 4 | Inspector source/provenance labels | | | | PASS/FAIL |
+
+      | 5 | Steer source-add receipt wording | | | | PASS/FAIL |
+
+      | 6 | Source Ledger row grammar/status | | | | PASS/FAIL |
+
+      | 7 | RESOFEED chrome/source-name ambiguity | | | | PASS/FAIL |
+
+      | 8 | Feed row Inspect/open layout stability | | | | PASS/FAIL |
+
+      | 9 | URDA mobile metadata/source clipping | | | | PASS/FAIL |
+
+
+      ### Test Integrity
+
+      - Tests weakened/deleted: YES/NO
+
+      - If YES, docs-backed deviation record: <doc section, old assertion, new assertion,
+      why>
+
+
+      ### Commands and Exact Output
+
+      ```sh
+
+      npm run test:e2e
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run check
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run test:render
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run build
+
+      ```
+
+      <paste exact output>
+
+
+      Visual/a11y proof if UI/layout/accessibility changed:
+
+      ```sh
+
+      <paste exact command>
+
+      ```
+
+      <paste exact output>
+
+
+      ### Remaining Failures Disposition
+
+      For each remaining failure, provide: provenance, disposition (blocking-now/blocking-later/non-blocking),
+      final-gate intersection evidence, and owner step if blocking.'
+    depends_on:
+    - srde2e-full-plan-check
+    agent: frontend-engineer
