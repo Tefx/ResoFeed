@@ -89322,3 +89322,177 @@ phases:
     depends_on:
     - srde2e-full-plan-e2e-blockers-fix
     agent: integration-verifier
+  - id: srde2e-uiux-full-plan-e2e-blockers-audit
+    name: Audit full-plan UI/UX E2E blocker closure
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      agent_source: project
+
+      work_type: defect_repair
+
+      independence_level: L1
+
+
+      As an INDEPENDENT UI/UX AUDITOR (uiux-auditor), audit the rendered/browser-observable
+      UI/UX effects after srde2e-full-plan-e2e-blockers-fix. This step protects srde2e-full-plan-e2e-blockers-retest
+      and srde2e-final-closure-gate; final closure may not bypass it.
+
+
+      Use real rendered artifacts from the running app or Playwright/browser captures,
+      not code-only review. Required artifacts include screenshots, DOM/accessibility
+      snapshots, terminal/browser command output, or equivalent visual/spatial evidence
+      for the changed states and responsive viewports.
+
+
+      Audit all nine blocker families from srde2e-full-plan-check:
+
+      1. Source Ledger per-source [FETCH] / [FETCHING...] button visible and reachable
+      in source rows.
+
+      2. SOURCE LEDGER and TODAY navigation role/name/focus/clickability in desktop
+      and mobile-relevant states.
+
+      3. Steer apply controls have distinct accessible names without documented action-label
+      drift.
+
+      4. Inspector source/provenance labels expose Source: Fixture Source and related
+      content hierarchy accessibly.
+
+      5. Source-add receipt orientation communicates added/already-active/background
+      ingest state without misleading UX.
+
+      6. Source Ledger row grammar/status/last_fetch text is readable, stable, and
+      spec-aligned.
+
+      7. RESOFEED product chrome is visually/accessibly distinguishable from source
+      names and does not create ambiguous user-facing selectors.
+
+      8. Feed row Inspect/open interaction preserves row layout stability and avoids
+      jumpy hit-target/layout shifts.
+
+      9. Mobile metadata/source text wraps or clips acceptably without hiding source
+      meaning, including long local fixture source text.
+
+
+      Gate-intersection rule:
+
+      - Any remaining rendered/a11y/layout failure in these nine families is blocker-class
+      for srde2e-final-closure-gate unless the evidence proves explicit non-intersection.
+
+      - Finding issues is a successful audit outcome, but OPEN final closure is invalid
+      until blocker-class UI/UX obligations are PROVEN or explicitly non-intersecting.
+
+
+      ## Completion Criteria
+
+      - [ ] Rendered/browser-observable evidence covers all nine blocker families.
+
+      - [ ] Evidence includes screenshots, DOM/accessibility snapshots, or equivalent
+      visual/spatial artifacts for desktop and mobile-relevant states.
+
+      - [ ] Accessible names, focusability, hit targets, visible labels, row stability,
+      and mobile clipping are assessed directly from rendered output.
+
+      - [ ] Any unresolved item has provenance plus disposition; pre-existing/out-of-scope
+      is not used as a disposition.
+
+      - [ ] Final recommendation is PASS only if no blocker-class UI/UX obligation
+      remains for srde2e-final-closure-gate.'
+    verification: '- [ ] UI/UX audit runs after srde2e-full-plan-e2e-blockers-fix.
+
+      - [ ] All nine UI/E2E blocker families are validated through rendered/browser-observable
+      artifacts.
+
+      - [ ] Desktop and mobile-relevant states are covered for Source Ledger, TODAY
+      nav, Steer controls, Inspector, feed rows, and metadata/source text.
+
+      - [ ] Audit evidence includes screenshots, DOM/accessibility snapshots, or equivalent
+      visual/spatial proof.
+
+      - [ ] Audit records PASS/PASS_WITH_DEBT/FAIL with blocker-class gate-intersection
+      reasoning for srde2e-final-closure-gate.'
+    evidence_template: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Full-plan E2E UI/UX blocker closure after srde2e-full-plan-e2e-blockers-fix
+
+
+      ## Rendered Evidence Inventory
+
+      | Blocker Family | Artifact(s) | Desktop Covered | Mobile Covered | Verdict
+      | Notes |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | Source Ledger [FETCH] | <screenshot/snapshot/output> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | SOURCE LEDGER/TODAY nav | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Steer apply accessible names | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Inspector provenance labels | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Source-add receipt orientation | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Source Ledger row grammar/status | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | RESOFEED ambiguity | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Feed row layout stability | <artifact> | yes/no | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+      | Mobile metadata/source clipping | <artifact> | n/a | yes/no | PASS/PASS_WITH_DEBT/FAIL
+      | <notes> |
+
+
+      ## Gate-Intersection Disposition
+
+      For every unresolved issue:
+
+      - provenance: pre-existing | introduced_now | out-of-step-origin
+
+      - disposition: blocking-now | blocking-later | non-blocking
+
+      - final gate intersection: <why it blocks or explicit non-intersection evidence>
+
+      - remediation owner: <step id or required follow-up>
+
+
+      ## Headline
+
+      - [ ] PASS: all blocker-class UI/UX obligations are proven closed
+
+      - [ ] PASS_WITH_DEBT: only explicit non-blocking/non-intersecting debt remains
+
+      - [ ] FAIL: blocker-class rendered/a11y/layout obligation remains
+
+      '
+    depends_on:
+    - srde2e-full-plan-e2e-blockers-fix
+    agent: uiux-auditor
