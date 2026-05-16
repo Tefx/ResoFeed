@@ -90571,7 +90571,7 @@ phases:
 
       - [x] Read each ref and cite the key passage or mark `NOT READ: <reason>`.
 
-      - [ ] Review the prior architecture, full-plan, E2E retest, and UIUX audit closure
+      - [x] Review the prior architecture, full-plan, E2E retest, and UIUX audit closure
       evidence listed in scope.
 
       - [ ] Produce a software-architect re-review artifact with `reviewer_agent:
