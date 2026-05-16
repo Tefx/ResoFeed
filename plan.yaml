@@ -95130,7 +95130,7 @@ phases:
 
       - [x] No backend schema/layer drift was introduced.
 
-      - [ ] UIUX audit and targeted retest are PASS or only explicit non-blocking
+      - [x] UIUX audit and targeted retest are PASS or only explicit non-blocking
       debt remains.
 
       - [ ] Gate decision basis recommends OPEN or records exact remediation actions
