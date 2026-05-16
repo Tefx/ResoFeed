@@ -91838,7 +91838,7 @@ phases:
       - [x] DOM/browser evidence shows closed RESOFEED menu no longer exposes persistent
       route chrome while opened menu still works by pointer and keyboard.
 
-      - [ ] Browser evidence shows OPML import does not call ingest and receipt tells
+      - [x] Browser evidence shows OPML import does not call ingest and receipt tells
       user sources were imported; manual `[RUN INGEST]` remains available.
 
       - [ ] Browser evidence in zh mode shows localized LANG/reprocess/status/receipt/steer/Inspector
