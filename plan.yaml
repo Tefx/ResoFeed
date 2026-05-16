@@ -95135,18 +95135,18 @@ phases:
 
       - [x] Gate decision basis recommends OPEN or records exact remediation actions
       if BLOCKED.'
-    verification: '- [ ] Gate review confirms expected-red → fix → green retest sequence,
+    verification: '- [x] Gate review confirms expected-red → fix → green retest sequence,
       including the reactive grouped-source sort crash remediation.
 
-      - [ ] Gate review confirms backend grouping contract remains unchanged and authoritative.
+      - [x] Gate review confirms backend grouping contract remains unchanged and authoritative.
 
-      - [ ] Gate review confirms synthetic feed-fragment identity is preserved and
+      - [x] Gate review confirms synthetic feed-fragment identity is preserved and
       true grouped-source transparency still works.
 
-      - [ ] Gate review confirms rendered Inspector evidence satisfies DESIGN.md and
+      - [x] Gate review confirms rendered Inspector evidence satisfies DESIGN.md and
       no grouped-source false positive or Svelte runtime crash remains.
 
-      - [ ] OPEN/BLOCK decision includes explicit behavioral proof register disposition
+      - [x] OPEN/BLOCK decision includes explicit behavioral proof register disposition
       for any unresolved item.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
