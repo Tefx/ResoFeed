@@ -95616,13 +95616,13 @@ phases:
       exists.
 
       - [x] MCP parity tests pass without introducing agent-only product concepts.'
-    verification: '- [ ] local-check protecting MCP parity: targeted Go MCP tests
+    verification: '- [x] local-check protecting MCP parity: targeted Go MCP tests
       prove `resofeed://system/operation` idle/running states.
 
-      - [ ] MCP conflict details match HTTP conflict details for operation guard conflicts
+      - [x] MCP conflict details match HTTP conflict details for operation guard conflicts
       where structured metadata is supported.
 
-      - [ ] Evidence confirms no MCP-only job/task/history/agent-registry concept
+      - [x] Evidence confirms no MCP-only job/task/history/agent-registry concept
       was added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
