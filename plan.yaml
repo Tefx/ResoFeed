@@ -84724,7 +84724,7 @@ phases:
       idle/add/search/find/doctor/rule/invalid/receipt/undo states, Source Ledger
       controls/details, desktop split-scroll, and mobile Inspector route.
 
-      - [ ] Prove real pointer center/interior activation and topmost element clickability
+      - [x] Prove real pointer center/interior activation and topmost element clickability
       for Steer submit, [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions,
       menu entries, row open, star, and original links.
 
