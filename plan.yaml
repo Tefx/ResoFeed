@@ -83571,7 +83571,7 @@ phases:
       disabled behavior, OPML reachability, scroll preservation, forbidden raw-payload
       absence, and mobile metadata visibility are covered.
 
-      - [ ] Do not mutate completed plan steps or split this into multiple serial
+      - [x] Do not mutate completed plan steps or split this into multiple serial
       remediation steps.'
     verification: '- [ ] local-check protecting `srdf-batched-frontend-audit-closure`
       and `srdf-frontend-gate`.
