@@ -92027,7 +92027,7 @@ phases:
       updates docs/ui-preview.html.'
   - id: azri-preview-contract-sync
     name: Sync docs/ui-preview.html with repaired UI, reprocess, and zh surfaces
-    status: claimed
+    status: done
     description: 'step_type: documentation
 
       agent_source: project
@@ -92118,6 +92118,97 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-16T14:07:54.692663+00:00'
+    done_at: '2026-05-16T14:14:29.425472+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read by execution agent; key passages: App Shell permits
+      TODAY/SOURCE LEDGER only inside opened RESOFEED menu; Language Control requires
+      terse LANG EN/ZH or localized equivalents; Reprocess requires bracket action
+      and no dashboard/queue/activity-log; Source Ledger header requires last_ingest
+      and [RUN INGEST] right-aligned; Inspector requires separate source text and
+      summary provenance; partial is not user-facing label.
+
+      - docs/ARCHITECTURE.md — Read by execution agent; processing language is runtime
+      metadata en|zh excluded from portable state; language change affects future
+      processing only; explicit reprocess may rewrite readable fields/rebuild FTS
+      without durable queues/jobs/dashboards; source identifiers are preservation
+      anchors.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — Read by execution agent; frontend
+      obligations require global language state, terse reprocess bracket operation,
+      preserved source identifiers with translate=no or equivalent, and no settings
+      dashboard/per-item translation selector/side-by-side reader.
+
+      - tests/contract/azrct_closure_matrix.yaml — Read by execution agent; P2-preview-drift
+      requires LANG/reprocess examples and source excerpt/excerpt labels, and Source
+      Ledger/Inspector proof obligations cite right-aligned ingest controls and approved
+      provenance copy.
+
+      - web/src/test/azrct-contract-fixtures.expected-red.test.ts — Read by execution
+      agent; static test checks docs/ui-preview.html for LANG/reprocess content, excerpt
+      labels, and absence of visible partial.
+
+      - docs/ui-preview.html — Read by execution agent; existing artifact had stale
+      preview subtitle route labels, no LANG/reprocess surface, and visible partial
+      badges in feed/mobile examples.
+
+
+      ## Preview Sync Evidence
+
+      - Updated docs/ui-preview.html.
+
+      - Route chrome: replaced preview subtitle `SOURCE LEDGER / DOCTOR / INSPECTOR`
+      with `STATIC DESIGN CONTRACT PREVIEW`; removed mobile persistent TODAY header
+      label from chrome.
+
+      - LANG/reprocess: added `LANG: EN`, `[REPROCESS LIBRARY]`, warning copy, and
+      source-identifier preservation copy.
+
+      - zh example: added localized `语言: 中文`, `[重处理资料库]`, Chinese warning copy, Chinese
+      feed chrome/content, and preserved `src:` identifiers with translate=no.
+
+      - Source Ledger alignment: added explicit `.source-ledger__header` right-justification
+      for `last_ingest` and `.bracket-action--run-ingest`.
+
+      - Inspector provenance: added separate `source text:` and `summary provenance:`
+      lines in desktop and mobile Inspector examples; no `model: ok` visible chrome
+      added.
+
+      - Excerpt labels: replaced visible `partial` badges with `source excerpt` /
+      `excerpt`.
+
+      - Static artifact: active preview artifact remains docs/ui-preview.html; no
+      runtime dependency or design-version dependency introduced.
+
+
+      ## Mainline final-state verification after squash merge
+
+      - `git diff --check HEAD~1..HEAD -- docs/ui-preview.html`: exit 0, no output.
+
+      - `npx vitest run src/test/azrct-contract-fixtures.expected-red.test.ts` (workdir
+      web): exit 0; 1 test file passed, 2 tests passed.
+
+      - Checklist state verified via vectl_show: all description completion criteria
+      and verification checklist items are checked.
+
+
+      ## Files changed
+
+      - docs/ui-preview.html
+
+
+      ## Commits
+
+      - Worktree commit: 5bddbc0e (`docs: sync UI preview contract surfaces`).
+
+      - Main squash merge commit: f7e5433a (`[vectl] step-azri-preview-contract-sync
+      completed`).
+
+
+      ## Gaps/Notes
+
+      - No related fixture changes were needed; the targeted static preview test passed
+      with docs/ui-preview.html only.'
   - id: azri-implementation-gate
     name: Gate audit and zh implementation repair
     status: pending
