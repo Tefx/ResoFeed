@@ -181,6 +181,7 @@ Out of scope:
 | Current attention state | `item_state` | Resonance state: yes; inspection/external-surface state: no | Stars are user-owned retrieval state; inspection/external-surface timestamps are operational state. |
 | Agent idempotency receipts | `agent_receipts` | No by default | Required for retry safety/provenance, not a user-facing activity ledger. |
 | Runtime metadata | `runtime_metadata` | No | Stores owner-token hash, local processing language, and optional runtime diagnostics; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
+| Current operation snapshot | process memory (`currentOperationSnapshot` behind the ingest/reprocess guard) | No | Best-effort description of the guarded operation currently running in this Go process; cleared when the guard releases. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
 | Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. |
 
@@ -205,6 +206,7 @@ Coordination rules:
 - coordinate background ingest, global manual ingest, and per-source manual fetch through one in-process ingest concurrency guard owned by `ingest.go`;
 - permit at most one ingest/fetch operation to run at a time across the process: background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch` must never overlap;
 - reject HTTP manual triggers with `409 conflict` when the guard is already held; background ticks may be ignored/skipped while an ingest is already running;
+- expose the current guard holder as an in-memory `CurrentOperationInfo` snapshot for contextual UI/MCP conflict explanation only; it is not persisted and is cleared when the guarded operation finishes or releases;
 - do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 
@@ -944,6 +946,64 @@ Revision contract: `revision` is response metadata only. HTTP and MCP clients do
 | `resonated` | boolean | Yes | Yes | resonance filter or null |
 | `limit` | integer | Yes | No | effective limit after defaults/max validation |
 
+`CurrentOperationInfo`:
+
+This type is the authoritative HTTP/MCP shape for the process-local current-operation snapshot. It is a best-effort in-memory runtime fact, not durable state. When no guarded ingest/fetch/reprocess operation is running, every nullable field is present as `null` and `running` is `false`. While a guarded operation is running, `running` is `true`; `kind`, `scope`, `phase`, `message`, `started_at`, and `updated_at` are present with non-null values when known; `count` is `null` until a measurable phase exists and then is an object with `current` and `total` integer members. Clients must tolerate `count: null` during startup/transition phases and must not infer durable progress history from the values.
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `running` | boolean | Yes | No | `true` only while the in-process guard is held by ingest, fetch, or reprocess. |
+| `kind` | string enum | Yes | Yes | `ingest`, `fetch`, or `reprocess`; `null` when idle. |
+| `scope` | string enum | Yes | Yes | Current approved values are `all`, `source`, or `library`; `null` when idle. |
+| `phase` | string | Yes | Yes | Terse phase such as `starting`, `loading_sources`, `fetching_sources`, `fetching_feed`, `processing_items`, `source_complete`, or `complete`; `null` when idle or unknown. |
+| `count` | object | Yes | Yes | `null` when no measurable count is available; otherwise `{ "current": integer, "total": integer }` with non-negative integers. |
+| `count.current` | integer | Yes when `count` is non-null | No | Current completed or attempted unit for the active phase. |
+| `count.total` | integer | Yes when `count` is non-null | No | Total known units for the active phase. |
+| `message` | string | Yes | Yes | Terse diagnostic/status text for inline UI/MCP explanation; `null` when idle or unknown. |
+| `started_at` | RFC3339 string | Yes | Yes | UTC timestamp for the guard acquisition/start of current operation; `null` when idle. |
+| `updated_at` | RFC3339 string | Yes | Yes | UTC timestamp for the latest snapshot update; `null` when idle. |
+
+`GET /api/runtime/operation` returns the current operation envelope:
+
+```json
+{
+  "operation": {
+    "running": false,
+    "kind": null,
+    "scope": null,
+    "phase": null,
+    "count": null,
+    "message": null,
+    "started_at": null,
+    "updated_at": null
+  }
+}
+```
+
+Example running response:
+
+```json
+{
+  "operation": {
+    "running": true,
+    "kind": "ingest",
+    "scope": "all",
+    "phase": "fetching_sources",
+    "count": { "current": 3, "total": 12 },
+    "message": "ingest fetching source",
+    "started_at": "2026-05-09T14:00:00Z",
+    "updated_at": "2026-05-09T14:00:04Z"
+  }
+}
+```
+
+Current-operation negative semantics:
+
+- the snapshot exists only in process memory and is cleared on guard release, process exit, or crash;
+- it must not be written to SQLite, `runtime_metadata`, state export/import bundles, OPML, `agent_receipts`, or any portable state surface;
+- it must not create durable jobs, queues, task tables, command histories, activity ledgers, job dashboards, retry dashboards, sidecar workers, sync/merge semantics, or portable operation receipts;
+- it is allowed only for contextual inline status and conflict explanation in the current runtime.
+
 Manual ingest request schemas:
 
 `POST /api/ingest` request body:
@@ -1052,7 +1112,7 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
 
 Manual ingest conflict response schema:
 
-The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, and `POST /api/runtime/reprocess-library`. Conflict responses indicate the current operation holding the guard.
+The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, and `POST /api/runtime/reprocess-library`. Conflict responses indicate the current operation holding the guard. When the in-memory snapshot reports `running: true`, `details.current_operation` is included and uses the exact `CurrentOperationInfo` shape above. This object is the same current-operation fact exposed by `GET /api/runtime/operation` and MCP `resofeed://system/operation`; it is not a durable job record.
 
 ```json
 {
@@ -1063,7 +1123,17 @@ The concurrency guard is global across background ingest, `POST /api/ingest`, `P
       "operation_running": true,
       "operation": "ingest",
       "scope": "all",
-      "retry_allowed": true
+      "retry_allowed": true,
+      "current_operation": {
+        "running": true,
+        "kind": "ingest",
+        "scope": "all",
+        "phase": "fetching_sources",
+        "count": { "current": 3, "total": 12 },
+        "message": "ingest fetching source",
+        "started_at": "2026-05-09T14:00:00Z",
+        "updated_at": "2026-05-09T14:00:04Z"
+      }
     }
   }
 }
@@ -1178,6 +1248,7 @@ Endpoint contracts:
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
 | `POST /api/state/import` | state bundle JSON, max `10 MiB` | `200` | restore result schema |
 | `GET /api/doctor` | none | `200` | `text/plain; charset=utf-8` raw diagnostic lines |
+| `GET /api/runtime/operation` | none; no query params | `200` | `{ "operation": CurrentOperationInfo }`; in-memory contextual snapshot only, not durable state |
 
 `POST /api/items/{id}/delivery` contract:
 
@@ -1212,7 +1283,7 @@ HTTP error matrix:
 | invalid state bundle schema or field shape | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
-| manual ingest/fetch/reprocess or language mutation requested while any guarded operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true }` |
+| manual ingest/fetch/reprocess or language mutation requested while any guarded operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true, "current_operation": CurrentOperationInfo }` when the in-memory snapshot is running; older fallback paths may omit `current_operation` only if no running snapshot is available |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
 Idempotency rules:
@@ -1321,7 +1392,7 @@ Rules:
 - operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global `errors[]` entry whose `code` is `timeout`, unless the server cannot serialize a response;
 - fatal SQLite or invariant failures before result construction return HTTP `500 internal`;
 - if committed item transactions exist but the final FTS rebuild does not complete, `runtime_metadata.search_fts_stale_since` remains set and `/api/doctor` reports stale FTS;
-- if ingest/fetch/reprocess is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "reprocess"|"ingest"|"fetch"`, `details.scope: "library"|"all"|"source"`, and `details.retry_allowed: true`;
+- if ingest/fetch/reprocess is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "reprocess"|"ingest"|"fetch"`, `details.scope: "library"|"all"|"source"`, `details.retry_allowed: true`, and `details.current_operation: CurrentOperationInfo` whenever the in-memory snapshot is running;
 - the endpoint must not create durable jobs, queues, command histories, activity rows, or sync metadata;
 - retrying with the same idempotency key while the operation is still running returns `409 conflict`; retrying after completion while a live receipt exists returns the completed result with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than returning `400` solely because the key was previously used.
 
@@ -1331,11 +1402,20 @@ Duplicate idempotency examples for `POST /api/runtime/reprocess-library`:
 - caller error: same key + different body fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
 - expired or lost receipt: same valid body/key after TTL expiration or crash-loss is accepted as a fresh operation with `already_applied: false` if the operation guard is free.
 
+`GET /api/runtime/operation` rules:
+
+- no request body and no query parameters are accepted;
+- success always returns `{ "operation": CurrentOperationInfo }` with all nullable fields present;
+- idle response is `running: false` with `kind`, `scope`, `phase`, `count`, `message`, `started_at`, and `updated_at` all `null`;
+- running response reflects the same process-local snapshot used in conflict details and MCP `resofeed://system/operation`;
+- it is read-only and must not create or update receipts, jobs, queues, history rows, dashboards, sync records, or portable state.
+
 Endpoint additions:
 
 | Method/path | Request | Success | Response |
 |---|---|---:|---|
 | `GET /api/runtime/language` | none | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": false }` |
+| `GET /api/runtime/operation` | none; no query params | `200` | `{ "operation": CurrentOperationInfo }` |
 | `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
 | `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if ingest/fetch/reprocess is already running |
 
@@ -1368,6 +1448,7 @@ Resources:
 - `resofeed://feed/today` — JSON `{ "items": [ItemSummary] }`;
 - `resofeed://rules/active` — JSON `{ "rules": [SteerRule] }`;
 - `resofeed://system/doctor` — `text/plain` raw diagnostics;
+- `resofeed://system/operation` — JSON `{ "operation": CurrentOperationInfo }`, the same in-memory current-operation snapshot as `GET /api/runtime/operation`;
 - `resofeed://sources` — JSON `{ "sources": [Source] }`.
 
 Tools:
@@ -1389,6 +1470,7 @@ MCP schema rules:
 - missing/invalid auth on `/mcp` returns HTTP `401` before MCP tool/resource handling;
 - resource content types are exactly those listed above (`application/json` or `text/plain`);
 - resource JSON bodies reuse canonical HTTP types;
+- `resofeed://system/operation` is read-only, authenticated, and exposes only the current in-memory guard snapshot; it must not imply a durable job, queue, history, dashboard, sidecar, sync/merge primitive, or portable operation receipt;
 - unknown tools/resources return MCP tool/resource not found errors, not HTTP `404` after session establishment;
 - `search_items.query` is required even though HTTP search `q` is optional; MCP clients that want empty-feed browsing should use `list_candidate_items`;
 - `actor_id`, when required, is a non-empty string with max length `128`;
@@ -1443,7 +1525,7 @@ Rules:
 - setting language through MCP affects future processing only and does not rewrite existing item rows;
 - `reprocess_library` is explicit, uses the current persisted language, and must not create durable jobs, queues, or activity feeds;
 - `list_candidate_items`, `search_items`, and `read_item` return stored historical item text as-is, which may differ from the current runtime processing language if the item was processed before a language change; source identifiers remain exact provenance anchors;
-- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` exactly matches the HTTP conflict detail shape: `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true }`;
+- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` whenever the same in-memory snapshot is running: `{ "operation_running": true, "operation": "ingest"|"fetch"|"reprocess", "scope": "all"|"source"|"library"|null, "retry_allowed": true, "current_operation": CurrentOperationInfo }`;
 - `set_processing_language` MCP idempotency behavior: while a live receipt exists, same key + same request fingerprint returns the stored language response with `already_applied: true`; same key + different request fingerprint returns an MCP schema/request error equivalent to HTTP `400 bad_request`; after crash-loss or TTL expiration, the same valid body/key is accepted as a fresh operation with `already_applied: false` if the operation guard is free;
 - `reprocess_library` MCP idempotency behavior: a duplicate key during an active run returns the JSON-RPC conflict error described above; a duplicate key after completion while a live receipt exists returns the same `ReprocessLibraryResult` payload with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns an MCP schema/request error equivalent to HTTP `400 bad_request`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours, which is permitted as transient runtime state. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the tool accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
 
@@ -1464,7 +1546,17 @@ Guarded-operation conflict:
           "operation_running": true,
           "operation": "reprocess",
           "scope": "library",
-          "retry_allowed": true
+          "retry_allowed": true,
+          "current_operation": {
+            "running": true,
+            "kind": "reprocess",
+            "scope": "library",
+            "phase": "processing_items",
+            "count": { "current": 40, "total": 200 },
+            "message": "reprocess running",
+            "started_at": "2026-05-09T14:00:00Z",
+            "updated_at": "2026-05-09T14:01:20Z"
+          }
         }
       }
     }
@@ -1507,6 +1599,7 @@ Responsibilities:
 - expose `TODAY` and `SOURCE LEDGER` through a discreet `RESOFEED` surface menu when the design chooses low-chrome navigation; persistent visible top-level links are not required;
 - expose flat Source Ledger without folders/tags/settings-dashboard behavior;
 - expose lightweight Source Ledger manual controls for `POST /api/ingest` and `POST /api/sources/{id}/fetch` as immediate bracket actions only; these controls must not create durable jobs, queues, command histories, activity ledgers, retry dashboards, sync/merge concepts, or additional source-management surfaces;
+- render current-operation status only as contextual inline feedback while an operation is running or a conflict is being explained; do not add a persistent idle top-chrome operation strip, job-management dashboard, or historical operation surface;
 - expose state export/import as terse actions, not backup-management UI;
 - show fallback/status labels plainly.
 
@@ -1647,7 +1740,7 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
   -H "Content-Type: application/json" \
   --data '{}'
 # when the first request is still running, expect 409 JSON error:
-# {"error":{"code":"conflict","message":"operation already running","details":{"operation_running":true,"operation":"ingest","scope":"all","retry_allowed":true}}}
+# {"error":{"code":"conflict","message":"operation already running","details":{"operation_running":true,"operation":"ingest","scope":"all","retry_allowed":true,"current_operation":{"running":true,"kind":"ingest","scope":"all","phase":"fetching_sources","count":{"current":0,"total":12},"message":"ingest fetching active sources","started_at":"2026-05-09T14:00:00Z","updated_at":"2026-05-09T14:00:01Z"}}}}
 ```
 
 State roundtrip check:
@@ -1669,7 +1762,8 @@ MCP connection check:
 ```text
 Connect an MCP Streamable HTTP client to http://127.0.0.1:8080/mcp
 with header Authorization: Bearer <OWNER_TOKEN>.
-Read resofeed://system/doctor and expect text/plain diagnostics.
+Read resofeed://system/doctor and expect text/plain diagnostics; read
+resofeed://system/operation and expect JSON {"operation": CurrentOperationInfo}.
 ```
 
 Processing-language and split-scroll verification additions:
@@ -1682,7 +1776,7 @@ Processing-language and split-scroll verification additions:
 - source identifier DOM nodes/links use `translate="no"` or equivalent so browser/page translation does not localize provenance anchors;
 - `POST /api/runtime/reprocess-library` explicitly rewrites existing readable item text in the current language and rebuilds FTS without creating durable jobs, queues, or activity ledgers;
 - if a reprocess receipt expires or is lost after restart, resubmitting the same request body and `idempotency_key` while the concurrency guard is free is accepted as a fresh request with `already_applied: false`, not rejected as `400` solely because the key was previously used;
-- operation guard conflicts across manual ingest/fetch/reprocess/language mutation use `409 conflict` details with `operation_running`, `operation`, `scope`, and `retry_allowed`, and MCP returns the matching JSON-RPC error data shape;
+- operation guard conflicts across manual ingest/fetch/reprocess/language mutation use `409 conflict` details with `operation_running`, `operation`, `scope`, `retry_allowed`, and `current_operation` when the in-memory snapshot is running; MCP returns the matching JSON-RPC error data shape;
 - timeout reprocess outcomes return `reprocess.status: "failed"`, `fts_rebuilt: false`, and error `code: "timeout"` when the server can serialize the response; fatal pre-result SQLite/invariant failures return `500 internal`;
 - `GET /api/search` searches the stored target-language FTS content after reprocess;
 - `GET /api/doctor` reports `search_fts: stale since <RFC3339_UTC>` when the stale marker is set, otherwise `search_fts: ok`, and never includes item text, source text, API keys, or raw model output;
