@@ -88996,7 +88996,7 @@ phases:
 
       - [x] Focus order conflict is resolved exactly as adjudicated.
 
-      - [ ] Nav visible text/selector conflict is resolved exactly as adjudicated.
+      - [x] Nav visible text/selector conflict is resolved exactly as adjudicated.
 
       - [ ] OPML import/ingest `last_fetch` expectation or app behavior is resolved
       exactly as adjudicated.
