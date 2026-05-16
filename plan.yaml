@@ -96813,10 +96813,14 @@ phases:
 
       - [ ] Gate decision basis is complete and parseable.'
     verification: '- [ ] full-plan-check protecting closure of this implementation
-      tail: gate reviews all phase evidence and emits OPEN/BLOCK decision.
+      tail: gate reviews all phase evidence, including current-operation frontend
+      wiring remediation, and emits OPEN/BLOCK decision.
 
       - [ ] Gate blocks on any unresolved blocker-class divergence in runtime status,
-      MCP parity, UI placement, UIUX evidence, or architecture constraints.
+      MCP parity, UI placement, UIUX evidence, wiring evidence, or architecture constraints.
+
+      - [ ] Gate confirms the frontend accepts and renders documented `CurrentOperationInfo.count`
+      object and operation detail fields.
 
       - [ ] Gate explicitly records disposition for any pre-existing/out-of-step-origin
       issues that intersect required checks.'
@@ -96835,47 +96839,42 @@ phases:
 
       ## Gate Review Report
 
-      **Reviewer**: gate-reviewer (independent of phase implementation)
 
       **Phase**: current-operation-status-and-low-frequency-utility-surface-implementation
 
-      **Timestamp**: <ISO 8601>
+
+      ### Remediation evidence that MUST be reviewed
+
+      - `cos-fix-current-operation-frontend-wiring`
+
+      - `cos-retest-current-operation-runtime-ui`
+
+      - `cos-reaudit-current-operation-wiring`
+
+      - `cos-uiux-multimodal-audit`
+
+      - `cos-spec-doc-conformance`
 
 
-      ### Execution Review
+      ### Required blocker closure checks
 
-      | Step ID | Status | Evidence Quality | Concerns |
+      - [ ] Count object shape mismatch closed.
 
-      |---|---|---|---|
+      - [ ] `phase`, `count`, `message`, `started_at`, `updated_at` are rendered/consumed
+      or have explicit authoritative disposition.
 
+      - [ ] Runtime/UI retest is green.
 
-      ### Gate Decision Basis
+      - [ ] Wiring re-audit is green or only non-blocking debt remains.
 
-      | requirement_ref | evidence_ref | status | unresolved_disposition | gate_decision_basis
-      |
+      - [ ] UIUX audit is green or only non-blocking debt remains.
 
-      |---|---|---|---|---|
+      - [ ] Spec/doc conformance is green or only non-blocking debt remains.
 
-
-      ### Issues Identified
-
-      | Severity | Description | Related Step | Blocking? |
-
-      |---|---|---|---|
+      - [ ] Forbidden dashboard/job/queue/history/settings/service-layer drift absent.
 
 
-      ### Final Decision
-
-      - [ ] OPEN: Phase passes gate.
-
-      - [ ] BLOCKED: Fix/retest steps required before proceeding.
-
-
-      ### Durability / Forbidden Scope Check
-
-      - Durable jobs/queues/task tables/history/sidecars introduced: YES/NO
-
-      - Persistent top-chrome LANG/reprocess/status strip introduced: YES/NO'
+      **Gate Decision**: OPEN | BLOCKED'
     depends_on:
     - cos-backend-operation-contract-tests
     - cos-frontend-operation-utility-contract-tests
@@ -96884,6 +96883,9 @@ phases:
     - cos-frontend-operation-utility-surface
     - cos-wiring-audit
     - cos-runtime-e2e-retest
+    - cos-fix-current-operation-frontend-wiring
+    - cos-retest-current-operation-runtime-ui
+    - cos-reaudit-current-operation-wiring
     - cos-uiux-multimodal-audit
     - cos-spec-doc-conformance
     agent: gate-reviewer
