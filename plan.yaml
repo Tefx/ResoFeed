@@ -97437,7 +97437,7 @@ phases:
 
       - [ ] Conflict rendering includes current-operation detail when available.
 
-      - [ ] Idle state remains hidden outside contextual surfaces.
+      - [x] Idle state remains hidden outside contextual surfaces.
 
       - [ ] Evidence includes exact command and actual output/artifact refs.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: runtime/UI retest
