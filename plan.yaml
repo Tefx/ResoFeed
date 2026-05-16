@@ -84683,7 +84683,7 @@ phases:
       - [x] Browser `/doctor` runs read-only diagnostics and does not become a steering
       rule.
 
-      - [ ] Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions
+      - [x] Source Ledger [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions
       are reachable and unobstructed.
 
       - [ ] MCP preview_steer/steer/undo_steer parity is exercised or cited from backend
