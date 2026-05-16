@@ -87525,7 +87525,7 @@ phases:
       - [x] The route preview renders documented chips [ADD SOURCE], [SEARCH], [DOCTOR],
       [STEER RULE], and [INVALID] from exact Steer input copy.
 
-      - [ ] Invalid URL feedback remains assertive/described and Escape cancellation
+      - [x] Invalid URL feedback remains assertive/described and Escape cancellation
       preserves focus.
 
       - [ ] Write preview controls expose accessible buttons matching the expected
