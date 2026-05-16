@@ -82264,7 +82264,7 @@ phases:
 
       - [x] Verify split-scroll desktop and mobile Inspector route behavior visually/spatially.
 
-      - [ ] Verify no forbidden UI concepts or AI/RAG/chat/semantic answer affordances
+      - [x] Verify no forbidden UI concepts or AI/RAG/chat/semantic answer affordances
       appear.
 
       - [ ] Produce parseable PASS/PASS_WITH_DEBT/FAIL handoff with blocker-class
