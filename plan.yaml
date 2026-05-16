@@ -95650,7 +95650,7 @@ phases:
       - [x] Frontend expected-red tests from `cos-frontend-operation-utility-contract-tests`
       pass green.
 
-      - [ ] Status placement matches `docs/DESIGN.md` current-operation status rules.
+      - [x] Status placement matches `docs/DESIGN.md` current-operation status rules.
 
       - [ ] LANG/reprocess placement matches `docs/DESIGN.md` utility menu rules.
 
