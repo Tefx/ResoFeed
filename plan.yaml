@@ -98822,3 +98822,149 @@ phases:
 
       - None after dependency installation; targeted Playwright and Vitest checks
       passed.'
+  - id: cos-fix-current-operation-spec-doc-contract
+    name: Fix current-operation spec/doc contract divergences
+    status: pending
+    description: 'Batched docs/spec remediation for the semantic FAIL from `cos-spec-doc-conformance`.
+
+
+      Use completed phase evidence as the approval basis: `cos-runtime-e2e-retest`
+      proved HTTP/MCP/runtime/browser behavior, `cos-uiux-multimodal-audit` passed,
+      `cos-reaudit-current-operation-wiring` passed with nonblocking debt, and `cos-retest-current-operation-browser-conflict-detail`
+      passed. Prefer docs sync only when that history proves the implemented behavior
+      is the approved contract. If any implemented behavior cannot be justified by
+      approved plan history and ResoFeed architecture/design constraints, explicitly
+      flag `IMPLEMENTATION_CHANGE_REQUIRED` in the evidence instead of silently rewriting
+      docs around an unapproved behavior.
+
+
+      Scope:
+
+      - Update `docs/ARCHITECTURE.md` as the authoritative contract for `CurrentOperationInfo`
+      if implementation is approved.
+
+      - Define `GET /api/runtime/operation`, including idle/running shape, `count:
+      { current, total }`, and nullable/optional fields such as phase/message/started_at/updated_at
+      as applicable.
+
+      - Define MCP parity for resource `resofeed://system/operation` and conflict-detail
+      behavior where MCP surfaces the same current-operation fact as HTTP.
+
+      - Resolve the conflict-detail doc/code mismatch: either document the approved
+      `details.current_operation` object in HTTP/MCP conflict details, or flag implementation
+      change required if older four-field-only shape is authoritative.
+
+      - Document that current-operation status is in-memory runtime snapshot only:
+      no durable jobs, queues, job history, command history, dashboards, task tables,
+      sidecars, sync/merge semantics, or portable operation receipts.
+
+      - Preserve `docs/DESIGN.md` constraints for contextual UI only: no persistent
+      idle top-chrome operation strip and no dashboard/job-management semantics.
+
+
+      ## Gate Preview (what the retest/final gate WILL reject)
+
+      1. Docs that mention the endpoint/resource but fail to define the exact shape,
+      count object, nullable fields, and conflict-detail `current_operation` semantics.
+
+      2. Docs that imply durable job/queue/history/dashboard semantics or any portable
+      operation state beyond active sources, active steering rules, and currently
+      resonated items.
+
+      3. A docs-only change that blesses behavior not approved by completed runtime/UI
+      evidence.
+
+      4. A conflict-detail contract that remains inconsistent between HTTP, MCP, implementation,
+      and tests.
+
+
+      ## Completion Criteria
+
+      - [ ] `docs/ARCHITECTURE.md` authoritatively defines `CurrentOperationInfo`,
+      `GET /api/runtime/operation`, and MCP resource `resofeed://system/operation`,
+      or evidence explicitly states `IMPLEMENTATION_CHANGE_REQUIRED` for any non-approved
+      behavior.
+
+      - [ ] Conflict-detail documentation is reconciled with approved HTTP/MCP behavior,
+      including the additional `current_operation` object where approved.
+
+      - [ ] `CurrentOperationInfo.count` is documented as an object with `current`
+      and `total`, and nullable/optional operation fields are documented with their
+      idle/running behavior.
+
+      - [ ] Documentation explicitly forbids durable jobs, queues, history, dashboard
+      semantics, sidecars, sync/merge semantics, and portable operation receipts for
+      this surface.
+
+      - [ ] Evidence cites the completed runtime/browser/UIUX/wiring steps used as
+      approval basis and lists any remaining implementation-change requirement instead
+      of hiding it.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: docs/spec contract
+      blockers from `cos-spec-doc-conformance` are either closed by authoritative
+      doc sync or explicitly routed as `IMPLEMENTATION_CHANGE_REQUIRED`.
+
+      - [ ] Main path: authoritative docs define HTTP endpoint, MCP resource/parity,
+      conflict-detail `current_operation`, `CurrentOperationInfo.count`, and nullable
+      fields.
+
+      - [ ] Failure path: evidence confirms no durable job/queue/history/dashboard
+      semantics were introduced or endorsed.
+
+      - [ ] Evidence contains a refs Read Confirmation and maps every original spec-verifier
+      blocker to closed docs update or explicit implementation-change flag.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Spec/Doc Remediation Evidence
+
+
+      **Approval basis reviewed**:
+
+      - cos-runtime-e2e-retest — key evidence passage:
+
+      - cos-uiux-multimodal-audit — key evidence passage:
+
+      - cos-reaudit-current-operation-wiring — key evidence passage:
+
+      - cos-retest-current-operation-browser-conflict-detail — key evidence passage:
+
+
+      **Blocker closure map**:
+
+      | Original blocker | Disposition | Files/sections changed | Notes |
+
+      | --- | --- | --- | --- |
+
+      | Missing `CurrentOperationInfo` / HTTP endpoint / MCP resource authority |
+      CLOSED_DOC_SYNC / IMPLEMENTATION_CHANGE_REQUIRED | | |
+
+      | Conflict-detail old four-field vs `current_operation` mismatch | CLOSED_DOC_SYNC
+      / IMPLEMENTATION_CHANGE_REQUIRED | | |
+
+      | Forbidden durable semantics unproven | CLOSED_BY_NEGATIVE_CONTRACT / IMPLEMENTATION_CHANGE_REQUIRED
+      | | |
+
+
+      **No durable semantics inventory**:
+
+      - Docs mention no durable jobs/queues/history/dashboard/task tables/sidecars/sync/merge/portable
+      operation receipts: PASS/FAIL
+
+
+      **Headline**: PASS | PASS_WITH_IMPLEMENTATION_CHANGE_REQUIRED | FAIL'
+    depends_on:
+    - cos-runtime-e2e-retest
+    - cos-uiux-multimodal-audit
+    - cos-reaudit-current-operation-wiring
+    - cos-retest-current-operation-browser-conflict-detail
+    agent: doc-reviewer
