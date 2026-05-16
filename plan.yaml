@@ -97947,7 +97947,7 @@ phases:
       - [x] B1 is closed by either removing real duplicate conflict status rendering
       or narrowing/fixing a demonstrably test-only selector ambiguity.
 
-      - [ ] B2 is closed by a browser/e2e conflict fixture carrying documented `current_operation`
+      - [x] B2 is closed by a browser/e2e conflict fixture carrying documented `current_operation`
       detail.
 
       - [ ] Source Ledger conflict evidence shows the intended contextual status exactly
