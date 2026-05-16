@@ -85037,7 +85037,7 @@ phases:
       - [x] Verify UI/backend/MCP consumer surfaces share the same resolved facts
       and do not re-derive contradictory route semantics.
 
-      - [ ] Produce findings with blocker/should_fix/suggestion/tech_debt severity
+      - [x] Produce findings with blocker/should_fix/suggestion/tech_debt severity
       and grep hints for every blocker/should_fix.
 
 
