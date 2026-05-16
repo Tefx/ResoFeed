@@ -95350,7 +95350,7 @@ phases:
       - product_implementation_files_modified: false'
   - id: cos-backend-operation-snapshot
     name: Complete in-memory current-operation snapshot backend
-    status: pending
+    status: claimed
     description: 'Complete the backend current-operation snapshot within existing
       flat-file runtime/ingest/reprocess code.
 
@@ -95463,6 +95463,8 @@ phases:
     depends_on:
     - cos-backend-operation-contract-tests
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-16T20:49:47.970089+00:00'
   - id: cos-mcp-operation-parity
     name: Complete MCP current-operation parity
     status: pending
