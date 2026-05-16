@@ -83556,7 +83556,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Re-run focused current-mainline evidence before coding enough to classify
+      - [x] Re-run focused current-mainline evidence before coding enough to classify
       every spec-verifier and UIUX finding as real, stale, fixture drift, or source-contract
       conflict.
 
