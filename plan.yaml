@@ -82930,7 +82930,7 @@ phases:
 
       - [x] Forbidden UI scan remains clean.
 
-      - [ ] Evidence includes actual command output, not only a summary.'
+      - [x] Evidence includes actual command output, not only a summary.'
     verification: '- [ ] full-plan-check protecting current frontend mainline: `npm
       run test` passes with `rendering-expected-red.test.ts` green.
 
