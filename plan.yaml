@@ -84713,7 +84713,7 @@ phases:
     claimed_at: '2026-05-16T01:56:11.548118+00:00'
   - id: srde2e-visual-a11y-regression-proof
     name: Run visual accessibility and hit-target regression proof
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (blind-tester), verify UI/a11y behavior
       from public surfaces without relying on implementation internals.
 
@@ -84775,6 +84775,136 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-16T06:28:23.491290+00:00'
+    done_at: '2026-05-16T06:51:43.461710+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - `docs/DESIGN.md` — read by blind tester. Key insight: Source Ledger controls
+      must be flat bracket actions with 44px hit targets; Steer receipts are terse/reversible;
+      desktop Feed/Inspector must be independent focusable scroll regions; forbidden
+      settings/dashboard/job concepts must not appear.
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — read. Key insight: proof must include real
+      elementFromPoint/topmost clickability, keyboard focus/activation, active panel
+      semantic agreement, screenshot manifest, and negative UX assertions.
+
+      - `docs/ui-preview.html` — read. Key insight: static preview demonstrates 44px
+      star/back controls, Source Ledger row/header/action layout, mobile feed/detail
+      preview, and no SaaS dashboard chrome.
+
+      - `docs/ARCHITECTURE.md` — read. Key insight: one Go binary, public static UI
+      plus owner-token APIs; no jobs/queues/activity/settings/RAG/semantic answer/source
+      hierarchy.
+
+
+      ## Visual/A11y Regression Evidence
+
+      - Screenshots and DOM/a11y artifacts committed under `artifacts/srde2e-visual-a11y-regression-proof/`.
+
+      - Audit script committed: `audits/srde2e-visual-a11y-regression-proof.mjs`.
+
+      - Worktree audit commit: `9400bec43da65e5cfa41dc45c19dcc46bfa53f08`.
+
+      - Mainline artifact commit: `2ada3dd1` (`[vectl] step-srde2e-visual-a11y-regression-proof
+      completed`).
+
+
+      ### Passing proof areas
+
+      - Owner-token accepted shell: PROVEN.
+
+      - Steer submit/menu/source-ledger/[RUN INGEST]/[FETCH]/[DELETE]/OPML export/row
+      open/star hit targets: PROVEN where listed in audit report.
+
+      - Keyboard traversal and visible focus indicators: PROVEN.
+
+      - Escape clears unsent Steer text: PROVEN.
+
+      - Active panel semantic state agrees with Source Ledger panel: PROVEN.
+
+      - Negative UX scan found no visible dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
+      terms: PROVEN.
+
+
+      ### Blockers found by audit
+
+      - B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN — DETAILS control could not be visibly/topmost
+      activated; `locator.scrollIntoViewIfNeeded` timed out because target was not
+      visible.
+
+      - B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET — IMPORT STATE resolved to obstructed/non-clickable
+      1x44 file input; `elementFromPoint` did not return target/descendant and interior
+      point hit another control.
+
+      - B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN — desktop Feed/Inspector independent
+      focusable scroll-region proof remained unproven.
+
+      - B4_ORIGINAL_LINK_BELOW_44PX — Inspector original link measured 97x14, below
+      44px minimum hit target.
+
+
+      ### Machine-readable closure (normalized)
+
+      headline: FAIL
+
+      verdict: FAIL
+
+      gate_open_allowed: false
+
+      blockers:
+
+      - B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN
+
+      - B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET
+
+      - B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN
+
+      - B4_ORIGINAL_LINK_BELOW_44PX
+
+      should_fix: []
+
+      orchestrator_action_hint: REMEDIATE
+
+
+      ## Remediation path created before completion
+
+      - `srde2e-visual-a11y-blockers-fix` — single batched frontend implementation
+      fix for B1-B4.
+
+      - `srde2e-visual-a11y-blockers-retest` — independent blind-tester retest requiring
+      the same public-surface proof to rerun green.
+
+      - Downstream documentation, architecture review/remediation, clean recheck,
+      full-plan check, and final closure gate now depend on `srde2e-visual-a11y-blockers-retest`.
+
+
+      ## Verification commands and outputs from blind tester
+
+      - `npm --prefix web install` — installed missing web dependencies; npm reported
+      5 vulnerabilities.
+
+      - `npm --prefix web run build && mkdir -p ./bin && go build -o ./bin/resofeed
+      ./cmd/resofeed` — Svelte/Vite build completed; Go binary built.
+
+      - `node audits/srde2e-visual-a11y-regression-proof.mjs` — `FAIL: 4 blocker(s)`.
+
+
+      ## Mainline final-state verification after artifact commit
+
+      - `npm run check` in `web/` exited 0: `svelte-check found 0 errors and 0 warnings`.
+
+
+      ## Gaps/Notes
+
+      - Product implementation files modified: no.
+
+      - Product docs modified: no.
+
+      - The audit step is completed as a report-with-findings because remediation
+      ownership now exists; it is not completed as a clean pass.
+
+      - Acceptance and verification checklist items are `[x]`; verification checklist
+      required planner repair because `vectl_check` could not match verification-field
+      checklist items.'
   - id: srde2e-documentation-sync
     name: Sync documentation after Steer delta implementation
     status: pending
