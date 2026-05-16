@@ -85741,7 +85741,7 @@ phases:
     claimed_at: '2026-05-16T02:33:56.703872+00:00'
   - id: srde2e-uiux-audit-source-ledger-steer-controls
     name: Audit Source Ledger and Steer control UI/UX after real-system blocker fix
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       scope: phase-check
@@ -85892,3 +85892,5 @@ phases:
     depends_on:
     - srde2e-real-system-e2e-blockers-fix
     agent: uiux-auditor
+    claimed_by: uiux-auditor
+    claimed_at: '2026-05-16T02:34:18.523525+00:00'
