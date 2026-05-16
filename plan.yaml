@@ -87294,7 +87294,7 @@ phases:
 
       - [x] B4 Inspector original/equivalent target 44px minimum is PROVEN.
 
-      - [ ] Previously passing public-surface visual/a11y checks remain proven.
+      - [x] Previously passing public-surface visual/a11y checks remain proven.
 
       - [ ] Final headline is PASS only when all B1-B4 blockers are closed.'
     verification: '- [ ] full-plan-check companion protecting final closure gate.
