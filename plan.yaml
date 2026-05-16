@@ -85024,7 +85024,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Verify single Go binary, SQLite/FTS5 only, flat internal/resofeed file
+      - [x] Verify single Go binary, SQLite/FTS5 only, flat internal/resofeed file
       shape, and no sidecar worker/service/repository/DI/event-bus drift.
 
       - [ ] Verify preview is read-only, commit reruns classification, undo is target-specific,
