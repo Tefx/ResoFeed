@@ -34,7 +34,6 @@
   }
 
   const tokenStorageKey = 'resofeed.ownerToken';
-  const shouldPersistOwnerToken = import.meta.env.MODE !== 'test';
 
   let ownerToken = $state('');
   let promptState = $state<OwnerTokenPromptState>('empty');
@@ -250,7 +249,7 @@
       agentSteeringRules = await loadAgentSteeringRules(client);
       selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
-      if (shouldPersistOwnerToken) window.localStorage.setItem(tokenStorageKey, token);
+      window.localStorage.setItem(tokenStorageKey, token);
       if (syncRoute) replaceSurfaceFromLocation();
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await client.doctor() };
@@ -624,7 +623,7 @@
     const handlePopState = () => replaceSurfaceFromLocation();
     window.addEventListener('popstate', handlePopState);
 
-    const storedToken = shouldPersistOwnerToken ? window.localStorage.getItem(tokenStorageKey) : null;
+    const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {
       ownerToken = storedToken;
       promptState = 'accepted';
