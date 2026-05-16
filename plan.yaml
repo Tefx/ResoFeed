@@ -89348,7 +89348,7 @@ phases:
       evidenced above.'
   - id: srde2e-full-plan-e2e-blockers-retest
     name: Retest batched full-plan E2E blocker closure
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -89582,6 +89582,8 @@ phases:
     - srde2e-full-plan-e2e-blockers-fix
     - srde2e-uiux-full-plan-e2e-blockers-audit
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T11:41:01.759410+00:00'
   - id: srde2e-uiux-full-plan-e2e-blockers-audit
     name: Audit full-plan UI/UX E2E blocker closure
     status: done
