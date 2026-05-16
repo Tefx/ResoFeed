@@ -85257,7 +85257,7 @@ phases:
     agent: gate-reviewer
   - id: srde2e-real-system-e2e-blockers-fix
     name: Fix real-system E2E blocker families
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       priority: HIGH
@@ -85482,6 +85482,8 @@ phases:
 
       - [ ] No known blocker remains unowned.'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T02:11:36.541439+00:00'
   - id: srde2e-real-system-e2e-blockers-retest
     name: Retest real-system E2E blocker closure
     status: pending
