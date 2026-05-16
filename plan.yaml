@@ -82884,7 +82884,7 @@ phases:
       - [ ] Run `npm run test` on mainline and verify the broad rendering suite is
       green, including `src/routes/components/__tests__/rendering-expected-red.test.ts`.
 
-      - [ ] Run `npm run test:render -- steer-route-preview.expected-red.test.ts`
+      - [x] Run `npm run test:render -- steer-route-preview.expected-red.test.ts`
       and verify the scoped Steer route preview remains green.
 
       - [ ] Run the scoped Source Ledger render checks covering details disclosure
