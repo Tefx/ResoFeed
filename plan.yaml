@@ -94823,7 +94823,7 @@ phases:
 
       - [x] New synthetic fragment regression is green.
 
-      - [ ] Existing valid grouped-source disclosure remains green.
+      - [x] Existing valid grouped-source disclosure remains green.
 
       - [ ] Backend contract is either tested or explicitly proven non-intersecting
       with citations from `gsfr-backend-grouping-contract-audit`.
