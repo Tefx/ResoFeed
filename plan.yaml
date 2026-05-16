@@ -97888,7 +97888,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Count object shape is accepted by frontend contract/guard and invalid
+      - [x] Count object shape is accepted by frontend contract/guard and invalid
       shapes remain rejected.
 
       - [ ] Operation detail fields are not write-only; each is traced to rendered
