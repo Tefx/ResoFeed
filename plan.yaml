@@ -84674,7 +84674,7 @@ phases:
       - [x] Browser Steer valid URL add preview commits through backend and shows
       undo only for revocable id.
 
-      - [ ] Browser invalid add (`添加 tldr`, `订阅 HN`, `add tldr`) returns URL-required
+      - [x] Browser invalid add (`添加 tldr`, `订阅 HN`, `add tldr`) returns URL-required
       copy and no source mutation.
 
       - [ ] Browser search and find alias execute lexical search/read-only route with
