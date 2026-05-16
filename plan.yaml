@@ -97144,7 +97144,7 @@ phases:
     agent: uiux-auditor
   - id: cos-spec-doc-conformance
     name: Verify spec and docs conformance for operation-status implementation
-    status: pending
+    status: claimed
     description: 'Spec/doc conformance verification via adversarial divergence hunting.
 
 
@@ -97254,6 +97254,8 @@ phases:
     - cos-retest-current-operation-browser-conflict-detail
     - cos-reaudit-current-operation-wiring
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-16T23:13:18.782827+00:00'
   - id: cos-final-gate
     name: Gate current-operation status and utility-surface implementation
     status: pending
