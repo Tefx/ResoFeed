@@ -92535,7 +92535,7 @@ phases:
   - id: azrv-zh-spec-conformance-audit
     name: Verify Chinese support and repair spec conformance across HTTP, MCP, OpenRouter,
       state, UI, tests, and preview
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -92686,6 +92686,8 @@ phases:
 
       |---|---|---|'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-16T14:21:46.250095+00:00'
   - id: azrv-architecture-boundary-audit
     name: Audit architecture boundary after OPML, copy, preview, and zh repairs
     status: claimed
