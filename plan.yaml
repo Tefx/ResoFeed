@@ -83503,6 +83503,119 @@ phases:
     - srdf-uiux-native-audit
     - srdf-broad-rendering-owner-token-bootstrap-retest
     agent: frontend-engineer
+  - id: srdf-batched-frontend-audit-closure
+    name: Retest and close batched frontend spec UIUX blockers
+    status: pending
+    description: "As an INDEPENDENT TESTER (integration-verifier), close the unified\
+      \ remediation from `srdf-batched-frontend-audit-remediation` with current-mainline\
+      \ rendered evidence, E2E evidence, and machine-readable stale-vs-real reconciliation.\n\
+      \nstep_type: test\nstep_intent: retest_green\nexpected_result: green\nverification_scope:\
+      \ phase-check protecting `srdf-frontend-gate` and full-plan-check protecting\
+      \ final E2E closure.\nagent_source: project\nindependence_level: L1\n\nThis\
+      \ step closes BOTH failed families:\n- `srdf-frontend-spec-conformance` blocker\
+      \ family: B1/R2, B2/R4, B3/R7, B4/R9, R10.\n- `srdf-uiux-native-audit` blocker\
+      \ family: `[ADD SOURCE]`, `[FETCH]`, split scroll/mobile scroll, forbidden JSON-LD\
+      \ raw payload, mobile metadata truncation, and claimed 34 Playwright expected-red\
+      \ failures.\n\nRequired command evidence:\n- [ ] Run `npm run test`.\n- [ ]\
+      \ Run focused E2E covering `source-ledger-steer-split-scroll.expected-red.spec.ts`,\
+      \ `processing-language-source-split-scroll.spec.ts`, and `feed-search-anatomy.spec.ts`.\n\
+      - [ ] Run Source Ledger controls/hit-target E2E.\n- [ ] Run forbidden concept\
+      \ scans across frontend Svelte/TS surfaces.\n- [ ] If any named command is not\
+      \ present in the repo harness, provide the exact discovery output proving absence\
+      \ and run the nearest current harness command that covers the same user-visible\
+      \ obligation.\n\nRequired rendered artifact evidence:\n- [ ] Steer add state.\n\
+      - [ ] Steer search state.\n- [ ] Steer doctor state.\n- [ ] Steer rule state.\n\
+      - [ ] Steer invalid state.\n- [ ] Steer receipt state.\n- [ ] Steer undo state.\n\
+      - [ ] Source Ledger controls and details.\n- [ ] Desktop split scroll.\n- [\
+      \ ] Mobile route and feed scroll preservation.\n- [ ] Inspector primary content\
+      \ with JSON-LD raw payload negative proof.\n- [ ] Mobile feed metadata with\
+      \ no required text clipped by over-truncation.\n\nMachine-readable closure output\
+      \ is mandatory. The evidence MUST include YAML with these fields:\n```yaml\n\
+      verdict: \"PASS|FAIL\"\ngate_open_allowed: true|false\nspec_verifier_family:\n\
+      \  B1_R2_steer_preview_aria: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B2_R4_search_accessible_name: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B3_R7_source_fetch_disabled_scope: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B4_R9_opml_input_reachability: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  R10_mobile_scroll_reconciliation: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \nuiux_auditor_family:\n  add_source_chip: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  fetch_control_reachability: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  split_scroll_mobile_scroll: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  jsonld_raw_payload_negative: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  mobile_metadata_truncation: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  playwright_expected_red_claims: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \nstale_vs_real_reconciliation:\n  - item: \"<finding id>\"\n    disposition:\
+      \ \"real|stale|fixture_drift|source_contract_conflict\"\n    current_mainline_evidence:\
+      \ \"<command/artifact ref>\"\n    gate_intersection: \"blocks|does_not_intersect\"\
+      \nrendered_artifacts:\n  - surface: \"<surface/state>\"\n    artifact_ref: \"\
+      <path/url/screenshot/dom/a11y ref>\"\ncommands:\n  - command: \"<exact command>\"\
+      \n    exit_code: 0\n    summary: \"<actual observed result>\"\nforbidden_concept_scan:\
+      \ \"PASS|FAIL\"\nreversal_risk: \"LOW|MEDIUM|HIGH\"\nremaining_blockers: []\n\
+      ```\n\nBehavioral proof register and gate decision basis:\n- [ ] requirement_ref:\
+      \ frontend spec/UIUX blocker family; behavior_claim: every blocker is fixed\
+      \ or proven stale/non-intersecting on current mainline; runtime_proof_expected:\
+      \ commands and rendered artifacts listed above; evidence_ref: pasted output\
+      \ and artifact paths; status: PROVEN or explicit blocker; closure_path: PASS\
+      \ opens gate, FAIL requires new remediation; gate_decision_basis: `srdf-frontend-gate`\
+      \ may open only when `gate_open_allowed: true` and `remaining_blockers: []`.\n\
+      \nA test that discovers remaining issues is valuable, but this closure step\
+      \ is complete only with PASS or a complete blocker register that prevents gate\
+      \ opening."
+    verification: '- [ ] phase-check protecting `srdf-frontend-gate` and full-plan-check
+      protecting final E2E closure.
+
+      - [ ] `npm run test` evidence is present.
+
+      - [ ] Focused E2E evidence covers `source-ledger-steer-split-scroll.expected-red.spec.ts`,
+      `processing-language-source-split-scroll.spec.ts`, `feed-search-anatomy.spec.ts`,
+      and Source Ledger controls/hit-targets, or documents absent harness names with
+      equivalent coverage.
+
+      - [ ] Rendered screenshots/DOM/a11y artifacts cover all required Steer, Source
+      Ledger, split-scroll, mobile, Inspector JSON-LD-negative, and mobile metadata
+      surfaces.
+
+      - [ ] Machine-readable YAML closure has `verdict`, `gate_open_allowed`, per-family
+      statuses, stale-vs-real reconciliation, command list, artifact list, forbidden
+      scan result, reversal risk, and remaining blockers.
+
+      - [ ] Closure is PASS only if no blocker-class spec-verifier or uiux-auditor
+      finding remains real and unresolved.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- docs/DESIGN.md — key passage or \"NOT READ: <reason>\"\n- docs/UI_REGRESSION_CONTRACT.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md — key passage\
+      \ or \"NOT READ: <reason>\"\n\nIf no refs were provided, state: \"No refs for\
+      \ this step.\"\n\n## Machine-Readable Closure\n```yaml\nverdict: \"PASS|FAIL\"\
+      \ngate_open_allowed: true|false\nspec_verifier_family:\n  B1_R2_steer_preview_aria:\
+      \ \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B2_R4_search_accessible_name: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B3_R7_source_fetch_disabled_scope: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  B4_R9_opml_input_reachability: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \n  R10_mobile_scroll_reconciliation: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|SOURCE_CONTRACT_UPDATED|STILL_BLOCKED\"\
+      \nuiux_auditor_family:\n  add_source_chip: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  fetch_control_reachability: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  split_scroll_mobile_scroll: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  jsonld_raw_payload_negative: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  mobile_metadata_truncation: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \n  playwright_expected_red_claims: \"PROVEN_FIXED|PROVEN_STALE_NON_INTERSECTING|STILL_BLOCKED\"\
+      \nstale_vs_real_reconciliation: []\nrendered_artifacts: []\ncommands: []\nforbidden_concept_scan:\
+      \ \"PASS|FAIL\"\nreversal_risk: \"LOW|MEDIUM|HIGH\"\nremaining_blockers: []\n\
+      ```\n\n## Command Evidence\n```\n<paste npm run test output>\n<paste focused\
+      \ E2E output>\n<paste Source Ledger controls/hit-target E2E output>\n<paste\
+      \ forbidden concept scan output>\n```\n\n## Rendered Artifact Evidence\n| Surface/state\
+      \ | Screenshot/DOM/a11y artifact | PASS/FAIL | Notes |\n| --- | --- | --- |\
+      \ --- |\n| Steer add |  |  |  |\n| Steer search |  |  |  |\n| Steer doctor |\
+      \  |  |  |\n| Steer rule |  |  |  |\n| Steer invalid |  |  |  |\n| Steer receipt\
+      \ |  |  |  |\n| Steer undo |  |  |  |\n| Source Ledger controls/details |  |\
+      \  |  |\n| Desktop split scroll |  |  |  |\n| Mobile route/feed scroll |  |\
+      \  |  |\n| Inspector JSON-LD negative |  |  |  |\n| Mobile metadata |  |  |\
+      \  |\n\n## Stale-vs-Real Reconciliation\n| Finding | Disposition | Current-mainline\
+      \ proof | Gate intersection | Closure |\n| --- | --- | --- | --- | --- |\n\n\
+      ## Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n"
+    depends_on:
+    - srdf-batched-frontend-audit-remediation
+    agent: integration-verifier
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
