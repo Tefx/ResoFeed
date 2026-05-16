@@ -85030,7 +85030,7 @@ phases:
       - [x] Verify preview is read-only, commit reruns classification, undo is target-specific,
       and idempotency boundaries are correct.
 
-      - [ ] Verify no command history, global undo stack, activity ledger, job dashboard,
+      - [x] Verify no command history, global undo stack, activity ledger, job dashboard,
       queue, sync/merge coordinator, accounts, vector DB, embeddings, RAG, or semantic
       answer engine was introduced.
 
