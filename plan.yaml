@@ -95011,7 +95011,7 @@ phases:
     claimed_at: '2026-05-16T20:35:35.588572+00:00'
   - id: cos-frontend-operation-utility-contract-tests
     name: Add frontend operation-status and utility-placement tests
-    status: pending
+    status: claimed
     description: 'Add expected-red frontend component/e2e tests for contextual current-operation
       status and low-frequency utility placement.
 
@@ -95091,6 +95091,8 @@ phases:
 
       - Downstream implementation owner: cos-frontend-operation-utility-surface'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T20:35:44.118950+00:00'
   - id: cos-backend-operation-snapshot
     name: Complete in-memory current-operation snapshot backend
     status: pending
