@@ -95615,7 +95615,7 @@ phases:
       - [x] MCP conflict payload consistency is covered where MCP structured metadata
       exists.
 
-      - [ ] MCP parity tests pass without introducing agent-only product concepts.'
+      - [x] MCP parity tests pass without introducing agent-only product concepts.'
     verification: '- [ ] local-check protecting MCP parity: targeted Go MCP tests
       prove `resofeed://system/operation` idle/running states.
 
