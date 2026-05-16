@@ -95299,16 +95299,16 @@ phases:
 
       - [x] Preserve dense Inspector grouped-source UI; no dashboard, wizard, or service-layer
       concept introduced.'
-    verification: '- [ ] Main path: valid grouped story renders grouped-source disclosure
+    verification: '- [x] Main path: valid grouped story renders grouped-source disclosure
       with deterministic ordering.
 
-      - [ ] Failure path: browser console no longer reports `state_unsafe_mutation`
+      - [x] Failure path: browser console no longer reports `state_unsafe_mutation`
       from grouped-source sorting.
 
-      - [ ] Scope guard: no backend grouping/schema/provenance files changed for this
+      - [x] Scope guard: no backend grouping/schema/provenance files changed for this
       frontend runtime fix.
 
-      - [ ] Visual guard: Inspector remains dense and archival, with grouped-source
+      - [x] Visual guard: Inspector remains dense and archival, with grouped-source
       disclosure visible.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
