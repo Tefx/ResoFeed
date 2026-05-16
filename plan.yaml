@@ -95007,3 +95007,85 @@ phases:
 
       - Downstream implementation owner: cos-backend-operation-snapshot'
     agent: golang-developer
+  - id: cos-frontend-operation-utility-contract-tests
+    name: Add frontend operation-status and utility-placement tests
+    status: pending
+    description: 'Add expected-red frontend component/e2e tests for contextual current-operation
+      status and low-frequency utility placement.
+
+
+      Scope:
+
+      - Prove current-operation status appears only in Source Ledger and opened `RESOFEED`
+      operations/utility surfaces when running or explaining a blocked operation.
+
+      - Prove no persistent idle global status strip exists in top chrome.
+
+      - Prove `LANG: EN` / `LANG: ZH` and `[REPROCESS LIBRARY]` are present only inside
+      the opened `RESOFEED` operations/utility menu or equivalent terse utility surface,
+      not prominent persistent top chrome.
+
+      - Include rendered output evidence expectations; DOM/query-only tests must show
+      visible content placement.
+
+
+      step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      These are frontend acceptance tests. They MUST render the app/component and
+      assert visible DOM output/absence, not just view-model data.
+
+
+      ## Completion Criteria
+
+      - [ ] Expected-red tests cover Source Ledger/open RESOFEED status placement
+      and idle top-chrome absence.
+
+      - [ ] Expected-red tests cover LANG/reprocess low-frequency placement and absence
+      from persistent prominent top chrome.
+
+      - [ ] Tests cite `docs/DESIGN.md` utility menu/current-operation/language/reprocess
+      sections.
+
+      - [ ] No frontend product implementation code is changed in this step.'
+    verification: '- [ ] local-check protecting frontend implementation: expected-red
+      tests expose missing/incorrect contextual operation status and utility placement.
+
+      - [ ] Evidence includes rendered DOM/snapshot assertions for visible placement
+      and absence cases.
+
+      - [ ] Evidence confirms tests are red before implementation and product code
+      was not modified.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Frontend Contract Evidence
+
+      - Test files changed:
+
+      - Test names added:
+
+      - Rendered placement/absence assertions:
+
+      - Expected failures / exposed gaps:
+
+      - Product-code changes: NONE required
+
+      - Downstream implementation owner: cos-frontend-operation-utility-surface'
+    agent: frontend-engineer
