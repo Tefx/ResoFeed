@@ -1,0 +1,20 @@
+{
+  "before": {
+    "feedTop": 0,
+    "inspectorTop": 0,
+    "feedScrollable": false,
+    "inspectorScrollable": false,
+    "feedTabIndex": null,
+    "inspectorTabIndex": "0",
+    "feedName": "RESOFEED",
+    "inspectorName": "INSPECTOR independent scroll"
+  },
+  "afterFeed": {
+    "feedTop": 0,
+    "inspectorTop": 0
+  },
+  "afterInspector": {
+    "feedTop": 0,
+    "inspectorTop": 0
+  }
+}

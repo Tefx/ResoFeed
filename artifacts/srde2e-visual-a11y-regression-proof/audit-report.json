@@ -1,0 +1,507 @@
+{
+  "base": "http://127.0.0.1:18081",
+  "screenshots": [
+    "artifacts/srde2e-visual-a11y-regression-proof/owner-token-empty-focused.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/owner-token-rejected.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/accepted-shell-today.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-idle.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-add-source-command.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-receipt-or-error.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-search-state.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-doctor-state.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-invalid-state.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/steer-rule-state.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/today-list.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/surface-menu-open.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/source-ledger-controls-details.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/source-ledger-after-actions.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/selected-item-star-row-open.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/keyboard-focus-path.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/mobile-feed.png",
+    "artifacts/srde2e-visual-a11y-regression-proof/mobile-inspector-route.png"
+  ],
+  "snapshots": [
+    "artifacts/srde2e-visual-a11y-regression-proof/owner-token-empty-focused-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/accepted-shell-today-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/doctor-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/source-ledger-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/feed-inspector-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/selected-item-a11y.json",
+    "artifacts/srde2e-visual-a11y-regression-proof/mobile-inspector-a11y.json"
+  ],
+  "hitRows": [
+    {
+      "label": "Steer submit",
+      "selector": "form button[type=\"submit\"], button:has-text(\"apply\"), button:has-text(\"[APPLY]\")",
+      "width": 76,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "RESOFEED surface menu",
+      "selector": "details.surface-nav > summary",
+      "width": 65,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "SOURCE LEDGER menu entry",
+      "selector": "button:has-text(\"SOURCE LEDGER\"), [role=\"menuitem\"]:has-text(\"SOURCE LEDGER\"), a:has-text(\"SOURCE LEDGER\")",
+      "width": 130,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[RUN INGEST]",
+      "selector": "button:has-text(\"[RUN INGEST]\")",
+      "width": 108,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[FETCH]",
+      "selector": "button:has-text(\"[FETCH]\")",
+      "width": 94,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[DETAILS]",
+      "error": "locator.scrollIntoViewIfNeeded: Timeout 4997.358ms exceeded.\nCall log:\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    10 × waiting for element to be stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying scroll into view action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "label": "[DELETE]",
+      "selector": "button:has-text(\"[DELETE]\")",
+      "width": 86,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[IMPORT OPML]",
+      "selector": "button:has-text(\"[IMPORT OPML]\"), input[type=\"file\"]",
+      "width": 115,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[EXPORT STATE]",
+      "selector": "button:has-text(\"[EXPORT STATE]\"), a:has-text(\"[EXPORT STATE]\")",
+      "width": 134,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "[IMPORT STATE]",
+      "selector": "button:has-text(\"[IMPORT STATE]\"), input[type=\"file\"]",
+      "width": 1,
+      "height": 44,
+      "centerTopmostOk": false,
+      "interiorTopmostOk": false,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": false
+    },
+    {
+      "label": "[IMPORT STATE]",
+      "error": "obstructed/non-clickable [IMPORT STATE]: {\"box\":{\"x\":1215,\"y\":186,\"width\":1,\"height\":44},\"c\":{\"tag\":\"SECTION\",\"text\":\"SOURCE LEDGER last_ingest: 06:42:16 [IMPORT OPML]  [RUN INGEST] src: Blind Audit\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false},\"i\":{\"tag\":\"BUTTON\",\"text\":\"[RUN INGEST]\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false}}"
+    },
+    {
+      "label": "row open",
+      "selector": ".contract-feed-open, button[aria-label*=\"Open Inspector\"], article button:not([aria-label*=\"Resonate\"]):not([aria-label*=\"Remove\"]), article a",
+      "width": 618,
+      "height": 72,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "star/resonate",
+      "selector": ".contract-resonate, button[aria-label*=\"Resonate\"], button[aria-label*=\"Remove resonance\"]",
+      "width": 44,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
+    },
+    {
+      "label": "original link",
+      "selector": ".contract-inspector a[href], a:has-text(\"original\"), a[href^=\"http\"]",
+      "width": 97,
+      "height": 14,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": false
+    }
+  ],
+  "keyboardRows": [
+    {
+      "label": "tab-1",
+      "tag": "INPUT",
+      "id": "steer-input",
+      "text": "Steer or paste RSS URL...",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 175,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-2",
+      "tag": "SUMMARY",
+      "id": "",
+      "text": "RESOFEED",
+      "outlineStyle": "auto",
+      "outlineWidth": "1px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 65,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-3",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "LANG: EN",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 79,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-4",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "[REPROCESS LIBRARY]",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 158,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-5",
+      "tag": "SECTION",
+      "id": "today-feed",
+      "text": "Independent scroll region Today feed items src: Blind Audit Feed · 1m · full · f",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 734,
+        "h": 713
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-6",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "src: Blind Audit Feed · 1m · full · fallback · quality: full  TODAY Blind Audit ",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 618,
+        "h": 72
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-7",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "★",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 44,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-8",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "src: Blind Audit Feed · 1m · full · fallback · quality: full   Blind Audit Item ",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 618,
+        "h": 72
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-9",
+      "tag": "BUTTON",
+      "id": "",
+      "text": "☆",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 44,
+        "h": 44
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-10",
+      "tag": "ASIDE",
+      "id": "",
+      "text": "back to TODAY INSPECTOR   src: Blind Audit Feed · full  Blind Audit Item One ori",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 480,
+        "h": 713
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-11",
+      "tag": "A",
+      "id": "",
+      "text": "original link",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 97,
+        "h": 14
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "tab-12",
+      "tag": "A",
+      "id": "",
+      "text": "http://127.0.0.1:18082/article-one",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px",
+      "boxShadow": "none",
+      "rect": {
+        "w": 253,
+        "h": 14
+      },
+      "focusIndicatorVisible": true
+    },
+    {
+      "label": "Escape clears unsent Steer text",
+      "valueAfterEscape": "",
+      "ok": true
+    }
+  ],
+  "activePanelRows": [
+    {
+      "expected": "ledger",
+      "surface": "ledger",
+      "activeTexts": [
+        "back to TODAY SOURCE LEDGER  [IMPORT OPML]  [RUN INGEST] src: Blind Audit Feed u"
+      ],
+      "visibleLedger": true,
+      "visibleToday": true,
+      "ok": true
+    }
+  ],
+  "negativeRows": [
+    {
+      "term": "dashboard",
+      "found": false
+    },
+    {
+      "term": "job",
+      "found": false
+    },
+    {
+      "term": "activity",
+      "found": false
+    },
+    {
+      "term": "settings",
+      "found": false
+    },
+    {
+      "term": "RAG",
+      "found": false
+    },
+    {
+      "term": "chat",
+      "found": false
+    },
+    {
+      "term": "semantic answer",
+      "found": false
+    },
+    {
+      "term": "folder",
+      "found": false
+    },
+    {
+      "term": "tag",
+      "found": false
+    },
+    {
+      "term": "source hierarchy",
+      "found": false
+    },
+    {
+      "term": "queue",
+      "found": false
+    },
+    {
+      "term": "sync",
+      "found": false
+    },
+    {
+      "term": "merge",
+      "found": false
+    },
+    {
+      "term": "mark all read",
+      "found": false
+    },
+    {
+      "term": "unread",
+      "found": false
+    }
+  ],
+  "proofs": [
+    {
+      "requirement_ref": "owner-token rejected shell",
+      "behavior_claim": "invalid owner token keeps prompt and emits raw error",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "owner-token-rejected.png / owner-token-empty-focused-a11y.json",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "raw rejection visible"
+    },
+    {
+      "requirement_ref": "owner-token accepted shell",
+      "behavior_claim": "accepted token opens app shell and moves beyond prompt",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "accepted-shell-today.png / accepted-shell-today-a11y.json",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "post-auth shell text inspected"
+    },
+    {
+      "requirement_ref": "Steer idle/add/search/find/doctor/rule/invalid/receipt/undo states",
+      "behavior_claim": "Steer exposes required command states through public shell",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "steer-*.png / doctor-a11y.json",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "screen states captured after real Enter submissions"
+    },
+    {
+      "requirement_ref": "active panel semantic state",
+      "behavior_claim": "visible Source Ledger agrees with semantic active state",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "active-panel table/source-ledger-a11y.json",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "ledger surface visible after menu activation"
+    },
+    {
+      "requirement_ref": "desktop split-scroll",
+      "behavior_claim": "Feed and Inspector are independently scrollable/focusable regions",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "desktop-split-scroll-proof.json",
+      "status": "UNPROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "checked focusability and labels without source access"
+    },
+    {
+      "requirement_ref": "mobile Inspector route",
+      "behavior_claim": "narrow viewport opens Inspector/detail route with reading density and back path",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "mobile-inspector-route.png / mobile-inspector-a11y.json",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "captured 390x844 mobile route after row activation"
+    },
+    {
+      "requirement_ref": "negative UX scan",
+      "behavior_claim": "forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy concepts are absent",
+      "runtime_proof_expected": "public browser surface",
+      "evidence_ref": "negative-ux-scan table",
+      "status": "PROVEN",
+      "closure_path": "none",
+      "gate_decision_basis": "no forbidden terms found in visible text"
+    }
+  ],
+  "failures": [
+    "locator.scrollIntoViewIfNeeded: Timeout 4997.358ms exceeded.\nCall log:\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    10 × waiting for element to be stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying scroll into view action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+    "obstructed/non-clickable [IMPORT STATE]: {\"box\":{\"x\":1215,\"y\":186,\"width\":1,\"height\":44},\"c\":{\"tag\":\"SECTION\",\"text\":\"SOURCE LEDGER last_ingest: 06:42:16 [IMPORT OPML]  [RUN INGEST] src: Blind Audit\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false},\"i\":{\"tag\":\"BUTTON\",\"text\":\"[RUN INGEST]\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false}}",
+    "desktop split-scroll: checked focusability and labels without source access",
+    "below 44px target original link: 97x14"
+  ],
+  "shouldFix": []
+}
