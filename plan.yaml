@@ -95401,7 +95401,7 @@ phases:
 
       - [x] Idle response has `running=false` and nullable fields null.
 
-      - [ ] Conflict response still contains `operation_running`, `operation`, `scope`,
+      - [x] Conflict response still contains `operation_running`, `operation`, `scope`,
       `retry_allowed` exactly as before.
 
       - [x] `current_operation` does not outlive guard release or become durable history.
