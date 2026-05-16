@@ -85663,7 +85663,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Run `npm ci` if node dependencies are absent or stale, and record result.
+      - [x] Run `npm ci` if node dependencies are absent or stale, and record result.
 
       - [ ] Run `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe`
       against the real-server harness.
