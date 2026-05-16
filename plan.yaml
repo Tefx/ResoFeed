@@ -95145,6 +95145,171 @@ phases:
     - gsfr-targeted-regression-retest
     - gsfr-uiux-multimodal-audit
     agent: gate-reviewer
+  - id: gsfr-fix-reactive-grouped-source-sort-crash
+    name: Fix reactive grouped-source sort crash
+    status: pending
+    description: 'step_type: implementation
+
+      work_type: defect_repair
+
+      agent_source: project
+
+      spec_refs:
+
+      - docs/DESIGN.md#Inspector Surface and grouped-source disclosure requirements
+
+      - docs/ARCHITECTURE.md#frontend-current-item-understanding-and-grouping-boundary
+
+      touch_paths:
+
+      - web/src/routes/components/Inspector.svelte
+
+      harness_refs:
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+      - grouped story/Inspector browser audit artifacts from gsfr-uiux-multimodal-audit
+
+
+      Fix the grouped-source rendering crash reported by `gsfr-uiux-multimodal-audit`.
+
+
+      Blocker ownership:
+
+      - Fatal Svelte runtime crash: browser console `state_unsafe_mutation` at `Proxy.sort
+      ... Inspector.svelte:438`.
+
+      - Root cause: `groupedSourceItems(...)` sorts a reactive/proxy-backed array
+      through mutating `items.sort(...)`.
+
+      - Required smallest repair: replace the grouped-source sort path with non-mutating
+      sorting (`items.toSorted(...)` when supported by project target, or `[...items].sort(...)`).
+
+
+      Scope constraints:
+
+      - Do not reopen completed contract/test steps unless a test is demonstrably
+      wrong.
+
+      - Do not change backend grouping semantics, schema, story key rules, or duplicate
+      provenance.
+
+      - Preserve grouped-source transparency and synthetic feed-fragment identity.
+
+      - Preserve ResoFeed UI constraints: dense archival workbench, no dashboards,
+      no settings panels, no extra service layers.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any remaining mutating sort of reactive/proxy grouped-source arrays in `Inspector.svelte`.
+
+      2. Fixes that remove valid grouped-source disclosure instead of rendering it
+      safely.
+
+      3. Backend/schema changes for this frontend Svelte runtime issue.
+
+      4. Synthetic no-grouping path passing while valid grouped story rendering still
+      crashes.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: grouped-source ordering remains deterministic and preserves
+      selected/source metadata.
+
+      2. Rendering completeness: valid grouped stories render visible grouped-source
+      DOM without Svelte runtime console errors.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      deliverable MUST contain substantive logic that processes the grouped-source
+      inputs and produces ordered output that varies based on those inputs.
+
+
+      ## Acceptance Checklist
+
+      - [ ] Replace the grouped-source sort mutation with a non-mutating sort in `web/src/routes/components/Inspector.svelte`.
+
+      - [ ] Preserve the existing grouped-source comparator/order semantics.
+
+      - [ ] Verify no backend grouping/schema/provenance behavior is changed.
+
+      - [ ] Produce evidence that a valid grouped story renders without `state_unsafe_mutation`
+      or other browser console runtime errors.
+
+      - [ ] Preserve dense Inspector grouped-source UI; no dashboard, wizard, or service-layer
+      concept introduced.'
+    verification: '- [ ] Main path: valid grouped story renders grouped-source disclosure
+      with deterministic ordering.
+
+      - [ ] Failure path: browser console no longer reports `state_unsafe_mutation`
+      from grouped-source sorting.
+
+      - [ ] Scope guard: no backend grouping/schema/provenance files changed for this
+      frontend runtime fix.
+
+      - [ ] Visual guard: Inspector remains dense and archival, with grouped-source
+      disclosure visible.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fix Evidence
+
+
+      **Changed files**:
+
+      ```
+
+      <paths>
+
+      ```
+
+
+      **Non-mutating sort proof**:
+
+      ```
+
+      <before/after snippet or grep output showing grouped-source sort no longer mutates
+      reactive arrays>
+
+      ```
+
+
+      **Runtime proof**:
+
+      ```
+
+      <command/test/browser evidence showing valid grouped story renders without state_unsafe_mutation>
+
+      ```
+
+
+      **Scope guard**:
+
+      - Backend grouping/schema changed: YES/NO
+
+      - If YES, explain why this did not violate the phase contract.
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - gsfr-uiux-multimodal-audit
+    agent: frontend-engineer
 - id: current-operation-status-and-low-frequency-utility-surface-implementation
   name: Current Operation Status and Low-Frequency Utility Surface Implementation
   status: in_progress
