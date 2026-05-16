@@ -82312,7 +82312,7 @@ phases:
     agent: uiux-auditor
   - id: srdf-frontend-spec-conformance
     name: Verify frontend spec and design conformance for Steer delta
-    status: pending
+    status: claimed
     description: 'Spec/design conformance verification via adversarial divergence
       hunting.
 
@@ -82377,6 +82377,8 @@ phases:
     - srdf-processing-language-low-chrome-controls
     - srdf-broad-rendering-owner-token-bootstrap-retest
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-16T00:14:51.024194+00:00'
   - id: srdf-frontend-gate
     name: Gate frontend Steer delta UI implementation
     status: pending
