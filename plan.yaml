@@ -84915,7 +84915,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] README/usage docs, architecture, design, PRD, and UI regression contract
+      - [x] README/usage docs, architecture, design, PRD, and UI regression contract
       remain consistent with implemented route preview/commit/undo, Source Ledger
       details/actions, lexical-only search, AC-4 conflicts, split-scroll/mobile route,
       and processing language controls.
