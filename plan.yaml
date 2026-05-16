@@ -86746,3 +86746,193 @@ phases:
       \ and verification checklist items are `[x]`; verification checklist required\
       \ planner repair because `vectl_check` could not match verification-field checklist\
       \ items."
+  - id: srde2e-visual-a11y-blockers-fix
+    name: Fix visual accessibility blocker families
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: default
+
+
+      Batched implementation remediation for ALL visual/a11y blocker families reported
+      by srde2e-visual-a11y-regression-proof. This step depends on the original proof
+      report so the failed blind-tester evidence remains preserved as the authoritative
+      blocker fingerprint.
+
+
+      ## Blocker fingerprints to close
+
+      - B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN: DETAILS control could not be visibly/topmost
+      activated; locator.scrollIntoViewIfNeeded timed out because target was not visible.
+      Real activation was not proven.
+
+      - B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET: IMPORT STATE resolved to an obstructed/non-clickable
+      1x44 file input; elementFromPoint did not return the target/descendant and the
+      interior point hit another control.
+
+      - B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN: desktop Feed/Inspector independent
+      focusable scroll-region proof remained unproven; required focusability/label
+      evidence failed.
+
+      - B4_ORIGINAL_LINK_BELOW_44PX: Inspector original link measured 97x14, below
+      the 44px minimum hit-target requirement.
+
+
+      ## Implementation scope
+
+      - Remediate all four blocker families in the rendered public UI, not only in
+      tests.
+
+      - Preserve passing surfaces from the failed proof: owner-token shell, Steer
+      controls, Source Ledger [RUN INGEST]/[FETCH]/[DELETE] hit targets, keyboard
+      tab path, Escape behavior, active panel semantic state, and negative forbidden-term
+      scan.
+
+      - Search for sibling instances of small/obstructed controls, invisible disclosure
+      targets, unfocusable split-scroll regions, and sub-44px original/external links
+      before claiming complete.
+
+      - Use audit artifacts from branch vectl/step-srde2e-visual-a11y-regression-proof
+      commit 9400bec43da65e5cfa41dc45c19dcc46bfa53f08 as context if available, but
+      do not require a step worktree.
+
+
+      ## Gate Preview (what the retest/final gate WILL reject)
+
+      - Any DETAILS activation proof that relies on hidden/offscreen/non-topmost targets
+      rather than real pointer/keyboard activation.
+
+      - Any IMPORT STATE proof that clicks a 1px file input or an obstructed target
+      instead of a visible accessible control path.
+
+      - Any desktop Feed/Inspector split-scroll evidence without independently focusable,
+      labeled scroll regions.
+
+      - Any Inspector original link or comparable public activation target with a
+      measured hit box below 44px or without an equivalent accessible 44px target.
+
+      - Any regression in already-passing owner-token, Steer, Source Ledger, keyboard,
+      Escape, active-panel, or forbidden-term proof surfaces.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: activation, focus, and hit-target behavior are correct.
+
+      2. Rendering completeness: controls produce visible DOM elements and accessible
+      targets.
+
+      Evidence MUST include rendered output, measurements, or browser/test-renderer
+      proof.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive rendered UI/interaction behavior that
+      processes real user input and produces observable UI state.
+
+
+      Acceptance checklist:
+
+      - [ ] B1 DETAILS has real visible/topmost pointer and keyboard activation proof
+      path.
+
+      - [ ] B2 IMPORT STATE uses a visible accessible activation control and no obstructed
+      1px target is the user-facing hit target.
+
+      - [ ] B3 desktop Feed and Inspector scroll regions are independently focusable
+      and labeled with visible focus evidence.
+
+      - [ ] B4 Inspector original link, or its documented equivalent activation target,
+      meets the 44px minimum hit-target requirement.
+
+      - [ ] Passing surfaces from the failed proof remain non-regressed.'
+    verification: '- [ ] Focused rendered/browser proof closes B1, B2, B3, and B4.
+
+      - [ ] Sibling search evidence covers invisible disclosure targets, obstructed
+      file inputs, unfocusable split-scroll regions, and sub-44px links/buttons.
+
+      - [ ] Previously passing visual/a11y surfaces remain passing or have explicit
+      non-regression evidence.
+
+      - [ ] No forbidden UI/product concepts are introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Visual/A11Y Blocker Fix Evidence
+
+
+      **Original failed proof**: srde2e-visual-a11y-regression-proof
+
+      **Audit artifact context**: branch `vectl/step-srde2e-visual-a11y-regression-proof`,
+      commit `9400bec43da65e5cfa41dc45c19dcc46bfa53f08`
+
+
+      ### Blocker closure table
+
+      | Blocker | Files changed | Root cause | Fix summary | Rendered/browser proof
+      |
+
+      | --- | --- | --- | --- | --- |
+
+      | B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN | <files> | <cause> | <summary> | <artifact/command/output>
+      |
+
+      | B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET | <files> | <cause> | <summary> | <artifact/command/output>
+      |
+
+      | B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN | <files> | <cause> | <summary>
+      | <artifact/command/output> |
+
+      | B4_ORIGINAL_LINK_BELOW_44PX | <files> | <cause> | <summary> | <artifact/command/output>
+      |
+
+
+      ### Sibling search evidence
+
+      - Invisible/offscreen DETAILS targets: `<command/output>`
+
+      - Obstructed/1px file input user targets: `<command/output>`
+
+      - Unfocusable split-scroll regions: `<command/output>`
+
+      - Sub-44px original/external links or equivalent targets: `<command/output>`
+
+
+      ### Non-regression evidence
+
+      - Owner-token shell: <proof>
+
+      - Steer controls: <proof>
+
+      - Source Ledger [RUN INGEST]/[FETCH]/[DELETE]: <proof>
+
+      - Keyboard tab path and Escape behavior: <proof>
+
+      - Active panel semantic state: <proof>
+
+      - Forbidden-term scan: <proof>
+
+
+      ### Headline
+
+      - [ ] PASS: all B1-B4 blocker families remediated and ready for independent
+      retest
+
+      - [ ] FAIL: blocker remediation remains incomplete'
+    depends_on:
+    - srde2e-visual-a11y-regression-proof
+    agent: frontend-engineer
