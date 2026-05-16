@@ -82269,13 +82269,13 @@ phases:
 
       - [x] Produce parseable PASS/PASS_WITH_DEBT/FAIL handoff with blocker-class
       issues separated from non-blocking debt.'
-    verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
+    verification: '- [x] phase-check protecting frontend gate and final E2E closure.
 
-      - [ ] Rendered screenshots/images/DOM snapshots cover required states/viewports.
+      - [x] Rendered screenshots/images/DOM snapshots cover required states/viewports.
 
-      - [ ] PASS handoff is parseable and includes explicit evidence refs.
+      - [x] PASS handoff is parseable and includes explicit evidence refs.
 
-      - [ ] Any blocker-class UI/design issue has remediation ownership before gate
+      - [x] Any blocker-class UI/design issue has remediation ownership before gate
       opens.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
