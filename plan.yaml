@@ -82890,7 +82890,7 @@ phases:
       - [x] Run the scoped Source Ledger render checks covering details disclosure
       and bracket hit targets.
 
-      - [ ] Run the scoped split-scroll/mobile render checks covering feed-first full-screen
+      - [x] Run the scoped split-scroll/mobile render checks covering feed-first full-screen
       surfaces and Search scoping away from Today.
 
       - [ ] Run the scoped processing-language/low-chrome render checks if present
