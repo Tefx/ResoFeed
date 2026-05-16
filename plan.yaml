@@ -82588,7 +82588,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Review `srdf-batched-frontend-audit-closure` machine-readable YAML before
+      - [x] Review `srdf-batched-frontend-audit-closure` machine-readable YAML before
       opening the gate.
 
       - [ ] Require `gate_open_allowed: true`, `verdict: PASS`, and `remaining_blockers:
