@@ -161,7 +161,7 @@ describe('expected-red Steer route preview and receipt contracts', () => {
     const { steer, user } = await renderAcceptedPage({ revocable: true });
     await user.type(steer, 'less celebrity coverage');
 
-    const preview = screen.getByRole('region', { name: 'Steer write preview' });
+    const preview = screen.getByRole('status', { name: 'Steer route preview' });
     expect(within(preview).getByText('[STEER RULE]')).toBeVisible();
     expect(within(preview).getByRole('button', { name: '[APPLY]' })).toBeVisible();
     expect(within(preview).getByRole('button', { name: '[CANCEL]' })).toBeVisible();

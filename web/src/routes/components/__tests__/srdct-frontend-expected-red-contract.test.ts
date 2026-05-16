@@ -155,7 +155,7 @@ describe('srdct expected-red frontend UI contracts', () => {
     cleanup();
     const revocable = await renderAcceptedPage({ revocableId: 'receipt_srdct_revocable' });
     await revocable.user.type(revocable.steer, 'less celebrity coverage');
-    const writePreview = screen.getByRole('region', { name: 'Steer write preview' });
+    const writePreview = screen.getByRole('status', { name: 'Steer route preview' });
     expect(within(writePreview).getByRole('button', { name: '[APPLY]' })).toBeVisible();
     expect(within(writePreview).getByRole('button', { name: '[CANCEL]' })).toBeVisible();
     await revocable.user.click(within(writePreview).getByRole('button', { name: '[APPLY]' }));
@@ -171,6 +171,10 @@ describe('srdct expected-red frontend UI contracts', () => {
     expect(within(ledger).getByRole('button', { name: 'Fetch source Example Source' })).toHaveTextContent('[FETCH]');
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example Source' })).toHaveTextContent('[DELETE]');
     expect(within(ledger).getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
+    const opmlFileInput = ledger.querySelector('#opml-file');
+    expect(opmlFileInput).toHaveAttribute('type', 'file');
+    expect(opmlFileInput).toHaveAttribute('aria-hidden', 'true');
+    expect(opmlFileInput).toHaveAttribute('tabindex', '-1');
     expect(within(ledger).getByRole('button', { name: '[EXPORT STATE]' })).toBeVisible();
     expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     expect(ledger.querySelectorAll('input[type="url"], input[name*="url" i], textarea[name*="url" i]')).toHaveLength(0);
@@ -181,5 +185,38 @@ describe('srdct expected-red frontend UI contracts', () => {
     expect(details.closest('details')).toHaveAttribute('open');
     expect(within(ledger).getByText(/fetch_error: err: timeout while fetching upstream feed/)).toBeVisible();
     expect(ledger).not.toHaveTextContent(/job|queue|dashboard|settings|activity log|folder|tag|semantic answer|chat|RAG/i);
+  });
+
+  it('disables only the active Source Ledger fetch row while another row remains reachable for backend conflict proof', async () => {
+    const user = userEvent.setup();
+    let releaseFetch: (() => void) | undefined;
+    const secondSource: Source = { ...sourceWithDiagnostic, id: 'src_srdct_second', title: 'Second Source', url: 'https://second.example/feed.xml' };
+    render(SourceLedger, {
+      props: {
+        sources: [sourceWithDiagnostic, secondSource],
+        onDeleteSource: async () => {},
+        onImportOpml: async (): Promise<ImportOpmlResponse> => ({ imported: 1, skipped: 0, folders_flattened: true }),
+        onRunIngest: async () => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 2, sources_fetched: 2, items_discovered: 2, items_upserted: 2, errors: [] }),
+        onFetchSource: async (source: Source): Promise<FetchSourceSuccessResponse> => {
+          if (source.id === sourceWithDiagnostic.id) {
+            await new Promise<void>((resolve) => { releaseFetch = resolve; });
+            return { operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: '2026-05-09T14:02:20Z' };
+          }
+          return { operation: 'source_fetch', source_id: source.id, completed: false, sources_total: 1, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [{ source_id: source.id, code: 'conflict', message: 'ingest already running' }] };
+        },
+        onExportState: async () => stateBundle(),
+        onImportState: async () => {}
+      }
+    });
+
+    const firstFetch = screen.getByRole('button', { name: 'Fetch source Example Source' });
+    const secondFetch = screen.getByRole('button', { name: 'Fetch source Second Source' });
+    await user.click(firstFetch);
+    expect(firstFetch).toBeDisabled();
+    expect(firstFetch).toHaveTextContent('[FETCHING...]');
+    expect(secondFetch).not.toBeDisabled();
+    await user.click(secondFetch);
+    expect(await screen.findByText('err: ingest already running')).toBeVisible();
+    releaseFetch?.();
   });
 });

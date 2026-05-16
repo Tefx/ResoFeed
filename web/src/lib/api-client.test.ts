@@ -110,7 +110,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(itemDisplayExcerpt(expectedRedFallbackItem)).toBe('Source-backed feed excerpt for list/search fallback.');
 
     render(SearchRetrieval, { props: { items: search.items, query: search.query.q, onSearch: async () => search } });
-    const searchRegion = screen.getByRole('region', { name: 'SEARCH' });
+    const searchRegion = screen.getByRole('region', { name: 'Search and Retrieval' });
     expect(within(searchRegion).getAllByText('match: lexical index')[0]).toBeVisible();
     expect(within(searchRegion).getAllByText('src: Example Source')[0]).toBeVisible();
 

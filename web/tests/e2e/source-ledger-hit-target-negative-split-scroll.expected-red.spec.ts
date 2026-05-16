@@ -192,22 +192,34 @@ test.describe('expected-red Source Ledger hit targets, negative UX, and split sc
     await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 
     await page.setViewportSize({ width: 1280, height: 900 });
-    const feedPane = page.getByRole('region', { name: /TODAY.*independent scroll/i });
-    const inspectorPane = page.getByRole('complementary', { name: /INSPECTOR.*independent scroll|Expected red split scroll item/i });
+    // The split-scroll contract targets the outer scroll containers, including
+    // the preserved-but-inert Feed container while the mobile Inspector route is active.
+    const feedPane = page.locator('[data-scroll-region="feed-independent"]');
+    // Target the outer Inspector scroll container, not the nested article
+    // Inspector landmark whose accessible name follows the opened item.
+    const inspectorPane = page.locator('[data-scroll-region="inspector-independent"]');
     await expect(feedPane).toHaveAttribute('tabindex', '0');
     await expect(inspectorPane).toHaveAttribute('tabindex', '0');
     await feedPane.evaluate((element) => { element.scrollTop = 420; });
-    await page.getByRole('button', { name: 'Open Inspector for: Expected red split scroll item 12' }).click();
-    await expect.poll(() => feedPane.evaluate((element) => element.scrollTop)).toBe(420);
+    const desktopOpenButton = page.getByRole('button', { name: 'Open Inspector for: Expected red split scroll item 12' });
+    await desktopOpenButton.scrollIntoViewIfNeeded();
+    const desktopFeedScroll = await feedPane.evaluate((element) => element.scrollTop);
+    await desktopOpenButton.click();
+    await expect.poll(() => feedPane.evaluate((element) => element.scrollTop)).toBe(desktopFeedScroll);
     await expect.poll(() => inspectorPane.evaluate((element) => element.scrollTop)).toBe(0);
 
+    await page.goto('/');
+    await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
     await feedPane.evaluate((element) => { element.scrollTop = 360; });
-    await page.getByRole('button', { name: 'Open Inspector for: Expected red split scroll item 13' }).click();
+    const mobileOpenButton = page.getByRole('button', { name: 'Open Inspector for: Expected red split scroll item 13' });
+    await mobileOpenButton.scrollIntoViewIfNeeded();
+    const mobileFeedScroll = await feedPane.evaluate((element) => element.scrollTop);
+    await mobileOpenButton.click();
     await expect(page.getByRole('button', { name: /back to TODAY/i })).toBeVisible();
     await expect(page.locator('.detail-pane')).toHaveClass(/active-panel/);
     await page.getByRole('button', { name: /back to TODAY/i }).click();
-    await expect.poll(() => feedPane.evaluate((element) => element.scrollTop)).toBe(360);
+    await expect.poll(() => feedPane.evaluate((element) => element.scrollTop)).toBe(mobileFeedScroll);
   });
 
   test('processing language and reprocess controls remain low-chrome runtime operations, not settings surfaces', async ({ page, ownerToken }) => {

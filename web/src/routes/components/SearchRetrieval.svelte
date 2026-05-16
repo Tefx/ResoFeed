@@ -77,7 +77,7 @@
 </script>
 
 <section class="contract-region contract-search" aria-labelledby="search-heading">
-  <h2 id="search-heading" tabindex="-1">SEARCH</h2>
+  <h2 id="search-heading" tabindex="-1">Search and Retrieval</h2>
   <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
       <label for="search-query">Plain text query</label>

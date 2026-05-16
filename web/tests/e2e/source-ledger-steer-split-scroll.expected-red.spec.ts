@@ -76,7 +76,21 @@ async function installFixtureApi(page: Page, ownerToken: string): Promise<void> 
     const url = new URL(request.url());
     if (url.pathname === '/api/runtime/language') return route.fulfill({ json: { language: { code: 'en', label: 'English' }, already_applied: false } });
     if (url.pathname === '/api/sources') return route.fulfill({ json: { sources } });
-    if (url.pathname === '/api/feed/today') return route.fulfill({ json: { items: [item] } });
+    if (url.pathname === '/api/feed/today') {
+      return route.fulfill({
+        json: {
+          items: [
+            item,
+            ...Array.from({ length: 24 }, (_, index) => ({
+              ...item,
+              id: `item_srdct_extra_${index}`,
+              title: `Additional scroll-preservation item ${index + 1}`,
+              url: `https://source.example.test/article-${index + 1}`
+            }))
+          ]
+        }
+      });
+    }
     if (url.pathname === '/api/items/item_srdct') return route.fulfill({ json: { item: itemDetail } });
     if (url.pathname === '/api/items/item_srdct/inspect') return route.fulfill({ json: { item_id: item.id, human_inspected_at: '2026-05-09T14:00:00Z', already_applied: false } });
     if (url.pathname === '/api/steer/active') return route.fulfill({ json: { rules: [] } });
@@ -169,8 +183,15 @@ test.describe('srdct expected-red Steer, Source Ledger, and split-scroll contrac
     await expect(inspectorPane).toHaveAttribute('aria-label', /INSPECTOR/);
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await feedPane.evaluate((element) => { element.scrollTop = 120; });
-    await page.getByRole('button', { name: 'Open Inspector for: SQLite FTS changes ranking contract' }).click();
+    const openButton = page.getByRole('button', { name: 'Open Inspector for: SQLite FTS changes ranking contract' });
+    await openButton.focus();
+    await feedPane.evaluate((element) => {
+      element.style.maxHeight = '260px';
+      element.style.overflowY = 'auto';
+      element.scrollTop = 120;
+    });
+    await expect.poll(() => feedPane.evaluate((element) => element.scrollTop)).toBe(120);
+    await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/items\/item_srdct$/);
     await expect(page.getByRole('heading', { name: 'SQLite FTS changes ranking contract' })).toBeFocused();
     await page.getByRole('button', { name: 'back to TODAY' }).click();

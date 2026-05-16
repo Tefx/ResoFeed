@@ -67,6 +67,7 @@
   let routePreviewElement = $state<HTMLElement | undefined>();
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
+  let suppressFeedScrollRecording = false;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -96,7 +97,6 @@
   const steerRouteEcho = $derived(routeEchoForCommand(steerCommand));
   const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRouteEcho.detail ? ` ${steerRouteEcho.detail}` : ''}`);
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
-  const routePreviewRole = $derived(steerRouteEcho.writeAction ? 'region' : 'status');
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
 
   function surfaceForPath(pathname: string): Surface {
@@ -160,12 +160,20 @@
   }
 
   async function restoreFeedScrollPosition(): Promise<void> {
+    suppressFeedScrollRecording = true;
     await tick();
     if (typeof requestAnimationFrame === 'function') {
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     }
     if (feedPaneElement) feedPaneElement.scrollTop = preservedFeedScrollTop;
     if (isNarrow && currentSurface === 'feed') window.scrollTo(0, preservedWindowScrollY);
+    if (typeof requestAnimationFrame === 'function') {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    if (feedPaneElement) feedPaneElement.scrollTop = preservedFeedScrollTop;
+    if (isNarrow && currentSurface === 'feed') window.scrollTo(0, preservedWindowScrollY);
+    await tick();
+    suppressFeedScrollRecording = false;
   }
 
   async function focusSurfaceAndRestoreFeed(surface: Surface): Promise<void> {
@@ -174,6 +182,8 @@
   }
 
   function rememberFeedScrollPosition(): void {
+    if (suppressFeedScrollRecording) return;
+    if (currentSurface !== 'feed' && (isNarrow || currentSurface !== 'inspector')) return;
     preservedFeedScrollTop = feedPaneElement?.scrollTop ?? preservedFeedScrollTop;
     if (isNarrow) preservedWindowScrollY = window.scrollY;
   }
@@ -354,6 +364,7 @@
   }
 
   function showSurface(surface: Surface, updateUrl = true): void {
+    if (surface === 'feed') suppressFeedScrollRecording = true;
     currentSurface = surface;
     if (updateUrl) {
       const canonicalPath = canonicalPathForSurface(surface);
@@ -708,8 +719,8 @@
         bind:this={routePreviewElement}
         id="steer-route-preview-status"
         class="steer-route-preview"
-        role={routePreviewRole}
-        aria-label={steerRouteEcho.writeAction ? 'Steer write preview' : 'Steer route preview'}
+        role="status"
+        aria-label="Steer route preview"
         aria-live={steerRouteEcho.live}
         aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
         data-route-kind={steerRouteEcho.kind}

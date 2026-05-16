@@ -430,7 +430,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await user.type(steer, 'search sqlite');
     await user.click(screen.getByRole('button', { name: 'apply' }));
 
-    const search = await screen.findByRole('region', { name: 'SEARCH' });
+    const search = await screen.findByRole('region', { name: 'Search and Retrieval' });
     expect(screen.getByText('retrieval: lexical search')).toBeVisible();
     expect(within(search).getByRole('button', { name: `Inspect search result: ${expectedRedItem.title}` })).toBeVisible();
     expect(screen.queryByRole('button', { name: `Open Inspector for: ${expectedRedItem.title}` })).not.toBeInTheDocument();
@@ -478,7 +478,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
   it('renders search/retrieval and exposes missing filters plus provenance-rich result anatomy', () => {
     render(SearchRetrieval, { props: { items: [expectedRedItem], query: 'sqlite', onSearch: async () => ({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } }) } });
 
-    const search = screen.getByRole('region', { name: 'SEARCH' });
+    const search = screen.getByRole('region', { name: 'Search and Retrieval' });
     expect(within(search).getByLabelText('Plain text query')).toHaveValue('sqlite');
     expect(within(search).getByLabelText('Source filter')).toBeVisible();
     expect(within(search).getByLabelText('From date')).toBeVisible();
@@ -503,7 +503,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       }
     });
 
-    const search = screen.getByRole('region', { name: 'SEARCH' });
+    const search = screen.getByRole('region', { name: 'Search and Retrieval' });
     const result = within(search).getByRole('listitem');
     expect(result).toHaveClass('contract-feed-item');
     expect(within(result).getByText('Source-backed feed excerpt for list/search fallback.')).toBeVisible();

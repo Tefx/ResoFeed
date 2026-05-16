@@ -130,8 +130,9 @@
   }
 
   async function fetchSource(source: Source): Promise<void> {
-    if (fetchingSourceId) return;
-    fetchingSourceId = source.id;
+    if (fetchingSourceId === source.id) return;
+    const ownsActivePendingState = fetchingSourceId === null;
+    if (ownsActivePendingState) fetchingSourceId = source.id;
     setSourceFeedback(source.id, null);
     try {
       await tick();
@@ -148,7 +149,7 @@
     } catch (error) {
       setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : 'err: fetch failed');
     } finally {
-      fetchingSourceId = null;
+      if (ownsActivePendingState) fetchingSourceId = null;
     }
   }
 
@@ -251,7 +252,7 @@
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId !== null} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
+            <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
             {#if confirmingSourceId === source.id}
               <button type="button" class="bracket-action bracket-action--confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
             {:else}

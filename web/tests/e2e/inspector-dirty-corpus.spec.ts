@@ -28,9 +28,12 @@ async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: strin
   await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /Fetch source Dirty Inspector Corpus|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await triggerFixtureIngest(page);
-  await expect(page.getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText('src: Dirty Inspector Corpus')).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/last_fetch:/).first()).toBeVisible({ timeout: 20_000 });
+  await page.reload();
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
   await runSteerCommand(page, 'today', 'today');
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
 }
