@@ -84115,7 +84115,7 @@ phases:
 
       This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
 
-      - [ ] Logic correctness: relevant state/selector/contract decisions produce
+      - [x] Logic correctness: relevant state/selector/contract decisions produce
       correct values.
 
       - [ ] Rendering completeness: Source Ledger, TODAY, mobile metadata, and OPML
