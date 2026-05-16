@@ -88858,3 +88858,238 @@ phases:
     depends_on:
     - srde2e-full-plan-check
     agent: frontend-engineer
+  - id: srde2e-full-plan-e2e-blockers-retest
+    name: Retest batched full-plan E2E blocker closure
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: full-plan-check
+
+      agent_source: project
+
+
+      As an INDEPENDENT VERIFIER (integration-verifier), retest the batched full-plan
+      E2E blocker remediation from srde2e-full-plan-e2e-blockers-fix. This step protects
+      srde2e-final-closure-gate and may not be bypassed by final closure.
+
+
+      Rerun the broad command families needed to prove the full-plan E2E blockers
+      are closed without regressing already-passing checks.
+
+
+      Required checks:
+
+      - npm run test:e2e — rerun the full Playwright E2E suite and record exact output;
+      expected result is green.
+
+      - Targeted failing specs/cases from srde2e-full-plan-check as practical — prove
+      the nine blocker families have direct coverage.
+
+      - npm run check — prove frontend static/type checks remain green.
+
+      - npm run test:render — prove render/component proof remains green.
+
+      - npm run build — sequential build proof remains green.
+
+      - Visual/a11y proof script if UI/layout/accessibility changed — prove no regression
+      in layout, hit targets, mobile metadata wrapping, keyboard focus, or accessible
+      names.
+
+
+      Broad verifier disposition rule:
+
+      - If any failure remains, classify it with provenance and disposition. Do NOT
+      call it pre-existing/out-of-scope as a disposition.
+
+      - Any remaining failure intersecting srde2e-final-closure-gate is blocking-now
+      and must identify remediation ownership.
+
+      - A green retest requires all blocker-class E2E failures from the nine-family
+      inventory to be PROVEN closed or explicitly proven non-intersecting with the
+      final gate.
+
+
+      Behavioral proof register required in evidence:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis'
+    verification: '- [ ] full-plan-check protecting srde2e-final-closure-gate.
+
+      - [ ] npm run test:e2e rerun with exact output recorded and expected_result:
+      green.
+
+      - [ ] Targeted failing specs/cases from the original nine blocker families rerun
+      as practical with exact output recorded.
+
+      - [ ] npm run check rerun with exact output recorded.
+
+      - [ ] npm run test:render rerun with exact output recorded.
+
+      - [ ] npm run build rerun sequentially with exact output recorded.
+
+      - [ ] Visual/a11y proof rerun if UI/layout/accessibility changed, with exact
+      output recorded.
+
+      - [ ] Broad verifier disposition pass covers any remaining failures with blocker/non-blocker
+      gate-intersection reasoning.
+
+      - [ ] Behavioral proof register maps every blocker-family closure to runtime
+      evidence and gate decision basis.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      ## Independent Full-Plan E2E Retest Report
+
+
+      **Tester**: integration-verifier (independent of frontend-engineer fix)
+
+      **Scope**: srde2e-full-plan-e2e-blockers-fix
+
+      **Expected result**: green
+
+
+      ### Commands and Exact Output
+
+      ```sh
+
+      npm run test:e2e
+
+      ```
+
+      <paste exact output>
+
+
+      Targeted failing specs/cases as practical:
+
+      ```sh
+
+      <paste commands>
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run check
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run test:render
+
+      ```
+
+      <paste exact output>
+
+
+      ```sh
+
+      npm run build
+
+      ```
+
+      <paste exact output>
+
+
+      Visual/a11y proof if UI/layout/accessibility changed:
+
+      ```sh
+
+      <paste exact command or "NOT RUN: no UI/layout/accessibility surface changed
+      after fix">
+
+      ```
+
+      <paste exact output or rationale>
+
+
+      ### Blocker Family Retest Matrix
+
+      | # | Family | Runtime evidence ref | Status | Gate decision basis |
+
+      |---|--------|----------------------|--------|---------------------|
+
+      | 1 | Source Ledger [FETCH] | | PROVEN/UNPROVEN | |
+
+      | 2 | SOURCE LEDGER/TODAY nav | | PROVEN/UNPROVEN | |
+
+      | 3 | Steer apply accessible-name collision | | PROVEN/UNPROVEN | |
+
+      | 4 | Inspector source/provenance labels | | PROVEN/UNPROVEN | |
+
+      | 5 | Steer source-add receipt wording | | PROVEN/UNPROVEN | |
+
+      | 6 | Source Ledger row grammar/status | | PROVEN/UNPROVEN | |
+
+      | 7 | RESOFEED chrome/source-name ambiguity | | PROVEN/UNPROVEN | |
+
+      | 8 | Feed row Inspect/open layout stability | | PROVEN/UNPROVEN | |
+
+      | 9 | URDA mobile metadata/source clipping | | PROVEN/UNPROVEN | |
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |-----------------|----------------|------------------------|--------------|--------|--------------|---------------------|
+
+      | | | | | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | | |
+
+
+      ### Remaining Failures Disposition
+
+      For each remaining failure, provide:
+
+      - provenance: pre-existing / introduced_now / out-of-step-origin
+
+      - disposition: blocking-now / blocking-later / non-blocking
+
+      - final-gate intersection evidence
+
+      - remediation owner step if blocking
+
+
+      ### Headline
+
+      - [ ] PASS: npm run test:e2e and regression command families are green, or only
+      explicit non-intersecting non-blocking debt remains.
+
+      - [ ] FAIL: Any blocker-class E2E or regression failure remains without remediation
+      ownership.'
+    depends_on:
+    - srde2e-full-plan-e2e-blockers-fix
+    agent: integration-verifier
