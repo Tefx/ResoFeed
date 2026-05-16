@@ -92383,7 +92383,7 @@ phases:
       audits; it does not replace those downstream audits.'
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
-  status: pending
+  status: in_progress
   gate: Final closure blocks unless browser/E2E evidence, uiux-auditor multimodal
     audit, spec/architecture conformance, and zh parity audit prove all repair findings
     closed or explicitly non-intersecting.
@@ -92686,7 +92686,7 @@ phases:
     agent: spec-verifier
   - id: azrv-architecture-boundary-audit
     name: Audit architecture boundary after OPML, copy, preview, and zh repairs
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       verification_scope: phase-check
@@ -92803,6 +92803,8 @@ phases:
 
       - [ ] FAIL'
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-16T14:21:20.723068+00:00'
   - id: azrv-uiux-multimodal-audit
     name: Run native multimodal UIUX audit for low-chrome and zh repair
     status: pending
