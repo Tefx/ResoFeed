@@ -97049,7 +97049,7 @@ phases:
       \ assertions, but this audit included real-binary/browser proof, so non-blocking."
   - id: cos-uiux-multimodal-audit
     name: Run UIUX audit for operation status and utility placement
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT UIUX AUDITOR (uiux-auditor), audit the implemented
       operation-status and utility-placement surfaces against `docs/DESIGN.md` and
       preview artifacts.
@@ -97144,6 +97144,86 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T23:13:26.407958+00:00'
+    done_at: '2026-05-16T23:19:44.983613+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by auditor; `RESOFEED` menu is intentional low-chrome
+      navigation, language/reprocess controls are low-frequency, and dashboard/queue/settings
+      surfaces are forbidden.
+
+      - docs/ARCHITECTURE.md — Read by auditor; reprocess is explicit/non-durable
+      and must not introduce durable job queue/activity ledger/sync/settings dashboard.
+
+      - web/src/routes/+page.svelte — Read by auditor; surface-nav menu contains LANG
+      control and REPROCESS LIBRARY bracket action.
+
+      - web/src/routes/components/SourceLedger.svelte — Read by auditor; `headerOperationStatusText`
+      renders natively in `.source-ledger__status`.
+
+      - Artifacts reviewed: `idle-top-chrome-before-menu-open.png`, `utility-menu-open-low-frequency-controls.png`,
+      `source-ledger-running-ingest-visible.png`, `utility-menu-open-running-operation-status.png`,
+      `source-ledger-blocked-operation-visible.png`, `utility-menu-open-blocked-operation-status.png`.
+
+
+      ## UIUX Audit Report
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      **Post-fix prerequisites reviewed:**
+
+      - `cos-retest-current-operation-browser-conflict-detail`: PASS.
+
+      - `cos-reaudit-current-operation-wiring`: PASS.
+
+
+      **Visual/spatial artifacts:**
+
+      - Closed top chrome: PASS.
+
+      - Open RESOFEED utility menu: PASS.
+
+      - Source Ledger running status with phase/count/message/timestamps: PASS.
+
+      - Reprocess conflict/running states with current-operation detail: PASS.
+
+
+      **Forbidden UI scan:**
+
+      - Dashboard/progress panel/queue/history/settings surface present: NO.
+
+      - Persistent idle top-chrome status strip present: NO.
+
+
+      **behavioral_proof_register:**
+
+      - Current-operation payloads render terse contextual status details: PASS.
+
+      - Low-frequency LANG/reprocess controls are not persistent: PASS.
+
+      - Current-operation status is contextual, not a global strip: PASS.
+
+
+      **Mainline/merge note:**
+
+      - Audit was verify-only; no product implementation files required merging.
+
+
+      **Gaps/Notes:**
+
+      - None.'
   - id: cos-spec-doc-conformance
     name: Verify spec and docs conformance for operation-status implementation
     status: claimed
