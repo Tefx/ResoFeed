@@ -1,0 +1,46 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - group "RESOFEED surface menu": RESOFEED
+  - button "Processing language English; set Chinese": "LANG: EN"
+  - text: Existing readable item content will be rewritten. Source identifiers remain unchanged.
+  - button "Reprocess existing library and rebuild search index": "[REPROCESS LIBRARY]"
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": today
+  - complementary "INSPECTOR independent scroll":
+    - button "back to TODAY"
+    - complementary "Live audit item one":
+      - paragraph: INSPECTOR
+      - paragraph: "src: Live Audit Source · partial · high"
+      - 'button "Resonate item: Live audit item one"': ☆
+      - heading "Live audit item one" [level=2]
+      - paragraph:
+        - link "original link":
+          - /url: https://live-audit.example.test/items/one
+      - term: url
+      - definition:
+        - link "https://live-audit.example.test/items/one":
+          - /url: https://live-audit.example.test/items/one
+      - term: source url
+      - definition:
+        - link "http://127.0.0.1:59066/policy-feed.xml":
+          - /url: http://127.0.0.1:59066/policy-feed.xml
+      - term: original link
+      - definition:
+        - link "https://live-audit.example.test/items/one":
+          - /url: https://live-audit.example.test/items/one
+      - paragraph: "source text: RSS excerpt only summary provenance: feed excerpt fallback"
+      - paragraph:
+        - strong: "summary:"
+        - text: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.
+      - paragraph:
+        - strong: "core insight:"
+        - text: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.
+      - paragraph: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.
+      - paragraph: "why: fresh from configured source"
+      - group: source details

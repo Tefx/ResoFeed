@@ -1,0 +1,45 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - group "RESOFEED surface menu": RESOFEED
+  - button "Processing language English; set Chinese": "LANG: EN"
+  - text: Existing readable item content will be rewritten. Source identifiers remain unchanged.
+  - button "Reprocess existing library and rebuild search index": "[REPROCESS LIBRARY]"
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": "retrieval: lexical search"
+  - region "Search surface":
+    - region "Search and Retrieval":
+      - heading "Search and Retrieval" [level=2]
+      - form "Search filters":
+        - text: Plain text query
+        - textbox "Plain text query": Live audit
+        - button "search"
+        - group:
+          - text: filters Source filter
+          - textbox "Source filter"
+          - text: From date
+          - textbox "From date"
+          - text: To date
+          - textbox "To date"
+          - checkbox "Resonated only"
+          - text: Resonated only Result limit
+          - combobox "Result limit":
+            - option "10"
+            - option "20"
+            - option "50" [selected]
+            - option "100"
+      - paragraph: 1 results
+      - region "Search results":
+        - list "Search result items":
+          - listitem:
+            - 'button "Inspect search result: Live audit item one"':
+              - paragraph: "src: Live Audit Source 14h YESTERDAY"
+              - paragraph: "extraction: source excerpt match: lexical index provenance: source-backed value: high"
+              - paragraph: Live audit item one
+              - paragraph: summary unavailable
+            - 'button "Resonate item: Live audit item one"': ☆

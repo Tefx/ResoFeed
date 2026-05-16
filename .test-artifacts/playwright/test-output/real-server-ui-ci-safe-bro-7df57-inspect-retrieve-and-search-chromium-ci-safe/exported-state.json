@@ -1,0 +1,13 @@
+{
+  "schema_version": "resofeed.state.v1",
+  "exported_at": "2026-05-16T02:36:52.649297Z",
+  "sources": [
+    {
+      "id": "src_9a28056df52effbfcceef19853c2f223",
+      "url": "http://127.0.0.1:59026/e2e-feed.xml",
+      "title": "ResoFeed E2E Local Source"
+    }
+  ],
+  "steer_rules": [],
+  "resonated_items": []
+}

@@ -1,1 +1,1 @@
-cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/fixtures/resofeed-e2e-1778429226647-49567.sqlite3
+cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-blockers-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778899010565-32263.sqlite3
