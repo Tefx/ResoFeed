@@ -93473,7 +93473,7 @@ phases:
       evidence, or has a documented non-runtime/non-intersection disposition usable
       by final gate.
 
-      - [ ] Stale closure matrix/contract text is updated or explicitly dispositioned
+      - [x] Stale closure matrix/contract text is updated or explicitly dispositioned
       so it cannot contradict current preview repair evidence.
 
       - [ ] UIUX stale-audit claims are reconciled against fresh current artifacts;
