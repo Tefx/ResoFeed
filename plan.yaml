@@ -94930,7 +94930,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Visual/rendered evidence proves unrelated synthetic feed fragments do
+      - [x] Visual/rendered evidence proves unrelated synthetic feed fragments do
       not show grouped-source disclosure.
 
       - [ ] Visual/rendered evidence proves valid grouped stories still expose grouped
