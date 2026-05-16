@@ -83573,19 +83573,19 @@ phases:
 
       - [x] Do not mutate completed plan steps or split this into multiple serial
       remediation steps.'
-    verification: '- [ ] local-check protecting `srdf-batched-frontend-audit-closure`
+    verification: '- [x] local-check protecting `srdf-batched-frontend-audit-closure`
       and `srdf-frontend-gate`.
 
-      - [ ] Evidence contains a combined findings register for all spec-verifier B1/B2/B3/B4/R10
+      - [x] Evidence contains a combined findings register for all spec-verifier B1/B2/B3/B4/R10
       items and all listed UIUX claims.
 
-      - [ ] Evidence distinguishes `PROVEN_FIXED`, `PROVEN_STALE_NON_INTERSECTING`,
+      - [x] Evidence distinguishes `PROVEN_FIXED`, `PROVEN_STALE_NON_INTERSECTING`,
       `SOURCE_CONTRACT_UPDATED`, and `STILL_BLOCKED` for each item.
 
-      - [ ] Evidence includes focused current-mainline command output used before
+      - [x] Evidence includes focused current-mainline command output used before
       and after the fix.
 
-      - [ ] No blocker-class item is left with only `pre-existing`, `stale`, `out-of-scope`,
+      - [x] No blocker-class item is left with only `pre-existing`, `stale`, `out-of-scope`,
       or narrative disposition.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
