@@ -93633,7 +93633,7 @@ phases:
       \ retest step remains required before final closure."
   - id: azrv-batched-verification-failure-retest
     name: Retest batched verification failures after remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -93822,3 +93822,103 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T15:26:22.687475+00:00'
+    done_at: '2026-05-16T15:36:35.830668+00:00'
+    evidence: "step_intent: retest_green\nexpected_result: green\nobserved_result:\
+      \ green\nverdict: PASS\nblockers: []\norchestrator_action_hint: COMPLETE\nproduct_implementation_files_modified:\
+      \ no; only evidence artifacts under .test-artifacts were generated/committed\n\
+      \n## refs Read Confirmation\n- AGENTS.md — NOT READ: integration-verifier reported\
+      \ no AGENTS.md in the isolated worktree glob result.\n- docs/ARCHITECTURE.md\
+      \ — key passage: one Go binary, SQLite/FTS5 only, source identifiers preserved\
+      \ unchanged, explicit non-durable reprocess, desktop split scroll containment.\n\
+      - docs/DESIGN.md — key passage: Language Control is terse, Reprocess Library\
+      \ is bracket-style, Source Ledger aligns last_ingest with [RUN INGEST], source\
+      \ identifiers remain unchanged/translate=no.\n- docs/ui-preview.html — key passage:\
+      \ preview includes LANG, [REPROCESS LIBRARY], SOURCE LEDGER last_ingest/[RUN\
+      \ INGEST], zh chrome, and source identifier preservation copy.\n\n## Retest\
+      \ Evidence\nExact commands executed in isolated worktree and again on merged\
+      \ mainline:\n```bash\nnpm run test:render\nnpm run test:e2e -- --project=chromium-ci-safe\
+      \ tests/e2e/azrct-audit-zh-repair.regression.spec.ts tests/e2e/processing-language-source-split-scroll.spec.ts\n\
+      npx vitest run src/test/azrct-contract-fixtures.regression.test.ts src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts\
+      \ src/routes/components/__tests__/steer-route-preview.regression.test.ts src/routes/components/__tests__/manual-rss-fetch-source-ledger.regression.test.ts\n\
+      ```\n\nIsolated worktree output:\n```text\nnpm run test:render: Test Files 12\
+      \ passed (12); Tests 64 passed (64)\nProtected AZRCT Playwright: Running 9 tests\
+      \ using 1 worker; 9 passed (6.9s)\nTargeted Vitest: Test Files 4 passed (4);\
+      \ Tests 20 passed (20)\n```\n\nMainline final-state verification after squash\
+      \ merge output:\n```text\nnpm run test:render: Test Files 12 passed (12); Tests\
+      \ 64 passed (64)\nProtected AZRCT Playwright: Running 9 tests using 1 worker;\
+      \ 9 passed (6.9s)\nTargeted Vitest: Test Files 4 passed (4); Tests 20 passed\
+      \ (20)\n```\n\n## Fresh UIUX Multimodal Audit Refresh\nCurrent artifacts used:\n\
+      - .test-artifacts/playwright/results/results.json\n- .test-artifacts/playwright/results/junit.xml\n\
+      - .test-artifacts/playwright/test-output/processing-language-source-cdf49--split-scroll-independently-chromium-ci-safe/split-scroll-mobile-route-evidence/desktop-split-scroll.png\n\
+      - .test-artifacts/playwright/test-output/processing-language-source-cdf49--split-scroll-independently-chromium-ci-safe/split-scroll-mobile-route-evidence/desktop-split-scroll.aria.txt\n\
+      - .test-artifacts/playwright/test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/split-scroll-mobile-route-evidence/mobile-inspector-route.png\n\
+      - .test-artifacts/playwright/test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/split-scroll-mobile-route-evidence/mobile-inspector-route.aria.txt\n\
+      - .test-artifacts/playwright/test-output/processing-language-source-8ee5a-ores-feed-scroll-after-back-chromium-ci-safe/split-scroll-mobile-route-evidence/mobile-feed-restored.png\n\
+      - docs/ui-preview.html\n\n| Prior UIUX claim | Current evidence ref | Status\
+      \ | Gate disposition |\n| --- | --- | --- | --- |\n| persistent route labels\
+      \ / T/SL | Playwright F1/P2 compact route chrome passed | PROVEN fixed | Gate-usable\
+      \ closure |\n| Source Ledger last_ingest + [RUN INGEST] alignment | Playwright\
+      \ F2 passed | PROVEN fixed | Gate-usable closure |\n| preview LANG/reprocess\
+      \ surfaces | Vitest contract fixtures and Playwright zh parity passed | PROVEN\
+      \ fixed | Gate-usable closure |\n| Inspector header/provenance model: ok absence\
+      \ | Playwright Inspector provenance passed | PROVEN fixed | Gate-usable closure\
+      \ |\n| zh localized chrome/status/receipt copy | Playwright zh UI parity and\
+      \ zh Inspector passed | PROVEN fixed | Gate-usable closure |\n| source identifier\
+      \ preservation | Playwright source split-scroll passed | PROVEN fixed | Gate-usable\
+      \ closure |\n\n## Focused zh Spec Conformance\n| Prior zh item | Evidence ref\
+      \ | Status | Gate disposition |\n| --- | --- | --- | --- |\n| B1 | Playwright\
+      \ azrct zh parity and zh Inspector tests | PROVEN | Gate-usable localized chrome/status/receipt\
+      \ and Inspector copy verified |\n| B2 | Playwright source split-scroll plus\
+      \ zh Inspector identifier assertions | PROVEN | Gate-usable identifiers preserved\
+      \ translate=no and unchanged |\n| stale closure matrix disposition | Fresh Vitest\
+      \ + Playwright current artifacts | PROVEN | Gate-usable current runtime/browser\
+      \ proof supersedes stale matrix |\n\n## Behavioral Proof Register\nbehavioral_proof_register:\n\
+      \  - requirement_ref: npm run test:render formerly failing legacy render tests\n\
+      \    behavior_claim: Full render suite is green including manual-rss-fetch-source-ledger\
+      \ and steer-route-preview.\n    runtime_proof_expected: Vitest render suite\
+      \ exits 0 with nonzero passing tests.\n    evidence_ref: npm run test:render\
+      \ output 12 files / 64 tests passed\n    status: PROVEN\n    closure_path: No\
+      \ remediation required.\n    gate_decision_basis: Green full render suite with\
+      \ no empty-room result.\n  - requirement_ref: Protected AZRCT Playwright E2E\n\
+      \    behavior_claim: OPML no-auto-ingest, zh UI, Inspector provenance, Source\
+      \ Ledger alignment, and route chrome coverage are green.\n    runtime_proof_expected:\
+      \ Chromium Playwright suite exits 0 and lists targeted tests passing.\n    evidence_ref:\
+      \ Playwright output 9 passed\n    status: PROVEN\n    closure_path: No remediation\
+      \ required.\n    gate_decision_basis: All protected browser tests passed against\
+      \ current app build.\n  - requirement_ref: Protected Vitest / processing-language\
+      \ preview-facing tests\n    behavior_claim: Processing-language, reprocess,\
+      \ preview drift, steer route, and Source Ledger render contracts are green.\n\
+      \    runtime_proof_expected: Targeted Vitest exits 0 with nonzero passing tests.\n\
+      \    evidence_ref: Targeted Vitest output 4 files / 20 tests passed\n    status:\
+      \ PROVEN\n    closure_path: No remediation required.\n    gate_decision_basis:\
+      \ Targeted non-empty suite passed.\n  - requirement_ref: UIUX multimodal audit\
+      \ current artifacts\n    behavior_claim: Design blocker-class items are fixed\
+      \ or non-intersecting using current screenshots/DOM/ARIA artifacts.\n    runtime_proof_expected:\
+      \ Current Playwright artifacts and tests demonstrate route labels, Source Ledger\
+      \ alignment, LANG/reprocess, Inspector provenance, zh copy, and source identifiers.\n\
+      \    evidence_ref: .test-artifacts/playwright/test-output/...split-scroll-mobile-route-evidence/*.png\
+      \ and *.aria.txt; Playwright output\n    status: PROVEN\n    closure_path: No\
+      \ blocker-class design debt remains.\n    gate_decision_basis: PASS; no true\
+      \ current blockers.\n  - requirement_ref: Focused zh B1/B2/stale-matrix closure\n\
+      \    behavior_claim: Previously failed zh items are closed by fresh runtime/browser\
+      \ checks.\n    runtime_proof_expected: zh parity/Inspector/browser source identifier\
+      \ tests pass and stale matrix is superseded.\n    evidence_ref: Playwright tests\
+      \ 6, 7, 8, 9 passed\n    status: PROVEN\n    closure_path: Gate may rely on\
+      \ current green browser evidence.\n    gate_decision_basis: No NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING\
+      \ items remain.\n\ngate_open_allowed: true\nblocking_status: CLOSED\nproof_gap_status:\
+      \ NONE\nheadline: PASS\n\n## Merge / Final-State Verification\n- Worktree branch\
+      \ committed evidence-only artifacts at f5536501eb90eadb050afd7bc0dabf239f56d6d7.\n\
+      - Orchestrator removed an unintended plan.yaml branch diff before merge with\
+      \ f4601fac; final branch diff excluded plan.yaml/orchestrator state.\n- Main\
+      \ had pre-existing dirty .test-artifacts that blocked merge; orchestrator stashed\
+      \ only .test-artifacts as `vectl main dirty test artifacts before azrv retest\
+      \ merge`, then squash-merged evidence branch.\n- Squash merge commit: 9626a495\
+      \ `[vectl] step-azrv-batched-verification-failure-retest completed`.\n- Mainline\
+      \ final-state verification after merge passed all three required command families.\n\
+      \n## Commit / Files / Gaps\nCommit hash(es): f5536501eb90eadb050afd7bc0dabf239f56d6d7,\
+      \ f4601fac, 9626a495\nFiles changed: evidence artifacts under .test-artifacts\
+      \ only; no product implementation files.\nVerification: required render, protected\
+      \ Playwright, and targeted Vitest suites green in isolated worktree and merged\
+      \ mainline.\nSpec link: azrv-batched-verification-failure-retest\nGaps/Notes:\
+      \ no unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING items remain; AGENTS.md\
+      \ was not available in isolated worktree per verifier evidence."
