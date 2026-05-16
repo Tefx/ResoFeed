@@ -84144,7 +84144,7 @@ phases:
       - [x] Fix or source-update the TODAY selector mismatch without weakening rendered
       artifact coverage.
 
-      - [ ] Fix or source-update mobile metadata truncation expectations so required
+      - [x] Fix or source-update mobile metadata truncation expectations so required
       text is neither clipped nor over-truncated.
 
       - [ ] Preserve the passing `[IMPORT OPML]` keyboard/file reachability behavior
