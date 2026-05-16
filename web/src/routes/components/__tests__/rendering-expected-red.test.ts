@@ -303,7 +303,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const steer = await screen.findByLabelText('Steer or paste RSS URL');
     await user.type(steer, 'https://example.com/feed.xml');
     await user.click(screen.getByRole('button', { name: 'apply' }));
-    await waitFor(() => expect(screen.getByText('applied: source added')).toBeVisible());
+    await waitFor(() => expect(screen.getByText(/source added:/)).toBeVisible());
 
     const steerCall = calls.find((call) => call.url.endsWith('/api/steer'));
     expect(steerCall?.init?.method).toBe('POST');
@@ -448,7 +448,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
-    expect(within(ledger).getByText('src: Example Source')).toBeVisible();
+    expect(within(ledger).getByText(/src: Example Source · status: ok · last_fetch:/)).toBeVisible();
     expect(within(ledger).getByText('url: https://example.com/feed.xml')).toBeVisible();
     expect(within(ledger).getByText('last_fetch: 00:00:00')).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();

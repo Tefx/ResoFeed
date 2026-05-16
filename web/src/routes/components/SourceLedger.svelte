@@ -93,6 +93,10 @@
     return `last_fetch: ${lastFetch ?? 'not_fetched'}`;
   }
 
+  function rowGrammarForSource(source: Source, sourceLabel: string, lastFetch: string | null): string {
+    return `src: ${sourceLabel} · status: ${source.last_fetch_status} · last_fetch: ${lastFetch ?? 'not_fetched'}`;
+  }
+
   function rawErrorText(message: string): string {
     const trimmed = message.trim();
     return trimmed.toLowerCase().startsWith('err:') ? trimmed : `err: ${trimmed}`;
@@ -246,11 +250,11 @@
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
-          <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate={sourceTitleTranslate}>src: {sourceLabel}</div>
+          <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{rowGrammarForSource(source, sourceLabel, lastFetch)}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
+            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? `[FETCHING...] Fetch source ${sourceLabel}` : `[FETCH] Fetch source ${sourceLabel}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
             {#if confirmingSourceId === source.id}
               <button type="button" class="bracket-action bracket-action--confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
             {:else}

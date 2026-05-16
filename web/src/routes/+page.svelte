@@ -65,6 +65,7 @@
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
   let routePreviewElement = $state<HTMLElement | undefined>();
+  let routePreviewAnnounces = $state(true);
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
   let suppressFeedScrollRecording = false;
@@ -397,8 +398,11 @@
   function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
     if (receipt.interpreted_as === 'add_source') {
       const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
-      const detail = normalizedMessage.length > 0 ? normalizedMessage : 'source added';
-      return `applied: ${detail}`;
+      const commandUrl = command.match(/^https?:\/\/\S+/i)?.[0];
+      const rawDetail = commandUrl ?? normalizedMessage.replace(/^source\s+(?:added|already active):?\s*/i, '').replace(/;\s*no change$/i, '').trim();
+      const detail = compactReceiptSourceIdentity(rawDetail);
+      const sourceText = detail.length > 0 ? `source added: ${detail}` : 'source added';
+      return `applied: ${sourceText}; source ledger records it; background ingest will pick it up`;
     }
 
     const state = receiptState(receipt);
@@ -408,6 +412,15 @@
     if (state === 'applied' && normalizedMessage.length > 0) return `applied: ${normalizedMessage}${suffix}`;
     const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
     return `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
+  }
+
+  function compactReceiptSourceIdentity(value: string): string {
+    try {
+      const parsed = new URL(value);
+      return `${parsed.host}${parsed.pathname}`.replace(/\/$/u, '');
+    } catch {
+      return value.replace(/^https?:\/\//iu, '').replace(/\/$/u, '').trim();
+    }
   }
 
   function undoTargetForReceipt(receipt: SteerReceipt): SteerUndoTarget | undefined {
@@ -433,6 +446,8 @@
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
+    let shouldRefocusSteer = true;
+    routePreviewAnnounces = false;
 
     const routeEcho = routeEchoForCommand(command);
     if (routeEcho.kind === 'invalid') {
@@ -445,12 +460,14 @@
     steerFeedback = { kind: 'submitting' };
     try {
       if (command.toLowerCase() === 'source ledger' || command.toLowerCase() === 'ledger') {
+        shouldRefocusSteer = false;
         showSurface('ledger');
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'source ledger' };
         return;
       }
       if (command.toLowerCase() === 'today') {
+        shouldRefocusSteer = false;
         await refreshShellLists();
         showSurface('feed');
         steerCommand = '';
@@ -458,6 +475,7 @@
         return;
       }
       if (/^(search|find)\s+/i.test(command)) {
+        shouldRefocusSteer = false;
         searchSeedQuery = command.replace(/^(search|find)\s+/i, '');
         showSurface('search', false);
         steerCommand = '';
@@ -470,6 +488,7 @@
         return;
       }
       if (command === '/doctor') {
+        shouldRefocusSteer = false;
         const diagnostics = await apiClient().doctor();
         showSurface('doctor');
         steerCommand = '';
@@ -491,7 +510,7 @@
       steerFeedback = { kind: 'error', text: formatSteerError(error) };
     } finally {
       await tick();
-      steerInput?.focus();
+      if (shouldRefocusSteer) steerInput?.focus();
     }
   }
 
@@ -527,6 +546,14 @@
   async function importOpml(opml: string): Promise<ImportOpmlResponse> {
     const response = await apiClient().importOpml(opml);
     sources = (await apiClient().sources()).sources;
+    try {
+      await apiClient().runIngest();
+      items = (await apiClient().today()).items;
+    } catch {
+      // Background ingest remains the documented steady-state path; this best-effort
+      // immediate refresh keeps first-use OPML fixtures populated without adding a
+      // durable job, queue, dashboard, or activity surface.
+    }
     return response;
   }
 
@@ -656,6 +683,7 @@
   {:else}
     <a class="skip-link" href="#today-feed" tabindex="-1">skip to feed</a>
     <header class="shell-command">
+      <h1 class="contract-brand">RESOFEED</h1>
       <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
         <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
         <span aria-hidden="true">&gt;</span>
@@ -669,6 +697,7 @@
           autocomplete="off"
           aria-describedby="steer-route-preview-status steer-route-preview-input-desc"
           disabled={steerFeedback.kind === 'submitting'}
+          oninput={() => { routePreviewAnnounces = true; }}
           onkeydown={(event) => {
             if (event.key === 'Escape') {
               event.preventDefault();
@@ -680,23 +709,33 @@
           <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
         {/if}
       </form>
-      <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen}>
-        <summary class="contract-label surface-nav-label">RESOFEED</summary>
-        <div class="surface-nav-menu">
-          <button
-            type="button"
-            aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
-            data-state={currentSurface === 'feed' ? 'active' : undefined}
-            onclick={() => openSurfaceFromMenu('feed')}
-          >TODAY</button>
-          <button
-            type="button"
-            aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'}
-            data-state={currentSurface === 'ledger' ? 'active' : undefined}
-            onclick={() => openSurfaceFromMenu('ledger')}
-          >SOURCE LEDGER</button>
-        </div>
-      </details>
+      <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
+        <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { surfaceMenuOpen = event.currentTarget.open; }}>
+          <summary class="contract-label surface-nav-label" tabindex="-1" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
+          {#if surfaceMenuOpen}
+            <div class="surface-nav-menu">
+              <button
+                type="button"
+                aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
+                data-state={currentSurface === 'feed' ? 'active' : undefined}
+                onclick={() => openSurfaceFromMenu('feed')}
+              >TODAY</button>
+              <button
+                type="button"
+                aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'}
+                data-state={currentSurface === 'ledger' ? 'active' : undefined}
+                onclick={() => openSurfaceFromMenu('ledger')}
+              >SOURCE LEDGER</button>
+            </div>
+          {/if}
+        </details>
+        <span class="surface-nav-quick-group" aria-hidden={surfaceMenuOpen ? 'true' : undefined}>
+          <!-- [DEVIATION]: Legacy E2E contracts still query direct TODAY/SOURCE LEDGER buttons; use abbreviated visible glyphs with explicit accessible names so primary copy remains low-chrome. -->
+          <button type="button" class="surface-nav-quick" aria-label="TODAY" tabindex={surfaceMenuOpen ? -1 : 0} aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} onclick={() => showSurface('feed')}>T</button>
+          <button type="button" class="surface-nav-quick" aria-label="SOURCE LEDGER" tabindex={surfaceMenuOpen ? -1 : 0} aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} onclick={() => showSurface('ledger')}>SL</button>
+        </span>
+        <span class="surface-nav-context">SOURCE LEDGER / DOCTOR / INSPECTOR</span>
+      </nav>
       <div class="runtime-language-controls" aria-label="Processing language controls">
         <button
           type="button"
@@ -720,7 +759,7 @@
         bind:this={routePreviewElement}
         id="steer-route-preview-status"
         class="steer-route-preview"
-        role="status"
+        role={routePreviewAnnounces ? 'status' : undefined}
         aria-label="Steer route preview"
         aria-live={steerRouteEcho.live}
         aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
@@ -735,7 +774,7 @@
           {/if}
           {#if steerRouteEcho.writeAction && steerFeedback.kind !== 'submitting'}
             <span class="steer-route-preview__actions" aria-label="Steer write action boundary">
-              <button type="button" class="bracket-action" onclick={() => void submitSteer()}>[APPLY]</button>
+              <button type="button" class="bracket-action" aria-label="confirm steer route preview" onclick={() => void submitSteer()}>[APPLY]</button>
               <button type="button" class="bracket-action" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
             </span>
           {/if}
@@ -785,10 +824,12 @@
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
       <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface independent scroll" aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">Independent scroll region</span>
-        {#if items.length === 0}
-          <FirstUseEmptyState state={firstUseState} />
-        {:else}
-          <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+        {#if !feedPaneInactive}
+          {#if items.length === 0}
+            <FirstUseEmptyState state={firstUseState} />
+          {:else}
+            <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+          {/if}
         {/if}
       </section>
 

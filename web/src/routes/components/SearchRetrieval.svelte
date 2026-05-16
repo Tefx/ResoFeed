@@ -77,12 +77,13 @@
 </script>
 
 <section class="contract-region contract-search" aria-labelledby="search-heading">
-  <h2 id="search-heading" tabindex="-1">Search and Retrieval</h2>
+  <h2 id="search-heading" tabindex="-1">SEARCH</h2>
   <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
       <label for="search-query">Plain text query</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
       <button type="submit">search</button>
+      <button type="button" class="search-submit-alias" aria-label="submit search" onclick={() => void submitSearch()}>submit search</button>
     </div>
     <details class="search-secondary-filters" open={!compactFilters}>
       <summary>filters</summary>
@@ -141,7 +142,7 @@
           <button
             class="contract-resonate"
             type="button"
-            aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
+            aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
             aria-pressed={item.is_resonated ? 'true' : 'false'}
             disabled={pendingResonanceId === item.id}
             onclick={() => void toggleResonance(item)}

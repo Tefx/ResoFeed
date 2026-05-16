@@ -71,7 +71,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeInTheDocument();
-    expect(within(ledger).getByRole('button', { name: 'Fetch source Example' })).toHaveTextContent('[FETCH]');
+    expect(within(ledger).getByRole('button', { name: /\[FETCH\].*Fetch source Example/ })).toHaveTextContent('[FETCH]');
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example' })).toHaveTextContent('[DELETE]');
   });
 
@@ -146,7 +146,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example' }));
     await user.click(within(ledger).getByRole('button', { name: 'confirm delete source: Example' }));
     expect(onDeleteSource).toHaveBeenCalledWith(sourceWithFetchTime);
-    expect(within(ledger).getByRole('button', { name: 'Fetch source Next Source' })).toHaveFocus();
+    expect(within(ledger).getByRole('button', { name: /\[FETCH\].*Fetch source Next Source/ })).toHaveFocus();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Next Source' }));
     await user.click(within(ledger).getByRole('button', { name: 'confirm delete source: Next Source' }));
@@ -174,7 +174,7 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     const row = ledger.querySelector('.source-ledger-row');
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent(/src: simonwillison\.net\/feed\.xml\s+url: https:\/\/simonwillison\.net\/atom\/everything\s+last_fetch: 10:25:31\s+\[FETCH\]\s+\[DELETE\]\s+\[DETAILS\]/);
+    expect(row).toHaveTextContent(/src: simonwillison\.net\/feed\.xml\s*· status: ok · last_fetch: 10:25:31\s+url: https:\/\/simonwillison\.net\/atom\/everything\s+last_fetch: 10:25:31\s+\[FETCH\]\s+\[DELETE\]\s+\[DETAILS\]/);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
     expect(row?.children).toHaveLength(4);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');

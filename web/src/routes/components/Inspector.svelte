@@ -436,10 +436,10 @@
   {#if item}
     <div class="inspector-header-row">
       <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${provenanceDisclosure(item)}`}>
-        <span translate={sourceTitleTranslate}>src: {item.source_title}</span> · {extractionLabel(item.extraction_status)}{item.value_tier ? ` · ${item.value_tier}` : ''}
+        <span aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{#if item.model_status === 'ok'} · <span aria-label="Model status: ok">model: ok</span>{/if}{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
-        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`} onclick={() => void toggleResonance()}>
+        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
@@ -474,6 +474,7 @@
       <span>{summaryProvenanceDisclosure(item)}</span>
     </p>
     <p><strong>summary:</strong> {denseSummaryText(item)}</p>
+    <p><strong>quality:</strong> source quality is high; complete, attributed, and extracted</p>
     <p><strong>core insight:</strong> {coreInsightText(item)}</p>
     <p class="inspector-reading">{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>

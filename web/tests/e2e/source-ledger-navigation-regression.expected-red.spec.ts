@@ -131,7 +131,7 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
 
     const shellText = await visibleText(page);
     expect(shellText, 'primary visible copy must stay operational and avoid forbidden source-management/SaaS concepts').not.toMatch(forbiddenPrimaryCopy);
-    await expect(page.getByText('RESOFEED')).toBeVisible();
+    await expect(page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary')).toHaveText('RESOFEED');
     await chrome.locator('summary').click();
     await expect(chrome.getByRole('button', { name: 'TODAY' })).toBeVisible();
     await expect(page.getByLabel('INSPECTOR')).toBeAttached();

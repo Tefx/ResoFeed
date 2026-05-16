@@ -129,12 +129,11 @@ async function openSurfaceMenu(page: Page): Promise<Locator> {
   return menu;
 }
 
-async function assertNoManualLedgerFetchControls(page: Page): Promise<void> {
+async function assertManualLedgerFetchControls(page: Page): Promise<void> {
   const ledgerSurface = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]');
-  for (const forbiddenName of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]'] as const) {
-    await expect(ledgerSurface.getByRole('button', { name: forbiddenName }), `${forbiddenName} must not render in real API Source Ledger`).toHaveCount(0);
-  }
-  await expect(ledgerSurface.getByRole('button', { name: /run ingest|ingesting|fetch|fetching/i })).toHaveCount(0);
+  // docs/DESIGN.md Source Ledger lines 573-591 and docs/UI_REGRESSION_CONTRACT.md lines 36-37 require lightweight manual controls.
+  await expect(ledgerSurface.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await expect(ledgerSurface.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
 }
 
 async function assertTodayExcludedFromA11yFlow(page: Page): Promise<void> {
@@ -208,7 +207,7 @@ test('R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payl
     await menu.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'retrieval: lexical search' })).toHaveCount(0);
     await expect(page.getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible();
-    await assertNoManualLedgerFetchControls(page);
+    await assertManualLedgerFetchControls(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);

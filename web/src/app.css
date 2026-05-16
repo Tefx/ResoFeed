@@ -452,11 +452,27 @@ a:focus,
 
 .shell-command {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(32ch, auto);
-  gap: var(--rf-space-md);
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(32ch, auto);
+  gap: var(--rf-space-sm);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-border);
-  padding: var(--rf-space-md);
+  padding: var(--rf-space-sm) var(--rf-space-md);
+}
+
+.contract-brand {
+  margin: 0;
+  font: var(--rf-typography-display);
+  letter-spacing: 0.08em;
+}
+
+.surface-nav-context {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
 }
 
 .steer-form {
@@ -466,30 +482,36 @@ a:focus,
   align-items: center;
 }
 
-.surface-nav {
+nav.surface-nav,
+details.surface-nav {
   display: flex;
   gap: var(--rf-space-row);
   align-items: center;
 }
 
-.surface-nav summary {
+details.surface-nav summary {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
   list-style: none;
 }
 
-.surface-nav summary::-webkit-details-marker {
+details.surface-nav summary::-webkit-details-marker {
   display: none;
 }
 
-.surface-nav-menu {
+.surface-nav--steering {
+  pointer-events: none;
+}
+
+details.surface-nav .surface-nav-menu {
   display: flex;
   gap: var(--rf-space-xs);
   align-items: center;
 }
 
-.surface-nav button {
+details.surface-nav button,
+.surface-nav-quick {
   min-height: 44px;
   border: 0;
   padding: 0 var(--rf-space-row);
@@ -501,15 +523,34 @@ a:focus,
   cursor: pointer;
 }
 
-.surface-nav button[aria-pressed='true'],
-.surface-nav button:hover,
-.surface-nav button:focus-visible {
+.surface-nav-quick-group {
+  display: inline-flex;
+  gap: var(--rf-space-xs);
+  align-items: center;
+}
+
+.surface-nav-quick {
+  width: 44px;
+  justify-content: center;
+}
+
+details.surface-nav button[aria-pressed='true'],
+details.surface-nav button:hover,
+details.surface-nav button:focus-visible,
+.surface-nav-quick[aria-pressed='true'],
+.surface-nav-quick:hover,
+.surface-nav-quick:focus-visible {
   color: var(--rf-color-text);
 }
 
-.surface-nav button:focus-visible {
+details.surface-nav button:focus-visible,
+.surface-nav-quick:focus-visible {
   outline: 2px solid var(--rf-color-focus);
   outline-offset: 2px;
+}
+
+details.surface-nav[open] ~ .surface-nav-quick-group {
+  display: none;
 }
 
 .runtime-language-controls {
@@ -523,6 +564,14 @@ a:focus,
 .runtime-language-warning,
 .runtime-reprocess-status {
   font: var(--rf-typography-metadata);
+}
+
+.runtime-language-warning {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
 }
 
 .runtime-reprocess-status {
@@ -1041,20 +1090,25 @@ a:focus,
   }
 
   .contract-feed-meta {
+    /* [DEVIATION]: Mobile source identifiers must remain fully measurable for
+       UI_REGRESSION_CONTRACT Issue 10 while FR-09 keeps feed-row metadata at
+       one compact line; allow visible overflow instead of wrapping/clipping. */
     flex-wrap: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    height: 16px;
+    line-height: 16px;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .contract-feed-meta span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .contract-feed-meta .feed-meta-source {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
   }
 
   .contract-time-label {

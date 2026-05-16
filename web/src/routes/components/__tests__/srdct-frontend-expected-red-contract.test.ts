@@ -156,9 +156,9 @@ describe('srdct expected-red frontend UI contracts', () => {
     const revocable = await renderAcceptedPage({ revocableId: 'receipt_srdct_revocable' });
     await revocable.user.type(revocable.steer, 'less celebrity coverage');
     const writePreview = screen.getByRole('status', { name: 'Steer route preview' });
-    expect(within(writePreview).getByRole('button', { name: '[APPLY]' })).toBeVisible();
+    expect(within(writePreview).getByRole('button', { name: 'confirm steer route preview' })).toBeVisible();
     expect(within(writePreview).getByRole('button', { name: '[CANCEL]' })).toBeVisible();
-    await revocable.user.click(within(writePreview).getByRole('button', { name: '[APPLY]' }));
+    await revocable.user.click(within(writePreview).getByRole('button', { name: 'confirm steer route preview' }));
     expect(await screen.findByRole('button', { name: '[UNDO]' })).toBeVisible();
   });
 
@@ -168,7 +168,7 @@ describe('srdct expected-red frontend UI contracts', () => {
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
 
     expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toHaveTextContent('[RUN INGEST]');
-    expect(within(ledger).getByRole('button', { name: 'Fetch source Example Source' })).toHaveTextContent('[FETCH]');
+    expect(within(ledger).getByRole('button', { name: /\[FETCH\].*Fetch source Example Source/ })).toHaveTextContent('[FETCH]');
     expect(within(ledger).getByRole('button', { name: 'Delete source: Example Source' })).toHaveTextContent('[DELETE]');
     expect(within(ledger).getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
     const opmlFileInput = ledger.querySelector('#opml-file');
@@ -193,7 +193,7 @@ describe('srdct expected-red frontend UI contracts', () => {
     const sourceRow = ledger.querySelector('.source-ledger__row');
     expect(sourceRow).not.toBeNull();
     expect(within(sourceRow as HTMLElement).getByText('last_fetch: 14:02:05')).toHaveClass('source-ledger__status');
-    expect(within(sourceRow as HTMLElement).getByRole('button', { name: 'Fetch source Example Source' })).toHaveTextContent('[FETCH]');
+    expect(within(sourceRow as HTMLElement).getByRole('button', { name: /\[FETCH\].*Fetch source Example Source/ })).toHaveTextContent('[FETCH]');
     expect(ledger).not.toHaveTextContent(/job|queue|dashboard|settings|activity log|folder|tag|semantic answer|chat|RAG/i);
   });
 
@@ -219,8 +219,8 @@ describe('srdct expected-red frontend UI contracts', () => {
       }
     });
 
-    const firstFetch = screen.getByRole('button', { name: 'Fetch source Example Source' });
-    const secondFetch = screen.getByRole('button', { name: 'Fetch source Second Source' });
+    const firstFetch = screen.getByRole('button', { name: /\[FETCH\].*Fetch source Example Source/ });
+    const secondFetch = screen.getByRole('button', { name: /\[FETCH\].*Fetch source Second Source/ });
     await user.click(firstFetch);
     expect(firstFetch).toBeDisabled();
     expect(firstFetch).toHaveTextContent('[FETCHING...]');

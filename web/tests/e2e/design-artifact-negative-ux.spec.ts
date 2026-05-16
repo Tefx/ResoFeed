@@ -174,9 +174,9 @@ async function assertMobileMetadataStaysFlat(page: Page): Promise<void> {
       overflow: style.overflowX
     };
   });
-  expect(metrics.whiteSpace, 'mobile metadata must use deterministic one-line treatment').toBe('nowrap');
-  expect(metrics.overflow, 'mobile metadata overflow must be clipped for ellipsis').toBe('hidden');
-  expect(metrics.height, 'mobile metadata must not wrap into stacked words').toBeLessThanOrEqual(metrics.lineHeight + 2);
+  expect(metrics.whiteSpace, 'mobile metadata must avoid source clipping on narrow viewports').toBe('normal');
+  expect(metrics.overflow, 'mobile metadata overflow remains visible to prevent source clipping').toBe('visible');
+  expect(metrics.height, 'mobile metadata may use a compact second line instead of clipping hostile source labels').toBeLessThanOrEqual((metrics.lineHeight * 2) + 2);
 }
 
 test('design artifact manifest captures required ResoFeed UI contract states', async ({ page, runInfo, ownerToken }, testInfo) => {

@@ -168,6 +168,8 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
   test('ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics', async ({ page }) => {
     await openFixtureShell(page);
 
+    // docs/DESIGN.md lines 373-374 and UI_REGRESSION_CONTRACT lines 28-30 require TODAY/SOURCE LEDGER through opened RESOFEED menu.
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     const ledgerButton = page.locator('nav.surface-nav button:has-text("SOURCE LEDGER")');
     await expectUnobstructedHitTarget(ledgerButton, 'SOURCE LEDGER nav');
     await ledgerButton.click();
@@ -176,15 +178,19 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);
     await expect(page.locator('.feed-pane')).not.toHaveClass(/active-panel/);
     await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-    await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]').getByText('Fixture Source · ok · last fetch: 10:00:00')).toBeVisible();
+    await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]').getByText('src: Fixture Source · status: ok · last_fetch: 10:00:00')).toBeVisible();
   });
 
   test('ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface', async ({ page }) => {
     await openFixtureShell(page);
 
+    // docs/DESIGN.md lines 373-374 and UI_REGRESSION_CONTRACT lines 28-30 require TODAY/SOURCE LEDGER through opened RESOFEED menu.
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);
 
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     const todayButton = page.locator('nav.surface-nav button:has-text("TODAY")');
     await expectUnobstructedHitTarget(todayButton, 'TODAY nav');
     await todayButton.click();
@@ -256,6 +262,7 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expectVisiblePrimaryCopyClean(page.locator('main.contract-shell'), 'Source Ledger shell');
 
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'TODAY' }).click();
     await page.getByRole('button', { name: 'Open Inspector for: Clean fixture item with JSON-LD metadata' }).click();
     await expectVisiblePrimaryCopyClean(page.locator('main.contract-shell'), 'selected Inspector shell');

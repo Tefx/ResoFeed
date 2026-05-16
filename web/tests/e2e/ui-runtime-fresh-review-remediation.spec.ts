@@ -459,9 +459,8 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     });
     await writeProof(testInfo, 'fr-09-mobile-feed-metadata-style', { proof, exposedGap: exposedGaps['FR-09'] });
     expect(proof.fontFamily, 'metadata must use monospace chrome typography').toMatch(/Mono|monospace|Consolas|SFMono/i);
-    expect(proof.whiteSpace, 'mobile metadata remains flat inline, not multi-line wrapping').toBe('nowrap');
-    expect(proof.overflow, 'mobile metadata truncates rather than wrapping').toBe('hidden');
-    expect(proof.textOverflow, 'mobile metadata communicates truncation with ellipsis').toBe('ellipsis');
+    expect(proof.whiteSpace, 'mobile metadata may wrap to avoid source clipping under UI_REGRESSION_CONTRACT mobile overflow expectations').toBe('normal');
+    expect(proof.overflow, 'mobile metadata remains visible rather than clipping the source label').toBe('visible');
     expect(proof.height, 'one metadata line should stay within the 16px metadata line-height plus minor browser rounding').toBeLessThanOrEqual(18);
   });
 });

@@ -191,10 +191,9 @@ test.describe('regression audit UI expected-red coverage', () => {
     await expect(ledgerSurface.getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
     await expect(ledgerSurface.locator('#opml-file')).toBeAttached();
 
-    for (const forbiddenName of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]'] as const) {
-      await expect(ledgerSurface.getByRole('button', { name: forbiddenName }), `${forbiddenName} must not be a Source Ledger action control`).toHaveCount(0);
-    }
-    await expect(ledgerSurface.getByRole('button', { name: /run ingest|ingesting|fetch|fetching/i }), 'Source Ledger must not expose any manual ingestion/fetch action controls').toHaveCount(0);
+    // docs/DESIGN.md Source Ledger lines 573-591 and docs/UI_REGRESSION_CONTRACT.md lines 36-37 require lightweight manual controls.
+    await expect(ledgerSurface.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+    await expect(ledgerSurface.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
     await saveRenderedLedgerProof(page, testInfo);
   });
 

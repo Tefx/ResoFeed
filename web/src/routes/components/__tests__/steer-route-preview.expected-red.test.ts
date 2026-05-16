@@ -163,10 +163,10 @@ describe('expected-red Steer route preview and receipt contracts', () => {
 
     const preview = screen.getByRole('status', { name: 'Steer route preview' });
     expect(within(preview).getByText('[STEER RULE]')).toBeVisible();
-    expect(within(preview).getByRole('button', { name: '[APPLY]' })).toBeVisible();
+    expect(within(preview).getByRole('button', { name: 'confirm steer route preview' })).toBeVisible();
     expect(within(preview).getByRole('button', { name: '[CANCEL]' })).toBeVisible();
 
-    await user.click(within(preview).getByRole('button', { name: '[APPLY]' }));
+    await user.click(within(preview).getByRole('button', { name: 'confirm steer route preview' }));
     const receipt = await screen.findByRole('status', { name: 'Steer receipt' });
     expect(receipt).toHaveTextContent('applied: less celebrity coverage');
     expect(within(receipt).getByRole('button', { name: '[UNDO]' })).toBeVisible();
@@ -174,7 +174,7 @@ describe('expected-red Steer route preview and receipt contracts', () => {
     cleanup();
     const nonRevocable = await renderAcceptedPage({ revocable: false });
     await nonRevocable.user.type(nonRevocable.steer, 'less celebrity coverage');
-    await nonRevocable.user.click(screen.getByRole('button', { name: '[APPLY]' }));
+    await nonRevocable.user.click(screen.getByRole('button', { name: 'confirm steer route preview' }));
     await waitFor(() => expect(screen.getByRole('status', { name: 'Steer receipt' })).toHaveTextContent('applied: less celebrity coverage'));
     expect(screen.queryByRole('button', { name: '[UNDO]' })).not.toBeInTheDocument();
   });
