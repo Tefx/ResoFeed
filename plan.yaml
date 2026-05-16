@@ -86516,7 +86516,7 @@ phases:
       - [x] Row-level `last_fetch: HH:MM:SS`, live source row visibility, and Source
       Ledger controls remain PROVEN.
 
-      - [ ] Steer accessible-name uniqueness remains PROVEN.
+      - [x] Steer accessible-name uniqueness remains PROVEN.
 
       - [ ] Negative scan finds no unapproved tokens/layout/copy/states or forbidden
       product concepts.
