@@ -84660,7 +84660,7 @@ phases:
   steps:
   - id: srde2e-real-system-e2e-regression
     name: Run real-system Steer delta E2E regression
-    status: claimed
+    status: pending
     description: 'As an INDEPENDENT TESTER (integration-verifier), run the real single-binary
       system and prove the full path from browser UI through HTTP/MCP/application
       logic/SQLite.
@@ -84709,8 +84709,6 @@ phases:
       \ | behavior_claim | runtime_proof_expected | evidence_ref | status | closure_path\
       \ | gate_decision_basis |\n|---|---|---|---|---|---|---|\n"
     agent: integration-verifier
-    claimed_by: integration-verifier
-    claimed_at: '2026-05-16T10:46:30.996805+00:00'
   - id: srde2e-visual-a11y-regression-proof
     name: Run visual accessibility and hit-target regression proof
     status: done
