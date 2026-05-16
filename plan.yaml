@@ -94525,7 +94525,7 @@ phases:
       schema/layer change required PROVEN.'
   - id: gsfr-inspector-fragment-identity-fix
     name: Repair Inspector grouping identity for synthetic feed fragments
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -94707,6 +94707,8 @@ phases:
     - gsfr-expected-red-fragment-grouping-test
     - gsfr-backend-grouping-contract-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T20:50:00.605795+00:00'
   - id: gsfr-targeted-regression-retest
     name: Run targeted frontend/backend grouped-story regression retest
     status: pending
