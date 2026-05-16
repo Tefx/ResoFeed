@@ -95420,7 +95420,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Backend contract tests from `cos-backend-operation-contract-tests` pass
+      - [x] Backend contract tests from `cos-backend-operation-contract-tests` pass
       green.
 
       - [ ] Implementation uses existing guard/reprocess/ingest paths and flat-file
