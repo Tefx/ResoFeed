@@ -97822,7 +97822,7 @@ phases:
     agent: wiring-auditor
   - id: cos-fix-current-operation-browser-conflict-detail
     name: Fix current-operation browser conflict detail blockers
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -98061,6 +98061,8 @@ phases:
     depends_on:
     - cos-fix-current-operation-frontend-wiring
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T22:49:29.145493+00:00'
   - id: cos-retest-current-operation-browser-conflict-detail
     name: Retest current-operation browser conflict detail path
     status: pending
