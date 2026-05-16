@@ -95487,7 +95487,7 @@ phases:
       - [x] Browser console evidence is captured and contains no blocker-class runtime
       crash.
 
-      - [ ] Evidence identifies exact command/test and actual output, not just a summary.'
+      - [x] Evidence identifies exact command/test and actual output, not just a summary.'
     verification: '- [ ] phase-check protecting `gsfr-final-gate`: focused runtime/browser
       retest is green after the sort fix.
 
