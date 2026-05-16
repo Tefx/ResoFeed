@@ -89661,18 +89661,18 @@ phases:
 
       - [x] Final recommendation is PASS only if no blocker-class UI/UX obligation
       remains for srde2e-final-closure-gate.'
-    verification: '- [ ] UI/UX audit runs after srde2e-full-plan-e2e-blockers-fix.
+    verification: '- [x] UI/UX audit runs after srde2e-full-plan-e2e-blockers-fix.
 
-      - [ ] All nine UI/E2E blocker families are validated through rendered/browser-observable
+      - [x] All nine UI/E2E blocker families are validated through rendered/browser-observable
       artifacts.
 
-      - [ ] Desktop and mobile-relevant states are covered for Source Ledger, TODAY
+      - [x] Desktop and mobile-relevant states are covered for Source Ledger, TODAY
       nav, Steer controls, Inspector, feed rows, and metadata/source text.
 
-      - [ ] Audit evidence includes screenshots, DOM/accessibility snapshots, or equivalent
+      - [x] Audit evidence includes screenshots, DOM/accessibility snapshots, or equivalent
       visual/spatial proof.
 
-      - [ ] Audit records PASS/PASS_WITH_DEBT/FAIL with blocker-class gate-intersection
+      - [x] Audit records PASS/PASS_WITH_DEBT/FAIL with blocker-class gate-intersection
       reasoning for srde2e-final-closure-gate.'
     evidence_template: '## UI/UX Audit Report
 
