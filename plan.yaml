@@ -89006,7 +89006,7 @@ phases:
 
       - [x] Hit-target scroll geometry is resolved exactly as adjudicated.
 
-      - [ ] Targeted render command remains green.
+      - [x] Targeted render command remains green.
 
       - [ ] `npm --prefix web run test:render` remains green.
 
