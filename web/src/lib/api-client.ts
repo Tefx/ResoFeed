@@ -1,5 +1,7 @@
 import type {
   ApiErrorCode,
+  CurrentOperationInfo,
+  CurrentOperationResponse,
   DeleteSourceResponse,
   ErrorBody,
   FeedTodayResponse,
@@ -125,6 +127,32 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isProcessingLanguage(value: unknown): value is ProcessingLanguage {
   return value === 'en' || value === 'zh';
+}
+
+function isOperationKind(value: unknown): value is CurrentOperationInfo['kind'] {
+  return value === 'ingest' || value === 'fetch' || value === 'reprocess' || value === null;
+}
+
+function isOperationScope(value: unknown): value is CurrentOperationInfo['scope'] {
+  return value === 'all' || value === 'source' || value === 'library' || value === null;
+}
+
+function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.running === 'boolean' &&
+    isOperationKind(value.kind) &&
+    isOperationScope(value.scope) &&
+    (typeof value.phase === 'string' || value.phase === null) &&
+    (typeof value.count === 'number' || value.count === null) &&
+    (typeof value.message === 'string' || value.message === null) &&
+    (typeof value.started_at === 'string' || value.started_at === null) &&
+    (typeof value.updated_at === 'string' || value.updated_at === null)
+  );
+}
+
+function isCurrentOperationResponse(value: unknown): value is CurrentOperationResponse {
+  return isRecord(value) && isCurrentOperationInfo(value.operation);
 }
 
 function isProcessingLanguageResponse(value: unknown): value is ProcessingLanguageResponse {
@@ -295,6 +323,14 @@ export class ResoFeedApiClient {
     const response = await this.request<unknown>(runtimeEndpoints.getLanguage.replace('GET ', ''));
     if (!isProcessingLanguageResponse(response)) {
       throw new ResoFeedApiError(500, fallbackError('internal', 'invalid processing language response'));
+    }
+    return response;
+  }
+
+  async currentOperation(): Promise<CurrentOperationResponse> {
+    const response = await this.request<unknown>(runtimeEndpoints.currentOperation.replace('GET ', ''));
+    if (!isCurrentOperationResponse(response)) {
+      throw new ResoFeedApiError(500, fallbackError('internal', 'invalid current operation response'));
     }
     return response;
   }

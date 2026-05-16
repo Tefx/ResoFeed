@@ -139,7 +139,7 @@
     globalIngestStatusText = '';
     try {
       await tick();
-      globalIngestStatusText = 'ingest complete';
+      globalIngestStatusText = 'current operation: ingest';
       const result = await onRunIngest();
       const completedAt = formatTime(result.completed_at);
       globalIngestStatusText = result.completed

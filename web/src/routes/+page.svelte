@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
+  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
@@ -15,6 +15,10 @@
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
   type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
   type ReprocessState = 'idle' | 'confirming' | 'running' | 'complete' | 'conflict' | 'failed';
+  type ContextualOperationState =
+    | { kind: 'idle' }
+    | { kind: 'running'; operation: CurrentOperationInfo }
+    | { kind: 'blocked'; text: string; operation: CurrentOperationInfo | null };
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -59,6 +63,7 @@
   let languageStatus = $state('');
   let reprocessState = $state<ReprocessState>('idle');
   let reprocessStatus = $state('');
+  let contextualOperation = $state<ContextualOperationState>({ kind: 'idle' });
   let reprocessTrigger = $state<HTMLButtonElement | undefined>();
   let reprocessConfirm = $state<HTMLButtonElement | undefined>();
   let shellElement = $state<HTMLElement | undefined>();
@@ -99,6 +104,7 @@
   const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRouteEcho.detail ? ` ${steerRouteEcho.detail}` : ''}`);
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
+  const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
 
   function surfaceForPath(pathname: string): Surface {
     if (pathname === '/doctor') return 'doctor';
@@ -243,6 +249,67 @@
     return `${prefix}: updated ${result.items_updated}; indexed ${result.items_indexed}`;
   }
 
+  function idleOperation(): CurrentOperationInfo {
+    return { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null };
+  }
+
+  function localRunningOperation(kind: NonNullable<CurrentOperationInfo['kind']>, scope: NonNullable<CurrentOperationInfo['scope']>, message: string): CurrentOperationInfo {
+    const timestamp = new Date().toISOString();
+    return { running: true, kind, scope, phase: 'running', count: null, message, started_at: timestamp, updated_at: timestamp };
+  }
+
+  function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+    const candidate = value as Record<string, unknown>;
+    return (
+      typeof candidate.running === 'boolean' &&
+      (candidate.kind === 'ingest' || candidate.kind === 'fetch' || candidate.kind === 'reprocess' || candidate.kind === null) &&
+      (candidate.scope === 'all' || candidate.scope === 'source' || candidate.scope === 'library' || candidate.scope === null) &&
+      (typeof candidate.phase === 'string' || candidate.phase === null) &&
+      (typeof candidate.count === 'number' || candidate.count === null) &&
+      (typeof candidate.message === 'string' || candidate.message === null) &&
+      (typeof candidate.started_at === 'string' || candidate.started_at === null) &&
+      (typeof candidate.updated_at === 'string' || candidate.updated_at === null)
+    );
+  }
+
+  function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
+    const candidate = error.body.error.details.current_operation;
+    if (isCurrentOperationInfo(candidate)) return candidate;
+    const operation = error.body.error.details.operation;
+    const scope = error.body.error.details.scope;
+    if ((operation === 'ingest' || operation === 'fetch' || operation === 'reprocess') && (scope === 'all' || scope === 'source' || scope === 'library' || scope === null)) {
+      return { ...idleOperation(), running: true, kind: operation, scope, phase: 'blocked', message: error.body.error.message };
+    }
+    return null;
+  }
+
+  function operationLabel(operation: CurrentOperationInfo): string {
+    const kind = operation.kind ?? 'operation';
+    return operation.scope ? `${kind}/${operation.scope}` : kind;
+  }
+
+  function formatContextualOperation(state: ContextualOperationState): string {
+    if (state.kind === 'idle') return '';
+    if (state.kind === 'running') {
+      if (state.operation.kind === 'ingest') return '[INGESTING...]';
+      if (state.operation.kind === 'fetch') return '[FETCHING...]';
+      if (state.operation.kind === 'reprocess') return reprocessRunningLabel;
+      return `current operation: ${operationLabel(state.operation)}`;
+    }
+    return state.operation ? `${state.text} · current operation: ${operationLabel(state.operation)}` : state.text;
+  }
+
+  async function refreshCurrentOperationIfAvailable(): Promise<void> {
+    try {
+      const response = await apiClient().currentOperation();
+      contextualOperation = response.operation.running ? { kind: 'running', operation: response.operation } : { kind: 'idle' };
+    } catch (error) {
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) return;
+      throw error;
+    }
+  }
+
   async function loadShellData(token: string, syncRoute = true, focusAfterLoad = true): Promise<void> {
     loadState = 'loading';
     apiError = null;
@@ -269,6 +336,7 @@
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await client.doctor() };
       }
+      void refreshCurrentOperationIfAvailable();
       loadState = 'ready';
       if (selectedItemId) {
         await loadItemDetail(selectedItemId, token);
@@ -567,10 +635,17 @@
   }
 
   async function runIngest(): Promise<RunIngestSuccessResponse> {
+    contextualOperation = { kind: 'running', operation: localRunningOperation('ingest', 'all', 'ingest running') };
     const response = await apiClient().runIngest();
-    if (!response.ok) throw new Error(`err: ${response.body.error.message}`);
+    if (!response.ok) {
+      const text = `err: ${response.body.error.message}`;
+      const operation = response.body.error.details.current_operation;
+      contextualOperation = { kind: 'blocked', text, operation: isCurrentOperationInfo(operation) ? operation : null };
+      throw new Error(text);
+    }
     sources = (await apiClient().sources()).sources;
     items = (await apiClient().today()).items;
+    contextualOperation = { kind: 'idle' };
     return response.body;
   }
 
@@ -623,11 +698,13 @@
     if (reprocessState === 'running') return;
     reprocessState = 'running';
     reprocessStatus = '';
+    contextualOperation = { kind: 'running', operation: localRunningOperation('reprocess', 'library', 'reprocess running') };
     await tick();
     await new Promise((resolve) => setTimeout(resolve, 75));
     try {
       const response = await apiClient().reprocessLibrary();
       reprocessState = 'complete';
+      contextualOperation = { kind: 'idle' };
       await tick();
       reprocessTrigger?.focus();
       reprocessStatus = reprocessCompleteMessage(response.reprocess);
@@ -636,8 +713,10 @@
     } catch (error) {
       if (error instanceof ResoFeedApiError && error.status === 409) {
         reprocessState = 'conflict';
+        contextualOperation = { kind: 'blocked', text: formatRawApiError(error, 'err: reprocess failed'), operation: detailsCurrentOperation(error) };
       } else {
         reprocessState = 'failed';
+        contextualOperation = { kind: 'idle' };
       }
       await tick();
       reprocessTrigger?.focus();
@@ -736,26 +815,33 @@
               tabindex={surfaceMenuOpen ? 0 : -1}
               onclick={() => openSurfaceFromMenu('ledger')}
             >SOURCE LEDGER</button>
+            <div class="runtime-language-controls" aria-label="Processing language controls">
+              {#if contextualOperationStatusText}
+                <span class="surface-operation-status" role="status" aria-live="polite">{contextualOperationStatusText}</span>
+              {/if}
+              <button
+                type="button"
+                class="bracket-action bracket-action--language"
+                aria-label={processingLanguageActionLabel}
+                tabindex={surfaceMenuOpen ? 0 : -1}
+                onclick={() => void updateProcessingLanguage()}
+              >{processingLanguageButtonText}</button>
+              <span class="contract-muted runtime-language-warning">{processingLanguage.code === 'zh' ? '已存可读内容将被重写。 来源标识保持不变。' : 'Existing readable item content will be rewritten. Source identifiers remain unchanged.'}</span>
+              {#if reprocessState === 'confirming'}
+                <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label="Confirm reprocess existing library" tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
+                <button type="button" class="bracket-action bracket-action--reprocess" aria-label="Cancel reprocess" tabindex={surfaceMenuOpen ? 0 : -1} onclick={cancelReprocess}>{reprocessCancelLabel}</button>
+              {:else if reprocessState === 'running'}
+                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" aria-disabled="true" tabindex={surfaceMenuOpen ? 0 : -1} onclick={(event) => event.preventDefault()}>{reprocessRunningLabel}</button>
+              {:else}
+                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
+              {/if}
+              {#if reprocessStatus}
+                <span class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</span>
+              {/if}
+            </div>
           </div>
         </details>
       </nav>
-      <div class="runtime-language-controls" aria-label="Processing language controls">
-        <button
-          type="button"
-          class="bracket-action bracket-action--language"
-          aria-label={processingLanguageActionLabel}
-          onclick={() => void updateProcessingLanguage()}
-        >{processingLanguageButtonText}</button>
-        <span class="contract-muted runtime-language-warning">{processingLanguage.code === 'zh' ? '已存可读内容将被重写。 来源标识保持不变。' : 'Existing readable item content will be rewritten. Source identifiers remain unchanged.'}</span>
-        {#if reprocessState === 'confirming'}
-          <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label="Confirm reprocess existing library" onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
-          <button type="button" class="bracket-action bracket-action--reprocess" aria-label="Cancel reprocess" onclick={cancelReprocess}>{reprocessCancelLabel}</button>
-        {:else if reprocessState === 'running'}
-          <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" aria-disabled="true" onclick={(event) => event.preventDefault()}>{reprocessRunningLabel}</button>
-        {:else}
-          <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
-        {/if}
-      </div>
       </header>
 
       <section
@@ -788,9 +874,6 @@
 
       {#if languageStatus}
         <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
-      {/if}
-      {#if reprocessStatus}
-        <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
       {/if}
       {#if undoStatus}
         <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>

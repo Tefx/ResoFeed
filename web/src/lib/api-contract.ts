@@ -5,11 +5,31 @@ export type OpaqueId = string;
 
 export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'conflict' | 'internal';
 
+export type OperationKind = 'ingest' | 'fetch' | 'reprocess';
+export type OperationScope = 'all' | 'source' | 'library' | null;
+
+export interface CurrentOperationInfo {
+  running: boolean;
+  kind: OperationKind | null;
+  scope: OperationScope;
+  phase: string | null;
+  count: number | null;
+  message: string | null;
+  started_at: Rfc3339UtcString | null;
+  updated_at: Rfc3339UtcString | null;
+}
+
+export interface CurrentOperationResponse {
+  operation: CurrentOperationInfo;
+}
+
+export type ApiErrorDetailValue = string | number | boolean | null | CurrentOperationInfo;
+
 export interface ErrorBody {
   error: {
     code: ApiErrorCode;
     message: string;
-    details: Record<string, string | number | boolean>;
+    details: Record<string, ApiErrorDetailValue>;
   };
 }
 
@@ -188,6 +208,7 @@ export const processingLanguageRuntimeContract = {
   endpoints: {
     getLanguage: 'GET /api/runtime/language',
     setLanguage: 'PUT /api/runtime/language',
+    currentOperation: 'GET /api/runtime/operation',
     reprocessLibrary: 'POST /api/runtime/reprocess-library',
     reportDelivery: 'POST /api/items/{id}/delivery',
     searchEcho: 'GET /api/search',
@@ -407,7 +428,7 @@ export interface ManualRssFetchErrorBody {
   error: {
     code: ManualRssFetchErrorCode;
     message: string;
-    details: Record<string, string | number | boolean>;
+    details: Record<string, ApiErrorDetailValue>;
   };
 }
 

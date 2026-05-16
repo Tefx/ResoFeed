@@ -452,7 +452,7 @@ a:focus,
 
 .shell-command {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto minmax(32ch, auto);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--rf-space-sm);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-border);
@@ -510,6 +510,7 @@ details.surface-nav .surface-nav-menu {
   position: relative;
   z-index: 7;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--rf-space-xs);
   align-items: center;
 }
@@ -595,8 +596,14 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 .runtime-reprocess-status {
   min-height: 20px;
   margin: 0;
-  padding: 0 var(--rf-space-md) var(--rf-space-sm);
+  padding: 0;
   color: var(--rf-color-muted);
+}
+
+.surface-operation-status {
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+  white-space: nowrap;
 }
 
 .bracket-action--language {
