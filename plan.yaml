@@ -87528,7 +87528,7 @@ phases:
       - [x] Invalid URL feedback remains assertive/described and Escape cancellation
       preserves focus.
 
-      - [ ] Write preview controls expose accessible buttons matching the expected
+      - [x] Write preview controls expose accessible buttons matching the expected
       [APPLY]/[CANCEL] contract, and [UNDO] appears only when a revocable backend
       id exists.
 
