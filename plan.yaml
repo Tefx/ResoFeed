@@ -85034,7 +85034,7 @@ phases:
       queue, sync/merge coordinator, accounts, vector DB, embeddings, RAG, or semantic
       answer engine was introduced.
 
-      - [ ] Verify UI/backend/MCP consumer surfaces share the same resolved facts
+      - [x] Verify UI/backend/MCP consumer surfaces share the same resolved facts
       and do not re-derive contradictory route semantics.
 
       - [ ] Produce findings with blocker/should_fix/suggestion/tech_debt severity
