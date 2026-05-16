@@ -85011,7 +85011,7 @@ phases:
       \ edits were needed."
   - id: srde2e-software-architect-fresh-review
     name: Run software-architect fresh architecture review
-    status: claimed
+    status: done
     description: 'As software-architect, perform a fresh read-only architecture review
       after implementation and E2E proof.
 
@@ -85086,6 +85086,73 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-16T07:55:50.054544+00:00'
+    done_at: '2026-05-16T08:05:33.989722+00:00'
+    evidence: "status: SUCCESS_WITH_REMEDIATION_OWNERSHIP\nverdict: FINDINGS_PRESENT\n\
+      \n## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md — READ. Key\
+      \ insight: one Go binary, one SQLite+FTS5 store, thin HTTP/MCP transports, lexical-only\
+      \ search, no vector/RAG, no queues/jobs/activity ledgers/sync, and receipt-backed\
+      \ idempotency semantics are hard constraints.\n- docs/DESIGN.md — READ. Key\
+      \ insight: Source Ledger manual controls remain bracket-style immediate commands,\
+      \ language/reprocess controls stay low-chrome, desktop feed/Inspector scroll\
+      \ independently, and no settings/dashboard/activity/job surfaces are allowed.\n\
+      - docs/PRD.md — READ. Key insight: Inspect/Resonate/Steer are the only primary\
+      \ primitives; AC-4 requires strict policy execution but product invariants outrank\
+      \ steering; search remains lexical and metadata-driven.\n- docs/UI_REGRESSION_CONTRACT.md\
+      \ — READ. Key insight: regression contract requires real hit-target/a11y proof\
+      \ for Steer, Source Ledger, split-scroll, language/reprocess, and negative checks\
+      \ against dashboards, queues, raw dumps, and forbidden RSS/SaaS concepts.\n\
+      - AGENTS.md — NOT READ: absent inside isolated worktree; task-provided AGENTS\
+      \ invariants used as non-file context.\n- CONSTITUTION.md — NOT READ: optional\
+      \ baseline file absent.\n\n## Software Architect Fresh Review\n| Severity |\
+      \ Finding | Location | Evidence | Grep hint | Required remediation |\n|---|---|---|---|---|---|\n\
+      | should_fix | HTTP and MCP `steer` idempotency fingerprints are not parity-aligned\
+      \ for same logical operation. HTTP includes classified `route_kind` while MCP\
+      \ omits it; globally scoped `agent_receipts.idempotency_key` can reject same\
+      \ command/actor/key cross-transport retry as `request_fingerprint_mismatch`.\
+      \ | `internal/resofeed/http.go:583-590`; `internal/resofeed/mcp.go:223-230`;\
+      \ docs anchors `docs/ARCHITECTURE.md:1218-1228`, `docs/ARCHITECTURE.md:1373-1384`\
+      \ | HTTP fingerprint payload includes Command/ActorKind/ActorID/RouteKind; MCP\
+      \ includes Command/ActorKind/ActorID only. | `grep -R \"operation.*steer\\|RouteKind\
+      \ SteerRouteKind\\|withMCPReceipt\" internal/resofeed` | Normalize/shared-align\
+      \ steer receipt fingerprint semantics; add HTTP/MCP same-key/same-command replay\
+      \ parity test. |\n| should_fix | `/api/steer/preview` source-add previews return\
+      \ `will_mutate: true`, conflicting with preview read-only schema example that\
+      \ shows `will_mutate: false`; public field semantics drift though preview appears\
+      \ not to write state. | `internal/resofeed/steer_intent.go:38-55`; `docs/ARCHITECTURE.md:1168`\
+      \ | `PreviewSteering` is read-only/no receipts, but source route sets `preview.WillMutate\
+      \ = true`. | `grep -R \"WillMutate\\|will_mutate\\|/api/steer/preview\" internal/resofeed\
+      \ docs/ARCHITECTURE.md web/src` | Decide/align `will_mutate` semantics while\
+      \ preserving no-write/no-receipt preview guarantee; update implementation/docs/tests\
+      \ accordingly. |\n\n**Verdict**: FINDINGS_PRESENT\n\n## Scope Coverage Notes\n\
+      - Single binary/KISS boundary: no sidecar worker/service/repository/DI/event-bus\
+      \ drift found.\n- Preview/commit/undo: preview path read-only by code inspection;\
+      \ commit reroutes through classifier; undo is target-specific.\n- Forbidden\
+      \ concepts: no command history, global undo stack, activity ledger, job dashboard,\
+      \ durable queue, sync/merge coordinator, accounts, vector DB, embeddings, RAG,\
+      \ or semantic answer engine found as implemented schema/runtime surfaces.\n\
+      - Shared facts: HTTP/MCP reuse core read surfaces; idempotency payload mismatch\
+      \ is the main parity defect found.\n- Source Ledger/language/split-scroll: bracket\
+      \ controls, language controls, reprocess action, translate=\"no\" provenance,\
+      \ and independent scroll-region markers were present.\n\n## Remediation Ownership\
+      \ Created\nPlanner added/updated one batched remediation path before completion:\n\
+      - `srde2e-backend-architecture-remediation` (golang-developer), depends on `srde2e-software-architect-fresh-review`,\
+      \ batches both should_fix findings.\n- `srde2e-software-architect-clean-recheck`\
+      \ (software-architect), depends on `srde2e-backend-architecture-remediation`,\
+      \ requires CLEAN recheck.\n- `srde2e-full-plan-check` and `srde2e-final-closure-gate`\
+      \ already depend on the clean recheck, so final closure cannot bypass remediation.\n\
+      \n## Mainline Final-State Verification\n```text\ncd /Users/tefx/Projects/ResoFeed\
+      \ && go test ./...\n?   \tresofeed\t[no test files]\n?   \tresofeed/cmd/resofeed\t\
+      [no test files]\nok  \tresofeed/internal/resofeed\t(cached)\n```\n\n## Standard\
+      \ Evidence\n- Commit hash(es): none — read-only review; no file changes made\
+      \ and branch has no ahead commits.\n- Files changed: none in isolated review\
+      \ worktree.\n- Verification/search commands: isolated `go test ./...` passed\
+      \ for Go packages; isolated `npm --prefix web run build` failed with `vite:\
+      \ command not found` due missing frontend dependencies and no install attempted\
+      \ in read-only review; mainline `go test ./...` passed.\n- Spec link: srde2e-software-architect-fresh-review\n\
+      - Gaps/Notes: AGENTS.md and CONSTITUTION.md unavailable in isolated worktree.\
+      \ Web build not run in isolated review due missing `vite`; review evidence relies\
+      \ on source inspection and passing Go tests. Required remediation ownership\
+      \ now exists for both should_fix findings."
   - id: srde2e-backend-architecture-remediation
     name: Remediate batched architecture/API contract findings
     status: pending
