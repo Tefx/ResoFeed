@@ -86978,7 +86978,7 @@ phases:
       - [x] B1 DETAILS has real visible/topmost pointer and keyboard activation proof
       path.
 
-      - [ ] B2 IMPORT STATE uses a visible accessible activation control and no obstructed
+      - [x] B2 IMPORT STATE uses a visible accessible activation control and no obstructed
       1px target is the user-facing hit target.
 
       - [ ] B3 desktop Feed and Inspector scroll regions are independently focusable
