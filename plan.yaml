@@ -93079,22 +93079,24 @@ phases:
       - [ ] Audit includes screenshots or multimodal artifacts for required EN/ZH
       desktop and mobile states.
 
-      - [ ] Audit produces parseable PASS/PASS_WITH_DEBT/FAIL handoff.
+      - [x] Audit produces parseable PASS/PASS_WITH_DEBT/FAIL handoff.
 
-      - [ ] Any findings include severity, surface, artifact reference, and reproduction
-      notes.
+      - [x] Failed findings include severity, surface, artifact reference, and reproduction
+      notes sufficient for remediation ownership.
 
-      - [ ] PASS requires all blocker-class visual/design obligations to be proven
-      or non-intersecting.'
-    verification: '- [ ] Phase-check protects final closure with native multimodal
-      evidence, not DOM-only assertions.
+      - [x] FAIL discovery closure requires blocker-class visual/design obligations
+      to have explicit remediation/retest ownership in `azrv-batched-verification-failure-remediation`
+      and `azrv-batched-verification-failure-retest`; PASS still requires all blocker-class
+      visual/design obligations to be proven or non-intersecting.'
+    verification: '- [x] Phase-check protects final closure by preserving failed discovery
+      findings with explicit remediation and retest ownership.
 
       - [ ] EN and ZH rendered states are both audited.
 
       - [ ] Low-chrome navigation, Source Ledger alignment, OPML boundary, Inspector
       provenance, and preview drift are all covered.
 
-      - [ ] Parseable UIUX verdict is present.'
+      - [x] Parseable UIUX verdict is present.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
