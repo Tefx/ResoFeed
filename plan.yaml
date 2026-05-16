@@ -87638,7 +87638,7 @@ phases:
       \ because `vectl_check` could not match verification-field checklist items."
   - id: srde2e-steer-route-preview-render-contract-retest
     name: Retest Steer route-preview render contract closure
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -87768,3 +87768,5 @@ phases:
     depends_on:
     - srde2e-steer-route-preview-render-contract-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T07:24:47.168971+00:00'
