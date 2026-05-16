@@ -84732,7 +84732,7 @@ phases:
 
       - [x] Prove active panel semantic state agrees with visible panel state.
 
-      - [ ] Fail on forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
+      - [x] Fail on forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
       concepts.'
     verification: '- [ ] full-plan-check companion protecting final closure gate.
 
