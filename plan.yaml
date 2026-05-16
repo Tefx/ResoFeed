@@ -97155,15 +97155,15 @@ phases:
 
       - [x] Update only frontend tests/fixtures needed to prove the documented shape
       and rendered field consumption.'
-    verification: '- [ ] Main path: frontend accepts backend `count: { current, total
+    verification: '- [x] Main path: frontend accepts backend `count: { current, total
       }` payloads and renders terse status detail.
 
-      - [ ] Failure path: invalid count shapes are rejected by the runtime guard.
+      - [x] Failure path: invalid count shapes are rejected by the runtime guard.
 
-      - [ ] Wiring path: `phase`, `count`, `message`, `started_at`, and `updated_at`
+      - [x] Wiring path: `phase`, `count`, `message`, `started_at`, and `updated_at`
       are read by rendered UI/conflict handling, not left write-only.
 
-      - [ ] Product guard: no durable job/queue/history/dashboard/settings/service-layer
+      - [x] Product guard: no durable job/queue/history/dashboard/settings/service-layer
       concept introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
