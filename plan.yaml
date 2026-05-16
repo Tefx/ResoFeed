@@ -91944,3 +91944,157 @@ phases:
 
       - [ ] FAIL'
     agent: integration-verifier
+  - id: azrv-zh-spec-conformance-audit
+    name: Verify Chinese support and repair spec conformance across HTTP, MCP, OpenRouter,
+      state, UI, tests, and preview
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: full-plan-check
+
+      agent_source: project
+
+
+      As spec-verifier, perform adversarial conformance audit for Chinese/zh support
+      and the repair findings. This is NOT "do tests pass"; it is "does implementation
+      match the authoritative specs." This step protects `azrv-final-closure-gate`
+      and any future release gate.
+
+
+      Required zh support audit surfaces:
+
+      1. Processing language selection / storage / API / MCP contract.
+
+      2. Frontend language control (`LANG: EN/ZH`) and related receipts / steer preview
+      / Inspector display.
+
+      3. Reprocess library surface and receipts.
+
+      4. OpenRouter / LLM prompt or summary generation path for processing language.
+
+      5. State backup/restore portability for processing language: must be excluded
+      by architecture.
+
+      6. E2E / contract tests proving zh behavior and parity.
+
+      7. `docs/ui-preview.html` and design preview coverage of zh surfaces.
+
+
+      Also verify:
+
+      - OPML import no longer auto-runs ingest.
+
+      - visible copy is terse and avoids explanatory architecture terms in product
+      chrome.
+
+      - Inspector provenance matches DESIGN.md.
+
+      - expected-red naming drift was corrected or dispositioned as non-runtime debt.
+
+      - legacy Gemini naming remains non-runtime naming debt or is repaired if user-visible/runtime-visible.
+
+
+      Behavioral precedence claims MUST be flagged as NEEDS_TEST with a concrete test
+      suggestion, not asserted as CONFORMS without runtime proof.
+
+
+      ## Completion Criteria
+
+      - [ ] Evidence table covers all seven zh surfaces with CONFORMS/DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
+      verdicts.
+
+      - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit remediation/retest or
+      non-intersection closure path.
+
+      - [ ] Product-boundary constraints are checked against AGENTS.md and docs/ARCHITECTURE.md.
+
+      - [ ] Final zh verdict is COMPLETE only if every blocker-class zh obligation
+      is PROVEN or explicitly non-intersecting.'
+    verification: '- [ ] Full-plan-check protects final closure by auditing every
+      zh surface requested by the user.
+
+      - [ ] Spec conformance report includes requirement refs and implementation file:line
+      refs.
+
+      - [ ] Unresolved NEEDS_TEST/UNPROVEN items have closure paths and cannot be
+      bypassed by the final gate.
+
+      - [ ] Architecture/product non-goals remain intact.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/processing_language_contract.go — key passage or "NOT READ:
+      <reason>"
+
+      - internal/resofeed/runtime_metadata.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/reprocess.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/openrouter.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/mcp.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/http.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/state.go — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/lib/api-contract.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Spec Conformance Report
+
+      **Phase**: audit-and-chinese-support-repair-verification-and-closure
+
+
+      ## Requirements Register
+
+      | R# | Spec Section | Requirement | Level | Checkable? |
+
+      |---|---|---|---|---|
+
+
+      ## Evidence Table
+
+      | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
+
+      |---|---|---|---|---|---|
+
+      Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
+      | SPEC_POSSIBLY_STALE
+
+
+      ## zh Completeness Verdict
+
+      - [ ] COMPLETE
+
+      - [ ] INCOMPLETE
+
+      - [ ] UNCERTAIN
+
+
+      ## Closure Paths
+
+      | Unresolved item | Gate intersection | Closure path |
+
+      |---|---|---|'
+    agent: spec-verifier
