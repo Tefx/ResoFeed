@@ -96369,7 +96369,7 @@ phases:
 
       - [x] Orphan exports/symbols report is produced.
 
-      - [ ] HTTP and MCP registration evidence is produced.
+      - [x] HTTP and MCP registration evidence is produced.
 
       - [ ] Frontend consumption evidence is produced.
 
