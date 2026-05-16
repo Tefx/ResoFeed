@@ -83817,7 +83817,7 @@ phases:
       - [x] Steer invalid state.\n- [x] Steer receipt state.\n- [x] Steer undo state.\n\
       - [x] Source Ledger controls and details.\n- [x] Desktop split scroll.\n- [x]\
       \ Mobile route and feed scroll preservation.\n- [x] Inspector primary content\
-      \ with JSON-LD raw payload negative proof.\n- [ ] Mobile feed metadata with\
+      \ with JSON-LD raw payload negative proof.\n- [x] Mobile feed metadata with\
       \ no required text clipped by over-truncation.\n\nMachine-readable closure output\
       \ is mandatory. The evidence MUST include YAML with these fields:\n```yaml\n\
       verdict: \"PASS|FAIL\"\ngate_open_allowed: true|false\nspec_verifier_family:\n\
