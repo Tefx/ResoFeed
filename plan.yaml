@@ -91149,7 +91149,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Closure matrix maps every listed audit finding to exactly one planned
+      - [x] Closure matrix maps every listed audit finding to exactly one planned
       owner step and one independent verification step.
 
       - [ ] Matrix verdict for Chinese support is explicit: COMPLETE, INCOMPLETE,
