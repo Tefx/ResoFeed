@@ -94386,3 +94386,187 @@ phases:
 
       - Handoff constraints for frontend fix:'
     agent: spec-verifier
+  - id: gsfr-inspector-fragment-identity-fix
+    name: Repair Inspector grouping identity for synthetic feed fragments
+    status: pending
+    description: 'step_type: implementation
+
+      work_type: defect_repair
+
+
+      Complete the frontend repair in `web/src/routes/components/Inspector.svelte`
+      so synthetic feed-entry fragment URLs remain distinct item identities for grouping
+      inference.
+
+
+      Root cause to address:
+
+      - `normalizedGroupingUrl(...)` strips hash and search.
+
+      - Ingest creates synthetic URLs for RSS entries without links as `source.URL
+      + "#" + stableID(...)`.
+
+      - Stripping the fragment collapses unrelated TLDR/feed entries into the feed
+      page URL, causing false grouped-source disclosure.
+
+
+      Required behavior:
+
+      - When an item URL is a synthetic feed-entry fragment, the fragment MUST remain
+      part of the grouping identity.
+
+      - URL-only runtime fallback grouping may remain only for true same-article URL
+      cases if existing tests/contracts require it.
+
+      - Backend-authoritative grouping (`story_key`, `duplicate_of_item_id`, and detail
+      `grouped_source_items`) must remain preferred over runtime URL inference.
+
+      - Do not introduce schema changes, new service/repository layers, DI containers,
+      event buses, sidecar workers, or hidden source suppression.
+
+      - Preserve transparent grouping: every original source item remains retrievable
+      when grouping is valid.
+
+
+      Exact touch scope:
+
+      - Primary: `web/src/routes/components/Inspector.svelte`.
+
+      - Allowed if needed: frontend test fixture helpers directly supporting `gsfr-expected-red-fragment-grouping-test`.
+
+      - Do not modify Go backend code unless `gsfr-backend-grouping-contract-audit`
+      proves a backend contract divergence.
+
+
+      ## KNOWN RISKS (from project guidance and current diagnosis)
+
+      - False grouping is user-visible provenance corruption: the Inspector must not
+      imply unrelated sources contributed to one story.
+
+      - Grouping transparency is mandatory: valid grouped stories must still disclose
+      source items and provenance.
+
+      - Dense archival UI must remain low-chrome and functional; do not add friendly
+      SaaS copy or onboarding-style explanation.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. A fix that simply disables all URL fallback grouping without checking existing
+      same-article fallback contract/tests.
+
+      2. A fix that still strips `#entry_*` or equivalent synthetic RSS entry fragments
+      before grouping comparison.
+
+      3. A fix that changes backend schema or adds architectural layers for a frontend
+      runtime inference bug.
+
+      4. Inspector UI copy that violates `docs/DESIGN.md` dense archival workbench
+      tone.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: grouping identity differentiates unrelated synthetic feed
+      fragments.
+
+      2. Rendering completeness: Inspector visibly omits grouped-source disclosure
+      for unrelated fragments and still renders valid grouped-source disclosure when
+      provenance says grouped.
+
+      Evidence MUST include rendered output proof (DOM snapshot or test-renderer/browser
+      output).
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Acceptance Checklist
+
+      - [ ] `#entry_*` or equivalent synthetic RSS feed-entry fragments remain part
+      of grouping identity.
+
+      - [ ] `story_key` and `duplicate_of_item_id` grouping remain authoritative and
+      preferred.
+
+      - [ ] True same-article URL fallback remains possible only where existing contract/tests
+      require it.
+
+      - [ ] No backend schema, service layer, repository layer, DI, event bus, or
+      sidecar worker is introduced.
+
+      - [ ] The expected-red test from `gsfr-expected-red-fragment-grouping-test`
+      turns green after this repair.'
+    verification: '- [ ] Targeted frontend regression command passes and includes
+      the synthetic same-base/different-fragment case.
+
+      - [ ] Evidence includes rendered Inspector output proving no grouped-source
+      disclosure for unrelated TLDR/feed fragment items.
+
+      - [ ] Evidence includes a valid grouping case proving transparent source disclosure
+      still works.
+
+      - [ ] Evidence explains whether same-article URL fallback was preserved, narrowed,
+      or left untouched and why.
+
+      - [ ] No Go backend/schema files are modified unless backed by the backend audit
+      evidence.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/ingest.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/search.go — key passage or "NOT READ: <reason>"
+
+
+      ## Implementation Evidence
+
+      - Files changed:
+
+      - Grouping identity rule implemented:
+
+      - Why this closes root cause, not only symptom:
+
+      - Same-article fallback disposition:
+
+      - Rendered Inspector proof for unrelated synthetic fragments:
+
+      ```text
+
+      <paste DOM snapshot/test-renderer/browser evidence>
+
+      ```
+
+      - Valid grouped-source proof:
+
+      ```text
+
+      <paste output/evidence>
+
+      ```
+
+      - Commands run:
+
+      ```text
+
+      <paste commands and outputs>
+
+      ```'
+    depends_on:
+    - gsfr-expected-red-fragment-grouping-test
+    - gsfr-backend-grouping-contract-audit
+    agent: frontend-engineer
