@@ -87518,7 +87518,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] The idle Steer route preview is role="status" with accessible name "Steer
+      - [x] The idle Steer route preview is role="status" with accessible name "Steer
       route preview", aria-live="polite", reserved blank space, no [IDLE] chip, no
       duplicate hint, and correct aria-describedby wiring from the Steer input.
 
