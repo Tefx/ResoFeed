@@ -84730,7 +84730,7 @@ phases:
 
       - [x] Prove keyboard tab/enter/space/escape behavior and visible focus indicators.
 
-      - [ ] Prove active panel semantic state agrees with visible panel state.
+      - [x] Prove active panel semantic state agrees with visible panel state.
 
       - [ ] Fail on forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
       concepts.'
