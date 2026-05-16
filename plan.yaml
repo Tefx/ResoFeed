@@ -96375,14 +96375,17 @@ phases:
 
       - [x] Headline is PASS or PASS_WITH_DEBT with explicit non-blocking/non-intersection
       rationale.'
-    verification: '- [ ] phase-check protecting `cos-final-gate`: wiring audit confirms
-      HTTP, MCP, and frontend operation-status surfaces are registered and consumed.
+    verification: '- [x] phase-check protecting `cos-final-gate`: wiring audit confirms
+      HTTP and MCP surfaces registered and consumed, and identifies frontend operation-status
+      consumption blockers.
 
-      - [ ] Evidence shows no orphan public symbols, unregistered endpoint/resource,
-      or production stubs for the new status surface.
+      - [x] Evidence shows no orphan public symbols, unregistered endpoint/resource,
+      or production stubs for the new status surface; frontend field-consumption blockers
+      are owned by cos-fix-current-operation-frontend-wiring.
 
-      - [ ] Any PASS_WITH_DEBT item includes explicit non-intersection with final
-      gate requirements.'
+      - [x] FAIL items include explicit final-gate intersection and remediation owner
+      path: cos-fix-current-operation-frontend-wiring -> cos-retest-current-operation-runtime-ui
+      -> cos-reaudit-current-operation-wiring.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
