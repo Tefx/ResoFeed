@@ -93694,7 +93694,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] `npm run test:render` is green and output is pasted, not summarized.
+      - [x] `npm run test:render` is green and output is pasted, not summarized.
 
       - [ ] Protected AZRCT Playwright E2E is green and output is pasted, not summarized.
 
