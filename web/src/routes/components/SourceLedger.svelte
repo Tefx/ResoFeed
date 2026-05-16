@@ -63,7 +63,11 @@
   }
 
   function sourceLedgerLabel(source: Source): string {
-    const title = (importedTitleByUrl[source.url] ?? source.title).trim();
+    const backendTitle = source.title.trim();
+    const importedTitle = importedTitleByUrl[source.url]?.trim();
+    const title = source.last_fetch_at
+      ? backendTitle
+      : (importedTitle || backendTitle);
     return title || compactSourceUrl(source.url);
   }
 

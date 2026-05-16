@@ -591,7 +591,20 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   const toolsList = await mcpPost(request, isolatedRunInfo, ownerToken, { jsonrpc: '2.0', id: 'tools', method: 'tools/list' });
   expect(toolsList.status).toBe(200);
   const toolNames = (((toolsList.body as JsonRpcResponse).result as { tools: Array<{ name: string }> }).tools).map((tool) => tool.name).sort();
-  expect(toolNames).toEqual(['list_candidate_items', 'mark_inspected', 'read_item', 'report_delivery', 'resonate_item', 'search_items', 'steer']);
+  expect(toolNames).toEqual([
+    'get_processing_language',
+    'list_candidate_items',
+    'mark_inspected',
+    'preview_steer',
+    'read_item',
+    'report_delivery',
+    'reprocess_library',
+    'resonate_item',
+    'search_items',
+    'set_processing_language',
+    'steer',
+    'undo_steer'
+  ]);
   expect(toolNames.join(' ')).not.toMatch(/telegram|slack|email|account|folder|tag|archive|semantic|rag/i);
 
   const missingMCPKey = await mcpPost(request, isolatedRunInfo, ownerToken, {
@@ -601,7 +614,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
     params: { name: 'resonate_item', arguments: { item_id: itemID, resonated: false, actor_id: 'parity-agent' } }
   });
   expect(missingMCPKey.status).toBe(200);
-  expect((missingMCPKey.body as JsonRpcResponse).error).toMatchObject({ code: -32602, data: { field: 'idempotency_key' } });
+  expect((missingMCPKey.body as JsonRpcResponse).error).toMatchObject({ code: -32602, data: { error: { details: { field: 'idempotency_key' } } } });
   } finally {
     await context.close();
     if (isolated.child.pid) {

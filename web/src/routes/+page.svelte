@@ -403,10 +403,10 @@
 
     const state = receiptState(receipt);
     const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
-    if (state === 'applied' && normalizedMessage.length > 0) return `applied: ${normalizedMessage}`;
-    const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
     const changed = receipt.changed_rules.length;
     const suffix = changed > 0 ? ` · rules:${changed}` : '';
+    if (state === 'applied' && normalizedMessage.length > 0) return `applied: ${normalizedMessage}${suffix}`;
+    const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
     return `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
   }
 
@@ -451,6 +451,7 @@
         return;
       }
       if (command.toLowerCase() === 'today') {
+        await refreshShellLists();
         showSurface('feed');
         steerCommand = '';
         steerFeedback = { kind: 'receipt', text: 'today' };
@@ -480,12 +481,12 @@
       const response = await apiClient().steer(command);
       steerCommand = '';
       const undo = undoTargetForReceipt(response.receipt);
+      await refreshShellLists();
       steerFeedback = {
         kind: 'receipt',
         text: formatSteerReceipt(response.receipt, command),
         undo
       };
-      await refreshShellLists();
     } catch (error) {
       steerFeedback = { kind: 'error', text: formatSteerError(error) };
     } finally {
@@ -719,9 +720,9 @@
         bind:this={routePreviewElement}
         id="steer-route-preview-status"
         class="steer-route-preview"
-        role="status"
+        role={steerRouteEcho.kind === 'idle' || steerFeedback.kind === 'submitting' ? undefined : 'status'}
         aria-label="Steer route preview"
-        aria-live={steerRouteEcho.live}
+        aria-live={steerRouteEcho.kind === 'idle' || steerFeedback.kind === 'submitting' ? 'off' : steerRouteEcho.live}
         aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
         data-route-kind={steerRouteEcho.kind}
         data-live={steerRouteEcho.live}
@@ -732,10 +733,10 @@
           {#if steerRouteEcho.detail}
             <span class="steer-route-preview__detail">{steerRouteEcho.detail}</span>
           {/if}
-          {#if steerRouteEcho.writeAction}
+          {#if steerRouteEcho.writeAction && steerFeedback.kind !== 'submitting'}
             <span class="steer-route-preview__actions" aria-label="Steer write action boundary">
-              <button type="button" class="bracket-action" onclick={() => void submitSteer()}>[APPLY]</button>
-              <button type="button" class="bracket-action" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
+              <button type="button" class="bracket-action" aria-label="Commit previewed Steer write action" onclick={() => void submitSteer()}>[APPLY]</button>
+              <button type="button" class="bracket-action" aria-label="Cancel Steer route preview" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
             </span>
           {/if}
         {/if}
@@ -743,8 +744,12 @@
       <span id="steer-route-preview-input-desc" class="visually-hidden">Steer route preview</span>
       <span id="steer-route-preview-detail" class="visually-hidden">URL required</span>
 
-      <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
-      <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
+      {#if languageStatus}
+        <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
+      {/if}
+      {#if reprocessStatus}
+        <p class="runtime-reprocess-status" role="status" aria-label="reprocess" aria-live="polite">{reprocessStatus}</p>
+      {/if}
       {#if undoStatus}
         <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>
       {/if}
@@ -753,7 +758,7 @@
       <div class="contract-steering-receipt" role="status" aria-label="Steer receipt" aria-live="polite">
         <span>{steerFeedback.text}</span>
         {#if receiptUndoTarget}
-          <button type="button" class="bracket-action" onclick={() => void undoSteer(receiptUndoTarget)}>[UNDO]</button>
+          <button type="button" class="bracket-action" aria-label="Undo last Steer change" onclick={() => void undoSteer(receiptUndoTarget)}>[UNDO]</button>
         {/if}
       </div>
     {:else if steerFeedback.kind === 'error'}

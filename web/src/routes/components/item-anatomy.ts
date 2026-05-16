@@ -96,11 +96,7 @@ export function compareItemsByTimeGroup(left: ItemSummary, right: ItemSummary, n
   const groupDelta = timeGroupOrder[leftGroup] - timeGroupOrder[rightGroup];
   if (groupDelta !== 0) return groupDelta;
 
-  const leftTimestamp = itemTimestamp(left);
-  const rightTimestamp = itemTimestamp(right);
-  const leftTime = leftTimestamp ? new Date(leftTimestamp).getTime() : 0;
-  const rightTime = rightTimestamp ? new Date(rightTimestamp).getTime() : 0;
-  return rightTime - leftTime;
+  return 0;
 }
 
 export function itemExtractionLabel(status: ItemSummary['extraction_status']): string {

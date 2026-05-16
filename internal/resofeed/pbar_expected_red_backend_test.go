@@ -137,6 +137,41 @@ func TestExpectedRedBackendCombinedReduceAndBoostRulesAffectRankingIndependently
 	}
 }
 
+func TestExpectedRedBackendPolicyRankingFixtureBoostsSpecificOlderMatch(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 16, 0, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_policy_ranking", "https://policy-ranking.example/feed.xml", "Policy Ranking Fixture")
+	insertPolicyRankingFixtureItem(t, ctx, db, "item_crypto", "Crypto token launch", time.Date(2026, 5, 12, 12, 0, 0, 0, time.UTC), now)
+	insertPolicyRankingFixtureItem(t, ctx, db, "item_sqlite", "SQLite storage analysis", time.Date(2026, 5, 12, 9, 0, 0, 0, time.UTC), now)
+	insertPolicyRankingFixtureItem(t, ctx, db, "item_rust", "Rust compiler release", time.Date(2026, 5, 12, 11, 0, 0, 0, time.UTC), now)
+
+	if _, err := db.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, created_at, created_by_actor_kind, created_by_actor_id, revision) values ('rule_filter_crypto', 'filter crypto token', 1, ?, 'human', 'owner', 1), ('rule_boost_sqlite', 'boost sqlite storage analysis', 1, ?, 'human', 'owner', 1)`, now.Format(time.RFC3339Nano), now.Format(time.RFC3339Nano)); err != nil {
+		t.Fatalf("insert steering rules: %v", err)
+	}
+
+	items, err := ListTodayFeed(ctx, db, RankingOptions{Limit: 50, Now: now})
+	if err != nil {
+		t.Fatalf("ListTodayFeed returned error: %v", err)
+	}
+	if len(items) == 0 || items[0].ID != "item_sqlite" {
+		t.Fatalf("ranked items=%+v, want boosted sqlite first", itemIDs(items))
+	}
+	for _, item := range items {
+		if item.ID == "item_crypto" {
+			t.Fatalf("ranked items=%+v, filter crypto token should exclude crypto item", itemIDs(items))
+		}
+	}
+}
+
+func insertPolicyRankingFixtureItem(t *testing.T, ctx context.Context, db execDB, id string, title string, publishedAt time.Time, firstSeenAt time.Time) {
+	t.Helper()
+	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, published_at, first_seen_at, extraction_status, model_status) values (?, 'src_policy_ranking', 'https://policy-ranking.example/feed.xml', ?, ?, ?, ?, ?, ?, 'partial_extraction', 'summary_unavailable')`, id, "https://policy-ranking.example/"+id, title, title+" summary", title+" insight", publishedAt.Format(time.RFC3339), firstSeenAt.Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("insert policy ranking fixture item %s: %v", id, err)
+	}
+}
+
 func TestExpectedRedBackendDoctorSeparatesOpenRouterModelAndItemTransformHealth(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)

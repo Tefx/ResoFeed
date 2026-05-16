@@ -74,6 +74,44 @@ func TestProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems(t *testing.
 	}
 }
 
+func TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, `<?xml version="1.0"?><rss><channel><title>Fetched Channel Source</title><item><guid>one</guid><title>One</title><link>http://`+r.Host+`/one</link><description>first excerpt</description></item></channel></rss>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feed.Close)
+
+	seedSource(t, ctx, db, "src_channel_title", feed.URL+"/feed.xml", "Imported OPML Label")
+	if err := IngestOnce(ctx, db, IngestConfig{}); err != nil {
+		t.Fatalf("IngestOnce: %v", err)
+	}
+
+	var sourceTitle string
+	if err := db.QueryRowContext(ctx, `select title from sources where id = 'src_channel_title'`).Scan(&sourceTitle); err != nil {
+		t.Fatalf("read source title: %v", err)
+	}
+	if sourceTitle != "Fetched Channel Source" {
+		t.Fatalf("source title = %q, want fetched channel title", sourceTitle)
+	}
+
+	itemID := itemIDByURL(t, ctx, db, feed.URL+"/one")
+	detail, err := ReadItemDetail(ctx, db, itemID)
+	if err != nil {
+		t.Fatalf("ReadItemDetail: %v", err)
+	}
+	if detail.SourceTitle != "Fetched Channel Source" {
+		t.Fatalf("item source title = %q, want fetched channel title", detail.SourceTitle)
+	}
+}
+
 func TestProcessingLanguageSearchFTSIncludesCoreInsight(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)

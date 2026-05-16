@@ -342,14 +342,16 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	if err != nil {
 		return ingestSourceResult{}, err
 	}
+	effectiveSource := source
 	if feed.Title != "" && feed.Title != source.Title {
 		if _, err := db.ExecContext(ctx, `update sources set title = ? where id = ?`, feed.Title, source.ID); err != nil {
 			return ingestSourceResult{}, fmt.Errorf("ingest source: update source title: %w", err)
 		}
+		effectiveSource.Title = feed.Title
 	}
 	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
 	for _, entry := range feed.Items {
-		item, err := buildItem(ctx, source, entry, cfg.LLM, language)
+		item, err := buildItem(ctx, effectiveSource, entry, cfg.LLM, language)
 		if err != nil {
 			return result, err
 		}
