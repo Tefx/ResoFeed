@@ -97898,16 +97898,16 @@ phases:
       present.
 
       - [x] Audit emits PASS / PASS_WITH_DEBT / FAIL headline and blocker disposition.'
-    verification: '- [ ] phase-check protecting `cos-final-gate`: wiring-auditor confirms
+    verification: '- [x] phase-check protecting `cos-final-gate`: wiring-auditor confirms
       B1/B2 are closed.
 
-      - [ ] Evidence traces each current-operation detail field to type guard and
+      - [x] Evidence traces each current-operation detail field to type guard and
       rendered UI/conflict consumption.
 
-      - [ ] Evidence records explicit blocker disposition for any remaining write-only
+      - [x] Evidence records explicit blocker disposition for any remaining write-only
       or shape mismatch issue.
 
-      - [ ] No forbidden product/runtime surface was introduced.'
+      - [x] No forbidden product/runtime surface was introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
