@@ -94638,7 +94638,7 @@ phases:
       - [x] No backend schema, service layer, repository layer, DI, event bus, or
       sidecar worker is introduced.
 
-      - [ ] The expected-red test from `gsfr-expected-red-fragment-grouping-test`
+      - [x] The expected-red test from `gsfr-expected-red-fragment-grouping-test`
       turns green after this repair.'
     verification: '- [ ] Targeted frontend regression command passes and includes
       the synthetic same-base/different-fragment case.
