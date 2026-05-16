@@ -95297,7 +95297,7 @@ phases:
       - [x] Produce evidence that a valid grouped story renders without `state_unsafe_mutation`
       or other browser console runtime errors.
 
-      - [ ] Preserve dense Inspector grouped-source UI; no dashboard, wizard, or service-layer
+      - [x] Preserve dense Inspector grouped-source UI; no dashboard, wizard, or service-layer
       concept introduced.'
     verification: '- [ ] Main path: valid grouped story renders grouped-source disclosure
       with deterministic ordering.
