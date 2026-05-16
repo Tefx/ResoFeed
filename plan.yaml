@@ -93371,7 +93371,7 @@ phases:
     agent: gate-reviewer
   - id: azrv-batched-verification-failure-remediation
     name: Batched remediation for parallel verification failures
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -93572,6 +93572,8 @@ phases:
     - azrv-uiux-multimodal-audit
     - azrv-zh-spec-conformance-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T15:09:11.701264+00:00'
   - id: azrv-batched-verification-failure-retest
     name: Retest batched verification failures after remediation
     status: pending
