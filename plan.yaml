@@ -92594,7 +92594,7 @@ phases:
       - [x] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit remediation/retest or
       non-intersection closure path.
 
-      - [ ] Product-boundary constraints are checked against AGENTS.md and docs/ARCHITECTURE.md.
+      - [x] Product-boundary constraints are checked against AGENTS.md and docs/ARCHITECTURE.md.
 
       - [ ] Final zh verdict is COMPLETE only if every blocker-class zh obligation
       is PROVEN or explicitly non-intersecting.'
