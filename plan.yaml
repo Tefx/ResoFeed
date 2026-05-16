@@ -86205,7 +86205,7 @@ phases:
       - [x] Global Source Ledger ingest status is rendered in `.source-ledger__header`
       or a documented contract-consistent equivalent with cited DESIGN.md proof.
 
-      - [ ] Row-level `last_fetch: HH:MM:SS` remains adjacent to each source row and
+      - [x] Row-level `last_fetch: HH:MM:SS` remains adjacent to each source row and
       still updates after source fetch.
 
       - [ ] `[RUN INGEST]`, `[IMPORT OPML]`, `[FETCH]`, `[DELETE]`, and `[DETAILS]`
