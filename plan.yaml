@@ -85396,6 +85396,8 @@ phases:
     - srde2e-visual-a11y-regression-proof
     - srde2e-visual-a11y-blockers-fix
     - srde2e-visual-a11y-blockers-retest
+    - srde2e-steer-route-preview-render-contract-fix
+    - srde2e-steer-route-preview-render-contract-retest
     - srde2e-documentation-sync
     - srde2e-software-architect-fresh-review
     - srde2e-backend-architecture-remediation
