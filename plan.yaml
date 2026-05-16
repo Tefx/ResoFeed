@@ -86524,18 +86524,18 @@ phases:
       - [x] Final headline is PASS only when no blocker-class should_fix remains;
       PASS_WITH_DEBT is not closable for this design-contract issue without explicit
       non-intersection proof.'
-    verification: '- [ ] phase-check protecting srde2e-visual-a11y-regression-proof,
+    verification: '- [x] phase-check protecting srde2e-visual-a11y-regression-proof,
       srde2e-software-architect-clean-recheck, srde2e-full-plan-check, and srde2e-final-closure-gate.
 
-      - [ ] Evidence includes screenshots, DOM snapshots, and/or accessibility snapshots
+      - [x] Evidence includes screenshots, DOM snapshots, and/or accessibility snapshots
       from the real Source Ledger OPML import + `[RUN INGEST]` rendered browser flow.
 
-      - [ ] Source Ledger header status contract and row `last_fetch: HH:MM:SS` behavior
+      - [x] Source Ledger header status contract and row `last_fetch: HH:MM:SS` behavior
       are both proven green.
 
-      - [ ] Steer accessible-name uniqueness remains green.
+      - [x] Steer accessible-name uniqueness remains green.
 
-      - [ ] Any unresolved NEEDS_TEST, UNPROVEN, PASS_WITH_DEBT, or should_fix item
+      - [x] Any unresolved NEEDS_TEST, UNPROVEN, PASS_WITH_DEBT, or should_fix item
       has explicit remediation ownership or non-intersection proof; otherwise the
       retest blocks closure.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
