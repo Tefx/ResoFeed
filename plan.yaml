@@ -86510,7 +86510,7 @@ phases:
       - [x] Real rendered browser artifacts are captured for Source Ledger after OPML
       import and `[RUN INGEST]`; dummy-backend-only evidence is rejected.
 
-      - [ ] Header `last_ingest` / global status contract is PROVEN or a contract-consistent
+      - [x] Header `last_ingest` / global status contract is PROVEN or a contract-consistent
       resolution is documented with DESIGN.md citation.
 
       - [ ] Row-level `last_fetch: HH:MM:SS`, live source row visibility, and Source
