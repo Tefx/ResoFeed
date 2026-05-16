@@ -82857,7 +82857,7 @@ phases:
   - id: srdf-broad-rendering-owner-token-bootstrap-retest
     name: Retest broad rendering and scoped frontend surfaces after owner-token bootstrap
       fix
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (integration-verifier), retest the batched
       owner-token/rendering bootstrap remediation from `srdf-broad-rendering-owner-token-bootstrap-fix`
       from a fresh perspective.
@@ -83046,6 +83046,170 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T00:05:11.666122+00:00'
+    done_at: '2026-05-16T00:14:26.251600+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — integration-verifier read single owner token boundary,
+      browser-local accepted token, server-side `owner_token_sha256`, and no accounts/OAuth/reset
+      UI.
+
+      - docs/DESIGN.md — integration-verifier read terse Owner Token Prompt, authenticated
+      shell surfaces (Steer, RESOFEED menu, Source Ledger, mobile full-screen Inspector,
+      raw receipts), and no settings/dashboard/SaaS drift.
+
+      - docs/UI_REGRESSION_CONTRACT.md — integration-verifier read broad rendering
+      contract for reachable surfaces/hit targets, Source Ledger details/actions,
+      mobile split behavior, dirty-content guards, and forbidden concept negatives.
+
+      - `web/src/routes/components/__tests__/rendering-expected-red.test.ts` — integration-verifier
+      read owner-token rejected/accepted persistence checks and authenticated Steer/Source
+      Ledger/agent receipt/mobile/search surfaces.
+
+      - Fix artifact `81117bd5` and main merge `254b07ab` — integration-verifier read
+      via `git show --stat`, confirming `web/src/routes/+page.svelte` bootstrap change.
+
+      - CONSTITUTION.md — NOT READ: no file found in isolated worktree.
+
+
+      ## Retest Evidence
+
+      **Tester**: integration-verifier (independent of frontend-engineer fix)
+
+      **Scope**: broad rendering owner-token bootstrap plus scoped Steer/Source Ledger/split-scroll
+      regression checks
+
+      **Independence Level**: L1
+
+
+      ### Machine-readable closure
+
+      ```yaml
+
+      verdict: "PASS"
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: "COMPLETE"
+
+      ```
+
+
+      ### Commands executed
+
+      ```
+
+      # integration-verifier worktree
+
+      npm run test
+
+      # initial exit 127: svelte-kit missing due absent node_modules
+
+      npm ci
+
+      # exit 0, installed dependencies from lockfile
+
+      npm run test
+
+      # svelte-check found 0 errors and 0 warnings; Test Files 11 passed (11); Tests
+      61 passed (61)
+
+      npm run test:render -- steer-route-preview.expected-red.test.ts
+
+      # Test Files 1 passed; Tests 4 passed
+
+      npm run test:render -- manual-rss-fetch-source-ledger.expected-red.test.ts srdct-frontend-expected-red-contract.test.ts
+
+      # Test Files 2 passed; Tests 12 passed
+
+      npm run test:render -- rendering-expected-red.test.ts processing-language-reprocess.expected-red.test.ts
+      -t "mobile|Search|independent"
+
+      # Test Files 2 passed; 4 matched passed; full suite above had no skips
+
+      npm run test:render -- processing-language-reprocess.expected-red.test.ts
+
+      # Test Files 1 passed; Tests 5 passed
+
+      npm run check
+
+      # svelte-check found 0 errors and 0 warnings
+
+      rg forbidden UI terms in src/routes/+page.svelte and src/routes/components --glob
+      "*.svelte"
+
+      # scan_exit=1 no matches
+
+
+      # orchestrator mainline final-state gate
+
+      npm run test
+
+      # svelte-check found 0 errors and 0 warnings; Test Files 11 passed (11); Tests
+      61 passed (61)
+
+      npm run test:render -- --run src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/manual-rss-fetch-client.expected-red.test.ts
+
+      # Test Files 4 passed (4); Tests 22 passed (22)
+
+      rg forbidden UI terms in web/src/routes/+page.svelte and web/src/routes/components
+      --glob "*.svelte"; printf ''scan_exit=%s''
+
+      # scan_exit=1
+
+      ```
+
+
+      ### Six-failure closure confirmation
+
+      | Closure signal | Proof | Status |
+
+      | --- | --- | --- |
+
+      | Mainline broad rendering suite green including `rendering-expected-red.test.ts`
+      | `npm run test`: 11 files / 61 tests passed | CLOSED |
+
+      | Owner token rejected never persists | covered by `rendering-expected-red.test.ts`;
+      full suite green | CLOSED |
+
+      | Owner token accepted persists after successful bootstrap | covered by `rendering-expected-red.test.ts`;
+      full suite green | CLOSED |
+
+      | Steer route preview remains green | scoped Steer test: 4 passed | CLOSED |
+
+      | Source Ledger details/bracket actions remain green | scoped Source Ledger
+      tests: 12 passed | CLOSED |
+
+      | Split/mobile/search/processing low-chrome remain green | scoped mobile/search:
+      4 matched passed; processing-language: 5 passed | CLOSED |
+
+
+      ### Behavioral proof register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | status | evidence
+      |
+
+      | --- | --- | --- | --- | --- |
+
+      | broad rendering owner-token bootstrap | accepted token persists after successful
+      bootstrap and rejected token never persists | `npm run test` | PROVEN | `rendering-expected-red.test.ts`
+      included in full suite; 61 passed |
+
+      | authenticated app chrome renders Steer, Source Ledger, mobile Today, and agent
+      receipt surfaces | prompt does not trap authenticated tests | broad/scoped render
+      tests | PROVEN | full suite green plus scoped Steer, Source Ledger, mobile/Search,
+      processing-language runs green |
+
+
+      ### Gaps/Notes
+
+      - NONE. Initial missing `node_modules` in isolated worktree was resolved with
+      `npm ci`; no product code/docs/tests were modified by retest. Verification checklist
+      items are [x].'
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
