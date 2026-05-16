@@ -82910,7 +82910,7 @@ phases:
       command output; status: PROVEN or explicit blocker; closure_path: pass or new
       remediation; gate_decision_basis: downstream gate may open only when PROVEN.
 
-      - [ ] requirement_ref: authenticated app chrome renders Steer, Source Ledger,
+      - [x] requirement_ref: authenticated app chrome renders Steer, Source Ledger,
       mobile Today, and agent receipt surfaces; behavior_claim: prompt does not trap
       authenticated tests; runtime_proof_expected: broad and scoped render tests;
       evidence_ref: pasted command output; status: PROVEN or explicit blocker; closure_path:
