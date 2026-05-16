@@ -95202,7 +95202,7 @@ phases:
     agent: gate-reviewer
   - id: gsfr-fix-reactive-grouped-source-sort-crash
     name: Fix reactive grouped-source sort crash
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -95365,6 +95365,8 @@ phases:
     depends_on:
     - gsfr-uiux-multimodal-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T22:12:22.082089+00:00'
   - id: gsfr-retest-grouped-source-runtime-rendering
     name: Retest grouped-source runtime rendering after sort fix
     status: pending
