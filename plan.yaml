@@ -82576,7 +82576,7 @@ phases:
       - [x] Broad rendering tests reach authenticated app chrome and route surfaces
       instead of staying stuck at Owner Token Prompt.
 
-      - [ ] Scoped Steer, Source Ledger, split-scroll/mobile, and processing-language
+      - [x] Scoped Steer, Source Ledger, split-scroll/mobile, and processing-language
       UI work remains intact.
 
       - [ ] Forbidden UI concepts remain absent.'
