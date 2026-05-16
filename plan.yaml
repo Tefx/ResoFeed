@@ -85155,7 +85155,7 @@ phases:
       \ now exists for both should_fix findings."
   - id: srde2e-backend-architecture-remediation
     name: Remediate batched architecture/API contract findings
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project (golang-developer discovered in Larva registry)
@@ -85329,6 +85329,8 @@ phases:
     depends_on:
     - srde2e-software-architect-fresh-review
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-16T08:06:18.903781+00:00'
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
     status: pending
