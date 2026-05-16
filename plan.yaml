@@ -95433,7 +95433,7 @@ phases:
       outside this step; they were preserved and not committed by the orchestrator.'
   - id: gsfr-retest-grouped-source-runtime-rendering
     name: Retest grouped-source runtime rendering after sort fix
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -95552,6 +95552,109 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T22:29:48.648488+00:00'
+    done_at: '2026-05-16T22:37:28.017972+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by verifier; key passages: dense low-fatigue archival
+      index chrome; Inspector requires source/provenance header, source-list disclosure
+      for grouped stories, and screen-reader-readable grouped sources/provenance.
+
+      - docs/ARCHITECTURE.md — Read by verifier; key passages: story grouping is represented
+      on item fields; original item provenance remains accessible when grouped; grouping
+      never acts like source suppression.
+
+
+      ## Retest Report
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: not_applicable
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: NO
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      **Commands executed by verifier:**
+
+      - `npm ci`
+
+      - `npm run test:render -- src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts`
+
+      - `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts -g "FR-04|B1"
+      --project=chromium-ci-safe`
+
+      - Build/preview plus Playwright browser-console/DOM probe.
+
+
+      **Actual output:**
+
+      - Vitest grouped fragment test: 1 file, 3 tests passed.
+
+      - Focused Playwright retest: FR-04 and B1 passed, 2 passed.
+
+
+      **Browser console result:**
+
+      - Artifact `.test-artifacts/gsfr-retest/browser-console-and-dom-proof.json`
+      has `pageErrors: []` and `hasStateUnsafeMutation: false`.
+
+      - Console contained two static preview 404 resource-load errors, not the blocker-class
+      Svelte crash.
+
+
+      **Rendered evidence:**
+
+      - Valid grouped story disclosure PASS: `.test-artifacts/playwright/test-output/ui-runtime-fresh-review-re-9bba9-source-items-and-provenance-chromium-ci-safe/ui-runtime-fresh-review-remediation-proof/fr-04-rendered-inspector-grouped-sources.json`
+      shows `Grouped story with 2 source items`, `Primary Wire`, `Duplicate Ledger`,
+      and `story-shared-runtime-review`.
+
+      - Synthetic no-grouping path PASS: `inspector-fragment-grouping.expected-red.test.ts`
+      passed 3/3 and asserts `.contract-grouped-sources` absent for distinct feed-entry
+      fragments while backend-provenance grouping still renders.
+
+
+      **behavioral_proof_register:**
+
+      - Valid grouped story renders grouped-source disclosure without Svelte `state_unsafe_mutation`:
+      PASS, proven by focused e2e + console proof.
+
+      - Synthetic feed-fragment no-grouping path remains non-grouped: PASS, proven
+      by render test.
+
+      - Browser console evidence captured with no blocker-class runtime crash: PASS,
+      artifact has no page errors and no state unsafe mutation.
+
+      - Runtime/browser phase-check is green after grouped-source sort fix: PASS,
+      focused Playwright 2 passed.
+
+
+      **Mainline evidence/artifact preservation:**
+
+      - Orchestrator had already verified mainline after the implementation merge
+      with `npm run check && npx playwright ... --grep "FR-04|B1"` from `web/`: 2
+      passed.
+
+      - Retest artifacts from worker commit `0cb462a1` were preserved in main commit
+      `df9d5d7c` without product implementation changes.
+
+
+      **Gaps/Notes:**
+
+      - Product implementation files were not modified by the retest step.
+
+      - Main worktree still contains unrelated pre-existing dirty/untracked files
+      outside this step; they were preserved and not committed by this completion.'
   - id: gsfr-uiux-reaudit-grouped-source-rendering
     name: Re-audit grouped-source rendering after crash fix
     status: pending
