@@ -95290,7 +95290,7 @@ phases:
 
       - [x] Replace the grouped-source sort mutation with a non-mutating sort in `web/src/routes/components/Inspector.svelte`.
 
-      - [ ] Preserve the existing grouped-source comparator/order semantics.
+      - [x] Preserve the existing grouped-source comparator/order semantics.
 
       - [ ] Verify no backend grouping/schema/provenance behavior is changed.
 
