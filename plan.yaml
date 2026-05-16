@@ -84728,7 +84728,7 @@ phases:
       for Steer submit, [RUN INGEST], [FETCH], [DETAILS], [DELETE], OPML/state actions,
       menu entries, row open, star, and original links.
 
-      - [ ] Prove keyboard tab/enter/space/escape behavior and visible focus indicators.
+      - [x] Prove keyboard tab/enter/space/escape behavior and visible focus indicators.
 
       - [ ] Prove active panel semantic state agrees with visible panel state.
 
