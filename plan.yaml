@@ -85546,7 +85546,7 @@ phases:
 
       - [x] Verify SF2: preview remains read-only and creates no write/no receipt.
 
-      - [ ] Check for new contract drift in HTTP, MCP, docs, and frontend consumers
+      - [x] Check for new contract drift in HTTP, MCP, docs, and frontend consumers
       touched by the fix.
 
       - [ ] Return CLEAN only if both should_fix findings are closed and no new blocker/should_fix
