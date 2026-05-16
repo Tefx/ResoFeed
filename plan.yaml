@@ -95310,6 +95310,125 @@ phases:
     depends_on:
     - gsfr-uiux-multimodal-audit
     agent: frontend-engineer
+  - id: gsfr-retest-grouped-source-runtime-rendering
+    name: Retest grouped-source runtime rendering after sort fix
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      spec_refs:
+
+      - docs/DESIGN.md#Current Operation Status? no; Inspector grouped-source visual
+      contract from existing phase evidence
+
+      - docs/ARCHITECTURE.md#grouping authority and frontend Inspector provenance
+      display
+
+      touch_paths:
+
+      - web/src/routes/components/Inspector.svelte
+
+      harness_refs:
+
+      - grouped story browser/e2e tests
+
+      - browser console capture from `gsfr-uiux-multimodal-audit`
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun focused runtime evidence
+      for the repaired grouped-source path.
+
+
+      Scope:
+
+      - Exercise the valid grouped story rendering path that crashed during `gsfr-uiux-multimodal-audit`.
+
+      - Include the synthetic fragment/no-grouping regression path that previously
+      passed, to guard against regression.
+
+      - Capture browser console output and rendered DOM evidence.
+
+
+      ## Completion Criteria
+
+      - [ ] Valid grouped story renders grouped-source disclosure without Svelte `state_unsafe_mutation`.
+
+      - [ ] Synthetic feed-fragment no-grouping path remains non-grouped and does
+      not regress.
+
+      - [ ] Browser console evidence is captured and contains no blocker-class runtime
+      crash.
+
+      - [ ] Evidence identifies exact command/test and actual output, not just a summary.'
+    verification: '- [ ] phase-check protecting `gsfr-final-gate`: focused runtime/browser
+      retest is green after the sort fix.
+
+      - [ ] Main path: valid grouped-source rendering path is exercised.
+
+      - [ ] Failure path: previous console `state_unsafe_mutation` is absent.
+
+      - [ ] Regression guard: synthetic no-grouping path remains correct.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Report
+
+
+      **Commands executed**:
+
+      ```
+
+      <actual command(s)>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <stdout/stderr or test runner output>
+
+      ```
+
+
+      **Browser console result**:
+
+      ```
+
+      <console output showing no state_unsafe_mutation>
+
+      ```
+
+
+      **Rendered evidence**:
+
+      - Valid grouped story grouped-source disclosure: PASS/FAIL, artifact ref
+
+      - Synthetic no-grouping path: PASS/FAIL, artifact ref
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - gsfr-fix-reactive-grouped-source-sort-crash
+    agent: integration-verifier
 - id: current-operation-status-and-low-frequency-utility-surface-implementation
   name: Current Operation Status and Low-Frequency Utility Surface Implementation
   status: in_progress
