@@ -82591,7 +82591,7 @@ phases:
       - [x] Review `srdf-batched-frontend-audit-closure` machine-readable YAML before
       opening the gate.
 
-      - [ ] Require `gate_open_allowed: true`, `verdict: PASS`, and `remaining_blockers:
+      - [x] Require `gate_open_allowed: true`, `verdict: PASS`, and `remaining_blockers:
       []` from the batched closure.
 
       - [ ] Confirm stale-vs-real reconciliation exists for every spec-verifier and
