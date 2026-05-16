@@ -85218,7 +85218,7 @@ phases:
 
       ## Architecture Guardrails
 
-      - [ ] Preserve the single Go binary, SQLite/FTS5-only storage, flat `internal/resofeed/`
+      - [x] Preserve the single Go binary, SQLite/FTS5-only storage, flat `internal/resofeed/`
       file shape, owner-token boundary, lexical-only search, and no-RAG/no-sync/no-merge
       product invariants.
 
