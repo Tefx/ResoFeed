@@ -94959,7 +94959,7 @@ phases:
       - [x] Visual/rendered evidence proves unrelated synthetic feed fragments do
       not show grouped-source disclosure.
 
-      - [ ] Visual/rendered evidence proves valid grouped stories still expose grouped
+      - [x] Visual/rendered evidence proves valid grouped stories still expose grouped
       source items accessibly.
 
       - [x] Inspector remains consistent with DESIGN.md dense archival workbench aesthetics.
