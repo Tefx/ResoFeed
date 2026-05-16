@@ -86208,7 +86208,7 @@ phases:
       - [x] Row-level `last_fetch: HH:MM:SS` remains adjacent to each source row and
       still updates after source fetch.
 
-      - [ ] `[RUN INGEST]`, `[IMPORT OPML]`, `[FETCH]`, `[DELETE]`, and `[DETAILS]`
+      - [x] `[RUN INGEST]`, `[IMPORT OPML]`, `[FETCH]`, `[DELETE]`, and `[DETAILS]`
       controls remain visible, reachable, and visually contract-consistent.
 
       - [ ] Steer preview/commit/undo accessible-name uniqueness remains intact.
