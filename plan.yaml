@@ -85552,7 +85552,7 @@ phases:
       - [x] Return CLEAN only if both should_fix findings are closed and no new blocker/should_fix
       contract drift exists.
 
-      - [ ] If any finding remains or a new finding appears, list severity, location,
+      - [x] If any finding remains or a new finding appears, list severity, location,
       reproduction, grep hint, and required remediation so the orchestrator can create
       another remediation loop before final closure.
 
