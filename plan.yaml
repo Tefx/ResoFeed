@@ -84907,7 +84907,7 @@ phases:
       checklist items.'
   - id: srde2e-documentation-sync
     name: Sync documentation after Steer delta implementation
-    status: claimed
+    status: done
     description: 'Sync documentation with final implemented behavior only if implementation
       changed behavior or filenames beyond existing clean docs. If docs already match,
       provide a no-op evidence report with cited proof.
@@ -84968,6 +84968,47 @@ phases:
     agent: doc-reviewer
     claimed_by: doc-reviewer
     claimed_at: '2026-05-16T07:50:28.583023+00:00'
+    done_at: '2026-05-16T07:55:26.219037+00:00'
+    evidence: "status: SUCCESS\n\n## refs Read Confirmation (MANDATORY)\n- docs/ARCHITECTURE.md\
+      \ — Read. Key passages: retrieval remains lexical-only/no vector/RAG; deterministic\
+      \ steering conflict handling; processing language/reprocess HTTP behavior; frontend\
+      \ split-scroll/mobile route and language responsibilities.\n- docs/DESIGN.md\
+      \ — Read. Key passages: independent desktop Feed/Inspector scroll and mobile\
+      \ full-screen Inspector; language/reprocess controls; Source Ledger details/actions\
+      \ and anti-dashboard constraints.\n- docs/DESIGN_VISION.md — Read. Key passages:\
+      \ split-pane desktop, single-column mobile, RESOFEED menu, flat Source Ledger\
+      \ with lightweight `[RUN INGEST]` / `[FETCH]`.\n- docs/PRD.md — Read. Key passages:\
+      \ lexical/metadata search and no built-in RAG/vector search; AC-4 strict policy\
+      \ execution; Steer + flat Source Ledger and manual fetch controls.\n- docs/UI_REGRESSION_CONTRACT.md\
+      \ — Read. Key passages: hit-target/keyboard coverage for RESOFEED menu, Source\
+      \ Ledger `[RUN INGEST]` / `[FETCH]`, search, doctor, mobile feed/Inspector,\
+      \ and negative drift checks.\n- AGENTS.md — NOT READ: absent in isolated worktree;\
+      \ dispatch/system-provided AGENTS project invariants were honored as available\
+      \ source.\n\n## Doc Sync Evidence\n- Files changed or no-op rationale: none.\
+      \ README, docs/USAGE.md, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md,\
+      \ and docs/UI_REGRESSION_CONTRACT.md already describe implemented route preview/commit/undo,\
+      \ Source Ledger actions, lexical-only search, AC-4/conflict handling, split-scroll/mobile\
+      \ route, and processing language/reprocess controls.\n- Design lint output if\
+      \ applicable: not applicable; docs/DESIGN.md was not changed, so npx @google/design.md\
+      \ lint was not required.\n- Spec/implementation alignment notes:\n  - Route\
+      \ preview/commit/undo docs align with internal/resofeed/http.go route implementations\
+      \ and web/src/routes/+page.svelte UI undo wiring.\n  - Source Ledger details/actions\
+      \ docs align with web/src/routes/components/SourceLedger.svelte.\n  - Lexical-only\
+      \ search docs align with internal/resofeed/steer_intent.go preview warning and\
+      \ forbidden vector/RAG constraints.\n  - AC-4/conflicts docs align with backend\
+      \ tests for invariant conflicts and human-over-agent precedence.\n  - Split-scroll/mobile\
+      \ route docs align with web/src/routes/+page.svelte and Inspector.svelte scroll\
+      \ preservation/route behavior.\n  - Processing language controls docs align\
+      \ with README/docs/USAGE/docs/ARCHITECTURE and internal/resofeed/http.go endpoints.\n\
+      \n## Mainline Final-State Verification\n```text\ncd /Users/tefx/Projects/ResoFeed\
+      \ && go test ./internal/resofeed\nok  \tresofeed/internal/resofeed\t1.026s\n\
+      ```\n\n## Standard Evidence\n- Commit hash(es): none — docs already aligned;\
+      \ no file changes made and branch has no ahead commits.\n- Files changed: none.\n\
+      - Verification: isolated `go test ./internal/resofeed` returned ok; isolated\
+      \ `git diff --exit-code` returned no output; mainline `go test ./internal/resofeed`\
+      \ returned ok.\n- Spec link: srde2e-documentation-sync\n- Gaps/Notes: AGENTS.md\
+      \ missing from isolated worktree, so it could not be read from disk; no documentation\
+      \ edits were needed."
   - id: srde2e-software-architect-fresh-review
     name: Run software-architect fresh architecture review
     status: pending
