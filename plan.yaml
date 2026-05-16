@@ -89004,7 +89004,7 @@ phases:
       - [x] Duplicate Dirty Inspector Corpus rows/shared DB state are resolved exactly
       as adjudicated.
 
-      - [ ] Hit-target scroll geometry is resolved exactly as adjudicated.
+      - [x] Hit-target scroll geometry is resolved exactly as adjudicated.
 
       - [ ] Targeted render command remains green.
 
