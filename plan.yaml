@@ -93275,7 +93275,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Browser E2E evidence is reviewed and specific.
+      - [x] Browser E2E evidence is reviewed and specific.
 
       - [ ] zh spec conformance evidence covers all seven user-requested surfaces.
 
