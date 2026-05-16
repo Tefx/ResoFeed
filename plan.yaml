@@ -91524,7 +91524,7 @@ phases:
       - [ ] Closure matrix covers all known audit findings F1/F2/P1/P2/P3 and requested
       zh surfaces.
 
-      - [ ] Expected-red tests are appropriately red before implementation or cite
+      - [x] Expected-red tests are appropriately red before implementation or cite
       already-green existing tests with evidence.
 
       - [ ] Product-boundary non-goals are preserved.
