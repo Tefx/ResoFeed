@@ -96996,7 +96996,7 @@ phases:
       **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
     - cos-frontend-operation-utility-surface
-    - cos-retest-current-operation-runtime-ui
+    - cos-retest-current-operation-browser-conflict-detail
     - cos-reaudit-current-operation-wiring
     agent: uiux-auditor
   - id: cos-spec-doc-conformance
