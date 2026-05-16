@@ -85513,7 +85513,7 @@ phases:
       \ remediation required; no forbidden UI/product concept introduced."
   - id: srde2e-software-architect-clean-recheck
     name: Re-review batched architecture/API contract remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -85635,6 +85635,8 @@ phases:
     depends_on:
     - srde2e-backend-architecture-remediation
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-16T08:18:18.216836+00:00'
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
     status: pending
