@@ -91073,7 +91073,7 @@ phases:
       here.'
 - id: audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
   name: Audit and Chinese Support Repair — Contract Matrix and Expected-Red Tests
-  status: pending
+  status: in_progress
   gate: Contract/test phase blocks unless the recent uiux-auditor/software-architect
     findings and Chinese support surfaces are translated into explicit acceptance
     criteria and expected-red browser/contract tests before implementation.
@@ -91082,7 +91082,7 @@ phases:
   steps:
   - id: azrct-closure-matrix
     name: Lock repair and zh completeness closure matrix
-    status: pending
+    status: claimed
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -91199,6 +91199,8 @@ phases:
 
       - Product-boundary non-goals confirmed.'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-16T13:13:27.783424+00:00'
   - id: azrct-expected-red-browser-and-contract-tests
     name: Add expected-red browser and contract tests for audit and zh gaps
     status: pending
