@@ -90645,7 +90645,7 @@ phases:
       \ are evidenced here."
   - id: srde2e-final-closure-gate-rerun
     name: Rerun final closure gate after software-architect CLEAN proof
-    status: pending
+    status: claimed
     description: 'Final gate rerun/recheck for Steer Delta E2E Architecture Review
       Closure after semantic FAIL from `srde2e-final-closure-gate`.
 
@@ -90744,3 +90744,5 @@ phases:
     - srde2e-real-system-e2e-blockers-retest
     - srde2e-visual-a11y-blockers-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T12:12:29.983418+00:00'
