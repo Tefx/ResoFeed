@@ -89698,7 +89698,7 @@ phases:
       - [x] Next implementation attempt has exact remediation instructions and forbidden
       shortcuts.
 
-      - [x] No product code, test code, docs, or plan completion state is modified
+      - [ ] No product code, test code, docs, or plan completion state is modified
       by this investigation step.'
     verification: '- [ ] Investigation is read-only/analysis-first and produces no
       app/test/docs modifications.
