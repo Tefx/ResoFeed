@@ -91079,3 +91079,11 @@ phases:
     criteria and expected-red browser/contract tests before implementation.
   depends_on:
   - steer-delta-e2e-architecture-review-closure
+- id: audit-and-chinese-support-repair-implementation-and-preview-sync
+  name: Audit and Chinese Support Repair — Implementation and Preview Sync
+  status: locked
+  gate: Implementation phase blocks unless UI low-chrome findings, OPML manual-ingest
+    boundary, terse copy, Inspector provenance, docs/ui-preview.html drift, and incomplete
+    zh UI surfaces are repaired without product-boundary expansion.
+  depends_on:
+  - audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
