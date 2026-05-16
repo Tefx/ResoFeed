@@ -94188,3 +94188,13 @@ phases:
       \ mainline.\nSpec link: azrv-batched-verification-failure-retest\nGaps/Notes:\
       \ no unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING items remain; AGENTS.md\
       \ was not available in isolated worktree per verifier evidence."
+- id: grouped-story-fragment-url-regression-repair
+  name: Grouped Story Fragment URL Regression Repair
+  status: pending
+  gate: Final gate blocks unless regression proof shows distinct synthetic feed-fragment
+    URLs do not create grouped-source disclosure, backend grouping remains story_key/duplicate
+    provenance based without schema changes, same-article URL fallback remains only
+    where contractually valid, and rendered Inspector evidence preserves the dense
+    archival workbench aesthetic.
+  depends_on:
+  - audit-and-chinese-support-repair-verification-and-closure
