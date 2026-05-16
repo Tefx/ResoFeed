@@ -95429,6 +95429,120 @@ phases:
     depends_on:
     - gsfr-fix-reactive-grouped-source-sort-crash
     agent: integration-verifier
+  - id: gsfr-uiux-reaudit-grouped-source-rendering
+    name: Re-audit grouped-source rendering after crash fix
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+      spec_refs:
+
+      - docs/DESIGN.md#Inspector grouped-source disclosure and dense archival workbench
+      aesthetic
+
+      - docs/ARCHITECTURE.md#frontend grouping/provenance display contract
+
+      touch_paths:
+
+      - web/src/routes/components/Inspector.svelte
+
+      harness_refs:
+
+      - screenshots/browser captures from `gsfr-retest-grouped-source-runtime-rendering`
+
+
+      As an INDEPENDENT UIUX AUDITOR (uiux-auditor), re-audit the grouped story Inspector
+      path after the reactive sort crash repair.
+
+
+      This is a targeted re-audit of the blocker from `gsfr-uiux-multimodal-audit`,
+      not a request to reopen completed contract/test work.
+
+
+      Audit focus:
+
+      - Valid grouped story source disclosure renders without runtime crash.
+
+      - UI remains dense, terse, and archival per DESIGN.md.
+
+      - Source titles, feed links, selected/grouped metadata, and provenance line
+      remain visible and understandable.
+
+      - Synthetic fragment no-grouping path remains visually sane and does not show
+      false grouped-source disclosure.
+
+
+      ## Completion Criteria
+
+      - [ ] Multimodal/rendered artifact shows valid grouped-source disclosure after
+      repair.
+
+      - [ ] Browser console evidence has no `state_unsafe_mutation` blocker.
+
+      - [ ] Synthetic fragment/no-grouping path remains non-grouped.
+
+      - [ ] Audit emits parseable PASS / PASS_WITH_DEBT / FAIL headline and blocker
+      disposition.'
+    verification: '- [ ] phase-check protecting `gsfr-final-gate`: uiux-auditor re-audit
+      passes or records only explicit non-blocking debt.
+
+      - [ ] Rendered evidence proves valid grouped-source disclosure no longer crashes.
+
+      - [ ] Evidence proves no false grouping regression for synthetic feed fragments.
+
+      - [ ] Gate-relevant blocker disposition is explicit.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UIUX Re-Audit Report
+
+
+      **Artifacts reviewed**:
+
+      ```
+
+      <screenshots, DOM snapshots, browser console captures>
+
+      ```
+
+
+      **Visual/spatial states**:
+
+      - Valid grouped story disclosure: PASS/FAIL
+
+      - Synthetic no-grouping path: PASS/FAIL
+
+      - Inspector density/archival aesthetic: PASS/FAIL
+
+
+      **Runtime blocker status**:
+
+      ```
+
+      state_unsafe_mutation present? YES/NO
+
+      ```
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - gsfr-retest-grouped-source-runtime-rendering
+    agent: uiux-auditor
 - id: current-operation-status-and-low-frequency-utility-surface-implementation
   name: Current Operation Status and Low-Frequency Utility Surface Implementation
   status: in_progress
