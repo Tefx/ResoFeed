@@ -84677,7 +84677,7 @@ phases:
       - [x] Browser invalid add (`添加 tldr`, `订阅 HN`, `add tldr`) returns URL-required
       copy and no source mutation.
 
-      - [ ] Browser search and find alias execute lexical search/read-only route with
+      - [x] Browser search and find alias execute lexical search/read-only route with
       warning-only find copy and no RAG/chat/semantic answer UI.
 
       - [ ] Browser `/doctor` runs read-only diagnostics and does not become a steering
