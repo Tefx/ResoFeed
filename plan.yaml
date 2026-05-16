@@ -85252,6 +85252,8 @@ phases:
     - srde2e-real-system-e2e-blockers-fix
     - srde2e-real-system-e2e-blockers-retest
     - srde2e-uiux-audit-source-ledger-steer-controls
+    - srde2e-uiux-source-ledger-status-contract-fix
+    - srde2e-uiux-source-ledger-status-contract-retest
     - srde2e-visual-a11y-regression-proof
     - srde2e-documentation-sync
     - srde2e-software-architect-fresh-review
