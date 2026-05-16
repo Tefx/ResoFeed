@@ -84155,28 +84155,28 @@ phases:
 
       - [x] Do not split this into serial one-issue fix chains or mutate completed
       plan steps.'
-    verification: '- [ ] local-check protecting `srdf-batched-frontend-closure-blockers-retest`
+    verification: '- [x] local-check protecting `srdf-batched-frontend-closure-blockers-retest`
       and `srdf-frontend-gate`.
 
-      - [ ] `cd web && npm run test` passes with svelte-check/vitest output recorded.
+      - [x] `cd web && npm run test` passes with svelte-check/vitest output recorded.
 
-      - [ ] `cd web && npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+      - [x] `cd web && npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
       tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`
       passes or any harness-name drift is proven with equivalent source-backed coverage.
 
-      - [ ] `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      - [x] `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
       tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
       tests/e2e/hit-target-clickability.spec.ts` passes and covers Source Ledger controls/hit
       targets.
 
-      - [ ] `cd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts
+      - [x] `cd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts
       tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`
       passes and covers rendered artifacts/TODAY/mobile metadata.
 
-      - [ ] Forbidden concept scan over frontend Svelte/TS user-facing surfaces remains
+      - [x] Forbidden concept scan over frontend Svelte/TS user-facing surfaces remains
       PASS.
 
-      - [ ] Evidence maps every blocker family to a source-backed fix or source-backed
+      - [x] Evidence maps every blocker family to a source-backed fix or source-backed
       stale-test correction with no `STILL_BLOCKED` blocker-class item.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
