@@ -85308,6 +85308,7 @@ phases:
     - srde2e-software-architect-clean-recheck
     - srde2e-uiux-source-ledger-status-contract-retest
     - srde2e-visual-a11y-blockers-retest
+    - srde2e-steer-route-preview-render-contract-retest
     agent: integration-verifier
   - id: srde2e-final-closure-gate
     name: Final gate for Steer delta implementation
