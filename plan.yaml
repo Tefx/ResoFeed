@@ -84366,7 +84366,7 @@ phases:
       register.'
   - id: srdf-batched-frontend-closure-blockers-retest
     name: Retest and close frontend closure blockers after batched fix
-    status: pending
+    status: claimed
     description: "As an INDEPENDENT TESTER (integration-verifier), retest the batched\
       \ closure-blocker fix from `srdf-batched-frontend-closure-blockers-fix` and\
       \ decide whether `srdf-frontend-gate` may open.\n\nstep_type: test\nstep_intent:\
@@ -84482,6 +84482,8 @@ phases:
     depends_on:
     - srdf-batched-frontend-closure-blockers-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T01:40:32.944204+00:00'
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
