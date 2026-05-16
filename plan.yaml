@@ -97818,3 +97818,244 @@ phases:
     depends_on:
     - cos-retest-current-operation-runtime-ui
     agent: wiring-auditor
+  - id: cos-fix-current-operation-browser-conflict-detail
+    name: Fix current-operation browser conflict detail blockers
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      provenance: introduced_now / discovered_by cos-retest-current-operation-runtime-ui
+
+      failure_source_step: cos-retest-current-operation-runtime-ui
+
+      spec_refs:
+
+      - docs/ARCHITECTURE.md#GET /api/runtime/operation
+
+      - docs/ARCHITECTURE.md#guarded-operation conflicts
+
+      - docs/DESIGN.md#Current Operation Status (`current-operation-status`)
+
+      touch_paths:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts
+
+      harness_refs:
+
+      - Vitest current-operation utility placement tests
+
+      - Playwright current-operation utility placement browser test
+
+
+      Fix ALL blockers discovered by `cos-retest-current-operation-runtime-ui` in
+      one batched pass. Do not create a serial fix chain.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### B1: Duplicate Source Ledger conflict status elements
+
+      Failed assertion:
+
+      - `locator(''section.source-ledger'').getByText(''err: ingest already running'')`
+      resolved to two visible matching status elements in strict mode.
+
+
+      Required closure:
+
+      - Determine whether the duplicate `err: ingest already running` elements are
+      a real UI duplication in the Source Ledger conflict path or a test/selector
+      fixture issue.
+
+      - If real UI duplication: eliminate duplicate status rendering so the contextual
+      Source Ledger conflict path has one intended visible status instance per affected
+      surface/row.
+
+      - If test-only selector ambiguity: update the browser selector/fixture to target
+      the authoritative contextual status element and prove no unintended duplicate
+      is visible.
+
+
+      ### B2: E2E conflict path does not prove `current_operation` detail
+
+      Failed coverage gap:
+
+      - The browser conflict fixture used only a generic conflict payload, so e2e
+      did not prove `error.details.current_operation` renders contextual detail.
+
+
+      Required closure:
+
+      - Update the browser/e2e conflict fixture or route fulfillment so the 409 guarded-operation
+      payload includes documented `current_operation` detail.
+
+      - Prove the rendered browser path exposes current-operation detail beyond the
+      generic `err: ingest already running` string, including phase/count/message/timestamp
+      context where supplied.
+
+
+      ## Product and Architecture Guardrails
+
+      - Preserve ResoFeed constraints from AGENTS.md, docs/ARCHITECTURE.md, and docs/DESIGN.md.
+
+      - Do NOT add dashboards, job queues, task tables, activity ledgers, settings
+      panels, service layers, sidecars, sync/merge state, provider/DI abstractions,
+      or persistent top-chrome operation status.
+
+      - Keep operation status contextual to Source Ledger and opened RESOFEED operations/utility
+      surfaces.
+
+      - Preserve low-frequency LANG/reprocess placement; do not turn this into a global
+      dashboard/progress surface.
+
+
+      ## Gate Preview (what downstream gates WILL reject)
+
+      1. Two visible Source Ledger status elements matching `err: ingest already running`
+      in the same conflict assertion scope.
+
+      2. Browser evidence that only proves a generic conflict string and does not
+      include `current_operation` detail.
+
+      3. Persistent top-chrome operation/status chrome outside contextual Source Ledger/open
+      RESOFEED surfaces.
+
+      4. Any new jobs/queues/activity ledgers/settings/service-layer abstractions.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Changes
+      must close the real browser/runtime failure path or precisely prove and repair
+      a test-only ambiguity.
+
+
+      ## Completion Checklist
+
+      - [ ] B1 is closed by either removing real duplicate conflict status rendering
+      or narrowing/fixing a demonstrably test-only selector ambiguity.
+
+      - [ ] B2 is closed by a browser/e2e conflict fixture carrying documented `current_operation`
+      detail.
+
+      - [ ] Source Ledger conflict evidence shows the intended contextual status exactly
+      once in the relevant assertion scope.
+
+      - [ ] Browser evidence shows current-operation detail, not only the generic
+      conflict string.
+
+      - [ ] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      top-chrome status was introduced.'
+    verification: '- [ ] Main path: targeted Vitest and/or browser tests still accept
+      documented current-operation count/detail payloads.
+
+      - [ ] Failure path: Playwright conflict scenario proves `error.details.current_operation`
+      detail renders contextually.
+
+      - [ ] Duplicate closure: evidence demonstrates the strict-mode duplicate `err:
+      ingest already running` status issue is resolved or was selector-only and corrected.
+
+      - [ ] Product guard: no persistent top-chrome status, dashboard, jobs, queues,
+      activity ledger, settings, sidecar, or service-layer drift is introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+      — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts — key
+      passage or "NOT READ: <reason>"
+
+
+      ## Failed Assertion
+
+      ```text
+
+      <quote the Playwright strict-mode duplicate locator failure and the exact locator/test
+      name>
+
+      ```
+
+
+      ## Fix Proof
+
+      - Root cause: <real duplicate UI rendering | test-only selector ambiguity |
+      both>
+
+      - Files changed: <paths>
+
+      - Why this closes the blocker family: <explanation>
+
+
+      ## Browser current_operation Detail Proof
+
+      - Fixture/payload used:
+
+      ```json
+
+      <paste guarded-operation 409 payload including error.details.current_operation>
+
+      ```
+
+      - Browser assertion proving detail beyond generic conflict string:
+
+      ```text
+
+      <paste assertion and actual visible text/artifact refs>
+
+      ```
+
+
+      ## Duplicate Status Closure Proof
+
+      - Selector/scope checked: <selector>
+
+      - Count before/after or final count evidence:
+
+      ```text
+
+      <paste locator count/output; must prove no unintended duplicate in the relevant
+      Source Ledger scope>
+
+      ```
+
+
+      ## Commands and Outputs
+
+      ```text
+
+      <paste exact commands and actual outputs for targeted Vitest/Playwright checks>
+
+      ```
+
+
+      ## Product Guardrail Confirmation
+
+      - [ ] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      top-chrome status introduced.
+
+      - [ ] LANG/reprocess placement remains low-frequency/contextual.'
+    depends_on:
+    - cos-fix-current-operation-frontend-wiring
+    agent: frontend-engineer
