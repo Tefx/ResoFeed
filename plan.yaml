@@ -83989,7 +83989,7 @@ phases:
       \ and `srdf-batched-frontend-closure-blockers-retest`."
   - id: srdf-batched-frontend-closure-blockers-fix
     name: Batch fix frontend closure blockers after failed audit retest
-    status: claimed
+    status: done
     description: 'Batched remediation for failed `srdf-batched-frontend-audit-closure`.
 
 
@@ -84267,6 +84267,103 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T01:22:28.397653+00:00'
+    done_at: '2026-05-16T01:40:01.690268+00:00'
+    evidence: 'Commit hash(es): branch 9df4bf44; main squash commit c5e5e66f.
+
+
+      Files changed:
+
+      - web/src/app.css
+
+      - web/tests/e2e/design-artifact-negative-ux.spec.ts
+
+      - web/tests/e2e/hit-target-clickability.spec.ts
+
+      - web/tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by frontend-engineer. Key insight: `RESOFEED` is a discreet
+      surface menu; `TODAY` and `SOURCE LEDGER` may appear only after opening it,
+      and mobile feed metadata must stay flat/one-line with deterministic truncation.
+
+      - docs/UI_REGRESSION_CONTRACT.md — Read by frontend-engineer. Key insight: hit-target
+      tests must open `RESOFEED` before targeting `TODAY`/`SOURCE LEDGER`; Source
+      Ledger controls and OPML import remain mandatory unobstructed targets.
+
+      - docs/ARCHITECTURE.md — Read by frontend-engineer. Key insight: manual ingest/fetch
+      use the single-process HTTP boundary and must not introduce queues, dashboards,
+      activity ledgers, sync/merge, or extra source hierarchy.
+
+
+      ## Batched Fix Evidence
+
+      Root cause summary: closure blockers were stale E2E/artifact expectations conflicting
+      with the current source-backed low-chrome menu contract, plus mobile CSS overriding
+      metadata to wrapping behavior.
+
+
+      Source-contract adjudication:
+
+      | Blocker | Disposition | Source section cited | Implementation/test/artifact
+      change |
+
+      | --- | --- | --- | --- |
+
+      | B-HT-01 | fixed/source-updated | DESIGN.md App Shell/Layout; UI_REGRESSION_CONTRACT
+      real hit-target table | Updated hit-target E2E to prove `RESOFEED` trigger first,
+      then opened menu entries; preserved real pointer/topmost checks. |
+
+      | B-ART-01 | fixed/source-updated | DESIGN.md allowing `SOURCE LEDGER` inside
+      `RESOFEED`; UI_REGRESSION_CONTRACT negative UX nav drift | Updated design artifact
+      E2E to activate Source Ledger/TODAY through the menu instead of expecting persistent
+      visible buttons. |
+
+      | B-TODAY-01 | fixed/source-updated | UI_REGRESSION_CONTRACT selector/observable
+      for `.feed-pane.active-panel` | Updated fresh-review selector to `feed-pane[aria-label="TODAY
+      surface independent scroll"]`. |
+
+      | B-FR09-01 | fixed/source-updated | DESIGN.md mobile/feed metadata truncation
+      rules | Changed mobile `.contract-feed-meta` CSS to `nowrap`, hidden overflow,
+      ellipsis; FR-09 E2E now green. |
+
+      | B4_R9_opml_input_reachability | fixed | DESIGN.md Source Ledger OPML/import
+      controls; UI_REGRESSION_CONTRACT OPML import row | Preserved `[IMPORT OPML]`
+      hit-target/keyboard reachability and used UI `[RUN INGEST]` flow for fixture
+      seeding. |
+
+      | playwright_expected_red_claims | fixed | UI_REGRESSION_CONTRACT mandatory
+      artifact/hit-target closure suites | Required rendered artifact, fresh-review,
+      and hit-target Playwright suites pass. |
+
+
+      Mainline final-state verification:
+
+      - `cd web && npm run test`: PASS; svelte-check 0 errors/warnings; vitest 11
+      files / 62 tests passed.
+
+      - `cd web && npm run build`: PASS; Vite/SvelteKit production build completed.
+
+      - `cd web && npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+      tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`:
+      PASS; 6 passed.
+
+      - `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      tests/e2e/hit-target-clickability.spec.ts`: PASS; 12 passed.
+
+      - `cd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts
+      tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`:
+      PASS; 10 passed.
+
+      - Forbidden concept scan: PASS per frontend-engineer evidence; scanned web/src/routes
+      Svelte/TS user-facing surfaces with scanned_files=11, violations=0.
+
+
+      Gaps/Notes: No remaining blockers for this fix step. Downstream `srdf-batched-frontend-closure-blockers-retest`
+      remains responsible for independent closure evidence and machine-readable gate-open
+      register.'
   - id: srdf-batched-frontend-closure-blockers-retest
     name: Retest and close frontend closure blockers after batched fix
     status: pending
