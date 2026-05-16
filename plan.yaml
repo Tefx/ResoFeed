@@ -91087,3 +91087,11 @@ phases:
     zh UI surfaces are repaired without product-boundary expansion.
   depends_on:
   - audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
+- id: audit-and-chinese-support-repair-verification-and-closure
+  name: Audit and Chinese Support Repair — Verification and Closure
+  status: locked
+  gate: Final closure blocks unless browser/E2E evidence, uiux-auditor multimodal
+    audit, spec/architecture conformance, and zh parity audit prove all repair findings
+    closed or explicitly non-intersecting.
+  depends_on:
+  - audit-and-chinese-support-repair-implementation-and-preview-sync
