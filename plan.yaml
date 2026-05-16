@@ -95386,3 +95386,118 @@ phases:
     - cos-frontend-operation-utility-contract-tests
     - cos-backend-operation-contract-tests
     agent: frontend-engineer
+  - id: cos-wiring-audit
+    name: Audit runtime wiring for operation status surfaces
+    status: pending
+    description: 'Wiring completeness audit for new HTTP/MCP/frontend operation-status
+      surfaces.
+
+
+      Scope:
+
+      - Verify `GET /api/runtime/operation` is reachable through the existing single
+      Go binary router.
+
+      - Verify `resofeed://system/operation` is listed/readable through the MCP surface.
+
+      - Verify frontend API client/types and components consume the current-operation
+      shape; no write-only fields or orphan symbols.
+
+      - Verify LANG/reprocess controls remain reachable from the opened `RESOFEED`
+      utility menu after removing/promoting no persistent top-chrome controls.
+
+
+      REQUIRED CHECKS:
+
+      1. Export/reachability: new public symbols have runtime callers.
+
+      2. HTTP route registration: endpoint is registered in the single binary router.
+
+      3. MCP resource registration: operation resource appears in MCP resources and
+      reads from the same snapshot.
+
+      4. Frontend consumption: current-operation fields are read by rendered UI or
+      conflict handling.
+
+      5. No production stubs/placeholders for operation status.
+
+
+      ## Completion Criteria
+
+      - [ ] Orphan exports/symbols report is produced.
+
+      - [ ] HTTP and MCP registration evidence is produced.
+
+      - [ ] Frontend consumption evidence is produced.
+
+      - [ ] Headline is PASS or PASS_WITH_DEBT with explicit non-blocking/non-intersection
+      rationale.'
+    verification: '- [ ] phase-check protecting `cos-final-gate`: wiring audit confirms
+      HTTP, MCP, and frontend operation-status surfaces are registered and consumed.
+
+      - [ ] Evidence shows no orphan public symbols, unregistered endpoint/resource,
+      or production stubs for the new status surface.
+
+      - [ ] Any PASS_WITH_DEBT item includes explicit non-intersection with final
+      gate requirements.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Wiring Audit Report
+
+      **Orphan exports/symbols**:
+
+      ```
+
+      <grep/import trace output or none found>
+
+      ```
+
+      **HTTP route registration**:
+
+      ```
+
+      <route evidence>
+
+      ```
+
+      **MCP resource registration**:
+
+      ```
+
+      <resource evidence>
+
+      ```
+
+      **Frontend field consumption**:
+
+      ```
+
+      <consumer evidence>
+
+      ```
+
+      **Production stubs/placeholders**:
+
+      ```
+
+      <none found or justified>
+
+      ```
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - cos-backend-operation-snapshot
+    - cos-mcp-operation-parity
+    - cos-frontend-operation-utility-surface
+    agent: wiring-auditor
