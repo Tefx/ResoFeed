@@ -90527,7 +90527,7 @@ phases:
       verification entries.'
   - id: srde2e-software-architect-clean-verdict-proof
     name: Produce exact software-architect CLEAN verdict proof
-    status: pending
+    status: claimed
     description: 'Remediation/review step for final closure proof gap B-FCG-001.
 
 
@@ -90613,6 +90613,8 @@ phases:
     - srde2e-uiux-full-plan-e2e-blockers-audit
     - srde2e-e2e-contract-adjudication
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-16T12:06:08.166337+00:00'
   - id: srde2e-final-closure-gate-rerun
     name: Rerun final closure gate after software-architect CLEAN proof
     status: pending
