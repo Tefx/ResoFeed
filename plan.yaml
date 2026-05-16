@@ -91330,6 +91330,115 @@ phases:
     depends_on:
     - azrct-closure-matrix
     agent: frontend-engineer
+  - id: azrct-contract-tests-gate
+    name: Gate repair contract matrix and expected-red tests
+    status: pending
+    description: 'step_type: gate
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the contract/test
+      foundation is complete before implementation begins.
+
+
+      Independence: gate-reviewer must not be the same agent as contract/test authors.
+
+
+      review_depth: STANDARD
+
+      review_depth_rationale:
+
+      - Phase defines repair acceptance for UI/UX and architecture audit findings.
+
+      - Phase includes zh completeness obligations across backend, frontend, MCP,
+      OpenRouter, state, and preview docs.
+
+
+      Gate Decision Basis required:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Completion Criteria
+
+      - [ ] Closure matrix covers all known audit findings F1/F2/P1/P2/P3 and requested
+      zh surfaces.
+
+      - [ ] Expected-red tests are appropriately red before implementation or cite
+      already-green existing tests with evidence.
+
+      - [ ] Product-boundary non-goals are preserved.
+
+      - [ ] Gate decision is OPEN only if every blocker-class behavior has a downstream
+      closure path.'
+    verification: '- [ ] All phase steps completed with specific evidence.
+
+      - [ ] Evidence quality is adequate for implementation agents to proceed without
+      guessing.
+
+      - [ ] No unresolved blocker lacks an owner step.
+
+      - [ ] OPEN/BLOCK recommendation includes structured behavioral decision basis.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+      | azrct-closure-matrix | ✅/⚠️/❌ | excellent/adequate/insufficient/missing |
+      |
+
+      | azrct-expected-red-browser-and-contract-tests | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED'
+    depends_on:
+    - azrct-closure-matrix
+    - azrct-expected-red-browser-and-contract-tests
+    agent: gate-reviewer
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
   status: locked
