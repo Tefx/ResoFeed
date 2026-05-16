@@ -85538,7 +85538,7 @@ phases:
       - [x] Verify SF1: HTTP/MCP steer idempotency fingerprint parity is aligned for
       the same logical operation.
 
-      - [ ] Verify SF1: same actor/key/command retry across HTTP then MCP replays
+      - [x] Verify SF1: same actor/key/command retry across HTTP then MCP replays
       or returns equivalent idempotent behavior, not `request_fingerprint_mismatch`.
 
       - [x] Verify SF2: `/api/steer/preview` `will_mutate` public semantics match
