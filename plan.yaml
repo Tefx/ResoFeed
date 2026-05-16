@@ -95404,7 +95404,7 @@ phases:
       - [ ] Conflict response still contains `operation_running`, `operation`, `scope`,
       `retry_allowed` exactly as before.
 
-      - [ ] `current_operation` does not outlive guard release or become durable history.
+      - [x] `current_operation` does not outlive guard release or become durable history.
 
       - [ ] Concurrent guarded operation attempts observe one active snapshot without
       data races.
