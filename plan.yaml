@@ -98300,7 +98300,7 @@ phases:
       - None for this blocker family.'
   - id: cos-retest-current-operation-browser-conflict-detail
     name: Retest current-operation browser conflict detail path
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -98501,3 +98501,134 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T22:59:38.066053+00:00'
+    done_at: '2026-05-16T23:07:20.548909+00:00'
+    evidence: '## Verification Report
+
+      **Tester:** integration-verifier (independent of implementation)
+
+      **Scope:** current-operation browser conflict detail retest
+
+      **Independence Level:** L1
+
+      **Timestamp:** 2026-05-17T07:10:00Z
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by verifier; one in-process guard rejects overlapping
+      manual triggers with `409 conflict`, conflict responses indicate the current
+      operation holding the guard, and queues/jobs/activity-ledger persistence are
+      forbidden.
+
+      - docs/DESIGN.md — Read by verifier; Source Ledger is the manual ingest control
+      location, conflict feedback is raw/contextual, and dashboards/queues/activity
+      ledgers/sync/merge controls/settings bloat are forbidden.
+
+      - AGENTS.md — Not present inside isolated worktree; prompt-level AGENTS constraints
+      were applied.
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts — Read
+      by verifier; fixture includes `error.details.current_operation` with running/kind/scope/phase/count/message/started_at/updated_at
+      and asserts one Source Ledger header status with full detail.
+
+      - web/src/routes/+page.svelte — Read by verifier; formats `current operation`,
+      phase, count, msg, started, updated and passes contextual operation status into
+      SourceLedger/menu.
+
+      - web/src/routes/components/SourceLedger.svelte — Read by verifier; header status
+      derives from `currentOperationStatusText || headerIngestStatusText`, rendering
+      one header status.
+
+
+      ## Semantic Result
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green
+
+      failure_alignment: matched
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: NO
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Commands and Outputs
+
+      - Initial `npm run test:e2e -- current-operation-utility-placement.expected-red.spec.ts`
+      failed with exit 127 because Playwright was not installed in the isolated worktree.
+
+      - After `npm ci`, `npm run test:e2e -- current-operation-utility-placement.expected-red.spec.ts`
+      exited 0: Playwright 3 passed.
+
+      - `npm run test:render -- current-operation-utility-placement.test.ts` exited
+      0: Vitest 1 file passed, 4 tests passed.
+
+
+      ## Browser current_operation detail proof
+
+      - Fixture includes `error.details.current_operation` with `running`, `kind`,
+      `scope`, `phase`, `count`, `message`, `started_at`, and `updated_at`.
+
+      - Artifact `.test-artifacts/playwright/test-output/current-operation-utility--ec455-pened-RESOFEED-utility-menu-chromium-ci-safe/operation-utility-placement-evidence/source-ledger-blocked-operation-visible.aria.txt`
+      shows one status line with `err: ingest already running · current operation:
+      reprocess/library · phase: processing_items · count: 2/5 · msg: library reprocess
+      processing item · started: 11:00:00 · updated: 11:00:05`.
+
+
+      ## Duplicate status closure proof
+
+      - Playwright asserts `ledger.getByText(''err: ingest already running'')` has
+      count 1.
+
+      - Vitest asserts one `err: operation already running` status in Source Ledger.
+
+      - Artifact has exactly one Source Ledger conflict status line.
+
+
+      ## behavioral_proof_register
+
+      - Targeted browser current-operation utility/conflict path rerun: PASS.
+
+      - Focused Vitest current-operation utility placement coverage rerun: PASS.
+
+      - Conflict payload carries documented `error.details.current_operation` fields:
+      PASS.
+
+      - Browser-visible output includes detail beyond generic conflict string: PASS.
+
+      - Source Ledger conflict scope no longer has unintended duplicate status elements:
+      PASS.
+
+      - No dashboard/job/queue/activity ledger/settings/service-layer/persistent top-chrome
+      drift visible: PASS.
+
+
+      ## Product Guard
+
+      - Dashboard/job/queue/activity ledger/settings/service-layer/persistent top-chrome
+      drift: NO.
+
+
+      ## Artifact Preservation
+
+      - Worker artifact commit: `27d66062`.
+
+      - Mainline artifact commit: `f62ab612` `[vectl] step-cos-retest-current-operation-browser-conflict-detail
+      artifacts`.
+
+      - Product implementation files modified by retest: NO.
+
+
+      ## Gaps/Notes
+
+      - None after dependency installation; targeted Playwright and Vitest checks
+      passed.'
