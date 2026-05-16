@@ -94938,7 +94938,7 @@ phases:
 
       - [x] Inspector remains consistent with DESIGN.md dense archival workbench aesthetics.
 
-      - [ ] Findings are classified as PASS, PASS_WITH_DEBT, or FAIL with blocking
+      - [x] Findings are classified as PASS, PASS_WITH_DEBT, or FAIL with blocking
       items explicit.'
     verification: '- [ ] Audit includes screenshot/DOM/render artifact for unrelated
       synthetic feed fragments with grouped-source disclosure absent.
