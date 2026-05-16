@@ -95406,7 +95406,7 @@ phases:
 
       - [x] `current_operation` does not outlive guard release or become durable history.
 
-      - [ ] Concurrent guarded operation attempts observe one active snapshot without
+      - [x] Concurrent guarded operation attempts observe one active snapshot without
       data races.
 
 
