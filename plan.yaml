@@ -85891,7 +85891,7 @@ phases:
       checklist items.'
   - id: srde2e-uiux-audit-source-ledger-steer-controls
     name: Audit Source Ledger and Steer control UI/UX after real-system blocker fix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       scope: phase-check
@@ -86044,6 +86044,111 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T02:34:18.523525+00:00'
+    done_at: '2026-05-16T05:49:20.510067+00:00'
+    evidence: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation
+
+      - `docs/DESIGN.md` — READ by auditor. Key insight reported: Source Ledger header/status
+      contract includes `.source-ledger__header` status presentation such as `last_ingest:
+      14:00:00`.
+
+      - `docs/ARCHITECTURE.md` — READ by auditor. Key insight reported: manual ingest
+      APIs return `completed_at` in `IngestRunResult`, used by UI status presentation.
+
+
+      ### Rendered / Browser-Observable Artifacts
+
+      - Source Ledger artifacts committed to main: `artifacts/source-ledger-live.png`,
+      `artifacts/dom-ledger-ingested-long.html`, `artifacts/dom-ledger-final.html`.
+
+      - Steer controls artifacts committed to main: `artifacts/steer-controls.png`,
+      `artifacts/dom-steer-preview.html`.
+
+      - Mainline artifact commit: `60512eaa` (`[vectl] step-srde2e-uiux-audit-source-ledger-steer-controls
+      completed`).
+
+
+      ### Design Contract Mapping (auditor evidence)
+
+      | Surface | DESIGN.md requirement | Observed evidence | Verdict |
+
+      | --- | --- | --- | --- |
+
+      | Source Ledger live row | `<li class="source-ledger-row">` | Present in DOM
+      and screenshot artifacts | PASS |
+
+      | Source Ledger controls | `[RUN INGEST]` header, row `[FETCH]`, header status
+      placement | Controls present, but `last_ingest` appeared in footer rather than
+      `.source-ledger__header` | FAIL (DEBT) |
+
+      | Steer preview/commit/undo accessible names | Duplicate `apply` failure prevention
+      | `apply` submit plus unique `aria-label="Commit previewed Steer write action"`
+      preview button | PASS |
+
+      | Keyboard/screen-reader usability | Accessible boundaries and uniqueness |
+      `aria-label` and `aria-live` present in observed controls | PASS |
+
+      | Browser-led MCP parity | MCP steer/import tools accessible | UI import/steer
+      paths exercised by browser scripts | PASS |
+
+
+      ### Machine-readable closure from auditor (normalized by orchestrator)
+
+      headline: PASS_WITH_DEBT
+
+      verdict: FAIL
+
+      gate_open_allowed: false
+
+      blockers: []
+
+      should_fix:
+
+      - Move `last_ingest` status from `.source-ledger-footer` to `.source-ledger__header`
+      or provide a contract-consistent minimal resolution.
+
+      orchestrator_action_hint: REMEDIATE
+
+
+      ### Remediation path created before completion
+
+      - `srde2e-uiux-source-ledger-status-contract-fix` — batched frontend implementation
+      fix for the Source Ledger status/header contract debt.
+
+      - `srde2e-uiux-source-ledger-status-contract-retest` — independent UI/UX retest
+      requiring real rendered browser artifacts from the real Source Ledger OPML import
+      + `[RUN INGEST]` flow, not dummy-backend-only evidence.
+
+      - Downstream closure/proof steps now depend on the new retest, including visual/a11y
+      proof, documentation sync, architecture review/check steps, full-plan check,
+      and final closure gate.
+
+
+      ### Verification
+
+      - `npm run check` in `web/` after committing audit artifacts exited 0: `svelte-check
+      found 0 errors and 0 warnings`.
+
+      - No product implementation files were modified by the audit artifact commit.
+
+      - No docs, `plan.yaml`, `.git/vectl/*`, or package files were committed from
+      the audit worktree.
+
+
+      ### Gaps/Notes
+
+      - Orchestrator did not accept the auditor''s `gate_open_allowed: true` because
+      the evidence included `PASS_WITH_DEBT`, a `should_fix`, and a Source Ledger
+      controls `FAIL (DEBT)` against the UI contract.
+
+      - The audit step is completed as a report-with-findings because a blocking remediation
+      path now owns the debt; it is not completed as a clean pass.
+
+      - Acceptance and verification checklist items are `[x]`; verification checklist
+      required planner repair because `vectl_check` could not match verification-field
+      checklist items.'
   - id: srde2e-uiux-source-ledger-status-contract-fix
     name: Fix Source Ledger status DOM contract after UI/UX audit
     status: pending
