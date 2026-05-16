@@ -114,6 +114,34 @@
       white-space: nowrap;
     }
 
+    .chrome-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      white-space: nowrap;
+    }
+
+    .runtime-strip {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .runtime-strip .bracket-action {
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .runtime-warning {
+      color: var(--warning);
+    }
+
     .desktop {
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) 480px;
@@ -331,6 +359,16 @@
       margin-top: 0;
     }
 
+    .evidence-lines {
+      display: grid;
+      gap: 4px;
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-family: var(--chrome);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
     .secondary-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
@@ -376,6 +414,14 @@
       line-height: 20px;
       font-weight: 500;
       letter-spacing: 0.08em;
+    }
+
+    .source-ledger__header .source-ledger__status {
+      justify-self: end;
+    }
+
+    .source-ledger__header .bracket-action--run-ingest {
+      justify-self: end;
     }
 
     .source-ledger__tools {
@@ -502,6 +548,10 @@
       letter-spacing: 0.08em;
     }
 
+    .mobile-header span:last-child {
+      text-align: right;
+    }
+
     .mobile-feed {
       padding: 16px 20px 20px;
       flex: 1;
@@ -591,13 +641,21 @@
       <div>
         <h1>RESOFEED</h1>
       </div>
-      <p class="subtitle">SOURCE LEDGER / DOCTOR / INSPECTOR</p>
+      <p class="subtitle">STATIC DESIGN CONTRACT PREVIEW</p>
     </header>
 
     <section class="panel">
       <div class="command-bar">
         <div class="steer">Steer or paste RSS URL...</div>
-        <div class="brand">RESOFEED</div>
+        <div class="chrome-actions">
+          <button class="bracket-action" type="button" aria-label="Processing language: English; switch to Chinese">LANG: EN</button>
+          <div class="brand">RESOFEED</div>
+        </div>
+      </div>
+      <div class="runtime-strip" aria-label="Processing language controls">
+        <button class="bracket-action" type="button" aria-label="Reprocess existing library and rebuild search index">[REPROCESS LIBRARY]</button>
+        <span class="runtime-warning">Existing readable item content will be rewritten.</span>
+        <span translate="no">Source identifiers remain unchanged.</span>
       </div>
       <div class="desktop">
         <section class="feed" aria-label="Feed preview">
@@ -639,7 +697,7 @@
             <div class="meta-row">
               <span class="pill">src: blog.example</span>
               <span class="pill">1d</span>
-              <span class="pill warning">partial</span>
+              <span class="pill warning">source excerpt</span>
               <span class="group-badge">YESTERDAY</span>
             </div>
             <div class="item-head">
@@ -661,6 +719,10 @@
             </div>
           </div>
           <h2 class="inspector-title">Agents are the new shell scripts</h2>
+          <div class="evidence-lines" aria-label="Inspector provenance">
+            <p>source text: full article</p>
+            <p>summary provenance: model-backed</p>
+          </div>
           <div class="rule"></div>
           <p class="reading">The piece compares agent workflows to shell scripts: small automations with explicit inputs, composable outputs, and failure modes that should stay inspectable. It cautions against turning every workflow into a hosted product surface.</p>
           <p class="why">why: fresh from configured source · quality: high · interpretation: source claim, not endorsement</p>
@@ -726,25 +788,30 @@ extraction_failures: see source rows</pre>
 
     <section class="mobile-wrap">
       <div class="mobile-card" aria-label="Narrow preview">
-        <div class="mobile-header"><span>RESOFEED</span><span>TODAY</span></div>
+        <div class="mobile-header"><span>RESOFEED</span><span>语言: 中文</span></div>
+        <div class="runtime-strip" aria-label="处理语言控件">
+          <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
+          <span class="runtime-warning">已存可读内容将被重写。</span>
+          <span translate="no">来源标识保持不变。</span>
+        </div>
         <div class="mobile-feed">
-          <div class="section-label">TODAY</div>
+          <div class="section-label">今日</div>
           <article class="item">
-            <div class="meta-row"><span class="pill">src: nytimes.com</span><span class="pill">2h</span><span class="pill">full</span></div>
+            <div class="meta-row"><span class="pill" translate="no">src: nytimes.com</span><span class="pill">2h</span><span class="pill">full</span><span class="group-badge">今日</span></div>
             <div class="item-head">
               <div>
-                <h2 class="item-title">Main headline here</h2>
-                <p class="summary">Dense summary text with provenance visible.</p>
+                <h2 class="item-title">主要标题示例</h2>
+                <p class="summary">密集摘要文本保持可扫读；来源标识不被翻译。</p>
               </div>
               <button type="button" class="star" aria-label="Resonate item">☆</button>
             </div>
           </article>
           <article class="item">
-            <div class="meta-row"><span class="pill">src: blog.example</span><span class="pill">4h</span><span class="pill warning">partial</span></div>
+            <div class="meta-row"><span class="pill" translate="no">src: blog.example</span><span class="pill">4h</span><span class="pill warning">excerpt</span></div>
             <div class="item-head">
               <div>
-                <h2 class="item-title">Another item</h2>
-                <p class="summary">Single-column feed; Inspector opens as a detail route.</p>
+                <h2 class="item-title">另一条目</h2>
+                <p class="summary">单列馈送保持紧凑；检查器作为详情视图打开。</p>
               </div>
               <button type="button" class="star active" aria-label="Remove resonance">★</button>
             </div>
@@ -762,10 +829,14 @@ extraction_failures: see source rows</pre>
           </div>
           <div class="meta-row">
             <span class="pill">src: nytimes.com</span>
-            <span class="pill">full</span>
+            <span class="pill warning">source excerpt</span>
             <span class="pill">original ↗</span>
           </div>
           <h2>Main headline here</h2>
+          <div class="evidence-lines" aria-label="Inspector provenance">
+            <p>source text: RSS excerpt only</p>
+            <p>summary provenance: feed excerpt fallback</p>
+          </div>
           <div class="rule"></div>
           <p class="reading">Mobile detail restores reading density after the compact feed: larger serif headline, comfortable body line-height, visible provenance, and no extra recommendation chrome.</p>
           <p class="why">why: fresh from configured source · interpretation: source claim</p>
