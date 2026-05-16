@@ -94971,7 +94971,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Expected-red tests are limited to backend test files and minimal fixtures/helpers.
+      - [x] Expected-red tests are limited to backend test files and minimal fixtures/helpers.
 
       - [ ] Idle, running, no-query-param rejection, and conflict `current_operation`
       payload assertions are present.
