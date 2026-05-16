@@ -85700,7 +85700,7 @@ phases:
       - Gaps/Notes: none."
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT VERIFIER (integration-verifier), run the broad
       full-plan check before final gate so late gate review does not discover predictable
       repo-wide debt first.
@@ -85761,6 +85761,213 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T08:24:36.399241+00:00'
+    done_at: '2026-05-16T08:38:56.396628+00:00'
+    evidence: 'status: SUCCESS_WITH_BLOCKER_REMEDIATION_OWNERSHIP
+
+      observed_result: red
+
+      verdict: FAIL_WITH_OWNED_REMEDIATION
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: DO_NOT_COMPLETE_FINAL_GATE
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — READ. Key passages: one deployable Go process serves
+      static SvelteKit, JSON HTTP, MCP, and background ingest; one SQLite database
+      only; thin HTTP/MCP transports share product operations; forbidden folders/tags/settings
+      dashboards/activity ledgers/vector search; manual ingest guard and 409 conflict
+      contract.
+
+      - docs/DESIGN.md — READ. Key passages: ResoFeed is a dense analyst workbench
+      with terse operational chrome; component contracts include owner-token prompt,
+      feed item, resonate button, Inspector, Source Ledger, state portability; visual
+      palette/typography/spacing defined in design tokens.
+
+      - docs/UI_REGRESSION_CONTRACT.md — READ. Key passages: browser tests prove real
+      hit targets via pointer/clicks and obstruction checks; required controls include
+      RESOFEED menu, TODAY, SOURCE LEDGER, Steer submit, star, Inspector links, /doctor,
+      RUN INGEST, FETCH, OPML import, details/delete; negative assertions ban inert
+      controls, raw dumps, forbidden RSS/SaaS concepts, layout-shift/noisy interactions.
+
+      - AGENTS.md — NOT READ from isolated worktree; file absent under required isolated
+      worktree.
+
+      - CONSTITUTION.md — NOT READ; absent in isolated worktree.
+
+
+      ## Full-Plan Check Matrix
+
+      | Check | Command | Result | Output/Evidence Ref | Blocking? | Closure Path
+      |
+
+      |---|---|---|---|---|---|
+
+      | Backend/Go full suite | `go test ./...` | PASS | `ok resofeed/internal/resofeed
+      1.077s` | No | None |
+
+      | Backend focused remediation | `go test ./internal/resofeed -run ''TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch|TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly''`
+      | PASS | `ok resofeed/internal/resofeed 0.354s` | No | None |
+
+      | Frontend dependency bootstrap | `npm ci` from `web/` | PASS with audit debt
+      | `added 150 packages`; `5 vulnerabilities` | No | Non-blocking dependency debt;
+      no declared audit gate |
+
+      | Frontend static | `npm run check` from `web/` | PASS | `svelte-check found
+      0 errors and 0 warnings` | No | None |
+
+      | Frontend render/component | `npm run test:render` from `web/` | PASS | `Test
+      Files 11 passed (11)`; `Tests 62 passed (62)` | No | None |
+
+      | Frontend build | `npm run build` from `web/` | PASS on sequential rerun |
+      `Wrote site to build`; earlier concurrent run raced with E2E | No | Avoid concurrent
+      SvelteKit build writes |
+
+      | Go binary build | `go build -o bin/resofeed ./cmd/resofeed` | PASS | no stdout/stderr
+      | No | None |
+
+      | Frontend E2E | `npm run test:e2e` from `web/` | FAIL | `25 failed`; `2 skipped`;
+      `46 passed` | YES | `srde2e-full-plan-e2e-blockers-fix` + `srde2e-full-plan-e2e-blockers-retest`
+      |
+
+      | Visual/a11y proof | `node audits/srde2e-visual-a11y-regression-proof.mjs`
+      | PASS | `PASS: UI/a11y black-box regression proof passed` | No | None |
+
+
+      ## Broad Verifier Disposition Pass
+
+      - `npm run test:e2e` failed 25/73 tests. Disposition: blocking_dependency. Gate
+      intersection: directly intersects final gate because web/package.json declares
+      `test:e2e` as Playwright E2E command and required scope asked for authoritative
+      E2E command family. Remediation ownership: `srde2e-full-plan-e2e-blockers-fix`
+      + `srde2e-full-plan-e2e-blockers-retest`.
+
+      - Source Ledger per-source `[FETCH]` missing/not visible. Disposition: batched_fix.
+      Ownership: `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Source Ledger/TODAY nav role/name/focus/clickability drift. Disposition: batched_fix.
+      Ownership: `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Steer apply accessible-name collision. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Inspector source/provenance metadata label drift. Disposition: batched_fix.
+      Ownership: `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Steer source-add receipt wording mismatch. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Source Ledger row grammar/status field drift. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - RESOFEED chrome/source-name ambiguity. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - Feed row layout shift on Inspect/open. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - URDA mobile metadata/source clipping. Disposition: batched_fix. Ownership:
+      `srde2e-full-plan-e2e-blockers-fix`.
+
+      - `npm ci` audit warning. Disposition: explicitly_non_blocking_with_non_intersection_evidence;
+      no npm audit gate declared.
+
+      - Initial concurrent `npm run build` failure. Disposition: explicitly_non_blocking_with_non_intersection_evidence;
+      sequential build passed and failure was a `.svelte-kit` concurrent-write artifact.
+
+
+      ## E2E Failure Inventory Used for Planning
+
+      - `[FETCH]` missing/not visible: full-ui-design-conformance, inspector-readable-content-regression,
+      PRD PBAR cases, ui-remediation R1-R8.
+
+      - SOURCE LEDGER/TODAY nav not discoverable/focusable/clickable: keyboard-a11y,
+      PRD Inspector parity, ui-navigation-hover-inspector-repair.
+
+      - Steer `apply` strict-mode collision: real-server-ui API/MCP parity and deterministic
+      LLM browser steering paths.
+
+      - Inspector `Source: Fixture Source` missing/renamed.
+
+      - Source-add receipt expected `source added...`, received `applied: source already
+      active...; no change`.
+
+      - Source Ledger row expected `src: Canonical Allowed Source · status: ok · last_fetch:`
+      missing.
+
+      - `getByText(''RESOFEED'')` strict-mode ambiguity due multiple visible matches.
+
+      - selected Inspect/open shifted row bounds.
+
+      - URDA Issue 10 mobile metadata/source text clipping.
+
+
+      ## Remediation Ownership Created
+
+      Planner created:
+
+      - `srde2e-full-plan-e2e-blockers-fix` (frontend-engineer), depends on `srde2e-full-plan-check`,
+      covers all nine blocker families.
+
+      - `srde2e-full-plan-e2e-blockers-retest` (integration-verifier), depends on
+      fix, expected green and reruns `npm run test:e2e` plus relevant command families.
+
+      - `srde2e-final-closure-gate` now depends on both the fix and retest and blocks
+      OPEN unless the retest is green or remaining failures have explicit non-intersection
+      disposition.
+
+
+      ## Behavioral Proof Register
+
+      - Backend suite compiles/tests repository packages: PROVEN.
+
+      - SRDC focused HTTP/MCP idempotency/preview tests pass: PROVEN.
+
+      - Frontend static Svelte/type contract passes: PROVEN.
+
+      - Frontend component/render tests pass: PROVEN.
+
+      - Frontend production build emits static site: PROVEN.
+
+      - Go binary builds: PROVEN.
+
+      - Authoritative E2E/browser contract passes: DISPROVEN, with remediation ownership
+      created.
+
+      - Visual/a11y black-box proof script passes: PROVEN.
+
+
+      ## Standard Evidence
+
+      - Commit hash(es): none — verification-only step; generated artifacts were cleaned
+      and no file changes remained.
+
+      - Files changed: none in isolated verification worktree.
+
+      - Verification: see matrix above.
+
+      - Spec link: srde2e-full-plan-check
+
+      - Gaps/Notes: E2E failure is blocker-class and intersects final gate; no non-intersection
+      evidence exists. It is now owned by batched fix/retest steps.
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: red
+
+      - verdict: FAIL_WITH_OWNED_REMEDIATION
+
+      - blockers: [`npm run test:e2e` failed 25 tests across UI/a11y/runtime surfaces]
+
+      - product_implementation_files_modified: no
+
+      - gate_open_allowed: false
+
+      - orchestrator_action_hint: DO_NOT_COMPLETE_FINAL_GATE'
   - id: srde2e-final-closure-gate
     name: Final gate for Steer delta implementation
     status: pending
