@@ -93494,3 +93494,192 @@ phases:
     - azrv-uiux-multimodal-audit
     - azrv-zh-spec-conformance-audit
     agent: frontend-engineer
+  - id: azrv-batched-verification-failure-retest
+    name: Retest batched verification failures after remediation
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: full-plan-check
+
+      agent_source: project
+
+      independence_level: L2
+
+
+      As an independent integration verifier, retest the batched remediation for both
+      failed verification outputs. This step protects `azrv-final-closure-gate` and
+      must produce a structured behavioral decision basis for the previously failed
+      items.
+
+
+      Required reruns / refreshed checks:
+
+      - `npm run test:render` must be rerun and green, including the two formerly
+      failing legacy render tests: `manual-rss-fetch-source-ledger` and `steer-route-preview`.
+
+      - Protected AZRCT Playwright E2E must be rerun and green, including OPML no-auto-ingest,
+      zh UI, Inspector provenance, Source Ledger alignment, and route chrome coverage.
+
+      - Protected Vitest must be rerun and green, including processing-language split-scroll
+      / preview-facing tests.
+
+      - UIUX multimodal audit must be refreshed against current mainline app/tests/artifacts,
+      not stale evidence. It must explicitly revisit: persistent route labels/T/SL,
+      Source Ledger `last_ingest` + `[RUN INGEST]` alignment, preview LANG/reprocess
+      surfaces, Inspector header/provenance (`model: ok` absence), zh localized chrome/status/receipt
+      copy, and source identifier preservation.
+
+      - zh spec conformance must be focused on the previously failed B1/B2 items plus
+      stale closure matrix disposition, while confirming the already-passed zh surfaces
+      remain non-regressed.
+
+
+      Behavioral proof register required for each previously failed blocker/debt item:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status: PROVEN | NON_INTERSECTING | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      ## Completion Criteria
+
+      - [ ] `npm run test:render` is green and output is pasted, not summarized.
+
+      - [ ] Protected AZRCT Playwright E2E is green and output is pasted, not summarized.
+
+      - [ ] Protected Vitest / processing-language preview-facing tests are green
+      and output is pasted, not summarized.
+
+      - [ ] Fresh UIUX multimodal audit produces PASS or PASS_WITH_DEBT with no blocker-class
+      design debt, using current artifacts.
+
+      - [ ] Focused zh spec conformance reports B1/B2/stale-matrix items as PROVEN
+      or explicitly NON_INTERSECTING.
+
+      - [ ] Final retest verdict is GREEN only when every prior blocker-class item
+      has a gate-usable closure path.'
+    verification: '- [ ] Full-plan-check protects `azrv-final-closure-gate` by rerunning
+      the exact failed command family and protected browser/Vitest suites.
+
+      - [ ] UIUX refresh uses current rendered artifacts and explicitly distinguishes
+      stale claims from true current blockers.
+
+      - [ ] zh conformance B1/B2/stale-matrix closure is independently verified and
+      gate-usable.
+
+      - [ ] No unresolved NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING item remains without
+      remediation ownership.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Retest Evidence
+
+
+      **Exact commands executed**:
+
+      ```
+
+      npm run test:render
+
+      <protected AZRCT Playwright command>
+
+      <protected Vitest / processing-language preview-facing command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste stdout/stderr for each command; do not summarize>
+
+      ```
+
+
+      ## Fresh UIUX Multimodal Audit Refresh
+
+
+      **Current artifacts used**:
+
+      - Screenshots / DOM / docs preview refs: <list>
+
+
+      | Prior UIUX claim | Current evidence ref | Status | Gate disposition |
+
+      | --- | --- | --- | --- |
+
+      | persistent route labels / T/SL | <ref> | PROVEN fixed / TRUE BLOCKER | <closure>
+      |
+
+      | Source Ledger alignment drift | <ref> | PROVEN fixed / TRUE BLOCKER | <closure>
+      |
+
+      | missing preview LANG/reprocess | <ref> | PROVEN fixed / TRUE BLOCKER | <closure>
+      |
+
+      | `model: ok` | <ref> | PROVEN absent / TRUE BLOCKER | <closure> |
+
+      | incomplete zh support | <ref> | PROVEN fixed / TRUE BLOCKER | <closure> |
+
+
+      **UIUX verdict**: PASS | PASS_WITH_DEBT | FAIL
+
+      **gate_open_allowed**: true | false
+
+
+      ## Focused zh Spec Conformance Closure
+
+
+      | Item | Requirement ref | Behavior claim | Runtime proof expected | Evidence
+      ref | Status | Closure path | Gate decision basis |
+
+      | --- | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1 manual-rss-fetch-source-ledger render expectation | <ref> | <claim> | npm
+      render proof | <ref> | PROVEN/NON_INTERSECTING/... | <path> | <basis> |
+
+      | B1 steer-route-preview copy expectation | <ref> | <claim> | npm render proof
+      | <ref> | PROVEN/NON_INTERSECTING/... | <path> | <basis> |
+
+      | B2 `.expected-red` naming | <ref> | <claim> | rename/disposition proof | <ref>
+      | PROVEN/NON_INTERSECTING/... | <path> | <basis> |
+
+      | stale closure matrix text | <ref> | <claim> | doc/contract proof | <ref> |
+      PROVEN/NON_INTERSECTING/... | <path> | <basis> |
+
+
+      **Final retest verdict**: GREEN | BLOCKED
+
+      **Remaining blockers**: <none or list>'
+    depends_on:
+    - azrv-batched-verification-failure-remediation
+    agent: integration-verifier
