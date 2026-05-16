@@ -83398,7 +83398,7 @@ phases:
       items are [x].'
   - id: srdf-batched-frontend-audit-remediation
     name: Batch remediate frontend spec and UIUX audit blockers
-    status: pending
+    status: claimed
     description: 'Batched remediation for the two concurrent frontend verification
       failures.
 
@@ -83685,6 +83685,8 @@ phases:
     - srdf-uiux-native-audit
     - srdf-broad-rendering-owner-token-bootstrap-retest
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T00:30:25.976354+00:00'
   - id: srdf-batched-frontend-audit-closure
     name: Retest and close batched frontend spec UIUX blockers
     status: pending
