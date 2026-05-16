@@ -97256,7 +97256,8 @@ phases:
     - cos-wiring-audit
     - cos-runtime-e2e-retest
     - cos-fix-current-operation-frontend-wiring
-    - cos-retest-current-operation-runtime-ui
+    - cos-fix-current-operation-browser-conflict-detail
+    - cos-retest-current-operation-browser-conflict-detail
     - cos-reaudit-current-operation-wiring
     - cos-uiux-multimodal-audit
     - cos-spec-doc-conformance
