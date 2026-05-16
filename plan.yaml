@@ -94792,3 +94792,128 @@ phases:
     depends_on:
     - gsfr-inspector-fragment-identity-fix
     agent: uiux-auditor
+  - id: gsfr-final-gate
+    name: Gate grouped-story fragment URL regression repair
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: phase-check
+
+      review_depth: STANDARD
+
+
+      As an INDEPENDENT REVIEWER, assess whether the grouped-story fragment URL regression
+      repair is safe to close.
+
+
+      Gate criteria:
+
+      1. Expected-red regression was created before product repair and turned green
+      after implementation.
+
+      2. Backend grouping authority remains `story_key` / `duplicate_of_item_id` /
+      detail provenance based; no schema or architecture-layer change was introduced
+      for this frontend inference bug.
+
+      3. Inspector grouping identity preserves synthetic feed-entry fragments and
+      does not collapse unrelated TLDR/feed items into one story.
+
+      4. Valid grouped stories still transparently expose every source item and provenance.
+
+      5. UI rendered evidence confirms the Inspector remains aligned with DESIGN.md
+      dense archival workbench aesthetic.
+
+
+      Gate Decision Basis required:
+
+      - requirement/proof-obligation refs reviewed
+
+      - evidence refs reviewed
+
+      - unresolved statuses (`NEEDS_TEST`, `UNPROVEN`, `UNCERTAIN_BLOCKING`)
+
+      - why each unresolved item blocks or does not intersect remaining required gates
+
+      - final OPEN/BLOCK recommendation
+
+
+      ## Completion Criteria
+
+      - [ ] All phase steps have complete evidence with refs read confirmation.
+
+      - [ ] No blocker-class false grouping proof gap remains.
+
+      - [ ] No backend schema/layer drift was introduced.
+
+      - [ ] UIUX audit and targeted retest are PASS or only explicit non-blocking
+      debt remains.
+
+      - [ ] Gate decision basis recommends OPEN or records exact remediation actions
+      if BLOCKED.'
+    verification: '- [ ] Gate review confirms expected-red → fix → green retest sequence.
+
+      - [ ] Gate review confirms backend grouping contract remains unchanged and authoritative.
+
+      - [ ] Gate review confirms synthetic feed-fragment identity is preserved and
+      true grouped-source transparency still works.
+
+      - [ ] Gate review confirms rendered Inspector evidence satisfies DESIGN.md and
+      no grouped-source false positive remains.
+
+      - [ ] OPEN/BLOCK decision includes explicit behavioral proof register disposition
+      for any unresolved item.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/ingest.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/search.go — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer
+
+      **Phase**: grouped-story-fragment-url-regression-repair
+
+
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      | --- | --- | --- | --- |
+
+
+      ### Gate Decision Basis
+
+      | requirement_ref | evidence_ref | status | blocks? | rationale | closure_path
+      |
+
+      | --- | --- | --- | --- | --- | --- |
+
+
+      ### Gate Decision
+
+      - [ ] OPEN: repair is complete
+
+      - [ ] BLOCKED: remediation required
+
+
+      Blocking issues, if any:
+
+      - <list>'
+    depends_on:
+    - gsfr-expected-red-fragment-grouping-test
+    - gsfr-backend-grouping-contract-audit
+    - gsfr-inspector-fragment-identity-fix
+    - gsfr-targeted-regression-retest
+    - gsfr-uiux-multimodal-audit
+    agent: gate-reviewer
