@@ -85544,7 +85544,7 @@ phases:
       - [x] Verify SF2: `/api/steer/preview` `will_mutate` public semantics match
       the documented/tested contract.
 
-      - [ ] Verify SF2: preview remains read-only and creates no write/no receipt.
+      - [x] Verify SF2: preview remains read-only and creates no write/no receipt.
 
       - [ ] Check for new contract drift in HTTP, MCP, docs, and frontend consumers
       touched by the fix.
