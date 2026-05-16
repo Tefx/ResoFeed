@@ -82243,7 +82243,7 @@ phases:
       **Gaps/Notes**: NONE. Description and verification checklist items are [x].'
   - id: srdf-uiux-native-audit
     name: Run native multimodal UIUX audit for Steer delta
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT UIUX AUDITOR (uiux-auditor), compare real rendered
       artifacts against DESIGN.md and UI_REGRESSION_CONTRACT.md.
 
@@ -82312,6 +82312,47 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T00:15:01.898887+00:00'
+    done_at: '2026-05-16T00:29:35.584679+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/DESIGN.md — uiux-auditor\
+      \ read strict layout/negative-space/type rhythm, monospace bracket buttons,\
+      \ and UI/UX expectations.\n- docs/UI_REGRESSION_CONTRACT.md — uiux-auditor read\
+      \ hit-target clickability, interaction matrix, keyboard a11y, and JSON-LD negative\
+      \ constraints.\n- docs/ui-preview.html — NOT READ/NOT CITED in returned evidence;\
+      \ drift risk noted for downstream closure.\n- `web/tests/e2e/` — uiux-auditor\
+      \ read test outputs and expected-red definitions.\n\n## Native Multimodal Audit\
+      \ Handoff\n```yaml\nheadline: \"FAIL\"\nverdict: \"FAIL\"\nblockers:\n  - \"\
+      Steer preview missing [ADD SOURCE] chip\"\n  - \"Source Ledger manual controls\
+      \ ([FETCH]) not rendered/reachable\"\n  - \"Inspector split scroll not independent\
+      \ on desktop and mobile route loses feed scroll\"\n  - \"Primary Inspector copy\
+      \ contains forbidden JSON-LD raw payload\"\n  - \"Mobile feed metadata over-truncation\
+      \ clips required text\"\nproof_gap_status: \"NONE\"\nblocking_status: \"OPEN\"\
+      \ngate_open_allowed: false\norchestrator_action_hint: \"CREATE_REMEDIATION\"\
+      \n```\n\n**Artifacts**:\n- Desktop: auditor reported screenshots in `.test-artifacts/playwright/test-output/`\
+      \ capturing missing `[FETCH]`, broken scroll layout, and JSON-LD leakage.\n\
+      - Mobile: auditor reported mobile variants capturing metadata clipping and scroll\
+      \ resets.\n- DOM/a11y snapshots: auditor reported Playwright `error-context.md`\
+      \ files verifying `[FETCH]`/`[ADD SOURCE]` missing or obstructed.\n\n**Checklist\
+      \ verdicts**:\n- Steer preview: FAIL.\n- Source Ledger: FAIL.\n- Split-scroll:\
+      \ FAIL.\n- Forbidden concepts/primary content: FAIL.\n\n**Commands/tests executed**:\n\
+      ```\nnpm run test:e2e\n# auditor reported 34 expected-red regression failures\n\
+      ```\n\n**Behavioral proof register**:\n- Steer preview idle/add/search: PROVEN\
+      \ failing per auditor.\n- Source Ledger controls rendered: PROVEN failing per\
+      \ auditor.\n- Split-scroll desktop behavior: PROVEN failing per auditor.\n-\
+      \ No raw payload in primary view: PROVEN failing per auditor.\n\n## Reconciliation\
+      \ / Remediation Ownership\n- Some UIUX findings conflict with recent scoped\
+      \ green tests (`npm run test` 61/61, Source Ledger controls/hit-target tests,\
+      \ split-scroll tests), so they require stale-vs-real reconciliation rather than\
+      \ dismissal.\n- Created remediation owner: `srdf-batched-frontend-audit-remediation`,\
+      \ which must distinguish real current blockers from stale/fixture/test-target\
+      \ drift by rerunning focused evidence on current mainline.\n- Created closure\
+      \ owner: `srdf-batched-frontend-audit-closure`, which must produce rendered\
+      \ screenshots/DOM/a11y artifacts and machine-readable PASS/FAIL closure.\n-\
+      \ `srdf-frontend-gate` now depends on the closure step and cannot open until\
+      \ closure evidence is PASS with `gate_open_allowed: true`, remaining blockers\
+      \ empty, and no STILL_BLOCKED family statuses.\n\n## Gaps/Notes\n- This UIUX\
+      \ audit step is complete as a failed-finding audit; it is not gate-open evidence.\
+      \ Verification checklist items are [x] because blocker-class issues have remediation\
+      \ ownership before gate."
   - id: srdf-frontend-spec-conformance
     name: Verify frontend spec and design conformance for Steer delta
     status: done
