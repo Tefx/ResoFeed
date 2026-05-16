@@ -82325,7 +82325,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Build requirements register for every user-visible state and forbidden
+      - [x] Build requirements register for every user-visible state and forbidden
       UI concept in this delta.
 
       - [x] Cite spec section and implementation file/line or rendered artifact for
