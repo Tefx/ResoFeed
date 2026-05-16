@@ -85677,7 +85677,7 @@ phases:
       - [x] Verify Steer valid URL preview/commit/undo and browser-led MCP parity
       flows no longer fail from duplicate accessible names `apply` / `[APPLY]`.
 
-      - [ ] Verify previously passing coverage remains green: owner-token gate, source
+      - [x] Verify previously passing coverage remains green: owner-token gate, source
       import, `[RUN INGEST]`, feed, inspect, resonate, `/doctor`, lexical search,
       and process cleanup.
 
