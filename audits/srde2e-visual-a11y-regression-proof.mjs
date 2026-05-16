@@ -286,8 +286,8 @@ async function main() {
     await page.waitForTimeout(800);
     await snapshot(page, 'feed-inspector-a11y');
     const scrollProof = await page.evaluate(() => {
-      const feed = document.querySelector('.feed-pane,[aria-label*="TODAY"],main');
-      const inspector = document.querySelector('.contract-inspector,[aria-label*="INSPECTOR"],aside');
+      const feed = document.querySelector('[data-scroll-region="feed-independent"],.feed-pane,[aria-label*="TODAY"]');
+      const inspector = document.querySelector('[data-scroll-region="inspector-reading-independent"],[data-scroll-region="inspector-independent"],.contract-inspector,[aria-label*="INSPECTOR"]');
       const before = { feedTop: feed?.scrollTop ?? null, inspectorTop: inspector?.scrollTop ?? null, feedScrollable: !!feed && feed.scrollHeight > feed.clientHeight, inspectorScrollable: !!inspector && inspector.scrollHeight > inspector.clientHeight, feedTabIndex: feed?.getAttribute('tabindex'), inspectorTabIndex: inspector?.getAttribute('tabindex'), feedName: feed?.getAttribute('aria-label') || feed?.getAttribute('aria-labelledby'), inspectorName: inspector?.getAttribute('aria-label') || inspector?.getAttribute('aria-labelledby') };
       if (feed) feed.scrollTop = 40;
       const afterFeed = { feedTop: feed?.scrollTop ?? null, inspectorTop: inspector?.scrollTop ?? null };

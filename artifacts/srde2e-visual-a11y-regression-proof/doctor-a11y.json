@@ -62,7 +62,7 @@
           "4"
         ],
         "backendDOMNodeId": 1,
-        "frameId": "0977A39DA99DB6FAB2D64F02295A70CB"
+        "frameId": "586CE95F5F572C9C0D54D14D9495F104"
       },
       {
         "nodeId": "4",
@@ -203,7 +203,7 @@
           "389",
           "609",
           "611",
-          "401",
+          "398",
           "408",
           "411",
           "413",
@@ -915,7 +915,7 @@
         "backendDOMNodeId": 614
       },
       {
-        "nodeId": "401",
+        "nodeId": "398",
         "ignored": true,
         "ignoredReasons": [
           {
@@ -938,7 +938,7 @@
         "childIds": [
           "505"
         ],
-        "backendDOMNodeId": 401
+        "backendDOMNodeId": 398
       },
       {
         "nodeId": "505",
@@ -960,7 +960,7 @@
           "type": "internalRole",
           "value": 0
         },
-        "parentId": "401",
+        "parentId": "398",
         "childIds": [],
         "backendDOMNodeId": 505
       },
@@ -2784,13 +2784,13 @@
         },
         "name": {
           "type": "computedString",
-          "value": "rss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:42:06Z\n",
+          "value": "rss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:57:51Z\n",
           "sources": [
             {
               "type": "contents",
               "value": {
                 "type": "computedString",
-                "value": "rss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:42:06Z\n"
+                "value": "rss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:57:51Z\n"
               }
             }
           ]
@@ -3674,7 +3674,7 @@
         },
         "name": {
           "type": "computedString",
-          "value": "ingest: last_run=2026-05-16T06:42:06Z"
+          "value": "ingest: last_run=2026-05-16T06:57:51Z"
         },
         "properties": [],
         "parentId": "823",
@@ -3818,7 +3818,7 @@
   "dom": {
     "title": "",
     "lang": "en",
-    "bodyText": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\n/doctor\nrss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:42:06Z\n",
+    "bodyText": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\n/doctor\nrss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown\nopenrouter: model_resolved=false resolved_model=unknown model_resolved: false\nopenrouter: item_transform_failures=2 item_transform_failures: 2\nopenrouter: current_item_transform_failures=2 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=2\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=2\nopenrouter: item=item_399c2559152ffb8591a27ba3edc31e28 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item One\nopenrouter: item=item_399c2559182ffb8591a27ba3edc321d9 source=src_da9d835249413f26e8fee7fe81c4c44f status=model_latency_error title=Blind Audit Item Two\nfallback_provenance: item=item_399c2559152ffb8591a27ba3edc31e28 summary=excerpt model_status=model_latency_error extraction_status=full\nfallback_provenance: item=item_399c2559182ffb8591a27ba3edc321d9 summary=excerpt model_status=model_latency_error extraction_status=full\nsearch_fts: ok\nextraction: ok\ningest: last_run=2026-05-16T06:57:51Z\n",
     "activeElement": {
       "tag": "INPUT",
       "id": "steer-input",
@@ -4070,7 +4070,7 @@
       {
         "tag": "SUMMARY",
         "role": null,
-        "name": "source details",
+        "name": "source provenance",
         "id": "",
         "disabled": false,
         "rect": {
@@ -4085,19 +4085,6 @@
         "role": null,
         "name": "[IMPORT OPML]",
         "id": "",
-        "disabled": false,
-        "rect": {
-          "x": 0,
-          "y": 0,
-          "w": 0,
-          "h": 0
-        }
-      },
-      {
-        "tag": "INPUT",
-        "role": null,
-        "name": "",
-        "id": "opml-file",
         "disabled": false,
         "rect": {
           "x": 0,
@@ -4189,6 +4176,19 @@
         "role": null,
         "name": "Choose state JSON",
         "id": "state-json-file",
+        "disabled": false,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "tag": "INPUT",
+        "role": null,
+        "name": "",
+        "id": "opml-file",
         "disabled": false,
         "rect": {
           "x": 0,

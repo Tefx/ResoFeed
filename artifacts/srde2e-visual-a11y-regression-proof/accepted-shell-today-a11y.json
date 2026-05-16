@@ -62,7 +62,7 @@
           "4"
         ],
         "backendDOMNodeId": 1,
-        "frameId": "0977A39DA99DB6FAB2D64F02295A70CB"
+        "frameId": "586CE95F5F572C9C0D54D14D9495F104"
       },
       {
         "nodeId": "4",
@@ -199,7 +199,7 @@
           "389",
           "609",
           "611",
-          "401",
+          "398",
           "408",
           "411",
           "413",
@@ -767,7 +767,7 @@
         "backendDOMNodeId": 614
       },
       {
-        "nodeId": "401",
+        "nodeId": "398",
         "ignored": true,
         "ignoredReasons": [
           {
@@ -790,7 +790,7 @@
         "childIds": [
           "505"
         ],
-        "backendDOMNodeId": 401
+        "backendDOMNodeId": 398
       },
       {
         "nodeId": "505",
@@ -812,7 +812,7 @@
           "type": "internalRole",
           "value": 0
         },
-        "parentId": "401",
+        "parentId": "398",
         "childIds": [],
         "backendDOMNodeId": 505
       },
@@ -1954,6 +1954,13 @@
           ]
         },
         "properties": [
+          {
+            "name": "focusable",
+            "value": {
+              "type": "booleanOrUndefined",
+              "value": true
+            }
+          },
           {
             "name": "labelledby",
             "value": {
@@ -4301,7 +4308,7 @@
         },
         "name": {
           "type": "computedString",
-          "value": "source details",
+          "value": "source provenance",
           "sources": [
             {
               "type": "relatedElement",
@@ -4315,7 +4322,7 @@
               "type": "contents",
               "value": {
                 "type": "computedString",
-                "value": "source details"
+                "value": "source provenance"
               }
             },
             {
@@ -5506,13 +5513,13 @@
         },
         "name": {
           "type": "computedString",
-          "value": "source details",
+          "value": "source provenance",
           "sources": [
             {
               "type": "contents",
               "value": {
                 "type": "computedString",
-                "value": "source details"
+                "value": "source provenance"
               }
             }
           ]
@@ -6708,7 +6715,7 @@
         },
         "name": {
           "type": "computedString",
-          "value": "source details"
+          "value": "source provenance"
         },
         "properties": [],
         "parentId": "665",
@@ -7685,7 +7692,7 @@
   "dom": {
     "title": "",
     "lang": "en",
-    "bodyText": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\nIndependent scroll region\nToday feed items\n\nsrc: Blind Audit Feed\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nBlind Audit Item One\n\nDense summary text with HTML and provenance.\n\n☆\n\nsrc: Blind Audit Feed\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\n\nBlind Audit Item Two\n\nSecond item for keyboard and split-scroll proof.\n\n☆\n\nINSPECTOR\n\nsrc: Blind Audit Feed · full\n\nBlind Audit Item One\n\noriginal link\n\nurl\nhttp://127.0.0.1:18082/article-one\nsource url\nhttp://127.0.0.1:18082/feed.xml\noriginal link\nhttp://127.0.0.1:18082/article-one\n\nfull · summary provenance: feed excerpt fallback\n\nsummary: Dense summary text with HTML and provenance.\n\ncore insight: /article-one Original article text for /article-one.\n\n/article-one Original article text for /article-one.\n\nwhy: fresh from configured source\n\nsource details",
+    "bodyText": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\nIndependent scroll region\nToday feed items\n\nsrc: Blind Audit Feed\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nBlind Audit Item One\n\nDense summary text with HTML and provenance.\n\n☆\n\nsrc: Blind Audit Feed\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\n\nBlind Audit Item Two\n\nSecond item for keyboard and split-scroll proof.\n\n☆\n\nINSPECTOR\n\nsrc: Blind Audit Feed · full\n\nBlind Audit Item One\n\noriginal link\n\nurl\nhttp://127.0.0.1:18082/article-one\nsource url\nhttp://127.0.0.1:18082/feed.xml\noriginal link\nhttp://127.0.0.1:18082/article-one\n\nfull · summary provenance: feed excerpt fallback\n\nsummary: Dense summary text with HTML and provenance.\n\ncore insight: /article-one Original article text for /article-one.\n\n/article-one Original article text for /article-one.\n\nwhy: fresh from configured source\n\nsource provenance",
     "activeElement": {
       "tag": "INPUT",
       "id": "steer-input",
@@ -7890,9 +7897,9 @@
         "disabled": false,
         "rect": {
           "x": 799,
-          "y": 307,
-          "w": 97,
-          "h": 14
+          "y": 298,
+          "w": 113,
+          "h": 44
         }
       },
       {
@@ -7903,9 +7910,9 @@
         "disabled": false,
         "rect": {
           "x": 905,
-          "y": 335,
+          "y": 350,
           "w": 253,
-          "h": 14
+          "h": 44
         }
       },
       {
@@ -7916,9 +7923,9 @@
         "disabled": false,
         "rect": {
           "x": 905,
-          "y": 355,
+          "y": 398,
           "w": 231,
-          "h": 14
+          "h": 44
         }
       },
       {
@@ -7929,20 +7936,20 @@
         "disabled": false,
         "rect": {
           "x": 905,
-          "y": 375,
+          "y": 446,
           "w": 253,
-          "h": 14
+          "h": 44
         }
       },
       {
         "tag": "SUMMARY",
         "role": null,
-        "name": "source details",
+        "name": "source provenance",
         "id": "",
         "disabled": false,
         "rect": {
           "x": 799,
-          "y": 650,
+          "y": 750,
           "w": 416,
           "h": 44
         }
@@ -7952,19 +7959,6 @@
         "role": null,
         "name": "[IMPORT OPML]",
         "id": "",
-        "disabled": false,
-        "rect": {
-          "x": 0,
-          "y": 0,
-          "w": 0,
-          "h": 0
-        }
-      },
-      {
-        "tag": "INPUT",
-        "role": null,
-        "name": "",
-        "id": "opml-file",
         "disabled": false,
         "rect": {
           "x": 0,
@@ -8056,6 +8050,19 @@
         "role": null,
         "name": "Choose state JSON",
         "id": "state-json-file",
+        "disabled": false,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "tag": "INPUT",
+        "role": null,
+        "name": "",
+        "id": "opml-file",
         "disabled": false,
         "rect": {
           "x": 0,

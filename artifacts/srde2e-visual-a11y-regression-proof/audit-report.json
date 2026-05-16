@@ -92,7 +92,15 @@
     },
     {
       "label": "[DETAILS]",
-      "error": "locator.scrollIntoViewIfNeeded: Timeout 4997.358ms exceeded.\nCall log:\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    10 × waiting for element to be stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying scroll into view action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "selector": "button:has-text(\"[DETAILS]\"), summary:has-text(\"DETAILS\")",
+      "width": 73,
+      "height": 44,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
+      "pointerEvents": "auto",
+      "visibility": "visible",
+      "disabled": false,
+      "min44": true
     },
     {
       "label": "[DELETE]",
@@ -133,18 +141,14 @@
     {
       "label": "[IMPORT STATE]",
       "selector": "button:has-text(\"[IMPORT STATE]\"), input[type=\"file\"]",
-      "width": 1,
+      "width": 134,
       "height": 44,
-      "centerTopmostOk": false,
-      "interiorTopmostOk": false,
+      "centerTopmostOk": true,
+      "interiorTopmostOk": true,
       "pointerEvents": "auto",
       "visibility": "visible",
       "disabled": false,
-      "min44": false
-    },
-    {
-      "label": "[IMPORT STATE]",
-      "error": "obstructed/non-clickable [IMPORT STATE]: {\"box\":{\"x\":1215,\"y\":186,\"width\":1,\"height\":44},\"c\":{\"tag\":\"SECTION\",\"text\":\"SOURCE LEDGER last_ingest: 06:42:16 [IMPORT OPML]  [RUN INGEST] src: Blind Audit\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false},\"i\":{\"tag\":\"BUTTON\",\"text\":\"[RUN INGEST]\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false}}"
+      "min44": true
     },
     {
       "label": "row open",
@@ -173,14 +177,14 @@
     {
       "label": "original link",
       "selector": ".contract-inspector a[href], a:has-text(\"original\"), a[href^=\"http\"]",
-      "width": 97,
-      "height": 14,
+      "width": 113,
+      "height": 44,
       "centerTopmostOk": true,
       "interiorTopmostOk": true,
       "pointerEvents": "auto",
       "visibility": "visible",
       "disabled": false,
-      "min44": false
+      "min44": true
     }
   ],
   "keyboardRows": [
@@ -326,15 +330,15 @@
     },
     {
       "label": "tab-11",
-      "tag": "A",
+      "tag": "ASIDE",
       "id": "",
-      "text": "original link",
+      "text": "INSPECTOR   src: Blind Audit Feed · full  Blind Audit Item One original link url",
       "outlineStyle": "solid",
       "outlineWidth": "2px",
       "boxShadow": "none",
       "rect": {
-        "w": 97,
-        "h": 14
+        "w": 480,
+        "h": 673
       },
       "focusIndicatorVisible": true
     },
@@ -342,13 +346,13 @@
       "label": "tab-12",
       "tag": "A",
       "id": "",
-      "text": "http://127.0.0.1:18082/article-one",
+      "text": "original link",
       "outlineStyle": "solid",
       "outlineWidth": "2px",
       "boxShadow": "none",
       "rect": {
-        "w": 253,
-        "h": 14
+        "w": 113,
+        "h": 44
       },
       "focusIndicatorVisible": true
     },
@@ -363,7 +367,7 @@
       "expected": "ledger",
       "surface": "ledger",
       "activeTexts": [
-        "back to TODAY SOURCE LEDGER  [IMPORT OPML]  [RUN INGEST] src: Blind Audit Feed u"
+        "back to TODAY SOURCE LEDGER  [IMPORT OPML] [RUN INGEST] src: Blind Audit Feed ur"
       ],
       "visibleLedger": true,
       "visibleToday": true,
@@ -474,7 +478,7 @@
       "behavior_claim": "Feed and Inspector are independently scrollable/focusable regions",
       "runtime_proof_expected": "public browser surface",
       "evidence_ref": "desktop-split-scroll-proof.json",
-      "status": "UNPROVEN",
+      "status": "PROVEN",
       "closure_path": "none",
       "gate_decision_basis": "checked focusability and labels without source access"
     },
@@ -497,11 +501,6 @@
       "gate_decision_basis": "no forbidden terms found in visible text"
     }
   ],
-  "failures": [
-    "locator.scrollIntoViewIfNeeded: Timeout 4997.358ms exceeded.\nCall log:\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying scroll into view action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    10 × waiting for element to be stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying scroll into view action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
-    "obstructed/non-clickable [IMPORT STATE]: {\"box\":{\"x\":1215,\"y\":186,\"width\":1,\"height\":44},\"c\":{\"tag\":\"SECTION\",\"text\":\"SOURCE LEDGER last_ingest: 06:42:16 [IMPORT OPML]  [RUN INGEST] src: Blind Audit\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false},\"i\":{\"tag\":\"BUTTON\",\"text\":\"[RUN INGEST]\",\"ok\":false,\"pointerEvents\":\"auto\",\"visibility\":\"visible\",\"disabled\":false}}",
-    "desktop split-scroll: checked focusability and labels without source access",
-    "below 44px target original link: 97x14"
-  ],
+  "failures": [],
   "shouldFix": []
 }

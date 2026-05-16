@@ -423,7 +423,9 @@
   }
 </script>
 
-<aside class="contract-region contract-inspector" aria-labelledby="inspector-heading" aria-label={item?.title ?? 'INSPECTOR'}>
+<!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
+<aside class="contract-region contract-inspector" aria-labelledby="inspector-heading" aria-label={item?.title ?? 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
   <p class="contract-label">INSPECTOR</p>
   {#if loading}
     <p class="contract-muted" role="status">loading</p>
@@ -443,7 +445,7 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link</a></p>
+    <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link</a></p>
     <dl class="contract-provenance-anchors" aria-label="Source identifiers">
       <div>
         <dt>url</dt>
@@ -497,7 +499,7 @@
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}
     <details class="contract-source-details">
-      <summary>source details</summary>
+      <summary>source provenance</summary>
       <pre translate="no">{sourceDetailsPayload(item)}</pre>
     </details>
   {:else}

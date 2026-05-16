@@ -233,16 +233,6 @@
         <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={globalIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={globalIngestStatusText}>{globalIngestStatusText}</span>
       {/if}
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
-      <input
-        id="opml-file"
-        class="source-ledger-file visually-hidden"
-        bind:this={importInput}
-        type="file"
-        accept=".opml,.xml,text/xml,application/xml"
-        aria-hidden="true"
-        tabindex="-1"
-        onchange={() => void importSelectedFile()}
-      />
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
     </div>
   </header>
@@ -280,5 +270,15 @@
       <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
     {/if}
     <StatePortability onExportState={onExportState} onImportState={onImportState} />
+    <input
+      id="opml-file"
+      class="source-ledger-file visually-hidden"
+      bind:this={importInput}
+      type="file"
+      accept=".opml,.xml,text/xml,application/xml"
+      aria-hidden="true"
+      tabindex="-1"
+      onchange={() => void importSelectedFile()}
+    />
   </div>
 </section>

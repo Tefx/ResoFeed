@@ -4,9 +4,9 @@
     "inspectorTop": 0,
     "feedScrollable": false,
     "inspectorScrollable": false,
-    "feedTabIndex": null,
+    "feedTabIndex": "0",
     "inspectorTabIndex": "0",
-    "feedName": "RESOFEED",
+    "feedName": "TODAY surface independent scroll",
     "inspectorName": "INSPECTOR independent scroll"
   },
   "afterFeed": {

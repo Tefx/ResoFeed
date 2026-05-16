@@ -815,10 +815,18 @@ a:focus,
 }
 
 .contract-inspector a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
   color: var(--rf-color-muted);
   font: var(--rf-typography-metadata);
   letter-spacing: 0.02em;
   text-decoration: none;
+}
+
+.inspector-original-link {
+  padding-inline: var(--rf-space-sm);
 }
 
 .contract-inspector a:hover,
@@ -929,6 +937,12 @@ a:focus,
   .feed-pane,
   .detail-pane {
     min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .contract-inspector {
+    max-height: calc(100vh - 130px);
     overflow-y: auto;
     overscroll-behavior: contain;
   }
