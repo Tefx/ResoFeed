@@ -93479,7 +93479,7 @@ phases:
       - [x] UIUX stale-audit claims are reconciled against fresh current artifacts;
       any confirmed real blocker is fixed in this same step.
 
-      - [ ] No forbidden product boundary is introduced: no accounts, sync coordinator,
+      - [x] No forbidden product boundary is introduced: no accounts, sync coordinator,
       vector DB/RAG surface, state merger, event bus, sidecar worker, or SaaS-style
       chrome.'
     verification: '- [ ] B1 render-test blocker is closed by rerunning `npm run test:render`
