@@ -82931,17 +82931,17 @@ phases:
       - [x] Forbidden UI scan remains clean.
 
       - [x] Evidence includes actual command output, not only a summary.'
-    verification: '- [ ] full-plan-check protecting current frontend mainline: `npm
+    verification: '- [x] full-plan-check protecting current frontend mainline: `npm
       run test` passes with `rendering-expected-red.test.ts` green.
 
-      - [ ] phase-check protecting frontend gate: scoped Steer, Source Ledger, split-scroll/mobile,
+      - [x] phase-check protecting frontend gate: scoped Steer, Source Ledger, split-scroll/mobile,
       and processing-language checks pass or have explicit blocker remediation ownership.
 
-      - [ ] local-check protecting type/static health: `npm run check` reports 0 errors/warnings.
+      - [x] local-check protecting type/static health: `npm run check` reports 0 errors/warnings.
 
-      - [ ] forbidden UI scan reports no forbidden concepts.
+      - [x] forbidden UI scan reports no forbidden concepts.
 
-      - [ ] Behavioral proof register statuses are PROVEN for bootstrap persistence
+      - [x] Behavioral proof register statuses are PROVEN for bootstrap persistence
       and authenticated rendering, or a new remediation owner is required before downstream
       gates open.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
