@@ -87537,16 +87537,16 @@ phases:
 
       - [x] B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix
       remain non-regressed.'
-    verification: '- [ ] Focused render/Vitest proof closes every listed role/name
+    verification: '- [x] Focused render/Vitest proof closes every listed role/name
       and action-name failure fingerprint.
 
-      - [ ] Accessibility proof covers role="status", accessible name, aria-live,
+      - [x] Accessibility proof covers role="status", accessible name, aria-live,
       aria-describedby, invalid feedback, Escape focus, and action button names.
 
-      - [ ] Policy resolution is documented in evidence with citations to DESIGN.md,
+      - [x] Policy resolution is documented in evidence with citations to DESIGN.md,
       UI_REGRESSION_CONTRACT.md, and the expected-red tests.
 
-      - [ ] B1-B4 visual/a11y closure surfaces are not regressed.'
+      - [x] B1-B4 visual/a11y closure surfaces are not regressed.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
