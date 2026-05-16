@@ -89683,7 +89683,7 @@ phases:
       - [x] Focus order conflict is adjudicated with a docs-backed winning expectation
       and allowed deviation for the stale expectation if applicable.
 
-      - [ ] Nav visible text conflict is adjudicated with a docs-backed visible-label/accessibility-name
+      - [x] Nav visible text conflict is adjudicated with a docs-backed visible-label/accessibility-name
       rule and allowed selector deviation if applicable.
 
       - [ ] OPML import/ingest `last_fetch` expectation is adjudicated with exact
