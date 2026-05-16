@@ -85359,7 +85359,7 @@ phases:
       - [ ] Fix ALL blocker families B-RSE2E-01 through B-RSE2E-04 in one batch; do
       not stop after the first green local assertion.
 
-      - [ ] Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
+      - [x] Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
       boundary, HTTP/MCP/UI operation parity, lexical-only search, no accounts, no
       sync/merge coordinator, no vector DB, no embeddings, no RAG/semantic answer
       UI, no dashboard/job/activity surfaces.
