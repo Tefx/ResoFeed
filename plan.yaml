@@ -96371,7 +96371,7 @@ phases:
 
       - [x] HTTP and MCP registration evidence is produced.
 
-      - [ ] Frontend consumption evidence is produced.
+      - [x] Frontend consumption evidence is produced.
 
       - [ ] Headline is PASS or PASS_WITH_DEBT with explicit non-blocking/non-intersection
       rationale.'
