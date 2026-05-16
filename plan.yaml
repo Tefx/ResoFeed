@@ -91366,7 +91366,7 @@ phases:
       - [x] Expected-red browser tests fail against the current known UI/UX defects
       before implementation.
 
-      - [ ] Test-only scope is maintained; product code is not changed.
+      - [x] Test-only scope is maintained; product code is not changed.
 
       - [ ] Tests cover all listed audit findings and every required Chinese support
       surface or explicitly cite existing tests that already cover a surface.
