@@ -85180,7 +85180,7 @@ phases:
 
       Required remediation:
 
-      - [ ] Extract/shared-normalize the steer receipt fingerprint payload used by
+      - [x] Extract/shared-normalize the steer receipt fingerprint payload used by
       HTTP and MCP, or otherwise explicitly align the fingerprint semantics for the
       same logical steer operation.
 
