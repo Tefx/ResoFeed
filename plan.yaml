@@ -84668,7 +84668,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Start cmd/resofeed with test owner token, SQLite DB, static UI, JSON HTTP,
+      - [x] Start cmd/resofeed with test owner token, SQLite DB, static UI, JSON HTTP,
       MCP Streamable HTTP, and background ingest configuration as applicable.
 
       - [x] Browser Steer valid URL add preview commits through backend and shows
