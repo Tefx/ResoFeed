@@ -83814,7 +83814,7 @@ phases:
       \ and run the nearest current harness command that covers the same user-visible\
       \ obligation.\n\nRequired rendered artifact evidence:\n- [x] Steer add state.\n\
       - [x] Steer search state.\n- [x] Steer doctor state.\n- [x] Steer rule state.\n\
-      - [x] Steer invalid state.\n- [x] Steer receipt state.\n- [ ] Steer undo state.\n\
+      - [x] Steer invalid state.\n- [x] Steer receipt state.\n- [x] Steer undo state.\n\
       - [ ] Source Ledger controls and details.\n- [ ] Desktop split scroll.\n- [\
       \ ] Mobile route and feed scroll preservation.\n- [ ] Inspector primary content\
       \ with JSON-LD raw payload negative proof.\n- [ ] Mobile feed metadata with\
