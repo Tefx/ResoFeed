@@ -1,0 +1,6 @@
+{
+  "primary_item_id": "item_today_primary_story",
+  "duplicate_item_id": "item_today_duplicate_story",
+  "shared_story_key": "story-shared-runtime-review",
+  "exposedGap": "Inspector primary story surface discloses grouped duplicate/source items and provenance."
+}

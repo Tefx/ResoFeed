@@ -1,0 +1,27 @@
+{
+  "text": "Grouped story with 2 source items Primary Wire — Primary grouped story keeps every source visible selected · story_key: story-shared-runtime-review · duplicate_of: none · full · ok feedDuplicate Ledger — Duplicate source item for primary grouped story grouped · story_key: story-shared-runtime-review · duplicate_of: item_today_primary_story · full · ok feed",
+  "summary": "Grouped story with 2 source items",
+  "accessibleName": "Grouped story with 2 source items",
+  "sourceLinks": [
+    {
+      "text": "Primary Wire",
+      "href": "https://primary.example.test/story",
+      "ariaLabel": null
+    },
+    {
+      "text": "feed",
+      "href": "https://primary.example.test/rss.xml",
+      "ariaLabel": "Source feed for Primary Wire"
+    },
+    {
+      "text": "Duplicate Ledger",
+      "href": "https://duplicate.example.test/story-copy",
+      "ariaLabel": null
+    },
+    {
+      "text": "feed",
+      "href": "https://duplicate.example.test/rss.xml",
+      "ariaLabel": "Source feed for Duplicate Ledger"
+    }
+  ]
+}
