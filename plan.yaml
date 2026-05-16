@@ -95107,7 +95107,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Expected-red tests cover Source Ledger/open RESOFEED status placement
+      - [x] Expected-red tests cover Source Ledger/open RESOFEED status placement
       and idle top-chrome absence.
 
       - [ ] Expected-red tests cover LANG/reprocess low-frequency placement and absence
