@@ -95128,7 +95128,7 @@ phases:
 
       - [x] No blocker-class false grouping proof gap remains.
 
-      - [ ] No backend schema/layer drift was introduced.
+      - [x] No backend schema/layer drift was introduced.
 
       - [ ] UIUX audit and targeted retest are PASS or only explicit non-blocking
       debt remains.
