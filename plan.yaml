@@ -95785,3 +95785,151 @@ phases:
     - cos-frontend-operation-utility-surface
     - cos-runtime-e2e-retest
     agent: spec-verifier
+  - id: cos-final-gate
+    name: Gate current-operation status and utility-surface implementation
+    status: pending
+    description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the current-operation
+      status and low-frequency utility surface phase meets the quality bar for proceeding.
+
+
+      YOU ARE THE QUALITY GATE. Block progress if runtime behavior, UI placement,
+      MCP parity, evidence quality, or ResoFeed architectural constraints are insufficient.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Phase touches HTTP/MCP runtime surfaces and frontend top-chrome/operations
+      UI.
+
+      - Status/progress wording is user-visible and must avoid job/dashboard semantics.
+
+      - LANG/reprocess placement is a recent design-review concern.
+
+
+      Cross-cutting focus:
+
+      - No durable jobs, queues, task tables, activity ledgers, command history, sync/merge
+      state, sidecars, or provider/DI/service layers.
+
+      - HTTP and MCP expose the same CurrentOperationInfo facts and conflict details
+      where supported.
+
+      - UI shows status contextually in Source Ledger/open RESOFEED operations surfaces
+      only; no persistent idle global strip.
+
+      - LANG/reprocess controls remain low-frequency inside RESOFEED operations/utility
+      surface, not prominent top chrome.
+
+      - UIUX audit includes rendered visual/spatial evidence.
+
+
+      Gate Decision Basis required:
+
+      - Map each requirement/proof obligation to evidence refs.
+
+      - List any unresolved NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING items.
+
+      - Explain why each unresolved item blocks or does not intersect remaining gates.
+
+      - Final OPEN/BLOCK recommendation.
+
+
+      ## Completion Criteria
+
+      - [ ] All phase steps completed with adequate refs-read evidence.
+
+      - [ ] Backend contract tests and implementation evidence prove idle/running/conflict
+      CurrentOperationInfo behavior.
+
+      - [ ] MCP parity evidence proves `resofeed://system/operation` and conflict
+      detail consistency where supported.
+
+      - [ ] Frontend tests/e2e evidence prove contextual status and no persistent
+      idle top-chrome status strip.
+
+      - [ ] UI evidence proves LANG/reprocess are only in low-frequency RESOFEED utility/operations
+      surfaces.
+
+      - [ ] UIUX audit and spec/doc conformance are PASS or have explicit non-blocking
+      disposition.
+
+      - [ ] No forbidden architecture/product concepts were introduced.
+
+      - [ ] Gate decision basis is complete and parseable.'
+    verification: '- [ ] full-plan-check protecting closure of this implementation
+      tail: gate reviews all phase evidence and emits OPEN/BLOCK decision.
+
+      - [ ] Gate blocks on any unresolved blocker-class divergence in runtime status,
+      MCP parity, UI placement, UIUX evidence, or architecture constraints.
+
+      - [ ] Gate explicitly records disposition for any pre-existing/out-of-step-origin
+      issues that intersect required checks.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Gate Review Report
+
+      **Reviewer**: gate-reviewer (independent of phase implementation)
+
+      **Phase**: current-operation-status-and-low-frequency-utility-surface-implementation
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### Execution Review
+
+      | Step ID | Status | Evidence Quality | Concerns |
+
+      |---|---|---|---|
+
+
+      ### Gate Decision Basis
+
+      | requirement_ref | evidence_ref | status | unresolved_disposition | gate_decision_basis
+      |
+
+      |---|---|---|---|---|
+
+
+      ### Issues Identified
+
+      | Severity | Description | Related Step | Blocking? |
+
+      |---|---|---|---|
+
+
+      ### Final Decision
+
+      - [ ] OPEN: Phase passes gate.
+
+      - [ ] BLOCKED: Fix/retest steps required before proceeding.
+
+
+      ### Durability / Forbidden Scope Check
+
+      - Durable jobs/queues/task tables/history/sidecars introduced: YES/NO
+
+      - Persistent top-chrome LANG/reprocess/status strip introduced: YES/NO'
+    depends_on:
+    - cos-backend-operation-contract-tests
+    - cos-frontend-operation-utility-contract-tests
+    - cos-backend-operation-snapshot
+    - cos-mcp-operation-parity
+    - cos-frontend-operation-utility-surface
+    - cos-wiring-audit
+    - cos-runtime-e2e-retest
+    - cos-uiux-multimodal-audit
+    - cos-spec-doc-conformance
+    agent: gate-reviewer
