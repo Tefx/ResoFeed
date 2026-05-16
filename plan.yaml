@@ -94698,3 +94698,97 @@ phases:
     - gsfr-inspector-fragment-identity-fix
     - gsfr-backend-grouping-contract-audit
     agent: integration-verifier
+  - id: gsfr-uiux-multimodal-audit
+    name: Run multimodal Inspector UI audit for grouped-source disclosure
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check protecting gsfr-final-gate
+
+      independence_level: L1
+
+
+      As an independent `uiux-auditor`, audit rendered Inspector behavior after the
+      grouped-story fragment repair.
+
+
+      Scope:
+
+      - Use real rendered artifacts: browser screenshots, DOM snapshots, or terminal/browser
+      captures equivalent to visual/spatial proof.
+
+      - Open an unrelated TLDR/feed-fragment item and verify the Inspector does NOT
+      show grouped-source disclosure such as `Grouped story with 50 source items`.
+
+      - Open or fixture a valid grouped story and verify grouped-source disclosure
+      remains transparent and accessible.
+
+      - Check the changed Inspector area against `docs/DESIGN.md`: dense archival
+      workbench tone, terse provenance labels, no SaaS/friendly onboarding copy, no
+      layout bloat.
+
+
+      ## Completion Criteria
+
+      - [ ] Visual/rendered evidence proves unrelated synthetic feed fragments do
+      not show grouped-source disclosure.
+
+      - [ ] Visual/rendered evidence proves valid grouped stories still expose grouped
+      source items accessibly.
+
+      - [ ] Inspector remains consistent with DESIGN.md dense archival workbench aesthetics.
+
+      - [ ] Findings are classified as PASS, PASS_WITH_DEBT, or FAIL with blocking
+      items explicit.'
+    verification: '- [ ] Audit includes screenshot/DOM/render artifact for unrelated
+      synthetic feed fragments with grouped-source disclosure absent.
+
+      - [ ] Audit includes screenshot/DOM/render artifact for valid grouped-source
+      disclosure still present and accessible.
+
+      - [ ] Audit explicitly checks DESIGN.md tone/density around Inspector provenance
+      UI.
+
+      - [ ] Any blocker-class UI/UX regression has a concrete remediation owner path
+      before the phase gate.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+
+      ## Multimodal UI Audit Report
+
+      **Auditor**: uiux-auditor
+
+
+      ### Rendered artifacts
+
+      - Unrelated synthetic feed-fragment Inspector artifact:
+
+      - Valid grouped-story Inspector artifact:
+
+
+      ### Findings
+
+      | Severity | Description | Evidence Ref | Blocking? |
+
+      | --- | --- | --- | --- |
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    depends_on:
+    - gsfr-inspector-fragment-identity-fix
+    agent: uiux-auditor
