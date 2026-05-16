@@ -82926,7 +82926,7 @@ phases:
 
       - [x] Scoped Steer/source/split/processing-language checks show no regression.
 
-      - [ ] `npm run check` remains clean.
+      - [x] `npm run check` remains clean.
 
       - [ ] Forbidden UI scan remains clean.
 
