@@ -90574,7 +90574,7 @@ phases:
       - [x] Review the prior architecture, full-plan, E2E retest, and UIUX audit closure
       evidence listed in scope.
 
-      - [ ] Produce a software-architect re-review artifact with `reviewer_agent:
+      - [x] Produce a software-architect re-review artifact with `reviewer_agent:
       software-architect`.
 
       - [ ] Artifact verdict is exactly `CLEAN` OR contains a concrete blocker list
