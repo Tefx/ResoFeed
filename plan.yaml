@@ -97956,7 +97956,7 @@ phases:
       - [x] Browser evidence shows current-operation detail, not only the generic
       conflict string.
 
-      - [ ] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      - [x] No dashboard/job/queue/activity ledger/settings/service-layer/persistent
       top-chrome status was introduced.'
     verification: '- [ ] Main path: targeted Vitest and/or browser tests still accept
       documented current-operation count/detail payloads.
