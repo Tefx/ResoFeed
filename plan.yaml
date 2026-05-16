@@ -85370,7 +85370,7 @@ phases:
       - [x] Steer preview/commit/undo controls have unambiguous accessible button
       names and remain keyboard/screen-reader usable.
 
-      - [ ] Browser-led MCP parity flow remains covered through the real-server UI
+      - [x] Browser-led MCP parity flow remains covered through the real-server UI
       path.
 
       - [ ] Search sibling instances for duplicate accessible names or Source Ledger
