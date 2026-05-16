@@ -91479,7 +91479,7 @@ phases:
       \ no production implementation files were modified."
   - id: azrct-contract-tests-gate
     name: Gate repair contract matrix and expected-red tests
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       agent_source: project
@@ -91586,6 +91586,8 @@ phases:
     - azrct-closure-matrix
     - azrct-expected-red-browser-and-contract-tests
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T13:42:10.924779+00:00'
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
   status: locked
