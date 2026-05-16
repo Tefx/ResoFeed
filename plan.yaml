@@ -98364,7 +98364,7 @@ phases:
       - [x] Prove the conflict fixture includes `error.details.current_operation`
       with documented fields.
 
-      - [ ] Prove browser-visible output includes current-operation detail beyond
+      - [x] Prove browser-visible output includes current-operation detail beyond
       generic `err: ingest already running` text.
 
       - [ ] Prove the relevant Source Ledger conflict scope no longer has unintended
