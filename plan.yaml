@@ -85161,6 +85161,7 @@ phases:
 
       '
     depends_on:
+    - srde2e-real-system-e2e-blockers-retest
     - srde2e-software-architect-clean-recheck
     agent: integration-verifier
   - id: srde2e-final-closure-gate
