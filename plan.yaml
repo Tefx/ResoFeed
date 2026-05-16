@@ -90577,7 +90577,7 @@ phases:
       - [x] Produce a software-architect re-review artifact with `reviewer_agent:
       software-architect`.
 
-      - [ ] Artifact verdict is exactly `CLEAN` OR contains a concrete blocker list
+      - [x] Artifact verdict is exactly `CLEAN` OR contains a concrete blocker list
       with closure paths.
 
       - [ ] No implementation/code changes are made by this review step.'
