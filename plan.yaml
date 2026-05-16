@@ -85339,67 +85339,128 @@ phases:
     - srde2e-visual-a11y-blockers-retest
     agent: frontend-engineer
   - id: srde2e-software-architect-clean-recheck
-    name: Run fresh software-architect clean re-review
+    name: Re-review batched architecture/API contract remediation
     status: pending
-    description: 'As software-architect, perform a fresh review after remediation.
-      This must be a clean re-review, not a rubber-stamp of the prior report.
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project (software-architect discovered in Larva registry)
 
 
-      Acceptance checklist:
+      As an INDEPENDENT ARCHITECTURE/API CONTRACT REVIEWER, perform a clean re-review
+      after `srde2e-backend-architecture-remediation`. This is a retest/re-review
+      step for the two should_fix findings from `srde2e-software-architect-fresh-review`,
+      not a rubber stamp.
 
-      - [ ] Re-read authoritative docs and remediation evidence.
 
-      - [ ] Re-test or inspect every prior blocker/should_fix closure path.
+      Independence Level: L1 independent review. This step must remain independent
+      from the `golang-developer` fix step.
 
-      - [ ] Check for regressions in previously green Steer preview/commit/undo, lexical
-      search/no-RAG, Source Ledger, processing language, split-scroll/mobile, and
-      KISS architecture boundaries.
 
-      - [ ] Return CLEAN only if no blocker or should_fix remains.
+      ## Re-review Scope
 
-      - [ ] If new findings appear, list them with severity, location, reproduction,
-      grep hint, and required remediation; orchestrator must create another remediation
-      loop before final gate opens.'
-    verification: '- [ ] phase-check protecting full-plan check and final gate.
+      - [ ] Verify SF1: HTTP/MCP steer idempotency fingerprint parity is aligned for
+      the same logical operation.
 
-      - [ ] Fresh review explicitly re-checks all prior findings and relevant regression
-      surfaces.
+      - [ ] Verify SF1: same actor/key/command retry across HTTP then MCP replays
+      or returns equivalent idempotent behavior, not `request_fingerprint_mismatch`.
 
-      - [ ] Verdict is CLEAN before downstream final gate can open.
+      - [ ] Verify SF2: `/api/steer/preview` `will_mutate` public semantics match
+      the documented/tested contract.
 
-      - [ ] Any remaining or new blocker/should_fix has remediation ownership rather
-      than being marked pre-existing/out-of-scope.'
+      - [ ] Verify SF2: preview remains read-only and creates no write/no receipt.
+
+      - [ ] Check for new contract drift in HTTP, MCP, docs, and frontend consumers
+      touched by the fix.
+
+      - [ ] Return CLEAN only if both should_fix findings are closed and no new blocker/should_fix
+      contract drift exists.
+
+      - [ ] If any finding remains or a new finding appears, list severity, location,
+      reproduction, grep hint, and required remediation so the orchestrator can create
+      another remediation loop before final closure.
+
+
+      ## Behavioral Proof Register Requirement
+
+      - [ ] Evidence includes `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,
+      `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis` for each
+      of SF1 and SF2.'
+    verification: '- [ ] phase-check protecting `srde2e-full-plan-check` and `srde2e-final-closure-gate`.
+
+      - [ ] Both architecture/API should_fix findings from `srde2e-software-architect-fresh-review`
+      are explicitly re-checked with evidence.
+
+      - [ ] Verdict is CLEAN only if SF1 and SF2 are closed and no new blocker/should_fix
+      contract drift exists.
+
+      - [ ] Decision basis maps any unresolved item to remediation ownership; final
+      closure cannot open with unresolved blocker-class or should_fix proof gaps.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
+
 
       For each ref in this step:
 
       - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
 
-      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+      - internal/resofeed/http.go — key passage or "NOT READ: <reason>"
 
-      - docs/PRD.md — key passage or "NOT READ: <reason>"
+      - internal/resofeed/mcp.go — key passage or "NOT READ: <reason>"
 
-      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
-
-      - AGENTS.md — key passage or "NOT READ: <reason>"
+      - internal/resofeed/steer_intent.go — key passage or "NOT READ: <reason>"
 
 
-      ## Fresh Architecture Re-Review
-
-      | Prior/New Finding | Closure Evidence | Recheck Result | Remaining Risk |
-
-      |---|---|---|---|
+      If no refs were provided, state: "No refs for this step."
 
 
-      **Verdict**: CLEAN | FINDINGS_PRESENT
+      ## Clean Re-review Report
 
-      '
+
+      **Reviewer**: software-architect (independent of golang-developer fix)
+
+      **Fix step reviewed**: srde2e-backend-architecture-remediation
+
+
+      ## Requirements / Behavioral Proof Register
+
+      | Requirement Ref | Behavior Claim | Runtime Proof Expected | Evidence Ref |
+      Status | Closure Path | Gate Decision Basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | SF1 HTTP/MCP idempotency parity |  |  |  | PROVEN/NEEDS_TEST/UNPROVEN |  |  |
+
+      | SF2 preview will_mutate contract |  |  |  | PROVEN/NEEDS_TEST/UNPROVEN |  |  |
+
+
+      ## Drift Check
+
+      - HTTP receipt/fingerprint semantics:
+
+      - MCP receipt/fingerprint semantics:
+
+      - Preview no-write/no-receipt proof:
+
+      - Docs/tests/frontend consumer alignment:
+
+
+      ## Verdict
+
+      - [ ] CLEAN: both should_fix findings closed and no new blocker/should_fix drift
+      exists
+
+      - [ ] FINDINGS_PRESENT: list each finding below with severity, location, reproduction,
+      grep hint, and required remediation'
+    refs:
+    - docs/ARCHITECTURE.md
+    - internal/resofeed/http.go
+    - internal/resofeed/mcp.go
+    - internal/resofeed/steer_intent.go
     depends_on:
     - srde2e-backend-architecture-remediation
-    - srde2e-frontend-architecture-remediation
-    - srde2e-uiux-audit-source-ledger-steer-controls
-    - srde2e-uiux-source-ledger-status-contract-retest
-    - srde2e-visual-a11y-blockers-retest
     agent: software-architect
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
