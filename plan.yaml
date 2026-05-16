@@ -85671,7 +85671,7 @@ phases:
       - [x] Verify 9/9 real-server tests pass, or explicitly report the current test
       count if the suite legitimately changed with rationale.
 
-      - [ ] Verify Source Ledger OPML import + `[RUN INGEST]` renders `Live Audit
+      - [x] Verify Source Ledger OPML import + `[RUN INGEST]` renders `Live Audit
       Source`, controls, and `last_fetch: HH:MM:SS`.
 
       - [ ] Verify Steer valid URL preview/commit/undo and browser-led MCP parity
