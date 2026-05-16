@@ -97833,7 +97833,7 @@ phases:
     skipped_reason: superseded
   - id: cos-reaudit-current-operation-wiring
     name: Re-audit current-operation frontend wiring after fix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -97965,6 +97965,110 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-16T23:07:45.171722+00:00'
+    done_at: '2026-05-16T23:12:55.556110+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by auditor; JSON operation types require present
+      nullable fields/RFC3339 UTC timestamps, guarded conflicts identify current operation,
+      and frontend boundary forbids dashboards/queues/history/settings/service-layer
+      drift.
+
+      - docs/DESIGN.md — Read by auditor; Source Ledger is the manual ingestion surface,
+      active/conflict states are terse text replacement only, and spinners/progress/dashboard/queue/activity
+      logs are forbidden.
+
+      - web/src/lib/api-contract.ts — Read by auditor; `CurrentOperationInfo.count`
+      is `CurrentOperationCount | null`, where `CurrentOperationCount` is `{ current:
+      number; total: number }`; phase/message/started_at/updated_at are present and
+      nullable.
+
+      - web/src/lib/api-client.ts — Read by auditor; `currentOperation()` uses `GET
+      /api/runtime/operation` and `isCurrentOperationCount` accepts only nonnegative
+      integer object counts.
+
+      - web/src/routes/components/SourceLedger.svelte — Read by auditor; consumes
+      parent-provided `currentOperationStatusText`, derives header status from shared
+      text before local fallback, and renders one header status span.
+
+      - web/src/routes/+page.svelte — Read by auditor; populates shared `contextualOperation`
+      from runtime endpoint and conflict detail; `operationDetails()` renders phase/count/message/started_at/updated_at
+      in opened RESOFEED menu and Source Ledger.
+
+
+      ## Wiring Re-Audit Report
+
+      verdict: PASS
+
+      headline: PASS_WITH_DEBT
+
+      blockers: []
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      **Count shape trace:**
+
+      - `api-contract.ts` defines object count shape.
+
+      - `api-client.ts` validates object count and rejects invalid primitive/string
+      shapes.
+
+      - `+page.svelte` applies matching structural guard for conflict detail.
+
+      - Static tests assert valid `{ current: 2, total: 5 }` and invalid shapes.
+
+      - Verdict: B1 CLOSED.
+
+
+      **Field consumption trace:**
+
+      - phase/count/message/started_at/updated_at are guarded and rendered by `operationDetails()`
+      in Source Ledger/open RESOFEED contextual surfaces.
+
+      - Each field has traced producer, guard, rendered surface, and CLOSED verdict
+      in auditor matrix.
+
+      - Verdict: B2 CLOSED.
+
+
+      **Forbidden surface scan:**
+
+      - Scoped static scan found no dashboard/queue/job/activity/settings/service-layer
+      implementation drift in touched runtime surfaces.
+
+      - Render path remains contextual spans/buttons in opened RESOFEED menu and Source
+      Ledger.
+
+
+      **behavioral_proof_register:**
+
+      - Count type/guard path: PASS.
+
+      - Operation detail fields not write-only: PASS.
+
+      - Source Ledger/open RESOFEED consume shared contextual text: PASS.
+
+      - Runtime/browser behavior in this audit: UNPROVEN but NON_BLOCKING because
+      this audit is static and runtime was covered by prior integration retest artifacts.
+
+      - No forbidden durable surfaces: PASS.
+
+
+      **Mainline/merge note:**
+
+      - Verify-only branch had no product/docs changes to merge.
+
+
+      **Gaps/Notes:**
+
+      - Non-blocking: wiring-auditor did not rerun app/tests by scope; runtime coverage
+      is supplied by completed integration retest artifacts.'
   - id: cos-fix-current-operation-browser-conflict-detail
     name: Fix current-operation browser conflict detail blockers
     status: done
