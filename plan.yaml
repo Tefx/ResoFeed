@@ -83812,7 +83812,7 @@ phases:
       \ scans across frontend Svelte/TS surfaces.\n- [x] If any named command is not\
       \ present in the repo harness, provide the exact discovery output proving absence\
       \ and run the nearest current harness command that covers the same user-visible\
-      \ obligation.\n\nRequired rendered artifact evidence:\n- [ ] Steer add state.\n\
+      \ obligation.\n\nRequired rendered artifact evidence:\n- [x] Steer add state.\n\
       - [ ] Steer search state.\n- [ ] Steer doctor state.\n- [ ] Steer rule state.\n\
       - [ ] Steer invalid state.\n- [ ] Steer receipt state.\n- [ ] Steer undo state.\n\
       - [ ] Source Ledger controls and details.\n- [ ] Desktop split scroll.\n- [\
