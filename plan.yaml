@@ -86513,7 +86513,7 @@ phases:
       - [x] Header `last_ingest` / global status contract is PROVEN or a contract-consistent
       resolution is documented with DESIGN.md citation.
 
-      - [ ] Row-level `last_fetch: HH:MM:SS`, live source row visibility, and Source
+      - [x] Row-level `last_fetch: HH:MM:SS`, live source row visibility, and Source
       Ledger controls remain PROVEN.
 
       - [ ] Steer accessible-name uniqueness remains PROVEN.
