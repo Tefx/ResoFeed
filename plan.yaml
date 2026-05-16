@@ -88924,7 +88924,7 @@ phases:
       - [ ] Full E2E residual failures are fixed from the latest current-main inventory,\
       \ not from stale worktree assumptions.\n- [ ] The targeted render/component\
       \ regression command passes exactly as listed.\n- [ ] `npm run test:render`\
-      \ passes.\n- [ ] `npm run test:e2e` passes, or remaining failures have explicit\
+      \ passes.\n- [x] `npm run test:e2e` passes, or remaining failures have explicit\
       \ blocker disposition and residual ownership.\n- [ ] `npm run check` passes.\n\
       - [ ] `npm run build` passes.\n- [ ] No E2E/render assertions were weakened\
       \ without docs-backed deviation notes.\n- [ ] ResoFeed architecture/design/UI\
