@@ -87522,7 +87522,7 @@ phases:
       route preview", aria-live="polite", reserved blank space, no [IDLE] chip, no
       duplicate hint, and correct aria-describedby wiring from the Steer input.
 
-      - [ ] The route preview renders documented chips [ADD SOURCE], [SEARCH], [DOCTOR],
+      - [x] The route preview renders documented chips [ADD SOURCE], [SEARCH], [DOCTOR],
       [STEER RULE], and [INVALID] from exact Steer input copy.
 
       - [ ] Invalid URL feedback remains assertive/described and Escape cancellation
