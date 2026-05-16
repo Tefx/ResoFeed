@@ -90684,7 +90684,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Read each ref and cite the key passage or mark `NOT READ: <reason>`.
+      - [x] Read each ref and cite the key passage or mark `NOT READ: <reason>`.
 
       - [ ] Confirm `srde2e-software-architect-clean-verdict-proof` evidence contains
       `reviewer_agent: software-architect`.
