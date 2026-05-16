@@ -89650,7 +89650,7 @@ phases:
 
       - [x] Rendered/browser-observable evidence covers all nine blocker families.
 
-      - [ ] Evidence includes screenshots, DOM/accessibility snapshots, or equivalent
+      - [x] Evidence includes screenshots, DOM/accessibility snapshots, or equivalent
       visual/spatial artifacts for desktop and mobile-relevant states.
 
       - [ ] Accessible names, focusability, hit targets, visible labels, row stability,
