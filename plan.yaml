@@ -86987,7 +86987,7 @@ phases:
       - [x] B4 Inspector original link, or its documented equivalent activation target,
       meets the 44px minimum hit-target requirement.
 
-      - [ ] Passing surfaces from the failed proof remain non-regressed.'
+      - [x] Passing surfaces from the failed proof remain non-regressed.'
     verification: '- [ ] Focused rendered/browser proof closes B1, B2, B3, and B4.
 
       - [ ] Sibling search evidence covers invisible disclosure targets, obstructed
