@@ -87422,7 +87422,7 @@ phases:
     agent: blind-tester
   - id: srde2e-steer-route-preview-render-contract-fix
     name: Fix Steer route-preview render contract failures
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -87582,6 +87582,8 @@ phases:
     depends_on:
     - srde2e-visual-a11y-blockers-fix
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T07:11:46.305875+00:00'
   - id: srde2e-steer-route-preview-render-contract-retest
     name: Retest Steer route-preview render contract closure
     status: pending
