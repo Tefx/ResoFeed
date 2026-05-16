@@ -87232,7 +87232,7 @@ phases:
       checklist items.'
   - id: srde2e-visual-a11y-blockers-retest
     name: Retest visual accessibility blocker closure
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -87420,6 +87420,8 @@ phases:
     - srde2e-visual-a11y-blockers-fix
     - srde2e-steer-route-preview-render-contract-retest
     agent: blind-tester
+    claimed_by: blind-tester
+    claimed_at: '2026-05-16T07:34:13.026239+00:00'
   - id: srde2e-steer-route-preview-render-contract-fix
     name: Fix Steer route-preview render contract failures
     status: done
