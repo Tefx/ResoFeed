@@ -89674,7 +89674,7 @@ phases:
       - [x] docs/UI_REGRESSION_CONTRACT.md is cited for regression selectors, accessibility
       expectations, hit targets, and fixture/test contract rules.
 
-      - [ ] docs/ARCHITECTURE.md is cited for OPML import, ingest lifecycle, SQLite/shared-state,
+      - [x] docs/ARCHITECTURE.md is cited for OPML import, ingest lifecycle, SQLite/shared-state,
       and single-deployable runtime constraints.
 
       - [ ] Each residual failure is classified as implementation bug, stale test,
