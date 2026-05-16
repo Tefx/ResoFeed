@@ -94342,7 +94342,7 @@ phases:
 
       - [ ] Backend grouping contract is documented with file:line citations.
 
-      - [ ] Schema-change decision is explicit: expected answer is no schema change
+      - [x] Schema-change decision is explicit: expected answer is no schema change
       unless audit proves otherwise.
 
       - [ ] Any discovered backend divergence is recorded as blocking-now and assigned
