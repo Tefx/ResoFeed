@@ -81421,7 +81421,7 @@ phases:
       - No product code/docs/tests were changed by this verify-only retest.'
 - id: steer-delta-frontend-ui-source-ledger-split-scroll
   name: Steer Delta Frontend UI Source Ledger Split Scroll
-  status: in_progress
+  status: done
   gate: Gate blocks unless rendered UI satisfies DESIGN.md/UI_REGRESSION_CONTRACT.md
     for Steer route preview, Source Ledger controls/details, split-scroll/mobile route,
     and no forbidden UI concepts.
@@ -82557,7 +82557,7 @@ phases:
       explicit remediation ownership before gate.'
   - id: srdf-frontend-gate
     name: Gate frontend Steer delta UI implementation
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the frontend
       UI phase can open for final real-system E2E.
 
@@ -82649,6 +82649,77 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T01:48:25.555639+00:00'
+    done_at: '2026-05-16T01:54:52.415531+00:00'
+    evidence: "## Gate Review Report\nReviewer: gate-reviewer\nPhase: steer-delta-frontend-ui-source-ledger-split-scroll\n\
+      Timestamp: 2026-05-16T01:52:28Z\n\n### refs Read Confirmation\n- docs/DESIGN.md\
+      \ — READ by gate-reviewer. Key insight: Source Ledger is flat, bracket-action/manual\
+      \ ingest controls are allowed only as immediate low-chrome operations; Steer\
+      \ must not become chat/rule-builder; desktop Feed/Inspector must independently\
+      \ scroll; processing language/reprocess must not become settings/dashboard UX.\n\
+      - docs/UI_REGRESSION_CONTRACT.md — READ by gate-reviewer. Key insight: browser\
+      \ proofs must verify real topmost hit targets, keyboard/a11y semantics, negative\
+      \ UX absence, Source Ledger controls, OPML import, split-scroll, and forbidden\
+      \ dashboard/RAG/chat/folder/tag concepts.\n- docs/ARCHITECTURE.md — READ by\
+      \ gate-reviewer. Key insight: one Go deployable/SQLite/FTS lexical retrieval,\
+      \ thin HTTP/MCP product parity, no vector/RAG/semantic answer engine, language/reprocess\
+      \ are runtime controls, and frontend must keep Source Ledger flat plus desktop\
+      \ split-scroll/mobile Inspector route.\n\n### Batched Closure Gate Inputs\n\
+      - superseded_failed_closure: `srdf-batched-frontend-audit-closure` was FAIL\
+      \ with B-HT-01, B-ART-01, B-TODAY-01, B-FR09-01, B4_R9, and expected-red proof\
+      \ gaps; superseded by latest current proof for the same blockers.\n- latest_retest_verdict:\
+      \ PASS\n- gate_open_allowed: true\n- remaining_blockers: []\n- still_blocked_statuses:\
+      \ []\n\n### Wiring Audit\nW1_route_entry: PASS - Source Ledger/TODAY/Steer/mobile\
+      \ Inspector route coverage exercised by `npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/processing-language-source-split-scroll.spec.ts` exit 0, 5 passed.\n\
+      W2_component_mount: PASS - `npm run test` exit 0; svelte-check 0 errors/0 warnings;\
+      \ Vitest 11 files, 62 tests passed.\nW3_state_event_flow: PASS - Source Ledger\
+      \ `[RUN INGEST]`, `[FETCH]`, OPML, delete/details, Steer preview/undo, and processing\
+      \ language flows passed in focused E2E shards: 12 + 10 + 5 tests passed.\nW4_accessibility_contract:\
+      \ PASS - Hit-target/topmost, 44px bracket actions, ARIA/live regions, route\
+      \ chips, source details semantics, and keyboard reachability covered by passing\
+      \ Source Ledger and Steer E2E shards.\nW5_rendered_artifact_coverage: PASS -\
+      \ Current artifact register includes `.audit-artifacts/frontend-gate/current-populated-desktop-full.png`,\
+      \ `current-mobile-feed.png`, `current-mobile-inspector.png`, `current-mobile-source-ledger.png`,\
+      \ and `render-proof.json` with split/mobile/star assertions.\nW6_forbidden_concept_guard:\
+      \ PASS - Negative UX shard passed 10 tests; scoped `rg '@invar:allow|invar:allow'\
+      \ ...` exit 1/no matches; forbidden product concepts are asserted by passing\
+      \ `design-artifact-negative-ux`, `source-ledger-hit-target-negative-split-scroll`,\
+      \ and contract tests.\nW7_test_harness_alignment: PASS - Required focused E2E\
+      \ files exist and ran under project Playwright config; production Vite build\
+      \ executed before each E2E shard.\nW8_downstream_gate_readiness: PASS - Latest\
+      \ retest says PASS/open/no blockers; local sanity rerun passed unit/render and\
+      \ 27 focused E2E tests covering Source Ledger, TODAY, OPML import, dirty corpus,\
+      \ Steer, split-scroll, mobile metadata, and processing-language surfaces.\n\n\
+      ### Escape Hatch Audit\nPASS: no scoped `@invar:allow` / `invar:allow` annotations\
+      \ found in `cmd`, `internal`, `web/src`, `web/tests`, or required docs (`rg_exit=1`).\
+      \ Broad audit/plan text matches were not used as implementation evidence.\n\n\
+      ### Smoke/Liveness Evidence\n- `npm ci` in `web/` — exit 0; dependencies installed\
+      \ from lockfile because `node_modules` was missing.\n- `npm run test` in `web/`\
+      \ — exit 0; svelte-check 0 errors/0 warnings; Vitest 11 files / 62 tests passed.\n\
+      - `npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/hit-target-clickability.spec.ts` — exit 0; Vite build succeeded;\
+      \ 12 passed.\n- `npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts\
+      \ tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`\
+      \ — exit 0; Vite build succeeded; 10 passed.\n- `npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/processing-language-source-split-scroll.spec.ts` — exit 0; Vite\
+      \ build succeeded; 5 passed.\n\n### Machine-Readable Gate Decision\n```yaml\n\
+      headline: \"PASS\"\nverdict: \"PASS\"\ngate_decision: \"OPEN\"\ngate_open_allowed:\
+      \ true\norchestrator_action_hint: \"COMPLETE\"\nproof_gap_status: \"NONE\"\n\
+      blocking_status: \"CLOSED\"\nblockers: []\nremaining_blockers: []\nbehavioral_proof_register:\n\
+      \  - requirement_ref: \"frontend phase gate\"\n    behavior_claim: \"frontend\
+      \ phase is ready for final real-system E2E\"\n    runtime_proof_expected: \"\
+      unit/render tests, focused E2E shards, rendered artifacts, forbidden scan, wiring\
+      \ audit\"\n    evidence_ref: \"npm run test exit 0; focused E2E shards 12+10+5\
+      \ passed; render-proof.json and current frontend-gate screenshots present; scoped\
+      \ invar scan no matches\"\n    status: \"PROVEN\"\n    closure_path: \"OPEN\
+      \ advances to next phase; BLOCKED requires remediation\"\n```\n\nCommit hash(es):\
+      \ none (verify-only)\nFiles changed: none\nVerification: `npm run test` passed;\
+      \ three focused E2E shards passed 27/27 total; scoped escape-hatch scan found\
+      \ no source annotations; generated artifacts cleaned and worktree clean.\nGaps/Notes:\
+      \ None blocking. Older failed closure artifacts are superseded by latest PASS/open\
+      \ retest and current rendered/runtime proof; stale-vs-real reconciliation is\
+      \ present in semantic closure/register artifacts."
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
     status: done
@@ -84580,7 +84651,7 @@ phases:
       \ artifact cleanup."
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
-  status: locked
+  status: pending
   gate: Final closure blocks unless real-system E2E, visual/a11y regression, documentation
     sync, software-architect fresh review, remediation, clean re-review, and full-plan
     check are complete with no blocker-class proof gaps.
