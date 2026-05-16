@@ -94973,7 +94973,7 @@ phases:
 
       - [x] Expected-red tests are limited to backend test files and minimal fixtures/helpers.
 
-      - [ ] Idle, running, no-query-param rejection, and conflict `current_operation`
+      - [x] Idle, running, no-query-param rejection, and conflict `current_operation`
       payload assertions are present.
 
       - [ ] Tests explicitly document exposed gaps and identify `cos-backend-operation-snapshot`
