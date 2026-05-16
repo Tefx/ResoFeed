@@ -91521,7 +91521,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Closure matrix covers all known audit findings F1/F2/P1/P2/P3 and requested
+      - [x] Closure matrix covers all known audit findings F1/F2/P1/P2/P3 and requested
       zh surfaces.
 
       - [x] Expected-red tests are appropriately red before implementation or cite
