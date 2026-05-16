@@ -94241,7 +94241,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] A failing-before-fix test exposes the fragment-collapse bug without modifying
+      - [x] A failing-before-fix test exposes the fragment-collapse bug without modifying
       product code.
 
       - [ ] The test fixture cites the synthetic URL behavior from `internal/resofeed/ingest.go`
