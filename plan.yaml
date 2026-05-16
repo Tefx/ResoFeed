@@ -95993,7 +95993,7 @@ phases:
     agent: wiring-auditor
   - id: cos-runtime-e2e-retest
     name: Run HTTP MCP frontend operation-status e2e retest
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT TESTER (integration-verifier), validate the complete
       path from guarded-operation snapshot to HTTP, MCP, and rendered UI.
 
@@ -96099,6 +96099,8 @@ phases:
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T21:53:26.387371+00:00'
   - id: cos-uiux-multimodal-audit
     name: Run UIUX audit for operation status and utility placement
     status: pending
