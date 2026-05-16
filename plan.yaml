@@ -91621,6 +91621,97 @@ phases:
 
       - Confirmation: source identifiers unchanged and guarded with translate="no".'
     agent: frontend-engineer
+  - id: azri-preview-contract-sync
+    name: Sync docs/ui-preview.html with repaired UI, reprocess, and zh surfaces
+    status: pending
+    description: 'step_type: documentation
+
+      agent_source: project
+
+
+      Update `docs/ui-preview.html` after live UI repair so the active preview artifact
+      matches current DESIGN.md and implementation surfaces.
+
+
+      Touch paths:
+
+      - docs/ui-preview.html only unless the contract matrix identifies a directly
+      related preview fixture.
+
+
+      Required preview updates:
+
+      - Remove stale persistent top-level route labels from the preview header/chrome
+      unless they are inside the opened RESOFEED menu depiction or active surface
+      content.
+
+      - Add current processing language and reprocess surface examples: `LANG: EN`,
+      `LANG: ZH` or localized equivalents, `[REPROCESS LIBRARY]` / `[重处理资料库]`, terse
+      warning copy, and no settings/dashboard/queue depiction.
+
+      - Replace stale `partial` badges with `source excerpt` / `excerpt` where DESIGN
+      and current UI prefer those labels.
+
+      - Show Source Ledger header with `last_ingest` and `[RUN INGEST]` right-aligned
+      in `.source-ledger__header`.
+
+      - Show Inspector source-text status plus summary provenance line; do not show
+      `model: ok` as visible header chrome.
+
+      - Include at least one zh-state preview snippet demonstrating localized chrome
+      while URLs/source identifiers remain unchanged.
+
+
+      ## Completion Criteria
+
+      - [ ] `docs/ui-preview.html` reflects current live UI surfaces for language,
+      reprocess, Source Ledger header alignment, and Inspector provenance.
+
+      - [ ] Preview no longer contains stale `partial` labels where `source excerpt`/`excerpt`
+      is required.
+
+      - [ ] Preview no longer contains forbidden product concepts or persistent route
+      chrome outside approved contexts.
+
+      - [ ] Preview remains a static artifact only; no runtime dependency or new design-version
+      directory is introduced.'
+    verification: '- [ ] Static preview diff shows updated LANG/reprocess/zh surfaces.
+
+      - [ ] Static preview diff shows Source Ledger alignment and Inspector provenance
+      copy matching DESIGN.md.
+
+      - [ ] No new `design-version/` dependency is introduced.
+
+      - [ ] No forbidden product concepts are added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Preview Sync Evidence
+
+      - Files changed.
+
+      - Before/after notes for route chrome, LANG/reprocess, zh example, Source Ledger
+      alignment, Inspector provenance, and excerpt labels.
+
+      - Confirmation: active preview artifact is docs/ui-preview.html; no design-version
+      directory required.'
+    depends_on:
+    - azri-frontend-low-chrome-copy-zh-repair
+    agent: doc-reviewer
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
   status: locked
