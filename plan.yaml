@@ -82579,7 +82579,7 @@ phases:
       - [x] Scoped Steer, Source Ledger, split-scroll/mobile, and processing-language
       UI work remains intact.
 
-      - [ ] Forbidden UI concepts remain absent.'
+      - [x] Forbidden UI concepts remain absent.'
     verification: '- [ ] `npm run test` passes, including all six `src/routes/components/__tests__/rendering-expected-red.test.ts`
       failures listed in this step.
 
