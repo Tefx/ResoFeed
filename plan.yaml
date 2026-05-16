@@ -96367,7 +96367,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Orphan exports/symbols report is produced.
+      - [x] Orphan exports/symbols report is produced.
 
       - [ ] HTTP and MCP registration evidence is produced.
 
