@@ -84141,7 +84141,7 @@ phases:
       - [x] Classify B-HT-01 and B-ART-01 with one shared `source_contract_conflict`
       disposition and apply one consistent source-backed fix.
 
-      - [ ] Fix or source-update the TODAY selector mismatch without weakening rendered
+      - [x] Fix or source-update the TODAY selector mismatch without weakening rendered
       artifact coverage.
 
       - [ ] Fix or source-update mobile metadata truncation expectations so required
