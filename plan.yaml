@@ -94976,7 +94976,7 @@ phases:
       - [x] Idle, running, no-query-param rejection, and conflict `current_operation`
       payload assertions are present.
 
-      - [ ] Tests explicitly document exposed gaps and identify `cos-backend-operation-snapshot`
+      - [x] Tests explicitly document exposed gaps and identify `cos-backend-operation-snapshot`
       as downstream implementation owner.
 
       - [ ] No product implementation code is changed in this step.'
