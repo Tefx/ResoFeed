@@ -87286,7 +87286,7 @@ phases:
 
       - [x] B1 DETAILS real visible/topmost activation is PROVEN.
 
-      - [ ] B2 IMPORT STATE visible accessible activation and non-obstruction are
+      - [x] B2 IMPORT STATE visible accessible activation and non-obstruction are
       PROVEN.
 
       - [ ] B3 desktop Feed/Inspector independent focusable labeled scroll regions
