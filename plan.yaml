@@ -89665,7 +89665,7 @@ phases:
 
       ## Completion Checklist
 
-      - [x] Current-main E2E failures after 107d1349 are run or inspected and exact
+      - [ ] Current-main E2E failures after 107d1349 are run or inspected and exact
       failure names are recorded.
 
       - [x] docs/DESIGN.md is cited for focus order, visible chrome/nav text, and
