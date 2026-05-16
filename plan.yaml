@@ -84147,7 +84147,7 @@ phases:
       - [x] Fix or source-update mobile metadata truncation expectations so required
       text is neither clipped nor over-truncated.
 
-      - [ ] Preserve the passing `[IMPORT OPML]` keyboard/file reachability behavior
+      - [x] Preserve the passing `[IMPORT OPML]` keyboard/file reachability behavior
       while making the broader Source Ledger controls/hit-target command green.
 
       - [ ] Run the exact verification commands listed for this step and record actual
