@@ -86211,7 +86211,7 @@ phases:
       - [x] `[RUN INGEST]`, `[IMPORT OPML]`, `[FETCH]`, `[DELETE]`, and `[DETAILS]`
       controls remain visible, reachable, and visually contract-consistent.
 
-      - [ ] Steer preview/commit/undo accessible-name uniqueness remains intact.
+      - [x] Steer preview/commit/undo accessible-name uniqueness remains intact.
 
       - [x] No forbidden ResoFeed architecture or UI concepts are introduced.
 
