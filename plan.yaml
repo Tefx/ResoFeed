@@ -91844,7 +91844,7 @@ phases:
       - [x] Browser evidence in zh mode shows localized LANG/reprocess/status/receipt/steer/Inspector
       chrome and unchanged source identifiers with non-translation guards.
 
-      - [ ] Screenshot or DOM evidence shows Source Ledger header alignment and Inspector
+      - [x] Screenshot or DOM evidence shows Source Ledger header alignment and Inspector
       provenance copy.'
     verification: '- [ ] Targeted browser/DOM tests for route chrome, Source Ledger
       alignment, OPML no-auto-ingest, terse copy, Inspector provenance, and zh UI
