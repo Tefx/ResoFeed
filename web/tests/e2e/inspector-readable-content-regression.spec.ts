@@ -36,15 +36,18 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 }
 
-async function importRegressionFixture(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
+async function importRegressionFixture(page: Page, ownerToken: string, opmlPath: string, feedUrl: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
   await runSteerCommand(page, 'source ledger', 'source ledger');
   await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
-  await triggerFixtureIngest(page);
-  await expect(page.getByText(/src: Inspector Readable Regression Source · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  const importedRow = page.locator('.source-ledger__row', { hasText: feedUrl }).first();
+  await expect(importedRow).toBeVisible();
+  const fetchButton = importedRow.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ });
+  await expect(fetchButton).toBeVisible();
+  await fetchButton.click();
+  await expect(importedRow.locator('.source-ledger__status', { hasText: /last_fetch: \d{2}:\d{2}:\d{2}/ })).toBeVisible({ timeout: 20_000 });
   await runSteerCommand(page, 'today', 'today');
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
 }
@@ -96,7 +99,7 @@ test('Inspector primary body hides screenshot-family raw source, navigation, and
   });
 
   try {
-    await importRegressionFixture(page, ownerToken, opmlPath);
+    await importRegressionFixture(page, ownerToken, opmlPath, fixtureServer.feedUrl);
     const feedItem = page.getByRole('button', { name: `Open Inspector for: ${POLLUTED_TITLE}` });
     await expect(feedItem).toBeVisible();
     await feedItem.click();

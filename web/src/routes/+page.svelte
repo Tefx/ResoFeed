@@ -434,6 +434,12 @@
     return undefined;
   }
 
+  function undoTargetForHandle(handle: { target?: { kind?: string; id?: string } | null } | null | undefined): SteerUndoTarget | undefined {
+    const target = handle?.target;
+    if ((target?.kind === 'steer_rule' || target?.kind === 'source') && target.id) return { targetKind: target.kind, targetId: target.id };
+    return undefined;
+  }
+
   function formatSteerError(error: unknown): string {
     if (error instanceof ResoFeedApiError && error.body.error.code === 'internal') {
       return error.message;
@@ -503,7 +509,7 @@
 
       const response = await apiClient().steer(command);
       steerCommand = '';
-      const undo = undoTargetForReceipt(response.receipt);
+      const undo = undoTargetForHandle(response.undo_handle) ?? undoTargetForReceipt(response.receipt);
       await refreshShellLists();
       steerFeedback = {
         kind: 'receipt',
@@ -715,7 +721,7 @@
       </form>
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { surfaceMenuOpen = event.currentTarget.open; }}>
-          <summary class="contract-label surface-nav-label" tabindex="-1" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
+          <summary class="contract-label surface-nav-label" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
           <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
             <button
               type="button"
@@ -734,9 +740,8 @@
           </div>
         </details>
         <span class="surface-nav-quick-group" aria-hidden={surfaceMenuOpen ? 'true' : undefined}>
-          <!-- [DEVIATION]: Legacy E2E contracts still query direct TODAY/SOURCE LEDGER buttons; use abbreviated visible glyphs with explicit accessible names so primary copy remains low-chrome. -->
-          <button type="button" class="surface-nav-quick" aria-label="TODAY" tabindex={surfaceMenuOpen ? -1 : 0} aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} onclick={() => showSurface('feed')}>T</button>
-          <button type="button" class="surface-nav-quick" aria-label="SOURCE LEDGER" tabindex={surfaceMenuOpen ? -1 : 0} aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} onclick={() => showSurface('ledger')}>SL</button>
+          <button type="button" class="surface-nav-quick" aria-label="TODAY" tabindex="-1" aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} onclick={() => showSurface('feed')}>T</button>
+          <button type="button" class="surface-nav-quick" aria-label="SOURCE LEDGER" tabindex="-1" aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} onclick={() => showSurface('ledger')}>SL</button>
         </span>
         <span class="surface-nav-context">SOURCE LEDGER / DOCTOR / INSPECTOR</span>
       </nav>

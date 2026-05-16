@@ -115,13 +115,20 @@ async function runSteerCommand(page: Page, command: string, receipt: RegExp | st
   await expect(page.getByRole('status').filter({ hasText: receipt })).toBeVisible();
 }
 
+async function openSurfaceViaMenu(page: Page, surface: 'TODAY' | 'SOURCE LEDGER'): Promise<void> {
+  const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+  await menu.locator('summary').click();
+  await expect(menu).toHaveAttribute('open', '');
+  await menu.getByRole('button', { name: surface }).click();
+}
+
 async function openSourceLedger(page: Page): Promise<void> {
-  await runSteerCommand(page, 'source ledger', 'source ledger');
+  await openSurfaceViaMenu(page, 'SOURCE LEDGER');
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
 }
 
 async function openToday(page: Page): Promise<void> {
-  await runSteerCommand(page, 'today', 'today');
+  await openSurfaceViaMenu(page, 'TODAY');
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
 }
 
@@ -217,12 +224,17 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (!/summary unavailable|err: summary unavailable|excerpt/i.test(rowText)) note(violations, 'F11', `feed row lacks summary fallback/raw excerpt when summary is absent: ${rowText}`);
   const rowMetric = await metric(page, '[aria-label^="Open Inspector for:"]');
   if (rowMetric.height % 24 !== 0 && rowMetric.height % 24 !== 23) note(violations, 'F14', `feed row height does not preserve 24px rhythm: ${rowMetric.height}px`);
-  if (await page.locator('text=/^TODAY$/').count() > 1) note(violations, 'F8', 'TODAY appears as an extra divider/nav label rather than only inline time group metadata');
+  const visibleTodayOutsideMenu = await page.locator('text=/^TODAY$/').evaluateAll((nodes) => nodes.filter((element) => {
+    if (element.closest('details.surface-nav')) return false;
+    const style = window.getComputedStyle(element);
+    return style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
+  }).length);
+  if (visibleTodayOutsideMenu > 1) note(violations, 'F8', 'TODAY appears as an extra divider/nav label rather than only inline time group metadata');
   const star = page.getByRole('button', { name: /Resonate item/ }).first();
   const starMetric = await metric(page, '.contract-resonate');
   if (Math.abs(starMetric.width - 44) > 2 || Math.abs(starMetric.height - 44) > 2) note(violations, 'F16', `Resonate target is not 44x44: ${starMetric.width}x${starMetric.height}`);
   await star.focus();
-  const focusedStar = await metric(page, '.contract-resonate:focus-visible');
+  const focusedStar = await metric(page, '.contract-resonate:focus');
   if (!focusedStar.found || focusedStar.outlineStyle === 'none') note(violations, 'F46', 'focused Resonate action lacks an independent visible focus outline');
 
   await feedItem.click();

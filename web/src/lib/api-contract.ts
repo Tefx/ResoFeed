@@ -315,8 +315,15 @@ export interface SteerReceipt {
   undo_target_id?: OpaqueId | null;
 }
 
+export interface SteerUndoHandle {
+  route_kind: SteerPreviewRouteKind;
+  target: { kind: 'steer_rule' | 'source'; id: OpaqueId } | null;
+  revision?: number | null;
+}
+
 export interface SteerResponse {
   receipt: SteerReceipt;
+  undo_handle?: SteerUndoHandle | null;
 }
 
 export type SteerPreviewRouteKind = 'policy' | 'source' | 'search' | 'doctor' | 'invariant_conflict' | 'unknown';

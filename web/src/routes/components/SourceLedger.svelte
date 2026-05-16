@@ -73,7 +73,7 @@
   }
 
   function sourceA11yLabel(label: string): string {
-    return /inspector/i.test(label) ? 'source title' : label;
+    return label;
   }
 
   function opmlTitleMap(opml: string): Record<string, string> {

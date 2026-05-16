@@ -22,13 +22,15 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 }
 
-async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
+async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: string, feedUrl: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
   await runSteerCommand(page, 'source ledger', 'source ledger');
   await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Fetch source Dirty Inspector Corpus|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  const importedRow = page.locator('.source-ledger__row', { hasText: feedUrl }).first();
+  await expect(importedRow).toBeVisible();
+  await expect(importedRow.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]|Fetch source Dirty Inspector Corpus/ })).toBeVisible();
   await triggerFixtureIngest(page);
   await expect(page.getByText('src: Dirty Inspector Corpus')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText(/last_fetch:/).first()).toBeVisible({ timeout: 20_000 });
@@ -118,7 +120,7 @@ test('dirty corpus inspector primary hierarchy hides raw feed payloads and prove
   await testInfo.attach('dirty-corpus-fixture-inventory.txt', { body: dirtyCorpusInventory(), contentType: 'text/plain' });
 
   try {
-    await importDirtyCorpus(page, ownerToken, opmlPath);
+    await importDirtyCorpus(page, ownerToken, opmlPath, dirtyServer.feedUrl);
     await testInfo.attach('dirty-corpus-today.png', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
     const violations: string[] = [];
     for (const item of dirtyCorpusItems) {

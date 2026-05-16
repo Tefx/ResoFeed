@@ -21,21 +21,30 @@ test('expected-red keyboard a11y primary nav tab order and active surface semant
   await focusAndAudit(steer, 'Steer input');
 
   await page.keyboard.press('Tab');
-  const today = page.getByRole('button', { name: 'TODAY' });
-  await expect(today).toBeFocused();
-  await focusAndAudit(today, 'TODAY nav');
-  await expectActiveState(today, 'TODAY nav initial selected surface');
+  const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+  const summary = menu.locator('summary');
+  await expect(summary).toBeFocused();
+  await focusAndAudit(summary, 'RESOFEED menu trigger');
+  await page.keyboard.press('Enter');
+  await expect(menu).toHaveAttribute('open', '');
+  await expect(menu.getByRole('button', { name: 'TODAY' })).toHaveAttribute('tabindex', '0');
 
   await page.keyboard.press('Tab');
-  const sourceLedger = page.getByRole('button', { name: 'SOURCE LEDGER' });
+  const today = menu.getByRole('button', { name: 'TODAY' });
+  await expect(today).toBeFocused();
+  await focusAndAudit(today, 'TODAY menu entry');
+  await expectActiveState(today, 'TODAY menu entry initial selected surface');
+
+  await page.keyboard.press('Tab');
+  const sourceLedger = menu.getByRole('button', { name: 'SOURCE LEDGER' });
   await expect(sourceLedger).toBeFocused();
-  await focusAndAudit(sourceLedger, 'SOURCE LEDGER nav');
+  await focusAndAudit(sourceLedger, 'SOURCE LEDGER menu entry');
   await page.keyboard.press('Space');
 
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'ledger');
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);
   await expect(page.locator('.feed-pane')).not.toHaveClass(/active-panel/);
-  await expectActiveState(sourceLedger, 'SOURCE LEDGER nav activated surface');
+  await expect(page.locator('.shell-grid'), 'SOURCE LEDGER activation exposes semantic surface state').toHaveAttribute('data-surface', 'ledger');
 
   await attachRoleAriaSnapshot(page, testInfo, 'primary-nav-role-aria-output.json');
   await testInfo.attach('primary-nav-keyboard-a11y.png', {

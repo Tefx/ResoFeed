@@ -179,12 +179,18 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
   const feedOpen = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   const row = page.locator('.contract-feed-item', { hasText: 'Local fixture item one' }).first();
   await expect(row).toBeVisible();
+  await feedOpen.scrollIntoViewIfNeeded();
   const rowBoxBefore = await row.boundingBox();
+  const feedScrollBefore = await page.locator('#today-feed').evaluate((element) => element.scrollTop);
   await pointerClick(page, feedOpen, 'Feed row Inspect/open');
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'inspector');
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
   await expect(row).toHaveAttribute('aria-current', 'true');
-  expect(await row.boundingBox(), 'selected Inspect/open must not shift row bounds').toEqual(rowBoxBefore);
+  const rowBoxAfter = await row.boundingBox();
+  expect(rowBoxAfter && rowBoxBefore ? { x: rowBoxAfter.x, width: rowBoxAfter.width, height: rowBoxAfter.height } : rowBoxAfter, 'selected Inspect/open must preserve dimensions and x-position').toEqual(
+    rowBoxBefore ? { x: rowBoxBefore.x, width: rowBoxBefore.width, height: rowBoxBefore.height } : rowBoxBefore
+  );
+  await expect(page.locator('#today-feed'), 'selected Inspect/open must preserve feed scroll container position').toHaveJSProperty('scrollTop', feedScrollBefore);
 
   await openSurfaceViaMenu(page, 'TODAY', 'TODAY nav after Inspect');
   const star = row.locator('.contract-resonate');

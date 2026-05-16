@@ -134,7 +134,7 @@ test.describe('source-ledger-navigation-regression expected-red contract', () =>
     await expect(page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary')).toHaveText('RESOFEED');
     await chrome.locator('summary').click();
     await expect(chrome.getByRole('button', { name: 'TODAY' })).toBeVisible();
-    await expect(page.getByLabel('INSPECTOR')).toBeAttached();
+    await expect(page.locator('aside[aria-label="INSPECTOR independent scroll"]')).toBeAttached();
   });
 
   for (const pathName of ['/source-ledger', '/source', '/sources'] as const) {

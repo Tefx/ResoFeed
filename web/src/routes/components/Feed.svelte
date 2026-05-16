@@ -56,7 +56,7 @@
   <h2 id="feed-heading" class="visually-hidden" tabindex="-1">Today feed items</h2>
   <div role="list" aria-label="Today feed items">
     {#each groupedItems as item, index (item.id)}
-      <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
+      <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>
         <button
           class="contract-feed-open"
           type="button"

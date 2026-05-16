@@ -56,14 +56,14 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
 
 async function importFixtureAndOpenInspector(page: Page, ownerToken: string, opmlPath: string): Promise<Locator> {
   await enterOwnerToken(page, ownerToken);
-  await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+  await openSurfaceViaMenu(page, 'SOURCE LEDGER');
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await expect(page.getByText(/PRD Inspector Fixture Source/)).toBeVisible({ timeout: 20_000 });
-  await page.getByRole('button', { name: 'TODAY' }).click();
+  await openSurfaceViaMenu(page, 'TODAY');
   await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
 
   const feedItem = page.getByRole('button', { name: `Open Inspector for: ${fixtureTitle}` });
@@ -71,6 +71,13 @@ async function importFixtureAndOpenInspector(page: Page, ownerToken: string, opm
   await feedItem.click();
   await expect(page.getByRole('heading', { name: fixtureTitle })).toBeFocused();
   return page.getByRole('complementary', { name: 'INSPECTOR' });
+}
+
+async function openSurfaceViaMenu(page: Page, surface: 'TODAY' | 'SOURCE LEDGER'): Promise<void> {
+  const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+  await menu.locator('summary').click();
+  await expect(menu).toHaveAttribute('open', '');
+  await menu.getByRole('button', { name: surface }).click();
 }
 
 async function screenshotToArtifact(page: Page, testInfo: TestInfo, runInfo: { readonly artifactRoot: string }, fileName: string): Promise<string> {
@@ -120,7 +127,7 @@ async function layoutSnapshot(page: Page): Promise<LayoutSnapshot> {
       prompt: metric('.steer, [aria-label="Steer or paste RSS URL"], input[placeholder*="Steer"], textarea[placeholder*="Steer"]'),
       panel: metric('.panel, main.contract-shell, .shell-grid'),
       firstRow: metric('.item, .contract-feed-item'),
-      star: metric('.star, button[aria-label="Resonate item"], button[aria-label="Remove resonance"]'),
+      star: metric('.star, .contract-feed-item[aria-current="true"] .contract-resonate, .contract-feed-item[aria-current="true"] button[aria-label="Resonate item"], .contract-feed-item[aria-current="true"] button[aria-label="Remove resonance"]'),
       inspector: metric('.inspector, .contract-inspector, [aria-label="INSPECTOR"]'),
       inspectorHeading: metric('.inspector h2, .contract-inspector h2, [aria-label="INSPECTOR"] h2'),
       viewport: { width: window.innerWidth, height: window.innerHeight }
