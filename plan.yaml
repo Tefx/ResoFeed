@@ -91071,3 +91071,11 @@ phases:
       exists in retest/original/architect artifacts and blind liveness proof. Completion
       checklist items were toggled to `[x]`; verification-field criteria are evidenced
       here.'
+- id: audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
+  name: Audit and Chinese Support Repair — Contract Matrix and Expected-Red Tests
+  status: pending
+  gate: Contract/test phase blocks unless the recent uiux-auditor/software-architect
+    findings and Chinese support surfaces are translated into explicit acceptance
+    criteria and expected-red browser/contract tests before implementation.
+  depends_on:
+  - steer-delta-e2e-architecture-review-closure
