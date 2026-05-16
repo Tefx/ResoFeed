@@ -85549,7 +85549,7 @@ phases:
       - [x] Check for new contract drift in HTTP, MCP, docs, and frontend consumers
       touched by the fix.
 
-      - [ ] Return CLEAN only if both should_fix findings are closed and no new blocker/should_fix
+      - [x] Return CLEAN only if both should_fix findings are closed and no new blocker/should_fix
       contract drift exists.
 
       - [ ] If any finding remains or a new finding appears, list severity, location,
