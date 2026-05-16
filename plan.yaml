@@ -95277,3 +95277,112 @@ phases:
     depends_on:
     - cos-backend-operation-snapshot
     agent: golang-developer
+  - id: cos-frontend-operation-utility-surface
+    name: Complete contextual operation status and low-frequency utility UI
+    status: pending
+    description: 'Complete frontend UI behavior for contextual operation status and
+      low-frequency utility placement.
+
+
+      Scope:
+
+      - Add/adjust frontend API types/client behavior for `GET /api/runtime/operation`
+      and conflict `current_operation` details as needed.
+
+      - Render current-operation status only in Source Ledger and opened `RESOFEED`
+      operations/utility surfaces when running or explaining a blocked operation.
+
+      - Ensure idle current-operation state is hidden from persistent global top chrome.
+
+      - Move/keep `LANG: EN` / `LANG: ZH` and `[REPROCESS LIBRARY]` only inside the
+      opened `RESOFEED` operations/utility menu or equivalent terse utility surface.
+
+      - Reprocess running/conflict status must reuse the shared current-operation
+      pattern; no wizard, progress dashboard, spinner-only UI, task list, or persistent
+      strip.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. `LANG` or `[REPROCESS LIBRARY]` visible as persistent prominent top chrome
+      while the `RESOFEED` menu is closed.
+
+      2. Current-operation status shown as an idle global strip or dashboard.
+
+      3. Conflict copy that says only `err: operation already running` without current-operation
+      context when available.
+
+      4. Friendly SaaS progress UI, spinners as sole status, task history, queue/dashboard
+      metaphors, or settings/preferences panels.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: current-operation and conflict data are normalized consistently.
+
+      2. Rendering completeness: visible DOM output appears only in the allowed contextual
+      surfaces.
+
+      A component that returns data objects instead of rendered elements does NOT
+      satisfy this step. Evidence MUST include rendered output proof.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Completion Criteria
+
+      - [ ] Frontend expected-red tests from `cos-frontend-operation-utility-contract-tests`
+      pass green.
+
+      - [ ] Status placement matches `docs/DESIGN.md` current-operation status rules.
+
+      - [ ] LANG/reprocess placement matches `docs/DESIGN.md` utility menu rules.
+
+      - [ ] No new dashboard, settings panel, wizard, persistent strip, or durable
+      task-history UI is introduced.'
+    verification: '- [ ] local-check protecting UI behavior: targeted component tests
+      for status placement and LANG/reprocess placement pass green.
+
+      - [ ] Evidence includes rendered DOM/snapshot proof for allowed surfaces and
+      absence from persistent top chrome.
+
+      - [ ] Evidence confirms no persistent idle global status strip, dashboard, wizard,
+      or settings/preference panel was added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Implementation Evidence
+
+      - Files changed:
+
+      - Tests run and output:
+
+      - Rendered allowed surfaces proof:
+
+      - Persistent top-chrome absence proof:
+
+      - Current-operation conflict rendering proof:
+
+      - Forbidden UI confirmation: no dashboard/wizard/settings/task-history/persistent
+      strip'
+    depends_on:
+    - cos-frontend-operation-utility-contract-tests
+    - cos-backend-operation-contract-tests
+    agent: frontend-engineer
