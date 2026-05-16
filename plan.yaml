@@ -91199,6 +91199,137 @@ phases:
 
       - Product-boundary non-goals confirmed.'
     agent: spec-verifier
+  - id: azrct-expected-red-browser-and-contract-tests
+    name: Add expected-red browser and contract tests for audit and zh gaps
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+      agent_source: project
+
+
+      Define expected-red tests that expose the current repair gaps before implementation.
+      Modified files must be limited to tests, fixtures, or contract-test helpers.
+
+
+      Anchors:
+
+      - spec_refs: docs/DESIGN.md App Shell, Language Control, Reprocess Library Action,
+      Inspector Pane, Source Ledger; docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md; docs/ARCHITECTURE.md
+      processing-language/state/reprocess sections.
+
+      - touch_paths: web/tests/e2e/*audit-zh-repair*.spec.ts, web/src/test/*contract*
+      if needed, internal/resofeed/*processing_language*_test.go if backend regression
+      coverage is missing.
+
+      - harness_refs: existing Playwright E2E harness; existing Go processing-language
+      and reprocess tests.
+
+      - authoritative_interface: existing public HTTP/MCP paths and existing Svelte
+      app shell DOM.
+
+
+      Tests MUST expose:
+
+      - route chrome: closed menu has no persistent `TODAY`, `SOURCE LEDGER`, `T`,
+      or `SL` route buttons/labels outside approved menu/surface contexts.
+
+      - Source Ledger header: `last_ingest` and `[RUN INGEST]` share a right-aligned
+      header action block.
+
+      - OPML import: importing OPML updates sources/receipt only and does not call
+      `/api/ingest` or refresh items through `runIngest()`.
+
+      - copy: steer/search preview and receipts do not render `semantic retrieval`,
+      `no semantic retrieval`, `RAG`, or explanatory architecture boundary copy.
+
+      - Inspector: header no longer exposes `model: ok`; summary provenance remains
+      visible as the approved trust line.
+
+      - zh UI: after setting language to zh, `html lang` is `zh-CN`, LANG/reprocess
+      labels/status/receipts/steer preview/Inspector chrome are localized where contract
+      requires, while URLs/source identifiers remain `translate="no"` and unchanged.
+
+      - backend parity regression if missing: HTTP/MCP processing-language, reprocess
+      result language/counts, OpenRouter target_language=zh, and state export/import
+      exclusion of processing_language.
+
+      - preview drift: docs/ui-preview.html contains current LANG/reprocess surface
+      examples and no stale `partial` labels where `source excerpt`/`excerpt` is required.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one test fixture MUST:
+
+      - Use the EXACT documented format from the authoritative spec.
+
+      - NOT include convenience fields beyond what the spec documents.
+
+      - Cite the spec section the fixture was derived from.
+
+
+      ## Completion Criteria
+
+      - [ ] Expected-red browser tests fail against the current known UI/UX defects
+      before implementation.
+
+      - [ ] Test-only scope is maintained; product code is not changed.
+
+      - [ ] Tests cover all listed audit findings and every required Chinese support
+      surface or explicitly cite existing tests that already cover a surface.
+
+      - [ ] Evidence lists `expected_failures` and names the downstream implementation
+      step `azri-frontend-low-chrome-copy-zh-repair`.'
+    verification: '- [ ] Expected-red tests expose persistent chrome, alignment, OPML
+      auto-ingest, copy, Inspector provenance, preview drift, and zh parity gaps.
+
+      - [ ] Expected-red evidence distinguishes newly failing gaps from existing green
+      backend coverage.
+
+      - [ ] No production code or docs are changed except allowed test fixtures/contracts.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/processing_language_ingest_test.go — key passage or "NOT
+      READ: <reason>"
+
+      - internal/resofeed/runtime_metadata_receipts_test.go — key passage or "NOT
+      READ: <reason>"
+
+      - internal/resofeed/reprocess_test.go — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Expected-Red Test Evidence
+
+      - Test files changed.
+
+      - Commands run and actual failing output.
+
+      - expected_failures table mapped to closure matrix rows.
+
+      - Confirmation that changes are test-only.'
+    depends_on:
+    - azrct-closure-matrix
+    agent: frontend-engineer
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
   status: locked
