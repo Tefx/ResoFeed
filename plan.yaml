@@ -97141,7 +97141,7 @@ phases:
 
       ## Acceptance Checklist
 
-      - [ ] Add/align `CurrentOperationCount` frontend type as `{ current: number;
+      - [x] Add/align `CurrentOperationCount` frontend type as `{ current: number;
       total: number }` or the exact documented nullable object shape.
 
       - [x] Update `isCurrentOperationInfo` and related guards to accept valid count
