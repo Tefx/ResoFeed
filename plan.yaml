@@ -92392,7 +92392,7 @@ phases:
   steps:
   - id: azrv-browser-e2e-regression-proof
     name: Run independent browser E2E proof for UI audit repairs and zh parity
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -92530,6 +92530,8 @@ phases:
 
       - [ ] FAIL'
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T14:21:28.460796+00:00'
   - id: azrv-zh-spec-conformance-audit
     name: Verify Chinese support and repair spec conformance across HTTP, MCP, OpenRouter,
       state, UI, tests, and preview
