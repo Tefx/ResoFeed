@@ -85713,7 +85713,7 @@ phases:
       - [x] Run the repository''s authoritative frontend/component/E2E command family
       for the touched web surfaces.
 
-      - [ ] Re-run any design/a11y/visual checks needed for the delta after architecture
+      - [x] Re-run any design/a11y/visual checks needed for the delta after architecture
       remediation.
 
       - [ ] Record failing checks as blocker-class if they intersect the final gate;
