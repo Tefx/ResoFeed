@@ -82339,15 +82339,15 @@ phases:
 
       - [x] Verify docs are not contradicted by implementation copy, labels, routes,
       or accessibility semantics.'
-    verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
+    verification: '- [x] phase-check protecting frontend gate and final E2E closure.
 
-      - [ ] Requirements register maps each frontend/design requirement to code or
+      - [x] Requirements register maps each frontend/design requirement to code or
       rendered evidence.
 
-      - [ ] No unresolved DIVERGES/PARTIAL/NOT_FOUND/UNCERTAIN_BLOCKING item lacks
+      - [x] No unresolved DIVERGES/PARTIAL/NOT_FOUND/UNCERTAIN_BLOCKING item lacks
       remediation or explicit non-intersection.
 
-      - [ ] Gate decision basis is suitable for frontend gate review.'
+      - [x] Gate decision basis is suitable for frontend gate review.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
