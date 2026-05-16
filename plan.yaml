@@ -97147,7 +97147,7 @@ phases:
       - [x] Update `isCurrentOperationInfo` and related guards to accept valid count
       objects and reject invalid count shapes.
 
-      - [ ] Render/use `phase`, `count`, `message`, `started_at`, and `updated_at`
+      - [x] Render/use `phase`, `count`, `message`, `started_at`, and `updated_at`
       in contextual Source Ledger/open RESOFEED operation/conflict surfaces when provided.
 
       - [ ] Preserve terse dense UI; no dashboards, progress bars, queues, job history,
