@@ -88919,7 +88919,7 @@ phases:
       \ MUST contain substantive UI/runtime logic or CSS/markup changes that process\
       \ real app state and produce visible/accessibility outputs that vary based on\
       \ inputs. Private stub or placeholder classes/functions do not satisfy this\
-      \ requirement.\n\n## Completion Checklist\n- [ ] Current-main residual failure\
+      \ requirement.\n\n## Completion Checklist\n- [x] Current-main residual failure\
       \ inventory is collected or explicitly refreshed before code changes are finalized.\n\
       - [ ] Full E2E residual failures are fixed from the latest current-main inventory,\
       \ not from stale worktree assumptions.\n- [ ] The targeted render/component\
