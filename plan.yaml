@@ -85369,14 +85369,14 @@ phases:
 
       This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable
       for any actual fix.'
-    verification: '- [ ] Every frontend/UI blocker or should_fix from srde2e-software-architect-fresh-review
+    verification: '- [x] Every frontend/UI blocker or should_fix from srde2e-software-architect-fresh-review
       is resolved or explicitly no-op because no applicable findings exist.
 
-      - [ ] Focused component/E2E/visual proof covers each remediated finding.
+      - [x] Focused component/E2E/visual proof covers each remediated finding.
 
-      - [ ] Sibling search evidence is provided for each blocker/should_fix.
+      - [x] Sibling search evidence is provided for each blocker/should_fix.
 
-      - [ ] No forbidden UI/product concept introduced.'
+      - [x] No forbidden UI/product concept introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
