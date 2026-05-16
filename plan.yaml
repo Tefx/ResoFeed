@@ -92596,7 +92596,7 @@ phases:
 
       - [x] Product-boundary constraints are checked against AGENTS.md and docs/ARCHITECTURE.md.
 
-      - [ ] Final zh verdict is COMPLETE only if every blocker-class zh obligation
+      - [x] Final zh verdict is COMPLETE only if every blocker-class zh obligation
       is PROVEN or explicitly non-intersecting.'
     verification: '- [ ] Full-plan-check protects final closure by auditing every
       zh surface requested by the user.
