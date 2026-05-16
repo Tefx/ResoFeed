@@ -94349,16 +94349,16 @@ phases:
       to a follow-up plan repair; do not dismiss as pre-existing.
 
       - [x] Frontend implementation constraints are clearly handed off to gsfr-inspector-fragment-identity-fix.'
-    verification: '- [ ] Evidence identifies backend grouping authority: non-empty
+    verification: '- [x] Evidence identifies backend grouping authority: non-empty
       `story_key` and/or direct duplicate provenance, not URL-base equivalence.
 
-      - [ ] Evidence verifies synthetic feed-entry fragment URL generation and explains
+      - [x] Evidence verifies synthetic feed-entry fragment URL generation and explains
       why fragment identity matters.
 
-      - [ ] Evidence states whether backend tests are already sufficient or names
+      - [x] Evidence states whether backend tests are already sufficient or names
       a precise backend test gap.
 
-      - [ ] Evidence confirms no schema migration or architectural layer addition
+      - [x] Evidence confirms no schema migration or architectural layer addition
       is needed for the frontend repair path.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
