@@ -84381,7 +84381,7 @@ phases:
       \ broader Source Ledger controls/hit-target command must be green while `[IMPORT\
       \ OPML]` reachability remains passing.\n- playwright_expected_red_claims: mandatory\
       \ rendered artifact/hit-target closure commands must be green.\n\nRequired command\
-      \ evidence:\n- [ ] Run `cd web && npm run test`.\n- [ ] Run `cd web && npm run\
+      \ evidence:\n- [x] Run `cd web && npm run test`.\n- [ ] Run `cd web && npm run\
       \ test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
       \ tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`.\n\
       - [ ] Run `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
