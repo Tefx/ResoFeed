@@ -85720,15 +85720,15 @@ phases:
       do not dismiss as pre-existing without non-intersection evidence.
 
       - [x] Produce a concise pass/fail matrix with exact commands and outputs.'
-    verification: '- [ ] full-plan-check protecting final closure gate.
+    verification: '- [x] full-plan-check protecting final closure gate.
 
-      - [ ] Exact commands and outputs are recorded for backend, frontend, E2E, and
+      - [x] Exact commands and outputs are recorded for backend, frontend, E2E, and
       visual/a11y checks.
 
-      - [ ] All blocker-class failures intersecting final gate have remediation ownership
+      - [x] All blocker-class failures intersecting final gate have remediation ownership
       or are resolved.
 
-      - [ ] The sweep passes or provides explicit non-intersection evidence for non-blocking
+      - [x] The sweep passes or provides explicit non-intersection evidence for non-blocking
       debt only.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
