@@ -94525,7 +94525,7 @@ phases:
       schema/layer change required PROVEN.'
   - id: gsfr-inspector-fragment-identity-fix
     name: Repair Inspector grouping identity for synthetic feed fragments
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -94709,6 +94709,65 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T20:50:00.605795+00:00'
+    done_at: '2026-05-16T21:09:05.065391+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passages: direct duplicates may be grouped
+      but every original source item remains retrievable; one deployable/one SQLite/no
+      event bus/DI/service layers.
+
+      - docs/DESIGN.md — read. Key passages: Inspector requires source-list disclosure
+      for grouped stories and transparent grouping preserves access/provenance with
+      terse operational copy.
+
+      - web/src/routes/components/Inspector.svelte — read. Key passage: normalizedGroupingUrl
+      stripped hash/search and sameRuntimeGroup preferred story_key/direct duplicates
+      before URL fallback.
+
+      - internal/resofeed/ingest.go — read. Key passage: blank entry URLs synthesize
+      source.URL + # + stableID(entry,...), creating #entry_* identities.
+
+      - internal/resofeed/search.go — read. Key passage: ReadItemDetail reads backend
+      grouped_source_items only when non-empty story_key exists.
+
+
+      ## Implementation Evidence
+
+      - Files changed: web/src/routes/components/Inspector.svelte; web/src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts
+
+      - Worktree commit: 58f7d3e5 fix inspector synthetic fragment grouping
+
+      - Mainline merge commit: 8b492c0d [vectl] step-gsfr-inspector-fragment-identity-fix
+      completed
+
+      - Grouping identity rule implemented: normalizedGroupingUrl now preserves #entry_*
+      fragments as runtime URL fallback identity; non-synthetic fragments/search still
+      normalize away for true same-article fallback; backend provenance.grouped_source_items
+      remains preferred.
+
+      - Why this closes root cause, not only symptom: false grouping came from collapsing
+      https://feed.rss#entry_01 and #entry_02 to the same feed URL; preserving synthetic
+      entry fragment prevents unrelated feed entries from comparing equal.
+
+      - Same-article fallback disposition: preserved and narrowed; query strings and
+      non-#entry_* fragments still normalize away for true same-article variants.
+
+      - Rendered Inspector proof for unrelated synthetic fragments: mainline `npm
+      run test:render -- src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts`
+      passed; test verifies selected #entry_01 URL visible, `.contract-grouped-sources`
+      absent, and ''Grouped story with 50 source items'' absent across 50 same-base/different-fragment
+      candidates.
+
+      - Valid grouped-source proof: same render test includes backend-authoritative
+      grouped_source_items[2] and same-article fallback cases; both show ''Grouped
+      story with 2 source items''.
+
+      - Commands run: npm run test:render -- src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts
+      => 3 passed; npm run check => svelte-check 0 errors/0 warnings.
+
+      - Deviation records: none.
+
+      - Backend/schema status: no Go backend/schema files modified.'
   - id: gsfr-targeted-regression-retest
     name: Run targeted frontend/backend grouped-story regression retest
     status: pending
