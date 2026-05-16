@@ -95292,7 +95292,7 @@ phases:
 
       - [x] Preserve the existing grouped-source comparator/order semantics.
 
-      - [ ] Verify no backend grouping/schema/provenance behavior is changed.
+      - [x] Verify no backend grouping/schema/provenance behavior is changed.
 
       - [ ] Produce evidence that a valid grouped story renders without `state_unsafe_mutation`
       or other browser console runtime errors.
