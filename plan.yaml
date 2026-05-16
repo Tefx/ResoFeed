@@ -90698,7 +90698,7 @@ phases:
       - [x] Output gate closure fields: `headline`, `verdict`, `blockers`, `gate_open_allowed`,
       and `orchestrator_action_hint`.
 
-      - [ ] Keep `gate_open_allowed: false` unless all blocker-class proof obligations
+      - [x] Keep `gate_open_allowed: false` unless all blocker-class proof obligations
       are closed.'
     verification: '- [ ] Evidence includes refs read confirmation for AGENTS.md, docs/ARCHITECTURE.md,
       and docs/DESIGN.md.
