@@ -96664,10 +96664,14 @@ phases:
       - [ ] Any DIVERGES/PARTIAL/NEEDS_TEST item has explicit blocker/non-blocker
       disposition and closure path.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: spec-verifier report
-      maps implementation to authoritative architecture/design requirements.
+      maps implementation to authoritative architecture/design requirements after
+      frontend current-operation wiring fix.
 
       - [ ] Evidence uses 7-verdict model and blocks on any unresolved blocker-class
       divergence.
+
+      - [ ] Evidence specifically checks `count: { current, total }`, `phase`, `message`,
+      `started_at`, and `updated_at` against docs/backend contract.
 
       - [ ] Any doc-sync need is explicitly identified with owner/closure path rather
       than left implicit.'
@@ -96686,48 +96690,54 @@ phases:
 
       ## Spec Conformance Report
 
-      **Phase**: current-operation-status-and-low-frequency-utility-surface-implementation
 
-      **Spec sources**: docs/ARCHITECTURE.md, docs/DESIGN.md
+      **Post-fix prerequisites reviewed**:
+
+      - `cos-retest-current-operation-runtime-ui`: PASS/FAIL
+
+      - `cos-reaudit-current-operation-wiring`: PASS/FAIL
 
 
       ## Requirements Register
 
       | R# | Spec Section | Requirement | Level | Checkable? |
 
-      |---|---|---|---|---|
-
 
       ## Evidence Table
 
       | R# | Spec Section | Requirement | Implementation | Verdict | Notes |
 
-      |---|---|---|---|---|---|
-
       Verdicts: CONFORMS | DIVERGES | PARTIAL | NEEDS_TEST | NOT_FOUND | AMBIGUOUS_SPEC
       | SPEC_POSSIBLY_STALE
 
 
+      Required explicit checks:
+
+      - `CurrentOperationInfo.count` object shape
+
+      - `phase`, `count`, `message`, `started_at`, `updated_at` field rendering/consumption
+
+      - contextual-only placement, no persistent idle top strip
+
+      - no durable jobs/queues/history/dashboard semantics
+
+
       ## Coverage Summary
 
-      - Total requirements:
+      - Total requirements: N
 
-      - CONFORMS:
+      - CONFORMS: N | DIVERGES: N | PARTIAL: N
 
-      - DIVERGES/PARTIAL/NEEDS_TEST:
-
-      - Unchecked sections:
+      - NEEDS_TEST: N | NOT_FOUND: N | AMBIGUOUS_SPEC: N
 
 
-      ## Top Risks
-
-
-      ## Suggested Tests / Doc-Sync Actions'
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
     - cos-backend-operation-snapshot
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
-    - cos-runtime-e2e-retest
+    - cos-retest-current-operation-runtime-ui
+    - cos-reaudit-current-operation-wiring
     agent: spec-verifier
   - id: cos-final-gate
     name: Gate current-operation status and utility-surface implementation
