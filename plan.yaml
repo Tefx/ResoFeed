@@ -85800,7 +85800,7 @@ phases:
 
       - [x] Browser-led MCP parity flow remains accessible through the UI controls.
 
-      - [ ] No unapproved token, layout, copy, chrome, or state invention relative
+      - [x] No unapproved token, layout, copy, chrome, or state invention relative
       to docs/DESIGN.md is introduced.
 
       - [ ] Findings are reported as PASS, PASS_WITH_DEBT, or FAIL, with blocker-class
