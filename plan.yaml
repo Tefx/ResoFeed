@@ -88998,7 +88998,7 @@ phases:
 
       - [x] Nav visible text/selector conflict is resolved exactly as adjudicated.
 
-      - [ ] OPML import/ingest `last_fetch` expectation or app behavior is resolved
+      - [x] OPML import/ingest `last_fetch` expectation or app behavior is resolved
       exactly as adjudicated.
 
       - [ ] Duplicate Dirty Inspector Corpus rows/shared DB state are resolved exactly
