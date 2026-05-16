@@ -86984,7 +86984,7 @@ phases:
       - [x] B3 desktop Feed and Inspector scroll regions are independently focusable
       and labeled with visible focus evidence.
 
-      - [ ] B4 Inspector original link, or its documented equivalent activation target,
+      - [x] B4 Inspector original link, or its documented equivalent activation target,
       meets the 44px minimum hit-target requirement.
 
       - [ ] Passing surfaces from the failed proof remain non-regressed.'
