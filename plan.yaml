@@ -95708,7 +95708,7 @@ phases:
       - [x] Multimodal/rendered artifact shows valid grouped-source disclosure after
       repair.
 
-      - [ ] Browser console evidence has no `state_unsafe_mutation` blocker.
+      - [x] Browser console evidence has no `state_unsafe_mutation` blocker.
 
       - [ ] Synthetic fragment/no-grouping path remains non-grouped.
 
