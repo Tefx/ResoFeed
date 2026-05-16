@@ -98372,21 +98372,21 @@ phases:
 
       - [x] Confirm no dashboard/job/queue/activity ledger/settings/service-layer/persistent
       top-chrome status drift is visible.'
-    verification: '- [ ] phase-check protecting `cos-reaudit-current-operation-wiring`,
+    verification: '- [x] phase-check protecting `cos-reaudit-current-operation-wiring`,
       `cos-uiux-multimodal-audit`, `cos-spec-doc-conformance`, and `cos-final-gate`:
       browser current-operation conflict retest is green after the batched fix.
 
-      - [ ] Main path: current-operation count/detail fields remain accepted and contextually
+      - [x] Main path: current-operation count/detail fields remain accepted and contextually
       rendered.
 
-      - [ ] Failure path: guarded-operation conflict browser path renders documented
+      - [x] Failure path: guarded-operation conflict browser path renders documented
       `current_operation` detail and no unintended duplicate `err: ingest already
       running` status elements.
 
-      - [ ] Evidence includes exact commands, actual outputs, browser artifact refs,
+      - [x] Evidence includes exact commands, actual outputs, browser artifact refs,
       and PASS/FAIL headline.
 
-      - [ ] Product guard: no dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      - [x] Product guard: no dashboard/job/queue/activity ledger/settings/service-layer/persistent
       top-chrome status appears.'
     evidence_template: '## Verification Report
 
