@@ -95588,7 +95588,7 @@ phases:
     agent: golang-developer
   - id: cos-frontend-operation-utility-surface
     name: Complete contextual operation status and low-frequency utility UI
-    status: claimed
+    status: done
     description: 'Complete frontend UI behavior for contextual operation status and
       low-frequency utility placement.
 
@@ -95697,6 +95697,55 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T20:49:54.059774+00:00'
+    done_at: '2026-05-16T21:07:18.375339+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — read. Key passages: utility surfaces reachable through RESOFEED
+      menu; Language Control terse LANG: EN/ZH; Reprocess bracket action with no spinner/progress
+      dashboard/wizard/activity log; Source Ledger conflict/status stays terse.
+
+      - docs/ARCHITECTURE.md — read. Key passages: one Go binary/one SQLite DB; no
+      settings dashboards/activity ledgers/job queues; reprocess is explicit and non-durable;
+      operation conflicts expose current operation guard details.
+
+
+      ## Frontend Implementation Evidence
+
+      - Files changed: web/src/lib/api-contract.ts; web/src/lib/api-client.ts; web/src/routes/+page.svelte;
+      web/src/routes/components/SourceLedger.svelte; web/src/app.css; web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+
+      - Worktree commit: 19c4beb2 Place operation utilities in RESOFEED menu
+
+      - Mainline merge commit: b4847def [vectl] step-cos-frontend-operation-utility-surface
+      completed
+
+      - Conflict resolution: reapplying a pre-existing local change to web/src/routes/+page.svelte
+      conflicted with the merge; conflict-resolver preserved both current-operation
+      utility behavior and local RuntimeLanguageStatus/language-feedback changes.
+      The resolved file was left unstaged to preserve local state outside the step
+      commit.
+
+      - Tests run and output: npm run check => svelte-check 0 errors/0 warnings; npm
+      run test:render -- src/routes/components/__tests__/current-operation-utility-placement.test.ts
+      => 2 tests passed; npm run test:e2e -- tests/e2e/current-operation-utility-placement.expected-red.spec.ts
+      => 3 passed.
+
+      - Rendered allowed surfaces proof: expected-red E2E now green; opened menu contains
+      LANG: EN, [REPROCESS LIBRARY], and running [INGESTING...] status; Source Ledger
+      shows [INGESTING...] and blocked err: ingest already running in contextual surfaces.
+
+      - Persistent top-chrome absence proof: E2E asserts header.shell-command does
+      not visibly contain LANG: EN, [REPROCESS LIBRARY], idle/current-operation strip,
+      [INGESTING...], or blocked error while menu is closed.
+
+      - Current-operation conflict rendering proof: render test verifies conflict
+      with current_operation renders `err: operation already running · current operation:
+      reprocess/library` in opened menu.
+
+      - Forbidden UI confirmation: no dashboard/wizard/settings/task-history/persistent
+      strip added.
+
+      - Deviation records: none.'
   - id: cos-wiring-audit
     name: Audit runtime wiring for operation status surfaces
     status: pending
