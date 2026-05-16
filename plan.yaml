@@ -91835,7 +91835,7 @@ phases:
       - [x] Protected expected-red tests from `azrct-expected-red-browser-and-contract-tests`
       now pass for frontend surfaces.
 
-      - [ ] DOM/browser evidence shows closed RESOFEED menu no longer exposes persistent
+      - [x] DOM/browser evidence shows closed RESOFEED menu no longer exposes persistent
       route chrome while opened menu still works by pointer and keyboard.
 
       - [ ] Browser evidence shows OPML import does not call ingest and receipt tells
