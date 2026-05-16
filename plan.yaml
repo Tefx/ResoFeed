@@ -82594,7 +82594,7 @@ phases:
       - [x] Require `gate_open_allowed: true`, `verdict: PASS`, and `remaining_blockers:
       []` from the batched closure.
 
-      - [ ] Confirm stale-vs-real reconciliation exists for every spec-verifier and
+      - [x] Confirm stale-vs-real reconciliation exists for every spec-verifier and
       uiux-auditor finding.
 
       - [ ] Confirm rendered artifact, command, and forbidden scan evidence are present
