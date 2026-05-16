@@ -96858,3 +96858,205 @@ phases:
     - cos-uiux-multimodal-audit
     - cos-spec-doc-conformance
     agent: gate-reviewer
+  - id: cos-fix-current-operation-frontend-wiring
+    name: Fix frontend current-operation contract and rendering wiring
+    status: pending
+    description: 'step_type: implementation
+
+      work_type: defect_repair
+
+      agent_source: project
+
+      spec_refs:
+
+      - docs/ARCHITECTURE.md#CurrentOperationInfo
+
+      - docs/ARCHITECTURE.md#GET /api/runtime/operation
+
+      - docs/DESIGN.md#Current Operation Status (`current-operation-status`)
+
+      - docs/DESIGN.md#Source Ledger and low-frequency operations surfaces
+
+      touch_paths:
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/lib/api-client.ts
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+
+      harness_refs:
+
+      - cos-wiring-audit evidence
+
+      - current-operation frontend tests/e2e fixtures
+
+
+      Fix ALL frontend current-operation wiring blockers found by `cos-wiring-audit`
+      in one bounded repair step.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### B1: `CurrentOperationInfo.count` shape mismatch
+
+      - Backend/docs emit `count` as object `{ current, total }` or `null` (`CurrentOperationCount`).
+
+      - Frontend currently types/guards `count` as `number | null`, causing valid
+      backend payloads to be rejected.
+
+      - Required repair: update frontend TypeScript contract and runtime guards to
+      accept the documented count object and reject invalid count shapes deterministically.
+
+
+      ### B2: documented current-operation fields validated but not rendered/used
+
+      - Frontend must consume/render or otherwise use documented `phase`, `count`,
+      `message`, `started_at`, and `updated_at` fields in contextual operation surfaces.
+
+      - Required repair: render terse status details near Source Ledger/open `RESOFEED`
+      operations/conflict surfaces, preserving dense design and avoiding dashboards.
+
+      - Do NOT remove fields from the contract; docs/backend already include them.
+
+
+      Root Cause vs Symptom:
+
+      - Root cause: frontend contract/guard and UI consumption drifted from backend/docs
+      `CurrentOperationInfo` shape.
+
+      - Symptoms: wiring audit rejects count object; operation detail fields are write-only
+      from frontend perspective.
+
+      - Why this fix is not surface-level: it must align type definitions, runtime
+      guard acceptance, and rendered contextual UI use.
+
+
+      Scope constraints:
+
+      - Do not introduce jobs, queues, activity ledgers, dashboards, settings panels,
+      service layers, DI, sidecars, or persistent idle top-chrome status.
+
+      - Preserve one Go binary / SQLite-only / in-memory current-operation snapshot
+      semantics.
+
+      - Do not change backend contract unless a frontend test is proven wrong and
+      spec authority demands it.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Runtime guard still rejects `{ count: { current, total } }`.
+
+      2. Operation fields are accepted but remain unrendered/write-only.
+
+      3. UI becomes a dashboard/progress panel/persistent global status strip.
+
+      4. Conflict copy shows only `operation already running` without current operation
+      detail when available.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: frontend contract/guards accept documented backend payloads
+      and reject invalid shapes.
+
+      2. Rendering completeness: contextual UI visibly uses phase/count/message/timestamps
+      where present.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. The
+      deliverable MUST contain substantive logic that processes current-operation
+      payload inputs and renders terse status output that varies based on those inputs.
+
+
+      ## Acceptance Checklist
+
+      - [ ] Add/align `CurrentOperationCount` frontend type as `{ current: number;
+      total: number }` or the exact documented nullable object shape.
+
+      - [ ] Update `isCurrentOperationInfo` and related guards to accept valid count
+      objects and reject invalid count shapes.
+
+      - [ ] Render/use `phase`, `count`, `message`, `started_at`, and `updated_at`
+      in contextual Source Ledger/open RESOFEED operation/conflict surfaces when provided.
+
+      - [ ] Preserve terse dense UI; no dashboards, progress bars, queues, job history,
+      settings panels, or persistent idle top strip.
+
+      - [ ] Update only frontend tests/fixtures needed to prove the documented shape
+      and rendered field consumption.'
+    verification: '- [ ] Main path: frontend accepts backend `count: { current, total
+      }` payloads and renders terse status detail.
+
+      - [ ] Failure path: invalid count shapes are rejected by the runtime guard.
+
+      - [ ] Wiring path: `phase`, `count`, `message`, `started_at`, and `updated_at`
+      are read by rendered UI/conflict handling, not left write-only.
+
+      - [ ] Product guard: no durable job/queue/history/dashboard/settings/service-layer
+      concept introduced.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Fix Evidence
+
+
+      **Changed files**:
+
+      ```
+
+      <paths>
+
+      ```
+
+
+      **Contract/guard proof**:
+
+      ```
+
+      <test output or snippet showing count object accepted and invalid shapes rejected>
+
+      ```
+
+
+      **Rendered field-use proof**:
+
+      ```
+
+      <DOM/test/browser evidence showing phase/count/message/started_at/updated_at
+      are consumed/rendered contextually>
+
+      ```
+
+
+      **Forbidden surface guard**:
+
+      - Jobs/queues/activity ledger/dashboard/settings/service layer introduced: YES/NO
+
+      - Persistent idle top-chrome status introduced: YES/NO
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - cos-wiring-audit
+    agent: frontend-engineer
