@@ -97824,7 +97824,7 @@ phases:
     agent: wiring-auditor
   - id: cos-fix-current-operation-browser-conflict-detail
     name: Fix current-operation browser conflict detail blockers
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -98065,6 +98065,98 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T22:49:29.145493+00:00'
+    done_at: '2026-05-16T22:58:28.532271+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by executor; guarded operations identify the operation
+      holding the guard and must not introduce queues/jobs.
+
+      - docs/DESIGN.md — Read by executor; Source Ledger is the lightweight manual
+      ingest surface; conflict feedback remains contextual/raw `err:` text, not dashboards/jobs/queues/top-chrome
+      status.
+
+      - AGENTS.md — Read by executor; docs/ARCHITECTURE.md and docs/DESIGN.md are
+      canonical; no sidecars/service layers/settings dashboards/activity ledgers.
+
+      - web/src/routes/+page.svelte — Read by executor; `contextualOperationStatusText`
+      is derived from conflict `error.details.current_operation` and passed to SourceLedger/menu
+      context.
+
+      - web/src/routes/components/SourceLedger.svelte — Read by executor; header rendered
+      both ingest status and current operation status, creating duplicate conflict
+      text.
+
+      - web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+      — Read by executor; component coverage expected current-operation phase/count/message/timestamps;
+      duplicate assertion strengthened.
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts — Read
+      by executor; browser fixture used generic `{ details: {} }` conflict, so it
+      did not prove `current_operation` rendering.
+
+
+      ## Failed Assertion
+
+      `locator(''section.source-ledger'').getByText(''err: ingest already running'')`
+      strict-mode failure: two visible `err: ingest already running` Source Ledger
+      status elements in the blocked operation browser scenario.
+
+
+      ## Fix Proof
+
+      - Root cause: real duplicate UI rendering.
+
+      - Worker commit: `102e8a65d46be34bddb0ee5d18c4d90ae01ab803`.
+
+      - Mainline commit: `fe3078ab` `[vectl] step-cos-fix-current-operation-browser-conflict-detail
+      completed`.
+
+      - Files changed: `web/src/routes/components/SourceLedger.svelte`, `web/src/routes/components/__tests__/current-operation-utility-placement.test.ts`,
+      `web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts`.
+
+      - Closure: SourceLedger now renders a single authoritative header status, preferring
+      contextual operation detail over generic ingest status. Vitest and Playwright
+      assert the contextual conflict status exactly once and require phase/count/message/timestamps
+      from `current_operation`.
+
+
+      ## Browser current_operation detail proof
+
+      - Playwright current-operation utility placement browser test now passes the
+      blocked-operation scenario and asserts Source Ledger conflict status includes
+      current-operation detail matching `reprocess/library`, `phase: processing_items`,
+      `count: 2/5`, message, started, and updated timestamps.
+
+
+      ## Duplicate status closure proof
+
+      - Playwright asserts `contextualConflictStatus` count is 1 and `ledger.getByText(''err:
+      ingest already running'')` count is 1.
+
+      - Vitest asserts Source Ledger has one `err: operation already running` conflict
+      status.
+
+
+      ## Mainline final-state verification
+
+      - Orchestrator squash-merged `vectl/step-cos-fix-current-operation-browser-conflict-detail`.
+
+      - Orchestrator ran from `web/`: `npm run check && npx vitest run src/routes/components/__tests__/current-operation-utility-placement.test.ts
+      && npx playwright test --config ./playwright.config.ts tests/e2e/current-operation-utility-placement.expected-red.spec.ts`.
+
+      - Result: `svelte-check found 0 errors and 0 warnings`; Vitest `1 passed`, `4
+      passed`; Playwright `3 passed`.
+
+
+      ## Product Guard
+
+      - Persistent top-chrome status/dashboard/jobs/queues/activity ledger/settings/service-layer
+      drift introduced: NO.
+
+
+      ## Gaps/Notes
+
+      - None for this blocker family.'
   - id: cos-retest-current-operation-browser-conflict-detail
     name: Retest current-operation browser conflict detail path
     status: pending
