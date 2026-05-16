@@ -86936,3 +86936,192 @@ phases:
     depends_on:
     - srde2e-visual-a11y-regression-proof
     agent: frontend-engineer
+  - id: srde2e-visual-a11y-blockers-retest
+    name: Retest visual accessibility blocker closure
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: default
+
+
+      As an INDEPENDENT TESTER (blind-tester), rerun the same public-surface visual/a11y
+      proof after srde2e-visual-a11y-blockers-fix. This is a post-remediation green
+      retest; success requires proving every original B1-B4 blocker family is closed
+      with rendered/browser evidence.
+
+
+      ## Required blocker reproof
+
+      - B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN: prove DETAILS control is visibly reachable,
+      topmost at activation point, and activatable by real pointer and keyboard paths.
+
+      - B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET: prove IMPORT STATE has a visible accessible
+      activation path; elementFromPoint at the tested interior/center point must return
+      the target/descendant or an explicitly associated visible control, not an unrelated
+      obstruction.
+
+      - B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN: prove desktop Feed and Inspector
+      independent scroll regions are focusable, labeled, and visibly focus-indicated.
+
+      - B4_ORIGINAL_LINK_BELOW_44PX: prove Inspector original link, or the documented
+      equivalent activation target, meets the 44px minimum hit-target requirement.
+
+
+      ## Public-surface regression scope
+
+      Rerun the same broad proof scope as srde2e-visual-a11y-regression-proof, including
+      owner-token shell, Steer controls, Source Ledger [RUN INGEST]/[FETCH]/[DETAILS]/[DELETE],
+      OPML/state actions, menu entries, row open, star, original links, keyboard tab/enter/space/escape
+      behavior, active panel semantic state, desktop split-scroll, mobile Inspector
+      route, and forbidden-term scan.
+
+
+      ## Behavioral proof register required
+
+      For each B1-B4 proof obligation, evidence must include requirement_ref, behavior_claim,
+      runtime_proof_expected, evidence_ref, status, closure_path, and gate_decision_basis.
+      OPEN/gate-ready is invalid while any B1-B4 item is NEEDS_TEST, UNPROVEN, or
+      UNCERTAIN_BLOCKING without explicit non-intersection evidence.
+
+
+      Acceptance checklist:
+
+      - [ ] B1 DETAILS real visible/topmost activation is PROVEN.
+
+      - [ ] B2 IMPORT STATE visible accessible activation and non-obstruction are
+      PROVEN.
+
+      - [ ] B3 desktop Feed/Inspector independent focusable labeled scroll regions
+      are PROVEN.
+
+      - [ ] B4 Inspector original/equivalent target 44px minimum is PROVEN.
+
+      - [ ] Previously passing public-surface visual/a11y checks remain proven.
+
+      - [ ] Final headline is PASS only when all B1-B4 blockers are closed.'
+    verification: '- [ ] full-plan-check companion protecting final closure gate.
+
+      - [ ] Expected result is green after remediation.
+
+      - [ ] Visual/spatial artifacts prove all B1-B4 blocker closures with real rendered/browser
+      evidence.
+
+      - [ ] Hit-target proof uses real elementFromPoint/topmost clickability evidence
+      and 44px minimum measurements.
+
+      - [ ] A11y proof covers tab order, focus, labels, live regions, aria-describedby,
+      details disclosure semantics, and active panel semantics.
+
+      - [ ] Negative UX scan finds no forbidden concepts.
+
+      - [ ] Behavioral proof register supports final gate OPEN only if every blocker-class
+      obligation is PROVEN.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Scope**: Public-surface visual/a11y retest for B1-B4 blocker closure
+
+      **Independence Level**: L1
+
+      **Timestamp**: <ISO 8601>
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Commands / browser actions executed
+
+      ```
+
+      <paste exact commands, browser script names, or manual browser action transcript>
+
+      ```
+
+
+      ### Behavioral proof register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN | DETAILS visibly/topmost activates
+      | pointer + keyboard + elementFromPoint | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | <OPEN/BLOCK basis> |
+
+      | B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET | IMPORT STATE visible accessible target
+      is clickable | visible control + elementFromPoint | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | <OPEN/BLOCK basis> |
+
+      | B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN | Feed/Inspector scroll regions
+      independently focusable/labeled | focus + label proof | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING
+      | <path> | <OPEN/BLOCK basis> |
+
+      | B4_ORIGINAL_LINK_BELOW_44PX | Original/equivalent target >=44px | measurement
+      proof | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN/UNCERTAIN_BLOCKING | <path>
+      | <OPEN/BLOCK basis> |
+
+
+      ### Regression matrix
+
+      | Surface | Evidence artifact | Verdict | Notes |
+
+      | --- | --- | --- | --- |
+
+      | Owner-token accepted shell | <artifact> | PASS/FAIL | <notes> |
+
+      | Steer controls | <artifact> | PASS/FAIL | <notes> |
+
+      | Source Ledger controls/details | <artifact> | PASS/FAIL | <notes> |
+
+      | OPML/state actions | <artifact> | PASS/FAIL | <notes> |
+
+      | Keyboard tab/enter/space/escape | <artifact> | PASS/FAIL | <notes> |
+
+      | Active panel semantic state | <artifact> | PASS/FAIL | <notes> |
+
+      | Desktop split-scroll | <artifact> | PASS/FAIL | <notes> |
+
+      | Mobile Inspector route | <artifact> | PASS/FAIL | <notes> |
+
+      | Forbidden-term scan | <artifact> | PASS/FAIL | <notes> |
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      | --- | --- | --- | --- |
+
+      | blocker | <issue or none> | <file/selector> | <steps> |
+
+      | should_fix | <issue or none> | <file/selector> | <steps> |
+
+
+      ### Headline
+
+      - [ ] PASS: All B1-B4 blockers are proven closed and no blocker-class visual/a11y
+      proof gaps remain
+
+      - [ ] PASS_WITH_DEBT: Only explicit non-blocking debt remains with non-intersection
+      evidence
+
+      - [ ] FAIL: Blocking issues or blocking proof gaps remain'
+    depends_on:
+    - srde2e-visual-a11y-blockers-fix
+    agent: blind-tester
