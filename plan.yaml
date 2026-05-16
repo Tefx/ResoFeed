@@ -87296,7 +87296,7 @@ phases:
 
       - [x] Previously passing public-surface visual/a11y checks remain proven.
 
-      - [ ] Final headline is PASS only when all B1-B4 blockers are closed.'
+      - [x] Final headline is PASS only when all B1-B4 blockers are closed.'
     verification: '- [ ] full-plan-check companion protecting final closure gate.
 
       - [ ] Expected result is green after remediation.
