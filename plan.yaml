@@ -95126,7 +95126,7 @@ phases:
 
       - [x] All phase steps have complete evidence with refs read confirmation.
 
-      - [ ] No blocker-class false grouping proof gap remains.
+      - [x] No blocker-class false grouping proof gap remains.
 
       - [ ] No backend schema/layer drift was introduced.
 
