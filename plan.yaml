@@ -85792,7 +85792,7 @@ phases:
       - [x] Rendered/browser-observable artifacts are captured for Source Ledger live
       row and Steer preview/commit/undo controls.
 
-      - [ ] Source Ledger shows the imported live row, visible controls, and the required
+      - [x] Source Ledger shows the imported live row, visible controls, and the required
       last-fetch timestamp format without layout collapse.
 
       - [ ] Steer preview/commit/undo controls have unique accessible names and remain
