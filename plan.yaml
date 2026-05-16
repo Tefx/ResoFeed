@@ -83563,7 +83563,7 @@ phases:
       - [x] Fix every real current blocker from the combined spec-verifier/UIUX failure
       family in one batch.
 
-      - [ ] For each stale or fixture-drift claim, record current rendered/DOM/a11y
+      - [x] For each stale or fixture-drift claim, record current rendered/DOM/a11y
       proof and explicit non-intersection with `srdf-frontend-gate` and final E2E
       closure.
 
