@@ -85233,22 +85233,22 @@ phases:
       This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
       The fix must contain substantive Go/backend/API contract logic and tests that
       vary by input and transport path.'
-    verification: '- [ ] SF1 is resolved by shared/aligned HTTP and MCP steer receipt
+    verification: '- [x] SF1 is resolved by shared/aligned HTTP and MCP steer receipt
       fingerprint semantics.
 
-      - [ ] SF1 parity regression covers HTTP then MCP same-key/same-command retry
+      - [x] SF1 parity regression covers HTTP then MCP same-key/same-command retry
       and expects replay-equivalent behavior, not `request_fingerprint_mismatch`.
 
-      - [ ] SF2 public `will_mutate` semantics are explicit in docs/tests and preserve
+      - [x] SF2 public `will_mutate` semantics are explicit in docs/tests and preserve
       no-write/no-receipt preview behavior.
 
-      - [ ] Both grep hints were run and sibling drift was either fixed or explicitly
+      - [x] Both grep hints were run and sibling drift was either fixed or explicitly
       ruled out with evidence.
 
-      - [ ] Focused Go/backend tests for the changed receipt and preview semantics
+      - [x] Focused Go/backend tests for the changed receipt and preview semantics
       pass, and any affected frontend/docs consumers remain contract-aligned.
 
-      - [ ] No forbidden ResoFeed architecture/product concept is introduced.'
+      - [x] No forbidden ResoFeed architecture/product concept is introduced.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
