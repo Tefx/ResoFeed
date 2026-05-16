@@ -91371,7 +91371,7 @@ phases:
       - [x] Tests cover all listed audit findings and every required Chinese support
       surface or explicitly cite existing tests that already cover a surface.
 
-      - [ ] Evidence lists `expected_failures` and names the downstream implementation
+      - [x] Evidence lists `expected_failures` and names the downstream implementation
       step `azri-frontend-low-chrome-copy-zh-repair`.'
     verification: '- [ ] Expected-red tests expose persistent chrome, alignment, OPML
       auto-ingest, copy, Inspector provenance, preview drift, and zh parity gaps.
