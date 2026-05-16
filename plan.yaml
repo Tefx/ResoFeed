@@ -85206,7 +85206,7 @@ phases:
       - [x] Decide and document in code/tests whether `will_mutate` means "preview
       call mutates" or "commit would mutate".
 
-      - [ ] Preserve the no-write/no-receipt guarantee for `/api/steer/preview`.
+      - [x] Preserve the no-write/no-receipt guarantee for `/api/steer/preview`.
 
       - [ ] Prefer the simplest contract-preserving change: if the field means preview
       mutates, make previews return false and update tests; if it means commit would
