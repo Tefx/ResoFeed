@@ -84720,7 +84720,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Capture screenshot/DOM/a11y evidence for owner-token accepted shell, Steer
+      - [x] Capture screenshot/DOM/a11y evidence for owner-token accepted shell, Steer
       idle/add/search/find/doctor/rule/invalid/receipt/undo states, Source Ledger
       controls/details, desktop split-scroll, and mobile Inspector route.
 
