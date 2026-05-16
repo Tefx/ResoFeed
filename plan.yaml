@@ -94190,7 +94190,7 @@ phases:
       \ was not available in isolated worktree per verifier evidence."
 - id: grouped-story-fragment-url-regression-repair
   name: Grouped Story Fragment URL Regression Repair
-  status: pending
+  status: in_progress
   gate: Final gate blocks unless regression proof shows distinct synthetic feed-fragment
     URLs do not create grouped-source disclosure, backend grouping remains story_key/duplicate
     provenance based without schema changes, same-article URL fallback remains only
@@ -94305,7 +94305,7 @@ phases:
     agent: frontend-engineer
   - id: gsfr-backend-grouping-contract-audit
     name: Audit backend grouping authority and schema non-change
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: local-check protecting gsfr-inspector-fragment-identity-fix
@@ -94386,6 +94386,8 @@ phases:
 
       - Handoff constraints for frontend fix:'
     agent: spec-verifier
+    claimed_by: spec-verifier
+    claimed_at: '2026-05-16T20:35:50.605032+00:00'
   - id: gsfr-inspector-fragment-identity-fix
     name: Repair Inspector grouping identity for synthetic feed fragments
     status: pending
