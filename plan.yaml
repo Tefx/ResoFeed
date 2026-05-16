@@ -91363,7 +91363,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Expected-red browser tests fail against the current known UI/UX defects
+      - [x] Expected-red browser tests fail against the current known UI/UX defects
       before implementation.
 
       - [ ] Test-only scope is maintained; product code is not changed.
