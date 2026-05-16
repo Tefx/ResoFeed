@@ -97891,7 +97891,7 @@ phases:
       - [x] Count object shape is accepted by frontend contract/guard and invalid
       shapes remain rejected.
 
-      - [ ] Operation detail fields are not write-only; each is traced to rendered
+      - [x] Operation detail fields are not write-only; each is traced to rendered
       UI/conflict handling or explicit authoritative disposition.
 
       - [ ] No dashboard/job/queue/activity history/settings/service-layer drift is
