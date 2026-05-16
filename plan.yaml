@@ -82314,7 +82314,7 @@ phases:
     claimed_at: '2026-05-16T00:15:01.898887+00:00'
   - id: srdf-frontend-spec-conformance
     name: Verify frontend spec and design conformance for Steer delta
-    status: claimed
+    status: done
     description: 'Spec/design conformance verification via adversarial divergence
       hunting.
 
@@ -82381,6 +82381,139 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-16T00:14:51.024194+00:00'
+    done_at: '2026-05-16T00:29:03.428409+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — spec-verifier read Steer input states/accessibility, Source
+      Ledger anatomy/manual controls/forbidden concepts, Search, split-scroll, and
+      forbidden UI copy/concepts.
+
+      - docs/UI_REGRESSION_CONTRACT.md — read real hit-target contract, keyboard/a11y
+      contract, negative UX assertions, and acceptance mapping.
+
+      - docs/PRD.md — read first-run/no folders/no wizards, source management flat
+      ledger, Search/Retrieval, and AC-18 manual fetch controls.
+
+      - docs/ARCHITECTURE.md — read frontend boundary, manual ingest/fetch schemas,
+      conflict response, endpoint contracts, and split-scroll verification.
+
+      - CONSTITUTION.md — NOT READ: file absent in isolated worktree.
+
+      - Implementation/test refs read: `web/src/routes/+page.svelte`, `web/src/routes/components/SourceLedger.svelte`,
+      `web/src/lib/api-client.ts`, `web/src/lib/api-contract.ts`, `source-ledger-steer-split-scroll.expected-red.spec.ts`,
+      `processing-language-source-split-scroll.spec.ts`, `feed-search-anatomy.spec.ts`,
+      `hit-target-clickability.spec.ts`.
+
+
+      ## Spec/Design Conformance Report
+
+      ```yaml
+
+      headline: "FAIL"
+
+      verdict: "FAIL"
+
+      blockers: ["B1", "B2", "B3", "B4", "R10"]
+
+      proof_gap_status: "BLOCKING"
+
+      blocking_status: "OPEN"
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: "DO_NOT_COMPLETE_WITHOUT_REMEDIATION"
+
+      ```
+
+
+      ## Key findings
+
+      - B1/R2 DIVERGES: Steer write preview ARIA role/name mismatch; E2E expected
+      `role=status` name `Steer route preview`, implementation rendered `role=region`
+      name `Steer write preview`.
+
+      - B2/R4 PARTIAL: Search accessible region mismatch; E2E expected `Search and
+      Retrieval`, rendered `SEARCH`.
+
+      - B3/R7 DIVERGES: SourceLedger fetch disabled scope disables every row when
+      `fetchingSourceId !== null`; requirement expects only active row disabled, backend
+      409 handles global guard conflicts.
+
+      - B4/R9 PARTIAL: OPML file input keyboard/file reachability: visible button
+      reachable, but file input is `aria-hidden=true` and `tabindex=-1`.
+
+      - R10 PARTIAL: mobile scroll proof conflict: one E2E passed via `window.scrollY`,
+      another failed via feed-pane `scrollTop` expected 120 got 0.
+
+
+      ## Commands/tests/evidence reviewed
+
+      ```
+
+      npm ci && npm run test
+
+      # PASS after dependency install: svelte-check 0 errors/warnings; 11 passed /
+      61 tests
+
+      npx playwright test --config ./playwright.config.ts tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+      tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts
+      --project=chromium-ci-safe
+
+      # FAIL: 3 failed / 3 passed
+
+      # failed feed-search-anatomy: missing region Search and Retrieval; rendered
+      SEARCH
+
+      # failed source-ledger-steer-split-scroll: preview locator role=status name=Steer
+      route preview disappeared for write preview
+
+      # failed source-ledger-steer-split-scroll: mobile feed scroll expected 120,
+      received 0
+
+      ```
+
+
+      ## Closure Paths / Remediation Ownership
+
+      - Created remediation owner: `srdf-batched-frontend-audit-remediation`.
+
+      - Created closure owner: `srdf-batched-frontend-audit-closure`.
+
+      - `srdf-frontend-gate` now depends on the closure step and cannot open until
+      closure evidence is PASS with `gate_open_allowed: true` and remaining blockers
+      empty.
+
+      - All B1/B2/B3/B4/R10 findings are blocker-class and owned by the remediation
+      chain; none are dismissed as stale/pre-existing/out-of-scope.
+
+
+      ## Behavioral proof register
+
+      - Steer input submit/Escape/live receipt: PROVEN by render tests.
+
+      - Steer write preview ARIA role: UNPROVEN/BLOCKING; owned by remediation.
+
+      - Search via Steer lexical surface: NEEDS_TEST/BLOCKING due accessible region
+      mismatch; owned by remediation.
+
+      - Source Ledger manual controls topmost 44px: PROVEN.
+
+      - Per-source only-active-row disabled: UNPROVEN/BLOCKING; owned by remediation.
+
+      - OPML import keyboard/file reachability: UNPROVEN/BLOCKING; owned by remediation.
+
+      - Desktop split scroll: PROVEN.
+
+      - Mobile Inspector feed scroll preservation: UNPROVEN/BLOCKING; owned by remediation.
+
+      - Forbidden UI concepts absent: PROVEN.
+
+
+      ## Gaps/Notes
+
+      - This verifier step is complete as a failed-finding phase check; it is not
+      gate-open evidence. Verification checklist items are [x] because findings have
+      explicit remediation ownership before gate.'
   - id: srdf-frontend-gate
     name: Gate frontend Steer delta UI implementation
     status: pending
