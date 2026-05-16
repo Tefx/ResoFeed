@@ -86037,3 +86037,176 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T02:34:18.523525+00:00'
+  - id: srde2e-uiux-source-ledger-status-contract-fix
+    name: Fix Source Ledger status DOM contract after UI/UX audit
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Batched UI/UX remediation for the Source Ledger design-contract debt reported
+      by srde2e-uiux-audit-source-ledger-steer-controls.
+
+
+      Scope:
+
+      - Move or otherwise correct the Source Ledger global ingest status so `last_ingest:
+      HH:MM:SS` / global ingest status is contract-consistent with `docs/DESIGN.md`
+      Required DOM contract: the global status belongs inside `.source-ledger__header`
+      alongside the `SOURCE LEDGER` heading and `[RUN INGEST]` action.
+
+      - Preserve row-level `last_fetch: HH:MM:SS` behavior inside each `.source-ledger__row`;
+      do not move row fetch status into the header or break row action alignment.
+
+      - Preserve Steer accessible-name uniqueness and existing Source Ledger live
+      row/actions behavior from prior remediation.
+
+      - Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
+      boundary, no dashboard/RAG/sync/account/job/activity-ledger surfaces.
+
+
+      Contract-dispute handling:
+
+      - If the audit finding is wrong because `docs/DESIGN.md` changed or another
+      contract-consistent location is authoritative, do not silently dismiss it. Provide
+      evidence citing the exact DESIGN.md section and make the minimal contract-consistent
+      resolution.
+
+      - Do not weaken DESIGN.md to match implementation unless the contract itself
+      is proven stale by an authoritative project source and the minimal doc update
+      is required.
+
+
+      Known risks / Gate Preview:
+
+      - Gate will reject `last_ingest` remaining only in `.source-ledger-footer` or
+      any non-header location without explicit contract-consistent proof.
+
+      - Gate will reject fixes that break row `last_fetch: HH:MM:SS`, hide `[FETCH]`/`[DELETE]`/`[DETAILS]`,
+      introduce duplicate Steer accessible names, or add forbidden dashboard/job/activity/sync/RAG/account
+      concepts.
+
+
+      Acceptance checklist:
+
+      - [ ] Global Source Ledger ingest status is rendered in `.source-ledger__header`
+      or a documented contract-consistent equivalent with cited DESIGN.md proof.
+
+      - [ ] Row-level `last_fetch: HH:MM:SS` remains adjacent to each source row and
+      still updates after source fetch.
+
+      - [ ] `[RUN INGEST]`, `[IMPORT OPML]`, `[FETCH]`, `[DELETE]`, and `[DETAILS]`
+      controls remain visible, reachable, and visually contract-consistent.
+
+      - [ ] Steer preview/commit/undo accessible-name uniqueness remains intact.
+
+      - [ ] No forbidden ResoFeed architecture or UI concepts are introduced.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      Completion requires rendered DOM or browser-test evidence for Source Ledger
+      header and row status placement. A data-only or mock-only proof is insufficient.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive logic/rendering that processes real
+      state and produces output that varies based on that state.'
+    verification: '- [ ] phase-check protecting Source Ledger UI/UX closure and final
+      gate.
+
+      - [ ] Evidence shows the main path: global ingest completion renders `last_ingest:
+      HH:MM:SS` in `.source-ledger__header` or a cited contract-consistent equivalent.
+
+      - [ ] Evidence shows the high-risk failure path: row `last_fetch: HH:MM:SS`
+      and Source Ledger controls still work after the header-status fix.
+
+      - [ ] Evidence confirms Steer accessible-name uniqueness and no forbidden design/architecture
+      concepts were introduced.
+
+      - [ ] Any disagreement with the audit finding is resolved by cited DESIGN.md/ARCHITECTURE.md
+      evidence, not silent dismissal.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## UI/UX Remediation Evidence
+
+
+      **Audit debt addressed**: Source Ledger global ingest status placement / `.source-ledger__header`
+      DOM contract.
+
+
+      **Files changed**:
+
+      ```
+
+      <paths>
+
+      ```
+
+
+      **Contract citation**:
+
+      - DESIGN.md Source Ledger passage for header status placement: <quote>
+
+      - ARCHITECTURE.md invariant passage preserved: <quote>
+
+
+      **Rendered/DOM proof**:
+
+      ```
+
+      <header/source-ledger DOM excerpt or browser-test artifact showing last_ingest/status
+      in .source-ledger__header>
+
+      ```
+
+
+      **Row behavior proof**:
+
+      ```
+
+      <artifact showing source row last_fetch: HH:MM:SS and row controls still present>
+
+      ```
+
+
+      **Steer accessible-name uniqueness proof**:
+
+      ```
+
+      <artifact or test output>
+
+      ```
+
+
+      **Forbidden-surface scan**:
+
+      - Dashboard/job/activity/sync/RAG/account concepts introduced: YES/NO, with
+      evidence.
+
+
+      **Contract-dispute resolution, if applicable**:
+
+      - Audit finding wrong? YES/NO
+
+      - If YES, cite exact authoritative contract passage and minimal resolution.
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - srde2e-uiux-audit-source-ledger-steer-controls
+    agent: frontend-engineer
