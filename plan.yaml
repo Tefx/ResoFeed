@@ -94244,7 +94244,7 @@ phases:
       - [x] A failing-before-fix test exposes the fragment-collapse bug without modifying
       product code.
 
-      - [ ] The test fixture cites the synthetic URL behavior from `internal/resofeed/ingest.go`
+      - [x] The test fixture cites the synthetic URL behavior from `internal/resofeed/ingest.go`
       and grouping authority from `docs/ARCHITECTURE.md`.
 
       - [ ] Evidence records the expected red failure message or exposed grouped-source
