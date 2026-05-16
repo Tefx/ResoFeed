@@ -95079,7 +95079,7 @@ phases:
       - design_md_conformance: PROVEN for rendered portions'
   - id: gsfr-final-gate
     name: Gate grouped-story fragment URL regression repair
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -95200,6 +95200,8 @@ phases:
     - gsfr-retest-grouped-source-runtime-rendering
     - gsfr-uiux-reaudit-grouped-source-rendering
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T22:49:35.434632+00:00'
   - id: gsfr-fix-reactive-grouped-source-sort-crash
     name: Fix reactive grouped-source sort crash
     status: done
