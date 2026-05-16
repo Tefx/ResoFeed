@@ -184,6 +184,16 @@ describe('srdct expected-red frontend UI contracts', () => {
     await user.click(details);
     expect(details.closest('details')).toHaveAttribute('open');
     expect(within(ledger).getByText(/fetch_error: err: timeout while fetching upstream feed/)).toBeVisible();
+
+    await user.click(within(ledger).getByRole('button', { name: '[RUN INGEST]' }));
+    const header = ledger.querySelector('.source-ledger__header');
+    expect(header).not.toBeNull();
+    expect(within(header as HTMLElement).getByText('last_ingest: 14:00:02')).toHaveClass('source-ledger__status');
+    expect(ledger.querySelector('.source-ledger-footer')).not.toHaveTextContent(/last_ingest:/);
+    const sourceRow = ledger.querySelector('.source-ledger__row');
+    expect(sourceRow).not.toBeNull();
+    expect(within(sourceRow as HTMLElement).getByText('last_fetch: 14:02:05')).toHaveClass('source-ledger__status');
+    expect(within(sourceRow as HTMLElement).getByRole('button', { name: 'Fetch source Example Source' })).toHaveTextContent('[FETCH]');
     expect(ledger).not.toHaveTextContent(/job|queue|dashboard|settings|activity log|folder|tag|semantic answer|chat|RAG/i);
   });
 

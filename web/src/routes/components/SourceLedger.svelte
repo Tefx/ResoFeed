@@ -27,6 +27,7 @@
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
   let statusText = $state('');
+  let globalIngestStatusText = $state('');
   let isImportingOpml = $state(false);
   let isRunningIngest = $state(false);
   let fetchingSourceId = $state<string | null>(null);
@@ -37,7 +38,7 @@
   let ledgerHeading = $state<HTMLHeadingElement | undefined>();
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
-  const hasGlobalIngestFeedback = $derived(statusText.startsWith('last_ingest:') || statusText === 'ingest complete');
+  const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
 
   function formatTime(timestamp: string | null | undefined): string | null {
@@ -117,17 +118,17 @@
   async function runIngest(): Promise<void> {
     if (isRunningIngest) return;
     isRunningIngest = true;
-    statusText = '';
+    globalIngestStatusText = '';
     try {
       await tick();
-      statusText = 'ingest complete';
+      globalIngestStatusText = 'ingest complete';
       const result = await onRunIngest();
       const completedAt = formatTime(result.completed_at);
-      statusText = result.completed
+      globalIngestStatusText = result.completed
         ? `last_ingest: ${completedAt ?? 'complete'}`
         : rawErrorText(result.errors[0]?.message ?? 'ingest failed');
     } catch (error) {
-      statusText = error instanceof Error ? rawErrorText(error.message) : 'err: ingest failed';
+      globalIngestStatusText = error instanceof Error ? rawErrorText(error.message) : 'err: ingest failed';
     } finally {
       isRunningIngest = false;
     }
@@ -225,9 +226,12 @@
 </script>
 
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-title">
-  <div class="source-ledger-head source-ledger__header">
+  <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <div class="source-ledger__header-actions">
+      {#if globalIngestStatusText}
+        <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={globalIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={globalIngestStatusText}>{globalIngestStatusText}</span>
+      {/if}
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
       <input
         id="opml-file"
@@ -241,7 +245,7 @@
       />
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
     </div>
-  </div>
+  </header>
   {#if visibleSources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
   {:else}
@@ -254,7 +258,7 @@
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
           <div class="source-ledger-copy source-ledger__name" title={`src: ${sourceLabel}`} translate={sourceTitleTranslate}>src: {sourceLabel}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
-          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" title={rowStatusText}>{rowStatusText}</div>
+          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" aria-label={`Fetch source ${sourceLabel}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
             {#if confirmingSourceId === source.id}
