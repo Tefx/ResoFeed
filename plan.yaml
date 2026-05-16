@@ -91803,3 +91803,144 @@ phases:
     closed or explicitly non-intersecting.
   depends_on:
   - audit-and-chinese-support-repair-implementation-and-preview-sync
+  steps:
+  - id: azrv-browser-e2e-regression-proof
+    name: Run independent browser E2E proof for UI audit repairs and zh parity
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+
+      As an INDEPENDENT TESTER (integration-verifier), run browser/E2E verification
+      from a fresh perspective. Goal is to find problems, not to rubber-stamp.
+
+
+      Scope protected gates: final `azrv-final-closure-gate`, UIUX audit, and software-architect/spec
+      conformance.
+
+
+      Required real-browser coverage:
+
+      - closed RESOFEED menu: `TODAY`, `SOURCE LEDGER`, `T`, `SL`, and persistent
+      route context labels are not visible as route chrome outside approved contexts.
+
+      - opened RESOFEED menu: `TODAY` and `SOURCE LEDGER` are keyboard and pointer
+      reachable.
+
+      - Source Ledger header: `last_ingest` right-aligns with `[RUN INGEST]`; hitboxes
+      remain 44px; source row geometry does not shift.
+
+      - OPML import: import request does not call `/api/ingest`; sources update; receipt
+      remains terse; manual `[RUN INGEST]` is still available and works when clicked.
+
+      - copy: search/find route preview and receipts contain terse lexical operational
+      text and do not contain `semantic retrieval`, `no semantic retrieval`, `RAG`,
+      `semantic answer`, embeddings, or vector copy.
+
+      - Inspector: visible header does not contain `model: ok`; source-text status
+      and summary provenance line remain visible and screen-reader readable.
+
+      - zh mode: setting language to zh changes `html lang` to `zh-CN`, shows localized
+      LANG/reprocess/status/receipt/steer/Inspector chrome required by DESIGN.md,
+      reprocess receipt is localized, and source identifiers/URLs remain unchanged
+      with non-translation guards.
+
+      - docs/ui-preview.html: static preview contains updated language/reprocess/zh
+      examples and no stale `partial` labels where `source excerpt`/`excerpt` is required.
+
+
+      ## Completion Criteria
+
+      - [ ] Browser/E2E commands and outputs are captured.
+
+      - [ ] Screenshots or DOM snapshots exist for EN closed/open menu, Source Ledger
+      header, OPML import, Inspector, and zh mode.
+
+      - [ ] Network evidence proves OPML import does not call ingest automatically.
+
+      - [ ] Evidence explicitly lists any blocker/should_fix findings with reproduction
+      steps.'
+    verification: '- [ ] Phase-check protects final closure gate by proving live browser
+      behavior for all repaired UI/design findings.
+
+      - [ ] At least one real browser proof covers zh mode end-to-end from language
+      set through visible UI state.
+
+      - [ ] OPML no-auto-ingest is proven with network/request evidence.
+
+      - [ ] Any issues found are classified as blocker/should_fix/suggestion/tech_debt
+      with gate-intersection notes.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Browser E2E Verification Report
+
+      **Tester**: integration-verifier
+
+      **Scope**: UI audit repairs and zh parity
+
+      **Independence Level**: L2
+
+
+      ### Commands executed
+
+      ```
+
+      <paste exact commands>
+
+      ```
+
+
+      ### Artifact table
+
+      | Surface | Evidence artifact | Verdict |
+
+      |---|---|---|
+
+      | Closed/open RESOFEED menu | | PASS/FAIL |
+
+      | Source Ledger header | | PASS/FAIL |
+
+      | OPML import network | | PASS/FAIL |
+
+      | Terse copy | | PASS/FAIL |
+
+      | Inspector provenance | | PASS/FAIL |
+
+      | zh UI mode | | PASS/FAIL |
+
+      | docs/ui-preview.html | | PASS/FAIL |
+
+
+      ### Issues Found
+
+      | Severity | Description | Location | Reproduction | Gate intersection |
+
+      |---|---|---|---|---|
+
+
+      ### Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    agent: integration-verifier
