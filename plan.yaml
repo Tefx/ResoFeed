@@ -95089,3 +95089,118 @@ phases:
 
       - Downstream implementation owner: cos-frontend-operation-utility-surface'
     agent: frontend-engineer
+  - id: cos-backend-operation-snapshot
+    name: Complete in-memory current-operation snapshot backend
+    status: pending
+    description: 'Complete the backend current-operation snapshot within existing
+      flat-file runtime/ingest/reprocess code.
+
+
+      Scope:
+
+      - Add `CurrentOperationInfo` response shape and `GET /api/runtime/operation`
+      route in the existing Go binary/runtime HTTP surface.
+
+      - Use the existing ingest/fetch/reprocess guard as the source of truth; record
+      only a best-effort in-memory current-operation snapshot.
+
+      - Update guarded-operation conflict payloads so HTTP conflicts preserve legacy
+      flat fields and add `current_operation` when available.
+
+      - Track best-effort phase/count/message for background ingest, manual ingest,
+      source fetch, and library reprocess where existing loops naturally know progress.
+
+      - Keep code in flat `internal/resofeed/` files; do not create service/repository/DI
+      layers or new deployables.
+
+
+      ## Forbidden Scope
+
+      - No durable jobs, queues, task tables, retry dashboards, activity ledgers,
+      command history, sync/merge state, sidecar worker, or schema persistence.
+
+      - The LLM must remain a JSON-in/JSON-out transformer and must not orchestrate
+      status/progress.
+
+
+      ## State Semantics
+
+      - Snapshot is process-local, best-effort, and lost on restart.
+
+      - Guard ownership is last holder wins only through the existing guard; idle
+      clears nullable fields after release.
+
+      - Legacy conflict fields remain backward compatible.
+
+
+      ## Failure-Mode Checklist
+
+      - [ ] No-query-param request to `GET /api/runtime/operation` is rejected per
+      existing strict validation style.
+
+      - [ ] Idle response has `running=false` and nullable fields null.
+
+      - [ ] Conflict response still contains `operation_running`, `operation`, `scope`,
+      `retry_allowed` exactly as before.
+
+      - [ ] `current_operation` does not outlive guard release or become durable history.
+
+      - [ ] Concurrent guarded operation attempts observe one active snapshot without
+      data races.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs. Private stub classes or placeholder
+      helpers do not satisfy this requirement.
+
+
+      ## Completion Criteria
+
+      - [ ] Backend contract tests from `cos-backend-operation-contract-tests` pass
+      green.
+
+      - [ ] Implementation uses existing guard/reprocess/ingest paths and flat-file
+      style.
+
+      - [ ] No SQLite schema, queue/job/history table, sidecar, or new architectural
+      layer is introduced.
+
+      - [ ] Race/concurrency safety for the in-memory snapshot is addressed with existing
+      or explicit synchronization.'
+    verification: '- [ ] local-check protecting HTTP runtime behavior: targeted Go
+      tests for idle, running, conflict, and no-query-param cases pass green.
+
+      - [ ] Failure path proof covers guard conflict payload compatibility and snapshot
+      clearing after release.
+
+      - [ ] Evidence confirms no durable job/queue/history/schema or sidecar was added.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Backend Implementation Evidence
+
+      - Files changed:
+
+      - Tests run and output:
+
+      - Snapshot source of truth:
+
+      - Concurrency/reset behavior:
+
+      - Legacy conflict compatibility proof:
+
+      - Forbidden-scope confirmation: no durable jobs/queues/history/schema/sidecar/layers'
+    depends_on:
+    - cos-backend-operation-contract-tests
+    agent: golang-developer
