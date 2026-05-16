@@ -93463,7 +93463,7 @@ phases:
       - [x] `npm run test:render` legacy expectation failures are resolved by spec-aligned
       test updates or by implementation fixes if current behavior is wrong.
 
-      - [ ] `manual-rss-fetch-source-ledger` now agrees with DESIGN.md that Source
+      - [x] `manual-rss-fetch-source-ledger` now agrees with DESIGN.md that Source
       Ledger shows `last_ingest` visually aligned/grouped with `[RUN INGEST]`.
 
       - [ ] `steer-route-preview` now agrees with terse-copy contract: `find maps
