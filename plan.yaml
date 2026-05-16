@@ -82256,7 +82256,7 @@ phases:
 
       - [x] Capture desktop and mobile screenshots/DOM snapshots for required states.
 
-      - [ ] Verify route preview idle/add/search/find/doctor/rule/invalid/receipt/undo
+      - [x] Verify route preview idle/add/search/find/doctor/rule/invalid/receipt/undo
       states against design tokens and copy.
 
       - [ ] Verify Source Ledger actions/details/hit-targets and manual controls are
