@@ -89686,7 +89686,7 @@ phases:
       - [x] Nav visible text conflict is adjudicated with a docs-backed visible-label/accessibility-name
       rule and allowed selector deviation if applicable.
 
-      - [ ] OPML import/ingest `last_fetch` expectation is adjudicated with exact
+      - [x] OPML import/ingest `last_fetch` expectation is adjudicated with exact
       allowed assertions for post-import status.
 
       - [ ] Duplicate Dirty Inspector Corpus rows are dispositioned with fixture/shared
