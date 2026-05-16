@@ -96331,7 +96331,7 @@ phases:
       - Deviation records: none.'
   - id: cos-wiring-audit
     name: Audit runtime wiring for operation status surfaces
-    status: claimed
+    status: done
     description: 'Wiring completeness audit for new HTTP/MCP/frontend operation-status
       surfaces.
 
@@ -96449,6 +96449,73 @@ phases:
     agent: wiring-auditor
     claimed_by: wiring-auditor
     claimed_at: '2026-05-16T21:53:34.190244+00:00'
+    done_at: '2026-05-16T22:08:37.797478+00:00'
+    evidence: 'headline: FAIL - operation-status surfaces are mostly registered, but
+      frontend shape/field consumption breaks final-gate wiring
+
+      verdict: FAIL
+
+      blockers:
+
+      - Frontend expects count:number|null while backend emits count object {current,total}.
+
+      - Frontend validates but does not render/use phase,count,message,started_at,updated_at.
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: REJECT until frontend CurrentOperationInfo matches
+      backend count shape and operation fields are rendered/used or removed from contract.
+
+
+      ## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — read. Key passages: one Go binary serves static UI,
+      JSON HTTP API, MCP, background ingest; HTTP/MCP call same product operations.
+
+      - docs/DESIGN.md — read. Key passages: low-chrome RESOFEED surface menu; LANG/reprocess
+      terse utility controls; Source Ledger manual controls without dashboards/jobs.
+
+
+      ## Wiring Audit Report
+
+      - Orphan exports/symbols: backend symbols have runtime callers; frontend fields
+      have write-only gaps.
+
+      - HTTP route registration: GET /api/runtime/operation statically wired through
+      single binary router to currentOperationInfo().
+
+      - MCP resource registration: resofeed://system/operation listed/readable and
+      uses currentOperationInfo().
+
+      - Frontend field consumption: partial/broken. Backend count is object; frontend
+      expects number/null and rejects object count. phase/count/message/started_at/updated_at
+      are validated but not rendered/used.
+
+      - Production stubs/placeholders: none found; operation path uses real ingestGuardState.current.
+
+
+      ## Blocker ownership created
+
+      - Planner remediation added `cos-fix-current-operation-frontend-wiring` to align
+      frontend count shape and render/use documented operation fields contextually.
+
+      - Follow-up chain: `cos-retest-current-operation-runtime-ui` -> `cos-reaudit-current-operation-wiring`
+      -> `cos-uiux-multimodal-audit` / `cos-spec-doc-conformance` -> `cos-final-gate`.
+
+
+      ## Behavioral proof register
+
+      - GET /api/runtime/operation reachable through single Go binary: static trace.
+
+      - resofeed://system/operation listed/readable: static trace.
+
+      - HTTP/MCP read same snapshot: static trace.
+
+      - frontend consumes current-operation shape: FAIL, owned by cos-fix-current-operation-frontend-wiring.
+
+      - LANG/reprocess reachable from opened RESOFEED menu: static trace.
+
+      - no production operation-status stubs: static scan.'
   - id: cos-runtime-e2e-retest
     name: Run HTTP MCP frontend operation-status e2e retest
     status: done
