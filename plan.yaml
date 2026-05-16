@@ -91073,7 +91073,7 @@ phases:
       here.'
 - id: audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
   name: Audit and Chinese Support Repair — Contract Matrix and Expected-Red Tests
-  status: in_progress
+  status: done
   gate: Contract/test phase blocks unless the recent uiux-auditor/software-architect
     findings and Chinese support surfaces are translated into explicit acceptance
     criteria and expected-red browser/contract tests before implementation.
@@ -91479,7 +91479,7 @@ phases:
       \ no production implementation files were modified."
   - id: azrct-contract-tests-gate
     name: Gate repair contract matrix and expected-red tests
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -91588,9 +91588,134 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T13:42:10.924779+00:00'
+    done_at: '2026-05-16T13:54:43.367546+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read by gate reviewer; key passages: App Shell allows TODAY/SOURCE
+      LEDGER inside RESOFEED menu; Language Control requires terse LANG labels/html
+      lang behavior; reprocess bracket action; Inspector provenance source-text/summary-provenance
+      lines; Source Ledger manual ingest/OPML/header contract; non-goals forbid settings
+      dashboards, architecture slogans, automatic language rewrite, source identifier
+      localization.
+
+      - docs/ARCHITECTURE.md — Read by gate reviewer; key passages: single deployable/SQLite/OpenRouter/lexical-only
+      boundaries; processing-language responsibilities; portable state excludes runtime
+      metadata/receipts/history/sync; explicit reprocess preserves identifiers and
+      rebuilds FTS; HTTP/MCP language parity.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — Read by gate reviewer; key passages:
+      processing_language en|zh runtime metadata, export exclusion, HTTP/MCP schemas,
+      no per-call MCP override, transient receipts, reprocess/source/FTS/frontend
+      non-goals.
+
+      - docs/ui-preview.html — Read by gate reviewer; preview has stale partial labels
+      and lacks LANG/reprocess examples.
+
+      - tests/contract/azrct_closure_matrix.yaml — Read by gate reviewer; all audit
+      findings and zh surfaces have owner/verification mappings and product-boundary
+      non-goals.
+
+      - web/tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts — Read by gate reviewer;
+      covers F1/P2 chrome, F2 ledger alignment, P1 OPML no-ingest, copy slogans, Inspector
+      provenance, zh UI parity, zh Inspector/source identifier behavior.
+
+      - web/src/test/azrct-contract-fixtures.expected-red.test.ts — Read by gate reviewer;
+      portable state fixture excludes processing_language/runtime_metadata/receipts
+      and static preview expected-red checks LANG/reprocess/excerpt/partial.
+
+
+      ## Gate Review Report
+
+      - verdict: PASS.
+
+      - blockers: [].
+
+      - gate_open_allowed: true.
+
+      - orchestrator_action_hint: COMPLETE.
+
+      - Closure matrix: adequate; covers F1/F2/P1/P2/P3 and requested zh surfaces
+      with owner and verification paths.
+
+      - Expected-red tests: adequate; red tests execute and fail on intended behavior/spec
+      drift assertions, not dependency/config errors.
+
+      - Product-boundary non-goals: preserved; no reviewed artifact authorizes vector
+      DB, embeddings, RAG, sidecar worker, queue/dashboard, settings dashboard, per-agent
+      auth registry, or portable receipts.
+
+
+      ## Behavioral Proof Register
+
+      - F1/P2 compact route chrome: expected-red confirmed; `.surface-nav-quick` count
+      2 where expected 0; closure path ui_shell_repair_owner + browser_shell_proof.
+
+      - F2 ledger header alignment: expected-red confirmed; `.source-ledger__header-actions`
+      status missing; closure path source_ledger_geometry_owner + browser_ledger_geometry_proof.
+
+      - P1 OPML no-auto-ingest: expected-red confirmed; observed POST /api/ingest
+      length 1; closure path source_ledger_geometry_owner + browser_ledger_geometry_proof.
+
+      - P2 visible copy: expected-red confirmed; steer preview contains `no semantic
+      retrieval`; closure path product_copy_owner + browser_copy_proof.
+
+      - P2 Inspector provenance: expected-red confirmed; visible `model: ok`; closure
+      path product_copy_owner + browser_copy_proof.
+
+      - P2 preview drift: expected-red confirmed; docs/ui-preview.html lacks LANG
+      surface; closure path preview_docs_owner + spec_preview_proof.
+
+      - zh UI parity: expected-red confirmed; untranslated language status/steer preview/search
+      receipt/steer receipt; closure path zh_frontend_owner + browser_zh_frontend_proof.
+
+      - zh Inspector display: expected-red confirmed; English source-text/summary-provenance
+      labels in zh; closure path zh_frontend_owner + browser_zh_frontend_proof.
+
+      - Go runtime language contract: targeted Go tests passed; closure path zh_runtime_owner
+      + zh_openrouter_owner.
+
+
+      ## Verification Run
+
+      - In gate worktree, the initial gate attempt failed due missing web dependencies.
+      Orchestrator installed dependencies with `npm ci` in `.vectl/worktrees/azrct-contract-tests-gate/web`,
+      then reran the independent gate in a fresh task context.
+
+      - Retry `npm run check` in web/: exit 0; `svelte-check found 0 errors and 0
+      warnings`.
+
+      - Retry `npx vitest run src/test/azrct-contract-fixtures.expected-red.test.ts`
+      in web/: exit 1 expected red; failed on intended docs/ui-preview LANG/reprocess/excerpt
+      drift assertion, not dependency/config failure.
+
+      - Retry `npm run test:e2e -- azrct-audit-zh-repair.expected-red.spec.ts --project=chromium-ci-safe`
+      in web/: exit 1 expected red; build succeeded and all 7 tests ran/failing on
+      intended behavior assertions.
+
+      - Retry `go test ./internal/resofeed -run ''Test(RuntimeMetadataProcessingLanguageDefaultsAndValidation|RuntimeMetadataStateExportImportExcludesMetadataAndReceipts|ProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems|OpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret|ReprocessLibraryAccountingSourcePrecedenceAndFTS)''`:
+      exit 0.
+
+      - Checklist state verified via vectl_show: all description completion criteria
+      and verification checklist items are checked.
+
+
+      ## Files changed
+
+      - none in git-tracked source for this gate step.
+
+
+      ## Commits
+
+      - none for gate source changes; no git-tracked files changed.
+
+
+      ## Gaps/Notes
+
+      - Gate is open for implementation because every current red finding is expected
+      and has downstream owner/verification closure path.'
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
-  status: locked
+  status: pending
   gate: Implementation phase blocks unless UI low-chrome findings, OPML manual-ingest
     boundary, terse copy, Inspector provenance, docs/ui-preview.html drift, and incomplete
     zh UI surfaces are repaired without product-boundary expansion.
