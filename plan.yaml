@@ -91715,7 +91715,7 @@ phases:
       and has downstream owner/verification closure path.'
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
-  status: in_progress
+  status: done
   gate: Implementation phase blocks unless UI low-chrome findings, OPML manual-ingest
     boundary, terse copy, Inspector provenance, docs/ui-preview.html drift, and incomplete
     zh UI surfaces are repaired without product-boundary expansion.
@@ -92211,7 +92211,7 @@ phases:
       with docs/ui-preview.html only.'
   - id: azri-implementation-gate
     name: Gate audit and zh implementation repair
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       agent_source: project
@@ -92294,9 +92294,96 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T14:14:54.331686+00:00'
+    done_at: '2026-05-16T14:20:36.774630+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md, docs/ARCHITECTURE.md, docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md,
+      docs/ui-preview.html, tests/contract/azrct_closure_matrix.yaml, protected E2E/Vitest
+      files, and changed Svelte components were reviewed by gate reviewer.
+
+      - CONSTITUTION.md search in isolated worktree found no file.
+
+
+      ## Gate Review Report
+
+      - verdict: PASS.
+
+      - gate_open_allowed: true.
+
+      - orchestrator_action_hint: COMPLETE.
+
+      - blockers: [].
+
+      - Frontend repair commit reviewed: a04952c5.
+
+      - Preview sync commit reviewed: f7e5433a.
+
+      - No reviewer-authored product/doc/test modifications remain; no gate commit
+      created.
+
+
+      ## Behavioral Proof Register
+
+      - BPR-001 closed RESOFEED menu: PASS; protected Playwright test confirms no
+      persistent TODAY/SOURCE LEDGER/T/SL route controls, open menu exposes TODAY/SOURCE
+      LEDGER.
+
+      - BPR-002 Source Ledger header: PASS; protected Playwright test confirms last_ingest
+      aligns with [RUN INGEST].
+
+      - BPR-003 OPML import: PASS; protected Playwright test confirms one import-opml
+      request and zero POST /api/ingest.
+
+      - BPR-004 protected tests not weakened: PASS; diff over protected test paths
+      produced no output; objective commit stats show only product source/preview
+      changed.
+
+      - BPR-005 Inspector provenance: PASS; protected Playwright confirms source-text
+      and summary-provenance lines, no model: ok.
+
+      - BPR-006 zh UI: PASS; protected Playwright confirms html lang, LANG control,
+      reprocess label/status, receipts, steer preview, Inspector chrome, translate=no
+      identifiers.
+
+      - BPR-007 static preview: PASS; Vitest confirms LANG/reprocess/excerpt surfaces
+      and absence of stale partial provenance.
+
+      - BPR-008 product boundaries: PASS_WITH_NOTES; static grep found no material
+      forbidden architecture slogans or new queue/job/dashboard/vector/RAG settings
+      surfaces.
+
+
+      ## Verification Run
+
+      - `npm run check` (web/): exit 0; svelte-check found 0 errors and 0 warnings.
+
+      - `npm run build` (web/): exit 0; Vite/SvelteKit production build completed.
+
+      - `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts
+      --project=chromium-ci-safe` (web/): exit 0; 7 passed.
+
+      - `npx vitest run src/test/azrct-contract-fixtures.expected-red.test.ts` (web/):
+      exit 0; 1 file passed, 2 tests passed.
+
+      - `git status --short --branch`: final worktree clean after restoring generated
+      artifacts.
+
+      - Checklist state verified via vectl_show: all description completion criteria
+      and verification checklist items are checked.
+
+
+      ## Files changed
+
+      - none by reviewer.
+
+
+      ## Gaps/Notes
+
+      - Gate approves readiness for independent browser, UIUX, spec, and architecture
+      audits; it does not replace those downstream audits.'
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
-  status: locked
+  status: pending
   gate: Final closure blocks unless browser/E2E evidence, uiux-auditor multimodal
     audit, spec/architecture conformance, and zh parity audit prove all repair findings
     closed or explicitly non-intersecting.
