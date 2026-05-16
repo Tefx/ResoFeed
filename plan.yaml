@@ -86886,7 +86886,7 @@ phases:
       \ items."
   - id: srde2e-visual-a11y-blockers-fix
     name: Fix visual accessibility blocker families
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: default
@@ -87074,6 +87074,8 @@ phases:
     depends_on:
     - srde2e-visual-a11y-regression-proof
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T06:52:25.661408+00:00'
   - id: srde2e-visual-a11y-blockers-retest
     name: Retest visual accessibility blocker closure
     status: pending
