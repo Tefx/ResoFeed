@@ -95657,7 +95657,7 @@ phases:
       outside this step; they were preserved and not committed by this completion.'
   - id: gsfr-uiux-reaudit-grouped-source-rendering
     name: Re-audit grouped-source rendering after crash fix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -95771,6 +95771,78 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T22:37:55.269321+00:00'
+    done_at: '2026-05-16T22:43:41.184903+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by auditor; Inspector pane is a deliberate Inspect surface
+      for detail reading and verification with clear provenance headers and no related-content
+      carousels.
+
+      - docs/ARCHITECTURE.md — Read by auditor; grouping never behaves like source
+      suppression or hidden spam filtering, and original item provenance remains accessible
+      when grouped.
+
+
+      ## UIUX Re-Audit Report
+
+      verdict: PASS
+
+      headline: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      **Artifacts reviewed:**
+
+      - `.test-artifacts/gsfr-retest/browser-console-and-dom-proof.json`
+
+      - `.test-artifacts/playwright/test-output/ui-runtime-fresh-review-re-9bba9-source-items-and-provenance-chromium-ci-safe/ui-runtime-fresh-review-remediation-proof/fr-04-rendered-inspector-grouped-sources.json`
+
+      - `web/src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts`
+      (vitest execution confirmed passed)
+
+
+      **Visual/spatial states:**
+
+      - Valid grouped story disclosure: PASS
+
+      - Synthetic no-grouping path: PASS
+
+      - Inspector density/archival aesthetic: PASS
+
+
+      **Runtime blocker status:**
+
+      - `state_unsafe_mutation present? NO`
+
+
+      **behavioral_proof_register:**
+
+      - Valid grouped story source disclosure renders without runtime crash: PASS;
+      `browser-console-and-dom-proof.json` shows `hasStateUnsafeMutation=false`, `pageErrors=[]`,
+      and valid disclosure string `Grouped story with 2 source items`.
+
+      - Synthetic fragment no-grouping path remains non-grouped: PASS; `npm run test:render`
+      inside `web/` confirmed `inspector-fragment-grouping.expected-red.test.ts` passes.
+
+
+      **Mainline/merge note:**
+
+      - Audit was read-only for product implementation files; branch contained no
+      product diff to merge.
+
+
+      **Gaps/Notes:**
+
+      - None.'
 - id: current-operation-status-and-low-frequency-utility-surface-implementation
   name: Current Operation Status and Low-Frequency Utility Surface Implementation
   status: in_progress
