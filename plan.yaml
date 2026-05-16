@@ -95352,7 +95352,7 @@ phases:
       - product_implementation_files_modified: false'
   - id: cos-backend-operation-snapshot
     name: Complete in-memory current-operation snapshot backend
-    status: claimed
+    status: done
     description: 'Complete the backend current-operation snapshot within existing
       flat-file runtime/ingest/reprocess code.
 
@@ -95467,6 +95467,52 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-16T20:49:47.970089+00:00'
+    done_at: '2026-05-16T21:03:55.385926+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passages: one deployable Go process/one SQLite
+      DB; existing library reprocess is explicit and non-durable and must not introduce
+      durable job queue, activity ledger, or sync protocol.
+
+      - docs/DESIGN.md — read. Key passage: flat Source Ledger and functional chrome/design
+      constraints.
+
+
+      ## Backend Implementation Evidence
+
+      - Files changed: internal/resofeed/current_operation.go; internal/resofeed/http.go;
+      internal/resofeed/ingest.go; internal/resofeed/reprocess.go; internal/resofeed/plhm_runtime_blocker_remediation_test.go
+
+      - Worktree commit: e45eba41 runtime: add current operation snapshot
+
+      - Mainline merge commit: 27ab6c62 [vectl] step-cos-backend-operation-snapshot
+      completed
+
+      - Tests run and output: go test ./internal/resofeed -run ''TestCOSBackend|TestManualFetch|TestProcessingLanguage|TestPLHM''
+      => ok; go test ./... => ok; go test -race ./internal/resofeed -run ''TestCOSBackend|TestManualFetchConcurrent|TestPLHM''
+      => ok; golangci-lint run ./... => 0 issues.
+
+      - Snapshot source of truth: existing ingest guard remains source of truth; tryAcquireIngestGuard
+      starts process-local snapshot only after acquiring guard; conflicts read active
+      holder/snapshot.
+
+      - Concurrency/reset behavior: snapshot protected by sync.RWMutex; guard release
+      clears snapshot; idle endpoint returns running=false with nullable fields null.
+
+      - Legacy conflict compatibility proof: HTTP conflicts preserve operation_running,
+      operation, scope, retry_allowed and add current_operation when active; MCP conflict
+      payloads remain legacy until parity step.
+
+      - Forbidden-scope confirmation: no durable jobs/queues/history/schema/sidecar/layers;
+      no LLM orchestration.
+
+      - Deviation record: test_error in internal/resofeed/plhm_runtime_blocker_remediation_test.go
+      relaxed legacy helper to accept optional current_operation while preserving
+      legacy assertions.
+
+      - Mainline dirty-file preservation: pre-existing local modification to internal/resofeed/plhm_runtime_blocker_remediation_test.go
+      was stashed before merge and reapplied after merge without conflict, preserving
+      local state.'
   - id: cos-mcp-operation-parity
     name: Complete MCP current-operation parity
     status: pending
