@@ -82597,7 +82597,7 @@ phases:
       - [x] Confirm stale-vs-real reconciliation exists for every spec-verifier and
       uiux-auditor finding.
 
-      - [ ] Confirm rendered artifact, command, and forbidden scan evidence are present
+      - [x] Confirm rendered artifact, command, and forbidden scan evidence are present
       for the required frontend surfaces.'
     verification: '- [ ] phase-check protecting steer-delta-e2e-architecture-review-closure.
 
