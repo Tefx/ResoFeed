@@ -87692,7 +87692,7 @@ phases:
       - [x] No regression to B1-B4 visual/a11y closures is observed or left without
       remediation ownership.
 
-      - [ ] Behavioral proof register supports downstream full-plan/final gate OPEN
+      - [x] Behavioral proof register supports downstream full-plan/final gate OPEN
       only when every blocker-class route-preview item is PROVEN.'
     verification: '- [ ] full-plan-check companion protecting srde2e-full-plan-check
       and srde2e-final-closure-gate.
