@@ -88861,7 +88861,7 @@ phases:
       - product_implementation_files_modified: no'
   - id: srde2e-full-plan-e2e-blockers-fix
     name: Fix batched full-plan E2E blocker families
-    status: pending
+    status: claimed
     description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
       scope: ONE BATCHED remediation for blocker-class failures reported by srde2e-full-plan-check.\n\
       \nFix ALL full-plan E2E blocker families below in one coherent frontend remediation\
@@ -89088,6 +89088,8 @@ phases:
     depends_on:
     - srde2e-full-plan-check
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T08:41:55.834973+00:00'
   - id: srde2e-full-plan-e2e-blockers-retest
     name: Retest batched full-plan E2E blocker closure
     status: pending
