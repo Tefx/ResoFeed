@@ -94635,7 +94635,7 @@ phases:
       - [x] True same-article URL fallback remains possible only where existing contract/tests
       require it.
 
-      - [ ] No backend schema, service layer, repository layer, DI, event bus, or
+      - [x] No backend schema, service layer, repository layer, DI, event bus, or
       sidecar worker is introduced.
 
       - [ ] The expected-red test from `gsfr-expected-red-fragment-grouping-test`
