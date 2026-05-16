@@ -91368,7 +91368,7 @@ phases:
 
       - [x] Test-only scope is maintained; product code is not changed.
 
-      - [ ] Tests cover all listed audit findings and every required Chinese support
+      - [x] Tests cover all listed audit findings and every required Chinese support
       surface or explicitly cite existing tests that already cover a surface.
 
       - [ ] Evidence lists `expected_failures` and names the downstream implementation
