@@ -90692,7 +90692,7 @@ phases:
       - [x] Confirm the architect artifact contains verdict exactly `CLEAN` before
       allowing gate open.
 
-      - [ ] Re-evaluate all remaining blockers, including any blocker list from the
+      - [x] Re-evaluate all remaining blockers, including any blocker list from the
       architect artifact.
 
       - [ ] Output gate closure fields: `headline`, `verdict`, `blockers`, `gate_open_allowed`,
