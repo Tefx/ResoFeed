@@ -85955,18 +85955,18 @@ phases:
 
       - [x] Findings are reported as PASS, PASS_WITH_DEBT, or FAIL, with blocker-class
       issues preventing downstream closure.'
-    verification: '- [ ] phase-check protecting srde2e-software-architect-clean-recheck,
+    verification: '- [x] phase-check protecting srde2e-software-architect-clean-recheck,
       srde2e-full-plan-check, and srde2e-final-closure-gate.
 
-      - [ ] uiux-auditor evidence includes rendered/browser-observable artifacts for
+      - [x] uiux-auditor evidence includes rendered/browser-observable artifacts for
       the Source Ledger and Steer controls after srde2e-real-system-e2e-blockers-fix.
 
-      - [ ] Evidence explicitly maps each observed UI state to docs/DESIGN.md requirements.
+      - [x] Evidence explicitly maps each observed UI state to docs/DESIGN.md requirements.
 
-      - [ ] Accessible-name uniqueness, Source Ledger live-row/controls visibility,
+      - [x] Accessible-name uniqueness, Source Ledger live-row/controls visibility,
       keyboard/screen-reader usability, and browser-led MCP parity are all validated.
 
-      - [ ] Any blocker or should_fix finding has a closure path and blocks downstream
+      - [x] Any blocker or should_fix finding has a closure path and blocks downstream
       final closure until remediated.'
     evidence_template: '## UI/UX Audit Report
 
