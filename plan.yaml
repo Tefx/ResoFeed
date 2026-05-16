@@ -96373,7 +96373,7 @@ phases:
 
       - [x] Frontend consumption evidence is produced.
 
-      - [ ] Headline is PASS or PASS_WITH_DEBT with explicit non-blocking/non-intersection
+      - [x] Headline is PASS or PASS_WITH_DEBT with explicit non-blocking/non-intersection
       rationale.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: wiring audit confirms
       HTTP, MCP, and frontend operation-status surfaces are registered and consumed.
