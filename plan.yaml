@@ -87265,3 +87265,165 @@ phases:
     depends_on:
     - srde2e-visual-a11y-blockers-fix
     agent: blind-tester
+  - id: srde2e-steer-route-preview-render-contract-fix
+    name: Fix Steer route-preview render contract failures
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Batched implementation remediation for ALL deterministic Steer route-preview
+      render contract failures surfaced by the broad render verifier. This is downstream-blocker
+      debt: it does not intersect the already-focused B1-B4 visual/a11y closure audit,
+      but it WILL predictably block broad/full/final gates that require a clean render/Vitest
+      suite.
+
+
+      ## Failure fingerprints to close
+
+      - srdct-frontend-expected-red-contract.test.ts > reserves a blank Steer idle
+      preview with aria-describedby and no [IDLE] chip before user input: unable to
+      find role="status" with accessible name "Steer route preview" at line 119.
+
+      - srdct-frontend-expected-red-contract.test.ts > uses documented Steer route
+      chips, Escape cancellation, assertive invalid URL feedback, and revocable-only
+      [UNDO]: same missing role/name at line 131.
+
+      - steer-route-preview.expected-red.test.ts > keeps idle preview space reserved
+      but blank with no [IDLE] chip, no duplicate hint, and aria-describedby wiring:
+      same missing role/name at line 98.
+
+      - steer-route-preview.expected-red.test.ts > classifies [ADD SOURCE], [SEARCH],
+      [DOCTOR], [STEER RULE], and [INVALID] previews from exact Steer input copy:
+      same missing role/name at line 111.
+
+      - steer-route-preview.expected-red.test.ts > renders write preview [APPLY]/[CANCEL]
+      and exposes [UNDO] only when backend returns a revocable id: unable to find
+      role="button" with accessible name "[APPLY]"; current accessible names are descriptive
+      labels such as "Commit previewed Steer write action" and "Cancel Steer route
+      preview" while visible text is [APPLY]/[CANCEL].
+
+
+      ## Policy ambiguity to resolve without weakening accessibility
+
+      Reconcile literal bracket accessible names versus descriptive aria-labels against
+      docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md, and the expected-red tests.
+      Preserve accessible semantics and terse operational bracket copy; do not satisfy
+      tests by removing names, hiding controls from assistive technology, weakening
+      aria-describedby/live-region wiring, or making visual text diverge from the
+      documented operational controls.
+
+
+      ## Implementation scope
+
+      - Touch the Steer route-preview rendered surface only as needed, expected primary
+      file web/src/routes/+page.svelte and related route-preview component/test-adjacent
+      code if present.
+
+      - Preserve idle preview reserved blank space, no [IDLE] chip, no duplicate hint,
+      aria-describedby wiring from Steer input to route preview, polite status live
+      region, assertive invalid URL feedback, Escape cancellation, documented route
+      chips, and revocable-only [UNDO].
+
+      - Preserve the B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix;
+      do not regress DETAILS activation, IMPORT STATE visible activation, split-scroll
+      focusability, or 44px Inspector original-link/equivalent target proof paths.
+
+
+      ## Gate Preview (what downstream checks WILL reject)
+
+      - A route preview that is visually present but not queryable as role="status"
+      with accessible name "Steer route preview".
+
+      - [APPLY]/[CANCEL] controls whose accessible names no longer match the expected
+      literal bracket contract unless the implementation records an explicit spec-aligned
+      resolution accepted by tests without weakening a11y.
+
+      - Fixes that delete aria-describedby/live-region behavior, duplicate the Steer
+      hint, reintroduce [IDLE], or show [UNDO] without a revocable backend id.
+
+      - Any regression to B1-B4 visual/a11y closures.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH logic correctness
+      and rendered accessibility completeness. Evidence MUST include rendered DOM/test
+      output proving the status region and action buttons are accessible under Testing
+      Library role/name queries.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION remediation step. Stub-only completion is NOT acceptable.
+      Each deliverable MUST contain substantive rendered UI/accessibility behavior
+      that processes real Steer input and produces observable route-preview state.
+
+
+      Acceptance checklist:
+
+      - [ ] The idle Steer route preview is role="status" with accessible name "Steer
+      route preview", aria-live="polite", reserved blank space, no [IDLE] chip, no
+      duplicate hint, and correct aria-describedby wiring from the Steer input.
+
+      - [ ] The route preview renders documented chips [ADD SOURCE], [SEARCH], [DOCTOR],
+      [STEER RULE], and [INVALID] from exact Steer input copy.
+
+      - [ ] Invalid URL feedback remains assertive/described and Escape cancellation
+      preserves focus.
+
+      - [ ] Write preview controls expose accessible buttons matching the expected
+      [APPLY]/[CANCEL] contract, and [UNDO] appears only when a revocable backend
+      id exists.
+
+      - [ ] DESIGN.md/UI_REGRESSION_CONTRACT/tests policy ambiguity is resolved without
+      weakening accessibility semantics.
+
+      - [ ] B1-B4 visual/a11y blocker closures from srde2e-visual-a11y-blockers-fix
+      remain non-regressed.'
+    verification: '- [ ] Focused render/Vitest proof closes every listed role/name
+      and action-name failure fingerprint.
+
+      - [ ] Accessibility proof covers role="status", accessible name, aria-live,
+      aria-describedby, invalid feedback, Escape focus, and action button names.
+
+      - [ ] Policy resolution is documented in evidence with citations to DESIGN.md,
+      UI_REGRESSION_CONTRACT.md, and the expected-red tests.
+
+      - [ ] B1-B4 visual/a11y closure surfaces are not regressed.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      — key passage or "NOT READ: <reason>"
+
+
+      ## Render Contract Fix Evidence
+
+      - Failure fingerprints closed: <list each fingerprint and file/test line>
+
+      - Policy ambiguity resolution: <literal bracket accessible names vs descriptive
+      labels, with doc/test citations>
+
+      - Files changed: <paths>
+
+      - Focused commands/output: <paste actual command output>
+
+      - B1-B4 non-regression evidence: <command/artifact references>
+
+      - Remaining gaps: <none or explicit blocker disposition>'
+    depends_on:
+    - srde2e-visual-a11y-blockers-fix
+    agent: frontend-engineer
