@@ -91527,7 +91527,7 @@ phases:
       - [x] Expected-red tests are appropriately red before implementation or cite
       already-green existing tests with evidence.
 
-      - [ ] Product-boundary non-goals are preserved.
+      - [x] Product-boundary non-goals are preserved.
 
       - [ ] Gate decision is OPEN only if every blocker-class behavior has a downstream
       closure path.'
