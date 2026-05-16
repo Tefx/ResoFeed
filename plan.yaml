@@ -85795,7 +85795,7 @@ phases:
       - [x] Source Ledger shows the imported live row, visible controls, and the required
       last-fetch timestamp format without layout collapse.
 
-      - [ ] Steer preview/commit/undo controls have unique accessible names and remain
+      - [x] Steer preview/commit/undo controls have unique accessible names and remain
       keyboard/screen-reader usable.
 
       - [ ] Browser-led MCP parity flow remains accessible through the UI controls.
