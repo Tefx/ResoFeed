@@ -189,7 +189,7 @@ async function openSourceLedger(page: Page): Promise<void> {
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/u);
 }
 
-test.describe('AZRCT expected-red audit and zh repair gaps', () => {
+test.describe('AZRCT audit and zh repair regression coverage', () => {
   test('F1/P2 compact route chrome: closed menu has no persistent TODAY/SOURCE LEDGER/T/SL route controls', async ({ page, ownerToken }) => {
     const calls: string[] = [];
     await openShell(page, ownerToken, calls);

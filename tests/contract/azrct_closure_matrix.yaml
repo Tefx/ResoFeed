@@ -60,8 +60,8 @@ spec_refs:
     quote: "runtime_metadata.processing_language ... en|zh ... excluded from state export/import ... No settings dashboard ... no vector DB, embeddings, RAG"
   - id: preview.current_drift_evidence
     path: docs/ui-preview.html
-    lines: 637-743
-    quote: "The current preview still renders `partial` in feed/mobile examples and lacks visible LANG/reprocess surfaces."
+    lines: 647-659, 695-700, 789-810
+    quote: "Historical/non-gating drift evidence superseded: current preview renders `LANG: EN`, `[REPROCESS LIBRARY]`, zh language/reprocess examples, and `source excerpt`/`excerpt` without user-visible `partial` provenance labels."
 
 owner_step_catalog:
   ui_shell_repair_owner:
@@ -214,8 +214,8 @@ audit_findings:
 
   - finding_id: P2-preview-drift
     source_audit: uiux-auditor
-    severity: debt
-    summary: "`docs/ui-preview.html` lacks current LANG/reprocess surfaces and still uses stale `partial` visible copy where DESIGN prefers excerpt language."
+    severity: closed_regression_guard
+    summary: "Historical preview drift is closed in the current artifact: `docs/ui-preview.html` includes LANG/reprocess surfaces and excerpt copy."
     acceptance:
       required: "Preview includes `LANG: EN`/`LANG: ZH` examples, `[REPROCESS LIBRARY]`, and source-text labels `source excerpt`/`excerpt` where user-visible."
       must_not: "No stale `partial` user-facing preview copy for extraction provenance where DESIGN prefers `source excerpt`/`excerpt`."
@@ -224,6 +224,7 @@ audit_findings:
     proof_obligations:
       - Static DOM/text check finds LANG and reprocess surfaces.
       - "Static DOM/text check finds `source excerpt`/`excerpt` and does not find user-visible `partial` provenance labels."
+    current_disposition: "UPDATED_ACTIVE_TEXT: this item is retained as a regression guard only; it no longer asserts current drift. Verified by web/src/test/azrct-contract-fixtures.regression.test.ts."
     product_boundaries_preserved:
       - preview remains static doc artifact, not implementation logic
 
@@ -245,16 +246,18 @@ audit_findings:
 
   - finding_id: P3-test-naming
     source_audit: uiux-auditor
-    severity: process_debt
-    summary: Expected-red names imply permanent failure after closure.
+    severity: dispositioned_process_debt
+    summary: Protected AZRCT and remediated legacy render tests no longer use expected-red names; remaining expected-red names are historical/non-intersecting process debt outside this batched final evidence path.
     acceptance:
       required: "Temporary red-test names are renamed or retitled to closure/regression language when the corresponding behavior is fixed."
       must_not: "No durable test naming that encodes permanent expected failure after the repair is accepted."
     owner_step: expected_red_rename_owner
     verification_step: test_name_proof
     proof_obligations:
-      - "Static test inventory flags remaining `.expected-red.` filenames only when their paired owner step is still open."
+      - "Protected AZRCT proof files and the two remediated render blockers use regression naming rather than `.expected-red.` filenames/titles."
+      - "Remaining `.expected-red.` filenames are not imported by the remediated render tests and are documented as historical/non-runtime naming debt unless a future gate explicitly assigns their paired owner step."
       - Closed behavior tests use regression/contract naming.
+    current_disposition: "RENAMED_INTERSECTIONS: web/src/test/azrct-contract-fixtures.regression.test.ts, web/tests/e2e/azrct-audit-zh-repair.regression.spec.ts, web/src/routes/components/__tests__/manual-rss-fetch-source-ledger.regression.test.ts, and web/src/routes/components/__tests__/steer-route-preview.regression.test.ts. Other expected-red files remain non-runtime/non-intersecting historical guard names for this final evidence."
     product_boundaries_preserved:
       - no product behavior changed by rename-only work
 
@@ -295,8 +298,8 @@ zh_completeness_verdict:
       current_evidence:
         - docs/DESIGN.md:437-445 defines LANG control anatomy and ARIA/html lang requirements.
         - docs/ARCHITECTURE.md:1520-1527 defines frontend processing-language responsibilities.
-      assessment: UNCERTAIN
-      gap: "Needs browser proof against current UI; docs/ui-preview.html currently lacks visible LANG surface."
+      assessment: MAPPED_TO_CURRENT_PROOF
+      gap: "Historical matrix text superseded for docs preview: current docs/ui-preview.html has visible LANG and zh language examples; browser proof remains mapped to browser_zh_frontend_proof."
       owner_step: zh_frontend_owner
       verification_step: browser_zh_frontend_proof
 
@@ -356,17 +359,19 @@ zh_completeness_verdict:
       required_contract: "Browser and Go contract names cover HTTP/MCP, UI controls, receipts/steer, Inspector, reprocess, prompt, state exclusion, and preview docs."
       current_evidence:
         - Existing `web/tests/e2e/processing-language-source-split-scroll.spec.ts` provides a split-scroll/source-identifier proof path.
-      assessment: INCOMPLETE
-      gap: "Need named tests from this matrix added or mapped to current harness; expected-red names should be retired after closure."
+      assessment: MAPPED_TO_CURRENT_PROOF
+      gap: "Protected AZRCT proof paths are mapped to current regression filenames; remaining expected-red names are historical/non-intersecting for this batched remediation."
       owner_step: zh_frontend_owner
       verification_step: browser_zh_frontend_proof
 
     - surface_id: zh-docs-preview-coverage
       required_contract: "docs/ui-preview.html reflects current LANG/reprocess surfaces and excerpt language."
       current_evidence:
-        - docs/ui-preview.html:637-743 contains stale `partial` labels and no LANG/reprocess example in the visible preview artifact.
-      assessment: INCOMPLETE
-      gap: "Static preview artifact must be refreshed; this contract step does not modify docs/ui-preview.html."
+        - docs/ui-preview.html:647-659 contains `LANG: EN`, `[REPROCESS LIBRARY]`, and source-identifier preservation copy.
+        - docs/ui-preview.html:789-810 contains zh language/reprocess examples and `excerpt` copy.
+        - web/src/test/azrct-contract-fixtures.regression.test.ts asserts LANG/reprocess/excerpt presence and no user-visible `partial` provenance label.
+      assessment: CLOSED_CURRENT_ARTIFACT
+      gap: "No active preview gap; retained as regression-guard mapping only."
       owner_step: preview_docs_owner
       verification_step: spec_preview_proof
 

@@ -58,7 +58,7 @@ function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: bo
         return jsonResponse({
           receipt: {
             interpreted_as: options.warningOnly ? 'find_alias_warning' : 'steer_rule',
-            message: options.warningOnly ? 'warning: find alias maps to [SEARCH]' : 'less celebrity coverage',
+            message: options.warningOnly ? 'find maps to SEARCH; retrieval: lexical search' : 'less celebrity coverage',
             changed_rules: options.warningOnly ? [] : [{ id: 'rule_expected_red', rule_text: 'less celebrity coverage' }],
             revocable_id: options.revocable ? 'receipt_revocable_expected_red' : null
           }
@@ -89,7 +89,7 @@ afterEach(() => {
   window.localStorage.clear();
 });
 
-describe('expected-red Steer route preview and receipt contracts', () => {
+describe('Steer route preview and receipt regression contracts', () => {
   it('keeps idle preview space reserved but blank with no [IDLE] chip, no duplicate hint, and aria-describedby wiring', async () => {
     const { steer } = await renderAcceptedPage();
     const form = steer.closest('form');
@@ -153,7 +153,7 @@ describe('expected-red Steer route preview and receipt contracts', () => {
     await rerendered.user.click(screen.getByRole('button', { name: 'apply' }));
     const receipt = await screen.findByRole('status', { name: 'Steer receipt' });
     expect(receipt).toHaveAttribute('aria-live', 'polite');
-    expect(receipt).toHaveTextContent('warning: find alias maps to [SEARCH]');
+    expect(receipt).toHaveTextContent('find maps to SEARCH; retrieval: lexical search');
     expect(screen.queryByRole('button', { name: '[UNDO]' })).not.toBeInTheDocument();
   });
 

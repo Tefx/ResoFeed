@@ -65,7 +65,7 @@ function renderCanonicalLedger(): HTMLElement {
   return screen.getByRole('region', { name: 'SOURCE LEDGER' });
 }
 
-describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () => {
+describe('Manual RSS Fetch Source Ledger regression contract', () => {
   it('renders manual ingest and per-source fetch controls in the Source Ledger', () => {
     renderLedger();
 
@@ -100,8 +100,11 @@ describe('expected-red Manual RSS Fetch Source Ledger rendering contract', () =>
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(within(ledger).queryByText(/last_ingest:/)).not.toBeInTheDocument();
-    expect(ledger.querySelector('.source-ledger__status')).toHaveTextContent('last_fetch: 10:25:31');
+    const header = ledger.querySelector('.source-ledger__header');
+    expect(header).toBeInstanceOf(HTMLElement);
+    expect(within(header as HTMLElement).getByText('last_ingest: 10:25:31')).toHaveClass('source-ledger__status');
+    expect(within(header as HTMLElement).getByRole('button', { name: '[RUN INGEST]' })).toHaveClass('bracket-action--run-ingest');
+    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveTextContent('last_fetch: 10:25:31');
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
   });
 

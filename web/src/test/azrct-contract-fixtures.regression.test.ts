@@ -33,7 +33,7 @@ const documentedStateBundleFixture = {
   ]
 } as const;
 
-describe('AZRCT expected-red static contracts', () => {
+describe('AZRCT closure static regression contracts', () => {
   test('state fixture uses the exact documented portable-state shape and excludes runtime processing_language', () => {
     expect(Object.keys(documentedStateBundleFixture)).toEqual([
       'schema_version',
