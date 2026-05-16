@@ -98359,7 +98359,7 @@ phases:
       - [x] Rerun focused Vitest current-operation utility placement coverage if the
       fix touched component logic or fixtures.
 
-      - [ ] Capture the original failed assertion and the new passing assertion/output.
+      - [x] Capture the original failed assertion and the new passing assertion/output.
 
       - [ ] Prove the conflict fixture includes `error.details.current_operation`
       with documented fields.
