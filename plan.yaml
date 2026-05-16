@@ -95601,7 +95601,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Frontend expected-red tests from `cos-frontend-operation-utility-contract-tests`
+      - [x] Frontend expected-red tests from `cos-frontend-operation-utility-contract-tests`
       pass green.
 
       - [ ] Status placement matches `docs/DESIGN.md` current-operation status rules.
