@@ -95652,7 +95652,7 @@ phases:
 
       - [x] Status placement matches `docs/DESIGN.md` current-operation status rules.
 
-      - [ ] LANG/reprocess placement matches `docs/DESIGN.md` utility menu rules.
+      - [x] LANG/reprocess placement matches `docs/DESIGN.md` utility menu rules.
 
       - [ ] No new dashboard, settings panel, wizard, persistent strip, or durable
       task-history UI is introduced.'
