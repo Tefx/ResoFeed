@@ -85684,7 +85684,7 @@ phases:
       - [x] Produce machine-readable closure with `verdict: PASS`, `gate_open_allowed:
       true`, and `blockers: []`; any blocker means `gate_open_allowed: false`.
 
-      - [ ] Preserve exact real-server browser artifacts: stdout/stderr, Playwright
+      - [x] Preserve exact real-server browser artifacts: stdout/stderr, Playwright
       report, traces/screenshots/videos where available, and server lifecycle logs.'
     verification: '- [ ] full-plan-check companion protecting srde2e-software-architect-fresh-review,
       srde2e-full-plan-check, and srde2e-final-closure-gate.
