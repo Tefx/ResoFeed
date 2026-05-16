@@ -82898,7 +82898,7 @@ phases:
 
       - [x] Run `npm run check` and verify 0 errors/warnings.
 
-      - [ ] Run the forbidden steer/UI concept scan used by `srdf-steer-preview-ui-state-aria`
+      - [x] Run the forbidden steer/UI concept scan used by `srdf-steer-preview-ui-state-aria`
       and verify exit 1/no matches.
 
 
