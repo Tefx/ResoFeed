@@ -89668,7 +89668,7 @@ phases:
       - [x] Current-main E2E failures after 107d1349 are run or inspected and exact
       failure names are recorded.
 
-      - [ ] docs/DESIGN.md is cited for focus order, visible chrome/nav text, and
+      - [x] docs/DESIGN.md is cited for focus order, visible chrome/nav text, and
       UI surface semantics.
 
       - [ ] docs/UI_REGRESSION_CONTRACT.md is cited for regression selectors, accessibility
