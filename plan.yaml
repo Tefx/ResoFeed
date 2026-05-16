@@ -98059,3 +98059,204 @@ phases:
     depends_on:
     - cos-fix-current-operation-frontend-wiring
     agent: frontend-engineer
+  - id: cos-retest-current-operation-browser-conflict-detail
+    name: Retest current-operation browser conflict detail path
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+      independence_level: L1
+
+      failure_source_step: cos-retest-current-operation-runtime-ui
+
+      spec_refs:
+
+      - docs/ARCHITECTURE.md#GET /api/runtime/operation
+
+      - docs/ARCHITECTURE.md#guarded-operation conflicts
+
+      - docs/DESIGN.md#Current Operation Status (`current-operation-status`)
+
+      touch_paths:
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      harness_refs:
+
+      - Playwright current-operation utility placement browser test
+
+      - Vitest current-operation utility placement tests
+
+
+      As an INDEPENDENT TESTER (integration-verifier), rerun the browser current-operation
+      runtime/UI conflict path after `cos-fix-current-operation-browser-conflict-detail`.
+
+
+      This retest must prove both blocker closures from the failed Playwright retest:
+
+      - duplicate `err: ingest already running` Source Ledger status elements are
+      gone or selector ambiguity is fixed with proof;
+
+      - browser/e2e conflict payload carries and renders `current_operation` detail,
+      not only a generic conflict string.
+
+
+      ## Retest Checklist
+
+      - [ ] Rerun the targeted Playwright browser current-operation utility/conflict
+      path.
+
+      - [ ] Rerun focused Vitest current-operation utility placement coverage if the
+      fix touched component logic or fixtures.
+
+      - [ ] Capture the original failed assertion and the new passing assertion/output.
+
+      - [ ] Prove the conflict fixture includes `error.details.current_operation`
+      with documented fields.
+
+      - [ ] Prove browser-visible output includes current-operation detail beyond
+      generic `err: ingest already running` text.
+
+      - [ ] Prove the relevant Source Ledger conflict scope no longer has unintended
+      duplicate status elements.
+
+      - [ ] Confirm no dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      top-chrome status drift is visible.'
+    verification: '- [ ] phase-check protecting `cos-reaudit-current-operation-wiring`,
+      `cos-uiux-multimodal-audit`, `cos-spec-doc-conformance`, and `cos-final-gate`:
+      browser current-operation conflict retest is green after the batched fix.
+
+      - [ ] Main path: current-operation count/detail fields remain accepted and contextually
+      rendered.
+
+      - [ ] Failure path: guarded-operation conflict browser path renders documented
+      `current_operation` detail and no unintended duplicate `err: ingest already
+      running` status elements.
+
+      - [ ] Evidence includes exact commands, actual outputs, browser artifact refs,
+      and PASS/FAIL headline.
+
+      - [ ] Product guard: no dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      top-chrome status appears.'
+    evidence_template: '## Verification Report
+
+
+      **Tester**: integration-verifier (independent of implementation)
+
+      **Scope**: current-operation browser conflict detail retest
+
+      **Independence Level**: L1
+
+      **Timestamp**: <ISO 8601>
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts — key
+      passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+
+      ## Failed Assertion
+
+      ```text
+
+      <quote original strict-mode duplicate locator failure for section.source-ledger
+      getByText(''err: ingest already running'')>
+
+      ```
+
+
+      ## Commands and Outputs
+
+      ```text
+
+      <paste exact Playwright/Vitest commands and actual stdout/stderr>
+
+      ```
+
+
+      ## Browser current_operation Detail Proof
+
+      - Conflict fixture/payload includes `error.details.current_operation`:
+
+      ```json
+
+      <paste payload>
+
+      ```
+
+      - Browser-visible detail assertions:
+
+      ```text
+
+      <paste assertions/output and artifact refs proving phase/count/message/timestamps
+      or supplied detail fields render>
+
+      ```
+
+
+      ## Duplicate Status Closure Proof
+
+      - Locator/scope: <selector>
+
+      - Count/result:
+
+      ```text
+
+      <paste evidence that the relevant Source Ledger conflict scope has no unintended
+      duplicate `err: ingest already running` status elements>
+
+      ```
+
+
+      ## Fix Proof Reviewed
+
+      - Fix step reviewed: cos-fix-current-operation-browser-conflict-detail
+
+      - Closure summary: <how B1/B2 were closed>
+
+
+      ## Issues Found
+
+      | Severity | Description | Location | Reproduction |
+
+      | --- | --- | --- | --- |
+
+      | blocker | <issue or none> | <file/test> | <steps> |
+
+
+      ## Headline
+
+      - [ ] PASS: Browser current-operation conflict path is green and gates may proceed.
+
+      - [ ] FAIL: Blocking duplicate-status or missing-current-operation-detail evidence
+      remains.
+
+      '
+    depends_on:
+    - cos-fix-current-operation-browser-conflict-detail
+    agent: integration-verifier
