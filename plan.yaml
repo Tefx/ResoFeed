@@ -97833,7 +97833,7 @@ phases:
     skipped_reason: superseded
   - id: cos-reaudit-current-operation-wiring
     name: Re-audit current-operation frontend wiring after fix
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       verification_scope: phase-check
@@ -97963,6 +97963,8 @@ phases:
     depends_on:
     - cos-retest-current-operation-browser-conflict-detail
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-16T23:07:45.171722+00:00'
   - id: cos-fix-current-operation-browser-conflict-detail
     name: Fix current-operation browser conflict detail blockers
     status: done
