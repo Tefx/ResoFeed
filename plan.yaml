@@ -87686,7 +87686,7 @@ phases:
       - [x] srdct-frontend-expected-red-contract.test.ts Steer idle/route-preview
       cases are green.
 
-      - [ ] steer-route-preview.expected-red.test.ts idle, chip classification, invalid,
+      - [x] steer-route-preview.expected-red.test.ts idle, chip classification, invalid,
       apply/cancel, and undo cases are green.
 
       - [ ] No regression to B1-B4 visual/a11y closures is observed or left without
