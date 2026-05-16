@@ -94770,7 +94770,7 @@ phases:
       - Backend/schema status: no Go backend/schema files modified.'
   - id: gsfr-targeted-regression-retest
     name: Run targeted frontend/backend grouped-story regression retest
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -94896,6 +94896,8 @@ phases:
     - gsfr-inspector-fragment-identity-fix
     - gsfr-backend-grouping-contract-audit
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T21:10:10.311788+00:00'
   - id: gsfr-uiux-multimodal-audit
     name: Run multimodal Inspector UI audit for grouped-source disclosure
     status: pending
