@@ -93217,7 +93217,15 @@ phases:
 
       - [ ] Final decision includes OPEN/BLOCK and explicit closure path for every
       unresolved item.'
-    verification: '- [ ] All verification/review steps completed with adequate evidence.
+    verification: '- [ ] All original verification/review steps completed with adequate
+      evidence or have an explicit remediation/retest closure path.
+
+      - [ ] `azrv-batched-verification-failure-remediation` completed and addressed
+      all true blockers/should_fix issues from both failed verification outputs.
+
+      - [ ] `azrv-batched-verification-failure-retest` is GREEN and provides gate-usable
+      closure for UIUX stale-audit reconciliation, zh B1/B2, `.expected-red` naming,
+      and stale closure-matrix text.
 
       - [ ] No unresolved blocker or unresolved zh proof gap remains without remediation
       ownership.
@@ -93290,6 +93298,8 @@ phases:
     - azrv-zh-spec-conformance-audit
     - azrv-architecture-boundary-audit
     - azrv-uiux-multimodal-audit
+    - azrv-batched-verification-failure-remediation
+    - azrv-batched-verification-failure-retest
     agent: gate-reviewer
   - id: azrv-batched-verification-failure-remediation
     name: Batched remediation for parallel verification failures
