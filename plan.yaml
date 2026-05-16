@@ -82573,7 +82573,7 @@ phases:
 
       - [x] Rejected owner token is not persisted and rejection semantics remain visible/tested.
 
-      - [ ] Broad rendering tests reach authenticated app chrome and route surfaces
+      - [x] Broad rendering tests reach authenticated app chrome and route surfaces
       instead of staying stuck at Owner Token Prompt.
 
       - [ ] Scoped Steer, Source Ledger, split-scroll/mobile, and processing-language
