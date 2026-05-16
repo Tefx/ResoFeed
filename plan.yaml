@@ -89348,7 +89348,7 @@ phases:
       evidenced above.'
   - id: srde2e-full-plan-e2e-blockers-retest
     name: Retest batched full-plan E2E blocker closure
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -89584,6 +89584,195 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T11:41:01.759410+00:00'
+    done_at: '2026-05-16T11:50:30.228959+00:00'
+    evidence: 'step_intent: retest_green
+
+      expected_result: green
+
+      observed_result: green; all required retest command families passed
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: no
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read. Key passages: one Go deployable serves static
+      UI/API/MCP/background ingest; one SQLite DB; no sidecars; OpenRouter secret
+      redaction/runtime-only contract.
+
+      - docs/DESIGN.md — Read. Key passages: dense muted UI contract, 44px resonate
+      target, functional chrome labels, Source Ledger/Inspector/Steer surfaces.
+
+      - docs/UI_REGRESSION_CONTRACT.md — Read. Key passages: real hit-target proof
+      via pointer coordinates/topmost element, keyboard/a11y coverage, dirty corpus,
+      negative UX assertions.
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md — Read. Key passages: Playwright must
+      build/launch real single deployable, no mocked API server/Vite preview as SUT,
+      CI-safe matrix and artifact requirements.
+
+
+      ## Independent Full-Plan E2E Retest Report
+
+      **Tester**: integration-verifier (independent of frontend-engineer fix)
+
+      **Scope**: srde2e-full-plan-e2e-blockers-fix
+
+      **Expected result**: green
+
+
+      ### Commands and Exact Output
+
+      ```sh
+
+      npm --prefix web run test:e2e
+
+      ```
+
+      Exit: 0; output: 2 skipped, 71 passed (39.7s).
+
+
+      Targeted failing specs/cases as practical:
+
+      ```sh
+
+      npm --prefix web run test:e2e -- tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+      tests/e2e/keyboard-a11y.expected-red.spec.ts tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts tests/e2e/ui-navigation-hover-inspector-repair.expected-red.spec.ts
+      tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/inspector-readable-content-regression.spec.ts
+      tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+      tests/e2e/feed-row-state-matrix.expected-red.spec.ts tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts
+      tests/e2e/prd-pbar-expected-red-browser-gaps.spec.ts
+
+      ```
+
+      Exit: 0; output: 43 passed (21.3s).
+
+
+      ```sh
+
+      npm --prefix web run check
+
+      ```
+
+      Exit: 0; `svelte-check found 0 errors and 0 warnings`.
+
+
+      ```sh
+
+      npm --prefix web run test:render
+
+      ```
+
+      Exit: 0; Test Files 11 passed (11); Tests 62 passed (62).
+
+
+      ```sh
+
+      npm --prefix web run build
+
+      ```
+
+      Exit: 0; production build succeeded and wrote site to `build`.
+
+
+      Visual/a11y proof if UI/layout/accessibility changed:
+
+      ```sh
+
+      npm --prefix web run test:e2e -- tests/e2e/urda-visual-a11y-expected-red-browser-tests.spec.ts
+
+      ```
+
+      Covered inside targeted run; relevant cases passed for UI preview Source Ledger
+      fixture and Issues 7-14 rendered app visual/a11y checks.
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | E2E-full-plan | Full Playwright suite remains green | Full real browser E2E
+      suite passes with nonzero tests | `npm --prefix web run test:e2e`: 71 passed
+      / 2 skipped | PROVEN | Full suite runtime retest | Gate may open; no failing
+      final-gate intersection |
+
+      | blocker-family-navigation | RESOFEED/TODAY/SOURCE LEDGER navigation and active
+      panel state fixed | Pointer/keyboard tests prove active surface and no obstruction
+      | targeted `ui-navigation-hover-inspector-repair`, `keyboard-a11y`, `hit-target`
+      via full suite | PROVEN | Direct E2E coverage | Gate may open |
+
+      | blocker-family-source-ledger | Source Ledger controls, `[RUN INGEST]`, `[FETCH]`,
+      diagnostics, row stability fixed | Browser tests click real controls and assert
+      HTTP/status/geometry | targeted `source-ledger-controls-diagnostics-layout`,
+      `source-ledger-hit-target`, `source-ledger-steer` | PROVEN | Direct E2E coverage
+      | Gate may open |
+
+      | blocker-family-keyboard-a11y | Keyboard focus, activation, labels, semantic
+      states fixed | Keyboard/a11y specs pass | targeted `keyboard-a11y.expected-red.spec.ts`:
+      4 tests passed | PROVEN | Direct E2E coverage | Gate may open |
+
+      | blocker-family-inspector | Inspector primary reading hierarchy avoids raw
+      payload and exposes provenance/original link | Dirty/readable Inspector specs
+      pass | targeted `inspector-dirty-corpus`, `inspector-readable-content`, `prd-inspector-preview`
+      | PROVEN | Direct E2E coverage | Gate may open |
+
+      | blocker-family-dirty-content | Dirty RSS payloads sanitized and secondary/provenance
+      placement enforced | Dirty corpus browser tests pass | targeted dirty corpus/readable
+      specs pass | PROVEN | Direct E2E coverage | Gate may open |
+
+      | blocker-family-layout-state | Hover/focus/selected/loading states avoid layout
+      shift/noisy active states | Feed state matrix and visual design conformance
+      pass | targeted `feed-row-state-matrix`, `full-ui-design-conformance` | PROVEN
+      | Direct E2E/screenshot coverage | Gate may open |
+
+      | blocker-family-mobile | Mobile feed/Inspector/metadata/source-ledger behavior
+      fixed | Mobile E2E assertions pass | targeted `ui-runtime-fresh-review`, `prd-pbar`,
+      `urda-visual-a11y` | PROVEN | Direct E2E coverage | Gate may open |
+
+      | blocker-family-static-render-build | Static checks, render tests, and production
+      build remain green | check/render/build pass | `npm run check`, `npm run test:render`,
+      `npm run build` | PROVEN | Sequential command proof | Gate may open |
+
+
+      ## Broad Verifier Disposition Pass
+
+      No remaining command failures. Skips observed: 2 live OpenRouter opt-in tests
+      skipped without runtime key; non-blocking because deterministic CI-safe E2E
+      passed and live external service was not required by this retest command family.
+      No failure intersects srde2e-final-closure-gate.
+
+
+      ## Verification
+
+      Files changed: concise audit artifact only, `artifacts/audits/srde2e-full-plan-e2e-blockers-retest.md`;
+      no product implementation, test source, docs, plan, claims, or lifecycle files
+      modified.
+
+      Commit hash(es): worktree evidence commit `48c417c3`; mainline squash merge
+      `c85a181f [vectl] step-srde2e-full-plan-e2e-blockers-retest completed`.
+
+      Gaps/Notes: Initial worktree `npm --prefix web run test:e2e` failed before dependency
+      install with `sh: playwright: command not found`; baseline web dependencies
+      were missing/incomplete in the isolated worktree, so `npm --prefix web install`
+      was run once, then all required checks passed. Bulky generated `.test-artifacts/`
+      were removed from branch history and replaced by the concise report artifact
+      before merge. Verification-field checklist items could not be toggled with `vectl_check`,
+      but all criteria are evidenced above.'
   - id: srde2e-uiux-full-plan-e2e-blockers-audit
     name: Audit full-plan UI/UX E2E blocker closure
     status: done
