@@ -89015,7 +89015,7 @@ phases:
 
       - [x] `npm --prefix web run check` remains green.
 
-      - [ ] `npm --prefix web run build` remains green.
+      - [x] `npm --prefix web run build` remains green.
 
       - [ ] No selector/assertion is weakened without an adjudication-backed docs
       citation.
