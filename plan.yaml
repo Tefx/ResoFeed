@@ -86151,7 +86151,7 @@ phases:
       checklist items.'
   - id: srde2e-uiux-source-ledger-status-contract-fix
     name: Fix Source Ledger status DOM contract after UI/UX audit
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -86322,6 +86322,8 @@ phases:
     depends_on:
     - srde2e-uiux-audit-source-ledger-steer-controls
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T05:50:00.534901+00:00'
   - id: srde2e-uiux-source-ledger-status-contract-retest
     name: Retest Source Ledger status DOM contract with real rendered flow
     status: pending
