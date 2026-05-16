@@ -83560,7 +83560,7 @@ phases:
       every spec-verifier and UIUX finding as real, stale, fixture drift, or source-contract
       conflict.
 
-      - [ ] Fix every real current blocker from the combined spec-verifier/UIUX failure
+      - [x] Fix every real current blocker from the combined spec-verifier/UIUX failure
       family in one batch.
 
       - [ ] For each stale or fixture-drift claim, record current rendered/DOM/a11y
