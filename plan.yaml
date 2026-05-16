@@ -82857,7 +82857,7 @@ phases:
   - id: srdf-broad-rendering-owner-token-bootstrap-retest
     name: Retest broad rendering and scoped frontend surfaces after owner-token bootstrap
       fix
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT TESTER (integration-verifier), retest the batched
       owner-token/rendering bootstrap remediation from `srdf-broad-rendering-owner-token-bootstrap-fix`
       from a fresh perspective.
@@ -83044,6 +83044,8 @@ phases:
     depends_on:
     - srdf-broad-rendering-owner-token-bootstrap-fix
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T00:05:11.666122+00:00'
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
