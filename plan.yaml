@@ -84393,7 +84393,7 @@ phases:
       \ named command is absent due harness drift, provide exact discovery output\
       \ proving absence and run the nearest current command that covers the same user-visible\
       \ obligation.\n\nRequired rendered artifact evidence:\n- [x] Source Ledger navigation/menu\
-      \ and visible/reachable hit-target behavior.\n- [ ] Source Ledger `[IMPORT OPML]`\
+      \ and visible/reachable hit-target behavior.\n- [x] Source Ledger `[IMPORT OPML]`\
       \ keyboard/file reachability preserved.\n- [ ] TODAY surface selector/rendered\
       \ artifact proof.\n- [ ] Mobile metadata text visibility/truncation proof for\
       \ the required narrow viewport.\n- [ ] Design-artifact negative UX proof with\
