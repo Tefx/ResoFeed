@@ -82928,7 +82928,7 @@ phases:
 
       - [x] `npm run check` remains clean.
 
-      - [ ] Forbidden UI scan remains clean.
+      - [x] Forbidden UI scan remains clean.
 
       - [ ] Evidence includes actual command output, not only a summary.'
     verification: '- [ ] full-plan-check protecting current frontend mainline: `npm
