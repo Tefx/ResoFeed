@@ -91832,7 +91832,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Protected expected-red tests from `azrct-expected-red-browser-and-contract-tests`
+      - [x] Protected expected-red tests from `azrct-expected-red-browser-and-contract-tests`
       now pass for frontend surfaces.
 
       - [ ] DOM/browser evidence shows closed RESOFEED menu no longer exposes persistent
