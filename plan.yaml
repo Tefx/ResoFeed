@@ -91725,7 +91725,7 @@ phases:
   - id: azri-frontend-low-chrome-copy-zh-repair
     name: Repair frontend low-chrome copy, OPML boundary, Inspector provenance, and
       zh UI parity
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -91897,6 +91897,134 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T13:55:39.671147+00:00'
+    done_at: '2026-05-16T14:07:30.199168+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read by execution agent; key insight: RESOFEED menu may contain
+      TODAY/SOURCE LEDGER only when open; Source Ledger header must right-align last_ingest
+      with [RUN INGEST]; Inspector must show source text / summary provenance lines;
+      zh chrome and translate=no source identifiers are required.
+
+      - docs/ARCHITECTURE.md — Read by execution agent; key insight: one deployable/SQLite
+      only, lexical retrieval only, processing_language is runtime metadata, language
+      change does not auto-rewrite existing items, reprocess is explicit.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — Read by execution agent; key insight:
+      frontend must expose global language/reprocess state without settings/dashboard
+      semantics and preserve source identifiers with translate=no.
+
+      - tests/contract/azrct_closure_matrix.yaml — Read by execution agent; F1/F2/P1/P2
+      and zh frontend proof obligations are authoritative; preview drift is owned
+      by a separate preview-doc step.
+
+      - web/tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts — Read by execution
+      agent; browser closure expects zero .surface-nav-quick nodes, OPML import zero
+      /api/ingest calls, localized zh status/receipts/Inspector copy, and translate=no
+      source URL guards.
+
+      - web/src/test/azrct-contract-fixtures.expected-red.test.ts — Read by execution
+      agent; static fixture includes portable state exclusion plus preview-doc assertions;
+      preview-doc assertion is out of this implementation step.
+
+      - web/src/routes/+page.svelte — Read by execution agent; shell owned route chrome,
+      OPML import wiring, language status, steer route preview, and receipts.
+
+      - web/src/routes/components/SourceLedger.svelte — Read by execution agent; Source
+      Ledger owned last_ingest/run/import header cluster, OPML receipt, manual ingest/fetch
+      controls, and source identifier translate guards.
+
+      - web/src/routes/components/Inspector.svelte — Read by execution agent; Inspector
+      owned visible provenance header and source-text/summary-provenance lines.
+
+      - web/src/lib/api-contract.ts — Read by execution agent; ProcessingLanguage
+      en|zh and non-translation identifier contract are already typed.
+
+
+      ## Frontend Repair Evidence
+
+      - Removed persistent closed-menu quick route buttons and route-context copy
+      outside open RESOFEED menu.
+
+      - Removed OPML import auto-ingest; import updates sources and receipt only.
+
+      - Replaced verbose semantic/RAG boundary copy with terse lexical/search operational
+      copy.
+
+      - Added zh steer preview/search receipt/language status/steer receipt localization.
+
+      - Moved Source Ledger last_ingest into the right header action cluster adjacent
+      to [RUN INGEST].
+
+      - Removed Inspector raw `model: ok` chrome and localized approved provenance
+      lines.
+
+      - Preserved source identifiers with translate=no in zh mode.
+
+
+      ## Files changed
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+
+      ## Worktree verification (reported by execution agent)
+
+      - `npm run check`: exit 0; svelte-check found 0 errors and 0 warnings.
+
+      - `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts`:
+      exit 0; 7/7 Playwright tests passed.
+
+      - `npm run test:render -- src/test/azrct-contract-fixtures.expected-red.test.ts`:
+      exit 1; expected preview-doc assertion failed because docs/ui-preview.html lacks
+      LANG/reprocess preview content, explicitly owned by next preview step.
+
+      - Browser evidence capture script: exit 0.
+
+      - Artifacts reported: .test-artifacts/azri-frontend-low-chrome-copy-zh-repair/closed-menu-en.png,
+      open-menu-en.png, source-ledger-header-en.png, opml-import-receipt-en.png, inspector-zh.png,
+      dom-evidence.json.
+
+      - DOM evidence highlights: htmlLang zh-CN; closedQuickCount 0; opmlIngestCalls
+      0; Source Ledger header DOM contains last_ingest before [RUN INGEST]; Inspector
+      DOM contains 检查器, 来源文本：仅 RSS 摘录, 摘要来源：模型支持, and no visible model: ok; Source
+      URL and item URL translate attributes are both no.
+
+
+      ## Mainline final-state verification after squash merge
+
+      - `npm run check` (workdir web): exit 0; `svelte-check found 0 errors and 0
+      warnings`.
+
+      - `npm run build` (workdir web): exit 0; Svelte/Vite static build succeeded
+      and wrote site to build.
+
+      - `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts
+      --project=chromium-ci-safe` (workdir web): exit 0; 7 passed.
+
+      - Checklist state verified via vectl_show: all description completion criteria
+      and verification checklist items are checked.
+
+
+      ## Commits
+
+      - Worktree commit: cfb01098 (`fix frontend chrome and zh repair surfaces`).
+
+      - Main squash merge commit: a04952c5 (`[vectl] step-azri-frontend-low-chrome-copy-zh-repair
+      completed`).
+
+
+      ## Deviations
+
+      - None.
+
+
+      ## Gaps/Notes
+
+      - Static preview-doc test still fails by design until `azri-preview-contract-sync`
+      updates docs/ui-preview.html.'
   - id: azri-preview-contract-sync
     name: Sync docs/ui-preview.html with repaired UI, reprocess, and zh surfaces
     status: pending
