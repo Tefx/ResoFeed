@@ -87680,7 +87680,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] npm run test:render completes green or the evidence records exact remaining
+      - [x] npm run test:render completes green or the evidence records exact remaining
       failures with blocker disposition.
 
       - [x] srdct-frontend-expected-red-contract.test.ts Steer idle/route-preview
