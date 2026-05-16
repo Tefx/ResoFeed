@@ -94980,13 +94980,13 @@ phases:
       as downstream implementation owner.
 
       - [x] No product implementation code is changed in this step.'
-    verification: '- [ ] local-check protecting backend implementation: expected-red
+    verification: '- [x] local-check protecting backend implementation: expected-red
       tests expose missing or incomplete `GET /api/runtime/operation` and conflict
       `current_operation` behavior before product code changes.
 
-      - [ ] Evidence lists exact test names and expected failures.
+      - [x] Evidence lists exact test names and expected failures.
 
-      - [ ] Evidence confirms no durable job/queue/history/schema implementation was
+      - [x] Evidence confirms no durable job/queue/history/schema implementation was
       added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
