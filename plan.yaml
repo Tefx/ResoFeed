@@ -93633,7 +93633,7 @@ phases:
       \ retest step remains required before final closure."
   - id: azrv-batched-verification-failure-retest
     name: Retest batched verification failures after remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -93820,3 +93820,5 @@ phases:
     depends_on:
     - azrv-batched-verification-failure-remediation
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T15:17:47.046524+00:00'
