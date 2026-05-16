@@ -91715,7 +91715,7 @@ phases:
       and has downstream owner/verification closure path.'
 - id: audit-and-chinese-support-repair-implementation-and-preview-sync
   name: Audit and Chinese Support Repair — Implementation and Preview Sync
-  status: pending
+  status: in_progress
   gate: Implementation phase blocks unless UI low-chrome findings, OPML manual-ingest
     boundary, terse copy, Inspector provenance, docs/ui-preview.html drift, and incomplete
     zh UI surfaces are repaired without product-boundary expansion.
@@ -91725,7 +91725,7 @@ phases:
   - id: azri-frontend-low-chrome-copy-zh-repair
     name: Repair frontend low-chrome copy, OPML boundary, Inspector provenance, and
       zh UI parity
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       agent_source: project
@@ -91895,6 +91895,8 @@ phases:
 
       - Confirmation: source identifiers unchanged and guarded with translate="no".'
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T13:55:39.671147+00:00'
   - id: azri-preview-contract-sync
     name: Sync docs/ui-preview.html with repaired UI, reprocess, and zh surfaces
     status: pending
