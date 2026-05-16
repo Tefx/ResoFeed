@@ -95113,7 +95113,7 @@ phases:
       - [x] Expected-red tests cover LANG/reprocess low-frequency placement and absence
       from persistent prominent top chrome.
 
-      - [ ] Tests cite `docs/DESIGN.md` utility menu/current-operation/language/reprocess
+      - [x] Tests cite `docs/DESIGN.md` utility menu/current-operation/language/reprocess
       sections.
 
       - [ ] No frontend product implementation code is changed in this step.'
