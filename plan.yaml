@@ -82455,7 +82455,7 @@ phases:
     agent: gate-reviewer
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
-    status: claimed
+    status: done
     description: 'Fix all six mainline broad rendering expected-red failures exposed
       while closing `srdf-steer-preview-ui-state-aria`.
 
@@ -82682,6 +82682,178 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-15T23:56:28.965048+00:00'
+    done_at: '2026-05-16T00:04:45.411035+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — subagent read owner token as sole local delegation
+      boundary; frontend must show prompt before `/api/*`, store `resofeed.ownerToken`,
+      and send it as bearer auth; no accounts/OAuth/per-agent auth.
+
+      - docs/DESIGN.md — subagent read Owner Token Prompt gate, accepted-token persistence
+      only after acceptance, rejection copy `err: owner token rejected`, and app chrome
+      as Steer/feed/Inspector plus discreet RESOFEED menu and flat Source Ledger.
+
+      - docs/UI_REGRESSION_CONTRACT.md — subagent read broad rendering contract for
+      owner-token, first-use, Today, Source Ledger, selected item, search, doctor,
+      mobile-feed surfaces, and negative dashboard/job/activity/account assertions.
+
+      - `web/src/routes/components/__tests__/rendering-expected-red.test.ts` — subagent
+      read six failures as all depending on authenticated bootstrap rendering actual
+      Steer/Source Ledger/mobile/search/agent receipt DOM.
+
+      - Current merged frontend implementation files — subagent read `web/src/routes/+page.svelte`,
+      `OwnerTokenPrompt.svelte`, `api-client.ts`, and `web/src/test/setup.ts`; key
+      insight: `+page.svelte` had a test-mode-only persistence/read bypass.
+
+      - CONSTITUTION.md — NOT READ: no file exists in isolated worktree root.
+
+
+      ## Batched Fix Evidence
+
+      **Commit hash(es)**: worktree commit `81117bd5f3a1b623470f903bc4621b14cba4c675`;
+      main squash merge `254b07ab [vectl] step-srdf-broad-rendering-owner-token-bootstrap-fix
+      completed`.
+
+      **Spec link**: docs/ARCHITECTURE.md / docs/DESIGN.md / docs/UI_REGRESSION_CONTRACT.md.
+
+      **Files changed**:
+
+      - `web/src/routes/+page.svelte`
+
+
+      **Root cause**: `web/src/routes/+page.svelte` gated localStorage owner-token
+      read/write behind `import.meta.env.MODE !== ''test''`, causing broad rendering
+      tests with pre-seeded accepted token to stay at Owner Token Prompt rather than
+      executing authenticated bootstrap. The fix removed the test-only bypass while
+      keeping persistence inside successful `loadShellData()` after authenticated
+      `/api/sources` and `/api/feed/today` bootstrap.
+
+
+      **why_previous_fix_failed**: The four frontend branches verified scoped surfaces
+      independently; none owned the broad authenticated bootstrap path that gates
+      all rendered routes in `rendering-expected-red.test.ts` after the merge combination.
+
+
+      **why_previous_gate_missed_it**: Targeted checks passed, but mainline broad
+      verifier `npm run test` was not green; owner-token bootstrap is a shared precondition
+      for Source Ledger, split-scroll/mobile, MCP receipt, and Steer route rendering.
+
+
+      **reversal_risk**: A local fix that bypasses the prompt or forces labels into
+      the DOM could regress Owner Token Prompt security, rejected-token non-persistence,
+      Source Ledger non-persistence, mobile route scoping, or scoped Steer/source/split
+      UI work. This fix preserves the prompt and restores real localStorage bootstrap.
+
+
+      **Six-failure closure table**:
+
+      | Test name | Before symptom | Fix location | Evidence |
+
+      | --- | --- | --- | --- |
+
+      | persists owner token only after authenticated bootstrap succeeds and never
+      after rejection | accepted token not persisted in test mode | `web/src/routes/+page.svelte`
+      loadShellData/onMount | focused expected-red 19/19 passed; full suite 61/61
+      passed |
+
+      | wires Steer to /api/steer and /doctor to raw text diagnostics | pre-seeded
+      token ignored, app stayed on prompt | `+page.svelte` stored-token read | focused
+      expected-red suite passed |
+
+      | exposes Source Ledger through non-persistent RESOFEED utility menu | authenticated
+      chrome unreachable | `+page.svelte` stored-token read | focused expected-red
+      suite passed |
+
+      | surfaces active MCP agent steering attribution as inline correction receipt
+      | agent receipt gated behind prompt | `+page.svelte` stored-token read | focused
+      expected-red suite passed |
+
+      | uses mobile feed-first full-screen surfaces instead of stacked page | mobile
+      Today/Inspector gated behind prompt | `+page.svelte` stored-token read | focused
+      expected-red suite passed |
+
+      | scopes mobile Search controls and retrieval receipts away from Today | search
+      route gated behind prompt | `+page.svelte` stored-token read | focused expected-red
+      suite passed |
+
+
+      **Commands/tests run**:
+
+      ```
+
+      # subagent worktree
+
+      npm ci
+
+      # exit 0
+
+      npm run test:render -- --run src/routes/components/__tests__/rendering-expected-red.test.ts
+
+      # 1 file passed; 19 tests passed
+
+      npm run test
+
+      # svelte-check 0 errors/warnings; 11 files passed; 61 tests passed
+
+      npm run test:render -- --run src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/manual-rss-fetch-client.expected-red.test.ts
+
+      # 4 files passed; 22 tests passed
+
+      forbidden scan on changed page
+
+      # no matches
+
+
+      # orchestrator mainline final-state gate
+
+      npm run test
+
+      # svelte-check found 0 errors and 0 warnings; Test Files 11 passed (11); Tests
+      61 passed (61)
+
+      npm run test:render -- --run src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/processing-language-reprocess.expected-red.test.ts
+      src/lib/manual-rss-fetch-client.expected-red.test.ts
+
+      # Test Files 4 passed (4); Tests 22 passed (22)
+
+      rg -n -i "account|oauth|settings dashboard|job queue|activity ledger|\bRAG\b|vector|folders|\btags\b|unread|archive"
+      web/src/routes/+page.svelte; printf ''exit_code=%s''
+
+      # exit_code=1
+
+      ```
+
+
+      **Rendered evidence**:
+
+      - `rendering-expected-red.test.ts` proves rejected 401 displays `err: owner
+      token rejected` and leaves `localStorage[''resofeed.ownerToken'']` null.
+
+      - Accepted bootstrap renders `Steer or paste RSS URL` and persists accepted
+      token.
+
+      - Authenticated app chrome proof covers Steer submit to `/api/steer`, `/doctor`
+      raw `<pre role="log">`, RESOFEED menu to SOURCE LEDGER, Agent steering receipt,
+      mobile Today feed items, mobile full-screen Inspector, and Search retrieval
+      scoping.
+
+
+      **Regression/forbidden scan**:
+
+      - Full `npm run test` green.
+
+      - Scoped Steer preview, Source Ledger/manual fetch, processing-language/reprocess,
+      and manual fetch client expected-red tests green.
+
+      - No new forbidden UI concepts introduced in changed file.
+
+
+      **Gaps/Notes**: NONE. Description and verification checklist items are [x].'
   - id: srdf-broad-rendering-owner-token-bootstrap-retest
     name: Retest broad rendering and scoped frontend surfaces after owner-token bootstrap
       fix
