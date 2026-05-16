@@ -37,7 +37,9 @@ func ClassifySteerRoute(command string) SteerRouteKind {
 
 // PreviewSteering pins the non-mutating preview signature. It must remain safe
 // to call without an idempotency key and must not write SQLite state, create
-// receipts, enqueue jobs, or update an undo stack.
+// receipts, enqueue jobs, or update an undo stack. WillMutate describes whether
+// this preview call mutates durable state, so preview responses always leave it
+// false even when a later commit for the same route could mutate.
 func PreviewSteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerPreviewRequest) (SteerPreviewResult, error) {
 	if err := ctx.Err(); err != nil {
 		return SteerPreviewResult{}, fmt.Errorf("preview steering: %w", err)
@@ -51,7 +53,6 @@ func PreviewSteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerPr
 	case SteerRouteSource:
 		sourceURL, _ := sourceURLFromSteerCommand(command)
 		preview.InterpretedAs = "add_source"
-		preview.WillMutate = true
 		preview.Message = "preview: syntactic RSS URL accepted; commit can add source without fetching or guessing: " + sourceURL
 	case SteerRouteSearch:
 		query, alias := lexicalQueryFromSteerCommand(command)

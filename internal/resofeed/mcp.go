@@ -222,11 +222,8 @@ func SteerForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPSteerI
 	}
 	var result SteerResult
 	req := SteerRequest{Command: input.Command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
-	_, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "steer", "", struct {
-		Command   string    `json:"command"`
-		ActorKind ActorKind `json:"actor_kind"`
-		ActorID   string    `json:"actor_id"`
-	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (SteerResult, error) {
+	route := ClassifySteerRoute(req.Command)
+	_, err := withMCPReceipt(ctx, db, input.IdempotencyKey, input.ActorID, "steer", "", steerFingerprintPayload(req, route), &result, func() (SteerResult, error) {
 		return ApplySteering(ctx, db, llm, req)
 	})
 	if err != nil {

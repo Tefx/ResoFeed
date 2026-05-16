@@ -248,6 +248,8 @@ type SteerUndoHandle struct {
 // lexical_search_query and undo_handle are present as null when inapplicable.
 // Preview may classify lexical search aliases, source additions, policy changes,
 // /doctor, and invariant conflicts, but must not write SQLite state or receipts.
+// WillMutate is scoped to the preview call itself, not a future commit: preview
+// is read-only, so public preview responses must report will_mutate=false.
 type SteerPreview struct {
 	RouteKind          SteerRouteKind   `json:"route_kind"`
 	InterpretedAs      string           `json:"interpreted_as"`

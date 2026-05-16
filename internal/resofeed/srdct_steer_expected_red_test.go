@@ -67,9 +67,9 @@ func TestSRDCTHTTPPreviewSteerExpectedRedRoutePrecedenceAndBoundaries(t *testing
 		wantMessage []string
 	}{
 		{name: "doctor wins over policy", command: "/doctor", wantRoute: SteerRouteDoctor, wantMutates: false},
-		{name: "direct URL add source", command: "https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: true},
-		{name: "add alias", command: "add https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: true},
-		{name: "add Chinese alias", command: "添加 https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: true},
+		{name: "direct URL add source", command: "https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: false},
+		{name: "add alias", command: "add https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: false},
+		{name: "add Chinese alias", command: "添加 https://new-source.example.test/rss.xml", wantRoute: SteerRouteSource, wantMutates: false},
 		{name: "search alias", command: "search sqlite", wantRoute: SteerRouteSearch, wantMutates: false},
 		{name: "search Chinese alias", command: "搜索 sqlite", wantRoute: SteerRouteSearch, wantMutates: false},
 		{name: "find warning-only alias", command: "find sqlite", wantRoute: SteerRouteSearch, wantMutates: false, wantMessage: []string{"warning", "find is treated as lexical search", "no generated answer"}},
@@ -94,6 +94,29 @@ func TestSRDCTHTTPPreviewSteerExpectedRedRoutePrecedenceAndBoundaries(t *testing
 				}
 			}
 		})
+	}
+}
+
+func TestSRDCTHTTPPreviewSteerSourceWillMutateFalseAndReadOnly(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedSRDCTSteerState(t, ctx, db)
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: srdctSteeringLLM{}})
+
+	before := srdctTableCounts(t, ctx, db)
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, srdctAuthorizedJSON(http.MethodPost, "/api/steer/preview", srdctPreviewBody(t, "add https://preview-source.example.test/rss.xml")))
+	srdctWantStatus(t, recorder, http.StatusOK, "source preview is a read-only classification")
+	var parsed SteerPreviewResult
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal source preview: %v; body=%s", err, recorder.Body.String())
+	}
+	if parsed.Preview.RouteKind != SteerRouteSource || parsed.Preview.WillMutate {
+		t.Fatalf("source preview = %+v, want source route with will_mutate=false because preview call does not mutate", parsed.Preview)
+	}
+	after := srdctTableCounts(t, ctx, db)
+	if before != after {
+		t.Fatalf("source preview changed durable state counts: before=%+v after=%+v", before, after)
 	}
 }
 
@@ -153,6 +176,45 @@ func TestSRDCTHTTPCommitSteerExpectedRedIdempotencyUndoAndPolicyConflicts(t *tes
 			t.Errorf("conflict result = %+v, want no changed rules and no undo handle for non-write", conflictResult)
 		}
 	}
+}
+
+func TestSRDCTHTTPThenMCPSteerSameKeyCommandReplaysWithoutFingerprintMismatch(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedSRDCTSteerState(t, ctx, db)
+	llm := &srdctCountingSteeringLLM{out: OpenRouterSteeringOutput{InterpretedAs: "openrouter_policy_update", RuleTexts: []string{"Prefer deterministic SQLite steering parity."}, Message: "applied: deterministic SQLite steering parity"}}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
+
+	command := "Push deterministic SQLite steering parity."
+	key := "srdct-http-mcp-steer-parity-001"
+	bodyData, err := json.Marshal(SteerRequest{Command: command, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: "briefing-agent", IdempotencyKey: key}})
+	if err != nil {
+		t.Fatalf("marshal HTTP steer body: %v", err)
+	}
+	first := postHTTPJSON[SteerResult](t, router, "/api/steer", string(bodyData), http.StatusOK)
+	if first.Receipt.InterpretedAs != "openrouter_policy_update" || len(first.Receipt.ChangedRules) != 1 {
+		t.Fatalf("HTTP steer result = %+v, want committed policy receipt", first)
+	}
+	if got := llm.calls; got != 1 {
+		t.Fatalf("TranslateSteering calls after HTTP steer = %d, want 1", got)
+	}
+
+	replayResp := mcpCall(t, router, "steer", map[string]any{"command": command, "actor_id": "briefing-agent", "idempotency_key": key})
+	if replayResp.Error != nil {
+		t.Fatalf("MCP steer replay returned error: %+v", replayResp.Error)
+	}
+	text := mcpToolText(t, replayResp, "steer HTTP-to-MCP replay")
+	var replay SteerResult
+	if err := json.Unmarshal([]byte(text), &replay); err != nil {
+		t.Fatalf("unmarshal MCP steer replay: %v; text=%s", err, text)
+	}
+	if replay.Receipt.InterpretedAs != first.Receipt.InterpretedAs || len(replay.Receipt.ChangedRules) != 1 || replay.Receipt.ChangedRules[0].ID != first.Receipt.ChangedRules[0].ID {
+		t.Fatalf("MCP replay = %+v, want stored HTTP receipt %+v", replay, first)
+	}
+	if got := llm.calls; got != 1 {
+		t.Fatalf("TranslateSteering calls after MCP replay = %d, want still 1", got)
+	}
+	assertReceiptCount(t, ctx, db, key, 1)
 }
 
 func TestSRDCTHTTPUndoSteerExpectedRedTargetSpecificAndIdempotent(t *testing.T) {

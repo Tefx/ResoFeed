@@ -582,12 +582,7 @@ func (h apiHandler) handleSteer(w http.ResponseWriter, r *http.Request) {
 	}
 	route := ClassifySteerRoute(req.Command)
 	var result SteerResult
-	_, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "steer", "", struct {
-		Command   string         `json:"command"`
-		ActorKind ActorKind      `json:"actor_kind"`
-		ActorID   string         `json:"actor_id"`
-		RouteKind SteerRouteKind `json:"route_kind"`
-	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID, RouteKind: route}, &result, func() (SteerResult, error) {
+	_, err := withIdempotencyReceipt(r.Context(), h.cfg.DB, req.IdempotencyKey, req.ActorID, "steer", "", steerFingerprintPayload(req, route), &result, func() (SteerResult, error) {
 		return h.commitSteeringByRoute(r.Context(), req, route)
 	})
 	if err != nil {

@@ -154,3 +154,17 @@ func mutationFingerprintPayload(fields MutationRequestFields) struct {
 		ActorID   string    `json:"actor_id"`
 	}{ActorKind: fields.ActorKind, ActorID: fields.ActorID}
 }
+
+func steerFingerprintPayload(req SteerRequest, route SteerRouteKind) struct {
+	Command   string         `json:"command"`
+	ActorKind ActorKind      `json:"actor_kind"`
+	ActorID   string         `json:"actor_id"`
+	RouteKind SteerRouteKind `json:"route_kind"`
+} {
+	return struct {
+		Command   string         `json:"command"`
+		ActorKind ActorKind      `json:"actor_kind"`
+		ActorID   string         `json:"actor_id"`
+		RouteKind SteerRouteKind `json:"route_kind"`
+	}{Command: req.Command, ActorKind: req.ActorKind, ActorID: req.ActorID, RouteKind: route}
+}
