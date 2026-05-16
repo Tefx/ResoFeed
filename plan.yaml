@@ -94640,19 +94640,19 @@ phases:
 
       - [x] The expected-red test from `gsfr-expected-red-fragment-grouping-test`
       turns green after this repair.'
-    verification: '- [ ] Targeted frontend regression command passes and includes
+    verification: '- [x] Targeted frontend regression command passes and includes
       the synthetic same-base/different-fragment case.
 
-      - [ ] Evidence includes rendered Inspector output proving no grouped-source
+      - [x] Evidence includes rendered Inspector output proving no grouped-source
       disclosure for unrelated TLDR/feed fragment items.
 
-      - [ ] Evidence includes a valid grouping case proving transparent source disclosure
+      - [x] Evidence includes a valid grouping case proving transparent source disclosure
       still works.
 
-      - [ ] Evidence explains whether same-article URL fallback was preserved, narrowed,
+      - [x] Evidence explains whether same-article URL fallback was preserved, narrowed,
       or left untouched and why.
 
-      - [ ] No Go backend/schema files are modified unless backed by the backend audit
+      - [x] No Go backend/schema files are modified unless backed by the backend audit
       evidence.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
