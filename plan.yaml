@@ -84978,6 +84978,7 @@ phases:
       '
     depends_on:
     - srde2e-software-architect-fresh-review
+    - srde2e-visual-a11y-blockers-retest
     agent: golang-developer
   - id: srde2e-frontend-architecture-remediation
     name: Remediate frontend architecture and design review findings
