@@ -92027,7 +92027,7 @@ phases:
       updates docs/ui-preview.html.'
   - id: azri-preview-contract-sync
     name: Sync docs/ui-preview.html with repaired UI, reprocess, and zh surfaces
-    status: pending
+    status: claimed
     description: 'step_type: documentation
 
       agent_source: project
@@ -92116,6 +92116,8 @@ phases:
     depends_on:
     - azri-frontend-low-chrome-copy-zh-repair
     agent: doc-reviewer
+    claimed_by: doc-reviewer
+    claimed_at: '2026-05-16T14:07:54.692663+00:00'
   - id: azri-implementation-gate
     name: Gate audit and zh implementation repair
     status: pending
