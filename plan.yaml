@@ -87694,18 +87694,18 @@ phases:
 
       - [x] Behavioral proof register supports downstream full-plan/final gate OPEN
       only when every blocker-class route-preview item is PROVEN.'
-    verification: '- [ ] full-plan-check companion protecting srde2e-full-plan-check
+    verification: '- [x] full-plan-check companion protecting srde2e-full-plan-check
       and srde2e-final-closure-gate.
 
-      - [ ] Expected result is green after remediation.
+      - [x] Expected result is green after remediation.
 
-      - [ ] npm run test:render output is captured and shows Steer route-preview expected-red
+      - [x] npm run test:render output is captured and shows Steer route-preview expected-red
       suites green.
 
-      - [ ] B1-B4 visual/a11y blocker closures remain non-regressed or any regression
+      - [x] B1-B4 visual/a11y blocker closures remain non-regressed or any regression
       has explicit remediation ownership.
 
-      - [ ] Gate-intersection disposition is explicit: failures intersect broad/full/final
+      - [x] Gate-intersection disposition is explicit: failures intersect broad/full/final
       render gates and are closed before progression.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
