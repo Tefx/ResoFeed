@@ -82580,15 +82580,15 @@ phases:
       UI work remains intact.
 
       - [x] Forbidden UI concepts remain absent.'
-    verification: '- [ ] `npm run test` passes, including all six `src/routes/components/__tests__/rendering-expected-red.test.ts`
+    verification: '- [x] `npm run test` passes, including all six `src/routes/components/__tests__/rendering-expected-red.test.ts`
       failures listed in this step.
 
-      - [ ] Focused evidence shows accepted-token persistence and rejected-token non-persistence.
+      - [x] Focused evidence shows accepted-token persistence and rejected-token non-persistence.
 
-      - [ ] Focused evidence shows authenticated app chrome renders expected Steer,
+      - [x] Focused evidence shows authenticated app chrome renders expected Steer,
       Source Ledger, mobile Today, and agent receipt surfaces.
 
-      - [ ] No scoped regression is introduced for Steer preview, Source Ledger, split-scroll/mobile,
+      - [x] No scoped regression is introduced for Steer preview, Source Ledger, split-scroll/mobile,
       processing-language controls, or forbidden UI concepts.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
