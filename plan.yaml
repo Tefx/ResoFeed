@@ -92338,3 +92338,150 @@ phases:
 
       |---|---|---|---|---|'
     agent: uiux-auditor
+  - id: azrv-final-closure-gate
+    name: Final gate for audit repair and Chinese support closure
+    status: pending
+    description: 'step_type: gate
+
+      verification_scope: full-plan-check
+
+      agent_source: project
+
+
+      As an INDEPENDENT REVIEWER (gate-reviewer), decide whether the recent UIUX/architecture
+      audit repair and Chinese support audit can close.
+
+
+      Independence: gate-reviewer must not be the same agent as frontend-engineer,
+      doc-reviewer, integration-verifier, spec-verifier, software-architect, or uiux-auditor
+      evidence producers for this phase.
+
+
+      review_depth: THOROUGH
+
+      review_depth_rationale:
+
+      - Prior uiux-auditor verdict was FAIL.
+
+      - Prior software-architect verdict was PASS_WITH_DEBT.
+
+      - Chinese support spans storage/API/MCP/frontend/OpenRouter/state/E2E/docs.
+
+
+      Gate Decision Basis required for each blocker-class behavior:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      Final gate may OPEN only if:
+
+      - all F1/F2/P1/P2/P3 findings are PROVEN fixed or have explicit non-intersection
+      evidence;
+
+      - Chinese support verdict is COMPLETE, or every incomplete/uncertain item has
+      a new remediation owner before closure;
+
+      - uiux-auditor handoff is PASS or PASS_WITH_DEBT with no blocker-class design
+      debt;
+
+      - architecture/spec audits show product boundaries intact.
+
+
+      ## Completion Criteria
+
+      - [ ] Browser E2E evidence is reviewed and specific.
+
+      - [ ] zh spec conformance evidence covers all seven user-requested surfaces.
+
+      - [ ] Software architecture boundary audit is reviewed.
+
+      - [ ] UIUX multimodal audit is reviewed.
+
+      - [ ] Final decision includes OPEN/BLOCK and explicit closure path for every
+      unresolved item.'
+    verification: '- [ ] All verification/review steps completed with adequate evidence.
+
+      - [ ] No unresolved blocker or unresolved zh proof gap remains without remediation
+      ownership.
+
+      - [ ] Final OPEN/BLOCK recommendation includes structured behavioral decision
+      basis.
+
+      - [ ] Product boundaries remain intact: single Go binary, SQLite only, no sync/merge/history,
+      no SaaS/settings/RAG/vector surfaces.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Final Gate Review Report
+
+      | Evidence step | Status | Evidence quality | Concerns |
+
+      |---|---|---|---|
+
+      | azrv-browser-e2e-regression-proof | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+      | azrv-zh-spec-conformance-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+      | azrv-architecture-boundary-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+      | azrv-uiux-multimodal-audit | ✅/⚠️/❌ | excellent/adequate/insufficient/missing
+      | |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+
+      ## Chinese Support Final Assessment
+
+      - [ ] COMPLETE
+
+      - [ ] INCOMPLETE — remediation owner(s): <step ids>
+
+      - [ ] UNCERTAIN — remediation/proof owner(s): <step ids>
+
+
+      ## Gate Decision
+
+      - [ ] OPEN
+
+      - [ ] BLOCKED'
+    depends_on:
+    - azrv-browser-e2e-regression-proof
+    - azrv-zh-spec-conformance-audit
+    - azrv-architecture-boundary-audit
+    - azrv-uiux-multimodal-audit
+    agent: gate-reviewer
