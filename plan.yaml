@@ -82259,7 +82259,7 @@ phases:
       - [x] Verify route preview idle/add/search/find/doctor/rule/invalid/receipt/undo
       states against design tokens and copy.
 
-      - [ ] Verify Source Ledger actions/details/hit-targets and manual controls are
+      - [x] Verify Source Ledger actions/details/hit-targets and manual controls are
       rendered and reachable.
 
       - [ ] Verify split-scroll desktop and mobile Inspector route behavior visually/spatially.
