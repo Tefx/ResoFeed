@@ -95399,7 +95399,7 @@ phases:
       - [x] No-query-param request to `GET /api/runtime/operation` is rejected per
       existing strict validation style.
 
-      - [ ] Idle response has `running=false` and nullable fields null.
+      - [x] Idle response has `running=false` and nullable fields null.
 
       - [ ] Conflict response still contains `operation_running`, `operation`, `scope`,
       `retry_allowed` exactly as before.
