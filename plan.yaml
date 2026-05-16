@@ -85106,6 +85106,7 @@ phases:
     depends_on:
     - srde2e-backend-architecture-remediation
     - srde2e-frontend-architecture-remediation
+    - srde2e-uiux-audit-source-ledger-steer-controls
     agent: software-architect
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
