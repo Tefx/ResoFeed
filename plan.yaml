@@ -94251,16 +94251,16 @@ phases:
       disclosure.
 
       - [x] Product code remains unchanged in this step.'
-    verification: '- [ ] Only frontend tests/fixtures changed; no product-code changes
+    verification: '- [x] Only frontend tests/fixtures changed; no product-code changes
       are included.
 
-      - [ ] The expected-red command is documented and fails specifically because
+      - [x] The expected-red command is documented and fails specifically because
       unrelated feed-fragment items produce a grouped-source disclosure.
 
-      - [ ] The fixture contains at least two same-base, different-fragment synthetic
+      - [x] The fixture contains at least two same-base, different-fragment synthetic
       feed URLs with null `story_key` and null `duplicate_of_item_id`.
 
-      - [ ] Any same-article fallback positive control is tied to an existing contract
+      - [x] Any same-article fallback positive control is tied to an existing contract
       or explicitly omitted as out of scope.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
