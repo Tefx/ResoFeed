@@ -91447,6 +91447,180 @@ phases:
     zh UI surfaces are repaired without product-boundary expansion.
   depends_on:
   - audit-and-chinese-support-repair-contract-matrix-and-expected-red-tests
+  steps:
+  - id: azri-frontend-low-chrome-copy-zh-repair
+    name: Repair frontend low-chrome copy, OPML boundary, Inspector provenance, and
+      zh UI parity
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+
+      Complete the implementation within existing frontend component boundaries; do
+      not introduce new settings, dashboards, queues, jobs, sync/merge/history, semantic/RAG,
+      folders/tags/unread, or sidecar surfaces.
+
+
+      UPSTREAM ARTIFACTS (from prior phase contract/test steps):
+
+      - azrct-closure-matrix — acceptance matrix is AUTHORITATIVE.
+
+      - azrct-expected-red-browser-and-contract-tests — tests are PROTECTED.
+
+
+      YOUR SCOPE: Modify existing Svelte/TypeScript/CSS bodies and markup only where
+      needed to satisfy the protected tests and design contract.
+
+
+      Touch paths:
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/Inspector.svelte
+
+      - web/src/lib/api-contract.ts only if test contract labels need alignment with
+      implemented UI
+
+      - web/src/routes or stylesheet files that already own shell/source-ledger layout
+
+
+      Required repairs:
+
+      - Remove persistent route chrome outside the open RESOFEED menu: no closed-menu
+      `TODAY`, `SOURCE LEDGER`, `T`, `SL`, or `SOURCE LEDGER / DOCTOR / INSPECTOR`
+      visible route context line. Preserve keyboard reachability through the opened
+      RESOFEED menu and legitimate active surface headings/time-group labels.
+
+      - Align `.source-ledger__status` showing `last_ingest` with `[RUN INGEST]` on
+      the right side of `.source-ledger__header`; do not push `SOURCE LEDGER` title
+      or source rows.
+
+      - Remove the automatic `runIngest()` call from frontend OPML import; OPML import
+      must update sources and receipt only. Manual `[RUN INGEST]` remains the explicit
+      refresh path.
+
+      - Replace explanatory copy such as `semantic retrieval`, `no semantic retrieval`,
+      RAG boundary phrasing, and verbose lexical/RAG safety copy with terse operational
+      copy (for example `retrieval: lexical search` / `find maps to SEARCH`). Preserve
+      safety as tests/specs, not product chrome.
+
+      - Replace Inspector visible `model: ok` header chrome with approved source-text
+      and summary-provenance lines; keep model-backed provenance visible in the existing
+      summary provenance contract, not as raw model internals.
+
+      - Complete zh UI support for product chrome required by contract: `html lang=zh-CN`,
+      LANG/reprocess labels, reprocess status/receipts, language status, steer preview/search
+      receipt, Inspector chrome/provenance labels, Source Ledger operational statuses
+      where required. Preserve source identifiers exactly and keep `translate="no"`
+      on URLs/source titles/canonical/original/source URLs.
+
+      - Rename confusing expected-red test descriptions only when they are now closure/regression
+      tests; do not delete useful regression coverage.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Persistent closed-menu route buttons/labels (`TODAY`, `SOURCE LEDGER`, `T`,
+      `SL`) outside the RESOFEED menu.
+
+      2. OPML import issuing `/api/ingest` or calling `runIngest()` implicitly.
+
+      3. Visible product chrome containing `semantic retrieval`, `no semantic retrieval`,
+      `RAG`, or raw architecture-explanation copy.
+
+      4. Inspector header exposing `model: ok` instead of approved provenance lines.
+
+      5. zh mode with English-only status/receipt/accessible names where DESIGN requires
+      localized chrome.
+
+      6. Source identifiers translated or missing `translate="no"` guards.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: data/state computation produces correct values.
+
+      2. Rendering completeness: component produces visible DOM elements and accessible
+      names.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive logic that processes its inputs and produces
+      outputs that vary based on those inputs.
+
+
+      ## Completion Criteria
+
+      - [ ] Protected expected-red tests from `azrct-expected-red-browser-and-contract-tests`
+      now pass for frontend surfaces.
+
+      - [ ] DOM/browser evidence shows closed RESOFEED menu no longer exposes persistent
+      route chrome while opened menu still works by pointer and keyboard.
+
+      - [ ] Browser evidence shows OPML import does not call ingest and receipt tells
+      user sources were imported; manual `[RUN INGEST]` remains available.
+
+      - [ ] Browser evidence in zh mode shows localized LANG/reprocess/status/receipt/steer/Inspector
+      chrome and unchanged source identifiers with non-translation guards.
+
+      - [ ] Screenshot or DOM evidence shows Source Ledger header alignment and Inspector
+      provenance copy.'
+    verification: '- [ ] Targeted browser/DOM tests for route chrome, Source Ledger
+      alignment, OPML no-auto-ingest, terse copy, Inspector provenance, and zh UI
+      parity pass.
+
+      - [ ] Evidence includes rendered screenshots/DOM snapshots for EN and ZH states.
+
+      - [ ] No forbidden product concepts or new runtime surfaces are introduced.
+
+      - [ ] Source identifiers remain unchanged and non-translatable in zh mode.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/lib/api-contract.ts — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Frontend Repair Evidence
+
+      - Files changed.
+
+      - Test commands and output.
+
+      - Screenshots/DOM snapshots for closed/open RESOFEED menu, Source Ledger header,
+      OPML import, Inspector provenance, EN controls, and ZH controls.
+
+      - Confirmation: no OPML auto-ingest network call.
+
+      - Confirmation: no visible forbidden copy (`semantic retrieval`, `no semantic
+      retrieval`, `RAG`) in product chrome.
+
+      - Confirmation: source identifiers unchanged and guarded with translate="no".'
+    agent: frontend-engineer
 - id: audit-and-chinese-support-repair-verification-and-closure
   name: Audit and Chinese Support Repair — Verification and Closure
   status: locked
