@@ -82328,7 +82328,7 @@ phases:
       - [ ] Build requirements register for every user-visible state and forbidden
       UI concept in this delta.
 
-      - [ ] Cite spec section and implementation file/line or rendered artifact for
+      - [x] Cite spec section and implementation file/line or rendered artifact for
       every requirement.
 
       - [ ] Flag all behavioral/ARIA claims as NEEDS_TEST unless tests or rendered
