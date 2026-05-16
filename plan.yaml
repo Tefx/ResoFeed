@@ -85559,7 +85559,7 @@ phases:
 
       ## Behavioral Proof Register Requirement
 
-      - [ ] Evidence includes `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,
+      - [x] Evidence includes `requirement_ref`, `behavior_claim`, `runtime_proof_expected`,
       `evidence_ref`, `status`, `closure_path`, and `gate_decision_basis` for each
       of SF1 and SF2.'
     verification: '- [ ] phase-check protecting `srde2e-full-plan-check` and `srde2e-final-closure-gate`.
