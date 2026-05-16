@@ -89001,7 +89001,7 @@ phases:
       - [x] OPML import/ingest `last_fetch` expectation or app behavior is resolved
       exactly as adjudicated.
 
-      - [ ] Duplicate Dirty Inspector Corpus rows/shared DB state are resolved exactly
+      - [x] Duplicate Dirty Inspector Corpus rows/shared DB state are resolved exactly
       as adjudicated.
 
       - [ ] Hit-target scroll geometry is resolved exactly as adjudicated.
