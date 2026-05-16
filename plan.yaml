@@ -94926,7 +94926,7 @@ phases:
       \ UNPROVEN, or UNCERTAIN_BLOCKING items remain."
   - id: gsfr-uiux-multimodal-audit
     name: Run multimodal Inspector UI audit for grouped-source disclosure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: phase-check protecting gsfr-final-gate
@@ -95020,6 +95020,63 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T21:10:28.510862+00:00'
+    done_at: '2026-05-16T22:07:27.567744+00:00'
+    evidence: 'headline: FAIL
+
+      verdict: FAIL
+
+      blockers: ["state_unsafe_mutation crash in Inspector.svelte grouped story rendering"]
+
+      gate_open_allowed: false
+
+      orchestrator_action_hint: ROUTE_TO_IMPLEMENTER
+
+
+      ## refs Read Confirmation
+
+      - docs/DESIGN.md — read. Key passage: dense but legible archival index; Inspector
+      grouped-story source-list disclosure should preserve provenance without SaaS
+      bloat.
+
+      - docs/ARCHITECTURE.md — read. Key passage: duplicate/story grouping preserves
+      every original source item.
+
+      - web/src/routes/components/Inspector.svelte — read. Key passage: groupedSourceItems/sort
+      path mutates reactive grouped source array.
+
+
+      ## Multimodal UI Audit Report
+
+      - Rendered artifacts: synthetic_spatial.txt; grouped_html2.txt; browser console
+      logs via Playwright.
+
+      - Synthetic fragment state: PASS; unrelated synthetic feed fragments correctly
+      omit grouped-source disclosure.
+
+      - Valid grouped story state: FAIL; browser console reports `Error: https://svelte.dev/e/state_unsafe_mutation
+      at Proxy.sort ... Inspector.svelte:438`, preventing grouped-source disclosure
+      rendering.
+
+      - DESIGN.md tone/density: PASS for rendered portions; terse provenance labels/no
+      SaaS bloat.
+
+
+      ## Blocker ownership created
+
+      - Planner remediation added `gsfr-fix-reactive-grouped-source-sort-crash` to
+      replace mutating sort with non-mutating sort.
+
+      - Follow-up verification chain: `gsfr-retest-grouped-source-runtime-rendering`
+      -> `gsfr-uiux-reaudit-grouped-source-rendering` -> `gsfr-final-gate`.
+
+
+      ## Behavioral proof register
+
+      - synthetic_fragment_hides_grouping: PROVEN
+
+      - grouped_story_shows_grouping: FAIL, owned by gsfr-fix-reactive-grouped-source-sort-crash
+
+      - design_md_conformance: PROVEN for rendered portions'
   - id: gsfr-final-gate
     name: Gate grouped-story fragment URL regression repair
     status: pending
