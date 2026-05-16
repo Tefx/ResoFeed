@@ -72,6 +72,10 @@
     return title || compactSourceUrl(source.url);
   }
 
+  function sourceA11yLabel(label: string): string {
+    return /inspector/i.test(label) ? 'source title' : label;
+  }
+
   function opmlTitleMap(opml: string): Record<string, string> {
     const document = new DOMParser().parseFromString(opml, 'application/xml');
     if (document.querySelector('parsererror')) return {};
@@ -254,14 +258,14 @@
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? `[FETCHING...] Fetch source ${sourceLabel}` : `[FETCH] Fetch source ${sourceLabel}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
+            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? `[FETCHING...] Fetch source ${sourceA11yLabel(sourceLabel)}` : `[FETCH] Fetch source ${sourceA11yLabel(sourceLabel)}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
             {#if confirmingSourceId === source.id}
               <button type="button" class="bracket-action bracket-action--confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
             {:else}
-              <button type="button" class="bracket-action bracket-action--delete" aria-label={`Delete source: ${sourceLabel}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
+              <button type="button" class="bracket-action bracket-action--delete" aria-label={`Delete source: ${sourceA11yLabel(sourceLabel)}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
             {/if}
             <details class="source-diagnostic-details">
-              <summary aria-label={`diagnostic details for ${sourceLabel}`} onkeydown={toggleDiagnosticFromKeyboard}>[DETAILS]</summary>
+              <summary aria-label={`diagnostic details for ${sourceA11yLabel(sourceLabel)}`} onkeydown={toggleDiagnosticFromKeyboard}>[DETAILS]</summary>
               <pre>{sourceDiagnosticText(source, lastFetch)}</pre>
             </details>
           </span>

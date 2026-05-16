@@ -76,7 +76,7 @@
   }
 </script>
 
-<section class="contract-region contract-search" aria-labelledby="search-heading">
+<section class="contract-region contract-search" aria-label="Search and Retrieval">
   <h2 id="search-heading" tabindex="-1">SEARCH</h2>
   <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
@@ -142,7 +142,7 @@
           <button
             class="contract-resonate"
             type="button"
-            aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'}
+            aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
             aria-pressed={item.is_resonated ? 'true' : 'false'}
             disabled={pendingResonanceId === item.id}
             onclick={() => void toggleResonance(item)}

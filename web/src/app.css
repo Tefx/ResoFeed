@@ -484,6 +484,8 @@ a:focus,
 
 nav.surface-nav,
 details.surface-nav {
+  position: relative;
+  z-index: 6;
   display: flex;
   gap: var(--rf-space-row);
   align-items: center;
@@ -505,9 +507,23 @@ details.surface-nav summary::-webkit-details-marker {
 }
 
 details.surface-nav .surface-nav-menu {
+  position: relative;
+  z-index: 7;
   display: flex;
   gap: var(--rf-space-xs);
   align-items: center;
+}
+
+.surface-nav-menu--closed {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+details.surface-nav[open] .surface-nav-menu--closed {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 details.surface-nav button,
@@ -554,6 +570,8 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 }
 
 .runtime-language-controls {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: var(--rf-space-sm);

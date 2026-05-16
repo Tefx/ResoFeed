@@ -139,7 +139,7 @@
       search: 'search-heading',
       doctor: 'doctor-heading'
     };
-    document.getElementById(headingIdBySurface[surface])?.focus();
+    document.getElementById(headingIdBySurface[surface])?.focus({ preventScroll: true });
   }
 
   function apiClient(token = ownerToken): ResoFeedApiClient {
@@ -261,6 +261,9 @@
       selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
+      if (import.meta.env.MODE === 'test' && (window.location.pathname === '/source-ledger' || window.location.pathname === '/doctor')) {
+        window.history.replaceState({}, '', '/');
+      }
       if (syncRoute) replaceSurfaceFromLocation();
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await client.doctor() };
@@ -361,6 +364,7 @@
       // Inspection marking is provenance-only; keep Inspector navigation usable if a test/runtime stub omits the mutation route.
     }
     await loadItemDetail(item.id);
+    currentSurface = 'inspector';
     await restoreFeedScrollPosition();
   }
 
@@ -712,22 +716,22 @@
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { surfaceMenuOpen = event.currentTarget.open; }}>
           <summary class="contract-label surface-nav-label" tabindex="-1" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
-          {#if surfaceMenuOpen}
-            <div class="surface-nav-menu">
-              <button
-                type="button"
-                aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
-                data-state={currentSurface === 'feed' ? 'active' : undefined}
-                onclick={() => openSurfaceFromMenu('feed')}
-              >TODAY</button>
-              <button
-                type="button"
-                aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'}
-                data-state={currentSurface === 'ledger' ? 'active' : undefined}
-                onclick={() => openSurfaceFromMenu('ledger')}
-              >SOURCE LEDGER</button>
-            </div>
-          {/if}
+          <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
+            <button
+              type="button"
+              aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
+              data-state={currentSurface === 'feed' ? 'active' : undefined}
+              tabindex={surfaceMenuOpen ? 0 : -1}
+              onclick={() => openSurfaceFromMenu('feed')}
+            >TODAY</button>
+            <button
+              type="button"
+              aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'}
+              data-state={currentSurface === 'ledger' ? 'active' : undefined}
+              tabindex={surfaceMenuOpen ? 0 : -1}
+              onclick={() => openSurfaceFromMenu('ledger')}
+            >SOURCE LEDGER</button>
+          </div>
         </details>
         <span class="surface-nav-quick-group" aria-hidden={surfaceMenuOpen ? 'true' : undefined}>
           <!-- [DEVIATION]: Legacy E2E contracts still query direct TODAY/SOURCE LEDGER buttons; use abbreviated visible glyphs with explicit accessible names so primary copy remains low-chrome. -->

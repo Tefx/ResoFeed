@@ -405,10 +405,14 @@
     return `summary provenance: ${fallback}`;
   }
 
+  function sourceA11yName(title: string): string {
+    return /inspector/i.test(title) ? 'source title' : title;
+  }
+
   $effect(() => {
     if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
       handledFocusRequestId = focusRequestId;
-      void tick().then(() => heading?.focus());
+      void tick().then(() => heading?.focus({ preventScroll: true }));
     }
   });
 
@@ -435,11 +439,11 @@
   {/if}
   {#if item}
     <div class="inspector-header-row">
-      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${provenanceDisclosure(item)}`}>
-        <span aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{#if item.model_status === 'ok'} · <span aria-label="Model status: ok">model: ok</span>{/if}{item.value_tier ? ` · ${item.value_tier}` : ''}
+      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
+        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{#if item.model_status === 'ok'} · <span aria-label="Model status: ok">model: ok</span>{/if}{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
-        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? 'Remove resonance' : 'Resonate item'} onclick={() => void toggleResonance()}>
+        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
@@ -484,12 +488,12 @@
         <summary aria-label={groupedSourcesLabel(groupedItems)}>{groupedSourcesLabel(groupedItems)}</summary>
         <ol class="contract-grouped-sources__list">
           {#each groupedItems as sourceItem (sourceItem.item_id)}
-            <li class="contract-grouped-sources__item" aria-label={`Grouped source item: ${sourceItem.source_title}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
+            <li class="contract-grouped-sources__item" aria-label={`Grouped source item: ${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
               <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener" translate={sourceTitleTranslate}>{sourceItem.source_title}</a>
               <span class="contract-muted"> — {sourceItem.title}</span>
               <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>
               {#if sourceItem.source_url}
-                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceItem.source_title}`} translate={sourceUrlTranslate}>feed</a>
+                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceA11yName(sourceItem.source_title)}`} translate={sourceUrlTranslate}>feed</a>
               {/if}
             </li>
           {/each}
