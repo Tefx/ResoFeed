@@ -85367,7 +85367,7 @@ phases:
       - [x] Source Ledger real-system flow imports OPML, runs `[RUN INGEST]`, renders
       `Live Audit Source`, exposes controls, and displays `last_fetch` as `HH:MM:SS`.
 
-      - [ ] Steer preview/commit/undo controls have unambiguous accessible button
+      - [x] Steer preview/commit/undo controls have unambiguous accessible button
       names and remain keyboard/screen-reader usable.
 
       - [ ] Browser-led MCP parity flow remains covered through the real-server UI
