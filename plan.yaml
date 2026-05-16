@@ -85668,7 +85668,7 @@ phases:
       - [x] Run `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe`
       against the real-server harness.
 
-      - [ ] Verify 9/9 real-server tests pass, or explicitly report the current test
+      - [x] Verify 9/9 real-server tests pass, or explicitly report the current test
       count if the suite legitimately changed with rationale.
 
       - [ ] Verify Source Ledger OPML import + `[RUN INGEST]` renders `Live Audit
