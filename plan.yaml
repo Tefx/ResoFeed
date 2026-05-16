@@ -92690,7 +92690,7 @@ phases:
     claimed_at: '2026-05-16T14:21:46.250095+00:00'
   - id: azrv-architecture-boundary-audit
     name: Audit architecture boundary after OPML, copy, preview, and zh repairs
-    status: claimed
+    status: done
     description: 'step_type: review
 
       verification_scope: phase-check
@@ -92809,6 +92809,117 @@ phases:
     agent: software-architect
     claimed_by: software-architect
     claimed_at: '2026-05-16T14:21:20.723068+00:00'
+    done_at: '2026-05-16T14:59:52.985239+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - AGENTS.md — NOT READ in isolated worktree; file absent, but project AGENTS
+      instructions were present in session context and treated as binding.
+
+      - docs/ARCHITECTURE.md — READ: one deployable Go process, one SQLite DB, one
+      backend package, thin transports, no event bus/DI/repository layers; processing
+      language runtime metadata excluded from portable state and source identifiers
+      preserved; state portability excludes runtime metadata/activity/sync; reprocess
+      explicit/non-durable/no jobs/queues/dashboards; HTTP/MCP language/reprocess
+      contracts.
+
+      - docs/DESIGN.md — READ: RESOFEED menu constraints; terse language/reprocess
+      controls; source identifiers not translated; Source Ledger OPML/manual ingest
+      boundaries; do/don''t guardrails.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — READ: runtime_metadata.processing_language
+      excluded from export/import; receipts not portable/jobs/queues; reprocess source
+      precedence; no durable job/queue/activity/sync/vector/RAG.
+
+      - docs/ui-preview.html — READ: active static preview includes LANG EN, REPROCESS
+      LIBRARY, source identifier warning, excerpt labels, Source Ledger controls.
+
+      - tests/contract/azrct_closure_matrix.yaml — READ: closure matrix requires no
+      persistent T/SL, OPML import-only, terse visible copy, active docs/ui-preview.html,
+      runtime language/state/reprocess/OpenRouter proofs.
+
+      - web/src/routes/+page.svelte — READ: importOpml only calls importOpml and refreshes
+      sources; runIngest separate; reprocess explicit; menu has TODAY/SOURCE LEDGER
+      only inside menu; controls terse.
+
+      - web/src/routes/components/SourceLedger.svelte — READ: OPML import calls onImportOpml
+      only, displays imported/folders-flattened status, run ingest separate, translate
+      suppression for source fields.
+
+      - web/src/routes/components/Inspector.svelte — READ: source identifiers use
+      translate controls; source-text and summary-provenance lines, no model: ok chrome.
+
+      - internal/resofeed/state.go — READ: portable bundle includes only sources,
+      steer rules, resonated items; export excludes runtime metadata/receipts/history/sync;
+      import validates/restores portable state only.
+
+      - internal/resofeed/reprocess.go — READ: explicit operation with no durable
+      coordination artifacts; ingest guard, idempotency receipt, in-process loop/FTS
+      rebuild; updates readable fields only.
+
+      - internal/resofeed/openrouter.go — READ: OpenRouter is JSON transformer, no
+      durable state; target language included in summary input.
+
+      - relevant HTTP/MCP/runtime files — READ: runtime metadata, HTTP routes, MCP
+      tools, processing language contracts, API client boundaries.
+
+
+      ## Architecture Boundary Review
+
+      - OPML import is import-only: PASS; no runIngest call in import handler; /api/sources/import-opml
+      separate from /api/ingest.
+
+      - Reprocess explicit/non-durable: PASS; explicit UI confirmation/API route;
+      in-process Go function; no job/queue/dashboard.
+
+      - Processing language runtime metadata/export exclusion: PASS.
+
+      - Source identifiers preserved: PASS.
+
+      - Terse product copy without architecture slogans: PASS.
+
+      - No new service/worker/sidecar/DI/event-bus/repository layers: PASS.
+
+      - SQLite-only/single Go binary intact: PASS.
+
+      - docs/ui-preview.html active preview; missing design-version non-blocking:
+      PASS.
+
+      - Persistent compact T/SL removed: PASS.
+
+
+      ## Behavioral proof register
+
+      - OPML boundary, reprocess boundary, state/language boundary, source identifiers,
+      product copy, compact nav, and preview artifact all have static code/spec proof;
+      no blockers.
+
+
+      ## Verification
+
+      - `npm run check` in web/: exit 0; svelte-check found 0 errors and 0 warnings.
+
+      - `go test ./internal/resofeed -run ''Test(ReprocessLibrary|RuntimeMetadata|ProcessingLanguage|OpenRouter|HTTP|MCP|State|ImportOPML|ManualIngest)''`:
+      exit 0; `ok resofeed/internal/resofeed 0.757s`.
+
+      - Worktree clean; no files changed.
+
+      - Checklist state verified via vectl_show: all checkboxes checked.
+
+
+      ## Verdict
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Files changed
+
+      - none.'
   - id: azrv-uiux-multimodal-audit
     name: Run native multimodal UIUX audit for low-chrome and zh repair
     status: claimed
