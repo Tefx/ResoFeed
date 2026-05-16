@@ -82571,7 +82571,7 @@ phases:
 
       - [x] Accepted owner token is persisted only after authenticated bootstrap succeeds.
 
-      - [ ] Rejected owner token is not persisted and rejection semantics remain visible/tested.
+      - [x] Rejected owner token is not persisted and rejection semantics remain visible/tested.
 
       - [ ] Broad rendering tests reach authenticated app chrome and route surfaces
       instead of staying stuck at Owner Token Prompt.
