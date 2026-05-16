@@ -83989,7 +83989,7 @@ phases:
       \ and `srdf-batched-frontend-closure-blockers-retest`."
   - id: srdf-batched-frontend-closure-blockers-fix
     name: Batch fix frontend closure blockers after failed audit retest
-    status: pending
+    status: claimed
     description: 'Batched remediation for failed `srdf-batched-frontend-audit-closure`.
 
 
@@ -84265,6 +84265,8 @@ phases:
     depends_on:
     - srdf-batched-frontend-audit-closure
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T01:22:28.397653+00:00'
   - id: srdf-batched-frontend-closure-blockers-retest
     name: Retest and close frontend closure blockers after batched fix
     status: pending
