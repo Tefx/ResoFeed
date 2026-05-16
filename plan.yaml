@@ -85686,20 +85686,20 @@ phases:
 
       - [x] Preserve exact real-server browser artifacts: stdout/stderr, Playwright
       report, traces/screenshots/videos where available, and server lifecycle logs.'
-    verification: '- [ ] full-plan-check companion protecting srde2e-software-architect-fresh-review,
+    verification: '- [x] full-plan-check companion protecting srde2e-software-architect-fresh-review,
       srde2e-full-plan-check, and srde2e-final-closure-gate.
 
-      - [ ] Real-server Playwright command `npm run test:e2e -- real-server-ui.spec.ts
+      - [x] Real-server Playwright command `npm run test:e2e -- real-server-ui.spec.ts
       --project chromium-ci-safe` exits 0.
 
-      - [ ] Closure payload is machine-readable and contains `verdict: PASS`, `gate_open_allowed:
+      - [x] Closure payload is machine-readable and contains `verdict: PASS`, `gate_open_allowed:
       true`, and `blockers: []`.
 
-      - [ ] Artifacts prove real binary launch, real browser execution, Source Ledger
+      - [x] Artifacts prove real binary launch, real browser execution, Source Ledger
       live audit row after ingest, unique accessible Steer controls, and browser-led
       MCP parity flow.
 
-      - [ ] If any blocker remains, retest evidence marks `verdict: FAIL`, `gate_open_allowed:
+      - [x] If any blocker remains, retest evidence marks `verdict: FAIL`, `gate_open_allowed:
       false`, lists blockers with reproduction, and does not recommend final gate
       opening.'
     evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
