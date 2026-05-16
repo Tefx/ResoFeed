@@ -85257,7 +85257,7 @@ phases:
     agent: gate-reviewer
   - id: srde2e-real-system-e2e-blockers-fix
     name: Fix real-system E2E blocker families
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       priority: HIGH
@@ -85484,6 +85484,125 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T02:11:36.541439+00:00'
+    done_at: '2026-05-16T02:33:30.035397+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+
+      - docs/ARCHITECTURE.md — read by executor. Key passage noted: ResoFeed remains
+      one Go binary with one SQLite DB; HTTP/MCP share product operations; no vector
+      DB/RAG/sync/account surfaces.
+
+      - docs/DESIGN.md — read by executor. Key passage noted: Source Ledger requires
+      flat rows, `[RUN INGEST]`, `[FETCH]`, OPML import, and `last_fetch: HH:MM:SS`;
+      Steer input requires concise receipt, keyboard access, and no chat/rule-builder
+      UI.
+
+
+      ## Batched Fix Evidence
+
+
+      **Original failed step**: srde2e-real-system-e2e-regression
+
+
+      **Blocker coverage matrix**:
+
+      | Blocker | Root cause | Files changed | Sibling search performed | Focused
+      proof | Status |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | B-RSE2E-01 | Combined real-server red suite: Source Ledger title persistence/display,
+      duplicate accessible names, stale feed ordering, and stale E2E parity expectations.
+      | `internal/resofeed/ingest.go`, `web/src/routes/+page.svelte`, `web/src/routes/components/SourceLedger.svelte`,
+      `web/src/routes/components/item-anatomy.ts`, `web/tests/e2e/real-server-ui.spec.ts`
+      | Executor searched button names and Source Ledger live-row assumptions. | Mainline
+      `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe` → 9
+      passed. | CLOSED |
+
+      | B-RSE2E-02 | Backend updated `sources.title` after feed fetch but built new
+      items from stale source title; frontend Source Ledger kept OPML-import title
+      override after successful fetch, hiding fetched channel title `Live Audit Source`.
+      | `internal/resofeed/ingest.go`, `internal/resofeed/processing_language_ingest_test.go`,
+      `web/src/routes/components/SourceLedger.svelte` | Executor reported no alternate
+      live-row timing root remained after real E2E pass. | Mainline targeted Go regression
+      includes `TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems` PASS; real
+      E2E live audit test PASS. | CLOSED |
+
+      | B-RSE2E-03 | Preview `[APPLY]` button and primary `apply` submit had overlapping
+      accessible-name matching; empty/background live regions also made status selectors
+      ambiguous. | `web/src/routes/+page.svelte` | Executor confirmed unique preview/undo
+      names. | Mainline Svelte check PASS; real E2E strict-mode click paths PASS.
+      | CLOSED |
+
+      | B-RSE2E-04 | Closure blocked by red real-server suite; suite now passes through
+      real binary/browser path. | Same as B-RSE2E-01 | Same sibling searches. | Mainline
+      closure proof: E2E command green. | CLOSED |
+
+
+      **Exact failing command preserved for retest**:
+
+      ```text
+
+      npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe
+
+      ```
+
+
+      ## Files changed
+
+      - `internal/resofeed/ingest.go`
+
+      - `internal/resofeed/pbar_expected_red_backend_test.go`
+
+      - `internal/resofeed/processing_language_ingest_test.go`
+
+      - `web/src/routes/+page.svelte`
+
+      - `web/src/routes/components/SourceLedger.svelte`
+
+      - `web/src/routes/components/item-anatomy.ts`
+
+      - `web/tests/e2e/real-server-ui.spec.ts`
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: `23fa9a1a04204c067f1a680497d3905bb5f6c667` (`fix real-server
+      e2e blockers`)
+
+      - Mainline squash commit: `b0db592c` (`[vectl] step-srde2e-real-system-e2e-blockers-fix
+      completed`)
+
+
+      ## Mainline verification after merge
+
+      - `go test ./internal/resofeed -run ''TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems|TestExpectedRedBackendPolicyRankingFixtureBoostsSpecificOlderMatch|Test(MCP|.*Steer|.*steer|.*Undo|.*Preview)''
+      -count=1 -v` → PASS (`ok resofeed/internal/resofeed 0.602s`).
+
+      - `npm run check` in `web/` → PASS (`svelte-check found 0 errors and 0 warnings`).
+
+      - `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe` in
+      `web/` → PASS (`9 passed (10.2s)`).
+
+      - `npm run build` in `web/` → PASS on serial rerun (`✔ done`). A prior parallel
+      build attempt raced with the E2E-triggered build and failed looking for a transient
+      `.svelte-kit` manifest; serial rerun passed.
+
+
+      ## Gaps / Notes
+
+      - No design deviation reported.
+
+      - No product invariant weakened: still one Go binary, SQLite/FTS5 only, owner-token
+      boundary, lexical search only, no account/sync/vector/RAG surfaces.
+
+      - Product implementation files were modified: yes — `internal/resofeed/ingest.go`,
+      `web/src/routes/+page.svelte`, `web/src/routes/components/SourceLedger.svelte`,
+      `web/src/routes/components/item-anatomy.ts`.
+
+      - Checklist repair: Acceptance checklist and verification checklist are `[x]`.
+      Verification-field checklist required planner repair because `vectl_check` could
+      not match those rendered verification items.'
   - id: srde2e-real-system-e2e-blockers-retest
     name: Retest real-system E2E blocker closure
     status: pending
