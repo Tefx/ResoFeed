@@ -84771,6 +84771,7 @@ phases:
       **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
     - srde2e-real-system-e2e-blockers-retest
+    - srde2e-uiux-source-ledger-status-contract-retest
     agent: blind-tester
   - id: srde2e-documentation-sync
     name: Sync documentation after Steer delta implementation
