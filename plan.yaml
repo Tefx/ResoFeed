@@ -89656,7 +89656,7 @@ phases:
       - [x] Accessible names, focusability, hit targets, visible labels, row stability,
       and mobile clipping are assessed directly from rendered output.
 
-      - [ ] Any unresolved item has provenance plus disposition; pre-existing/out-of-scope
+      - [x] Any unresolved item has provenance plus disposition; pre-existing/out-of-scope
       is not used as a disposition.
 
       - [ ] Final recommendation is PASS only if no blocker-class UI/UX obligation
