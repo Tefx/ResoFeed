@@ -97020,7 +97020,7 @@ phases:
     agent: gate-reviewer
   - id: cos-fix-current-operation-frontend-wiring
     name: Fix frontend current-operation contract and rendering wiring
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -97222,6 +97222,91 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T22:12:05.803136+00:00'
+    done_at: '2026-05-16T22:28:18.308530+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/ARCHITECTURE.md — Read by execution agent; key passage: one Go process
+      serves static UI/API/MCP/background ingest; no queues/services; concurrency
+      guard conflict responses include current operation holding the guard.
+
+      - docs/DESIGN.md — Read by execution agent; key passage: Source Ledger is the
+      lightweight manual ingestion surface; conflicts remain terse/raw; no spinner/progress/dashboard/queue/activity
+      log; low-frequency RESOFEED utility surfaces are allowed only when discreet.
+
+
+      ## Fix Evidence
+
+      **Worker commit:** c390a201 on isolated branch `vectl/step-cos-fix-current-operation-frontend-wiring`
+
+      **Mainline commit:** cc75c4da `[vectl] step-cos-fix-current-operation-frontend-wiring
+      completed`
+
+      **Changed files:**
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/lib/api-client.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/src/routes/components/__tests__/current-operation-utility-placement.test.ts
+
+
+      **Contract/guard proof:**
+
+      - Worker ran `npm run check && npx vitest run src/routes/components/__tests__/current-operation-utility-placement.test.ts`
+      with exit code 0.
+
+      - Focused test added/updated to accept valid `count: { current: 2, total: 5
+      }` and reject invalid `count: 2` and `{ current: ''2'', total: 5 }`.
+
+
+      **Rendered field-use proof:**
+
+      - Render tests assert contextual menu and Source Ledger output include operation
+      type, `phase`, `count`, `message`, `started_at`, and `updated_at`.
+
+      - Conflict render test asserts generic `operation already running` is accompanied
+      by current-operation detail when available.
+
+
+      **Mainline final-state verification:**
+
+      - Merge initially blocked by dirty main `web/src/routes/+page.svelte`; conflict-resolver
+      preserved pre-existing dirty main changes and manually applied the cos branch
+      delta.
+
+      - Orchestrator staged only the cos branch patch with `git diff --binary c390a201^
+      c390a201 ... | git apply --cached --3way` and committed it as cc75c4da, leaving
+      unrelated pre-existing dirty worktree changes unstaged.
+
+      - Orchestrator ran `npm --prefix web run check && npm --prefix web run test:render
+      -- current-operation-utility-placement.test.ts` in main after merge resolution:
+      `svelte-check found 0 errors and 0 warnings`; Vitest `1 passed`, `4 passed`.
+
+
+      **Broad render failure disposition:**
+
+      - Worker''s broader `npm run test:render` had 2 failures in `processing-language-reprocess.expected-red.test.ts`
+      involving hidden processing-language/reprocess visibility expectations. Follow-up
+      evidence mapped both to `explicitly_non_blocking_with_non_intersection_evidence`
+      for this current-operation wiring step; product files were unchanged during
+      clarification.
+
+
+      **Forbidden surface guard:**
+
+      - Jobs/queues/activity ledger/dashboard/settings/service layer introduced: NO.
+
+      - Persistent idle top-chrome status introduced: NO.
+
+
+      **Gaps/Notes:**
+
+      - Main worktree still has unrelated pre-existing dirty/untracked files outside
+      this step; they were preserved and not committed by the orchestrator.'
   - id: cos-retest-current-operation-runtime-ui
     name: Retest current-operation runtime UI after frontend wiring fix
     status: pending
