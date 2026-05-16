@@ -94919,7 +94919,7 @@ phases:
     agent: gate-reviewer
 - id: current-operation-status-and-low-frequency-utility-surface-implementation
   name: Current Operation Status and Low-Frequency Utility Surface Implementation
-  status: pending
+  status: in_progress
   gate: Gate blocks unless HTTP/MCP current-operation status, guarded-operation conflict
     payloads, contextual Source Ledger/RESOFEED operation UI, low-frequency LANG/reprocess
     placement, real runtime/e2e evidence, UIUX audit, and doc/spec drift checks all
@@ -94930,7 +94930,7 @@ phases:
   steps:
   - id: cos-backend-operation-contract-tests
     name: Add backend current-operation contract tests
-    status: pending
+    status: claimed
     description: 'Add expected-red Go contract tests for the approved CurrentOperationInfo
       HTTP conflict contract.
 
@@ -95007,6 +95007,8 @@ phases:
 
       - Downstream implementation owner: cos-backend-operation-snapshot'
     agent: golang-developer
+    claimed_by: golang-developer
+    claimed_at: '2026-05-16T20:35:35.588572+00:00'
   - id: cos-frontend-operation-utility-contract-tests
     name: Add frontend operation-status and utility-placement tests
     status: pending
