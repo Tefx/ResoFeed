@@ -95540,7 +95540,7 @@ phases:
     agent: golang-developer
   - id: cos-frontend-operation-utility-surface
     name: Complete contextual operation status and low-frequency utility UI
-    status: pending
+    status: claimed
     description: 'Complete frontend UI behavior for contextual operation status and
       low-frequency utility placement.
 
@@ -95647,6 +95647,8 @@ phases:
     - cos-frontend-operation-utility-contract-tests
     - cos-backend-operation-contract-tests
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T20:49:54.059774+00:00'
   - id: cos-wiring-audit
     name: Audit runtime wiring for operation status surfaces
     status: pending
