@@ -85681,7 +85681,7 @@ phases:
       import, `[RUN INGEST]`, feed, inspect, resonate, `/doctor`, lexical search,
       and process cleanup.
 
-      - [ ] Produce machine-readable closure with `verdict: PASS`, `gate_open_allowed:
+      - [x] Produce machine-readable closure with `verdict: PASS`, `gate_open_allowed:
       true`, and `blockers: []`; any blocker means `gate_open_allowed: false`.
 
       - [ ] Preserve exact real-server browser artifacts: stdout/stderr, Playwright
