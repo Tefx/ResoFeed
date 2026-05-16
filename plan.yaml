@@ -85674,7 +85674,7 @@ phases:
       - [x] Verify Source Ledger OPML import + `[RUN INGEST]` renders `Live Audit
       Source`, controls, and `last_fetch: HH:MM:SS`.
 
-      - [ ] Verify Steer valid URL preview/commit/undo and browser-led MCP parity
+      - [x] Verify Steer valid URL preview/commit/undo and browser-led MCP parity
       flows no longer fail from duplicate accessible names `apply` / `[APPLY]`.
 
       - [ ] Verify previously passing coverage remains green: owner-token gate, source
