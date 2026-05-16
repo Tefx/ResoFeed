@@ -91162,13 +91162,13 @@ phases:
       no settings dashboard, no RAG/vector/semantic-answer product surface.
 
       - [x] No production implementation code is changed in this contract step.'
-    verification: '- [ ] Contract-only outputs define finding-by-finding acceptance
+    verification: '- [x] Contract-only outputs define finding-by-finding acceptance
       without product implementation logic.
 
-      - [ ] Each acceptance item is testable through a named browser, Go, spec, or
+      - [x] Each acceptance item is testable through a named browser, Go, spec, or
       UIUX proof path.
 
-      - [ ] Chinese support assessment covers all seven surfaces requested by the
+      - [x] Chinese support assessment covers all seven surfaces requested by the
       user.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
