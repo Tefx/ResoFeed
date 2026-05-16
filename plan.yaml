@@ -89584,7 +89584,7 @@ phases:
     agent: integration-verifier
   - id: srde2e-uiux-full-plan-e2e-blockers-audit
     name: Audit full-plan UI/UX E2E blocker closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -89758,6 +89758,131 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T11:31:43.439308+00:00'
+    done_at: '2026-05-16T11:40:37.795409+00:00'
+    evidence: 'headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read, confirming single-binary constraints and invariant
+      adherence limits.
+
+      - docs/DESIGN.md — Read, confirming strict aesthetic compliance (dense index,
+      muted colors, specific wording).
+
+      - docs/UI_REGRESSION_CONTRACT.md — Read, ensuring compliance with strict UI
+      and UX state paths.
+
+      - artifacts/audits/srde2e-e2e-contract-adjudication.md — Read to align on context
+      for the nine blockers and test scopes.
+
+
+      **Auditor**: uiux-auditor
+
+      **Scope**: Full-plan E2E UI/UX blocker closure after srde2e-full-plan-e2e-blockers-fix
+
+
+      ## Rendered Evidence Inventory
+
+      | Blocker Family | Artifact(s) | Desktop Covered | Mobile Covered | Verdict
+      | Notes |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | 1. Source Ledger [FETCH] button | `desktop-source-ledger-with-actions...png`,
+      `narrow-source-ledger...png` | Yes | Yes | PASS | `[FETCH]` is visibly distinct,
+      clickable, and appropriately placed on both desktop and mobile views. |
+
+      | 2. TODAY/SOURCE LEDGER nav | `desktop-source-ledger-with-actions...png`, `narrow-source-ledger...png`
+      | Yes | Yes | PASS | Desktop uses an expandable `RESOFEED` menu; mobile displays
+      `back to TODAY`. Passing `keyboard-a11y` tests prove focusability. |
+
+      | 3. Steer apply controls | `desktop-authenticated-today-split-pane...png` |
+      Yes | Yes | PASS | Input is clearly labeled `Steer or paste RSS URL...`. E2E
+      tests confirm click/submit semantics. |
+
+      | 4. Inspector provenance labels | `desktop-authenticated-feed-inspector...png`,
+      `narrow-inspector-route...png` | Yes | Yes | PASS | Displays `src: ResoFeed
+      E2E Local Source`, exposing hierarchy correctly. |
+
+      | 5. Source-add receipt | `desktop-source-ledger-with-actions...png` | Yes |
+      N/A | PASS | Displays `imported 1 sources; folders flattened`, representing
+      background ingest state without confusion. |
+
+      | 6. Source Ledger row grammar | `desktop-source-ledger-with-actions...png`,
+      `narrow-source-ledger...png` | Yes | Yes | PASS | Displays `ok · last_fetch:
+      ...` syntax on desktop and analogous stats on mobile. |
+
+      | 7. RESOFEED chrome | `desktop-source-ledger-with-actions...png` | Yes | Yes
+      | PASS | `RESOFEED` is distinct navigation chrome and not confused with feed
+      data. |
+
+      | 8. Feed row Inspect interaction | `desktop-authenticated-feed-inspector...png`,
+      E2E tests | Yes | N/A | PASS | Active state is visible with no geometric layout
+      shift, matching strict E2E assertions. |
+
+      | 9. Mobile metadata wrap/clip | `narrow-authenticated-feed...png`, `narrow-inspector-route...png`
+      | N/A | Yes | PASS | Feed line ellipsizes (`SRC: RESOFE...`) while Inspector
+      view exposes full source text. |
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | DESIGN.md | [FETCH] / [FETCHING...] is visible | YES | `desktop-source-ledger...png`,
+      `narrow-source-ledger...png` | PROVEN | CLOSED | Visually proven on both layouts.
+      |
+
+      | DESIGN.md | Steer control labels distinct | YES | `desktop-authenticated-today-split-pane...png`
+      | PROVEN | CLOSED | Input is explicitly marked. |
+
+      | DESIGN.md | Mobile metadata wrapping | YES | `narrow-authenticated-feed...png`,
+      `narrow-inspector-route...png` | PROVEN | CLOSED | Clips in feed, wraps in inspector.
+      |
+
+      | UI_REGRESSION_CONTRACT.md | Feed row layout stability | YES | Playwright tests
+      + `desktop-authenticated-feed-inspector...png` | PROVEN | CLOSED | Active state
+      (`aria-current="true"`) causes no visual bounding box shift. |
+
+
+      ## Gate-Intersection Reasoning
+
+      All nine blocker families conform to the visual requirements set by `DESIGN.md`
+      and the structural constraints of `ARCHITECTURE.md`. Automated Playwright traces
+      and generated artifact checks show clickability, geometric stability, and textual
+      truncation/wrapping without ambiguous user-facing patterns. No blocker-class
+      UI/UX obligations remain for `srde2e-final-closure-gate`.
+
+
+      ## Verification
+
+      Commands/artifacts: Playwright captures extracted from `web/test-results/ui-remediation/playwright-test-output/`.
+
+      Files changed: none (read-only audit; checklist toggles only).
+
+      Commit hash(es): none (read-only audit).
+
+      Gaps/Notes: No product code, test code, docs, fixtures, claims, or lifecycle
+      state were intentionally modified; final audit recommendation PASS.'
   - id: srde2e-e2e-contract-adjudication
     name: Adjudicate residual full E2E contract conflicts before next fix
     status: done
