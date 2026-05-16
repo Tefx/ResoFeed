@@ -84925,7 +84925,7 @@ phases:
 
       - [x] Do not weaken design/architecture constraints to match a bad implementation.
 
-      - [ ] Preserve npx @google/design.md lint cleanliness for docs/DESIGN.md if
+      - [x] Preserve npx @google/design.md lint cleanliness for docs/DESIGN.md if
       changed.'
     verification: '- [ ] phase-check protecting final closure gate.
 
