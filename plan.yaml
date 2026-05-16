@@ -84651,7 +84651,7 @@ phases:
       \ artifact cleanup."
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
-  status: in_progress
+  status: done
   gate: Final closure blocks unless real-system E2E, visual/a11y regression, documentation
     sync, software-architect fresh review, remediation, clean re-review, and full-plan
     check are complete with no blocker-class proof gaps.
@@ -84660,7 +84660,7 @@ phases:
   steps:
   - id: srde2e-real-system-e2e-regression
     name: Run real-system Steer delta E2E regression
-    status: claimed
+    status: done
     description: 'As an INDEPENDENT TESTER (integration-verifier), run the real single-binary
       system and prove the full path from browser UI through HTTP/MCP/application
       logic/SQLite.
@@ -84711,6 +84711,115 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T12:25:44.332606+00:00'
+    done_at: '2026-05-16T12:36:52.852207+00:00'
+    evidence: 'step_intent: post_fix_real_system_e2e_verification
+
+      expected_result: green
+
+      observed_result: green — targeted real-server browser E2E passed, backend/MCP
+      tests passed, web check passed, and custom runtime proof reproduced source-add
+      `[UNDO]` successfully.
+
+      failure_alignment: none
+
+      verdict: PASS
+
+      blockers: []
+
+      product_implementation_files_modified: no
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — one Go binary serves static UI, JSON HTTP API, MCP
+      Streamable HTTP at `/mcp`, background ingest; one SQLite DB; lexical retrieval
+      only, no vector/RAG.
+
+      - docs/DESIGN.md — Source Ledger, bracket actions, owner-token prompt, Steer
+      input, diagnostics/doctor, and functional chrome are canonical UI surfaces.
+
+      - docs/PRD.md — Steer supports RSS URL add and `/doctor`; Search is retrieval;
+      no folders/tags/settings/RAG/chat semantics.
+
+      - docs/UI_REGRESSION_CONTRACT.md — required proof includes real hit targets
+      for Steer, `/doctor`, Source Ledger `[RUN INGEST]`, `[FETCH]`, OPML/state actions,
+      screenshots/DOM evidence, and no semantic/RAG answer UI.
+
+
+      ## Real-System E2E Evidence
+
+      **Server command**:
+
+      ```text
+
+      cmd/resofeed serve --addr 127.0.0.1:52960 --public-url http://127.0.0.1:52960
+      --db artifacts/audits/srde2e-real-system-e2e-regression-runtime-proof/runtime-proof-1778934650012.sqlite3
+      --owner-token <test-owner-token>
+
+      ```
+
+
+      **Browser/E2E commands**:
+
+      ```text
+
+      npm --prefix web ci
+
+      npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts
+
+      go test ./...
+
+      npm --prefix web run check
+
+      node --input-type=module <custom Playwright real-system proof script>
+
+      ```
+
+
+      **Actual output/artifacts**:
+
+      - `npm --prefix web run test:e2e -- --project=chromium-ci-safe web/tests/e2e/real-server-ui.spec.ts`
+      → `9 passed (11.4s)`.
+
+      - `go test ./...` → `? resofeed/cmd/resofeed [no test files]`; `ok resofeed/internal/resofeed
+      1.071s`.
+
+      - `npm --prefix web run check` → `svelte-check found 0 errors and 0 warnings`.
+
+      - Custom proof output → `status: ok`; checks included `browser_valid_url_add_shows_undo`,
+      `invalid_add_url_required_no_mutation`, `find_alias_lexical_warning_read_only`,
+      `doctor_read_only_diagnostics`, `mcp_preview_steer_undo_parity`.
+
+      - Server log: `serving ResoFeed on 127.0.0.1:52960 (public-url http://127.0.0.1:52960)`.
+
+      - Runtime evidence: `artifacts/audits/srde2e-real-system-e2e-regression-runtime-proof/runtime-proof.json`.
+
+      - Screenshots: `source-add-undo-visible.png`, `source-ledger-controls.png`,
+      `find-lexical-warning.png`, `doctor-read-only.png`.
+
+
+      ## Behavioral proof register
+
+      All acceptance paths are PROVEN: runtime start; source-add `[UNDO]`; undo deactivates
+      source; invalid add no mutation; lexical find/search warning without RAG UI;
+      `/doctor` read-only diagnostics; Source Ledger controls reachable; MCP preview/steer/undo
+      parity; architecture gate via E2E + Go tests + web check.
+
+
+      ## Verification
+
+      Files changed: audit artifacts only under `artifacts/audits/`.
+
+      Commit hash(es): worktree `de33e8cc9cc8523df15104fc99ee2cbf34517656`; mainline
+      squash `23424964 [vectl] step-srde2e-real-system-e2e-regression completed`.
+
+      Gaps/Notes: acceptance checklist was toggled fully with `vectl_check`; no product
+      implementation files changed. Verification-field checklist items could not be
+      toggled by keyword, but exact criteria are evidenced here.'
   - id: srde2e-visual-a11y-regression-proof
     name: Run visual accessibility and hit-target regression proof
     status: done
