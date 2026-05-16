@@ -88861,7 +88861,7 @@ phases:
       - product_implementation_files_modified: no'
   - id: srde2e-full-plan-e2e-blockers-fix
     name: Execute adjudicated residual full-plan E2E fixes
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       agent_source: project
@@ -89164,6 +89164,188 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T11:06:30.178507+00:00'
+    done_at: '2026-05-16T11:31:22.859794+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — Read. Key insight: ResoFeed is one Go deployable with
+      one SQLite DB; Source Ledger source identity is URL-based and OPML dedupes by
+      URL, not title; ingest/fetch statuses include documented terminal states.
+
+      - docs/DESIGN.md — Read. Key insight: `RESOFEED` menu summary must be keyboard
+      reachable; opened menu entries use visible `TODAY` and `SOURCE LEDGER`; desktop
+      Inspector must not duplicate the star; Source Ledger `[FETCH]` is row-local.
+
+      - docs/UI_REGRESSION_CONTRACT.md — Read. Key insight: E2E must prove real hit
+      targets, keyboard order `Steer -> RESOFEED trigger -> opened menu entries`,
+      row-scoped `[FETCH]`, and no layout shift via stable dimensions/scroll containment.
+
+      - artifacts/audits/srde2e-e2e-contract-adjudication.md — Read. Key insight:
+      decision matrix classified the residual 7 failures and authorized only focused
+      fixes for RESOFEED focus, menu/nav helpers, row-scoped fetch, terminal OPML/fetch
+      states, URL/id-based dirty fixture selection, hit-target scroll geometry, and
+      desktop feed-row star checks.
+
+
+      ## Adjudication Consumption
+
+      - srde2e-e2e-contract-adjudication evidence read: YES
+
+      - Decision matrix citation: artifact lines 60-70 and dispositions lines 72-89
+      governed all changes.
+
+
+      ## Fix Execution Matrix
+
+      | Theme | Adjudicated classification | Files/tests changed | Exact remediation
+      applied | Allowed deviation citation | Status |
+
+      |---|---|---|---|---|---|
+
+      | Focus order | implementation_bug | `web/src/routes/+page.svelte`, `keyboard-a11y.expected-red.spec.ts`
+      | Removed `tabindex="-1"` from RESOFEED summary; updated keyboard test to tab
+      to RESOFEED, open menu, then tab to menu entries. | Adjudication lines 70, 74
+      | PASS |
+
+      | Nav visible text | implementation_bug / stale legacy direct-tab tests | `+page.svelte`,
+      nav E2E specs | Kept opened menu entries as visible `TODAY` / `SOURCE LEDGER`;
+      removed quick buttons from tab order; normalized tests to authoritative menu
+      path. | Adjudication lines 64, 75, 82-83 | PASS |
+
+      | OPML import/ingest status | stale_test / fixture_shared_state_issue | `inspector-readable-content-regression.spec.ts`,
+      `ui-remediation-r1-r8-browser-retest.spec.ts` | Tests now use controlled row/source
+      fetch and URL/id-targeted source rows before requiring `last_fetch`. | Adjudication
+      lines 67, 76, 85 | PASS |
+
+      | Duplicate rows/shared DB state | fixture_shared_state_issue | `Feed.svelte`,
+      dirty/readable/R1-R8 tests | Added source/item data attributes for non-visible
+      test targeting; dynamic tests select by imported URL/source id instead of duplicate
+      title. | Adjudication lines 69, 77, 85-86 | PASS |
+
+      | Hit-target scroll geometry | mixed | `hit-target-clickability.spec.ts` | Replaced
+      viewport-y equality with x/width/height invariance plus feed scroll-container
+      stability after scroll-into-view. | Adjudication lines 65, 78, 87 | PASS |
+
+
+      ## Command Evidence
+
+      Agent worktree:
+
+      ```text
+
+      npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+
+      Test Files 4 passed (4); Tests 36 passed (36)
+
+
+      npm --prefix web run test:render
+
+      Test Files 11 passed (11); Tests 62 passed (62)
+
+
+      npm --prefix web run test:e2e
+
+      2 skipped; 71 passed (37.3s)
+
+
+      npm --prefix web run check
+
+      svelte-check found 0 errors and 0 warnings
+
+
+      npm --prefix web run build
+
+      ✓ built; Wrote site to "build"
+
+      ```
+
+
+      Mainline final-state verification after squash merge:
+
+      ```text
+
+      npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+
+      Test Files 4 passed (4); Tests 36 passed (36)
+
+
+      npm --prefix web run test:render
+
+      Test Files 11 passed (11); Tests 62 passed (62)
+
+
+      npm --prefix web run test:e2e
+
+      2 skipped; 71 passed (39.0s)
+
+
+      npm --prefix web run check
+
+      svelte-check found 0 errors and 0 warnings
+
+
+      npm --prefix web run build
+
+      ✓ built; Wrote site to "build"
+
+      ```
+
+
+      ## Files changed
+
+      - web/src/lib/api-contract.ts
+
+      - web/src/routes/+page.svelte
+
+      - web/src/routes/components/Feed.svelte
+
+      - web/src/routes/components/SourceLedger.svelte
+
+      - web/tests/e2e/full-ui-design-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/hit-target-clickability.spec.ts
+
+      - web/tests/e2e/inspector-dirty-corpus.spec.ts
+
+      - web/tests/e2e/inspector-readable-content-regression.spec.ts
+
+      - web/tests/e2e/keyboard-a11y.expected-red.spec.ts
+
+      - web/tests/e2e/prd-inspector-preview-conformance.expected-red.spec.ts
+
+      - web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts
+
+      - web/tests/e2e/ui-remediation-r1-r8-browser-retest.spec.ts
+
+
+      ## Commit hash(es)
+
+      - Worktree commit: `3ee4f222 Fix adjudicated E2E blockers`
+
+      - Mainline squash merge: `aa8a512c [vectl] step-srde2e-full-plan-e2e-blockers-fix
+      completed`
+
+
+      ## Gaps/Notes
+
+      - No remaining E2E failures: full suite green with 71 passed / 2 skipped in
+      worktree and mainline.
+
+      - Additional real-system `[UNDO]` blocker intersected the Steer receipt surface;
+      frontend now consumes top-level `undo_handle` and exposes `[UNDO]` for source-add
+      receipts.
+
+      - Before merge, stale overlapping main-worktree modifications in `+page.svelte`,
+      `Feed.svelte`, and `SourceLedger.svelte` were preserved in git stash `vectl-orchestrator
+      pre-merge overlap before srde2e-full-plan-e2e-blockers-fix`; they were not reapplied
+      because mainline verified green after the step merge.
+
+      - Completion checklist items were toggled to `[x]`; verification-field checklist
+      toggling is not supported by `vectl_check`, but all verification criteria are
+      evidenced above.'
   - id: srde2e-full-plan-e2e-blockers-retest
     name: Retest batched full-plan E2E blocker closure
     status: pending
