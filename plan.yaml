@@ -88860,187 +88860,210 @@ phases:
 
       - product_implementation_files_modified: no'
   - id: srde2e-full-plan-e2e-blockers-fix
-    name: Fix final residual 7 full-plan E2E blockers after salvage
+    name: Execute adjudicated residual full-plan E2E fixes
     status: claimed
-    description: "step_type: implementation\nagent_source: project\nwork_type: defect_repair\n\
-      scope: FINAL RESIDUAL remediation for the 7 blocker-class full-plan E2E failures\
-      \ remaining after additional partial progress was salvaged to main.\n\nThis\
-      \ step remains claimed and is NOT complete. Do not restart from the old step\
-      \ worktree state and do not assume any previous 25-failure, 10-failure, or partial\
-      \ worktree inventory is current. Partial source/test progress from the previous\
-      \ attempts has already been salvaged into main in commits:\n- 61a8825c (`[vectl]\
-      \ salvage partial progress from step-srde2e-full-plan-e2e-blockers-fix`)\n-\
-      \ 107d1349 (`[vectl] salvage residual UI render fixes from step-srde2e-full-plan-e2e-blockers-fix`)\n\
-      \nMainline verification after commit 107d1349 is newly green for these gates\
-      \ and MUST be preserved:\n- exact targeted render command: 4 files passed, 36\
-      \ tests passed\n- `npm --prefix web run test:render`: 11 files passed, 62 tests\
-      \ passed\n- `npm --prefix web run check`: 0 errors/warnings\n- `npm --prefix\
-      \ web run build`: passed\n\nLatest known full E2E state from the fix worktree\
-      \ evidence remains red: 7 failed / 64 passed / 2 skipped. Treat that as a starting\
-      \ clue only. The next executor MUST begin from current main and collect a fresh\
-      \ current-main full E2E baseline before finalizing fixes.\n\n## Fresh baseline\
-      \ requirement\nBefore finalizing any fix handoff:\n1. Start from current main\
-      \ containing both salvage commits 61a8825c and 107d1349.\n2. Run or otherwise\
-      \ collect a current-main `npm --prefix web run test:e2e` baseline and record\
-      \ exact failing spec/test names.\n3. Compare the fresh inventory against the\
-      \ 7 known residual blockers below.\n4. If the fresh inventory differs, fix the\
-      \ current-main failures and explicitly explain the delta; do not chase stale\
-      \ failures that no longer reproduce.\n\n## Remaining 7 blocker failures to close\n\
-      Fix all blocker-class failures that still reproduce on current main, with special\
-      \ focus on these known residuals:\n\n1. `full-ui-design-conformance.expected-red.spec.ts`\n\
-      \   - Failure: Source Ledger heading is not visible after Steer `source ledger`.\n\
-      \   - Closure expectation: the real rendered Steer-to-Source-Ledger path exposes\
-      \ the documented Source Ledger heading without relying on hidden-only or test-only\
-      \ text.\n\n2. `hit-target-clickability.spec.ts`\n   - Failure: selected Inspect/open\
-      \ row y-position shifts after Playwright scrolls the row into view.\n   - Closure\
-      \ expectation: click target geometry remains stable enough for the documented\
-      \ hit-target assertions after scroll-into-view, without weakening the hit-target\
-      \ contract.\n\n3. `inspector-dirty-corpus.spec.ts`\n   - Failure: Dirty Inspector\
-      \ Corpus fetch accessible name/status mismatch after SourceLedger accessibility\
-      \ collision mitigation.\n   - Closure expectation: accessible names/status labels\
-      \ are unambiguous across Source Ledger and Inspector and still expose the Dirty\
-      \ Inspector Corpus fetch status expected by the spec.\n\n4. `inspector-readable-content-regression.spec.ts`\n\
-      \   - Failure: Inspector Readable Regression Source status remains `rss_fetch_error`\
-      \ instead of visible `status: ok`.\n   - Closure expectation: the fixture/API\
-      \ lifecycle and visible Inspector status converge on `status: ok` for the regression\
-      \ source where the contract requires readable content success.\n\n5. `prd-inspector-preview-conformance.expected-red.spec.ts`\n\
-      \   - Failure: hidden/zero-size first `.contract-resonate` probe reports 0x0.\n\
-      \   - Closure expectation: the first contract-resonate probe used by the PRD\
-      \ conformance test maps to a visible non-zero-size affordance, or the selector/test\
-      \ contract is docs-backed and updated without hiding product semantics.\n\n\
-      6. `ui-remediation-r1-r8-browser-retest.spec.ts`\n   - Failure: Dirty Inspector\
-      \ Corpus API lifecycle status remains `rss_fetch_error`.\n   - Closure expectation:\
-      \ browser retest API lifecycle evidence agrees with the visible Inspector contract\
-      \ and no longer reports the stale/error status for the Dirty Inspector Corpus\
-      \ success path.\n\n7. `ui-runtime-fresh-review-remediation.spec.ts`\n   - Failure:\
-      \ FR-01/FR-10 expects keyboard focus on `RESOFEED` summary, conflicting with\
-      \ the legacy keyboard-a11y quick-nav order currently kept passing.\n   - Closure\
-      \ expectation: resolve the focus-order contract conflict with docs-backed reasoning.\
-      \ Preserve both keyboard accessibility and documented chrome/summary behavior;\
-      \ if one test expectation is stale, record the authoritative docs-backed deviation\
-      \ and update only the stale expectation.\n\n## Required execution order\n1.\
-      \ Freshly re-baseline from current main after commits 61a8825c and 107d1349,\
-      \ not from any old worktree or stale unmerged state.\n2. Confirm the exact residual\
-      \ full E2E inventory from current main.\n3. Fix the remaining 7 blocker families\
-      \ in the app/test surface without weakening documented contracts.\n4. Preserve\
-      \ the already-green targeted render/check/build gates from the post-salvage\
-      \ mainline verification.\n5. Run the required command family before handoff\
-      \ and record exact output/disposition.\n\n## Residual remediation rules\n- Do\
-      \ NOT add duplicate implementation work for blocker families already closed\
-      \ by salvaged commits unless current-main evidence proves they are still failing.\n\
-      - Do NOT weaken or delete E2E/render assertions to make tests pass. Test changes\
-      \ are allowed only when they align tests with docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/UI_REGRESSION_CONTRACT.md, and the implemented user-visible contract;\
-      \ record a deviation note with citation.\n- Preserve ResoFeed invariants from\
-      \ AGENTS.md and docs/ARCHITECTURE.md: single deployable Go binary, SQLite-only\
-      \ storage, lexical search only, no vector DB/embeddings/RAG semantic answer\
-      \ UI, no account/auth model, no sync/merge coordinator.\n- Preserve DESIGN.md\
-      \ chrome and interaction principles: dense archival index, functional labels,\
-      \ Source Ledger/Inspector/Steer language, no SaaS/friendly copy drift.\n- Treat\
-      \ `pre-existing`, `introduced_now`, and `out-of-step-origin` as provenance only,\
-      \ never as dispositions. Any remaining failure that intersects srde2e-final-closure-gate\
-      \ must have blocker disposition and residual ownership.\n\n## Required commands\
-      \ before handoff\nRun from the repository root unless documenting an equivalent\
-      \ working-directory form:\n- `npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts\
-      \ src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts\
-      \ src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`\
-      \ MUST pass.\n- `npm --prefix web run test:render` MUST pass.\n- `npm --prefix\
-      \ web run test:e2e` MUST pass green. If any residual failure remains, it must\
-      \ have explicit blocker/non-blocker gate-intersection disposition and residual\
-      \ ownership, but the goal of this step is full green E2E closure.\n- `npm --prefix\
-      \ web run check` MUST pass.\n- `npm --prefix web run build` MUST pass.\n\n##\
-      \ Downstream dependency preservation\n- Keep srde2e-uiux-full-plan-e2e-blockers-audit\
-      \ dependent on this step.\n- Keep srde2e-full-plan-e2e-blockers-retest dependent\
-      \ on this step and the UI/UX audit.\n- Do not mark this step complete; completion\
-      \ remains orchestrator-owned.\n\n## Completion Criteria (stub exclusion)\nThis\
-      \ is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each deliverable\
-      \ MUST contain substantive UI/runtime logic or CSS/markup changes that process\
-      \ real app state and produce visible/accessibility outputs that vary based on\
-      \ inputs. Private stub or placeholder classes/functions do not satisfy this\
-      \ requirement.\n\n## Completion Checklist\n- [ ] Current-main full E2E baseline\
-      \ is refreshed after commits 61a8825c and 107d1349 before finalizing code changes.\n\
-      - [ ] Fresh residual failure inventory is compared against the 7 known blockers\
-      \ and any delta is explained.\n- [ ] Source Ledger heading visibility after\
-      \ Steer `source ledger` is fixed or docs-backed disposition is recorded.\n-\
-      \ [ ] Inspect/open hit-target geometry remains stable after Playwright scroll-into-view.\n\
-      - [ ] Dirty Inspector Corpus accessible name/status mismatch is fixed without\
-      \ reintroducing SourceLedger a11y collisions.\n- [ ] Inspector Readable Regression\
-      \ Source shows visible `status: ok` where required.\n- [ ] `.contract-resonate`\
-      \ conformance probe resolves to a visible non-zero-size affordance or has a\
-      \ docs-backed selector contract update.\n- [ ] Dirty Inspector Corpus API lifecycle\
-      \ status no longer remains `rss_fetch_error` for the success path.\n- [ ] FR-01/FR-10\
-      \ `RESOFEED` summary focus conflict is resolved with docs-backed accessibility\
-      \ reasoning.\n- [ ] Full `npm --prefix web run test:e2e` passes green, or every\
-      \ residual failure has explicit blocker disposition and residual ownership.\n\
-      - [ ] The exact targeted render command remains green.\n- [ ] `npm --prefix\
-      \ web run test:render` remains green.\n- [ ] `npm --prefix web run check` remains\
-      \ green.\n- [ ] `npm --prefix web run build` remains green.\n- [ ] No E2E/render\
-      \ assertions were weakened without docs-backed deviation notes.\n- [ ] ResoFeed\
-      \ architecture/design/UI regression invariants are preserved.\n\n## Gate Preview\
-      \ (what final closure WILL reject)\n1. Fixes based on stale old-worktree state\
-      \ instead of current main after commits 61a8825c and 107d1349.\n2. Any unresolved\
-      \ targeted render/component regression in the listed command.\n3. Passing targeted\
-      \ render checks while full `npm --prefix web run test:render` regresses.\n4.\
-      \ Full `npm --prefix web run test:e2e` still red without explicit blocker/non-blocker\
-      \ gate-intersection disposition and residual ownership.\n5. Selector or assertion\
-      \ weakening that hides product semantics instead of preserving documented Source\
-      \ Ledger/TODAY/Steer/Inspector contracts.\n6. A focus-order change that breaks\
-      \ legacy keyboard accessibility without a docs-backed resolution of the FR-01/FR-10\
-      \ conflict."
-    verification: '- [ ] Fresh re-baselining starts from current main after salvaged
-      commits 61a8825c and 107d1349, not old worktree state.
+    description: 'step_type: implementation
 
-      - [ ] Current-main `npm --prefix web run test:e2e` baseline is collected before
-      final fix handoff and reports the exact residual spec/test inventory.
+      agent_source: project
 
-      - [ ] Fresh baseline is compared to the known 7 residual blocker list, with
-      any added/closed/different failures explicitly explained.
+      work_type: defect_repair
 
-      - [ ] All 7 known residual blocker families are fixed where they still reproduce
-      on current main, or each has explicit blocker/non-blocker gate-intersection
+      scope: Execute only the adjudicated residual full-plan E2E fixes after srde2e-e2e-contract-adjudication.
+
+
+      This step remains the implementation owner for the final residual full-plan
+      E2E blocker closure, but it is no longer authorized to guess contracts or chase
+      the latest unsalvaged worktree state directly. It MUST consume the investigation
+      output from srde2e-e2e-contract-adjudication and execute the docs-backed remediation
+      packet produced there.
+
+
+      Context that MUST be preserved:
+
+      - Salvaged main commits 61a8825c and 107d1349 are the only verified net-positive
+      baseline for this loop.
+
+      - 61a8825c reduced full E2E from 25 to 10 failures but introduced/exposed render
+      regressions.
+
+      - 107d1349 fixed render gates; targeted render/check/build are green and MUST
+      remain green.
+
+      - The latest unsalvaged attempt stayed at 7 failed / 64 passed / 2 skipped and
+      changed failures without reducing the full E2E count; treat it only as diagnostic
+      input already summarized by srde2e-e2e-contract-adjudication, not as verified
+      salvage.
+
+
+      Execution rule:
+
+      1. Read srde2e-e2e-contract-adjudication evidence before editing source or tests.
+
+      2. Apply only the adjudicated fixes and allowed test deviations from that evidence.
+
+      3. Do not weaken selectors/assertions unless the adjudication explicitly classifies
+      the expectation as stale and cites docs/DESIGN.md, docs/UI_REGRESSION_CONTRACT.md,
+      or docs/ARCHITECTURE.md.
+
+      4. If current-main E2E failures differ from the adjudication inventory, stop
+      implementation and record the delta for planner/orchestrator repair rather than
+      inventing a new contract decision inside this step.
+
+
+      Mandatory adjudicated themes to execute:
+
+      - Focus order: apply the adjudicated resolution for `keyboard-a11y.expected-red.spec.ts`
+      vs FR-01/FR-10 RESOFEED summary focus.
+
+      - Nav visible text: apply the adjudicated resolution for legacy `TODAY` / `SOURCE
+      LEDGER` visible button text selectors vs F8 `T` / `SL` visible text.
+
+      - OPML import/ingest status: apply the adjudicated real-server assertion or
+      app fix for best-effort import ingest changing `last_fetch` away from `not_fetched`
+      immediately after import.
+
+      - Duplicate rows/shared DB state: apply the adjudicated fixture/shared-state
+      remediation for duplicate Dirty Inspector Corpus rows in accumulated full-run
+      state.
+
+      - Hit-target scroll geometry: apply the adjudicated UI, fixture, or test-scroll
+      remediation for the offscreen local fixture row y-position after Playwright
+      scroll-into-view.
+
+
+      State and fixture hardening requirements:
+
+      - Explicitly distinguish implementation bugs from stale tests and fixture/shared-state
+      issues per the adjudication matrix.
+
+      - Preserve SQLite-only, single-deployable, no-sync/no-merge architecture invariants
+      from docs/ARCHITECTURE.md and AGENTS.md.
+
+      - Preserve dense archival UI, functional chrome labels, and Source Ledger/Inspector/Steer
+      language from docs/DESIGN.md.
+
+      - For shared DB/full-run state fixes, address idempotency, fixture isolation/cleanup,
+      duplicate row prevention, and ordering between import and best-effort ingest.
+
+      - For scroll/hit-target fixes, prove the contract under full accumulated state,
+      not only isolated targeted state.
+
+
+      Required commands before handoff:
+
+      - `npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts` MUST
+      pass.
+
+      - `npm --prefix web run test:render` MUST pass.
+
+      - `npm --prefix web run test:e2e` MUST pass green, or every remaining failure
+      must match the adjudication output with explicit blocker/non-blocker gate-intersection
       disposition and residual ownership.
 
-      - [ ] `full-ui-design-conformance.expected-red.spec.ts` Source Ledger heading
-      visibility after Steer `source ledger` is proven fixed or dispositioned.
+      - `npm --prefix web run check` MUST pass.
 
-      - [ ] `hit-target-clickability.spec.ts` Inspect/open hit-target y-position stability
-      after scroll-into-view is proven fixed or dispositioned.
+      - `npm --prefix web run build` MUST pass.
 
-      - [ ] `inspector-dirty-corpus.spec.ts` Dirty Inspector Corpus accessible name/status
-      mismatch is proven fixed or dispositioned.
 
-      - [ ] `inspector-readable-content-regression.spec.ts` Inspector Readable Regression
-      Source visible `status: ok` is proven fixed or dispositioned.
+      Downstream dependency preservation:
 
-      - [ ] `prd-inspector-preview-conformance.expected-red.spec.ts` `.contract-resonate`
-      visible non-zero-size contract is proven fixed or dispositioned.
+      - srde2e-uiux-full-plan-e2e-blockers-audit remains dependent on this step.
 
-      - [ ] `ui-remediation-r1-r8-browser-retest.spec.ts` Dirty Inspector Corpus API
-      lifecycle status is proven fixed or dispositioned.
+      - srde2e-full-plan-e2e-blockers-retest remains dependent on this step and the
+      UI/UX audit.
 
-      - [ ] `ui-runtime-fresh-review-remediation.spec.ts` FR-01/FR-10 `RESOFEED` focus-order
-      conflict is resolved with docs-backed accessibility reasoning.
+      - Do not mark this step complete; completion remains orchestrator-owned.
 
-      - [ ] The exact targeted render command passes: `npm --prefix web run test:render
-      -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
-      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
-      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts`.
 
-      - [ ] `npm --prefix web run test:render` passes and preserves the 11-file/62-test
-      green gate or records any expanded count accurately.
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive UI/runtime logic, fixture isolation, or
+      docs-backed test-contract updates that process real app/test state and produce
+      visible/accessibility/runtime outputs that vary based on inputs. Private stub
+      or placeholder functions do not satisfy this requirement.
+
+
+      ## Completion Checklist
+
+      - [ ] srde2e-e2e-contract-adjudication evidence is read and cited before implementation
+      begins.
+
+      - [ ] Implementation changes are limited to the adjudicated remediation packet
+      and allowed test deviations.
+
+      - [ ] Focus order conflict is resolved exactly as adjudicated.
+
+      - [ ] Nav visible text/selector conflict is resolved exactly as adjudicated.
+
+      - [ ] OPML import/ingest `last_fetch` expectation or app behavior is resolved
+      exactly as adjudicated.
+
+      - [ ] Duplicate Dirty Inspector Corpus rows/shared DB state are resolved exactly
+      as adjudicated.
+
+      - [ ] Hit-target scroll geometry is resolved exactly as adjudicated.
+
+      - [ ] Targeted render command remains green.
+
+      - [ ] `npm --prefix web run test:render` remains green.
+
+      - [ ] `npm --prefix web run test:e2e` is green, or residual failures are dispositioned
+      exactly according to adjudication with ownership.
+
+      - [ ] `npm --prefix web run check` remains green.
+
+      - [ ] `npm --prefix web run build` remains green.
+
+      - [ ] No selector/assertion is weakened without an adjudication-backed docs
+      citation.
+
+
+      ## Gate Preview (what final closure WILL reject)
+
+      1. Any further implementation attempt that bypasses srde2e-e2e-contract-adjudication.
+
+      2. Treating the latest unsalvaged 7-failure worktree as verified net-positive
+      salvage.
+
+      3. Selector or assertion weakening without docs-backed adjudication.
+
+      4. Fixing isolated targeted state while accumulated full-run state still duplicates
+      rows or shifts hit-target geometry.
+
+      5. Focus-order or nav-label changes that make one E2E pass by contradicting
+      docs/DESIGN.md or docs/UI_REGRESSION_CONTRACT.md.
+
+      6. Any regression in the green post-107d1349 render/check/build gates.'
+    verification: '- [ ] srde2e-e2e-contract-adjudication is complete and its decision
+      matrix is cited in implementation evidence.
+
+      - [ ] All changes match adjudicated classifications: implementation bug, stale
+      test, fixture/shared-state issue, or mixed.
+
+      - [ ] Focus order, nav visible text, OPML import/ingest status, duplicate rows/shared
+      DB state, and hit-target scroll geometry are each resolved according to the
+      adjudication output.
+
+      - [ ] Any test update is explicitly allowed by the adjudication and cites the
+      governing docs authority.
+
+      - [ ] Targeted render command passes with exact output recorded.
+
+      - [ ] `npm --prefix web run test:render` passes with exact output recorded.
 
       - [ ] `npm --prefix web run test:e2e` passes green, or every remaining failure
-      has explicit blocker disposition and residual ownership.
+      has adjudication-backed blocker/non-blocker gate-intersection disposition and
+      residual ownership.
 
-      - [ ] `npm --prefix web run check` passes with 0 errors/warnings.
+      - [ ] `npm --prefix web run check` passes with exact output recorded.
 
-      - [ ] `npm --prefix web run build` passes.
-
-      - [ ] No tests/assertions/selectors were weakened except with docs-backed deviation
-      evidence.
+      - [ ] `npm --prefix web run build` passes with exact output recorded.
 
       - [ ] Downstream srde2e-uiux-full-plan-e2e-blockers-audit and srde2e-full-plan-e2e-blockers-retest
-      remain the verification owners after this implementation step.'
+      remain wired after this step.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
@@ -89056,90 +89079,88 @@ phases:
       If no refs were provided, state: "No refs for this step."
 
 
-      ## Fresh Current-Main E2E Baseline
+      ## Adjudication Consumption
 
-      - Current main commit used: <sha>
+      - srde2e-e2e-contract-adjudication evidence read: YES/NO
 
-      - Salvage commits present: 61a8825c yes/no; 107d1349 yes/no
-
-      - Exact command: `npm --prefix web run test:e2e`
-
-      - Result: <passed/failed>
-
-      - Residual inventory compared to known 7 blockers: <paste summary>
+      - Decision matrix citation: <paste relevant rows or artifact reference>
 
 
-      ## Seven-Blocker Closure Register
+      ## Fix Execution Matrix
 
-      | # | Spec/test | Fresh-main status | Fix/disposition | Evidence ref |
+      | Theme | Adjudicated classification | Files/tests changed | Exact remediation
+      applied | Allowed deviation citation | Status |
 
-      |---|-----------|-------------------|-----------------|--------------|
+      |---|---|---|---|---|---|
 
-      | 1 | full-ui-design-conformance.expected-red.spec.ts | | | |
+      | Focus order | | | | | |
 
-      | 2 | hit-target-clickability.spec.ts | | | |
+      | Nav visible text | | | | | |
 
-      | 3 | inspector-dirty-corpus.spec.ts | | | |
+      | OPML import/ingest status | | | | | |
 
-      | 4 | inspector-readable-content-regression.spec.ts | | | |
+      | Duplicate rows/shared DB state | | | | | |
 
-      | 5 | prd-inspector-preview-conformance.expected-red.spec.ts | | | |
-
-      | 6 | ui-remediation-r1-r8-browser-retest.spec.ts | | | |
-
-      | 7 | ui-runtime-fresh-review-remediation.spec.ts | | | |
+      | Hit-target scroll geometry | | | | | |
 
 
       ## Command Evidence
 
-      - Targeted render command output: <paste exact summary>
+      ```
 
-      - `npm --prefix web run test:render` output: <paste exact summary>
+      npm --prefix web run test:render -- src/routes/components/__tests__/manual-rss-fetch-source-ledger.expected-red.test.ts
+      src/routes/components/__tests__/rendering-expected-red.test.ts src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
 
-      - `npm --prefix web run test:e2e` output: <paste exact summary>
-
-      - `npm --prefix web run check` output: <paste exact summary>
-
-      - `npm --prefix web run build` output: <paste exact summary>
+      <output>
 
 
-      ## Disposition Rules
+      npm --prefix web run test:render
 
-      If any failure remains, include:
+      <output>
 
-      - requirement_ref:
 
-      - behavior_claim:
+      npm --prefix web run test:e2e
 
-      - runtime_proof_expected:
+      <output>
 
-      - evidence_ref:
 
-      - status: PROVEN | NEEDS_TEST | UNPROVEN | UNCERTAIN_BLOCKING
+      npm --prefix web run check
 
-      - closure_path:
+      <output>
 
-      - gate_decision_basis:
 
-      - residual_owner:
+      npm --prefix web run build
+
+      <output>
+
+      ```
+
+
+      ## Residual Disposition
+
+      For any remaining failure:
+
+      | Failure | Provenance | Disposition | Gate intersection | Owner | Closure path
+      |
+
+      |---|---|---|---|---|---|
 
 
       ## Headline
 
-      - [ ] PASS: all required render/check/build gates are green and full E2E is
-      green.
+      - [ ] PASS: adjudicated fixes executed and required command family is green
 
-      - [ ] PASS_WITH_RESIDUAL_OWNER: only explicitly dispositioned residuals remain
-      with blocker ownership.
+      - [ ] PASS_WITH_BLOCKING_RESIDUAL_OWNERSHIP: residual remains but is fully dispositioned
 
-      - [ ] FAIL: blocker-class failures remain without ownership or required command
-      evidence is missing.'
+      - [ ] FAIL: implementation deviated from adjudication or required checks are
+      red'
     refs:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/UI_REGRESSION_CONTRACT.md
     depends_on:
-    - srde2e-full-plan-check
+    - srde2e-e2e-contract-adjudication
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T08:41:55.834973+00:00'
