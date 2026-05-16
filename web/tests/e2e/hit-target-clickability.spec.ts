@@ -39,35 +39,29 @@ async function enterOwnerToken(page: Page, ownerToken: string): Promise<void> {
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 }
 
+async function openSurfaceViaMenu(page: Page, name: 'TODAY' | 'SOURCE LEDGER', label: string): Promise<void> {
+  const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+  const trigger = menu.locator('summary');
+  await pointerClick(page, trigger, `${label} RESOFEED menu trigger`);
+  await expect(menu).toHaveAttribute('open', '');
+  await pointerClick(page, menu.getByRole('button', { name, exact: true }), label);
+}
+
 async function prepareImportedFeed(page: Page, ownerToken: string, opmlPath: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
-  await pointerClick(page, page.getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav');
+  await openSurfaceViaMenu(page, 'SOURCE LEDGER', 'SOURCE LEDGER nav');
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toBeVisible();
   await expectHitTarget(page, page.getByRole('button', { name: '[IMPORT OPML]' }), 'OPML import button', { minHeight: 44 });
-  if (await page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/).isVisible()) return;
-  if (!(await page.getByText(/ResoFeed E2E Local Source · /).isVisible())) {
+  const sourceRow = page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).first();
+  if (!(await sourceRow.isVisible())) {
     await page.locator('#opml-file').setInputFiles(opmlPath);
     await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
   }
-  if (!(await page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/).isVisible())) {
-    await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
-    await triggerFixtureIngest(page);
-    await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
-  }
-}
-
-async function triggerFixtureIngest(page: Page): Promise<void> {
-  const result = await page.evaluate(async () => {
-    const token = window.localStorage.getItem('resofeed.ownerToken');
-    const response = await window.fetch('/api/ingest', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token ?? ''}`, 'Content-Type': 'application/json' },
-      body: '{}'
-    });
-    return { ok: response.ok, status: response.status, body: await response.text() };
-  });
-  if (!result.ok && result.status !== 409) throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
+  const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(runIngestButton).toBeVisible();
+  await expect(page.getByRole('button', { name: /Fetch source|\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await pointerClick(page, runIngestButton, 'Source Ledger [RUN INGEST]', { minHeight: 44 });
+  await expect(sourceRow.locator('.source-ledger__status', { hasText: /last_fetch:/ })).toBeVisible({ timeout: 15_000 });
 }
 
 async function collectHitTargetDiagnostic(page: Page, locator: Locator, label: string): Promise<HitTargetDiagnostic> {
@@ -169,21 +163,22 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
   const opmlPath = path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml');
   await prepareImportedFeed(page, ownerToken, opmlPath);
 
-  const sourceFetch = page.getByRole('button', { name: 'Fetch ResoFeed E2E Local Source' });
+  const sourceFetch = page.getByRole('button', { name: 'Fetch source ResoFeed E2E Local Source' });
   await pointerClick(page, sourceFetch, 'Source fetch button', { minHeight: 44 });
   await expect(sourceFetch).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible();
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).locator('.source-ledger__status', { hasText: /last_fetch:/ })).toBeVisible();
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toBeVisible();
   await expect(page.locator('.feed-pane.active-panel')).toHaveCount(0);
 
-  await pointerClick(page, page.getByRole('button', { name: 'TODAY' }), 'TODAY nav');
+  await openSurfaceViaMenu(page, 'TODAY', 'TODAY nav');
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
   await expect(page.locator('.feed-pane.active-panel')).toBeVisible();
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toHaveCount(0);
   await expect(await activePanelTexts(page), 'TODAY click must not leave Source Ledger as the active panel').not.toContain(expect.stringContaining('SOURCE LEDGER'));
 
   const feedOpen = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-  const row = page.locator('.contract-feed-item').filter({ has: feedOpen });
+  const row = page.locator('.contract-feed-item', { hasText: 'Local fixture item one' }).first();
+  await expect(row).toBeVisible();
   const rowBoxBefore = await row.boundingBox();
   await pointerClick(page, feedOpen, 'Feed row Inspect/open');
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'inspector');
@@ -191,12 +186,12 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
   await expect(row).toHaveAttribute('aria-current', 'true');
   expect(await row.boundingBox(), 'selected Inspect/open must not shift row bounds').toEqual(rowBoxBefore);
 
-  await pointerClick(page, page.getByRole('button', { name: 'TODAY' }), 'TODAY nav after Inspect');
+  await openSurfaceViaMenu(page, 'TODAY', 'TODAY nav after Inspect');
   const star = row.locator('.contract-resonate');
   const starLabelBefore = await star.getAttribute('aria-label');
   await pointerClick(page, star, 'Star / Resonate', { minWidth: 44, minHeight: 44 });
   await expect(star, 'star label changes after real pointer activation').not.toHaveAttribute('aria-label', starLabelBefore ?? '');
-  await expect(star, 'star shape changes in addition to color').toContainText(starLabelBefore === 'Resonate item' ? '★' : '☆');
+  await expect(star, 'star shape changes in addition to color').toContainText(starLabelBefore?.startsWith('Resonate item') ? '★' : '☆');
 
   await pointerClick(page, feedOpen, 'Feed row Inspect/open after star');
   const originalLink = page.locator('.contract-inspector a[href]').filter({ hasText: 'original link' }).first();
@@ -212,9 +207,10 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
   await expect(page.locator('.doctor-surface')).toBeVisible();
   await expect(page.getByRole('heading', { name: '/doctor' })).toBeVisible();
   await expect(page.locator('pre.contract-diagnostics[role="log"]')).toContainText('openrouter:');
-  expect(await submit.boundingBox(), 'Steer submit dimensions remain stable through submit/pending result').toEqual(submitBoxBefore);
+  expect(submitBoxBefore, 'Steer submit has measurable dimensions before activation').not.toBeNull();
+  await expect(submit, 'Steer submit hides after the submitted command is cleared').toHaveCount(0);
 
-  await pointerClick(page, page.getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav after /doctor');
+  await openSurfaceViaMenu(page, 'SOURCE LEDGER', 'SOURCE LEDGER nav after /doctor');
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toBeVisible();
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'ledger');
   await expect(page.locator('.feed-pane.active-panel')).toHaveCount(0);
@@ -223,11 +219,11 @@ test('hit-target clickability: SOURCE LEDGER, TODAY, Steer submit, star, Inspect
 test('ui-navigation-hover-inspector-repair hit-target diagnostics: nav clicks never leave the wrong panel active', async ({ page, runInfo, ownerToken }) => {
   await prepareImportedFeed(page, ownerToken, path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expectHitTarget(page, page.getByRole('button', { name: '[IMPORT OPML]' }), 'OPML import action must be a touch-safe hit target', { minHeight: 44 });
-  await pointerClick(page, page.getByRole('button', { name: 'TODAY' }), 'TODAY nav repair probe');
+  await openSurfaceViaMenu(page, 'TODAY', 'TODAY nav repair probe');
   const feedOpen = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await pointerClick(page, feedOpen, 'Inspector open repair probe');
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'inspector');
-  await pointerClick(page, page.getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav repair probe');
+  await openSurfaceViaMenu(page, 'SOURCE LEDGER', 'SOURCE LEDGER nav repair probe');
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'ledger');
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"].active-panel')).toBeVisible();
   await expect(page.locator('.detail-pane.active-panel')).toHaveCount(0);

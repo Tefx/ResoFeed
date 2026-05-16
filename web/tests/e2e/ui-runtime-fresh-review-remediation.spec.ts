@@ -336,7 +336,7 @@ async function assertSurfaceMenuContract(page: Page, viewport: { readonly width:
   await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);
   await menu.locator('summary').click();
   await menu.getByRole('button', { name: 'TODAY' }).click();
-  await expect(page.locator('.utility-surface[aria-label="TODAY surface"]')).toHaveClass(/active-panel/);
+  await expect(page.locator('.feed-pane[aria-label="TODAY surface independent scroll"]')).toHaveClass(/active-panel/);
 
   await writeProof(testInfo, `fr-01-fr-10-surface-menu-${viewport.width}`, { viewport, exposedGap: exposedGaps['FR-01/FR-10'] });
 }

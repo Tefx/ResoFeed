@@ -96,6 +96,13 @@ async function assertUnobstructedClick(locator: Locator): Promise<void> {
   await locator.click();
 }
 
+async function activateSurfaceMenuEntry(page: Page, name: 'TODAY' | 'SOURCE LEDGER'): Promise<void> {
+  const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
+  await assertUnobstructedClick(menu.locator('summary'));
+  await expect(menu).toHaveAttribute('open', '');
+  await assertUnobstructedClick(menu.getByRole('button', { name, exact: true }));
+}
+
 async function assertSurface(page: Page, surface: 'feed' | 'ledger' | 'search' | 'inspector'): Promise<void> {
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', surface);
   if (surface === 'feed') {
@@ -116,30 +123,18 @@ async function assertSurface(page: Page, surface: 'feed' | 'ledger' | 'search' |
 }
 
 async function seedFeedFromOpml(page: Page, opmlPath: string): Promise<void> {
-  await assertUnobstructedClick(page.getByRole('button', { name: 'SOURCE LEDGER' }));
+  await activateSurfaceMenuEntry(page, 'SOURCE LEDGER');
   await assertSurface(page, 'ledger');
-  const sourceRow = page.getByText(/ResoFeed E2E Local Source ·/);
+  const sourceRow = page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).first();
   if (!(await sourceRow.first().isVisible().catch(() => false))) {
     await page.locator('#opml-file').setInputFiles(opmlPath);
     await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   }
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
-  await triggerFixtureIngest(page);
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
-}
-
-async function triggerFixtureIngest(page: Page): Promise<void> {
-  const result = await page.evaluate(async () => {
-    const token = window.localStorage.getItem('resofeed.ownerToken');
-    const response = await window.fetch('/api/ingest', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token ?? ''}`, 'Content-Type': 'application/json' },
-      body: '{}'
-    });
-    return { ok: response.ok, status: response.status, body: await response.text() };
-  });
-  if (!result.ok && result.status !== 409) throw new Error(`fixture ingest failed: ${result.status} ${result.body}`);
+  const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(runIngestButton).toBeVisible();
+  await expect(page.getByRole('button', { name: /Fetch source|\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await assertUnobstructedClick(runIngestButton);
+  await expect(sourceRow.locator('.source-ledger__status', { hasText: /last_fetch:/ })).toBeVisible({ timeout: 15_000 });
 }
 
 async function assertPrimaryTextIsClean(page: Page): Promise<void> {
@@ -196,17 +191,18 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'first-use', 'Accepted token with no sources; first-use copy in normal shell.');
 
-  await assertUnobstructedClick(page.getByRole('button', { name: 'SOURCE LEDGER' }));
+  await activateSurfaceMenuEntry(page, 'SOURCE LEDGER');
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
   await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'source-ledger', 'Ledger active with OPML import receipt and flattened source row.');
 
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
-  await triggerFixtureIngest(page);
-  await expect(page.getByText(/ResoFeed E2E Local Source · ok · last fetch:/)).toBeVisible({ timeout: 15_000 });
+  const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(runIngestButton).toBeVisible();
+  await expect(page.getByRole('button', { name: /Fetch source|\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  await assertUnobstructedClick(runIngestButton);
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).locator('.source-ledger__status', { hasText: /last_fetch:/ })).toBeVisible({ timeout: 15_000 });
 
-  await assertUnobstructedClick(page.getByRole('button', { name: 'TODAY', exact: true }));
+  await activateSurfaceMenuEntry(page, 'TODAY');
   await assertSurface(page, 'feed');
   const fixtureFeedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await expect(fixtureFeedItem).toBeVisible();
@@ -220,7 +216,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
 
   await fixtureFeedItem.hover();
   await captureArtifact(page, testInfo, manifest, 'selected-hover', 'Selected feed row under hover; marker/bounds context captured.');
-  const rawProvenanceDisclosure = page.locator('details.contract-raw-provenance').first();
+  const rawProvenanceDisclosure = page.locator('details.contract-source-details').first();
   await expect(rawProvenanceDisclosure, 'raw/provenance must remain a labelled secondary disclosure').toBeVisible();
   await rawProvenanceDisclosure.locator('summary').click();
   await expect(rawProvenanceDisclosure, 'expanded raw/provenance proof requires the disclosure to be open').toHaveAttribute('open', '');
@@ -230,7 +226,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await steer.fill('search Local fixture');
   await page.getByRole('button', { name: 'apply' }).click();
   await assertSurface(page, 'search');
-  await page.getByRole('button', { name: 'search' }).click();
+  await page.getByRole('button', { name: 'search', exact: true }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await captureArtifact(page, testInfo, manifest, 'search', 'Lexical Search and Retrieval surface with source-backed result.');
 
@@ -247,7 +243,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   expect(artifactNames).toHaveLength(requiredArtifacts.length);
   expect(artifactNames).toEqual(expect.arrayContaining([...requiredArtifacts]));
   await expect(
-    page.locator('details, [aria-expanded="true"]').filter({ hasText: /raw|provenance|diagnostics/i }).first(),
+    page.locator('details, [aria-expanded="true"]').filter({ hasText: /raw|provenance|diagnostics|source details/i }).first(),
     'Expected-red gap: raw/provenance artifact requires a labelled expandable or expanded secondary disclosure.'
   ).toBeVisible();
 });
@@ -258,7 +254,7 @@ test('negative UX assertions reject raw payload copy and active-panel drift', as
   await enterOwnerToken(page, ownerToken);
   await seedFeedFromOpml(page, path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
 
-  await assertUnobstructedClick(page.getByRole('button', { name: 'TODAY', exact: true }));
+  await activateSurfaceMenuEntry(page, 'TODAY');
   await assertSurface(page, 'feed');
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
@@ -266,8 +262,8 @@ test('negative UX assertions reject raw payload copy and active-panel drift', as
   await assertPrimaryTextIsClean(page);
   await assertForbiddenUxCopyAbsent(page);
 
-  await assertUnobstructedClick(page.getByRole('button', { name: 'SOURCE LEDGER' }));
+  await activateSurfaceMenuEntry(page, 'SOURCE LEDGER');
   await assertSurface(page, 'ledger');
-  await assertUnobstructedClick(page.getByRole('button', { name: 'TODAY', exact: true }));
+  await activateSurfaceMenuEntry(page, 'TODAY');
   await assertSurface(page, 'feed');
 });

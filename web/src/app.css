@@ -1027,20 +1027,20 @@ a:focus,
   }
 
   .contract-feed-meta {
-    flex-wrap: wrap;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta span {
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta .feed-meta-source {
-    flex-basis: auto;
+    flex: 1 1 auto;
   }
 
   .contract-time-label {
