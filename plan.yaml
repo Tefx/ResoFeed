@@ -97950,7 +97950,7 @@ phases:
       - [x] B2 is closed by a browser/e2e conflict fixture carrying documented `current_operation`
       detail.
 
-      - [ ] Source Ledger conflict evidence shows the intended contextual status exactly
+      - [x] Source Ledger conflict evidence shows the intended contextual status exactly
       once in the relevant assertion scope.
 
       - [ ] Browser evidence shows current-operation detail, not only the generic
