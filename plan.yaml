@@ -85970,7 +85970,7 @@ phases:
       - orchestrator_action_hint: DO_NOT_COMPLETE_FINAL_GATE'
   - id: srde2e-final-closure-gate
     name: Final gate for Steer delta implementation
-    status: claimed
+    status: pending
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), decide whether the Steer
       delta implementation is complete.
 
@@ -86086,8 +86086,6 @@ phases:
     - srde2e-uiux-full-plan-e2e-blockers-audit
     - srde2e-full-plan-e2e-blockers-retest
     agent: gate-reviewer
-    claimed_by: gate-reviewer
-    claimed_at: '2026-05-16T11:50:57.448497+00:00'
   - id: srde2e-real-system-e2e-blockers-fix
     name: Fix real-system E2E blocker families
     status: done
