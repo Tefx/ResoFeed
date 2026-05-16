@@ -84831,6 +84831,7 @@ phases:
     depends_on:
     - srde2e-real-system-e2e-blockers-retest
     - srde2e-visual-a11y-regression-proof
+    - srde2e-uiux-source-ledger-status-contract-retest
     agent: doc-reviewer
   - id: srde2e-software-architect-fresh-review
     name: Run software-architect fresh architecture review
