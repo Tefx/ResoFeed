@@ -91082,7 +91082,7 @@ phases:
   steps:
   - id: azrct-closure-matrix
     name: Lock repair and zh completeness closure matrix
-    status: claimed
+    status: done
     description: 'step_type: contract
 
       contract_purity: ENFORCED
@@ -91201,6 +91201,93 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-16T13:13:27.783424+00:00'
+    done_at: '2026-05-16T13:25:35.785340+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — Read by execution agent; key passages cited: App Shell permits
+      TODAY/SOURCE LEDGER only inside RESOFEED menu, Language Control requires LANG:
+      EN/ZH, Reprocess is explicit bracket action, Inspector requires source-text/provenance
+      lines, Source Ledger defines RUN INGEST/OPML/header alignment, Do/Don''ts forbid
+      settings dashboards/sync/RAG/vector surfaces.
+
+      - docs/ARCHITECTURE.md — Read by execution agent; key passages cited: one binary,
+      SQLite+FTS5, OpenRouter JSON transformer, processing language en|zh in runtime
+      metadata, state export/import excludes runtime metadata, HTTP/MCP language and
+      reprocess addenda, no queues/jobs/sync/activity ledger.
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — Read by execution agent; key passages
+      cited: runtime_metadata.processing_language, HTTP /api/runtime/language, /api/runtime/reprocess-library,
+      MCP parity, source/FTS reprocess rules, frontend obligations, explicit non-goals.
+
+      - docs/ui-preview.html — Read by execution agent; key passage cited: preview
+      includes Source Ledger and partial labels but lacks visible LANG/reprocess surfaces.
+
+      - AGENTS.md — NOT READ by execution agent: not present in isolated worktree;
+      orchestrator context includes AGENTS.md constraints.
+
+
+      ## Closure Matrix Evidence
+
+      - Added contract-only closure matrix: tests/contract/azrct_closure_matrix.yaml.
+
+      - Audit finding table covers F1, F2, P1, P2 visible copy, P2 compact nav, P2
+      preview drift, P2 Inspector provenance, P3 test naming, and P3 legacy Gemini
+      naming.
+
+      - Each finding maps to exactly one planned owner step and exactly one independent
+      verification step.
+
+      - Chinese support verdict is explicit: INCOMPLETE.
+
+      - zh surface table covers storage/API/MCP, frontend LANG control, receipts/steer
+      preview, Inspector display, reprocess surface, OpenRouter prompt, state portability
+      exclusion, E2E/contracts, and preview docs.
+
+      - Product-boundary non-goals recorded: single binary, SQLite only, no sync/merge/history,
+      no settings dashboard, no RAG/vector/semantic-answer product surface.
+
+      - No production implementation code changed.
+
+
+      ## Verification
+
+      - Worktree validation (reported by execution agent): `validated 9 audit findings
+      and 9 zh surfaces in tests/contract/azrct_closure_matrix.yaml`.
+
+      - Mainline final-state verification after squash merge: `python3 -c ''import
+      yaml, pathlib; data=yaml.safe_load(pathlib.Path("tests/contract/azrct_closure_matrix.yaml").read_text());
+      findings=data["audit_findings"]; zh=data["zh_completeness_verdict"]["surfaces"];
+      assert len(findings)==9, len(findings); assert len(zh)==9, len(zh); assert data["zh_completeness_verdict"]["verdict"]=="INCOMPLETE";
+      assert data["production_code_change_allowed"] is False; print("validated 9 audit
+      findings and 9 zh surfaces; verdict INCOMPLETE; production_code_change_allowed=false")''`
+
+      - Mainline output: `validated 9 audit findings and 9 zh surfaces; verdict INCOMPLETE;
+      production_code_change_allowed=false`.
+
+      - Checklist state verified via vectl_show: all description completion criteria
+      and verification checklist items are checked.
+
+
+      ## Files changed
+
+      - tests/contract/azrct_closure_matrix.yaml
+
+
+      ## Commits
+
+      - Worktree commit: e6db984b168a9e11303071a026c4a88c4ea3ce15 (`test: add azrct
+      closure matrix contract`).
+
+      - Main squash merge commit: 61ef68d0 (`[vectl] step-azrct-closure-matrix completed`).
+
+
+      ## Gaps/Notes
+
+      - AGENTS.md was unavailable inside the isolated worktree, but its constraints
+      were included in the orchestrator dispatch context.
+
+      - Chinese support is intentionally classified INCOMPLETE; downstream repair
+      and verification steps own the gaps.'
   - id: azrct-expected-red-browser-and-contract-tests
     name: Add expected-red browser and contract tests for audit and zh gaps
     status: pending
