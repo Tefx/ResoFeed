@@ -85396,22 +85396,22 @@ phases:
       deliverable MUST contain substantive logic that processes its inputs and produces
       outputs that vary based on those inputs. Private stub classes or hardcoded test-only
       bypasses do not satisfy this requirement.'
-    verification: '- [ ] local-check protecting srde2e-real-system-e2e-blockers-retest
+    verification: '- [x] local-check protecting srde2e-real-system-e2e-blockers-retest
       and srde2e-final-closure-gate.
 
-      - [ ] ALL B-RSE2E blocker families are remediated or have evidence showing the
+      - [x] ALL B-RSE2E blocker families are remediated or have evidence showing the
       exact root cause is outside the changed code and still closed by an equivalent
       fix.
 
-      - [ ] Focused checks cover Source Ledger OPML import + `[RUN INGEST]` + `Live
+      - [x] Focused checks cover Source Ledger OPML import + `[RUN INGEST]` + `Live
       Audit Source` + `last_fetch: HH:MM:SS`.
 
-      - [ ] Focused checks cover unique accessible button names for Steer preview/commit/undo
+      - [x] Focused checks cover unique accessible button names for Steer preview/commit/undo
       and browser-led MCP parity paths.
 
-      - [ ] No product invariant from docs/ARCHITECTURE.md or docs/DESIGN.md is weakened.
+      - [x] No product invariant from docs/ARCHITECTURE.md or docs/DESIGN.md is weakened.
 
-      - [ ] Implementer evidence includes sibling search results and root-cause-vs-symptom
+      - [x] Implementer evidence includes sibling search results and root-cause-vs-symptom
       notes for B-RSE2E-02 and B-RSE2E-03.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
