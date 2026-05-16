@@ -85184,7 +85184,7 @@ phases:
       HTTP and MCP, or otherwise explicitly align the fingerprint semantics for the
       same logical steer operation.
 
-      - [ ] Preserve globally scoped `agent_receipts.idempotency_key` behavior without
+      - [x] Preserve globally scoped `agent_receipts.idempotency_key` behavior without
       allowing equivalent HTTP/MCP retries to fail as `request_fingerprint_mismatch`.
 
       - [ ] Add a parity regression test that performs HTTP then MCP with the same
