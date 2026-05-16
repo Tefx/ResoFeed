@@ -82262,7 +82262,7 @@ phases:
       - [x] Verify Source Ledger actions/details/hit-targets and manual controls are
       rendered and reachable.
 
-      - [ ] Verify split-scroll desktop and mobile Inspector route behavior visually/spatially.
+      - [x] Verify split-scroll desktop and mobile Inspector route behavior visually/spatially.
 
       - [ ] Verify no forbidden UI concepts or AI/RAG/chat/semantic answer affordances
       appear.
