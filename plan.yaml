@@ -84905,6 +84905,7 @@ phases:
     - srde2e-real-system-e2e-blockers-retest
     - srde2e-visual-a11y-regression-proof
     - srde2e-documentation-sync
+    - srde2e-uiux-source-ledger-status-contract-retest
     agent: software-architect
   - id: srde2e-backend-architecture-remediation
     name: Remediate backend architecture review findings
