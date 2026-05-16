@@ -95656,13 +95656,13 @@ phases:
 
       - [x] No new dashboard, settings panel, wizard, persistent strip, or durable
       task-history UI is introduced.'
-    verification: '- [ ] local-check protecting UI behavior: targeted component tests
+    verification: '- [x] local-check protecting UI behavior: targeted component tests
       for status placement and LANG/reprocess placement pass green.
 
-      - [ ] Evidence includes rendered DOM/snapshot proof for allowed surfaces and
+      - [x] Evidence includes rendered DOM/snapshot proof for allowed surfaces and
       absence from persistent top chrome.
 
-      - [ ] Evidence confirms no persistent idle global status strip, dashboard, wizard,
+      - [x] Evidence confirms no persistent idle global status strip, dashboard, wizard,
       or settings/preference panel was added.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
