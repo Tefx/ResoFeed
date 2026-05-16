@@ -89692,7 +89692,7 @@ phases:
       - [x] Duplicate Dirty Inspector Corpus rows are dispositioned with fixture/shared
       DB isolation or app idempotency remediation instructions.
 
-      - [ ] Hit-target scroll geometry is dispositioned with exact UI/test/fixture
+      - [x] Hit-target scroll geometry is dispositioned with exact UI/test/fixture
       remediation instructions.
 
       - [ ] Next implementation attempt has exact remediation instructions and forbidden
