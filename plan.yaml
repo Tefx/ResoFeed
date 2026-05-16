@@ -95396,7 +95396,7 @@ phases:
 
       ## Failure-Mode Checklist
 
-      - [ ] No-query-param request to `GET /api/runtime/operation` is rejected per
+      - [x] No-query-param request to `GET /api/runtime/operation` is rejected per
       existing strict validation style.
 
       - [ ] Idle response has `running=false` and nullable fields null.
