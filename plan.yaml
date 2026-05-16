@@ -82557,7 +82557,7 @@ phases:
       explicit remediation ownership before gate.'
   - id: srdf-frontend-gate
     name: Gate frontend Steer delta UI implementation
-    status: pending
+    status: claimed
     description: 'As an INDEPENDENT REVIEWER (gate-reviewer), assess whether the frontend
       UI phase can open for final real-system E2E.
 
@@ -82647,6 +82647,8 @@ phases:
     - srdf-batched-frontend-audit-closure
     - srdf-batched-frontend-closure-blockers-retest
     agent: gate-reviewer
+    claimed_by: gate-reviewer
+    claimed_at: '2026-05-16T01:48:25.555639+00:00'
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
     status: done
