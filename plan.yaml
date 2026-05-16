@@ -92098,3 +92098,122 @@ phases:
 
       |---|---|---|'
     agent: spec-verifier
+  - id: azrv-architecture-boundary-audit
+    name: Audit architecture boundary after OPML, copy, preview, and zh repairs
+    status: pending
+    description: 'step_type: review
+
+      verification_scope: phase-check
+
+      agent_source: project
+
+
+      As software-architect, independently review the repair against ResoFeed architecture
+      boundaries and the previous PASS_WITH_DEBT findings.
+
+
+      Required architecture checks:
+
+      - OPML import remains import-only and does not implicitly run ingest, queue
+      ingest, create a durable job, or invent activity/history surfaces.
+
+      - Reprocess remains explicit, owner-authorized, in-process, and non-durable;
+      no queue/dashboard/job model appears.
+
+      - Processing language remains runtime metadata excluded from state export/import;
+      source identifiers remain preserved.
+
+      - Terse copy preserves safety boundaries without exposing explanatory architecture
+      language in product chrome.
+
+      - No new service/worker/sidecar/DI/event-bus/repository layers are introduced;
+      single Go binary and SQLite-only constraints remain intact.
+
+      - `docs/ui-preview.html` is the active preview artifact; missing `design-version/`
+      is dispositioned as non-blocking unless another authoritative source requires
+      it.
+
+      - Persistent compact navigation (`T`/`SL`) is removed or explicitly adjudicated
+      against DESIGN.md; default gate stance is removal.
+
+
+      ## Completion Criteria
+
+      - [ ] Architecture review maps P1/P2/P3 findings to PROVEN closure, accepted
+      non-intersection, or blocker remediation.
+
+      - [ ] Review confirms no forbidden product concepts or deployability changes
+      were introduced.
+
+      - [ ] Review includes explicit disposition for Chinese support state portability
+      and OpenRouter target-language path.
+
+      - [ ] Any remaining debt has gate-intersection analysis; `pre-existing` is not
+      used as a disposition.'
+    verification: '- [ ] Phase-check protects final closure by reviewing architecture/product
+      boundaries.
+
+      - [ ] OPML manual-ingest boundary is proven with code and/or test evidence.
+
+      - [ ] Chinese processing language remains runtime-only and not portable state.
+
+      - [ ] No new forbidden architecture layers or product concepts are present.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/+page.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/SourceLedger.svelte — key passage or "NOT READ:
+      <reason>"
+
+      - internal/resofeed/state.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/reprocess.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/openrouter.go — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Architecture Boundary Review
+
+      | Finding | Evidence | Verdict | Closure path |
+
+      |---|---|---|---|
+
+      | P1 OPML no-auto-ingest | | PROVEN/PARTIAL/BLOCKER | |
+
+      | P2 copy/product chrome | | PROVEN/PARTIAL/BLOCKER | |
+
+      | P2 compact nav | | PROVEN/PARTIAL/BLOCKER | |
+
+      | P2 preview drift | | PROVEN/PARTIAL/BLOCKER | |
+
+      | P2 Inspector provenance | | PROVEN/PARTIAL/BLOCKER | |
+
+      | P3 naming debt | | PROVEN/NON_BLOCKING/BLOCKER | |
+
+      | zh architecture parity | | PROVEN/PARTIAL/BLOCKER | |
+
+
+      ## Headline
+
+      - [ ] PASS
+
+      - [ ] PASS_WITH_DEBT
+
+      - [ ] FAIL'
+    agent: software-architect
