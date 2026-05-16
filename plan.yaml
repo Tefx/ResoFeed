@@ -84135,7 +84135,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Re-read `docs/DESIGN.md` and `docs/UI_REGRESSION_CONTRACT.md` before changing
+      - [x] Re-read `docs/DESIGN.md` and `docs/UI_REGRESSION_CONTRACT.md` before changing
       selectors, tests, or UI behavior.
 
       - [ ] Classify B-HT-01 and B-ART-01 with one shared `source_contract_conflict`
