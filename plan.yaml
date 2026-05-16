@@ -95705,7 +95705,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Multimodal/rendered artifact shows valid grouped-source disclosure after
+      - [x] Multimodal/rendered artifact shows valid grouped-source disclosure after
       repair.
 
       - [ ] Browser console evidence has no `state_unsafe_mutation` blocker.
