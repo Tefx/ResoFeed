@@ -95288,7 +95288,7 @@ phases:
 
       ## Acceptance Checklist
 
-      - [ ] Replace the grouped-source sort mutation with a non-mutating sort in `web/src/routes/components/Inspector.svelte`.
+      - [x] Replace the grouped-source sort mutation with a non-mutating sort in `web/src/routes/components/Inspector.svelte`.
 
       - [ ] Preserve the existing grouped-source comparator/order semantics.
 
