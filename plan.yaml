@@ -90689,7 +90689,7 @@ phases:
       - [x] Confirm `srde2e-software-architect-clean-verdict-proof` evidence contains
       `reviewer_agent: software-architect`.
 
-      - [ ] Confirm the architect artifact contains verdict exactly `CLEAN` before
+      - [x] Confirm the architect artifact contains verdict exactly `CLEAN` before
       allowing gate open.
 
       - [ ] Re-evaluate all remaining blockers, including any blocker list from the
