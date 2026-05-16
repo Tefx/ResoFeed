@@ -87683,7 +87683,7 @@ phases:
       - [ ] npm run test:render completes green or the evidence records exact remaining
       failures with blocker disposition.
 
-      - [ ] srdct-frontend-expected-red-contract.test.ts Steer idle/route-preview
+      - [x] srdct-frontend-expected-red-contract.test.ts Steer idle/route-preview
       cases are green.
 
       - [ ] steer-route-preview.expected-red.test.ts idle, chip classification, invalid,
