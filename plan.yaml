@@ -87264,6 +87264,7 @@ phases:
       - [ ] FAIL: Blocking issues or blocking proof gaps remain'
     depends_on:
     - srde2e-visual-a11y-blockers-fix
+    - srde2e-steer-route-preview-render-contract-retest
     agent: blind-tester
   - id: srde2e-steer-route-preview-render-contract-fix
     name: Fix Steer route-preview render contract failures
