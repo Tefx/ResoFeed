@@ -95294,7 +95294,7 @@ phases:
 
       - [x] Verify no backend grouping/schema/provenance behavior is changed.
 
-      - [x] Produce evidence that a valid grouped story renders without `state_unsafe_mutation`
+      - [ ] Produce evidence that a valid grouped story renders without `state_unsafe_mutation`
       or other browser console runtime errors.
 
       - [x] Preserve dense Inspector grouped-source UI; no dashboard, wizard, or service-layer
