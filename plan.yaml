@@ -87232,7 +87232,7 @@ phases:
       checklist items.'
   - id: srde2e-visual-a11y-blockers-retest
     name: Retest visual accessibility blocker closure
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: retest_green
@@ -87422,6 +87422,247 @@ phases:
     agent: blind-tester
     claimed_by: blind-tester
     claimed_at: '2026-05-16T07:34:13.026239+00:00'
+    done_at: '2026-05-16T07:50:04.799889+00:00'
+    evidence: 'status: SUCCESS
+
+      verdict: PASS
+
+      headline: PASS
+
+      blocking_status: CLOSED
+
+      proof_gap_status: NONE
+
+      blockers: []
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## Verification Report
+
+      **Tester**: blind-tester (independent of implementation)
+
+      **Scope**: Public-surface visual/a11y retest for B1-B4 blocker closure
+
+      **Independence Level**: L1
+
+      **Timestamp**: 2026-05-16T07:45:00Z
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — read. Key passages used: Feed and Inspector must be independent
+      focusable labelled scroll regions; Source Ledger exposes [RUN INGEST], [IMPORT
+      OPML], [FETCH], [DELETE], [DETAILS], [EXPORT STATE], [IMPORT STATE] with 44px
+      targets and terse bracket actions; Inspector original links remain provenance
+      anchors.
+
+      - docs/UI_REGRESSION_CONTRACT.md — read. Key passages used: real hit-target
+      contract, keyboard/accessibility contract, negative UX assertions, acceptance
+      checklist mapping; elementFromPoint at center/interior must be target/descendant;
+      pointer and keyboard activation must be real.
+
+      - docs/ARCHITECTURE.md §3.5 — read. Key passage used: browser SPA renders localized
+      chrome and keeps desktop Feed and Inspector as independent scroll regions; frontend
+      owns split-scroll containment without persisted reading-position state.
+
+
+      ## Commands / browser actions executed
+
+      ```text
+
+      pwd && git status --short --branch
+
+      npm ci
+
+      npm run build
+
+      go build -o bin/resofeed ./cmd/resofeed
+
+      node audits/srde2e-visual-a11y-regression-proof.mjs
+
+      node <supplemental B1-B4 browser proof script>
+
+      node <supplemental B1 keyboard-focus and B3 small-viewport scroll proof script>
+
+      git add artifacts/srde2e-visual-a11y-regression-proof
+
+      git commit -m "test: record visual a11y blocker retest evidence"
+
+      ```
+
+      Main proof outcome:
+
+      ```text
+
+      PASS: UI/a11y black-box regression proof passed
+
+      ```
+
+
+      ## Merge / Mainline Final-State Verification
+
+      - Branch artifact commit from worker: `767fd870 test: record visual a11y blocker
+      retest evidence`.
+
+      - Initial orchestrator `git merge --squash vectl/step-srde2e-visual-a11y-blockers-retest`
+      was blocked by pre-existing dirty overlapping artifact files in main.
+
+      - conflict-resolver restored and staged only incoming visual/a11y evidence artifacts
+      from the source branch, verified no conflict markers, validated staged JSON
+      artifacts, verified staged files matched the source branch, and committed `d176da02`
+      with message `[vectl] step-srde2e-visual-a11y-blockers-retest completed`.
+
+      - Protected files `plan.yaml` and `.git/vectl/claims.json` were not touched
+      by the resolver.
+
+      - Mainline verification after resolver commit:
+
+      ```text
+
+      cd /Users/tefx/Projects/ResoFeed/web && npm run build
+
+      cd /Users/tefx/Projects/ResoFeed && go build -o bin/resofeed ./cmd/resofeed
+      && node audits/srde2e-visual-a11y-regression-proof.mjs
+
+      PASS: UI/a11y black-box regression proof passed
+
+      ```
+
+
+      ## Behavioral proof register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | B1_DETAILS_NOT_REAL_ACTIVATION_PROVEN | DETAILS visibly/topmost activates
+      | pointer + keyboard + elementFromPoint/topmost proof | artifacts/srde2e-visual-a11y-regression-proof/audit-report.json;
+      supplemental-b1-b4-retest.json; supplemental-b1-b3-keyboard-scroll.json | PROVEN
+      | closed | [DETAILS] 73x44, center/interior topTag SUMMARY ok=true, pointerEvents
+      auto, visible; keyboard Tab focus solid 2px outline and Enter opened diagnostic
+      content |
+
+      | B2_IMPORT_STATE_OBSTRUCTED_1PX_TARGET | IMPORT STATE visible accessible activation
+      path not obstructed | elementFromPoint interior/center + keyboard/accessibility
+      proof | audit-report.json; supplemental-b1-b4-retest.json | PROVEN | closed
+      | [IMPORT STATE] 134x44, center/interior topTag BUTTON ok=true, focusVisible
+      true, accessible name present |
+
+      | B3_DESKTOP_SPLIT_SCROLL_FOCUSABILITY_UNPROVEN | desktop Feed and Inspector
+      scroll regions independently focusable/labeled/focus-visible | browser focus
+      and labels proof | desktop-split-scroll-proof.json; supplemental-b1-b4-retest.json;
+      supplemental-b1-b3-keyboard-scroll.json | PROVEN | closed | Feed and Inspector
+      tabindex=0, labelled, focusVisible true; independent scroll offsets proved at
+      1280x420 with bodyTop staying 0 |
+
+      | B4_ORIGINAL_LINK_BELOW_44PX | Inspector original/equivalent link target is
+      at least 44px | measured box and activation proof | audit-report.json; supplemental-b1-b4-retest.json
+      | PROVEN | closed | original link measured 113x44, href non-empty, center/interior
+      topmost A ok=true, focusVisible true |
+
+      | Public-surface regression scope | previously passing public surface checks
+      remain green | broad proof output | audit-report.json failures=[] and screenshots/snapshots
+      under artifacts/srde2e-visual-a11y-regression-proof/ | PROVEN | closed | Browser
+      audit passed across owner-token shell, Steer, Source Ledger controls, OPML/state
+      actions, menu, row open, star, original link, keyboard, active panel, mobile,
+      forbidden scan |
+
+
+      ## B1-B4 Reproof
+
+      - B1: [DETAILS] box x=1142 y=231 w=73 h=44; center/interior topTag=SUMMARY ok=true;
+      pointerEvents=auto; visibility=visible; min44=true. Keyboard Tab reached SUMMARY
+      [DETAILS], outlineStyle=solid, outlineWidth=2px, rect=73x44, focusVisible=true,
+      Enter opened diagnostic content.
+
+      - B2: [IMPORT STATE] box x=217 y=291 w=134 h=44; center/interior topTag=BUTTON
+      ok=true; pointerEvents=auto; visibility=visible; min44=true; focus name=[IMPORT
+      STATE]; outlineStyle=solid; outlineWidth=2px; focusVisible=true; accessible=true;
+      nonObstructed=true.
+
+      - B3: desktop-split-scroll-proof.json plus supplemental scroll proof: Feed scrollHeight=3513
+      clientHeight=233 scrollable=true; Inspector scrollHeight=290 clientHeight=233
+      scrollable=true; after Feed scroll feedTop=150 inspectorTop=0 bodyTop=0; after
+      Inspector scroll feedTop=150 inspectorTop=57 bodyTop=0.
+
+      - B4: original link box 113x44, center/interior topmost A ok=true, pointerEvents=auto,
+      visibility=visible, min44=true, href non-empty, focusVisible=true.
+
+
+      ## Public-surface regression proof
+
+      - Owner-token shell: PROVEN.
+
+      - Steer controls: PROVEN.
+
+      - Source Ledger actions: PROVEN.
+
+      - OPML/state actions: PROVEN.
+
+      - Menu entries: PROVEN.
+
+      - Row open/star/original links: PROVEN.
+
+      - Keyboard tab/enter/space/escape behavior: PROVEN.
+
+      - Active panel semantic state: PROVEN.
+
+      - Desktop split-scroll: PROVEN.
+
+      - Mobile Inspector route: PROVEN.
+
+      - Forbidden-term scan: PROVEN; forbidden dashboard/job/activity/settings/RAG/chat/semantic
+      answer/folder/tag/source hierarchy/queue/sync/merge/mark all read/unread concepts
+      not found.
+
+
+      ## Gate-Intersection Disposition
+
+      - Remaining blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+
+      ## Standard Evidence
+
+      - Commit hash(es): worker artifact commit 767fd870; resolver/main commit d176da02.
+
+      - Files changed: artifact evidence only under artifacts/srde2e-visual-a11y-regression-proof/
+      including updated screenshots/a11y snapshots and supplemental-b1-b4-retest.json
+      plus supplemental-b1-b3-keyboard-scroll.json.
+
+      - Verification: worker main browser audit returned `PASS: UI/a11y black-box
+      regression proof passed`; supplemental B1-B4 scripts returned PROVEN measurements;
+      mainline rerun after resolver commit returned `PASS: UI/a11y black-box regression
+      proof passed`.
+
+      - Spec link: srde2e-visual-a11y-blockers-retest
+
+      - Gaps/Notes: none blocking. Initial worker run before rebuilding current web
+      assets failed against stale/missing served assets; after `npm run build` and
+      `go build`, public binary served remediated UI and audit passed.
+
+      - step_intent: retest_green
+
+      - expected_result: green
+
+      - observed_result: green
+
+      - failure_alignment: n/a
+
+      - verdict: PASS
+
+      - blockers: []
+
+      - product_implementation_files_modified: no
+
+      - product_implementation_files_modified_list: []'
   - id: srde2e-steer-route-preview-render-contract-fix
     name: Fix Steer route-preview render contract failures
     status: done
