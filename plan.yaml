@@ -84153,7 +84153,7 @@ phases:
       - [x] Run the exact verification commands listed for this step and record actual
       outputs.
 
-      - [ ] Do not split this into serial one-issue fix chains or mutate completed
+      - [x] Do not split this into serial one-issue fix chains or mutate completed
       plan steps.'
     verification: '- [ ] local-check protecting `srdf-batched-frontend-closure-blockers-retest`
       and `srdf-frontend-gate`.
