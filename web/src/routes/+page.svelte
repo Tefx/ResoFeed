@@ -229,12 +229,13 @@
       return { kind: 'doctor', label: '[DOCTOR]', detail: 'read-only diagnostics', live: 'polite', marker: '>', writeAction: false };
     }
     if (/^(search|find)\s+\S+/i.test(command)) {
+      const isZh = processingLanguage.code === 'zh';
       const detail = lower.startsWith('find ')
-        ? 'lexical SEARCH only; no semantic retrieval'
-        : 'lexical retrieval';
-      return { kind: 'search', label: '[SEARCH]', detail, live: 'polite', marker: '?', writeAction: false };
+        ? (isZh ? 'find 映射到搜索' : 'find maps to SEARCH')
+        : (isZh ? '检索：词汇搜索' : 'retrieval: lexical search');
+      return { kind: 'search', label: isZh ? '[搜索]' : '[SEARCH]', detail, live: 'polite', marker: '?', writeAction: false };
     }
-    return { kind: 'steer-rule', label: '[STEER RULE]', detail: 'policy proposal', live: 'polite', marker: '*', writeAction: true };
+    return { kind: 'steer-rule', label: processingLanguage.code === 'zh' ? '[导向规则]' : '[STEER RULE]', detail: processingLanguage.code === 'zh' ? '规则预览' : 'policy proposal', live: 'polite', marker: '*', writeAction: true };
   }
 
   function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
@@ -400,22 +401,26 @@
   }
 
   function formatSteerReceipt(receipt: SteerReceipt, command: string): string {
+    const isZh = processingLanguage.code === 'zh';
     if (receipt.interpreted_as === 'add_source') {
       const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
       const commandUrl = command.match(/^https?:\/\/\S+/i)?.[0];
       const rawDetail = commandUrl ?? normalizedMessage.replace(/^source\s+(?:added|already active):?\s*/i, '').replace(/;\s*no change$/i, '').trim();
       const detail = compactReceiptSourceIdentity(rawDetail);
-      const sourceText = detail.length > 0 ? `source added: ${detail}` : 'source added';
-      return `applied: ${sourceText}; source ledger records it; background ingest will pick it up`;
+      const sourceText = detail.length > 0 ? (isZh ? `来源已添加: ${detail}` : `source added: ${detail}`) : (isZh ? '来源已添加' : 'source added');
+      return isZh ? `已应用：${sourceText}` : `applied: ${sourceText}; source ledger records it; background ingest will pick it up`;
     }
 
     const state = receiptState(receipt);
     const normalizedMessage = receiptMessageWithoutInterpretation(receipt);
     const changed = receipt.changed_rules.length;
     const suffix = changed > 0 ? ` · rules:${changed}` : '';
-    if (state === 'applied' && normalizedMessage.length > 0) return `applied: ${normalizedMessage}${suffix}`;
+    if (state === 'applied' && normalizedMessage.length > 0) {
+      const message = normalizedMessage.replace(/^applied:\s*/iu, '');
+      return isZh ? `已应用：${message}${suffix}` : `applied: ${message}${suffix}`;
+    }
     const detail = normalizedMessage.length > 0 ? `: ${normalizedMessage}` : '';
-    return `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
+    return isZh ? `解释为: ${receipt.interpreted_as}; ${state === 'rejected' ? '未应用' : '已应用'}${detail}${suffix}` : `interpreted_as: ${receipt.interpreted_as}; ${state}${detail}${suffix}`;
   }
 
   function compactReceiptSourceIdentity(value: string): string {
@@ -491,9 +496,11 @@
         steerCommand = '';
         steerFeedback = {
           kind: 'receipt',
-          text: command.toLowerCase().startsWith('find ')
-            ? 'warning: find alias maps to [SEARCH]; lexical only, no semantic retrieval'
-            : 'retrieval: lexical search'
+          text: processingLanguage.code === 'zh'
+            ? '检索：词汇搜索'
+            : command.toLowerCase().startsWith('find ')
+              ? 'find maps to SEARCH; retrieval: lexical search'
+              : 'retrieval: lexical search'
         };
         return;
       }
@@ -556,14 +563,6 @@
   async function importOpml(opml: string): Promise<ImportOpmlResponse> {
     const response = await apiClient().importOpml(opml);
     sources = (await apiClient().sources()).sources;
-    try {
-      await apiClient().runIngest();
-      items = (await apiClient().today()).items;
-    } catch {
-      // Background ingest remains the documented steady-state path; this best-effort
-      // immediate refresh keeps first-use OPML fixtures populated without adding a
-      // durable job, queue, dashboard, or activity surface.
-    }
     return response;
   }
 
@@ -601,7 +600,7 @@
       const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
       processingLanguage = response.language;
       setDocumentLanguage(response.language.code);
-      languageStatus = response.language.code === 'zh' ? 'Language set to 中文' : 'Language set to English';
+      languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
     } catch (error) {
       languageStatus = formatRawApiError(error, 'err: language update failed');
     }
@@ -739,11 +738,6 @@
             >SOURCE LEDGER</button>
           </div>
         </details>
-        <span class="surface-nav-quick-group" aria-hidden={surfaceMenuOpen ? 'true' : undefined}>
-          <button type="button" class="surface-nav-quick" aria-label="TODAY" tabindex="-1" aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} onclick={() => showSurface('feed')}>T</button>
-          <button type="button" class="surface-nav-quick" aria-label="SOURCE LEDGER" tabindex="-1" aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} onclick={() => showSurface('ledger')}>SL</button>
-        </span>
-        <span class="surface-nav-context">SOURCE LEDGER / DOCTOR / INSPECTOR</span>
       </nav>
       <div class="runtime-language-controls" aria-label="Processing language controls">
         <button
@@ -846,7 +840,7 @@
       <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR independent scroll" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}

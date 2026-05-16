@@ -14,6 +14,7 @@
   interface Props {
     item: InspectableItem | null;
     mode: InspectorMode;
+    language?: 'en' | 'zh';
     groupedSourceCandidates?: ItemSummary[];
     sources?: Source[];
     loading?: boolean;
@@ -23,7 +24,7 @@
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
   }
 
-  let { item, mode, groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let handledFocusRequestId = $state(-1);
@@ -35,8 +36,12 @@
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
     if (status === 'full') return 'full';
-    if (status === 'partial_extraction') return 'partial';
+    if (status === 'partial_extraction') return 'source excerpt';
     return 'excerpt';
+  }
+
+  function localizedChrome(en: string, zh: string): string {
+    return language === 'zh' ? zh : en;
   }
 
   function decodeEntities(text: string): string {
@@ -374,10 +379,10 @@
   }
 
   function extractionDisclosure(value: InspectableItem): string {
-    if (value.extraction_status === 'partial_extraction') return 'source text: RSS excerpt only';
-    if (value.extraction_status === 'original_unavailable') return 'original unavailable';
-    if (value.extraction_status === 'summary_unavailable') return 'summary unavailable';
-    return 'full';
+    if (value.extraction_status === 'partial_extraction') return localizedChrome('source text: RSS excerpt only', '来源文本：仅 RSS 摘录');
+    if (value.extraction_status === 'original_unavailable') return localizedChrome('original unavailable', '原文不可用');
+    if (value.extraction_status === 'summary_unavailable') return localizedChrome('summary unavailable', '摘要不可用');
+    return localizedChrome('source text: full', '来源文本：全文');
   }
 
   function provenanceDisclosure(value: InspectableItem): string {
@@ -400,8 +405,9 @@
 
   function summaryProvenanceDisclosure(value: InspectableItem): string {
     const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
-    if (hasModelText) return 'summary provenance: model-backed';
+    if (hasModelText) return localizedChrome('summary provenance: model-backed', '摘要来源：模型支持');
     const fallback = summaryText(value) ? 'feed excerpt fallback' : 'fallback unavailable';
+    if (language === 'zh') return `摘要来源：${fallback === 'feed excerpt fallback' ? '订阅摘录回退' : '回退不可用'}`;
     return `summary provenance: ${fallback}`;
   }
 
@@ -430,7 +436,7 @@
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
 <aside class="contract-region contract-inspector" aria-labelledby="inspector-heading" aria-label={item?.title ?? 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
-  <p class="contract-label">INSPECTOR</p>
+  <p class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted" role="status">loading</p>
   {/if}
@@ -440,7 +446,7 @@
   {#if item}
     <div class="inspector-header-row">
       <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
-        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{#if item.model_status === 'ok'} · <span aria-label="Model status: ok">model: ok</span>{/if}{item.value_tier ? ` · ${item.value_tier}` : ''}
+        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`} onclick={() => void toggleResonance()}>
@@ -477,9 +483,9 @@
       <span aria-hidden="true"> · </span>
       <span>{summaryProvenanceDisclosure(item)}</span>
     </p>
-    <p><strong>summary:</strong> {denseSummaryText(item)}</p>
+    <p><strong>{localizedChrome('summary:', '摘要：')}</strong> {denseSummaryText(item)}</p>
     <p><strong>quality:</strong> source quality is high; complete, attributed, and extracted</p>
-    <p><strong>core insight:</strong> {coreInsightText(item)}</p>
+    <p><strong>{localizedChrome('core insight:', '核心洞察：')}</strong> {coreInsightText(item)}</p>
     <p class="inspector-reading">{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>
     {@const groupedItems = groupedSourceItems(item)}

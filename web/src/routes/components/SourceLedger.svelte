@@ -40,6 +40,7 @@
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
+  const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -52,6 +53,15 @@
       hour12: false,
       timeZone: 'UTC'
     }).format(date);
+  }
+
+  function latestIngestStatusText(candidates: Source[]): string {
+    const latest = candidates
+      .map((source) => source.last_fetch_at)
+      .filter((timestamp): timestamp is string => Boolean(timestamp))
+      .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
+    const formatted = formatTime(latest);
+    return `last_ingest: ${formatted ?? 'not_run'}`;
   }
 
   function compactSourceUrl(url: string): string {
@@ -237,11 +247,9 @@
   <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <div class="source-ledger__header-actions">
-      {#if globalIngestStatusText}
-        <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={globalIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={globalIngestStatusText}>{globalIngestStatusText}</span>
-      {/if}
-      <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
+      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerIngestStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerIngestStatusText}>{headerIngestStatusText}</span>
       <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
+      <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
     </div>
   </header>
   {#if visibleSources.length === 0}
