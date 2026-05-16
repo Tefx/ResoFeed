@@ -86507,7 +86507,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Real rendered browser artifacts are captured for Source Ledger after OPML
+      - [x] Real rendered browser artifacts are captured for Source Ledger after OPML
       import and `[RUN INGEST]`; dummy-backend-only evidence is rejected.
 
       - [ ] Header `last_ingest` / global status contract is PROVEN or a contract-consistent
