@@ -84414,7 +84414,7 @@ phases:
       rendered_artifacts:\n  - surface: \"<surface/state>\"\n    artifact_ref: \"\
       <path/url/screenshot/dom/a11y ref>\"\nforbidden_concept_scan: \"PASS|FAIL\"\n\
       remaining_blockers: []\nreversal_risk: \"LOW|MEDIUM|HIGH\"\n```\n\nBehavioral\
-      \ proof register and gate decision basis:\n- [ ] requirement_ref: failed frontend\
+      \ proof register and gate decision basis:\n- [x] requirement_ref: failed frontend\
       \ closure blocker family; behavior_claim: each blocker is fixed or proven stale/non-intersecting\
       \ under source-backed contract; runtime_proof_expected: commands and rendered\
       \ artifacts listed above; evidence_ref: pasted command output and artifact paths;\
