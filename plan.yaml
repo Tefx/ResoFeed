@@ -95878,7 +95878,7 @@ phases:
       - Deviation records: none.'
   - id: cos-wiring-audit
     name: Audit runtime wiring for operation status surfaces
-    status: pending
+    status: claimed
     description: 'Wiring completeness audit for new HTTP/MCP/frontend operation-status
       surfaces.
 
@@ -95991,6 +95991,8 @@ phases:
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
     agent: wiring-auditor
+    claimed_by: wiring-auditor
+    claimed_at: '2026-05-16T21:53:34.190244+00:00'
   - id: cos-runtime-e2e-retest
     name: Run HTTP MCP frontend operation-status e2e retest
     status: claimed
