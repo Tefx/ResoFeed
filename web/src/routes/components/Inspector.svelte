@@ -363,7 +363,7 @@
   }
 
   function sortedGroupedSourceItems(items: InspectorGroupedSourceItem[], value: InspectableItem): InspectorGroupedSourceItem[] {
-    return items.sort((left, right) => {
+    return [...items].sort((left, right) => {
       if (left.item_id === value.id) return -1;
       if (right.item_id === value.id) return 1;
       return left.source_title.localeCompare(right.source_title) || left.item_id.localeCompare(right.item_id);
