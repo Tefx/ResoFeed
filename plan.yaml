@@ -85354,7 +85354,7 @@ phases:
       - [x] For each finding, run the provided grep/search hint and search for sibling
       instances beyond listed locations.
 
-      - [ ] Provide root cause vs symptom explanation for every blocker-class finding.
+      - [x] Provide root cause vs symptom explanation for every blocker-class finding.
 
       - [ ] If no applicable findings exist, record CLEAN no-op evidence with the
       review citation.
