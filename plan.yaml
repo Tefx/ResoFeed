@@ -94626,7 +94626,7 @@ phases:
 
       ## Acceptance Checklist
 
-      - [ ] `#entry_*` or equivalent synthetic RSS feed-entry fragments remain part
+      - [x] `#entry_*` or equivalent synthetic RSS feed-entry fragments remain part
       of grouping identity.
 
       - [ ] `story_key` and `duplicate_of_item_id` grouping remain authoritative and
