@@ -84671,7 +84671,7 @@ phases:
       - [ ] Start cmd/resofeed with test owner token, SQLite DB, static UI, JSON HTTP,
       MCP Streamable HTTP, and background ingest configuration as applicable.
 
-      - [ ] Browser Steer valid URL add preview commits through backend and shows
+      - [x] Browser Steer valid URL add preview commits through backend and shows
       undo only for revocable id.
 
       - [ ] Browser invalid add (`添加 tldr`, `订阅 HN`, `add tldr`) returns URL-required
