@@ -85117,6 +85117,7 @@ phases:
     - srde2e-frontend-architecture-remediation
     - srde2e-uiux-audit-source-ledger-steer-controls
     - srde2e-uiux-source-ledger-status-contract-retest
+    - srde2e-visual-a11y-blockers-retest
     agent: software-architect
   - id: srde2e-full-plan-check
     name: Run full-plan verification sweep for Steer delta closure
