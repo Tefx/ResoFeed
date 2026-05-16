@@ -89572,7 +89572,7 @@ phases:
     agent: uiux-auditor
   - id: srde2e-e2e-contract-adjudication
     name: Adjudicate residual full E2E contract conflicts before next fix
-    status: pending
+    status: claimed
     description: 'step_type: planning
 
       work_type: authority_adjudication
@@ -89787,3 +89787,5 @@ phases:
     depends_on:
     - srde2e-full-plan-check
     agent: software-architect
+    claimed_by: software-architect
+    claimed_at: '2026-05-16T10:46:24.546654+00:00'
