@@ -507,6 +507,9 @@ func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (
 		if err == nil {
 			payload, err = json.Marshal(language)
 		}
+	case RuntimeOperationMCPResourceURI:
+		mimeType = "application/json"
+		payload, err = json.Marshal(CurrentOperationResponse{Operation: currentOperationInfo()})
 	default:
 		return nil, notFoundError("resource", input.URI)
 	}
@@ -747,7 +750,7 @@ func mcpErrFromError(err error) *mcpError {
 		return &mcpError{Code: -32602, Message: "invalid request", Data: nestedMCPErrorData("bad_request", message, details)}
 	}
 	if details, ok := guardConflictDetails(err); ok {
-		return &mcpError{Code: -32000, Message: "operation already running", Data: nestedMCPErrorData("conflict", "operation already running", guardConflictDetailMap(details))}
+		return &mcpError{Code: -32000, Message: "operation already running", Data: nestedMCPErrorData("conflict", "operation already running", guardConflictHTTPDetailMap(details))}
 	}
 	var notFound mcpNotFoundError
 	if errors.As(err, &notFound) {
@@ -856,6 +859,7 @@ func mcpResourceList() []map[string]string {
 		{"uri": "resofeed://feed/today", "name": "Today feed", "mimeType": "application/json"},
 		{"uri": "resofeed://rules/active", "name": "Active steering rules", "mimeType": "application/json"},
 		{"uri": "resofeed://system/doctor", "name": "Doctor diagnostics", "mimeType": "text/plain"},
+		{"uri": RuntimeOperationMCPResourceURI, "name": "Current runtime operation", "mimeType": "application/json"},
 		{"uri": "resofeed://sources", "name": "Sources", "mimeType": "application/json"},
 		{"uri": RuntimeLanguageMCPResourceURI, "name": "Runtime processing language", "mimeType": "application/json"},
 	}

@@ -7,6 +7,8 @@ import (
 
 const RuntimeOperationHTTPPath = "/api/runtime/operation"
 
+const RuntimeOperationMCPResourceURI = "resofeed://system/operation"
+
 // CurrentOperationInfo is a process-local, best-effort view of the guarded
 // runtime operation. It is intentionally in-memory only and is cleared when the
 // guard is released; it is not a job, queue, ledger, or durable history.

@@ -96,6 +96,70 @@ func TestMCPResourcesReadFreshEmptyStateSerializesSourcesAndRulesAsArrays(t *tes
 	}
 }
 
+func TestMCPCurrentOperationResourceIdleAndRunningStates(t *testing.T) {
+	handler := NewMCPHandler(MCPConfig{OwnerToken: contractOwnerToken})
+
+	idleText := mcpResourceText(t, handler, RuntimeOperationMCPResourceURI)
+	assertJSONEqual(t, []byte(idleText), []byte(`{
+		"operation": {
+			"running": false,
+			"kind": null,
+			"scope": null,
+			"phase": null,
+			"count": null,
+			"message": null,
+			"started_at": null,
+			"updated_at": null
+		}
+	}`))
+
+	release, err := tryAcquireIngestGuard(context.Background(), "fetch", "source")
+	if err != nil {
+		t.Fatalf("hold operation guard: %v", err)
+	}
+	t.Cleanup(release)
+
+	runningText := mcpResourceText(t, handler, RuntimeOperationMCPResourceURI)
+	operation := decodeCurrentOperationEnvelope(t, []byte(runningText))
+	assertCurrentOperationShape(t, operation)
+	if operation["running"] != true || operation["kind"] != "fetch" || operation["scope"] != "source" {
+		t.Fatalf("MCP operation snapshot = %#v, want running fetch/source from shared in-memory guard", operation)
+	}
+	assertRFC3339Field(t, operation, "started_at")
+	assertRFC3339Field(t, operation, "updated_at")
+}
+
+func TestMCPGuardConflictDetailsMatchHTTPCurrentOperationShape(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	handler := NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken})
+	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	if err != nil {
+		t.Fatalf("hold operation guard: %v", err)
+	}
+	t.Cleanup(release)
+
+	resp := mcpCall(t, handler, "reprocess_library", map[string]any{"actor_id": "briefing-agent", "idempotency_key": "mcp-reprocess-operation-conflict"})
+	if resp.Error == nil {
+		t.Fatalf("reprocess_library conflict response missing error")
+	}
+	if resp.Error.Code != -32000 || resp.Error.Message != "operation already running" {
+		t.Fatalf("MCP conflict error = %+v, want JSON-RPC operation conflict", resp.Error)
+	}
+	inner, ok := resp.Error.Data["error"].(map[string]any)
+	if !ok {
+		t.Fatalf("MCP conflict data = %#v, want nested error object", resp.Error.Data)
+	}
+	if inner["code"] != "conflict" || inner["message"] != "operation already running" {
+		t.Fatalf("MCP nested conflict error = %#v, want HTTP conflict code/message", inner)
+	}
+	details, ok := inner["details"].(map[string]any)
+	if !ok {
+		t.Fatalf("MCP conflict details = %#v, want object", inner["details"])
+	}
+	assertConflictDetailsWithCurrentOperation(t, details, "ingest", "all")
+}
+
 func TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason(t *testing.T) {
 	// REG-2026-05-12-04: distinct from REG-02 empty-resource array coverage.
 	// This fixture models the audit gap where SQLite transport parity showed
