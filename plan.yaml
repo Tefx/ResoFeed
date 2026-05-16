@@ -94830,15 +94830,15 @@ phases:
 
       - [x] Behavioral proof register is complete with no `NEEDS_TEST`, `UNPROVEN`,
       or `UNCERTAIN_BLOCKING` item lacking a closure path.'
-    verification: '- [ ] Targeted frontend regression tests pass green after the implementation.
+    verification: '- [x] Targeted frontend regression tests pass green after the implementation.
 
-      - [ ] Existing Inspector grouped-source tests pass and prove valid grouping
+      - [x] Existing Inspector grouped-source tests pass and prove valid grouping
       still exposes every source item.
 
-      - [ ] Backend targeted tests are run when applicable, or non-intersection is
+      - [x] Backend targeted tests are run when applicable, or non-intersection is
       documented with backend audit citations.
 
-      - [ ] Test output is pasted, not summarized, and maps to the behavioral proof
+      - [x] Test output is pasted, not summarized, and maps to the behavioral proof
       register.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
