@@ -84389,7 +84389,7 @@ phases:
       \ tests/e2e/hit-target-clickability.spec.ts`.\n- [x] Run `cd web && npm run\
       \ test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts tests/e2e/inspector-dirty-corpus.spec.ts\
       \ tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`.\n- [x] Run the forbidden\
-      \ concept scan across frontend Svelte/TS user-facing surfaces.\n- [ ] If any\
+      \ concept scan across frontend Svelte/TS user-facing surfaces.\n- [x] If any\
       \ named command is absent due harness drift, provide exact discovery output\
       \ proving absence and run the nearest current command that covers the same user-visible\
       \ obligation.\n\nRequired rendered artifact evidence:\n- [ ] Source Ledger navigation/menu\
