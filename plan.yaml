@@ -87289,7 +87289,7 @@ phases:
       - [x] B2 IMPORT STATE visible accessible activation and non-obstruction are
       PROVEN.
 
-      - [ ] B3 desktop Feed/Inspector independent focusable labeled scroll regions
+      - [x] B3 desktop Feed/Inspector independent focusable labeled scroll regions
       are PROVEN.
 
       - [ ] B4 Inspector original/equivalent target 44px minimum is PROVEN.
