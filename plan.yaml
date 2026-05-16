@@ -96569,7 +96569,11 @@ phases:
       - [ ] Audit returns parseable PASS / PASS_WITH_DEBT / FAIL headline with blocker
       disposition.'
     verification: '- [ ] phase-check protecting `cos-final-gate`: uiux-auditor provides
-      multimodal rendered evidence for required states/viewports.
+      multimodal rendered evidence for required states/viewports after the frontend
+      wiring fix.
+
+      - [ ] Evidence proves valid count-object current-operation payloads render terse
+      contextual status details.
 
       - [ ] Evidence proves low-frequency LANG/reprocess controls are not persistent
       prominent top chrome.
@@ -96583,28 +96587,45 @@ phases:
 
       - docs/DESIGN.md — key passage or "NOT READ: <reason>"
 
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
 
       If no refs were provided, state: "No refs for this step."
 
 
       ## UIUX Audit Report
 
-      - Artifacts reviewed/generated:
 
-      - Closed top chrome verdict:
+      **Post-fix prerequisites reviewed**:
 
-      - Open RESOFEED utility menu verdict:
+      - `cos-retest-current-operation-runtime-ui`: PASS/FAIL
 
-      - Source Ledger status verdict:
+      - `cos-reaudit-current-operation-wiring`: PASS/FAIL
 
-      - Reprocess running/conflict verdict:
 
-      - DESIGN.md conformance notes:
+      **Visual/spatial artifacts**:
 
-      - Headline: PASS | PASS_WITH_DEBT | FAIL'
+      - Closed top chrome: PASS/FAIL
+
+      - Open RESOFEED utility menu: PASS/FAIL
+
+      - Source Ledger running status with phase/count/message/timestamps: PASS/FAIL
+
+      - Reprocess conflict/running states with current-operation detail: PASS/FAIL
+
+
+      **Forbidden UI scan**:
+
+      - Dashboard/progress panel/queue/history/settings surface present: YES/NO
+
+      - Persistent idle top-chrome status strip present: YES/NO
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
     depends_on:
     - cos-frontend-operation-utility-surface
-    - cos-runtime-e2e-retest
+    - cos-retest-current-operation-runtime-ui
+    - cos-reaudit-current-operation-wiring
     agent: uiux-auditor
   - id: cos-spec-doc-conformance
     name: Verify spec and docs conformance for operation-status implementation
