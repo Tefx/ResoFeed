@@ -92237,22 +92237,22 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] All implementation phase steps are complete with specific evidence.
+      - [x] All implementation phase steps are complete with specific evidence.
 
-      - [ ] Evidence includes screenshots/DOM or static preview snippets for every
+      - [x] Evidence includes screenshots/DOM or static preview snippets for every
       repaired surface.
 
-      - [ ] No protected expected-red tests were weakened to pass.
+      - [x] No protected expected-red tests were weakened to pass.
 
-      - [ ] No new product-boundary violations were introduced.'
-    verification: '- [ ] Frontend repair and preview sync evidence is complete.
+      - [x] No new product-boundary violations were introduced.'
+    verification: '- [x] Frontend repair and preview sync evidence is complete.
 
-      - [ ] Source Ledger OPML import remains explicit-manual-ingest only.
+      - [x] Source Ledger OPML import remains explicit-manual-ingest only.
 
-      - [ ] Closed-menu route chrome, copy, Inspector provenance, and zh UI criteria
+      - [x] Closed-menu route chrome, copy, Inspector provenance, and zh UI criteria
       are satisfied in evidence.
 
-      - [ ] Phase is ready for independent browser, UIUX, spec, and architecture audits.'
+      - [x] Phase is ready for independent browser, UIUX, spec, and architecture audits.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
