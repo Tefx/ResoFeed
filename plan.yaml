@@ -97075,7 +97075,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] Visual/spatial artifacts cover closed top chrome, opened RESOFEED utility
+      - [x] Visual/spatial artifacts cover closed top chrome, opened RESOFEED utility
       menu, Source Ledger running status, and reprocess conflict/running states.
 
       - [ ] Audit checks dense archival workbench aesthetic, stark rules, no friendly
