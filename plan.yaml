@@ -84927,13 +84927,13 @@ phases:
 
       - [x] Preserve npx @google/design.md lint cleanliness for docs/DESIGN.md if
       changed.'
-    verification: '- [ ] phase-check protecting final closure gate.
+    verification: '- [x] phase-check protecting final closure gate.
 
-      - [ ] Documentation sync evidence states changed files or no-op rationale.
+      - [x] Documentation sync evidence states changed files or no-op rationale.
 
-      - [ ] Docs remain aligned with implementation and authoritative constraints.
+      - [x] Docs remain aligned with implementation and authoritative constraints.
 
-      - [ ] If DESIGN.md changed, design lint output is included and clean.'
+      - [x] If DESIGN.md changed, design lint output is included and clean.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
