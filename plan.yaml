@@ -90457,3 +90457,91 @@ phases:
       - Completion checklist items were toggled to `[x]`; verification-field checklist
       toggling was attempted by the agent but `vectl_check` could not match those
       verification entries.'
+  - id: srde2e-software-architect-clean-verdict-proof
+    name: Produce exact software-architect CLEAN verdict proof
+    status: pending
+    description: 'Remediation/review step for final closure proof gap B-FCG-001.
+
+
+      Purpose: perform the missing software-architect clean re-review for the Steer
+      Delta E2E Architecture Review Closure phase. The prior final gate reported that
+      runtime behavior and E2E evidence are otherwise green; this step owns only the
+      missing governance proof: an exact software-architect re-review artifact whose
+      verdict is exactly `CLEAN`, or a concrete blocker list if CLEAN cannot be honestly
+      issued.
+
+
+      Scope:
+
+      - Review the existing closure evidence from `srde2e-software-architect-clean-recheck`,
+      `srde2e-full-plan-check`, `srde2e-full-plan-e2e-blockers-retest`, and `srde2e-uiux-full-plan-e2e-blockers-audit`.
+
+      - Re-check the Steer delta architecture/API/runtime closure obligations against
+      the authoritative ResoFeed boundaries: single Go binary, SQLite-only state,
+      owner-token boundary, HTTP/MCP operation parity, strict query validation, and
+      DESIGN.md UI constraints where relevant.
+
+      - Do not modify product code. This is a review/proof step only.
+
+
+      Required artifact:
+
+      - Produce a clearly labeled software-architect re-review artifact in the step
+      evidence.
+
+      - The artifact MUST include `reviewer_agent: software-architect`.
+
+      - The artifact MUST include `verdict: CLEAN` exactly when no blocker-class issue
+      remains.
+
+      - If the verdict is not exactly `CLEAN`, the artifact MUST include a blocker
+      list with IDs, severity, affected evidence/requirement, and required closure
+      path.
+
+
+      ## Completion Criteria
+
+      - [ ] Read each ref and cite the key passage or mark `NOT READ: <reason>`.
+
+      - [ ] Review the prior architecture, full-plan, E2E retest, and UIUX audit closure
+      evidence listed in scope.
+
+      - [ ] Produce a software-architect re-review artifact with `reviewer_agent:
+      software-architect`.
+
+      - [ ] Artifact verdict is exactly `CLEAN` OR contains a concrete blocker list
+      with closure paths.
+
+      - [ ] No implementation/code changes are made by this review step.'
+    verification: '- [ ] Evidence includes refs read confirmation for AGENTS.md, docs/ARCHITECTURE.md,
+      and docs/DESIGN.md.
+
+      - [ ] Evidence includes exact field `reviewer_agent: software-architect`.
+
+      - [ ] Evidence includes exact field `verdict: CLEAN` when closure is clean.
+
+      - [ ] If not CLEAN, evidence includes blocker IDs, severities, affected evidence/requirement
+      refs, and required closure paths.
+
+      - [ ] Evidence explicitly states whether B-FCG-001 is closed.'
+    evidence_template: "## refs Read Confirmation (MANDATORY)\n\nFor each ref in this\
+      \ step:\n- AGENTS.md — key passage or \"NOT READ: <reason>\"\n- docs/ARCHITECTURE.md\
+      \ — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md — key passage or\
+      \ \"NOT READ: <reason>\"\n\n## Software-Architect CLEAN Re-Review Artifact\n\
+      \nreviewer_agent: software-architect\nclosure_phase: steer-delta-e2e-architecture-review-closure\n\
+      source_blocker: B-FCG-001\nreviewed_evidence:\n  - srde2e-software-architect-clean-recheck\n\
+      \  - srde2e-full-plan-check\n  - srde2e-full-plan-e2e-blockers-retest\n  - srde2e-uiux-full-plan-e2e-blockers-audit\n\
+      \  - srde2e-e2e-contract-adjudication\nverdict: CLEAN\nblockers: []\nclosure_statement:\
+      \ <why architecture/API/runtime closure is clean, or why blockers remain>\n\n\
+      If `verdict` is not exactly `CLEAN`, replace `blockers: []` with:\nblockers:\n\
+      \  - id: <blocker-id>\n    severity: blocker\n    requirement_or_evidence_ref:\
+      \ <ref>\n    description: <issue>\n    closure_path: <required action>\n\n##\
+      \ B-FCG-001 Closure\n- [ ] Exact software-architect CLEAN artifact produced,\
+      \ or blockers listed with closure paths."
+    depends_on:
+    - srde2e-software-architect-clean-recheck
+    - srde2e-full-plan-check
+    - srde2e-full-plan-e2e-blockers-retest
+    - srde2e-uiux-full-plan-e2e-blockers-audit
+    - srde2e-e2e-contract-adjudication
+    agent: software-architect
