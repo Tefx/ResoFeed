@@ -82920,7 +82920,7 @@ phases:
 
       Acceptance checklist:
 
-      - [ ] Mainline `npm run test` is green.
+      - [x] Mainline `npm run test` is green.
 
       - [x] The six named broad rendering failures are explicitly checked and closed.
 
