@@ -94825,7 +94825,7 @@ phases:
 
       - [x] Existing valid grouped-source disclosure remains green.
 
-      - [ ] Backend contract is either tested or explicitly proven non-intersecting
+      - [x] Backend contract is either tested or explicitly proven non-intersecting
       with citations from `gsfr-backend-grouping-contract-audit`.
 
       - [ ] Behavioral proof register is complete with no `NEEDS_TEST`, `UNPROVEN`,
