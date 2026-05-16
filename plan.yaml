@@ -89695,7 +89695,7 @@ phases:
       - [x] Hit-target scroll geometry is dispositioned with exact UI/test/fixture
       remediation instructions.
 
-      - [ ] Next implementation attempt has exact remediation instructions and forbidden
+      - [x] Next implementation attempt has exact remediation instructions and forbidden
       shortcuts.
 
       - [ ] No product code, test code, docs, or plan completion state is modified
