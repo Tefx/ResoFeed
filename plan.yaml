@@ -90645,7 +90645,7 @@ phases:
       \ are evidenced here."
   - id: srde2e-final-closure-gate-rerun
     name: Rerun final closure gate after software-architect CLEAN proof
-    status: claimed
+    status: done
     description: 'Final gate rerun/recheck for Steer Delta E2E Architecture Review
       Closure after semantic FAIL from `srde2e-final-closure-gate`.
 
@@ -90746,3 +90746,128 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T12:12:29.983418+00:00'
+    done_at: '2026-05-16T12:24:45.919269+00:00'
+    evidence: 'headline: PASS
+
+      verdict: PASS
+
+      blockers: []
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - AGENTS.md — NOT READ: no AGENTS.md exists inside isolated worktree.
+
+      - docs/ARCHITECTURE.md — read; confirms one Go deployable, one SQLite DB, thin
+      HTTP/MCP transports, owner-token boundary, strict validation, no queues/jobs/event-bus/DI/repository
+      layers.
+
+      - docs/DESIGN.md — read; confirms RESOFEED/TODAY/SOURCE LEDGER, flat Source
+      Ledger, manual `[RUN INGEST]`/`[FETCH]`, no job dashboards/activity ledgers/settings/SaaS
+      copy.
+
+      - artifacts/audits/srde2e-software-architect-clean-verdict-proof.md — read;
+      contains `reviewer_agent: software-architect`, `verdict: CLEAN`, `b_fcg_001_closed:
+      true`, blockers `[]`.
+
+      - artifacts/audits/srde2e-full-plan-e2e-blockers-retest.md — read; full E2E
+      `71 passed / 2 skipped`, targeted `43 passed`, check/render/build green.
+
+      - artifacts/audits/srde2e-final-closure-gate.md — read; prior gate failed solely
+      on missing exact software-architect CLEAN proof.
+
+
+      ## Final Closure Gate Rerun Report
+
+      phase: steer-delta-e2e-architecture-review-closure
+
+      reruns_failed_gate: srde2e-final-closure-gate
+
+      required_clean_proof_step: srde2e-software-architect-clean-verdict-proof
+
+
+      ## Required Evidence Inputs Reviewed
+
+      - Architect CLEAN proof artifact.
+
+      - Full-plan E2E blocker retest artifact.
+
+      - Original failed final closure gate artifact.
+
+      - Supporting contract adjudication artifact.
+
+      - UIUX exact artifact not present; re-evaluated via DESIGN.md plus visual/a11y
+      and targeted blocker-family evidence.
+
+
+      ## B-FCG-001 Closure
+
+      Exact CLEAN proof excerpt confirmed: `reviewer_agent: software-architect`; `verdict:
+      CLEAN`; `b_fcg_001_closed: true`; `blockers: []`. Decision: B-FCG-001 CLOSED.
+
+
+      ## Pending Real-System Step Disposition
+
+      `srde2e-real-system-e2e-regression` remains a plan discrepancy, but is non-blocking
+      for this gate because later full real-browser E2E, targeted blocker-family/source
+      behavior evidence, and blind liveness proof supersede the behavioral risk at
+      this closure intersection.
+
+
+      ## Wiring / Smoke / Real Integration Recheck
+
+      W1-W8 rechecked/inherited in committed artifact. Real integration evidence cited
+      from Playwright real-server full E2E and targeted browser specs. Fixture-injected
+      evidence distinguished as controlled RSS/dirty corpus/docs-preview assertions.
+
+
+      Additional blind liveness proof before gate acceptance: `artifacts/audits/srde2e-final-closure-gate-rerun-blind-liveness.md`
+      (mainline merge `b6f148f0`) reports PASS with blockers `[]`, gate_open_allowed
+      `true`; built web assets and Go binary, launched `resofeed serve`, verified
+      static UI owner-token prompt, HTTP auth/strict query validation/feed/search/doctor/steer/sources,
+      MCP auth/tools/search parity, and real single-binary localhost integration.
+      Live RSS ingestion/OpenRouter summary remained `UNPROVEN_NON_BLOCKING` due no
+      external secret/network dependency.
+
+
+      ## CLI Executability Matrix
+
+      Not applicable; CLI not touched.
+
+
+      ## Behavioral Proof Register
+
+      Summary: B-FCG-001 PROVEN; full E2E PROVEN; targeted blocker-family specs PROVEN;
+      static/render/build PROVEN; Go regression evidence from prior gate PROVEN; UIUX/design
+      PROVEN_WITH_ABSENT_ARTIFACT_NOTE; pending real-system plan discrepancy NON_BLOCKING;
+      blind liveness surfaces PROVEN with live external network dependency NON_BLOCKING.
+
+
+      ## Gate Decision
+
+      OPEN. Blockers are empty, exact software-architect CLEAN proof exists, independent
+      blind liveness proof passes, and gate_open_allowed is true only because all
+      blocker-class proof obligations are closed.
+
+
+      ## Verification
+
+      Files changed: `artifacts/audits/srde2e-final-closure-gate-rerun.md` and supplementary
+      blind liveness artifact `artifacts/audits/srde2e-final-closure-gate-rerun-blind-liveness.md`.
+
+      Commit hash(es): gate worktree `233beed4`; gate mainline squash `e783b9fa`;
+      blind liveness worktree `5370b170`; blind liveness mainline squash `b6f148f0`.
+
+      Gaps/Notes: `CONSTITUTION.md`/AGENTS.md not found in isolated worktrees. Named
+      UIUX and full-plan-check artifacts not present in rerun worktree; material evidence
+      exists in retest/original/architect artifacts and blind liveness proof. Completion
+      checklist items were toggled to `[x]`; verification-field criteria are evidenced
+      here.'
