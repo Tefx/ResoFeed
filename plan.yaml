@@ -83899,6 +83899,284 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T01:09:22.079339+00:00'
+  - id: srdf-batched-frontend-closure-blockers-fix
+    name: Batch fix frontend closure blockers after failed audit retest
+    status: pending
+    description: 'Batched remediation for failed `srdf-batched-frontend-audit-closure`.
+
+
+      step_type: implementation
+
+      work_type: defect_repair
+
+      failure_family: frontend_closure_blockers_after_retest
+
+      agent_source: project
+
+      upstream_failed_closure: srdf-batched-frontend-audit-closure
+
+      upstream_completed_implementation: srdf-batched-frontend-audit-remediation
+
+      upstream_main_commit: 21e91e79
+
+
+      Scope: fix ALL blocker families from the failed closure in one batch. Do not
+      create serial one-issue fix chains. Keep completed plan steps immutable. Modify
+      only frontend implementation, tests, rendered-artifact expectations, or source-backed
+      test contracts needed to reconcile current mainline behavior with `docs/DESIGN.md`
+      and `docs/UI_REGRESSION_CONTRACT.md`.
+
+
+      Authoritative refs:
+
+      - `docs/DESIGN.md` — UI chrome, required labels, mobile/source-ledger design
+      behavior, visual/interaction rules.
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — rendered UI regression contract, required
+      selectors/artifacts, source-backed E2E obligations.
+
+      - `docs/ARCHITECTURE.md` — single-deployable and product-operation boundaries;
+      no forbidden UI concepts.
+
+
+      ## Blockers to Fix (ALL of these, not just the first)
+
+
+      ### B-HT-01 — Source Ledger hit-target clickability source-contract conflict
+
+      `hit-target-clickability.spec.ts` cannot find a visible `SOURCE LEDGER` button
+      before opening the menu. Adjudicate source-backed behavior from `docs/DESIGN.md`
+      and `docs/UI_REGRESSION_CONTRACT.md`: either update stale tests/artifact expectations
+      or implementation, but do not weaken navigation or hit-target coverage.
+
+
+      ### B-ART-01 — Design artifact negative UX Source Ledger source-contract conflict
+
+      `design-artifact-negative-ux.spec.ts` cannot find a visible `SOURCE LEDGER`
+      button. Resolve consistently with B-HT-01 using the same source-backed contract
+      decision.
+
+
+      ### B-TODAY-01 — TODAY rendered artifact selector mismatch
+
+      Rendered artifact/fresh-review E2E reported a `TODAY` surface selector mismatch.
+      Align selectors, implementation, or tests with the authoritative UI contract
+      without broadening to non-contract SaaS/dashboard concepts.
+
+
+      ### B-FR09-01 — Mobile metadata truncation contract mismatch
+
+      Mobile metadata CSS `white-space` is `normal` while the artifact test expected
+      `nowrap`. Adjudicate and fix the mobile metadata truncation contract so required
+      text is not clipped or over-truncated and the test expectation is source-backed.
+
+
+      ### B4_R9_opml_input_reachability — Source Ledger controls still blocked by
+      broader command
+
+      Preserve the already-passing `[IMPORT OPML]` keyboard/file reachability test
+      while fixing the mandatory Source Ledger controls/hit-target E2E command that
+      still failed.
+
+
+      ### playwright_expected_red_claims — rendered artifact/hit-target closure not
+      green
+
+      Close the remaining expected-red claim only when mandatory rendered artifact
+      and hit-target closure commands are green on current mainline.
+
+
+      ## Root Cause vs Symptom
+
+      - Root cause: closure evidence shows stale-or-conflicting selector/artifact
+      contracts around navigation visibility, TODAY surface targeting, and mobile
+      metadata truncation were not consistently source-adjudicated after the previous
+      remediation.
+
+      - Symptoms: two focused Playwright command groups still fail despite unit tests,
+      svelte-check, vitest, and several E2E suites passing.
+
+      - Why previous fix failed: `srdf-batched-frontend-audit-remediation` produced
+      strong scoped evidence, but the independent closure found additional source-contract
+      conflicts and artifact-selector mismatches in commands not fully green.
+
+      - Why this fix is not surface-level: it must reconcile docs, implementation,
+      and tests for each blocker family, preserving navigation/hit-target, OPML reachability,
+      rendered artifact, and forbidden-concept coverage.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Updating tests to avoid SOURCE LEDGER or TODAY obligations without a cited
+      source-backed contract decision.
+
+      2. Weakening Source Ledger navigation, menu, hit-target, or OPML keyboard/file
+      reachability coverage.
+
+      3. Marking mobile metadata truncation fixed without rendered mobile proof that
+      required text remains visible and not over-truncated.
+
+      4. Leaving `B4_R9_opml_input_reachability` or `playwright_expected_red_claims`
+      as `STILL_BLOCKED` in the follow-up closure register.
+
+      5. Claiming green based only on `npm run test` while mandatory rendered artifact/hit-target
+      Playwright commands still fail.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      - [ ] Logic correctness: relevant state/selector/contract decisions produce
+      correct values.
+
+      - [ ] Rendering completeness: Source Ledger, TODAY, mobile metadata, and OPML
+      controls produce visible/reachable DOM behavior under the required viewports.
+
+      - [ ] Rendered evidence or updated test fixtures reflect source-backed behavior
+      from the refs.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive frontend behavior or source-backed test/fixture
+      correction that processes current UI state and produces accessible rendered
+      output that varies based on that state.
+
+
+      Acceptance checklist:
+
+      - [ ] Re-read `docs/DESIGN.md` and `docs/UI_REGRESSION_CONTRACT.md` before changing
+      selectors, tests, or UI behavior.
+
+      - [ ] Classify B-HT-01 and B-ART-01 with one shared `source_contract_conflict`
+      disposition and apply one consistent source-backed fix.
+
+      - [ ] Fix or source-update the TODAY selector mismatch without weakening rendered
+      artifact coverage.
+
+      - [ ] Fix or source-update mobile metadata truncation expectations so required
+      text is neither clipped nor over-truncated.
+
+      - [ ] Preserve the passing `[IMPORT OPML]` keyboard/file reachability behavior
+      while making the broader Source Ledger controls/hit-target command green.
+
+      - [ ] Run the exact verification commands listed for this step and record actual
+      outputs.
+
+      - [ ] Do not split this into serial one-issue fix chains or mutate completed
+      plan steps.'
+    verification: '- [ ] local-check protecting `srdf-batched-frontend-closure-blockers-retest`
+      and `srdf-frontend-gate`.
+
+      - [ ] `cd web && npm run test` passes with svelte-check/vitest output recorded.
+
+      - [ ] `cd web && npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+      tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts`
+      passes or any harness-name drift is proven with equivalent source-backed coverage.
+
+      - [ ] `cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      tests/e2e/hit-target-clickability.spec.ts` passes and covers Source Ledger controls/hit
+      targets.
+
+      - [ ] `cd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts
+      tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts`
+      passes and covers rendered artifacts/TODAY/mobile metadata.
+
+      - [ ] Forbidden concept scan over frontend Svelte/TS user-facing surfaces remains
+      PASS.
+
+      - [ ] Evidence maps every blocker family to a source-backed fix or source-backed
+      stale-test correction with no `STILL_BLOCKED` blocker-class item.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Fix Evidence
+
+
+      **Root cause summary**: <why the failed closure still had blockers>
+
+
+      **Source-contract adjudication**:
+
+      | Blocker | Disposition | Source section cited | Implementation/test/artifact
+      change |
+
+      | --- | --- | --- | --- |
+
+      | B-HT-01 | fixed/source-updated | <ref> | <change> |
+
+      | B-ART-01 | fixed/source-updated | <ref> | <change> |
+
+      | B-TODAY-01 | fixed/source-updated | <ref> | <change> |
+
+      | B-FR09-01 | fixed/source-updated | <ref> | <change> |
+
+      | B4_R9_opml_input_reachability | fixed | <ref> | <change> |
+
+      | playwright_expected_red_claims | fixed | <ref> | <change> |
+
+
+      **Commands executed**:
+
+      ```text
+
+      cd web && npm run test
+
+      cd web && npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts
+      tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts
+
+      cd web && npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts
+      tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts
+      tests/e2e/hit-target-clickability.spec.ts
+
+      cd web && npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts
+      tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+
+      <forbidden concept scan command>
+
+      ```
+
+
+      **Actual output**:
+
+      ```text
+
+      <paste actual outputs and exit codes>
+
+      ```
+
+
+      **Rendered/artifact proof refs**:
+
+      - Source Ledger navigation/menu/hit-targets: <artifact path>
+
+      - TODAY surface: <artifact path>
+
+      - Mobile metadata truncation: <artifact path>
+
+      - OPML import reachability: <artifact path>
+
+
+      **Remaining blockers**: [] or list with explicit reason the follow-up retest
+      must keep gate closed.'
+    depends_on:
+    - srdf-batched-frontend-audit-closure
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
