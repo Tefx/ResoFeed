@@ -98370,7 +98370,7 @@ phases:
       - [x] Prove the relevant Source Ledger conflict scope no longer has unintended
       duplicate status elements.
 
-      - [ ] Confirm no dashboard/job/queue/activity ledger/settings/service-layer/persistent
+      - [x] Confirm no dashboard/job/queue/activity ledger/settings/service-layer/persistent
       top-chrome status drift is visible.'
     verification: '- [ ] phase-check protecting `cos-reaudit-current-operation-wiring`,
       `cos-uiux-multimodal-audit`, `cos-spec-doc-conformance`, and `cos-final-gate`:
