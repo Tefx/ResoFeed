@@ -95072,7 +95072,7 @@ phases:
       - durable_job_queue_history_schema_added: false'
   - id: cos-frontend-operation-utility-contract-tests
     name: Add frontend operation-status and utility-placement tests
-    status: claimed
+    status: done
     description: 'Add expected-red frontend component/e2e tests for contextual current-operation
       status and low-frequency utility placement.
 
@@ -95154,6 +95154,67 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T20:35:44.118950+00:00'
+    done_at: '2026-05-16T20:47:20.800194+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/DESIGN.md — read. Key passages: utility surfaces are reachable through
+      RESOFEED menu; Language Control is terse LANG: EN/ZH; Reprocess is [REPROCESS
+      LIBRARY] with no wizard/dashboard; Source Ledger owns manual ingest status.
+
+      - docs/ARCHITECTURE.md — read. Key passages: frontend exposes language/reprocess
+      as terse operational controls; no durable jobs/queues/activity ledgers; reprocess
+      does not create dashboards.
+
+
+      ## Expected-Red Frontend Contract Evidence
+
+      - Test files changed: web/tests/e2e/current-operation-utility-placement.expected-red.spec.ts
+
+      - Test names added: low-frequency utilities render only inside opened RESOFEED
+      menu; running operation status contextual to Source Ledger/open RESOFEED; blocked
+      explanation contextual to Source Ledger/open RESOFEED.
+
+      - Rendered placement/absence assertions: Playwright renders app, captures screenshot/ARIA,
+      asserts LANG/reprocess absent from persistent header while menu closed and status/explanations
+      visible in contextual surfaces.
+
+      - Expected failures/exposed gaps: persistent header still shows LANG; opened
+      RESOFEED menu lacks running/blocked current-operation status.
+
+      - Product-code changes: NONE
+
+      - Downstream implementation owner: cos-frontend-operation-utility-surface
+
+
+      ## Verification
+
+      - Worktree commit: 97f37031 test: add operation utility placement contracts
+
+      - Mainline merge commit: c993f986 [vectl] step-cos-frontend-operation-utility-contract-tests
+      completed
+
+      - Mainline command: npm run test:e2e -- current-operation-utility-placement.expected-red.spec.ts
+      (run from web/ after root script absence)
+
+      - Mainline observed result: red as expected; 3 failures align with persistent
+      LANG/reprocess top chrome and missing contextual RESOFEED operation status/explanation.
+
+      - step_intent: test_define_red
+
+      - expected_result: red
+
+      - observed_result: red
+
+      - failure_alignment: EXPECTED_RED_ACCEPTED
+
+      - verdict: SUCCESS
+
+      - blockers: []
+
+      - product_implementation_files_modified: false'
   - id: cos-backend-operation-snapshot
     name: Complete in-memory current-operation snapshot backend
     status: pending
