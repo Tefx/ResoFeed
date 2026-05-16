@@ -83214,6 +83214,295 @@ phases:
       - NONE. Initial missing `node_modules` in isolated worktree was resolved with
       `npm ci`; no product code/docs/tests were modified by retest. Verification checklist
       items are [x].'
+  - id: srdf-batched-frontend-audit-remediation
+    name: Batch remediate frontend spec and UIUX audit blockers
+    status: pending
+    description: 'Batched remediation for the two concurrent frontend verification
+      failures.
+
+
+      step_type: implementation
+
+      failure_family: frontend_spec_uiux_reconciliation
+
+      agent_source: project
+
+      work_type: defect_repair
+
+
+      Scope: close the blocker-class findings from `srdf-frontend-spec-conformance`
+      and `srdf-uiux-native-audit` as one unified fix strategy, not as serial or competing
+      remediations. Keep completed implementation steps immutable; modify only current
+      frontend code/tests/artifacts needed to reconcile current mainline behavior
+      with authoritative docs.
+
+
+      Authoritative refs:
+
+      - `docs/DESIGN.md` — UI labels, chrome, accessibility intent, forbidden concepts.
+
+      - `docs/UI_REGRESSION_CONTRACT.md` — regression contract for Steer, Source Ledger,
+      split scroll, mobile route, and forbidden UI concepts.
+
+      - `docs/ARCHITECTURE.md` — single deployable, owner-token boundary, HTTP/MCP
+      product operation parity, no forbidden product concepts.
+
+
+      Blockers to reconcile in one pass:
+
+      - Spec B1/R2: Steer route preview write-state ARIA role/name. Current contract
+      evidence expects `role=status` with accessible name `Steer route preview`; reported
+      implementation renders `role=region` with name `Steer write preview`. Align
+      implementation to the current authoritative contract, or produce a source-backed
+      spec/test update only if the docs clearly authorize it.
+
+      - Spec B2/R4: Search surface accessible name mismatch. E2E expected region `Search
+      and Retrieval`; rendered region `SEARCH`. Align accessible name to the authoritative
+      contract or update the test/spec from an explicit source-backed decision.
+
+      - Spec B3/R7: Source Ledger per-source fetch disabled scope. Do not disable
+      every row merely because any fetch is pending. Only the active row should be
+      disabled; backend 409 remains the global guard for conflict.
+
+      - Spec B4/R9: OPML file input keyboard/file reachability. Provide an accessible
+      keyboard/file-selection path equivalent to the visible button, or document an
+      explicit source-backed contract if native input hiding remains intentional.
+
+      - Spec R10: Mobile scroll proof conflict. Reconcile window scroll versus feed-pane
+      scrollTop evidence and preserve actual feed scroll consistently.
+
+      - UIUX: Missing `[ADD SOURCE]` chip in Steer preview.
+
+      - UIUX: Source Ledger `[FETCH]` control not rendered/reachable.
+
+      - UIUX: Inspector split scroll not independent on desktop and mobile route loses
+      feed scroll.
+
+      - UIUX: Primary Inspector copy contains forbidden JSON-LD raw payload.
+
+      - UIUX: Mobile feed metadata over-truncation clips required text.
+
+      - UIUX: Claimed 34 Playwright expected-red failures.
+
+
+      Reconciliation rule:
+
+      - Some UIUX claims may be stale or fixture/test-target drift because recent
+      scoped evidence reports `npm run test` 61/61, Source Ledger hit-target tests,
+      and split-scroll tests passing. You MUST rerun focused evidence on current mainline
+      before dispositioning any UIUX item as stale.
+
+      - Do NOT dismiss a UIUX claim as stale unless current rendered artifact, DOM/a11y
+      evidence, and the focused command prove non-reproduction.
+
+      - If a claim is real, fix it in the same batch. If it is stale, record the exact
+      current-mainline proof and why it does not intersect the remaining frontend
+      gate.
+
+
+      why_previous_fix_failed:
+
+      - The previous owner-token/rendering bootstrap retest closed broad render bootstrapping
+      and scoped green tests, but it did not force cross-auditor reconciliation between
+      spec-verifier accessible-contract findings and uiux-auditor rendered-artifact
+      findings.
+
+      - Existing scoped tests could pass while accessible names, hidden file inputs,
+      per-row disabled semantics, or stale UIUX artifact claims remained unresolved
+      at the frontend gate boundary.
+
+
+      why_previous_gate_missed_it:
+
+      - The prior gate path relied on separate verifier/auditor streams; it lacked
+      a single machine-readable closure register mapping each spec-verifier item and
+      each UIUX claim to current-mainline evidence.
+
+      - Rendered artifact evidence and focused E2E evidence were not forced to agree
+      before `srdf-frontend-gate` could open.
+
+
+      reversal_risk:
+
+      - High if the fix only changes tests or only changes visual copy without checking
+      accessibility tree names, keyboard reachability, active-row disabled semantics,
+      actual scroll containers, and forbidden raw-payload text.
+
+      - High if stale UIUX claims are dismissed from memory rather than current mainline
+      screenshots/DOM/a11y artifacts.
+
+      - High if mobile route scroll is proven with only `window.scrollY` while the
+      user-visible feed pane does not preserve scroll.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      1. Any unresolved spec B1/B2/B3/B4/R10 item without `PROVEN_FIXED` or `PROVEN_STALE_NON_INTERSECTING`
+      evidence.
+
+      2. Any UIUX blocker claim dismissed without current-mainline rendered proof.
+
+      3. Any Steer/Source Ledger/Inspector/mobile screenshot or DOM artifact missing
+      from closure evidence.
+
+      4. Any forbidden concept, raw JSON-LD payload, or over-truncated metadata still
+      visible in required UI surfaces.
+
+      5. Any Source Ledger fetch state that disables non-active rows solely because
+      another fetch is pending.
+
+
+      ## Frontend Completion Criteria (rendering required)
+
+      This is a FRONTEND IMPLEMENTATION step. Completion requires BOTH:
+
+      1. Logic correctness: data/state computation produces correct values.
+
+      2. Rendering completeness: components produce visible DOM elements and accessible
+      semantics.
+
+      A component or control that only passes data-layer tests but is not rendered/reachable
+      does NOT satisfy this step.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive frontend behavior that processes current
+      state and produces accessible rendered output that varies based on that state.
+
+
+      Acceptance checklist:
+
+      - [ ] Re-run focused current-mainline evidence before coding enough to classify
+      every spec-verifier and UIUX finding as real, stale, fixture drift, or source-contract
+      conflict.
+
+      - [ ] Fix every real current blocker from the combined spec-verifier/UIUX failure
+      family in one batch.
+
+      - [ ] For each stale or fixture-drift claim, record current rendered/DOM/a11y
+      proof and explicit non-intersection with `srdf-frontend-gate` and final E2E
+      closure.
+
+      - [ ] Preserve or update focused tests so role/name, Source Ledger active-row
+      disabled behavior, OPML reachability, scroll preservation, forbidden raw-payload
+      absence, and mobile metadata visibility are covered.
+
+      - [ ] Do not mutate completed plan steps or split this into multiple serial
+      remediation steps.'
+    verification: '- [ ] local-check protecting `srdf-batched-frontend-audit-closure`
+      and `srdf-frontend-gate`.
+
+      - [ ] Evidence contains a combined findings register for all spec-verifier B1/B2/B3/B4/R10
+      items and all listed UIUX claims.
+
+      - [ ] Evidence distinguishes `PROVEN_FIXED`, `PROVEN_STALE_NON_INTERSECTING`,
+      `SOURCE_CONTRACT_UPDATED`, and `STILL_BLOCKED` for each item.
+
+      - [ ] Evidence includes focused current-mainline command output used before
+      and after the fix.
+
+      - [ ] No blocker-class item is left with only `pre-existing`, `stale`, `out-of-scope`,
+      or narrative disposition.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Combined Remediation Register
+
+      | Source | Item | Current-mainline status before fix | Action taken | Final
+      status | Evidence ref |
+
+      | --- | --- | --- | --- | --- | --- |
+
+      | spec-verifier | B1/R2 Steer route preview ARIA role/name | REAL/STALE/FIXTURE_DRIFT/SOURCE_CONFLICT
+      | <change or proof> | PROVEN_FIXED/PROVEN_STALE_NON_INTERSECTING/SOURCE_CONTRACT_UPDATED/STILL_BLOCKED
+      | <artifact/command> |
+
+      | spec-verifier | B2/R4 Search accessible name |  |  |  |  |
+
+      | spec-verifier | B3/R7 Source Ledger active-row disabled scope |  |  |  |  |
+
+      | spec-verifier | B4/R9 OPML file input reachability |  |  |  |  |
+
+      | spec-verifier | R10 mobile scroll proof conflict |  |  |  |  |
+
+      | uiux-auditor | `[ADD SOURCE]` chip |  |  |  |  |
+
+      | uiux-auditor | `[FETCH]` control reachability |  |  |  |  |
+
+      | uiux-auditor | desktop/mobile split scroll |  |  |  |  |
+
+      | uiux-auditor | forbidden JSON-LD raw payload |  |  |  |  |
+
+      | uiux-auditor | mobile metadata over-truncation |  |  |  |  |
+
+      | uiux-auditor | 34 Playwright expected-red failures |  |  |  |  |
+
+
+      ## Current-Mainline Reconciliation Evidence
+
+      **Commands run before fix:**
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Commands run after fix:**
+
+      ```
+
+      <paste commands and output>
+
+      ```
+
+
+      **Rendered/DOM/a11y artifacts produced:**
+
+      - <path or artifact id> — <surface/state>
+
+
+      ## Root Cause vs Symptom
+
+      - Root cause: <why separate green tests failed to close combined gate obligations>
+
+      - Symptom: <which verifier/auditor findings surfaced it>
+
+      - Why previous fix failed: <must address bootstrap retest limitation>
+
+      - Why this fix is not surface-level: <explain coverage across rendered, DOM,
+      a11y, and commands>
+
+
+      ## Residual Risk
+
+      - Remaining blockers: <none or list>
+
+      - Reversal risk controls: <tests/artifacts preventing recurrence>
+
+      - Gate intersection: <why srdf-frontend-gate may or may not open>
+
+      '
+    depends_on:
+    - srdf-frontend-spec-conformance
+    - srdf-uiux-native-audit
+    - srdf-broad-rendering-owner-token-bootstrap-retest
+    agent: frontend-engineer
 - id: steer-delta-e2e-architecture-review-closure
   name: Steer Delta E2E Architecture Review Closure
   status: locked
