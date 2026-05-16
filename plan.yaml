@@ -94198,3 +94198,108 @@ phases:
     archival workbench aesthetic.
   depends_on:
   - audit-and-chinese-support-repair-verification-and-closure
+  steps:
+  - id: gsfr-expected-red-fragment-grouping-test
+    name: Add expected-red regression for synthetic feed-fragment grouping
+    status: pending
+    description: 'step_type: test
+
+      step_intent: test_define_red
+
+      expected_result: red
+
+
+      Create a focused frontend regression test proving distinct synthetic RSS feed-entry
+      fragment URLs are not inferred as one grouped story.
+
+
+      Scope:
+
+      - Touch only frontend test files/fixtures, preferably under `web/src/routes/components/__tests__/`
+      or an existing Inspector/route regression test harness.
+
+      - Use two or more TLDR/feed-style items whose URLs share the same feed URL base
+      but have distinct hash fragments, e.g. `https://bullrich.dev/tldr-rss/feed.rss#entry_a`
+      and `https://bullrich.dev/tldr-rss/feed.rss#entry_b`.
+
+      - Set `story_key: null`, `duplicate_of_item_id: null`, and empty `grouped_source_items`
+      for those unrelated items.
+
+      - Open one item in Inspector and assert `.contract-grouped-sources` is absent
+      and copy like `Grouped story with 50 source items` cannot appear.
+
+      - Include a positive-control fixture only if an existing contract/test requires
+      true same-article URL fallback grouping; do not broaden product semantics.
+
+
+      ## Spec-Fixture Conformance (MANDATORY)
+
+      At least one fixture MUST use the documented external item fields exactly: `story_key`,
+      `duplicate_of_item_id`, and `grouped_source_items`, without convenience grouping-only
+      fields not present in the API contract.
+
+
+      ## Completion Criteria
+
+      - [ ] A failing-before-fix test exposes the fragment-collapse bug without modifying
+      product code.
+
+      - [ ] The test fixture cites the synthetic URL behavior from `internal/resofeed/ingest.go`
+      and grouping authority from `docs/ARCHITECTURE.md`.
+
+      - [ ] Evidence records the expected red failure message or exposed grouped-source
+      disclosure.
+
+      - [ ] Product code remains unchanged in this step.'
+    verification: '- [ ] Only frontend tests/fixtures changed; no product-code changes
+      are included.
+
+      - [ ] The expected-red command is documented and fails specifically because
+      unrelated feed-fragment items produce a grouped-source disclosure.
+
+      - [ ] The fixture contains at least two same-base, different-fragment synthetic
+      feed URLs with null `story_key` and null `duplicate_of_item_id`.
+
+      - [ ] Any same-article fallback positive control is tied to an existing contract
+      or explicitly omitted as out of scope.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/ingest.go — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/Inspector.svelte — key passage or "NOT READ: <reason>"
+
+      - web/src/lib/api-contract.ts — key passage or "NOT READ: <reason>"
+
+
+      ## Expected-Red Test Evidence
+
+      - Test file(s) changed:
+
+      - Exact command executed:
+
+      ```text
+
+      <paste command>
+
+      ```
+
+      - Expected-red output proving the bug:
+
+      ```text
+
+      <paste failing assertion/output>
+
+      ```
+
+      - Exposed gap: unrelated synthetic feed-fragment URLs must not create grouped-source
+      disclosure.
+
+      - Downstream implementation owner: gsfr-inspector-fragment-identity-fix.'
+    agent: frontend-engineer
