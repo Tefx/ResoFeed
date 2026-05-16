@@ -86449,7 +86449,7 @@ phases:
       checklist items.'
   - id: srde2e-uiux-source-ledger-status-contract-retest
     name: Retest Source Ledger status DOM contract with real rendered flow
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       step_intent: retest_green
@@ -86677,3 +86677,70 @@ phases:
     agent: uiux-auditor
     claimed_by: uiux-auditor
     claimed_at: '2026-05-16T06:06:33.710666+00:00'
+    done_at: '2026-05-16T06:27:51.853170+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n\n- `docs/DESIGN.md` — read\
+      \ by auditor. Key passage cited: Required DOM contract for manual ingest controls\
+      \ mandates `.source-ledger__header` status with `last_ingest: HH:MM:SS` and\
+      \ row `.source-ledger__status` with `last_fetch: HH:MM:SS`.\n- `docs/ARCHITECTURE.md`\
+      \ — read by auditor. Key passage cited: manual ingest/fetch endpoints map completion\
+      \ timestamps to UI outputs while preserving the single-binary, owner-token-bounded\
+      \ architecture.\n\n## Native Multimodal UI/UX Retest Report\n\n**Tester**: uiux-auditor\
+      \ (independent of frontend-engineer fix)\n**Scope**: Source Ledger status DOM\
+      \ contract and Steer control regression\n**Independence Level**: L2\n\n### Real\
+      \ Flow Setup\nCommands reported by auditor:\n```text\nnpm --prefix web run build\n\
+      go build -o ./bin/resofeed ./cmd/resofeed\nOPENROUTER_KEY=<redacted> ./bin/resofeed\
+      \ serve --db ./data/test.sqlite3 --owner-token=<redacted> --addr 127.0.0.1:8080\
+      \ > server.log &\nnode web/test_flow_fixed.mjs\n```\n\nArtifacts committed to\
+      \ main:\n- `artifacts/source_ledger_populated.png`\n- `artifacts/source_ledger_post_ingest.png`\n\
+      - `artifacts/source_ledger_post_ingest.html`\n- `artifacts/steer_preview.png`\n\
+      - `artifacts/steer_preview.html`\n\n### Rendered Artifacts Evidence\n\n**Source\
+      \ Ledger header global `last_ingest`** — verified from `artifacts/source_ledger_post_ingest.html`:\n\
+      ```html\n<header class=\"source-ledger-head source-ledger__header\">\n  <h1\
+      \ id=\"source-ledger-title\" class=\"source-ledger__title\" tabindex=\"-1\"\
+      >SOURCE LEDGER</h1>\n  <div class=\"source-ledger__header-actions\">\n    <span\
+      \ aria-live=\"polite\" role=\"status\" class=\"source-ledger__status\" title=\"\
+      last_ingest: 06:20:18\">last_ingest: 06:20:18</span>\n    <button type=\"button\"\
+      \ class=\"bracket-action bracket-action--import-opml\" aria-label=\"[IMPORT\
+      \ OPML]\">[IMPORT OPML]</button>\n    <button type=\"button\" class=\"bracket-action\
+      \ bracket-action--run-ingest\">[RUN INGEST]</button>\n  </div>\n</header>\n\
+      ```\nResult: PROVEN.\n\n**Source Ledger row `last_fetch`** — verified from `artifacts/source_ledger_post_ingest.html`:\n\
+      ```html\n<li class=\"source-ledger-row source-ledger__row source-row\" data-testid=\"\
+      source-row\" ...>\n  <div class=\"source-ledger-copy source-ledger__name\" ...>src:\
+      \ Hacker News</div>\n  <div class=\"source-ledger-url source-ledger__url\" ...>url:\
+      \ https://news.ycombinator.com/rss</div>\n  <div aria-live=\"polite\" class=\"\
+      source-ledger__status\" title=\"last_fetch: 06:20:18\">last_fetch: 06:20:18</div>\n\
+      \  <span class=\"source-ledger__actions\">...</span>\n</li>\n```\nResult: PROVEN.\n\
+      \n**Steer accessible-name uniqueness** — verified from `artifacts/steer_preview.html`:\n\
+      ```html\n<span class=\"steer-route-preview__actions\" aria-label=\"Steer write\
+      \ action boundary\">\n  <button type=\"button\" class=\"bracket-action\" aria-label=\"\
+      Commit previewed Steer write action\">[APPLY]</button>\n  <button type=\"button\"\
+      \ class=\"bracket-action\" aria-label=\"Cancel Steer route preview\">[CANCEL]</button>\n\
+      </span>\n```\nAuditor also verified `aria-label=\"Undo last Steer change\"`\
+      \ on `[UNDO]` by source inspection. Result: PROVEN.\n\n### Behavioral proof\
+      \ register\n- requirement_ref: Source Ledger header/row status format\n  behavior_claim:\
+      \ Source Ledger displays `last_ingest` globally and `last_fetch` per row\n \
+      \ runtime_proof_expected: real browser + real rendered flow\n  evidence_ref:\
+      \ `artifacts/source_ledger_post_ingest.html`\n  status: PROVEN\n  closure_path:\
+      \ none\n  gate_decision_basis: DOM snapshot confirms `last_ingest: HH:MM:SS`\
+      \ and `last_fetch: HH:MM:SS`.\n- requirement_ref: Steer unique accessible names\n\
+      \  behavior_claim: Preview and undo buttons do not duplicate aria-labels\n \
+      \ runtime_proof_expected: real browser + real rendered flow\n  evidence_ref:\
+      \ `artifacts/steer_preview.html`\n  status: PROVEN\n  closure_path: none\n \
+      \ gate_decision_basis: concrete a11y labels distinguish Apply, Cancel, and Undo\
+      \ actions.\n\n### Machine-readable closure\nheadline: PASS\nverdict: PASS\n\
+      gate_open_allowed: true\nblockers: []\nshould_fix: []\norchestrator_action_hint:\
+      \ COMPLETE\n\n## Commit hash(es)\n- Worktree artifact commit: `e9cccef839284d30e812daf7a0df9d02f75b9021`\
+      \ (`chore: add visual and DOM artifacts for Source Ledger status contract`)\n\
+      - Branch plan-alignment cleanup commit: `44a3cf8e` (excluded plan diff before\
+      \ merge)\n- Mainline artifact commit: `1907a5c4` (`[vectl] step-srde2e-uiux-source-ledger-status-contract-retest\
+      \ completed`)\n\n## Files changed\n- Committed evidence artifacts under `artifacts/`\
+      \ only.\n- Product implementation files modified: false.\n- No docs, `plan.yaml`,\
+      \ `.git/vectl/*`, or package files were committed from the audit worktree.\n\
+      \n## Mainline final-state verification after artifact commit\n- `npm run check`\
+      \ in `web/` exited 0: `svelte-check found 0 errors and 0 warnings`.\n\n## Gaps/Notes\n\
+      - First audit attempt was rejected for contradictory proof (`ingest complete`\
+      \ / `last_fetch: not_fetched`); retry evidence corrected this with committed\
+      \ DOM/screenshot artifacts showing exact `HH:MM:SS` status strings.\n- Acceptance\
+      \ and verification checklist items are `[x]`; verification checklist required\
+      \ planner repair because `vectl_check` could not match verification-field checklist\
+      \ items."
