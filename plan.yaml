@@ -96028,7 +96028,7 @@ phases:
       - [x] HTTP idle/running/conflict path is exercised against a real runtime or
       equivalent integration harness.
 
-      - [ ] MCP resource/conflict parity is exercised where supported.
+      - [x] MCP resource/conflict parity is exercised where supported.
 
       - [ ] Frontend rendered e2e proof shows allowed contextual status and absence
       from persistent idle top chrome.
