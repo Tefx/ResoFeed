@@ -98300,7 +98300,7 @@ phases:
       - None for this blocker family.'
   - id: cos-retest-current-operation-browser-conflict-detail
     name: Retest current-operation browser conflict detail path
-    status: pending
+    status: claimed
     description: 'step_type: test
 
       step_intent: retest_green
@@ -98499,3 +98499,5 @@ phases:
     depends_on:
     - cos-fix-current-operation-browser-conflict-detail
     agent: integration-verifier
+    claimed_by: integration-verifier
+    claimed_at: '2026-05-16T22:59:38.066053+00:00'
