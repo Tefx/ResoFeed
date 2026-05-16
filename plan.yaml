@@ -94307,7 +94307,7 @@ phases:
     claimed_at: '2026-05-16T20:35:56.687827+00:00'
   - id: gsfr-backend-grouping-contract-audit
     name: Audit backend grouping authority and schema non-change
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: local-check protecting gsfr-inspector-fragment-identity-fix
@@ -94390,6 +94390,74 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-16T20:35:50.605032+00:00'
+    done_at: '2026-05-16T20:48:02.383932+00:00'
+    evidence: 'PASS_WITH_DEBT non-blocking; Blocking Status CLOSED; Proof-Gap Status
+      NON_BLOCKING
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passages: story grouping source of truth
+      is fields on items; item rows include story_key and duplicate_of_item_id; duplicate/story
+      grouping preserves every original source item.
+
+      - internal/resofeed/search.go — read. Key passages: ReadItemDetail reads story_key/duplicate_of_item_id
+      and readGroupedSourceItems returns empty for nil/blank storyKey, otherwise uses
+      where i.story_key = ?.
+
+      - internal/resofeed/ingest.go — read. Key passages: blank entry URLs synthesize
+      source.URL + # + stableID(entry, ...), persisted as item URL/provenance original
+      URL.
+
+      - internal/resofeed/state.go — read. Key passages: portable state excludes runtime
+      metadata/receipts/history/sync metadata and does not add grouping machinery.
+
+
+      ## Backend Grouping Contract Audit
+
+      - Backend grouping authority: CONFORMS; authoritative grouping is story_key
+      bounded; direct duplicate provenance exposed via duplicate_of_item_id; no URL-base
+      matching found.
+
+      - Search/detail query evidence: internal/resofeed/search.go:165 calls readGroupedSourceItems;
+      175-178 guards nil/blank storyKey; 185 uses where i.story_key = ?.
+
+      - Synthetic URL generation evidence: internal/resofeed/ingest.go:473-475 creates
+      feed URL plus #entry_*; 480-484 persists that URL/original URL.
+
+      - Schema change required: NO; existing items.story_key and duplicate_of_item_id
+      fields suffice; repair is frontend identity handling.
+
+      - Backend test gap: non-blocking exact backend runtime test gap for blank-link
+      synthetic #entry_* persistence/no URL-base grouping; existing item-detail grouping/duplicate
+      tests are partially sufficient.
+
+      - Handoff constraints: frontend must not strip fragments for grouping identity;
+      prefer backend grouped_source_items; story_key/duplicate_of_item_id remain authority.
+
+
+      ## Verification
+
+      - Worktree commit: none — audit-only verification; no file changes.
+
+      - Mainline merge: none required; branch had no file changes.
+
+      - Command from audit evidence: go test ./internal/resofeed -run ''TestHTTPItemDetailDisclosesGroupedSourceItems|TestReadItemDetailKeepsDuplicateOriginalRetrievable|TestItemDetailJSONIncludesRequiredNullableProvenanceFields|TestProcessingLanguageIngestPreservesProvenance|TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems''
+      => ok
+
+      - verdict: PASS_WITH_DEBT
+
+      - blockers: []
+
+      - gate_open_allowed: true
+
+      - orchestrator_action_hint: COMPLETE
+
+      - proof_gap_status: NON_BLOCKING
+
+      - behavioral_proof_register: backend grouping by story_key PROVEN; duplicate
+      provenance PROVEN; synthetic fragment generation NEEDS_TEST non-blocking; no
+      schema/layer change required PROVEN.'
   - id: gsfr-inspector-fragment-identity-fix
     name: Repair Inspector grouping identity for synthetic feed fragments
     status: pending
