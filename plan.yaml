@@ -85356,7 +85356,7 @@ phases:
 
       Acceptance checklist:
 
-      - [x] Fix ALL blocker families B-RSE2E-01 through B-RSE2E-04 in one batch; do
+      - [ ] Fix ALL blocker families B-RSE2E-01 through B-RSE2E-04 in one batch; do
       not stop after the first green local assertion.
 
       - [x] Preserve ResoFeed invariants: single Go binary, SQLite/FTS5 only, owner-token
