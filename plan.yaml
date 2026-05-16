@@ -94201,7 +94201,7 @@ phases:
   steps:
   - id: gsfr-expected-red-fragment-grouping-test
     name: Add expected-red regression for synthetic feed-fragment grouping
-    status: claimed
+    status: done
     description: 'step_type: test
 
       step_intent: test_define_red
@@ -94305,6 +94305,71 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T20:35:56.687827+00:00'
+    done_at: '2026-05-16T20:49:26.783290+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passage: items expose story_key/direct duplicate
+      pointer; direct duplicates may be grouped while every original source item remains
+      retrievable.
+
+      - docs/DESIGN.md — read. Key passage: Inspector source-list disclosure is for
+      grouped stories and must preserve source/provenance.
+
+      - internal/resofeed/ingest.go — read. Key passage: buildItem synthesizes blank
+      entry URLs as source.URL + # + stableID(entry,...).
+
+      - web/src/routes/components/Inspector.svelte — read. Key passage: normalizedGroupingUrl
+      strips hash/search and sameRuntimeGroup uses normalized URL fallback.
+
+      - web/src/lib/api-contract.ts — read. Key passage: ItemSummary/Provenance expose
+      story_key, duplicate_of_item_id, grouped_source_items.
+
+
+      ## Expected-Red Test Evidence
+
+      - Test file(s) changed: web/src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts
+
+      - Exact command executed: npm run test:render -- src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts
+
+      - Expected-red output proving bug: expect(element).not.toBeInTheDocument() failed
+      because details.contract-grouped-sources was present with summary aria-label/text
+      ''Grouped story with 50 source items''.
+
+      - Exposed gap: unrelated synthetic feed-fragment URLs must not create grouped-source
+      disclosure.
+
+      - Downstream implementation owner: gsfr-inspector-fragment-identity-fix
+
+
+      ## Verification
+
+      - Worktree commit: 45fa6f6a test inspector fragment grouping expected red
+
+      - Mainline merge commit: 9ae0f96e [vectl] step-gsfr-expected-red-fragment-grouping-test
+      completed
+
+      - Mainline command: npm run test:render -- src/routes/components/__tests__/inspector-fragment-grouping.expected-red.test.ts
+      (run from web/)
+
+      - Mainline observed result: red as expected; unrelated same-feed-base #entry
+      URLs produce false grouped-source disclosure.
+
+      - step_intent: test_define_red
+
+      - expected_result: red
+
+      - observed_result: red
+
+      - failure_alignment: EXPECTED_RED_ACCEPTED
+
+      - verdict: SUCCESS
+
+      - blockers: []
+
+      - product_implementation_files_modified: false'
   - id: gsfr-backend-grouping-contract-audit
     name: Audit backend grouping authority and schema non-change
     status: done
