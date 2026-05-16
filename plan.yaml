@@ -97018,7 +97018,7 @@ phases:
     agent: gate-reviewer
   - id: cos-fix-current-operation-frontend-wiring
     name: Fix frontend current-operation contract and rendering wiring
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -97218,6 +97218,8 @@ phases:
     depends_on:
     - cos-wiring-audit
     agent: frontend-engineer
+    claimed_by: frontend-engineer
+    claimed_at: '2026-05-16T22:12:05.803136+00:00'
   - id: cos-retest-current-operation-runtime-ui
     name: Retest current-operation runtime UI after frontend wiring fix
     status: pending
