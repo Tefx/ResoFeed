@@ -96030,7 +96030,7 @@ phases:
 
       - [x] MCP resource/conflict parity is exercised where supported.
 
-      - [ ] Frontend rendered e2e proof shows allowed contextual status and absence
+      - [x] Frontend rendered e2e proof shows allowed contextual status and absence
       from persistent idle top chrome.
 
       - [ ] Findings, if any, are documented as blocker/should_fix/suggestion/tech_debt
