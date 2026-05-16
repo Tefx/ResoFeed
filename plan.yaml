@@ -95578,7 +95578,7 @@ phases:
       local state.'
   - id: cos-mcp-operation-parity
     name: Complete MCP current-operation parity
-    status: claimed
+    status: done
     description: 'Complete MCP parity for the current-operation contract.
 
 
@@ -95651,6 +95651,45 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-16T21:09:52.889076+00:00'
+    done_at: '2026-05-16T21:52:06.136269+00:00'
+    evidence: '## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passage: HTTP and MCP validate auth/payloads
+      and call same product operations; MCP must not get product concepts unavailable
+      to humans; ingest guards forbid queues/jobs/ledgers.
+
+      - docs/DESIGN.md — read. Key passage: manual ingestion boundary uses immediate
+      operational commands and in-process guard; conflict feedback is raw/terse.
+
+
+      ## MCP Parity Evidence
+
+      - Files changed: internal/resofeed/current_operation.go; internal/resofeed/mcp.go;
+      internal/resofeed/mcp_integration_test.go
+
+      - Worktree commit: da9bc910 add MCP current operation parity
+
+      - Mainline merge commit: 6ec4ca6e [vectl] step-cos-mcp-operation-parity completed
+
+      - MCP resource/tool tests run and output: go test ./internal/resofeed -run ''TestMCPCurrentOperationResourceIdleAndRunningStates|TestMCPGuardConflictDetailsMatchHTTPCurrentOperationShape|TestCOSBackendCurrentOperation|TestMCPExpectedRedLanguageReprocessSearchDeliveryParityThroughPublicSurface''
+      => ok; go test ./... => ok; go test -race ./internal/resofeed -run ''TestMCPCurrentOperationResourceIdleAndRunningStates|TestMCPGuardConflictDetailsMatchHTTPCurrentOperationShape''
+      => ok; golangci-lint run ./... => 0 issues.
+
+      - HTTP/MCP conflict details comparison: MCP JSON-RPC error data uses guardConflictHTTPDetailMap,
+      same detail construction as HTTP conflicts; test asserts legacy flat fields
+      plus current_operation matching HTTP shape.
+
+      - Parity/non-special-agent confirmation: added resofeed://system/operation resource
+      returning {"operation": CurrentOperationInfo} from currentOperationInfo(), same
+      in-memory snapshot source as HTTP.
+
+      - Unsupported metadata caveat: none; existing MCP JSON-RPC error data supports
+      structured metadata for covered path.
+
+      - Deviation records: none.
+
+      - Forbidden-scope confirmation: no MCP-only durable job/task/history/agent-registry
+      concepts added.'
   - id: cos-frontend-operation-utility-surface
     name: Complete contextual operation status and low-frequency utility UI
     status: done
