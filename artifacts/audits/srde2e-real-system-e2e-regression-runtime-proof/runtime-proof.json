@@ -1,0 +1,125 @@
+{
+  "baseURL": "http://127.0.0.1:52960",
+  "dbPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-regression/artifacts/audits/srde2e-real-system-e2e-regression-runtime-proof/runtime-proof-1778934650012.sqlite3",
+  "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-regression/artifacts/audits/srde2e-real-system-e2e-regression-runtime-proof/server.stdout.log",
+  "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/srde2e-real-system-e2e-regression/artifacts/audits/srde2e-real-system-e2e-regression-runtime-proof/server.stderr.log",
+  "fixtureURL": "http://127.0.0.1:52958/undo-proof.xml",
+  "checks": [
+    {
+      "name": "owner_token_gate",
+      "bodyText": "skip to feed\nRESOFEED\nSteer or paste RSS URL\n>\nRESOFEED\nT\nSL\nSOURCE LEDGER / DOCTOR / INSPECTOR\nLANG: EN\nExisting readable item content will be rewritten. Source identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\nIndependent scroll region\nFirst use\n\nPaste RSS URL in S"
+    },
+    {
+      "name": "browser_valid_url_add_shows_undo",
+      "receipt": "applied: source added: 127.0.0.1:52958/undo-proof.xml; source ledger records it; background ingest will pick it up\n[UNDO]",
+      "source_id": "src_222cb13c72a033a9",
+      "screenshot": "source-add-undo-visible.png"
+    },
+    {
+      "name": "browser_undo_deactivates_source",
+      "receipt": "applied: source added: 127.0.0.1:52958/undo-proof.xml; source ledger records it; background ingest will pick it up\n[UNDO]",
+      "active_source_present": false
+    },
+    {
+      "name": "source_ledger_controls_reachable",
+      "controls": {
+        "run_ingest": true,
+        "fetch": true,
+        "details": true,
+        "delete": true,
+        "import_opml": true,
+        "export_state": true,
+        "import_state": true
+      },
+      "screenshot": "source-ledger-controls.png"
+    },
+    {
+      "name": "invalid_add_url_required_no_mutation",
+      "command": "添加 tldr",
+      "countBeforeInvalid": 1,
+      "countAfterInvalid": 1,
+      "visible": true
+    },
+    {
+      "name": "invalid_add_url_required_no_mutation",
+      "command": "订阅 HN",
+      "countBeforeInvalid": 1,
+      "countAfterInvalid": 1,
+      "visible": true
+    },
+    {
+      "name": "invalid_add_url_required_no_mutation",
+      "command": "add tldr",
+      "countBeforeInvalid": 1,
+      "countAfterInvalid": 1,
+      "visible": true
+    },
+    {
+      "name": "find_alias_lexical_warning_read_only",
+      "status": "1 results",
+      "no_semantic_answer_ui": true,
+      "screenshot": "find-lexical-warning.png"
+    },
+    {
+      "name": "doctor_read_only_diagnostics",
+      "diagnostics": "rss: ok\nopenrouter: ok item_transform_failures=0\nopenrouter: provider_reachable=true configured_model=account_default provider_reachable: true\nopenrouter: model_resolved=true resolved_model=openrouter/audit model_resolved: true\nopenrouter: item_transform_failures=0 item_transform_failures: 0\nopenrouter: current_item_transform_failures=0 historic_item_transform_failures=0\nopenrouter: live_summary_successes=1 fallback_only_current_summaries=0\nopenrouter: health_classification=openrouter_live_summa",
+      "rulesBeforeDoctor": 1,
+      "rulesAfterDoctor": 1,
+      "screenshot": "doctor-read-only.png"
+    },
+    {
+      "name": "mcp_preview_steer_undo_parity",
+      "preview": {
+        "route_kind": "search",
+        "interpreted_as": "lexical_search",
+        "changed_rules": [],
+        "message": "warning: find is treated as lexical search; no generated answer, vector DB, embeddings, RAG, or hidden retrieval expansion",
+        "lexical_search_query": {
+          "q": "Undo proof",
+          "source": null,
+          "from": null,
+          "to": null,
+          "resonated": null,
+          "limit": 50
+        },
+        "undo_handle": null,
+        "will_mutate": false
+      },
+      "steer_receipt": {
+        "interpreted_as": "steering_policy_update",
+        "changed_rules": [
+          {
+            "id": "rule_d54fdc6d32cfeebc",
+            "rule_text": "Runtime proof policy rule.",
+            "is_active": true,
+            "superseded_by": null,
+            "revision": 1,
+            "created_by_actor_kind": "agent",
+            "created_by_actor_id": "runtime-proof-agent"
+          }
+        ],
+        "message": "steering updated"
+      },
+      "undo": {
+        "route_kind": "policy",
+        "target": {
+          "kind": "steer_rule",
+          "id": "rule_d54fdc6d32cfeebc"
+        },
+        "undone": true,
+        "restored_rule": {
+          "id": "rule_d54fdc6d32cfeebc",
+          "rule_text": "Runtime proof policy rule.",
+          "is_active": true,
+          "superseded_by": null,
+          "revision": 1,
+          "created_by_actor_kind": "agent",
+          "created_by_actor_id": "runtime-proof-agent"
+        },
+        "restored_source": null,
+        "message": "undone: target steer rule disabled",
+        "already_applied": false
+      }
+    }
+  ]
+}
