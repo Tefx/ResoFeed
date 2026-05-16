@@ -95654,7 +95654,7 @@ phases:
 
       - [x] LANG/reprocess placement matches `docs/DESIGN.md` utility menu rules.
 
-      - [ ] No new dashboard, settings panel, wizard, persistent strip, or durable
+      - [x] No new dashboard, settings panel, wizard, persistent strip, or durable
       task-history UI is introduced.'
     verification: '- [ ] local-check protecting UI behavior: targeted component tests
       for status placement and LANG/reprocess placement pass green.
