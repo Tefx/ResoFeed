@@ -94917,3 +94917,13 @@ phases:
     - gsfr-targeted-regression-retest
     - gsfr-uiux-multimodal-audit
     agent: gate-reviewer
+- id: current-operation-status-and-low-frequency-utility-surface-implementation
+  name: Current Operation Status and Low-Frequency Utility Surface Implementation
+  status: pending
+  gate: Gate blocks unless HTTP/MCP current-operation status, guarded-operation conflict
+    payloads, contextual Source Ledger/RESOFEED operation UI, low-frequency LANG/reprocess
+    placement, real runtime/e2e evidence, UIUX audit, and doc/spec drift checks all
+    pass without introducing durable jobs, queues, dashboards, sidecars, or persistent
+    top-chrome utility controls.
+  depends_on:
+  - audit-and-chinese-support-repair-verification-and-closure
