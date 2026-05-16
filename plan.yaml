@@ -98361,7 +98361,7 @@ phases:
 
       - [x] Capture the original failed assertion and the new passing assertion/output.
 
-      - [ ] Prove the conflict fixture includes `error.details.current_operation`
+      - [x] Prove the conflict fixture includes `error.details.current_operation`
       with documented fields.
 
       - [ ] Prove browser-visible output includes current-operation detail beyond
