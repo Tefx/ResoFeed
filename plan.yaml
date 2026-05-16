@@ -86210,3 +86210,231 @@ phases:
     depends_on:
     - srde2e-uiux-audit-source-ledger-steer-controls
     agent: frontend-engineer
+  - id: srde2e-uiux-source-ledger-status-contract-retest
+    name: Retest Source Ledger status DOM contract with real rendered flow
+    status: pending
+    description: 'step_type: verification
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      scope: phase-check
+
+      agent_source: project
+
+      independence_level: L2
+
+
+      As a NATIVE MULTIMODAL UI/UX AUDITOR (uiux-auditor), independently retest the
+      Source Ledger status-contract remediation after srde2e-uiux-source-ledger-status-contract-fix.
+
+
+      This retest MUST use real rendered browser artifacts from the real Source Ledger
+      flow. Do not rely on dummy-backend-only evidence. The required flow is: owner-token
+      accepted app shell -> real Source Ledger OPML import -> real `[RUN INGEST]`
+      flow -> Source Ledger row/control inspection.
+
+
+      Required coverage:
+
+      - Source Ledger header global `last_ingest` / status placement contract, or
+      documented contract-consistent resolution if DESIGN.md authoritatively allows
+      a different location.
+
+      - Source Ledger live row/controls, including row-level `last_fetch: HH:MM:SS`
+      after fetch/ingest where applicable.
+
+      - Steer preview/commit/undo accessible-name uniqueness remains intact.
+
+      - No unapproved tokens, layout, copy, chrome, states, dashboard/job/activity/sync/RAG/account
+      concepts, or friendly SaaS/AI-magic surfaces.
+
+
+      Behavioral proof register required:
+
+      - requirement_ref
+
+      - behavior_claim
+
+      - runtime_proof_expected
+
+      - evidence_ref
+
+      - status
+
+      - closure_path
+
+      - gate_decision_basis
+
+
+      Acceptance checklist:
+
+      - [ ] Real rendered browser artifacts are captured for Source Ledger after OPML
+      import and `[RUN INGEST]`; dummy-backend-only evidence is rejected.
+
+      - [ ] Header `last_ingest` / global status contract is PROVEN or a contract-consistent
+      resolution is documented with DESIGN.md citation.
+
+      - [ ] Row-level `last_fetch: HH:MM:SS`, live source row visibility, and Source
+      Ledger controls remain PROVEN.
+
+      - [ ] Steer accessible-name uniqueness remains PROVEN.
+
+      - [ ] Negative scan finds no unapproved tokens/layout/copy/states or forbidden
+      product concepts.
+
+      - [ ] Final headline is PASS only when no blocker-class should_fix remains;
+      PASS_WITH_DEBT is not closable for this design-contract issue without explicit
+      non-intersection proof.'
+    verification: '- [ ] phase-check protecting srde2e-visual-a11y-regression-proof,
+      srde2e-software-architect-clean-recheck, srde2e-full-plan-check, and srde2e-final-closure-gate.
+
+      - [ ] Evidence includes screenshots, DOM snapshots, and/or accessibility snapshots
+      from the real Source Ledger OPML import + `[RUN INGEST]` rendered browser flow.
+
+      - [ ] Source Ledger header status contract and row `last_fetch: HH:MM:SS` behavior
+      are both proven green.
+
+      - [ ] Steer accessible-name uniqueness remains green.
+
+      - [ ] Any unresolved NEEDS_TEST, UNPROVEN, PASS_WITH_DEBT, or should_fix item
+      has explicit remediation ownership or non-intersection proof; otherwise the
+      retest blocks closure.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Native Multimodal UI/UX Retest Report
+
+
+      **Tester**: uiux-auditor (independent of frontend-engineer fix)
+
+      **Scope**: Source Ledger status DOM contract and Steer control regression
+
+      **Independence Level**: L2
+
+
+      ### Real Flow Setup
+
+      - App/server launch command or existing real runtime URL:
+
+      ```
+
+      <exact command or URL>
+
+      ```
+
+      - Owner-token accepted evidence:
+
+      ```
+
+      <artifact ref>
+
+      ```
+
+      - OPML import evidence:
+
+      ```
+
+      <artifact ref and source count>
+
+      ```
+
+      - `[RUN INGEST]` execution evidence:
+
+      ```
+
+      <artifact ref and observed status>
+
+      ```
+
+
+      ### Rendered Artifacts
+
+      - Source Ledger header screenshot/DOM/a11y snapshot:
+
+      ```
+
+      <artifact path or excerpt showing .source-ledger__header and last_ingest/status>
+
+      ```
+
+      - Source Ledger row screenshot/DOM/a11y snapshot:
+
+      ```
+
+      <artifact path or excerpt showing live row, controls, last_fetch: HH:MM:SS>
+
+      ```
+
+      - Steer controls accessible-name snapshot:
+
+      ```
+
+      <artifact path or excerpt>
+
+      ```
+
+
+      ### Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      |---|---|---|---|---|---|---|
+
+      | docs/DESIGN.md Source Ledger DOM contract | Header status is contract-compliant
+      | Real rendered DOM/browser artifact | <ref> | PROVEN/NEEDS_TEST/UNPROVEN |
+      <path> | <basis> |
+
+      | docs/DESIGN.md Source Ledger row status | Row last_fetch remains intact |
+      Real rendered DOM/browser artifact | <ref> | PROVEN/NEEDS_TEST/UNPROVEN | <path>
+      | <basis> |
+
+      | docs/DESIGN.md Steer controls | Accessible names are unique | A11y snapshot
+      | <ref> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <basis> |
+
+
+      ### Negative Design/Product Scan
+
+      - Unapproved tokens/layout/copy/states found: YES/NO
+
+      - Forbidden dashboard/job/activity/sync/RAG/account concepts found: YES/NO
+
+
+      ### Findings
+
+      | Severity | Description | Location | Reproduction | Blocking? |
+
+      |---|---|---|---|---|
+
+      | blocker/should_fix/suggestion/tech_debt | <finding or none> | <location> |
+      <steps> | YES/NO |
+
+
+      ### Headline
+
+      - [ ] PASS: No blocker-class design-contract issue remains.
+
+      - [ ] PASS_WITH_DEBT: Only explicit non-blocking debt remains with non-intersection
+      proof.
+
+      - [ ] FAIL: A blocker-class design-contract issue or proof gap remains.
+
+
+      **Gate open allowed**: true/false
+
+      **Confidence**: high/medium/low'
+    depends_on:
+    - srde2e-uiux-source-ledger-status-contract-fix
+    agent: uiux-auditor
