@@ -82601,17 +82601,24 @@ phases:
       for the required frontend surfaces.'
     verification: '- [ ] phase-check protecting steer-delta-e2e-architecture-review-closure.
 
-      - [ ] All frontend implementation, UIUX audit, spec/design conformance, and
-      batched remediation closure steps completed with evidence.
+      - [ ] All frontend implementation, UIUX audit, spec/design conformance, original
+      batched remediation closure, closure-blocker fix, and closure-blocker retest
+      steps completed with evidence.
+
+      - [ ] Latest closure-blocker retest evidence has `verdict: PASS`, `gate_open_allowed:
+      true`, `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses.
 
       - [ ] Batched closure evidence has `verdict: PASS`, `gate_open_allowed: true`,
-      `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses.
+      `remaining_blockers: []`, and no `STILL_BLOCKED` per-family statuses, or is
+      superseded by a PASS in `srdf-batched-frontend-closure-blockers-retest` for
+      the documented failed-closure blockers.
 
       - [ ] Rendered evidence covers required states/viewports and visual/spatial
-      artifacts.
+      artifacts, including Source Ledger, TODAY, OPML import reachability, mobile
+      metadata, and negative-UX/forbidden-concept surfaces.
 
-      - [ ] No unresolved blocker-class UI, a11y, design, stale-vs-real, or forbidden-concept
-      issue remains without remediation ownership.
+      - [ ] No unresolved blocker-class UI, a11y, design, stale-vs-real, source-contract-conflict,
+      or forbidden-concept issue remains without remediation ownership.
 
       - [ ] Gate decision basis is OPEN only when frontend is ready for real-system
       E2E.'
@@ -82638,6 +82645,7 @@ phases:
     - srdf-uiux-native-audit
     - srdf-frontend-spec-conformance
     - srdf-batched-frontend-audit-closure
+    - srdf-batched-frontend-closure-blockers-retest
     agent: gate-reviewer
   - id: srdf-broad-rendering-owner-token-bootstrap-fix
     name: Batch fix broad rendering owner-token bootstrap failures
