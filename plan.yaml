@@ -84734,17 +84734,17 @@ phases:
 
       - [x] Fail on forbidden dashboard/job/activity/settings/RAG/chat/semantic-answer/source-hierarchy
       concepts.'
-    verification: '- [ ] full-plan-check companion protecting final closure gate.
+    verification: '- [x] full-plan-check companion protecting final closure gate.
 
-      - [ ] Visual/spatial artifacts cover required states and viewports.
+      - [x] Visual/spatial artifacts cover required states and viewports.
 
-      - [ ] Hit-target proof uses real elementFromPoint/topmost clickability evidence
+      - [x] Hit-target proof uses real elementFromPoint/topmost clickability evidence
       and 44px minimum measurements.
 
-      - [ ] A11y proof covers tab order, focus, live regions, aria-describedby, details
+      - [x] A11y proof covers tab order, focus, live regions, aria-describedby, details
       disclosure semantics, and active panel semantics.
 
-      - [ ] Negative UX scan finds no forbidden concepts.'
+      - [x] Negative UX scan finds no forbidden concepts.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
       For each ref in this step:
