@@ -97108,7 +97108,7 @@ phases:
     - cos-backend-operation-snapshot
     - cos-mcp-operation-parity
     - cos-frontend-operation-utility-surface
-    - cos-retest-current-operation-runtime-ui
+    - cos-retest-current-operation-browser-conflict-detail
     - cos-reaudit-current-operation-wiring
     agent: spec-verifier
   - id: cos-final-gate
