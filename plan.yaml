@@ -90695,7 +90695,7 @@ phases:
       - [x] Re-evaluate all remaining blockers, including any blocker list from the
       architect artifact.
 
-      - [ ] Output gate closure fields: `headline`, `verdict`, `blockers`, `gate_open_allowed`,
+      - [x] Output gate closure fields: `headline`, `verdict`, `blockers`, `gate_open_allowed`,
       and `orchestrator_action_hint`.
 
       - [ ] Keep `gate_open_allowed: false` unless all blocker-class proof obligations
