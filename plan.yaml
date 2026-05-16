@@ -84424,26 +84424,26 @@ phases:
       \ []`.\n\nA test that discovers remaining issues is valuable, but this closure\
       \ step is complete only with PASS or with a complete blocker register that keeps\
       \ the gate closed."
-    verification: '- [ ] phase-check protecting `srdf-frontend-gate` and full-plan-check
+    verification: '- [x] phase-check protecting `srdf-frontend-gate` and full-plan-check
       protecting final frontend E2E closure.
 
-      - [ ] `cd web && npm run test` evidence is present and green.
+      - [x] `cd web && npm run test` evidence is present and green.
 
-      - [ ] Focused E2E evidence is present and green for the source-ledger/processing/feed-search
+      - [x] Focused E2E evidence is present and green for the source-ledger/processing/feed-search
       command group.
 
-      - [ ] Focused E2E evidence is present and green for Source Ledger controls,
+      - [x] Focused E2E evidence is present and green for Source Ledger controls,
       hit-target negative split-scroll, and `hit-target-clickability.spec.ts`.
 
-      - [ ] Focused E2E evidence is present and green for design artifact negative
+      - [x] Focused E2E evidence is present and green for design artifact negative
       UX, inspector dirty corpus, and runtime fresh review remediation.
 
-      - [ ] Forbidden concept scan evidence is present and PASS.
+      - [x] Forbidden concept scan evidence is present and PASS.
 
-      - [ ] Rendered artifacts cover Source Ledger, TODAY, mobile metadata, OPML reachability,
+      - [x] Rendered artifacts cover Source Ledger, TODAY, mobile metadata, OPML reachability,
       and negative UX obligations.
 
-      - [ ] Machine-readable YAML closure has `verdict: PASS`, `gate_open_allowed:
+      - [x] Machine-readable YAML closure has `verdict: PASS`, `gate_open_allowed:
       true`, `remaining_blockers: []`, per-blocker statuses with no `STILL_BLOCKED`,
       command list, rendered artifact list, forbidden scan result, and reversal risk
       before the frontend gate may open.'
