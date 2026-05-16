@@ -94303,3 +94303,86 @@ phases:
 
       - Downstream implementation owner: gsfr-inspector-fragment-identity-fix.'
     agent: frontend-engineer
+  - id: gsfr-backend-grouping-contract-audit
+    name: Audit backend grouping authority and schema non-change
+    status: pending
+    description: 'step_type: verification
+
+      verification_scope: local-check protecting gsfr-inspector-fragment-identity-fix
+      and gsfr-final-gate
+
+      independence_level: L1
+
+
+      Verify the backend grouping contract before frontend repair proceeds.
+
+
+      Scope:
+
+      - Read `docs/ARCHITECTURE.md` grouping/provenance requirements, `internal/resofeed/search.go`,
+      `internal/resofeed/ingest.go`, and any existing backend tests around item detail/grouped
+      sources.
+
+      - Confirm item-detail grouping is authoritative only when non-empty `story_key`
+      exists or direct duplicate provenance (`duplicate_of_item_id`) requires disclosure.
+
+      - Confirm `readGroupedSourceItems(...)` or equivalent uses bounded provenance
+      predicates such as `where i.story_key = ?`, not URL base matching.
+
+      - Confirm ingest may generate synthetic RSS entry URLs using feed URL plus `#entry_*`,
+      so the frontend must not strip the fragment for grouping identity in that case.
+
+      - Confirm no schema migration, new table, service layer, repository layer, DI
+      container, or sidecar is required for this bug repair.
+
+
+      ## Completion Criteria
+
+      - [ ] Backend grouping contract is documented with file:line citations.
+
+      - [ ] Schema-change decision is explicit: expected answer is no schema change
+      unless audit proves otherwise.
+
+      - [ ] Any discovered backend divergence is recorded as blocking-now and assigned
+      to a follow-up plan repair; do not dismiss as pre-existing.
+
+      - [ ] Frontend implementation constraints are clearly handed off to gsfr-inspector-fragment-identity-fix.'
+    verification: '- [ ] Evidence identifies backend grouping authority: non-empty
+      `story_key` and/or direct duplicate provenance, not URL-base equivalence.
+
+      - [ ] Evidence verifies synthetic feed-entry fragment URL generation and explains
+      why fragment identity matters.
+
+      - [ ] Evidence states whether backend tests are already sufficient or names
+      a precise backend test gap.
+
+      - [ ] Evidence confirms no schema migration or architectural layer addition
+      is needed for the frontend repair path.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/search.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/ingest.go — key passage or "NOT READ: <reason>"
+
+      - internal/resofeed/state.go — key passage or "NOT READ: <reason>"
+
+
+      ## Backend Grouping Contract Audit
+
+      - Backend grouping authority:
+
+      - Search/detail query evidence with file:line:
+
+      - Synthetic URL generation evidence with file:line:
+
+      - Schema change required: YES/NO, with rationale:
+
+      - Backend test gap, if any:
+
+      - Handoff constraints for frontend fix:'
+    agent: spec-verifier
