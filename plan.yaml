@@ -83794,7 +83794,7 @@ phases:
       remains responsible for independent closure evidence and rendered artifact register.'
   - id: srdf-batched-frontend-audit-closure
     name: Retest and close batched frontend spec UIUX blockers
-    status: claimed
+    status: done
     description: "As an INDEPENDENT TESTER (integration-verifier), close the unified\
       \ remediation from `srdf-batched-frontend-audit-remediation` with current-mainline\
       \ rendered evidence, E2E evidence, and machine-readable stale-vs-real reconciliation.\n\
@@ -83907,6 +83907,86 @@ phases:
     agent: integration-verifier
     claimed_by: integration-verifier
     claimed_at: '2026-05-16T01:09:22.079339+00:00'
+    done_at: '2026-05-16T01:21:41.805468+00:00'
+    evidence: "Independent closure retest completed with blocker register; semantic\
+      \ verdict is FAIL and gate remains closed. Planner created batched remediation\
+      \ steps `srdf-batched-frontend-closure-blockers-fix` and `srdf-batched-frontend-closure-blockers-retest`;\
+      \ `srdf-frontend-gate` dependency was hardened to require the new retest.\n\n\
+      ## refs Read Confirmation\n- docs/DESIGN.md — Read by integration-verifier.\
+      \ Key expectations: Source Ledger is the only location for lightweight `[RUN\
+      \ INGEST]`/row `[FETCH]`; forbidden Source Ledger concepts include folders/tags/job\
+      \ dashboards/queues/activity ledgers/sync-merge/second URL field; desktop Feed/Inspector\
+      \ must be independent scroll regions; mobile Inspector is full-screen route\
+      \ with preserved feed scroll; mobile feed metadata remains flat inline monospace\
+      \ and touch targets stay >=44px.\n- docs/UI_REGRESSION_CONTRACT.md — Read by\
+      \ integration-verifier. Key expectations: browser tests must prove real hit\
+      \ targets via pointer movement/clicks and topmost element checks; Source Ledger\
+      \ controls `[RUN INGEST]`, `[FETCH]`, OPML import, details/delete/state actions\
+      \ must be reachable; raw JSON-LD must not appear in primary Feed/Inspector text;\
+      \ screenshot/DOM evidence should cover Steer, Source Ledger, split scroll, mobile,\
+      \ Inspector, search, doctor, and negative forbidden UI concepts.\n- docs/ARCHITECTURE.md\
+      \ — Read by integration-verifier. Key expectations: one Go process, one SQLite\
+      \ DB, no queues/jobs/activity ledgers/sync; manual ingest and per-source fetch\
+      \ share one in-process concurrency guard and must return `409 conflict` when\
+      \ held; desktop split-scroll is frontend containment, not persisted state.\n\
+      \n## Machine-Readable Closure\n```yaml\nverdict: \"FAIL\"\ngate_open_allowed:\
+      \ false\norchestrator_action_hint: \"DO_NOT_COMPLETE_AS_PASS_CREATE_FIX\"\n\
+      spec_verifier_family:\n  B1_R2_steer_preview_aria: \"PROVEN_FIXED\"\n  B2_R4_search_accessible_name:\
+      \ \"PROVEN_FIXED\"\n  B3_R7_source_fetch_disabled_scope: \"PROVEN_FIXED\"\n\
+      \  B4_R9_opml_input_reachability: \"STILL_BLOCKED\"\n  R10_mobile_scroll_reconciliation:\
+      \ \"PROVEN_FIXED\"\nuiux_auditor_family:\n  add_source_chip: \"PROVEN_FIXED\"\
+      \n  fetch_control_reachability: \"PROVEN_FIXED\"\n  split_scroll_mobile_scroll:\
+      \ \"PROVEN_FIXED\"\n  jsonld_raw_payload_negative: \"PROVEN_FIXED\"\n  mobile_metadata_truncation:\
+      \ \"STILL_BLOCKED\"\n  playwright_expected_red_claims: \"STILL_BLOCKED\"\nstale_vs_real_reconciliation:\n\
+      \  - item: \"hit-target-clickability SOURCE LEDGER nav visibility\"\n    disposition:\
+      \ \"source_contract_conflict\"\n    current_mainline_evidence: \"Source Ledger\
+      \ controls/hit-target E2E command failed; hit-target-clickability expected getByRole('button',\
+      \ { name: 'SOURCE LEDGER' }) visible before opening RESOFEED menu\"\n    gate_intersection:\
+      \ \"blocks\"\n  - item: \"design-artifact-negative-ux SOURCE LEDGER nav visibility\"\
+      \n    disposition: \"source_contract_conflict\"\n    current_mainline_evidence:\
+      \ \"Rendered artifact command failed; design-artifact-negative-ux expected SOURCE\
+      \ LEDGER button visible immediately\"\n    gate_intersection: \"blocks\"\n \
+      \ - item: \"FR-09 mobile metadata nowrap/truncation\"\n    disposition: \"real\"\
+      \n    current_mainline_evidence: \"ui-runtime-fresh-review-remediation.spec.ts\
+      \ FR-09 failed: expected whiteSpace 'nowrap', received 'normal'\"\n    gate_intersection:\
+      \ \"blocks\"\n  - item: \"JSON-LD raw payload negative proof\"\n    disposition:\
+      \ \"real\"\n    current_mainline_evidence: \"inspector-dirty-corpus.spec.ts\
+      \ passed: dirty corpus Inspector primary hierarchy hides raw feed payloads and\
+      \ provenance\"\n    gate_intersection: \"does_not_intersect\"\ncommands:\n \
+      \ - command: \"npm run test\"\n    exit_code: 0\n    summary: \"svelte-check\
+      \ found 0 errors and 0 warnings; vitest: 11 files / 62 tests passed\"\n  - command:\
+      \ \"npm run test:e2e -- tests/e2e/source-ledger-steer-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/processing-language-source-split-scroll.spec.ts tests/e2e/feed-search-anatomy.spec.ts\"\
+      \n    exit_code: 0\n    summary: \"6 Playwright tests passed\"\n  - command:\
+      \ \"npm run test:e2e -- tests/e2e/source-ledger-controls-diagnostics-layout.expected-red.spec.ts\
+      \ tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts\
+      \ tests/e2e/hit-target-clickability.spec.ts\"\n    exit_code: 1\n    summary:\
+      \ \"10 passed, 2 failed; failures in hit-target-clickability due missing visible\
+      \ SOURCE LEDGER nav button before opening menu\"\n  - command: \"python3 forbidden\
+      \ concept scan over web/src routes/lib user-facing Svelte/TS surfaces\"\n  \
+      \  exit_code: 0\n    summary: \"scanned_files=15; contract_guard_mentions_ignored=12;\
+      \ FORBIDDEN_CONCEPT_SCAN=PASS\"\n  - command: \"npm run test:e2e -- tests/e2e/design-artifact-negative-ux.spec.ts\
+      \ tests/e2e/inspector-dirty-corpus.spec.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts\"\
+      \n    exit_code: 1\n    summary: \"6 passed, 4 failed; failures: immediate SOURCE\
+      \ LEDGER button expectation, TODAY surface selector mismatch, mobile metadata\
+      \ whiteSpace normal not nowrap\"\nforbidden_concept_scan: \"PASS\"\nreversal_risk:\
+      \ \"HIGH\"\nremaining_blockers:\n  - \"Required Source Ledger controls/hit-target\
+      \ E2E command failed.\"\n  - \"Required rendered artifact closure command failed.\"\
+      \n  - \"Mobile metadata truncation/nowrap proof failed.\"\nblockers:\n  - \"\
+      B-HT-01: hit-target-clickability.spec.ts cannot find visible SOURCE LEDGER button\
+      \ before opening menu.\"\n  - \"B-ART-01: design-artifact-negative-ux.spec.ts\
+      \ cannot find visible SOURCE LEDGER button.\"\n  - \"B-FR09-01: mobile metadata\
+      \ CSS white-space is normal, expected nowrap.\"\nbehavioral_proof_register:\n\
+      \  - requirement_ref: \"frontend spec/UIUX blocker family\"\n    behavior_claim:\
+      \ \"every blocker is fixed or proven stale/non-intersecting on current mainline\"\
+      \n    runtime_proof_expected: \"commands and rendered artifacts listed above\"\
+      \n    evidence_ref: \"npm run test passed; focused 3-file E2E passed; Source\
+      \ Ledger hit-target E2E failed; rendered artifact/dirty corpus/fresh review\
+      \ E2E failed\"\n    status: \"BLOCKED\"\n    closure_path: \"FAIL requires remediation;\
+      \ batched fix and retest steps created\"\n```\n\nCommit hash(es): none (verify-only)\n\
+      Files changed: none\nGaps/Notes: Closure intentionally does not open the gate;\
+      \ all blocker families have explicit downstream ownership in `srdf-batched-frontend-closure-blockers-fix`\
+      \ and `srdf-batched-frontend-closure-blockers-retest`."
   - id: srdf-batched-frontend-closure-blockers-fix
     name: Batch fix frontend closure blockers after failed audit retest
     status: pending
