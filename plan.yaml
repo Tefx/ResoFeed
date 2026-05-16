@@ -85373,7 +85373,7 @@ phases:
       - [x] Browser-led MCP parity flow remains covered through the real-server UI
       path.
 
-      - [ ] Search sibling instances for duplicate accessible names or Source Ledger
+      - [x] Search sibling instances for duplicate accessible names or Source Ledger
       live-row timing/selector assumptions beyond the listed failures.
 
       - [ ] Include exact command output snippets for focused local checks run by
