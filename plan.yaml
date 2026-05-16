@@ -91846,15 +91846,15 @@ phases:
 
       - [x] Screenshot or DOM evidence shows Source Ledger header alignment and Inspector
       provenance copy.'
-    verification: '- [ ] Targeted browser/DOM tests for route chrome, Source Ledger
+    verification: '- [x] Targeted browser/DOM tests for route chrome, Source Ledger
       alignment, OPML no-auto-ingest, terse copy, Inspector provenance, and zh UI
       parity pass.
 
-      - [ ] Evidence includes rendered screenshots/DOM snapshots for EN and ZH states.
+      - [x] Evidence includes rendered screenshots/DOM snapshots for EN and ZH states.
 
-      - [ ] No forbidden product concepts or new runtime surfaces are introduced.
+      - [x] No forbidden product concepts or new runtime surfaces are introduced.
 
-      - [ ] Source identifiers remain unchanged and non-translatable in zh mode.'
+      - [x] Source identifiers remain unchanged and non-translatable in zh mode.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
