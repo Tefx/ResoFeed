@@ -93476,7 +93476,7 @@ phases:
       - [x] Stale closure matrix/contract text is updated or explicitly dispositioned
       so it cannot contradict current preview repair evidence.
 
-      - [ ] UIUX stale-audit claims are reconciled against fresh current artifacts;
+      - [x] UIUX stale-audit claims are reconciled against fresh current artifacts;
       any confirmed real blocker is fixed in this same step.
 
       - [ ] No forbidden product boundary is introduced: no accounts, sync coordinator,
