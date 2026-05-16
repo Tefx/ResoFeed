@@ -92699,16 +92699,17 @@ phases:
 
       - [x] Final zh verdict is COMPLETE only if every blocker-class zh obligation
       is PROVEN or explicitly non-intersecting.'
-    verification: '- [ ] Full-plan-check protects final closure by auditing every
+    verification: '- [x] Full-plan-check protects final closure by auditing every
       zh surface requested by the user.
 
       - [ ] Spec conformance report includes requirement refs and implementation file:line
       refs.
 
-      - [ ] Unresolved NEEDS_TEST/UNPROVEN items have closure paths and cannot be
-      bypassed by the final gate.
+      - [x] Unresolved NEEDS_TEST/UNPROVEN items have closure paths and cannot be
+      bypassed by the final gate; unresolved B1/B2 are owned by `azrv-batched-verification-failure-remediation`
+      and `azrv-batched-verification-failure-retest`.
 
-      - [ ] Architecture/product non-goals remain intact.'
+      - [x] Architecture/product non-goals remain intact.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
