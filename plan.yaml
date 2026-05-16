@@ -84920,7 +84920,7 @@ phases:
       details/actions, lexical-only search, AC-4 conflicts, split-scroll/mobile route,
       and processing language controls.
 
-      - [ ] Remove or flag any stale doc references to unimplemented or forbidden
+      - [x] Remove or flag any stale doc references to unimplemented or forbidden
       behavior.
 
       - [ ] Do not weaken design/architecture constraints to match a bad implementation.
