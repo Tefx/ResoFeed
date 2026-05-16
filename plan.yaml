@@ -87427,3 +87427,135 @@ phases:
     depends_on:
     - srde2e-visual-a11y-blockers-fix
     agent: frontend-engineer
+  - id: srde2e-steer-route-preview-render-contract-retest
+    name: Retest Steer route-preview render contract closure
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      agent_source: project
+
+
+      As an INDEPENDENT VERIFIER (integration-verifier), retest the broad render failure
+      family after srde2e-steer-route-preview-render-contract-fix. This is a downstream-blocker
+      closure step for render/Vitest gates, not a replacement for the focused B1-B4
+      visual/a11y retest.
+
+
+      ## Required retest scope
+
+      - Run npm run test:render from the repo/frontend context used by the project
+      scripts and capture exact output.
+
+      - Prove the Steer route-preview expected-red suites are green, including srdct-frontend-expected-red-contract.test.ts
+      and steer-route-preview.expected-red.test.ts.
+
+      - Verify no regression to the B1-B4 visual/a11y blocker closures already fixed
+      by srde2e-visual-a11y-blockers-fix.
+
+      - Preserve disposition: these failures did not intersect the focused B1-B4 audit,
+      but they do intersect broad/full/final gates requiring clean render/Vitest suites.
+
+
+      ## Behavioral proof register required
+
+      For each failure family, evidence must include requirement_ref, behavior_claim,
+      runtime_proof_expected, evidence_ref, status, closure_path, and gate_decision_basis.
+      OPEN/gate-ready is invalid while any Steer route-preview render contract item
+      is NEEDS_TEST, UNPROVEN, or UNCERTAIN_BLOCKING without explicit non-intersection
+      evidence.
+
+
+      Acceptance checklist:
+
+      - [ ] npm run test:render completes green or the evidence records exact remaining
+      failures with blocker disposition.
+
+      - [ ] srdct-frontend-expected-red-contract.test.ts Steer idle/route-preview
+      cases are green.
+
+      - [ ] steer-route-preview.expected-red.test.ts idle, chip classification, invalid,
+      apply/cancel, and undo cases are green.
+
+      - [ ] No regression to B1-B4 visual/a11y closures is observed or left without
+      remediation ownership.
+
+      - [ ] Behavioral proof register supports downstream full-plan/final gate OPEN
+      only when every blocker-class route-preview item is PROVEN.'
+    verification: '- [ ] full-plan-check companion protecting srde2e-full-plan-check
+      and srde2e-final-closure-gate.
+
+      - [ ] Expected result is green after remediation.
+
+      - [ ] npm run test:render output is captured and shows Steer route-preview expected-red
+      suites green.
+
+      - [ ] B1-B4 visual/a11y blocker closures remain non-regressed or any regression
+      has explicit remediation ownership.
+
+      - [ ] Gate-intersection disposition is explicit: failures intersect broad/full/final
+      render gates and are closed before progression.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/UI_REGRESSION_CONTRACT.md — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/__tests__/srdct-frontend-expected-red-contract.test.ts
+      — key passage or "NOT READ: <reason>"
+
+      - web/src/routes/components/__tests__/steer-route-preview.expected-red.test.ts
+      — key passage or "NOT READ: <reason>"
+
+
+      ## Render Retest Evidence
+
+
+      **Commands executed**:
+
+      ```
+
+      npm run test:render
+
+      ```
+
+
+      **Actual output**:
+
+      ```
+
+      <paste stdout/stderr, not summary>
+
+      ```
+
+
+      ## Behavioral Proof Register
+
+      | requirement_ref | behavior_claim | runtime_proof_expected | evidence_ref |
+      status | closure_path | gate_decision_basis |
+
+      | --- | --- | --- | --- | --- | --- | --- |
+
+      | Steer preview status role/name | role=status named Steer route preview is
+      present in idle and active states | Testing Library role/name query passes |
+      <test output> | PROVEN/NEEDS_TEST/UNPROVEN | <path> | <OPEN/BLOCK basis> |
+
+      | Steer preview action names | [APPLY]/[CANCEL] accessible button names satisfy
+      contract | Testing Library role/name query passes | <test output> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> | <OPEN/BLOCK basis> |
+
+      | B1-B4 non-regression | prior visual/a11y blocker closures remain intact |
+      focused audit reference or rerun evidence | <artifact> | PROVEN/NEEDS_TEST/UNPROVEN
+      | <path> | <OPEN/BLOCK basis> |
+
+
+      **Headline**: PASS | PASS_WITH_DEBT | FAIL'
+    depends_on:
+    - srde2e-steer-route-preview-render-contract-fix
+    agent: integration-verifier
