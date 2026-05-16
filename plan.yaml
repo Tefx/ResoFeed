@@ -94190,7 +94190,7 @@ phases:
       \ was not available in isolated worktree per verifier evidence."
 - id: grouped-story-fragment-url-regression-repair
   name: Grouped Story Fragment URL Regression Repair
-  status: in_progress
+  status: done
   gate: Final gate blocks unless regression proof shows distinct synthetic feed-fragment
     URLs do not create grouped-source disclosure, backend grouping remains story_key/duplicate
     provenance based without schema changes, same-article URL fallback remains only
@@ -95079,7 +95079,7 @@ phases:
       - design_md_conformance: PROVEN for rendered portions'
   - id: gsfr-final-gate
     name: Gate grouped-story fragment URL regression repair
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       verification_scope: phase-check
@@ -95202,6 +95202,147 @@ phases:
     agent: gate-reviewer
     claimed_by: gate-reviewer
     claimed_at: '2026-05-16T22:49:35.434632+00:00'
+    done_at: '2026-05-16T22:58:52.283219+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by gate reviewer; source identifiers/provenance anchors
+      must remain readable, and grouped duplicate/story transparency must preserve
+      access to every source item and provenance with accessible `Grouped story with
+      N source items` labels.
+
+      - docs/ARCHITECTURE.md — Read by gate reviewer; ResoFeed remains one deployable/SQLite/backend
+      package with thin transports/no extra layers; duplicate/story siblings group
+      transparently while every original source item remains retrievable through detail/provenance;
+      `story_key`, `duplicate_of_item_id`, and provenance fields define the contract.
+
+
+      ## Gate Review Report
+
+      verdict: PASS
+
+      headline: PASS_WITH_DEBT
+
+      proof_gap_status: NON_BLOCKING
+
+      blocking_status: CLOSED
+
+      gate_open_allowed: true
+
+      orchestrator_action_hint: COMPLETE
+
+      Gate Decision: OPEN
+
+      blockers: []
+
+
+      **Phase:** grouped-story-fragment-url-regression-repair
+
+
+      ### Remediation evidence reviewed
+
+      - Expected-red regression before repair: PASS (`9ae0f96e`).
+
+      - Product repair: PASS (`8b492c0d`).
+
+      - Reactive sort crash fix: PASS (`9e90604a` changed `items.sort(...)` to `[...items].sort(...)`).
+
+      - Runtime/browser retest artifacts: PASS (`df9d5d7c`, FR-04/B1 passed).
+
+      - Browser console/DOM proof: PASS_WITH_DEBT; no `state_unsafe_mutation`/page
+      errors, grouped disclosure present; two non-intersecting static preview 404
+      resource errors.
+
+      - UIUX re-audit: PASS; blockers closed.
+
+
+      ### Wiring/static audit summary
+
+      - Backend grouping authority remains `story_key`/duplicate/detail provenance
+      based; no schema migration or service/repository layer introduced.
+
+      - Frontend receives feed candidates only at Inspector boundary and preserves
+      synthetic `#entry_*` fragments.
+
+      - Non-mutating sort reviewed in `Inspector.svelte`.
+
+
+      ### Smoke/liveness evidence
+
+      - `go test ./...` exit 0.
+
+      - `go test ./internal/resofeed` exit 0.
+
+      - `npm run check` exit 0.
+
+      - `npm run test:render -- inspector-fragment-grouping.expected-red.test.ts`
+      exit 0, 3 tests passed.
+
+      - `npm run test:e2e -- ui-runtime-fresh-review-remediation.spec.ts --project=chromium-ci-safe
+      --grep "FR-04|B1"` exit 0, 2 browser tests passed.
+
+      - Full `npm run test` exit 1 due unrelated `processing-language-reprocess.expected-red.test.ts`
+      visibility expectations, classified non-blocking because it does not intersect
+      grouped-source identity/provenance closure.
+
+
+      ### Integration vs fixture evidence distinction
+
+      - Fixture/unit evidence directly asserts synthetic TLDR `#entry_*` fragments
+      do not collapse, authoritative detail grouped_source_items remain visible, and
+      same-article URL fallback remains supported.
+
+      - Browser/integration evidence from FR-04/B1 passed against rendered app surfaces
+      and DOM proof artifacts.
+
+      - Runtime artifact evidence captures rendered Inspector text, grouped disclosure
+      text, page error absence, and no unsafe state mutation.
+
+
+      ### behavioral_proof_register
+
+      - Expected-red regression existed before repair and now passes: PASS.
+
+      - Backend grouping authority unchanged: PASS.
+
+      - Synthetic feed-entry fragment identity preserved: PASS.
+
+      - Valid grouped stories expose every source item/provenance: PASS.
+
+      - Sparse-detail mobile/runtime fallback discloses same-URL grouped sources:
+      PASS.
+
+      - Reactive grouped-source sort crash remediated: PASS.
+
+      - Full unrelated web render suite clean: UNPROVEN, explicitly non-blocking/non-intersecting
+      with this gate.
+
+
+      ### Decision basis
+
+      - Original UIUX blocker disposition reviewed: PASS.
+
+      - Non-mutating grouped-source sort fix reviewed: PASS.
+
+      - Runtime/browser retest reviewed: PASS.
+
+      - UIUX re-audit reviewed: PASS_WITH_DEBT.
+
+      - Backend grouping/schema non-change guard reviewed: PASS.
+
+      - No NEEDS_TEST or UNCERTAIN_BLOCKING items remain for this gate. Final recommendation:
+      OPEN.
+
+
+      ### Verification Run
+
+      - Gate reviewer ran `go test ./...`, `npm run check`, targeted render, targeted
+      e2e; required targeted checks passed.
+
+      - Verify-only branch had no product/docs changes to merge.
+
+
+      **Gaps/Notes:** Remaining non-blocking debt belongs to processing-language/reprocess
+      render expectations outside grouped-source repair closure.'
   - id: gsfr-fix-reactive-grouped-source-sort-crash
     name: Fix reactive grouped-source sort crash
     status: done
