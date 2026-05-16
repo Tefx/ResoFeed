@@ -84900,7 +84900,7 @@ phases:
 
       '
     depends_on:
-    - srde2e-real-system-e2e-regression
+    - srde2e-real-system-e2e-blockers-retest
     - srde2e-visual-a11y-regression-proof
     - srde2e-documentation-sync
     agent: software-architect
