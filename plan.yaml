@@ -85477,3 +85477,137 @@ phases:
 
       - [ ] No known blocker remains unowned.'
     agent: frontend-engineer
+  - id: srde2e-real-system-e2e-blockers-retest
+    name: Retest real-system E2E blocker closure
+    status: pending
+    description: 'step_type: test
+
+      step_intent: retest_green
+
+      expected_result: green
+
+      priority: HIGH
+
+
+      As an INDEPENDENT VERIFIER (integration-verifier), rerun the real-system E2E
+      regression from a fresh perspective after srde2e-real-system-e2e-blockers-fix.
+      This retest replaces the failed E2E as the closure dependency for downstream
+      architecture and final-gate work.
+
+
+      Independence Level: L2 semi-blind real-runtime/browser verification. Use the
+      real binary and browser harness; do not rely on implementation-only context
+      or mock-heavy component tests.
+
+
+      Required real-server context:
+
+      - Launch path must use the real ResoFeed binary through the Playwright harness,
+      equivalent to the failed evidence command: `.test-artifacts/bin/resofeed serve
+      --addr 127.0.0.1:<port> --public-url http://127.0.0.1:<port> --db .test-artifacts/playwright/fixtures/<fresh>.sqlite3
+      --owner-token <redacted>`.
+
+      - Authoritative retest command: `npm run test:e2e -- real-server-ui.spec.ts
+      --project chromium-ci-safe`.
+
+      - Treat the earlier invalid Playwright argument-order invocation as non-blocking
+      operator error; do not include it as product failure.
+
+
+      Behavioral proof register requirement:
+
+      - requirement_ref: B-RSE2E-01 through B-RSE2E-04 plus final closure gate real-system
+      E2E obligation.
+
+      - behavior_claim: real-server UI/MCP parity, Source Ledger ingest/control evidence,
+      unique accessible Steer controls, and final closure E2E readiness are proven.
+
+      - runtime_proof_expected: real binary + real browser artifacts, not mocks.
+
+      - evidence_ref: Playwright trace/screenshot/video/log artifacts and command
+      output.
+
+      - status: PROVEN only if the suite is green and blockers are empty.
+
+      - closure_path: if any failure remains, report it as blocker with reproduction
+      and do not recommend gate opening.
+
+      - gate_decision_basis: final gate may open only when this retest reports PASS.
+
+
+      Acceptance checklist:
+
+      - [ ] Run `npm ci` if node dependencies are absent or stale, and record result.
+
+      - [ ] Run `npm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe`
+      against the real-server harness.
+
+      - [ ] Verify 9/9 real-server tests pass, or explicitly report the current test
+      count if the suite legitimately changed with rationale.
+
+      - [ ] Verify Source Ledger OPML import + `[RUN INGEST]` renders `Live Audit
+      Source`, controls, and `last_fetch: HH:MM:SS`.
+
+      - [ ] Verify Steer valid URL preview/commit/undo and browser-led MCP parity
+      flows no longer fail from duplicate accessible names `apply` / `[APPLY]`.
+
+      - [ ] Verify previously passing coverage remains green: owner-token gate, source
+      import, `[RUN INGEST]`, feed, inspect, resonate, `/doctor`, lexical search,
+      and process cleanup.
+
+      - [ ] Produce machine-readable closure with `verdict: PASS`, `gate_open_allowed:
+      true`, and `blockers: []`; any blocker means `gate_open_allowed: false`.
+
+      - [ ] Preserve exact real-server browser artifacts: stdout/stderr, Playwright
+      report, traces/screenshots/videos where available, and server lifecycle logs.'
+    verification: '- [ ] full-plan-check companion protecting srde2e-software-architect-fresh-review,
+      srde2e-full-plan-check, and srde2e-final-closure-gate.
+
+      - [ ] Real-server Playwright command `npm run test:e2e -- real-server-ui.spec.ts
+      --project chromium-ci-safe` exits 0.
+
+      - [ ] Closure payload is machine-readable and contains `verdict: PASS`, `gate_open_allowed:
+      true`, and `blockers: []`.
+
+      - [ ] Artifacts prove real binary launch, real browser execution, Source Ledger
+      live audit row after ingest, unique accessible Steer controls, and browser-led
+      MCP parity flow.
+
+      - [ ] If any blocker remains, retest evidence marks `verdict: FAIL`, `gate_open_allowed:
+      false`, lists blockers with reproduction, and does not recommend final gate
+      opening.'
+    evidence_template: "## Verification Report\n\n**Tester**: integration-verifier\
+      \ (independent of implementation)\n**Scope**: Real-system E2E blocker retest\
+      \ for srde2e-real-system-e2e-blockers-fix\n**Independence Level**: L2\n**Timestamp**:\
+      \ <ISO 8601>\n\n### refs Read Confirmation (MANDATORY)\nFor each ref in this\
+      \ step:\n- docs/ARCHITECTURE.md — key passage or \"NOT READ: <reason>\"\n- docs/DESIGN.md\
+      \ — key passage or \"NOT READ: <reason>\"\n\nIf no refs were provided, state:\
+      \ \"No refs for this step.\"\n\n### Test Execution\n- Install command/result:\n\
+      ```sh\nnpm ci\n<paste output or state why skipped>\n```\n- Real-server command/result:\n\
+      ```sh\nnpm run test:e2e -- real-server-ui.spec.ts --project chromium-ci-safe\n\
+      <paste output>\n```\n- Server launch evidence:\n```text\n<real binary command,\
+      \ db path, public URL, lifecycle logs with token redacted>\n```\n\n### Required\
+      \ Browser Artifacts\n- Playwright HTML/report path: <path>\n- Trace path(s):\
+      \ <paths or NOT AVAILABLE with reason>\n- Screenshot/video path(s): <paths or\
+      \ NOT AVAILABLE with reason>\n- Server stdout/stderr path(s): <paths>\n\n###\
+      \ Behavioral Proof Register\n| requirement_ref | behavior_claim | runtime_proof_expected\
+      \ | evidence_ref | status | closure_path | gate_decision_basis |\n| --- | ---\
+      \ | --- | --- | --- | --- | --- |\n| B-RSE2E-01 | real-server suite green |\
+      \ real binary + browser | <artifact> | PROVEN/UNPROVEN | <path> | <basis> |\n\
+      | B-RSE2E-02 | Source Ledger row after import+ingest | browser artifact | <artifact>\
+      \ | PROVEN/UNPROVEN | <path> | <basis> |\n| B-RSE2E-03 | unique accessible Steer\
+      \ apply controls | browser/a11y artifact | <artifact> | PROVEN/UNPROVEN | <path>\
+      \ | <basis> |\n| B-RSE2E-04 | final closure E2E proof green | command + artifacts\
+      \ | <artifact> | PROVEN/UNPROVEN | <path> | <basis> |\n\n### Machine-Readable\
+      \ Closure\n```yaml\nverdict: PASS|FAIL\ngate_open_allowed: true|false\nblockers:\
+      \ []\npreviously_green_coverage_preserved:\n  owner_token_gate: true|false\n\
+      \  source_import: true|false\n  run_ingest: true|false\n  feed: true|false\n\
+      \  inspect: true|false\n  resonate: true|false\n  doctor: true|false\n  lexical_search:\
+      \ true|false\n  process_cleanup: true|false\nartifacts:\n  playwright_report:\
+      \ \"<path>\"\n  traces:\n    - \"<path>\"\n  screenshots_or_videos:\n    - \"\
+      <path>\"\n  server_logs: \"<path>\"\n```\n\n### Headline\n- [ ] **PASS**: No\
+      \ blocking issues found and closure payload allows gate opening.\n- [ ] **FAIL**:\
+      \ Blocking issues or blocking proof gaps remain.\n\n**Confidence**: high/medium/low"
+    depends_on:
+    - srde2e-real-system-e2e-blockers-fix
+    agent: integration-verifier
