@@ -82896,7 +82896,7 @@ phases:
       - [x] Run the scoped processing-language/low-chrome render checks if present
       in the repo test harness.
 
-      - [ ] Run `npm run check` and verify 0 errors/warnings.
+      - [x] Run `npm run check` and verify 0 errors/warnings.
 
       - [ ] Run the forbidden steer/UI concept scan used by `srdf-steer-preview-ui-state-aria`
       and verify exit 1/no matches.
