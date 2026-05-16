@@ -93291,3 +93291,206 @@ phases:
     - azrv-architecture-boundary-audit
     - azrv-uiux-multimodal-audit
     agent: gate-reviewer
+  - id: azrv-batched-verification-failure-remediation
+    name: Batched remediation for parallel verification failures
+    status: pending
+    description: 'step_type: implementation
+
+      agent_source: project
+
+      tags: ["frontend", "verification-remediation", "uiux", "zh-conformance"]
+
+
+      Remediate the two parallel failure-class verification outputs as ONE batched
+      fix path. Do not treat either failed audit in isolation; reconcile against the
+      current mainline evidence from the passing architecture and browser E2E verification
+      steps.
+
+
+      Failure context to preserve exactly:
+
+      - `azrv-uiux-multimodal-audit`: transport success, semantic FAIL, blockers non-empty,
+      `gate_open_allowed=false`; evidence appears stale/contradictory because it claims
+      persistent route labels, Source Ledger alignment drift, missing preview LANG/reprocess
+      surfaces, `model: ok`, and incomplete zh support even though current protected
+      Playwright/Vitest plus `azrv-architecture-boundary-audit` passed these surfaces
+      after repair. Do not assume this failure is real without reconciling current
+      artifacts.
+
+      - `azrv-zh-spec-conformance-audit`: transport FAIL and semantic FAIL, `final_zh_verdict=INCOMPLETE`,
+      blockers B1/B2, `gate_open_allowed=false`; good evidence says zh surfaces 1-5
+      conform, targeted Go tests passed, protected AZRCT E2E passed 7/7, processing-language
+      split-scroll E2E passed 2/2, and `npm check` passed.
+
+      - Real B1 blocker: `npm run test:render` failed two legacy tests: `manual-rss-fetch-source-ledger`
+      still expected absence of `last_ingest`, while current DESIGN requires Source
+      Ledger header `last_ingest` aligned with `[RUN INGEST]`; `steer-route-preview`
+      still expected old copy `warning: find alias maps to [SEARCH]`, while current
+      terse-copy contract uses `find maps to SEARCH; retrieval: lexical search`.
+
+      - B2 blocker/debt: `.expected-red` naming remains present in protected filenames/titles;
+      disposition or rename is required if it intersects final closure.
+
+      - Stale/conflicting closure matrix text may still describe old preview gaps
+      after preview repair; update it if it remains contradictory in a contract artifact,
+      or record explicit non-intersection if it is historical-only and cannot affect
+      final gate.
+
+
+      Scope:
+
+      - Update legacy render test expectations OR fix implementation if rerunning
+      the tests proves the current rendered behavior diverges from DESIGN.md. Do not
+      blindly make tests match code if DESIGN.md says otherwise.
+
+      - Disposition `.expected-red` naming: rename protected filenames/titles if required
+      by final gate semantics, or document a precise non-runtime/non-intersection
+      closure path if the naming is process debt only.
+
+      - Reconcile stale closure matrix/contract text: remove or update contradictory
+      lines if they remain in active contract artifacts; otherwise add an explicit
+      disposition note that they are stale historical evidence and cannot be used
+      as gate blockers.
+
+      - Reconcile stale UIUX audit claims against current app/tests/artifacts; if
+      current artifacts still show any real UIUX blocker, fix that blocker in the
+      same batched remediation.
+
+
+      ## Gate Preview (what the gate WILL reject)
+
+      - A fix that only updates `npm run test:render` expectations while leaving active
+      contradictory contract text unresolved.
+
+      - A UIUX disposition that claims the prior FAIL was stale without citing current
+      rendered artifacts/tests proving the relevant surfaces.
+
+      - `.expected-red` naming left ambiguous with no rename or explicit final-gate
+      non-intersection disposition.
+
+      - Any change that violates ResoFeed boundaries: single Go binary, SQLite only,
+      OPML import-only, no sync/merge/history, source identifiers preserved, terse
+      non-SaaS copy.
+
+
+      ## Completion Criteria (stub exclusion)
+
+      This is an IMPLEMENTATION step. Stub-only completion is NOT acceptable. Each
+      deliverable MUST contain substantive updates or explicit evidence-backed dispositions
+      that close the reported blockers.
+
+
+      ## Completion Criteria
+
+      - [ ] `npm run test:render` legacy expectation failures are resolved by spec-aligned
+      test updates or by implementation fixes if current behavior is wrong.
+
+      - [ ] `manual-rss-fetch-source-ledger` now agrees with DESIGN.md that Source
+      Ledger shows `last_ingest` visually aligned/grouped with `[RUN INGEST]`.
+
+      - [ ] `steer-route-preview` now agrees with terse-copy contract: `find maps
+      to SEARCH; retrieval: lexical search`.
+
+      - [ ] `.expected-red` naming is either renamed where it intersects protected/final
+      evidence, or has a documented non-runtime/non-intersection disposition usable
+      by final gate.
+
+      - [ ] Stale closure matrix/contract text is updated or explicitly dispositioned
+      so it cannot contradict current preview repair evidence.
+
+      - [ ] UIUX stale-audit claims are reconciled against fresh current artifacts;
+      any confirmed real blocker is fixed in this same step.
+
+      - [ ] No forbidden product boundary is introduced: no accounts, sync coordinator,
+      vector DB/RAG surface, state merger, event bus, sidecar worker, or SaaS-style
+      chrome.'
+    verification: '- [ ] B1 render-test blocker is closed by rerunning `npm run test:render`
+      after the fix and preserving output.
+
+      - [ ] B2 `.expected-red` naming has either concrete rename evidence or explicit
+      non-intersection disposition evidence.
+
+      - [ ] Stale closure-matrix/contract wording no longer contradicts active final-gate
+      evidence, or is explicitly marked historical/non-gating.
+
+      - [ ] UIUX stale/contradictory findings are reconciled with current artifacts
+      and any true blocker-class finding is fixed.
+
+      - [ ] Product and architecture constraints from AGENTS.md/docs remain intact.'
+    evidence_template: '## refs Read Confirmation (MANDATORY)
+
+
+      For each ref in this step:
+
+      - AGENTS.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ui-preview.html — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ## Batched Remediation Evidence
+
+
+      **Failures reconciled**:
+
+      - azrv-uiux-multimodal-audit: <stale vs real finding analysis with artifact
+      refs>
+
+      - azrv-zh-spec-conformance-audit B1/B2: <fix/disposition summary>
+
+
+      **Commands run**:
+
+      ```
+
+      <npm run test:render and any targeted commands>
+
+      ```
+
+
+      **Render test changes or implementation fixes**:
+
+      - manual-rss-fetch-source-ledger: <what changed and why it matches DESIGN.md>
+
+      - steer-route-preview: <what changed and why it matches terse-copy contract>
+
+
+      **Expected-red naming disposition**:
+
+      - Action: RENAMED | NON_INTERSECTING_DEBT
+
+      - Evidence: <paths/titles changed or non-intersection rationale>
+
+
+      **Closure matrix / contract text disposition**:
+
+      - Action: UPDATED | NON_GATING_HISTORICAL
+
+      - Evidence: <paths/lines or rationale>
+
+
+      **UIUX reconciliation**:
+
+      - Current artifacts inspected: <screenshots/DOM/tests/docs>
+
+      - Prior stale claims resolved: <mapping>
+
+      - Real blockers fixed: <none or list>
+
+
+      **Architecture boundary check**:
+
+      - Forbidden surfaces introduced: NONE | <details>
+
+
+      **Remaining ambiguity**: <none, or exact blocker requiring follow-up>'
+    depends_on:
+    - azrv-uiux-multimodal-audit
+    - azrv-zh-spec-conformance-audit
+    agent: frontend-engineer
