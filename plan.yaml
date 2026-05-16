@@ -93469,7 +93469,7 @@ phases:
       - [x] `steer-route-preview` now agrees with terse-copy contract: `find maps
       to SEARCH; retrieval: lexical search`.
 
-      - [ ] `.expected-red` naming is either renamed where it intersects protected/final
+      - [x] `.expected-red` naming is either renamed where it intersects protected/final
       evidence, or has a documented non-runtime/non-intersection disposition usable
       by final gate.
 
