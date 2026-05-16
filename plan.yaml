@@ -97150,7 +97150,7 @@ phases:
       - [x] Render/use `phase`, `count`, `message`, `started_at`, and `updated_at`
       in contextual Source Ledger/open RESOFEED operation/conflict surfaces when provided.
 
-      - [ ] Preserve terse dense UI; no dashboards, progress bars, queues, job history,
+      - [x] Preserve terse dense UI; no dashboards, progress bars, queues, job history,
       settings panels, or persistent idle top strip.
 
       - [ ] Update only frontend tests/fixtures needed to prove the documented shape
