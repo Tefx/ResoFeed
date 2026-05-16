@@ -84150,7 +84150,7 @@ phases:
       - [x] Preserve the passing `[IMPORT OPML]` keyboard/file reachability behavior
       while making the broader Source Ledger controls/hit-target command green.
 
-      - [ ] Run the exact verification commands listed for this step and record actual
+      - [x] Run the exact verification commands listed for this step and record actual
       outputs.
 
       - [ ] Do not split this into serial one-issue fix chains or mutate completed
