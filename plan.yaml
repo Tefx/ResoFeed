@@ -82887,7 +82887,7 @@ phases:
       - [x] Run `npm run test:render -- steer-route-preview.expected-red.test.ts`
       and verify the scoped Steer route preview remains green.
 
-      - [ ] Run the scoped Source Ledger render checks covering details disclosure
+      - [x] Run the scoped Source Ledger render checks covering details disclosure
       and bracket hit targets.
 
       - [ ] Run the scoped split-scroll/mobile render checks covering feed-first full-screen
