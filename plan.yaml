@@ -92636,7 +92636,7 @@ phases:
   - id: azrv-zh-spec-conformance-audit
     name: Verify Chinese support and repair spec conformance across HTTP, MCP, OpenRouter,
       state, UI, tests, and preview
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       verification_scope: full-plan-check
@@ -92790,6 +92790,70 @@ phases:
     agent: spec-verifier
     claimed_by: spec-verifier
     claimed_at: '2026-05-16T14:21:46.250095+00:00'
+    done_at: '2026-05-16T15:08:11.176604+00:00'
+    evidence: "## refs Read Confirmation (MANDATORY)\n- docs/DESIGN.md — READ: language\
+      \ control, html lang, reprocess action, Inspector provenance, source identifier\
+      \ preservation, Source Ledger OPML/manual ingest boundaries.\n- docs/ARCHITECTURE.md\
+      \ — READ: processing language runtime metadata en|zh excluded from state export/import;\
+      \ language affects future ingest only; explicit reprocess rewrites readable\
+      \ fields/rebuilds FTS; OpenRouter target_language; no vector/RAG/sync/jobs/accounts.\n\
+      - docs/PROCESSING_LANGUAGE_CONTRACT_LOCK.md — READ: runtime metadata, HTTP schemas,\
+      \ MCP parity, receipt semantics, reprocess source precedence/FTS, frontend obligations,\
+      \ explicit non-goals.\n- docs/ui-preview.html — READ: current preview includes\
+      \ LANG EN, REPROCESS LIBRARY, zh mobile examples, source identifiers translate=no.\n\
+      - tests/contract/azrct_closure_matrix.yaml — READ: closure obligations; audit\
+      \ noted stale/conflicting preview assertions remain in matrix text after preview\
+      \ repair.\n- internal/resofeed/processing_language_contract.go, runtime_metadata.go,\
+      \ reprocess.go, openrouter.go, mcp.go, http.go, state.go — READ; audit cited\
+      \ implementation refs for processing language, reprocess, OpenRouter target\
+      \ language, MCP/HTTP parity, and state portability.\n- web/src/routes/+page.svelte,\
+      \ Inspector.svelte, SourceLedger.svelte, web/src/lib/api-contract.ts — READ;\
+      \ audit cited frontend language, reprocess, receipt, Inspector, OPML, source\
+      \ identifier, and contract types.\n- AGENTS.md — NOT READ in worktree; absent;\
+      \ product-boundary content was available in injected instructions.\n\n## Spec\
+      \ conformance report\n- verdict: FAIL\n- final_zh_verdict: INCOMPLETE\n- gate_open_allowed:\
+      \ false\n- orchestrator_action_hint: DO_NOT_COMPLETE\n- blockers:\n  - B1: `npm\
+      \ run test:render` failed 2 protected/legacy Vitest tests; `manual-rss-fetch-source-ledger`\
+      \ expected absence of last_ingest despite DESIGN requiring visible last_ingest\
+      \ with RUN INGEST; `steer-route-preview` expected old warning copy while current\
+      \ terse-copy contract uses `find maps to SEARCH; retrieval: lexical search`.\n\
+      \  - B2: `.expected-red` naming remains present in protected filenames/titles;\
+      \ process/non-runtime debt needs disposition or rename.\n\n## zh surface table\
+      \ summary\n- Processing language selection/storage/API/MCP: CONFORMS; targeted\
+      \ Go tests passed.\n- Frontend LANG EN/ZH control and receipts/steer preview/Inspector:\
+      \ CONFORMS; AZRCT E2E passed zh UI and Inspector tests.\n- Reprocess library\
+      \ surface and receipts: CONFORMS; Go reprocess and E2E surface proofs passed.\n\
+      - OpenRouter target_language path: CONFORMS; Go tests proved target_language\
+      \ zh in prompt.\n- State backup/restore portability excludes processing language:\
+      \ CONFORMS; Go tests proved runtime_metadata/processing_language excluded.\n\
+      - E2E/contract tests proving zh parity: PARTIAL because full `npm run test:render`\
+      \ failed 2 legacy tests despite targeted E2E green.\n- docs/ui-preview.html/design\
+      \ preview coverage: CONFORMS_WITH_STALE_MATRIX; actual preview includes LANG/reprocess/zh\
+      \ but closure matrix text contains stale preview-gap language.\n\n## Product-boundary\
+      \ checks\n- OPML no-auto-ingest: CONFORMS; AZRCT E2E route spy saw zero POST\
+      \ /api/ingest.\n- Terse copy/no architecture slogans: CONFORMS for AZRCT-probed\
+      \ UI.\n- Inspector provenance: CONFORMS.\n- Expected-red naming: PARTIAL/non-runtime\
+      \ debt.\n- Legacy Gemini naming: PARTIAL/non-runtime debt; no runtime /doctor\
+      \ output.\n- Forbidden architecture drift: no evidence of accounts, sync/merge,\
+      \ queues/jobs, vector DB/RAG, sidecar workers, settings dashboard.\n\n## Behavioral\
+      \ proof register\n- Language affects future ingest only: PROVEN.\n- Reprocess\
+      \ rewrites readable fields/rebuilds FTS: PROVEN.\n- OPML import no auto ingest:\
+      \ PROVEN.\n- Frontend zh control/receipts/preview: PROVEN.\n- Source identifiers\
+      \ unchanged/non-translated: PROVEN.\n- Human steering precedence: existing Go\
+      \ test proof; not reasserted from static only.\n\n## Commands run\n- Targeted\
+      \ Go zh/runtime/state/reprocess/OpenRouter tests: PASS.\n- `npm run check`:\
+      \ PASS.\n- `npm run test:render -- --runInBand`: FAIL due unsupported Vitest\
+      \ flag.\n- `npm run test:render`: FAIL; 2 failed, 62 passed; failures described\
+      \ in B1.\n- `npm run test:e2e -- tests/e2e/azrct-audit-zh-repair.expected-red.spec.ts`:\
+      \ PASS, 7 passed.\n- `npm run test:e2e -- tests/e2e/processing-language-source-split-scroll.spec.ts`:\
+      \ PASS, 2 passed.\n- Final git status after artifact cleanup: clean.\n\n## Remediation\
+      \ ownership created\n- Batched fix step: `azrv-batched-verification-failure-remediation`.\n\
+      - Retest step: `azrv-batched-verification-failure-retest`.\n- Final gate now\
+      \ depends on the batched remediation and retest, so unresolved B1/B2/stale matrix\
+      \ items cannot be bypassed.\n- Checklist state verified via vectl_show: all\
+      \ checkboxes checked.\n\n## Files changed\n- none by spec verifier.\n\n## Gaps/Notes\n\
+      - This step is completed as a failed discovery/report with explicit remediation\
+      \ ownership, not as a green conformance pass."
   - id: azrv-architecture-boundary-audit
     name: Audit architecture boundary after OPML, copy, preview, and zh repairs
     status: done
