@@ -96025,7 +96025,7 @@ phases:
 
       ## Completion Criteria
 
-      - [ ] HTTP idle/running/conflict path is exercised against a real runtime or
+      - [x] HTTP idle/running/conflict path is exercised against a real runtime or
       equivalent integration harness.
 
       - [ ] MCP resource/conflict parity is exercised where supported.
