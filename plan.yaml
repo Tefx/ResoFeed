@@ -91529,7 +91529,7 @@ phases:
 
       - [x] Product-boundary non-goals are preserved.
 
-      - [ ] Gate decision is OPEN only if every blocker-class behavior has a downstream
+      - [x] Gate decision is OPEN only if every blocker-class behavior has a downstream
       closure path.'
     verification: '- [ ] All phase steps completed with specific evidence.
 
