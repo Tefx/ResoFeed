@@ -89677,7 +89677,7 @@ phases:
       - [x] docs/ARCHITECTURE.md is cited for OPML import, ingest lifecycle, SQLite/shared-state,
       and single-deployable runtime constraints.
 
-      - [ ] Each residual failure is classified as implementation bug, stale test,
+      - [x] Each residual failure is classified as implementation bug, stale test,
       fixture/shared-state issue, or mixed.
 
       - [ ] Focus order conflict is adjudicated with a docs-backed winning expectation
