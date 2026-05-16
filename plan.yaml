@@ -95202,7 +95202,7 @@ phases:
     agent: gate-reviewer
   - id: gsfr-fix-reactive-grouped-source-sort-crash
     name: Fix reactive grouped-source sort crash
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       work_type: defect_repair
@@ -95367,6 +95367,70 @@ phases:
     agent: frontend-engineer
     claimed_by: frontend-engineer
     claimed_at: '2026-05-16T22:12:22.082089+00:00'
+    done_at: '2026-05-16T22:29:14.834758+00:00'
+    evidence: '## refs Read Confirmation
+
+      - docs/DESIGN.md — Read by execution agent; key passage: grouped duplicate/story
+      transparency must preserve access to every source item and provenance; Inspector
+      requires source/provenance header and source-list disclosure for grouped stories
+      while preserving dense inspection surface.
+
+      - docs/ARCHITECTURE.md — Read by execution agent; key passage: frontend renders
+      DESIGN.md surfaces and `ItemSummary`/`ItemDetail` expose story/provenance fields
+      for transparent grouping without backend schema/layer expansion.
+
+
+      ## Fix Evidence
+
+      **Worker commit:** 9d433d47 on isolated branch `vectl/step-gsfr-fix-reactive-grouped-source-sort-crash`
+
+      **Mainline commit:** 9e90604a `[vectl] step-gsfr-fix-reactive-grouped-source-sort-crash
+      completed`
+
+      **Changed files:**
+
+      - web/src/routes/components/Inspector.svelte
+
+
+      **Non-mutating sort proof:**
+
+      - `groupedSourceItems` sort path now returns `[...items].sort(...)`, avoiding
+      mutation of a reactive/proxy-backed array.
+
+      - Existing comparator was preserved: selected item first, then `source_title.localeCompare`,
+      then `item_id.localeCompare`.
+
+
+      **Runtime proof:**
+
+      - Worker ran `npm run check`: exit 0, `svelte-check found 0 errors and 0 warnings`.
+
+      - Worker ran `npx playwright test --config ./playwright.config.ts tests/e2e/ui-runtime-fresh-review-remediation.spec.ts
+      --grep "FR-04|B1"`: exit 0, 2 passed.
+
+
+      **Mainline final-state verification:**
+
+      - Orchestrator squash-merged `vectl/step-gsfr-fix-reactive-grouped-source-sort-crash`
+      into main.
+
+      - Orchestrator ran `npm run check && npx playwright test --config ./playwright.config.ts
+      tests/e2e/ui-runtime-fresh-review-remediation.spec.ts --grep "FR-04|B1"` from
+      `web/`: `svelte-check found 0 errors and 0 warnings`; Playwright FR-04 and B1
+      both passed (`2 passed`).
+
+
+      **Scope guard:**
+
+      - Backend grouping/schema changed: NO.
+
+      - Only `web/src/routes/components/Inspector.svelte` was committed for this step.
+
+
+      **Gaps/Notes:**
+
+      - Main worktree still contains unrelated pre-existing dirty/untracked files
+      outside this step; they were preserved and not committed by the orchestrator.'
   - id: gsfr-retest-grouped-source-runtime-rendering
     name: Retest grouped-source runtime rendering after sort fix
     status: pending
