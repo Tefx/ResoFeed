@@ -94934,7 +94934,7 @@ phases:
   steps:
   - id: cos-backend-operation-contract-tests
     name: Add backend current-operation contract tests
-    status: claimed
+    status: done
     description: 'Add expected-red Go contract tests for the approved CurrentOperationInfo
       HTTP conflict contract.
 
@@ -95013,6 +95013,63 @@ phases:
     agent: golang-developer
     claimed_by: golang-developer
     claimed_at: '2026-05-16T20:35:35.588572+00:00'
+    done_at: '2026-05-16T20:45:36.257682+00:00'
+    evidence: 'EXPECTED_RED_ACCEPTED
+
+
+      ## refs Read Confirmation (MANDATORY)
+
+      - docs/ARCHITECTURE.md — read. Key passage: guarded operations share in-process
+      guard; conflict responses indicate current operation and HTTP validation rejects
+      unknown/duplicate params.
+
+      - docs/DESIGN.md — read. Key passage: Source Ledger manual actions are immediate
+      operational commands, not durable jobs; conflict feedback is raw/terse.
+
+
+      ## Expected-Red Backend Contract Evidence
+
+      - Test files changed: internal/resofeed/current_operation_contract_expected_red_test.go
+
+      - Test names added: TestCOSBackendCurrentOperationIdleContract; TestCOSBackendCurrentOperationRunningSnapshotContract;
+      TestCOSBackendGuardConflictIncludesCurrentOperationContract
+
+      - Expected failures / exposed gaps: GET /api/runtime/operation returns 404 instead
+      of idle/running CurrentOperationInfo; query-param cases return 404 instead of
+      400; conflict details lack current_operation.
+
+      - Product-code changes: NONE
+
+      - Downstream implementation owner: cos-backend-operation-snapshot
+
+
+      ## Verification
+
+      - Worktree commit: 15168f96 Add expected-red current operation contract tests
+
+      - Mainline merge commit: 4bc7ea64 [vectl] step-cos-backend-operation-contract-tests
+      completed
+
+      - Mainline command: go test ./internal/resofeed -run ''TestCOSBackend(CurrentOperationIdleContract|CurrentOperationRunningSnapshotContract|GuardConflictIncludesCurrentOperationContract)''
+
+      - Mainline observed result: red as expected; failures align with missing endpoint
+      and missing conflict current_operation.
+
+      - step_intent: test_define_red
+
+      - expected_result: red
+
+      - observed_result: red
+
+      - failure_alignment: EXPECTED_RED_ACCEPTED
+
+      - verdict: SUCCESS
+
+      - blockers: []
+
+      - product_implementation_files_modified: false
+
+      - durable_job_queue_history_schema_added: false'
   - id: cos-frontend-operation-utility-contract-tests
     name: Add frontend operation-status and utility-placement tests
     status: claimed
