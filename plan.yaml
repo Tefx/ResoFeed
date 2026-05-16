@@ -82267,7 +82267,7 @@ phases:
       - [x] Verify no forbidden UI concepts or AI/RAG/chat/semantic answer affordances
       appear.
 
-      - [ ] Produce parseable PASS/PASS_WITH_DEBT/FAIL handoff with blocker-class
+      - [x] Produce parseable PASS/PASS_WITH_DEBT/FAIL handoff with blocker-class
       issues separated from non-blocking debt.'
     verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
 
