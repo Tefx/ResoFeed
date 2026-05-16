@@ -85613,3 +85613,156 @@ phases:
     depends_on:
     - srde2e-real-system-e2e-blockers-fix
     agent: integration-verifier
+  - id: srde2e-uiux-audit-source-ledger-steer-controls
+    name: Audit Source Ledger and Steer control UI/UX after real-system blocker fix
+    status: pending
+    description: 'step_type: verification
+
+      scope: phase-check
+
+      agent_source: project
+
+      independence_level: L2
+
+
+      As a NATIVE MULTIMODAL UI/UX AUDITOR (uiux-auditor), validate the browser-rendered
+      Source Ledger and Steer control remediation after srde2e-real-system-e2e-blockers-fix.
+      This is a downstream UI/UX validation step and is read-only with respect to
+      product code.
+
+
+      Authoritative refs:
+
+      - docs/DESIGN.md — UI/UX contract for ResoFeed chrome, Source Ledger behavior,
+      controls, accessibility, and visual state constraints.
+
+      - docs/ARCHITECTURE.md — product invariants that UI fixes must not violate.
+
+
+      Required rendered/browser-observable evidence:
+
+      - Use real rendered browser artifacts (screenshots, DOM/accessibility snapshots,
+      or equivalent captured browser output) for the affected Source Ledger and Steer
+      controls.
+
+      - Compare artifacts against docs/DESIGN.md; do not approve unapproved design-token,
+      layout, copy, chrome, or state inventions.
+
+      - Validate accessible-name uniqueness for Steer preview/commit/undo controls,
+      including the duplicate `apply` / `[APPLY]` failure family.
+
+      - Validate Source Ledger live-row visibility after OPML import + `[RUN INGEST]`,
+      controls visibility, and `last_fetch: HH:MM:SS` presentation.
+
+      - Validate keyboard and screen-reader usability for Steer controls and Source
+      Ledger row controls.
+
+      - Validate browser-led MCP parity surfaces remain usable through real UI controls,
+      not only programmatic API checks.
+
+
+      Acceptance checklist:
+
+      - [ ] Rendered/browser-observable artifacts are captured for Source Ledger live
+      row and Steer preview/commit/undo controls.
+
+      - [ ] Source Ledger shows the imported live row, visible controls, and the required
+      last-fetch timestamp format without layout collapse.
+
+      - [ ] Steer preview/commit/undo controls have unique accessible names and remain
+      keyboard/screen-reader usable.
+
+      - [ ] Browser-led MCP parity flow remains accessible through the UI controls.
+
+      - [ ] No unapproved token, layout, copy, chrome, or state invention relative
+      to docs/DESIGN.md is introduced.
+
+      - [ ] Findings are reported as PASS, PASS_WITH_DEBT, or FAIL, with blocker-class
+      issues preventing downstream closure.'
+    verification: '- [ ] phase-check protecting srde2e-software-architect-clean-recheck,
+      srde2e-full-plan-check, and srde2e-final-closure-gate.
+
+      - [ ] uiux-auditor evidence includes rendered/browser-observable artifacts for
+      the Source Ledger and Steer controls after srde2e-real-system-e2e-blockers-fix.
+
+      - [ ] Evidence explicitly maps each observed UI state to docs/DESIGN.md requirements.
+
+      - [ ] Accessible-name uniqueness, Source Ledger live-row/controls visibility,
+      keyboard/screen-reader usability, and browser-led MCP parity are all validated.
+
+      - [ ] Any blocker or should_fix finding has a closure path and blocks downstream
+      final closure until remediated.'
+    evidence_template: '## UI/UX Audit Report
+
+
+      ### refs Read Confirmation (MANDATORY)
+
+      For each ref in this step:
+
+      - docs/DESIGN.md — key passage or "NOT READ: <reason>"
+
+      - docs/ARCHITECTURE.md — key passage or "NOT READ: <reason>"
+
+
+      If no refs were provided, state: "No refs for this step."
+
+
+      ### Rendered / Browser-Observable Artifacts
+
+      - Source Ledger artifact(s): <screenshot/DOM/accessibility snapshot refs>
+
+      - Steer controls artifact(s): <screenshot/DOM/accessibility snapshot refs>
+
+      - Browser-led MCP parity artifact(s): <artifact refs>
+
+
+      ### Design Contract Mapping
+
+      | Surface | DESIGN.md requirement | Observed evidence | Verdict |
+
+      | --- | --- | --- | --- |
+
+      | Source Ledger live row | <section/passage> | <artifact ref> | PASS/FAIL |
+
+      | Source Ledger controls | <section/passage> | <artifact ref> | PASS/FAIL |
+
+      | Steer preview/commit/undo accessible names | <section/passage> | <artifact
+      ref> | PASS/FAIL |
+
+      | Keyboard/screen-reader usability | <section/passage> | <artifact ref> | PASS/FAIL
+      |
+
+      | Browser-led MCP parity UI path | <section/passage> | <artifact ref> | PASS/FAIL
+      |
+
+
+      ### Token / Layout / State Invention Check
+
+      - Unapproved tokens found: <none or list>
+
+      - Unapproved layout/chrome/copy/state inventions found: <none or list>
+
+
+      ### Issues Found
+
+      | Severity | Description | Surface | Artifact/Repro | Closure Path |
+
+      | --- | --- | --- | --- | --- |
+
+      | blocker/should_fix/suggestion | <issue> | <surface> | <artifact/repro> | <closure
+      path> |
+
+
+      ### Headline
+
+      - [ ] PASS: Required rendered UI/UX evidence conforms to docs/DESIGN.md with
+      no blocker-class issues.
+
+      - [ ] PASS_WITH_DEBT: Only explicitly non-blocking debt remains with non-intersection
+      evidence.
+
+      - [ ] FAIL: Blocker or should_fix issues remain and downstream closure must
+      not proceed.'
+    depends_on:
+    - srde2e-real-system-e2e-blockers-fix
+    agent: uiux-auditor
