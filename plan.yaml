@@ -91841,7 +91841,7 @@ phases:
       - [x] Browser evidence shows OPML import does not call ingest and receipt tells
       user sources were imported; manual `[RUN INGEST]` remains available.
 
-      - [ ] Browser evidence in zh mode shows localized LANG/reprocess/status/receipt/steer/Inspector
+      - [x] Browser evidence in zh mode shows localized LANG/reprocess/status/receipt/steer/Inspector
       chrome and unchanged source identifiers with non-translation guards.
 
       - [ ] Screenshot or DOM evidence shows Source Ledger header alignment and Inspector
