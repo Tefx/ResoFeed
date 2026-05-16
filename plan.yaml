@@ -85710,7 +85710,7 @@ phases:
 
       - [x] Run the repository''s authoritative Go/backend test command family.
 
-      - [ ] Run the repository''s authoritative frontend/component/E2E command family
+      - [x] Run the repository''s authoritative frontend/component/E2E command family
       for the touched web surfaces.
 
       - [ ] Re-run any design/a11y/visual checks needed for the delta after architecture
