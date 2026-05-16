@@ -84118,7 +84118,7 @@ phases:
       - [x] Logic correctness: relevant state/selector/contract decisions produce
       correct values.
 
-      - [ ] Rendering completeness: Source Ledger, TODAY, mobile metadata, and OPML
+      - [x] Rendering completeness: Source Ledger, TODAY, mobile metadata, and OPML
       controls produce visible/reachable DOM behavior under the required viewports.
 
       - [ ] Rendered evidence or updated test fixtures reflect source-backed behavior
