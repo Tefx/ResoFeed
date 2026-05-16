@@ -89680,7 +89680,7 @@ phases:
       - [x] Each residual failure is classified as implementation bug, stale test,
       fixture/shared-state issue, or mixed.
 
-      - [ ] Focus order conflict is adjudicated with a docs-backed winning expectation
+      - [x] Focus order conflict is adjudicated with a docs-backed winning expectation
       and allowed deviation for the stale expectation if applicable.
 
       - [ ] Nav visible text conflict is adjudicated with a docs-backed visible-label/accessibility-name
