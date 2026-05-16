@@ -82337,7 +82337,7 @@ phases:
       - [x] Provide closure path for every DIVERGES/PARTIAL/NEEDS_TEST/NOT_FOUND/AMBIGUOUS_SPEC
       item.
 
-      - [ ] Verify docs are not contradicted by implementation copy, labels, routes,
+      - [x] Verify docs are not contradicted by implementation copy, labels, routes,
       or accessibility semantics.'
     verification: '- [ ] phase-check protecting frontend gate and final E2E closure.
 
