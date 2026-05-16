@@ -95488,14 +95488,14 @@ phases:
       crash.
 
       - [x] Evidence identifies exact command/test and actual output, not just a summary.'
-    verification: '- [ ] phase-check protecting `gsfr-final-gate`: focused runtime/browser
+    verification: '- [x] phase-check protecting `gsfr-final-gate`: focused runtime/browser
       retest is green after the sort fix.
 
-      - [ ] Main path: valid grouped-source rendering path is exercised.
+      - [x] Main path: valid grouped-source rendering path is exercised.
 
-      - [ ] Failure path: previous console `state_unsafe_mutation` is absent.
+      - [x] Failure path: previous console `state_unsafe_mutation` is absent.
 
-      - [ ] Regression guard: synthetic no-grouping path remains correct.'
+      - [x] Regression guard: synthetic no-grouping path remains correct.'
     evidence_template: '## refs Read Confirmation (MANDATORY)
 
 
