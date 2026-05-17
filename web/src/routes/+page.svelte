@@ -199,21 +199,6 @@
     if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
   });
 
-  $effect(() => {
-    if (!routePreviewElement || import.meta.env.MODE !== 'test') return;
-    routePreviewElement.getBoundingClientRect = () => ({
-      x: 0,
-      y: 0,
-      width: 640,
-      height: 44,
-      top: 0,
-      right: 640,
-      bottom: 44,
-      left: 0,
-      toJSON: () => ({})
-    });
-  });
-
   function formatRawApiError(error: unknown, fallback: string): string {
     if (error instanceof ResoFeedApiError) return `err: ${error.body.error.message}`;
     return error instanceof Error ? error.message : fallback;

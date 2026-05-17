@@ -29,9 +29,7 @@
   let pending = $state(false);
   let handledFocusRequestId = $state(-1);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
-  const itemUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('url') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
-  const canonicalUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.canonical_url') ? 'no' : undefined;
   const originalUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.original_url') ? 'no' : undefined;
 
   function extractionLabel(status: ItemSummary['extraction_status']): string {
@@ -271,24 +269,12 @@
 
   function originalHref(value: InspectableItem): string {
     const candidates = [
-      value.url,
       'provenance' in value ? value.provenance.original_url : null,
       'provenance' in value ? value.provenance.canonical_url : null,
+      value.url,
       'provenance' in value ? value.provenance.source_url : null
     ];
     return candidates.find((candidate): candidate is string => Boolean(candidate?.match(/^https?:\/\//))) ?? 'https://example.invalid/unavailable';
-  }
-
-  function sourceDetailsPayload(value: InspectableItem): string {
-    const lines = [
-      `source: ${value.source_title}`,
-      `original: ${originalHref(value)}`,
-      'provenance' in value && value.provenance.canonical_url ? `canonical: ${value.provenance.canonical_url}` : '',
-      'provenance' in value && value.provenance.source_url ? `feed: ${value.provenance.source_url}` : '',
-      value.story_key ? `story: ${value.story_key}` : '',
-      value.duplicate_of_item_id ? `duplicate: ${value.duplicate_of_item_id}` : ''
-    ].filter((line) => line.length > 0);
-    return lines.join('\n');
   }
 
   type InspectorGroupedSourceItem = GroupedSourceItem;
@@ -403,18 +389,6 @@
     return `src: ${value.source_title} · ${extraction}${tier}`;
   }
 
-  function provenanceSourceUrl(value: InspectableItem): string | null {
-    return 'provenance' in value ? value.provenance.source_url : null;
-  }
-
-  function provenanceCanonicalUrl(value: InspectableItem): string | null {
-    return 'provenance' in value ? value.provenance.canonical_url : null;
-  }
-
-  function provenanceOriginalUrl(value: InspectableItem): string {
-    return 'provenance' in value ? value.provenance.original_url : value.url;
-  }
-
   function summaryProvenanceDisclosure(value: InspectableItem): string {
     const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
     if (hasModelText) return localizedChrome('summary provenance: model-backed', '摘要来源：模型支持');
@@ -468,28 +442,6 @@
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link</a></p>
-    <dl class="contract-provenance-anchors" aria-label="Source identifiers">
-      <div>
-        <dt>url</dt>
-        <dd><a href={item.url} target="_blank" rel="noreferrer noopener" translate={itemUrlTranslate}>{item.url}</a></dd>
-      </div>
-      {#if provenanceSourceUrl(item)}
-        <div>
-          <dt>source url</dt>
-          <dd><a href={provenanceSourceUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{provenanceSourceUrl(item)}</a></dd>
-        </div>
-      {/if}
-      {#if provenanceCanonicalUrl(item)}
-        <div>
-          <dt>canonical url</dt>
-          <dd><a href={provenanceCanonicalUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={canonicalUrlTranslate}>{provenanceCanonicalUrl(item)}</a></dd>
-        </div>
-      {/if}
-      <div>
-        <dt>original link</dt>
-        <dd><a href={provenanceOriginalUrl(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{provenanceOriginalUrl(item)}</a></dd>
-      </div>
-    </dl>
     <p class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
@@ -521,10 +473,6 @@
     {#if item.story_key || item.duplicate_of_item_id}
       <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}
-    <details class="contract-source-details">
-      <summary>source provenance</summary>
-      <pre translate="no">{sourceDetailsPayload(item)}</pre>
-    </details>
   {:else}
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">No item selected</h2>
   {/if}
