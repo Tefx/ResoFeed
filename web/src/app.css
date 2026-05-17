@@ -142,22 +142,35 @@ a:focus,
   list-style: none;
 }
 
-.source-ledger-head {
-  display: flex;
-  gap: var(--rf-space-row);
-  align-items: center;
+.source-ledger,
+.contract-source-ledger {
+  background: var(--rf-color-surface);
+  color: var(--rf-color-text);
+  font: var(--rf-typography-chrome);
+  font-variant-numeric: tabular-nums;
 }
 
-.source-ledger__header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--rf-space-row);
-  align-items: center;
-  justify-content: flex-end;
-  margin-inline-start: auto;
+.source-ledger__header {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto auto;
+  gap: var(--rf-space-md);
+  align-items: baseline;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: 0 0 var(--rf-space-sm);
 }
 
-.source-ledger-head,
+.source-ledger__title {
+  margin: 0;
+  font: var(--rf-typography-chrome);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.source-ledger__header > .source-ledger__status,
+.source-ledger__header > .bracket-action--run-ingest {
+  justify-self: end;
+}
+
 .source-ledger-row {
   justify-content: space-between;
 }
@@ -193,7 +206,7 @@ a:focus,
   min-width: 0;
   overflow: hidden;
   color: var(--rf-color-muted);
-  font: var(--rf-typography-metadata);
+  font: var(--rf-typography-chrome);
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -210,6 +223,15 @@ a:focus,
   gap: var(--rf-space-row);
   align-items: center;
   justify-content: flex-end;
+}
+
+.source-ledger__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rf-space-sm);
+  align-items: center;
+  border-block-end: 1px solid var(--rf-color-border);
+  padding: var(--rf-space-sm) 0;
 }
 
 .source-ledger-separator {
@@ -234,15 +256,18 @@ a:focus,
 
 .bracket-action {
   appearance: none;
-  min-height: 44px;
+  min-height: 20px;
   border: 0;
-  padding: 0 10px;
-  color: var(--rf-color-text);
+  padding: var(--rf-space-sm);
+  margin: calc(-1 * var(--rf-space-sm));
+  color: var(--rf-color-muted);
   background: transparent;
-  font: var(--rf-typography-metadata);
-  letter-spacing: 0.08em;
+  font: var(--rf-typography-chrome);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
+  transition: none;
 }
 
 .bracket-action:hover:not(:disabled),
@@ -262,23 +287,23 @@ a:focus,
 }
 
 .bracket-action--run-ingest {
-  width: 15ch;
+  width: auto;
   justify-content: center;
 }
 
 .bracket-action--fetch {
-  width: 13ch;
+  width: auto;
   justify-content: center;
 }
 
 .bracket-action--import-opml {
-  width: 16ch;
+  width: auto;
   justify-content: center;
 }
 
 .bracket-action--delete,
 .bracket-action--confirm {
-  width: 12ch;
+  width: auto;
   justify-content: center;
 }
 
@@ -350,9 +375,9 @@ a:focus,
 .state-portability-warning,
 .state-portability-status {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 20px;
   align-items: center;
-  font: var(--rf-typography-metadata);
+  font: var(--rf-typography-chrome);
 }
 
 .imported-status {
@@ -364,6 +389,10 @@ a:focus,
 .contract-source-ledger,
 .contract-search {
   padding: var(--rf-space-xl);
+}
+
+.contract-source-ledger {
+  padding: var(--rf-space-lg);
 }
 
 .contract-steering-receipt {
@@ -380,11 +409,11 @@ a:focus,
 
 .steer-route-preview {
   display: flex;
-  min-height: 44px;
+  min-height: 20px;
   align-items: center;
   gap: var(--rf-space-sm);
   margin: 0;
-  border-block-end: 1px solid var(--rf-color-border);
+  border-block-end: 0;
   padding: 0 var(--rf-space-md);
   color: var(--rf-color-muted);
   background: var(--rf-color-background);
@@ -458,16 +487,18 @@ a:focus,
 
 .shell-command {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--rf-space-sm);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--rf-space-md);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-border);
   padding: var(--rf-space-sm) var(--rf-space-md);
 }
 
 .contract-brand {
+  display: none;
   margin: 0;
-  font: var(--rf-typography-display);
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
   letter-spacing: 0.08em;
 }
 
@@ -518,7 +549,7 @@ details.surface-nav .surface-nav-menu {
   inset-block-start: calc(100% + var(--rf-space-xs));
   inset-inline-end: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   width: min(36rem, calc(100vw - (var(--rf-space-sm) * 2)));
   gap: var(--rf-space-xs);
   align-items: start;
@@ -546,8 +577,8 @@ details.surface-nav button,
   padding: 0 var(--rf-space-row);
   color: var(--rf-color-muted);
   background: transparent;
-  font: var(--rf-typography-metadata);
-  letter-spacing: 0.08em;
+  font: var(--rf-typography-chrome);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -587,7 +618,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   z-index: 1;
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--rf-space-sm);
   align-items: center;
   justify-content: stretch;
@@ -595,15 +626,25 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 
 .runtime-language-warning,
 .runtime-reprocess-status {
-  font: var(--rf-typography-metadata);
+  font: var(--rf-typography-chrome);
 }
 
 .runtime-language-warning {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  clip: rect(0, 0, 0, 0);
-  overflow: hidden;
+  display: grid;
+  gap: var(--rf-space-xxs);
+  color: var(--rf-color-warning);
+}
+
+.utility-label {
+  margin: 0;
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.utility-label--operations {
+  margin-block-start: var(--rf-space-xs);
 }
 
 .runtime-reprocess-status {
@@ -1139,26 +1180,22 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   }
 
   .contract-feed-meta {
-    /* [DEVIATION]: Mobile source identifiers must remain fully measurable for
-       UI_REGRESSION_CONTRACT Issue 10 while FR-09 keeps feed-row metadata at
-       one compact line; allow inline overflow inside the clipped feed-open
-       text column instead of wrapping or entering the 44px Resonate hit area. */
     flex-wrap: nowrap;
     height: 16px;
     line-height: 16px;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta span {
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta .feed-meta-source {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
   }
 
   .contract-time-label {
@@ -1187,7 +1224,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   }
 
   .search-secondary-filters summary {
-    min-height: 36px;
+    min-height: 44px;
   }
 
   .search-secondary-grid {
@@ -1202,8 +1239,8 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 
   .search-secondary-grid input,
   .search-secondary-grid select {
-    min-height: 36px;
-    padding: var(--rf-space-xs) var(--rf-space-sm);
+    min-height: 44px;
+    padding: var(--rf-space-sm) var(--rf-space-sm);
   }
 
   .contract-search-meta-primary,

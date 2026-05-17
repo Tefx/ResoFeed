@@ -70,6 +70,8 @@
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
   let routePreviewElement = $state<HTMLElement | undefined>();
+  let surfaceMenuSummary = $state<HTMLElement | undefined>();
+  let firstSurfaceMenuItem = $state<HTMLButtonElement | undefined>();
   let routePreviewAnnounces = $state(true);
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
@@ -561,6 +563,21 @@
     showSurface(surface);
   }
 
+  async function handleSurfaceMenuToggle(event: Event): Promise<void> {
+    const details = event.currentTarget as HTMLDetailsElement;
+    surfaceMenuOpen = details.open;
+    if (!details.open) return;
+    await tick();
+    firstSurfaceMenuItem?.focus();
+  }
+
+  function handleSurfaceMenuKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    surfaceMenuOpen = false;
+    void tick().then(() => surfaceMenuSummary?.focus());
+  }
+
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
@@ -806,7 +823,7 @@
   {:else}
     <a class="skip-link" href="#today-feed" tabindex="-1">skip to feed</a>
     <header class="shell-command">
-      <h1 class="contract-brand">RESOFEED</h1>
+      <div class="contract-brand" aria-hidden="true">RESOFEED</div>
       <form class="steer-form" aria-label="Steer" onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
         <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
         <span aria-hidden="true">&gt;</span>
@@ -829,14 +846,17 @@
           }}
         />
         {#if steerCommand.trim().length > 0}
-          <button type="submit" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? 'applying' : 'apply'}</button>
+          <button class="bracket-action" type="submit" aria-label="apply" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? '[APPLYING...]' : '[APPLY]'}</button>
         {/if}
       </form>
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
-        <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { surfaceMenuOpen = event.currentTarget.open; }}>
-          <summary class="contract-label surface-nav-label" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions: details owns the opened menu subtree; Escape must close from any focused menu item and return focus to the summary per DESIGN.md App Shell keyboard contract. -->
+        <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
+          <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
           <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
+            <p class="utility-label">NAV</p>
             <button
+              bind:this={firstSurfaceMenuItem}
               type="button"
               aria-pressed={currentSurface === 'feed' ? 'true' : 'false'}
               data-state={currentSurface === 'feed' ? 'active' : undefined}
@@ -850,6 +870,7 @@
               tabindex={surfaceMenuOpen ? 0 : -1}
               onclick={() => openSurfaceFromMenu('ledger')}
             >SOURCE LEDGER</button>
+            <p class="utility-label utility-label--operations">OPERATIONS</p>
             <div class="runtime-language-controls" aria-label="Processing language controls">
               {#if contextualOperationStatusText}
                 <span class="surface-operation-status" role="status" aria-live="polite">{contextualOperationStatusText}</span>
@@ -861,7 +882,7 @@
                 tabindex={surfaceMenuOpen ? 0 : -1}
                 onclick={() => void updateProcessingLanguage()}
               >{processingLanguageButtonText}</button>
-              <span class="contract-muted runtime-language-warning">{processingLanguage.code === 'zh' ? '已存可读内容将被重写。 来源标识保持不变。' : 'Existing readable item content will be rewritten. Source identifiers remain unchanged.'}</span>
+              <span class="contract-muted runtime-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
               {#if reprocessState === 'confirming'}
                 <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label="Confirm reprocess existing library" tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
                 <button type="button" class="bracket-action bracket-action--reprocess" aria-label="Cancel reprocess" tabindex={surfaceMenuOpen ? 0 : -1} onclick={cancelReprocess}>{reprocessCancelLabel}</button>
@@ -895,12 +916,6 @@
           <span class="steer-route-preview__label">{steerRouteEcho.label}</span>
           {#if steerRouteEcho.detail}
             <span class="steer-route-preview__detail">{steerRouteEcho.detail}</span>
-          {/if}
-          {#if steerRouteEcho.writeAction && steerFeedback.kind !== 'submitting'}
-            <span class="steer-route-preview__actions" aria-label="Steer write action boundary">
-              <button type="button" class="bracket-action" aria-label="confirm steer route preview" onclick={() => void submitSteer()}>[APPLY]</button>
-              <button type="button" class="bracket-action" onclick={() => { steerCommand = ''; steerFeedback = { kind: 'idle' }; steerInput?.focus(); }}>[CANCEL]</button>
-            </span>
           {/if}
         {/if}
       </section>

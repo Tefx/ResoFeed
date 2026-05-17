@@ -249,12 +249,16 @@
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-title">
   <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
-    <div class="source-ledger__header-actions">
-      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
-      <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
-      <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
-    </div>
+    <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
+    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
   </header>
+  <div class="source-ledger__tools" aria-label="Ledger actions">
+    <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
+    <StatePortability onExportState={onExportState} onImportState={onImportState} />
+    {#if statusText}
+      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
+    {/if}
+  </div>
   {#if visibleSources.length === 0}
     <p>No sources. Paste RSS URL in Steer.</p>
   {:else}
@@ -285,10 +289,6 @@
     </ul>
   {/if}
   <div class="source-ledger-footer">
-    {#if statusText}
-      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
-    {/if}
-    <StatePortability onExportState={onExportState} onImportState={onImportState} />
     <input
       id="opml-file"
       class="source-ledger-file visually-hidden"

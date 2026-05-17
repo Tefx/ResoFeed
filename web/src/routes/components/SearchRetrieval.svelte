@@ -82,8 +82,7 @@
     <div class="search-primary-row">
       <label for="search-query">Plain text query</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
-      <button type="submit">search</button>
-      <button type="button" class="search-submit-alias" aria-label="submit search" onclick={() => void submitSearch()}>submit search</button>
+      <button type="submit" class="bracket-action">[SEARCH]</button>
     </div>
     <details class="search-secondary-filters" open={!compactFilters}>
       <summary>filters</summary>
