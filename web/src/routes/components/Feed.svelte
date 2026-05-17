@@ -12,7 +12,7 @@
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
-  const groupedItems = $derived(dedupeVisibleItems(items)
+  const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item) || left.index - right.index)
     .map(({ item }) => item));
@@ -26,16 +26,6 @@
       .filter((timestamp) => !Number.isNaN(timestamp))
       .sort((left, right) => right - left)[0];
     return latestTimestamp === undefined ? new Date() : new Date(latestTimestamp);
-  }
-
-  function dedupeVisibleItems(feedItems: ItemSummary[]): ItemSummary[] {
-    const seen = new Set<string>();
-    return feedItems.filter((item) => {
-      const key = `${item.source_id}\u0000${item.title}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
   }
 
   async function openInspector(item: ItemSummary): Promise<void> {

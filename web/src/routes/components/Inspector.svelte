@@ -279,26 +279,6 @@
 
   type InspectorGroupedSourceItem = GroupedSourceItem;
 
-  function normalizedGroupingUrl(value: string | null | undefined): string | null {
-    if (!value) return null;
-    try {
-      const parsed = new URL(value);
-      // RSS entries without item links are synthesized by ingest as
-      // source.URL + "#entry_*"; that fragment is the item identity and must
-      // stay distinct from the feed page for Inspector-only URL fallback.
-      const syntheticFeedEntryFragment = /^#entry_/iu.test(parsed.hash);
-      if (!syntheticFeedEntryFragment) parsed.hash = '';
-      parsed.search = '';
-      parsed.pathname = parsed.pathname.replace(/\/$/u, '');
-      return parsed.toString().toLowerCase();
-    } catch {
-      const trimmed = value.trim();
-      const syntheticFragment = trimmed.match(/#entry_[^?#\s]*/iu)?.[0] ?? '';
-      const withoutSearchAndFragment = trimmed.replace(/[?#].*$/u, '').replace(/\/$/u, '');
-      return `${withoutSearchAndFragment}${syntheticFragment}`.toLowerCase() || null;
-    }
-  }
-
   function sourceUrlFor(sourceId: string): string {
     return sources.find((source) => source.id === sourceId)?.url ?? '';
   }
@@ -323,23 +303,21 @@
   }
 
   function sameRuntimeGroup(candidate: ItemSummary, value: InspectableItem): boolean {
-    if (candidate.id === value.id) return true;
     if (value.story_key && candidate.story_key === value.story_key) return true;
     if (candidate.duplicate_of_item_id === value.id || value.duplicate_of_item_id === candidate.id) return true;
-    const selectedUrls = [
-      normalizedGroupingUrl(value.url),
-      'provenance' in value ? normalizedGroupingUrl(value.provenance.original_url) : null,
-      'provenance' in value ? normalizedGroupingUrl(value.provenance.canonical_url) : null
-    ].filter((candidateUrl): candidateUrl is string => candidateUrl !== null);
-    return selectedUrls.length > 0 && selectedUrls.includes(normalizedGroupingUrl(candidate.url) ?? '');
+    return false;
   }
 
   function groupedSourceItems(value: InspectableItem): InspectorGroupedSourceItem[] {
     const fromDetail = 'provenance' in value ? (value.provenance.grouped_source_items ?? []) : [];
     if (fromDetail.length > 1) return sortedGroupedSourceItems(fromDetail, value);
-    const inferred = groupedSourceCandidates
+    const authoritativeRelated = groupedSourceCandidates
       .filter((candidate) => sameRuntimeGroup(candidate, value))
       .map((candidate) => summaryToGroupedSourceItem(candidate, value));
+    const selectedCandidate = groupedSourceCandidates.find((candidate) => candidate.id === value.id) ?? value;
+    const inferred = authoritativeRelated.length > 0
+      ? [summaryToGroupedSourceItem(selectedCandidate, value), ...authoritativeRelated]
+      : [];
     if (fromDetail.length <= 1 && inferred.length <= 1) return [];
     const byItemId = new Map<string, InspectorGroupedSourceItem>();
     for (const sourceItem of [...fromDetail, ...inferred]) {
@@ -428,8 +406,7 @@
   {/if}
   {#if error}
     <p class="contract-feedback-error" role="alert">{error}</p>
-  {/if}
-  {#if item}
+  {:else if item}
     <div class="inspector-header-row">
       <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
         <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
@@ -448,7 +425,6 @@
       <span>{summaryProvenanceDisclosure(item)}</span>
     </p>
     <p><strong>{localizedChrome('summary:', '摘要：')}</strong> {denseSummaryText(item)}</p>
-    <p><strong>quality:</strong> source quality is high; complete, attributed, and extracted</p>
     <p><strong>{localizedChrome('core insight:', '核心洞察：')}</strong> {coreInsightText(item)}</p>
     <p class="inspector-reading">{detailText(item)}</p>
     <p class="contract-muted">why: fresh from configured source</p>
