@@ -67,6 +67,7 @@ input {
   min-width: 0;
   width: 100%;
   border: 0;
+  overflow: hidden;
   padding: 0;
   color: inherit;
   background: transparent;
@@ -659,6 +660,11 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   overflow-y: auto;
 }
 
+.feed-pane > .contract-region {
+  border-block-end: 0;
+  padding: var(--rf-space-lg);
+}
+
 .feed-pane h1 {
   margin-block: var(--rf-space-lg) var(--rf-space-sm);
   font: var(--rf-typography-section-title);
@@ -1072,6 +1078,10 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
     display: none;
   }
 
+  .contract-brand {
+    display: none;
+  }
+
   .steer-form {
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
@@ -1131,7 +1141,8 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   .contract-feed-meta {
     /* [DEVIATION]: Mobile source identifiers must remain fully measurable for
        UI_REGRESSION_CONTRACT Issue 10 while FR-09 keeps feed-row metadata at
-       one compact line; allow visible overflow instead of wrapping/clipping. */
+       one compact line; allow inline overflow inside the clipped feed-open
+       text column instead of wrapping or entering the 44px Resonate hit area. */
     flex-wrap: nowrap;
     height: 16px;
     line-height: 16px;

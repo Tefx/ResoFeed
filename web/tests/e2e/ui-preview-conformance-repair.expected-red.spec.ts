@@ -175,6 +175,14 @@ test.describe('expected-red BUG_NOT_CHANGE UI preview conformance regressions', 
     const routePreviewBox = await routePreview.boundingBox();
     expect(routePreviewBox, 'idle route preview element is rendered').not.toBeNull();
     expect(routePreviewBox?.height ?? 0, 'idle command/header area must not reserve a visible blank strip below the command row').toBeLessThanOrEqual(1);
+
+    const spacing = await page.locator('.resofeed-shell').evaluate((shell) => {
+      const command = shell.querySelector('.shell-command')?.getBoundingClientRect();
+      const firstItem = shell.querySelector('.contract-feed-item')?.getBoundingClientRect();
+      return command && firstItem ? firstItem.top - command.bottom : null;
+    });
+    expect(spacing, 'desktop feed first item must retain preview top padding without restoring an idle command strip').not.toBeNull();
+    expect(spacing ?? 0).toBeGreaterThanOrEqual(23);
   });
 
   test('DESIGN/UI preview: Inspector exposes exactly one user-facing original article link and no redundant raw URL list', async ({ page, ownerToken }, testInfo) => {
@@ -240,5 +248,50 @@ test.describe('expected-red BUG_NOT_CHANGE UI preview conformance regressions', 
       expect(child.right, `${child.text} must not overflow right edge`).toBeLessThanOrEqual(layout.menuRight + 0.5);
       expect(child.width, `${child.text} must retain positive measurable width for Chinese label fit`).toBeGreaterThan(0);
     }
+
+    const shellLayout = await page.locator('.shell-command').evaluate((element) => {
+      const input = element.querySelector('#steer-input')?.getBoundingClientRect();
+      const brand = element.querySelector('.contract-brand')?.getBoundingClientRect();
+      return {
+        inputLeft: input?.left ?? null,
+        inputRight: input?.right ?? null,
+        brandWidth: brand?.width ?? null,
+        brandHeight: brand?.height ?? null
+      };
+    });
+    expect(shellLayout.inputLeft, 'Steer input remains measurable in mobile command row').not.toBeNull();
+    expect(shellLayout.inputRight, 'Steer input remains measurable in mobile command row').not.toBeNull();
+    expect(shellLayout.brandWidth ?? 0, 'mobile command row must not render enlarged duplicate RESOFEED brand over the Steer input').toBeLessThanOrEqual(1);
+    expect(shellLayout.brandHeight ?? 0, 'mobile command row must not render enlarged duplicate RESOFEED brand over the Steer input').toBeLessThanOrEqual(1);
+  });
+
+  test('DESIGN/UI preview: long feed metadata cannot overlap the 44px Resonate hit area', async ({ page, ownerToken }, testInfo) => {
+    // Contract basis: docs/DESIGN.md requires flat one-line feed metadata and an independent 44px Resonate target;
+    // docs/ui-preview.html models the feed row as text stack plus protected 44px star column with a 12px gap.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await installRenderedUiFixtures(page, ownerToken, 'zh');
+    await page.goto('/');
+    await waitForShell(page);
+    await page.locator('.feed-meta-source').first().evaluate((element) => {
+      element.textContent = 'src: 极长来源名称用于验证元数据不会覆盖独立星标命中区域.example.test/rss-feed-with-long-name';
+    });
+    await attachRenderedEvidence(page, testInfo, 'metadata-star-hit-area-protection', '.contract-feed-item');
+
+    const layout = await page.locator('.contract-feed-item').first().evaluate((item) => {
+      const meta = item.querySelector('.contract-feed-meta')?.getBoundingClientRect();
+      const star = item.querySelector('.contract-resonate')?.getBoundingClientRect();
+      return meta && star
+        ? {
+          metaRight: meta.right,
+          starLeft: star.left,
+          starWidth: star.width,
+          starHeight: star.height
+        }
+        : null;
+    });
+    expect(layout, 'metadata and Resonate button must both render').not.toBeNull();
+    expect(layout?.starWidth ?? 0, 'Resonate hit area keeps 44px width').toBeGreaterThanOrEqual(44);
+    expect(layout?.starHeight ?? 0, 'Resonate hit area keeps 44px height').toBeGreaterThanOrEqual(44);
+    expect(layout ? layout.metaRight : 0, 'metadata visual box must end before the Resonate star hit area starts').toBeLessThanOrEqual((layout?.starLeft ?? 0) - 11.5);
   });
 });
