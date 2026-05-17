@@ -1,0 +1,6 @@
+- listitem:
+  - 'button "Open Inspector for: UI preview conformance article"':
+    - paragraph: "src: 极长来源名称用于验证元数据不会覆盖独立星标命中区域.example.test/rss-feed-with-long-name · 4h · full · model-backed · value: high TODAY"
+    - paragraph: UI preview conformance article
+    - paragraph: Dense rendered summary for the conformance repair regression contract.
+  - 'button "Resonate item: UI preview conformance article"': ☆
