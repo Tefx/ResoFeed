@@ -1,0 +1,20 @@
+- complementary "INSPECTOR independent scroll":
+  - complementary "UI preview conformance article":
+    - paragraph: INSPECTOR
+    - paragraph: "src: UI Preview Contract Source · full · high"
+    - heading "UI preview conformance article" [level=2]
+    - paragraph:
+      - link "original link":
+        - /url: https://articles.example.test/original-article
+    - paragraph: "source text: full summary provenance: model-backed"
+    - paragraph:
+      - strong: "summary:"
+      - text: Dense rendered summary for the conformance repair regression contract.
+    - paragraph:
+      - strong: "quality:"
+      - text: source quality is high; complete, attributed, and extracted
+    - paragraph:
+      - strong: "core insight:"
+      - text: The browser-rendered UI must match the static preview before product fixes proceed.
+    - paragraph: Full article text remains readable in the Inspector without raw provenance URL inventory rows.
+    - paragraph: "why: fresh from configured source"
