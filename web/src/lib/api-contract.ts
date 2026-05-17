@@ -5,7 +5,8 @@ export type OpaqueId = string;
 
 export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'conflict' | 'internal';
 
-export type OperationKind = 'ingest' | 'fetch' | 'reprocess';
+export type OperationKind = 'background_ingest' | 'manual_ingest' | 'source_fetch' | 'library_reprocess' | 'ingest' | 'fetch' | 'reprocess';
+export type OperationActorKind = 'background' | 'human' | 'agent';
 export type OperationScope = 'all' | 'source' | 'library' | null;
 
 export interface CurrentOperationCount {
@@ -16,7 +17,8 @@ export interface CurrentOperationCount {
 export interface CurrentOperationInfo {
   running: boolean;
   kind: OperationKind | null;
-  scope: OperationScope;
+  actor_kind?: OperationActorKind | null;
+  scope?: OperationScope;
   phase: string | null;
   count: CurrentOperationCount | null;
   message: string | null;

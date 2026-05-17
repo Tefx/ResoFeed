@@ -152,7 +152,7 @@ a:focus,
 
 .source-ledger__header {
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) auto auto;
+  grid-template-columns: minmax(160px, auto) minmax(0, 1fr) auto;
   gap: var(--rf-space-md);
   align-items: baseline;
   border-block-end: 1px solid var(--rf-color-border);
@@ -208,8 +208,13 @@ a:focus,
   color: var(--rf-color-muted);
   font: var(--rf-typography-chrome);
   font-variant-numeric: tabular-nums;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.source-ledger__header > .source-ledger__status {
+  overflow: visible;
 }
 
 .source-ledger__status--error {
@@ -256,7 +261,9 @@ a:focus,
 
 .bracket-action {
   appearance: none;
-  min-height: 20px;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   border: 0;
   padding: var(--rf-space-sm);
   margin: calc(-1 * var(--rf-space-sm));
@@ -656,8 +663,9 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 
 .surface-operation-status {
   color: var(--rf-color-muted);
-  font: var(--rf-typography-metadata);
-  white-space: nowrap;
+  font: var(--rf-typography-chrome);
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .bracket-action--language {
@@ -1127,9 +1135,14 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
-  .surface-nav-menu {
+  details.surface-nav .surface-nav-menu {
+    position: fixed;
     inset-block-start: auto;
-    inset-block-end: calc(100% + var(--rf-space-xs));
+    inset-block-end: 78px;
+    inset-inline: 0;
+    width: 100vw;
+    max-height: calc(100dvh - 78px);
+    overflow: auto;
   }
 
   .shell-grid {

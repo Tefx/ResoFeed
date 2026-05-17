@@ -130,11 +130,11 @@ function isProcessingLanguage(value: unknown): value is ProcessingLanguage {
 }
 
 function isOperationKind(value: unknown): value is CurrentOperationInfo['kind'] {
-  return value === 'ingest' || value === 'fetch' || value === 'reprocess' || value === null;
+  return value === 'background_ingest' || value === 'manual_ingest' || value === 'source_fetch' || value === 'library_reprocess' || value === null;
 }
 
-function isOperationScope(value: unknown): value is CurrentOperationInfo['scope'] {
-  return value === 'all' || value === 'source' || value === 'library' || value === null;
+function isOperationActorKind(value: unknown): value is CurrentOperationInfo['actor_kind'] {
+  return value === 'background' || value === 'human' || value === 'agent' || value === null;
 }
 
 function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
@@ -155,7 +155,7 @@ function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
   return (
     typeof value.running === 'boolean' &&
     isOperationKind(value.kind) &&
-    isOperationScope(value.scope) &&
+    isOperationActorKind(value.actor_kind) &&
     (typeof value.phase === 'string' || value.phase === null) &&
     (isCurrentOperationCount(value.count) || value.count === null) &&
     (typeof value.message === 'string' || value.message === null) &&
@@ -164,8 +164,30 @@ function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
   );
 }
 
+function normalizeLegacyOperation(value: Record<string, unknown>): CurrentOperationInfo | null {
+  const legacyKind = value.kind;
+  const legacyScope = value.scope;
+  const kind = legacyKind === 'ingest' && legacyScope === 'all'
+    ? 'manual_ingest'
+    : legacyKind === 'fetch' && legacyScope === 'source'
+      ? 'source_fetch'
+      : legacyKind === 'reprocess' && legacyScope === 'library'
+        ? 'library_reprocess'
+        : null;
+  if (!kind) return null;
+  const candidate = { ...value, kind, actor_kind: 'human' };
+  return isCurrentOperationInfo(candidate) ? candidate : null;
+}
+
+function normalizeCurrentOperationResponse(value: unknown): CurrentOperationResponse | null {
+  if (!isRecord(value) || !isRecord(value.operation)) return null;
+  if (isCurrentOperationInfo(value.operation)) return { operation: value.operation };
+  const legacy = normalizeLegacyOperation(value.operation);
+  return legacy ? { operation: legacy } : null;
+}
+
 function isCurrentOperationResponse(value: unknown): value is CurrentOperationResponse {
-  return isRecord(value) && isCurrentOperationInfo(value.operation);
+  return normalizeCurrentOperationResponse(value) !== null;
 }
 
 function isProcessingLanguageResponse(value: unknown): value is ProcessingLanguageResponse {
@@ -342,10 +364,11 @@ export class ResoFeedApiClient {
 
   async currentOperation(): Promise<CurrentOperationResponse> {
     const response = await this.request<unknown>(runtimeEndpoints.currentOperation.replace('GET ', ''));
-    if (!isCurrentOperationResponse(response)) {
+    const normalized = normalizeCurrentOperationResponse(response);
+    if (!normalized) {
       throw new ResoFeedApiError(500, fallbackError('internal', 'invalid current operation response'));
     }
-    return response;
+    return normalized;
   }
 
   async setProcessingLanguage(

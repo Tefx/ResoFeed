@@ -38,12 +38,16 @@
   let deletedSourceIds = $state<ReadonlySet<string>>(new Set());
   let importInput = $state<HTMLInputElement | undefined>();
   let ledgerHeading = $state<HTMLHeadingElement | undefined>();
+  let sharedIngestConflictProbeDone = false;
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
   const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
+  const sharedIngestRunning = $derived(/\[INGESTING\.\.\.\].*op:\s*(manual_ingest|background_ingest)/i.test(currentOperationStatusText));
+  const sharedIngestBlocked = $derived(/err:\s*ingest already running/i.test(currentOperationStatusText));
+  const ingestActionRunning = $derived(isRunningIngest || sharedIngestRunning || sharedIngestBlocked);
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -142,6 +146,18 @@
     }).format(new Date());
   }
 
+  $effect(() => {
+    if (!sharedIngestRunning) {
+      sharedIngestConflictProbeDone = false;
+      return;
+    }
+    if (sharedIngestConflictProbeDone) return;
+    sharedIngestConflictProbeDone = true;
+    void onRunIngest().catch(() => {
+      // The guarded endpoint returns canonical details.current_operation; +page.svelte promotes it into currentOperationStatusText for the visible disabled state.
+    });
+  });
+
   function openImportPicker(): void {
     importInput?.click();
   }
@@ -152,7 +168,7 @@
     globalIngestStatusText = '';
     try {
       await tick();
-      globalIngestStatusText = `op: ingest/all · actor:owner · phase:running · since ${currentUtcClock()}`;
+      globalIngestStatusText = `[INGESTING...] · op: manual_ingest · actor:human · phase:running · ingest running · since ${currentUtcClock()}`;
       const result = await onRunIngest();
       const completedAt = formatTime(result.completed_at);
       globalIngestStatusText = result.completed
@@ -260,7 +276,7 @@
   <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
-    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={isRunningIngest} onclick={() => void runIngest()}>{isRunningIngest ? '[INGESTING...]' : '[RUN INGEST]'}</button>
+    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? '[INGESTING...]' : '[RUN INGEST]'}</button>
   </header>
   <div class="source-ledger__tools" aria-label="Ledger actions">
     <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>

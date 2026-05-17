@@ -75,6 +75,10 @@
   let routePreviewAnnounces = $state(true);
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
+  let operationPollGeneration = 0;
+  let operationPollCount = 0;
+  let operationPollInFlight = false;
+  let operationPollTimer: number | null = null;
   let suppressFeedScrollRecording = false;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
@@ -107,6 +111,7 @@
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
   const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
+  const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running'));
 
   function surfaceForPath(pathname: string): Surface {
     if (pathname === '/doctor') return 'doctor';
@@ -237,12 +242,12 @@
   }
 
   function idleOperation(): CurrentOperationInfo {
-    return { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null };
+    return { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null };
   }
 
-  function localRunningOperation(kind: NonNullable<CurrentOperationInfo['kind']>, scope: NonNullable<CurrentOperationInfo['scope']>, message: string): CurrentOperationInfo {
+  function localRunningOperation(kind: NonNullable<CurrentOperationInfo['kind']>, message: string): CurrentOperationInfo {
     const timestamp = new Date().toISOString();
-    return { running: true, kind, scope, phase: 'running', count: null, message, started_at: timestamp, updated_at: timestamp };
+    return { running: true, kind, actor_kind: 'human', phase: 'running', count: null, message, started_at: timestamp, updated_at: timestamp };
   }
 
   function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
@@ -250,14 +255,30 @@
     const candidate = value as Record<string, unknown>;
     return (
       typeof candidate.running === 'boolean' &&
-      (candidate.kind === 'ingest' || candidate.kind === 'fetch' || candidate.kind === 'reprocess' || candidate.kind === null) &&
-      (candidate.scope === 'all' || candidate.scope === 'source' || candidate.scope === 'library' || candidate.scope === null) &&
+      (candidate.kind === 'background_ingest' || candidate.kind === 'manual_ingest' || candidate.kind === 'source_fetch' || candidate.kind === 'library_reprocess' || candidate.kind === null) &&
+      (candidate.actor_kind === 'background' || candidate.actor_kind === 'human' || candidate.actor_kind === 'agent' || candidate.actor_kind === null) &&
       (typeof candidate.phase === 'string' || candidate.phase === null) &&
       (isCurrentOperationCount(candidate.count) || candidate.count === null) &&
       (typeof candidate.message === 'string' || candidate.message === null) &&
       (typeof candidate.started_at === 'string' || candidate.started_at === null) &&
       (typeof candidate.updated_at === 'string' || candidate.updated_at === null)
     );
+  }
+
+  function normalizeCurrentOperationInfo(value: unknown): CurrentOperationInfo | null {
+    if (isCurrentOperationInfo(value)) return value;
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+    const candidate = value as Record<string, unknown>;
+    const kind = candidate.kind === 'ingest' && candidate.scope === 'all'
+      ? 'manual_ingest'
+      : candidate.kind === 'fetch' && candidate.scope === 'source'
+        ? 'source_fetch'
+        : candidate.kind === 'reprocess' && candidate.scope === 'library'
+          ? 'library_reprocess'
+          : null;
+    if (!kind) return null;
+    const normalized = { ...candidate, kind, actor_kind: 'human' };
+    return isCurrentOperationInfo(normalized) ? normalized : null;
   }
 
   function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
@@ -276,18 +297,18 @@
 
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
     const candidate = error.body.error.details.current_operation;
-    if (isCurrentOperationInfo(candidate)) return candidate;
+    const normalized = normalizeCurrentOperationInfo(candidate);
+    if (normalized) return normalized;
     const operation = error.body.error.details.operation;
     const scope = error.body.error.details.scope;
     if ((operation === 'ingest' || operation === 'fetch' || operation === 'reprocess') && (scope === 'all' || scope === 'source' || scope === 'library' || scope === null)) {
-      return { ...idleOperation(), running: true, kind: operation, scope, phase: 'blocked', message: error.body.error.message };
+      return normalizeCurrentOperationInfo({ ...idleOperation(), running: true, kind: operation, scope, phase: 'blocked', message: error.body.error.message });
     }
     return null;
   }
 
   function operationLabel(operation: CurrentOperationInfo): string {
-    const kind = operation.kind ?? 'operation';
-    return operation.scope ? `${kind}/${operation.scope}` : kind;
+    return operation.kind ?? 'operation';
   }
 
   function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
@@ -306,7 +327,7 @@
   function operationDetails(operation: CurrentOperationInfo): string {
     return [
       `op: ${operationLabel(operation)}`,
-      'actor:owner',
+      operation.actor_kind ? `actor:${operation.actor_kind}` : null,
       operation.phase ? `phase:${operation.phase}` : null,
       operation.count ? `${operation.count.current}/${operation.count.total}` : null,
       operation.message,
@@ -317,11 +338,11 @@
   function formatContextualOperation(state: ContextualOperationState): string {
     if (state.kind === 'idle') return '';
     if (state.kind === 'running') {
-      const label = state.operation.kind === 'ingest'
+      const label = state.operation.kind === 'manual_ingest' || state.operation.kind === 'background_ingest'
         ? '[INGESTING...]'
-        : state.operation.kind === 'fetch'
+        : state.operation.kind === 'source_fetch'
           ? '[FETCHING...]'
-          : state.operation.kind === 'reprocess'
+          : state.operation.kind === 'library_reprocess'
             ? reprocessRunningLabel
             : null;
       return label ? `${label} · ${operationDetails(state.operation)}` : operationDetails(state.operation);
@@ -338,6 +359,38 @@
       throw error;
     }
   }
+
+  function clearOperationPollTimer(): void {
+    if (operationPollTimer !== null) {
+      window.clearTimeout(operationPollTimer);
+      operationPollTimer = null;
+    }
+  }
+
+  async function pollCurrentOperationWhileRelevant(generation: number): Promise<void> {
+    if (!operationSurfaceRelevant || operationPollInFlight || operationPollCount >= 3) return;
+    operationPollInFlight = true;
+    operationPollCount += 1;
+    try {
+      await refreshCurrentOperationIfAvailable();
+    } finally {
+      operationPollInFlight = false;
+    }
+    if (generation !== operationPollGeneration || !operationSurfaceRelevant) return;
+    clearOperationPollTimer();
+    if (contextualOperation.kind === 'running') {
+      operationPollTimer = window.setTimeout(() => void pollCurrentOperationWhileRelevant(generation), 800);
+    }
+  }
+
+  $effect(() => {
+    operationPollGeneration += 1;
+    operationPollCount = 0;
+    const generation = operationPollGeneration;
+    clearOperationPollTimer();
+    if (operationSurfaceRelevant) void pollCurrentOperationWhileRelevant(generation);
+    return clearOperationPollTimer;
+  });
 
   async function loadShellData(token: string, syncRoute = true, focusAfterLoad = true): Promise<void> {
     loadState = 'loading';
@@ -365,7 +418,6 @@
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics(client) };
       }
-      void refreshCurrentOperationIfAvailable();
       loadState = 'ready';
       if (selectedItemId) {
         await loadItemDetail(selectedItemId, token);
@@ -687,12 +739,12 @@
   }
 
   async function runIngest(): Promise<RunIngestSuccessResponse> {
-    contextualOperation = { kind: 'running', operation: localRunningOperation('ingest', 'all', 'ingest running') };
+    contextualOperation = { kind: 'running', operation: localRunningOperation('manual_ingest', 'ingest running') };
     const response = await apiClient().runIngest();
     if (!response.ok) {
       const text = `err: ${response.body.error.message}`;
       const operation = response.body.error.details.current_operation;
-      contextualOperation = { kind: 'blocked', text, operation: isCurrentOperationInfo(operation) ? operation : null };
+      contextualOperation = { kind: 'blocked', text, operation: normalizeCurrentOperationInfo(operation) };
       throw new Error(text);
     }
     sources = (await apiClient().sources()).sources;
@@ -750,7 +802,7 @@
     if (reprocessState === 'running') return;
     reprocessState = 'running';
     reprocessStatus = '';
-    contextualOperation = { kind: 'running', operation: localRunningOperation('reprocess', 'library', 'reprocess running') };
+    contextualOperation = { kind: 'running', operation: localRunningOperation('library_reprocess', 'reprocess running') };
     await tick();
     await new Promise((resolve) => setTimeout(resolve, 75));
     try {
