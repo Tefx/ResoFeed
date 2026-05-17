@@ -1,0 +1,39 @@
+html: <body data-sveltekit-preload-data="hover">
+    <div><!--[--><!--[0--><!--[--><!--[--><main class="contract-shell resofeed-shell" aria-label="RESOFEED"><!--[0--><a class="skip-link" href="#today-feed" tabindex="-1">skip to feed</a> <header class="shell-command"><h1 class="contract-brand">RESOFEED</h1> <form class="steer-form" aria-label="Steer"><label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label> <span aria-hidden="true">&gt;</span> <input id="steer-input" class="steer-input" type="text" placeholder="Steer or paste RSS URL..." autocomplete="off" aria-describedby="steer-route-preview-status steer-route-preview-input-desc"> <!----></form> <nav aria-label="RESOFEED surfaces" class="surface-nav"><details class="surface-nav" aria-label="RESOFEED surface menu"><summary class="contract-label surface-nav-label">RESOFEED</summary> <div class="surface-nav-menu surface-nav-menu--closed"><button type="button" aria-pressed="false" tabindex="-1">TODAY</button> <button type="button" aria-pressed="false" tabindex="-1">SOURCE LEDGER</button> <div class="runtime-language-controls" aria-label="Processing language controls"><!----> <button type="button" class="bracket-action bracket-action--language" aria-label="Processing language English; set Chinese" tabindex="-1">LANG: EN</button> <span class="contract-muted runtime-language-warning">Existing readable item content will be rewritten. Source identifiers remain unchanged.</span> <button type="button" class="bracket-action bracket-action--reprocess" aria-label="Reprocess existing library and rebuild search index" tabindex="-1">[REPROCESS LIBRARY]</button><!----> <!----></div></div></details></nav></header> <section id="steer-route-preview-status" class="steer-route-preview" aria-label="Steer route preview" aria-live="polite" data-route-kind="idle" data-live="polite"><!----></section> <span id="steer-route-preview-input-desc" class="visually-hidden">Steer route preview</span> <span id="steer-route-preview-detail" class="visually-hidden">URL required</span> <!----> <!----> <!----> <!----> <!----> <div class="shell-grid" data-surface="doctor"><section id="today-feed" aria-label="TODAY surface independent scroll" aria-describedby="today-feed-scroll-contract" tabindex="0" data-scroll-region="feed-independent" class="feed-pane utility-surface" aria-hidden="true" inert="" style="overflow-y: auto;"><span id="today-feed-scroll-contract" class="visually-hidden">Independent scroll region</span> <!----></section> <aside aria-label="INSPECTOR independent scroll" tabindex="0" data-scroll-region="inspector-independent" class="detail-pane" aria-hidden="true" inert="" style="overflow-y: auto;"><button class="back-command" type="button">back to TODAY</button> <p class="contract-label">INSPECTOR</p><!----></aside></div> <section aria-label="SOURCE LEDGER surface" class="utility-surface"><!----> <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-title"><header class="source-ledger-head source-ledger__header"><h1 id="source-ledger-title" class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1> <div class="source-ledger__header-actions"><span aria-live="polite" role="status" class="source-ledger__status" title="last_ingest: not_run">last_ingest: not_run</span> <button type="button" class="bracket-action bracket-action--run-ingest">[RUN INGEST]</button> <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]">[IMPORT OPML]</button></div></header> <p>No sources. Paste RSS URL in Steer.</p><!----> <div class="source-ledger-footer"><!----> <div class="state-portability-actions contract-portability" role="group" aria-label="State portability" data-state="idle"><button id="state-export" class="bracket-action" type="button">[EXPORT STATE]</button> <button id="state-import" class="bracket-action" type="button">[IMPORT STATE]</button> <label class="visually-hidden" for="state-json-file">Choose state JSON</label> <input id="state-json-file" class="state-portability-file visually-hidden" type="file" accept="application/json,.json" aria-label="Choose state JSON"> <span class="contract-warning state-portability-warning">import replaces active sources, rules, and stars</span> <!----></div><!----> <input id="opml-file" class="source-ledger-file visually-hidden" type="file" accept=".opml,.xml,text/xml,application/xml" aria-hidden="true" tabindex="-1"></div></section><!----></section> <section aria-label="Search surface" class="utility-surface"><!----> <section class="contract-region contract-search" aria-label="Search and Retrieval"><h2 id="search-heading" tabindex="-1">SEARCH</h2> <form class="contract-search-form" aria-label="Search filters"><div class="search-primary-row"><label for="search-query">Plain text query</label> <input id="search-query" aria-describedby="search-status"> <button type="submit">search</button> <button type="button" class="search-submit-alias" aria-label="submit search">submit search</button></div> <details class="search-secondary-filters" open=""><summary>filters</summary> <div class="search-secondary-grid"><label for="search-source">Source filter</label> <input id="search-source" name="source"> <label for="search-from">From date</label> <input id="search-from" name="from" type="date"> <label for="search-to">To date</label> <input id="search-to" name="to" type="date"> <label class="contract-checkbox" for="search-resonated"><input id="search-resonated" name="resonated" type="checkbox"> Resonated only</label> <label for="search-limit">Result limit</label> <select id="search-limit" name="limit"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></div></details></form> <p id="search-status" aria-live="polite" class="contract-muted" role="status">0 results</p> <div role="region" aria-label="Search results"><div role="list" aria-label="Search result items"></div> <p>no results</p><!----></div></section><!----></section> <section aria-labelledby="doctor-heading" class="utility-surface doctor-surface active-panel"><button class="back-command" type="button">back to TODAY</button><!----> <div class="contract-region"><h2 id="doctor-heading" tabindex="-1">/doctor</h2> <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">rss: ok
+openrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown
+openrouter: model_resolved=false resolved_model=unknown model_resolved: false
+openrouter: item_transform_failures=0 item_transform_failures: 0
+openrouter: current_item_transform_failures=0 historic_item_transform_failures=0
+openrouter: live_summary_successes=0 fallback_only_current_summaries=0
+openrouter: health_classification=missing_live_model_configuration
+fallback_provenance: item_transform_failures=0 summary=none
+search_fts: ok
+extraction: ok
+ingest: last_run=never
+</pre></div></section><!----><!--]--></main><!--]--><!----><!--]--><!--]--> <!--[-1--><div id="svelte-announcer" aria-live="assertive" aria-atomic="true" style="position: absolute; left: 0; top: 0; clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap; width: 1px; height: 1px"><!----></div><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1wkqqm = {
+						base: new URL(".", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("./_app/immutable/entry/start.Bz_b9ynr.js"),
+						import("./_app/immutable/entry/app.BA_7HTgc.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+  
+
+</body>
