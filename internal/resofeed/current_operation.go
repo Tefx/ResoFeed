@@ -15,7 +15,7 @@ const RuntimeOperationMCPResourceURI = "resofeed://system/operation"
 type CurrentOperationInfo struct {
 	Running   bool                   `json:"running"`
 	Kind      *string                `json:"kind"`
-	Scope     any                    `json:"scope"`
+	ActorKind *string                `json:"actor_kind"`
 	Phase     *string                `json:"phase"`
 	Count     *CurrentOperationCount `json:"count"`
 	Message   *string                `json:"message"`
@@ -37,15 +37,17 @@ type currentOperationSnapshot struct {
 	current CurrentOperationInfo
 }
 
-func (s *currentOperationSnapshot) start(kind string, scope any) {
+func (s *currentOperationSnapshot) start(kind string, scope any, actorKind string) {
 	now := time.Now().UTC()
+	canonicalKind := canonicalOperationKind(kind, scope)
+	canonicalActorKind := canonicalOperationActorKind(actorKind)
 	phase := "starting"
-	message := "operation running"
+	message := currentOperationStartMessage(canonicalKind)
 	s.mu.Lock()
 	s.current = CurrentOperationInfo{
 		Running:   true,
-		Kind:      stringPtr(kind),
-		Scope:     scope,
+		Kind:      stringPtr(canonicalKind),
+		ActorKind: stringPtr(canonicalActorKind),
 		Phase:     stringPtr(phase),
 		Message:   stringPtr(message),
 		StartedAt: timePtr(now),
@@ -91,6 +93,9 @@ func cloneCurrentOperationInfo(info CurrentOperationInfo) CurrentOperationInfo {
 	if info.Kind != nil {
 		clone.Kind = stringPtr(*info.Kind)
 	}
+	if info.ActorKind != nil {
+		clone.ActorKind = stringPtr(*info.ActorKind)
+	}
 	if info.Phase != nil {
 		clone.Phase = stringPtr(*info.Phase)
 	}
@@ -116,6 +121,48 @@ func currentOperationInfo() CurrentOperationInfo {
 
 func updateCurrentOperation(phase string, count *CurrentOperationCount, message string) {
 	ingestGuardState.current.update(phase, count, message)
+}
+
+func canonicalOperationKind(kind string, scope any) string {
+	switch kind {
+	case "ingest":
+		if scope == "background" {
+			return "background_ingest"
+		}
+		return "manual_ingest"
+	case "fetch":
+		return "source_fetch"
+	case "reprocess":
+		return "library_reprocess"
+	default:
+		return kind
+	}
+}
+
+func canonicalOperationActorKind(actorKind string) string {
+	switch actorKind {
+	case "background":
+		return "background"
+	case string(ActorKindAgent):
+		return string(ActorKindAgent)
+	default:
+		return string(ActorKindHuman)
+	}
+}
+
+func currentOperationStartMessage(kind string) string {
+	switch kind {
+	case "background_ingest":
+		return "background ingest starting"
+	case "manual_ingest":
+		return "manual ingest starting"
+	case "source_fetch":
+		return "manual source fetch starting"
+	case "library_reprocess":
+		return "library reprocess starting"
+	default:
+		return "operation running"
+	}
 }
 
 func stringPtr(value string) *string {

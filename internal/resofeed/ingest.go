@@ -96,7 +96,7 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 
 // IngestOnce performs one ingestion pass over active sources.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
-	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	release, err := tryAcquireIngestGuardWithActor(ctx, "ingest", "background", "background")
 	if err != nil {
 		return nil
 	}
@@ -110,7 +110,7 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 // in-process guard as background ingestion and never creates durable queue/job
 // state when another operation is already running.
 func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuard(ctx, "ingest", "all")
+	release, err := tryAcquireIngestGuardWithActor(ctx, "ingest", "all", string(ActorKindHuman))
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
@@ -123,7 +123,7 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret Manual
 // source. Missing, deleted, and inactive sources are reported by the caller as
 // not_found; operational RSS failures are source-level result entries.
 func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuard(ctx, "fetch", "source")
+	release, err := tryAcquireIngestGuardWithActor(ctx, "fetch", "source", string(ActorKindHuman))
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
@@ -267,6 +267,10 @@ func DeleteSource(ctx context.Context, db *sql.DB, sourceID string) (DeleteSourc
 }
 
 func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (func(), error) {
+	return tryAcquireIngestGuardWithActor(ctx, operation, scope, string(ActorKindHuman))
+}
+
+func tryAcquireIngestGuardWithActor(ctx context.Context, operation string, scope any, actorKind string) (func(), error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -277,7 +281,7 @@ func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (fu
 		return nil, operationGuardConflictError{details: details}
 	}
 	ingestGuardState.holder.Store(operationGuardDetails{Operation: operation, Scope: scope})
-	ingestGuardState.current.start(operation, scope)
+	ingestGuardState.current.start(operation, scope, actorKind)
 	released := false
 	return func() {
 		if released {
@@ -309,15 +313,29 @@ func guardConflictDetails(err error) (operationGuardDetails, bool) {
 }
 
 func guardConflictDetailMap(details operationGuardDetails) map[string]any {
-	return map[string]any{"operation_running": true, "operation": details.Operation, "scope": details.Scope, "retry_allowed": true}
+	return map[string]any{"retry_allowed": true, "current_operation": currentOperationFromGuardDetails(details)}
 }
 
 func guardConflictHTTPDetailMap(details operationGuardDetails) map[string]any {
-	result := guardConflictDetailMap(details)
+	return guardConflictDetailMap(details)
+}
+
+func currentOperationFromGuardDetails(details operationGuardDetails) CurrentOperationInfo {
 	if current := currentOperationInfo(); current.Running {
-		result["current_operation"] = current
+		return current
 	}
-	return result
+	now := time.Now().UTC()
+	phase := "starting"
+	message := currentOperationStartMessage(canonicalOperationKind(details.Operation, details.Scope))
+	return CurrentOperationInfo{
+		Running:   true,
+		Kind:      stringPtr(canonicalOperationKind(details.Operation, details.Scope)),
+		ActorKind: stringPtr(string(ActorKindHuman)),
+		Phase:     stringPtr(phase),
+		Message:   stringPtr(message),
+		StartedAt: timePtr(now),
+		UpdatedAt: timePtr(now),
+	}
 }
 
 func releaseGuardRecover(release func(), retErr *error, label string) {

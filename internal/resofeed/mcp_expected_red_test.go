@@ -322,7 +322,8 @@ func expectedRedAssertNestedMCPConflict(t *testing.T, resp mcpResponse, operatio
 		return
 	}
 	details, _ := inner["details"].(map[string]any)
-	if inner["code"] != "conflict" || details["operation_running"] != true || details["retry_allowed"] != true {
+	currentOperation, ok := details["current_operation"].(map[string]any)
+	if inner["code"] != "conflict" || details["retry_allowed"] != true || !ok || currentOperation["running"] != true {
 		t.Errorf("%s nested conflict = code:%#v details:%#v", operation, inner["code"], details)
 	}
 }

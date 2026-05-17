@@ -21,7 +21,7 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 	if err := validateMutationRequestFields(req.MutationRequestFields); err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
-	release, err := tryAcquireIngestGuard(ctx, "reprocess", "library")
+	release, err := tryAcquireIngestGuardWithActor(ctx, "reprocess", "library", string(req.ActorKind))
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}

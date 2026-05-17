@@ -104,7 +104,7 @@ func TestMCPCurrentOperationResourceIdleAndRunningStates(t *testing.T) {
 		"operation": {
 			"running": false,
 			"kind": null,
-			"scope": null,
+			"actor_kind": null,
 			"phase": null,
 			"count": null,
 			"message": null,
@@ -122,8 +122,8 @@ func TestMCPCurrentOperationResourceIdleAndRunningStates(t *testing.T) {
 	runningText := mcpResourceText(t, handler, RuntimeOperationMCPResourceURI)
 	operation := decodeCurrentOperationEnvelope(t, []byte(runningText))
 	assertCurrentOperationShape(t, operation)
-	if operation["running"] != true || operation["kind"] != "fetch" || operation["scope"] != "source" {
-		t.Fatalf("MCP operation snapshot = %#v, want running fetch/source from shared in-memory guard", operation)
+	if operation["running"] != true || operation["kind"] != "source_fetch" || operation["actor_kind"] != "human" {
+		t.Fatalf("MCP operation snapshot = %#v, want running source_fetch with human actor from shared in-memory guard", operation)
 	}
 	assertRFC3339Field(t, operation, "started_at")
 	assertRFC3339Field(t, operation, "updated_at")
@@ -157,7 +157,7 @@ func TestMCPGuardConflictDetailsMatchHTTPCurrentOperationShape(t *testing.T) {
 	if !ok {
 		t.Fatalf("MCP conflict details = %#v, want object", inner["details"])
 	}
-	assertConflictDetailsWithCurrentOperation(t, details, "ingest", "all")
+	assertConflictDetailsWithCurrentOperation(t, details, "manual_ingest", "human")
 }
 
 func TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason(t *testing.T) {
