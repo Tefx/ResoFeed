@@ -71,6 +71,17 @@ interface StyleSnapshot {
   readonly text: string;
 }
 
+interface RuntimeOperationFixture {
+  readonly running: boolean;
+  readonly kind: string | null;
+  readonly scope: string | null;
+  readonly phase: string | null;
+  readonly count: { readonly current: number; readonly total: number } | null;
+  readonly message: string | null;
+  readonly started_at: string | null;
+  readonly updated_at: string | null;
+}
+
 const sourceFixture: SourceFixture = {
   id: 'src_runtime_conformance',
   url: 'https://feeds.example.test/runtime-conformance.xml',
@@ -134,11 +145,24 @@ function runtimeOperationPayload(): object {
   return { operation: { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } };
 }
 
+function runningRuntimeOperationPayload(): RuntimeOperationFixture {
+  return {
+    running: true,
+    kind: 'ingest',
+    scope: 'all',
+    phase: 'fetching_sources',
+    count: { current: 1, total: 3 },
+    message: 'global ingest fetching sources',
+    started_at: '2026-05-17T14:00:00Z',
+    updated_at: '2026-05-17T14:00:05Z'
+  };
+}
+
 async function fulfillJson(route: Route, payload: object, status = 200): Promise<void> {
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
 }
 
-async function installFixtures(page: Page, ownerToken: string, options: { readonly emptySources?: boolean; readonly mobileCollision?: boolean } = {}): Promise<void> {
+async function installFixtures(page: Page, ownerToken: string, options: { readonly emptySources?: boolean; readonly mobileCollision?: boolean; readonly runningOperation?: boolean } = {}): Promise<void> {
   await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
   await page.route('**/api/**', async (route) => {
     const url = new URL(route.request().url());
@@ -150,7 +174,7 @@ async function installFixtures(page: Page, ownerToken: string, options: { readon
     if (url.pathname === `/api/items/${itemFixture.id}`) return fulfillJson(route, { item: itemDetailFixture });
     if (url.pathname === `/api/items/${mobileCollisionItemFixture.id}`) return fulfillJson(route, { item: { ...itemDetailFixture, ...mobileCollisionItemFixture } });
     if (url.pathname === '/api/runtime/language') return fulfillJson(route, { language: { code: 'en', label: 'English' } });
-    if (url.pathname === '/api/runtime/operation') return fulfillJson(route, runtimeOperationPayload());
+    if (url.pathname === '/api/runtime/operation') return fulfillJson(route, options.runningOperation ? { operation: runningRuntimeOperationPayload() } : runtimeOperationPayload());
     if (url.pathname === '/api/steer/active') return fulfillJson(route, { rules: [] });
     if (url.pathname === '/api/search') return fulfillJson(route, { items });
     if (url.pathname === '/api/doctor') return route.fulfill({ status: 200, contentType: 'text/plain', body: 'doctor:\nrss_fetch_errors: 0' });
@@ -318,9 +342,9 @@ test.describe('expected-red runtime conformance audit browser regressions', () =
     expect.soft(routePreviewStyle.height, 'F14: active route preview remains terse and below full touch-target strip height').toBeLessThanOrEqual(24);
   });
 
-  test('F20-F24: mobile search, feed metadata/star geometry, state import label, and ledger density use touch-safe preview anatomy', async ({ page, ownerToken }, testInfo) => {
+  test('F20-F24 plus F08/F25: mobile ledger header/status geometry and current-operation copy remain readable/canonical', async ({ page, ownerToken }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await installFixtures(page, ownerToken, { mobileCollision: true });
+    await installFixtures(page, ownerToken, { mobileCollision: true, runningOperation: true });
     await page.goto('/');
     await waitForShell(page);
 
@@ -356,6 +380,20 @@ test.describe('expected-red runtime conformance audit browser regressions', () =
     await page.keyboard.press('Enter');
     await expect(page.locator('.source-ledger')).toBeVisible();
     await attachEvidence(page, testInfo, 'f23-f24-mobile-source-ledger', '.utility-surface[aria-label="SOURCE LEDGER surface"]');
+
+    const visibleLedger = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"] .source-ledger');
+    const titleBox = await visibleLedger.locator('#source-ledger-title').boundingBox();
+    const statusBox = await visibleLedger.locator('.source-ledger__header > .source-ledger__status').boundingBox();
+    const runIngestBox = await visibleLedger.locator('.source-ledger__header > .bracket-action--run-ingest').boundingBox();
+    expect.soft(titleBox, 'F08 mobile: Source Ledger title is measurable').not.toBeNull();
+    expect.soft(statusBox, 'F08 mobile: Source Ledger status is measurable').not.toBeNull();
+    expect.soft(runIngestBox, 'F08 mobile: Source Ledger run action is measurable').not.toBeNull();
+    expect.soft(statusBox && titleBox ? statusBox.y >= titleBox.y + titleBox.height - 1 : false, 'F08 mobile: last_ingest/current status sits below title instead of colliding on the same line').toBe(true);
+    expect.soft(runIngestBox && titleBox ? runIngestBox.y >= titleBox.y + titleBox.height - 1 : false, 'F08 mobile: [RUN INGEST] is not on the title baseline that previously collided with status metadata').toBe(true);
+
+    const ledgerText = await page.locator('.source-ledger').innerText();
+    expect.soft(ledgerText, 'F25: canonical current-operation copy is visible in Source Ledger output').toMatch(/op:\s*ingest\/all\s*·\s*actor:owner\s*·\s*phase:fetching_sources\s*·\s*1\/3\s*·\s*global ingest fetching sources\s*·\s*since 14:00:00/i);
+    expect.soft(ledgerText, 'F25: forbidden current-operation prefix is absent from Source Ledger output').not.toMatch(/current operation:\s*ingest/i);
 
     await expect.soft(page.getByText('Choose state JSON'), 'F23: file-form label is absent from visible product UI').toHaveCount(0);
     await expect.soft(page.locator('#state-json-file'), 'F23: import state file input remains keyboard reachable through bracket action, not direct visible file UI').not.toHaveAccessibleName('Choose state JSON');

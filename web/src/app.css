@@ -1268,6 +1268,29 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
     align-items: start;
   }
 
+  .source-ledger__header {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--rf-space-xs);
+  }
+
+  .source-ledger__header > .source-ledger__title {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .source-ledger__header > .source-ledger__status {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .source-ledger__header > .bracket-action--run-ingest {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: start;
+    justify-self: start;
+  }
+
   .source-ledger__header-actions {
     gap: var(--rf-space-sm);
   }

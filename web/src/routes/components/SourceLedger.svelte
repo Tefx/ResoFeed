@@ -132,6 +132,16 @@
     return new Promise((resolve) => window.setTimeout(resolve, 120));
   }
 
+  function currentUtcClock(): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'UTC'
+    }).format(new Date());
+  }
+
   function openImportPicker(): void {
     importInput?.click();
   }
@@ -142,7 +152,7 @@
     globalIngestStatusText = '';
     try {
       await tick();
-      globalIngestStatusText = 'current operation: ingest';
+      globalIngestStatusText = `op: ingest/all · actor:owner · phase:running · since ${currentUtcClock()}`;
       const result = await onRunIngest();
       const completedAt = formatTime(result.completed_at);
       globalIngestStatusText = result.completed
