@@ -30,7 +30,7 @@ func TestCOSBackendCurrentOperationIdleContract(t *testing.T) {
 			"operation": {
 				"running": false,
 				"kind": null,
-				"scope": null,
+				"actor_kind": null,
 				"phase": null,
 				"count": null,
 				"message": null,
@@ -52,6 +52,35 @@ func TestCOSBackendCurrentOperationIdleContract(t *testing.T) {
 	}
 }
 
+func TestCOSBackendOperationEndpointsRequireOwnerTokenContract(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+
+	for _, tc := range []struct {
+		name   string
+		method string
+		path   string
+		body   []byte
+	}{
+		{name: "current operation read", method: http.MethodGet, path: currentOperationHTTPPath},
+		{name: "manual ingest trigger", method: http.MethodPost, path: ManualIngestHTTPPath, body: []byte(ManualFetchRequestBody)},
+		{name: "library reprocess trigger", method: http.MethodPost, path: RuntimeReprocessLibraryHTTPPath, body: []byte(`{"actor_kind":"human","actor_id":"owner","idempotency_key":"reprocess-auth-contract"}`)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			req := httptest.NewRequest(tc.method, tc.path, bytes.NewReader(tc.body))
+			if len(tc.body) > 0 {
+				req.Header.Set("Content-Type", "application/json")
+			}
+
+			router.ServeHTTP(recorder, req)
+
+			assertStatus(t, recorder, http.StatusUnauthorized)
+		})
+	}
+}
+
 func TestCOSBackendCurrentOperationRunningSnapshotContract(t *testing.T) {
 	ctx := context.Background()
 	release, err := tryAcquireIngestGuard(ctx, "fetch", "source")
@@ -67,8 +96,8 @@ func TestCOSBackendCurrentOperationRunningSnapshotContract(t *testing.T) {
 	assertStatus(t, recorder, http.StatusOK)
 	operation := decodeCurrentOperationEnvelope(t, recorder.Body.Bytes())
 	assertCurrentOperationShape(t, operation)
-	if operation["running"] != true || operation["kind"] != "fetch" || operation["scope"] != "source" {
-		t.Fatalf("operation snapshot = %#v, want running fetch/source from in-memory guard", operation)
+	if operation["running"] != true || operation["kind"] != "source_fetch" || operation["actor_kind"] != "human" {
+		t.Fatalf("operation snapshot = %#v, want running source_fetch with actor_kind human from in-memory guard", operation)
 	}
 	if phase, ok := operation["phase"].(string); !ok || phase == "" {
 		t.Fatalf("operation.phase = %#v, want non-empty documented running phase", operation["phase"])
@@ -103,7 +132,7 @@ func TestCOSBackendGuardConflictIncludesCurrentOperationContract(t *testing.T) {
 	if parsed.Error.Code != "conflict" || parsed.Error.Message != "operation already running" {
 		t.Fatalf("error = %+v, want operation guard conflict", parsed.Error)
 	}
-	assertConflictDetailsWithCurrentOperation(t, parsed.Error.Details, "reprocess", "library")
+	assertConflictDetailsWithCurrentOperation(t, parsed.Error.Details, "library_reprocess", "human")
 }
 
 func decodeCurrentOperationEnvelope(t *testing.T, body []byte) map[string]any {
@@ -121,7 +150,7 @@ func decodeCurrentOperationEnvelope(t *testing.T, body []byte) map[string]any {
 
 func assertCurrentOperationShape(t *testing.T, operation map[string]any) {
 	t.Helper()
-	wantFields := []string{"running", "kind", "scope", "phase", "count", "message", "started_at", "updated_at"}
+	wantFields := []string{"running", "kind", "actor_kind", "phase", "count", "message", "started_at", "updated_at"}
 	if len(operation) != len(wantFields) {
 		t.Fatalf("operation fields = %#v, want exactly %v", operation, wantFields)
 	}
@@ -132,21 +161,21 @@ func assertCurrentOperationShape(t *testing.T, operation map[string]any) {
 	}
 }
 
-func assertConflictDetailsWithCurrentOperation(t *testing.T, details map[string]any, kind string, scope string) {
+func assertConflictDetailsWithCurrentOperation(t *testing.T, details map[string]any, kind string, actorKind string) {
 	t.Helper()
-	if len(details) != 5 {
-		t.Fatalf("conflict details = %#v, want legacy fields plus current_operation only", details)
+	if len(details) != 2 {
+		t.Fatalf("conflict details = %#v, want retry_allowed plus current_operation only", details)
 	}
-	if details["operation_running"] != true || details["operation"] != kind || details["scope"] != scope || details["retry_allowed"] != true {
-		t.Fatalf("conflict legacy details = %#v, want operation=%s scope=%s", details, kind, scope)
+	if details["retry_allowed"] != true {
+		t.Fatalf("conflict details = %#v, want retry_allowed true", details)
 	}
 	operation, ok := details["current_operation"].(map[string]any)
 	if !ok {
 		t.Fatalf("current_operation = %#v, want object derived from same in-memory snapshot", details["current_operation"])
 	}
 	assertCurrentOperationShape(t, operation)
-	if operation["running"] != true || operation["kind"] != kind || operation["scope"] != scope {
-		t.Fatalf("current_operation = %#v, want same kind/scope as legacy conflict fields", operation)
+	if operation["running"] != true || operation["kind"] != kind || operation["actor_kind"] != actorKind {
+		t.Fatalf("current_operation = %#v, want canonical kind=%s actor_kind=%s", operation, kind, actorKind)
 	}
 	assertRFC3339Field(t, operation, "started_at")
 	assertRFC3339Field(t, operation, "updated_at")

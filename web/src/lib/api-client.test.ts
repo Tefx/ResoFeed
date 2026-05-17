@@ -3,13 +3,16 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
 import {
+  type CurrentOperationInfo,
+  type CurrentOperationResponse,
   itemDisplayExcerpt,
   itemDisplayTimestamp,
   type ErrorBody,
   type FeedTodayResponse,
   type SearchResponse,
   type SourcesResponse,
-  type StateBundleV1
+  type StateBundleV1,
+  type OperationKind
 } from '$lib/api-contract';
 import Feed from '../routes/components/Feed.svelte';
 import SearchRetrieval from '../routes/components/SearchRetrieval.svelte';
@@ -45,7 +48,10 @@ const stateFixture: StateBundleV1 = {
   ]
 };
 
-function jsonResponse(body: FeedTodayResponse | SourcesResponse | SearchResponse | StateBundleV1 | ErrorBody, status = 200): Response {
+function jsonResponse(
+  body: FeedTodayResponse | SourcesResponse | SearchResponse | StateBundleV1 | CurrentOperationResponse | ErrorBody,
+  status = 200
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json; charset=utf-8' }
@@ -131,5 +137,77 @@ describe('ResoFeed API client and rendered sinks', () => {
       status: 400,
       body: badRequest
     } satisfies Partial<ResoFeedApiError>);
+  });
+
+  it('accepts the canonical current-operation runtime contract and clears idle display state', async () => {
+    const canonicalKind: OperationKind = 'library_reprocess';
+    const running: CurrentOperationResponse = {
+      operation: {
+        running: true,
+        kind: canonicalKind,
+        actor_kind: 'human',
+        phase: 'processing_items',
+        count: { current: 2, total: 5 },
+        message: 'library reprocess processing item',
+        started_at: '2026-05-17T11:00:00Z',
+        updated_at: '2026-05-17T11:00:05Z'
+      }
+    };
+    const idle: CurrentOperationResponse = {
+      operation: {
+        running: false,
+        kind: null,
+        actor_kind: null,
+        phase: null,
+        count: null,
+        message: null,
+        started_at: null,
+        updated_at: null
+      }
+    };
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(running))
+      .mockResolvedValueOnce(jsonResponse(idle));
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    await expect(client.currentOperation()).resolves.toEqual(running);
+    await expect(client.currentOperation()).resolves.toEqual(idle);
+    expect(fetcher).toHaveBeenCalledWith('/api/runtime/operation', {
+      headers: { Authorization: 'Bearer owner-token-123456789012345678901234' }
+    });
+  });
+
+  it('preserves canonical current_operation details on operation conflict responses', async () => {
+    const currentOperation: CurrentOperationInfo = {
+      running: true,
+      kind: 'manual_ingest',
+      actor_kind: 'agent',
+      phase: 'fetching_sources',
+      count: { current: 1, total: 3 },
+      message: 'ingest fetching source',
+      started_at: '2026-05-17T14:00:00Z',
+      updated_at: '2026-05-17T14:00:05Z'
+    };
+    const conflict: ErrorBody = {
+      error: {
+        code: 'conflict',
+        message: 'operation already running',
+        details: {
+          retry_allowed: true,
+          current_operation: currentOperation
+        }
+      }
+    };
+    const fetcher = vi.fn<typeof fetch>(async () => jsonResponse(conflict, 409));
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    const result = await client.runIngest();
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.body.error.details.current_operation).toEqual(currentOperation);
+      expect(result.body.error.details.current_operation).not.toMatchObject({ kind: 'ingest', scope: 'all' });
+    }
   });
 });
