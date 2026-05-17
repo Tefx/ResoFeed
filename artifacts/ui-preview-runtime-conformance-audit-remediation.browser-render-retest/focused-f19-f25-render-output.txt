@@ -1,0 +1,16 @@
+Command:
+npm --prefix web run test:render -- src/routes/components/__tests__/ui-preview-runtime-provenance.expected-red.test.ts -t "F19|F25"
+
+Output:
+> resofeed-web@0.0.0-contract test:render
+> vitest run src/routes/components/__tests__/ui-preview-runtime-provenance.expected-red.test.ts -t F19|F25
+
+ RUN  v4.1.5 /Users/tefx/Projects/ResoFeed/.vectl/worktrees/ui-preview-runtime-conformance-audit-remediation.browser-render-retest/web
+
+(node:13480) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 5 skipped (7)
+   Start at  00:22:35
+   Duration  1.55s (transform 456ms, setup 327ms, import 290ms, tests 317ms, environment 522ms)

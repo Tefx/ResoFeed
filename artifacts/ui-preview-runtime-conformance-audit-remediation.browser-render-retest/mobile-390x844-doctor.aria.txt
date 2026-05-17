@@ -1,0 +1,15 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - region "/doctor":
+    - button "back to TODAY"
+    - heading "/doctor" [level=2]
+    - log "/doctor diagnostics": "rss: ok openrouter: provider_reachable=unknown configured_model=account_default provider_reachable: unknown openrouter: model_resolved=false resolved_model=unknown model_resolved: false openrouter: item_transform_failures=0 item_transform_failures: 0 openrouter: current_item_transform_failures=0 historic_item_transform_failures=0 openrouter: live_summary_successes=0 fallback_only_current_summaries=0 openrouter: health_classification=missing_live_model_configuration fallback_provenance: item_transform_failures=0 summary=none search_fts: ok extraction: ok ingest: last_run=never"
