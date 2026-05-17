@@ -303,12 +303,12 @@
 
   function operationDetails(operation: CurrentOperationInfo): string {
     return [
-      `current operation: ${operationLabel(operation)}`,
-      operation.phase ? `phase: ${operation.phase}` : null,
-      operation.count ? `count: ${operation.count.current}/${operation.count.total}` : null,
-      operation.message ? `msg: ${operation.message}` : null,
-      operation.started_at ? `started: ${operationTimestamp(operation.started_at)}` : null,
-      operation.updated_at ? `updated: ${operationTimestamp(operation.updated_at)}` : null
+      `op: ${operationLabel(operation)}`,
+      'actor:owner',
+      operation.phase ? `phase:${operation.phase}` : null,
+      operation.count ? `${operation.count.current}/${operation.count.total}` : null,
+      operation.message,
+      operation.started_at || operation.updated_at ? `since ${operationTimestamp(operation.started_at ?? operation.updated_at)}` : null
     ].filter(Boolean).join(' · ');
   }
 
@@ -361,7 +361,7 @@
       }
       if (syncRoute) replaceSurfaceFromLocation();
       if (currentSurface === 'doctor') {
-        steerFeedback = { kind: 'doctor', text: await client.doctor() };
+        steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics(client) };
       }
       void refreshCurrentOperationIfAvailable();
       loadState = 'ready';
@@ -399,6 +399,14 @@
         return { code: 'en', label: 'English' };
       }
       throw error;
+    }
+  }
+
+  async function loadDoctorDiagnostics(client = apiClient()): Promise<string> {
+    try {
+      return await client.doctor();
+    } catch (error) {
+      return error instanceof Error ? error.message : 'err: doctor unavailable';
     }
   }
 
@@ -601,10 +609,10 @@
       }
       if (command === '/doctor') {
         shouldRefocusSteer = false;
-        const diagnostics = await apiClient().doctor();
         showSurface('doctor');
         steerCommand = '';
-        steerFeedback = { kind: 'doctor', text: diagnostics };
+        steerFeedback = { kind: 'doctor', text: 'doctor:\nloading' };
+        steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics() };
         void focusActiveSurface('doctor');
         return;
       }
@@ -929,8 +937,6 @@
 
     {#if loadState === 'loading'}
       <p class="contract-muted shell-status" role="status">loading</p>
-    {:else if apiError && promptState !== 'rejected'}
-      <p class="contract-feedback-error shell-status" role="alert">{apiError}</p>
     {/if}
 
     <div class="shell-grid" data-surface={currentSurface}>
@@ -938,6 +944,9 @@
       <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface independent scroll" aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">Independent scroll region</span>
         {#if !feedPaneInactive}
+          {#if apiError && promptState !== 'rejected'}
+            <p class="contract-feedback-error" role="alert">{apiError}</p>
+          {/if}
           {#if items.length === 0}
             <FirstUseEmptyState state={firstUseState} />
           {:else}

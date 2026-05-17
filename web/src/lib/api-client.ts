@@ -401,6 +401,11 @@ export class ResoFeedApiClient {
       headers: { Authorization: `Bearer ${this.ownerToken}` }
     });
     if (!response.ok) {
+      const contentType = response.headers.get('Content-Type') ?? '';
+      if (contentType.toLowerCase().includes('text/plain')) {
+        const diagnostic = (await response.text()).trim();
+        throw new Error(diagnostic || 'err: doctor unavailable');
+      }
       await this.throwCanonicalError(response);
     }
     return response.text();
