@@ -74,7 +74,7 @@ interface StyleSnapshot {
 interface RuntimeOperationFixture {
   readonly running: boolean;
   readonly kind: string | null;
-  readonly scope: string | null;
+  readonly actor_kind: string | null;
   readonly phase: string | null;
   readonly count: { readonly current: number; readonly total: number } | null;
   readonly message: string | null;
@@ -142,14 +142,14 @@ const itemDetailFixture: ItemDetailFixture = {
 };
 
 function runtimeOperationPayload(): object {
-  return { operation: { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } };
+  return { operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } };
 }
 
 function runningRuntimeOperationPayload(): RuntimeOperationFixture {
   return {
     running: true,
-    kind: 'ingest',
-    scope: 'all',
+    kind: 'manual_ingest',
+    actor_kind: 'human',
     phase: 'fetching_sources',
     count: { current: 1, total: 3 },
     message: 'global ingest fetching sources',

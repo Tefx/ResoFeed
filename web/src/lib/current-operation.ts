@@ -67,21 +67,7 @@ export function isCurrentOperationInfo(value: unknown): value is CurrentOperatio
 
 export function normalizeCurrentOperationInfo(value: unknown): CurrentOperationInfo | null {
   if (isCurrentOperationInfo(value)) return value;
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
-  const candidate = value as Record<string, unknown>;
-  const kind = candidate.kind === 'ingest' && candidate.scope === 'all'
-    ? 'manual_ingest'
-    : candidate.kind === 'fetch' && candidate.scope === 'source'
-      ? 'source_fetch'
-      : candidate.kind === 'reprocess' && candidate.scope === 'library'
-        ? 'library_reprocess'
-        : null;
-  if (!kind) return null;
-  const actorKind = candidate.actor_kind === 'background' || candidate.actor_kind === 'human' || candidate.actor_kind === 'agent'
-    ? candidate.actor_kind
-    : 'human';
-  const normalized = { ...candidate, kind, actor_kind: actorKind };
-  return isCurrentOperationInfo(normalized) ? normalized : null;
+  return null;
 }
 
 export function operationActionLabel(operation: CurrentOperationInfo): OperationActionLabel | null {

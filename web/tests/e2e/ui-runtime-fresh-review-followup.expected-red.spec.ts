@@ -19,17 +19,7 @@ type CanonicalCurrentOperation = {
   readonly started_at: string | null;
   readonly updated_at: string | null;
 };
-type LegacyCurrentOperation = {
-  readonly running: boolean;
-  readonly kind: 'ingest' | 'fetch' | 'reprocess' | null;
-  readonly scope: 'all' | 'source' | 'library' | null;
-  readonly phase: string | null;
-  readonly count: CurrentOperationCount | null;
-  readonly message: string | null;
-  readonly started_at: string | null;
-  readonly updated_at: string | null;
-};
-type RuntimeOperation = CanonicalCurrentOperation | LegacyCurrentOperation;
+type RuntimeOperation = CanonicalCurrentOperation;
 type RuntimeOperationResponse = { readonly operation: RuntimeOperation };
 type SourceFixture = {
   readonly id: string;
@@ -137,11 +127,11 @@ const runningManualIngestOperation: CanonicalCurrentOperation = {
   updated_at: '2026-05-17T14:00:05Z'
 };
 
-const legacyPollingOperations: readonly LegacyCurrentOperation[] = [
+const pollingOperations: readonly CanonicalCurrentOperation[] = [
   {
     running: true,
-    kind: 'reprocess',
-    scope: 'library',
+    kind: 'library_reprocess',
+    actor_kind: 'human',
     phase: 'loading_sources',
     count: { current: 1, total: 5 },
     message: 'library reprocess loading sources',
@@ -150,8 +140,8 @@ const legacyPollingOperations: readonly LegacyCurrentOperation[] = [
   },
   {
     running: true,
-    kind: 'reprocess',
-    scope: 'library',
+    kind: 'library_reprocess',
+    actor_kind: 'human',
     phase: 'processing_items',
     count: { current: 3, total: 5 },
     message: 'library reprocess processing item 3',
@@ -296,7 +286,7 @@ test.describe('expected-red current-operation and fresh review browser proof', (
   test('CO-04/FR-06: visible current-operation surfaces poll bounded updates and clear when idle', async ({ page, ownerToken }) => {
     let operationIndex = 0;
     const fixture = await installApiFixture(page, ownerToken, {
-      currentOperation: () => ({ operation: legacyPollingOperations[Math.min(operationIndex++, legacyPollingOperations.length - 1)] })
+      currentOperation: () => ({ operation: pollingOperations[Math.min(operationIndex++, pollingOperations.length - 1)] })
     });
     await page.goto('/');
     await waitForShell(page);

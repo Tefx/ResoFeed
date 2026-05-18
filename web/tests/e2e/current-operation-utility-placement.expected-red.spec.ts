@@ -70,8 +70,8 @@ const items: ItemSummary[] = [
 function runningOperation() {
   return {
     running: true,
-    kind: 'reprocess',
-    scope: 'library',
+    kind: 'library_reprocess',
+    actor_kind: 'human',
     phase: 'processing_items',
     count: { current: 2, total: 5 },
     message: 'library reprocess processing item',
@@ -130,8 +130,8 @@ async function installApiFixtures(
             message: 'ingest already running',
             details: {
               operation_running: true,
-              operation: 'reprocess',
-              scope: 'library',
+              operation: 'library_reprocess',
+              actor_kind: 'human',
               retry_allowed: true,
               current_operation: runningOperation()
             }
