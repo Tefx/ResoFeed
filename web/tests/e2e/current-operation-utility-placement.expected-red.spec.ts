@@ -238,8 +238,8 @@ test.describe('expected-red contextual operation and utility placement contracts
     await page.getByRole('button', { name: '[RUN INGEST]' }).click();
 
     const ledger = page.locator('section.source-ledger');
-    const contextualConflictStatus = ledger.locator('.source-ledger__header-actions .source-ledger__status').filter({
-      hasText: /err: ingest already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i
+    const contextualConflictStatus = ledger.locator('.source-ledger__header > .source-ledger__status').filter({
+      hasText: /err: ingest already running.*op:\s*library_reprocess.*actor:human.*phase:processing_items.*2\/5.*library reprocess processing item.*since 11:00:00/i
     });
     await expect(contextualConflictStatus, 'Source Ledger conflict status must include current_operation detail').toHaveCount(1);
     await expect(contextualConflictStatus).toBeVisible();
@@ -251,6 +251,6 @@ test.describe('expected-red contextual operation and utility placement contracts
 
     const menu = await openSurfaceMenu(page);
     await attachRenderedEvidence(page, testInfo, 'utility-menu-open-blocked-operation-status');
-    await expect(menu.getByText(/err: ingest already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i), 'opened RESOFEED operations/utility surface must expose blocked-operation explanation with current_operation detail').toBeVisible();
+    await expect(menu.getByText(/err: ingest already running.*op:\s*library_reprocess.*actor:human.*phase:processing_items.*2\/5.*library reprocess processing item.*since 11:00:00/i), 'opened RESOFEED operations/utility surface must expose blocked-operation explanation with current_operation detail').toBeVisible();
   });
 });

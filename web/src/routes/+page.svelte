@@ -256,6 +256,19 @@
     return formatOperationConflictStatus(state.text, state.operation);
   }
 
+  function localManualIngestOperation(startedAt: string): CurrentOperationInfo {
+    return {
+      running: true,
+      kind: 'manual_ingest',
+      actor_kind: 'human',
+      phase: 'submitting_ingest',
+      count: null,
+      message: 'manual ingest pending',
+      started_at: startedAt,
+      updated_at: startedAt
+    };
+  }
+
   async function refreshCurrentOperationIfAvailable(): Promise<void> {
     try {
       const response = await apiClient().currentOperation();
@@ -645,6 +658,9 @@
   }
 
   async function runIngest(): Promise<RunIngestSuccessResponse> {
+    if (contextualOperation.kind !== 'running') {
+      contextualOperation = { kind: 'running', operation: localManualIngestOperation(new Date().toISOString()) };
+    }
     const response = await apiClient().runIngest();
     if (!response.ok) {
       const text = `err: ${response.body.error.message}`;

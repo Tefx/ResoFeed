@@ -50,7 +50,7 @@
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
   const ingestActionRunning = $derived(isRunningIngest || isOperationBlockingManualIngest(currentOperation));
   const sharedIngestProbeKey = $derived(
-    currentOperation?.running && (currentOperation.kind === 'manual_ingest' || currentOperation.kind === 'background_ingest')
+    !isRunningIngest && currentOperation?.running && (currentOperation.kind === 'manual_ingest' || currentOperation.kind === 'background_ingest')
       ? `${currentOperation.kind}:${currentOperation.started_at ?? currentOperation.updated_at ?? 'unknown'}`
       : null
   );
