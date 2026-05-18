@@ -12,11 +12,11 @@
   let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
+  const feedTimeGroupReference = $derived(feedReferenceNow(items));
   const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
-    .sort((left, right) => compareItemsByTimeGroup(left.item, right.item) || left.index - right.index)
+    .sort((left, right) => compareItemsByTimeGroup(left.item, right.item, feedTimeGroupReference) || left.index - right.index)
     .map(({ item }) => item));
-  const feedTimeGroupReference = $derived(feedReferenceNow(items));
 
   function feedReferenceNow(feedItems: ItemSummary[]): Date {
     const latestTimestamp = feedItems
@@ -55,12 +55,12 @@
         >
           <p class="contract-label contract-feed-meta">
             <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span>
-            · <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
-            · <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
-            · <span aria-label={`Summary provenance: ${itemSummaryProvenanceLabel(item)}`}>{itemSummaryProvenanceLabel(item)}</span>
-            · <span aria-label={`Priority signal: ${itemPriorityLabel(item)}`}>{itemPriorityLabel(item)}</span>
+            <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
+            <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
+            <span class="feed-meta-separator feed-meta-secondary" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={`Summary provenance: ${itemSummaryProvenanceLabel(item)}`}>{itemSummaryProvenanceLabel(item)}</span>
+            <span class="feed-meta-separator feed-meta-secondary" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={`Priority signal: ${itemPriorityLabel(item)}`}>{itemPriorityLabel(item)}</span>
             {#if item.external_surfaced_at}
-              · <span aria-label="Externally surfaced by agent">agent:external</span>
+              <span class="feed-meta-separator feed-meta-agent" aria-hidden="true">·</span> <span class="feed-meta-agent" aria-label="Externally surfaced by agent">agent:external</span>
             {/if}
             {#if shouldShowTimeGroup(groupedItems, index, feedTimeGroupReference)}
               <span class="contract-time-label">{itemTimeGroup(item, feedTimeGroupReference)}</span>

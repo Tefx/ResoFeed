@@ -1193,22 +1193,37 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   }
 
   .contract-feed-meta {
+    display: flex;
     flex-wrap: nowrap;
     height: 16px;
     line-height: 16px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .contract-feed-meta span {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
     white-space: nowrap;
   }
 
+  .contract-feed-meta .feed-meta-age,
+  .contract-feed-meta .feed-meta-age-separator,
+  .contract-feed-meta .feed-meta-extraction,
+  .contract-feed-meta .feed-meta-extraction-separator,
+  .contract-feed-meta .feed-meta-secondary,
+  .contract-feed-meta .feed-meta-agent {
+    /* [DEVIATION]: The 390px feed row cannot show every metadata atom beside the fixed 44px Resonate control without clipping source provenance; the full metadata remains in DOM/desktop while mobile preserves source + time-group scan anchors. */
+    display: none;
+  }
+
+  .contract-feed-meta .feed-meta-separator {
+    margin-inline: var(--rf-space-xs);
+  }
+
   .contract-feed-meta .feed-meta-source {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
   }
 
   .contract-time-label {

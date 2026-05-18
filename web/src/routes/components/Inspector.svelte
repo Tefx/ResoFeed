@@ -283,6 +283,27 @@
     return sources.find((source) => source.id === sourceId)?.url ?? '';
   }
 
+  function normalizedArticleUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url);
+      parsed.search = '';
+      parsed.hash = '';
+      return parsed.toString();
+    } catch {
+      return null;
+    }
+  }
+
+  function sourceFeedUrl(value: InspectableItem): string | null {
+    return 'provenance' in value ? value.provenance.source_url : sourceUrlFor(value.source_id) || null;
+  }
+
+  function isSyntheticFeedFragment(url: string, feedUrl: string | null): boolean {
+    if (!feedUrl) return false;
+    return url.startsWith(`${feedUrl}#`);
+  }
+
   function summaryToGroupedSourceItem(candidate: ItemSummary, value: InspectableItem): InspectorGroupedSourceItem {
     return {
       item_id: candidate.id,
@@ -303,9 +324,16 @@
   }
 
   function sameRuntimeGroup(candidate: ItemSummary, value: InspectableItem): boolean {
+    if (candidate.id === value.id) return false;
     if (value.story_key && candidate.story_key === value.story_key) return true;
     if (candidate.duplicate_of_item_id === value.id || value.duplicate_of_item_id === candidate.id) return true;
-    return false;
+    const valueUrl = 'provenance' in value ? (value.provenance.canonical_url ?? value.provenance.original_url ?? value.url) : value.url;
+    if (!candidate.url || !valueUrl) return false;
+    const selectedFeedUrl = sourceFeedUrl(value);
+    const candidateFeedUrl = sourceUrlFor(candidate.source_id) || selectedFeedUrl;
+    if (isSyntheticFeedFragment(valueUrl, selectedFeedUrl) || isSyntheticFeedFragment(candidate.url, candidateFeedUrl)) return false;
+    if (candidate.url === valueUrl) return true;
+    return candidate.source_id !== value.source_id && normalizedArticleUrl(candidate.url) !== null && normalizedArticleUrl(candidate.url) === normalizedArticleUrl(valueUrl);
   }
 
   function groupedSourceItems(value: InspectableItem): InspectorGroupedSourceItem[] {
@@ -418,7 +446,7 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link</a></p>
+    <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <p class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
