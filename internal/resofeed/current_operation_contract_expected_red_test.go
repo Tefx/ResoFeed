@@ -163,11 +163,11 @@ func assertCurrentOperationShape(t *testing.T, operation map[string]any) {
 
 func assertConflictDetailsWithCurrentOperation(t *testing.T, details map[string]any, kind string, actorKind string) {
 	t.Helper()
-	if len(details) != 2 {
-		t.Fatalf("conflict details = %#v, want retry_allowed plus current_operation only", details)
+	if len(details) != 5 {
+		t.Fatalf("conflict details = %#v, want operation_running, operation, actor_kind, retry_allowed, and current_operation", details)
 	}
-	if details["retry_allowed"] != true {
-		t.Fatalf("conflict details = %#v, want retry_allowed true", details)
+	if details["operation_running"] != true || details["operation"] != kind || details["actor_kind"] != actorKind || details["retry_allowed"] != true {
+		t.Fatalf("conflict details = %#v, want canonical operation=%s actor_kind=%s retry_allowed true", details, kind, actorKind)
 	}
 	operation, ok := details["current_operation"].(map[string]any)
 	if !ok {

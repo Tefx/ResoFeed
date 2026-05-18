@@ -82,8 +82,8 @@ function internalError(message = 'unexpected api error'): Response {
 function runningOperation(): CurrentOperationInfo {
   return {
     running: true,
-    kind: 'reprocess',
-    scope: 'library',
+    kind: 'library_reprocess',
+    actor_kind: 'human',
     phase: 'processing_items',
     count: { current: 2, total: 5 },
     message: 'library reprocess processing item',
@@ -113,7 +113,7 @@ function installFetch(options: FetchFixtureOptions = {}) {
     if (url.endsWith('/api/feed/today')) return jsonResponse({ items: feedItems });
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
-      return jsonResponse({ operation: options.operation ?? { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
+      return jsonResponse({ operation: options.operation ?? { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     }
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith('/api/doctor')) {
@@ -240,7 +240,7 @@ describe('expected-red runtime and provenance conformance regressions', () => {
     await user.click(within(menu as HTMLElement).getByText('RESOFEED'));
 
     await waitFor(() => {
-      expect(within(menu as HTMLElement).getByText(/op:\s*reprocess\/library\s*·\s*actor:owner\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since\s*11:00:00/i)).toBeVisible();
+      expect(within(menu as HTMLElement).getByText(/op:\s*library_reprocess\s*·\s*actor:human\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since\s*11:00:00/i)).toBeVisible();
     });
     expect(within(menu as HTMLElement).queryByText(/current operation:|msg:|started:|updated:/i)).not.toBeInTheDocument();
   });

@@ -1,0 +1,131 @@
+import type { CurrentOperationInfo, OperationActorKind, OperationKind } from '$lib/api-contract';
+
+export const CANONICAL_OPERATION_KINDS = [
+  'background_ingest',
+  'manual_ingest',
+  'source_fetch',
+  'library_reprocess'
+] as const satisfies readonly OperationKind[];
+
+export const CANONICAL_OPERATION_ACTOR_KINDS = [
+  'background',
+  'human',
+  'agent'
+] as const satisfies readonly OperationActorKind[];
+
+export type OperationActionLabel = '[INGESTING...]' | '[FETCHING...]' | '[REPROCESSING...]';
+
+export function idleOperation(): CurrentOperationInfo {
+  return {
+    running: false,
+    kind: null,
+    actor_kind: null,
+    phase: null,
+    count: null,
+    message: null,
+    started_at: null,
+    updated_at: null
+  };
+}
+
+export function isOperationKind(value: unknown): value is CurrentOperationInfo['kind'] {
+  return value === null || CANONICAL_OPERATION_KINDS.includes(value as OperationKind);
+}
+
+export function isOperationActorKind(value: unknown): value is CurrentOperationInfo['actor_kind'] {
+  return value === null || CANONICAL_OPERATION_ACTOR_KINDS.includes(value as OperationActorKind);
+}
+
+export function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  const { current, total } = candidate;
+  return (
+    Number.isInteger(current) &&
+    Number.isInteger(total) &&
+    typeof current === 'number' &&
+    typeof total === 'number' &&
+    current >= 0 &&
+    total >= 0
+  );
+}
+
+export function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.running === 'boolean' &&
+    isOperationKind(candidate.kind) &&
+    isOperationActorKind(candidate.actor_kind) &&
+    (typeof candidate.phase === 'string' || candidate.phase === null) &&
+    (isCurrentOperationCount(candidate.count) || candidate.count === null) &&
+    (typeof candidate.message === 'string' || candidate.message === null) &&
+    (typeof candidate.started_at === 'string' || candidate.started_at === null) &&
+    (typeof candidate.updated_at === 'string' || candidate.updated_at === null)
+  );
+}
+
+export function normalizeCurrentOperationInfo(value: unknown): CurrentOperationInfo | null {
+  if (isCurrentOperationInfo(value)) return value;
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const candidate = value as Record<string, unknown>;
+  const kind = candidate.kind === 'ingest' && candidate.scope === 'all'
+    ? 'manual_ingest'
+    : candidate.kind === 'fetch' && candidate.scope === 'source'
+      ? 'source_fetch'
+      : candidate.kind === 'reprocess' && candidate.scope === 'library'
+        ? 'library_reprocess'
+        : null;
+  if (!kind) return null;
+  const actorKind = candidate.actor_kind === 'background' || candidate.actor_kind === 'human' || candidate.actor_kind === 'agent'
+    ? candidate.actor_kind
+    : 'human';
+  const normalized = { ...candidate, kind, actor_kind: actorKind };
+  return isCurrentOperationInfo(normalized) ? normalized : null;
+}
+
+export function operationActionLabel(operation: CurrentOperationInfo): OperationActionLabel | null {
+  if (!operation.running) return null;
+  if (operation.kind === 'manual_ingest' || operation.kind === 'background_ingest') return '[INGESTING...]';
+  if (operation.kind === 'source_fetch') return '[FETCHING...]';
+  if (operation.kind === 'library_reprocess') return '[REPROCESSING...]';
+  return null;
+}
+
+export function isOperationBlockingManualIngest(operation: CurrentOperationInfo | null): boolean {
+  return Boolean(operation?.running && operation.kind !== null);
+}
+
+export function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
+  if (!timestamp) return null;
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return timestamp;
+  return new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+export function operationDetails(operation: CurrentOperationInfo): string {
+  return [
+    operation.kind ? `op: ${operation.kind}` : null,
+    operation.actor_kind ? `actor:${operation.actor_kind}` : null,
+    operation.phase ? `phase:${operation.phase}` : null,
+    operation.count ? `${operation.count.current}/${operation.count.total}` : null,
+    operation.message,
+    operation.started_at || operation.updated_at ? `since ${operationTimestamp(operation.started_at ?? operation.updated_at)}` : null
+  ].filter(Boolean).join(' · ');
+}
+
+export function formatCurrentOperationStatus(operation: CurrentOperationInfo): string {
+  const label = operationActionLabel(operation);
+  const details = operationDetails(operation);
+  return label && details ? `${label} · ${details}` : details;
+}
+
+export function formatOperationConflictStatus(text: string, operation: CurrentOperationInfo | null): string {
+  return operation ? `${text} · ${operationDetails(operation)}` : text;
+}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { processingLanguageRuntimeContract, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
+  import { isOperationBlockingManualIngest } from '$lib/current-operation';
   import StatePortability from './StatePortability.svelte';
 
   interface Props {
@@ -12,6 +13,7 @@
     onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
     onExportState: () => Promise<StateBundleV1>;
     onImportState: (bundle: StateBundleV1) => Promise<void> | void;
+    currentOperation?: CurrentOperationInfo | null;
     currentOperationStatusText?: string;
     suppressStatusRole?: boolean;
   }
@@ -24,6 +26,7 @@
     onFetchSource = async (source: Source) => ({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
     onImportState,
+    currentOperation = null,
     currentOperationStatusText = '',
     suppressStatusRole = false
   }: Props = $props();
@@ -38,16 +41,19 @@
   let deletedSourceIds = $state<ReadonlySet<string>>(new Set());
   let importInput = $state<HTMLInputElement | undefined>();
   let ledgerHeading = $state<HTMLHeadingElement | undefined>();
-  let sharedIngestConflictProbeDone = false;
+  let sharedIngestConflictProbeKey: string | null = null;
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
   const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
-  const sharedIngestRunning = $derived(/\[INGESTING\.\.\.\].*op:\s*(manual_ingest|background_ingest)/i.test(currentOperationStatusText));
-  const sharedIngestBlocked = $derived(/err:\s*ingest already running/i.test(currentOperationStatusText));
-  const ingestActionRunning = $derived(isRunningIngest || sharedIngestRunning || sharedIngestBlocked);
+  const ingestActionRunning = $derived(isRunningIngest || isOperationBlockingManualIngest(currentOperation));
+  const sharedIngestProbeKey = $derived(
+    currentOperation?.running && (currentOperation.kind === 'manual_ingest' || currentOperation.kind === 'background_ingest')
+      ? `${currentOperation.kind}:${currentOperation.started_at ?? currentOperation.updated_at ?? 'unknown'}`
+      : null
+  );
 
   function formatTime(timestamp: string | null | undefined): string | null {
     if (!timestamp) return null;
@@ -136,25 +142,15 @@
     return new Promise((resolve) => window.setTimeout(resolve, 120));
   }
 
-  function currentUtcClock(): string {
-    return new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'UTC'
-    }).format(new Date());
-  }
-
   $effect(() => {
-    if (!sharedIngestRunning) {
-      sharedIngestConflictProbeDone = false;
+    if (!sharedIngestProbeKey) {
+      sharedIngestConflictProbeKey = null;
       return;
     }
-    if (sharedIngestConflictProbeDone) return;
-    sharedIngestConflictProbeDone = true;
+    if (sharedIngestConflictProbeKey === sharedIngestProbeKey) return;
+    sharedIngestConflictProbeKey = sharedIngestProbeKey;
     void onRunIngest().catch(() => {
-      // The guarded endpoint returns canonical details.current_operation; +page.svelte promotes it into currentOperationStatusText for the visible disabled state.
+      // Source Ledger remains disabled from typed currentOperation; parent promotes backend details.current_operation into contextual conflict display.
     });
   });
 
@@ -168,7 +164,7 @@
     globalIngestStatusText = '';
     try {
       await tick();
-      globalIngestStatusText = `[INGESTING...] · op: manual_ingest · actor:human · phase:running · ingest running · since ${currentUtcClock()}`;
+      globalIngestStatusText = 'submitting ingest';
       const result = await onRunIngest();
       const completedAt = formatTime(result.completed_at);
       globalIngestStatusText = result.completed

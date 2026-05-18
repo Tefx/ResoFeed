@@ -313,7 +313,22 @@ func guardConflictDetails(err error) (operationGuardDetails, bool) {
 }
 
 func guardConflictDetailMap(details operationGuardDetails) map[string]any {
-	return map[string]any{"retry_allowed": true, "current_operation": currentOperationFromGuardDetails(details)}
+	currentOperation := currentOperationFromGuardDetails(details)
+	operation := "operation"
+	actorKind := string(ActorKindHuman)
+	if currentOperation.Kind != nil {
+		operation = *currentOperation.Kind
+	}
+	if currentOperation.ActorKind != nil {
+		actorKind = *currentOperation.ActorKind
+	}
+	return map[string]any{
+		"operation_running": true,
+		"operation":         operation,
+		"actor_kind":        actorKind,
+		"retry_allowed":     true,
+		"current_operation": currentOperation,
+	}
 }
 
 func guardConflictHTTPDetailMap(details operationGuardDetails) map[string]any {

@@ -46,7 +46,7 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 			if parsed.Error.Code != "conflict" || parsed.Error.Message != "operation already running" {
 				t.Fatalf("error = %+v, want exact conflict message", parsed.Error)
 			}
-			assertGuardDetails(t, parsed.Error.Details, "fetch", "source")
+			assertGuardDetails(t, parsed.Error.Details, "source_fetch", "human")
 		})
 	}
 }
@@ -69,7 +69,7 @@ func TestPLHMMCPGuardConflictUsesActualHolderAndNestedOnlyData(t *testing.T) {
 	if resp.Error.Code != -32000 || resp.Error.Message != "operation already running" {
 		t.Fatalf("MCP error = %+v, want conflict", resp.Error)
 	}
-	assertNestedOnlyMCPErrorData(t, resp.Error.Data, "conflict", "operation already running", "ingest", "all")
+	assertNestedOnlyMCPErrorData(t, resp.Error.Data, "conflict", "operation already running", "manual_ingest", "human")
 }
 
 func TestPLHMMCPRuntimeFieldErrorsUseNestedOnlyData(t *testing.T) {
@@ -99,17 +99,17 @@ func TestPLHMMCPRuntimeFieldErrorsUseNestedOnlyData(t *testing.T) {
 	}
 }
 
-func assertGuardDetails(t *testing.T, details map[string]any, operation string, scope string) {
+func assertGuardDetails(t *testing.T, details map[string]any, operation string, actorKind string) {
 	t.Helper()
-	if len(details) != 4 && len(details) != 5 {
-		t.Fatalf("guard details = %#v, want legacy fields and optional current_operation", details)
+	if len(details) != 5 {
+		t.Fatalf("guard details = %#v, want canonical fields and current_operation", details)
 	}
-	if details["operation_running"] != true || details["operation"] != operation || details["scope"] != scope || details["retry_allowed"] != true {
-		t.Fatalf("guard details = %#v, want operation=%s scope=%s", details, operation, scope)
+	if details["operation_running"] != true || details["operation"] != operation || details["actor_kind"] != actorKind || details["retry_allowed"] != true {
+		t.Fatalf("guard details = %#v, want operation=%s actor_kind=%s", details, operation, actorKind)
 	}
 }
 
-func assertNestedOnlyMCPErrorData(t *testing.T, data map[string]any, code string, message string, operation string, scope string) {
+func assertNestedOnlyMCPErrorData(t *testing.T, data map[string]any, code string, message string, operation string, actorKind string) {
 	t.Helper()
 	if len(data) != 1 {
 		t.Fatalf("MCP error data = %#v, want only nested error object", data)
@@ -125,5 +125,5 @@ func assertNestedOnlyMCPErrorData(t *testing.T, data map[string]any, code string
 	if !ok {
 		t.Fatalf("nested details = %#v, want object", inner["details"])
 	}
-	assertGuardDetails(t, details, operation, scope)
+	assertGuardDetails(t, details, operation, actorKind)
 }

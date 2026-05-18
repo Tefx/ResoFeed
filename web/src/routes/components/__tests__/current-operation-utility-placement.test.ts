@@ -18,8 +18,8 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
 function runningOperation() {
   return {
     running: true,
-    kind: 'reprocess',
-    scope: 'library',
+    kind: 'library_reprocess',
+    actor_kind: 'human',
     phase: 'processing_items',
     count: { current: 2, total: 5 },
     message: 'library reprocess processing item',
@@ -28,7 +28,20 @@ function runningOperation() {
   };
 }
 
-function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown } = {}) {
+function runningManualIngestOperation() {
+  return {
+    running: true,
+    kind: 'manual_ingest',
+    actor_kind: 'human',
+    phase: 'fetching_sources',
+    count: { current: 1, total: 3 },
+    message: 'ingest fetching source',
+    started_at: '2026-05-17T11:00:00Z',
+    updated_at: '2026-05-17T11:00:05Z'
+  };
+}
+
+function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown) } = {}) {
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? 'GET';
@@ -37,7 +50,8 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
     if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
-      return jsonResponse({ operation: options.operation ?? { running: false, kind: null, scope: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
+      const operation = typeof options.operation === 'function' ? options.operation() : options.operation;
+      return jsonResponse({ operation: operation ?? { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     }
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith('/api/ingest') && method === 'POST') {
@@ -48,8 +62,6 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
             message: 'operation already running',
             details: {
               operation_running: true,
-              operation: 'reprocess',
-              scope: 'library',
               retry_allowed: true,
               current_operation: runningOperation()
             }
@@ -65,7 +77,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown } = {}) {
+async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown) } = {}) {
   cleanup();
   window.localStorage.clear();
   installFetch(options);
@@ -118,18 +130,17 @@ describe('current operation and low-frequency utility placement', () => {
   it('renders running and blocked operation context in Source Ledger/menu without top-chrome dashboard chrome', async () => {
     let releaseIngest!: () => void;
     const holdIngest = new Promise<void>((resolve) => { releaseIngest = resolve; });
-    const { user } = await renderAuthenticatedPage({ holdIngest });
+    let operationActive = true;
+    const { user } = await renderAuthenticatedPage({ holdIngest, operation: () => operationActive ? runningManualIngestOperation() : undefined });
 
     let menu = await openMenu(user);
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
-    await user.click(screen.getByRole('button', { name: '[RUN INGEST]' }));
-    expect(screen.getByRole('button', { name: '[INGESTING...]' })).toBeVisible();
+    expect(screen.getByRole('button', { name: '[INGESTING...]' })).toBeDisabled();
     expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('[INGESTING...]')).not.toBeInTheDocument();
     menu = await openMenu(user);
-    expect(menu.getByText(/\[INGESTING\.\.\.\]|current operation:\s*ingest/i)).toBeVisible();
+    await waitFor(() => expect(menu.getByText(/\[INGESTING\.\.\.\].*op:\s*manual_ingest.*actor:human/i)).toBeVisible());
+    operationActive = false;
     releaseIngest();
-
-    await waitFor(() => expect(screen.getByRole('button', { name: '[RUN INGEST]' })).toBeVisible());
     cleanup();
     window.localStorage.clear();
     const blocked = await renderAuthenticatedPage({ ingestConflict: true });
@@ -137,21 +148,21 @@ describe('current operation and low-frequency utility placement', () => {
     await blocked.user.click(blockedNavigation.getByRole('button', { name: 'SOURCE LEDGER' }));
     await blocked.user.click(screen.getByRole('button', { name: '[RUN INGEST]' }));
     await waitFor(() => {
-      expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*current operation:\s*reprocess\/library/i)).toBeVisible();
+      expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*op:\s*library_reprocess/i)).toBeVisible();
     });
     expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('err: operation already running')).not.toBeInTheDocument();
     expect(within(screen.getByTestId('source-ledger')).getAllByText(/err: operation already running/i)).toHaveLength(1);
     const blockedMenu = await openMenu(blocked.user);
-    expect(blockedMenu.getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
-    expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+    expect(blockedMenu.getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
+    expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
   });
 
   it('renders current operation phase, count, message, and timestamps when the menu or Source Ledger is contextual', async () => {
     const { user } = await renderAuthenticatedPage({ operation: runningOperation() });
     const menu = await openMenu(user);
-    expect(menu.getByText(/\[REPROCESSING\.\.\.\].*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+    expect(menu.getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
 
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
-    expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*current operation:\s*reprocess\/library.*phase:\s*processing_items.*count:\s*2\/5.*msg:\s*library reprocess processing item.*started:\s*11:00:00.*updated:\s*11:00:05/i)).toBeVisible();
+    expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
   });
 });

@@ -1,6 +1,5 @@
 import type {
   ApiErrorCode,
-  CurrentOperationInfo,
   CurrentOperationResponse,
   DeleteSourceResponse,
   ErrorBody,
@@ -35,6 +34,7 @@ import type {
   SteerUndoResult
 } from '$lib/api-contract';
 import { processingLanguageRuntimeContract } from '$lib/api-contract';
+import { normalizeCurrentOperationInfo } from '$lib/current-operation';
 
 export interface ResoFeedApiClientOptions {
   ownerToken: string;
@@ -129,65 +129,10 @@ function isProcessingLanguage(value: unknown): value is ProcessingLanguage {
   return value === 'en' || value === 'zh';
 }
 
-function isOperationKind(value: unknown): value is CurrentOperationInfo['kind'] {
-  return value === 'background_ingest' || value === 'manual_ingest' || value === 'source_fetch' || value === 'library_reprocess' || value === null;
-}
-
-function isOperationActorKind(value: unknown): value is CurrentOperationInfo['actor_kind'] {
-  return value === 'background' || value === 'human' || value === 'agent' || value === null;
-}
-
-function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
-  if (!isRecord(value)) return false;
-  const { current, total } = value;
-  return (
-    Number.isInteger(current) &&
-    Number.isInteger(total) &&
-    typeof current === 'number' &&
-    typeof total === 'number' &&
-    current >= 0 &&
-    total >= 0
-  );
-}
-
-function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
-  if (!isRecord(value)) return false;
-  return (
-    typeof value.running === 'boolean' &&
-    isOperationKind(value.kind) &&
-    isOperationActorKind(value.actor_kind) &&
-    (typeof value.phase === 'string' || value.phase === null) &&
-    (isCurrentOperationCount(value.count) || value.count === null) &&
-    (typeof value.message === 'string' || value.message === null) &&
-    (typeof value.started_at === 'string' || value.started_at === null) &&
-    (typeof value.updated_at === 'string' || value.updated_at === null)
-  );
-}
-
-function normalizeLegacyOperation(value: Record<string, unknown>): CurrentOperationInfo | null {
-  const legacyKind = value.kind;
-  const legacyScope = value.scope;
-  const kind = legacyKind === 'ingest' && legacyScope === 'all'
-    ? 'manual_ingest'
-    : legacyKind === 'fetch' && legacyScope === 'source'
-      ? 'source_fetch'
-      : legacyKind === 'reprocess' && legacyScope === 'library'
-        ? 'library_reprocess'
-        : null;
-  if (!kind) return null;
-  const candidate = { ...value, kind, actor_kind: 'human' };
-  return isCurrentOperationInfo(candidate) ? candidate : null;
-}
-
 function normalizeCurrentOperationResponse(value: unknown): CurrentOperationResponse | null {
   if (!isRecord(value) || !isRecord(value.operation)) return null;
-  if (isCurrentOperationInfo(value.operation)) return { operation: value.operation };
-  const legacy = normalizeLegacyOperation(value.operation);
-  return legacy ? { operation: legacy } : null;
-}
-
-function isCurrentOperationResponse(value: unknown): value is CurrentOperationResponse {
-  return normalizeCurrentOperationResponse(value) !== null;
+  const operation = normalizeCurrentOperationInfo(value.operation);
+  return operation ? { operation } : null;
 }
 
 function isProcessingLanguageResponse(value: unknown): value is ProcessingLanguageResponse {

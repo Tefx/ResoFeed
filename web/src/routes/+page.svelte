@@ -3,6 +3,7 @@
   import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
+  import { formatCurrentOperationStatus, formatOperationConflictStatus, normalizeCurrentOperationInfo } from '$lib/current-operation';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import Feed from './components/Feed.svelte';
@@ -111,6 +112,7 @@
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
   const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
+  const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running'));
 
   function surfaceForPath(pathname: string): Surface {
@@ -241,113 +243,17 @@
     return `${prefix}: updated ${result.items_updated}; indexed ${result.items_indexed}`;
   }
 
-  function idleOperation(): CurrentOperationInfo {
-    return { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null };
-  }
-
-  function localRunningOperation(kind: NonNullable<CurrentOperationInfo['kind']>, message: string): CurrentOperationInfo {
-    const timestamp = new Date().toISOString();
-    return { running: true, kind, actor_kind: 'human', phase: 'running', count: null, message, started_at: timestamp, updated_at: timestamp };
-  }
-
-  function isCurrentOperationInfo(value: unknown): value is CurrentOperationInfo {
-    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-    const candidate = value as Record<string, unknown>;
-    return (
-      typeof candidate.running === 'boolean' &&
-      (candidate.kind === 'background_ingest' || candidate.kind === 'manual_ingest' || candidate.kind === 'source_fetch' || candidate.kind === 'library_reprocess' || candidate.kind === null) &&
-      (candidate.actor_kind === 'background' || candidate.actor_kind === 'human' || candidate.actor_kind === 'agent' || candidate.actor_kind === null) &&
-      (typeof candidate.phase === 'string' || candidate.phase === null) &&
-      (isCurrentOperationCount(candidate.count) || candidate.count === null) &&
-      (typeof candidate.message === 'string' || candidate.message === null) &&
-      (typeof candidate.started_at === 'string' || candidate.started_at === null) &&
-      (typeof candidate.updated_at === 'string' || candidate.updated_at === null)
-    );
-  }
-
-  function normalizeCurrentOperationInfo(value: unknown): CurrentOperationInfo | null {
-    if (isCurrentOperationInfo(value)) return value;
-    if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
-    const candidate = value as Record<string, unknown>;
-    const kind = candidate.kind === 'ingest' && candidate.scope === 'all'
-      ? 'manual_ingest'
-      : candidate.kind === 'fetch' && candidate.scope === 'source'
-        ? 'source_fetch'
-        : candidate.kind === 'reprocess' && candidate.scope === 'library'
-          ? 'library_reprocess'
-          : null;
-    if (!kind) return null;
-    const normalized = { ...candidate, kind, actor_kind: 'human' };
-    return isCurrentOperationInfo(normalized) ? normalized : null;
-  }
-
-  function isCurrentOperationCount(value: unknown): value is NonNullable<CurrentOperationInfo['count']> {
-    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-    const candidate = value as Record<string, unknown>;
-    const { current, total } = candidate;
-    return (
-      Number.isInteger(current) &&
-      Number.isInteger(total) &&
-      typeof current === 'number' &&
-      typeof total === 'number' &&
-      current >= 0 &&
-      total >= 0
-    );
-  }
-
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
     const candidate = error.body.error.details.current_operation;
     const normalized = normalizeCurrentOperationInfo(candidate);
     if (normalized) return normalized;
-    const operation = error.body.error.details.operation;
-    const scope = error.body.error.details.scope;
-    if ((operation === 'ingest' || operation === 'fetch' || operation === 'reprocess') && (scope === 'all' || scope === 'source' || scope === 'library' || scope === null)) {
-      return normalizeCurrentOperationInfo({ ...idleOperation(), running: true, kind: operation, scope, phase: 'blocked', message: error.body.error.message });
-    }
     return null;
-  }
-
-  function operationLabel(operation: CurrentOperationInfo): string {
-    return operation.kind ?? 'operation';
-  }
-
-  function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
-    if (!timestamp) return null;
-    const date = new Date(timestamp);
-    if (Number.isNaN(date.getTime())) return timestamp;
-    return new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'UTC'
-    }).format(date);
-  }
-
-  function operationDetails(operation: CurrentOperationInfo): string {
-    return [
-      `op: ${operationLabel(operation)}`,
-      operation.actor_kind ? `actor:${operation.actor_kind}` : null,
-      operation.phase ? `phase:${operation.phase}` : null,
-      operation.count ? `${operation.count.current}/${operation.count.total}` : null,
-      operation.message,
-      operation.started_at || operation.updated_at ? `since ${operationTimestamp(operation.started_at ?? operation.updated_at)}` : null
-    ].filter(Boolean).join(' · ');
   }
 
   function formatContextualOperation(state: ContextualOperationState): string {
     if (state.kind === 'idle') return '';
-    if (state.kind === 'running') {
-      const label = state.operation.kind === 'manual_ingest' || state.operation.kind === 'background_ingest'
-        ? '[INGESTING...]'
-        : state.operation.kind === 'source_fetch'
-          ? '[FETCHING...]'
-          : state.operation.kind === 'library_reprocess'
-            ? reprocessRunningLabel
-            : null;
-      return label ? `${label} · ${operationDetails(state.operation)}` : operationDetails(state.operation);
-    }
-    return state.operation ? `${state.text} · ${operationDetails(state.operation)}` : state.text;
+    if (state.kind === 'running') return formatCurrentOperationStatus(state.operation);
+    return formatOperationConflictStatus(state.text, state.operation);
   }
 
   async function refreshCurrentOperationIfAvailable(): Promise<void> {
@@ -739,7 +645,6 @@
   }
 
   async function runIngest(): Promise<RunIngestSuccessResponse> {
-    contextualOperation = { kind: 'running', operation: localRunningOperation('manual_ingest', 'ingest running') };
     const response = await apiClient().runIngest();
     if (!response.ok) {
       const text = `err: ${response.body.error.message}`;
@@ -802,9 +707,8 @@
     if (reprocessState === 'running') return;
     reprocessState = 'running';
     reprocessStatus = '';
-    contextualOperation = { kind: 'running', operation: localRunningOperation('library_reprocess', 'reprocess running') };
     await tick();
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    await refreshCurrentOperationIfAvailable();
     try {
       const response = await apiClient().reprocessLibrary();
       reprocessState = 'complete';
@@ -1045,6 +949,7 @@
         onFetchSource={fetchSource}
         onExportState={exportState}
         onImportState={importState}
+        currentOperation={currentOperation}
         currentOperationStatusText={contextualOperationStatusText}
         suppressStatusRole={steerFeedback.kind === 'receipt'}
       />

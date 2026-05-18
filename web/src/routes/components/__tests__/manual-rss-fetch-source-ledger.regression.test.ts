@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
-import type { Source, StateBundleV1 } from '$lib/api-contract';
+import type { CurrentOperationInfo, Source, StateBundleV1 } from '$lib/api-contract';
 import SourceLedger from '../SourceLedger.svelte';
 
 type ManualFetchSourceLedgerProps = {
@@ -12,6 +12,8 @@ type ManualFetchSourceLedgerProps = {
   onImportOpml: (opml: string) => Promise<void> | void;
   onExportState: () => Promise<StateBundleV1>;
   onImportState: (bundle: StateBundleV1) => Promise<void> | void;
+  currentOperation?: CurrentOperationInfo | null;
+  currentOperationStatusText?: string;
 };
 
 const ManualSourceLedger = SourceLedger as Component<ManualFetchSourceLedgerProps>;
@@ -83,6 +85,27 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
       expect(within(ledger).getByText(label)).toHaveTextContent(label);
     }
     expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export state\]|\[import state\]/);
+  });
+
+  it('disables global ingest from typed current-operation state including library_reprocess without parsing status text', () => {
+    renderLedger({
+      currentOperation: {
+        running: true,
+        kind: 'library_reprocess',
+        actor_kind: 'human',
+        phase: 'processing_items',
+        count: { current: 2, total: 5 },
+        message: 'library reprocess processing item',
+        started_at: '2026-05-17T11:00:00Z',
+        updated_at: '2026-05-17T11:00:05Z'
+      },
+      currentOperationStatusText: '[REPROCESSING...] · op: library_reprocess · actor:human · phase:processing_items · 2/5 · library reprocess processing item · since 11:00:00'
+    });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    const runIngest = within(ledger).getByRole('button', { name: '[INGESTING...]' });
+    expect(runIngest).toBeDisabled();
+    expect(within(ledger).getByText(/op: library_reprocess/)).toBeVisible();
   });
 
   it('keeps manual fetch progress free of spinner or progress animation affordance at rest', () => {

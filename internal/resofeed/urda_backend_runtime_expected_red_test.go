@@ -160,7 +160,7 @@ func TestURDAIngestFetchConflictResponseCarriesRawUIMessageDetails(t *testing.T)
 		if parsed.Error.Code != "conflict" || parsed.Error.Message != "operation already running" {
 			t.Fatalf("conflict error = %+v, want operation guard conflict", parsed.Error)
 		}
-		if parsed.Error.Details["operation_running"] != true || parsed.Error.Details["operation"] != "ingest" || parsed.Error.Details["scope"] != "all" || parsed.Error.Details["retry_allowed"] != true {
+		if parsed.Error.Details["operation_running"] != true || parsed.Error.Details["operation"] != "manual_ingest" || parsed.Error.Details["actor_kind"] != "human" || parsed.Error.Details["retry_allowed"] != true {
 			t.Fatalf("conflict details = %#v, want ARCHITECTURE guard details", parsed.Error.Details)
 		}
 	case first := <-firstDone:
