@@ -1,0 +1,7 @@
+{
+  "labels": [
+    "TODAY",
+    "YESTERDAY"
+  ],
+  "exposedGap": "Feed time-group labels are contiguous chronological groups, never TODAY > YESTERDAY > TODAY for one feed page."
+}

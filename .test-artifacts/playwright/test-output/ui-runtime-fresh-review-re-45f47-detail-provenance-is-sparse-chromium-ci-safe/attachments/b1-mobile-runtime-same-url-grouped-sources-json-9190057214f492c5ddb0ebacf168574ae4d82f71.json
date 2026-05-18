@@ -1,0 +1,16 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "text": "Grouped story with 2 source items Fresh Runtime A — Alpha Today Primary Story selected · duplicate_of: none · full · ok feedFresh Runtime B — Alpha Today Primary Story grouped · duplicate_of: none · full · ok feed",
+  "sourceLinks": [
+    "Fresh Runtime A",
+    "feed",
+    "Fresh Runtime B",
+    "feed"
+  ],
+  "detailProvidedGroupedItems": 0,
+  "feedProvidedSameUrlItems": 2,
+  "exposedGap": "B1 public runtime mobile Inspector must expose both Fresh Runtime A and Fresh Runtime B for same-URL items."
+}

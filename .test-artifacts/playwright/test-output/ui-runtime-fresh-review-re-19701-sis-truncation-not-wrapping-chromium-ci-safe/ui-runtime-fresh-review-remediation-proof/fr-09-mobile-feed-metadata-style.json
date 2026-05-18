@@ -1,0 +1,13 @@
+{
+  "proof": {
+    "text": "src: Primary Wire · 3d · full · model-backed · value: high TODAY",
+    "height": 16,
+    "fontFamily": "\"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+    "lineHeight": "16px",
+    "whiteSpace": "normal",
+    "overflow": "visible",
+    "textOverflow": "clip",
+    "display": "flex"
+  },
+  "exposedGap": "Mobile feed metadata remains one flat inline monospace truncating line, not multi-line wrapping."
+}
