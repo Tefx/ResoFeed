@@ -88,10 +88,10 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	prompt := map[string]any{
 		"task": "summarize_rss_item",
 		"contract": map[string]any{
-			"response_json_only":  true,
-			"fields":              []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
-			"model_status_values": []string{"ok", "summary_unavailable", "model_latency_error"},
-			"target_language_rule": "Write all user-readable output fields in item.target_language. Keep URLs, source identifiers, and provenance literal and untranslated.",
+			"response_json_only":   true,
+			"fields":               []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
+			"model_status_values":  []string{"ok", "summary_unavailable", "model_latency_error"},
+			"target_language_rule": "Write all user-readable output fields in item.target_language. When available_text exists and model_status is ok, translate title, feed_excerpt, extracted_text, summary, and core_insight into item.target_language; do not copy original-language body or excerpt text for feed_excerpt/extracted_text. Keep URLs, source identifiers, and provenance literal and untranslated; source titles also remain literal.",
 		},
 		"item": input,
 	}

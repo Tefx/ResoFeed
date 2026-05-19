@@ -219,7 +219,7 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 		title = reprocessInputTitle(item)
 	}
 	result := reprocessItemOutcome{title: title, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
-	if result.extractedText == nil {
+	if result.extractedText == nil && language != ProcessingLanguageChinese {
 		result.extractedText = nullableString(sourceText)
 	}
 	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}

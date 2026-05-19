@@ -188,6 +188,51 @@ func TestIngestUsesHTTPGUIDAsURLWhenRSSLinkIsEmpty(t *testing.T) {
 	}
 }
 
+func TestChineseModelBackedIngestDoesNotStoreRawEnglishExcerptWhenModelOmitsReadableBody(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-blank-body-ingest"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, `<?xml version="1.0"?><rss><channel><title>TLDR AI</title><item><guid>one</guid><title>OpenAI launches agent</title><link>http://`+r.Host+`/one</link><description>This is the original English RSS excerpt that should not remain visible.</description></item></channel></rss>`)
+		case "/one":
+			_, _ = io.WriteString(w, `<html><body><article>This is the original English article body that should not remain visible.</article></body></html>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feed.Close)
+
+	seedSource(t, ctx, db, "src_zh_blank_ingest", feed.URL+"/feed.xml", "TLDR AI")
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: blankReadableBodyLLM{}}); err != nil {
+		t.Fatalf("IngestOnce: %v", err)
+	}
+
+	itemID := itemIDByURL(t, ctx, db, feed.URL+"/one")
+	text := readStoredText(t, ctx, db, itemID)
+	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || text.feedExcerpt != "" || text.extractedText != "" {
+		t.Fatalf("stored text = %+v, want Chinese summary/insight and no raw English body/excerpt", text)
+	}
+	detail, err := ReadItemDetail(ctx, db, itemID)
+	if err != nil {
+		t.Fatalf("ReadItemDetail: %v", err)
+	}
+	if detail.FeedExcerpt != nil || detail.ExtractedText != nil {
+		t.Fatalf("detail exposed raw source text: feed_excerpt=%v extracted_text=%v", detail.FeedExcerpt, detail.ExtractedText)
+	}
+	if detail.SourceTitle != "TLDR AI" || detail.URL != feed.URL+"/one" || detail.Provenance.SourceURL != feed.URL+"/feed.xml" {
+		t.Fatalf("source identifiers changed: detail=%+v provenance=%+v", detail, detail.Provenance)
+	}
+	if count := reprocessFTSCount(t, ctx, db, itemID, `"original English"`); count != 0 {
+		t.Fatalf("FTS retained raw English excerpt/body with count %d", count)
+	}
+}
+
 func TestProcessingLanguageSearchFTSIncludesCoreInsight(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -276,6 +321,16 @@ func (l *countingSummaryLLM) SummarizeItem(_ context.Context, input OpenRouterSu
 }
 
 func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
+type blankReadableBodyLLM struct{}
+
+func (blankReadableBodyLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{Summary: "中文摘要", CoreInsight: "中文洞察", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (blankReadableBodyLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	return OpenRouterSteeringOutput{}, nil
 }
 

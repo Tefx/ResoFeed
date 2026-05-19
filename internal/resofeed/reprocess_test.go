@@ -76,6 +76,8 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if fallback.title != "processed "+server.URL+"/original-fallback" || fallback.summary != "summary original body after canonical miss" {
 		t.Fatalf("fallback item text = %+v", fallback)
 	}
+	assertNoStaleReadableFTS(t, ctx, db, "item_success")
+	assertNoStaleReadableFTS(t, ctx, db, "item_fallback")
 	assertPreservedReprocessFields(t, ctx, db, "item_unavailable")
 	assertPreservedReprocessFields(t, ctx, db, "item_failed")
 	assertStaleReadableFTS(t, ctx, db, "item_unavailable")
@@ -226,6 +228,40 @@ func TestReprocessLibraryUsesStoredTitleAndPreservesItForURLLikeModelTitle(t *te
 	realTitle := readStoredText(t, ctx, db, "item_real_title")
 	if realTitle.title != "真正的中文标题" || realTitle.summary != "中文摘要：更新标题" || realTitle.coreInsight != "中文洞察：更新标题" {
 		t.Fatalf("real title item text = %+v, want genuine model title applied", realTitle)
+	}
+}
+
+func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsReadableBody(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-blank-body-reprocess"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>Original English TLDR article body should not be surfaced after Chinese reprocess.</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_zh_blank_reprocess", server.URL+"/feed.xml", "TLDR AI")
+	seedReprocessItem(t, ctx, db, "item_zh_blank_reprocess", "src_zh_blank_reprocess", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := reprocessLibraryFresh(ctx, db, blankReadableBodyLLM{})
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 1 || resp.Reprocess.ItemsFailed != 0 || resp.Reprocess.ItemsUnavailable != 0 {
+		t.Fatalf("result = %+v, want one updated item", resp.Reprocess)
+	}
+	text := readStoredText(t, ctx, db, "item_zh_blank_reprocess")
+	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || text.feedExcerpt != "" || text.extractedText != "" {
+		t.Fatalf("stored text = %+v, want Chinese summary/insight and no raw English body/excerpt", text)
+	}
+	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"Original English"`); count != 0 {
+		t.Fatalf("FTS retained raw English source text with count %d", count)
+	}
+	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"PRIOR extracted"`); count != 0 {
+		t.Fatalf("FTS retained stale prior body/excerpt text with count %d", count)
 	}
 }
 
