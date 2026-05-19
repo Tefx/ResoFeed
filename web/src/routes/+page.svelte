@@ -39,6 +39,9 @@
   }
 
   const tokenStorageKey = 'resofeed.ownerToken';
+  const feedPageSize = 50;
+  const activeOperationPollMs = 800;
+  const idleOperationPollMs = 5000;
 
   let ownerToken = $state('');
   let promptState = $state<OwnerTokenPromptState>('empty');
@@ -46,6 +49,9 @@
   let apiError = $state<string | null>(null);
   let steerInput = $state<HTMLInputElement | undefined>();
   let items = $state<ItemSummary[]>([]);
+  let feedOffset = $state(0);
+  let feedHasMore = $state(false);
+  let feedLoadingMore = $state(false);
   let sources = $state<Source[]>([]);
   let selectedItemId = $state<string | null>(null);
   let selectedItemDetail = $state<ItemDetail | null>(null);
@@ -77,7 +83,6 @@
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
   let operationPollGeneration = 0;
-  let operationPollCount = 0;
   let operationPollInFlight = false;
   let operationPollTimer: number | null = null;
   let suppressFeedScrollRecording = false;
@@ -114,7 +119,7 @@
   const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
   const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
-  const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running'));
+  const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
 
   function surfaceForPath(pathname: string): Surface {
     if (pathname === '/doctor') return 'doctor';
@@ -288,9 +293,8 @@
   }
 
   async function pollCurrentOperationWhileRelevant(generation: number): Promise<void> {
-    if (!operationSurfaceRelevant || operationPollInFlight || operationPollCount >= 3) return;
+    if (!operationSurfaceRelevant || operationPollInFlight) return;
     operationPollInFlight = true;
-    operationPollCount += 1;
     try {
       await refreshCurrentOperationIfAvailable();
     } finally {
@@ -298,14 +302,14 @@
     }
     if (generation !== operationPollGeneration || !operationSurfaceRelevant) return;
     clearOperationPollTimer();
-    if (contextualOperation.kind === 'running') {
-      operationPollTimer = window.setTimeout(() => void pollCurrentOperationWhileRelevant(generation), 800);
-    }
+    operationPollTimer = window.setTimeout(
+      () => void pollCurrentOperationWhileRelevant(generation),
+      contextualOperation.kind === 'running' ? activeOperationPollMs : idleOperationPollMs
+    );
   }
 
   $effect(() => {
     operationPollGeneration += 1;
-    operationPollCount = 0;
     const generation = operationPollGeneration;
     clearOperationPollTimer();
     if (operationSurfaceRelevant) void pollCurrentOperationWhileRelevant(generation);
@@ -320,11 +324,13 @@
       const client = apiClient(token);
       const [sourceResponse, feedResponse, languageResponse] = await Promise.all([
         client.sources(),
-        client.today(),
+        client.today({ limit: feedPageSize }),
         loadProcessingLanguageSafe(client)
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
+      feedOffset = feedResponse.items.length;
+      feedHasMore = feedResponse.items.length === feedPageSize;
       processingLanguage = languageResponse;
       setDocumentLanguage(languageResponse.code);
       agentSteeringRules = await loadAgentSteeringRules(client);
@@ -392,9 +398,11 @@
 
   async function refreshShellLists(): Promise<void> {
     const client = apiClient();
-    const [sourceResponse, feedResponse] = await Promise.all([client.sources(), client.today()]);
+    const [sourceResponse, feedResponse] = await Promise.all([client.sources(), client.today({ limit: feedPageSize })]);
     sources = sourceResponse.sources;
     items = feedResponse.items;
+    feedOffset = feedResponse.items.length;
+    feedHasMore = feedResponse.items.length === feedPageSize;
     agentSteeringRules = await loadAgentSteeringRules(client);
     if (selectedItemId && !feedResponse.items.some((item) => item.id === selectedItemId)) {
       selectedItemId = feedResponse.items[0]?.id ?? null;
@@ -444,6 +452,20 @@
     await loadItemDetail(item.id);
     currentSurface = 'inspector';
     await restoreFeedScrollPosition();
+  }
+
+  async function loadMoreFeedItems(): Promise<void> {
+    if (feedLoadingMore || !feedHasMore) return;
+    feedLoadingMore = true;
+    try {
+      const response = await apiClient().today({ limit: feedPageSize, offset: feedOffset });
+      const existingIds = new Set(items.map((item) => item.id));
+      items = [...items, ...response.items.filter((item) => !existingIds.has(item.id))];
+      feedOffset += response.items.length;
+      feedHasMore = response.items.length === feedPageSize;
+    } finally {
+      feedLoadingMore = false;
+    }
   }
 
   function showSurface(surface: Surface, updateUrl = true): void {
@@ -670,7 +692,10 @@
       throw new Error(text);
     }
     sources = (await apiClient().sources()).sources;
-    items = (await apiClient().today()).items;
+    const feedResponse = await apiClient().today({ limit: feedPageSize });
+    items = feedResponse.items;
+    feedOffset = feedResponse.items.length;
+    feedHasMore = feedResponse.items.length === feedPageSize;
     contextualOperation = { kind: 'idle' };
     return response.body;
   }
@@ -945,7 +970,7 @@
           {#if items.length === 0}
             <FirstUseEmptyState state={firstUseState} />
           {:else}
-            <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} />
+            <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
           {/if}
         {/if}
       </section>

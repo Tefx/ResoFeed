@@ -15,13 +15,13 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function runningOperation() {
+function runningOperation(current = 2, total = 5) {
   return {
     running: true,
     kind: 'library_reprocess',
     actor_kind: 'human',
     phase: 'processing_items',
-    count: { current: 2, total: 5 },
+    count: { current, total },
     message: 'library reprocess processing item',
     started_at: '2026-05-17T11:00:00Z',
     updated_at: '2026-05-17T11:00:05Z'
@@ -41,13 +41,28 @@ function runningManualIngestOperation() {
   };
 }
 
-function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown) } = {}) {
+function feedItems(count: number, offset = 0) {
+  return Array.from({ length: count }, (_, index) => ({
+    ...expectedRedItem,
+    id: `item_feed_${offset + index + 1}`,
+    title: `Feed row ${offset + index + 1}`,
+    published_at: `2026-05-17T10:${String((offset + index) % 60).padStart(2, '0')}:00Z`
+  }));
+}
+
+function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean } = {}) {
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? 'GET';
 
     if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-    if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+    if (url.includes('/api/feed/today')) {
+      if (!options.pagedFeed) return jsonResponse({ items: [expectedRedItem] });
+      const parsed = new URL(url, 'http://resofeed.test');
+      const offset = Number(parsed.searchParams.get('offset') ?? '0');
+      const count = offset === 0 ? 50 : 10;
+      return jsonResponse({ items: feedItems(count, offset) });
+    }
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
       const operation = typeof options.operation === 'function' ? options.operation() : options.operation;
@@ -77,7 +92,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown) } = {}) {
+async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean } = {}) {
   cleanup();
   window.localStorage.clear();
   installFetch(options);
@@ -164,5 +179,31 @@ describe('current operation and low-frequency utility placement', () => {
 
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
     expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
+  });
+
+  it('refreshes current operation counts in-place while the RESOFEED menu remains open', async () => {
+    let pollCount = 0;
+    const { user } = await renderAuthenticatedPage({
+      operation: () => runningOperation(++pollCount === 1 ? 20 : 21, 591)
+    });
+    const menu = await openMenu(user);
+
+    expect(menu.getByText(/20\/591/)).toBeVisible();
+    await waitFor(() => expect(menu.getByText(/21\/591/)).toBeVisible(), { timeout: 1500 });
+    expect(screen.getByLabelText('RESOFEED surface menu')).toHaveAttribute('open');
+  });
+
+  it('lets the feed surface request and append more than the first visible batch', async () => {
+    const { user } = await renderAuthenticatedPage({ pagedFeed: true });
+    const feedRegion = screen.getByRole('region', { name: /TODAY surface independent scroll/i });
+
+    expect(within(feedRegion).getByText('Feed row 1')).toBeVisible();
+    expect(within(feedRegion).getByText('Feed row 50')).toBeVisible();
+    expect(within(feedRegion).queryByText('Feed row 60')).not.toBeInTheDocument();
+
+    await user.click(within(feedRegion).getByRole('button', { name: 'Load more feed items' }));
+
+    await waitFor(() => expect(within(feedRegion).getByText('Feed row 60')).toBeVisible());
+    expect(fetch).toHaveBeenCalledWith('/api/feed/today?limit=50&offset=50', expect.any(Object));
   });
 });

@@ -14,6 +14,7 @@ import (
 const (
 	defaultFeedLimit = 50
 	maxFeedLimit     = 100
+	maxFeedOffset    = 10000
 	freshWindow      = 48 * time.Hour
 )
 
@@ -31,8 +32,9 @@ type rankedCandidate struct {
 // RankingOptions define feed candidate limits only. Contract guardrails are
 // authoritative over any future scoring formula.
 type RankingOptions struct {
-	Limit int
-	Now   time.Time
+	Limit  int
+	Offset int
+	Now    time.Time
 }
 
 // ListTodayFeed returns candidates for GET /api/feed/today and MCP
@@ -45,6 +47,10 @@ func ListTodayFeed(ctx context.Context, db *sql.DB, opts RankingOptions) ([]Item
 		return nil, errors.New("list today feed: db is nil")
 	}
 	limit := normalizeLimit(opts.Limit, defaultFeedLimit, maxFeedLimit)
+	offset := opts.Offset
+	if offset < 0 {
+		offset = 0
+	}
 	now := opts.Now
 	if now.IsZero() {
 		now = time.Now().UTC()
@@ -84,7 +90,15 @@ order by coalesce(i.published_at, i.first_seen_at) desc, i.id asc`)
 		return nil, fmt.Errorf("iterate today feed rows: %w", err)
 	}
 
-	return rankCandidatesWithRules(items, limit, now, activeRules), nil
+	ranked := rankCandidatesWithRules(items, limit+offset, now, activeRules)
+	if offset >= len(ranked) {
+		return []ItemSummary{}, nil
+	}
+	end := offset + limit
+	if end > len(ranked) {
+		end = len(ranked)
+	}
+	return ranked[offset:end], nil
 }
 
 // ApplySteering accepts natural-language steering and RSS URL subscription

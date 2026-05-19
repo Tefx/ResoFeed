@@ -41,7 +41,7 @@ function installPageApi(options: { revocableId?: string | null; invalidAddSource
       const url = String(input);
       if (url.endsWith('/api/runtime/language')) return jsonResponse({ language: { code: 'en', label: 'English' }, already_applied: false });
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedDetail });
       if (url.endsWith(`/api/items/${expectedRedItem.id}/inspect`)) return jsonResponse({ item_id: expectedRedItem.id, human_inspected_at: '2026-05-09T00:00:00Z', already_applied: false });

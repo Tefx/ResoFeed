@@ -42,7 +42,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
     const method = init?.method ?? 'GET';
 
     if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-    if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+    if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
     if (url.endsWith(`/api/items/${expectedRedItem.id}/inspect`) && method === 'POST') {
       return jsonResponse({ item_id: expectedRedItem.id, human_inspected_at: '2026-05-15T00:00:00Z', already_applied: false });
     }

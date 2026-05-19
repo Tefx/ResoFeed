@@ -51,6 +51,11 @@ export interface SearchRequestParams {
   limit?: number;
 }
 
+export interface TodayFeedRequestParams {
+  limit?: number;
+  offset?: number;
+}
+
 export class ResoFeedApiError extends Error {
   readonly status: 400 | 401 | 404 | 409 | 500;
   readonly body: ErrorBody;
@@ -176,10 +181,15 @@ export class ResoFeedApiClient {
     this.fetcher = options.fetcher ?? fetch;
   }
 
-  async today(limit?: number): Promise<FeedTodayResponse> {
-    const params = new URLSearchParams();
-    if (limit !== undefined) params.set('limit', String(limit));
-    const suffix = params.toString() ? `?${params.toString()}` : '';
+  async today(request?: number | TodayFeedRequestParams): Promise<FeedTodayResponse> {
+    const query = new URLSearchParams();
+    if (typeof request === 'number') {
+      query.set('limit', String(request));
+    } else {
+      if (request?.limit !== undefined) query.set('limit', String(request.limit));
+      if (request?.offset !== undefined) query.set('offset', String(request.offset));
+    }
+    const suffix = query.toString() ? `?${query.toString()}` : '';
     return this.request<FeedTodayResponse>(`/api/feed/today${suffix}`);
   }
 

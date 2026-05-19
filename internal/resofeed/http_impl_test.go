@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -71,6 +72,45 @@ func TestHTTPHandlersExerciseCorePaths(t *testing.T) {
 		}
 		if parsed.Query.Q != "no-match-pbar-expected-red-zzzz" || len(parsed.Items) != 0 {
 			t.Fatalf("hyphenated no-match search items=%+v query=%+v, want stable empty result for submitted query", parsed.Items, parsed.Query)
+		}
+	})
+
+	t.Run("feed today offset pages beyond first visible batch", func(t *testing.T) {
+		for i := 0; i < 60; i++ {
+			published := now.Add(time.Duration(i+1) * time.Minute).Format(time.RFC3339)
+			id := "item_http_bulk_" + strconv.Itoa(i)
+			_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text) values (?, 'src_http', 'https://http.example/feed.xml', ?, ?, 'bulk summary', 'bulk insight', ?, ?, 'full', 'ok', 'bulk excerpt', 'bulk text')`, id, "https://http.example/bulk/"+strconv.Itoa(i), "Bulk Feed Row "+strconv.Itoa(i), published, published)
+			if err != nil {
+				t.Fatalf("insert bulk feed item %d: %v", i, err)
+			}
+		}
+
+		firstRecorder := httptest.NewRecorder()
+		router.ServeHTTP(firstRecorder, authorizedRequest(http.MethodGet, "/api/feed/today?limit=50", nil))
+		assertStatus(t, firstRecorder, http.StatusOK)
+		var first TodayFeedResponse
+		if err := json.Unmarshal(firstRecorder.Body.Bytes(), &first); err != nil {
+			t.Fatalf("unmarshal first feed page: %v", err)
+		}
+
+		secondRecorder := httptest.NewRecorder()
+		router.ServeHTTP(secondRecorder, authorizedRequest(http.MethodGet, "/api/feed/today?limit=50&offset=50", nil))
+		assertStatus(t, secondRecorder, http.StatusOK)
+		var second TodayFeedResponse
+		if err := json.Unmarshal(secondRecorder.Body.Bytes(), &second); err != nil {
+			t.Fatalf("unmarshal second feed page: %v", err)
+		}
+		if len(first.Items) != 50 || len(second.Items) == 0 {
+			t.Fatalf("page sizes first=%d second=%d, want full first page and accessible second page", len(first.Items), len(second.Items))
+		}
+		seen := map[string]bool{}
+		for _, item := range first.Items {
+			seen[item.ID] = true
+		}
+		for _, item := range second.Items {
+			if seen[item.ID] {
+				t.Fatalf("second page repeated first-page item %s", item.ID)
+			}
 		}
 	})
 
@@ -160,6 +200,7 @@ func TestHTTPQueryValidationRejectsUnknownAndDuplicateParameters(t *testing.T) {
 	}{
 		{name: "feed unknown", path: "/api/feed/today?topic=sqlite", field: "topic"},
 		{name: "feed duplicate", path: "/api/feed/today?limit=1&limit=2", field: "limit"},
+		{name: "feed invalid offset", path: "/api/feed/today?limit=1&offset=-1", field: "offset"},
 		{name: "search unknown", path: "/api/search?semantic=true", field: "semantic"},
 		{name: "search duplicate", path: "/api/search?q=a&q=b", field: "q"},
 	} {

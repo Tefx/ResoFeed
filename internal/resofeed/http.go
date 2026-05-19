@@ -376,16 +376,45 @@ func (h apiHandler) authorized(r *http.Request) bool {
 }
 
 func (h apiHandler) handleToday(w http.ResponseWriter, r *http.Request) {
-	limit, ok := parseLimitQuery(w, r, map[string]bool{"limit": true}, defaultFeedLimit, maxFeedLimit)
+	limit, offset, ok := parseFeedWindowQuery(w, r)
 	if !ok {
 		return
 	}
-	items, err := ListTodayFeed(r.Context(), h.cfg.DB, RankingOptions{Limit: limit})
+	items, err := ListTodayFeed(r.Context(), h.cfg.DB, RankingOptions{Limit: limit, Offset: offset})
 	if err != nil {
 		writeInternal(w)
 		return
 	}
 	writeJSON(w, http.StatusOK, TodayFeedResponse{Items: items})
+}
+
+func parseFeedWindowQuery(w http.ResponseWriter, r *http.Request) (int, int, bool) {
+	values := r.URL.Query()
+	for key, vals := range values {
+		if (key != "limit" && key != "offset") || len(vals) != 1 {
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": key})
+			return 0, 0, false
+		}
+	}
+	limit := defaultFeedLimit
+	if vals, ok := values["limit"]; ok {
+		parsed, valid := parseBase10Limit(vals[0], maxFeedLimit)
+		if !valid {
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "limit"})
+			return 0, 0, false
+		}
+		limit = parsed
+	}
+	offset := 0
+	if vals, ok := values["offset"]; ok {
+		parsed, valid := parseBase10Offset(vals[0], maxFeedOffset)
+		if !valid {
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "offset"})
+			return 0, 0, false
+		}
+		offset = parsed
+	}
+	return limit, offset, true
 }
 
 func (h apiHandler) handleSearch(w http.ResponseWriter, r *http.Request) {
@@ -942,6 +971,22 @@ func parseBase10Limit(raw string, maxValue int) (int, bool) {
 	}
 	parsed, err := strconv.Atoi(raw)
 	if err != nil || parsed < 1 || parsed > maxValue {
+		return 0, false
+	}
+	return parsed, true
+}
+
+func parseBase10Offset(raw string, maxValue int) (int, bool) {
+	if raw == "" {
+		return 0, false
+	}
+	for _, char := range raw {
+		if char < '0' || char > '9' {
+			return 0, false
+		}
+	}
+	parsed, err := strconv.Atoi(raw)
+	if err != nil || parsed < 0 || parsed > maxValue {
 		return 0, false
 	}
 	return parsed, true

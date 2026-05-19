@@ -909,6 +909,10 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
 }
 
+.feed-load-more {
+  margin-block-start: var(--rf-space-md);
+}
+
 .contract-resonate[aria-pressed='true'] {
   border-color: var(--rf-color-accent);
   color: var(--rf-color-accent-contrast);

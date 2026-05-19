@@ -64,7 +64,7 @@ describe('ResoFeed API client and rendered sinks', () => {
       expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse(sourcesFixture);
-      if (url.endsWith('/api/feed/today')) return jsonResponse(feedFixture);
+      if (url.includes('/api/feed/today')) return jsonResponse(feedFixture);
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, 404);
     });
 
@@ -124,6 +124,19 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(screen.getByRole('group', { name: 'State portability' })).toHaveTextContent(
       'import replaces active sources, rules, and stars'
     );
+  });
+
+  it('requests feed windows with limit and offset for lightweight browsing', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
+      expect(String(input)).toBe('/api/feed/today?limit=50&offset=50');
+      return jsonResponse(feedFixture);
+    });
+
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+    await client.today({ limit: 50, offset: 50 });
+
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
   it('throws canonical API errors without replacing backend code/message/details', async () => {

@@ -7,9 +7,12 @@
     selectedItemId?: string | null;
     onSelect: (item: ItemSummary) => Promise<void> | void;
     onResonanceToggle: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
+    hasMore?: boolean;
+    loadingMore?: boolean;
+    onLoadMore?: () => Promise<void> | void;
   }
 
-  let { items, selectedItemId = null, onSelect, onResonanceToggle }: Props = $props();
+  let { items, selectedItemId = null, onSelect, onResonanceToggle, hasMore = false, loadingMore = false, onLoadMore }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const feedTimeGroupReference = $derived(feedReferenceNow(items));
@@ -39,6 +42,10 @@
     } finally {
       pendingResonanceId = null;
     }
+  }
+
+  async function loadMore(): Promise<void> {
+    await onLoadMore?.();
   }
 </script>
 
@@ -82,4 +89,13 @@
       </article>
     {/each}
   </div>
+  {#if hasMore}
+    <button
+      class="bracket-action feed-load-more"
+      type="button"
+      aria-label="Load more feed items"
+      disabled={loadingMore}
+      onclick={() => void loadMore()}
+    >{loadingMore ? '[LOADING]' : '[LOAD MORE]'}</button>
+  {/if}
 </section>

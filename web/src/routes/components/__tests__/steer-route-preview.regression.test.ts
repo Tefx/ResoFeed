@@ -44,7 +44,7 @@ function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: bo
       const url = String(input);
       calls.push({ url, init });
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
       if (url.endsWith('/api/doctor')) return textResponse('doctor: model latency 842ms\nrss: ok');

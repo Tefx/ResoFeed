@@ -84,7 +84,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const acceptedFetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [] });
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
     });
     vi.stubGlobal('fetch', acceptedFetch);
@@ -292,7 +292,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       const url = String(input);
       calls.push({ url, init });
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
       if (url.endsWith('/api/steer')) return jsonResponse({ receipt: { interpreted_as: 'add_source', message: 'source added', changed_rules: [] } });
       if (url.endsWith('/api/doctor')) return textResponse('rss: ok\ngemini: ok\ningest: last_run=2026-05-09T00:00:00Z');
@@ -324,7 +324,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
@@ -349,7 +349,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [{ id: 'rule_agent', rule_text: 'Push more sqlite research.', is_active: true, superseded_by: null, revision: 1, created_by_actor_kind: 'agent', created_by_actor_id: 'briefing-agent' }] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
@@ -379,7 +379,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
       if (url.endsWith(`/api/items/${expectedRedItem.id}/inspect`)) return jsonResponse({ item_id: expectedRedItem.id, human_inspected_at: '2026-05-09T00:00:00Z', already_applied: false });
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
@@ -418,7 +418,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
-      if (url.endsWith('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
+      if (url.includes('/api/feed/today')) return jsonResponse({ items: [expectedRedItem] });
       if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
       if (url.includes('/api/search')) return jsonResponse({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } });
       if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });

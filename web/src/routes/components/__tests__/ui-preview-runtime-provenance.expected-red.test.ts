@@ -110,7 +110,7 @@ function installFetch(options: FetchFixtureOptions = {}) {
       if (options.shellFails) return internalError();
       return jsonResponse({ sources: [source] });
     }
-    if (url.endsWith('/api/feed/today')) return jsonResponse({ items: feedItems });
+    if (url.includes('/api/feed/today')) return jsonResponse({ items: feedItems });
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
       return jsonResponse({ operation: options.operation ?? { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
