@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import fs from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
 import Feed from '../Feed.svelte';
@@ -302,6 +303,38 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const originalLink = screen.getByRole('link', { name: 'original link' });
     expect(originalLink).toHaveClass('inspector-original-link');
     expect(originalLink.closest('p')).toHaveClass('inspector-link-row');
+    expect(originalLink.tagName).toBe('A');
+    expect(originalLink).not.toHaveAttribute('role', 'button');
+  });
+
+  it('keeps the Inspector reading hierarchy on shared section classes and labels', () => {
+    render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });
+    const sections = Array.from(inspector.querySelectorAll('.inspector-text-section'));
+    expect(sections).toHaveLength(3);
+    expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Summary', 'Core insight', 'Source text']);
+    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'source excerpt:']);
+    expect(sections[0].querySelector('.inspector-section-copy')).not.toBeNull();
+    expect(sections[1].querySelector('.inspector-section-copy')).not.toBeNull();
+    expect(sections[2]).toHaveClass('inspector-reading-section');
+    expect(sections[2].querySelector('.inspector-reading')).not.toBeNull();
+  });
+
+  it('contracts original-link CSS away from boxed/button-like styling', () => {
+    const css = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
+    const originalLinkRule = css.match(/\.contract-inspector \.inspector-original-link\s*\{[^}]+\}/)?.[0] ?? '';
+    const originalLinkHoverFocusRule = css.match(/\.contract-inspector \.inspector-original-link:hover,\n\.contract-inspector \.inspector-original-link:focus-visible\s*\{[^}]+\}/)?.[0] ?? '';
+
+    expect(originalLinkRule).toContain('display: inline;');
+    expect(originalLinkRule).toContain('min-height: auto;');
+    expect(originalLinkRule).toContain('padding: 0;');
+    expect(originalLinkRule).toContain('border: 0;');
+    expect(originalLinkRule).not.toMatch(/border-block-end|box-shadow|background:/);
+    expect(originalLinkHoverFocusRule).toContain('background: transparent;');
+    expect(originalLinkHoverFocusRule).toContain('outline: 0;');
+    expect(originalLinkHoverFocusRule).toContain('box-shadow: none;');
+    expect(originalLinkHoverFocusRule).toContain('text-decoration-line: underline;');
   });
 
   it('removes follow/newsletter prompts and adjacent repeated lead-like filler without blanking article prose', () => {
