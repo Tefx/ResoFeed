@@ -144,6 +144,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 type reprocessItem struct {
 	id           string
 	sourceTitle  string
+	title        string
 	url          string
 	canonicalURL sql.NullString
 }
@@ -168,7 +169,7 @@ func (o reprocessItemOutcome) writable() bool {
 }
 
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {
-	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), i.url, i.canonical_url from items i join sources s on s.id = i.source_id where s.is_active = 1 order by i.id`)
+	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), i.title, i.url, i.canonical_url from items i join sources s on s.id = i.source_id where s.is_active = 1 order by i.id`)
 	if err != nil {
 		return nil, fmt.Errorf("reprocess library: query items: %w", err)
 	}
@@ -176,7 +177,7 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 	items := []reprocessItem{}
 	for rows.Next() {
 		var item reprocessItem
-		if err := rows.Scan(&item.id, &item.sourceTitle, &item.url, &item.canonicalURL); err != nil {
+		if err := rows.Scan(&item.id, &item.sourceTitle, &item.title, &item.url, &item.canonicalURL); err != nil {
 			return nil, fmt.Errorf("reprocess library: scan item: %w", err)
 		}
 		items = append(items, item)
@@ -198,7 +199,7 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 	if llm == nil {
 		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
 	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.id, Title: sourceURL, SourceTitle: item.sourceTitle, URL: sourceURL, AvailableText: sourceText, TargetLanguage: language})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableText: sourceText, TargetLanguage: language})
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return reprocessItemOutcome{}, err
@@ -214,8 +215,8 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 		return unavailableReprocessOutcome(sourceURL, code, string(code)), nil
 	}
 	title := strings.TrimSpace(out.Title)
-	if title == "" {
-		title = fallbackReprocessTitle(sourceURL)
+	if isUnusableReprocessOutputTitle(title) {
+		title = reprocessInputTitle(item)
 	}
 	result := reprocessItemOutcome{title: title, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
 	if result.extractedText == nil {
@@ -266,6 +267,29 @@ func fallbackReprocessSourceURL(item reprocessItem) string {
 		return candidates[0]
 	}
 	return item.url
+}
+
+func reprocessInputTitle(item reprocessItem) string {
+	if title := strings.TrimSpace(item.title); title != "" {
+		return title
+	}
+	return fallbackReprocessTitle(fallbackReprocessSourceURL(item))
+}
+
+func isUnusableReprocessOutputTitle(title string) bool {
+	title = strings.TrimSpace(title)
+	if title == "" || isHTTPArticleURL(title) {
+		return true
+	}
+	if strings.HasPrefix(strings.ToLower(title), "http://") || strings.HasPrefix(strings.ToLower(title), "https://") {
+		return true
+	}
+	switch strings.ToLower(title) {
+	case "untitled", "unavailable", "summary unavailable", "summary_unavailable", "original unavailable", "original_unavailable", "model latency error", "model_latency_error":
+		return true
+	default:
+		return false
+	}
 }
 
 func isHTTPArticleURL(raw string) bool {

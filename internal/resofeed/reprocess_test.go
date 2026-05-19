@@ -191,9 +191,51 @@ func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *tes
 	}
 }
 
+func TestReprocessLibraryUsesStoredTitleAndPreservesItForURLLikeModelTitle(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>English article body for Chinese rewrite</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_reprocess_title", server.URL+"/feed.xml", "TLDR Feed")
+	seedReprocessItem(t, ctx, db, "item_url_title", "src_reprocess_title", server.URL+"/url-title", "")
+	seedReprocessItem(t, ctx, db, "item_real_title", "src_reprocess_title", server.URL+"/real-title", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := &reprocessTitleLLM{}
+	resp, err := reprocessLibraryFresh(ctx, db, llm)
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 2 || resp.Reprocess.ItemsFailed != 0 || resp.Reprocess.ItemsUnavailable != 0 {
+		t.Fatalf("result = %+v, want two updated items", resp.Reprocess)
+	}
+	if got := llm.inputTitles["item_url_title"]; got != "PRIOR title item_url_title" {
+		t.Fatalf("LLM title input for URL-title item = %q, want stored title", got)
+	}
+	if got := llm.inputTitles["item_real_title"]; got != "PRIOR title item_real_title" {
+		t.Fatalf("LLM title input for real-title item = %q, want stored title", got)
+	}
+
+	urlTitle := readStoredText(t, ctx, db, "item_url_title")
+	if urlTitle.title != "PRIOR title item_url_title" || urlTitle.summary != "中文摘要：保留标题" || urlTitle.coreInsight != "中文洞察：保留标题" {
+		t.Fatalf("URL-like title item text = %+v, want preserved title with updated Chinese fields", urlTitle)
+	}
+	realTitle := readStoredText(t, ctx, db, "item_real_title")
+	if realTitle.title != "真正的中文标题" || realTitle.summary != "中文摘要：更新标题" || realTitle.coreInsight != "中文洞察：更新标题" {
+		t.Fatalf("real title item text = %+v, want genuine model title applied", realTitle)
+	}
+}
+
 type reprocessMatrixLLM struct {
 	failURLSubstring string
 	availableTexts   []string
+}
+
+type reprocessTitleLLM struct {
+	inputTitles map[string]string
 }
 
 type reprocessStatusLLM struct {
@@ -214,6 +256,21 @@ func (l *reprocessMatrixLLM) SummarizeItem(_ context.Context, input OpenRouterSu
 	}
 	l.availableTexts = append(l.availableTexts, input.AvailableText)
 	return OpenRouterSummaryOutput{Title: "processed " + input.URL, Summary: "summary " + input.AvailableText, CoreInsight: "core insight " + input.AvailableText, FeedExcerpt: "excerpt " + input.AvailableText, ExtractedText: "extracted " + input.AvailableText, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (l *reprocessTitleLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	if l.inputTitles == nil {
+		l.inputTitles = map[string]string{}
+	}
+	l.inputTitles[input.ItemID] = input.Title
+	if input.ItemID == "item_url_title" {
+		return OpenRouterSummaryOutput{Title: "https://github.com/raindrop-ai/workshop?utm_source=tldrai", Summary: "中文摘要：保留标题", CoreInsight: "中文洞察：保留标题", FeedExcerpt: "中文摘录：保留标题", ExtractedText: "中文全文：保留标题", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	}
+	return OpenRouterSummaryOutput{Title: "真正的中文标题", Summary: "中文摘要：更新标题", CoreInsight: "中文洞察：更新标题", FeedExcerpt: "中文摘录：更新标题", ExtractedText: "中文全文：更新标题", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (l *reprocessTitleLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
 }
 
 func (l *reprocessMatrixLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
