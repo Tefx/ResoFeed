@@ -33,6 +33,7 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 
 ## 7. Layout & Surfaces
 - **Desktop (Desk Review):** A split-pane layout. A unified scrolling feed on the left (or center), and an "Inspector" pane on the right when an item is clicked. No left-hand navigation sidebar.
+- **Search as Filtered Desk Review:** Search results are another archival index slice, not a separate product mode. On desktop, choosing a result keeps the filtered list, query, and scroll context visible while the Inspector updates on the right with a quiet selected-row marker. On mobile, choosing a result drills into the full-screen Inspector, and Back returns to the same filtered slice and scroll position. This preserves the Inspect primitive without adding saved searches, tabs, modal readers, recommendation flows, or history ledgers.
 - **Mobile (Commute Review):** A single-column vertical timeline. Edge-to-edge content cards. The "Steer" input is anchored as a sticky bottom bar or floating action button.
 - **Surface Access:** Utility surfaces may sit behind a discreet `RESOFEED` menu. `SOURCE LEDGER` can be discoverable through that menu instead of being a persistent always-visible nav link.
 - **Agent Handoffs:** Items delivered by external agents receive a subtle visual "Receipt Pill" but live within the same unified feed.

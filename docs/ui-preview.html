@@ -142,6 +142,22 @@
       color: var(--warning);
     }
 
+    .search-contract-strip {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .search-contract-query {
+      color: var(--text);
+    }
+
     .desktop {
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) 480px;
@@ -650,7 +666,7 @@
 
     <section class="panel">
       <div class="command-bar">
-        <div class="steer">Steer or paste RSS URL...</div>
+        <div class="steer">search agent workflows</div>
         <div class="chrome-actions">
           <button class="bracket-action" type="button" aria-label="Processing language: English; switch to Chinese">LANG: EN</button>
           <div class="brand">RESOFEED</div>
@@ -661,11 +677,15 @@
         <span class="runtime-warning">Existing readable item content will be rewritten.</span>
         <span translate="no">Source identifiers remain unchanged.</span>
       </div>
+      <div class="search-contract-strip" aria-label="Search selection contract preview">
+        <span>SEARCH · <span class="search-contract-query">q: agent workflows</span> · 3 results · selected opens INSPECTOR</span>
+        <span>list/query/scroll remain visible on desktop</span>
+      </div>
       <div class="desktop">
-        <section class="feed" aria-label="Feed preview">
+        <section class="feed" aria-label="Search results preview">
           <div class="section-label">TODAY</div>
 
-          <article class="item selected">
+          <article class="item selected" aria-current="true">
             <div class="meta-row">
               <span class="pill">src: simonwillison.net</span>
               <span class="pill">2h</span>
@@ -681,7 +701,7 @@
             </div>
           </article>
 
-          <article class="item">
+          <article class="item" aria-current="false">
             <div class="meta-row">
               <span class="pill">src: hn.algolia.com</span>
               <span class="pill">4h</span>
@@ -697,7 +717,7 @@
           </article>
 
           <div class="section-label">YESTERDAY</div>
-          <article class="item">
+          <article class="item" aria-current="false">
             <div class="meta-row">
               <span class="pill">src: blog.example</span>
               <span class="pill">1d</span>

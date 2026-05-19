@@ -714,7 +714,17 @@ Purpose: retrieve corpus by keyword/plain text, source, time, and resonance stat
 
 Anatomy: query field may reuse Steer chrome or a dedicated search field if implementation separates modes; results use feed-item anatomy with extra match/provenance line. States: empty query, loading, no results, partial results, error. Results must explain enough provenance to verify the match.
 
-Keyboard and accessibility: search results follow normal feed item focus behavior; result count, if present, is plain text inside the results region, not a badge or queue indicator.
+Search result click/Inspector contract:
+
+- Desktop search is a filtered workflow slice, not a navigation-away mode. Clicking or keyboard-activating a search result MUST keep the search surface and result list visible, preserve the current query/filter fields, preserve the search-result scroll position, mark only the selected result with the same low-chrome neutral state as a selected feed item, and open or update the desktop Inspector pane with that item. The selected state means `currently open in Inspector`; it is not a recommendation, unread, priority, or focus state.
+- Mobile/narrow search keeps the single-column route model. Tapping a search result drills into the full-screen Inspector/detail route. Browser/app Back MUST return to the same search surface with the same query/filter values, same result set, same selected item indication where practical, and the prior search-result scroll position. This restoration is ephemeral navigation state only; it must not create reading history, command history, analytics, or a new product concept.
+- URL/history state SHOULD preserve query and selection where practical with ordinary URL/search/history primitives. Acceptable examples include a search query parameter plus selected item route state or equivalent history state. This must remain implementation state for returning to the filtered slice, not a durable saved-search feature, tab system, or activity ledger.
+- Empty query, loading, no-results, partial results, and error/fallback states remain explicit: show plain `0 results`, `no results`, `searching`, or raw `err: <diagnostic>` text as applicable. Empty/no-results states must not auto-open the Inspector and must not replace fallback source evidence semantics.
+- Inspector fallback/source evidence remains authoritative from the Inspector contract: search selection must not regress the one-line fallback processing state, `Source evidence:` section, literal source identifiers, or the prohibition on ghost Summary/Core sections when model-backed text is unavailable.
+
+Keyboard and accessibility: search results follow normal feed item focus behavior; each result activation target is a real button or link and supports `Enter` and `Space`. The selected result MUST expose `aria-selected="true"` on an option/listbox pattern or `aria-current="true"` on a list/listitem pattern, with the attribute absent/false on unselected rows. Focus rings remain distinct from selected state. Result count, if present, is plain text inside the results region, not a badge or queue indicator.
+
+Forbidden search-detail patterns: no modal detail views, accordions-as-detail, recommendation rails, generated answer panels, immersive reader mode, complex tabs, folders/tags/unread concepts, settings sliders, onboarding/account prompts, flashy highlight effects, animated selection, or accent-color selection. Search selection reuses feed-item selected chrome and Inspector detail only.
 
 ### Feedback Lines
 
