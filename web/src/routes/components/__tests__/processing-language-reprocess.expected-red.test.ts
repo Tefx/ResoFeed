@@ -32,9 +32,10 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; reprocessStatus?: number } = {}) {
+function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number } = {}) {
   const language = options.language ?? 'en';
   const languageStatus = options.languageStatus ?? 200;
+  const languagePutStatus = options.languagePutStatus ?? languageStatus;
   const reprocessStatus = options.reprocessStatus ?? 200;
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
@@ -54,12 +55,22 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
       return jsonResponse({ language: { code: language, label: language === 'zh' ? '中文' : 'English' } });
     }
     if (url.endsWith('/api/runtime/language') && method === 'PUT') {
-      if (languageStatus === 400) {
+      if (languagePutStatus === 400) {
         return jsonResponse({ error: { code: 'bad_request', message: 'request_fingerprint_mismatch', details: { reason: 'request_fingerprint_mismatch' } } }, { status: 400 });
+      }
+      if (languagePutStatus === 401) {
+        return jsonResponse({ error: { code: 'unauthorized', message: 'owner token rejected', details: {} } }, { status: 401 });
+      }
+      if (languagePutStatus === 409) {
+        return jsonResponse({ error: { code: 'conflict', message: 'ingest already running', details: {} } }, { status: 409 });
+      }
+      if (languagePutStatus === 500) {
+        return jsonResponse({ error: { code: 'internal', message: 'language update failed', details: {} } }, { status: 500 });
       }
       return jsonResponse({ language: { code: 'zh', label: '中文' }, already_applied: false });
     }
     if (url.endsWith('/api/runtime/reprocess-library') && method === 'POST') {
+      await new Promise((resolve) => setTimeout(resolve, 10));
       if (reprocessStatus === 400) {
         return jsonResponse({ error: { code: 'bad_request', message: 'request_fingerprint_mismatch', details: { reason: 'request_fingerprint_mismatch' } } }, { status: 400 });
       }
@@ -75,11 +86,11 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
           language: 'zh',
           started_at: '2026-05-15T00:00:00Z',
           completed_at: '2026-05-15T00:00:01Z',
-          items_attempted: 1,
+          items_attempted: 6,
           items_updated: 1,
-          items_indexed: 1,
-          items_unavailable: 0,
-          items_failed: 0,
+          items_indexed: 4,
+          items_unavailable: 2,
+          items_failed: 3,
           fts_rebuilt: true,
           errors: []
         },
@@ -92,7 +103,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; reprocessStatus?: number } = {}) {
+async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number } = {}) {
   cleanup();
   window.localStorage.clear();
   installAuthenticatedRuntimeFetch(options);
@@ -104,14 +115,24 @@ async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; langua
   return { user };
 }
 
+async function openResofeedSurfaceMenu(user: ReturnType<typeof userEvent.setup>): Promise<HTMLElement> {
+  const menu = screen.getByLabelText('RESOFEED surface menu') as HTMLDetailsElement;
+  if (!menu.open) {
+    await user.click(within(menu).getByText('RESOFEED', { selector: 'summary' }));
+  }
+  await waitFor(() => expect(menu).toHaveAttribute('open'));
+  return menu;
+}
+
 describe('expected-red processing language and reprocess rendering contracts', () => {
   it('renders global LANG control, updates <html lang>, announces success/failure, and avoids forbidden surfaces', async () => {
     const { user } = await renderAuthenticatedPage({ language: 'en' });
 
     const domSnapshot = document.body.innerHTML;
     expect(domSnapshot).toContain('LANG: EN');
+    const surfaceMenu = await openResofeedSurfaceMenu(user);
 
-    const languageControl = screen.getByRole('button', {
+    const languageControl = within(surfaceMenu).getByRole('button', {
       name: /processing language.*English.*set.*Chinese/i
     });
     expect(languageControl).toBeVisible();
@@ -121,6 +142,7 @@ describe('expected-red processing language and reprocess rendering contracts', (
     await user.click(languageControl);
 
     await waitFor(() => expect(document.documentElement).toHaveAttribute('lang', 'zh-CN'));
+    expect(within(surfaceMenu).getByRole('button', { name: /处理语言 中文; set English/i })).toHaveTextContent('语言: 中文');
     expect(screen.getByRole('status', { name: /processing language/i })).toHaveAttribute('aria-live', 'polite');
     expect(screen.getByRole('status', { name: /processing language/i })).toHaveTextContent(/Language set to 中文|语言已设为中文/);
     expect(screen.queryByRole('heading', { name: /settings|preferences|onboarding/i })).not.toBeInTheDocument();
@@ -128,13 +150,32 @@ describe('expected-red processing language and reprocess rendering contracts', (
   });
 
   it('renders terse HTTP 400 and 401 language failures without replacing controls with settings UI', async () => {
-    const { user } = await renderAuthenticatedPage({ language: 'en', languageStatus: 400 });
+    const { user } = await renderAuthenticatedPage({ language: 'en', languagePutStatus: 400 });
+    const surfaceMenu = await openResofeedSurfaceMenu(user);
 
-    await user.click(screen.getByRole('button', { name: /processing language.*English.*set.*Chinese/i }));
+    await user.click(within(surfaceMenu).getByRole('button', { name: /processing language.*English.*set.*Chinese/i }));
 
     await waitFor(() => expect(screen.getByRole('status', { name: /processing language/i })).toHaveTextContent('err: request_fingerprint_mismatch'));
+    expect(screen.getByRole('status', { name: /processing language/i })).toBeVisible();
+    expect(screen.getByRole('status', { name: /processing language/i })).toHaveClass('contract-feedback-error');
     expect(screen.getByText('LANG: EN')).toHaveClass('bracket-action');
     expect(screen.queryByRole('heading', { name: /settings|preferences|onboarding/i })).not.toBeInTheDocument();
+
+    cleanup();
+    window.localStorage.clear();
+    installAuthenticatedRuntimeFetch({ language: 'en', languagePutStatus: 401 });
+    render(Page);
+    await user.type(screen.getByLabelText('Owner token'), ownerToken);
+    await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
+    await waitFor(() => expect(screen.getByLabelText('Steer or paste RSS URL')).toBeVisible());
+    expect(window.localStorage.getItem('resofeed.ownerToken')).toBe(ownerToken);
+
+    const unauthorizedMenu = await openResofeedSurfaceMenu(user);
+    await user.click(within(unauthorizedMenu).getByRole('button', { name: /processing language.*English.*set.*Chinese/i }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('err: owner token rejected'));
+    expect(window.localStorage.getItem('resofeed.ownerToken')).toBeNull();
+    expect(screen.getByLabelText('Owner token')).toHaveFocus();
 
     cleanup();
     window.localStorage.clear();
@@ -149,8 +190,9 @@ describe('expected-red processing language and reprocess rendering contracts', (
 
   it('renders reprocess bracket-action default, confirmation, running, complete, conflict, and failure states with live output', async () => {
     const { user } = await renderAuthenticatedPage({ language: 'zh' });
+    const surfaceMenu = await openResofeedSurfaceMenu(user);
 
-    const action = screen.getByRole('button', {
+    const action = within(surfaceMenu).getByRole('button', {
       name: /Reprocess existing library and rebuild search index/i
     });
     expect(action).toHaveTextContent('[重处理资料库]');
@@ -170,22 +212,26 @@ describe('expected-red processing language and reprocess rendering contracts', (
     expect(running).not.toHaveAttribute('disabled');
 
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/reprocess complete|重处理完成/));
+    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/updated 1; unavailable 2; failed 3; indexed 4/);
     expect(screen.getByRole('status', { name: /reprocess/i })).toHaveAttribute('aria-live', 'polite');
 
     installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 409 });
-    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
-    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await openResofeedSurfaceMenu(user);
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Confirm reprocess/i }));
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: ingest already running'));
     expect(screen.getByRole('button', { name: /Reprocess existing library/i })).toHaveFocus();
 
     installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 400 });
-    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
-    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await openResofeedSurfaceMenu(user);
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Confirm reprocess/i }));
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: request_fingerprint_mismatch'));
 
     installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 500 });
-    await user.click(screen.getByRole('button', { name: /Reprocess existing library/i }));
-    await user.click(screen.getByRole('button', { name: /Confirm reprocess/i }));
+    await openResofeedSurfaceMenu(user);
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Confirm reprocess/i }));
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent('err: reprocess failed'));
   });
 
@@ -203,8 +249,9 @@ describe('expected-red processing language and reprocess rendering contracts', (
 
     render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split' } });
     const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });
-    expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
-    expect(within(inspector).getByText(expectedRedSource.url)).toHaveAttribute('translate', 'no');
+    const originalLink = within(inspector).getByRole('link', { name: 'original link' });
+    expect(originalLink).toHaveAttribute('translate', 'no');
+    expect(originalLink).toHaveAttribute('href', expectedRedItem.url);
 
     render(SourceLedger, {
       props: {

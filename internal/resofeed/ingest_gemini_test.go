@@ -244,6 +244,7 @@ type ingestFakeState struct {
 	mu             sync.Mutex
 	sources        []Source
 	sourceStatuses map[string]string
+	itemIDs        map[string]bool
 	items          []ingestFakeItem
 }
 
@@ -278,6 +279,9 @@ func (ingestFakeDriver) Open(name string) (driver.Conn, error) {
 	if state.sourceStatuses == nil {
 		state.sourceStatuses = map[string]string{}
 	}
+	if state.itemIDs == nil {
+		state.itemIDs = map[string]bool{}
+	}
 	return &ingestFakeConn{state: state}, nil
 }
 
@@ -287,9 +291,19 @@ func (c *ingestFakeConn) Prepare(string) (driver.Stmt, error) { return nil, driv
 func (c *ingestFakeConn) Close() error                        { return nil }
 func (c *ingestFakeConn) Begin() (driver.Tx, error)           { return nil, driver.ErrSkip }
 
-func (c *ingestFakeConn) QueryContext(_ context.Context, query string, _ []driver.NamedValue) (driver.Rows, error) {
+func (c *ingestFakeConn) QueryContext(_ context.Context, query string, args []driver.NamedValue) (driver.Rows, error) {
 	if strings.Contains(query, "from sources") {
 		return &ingestFakeRows{columns: []string{"id", "url", "title"}, sources: c.state.sources}, nil
+	}
+	if strings.Contains(query, "from items") {
+		itemID, _ := args[0].Value.(string)
+		c.state.mu.Lock()
+		exists := c.state.itemIDs[itemID]
+		c.state.mu.Unlock()
+		if !exists {
+			return &ingestFakeRows{columns: []string{"1"}}, nil
+		}
+		return &ingestFakeRows{columns: []string{"1"}, values: [][]driver.Value{{int64(1)}}}, nil
 	}
 	return nil, driver.ErrSkip
 }
@@ -306,9 +320,11 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 		c.state.sourceStatuses[sourceID] = status
 		return driver.RowsAffected(1), nil
 	case strings.HasPrefix(query, "insert into items"):
+		itemID, _ := args[0].Value.(string)
 		valueTier, _ := args[7].Value.(string)
 		extractionStatus, _ := args[10].Value.(string)
 		modelStatus, _ := args[11].Value.(string)
+		c.state.itemIDs[itemID] = true
 		c.state.items = append(c.state.items, ingestFakeItem{extractionStatus: extractionStatus, modelStatus: modelStatus, valueTier: valueTier})
 		return driver.RowsAffected(1), nil
 	case strings.HasPrefix(query, "delete from search_fts"):
@@ -323,6 +339,7 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 type ingestFakeRows struct {
 	columns []string
 	sources []Source
+	values  [][]driver.Value
 	idx     int
 }
 
@@ -330,6 +347,14 @@ func (r *ingestFakeRows) Columns() []string { return r.columns }
 func (r *ingestFakeRows) Close() error      { return nil }
 
 func (r *ingestFakeRows) Next(dest []driver.Value) error {
+	if r.values != nil {
+		if r.idx >= len(r.values) {
+			return io.EOF
+		}
+		copy(dest, r.values[r.idx])
+		r.idx++
+		return nil
+	}
 	if r.idx >= len(r.sources) {
 		return io.EOF
 	}

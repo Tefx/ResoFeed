@@ -112,6 +112,7 @@
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? 'Steer route preview' : `Steer route preview: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
   const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
+  const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running'));
 
@@ -240,7 +241,7 @@
 
   function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
     const prefix = result.language === 'zh' ? '重处理完成' : 'reprocess complete';
-    return `${prefix}: updated ${result.items_updated}; indexed ${result.items_indexed}`;
+    return `${prefix}: updated ${result.items_updated}; unavailable ${result.items_unavailable}; failed ${result.items_failed}; indexed ${result.items_indexed}`;
   }
 
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
@@ -703,6 +704,13 @@
       languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
     } catch (error) {
       languageStatus = formatRawApiError(error, 'err: language update failed');
+      if (error instanceof ResoFeedApiError && error.status === 401) {
+        window.localStorage.removeItem(tokenStorageKey);
+        ownerToken = '';
+        promptState = 'rejected';
+        await tick();
+        document.getElementById('owner-token-input')?.focus();
+      }
     }
   }
 
@@ -895,7 +903,7 @@
       <span id="steer-route-preview-detail" class="visually-hidden">URL required</span>
 
       {#if languageStatus}
-        <p class="visually-hidden" role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
+        <p class:visually-hidden={!languageStatusIsError} class:contract-feedback-error={languageStatusIsError} role="status" aria-label="processing language" aria-live="polite">{languageStatus}</p>
       {/if}
       {#if undoStatus}
         <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>

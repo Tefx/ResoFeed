@@ -74,6 +74,45 @@ func TestProcessingLanguageFutureIngestDoesNotRewriteHistoricalItems(t *testing.
 	}
 }
 
+func TestIngestSkipsExistingItems(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	var articleFetches atomic.Int64
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, `<?xml version="1.0"?><rss><channel><title>Skip Source</title><item><guid>stable-one</guid><title>One</title><link>http://`+r.Host+`/one</link><description>first excerpt</description></item></channel></rss>`)
+		case "/one":
+			articleFetches.Add(1)
+			_, _ = io.WriteString(w, `<html><body><article>first article body</article></body></html>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feed.Close)
+
+	seedSource(t, ctx, db, "src_skip_existing", feed.URL+"/feed.xml", "Skip Source")
+	llm := &countingSummaryLLM{}
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: llm}); err != nil {
+		t.Fatalf("initial IngestOnce: %v", err)
+	}
+	if articleFetches.Load() != 1 || llm.calls.Load() != 1 {
+		t.Fatalf("initial ingest fetches=%d llm_calls=%d, want 1 each", articleFetches.Load(), llm.calls.Load())
+	}
+
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: llm}); err != nil {
+		t.Fatalf("second IngestOnce: %v", err)
+	}
+	if articleFetches.Load() != 1 {
+		t.Fatalf("second ingest fetched existing article; article fetches=%d, want 1", articleFetches.Load())
+	}
+	if llm.calls.Load() != 1 {
+		t.Fatalf("second ingest summarized existing item; llm calls=%d, want 1", llm.calls.Load())
+	}
+}
+
 func TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -157,6 +196,9 @@ func TestOpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret(t
 	if !strings.Contains(capturedContent, `"target_language":"zh"`) {
 		t.Fatalf("OpenRouter prompt missing target_language zh: %s", capturedContent)
 	}
+	if !strings.Contains(capturedContent, "Write all user-readable output fields in item.target_language") || !strings.Contains(capturedContent, "Keep URLs, source identifiers, and provenance literal and untranslated") {
+		t.Fatalf("OpenRouter prompt missing explicit target-language output rule: %s", capturedContent)
+	}
 	if capturedAuth != "Bearer sk-test-secret" {
 		t.Fatalf("OpenRouter Authorization header not set for request")
 	}
@@ -184,6 +226,19 @@ func (l *languageAwareLLM) SummarizeItem(_ context.Context, input OpenRouterSumm
 }
 
 func (l *languageAwareLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
+type countingSummaryLLM struct {
+	calls atomic.Int64
+}
+
+func (l *countingSummaryLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.calls.Add(1)
+	return OpenRouterSummaryOutput{Summary: "summary " + input.Title, CoreInsight: "insight " + input.Title, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	return OpenRouterSteeringOutput{}, nil
 }
 

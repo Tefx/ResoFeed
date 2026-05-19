@@ -406,14 +406,26 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
 	for index, entry := range feed.Items {
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(feed.Items)}, "processing feed items")
+		itemID := ingestedItemID(effectiveSource, entry)
+		exists, err := itemExists(ctx, db, itemID)
+		if err != nil {
+			return result, err
+		}
+		if exists {
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
+			continue
+		}
 		item, err := buildItem(ctx, effectiveSource, entry, cfg.LLM, language)
 		if err != nil {
 			return result, err
 		}
-		if err := upsertIngestedItem(ctx, db, item); err != nil {
+		inserted, err := upsertIngestedItem(ctx, db, item)
+		if err != nil {
 			return result, err
 		}
-		result.itemsUpserted++
+		if inserted {
+			result.itemsUpserted++
+		}
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
 	}
 	return result, nil
@@ -590,6 +602,13 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	return item, nil
 }
 
+func ingestedItemID(source Source, entry feedEntry) string {
+	if strings.TrimSpace(entry.URL) == "" {
+		entry.URL = source.URL + "#" + stableID("entry", entry.Title+entry.Description)
+	}
+	return stableID("item", source.ID+"|"+entryIdentity(entry))
+}
+
 func extractArticleText(ctx context.Context, itemURL string, fallback string) (text string, status string) {
 	parsed, err := url.Parse(itemURL)
 	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
@@ -651,23 +670,35 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 	return cleaned, extractionStatusFull
 }
 
-func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) error {
+func itemExists(ctx context.Context, db *sql.DB, itemID string) (bool, error) {
+	var exists int
+	err := db.QueryRowContext(ctx, `select 1 from items where id = ? limit 1`, itemID).Scan(&exists)
+	if err == nil {
+		return true, nil
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+	return false, fmt.Errorf("ingest item %q: check existing: %w", itemID, err)
+}
+
+func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error) {
 	sanitizeReadableItem(&item)
 	res, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
-		return fmt.Errorf("ingest item %q: %w", item.ID, err)
+		return false, fmt.Errorf("ingest item %q: %w", item.ID, err)
 	}
 	inserted, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("ingest item %q: rows affected: %w", item.ID, err)
+		return false, fmt.Errorf("ingest item %q: rows affected: %w", item.ID, err)
 	}
 	if inserted == 0 {
-		return nil
+		return false, nil
 	}
 	if err := upsertSearchIndex(ctx, db, item); err != nil {
-		return err
+		return false, err
 	}
-	return nil
+	return true, nil
 }
 
 func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {

@@ -91,6 +91,7 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 			"response_json_only":  true,
 			"fields":              []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
 			"model_status_values": []string{"ok", "summary_unavailable", "model_latency_error"},
+			"target_language_rule": "Write all user-readable output fields in item.target_language. Keep URLs, source identifiers, and provenance literal and untranslated.",
 		},
 		"item": input,
 	}
