@@ -76,10 +76,10 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if fallback.title != "processed "+server.URL+"/original-fallback" || fallback.summary != "summary original body after canonical miss" {
 		t.Fatalf("fallback item text = %+v", fallback)
 	}
-	assertClearedReprocessFields(t, ctx, db, "item_unavailable", server.URL+"/unavailable", extractionStatusOriginalNA, modelStatusSummaryNA)
-	assertClearedReprocessFields(t, ctx, db, "item_failed", server.URL+"/failed", extractionStatusOriginalNA, modelStatusLatencyError)
-	assertNoStaleReadableFTS(t, ctx, db, "item_unavailable")
-	assertNoStaleReadableFTS(t, ctx, db, "item_failed")
+	assertPreservedReprocessFields(t, ctx, db, "item_unavailable")
+	assertPreservedReprocessFields(t, ctx, db, "item_failed")
+	assertStaleReadableFTS(t, ctx, db, "item_unavailable")
+	assertStaleReadableFTS(t, ctx, db, "item_failed")
 
 	var staleCount int
 	if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleCount); err != nil {
@@ -97,7 +97,7 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 }
 
-func TestReprocessLibraryTimeoutClearsReadableFieldsAndItemFTS(t *testing.T) {
+func TestReprocessLibraryTimeoutPreservesReadableFieldsAndItemFTS(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -126,11 +126,11 @@ func TestReprocessLibraryTimeoutClearsReadableFieldsAndItemFTS(t *testing.T) {
 	if _, err := time.Parse(time.RFC3339, staleSince); err != nil {
 		t.Fatalf("stale marker is not RFC3339 UTC: %q", staleSince)
 	}
-	assertClearedReprocessFields(t, ctx, db, "item_timeout", server.URL+"/slow", extractionStatusOriginalNA, modelStatusLatencyError)
-	assertNoStaleReadableFTS(t, ctx, db, "item_timeout")
+	assertPreservedReprocessFields(t, ctx, db, "item_timeout")
+	assertStaleReadableFTS(t, ctx, db, "item_timeout")
 }
 
-func TestReprocessLibraryCanceledFetchClearsReadableFieldsAndItemFTS(t *testing.T) {
+func TestReprocessLibraryCanceledFetchPreservesReadableFieldsAndItemFTS(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	runCtx, cancel := context.WithCancel(ctx)
@@ -153,13 +153,59 @@ func TestReprocessLibraryCanceledFetchClearsReadableFieldsAndItemFTS(t *testing.
 	if resp.Reprocess.Status != ReprocessStatusFailed || resp.Reprocess.FTSRebuilt || resp.Reprocess.ItemsIndexed != 0 || resp.Reprocess.ItemsFailed != 1 {
 		t.Fatalf("canceled result = %+v, want failed without FTS rebuild and one failed item", resp.Reprocess)
 	}
-	assertClearedReprocessFields(t, ctx, db, "item_canceled", server.URL+"/blocked", extractionStatusOriginalNA, modelStatusLatencyError)
-	assertNoStaleReadableFTS(t, ctx, db, "item_canceled")
+	assertPreservedReprocessFields(t, ctx, db, "item_canceled")
+	assertStaleReadableFTS(t, ctx, db, "item_canceled")
+}
+
+func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *testing.T) {
+	ctx := context.Background()
+	for _, tc := range []struct {
+		name string
+		llm  LLMClient
+	}{
+		{name: "nil_llm", llm: nil},
+		{name: "summary_unavailable", llm: reprocessStatusLLM{status: modelStatusSummaryNA}},
+		{name: "latency_status", llm: reprocessStatusLLM{status: modelStatusLatencyError}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			db := newContractDB(t, ctx)
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, _ = io.WriteString(w, `<html><body><article>available body for non ok model</article></body></html>`)
+			}))
+			t.Cleanup(server.Close)
+
+			seedSource(t, ctx, db, "src_"+tc.name, server.URL+"/feed.xml", "Source "+tc.name)
+			seedReprocessItem(t, ctx, db, "item_"+tc.name, "src_"+tc.name, server.URL+"/article", "")
+			assertReprocessIndexReady(t, ctx, db)
+
+			resp, err := reprocessLibraryFresh(ctx, db, tc.llm)
+			if err != nil {
+				t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+			}
+			if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
+				t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
+			}
+			assertPreservedReprocessFields(t, ctx, db, "item_"+tc.name)
+			assertStaleReadableFTS(t, ctx, db, "item_"+tc.name)
+		})
+	}
 }
 
 type reprocessMatrixLLM struct {
 	failURLSubstring string
 	availableTexts   []string
+}
+
+type reprocessStatusLLM struct {
+	status string
+}
+
+func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{ModelStatus: l.status}, nil
+}
+
+func (l reprocessStatusLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
 }
 
 func (l *reprocessMatrixLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
@@ -183,15 +229,14 @@ func seedReprocessItem(t *testing.T, ctx context.Context, db *sql.DB, id string,
 	}
 }
 
-func assertClearedReprocessFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, wantTitle string, wantExtractionStatus string, wantModelStatus string) {
+func assertPreservedReprocessFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string) {
 	t.Helper()
-	var title, extractionStatus, modelStatus string
-	var summary, coreInsight, feedExcerpt, extractedText sql.NullString
-	if err := db.QueryRowContext(ctx, `select title, summary, core_insight, feed_excerpt, extracted_text, extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &extractionStatus, &modelStatus); err != nil {
-		t.Fatalf("read cleared item %s: %v", itemID, err)
+	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, modelStatus string
+	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &modelStatus); err != nil {
+		t.Fatalf("read preserved item %s: %v", itemID, err)
 	}
-	if title != wantTitle || summary.Valid || coreInsight.Valid || feedExcerpt.Valid || extractedText.Valid || extractionStatus != wantExtractionStatus || modelStatus != wantModelStatus {
-		t.Fatalf("cleared item %s = title:%q summary:%v core:%v feed:%v extracted:%v extraction:%q model:%q, want title %q and null readable fields", itemID, title, summary.Valid, coreInsight.Valid, feedExcerpt.Valid, extractedText.Valid, extractionStatus, modelStatus, wantTitle)
+	if title != "PRIOR title "+itemID || summary != "PRIOR summary "+itemID || coreInsight != "PRIOR insight "+itemID || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || valueTier != "prior-tier" || extractionStatus != extractionStatusFull || modelStatus != modelStatusOK {
+		t.Fatalf("item %s was degraded: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, modelStatus)
 	}
 }
 

@@ -88,9 +88,6 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		if err != nil {
 			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 				outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out")
-				if storeErr := storeReprocessItem(context.WithoutCancel(ctx), db, item.id, outcome); storeErr != nil {
-					return ReprocessLibraryResponse{}, storeErr
-				}
 				result.ItemsFailed++
 				appendReprocessError(&result, &item.id, ReprocessErrorTimeout, "item processing timed out")
 				continue
@@ -98,9 +95,6 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 			result.ItemsFailed++
 			appendReprocessError(&result, &item.id, ReprocessErrorRSSFetchError, err.Error())
 			continue
-		}
-		if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
-			return ReprocessLibraryResponse{}, err
 		}
 		if outcome.failed {
 			result.ItemsFailed++
@@ -112,6 +106,15 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
 			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
 			continue
+		}
+		if !outcome.writable() {
+			result.ItemsUnavailable++
+			appendReprocessError(&result, &item.id, ReprocessErrorSummaryUnavailable, "summary unavailable")
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
+			continue
+		}
+		if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
+			return ReprocessLibraryResponse{}, err
 		}
 		result.ItemsUpdated++
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item processed")
@@ -158,6 +161,10 @@ type reprocessItemOutcome struct {
 	failed        bool
 	errorCode     ReprocessErrorCode
 	errorMessage  string
+}
+
+func (o reprocessItemOutcome) writable() bool {
+	return !o.failed && !o.unavailable && o.modelStatus == modelStatusOK
 }
 
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {

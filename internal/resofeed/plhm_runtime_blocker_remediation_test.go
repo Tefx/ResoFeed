@@ -20,7 +20,7 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 	}
 	t.Cleanup(release)
 
-	cases := []struct {
+	conflictCases := []struct {
 		name   string
 		method string
 		path   string
@@ -28,10 +28,9 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 	}{
 		{name: "manual ingest", method: http.MethodPost, path: ManualIngestHTTPPath, body: ManualFetchRequestBody},
 		{name: "manual fetch", method: http.MethodPost, path: "/api/sources/src_missing/fetch", body: ManualFetchRequestBody},
-		{name: "runtime language", method: http.MethodPut, path: RuntimeLanguageHTTPPath, body: `{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-language-conflict"}`},
 		{name: "runtime reprocess", method: http.MethodPost, path: RuntimeReprocessLibraryHTTPPath, body: `{"actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-reprocess-conflict"}`},
 	}
-	for _, tc := range cases {
+	for _, tc := range conflictCases {
 		t.Run(tc.name, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			req := authorizedRequest(tc.method, tc.path, bytes.NewReader([]byte(tc.body)))
@@ -49,6 +48,22 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 			assertGuardDetails(t, parsed.Error.Details, "source_fetch", "human")
 		})
 	}
+
+	t.Run("runtime language", func(t *testing.T) {
+		recorder := httptest.NewRecorder()
+		req := authorizedRequest(http.MethodPut, RuntimeLanguageHTTPPath, bytes.NewReader([]byte(`{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-language-allowed"}`)))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(recorder, req)
+		assertStatus(t, recorder, http.StatusOK)
+
+		var parsed ProcessingLanguageResponse
+		if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+			t.Fatalf("unmarshal language body: %v; body=%s", err, recorder.Body.String())
+		}
+		if parsed.Language.Code != ProcessingLanguageChinese || parsed.Language.Label != "中文" || parsed.AlreadyApplied {
+			t.Fatalf("language response = %+v, want fresh zh response", parsed)
+		}
+	})
 }
 
 func TestPLHMMCPGuardConflictUsesActualHolderAndNestedOnlyData(t *testing.T) {

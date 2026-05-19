@@ -509,7 +509,12 @@ func parseFeed(data []byte) (parsedFeed, error) {
 		feed := parsedFeed{Title: strings.TrimSpace(root.Channel.Title)}
 		for _, item := range root.Channel.Items {
 			published := parseFeedTime(item.PubDate)
-			feed.Items = append(feed.Items, feedEntry{ID: strings.TrimSpace(item.GUID), Title: strings.TrimSpace(item.Title), URL: strings.TrimSpace(item.Link), Description: textFromHTML(item.Description), PublishedAt: published})
+			guid := strings.TrimSpace(item.GUID)
+			link := strings.TrimSpace(item.Link)
+			if link == "" && isHTTPArticleURL(guid) {
+				link = guid
+			}
+			feed.Items = append(feed.Items, feedEntry{ID: guid, Title: strings.TrimSpace(item.Title), URL: link, Description: textFromHTML(item.Description), PublishedAt: published})
 		}
 		return feed, nil
 	case "feed":

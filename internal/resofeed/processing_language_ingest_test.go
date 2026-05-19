@@ -151,6 +151,43 @@ func TestIngestUsesFetchedFeedTitleForSourceLedgerAndNewItems(t *testing.T) {
 	}
 }
 
+func TestIngestUsesHTTPGUIDAsURLWhenRSSLinkIsEmpty(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, `<?xml version="1.0"?><rss><channel><title>GUID Source</title><item><guid>http://`+r.Host+`/article-guid</guid><title>GUID Article</title><link></link><description>guid excerpt</description></item></channel></rss>`)
+		case "/article-guid":
+			_, _ = io.WriteString(w, `<html><body><article>guid article body</article></body></html>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feed.Close)
+
+	seedSource(t, ctx, db, "src_guid_fallback", feed.URL+"/feed.xml", "GUID Source")
+	if err := IngestOnce(ctx, db, IngestConfig{}); err != nil {
+		t.Fatalf("IngestOnce: %v", err)
+	}
+
+	itemURL := feed.URL + "/article-guid"
+	itemID := itemIDByURL(t, ctx, db, itemURL)
+	text := readStoredText(t, ctx, db, itemID)
+	if text.title != "GUID Article" || text.feedExcerpt != "guid excerpt" {
+		t.Fatalf("stored text = %+v, want title and feed excerpt from RSS item", text)
+	}
+	var syntheticCount int
+	if err := db.QueryRowContext(ctx, `select count(*) from items where source_id = ? and url like ?`, "src_guid_fallback", feed.URL+"/feed.xml#entry_%").Scan(&syntheticCount); err != nil {
+		t.Fatalf("query synthetic URL count: %v", err)
+	}
+	if syntheticCount != 0 {
+		t.Fatalf("stored %d synthetic feed-fragment URLs, want 0", syntheticCount)
+	}
+}
+
 func TestProcessingLanguageSearchFTSIncludesCoreInsight(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
