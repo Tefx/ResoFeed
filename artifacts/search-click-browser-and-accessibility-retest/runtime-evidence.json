@@ -1,0 +1,39 @@
+{
+  "screenshots": {
+    "desktop": "desktop-selected-inspector.png",
+    "mobileDetail": "mobile-detail.png",
+    "mobileRestored": "mobile-restored-search.png",
+    "preview": "preview-selected-state.png"
+  },
+  "checks": {
+    "desktop": {
+      "desktopQuery": "fallback evidence",
+      "desktopScroll": 48,
+      "selectedAria": "true",
+      "inspectorHasSelectedTitle": true
+    },
+    "accessibility": {
+      "selectedAriaAfterEnter": "true",
+      "alternateAriaAfterSpace": "true"
+    },
+    "mobile": {
+      "detailUrl": "http://127.0.0.1:4173/items/item_search_click_selected",
+      "restoredUrl": "http://127.0.0.1:4173/?search=fallback+evidence",
+      "restoredQuery": "fallback evidence",
+      "restoredScroll": 180
+    },
+    "preview": {
+      "selectedAria": "true",
+      "hasInspectorPreview": 1,
+      "hasSourceEvidence": 1
+    },
+    "forbiddenPatterns": {
+      "dialogCount": 0,
+      "forbiddenTextCount": 0
+    }
+  },
+  "build": {
+    "status": 0
+  },
+  "serverOutput": "\n> resofeed-web@0.0.0-contract preview\n> vite preview --host 127.0.0.1 --port 4173\n\n  ➜  Local:   http://127.0.0.1:4173/\n"
+}
