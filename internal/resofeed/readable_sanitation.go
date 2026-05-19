@@ -1,9 +1,12 @@
 package resofeed
 
 import (
+	"bytes"
+	"mime"
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 const contaminatedInsightFallback = "insight unavailable (fallback: source payload contaminated)"
@@ -27,12 +30,60 @@ var (
 	readableContaminationPatterns = append(append([]*regexp.Regexp{}, readableTailMarkerPatterns...), readableDropLinePatterns...)
 	inlineSocialPromptRE          = regexp.MustCompile(`(?i)\bfollow\s+us\s+on\s+(twitter|x)\s+for\s+more\s+newsletters?\b`)
 	repeatedDirtyLeadRE           = regexp.MustCompile(`(?i)\bsummary-like\s+lead\s+repeated\s+by\s+the\s+site\s+summary-like\s+lead\s+repeated\s+by\s+the\s+site\b`)
+	pdfPayloadLeadRE              = regexp.MustCompile(`(?i)^%pdf-\d`)
 )
+
+func isReadableTextContentType(contentType string) bool {
+	contentType = strings.TrimSpace(contentType)
+	if contentType == "" {
+		return true
+	}
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		mediaType = strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
+	}
+	switch strings.ToLower(mediaType) {
+	case "text/html", "text/plain", "application/xhtml+xml", "application/xml", "text/xml", "application/rss+xml", "application/atom+xml":
+		return true
+	default:
+		return false
+	}
+}
+
+func looksLikeBinaryReadablePayload(body []byte) bool {
+	trimmed := bytes.TrimSpace(body)
+	if len(trimmed) == 0 {
+		return false
+	}
+	if bytes.HasPrefix(bytes.ToLower(trimmed), []byte("%pdf-")) {
+		return true
+	}
+	sample := trimmed
+	if len(sample) > 2048 {
+		sample = sample[:2048]
+	}
+	if bytes.IndexByte(sample, 0) >= 0 {
+		return true
+	}
+	if !utf8.Valid(sample) {
+		return true
+	}
+	controlCount := 0
+	for _, r := range string(sample) {
+		if unicode.IsControl(r) && r != '\n' && r != '\r' && r != '\t' {
+			controlCount++
+		}
+	}
+	return controlCount > 0 && controlCount*12 > utf8.RuneCount(sample)
+}
 
 func sanitizeReadablePayloadText(value string) (string, bool) {
 	value = strings.TrimSpace(value)
 	if value == "" {
 		return "", false
+	}
+	if pdfPayloadLeadRE.MatchString(value) || strings.ContainsRune(value, '\uFFFD') {
+		return "", true
 	}
 	paragraphs := splitReadableParagraphs(value)
 	kept := make([]string, 0, len(paragraphs))

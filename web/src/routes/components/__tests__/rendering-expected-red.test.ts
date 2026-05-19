@@ -237,6 +237,73 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(originalLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))).toBe(true);
   });
 
+  it('does not present unprocessed English source text as completed Chinese Inspector body', () => {
+    const fallbackDetail: ItemDetail = {
+      ...expectedRedItem,
+      id: 'item_zh_fallback_source_excerpt',
+      title: 'English source fixture awaiting reprocess',
+      summary: null,
+      core_insight: null,
+      extraction_status: 'partial_extraction',
+      model_status: 'summary_unavailable',
+      feed_excerpt: 'This raw English RSS excerpt should remain provenance, not the main Chinese body.',
+      extracted_text: 'This raw English body should not appear as completed Chinese reading content.',
+      provenance: {
+        source_url: expectedRedSource.url,
+        canonical_url: expectedRedItem.url,
+        original_url: expectedRedItem.url,
+        story_key: null,
+        duplicate_of_item_id: null,
+        grouped_source_items: []
+      }
+    };
+
+    render(Inspector, { props: { item: fallbackDetail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: fallbackDetail.title });
+    expect(within(inspector).getByText('来源文本：仅 RSS 摘录')).toBeVisible();
+    expect(within(inspector).getByText('摘要来源：订阅摘录回退')).toBeVisible();
+    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('来源回退：');
+    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('源文本尚未完成中文处理；来源摘录仅作为出处证据。');
+    expect(inspector).not.toHaveTextContent('This raw English body should not appear as completed Chinese reading content.');
+  });
+
+  it('prefers model-backed Chinese reading text over stale English extracted text', () => {
+    const mixedDetail: ItemDetail = {
+      ...expectedRedItem,
+      id: 'item_zh_model_backed_stale_body',
+      title: '中文标题',
+      summary: '这是中文摘要。',
+      core_insight: '这是中文核心洞察。',
+      extraction_status: 'full',
+      model_status: 'ok',
+      feed_excerpt: 'An older English feed excerpt remains stored from before reprocess.',
+      extracted_text: 'An older English full article body remains stored from before reprocess and should not be shown in Chinese mode.',
+      provenance: {
+        source_url: expectedRedSource.url,
+        canonical_url: expectedRedItem.url,
+        original_url: expectedRedItem.url,
+        story_key: null,
+        duplicate_of_item_id: null,
+        grouped_source_items: []
+      }
+    };
+
+    render(Inspector, { props: { item: mixedDetail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: mixedDetail.title });
+    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('这是中文摘要。 这是中文核心洞察。');
+    expect(inspector).not.toHaveTextContent('older English full article body');
+  });
+
+  it('keeps the original link as a low-chrome provenance anchor with its own focus class', () => {
+    render(Inspector, { props: { item: expectedRedItem, mode: 'desktop-split' } });
+
+    const originalLink = screen.getByRole('link', { name: 'original link' });
+    expect(originalLink).toHaveClass('inspector-original-link');
+    expect(originalLink.closest('p')).toHaveClass('inspector-link-row');
+  });
+
   it('removes follow/newsletter prompts and adjacent repeated lead-like filler without blanking article prose', () => {
     const dirtyDetail: ItemDetail = {
       ...expectedRedItem,

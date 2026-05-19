@@ -49,3 +49,25 @@ func TestSanitizeReadablePayloadTextKeepsCleanArticleBody(t *testing.T) {
 		t.Fatalf("cleaned body = %q, want original", cleaned)
 	}
 }
+
+func TestSanitizeReadablePayloadTextRejectsPDFGarbage(t *testing.T) {
+	pdfLike := "%PDF-1.7\n%����\n1 0 obj\n<< /Type /Catalog >>\nendobj"
+	cleaned, changed := sanitizeReadablePayloadText(pdfLike)
+	if !changed {
+		t.Fatalf("sanitizeReadablePayloadText changed=false, want binary/PDF rejection")
+	}
+	if cleaned != "" {
+		t.Fatalf("cleaned PDF payload = %q, want empty", cleaned)
+	}
+}
+
+func TestSanitizeReadableInsightRejectsPDFGarbage(t *testing.T) {
+	pdfLike := "%PDF-1.7\n%����\nstream"
+	cleaned, changed := sanitizeReadableInsightPointer(&pdfLike)
+	if !changed {
+		t.Fatalf("sanitizeReadableInsightPointer changed=false, want binary/PDF rejection")
+	}
+	if cleaned != nil {
+		t.Fatalf("cleaned PDF insight = %q, want nil", *cleaned)
+	}
+}

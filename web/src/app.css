@@ -983,6 +983,8 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 
 .inspector-original-link {
   padding-inline: var(--rf-space-sm);
+  border-block-end: 1px solid var(--rf-color-border);
+  outline: 0;
 }
 
 .contract-inspector a:hover,
@@ -990,6 +992,14 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   color: var(--rf-color-text);
   outline: 2px solid var(--rf-color-focus);
   outline-offset: 2px;
+}
+
+.inspector-original-link:hover,
+.inspector-original-link:focus-visible {
+  background: var(--rf-color-surface-active);
+  outline: 1px solid var(--rf-color-focus);
+  outline-offset: 3px;
+  box-shadow: inset 0 -2px 0 var(--rf-color-focus);
 }
 
 .inspector-header-row {
@@ -1008,6 +1018,35 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   max-width: 68ch;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
+}
+
+.contract-inspector .inspector-link-row,
+.contract-inspector .inspector-status-line,
+.contract-inspector .inspector-section-label {
+  font: var(--rf-typography-metadata);
+  letter-spacing: 0.02em;
+}
+
+.contract-inspector .inspector-text-section {
+  max-width: 68ch;
+  margin-block: var(--rf-space-md);
+}
+
+.contract-inspector .inspector-section-label {
+  margin-block-end: var(--rf-space-xs);
+  color: var(--rf-color-muted);
+}
+
+.contract-inspector .inspector-section-copy,
+.contract-inspector .inspector-reading {
+  margin-block: 0;
+  overflow-wrap: anywhere;
+  font: var(--rf-typography-payload);
+}
+
+.contract-inspector .inspector-reading-section {
+  padding-block-start: var(--rf-space-sm);
+  border-block-start: 1px solid var(--rf-color-border);
 }
 
 .contract-source-details {

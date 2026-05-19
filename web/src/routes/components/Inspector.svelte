@@ -230,7 +230,39 @@
     return normalized.length > 0 ? normalized : null;
   }
 
+  function hasCJKText(text: string | null): boolean {
+    return Boolean(text?.match(/[\u3400-\u9FFF]/u));
+  }
+
+  function isLikelyUntranslatedEnglish(text: string | null): boolean {
+    if (!text || hasCJKText(text)) return false;
+    const latinWords = text.match(/\b[A-Za-z][A-Za-z'-]{2,}\b/g) ?? [];
+    const allWords = text.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? [];
+    return latinWords.length >= 8 && allWords.length > 0 && latinWords.length / allWords.length > 0.75;
+  }
+
+  function hasModelBackedText(value: InspectableItem): boolean {
+    return value.model_status === 'ok' && Boolean(readableText(value.summary) || readableText(value.core_insight));
+  }
+
+  function modelBackedZhText(value: InspectableItem): string | null {
+    if (language !== 'zh' || !hasModelBackedText(value)) return null;
+    const summary = readableText(value.summary);
+    const coreInsight = readableText(value.core_insight);
+    if (!hasCJKText(summary) && !hasCJKText(coreInsight)) return null;
+    const body = 'extracted_text' in value ? readableText(value.extracted_text) : null;
+    const excerpt = 'feed_excerpt' in value ? readableText(value.feed_excerpt) : null;
+    if (body && !isLikelyUntranslatedEnglish(body)) return body;
+    if (excerpt && !isLikelyUntranslatedEnglish(excerpt)) return excerpt;
+    return [summary, coreInsight].filter((part): part is string => Boolean(part)).join(' ');
+  }
+
   function detailText(value: InspectableItem): string {
+    const zhModelText = modelBackedZhText(value);
+    if (zhModelText) return zhModelText;
+    if (language === 'zh' && !hasModelBackedText(value)) {
+      return localizedChrome('Source text is not yet processed in Chinese; source excerpt remains provenance only.', '源文本尚未完成中文处理；来源摘录仅作为出处证据。');
+    }
     if ('extracted_text' in value) {
       const extractedText = readableText(value.extracted_text);
       if (extractedText) return extractedText;
@@ -252,6 +284,13 @@
     return firstSentence(detailText(value));
   }
 
+  function readingSectionLabel(value: InspectableItem): string {
+    if (language === 'zh' && !hasModelBackedText(value)) return localizedChrome('source fallback:', '来源回退：');
+    return value.extraction_status === 'partial_extraction'
+      ? localizedChrome('source excerpt:', '来源摘录：')
+      : localizedChrome('source text:', '来源文本：');
+  }
+
   function firstSentence(text: string): string {
     const sentence = text.match(/^[^.!?]+[.!?]/u)?.[0] ?? text;
     return sentence.trim();
@@ -264,6 +303,7 @@
   }
 
   function denseSummaryText(value: InspectableItem): string {
+    if (language === 'zh' && !hasModelBackedText(value)) return detailText(value);
     return summaryText(value) ?? conciseExcerpt(detailText(value), 240);
   }
 
@@ -396,8 +436,7 @@
   }
 
   function summaryProvenanceDisclosure(value: InspectableItem): string {
-    const hasModelText = value.model_status === 'ok' && (readableText(value.summary) || readableText(value.core_insight));
-    if (hasModelText) return localizedChrome('summary provenance: model-backed', '摘要来源：模型支持');
+    if (hasModelBackedText(value)) return localizedChrome('summary provenance: model-backed', '摘要来源：模型支持');
     const fallback = summaryText(value) ? 'feed excerpt fallback' : 'fallback unavailable';
     if (language === 'zh') return `摘要来源：${fallback === 'feed excerpt fallback' ? '订阅摘录回退' : '回退不可用'}`;
     return `summary provenance: ${fallback}`;
@@ -446,15 +485,24 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
-    <p class:contract-warning={item.extraction_status !== 'full'}>
+    <p class="inspector-link-row"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <p class="inspector-status-line" class:contract-warning={item.extraction_status !== 'full'}>
       <span>{extractionDisclosure(item)}</span>
       <span aria-hidden="true"> · </span>
       <span>{summaryProvenanceDisclosure(item)}</span>
     </p>
-    <p><strong>{localizedChrome('summary:', '摘要：')}</strong> {denseSummaryText(item)}</p>
-    <p><strong>{localizedChrome('core insight:', '核心洞察：')}</strong> {coreInsightText(item)}</p>
-    <p class="inspector-reading">{detailText(item)}</p>
+    <section class="inspector-text-section" aria-label={localizedChrome('Summary', '摘要')}>
+      <p class="inspector-section-label">{localizedChrome('summary:', '摘要：')}</p>
+      <p class="inspector-section-copy">{denseSummaryText(item)}</p>
+    </section>
+    <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>
+      <p class="inspector-section-label">{localizedChrome('core insight:', '核心洞察：')}</p>
+      <p class="inspector-section-copy">{coreInsightText(item)}</p>
+    </section>
+    <section class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
+      <p class="inspector-section-label">{readingSectionLabel(item)}</p>
+      <p class="inspector-reading">{detailText(item)}</p>
+    </section>
     <p class="contract-muted">why: fresh from configured source</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}

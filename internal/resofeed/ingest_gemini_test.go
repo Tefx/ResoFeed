@@ -72,6 +72,41 @@ func TestExtractionStatusMappingCoversFullPartialAndOriginalUnavailable(t *testi
 	}
 }
 
+func TestExtractArticleTextRejectsPDFPayloads(t *testing.T) {
+	t.Parallel()
+
+	pdf := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/pdf")
+		_, _ = w.Write([]byte("%PDF-1.7\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<< /Type /Catalog >>\nendobj"))
+	}))
+	defer pdf.Close()
+
+	text, status := extractArticleText(context.Background(), pdf.URL, "fallback excerpt")
+	if status != extractionStatusPartial || text != "" {
+		t.Fatalf("pdf with fallback extraction = (%q, %q), want empty/partial_extraction", text, status)
+	}
+
+	text, status = extractArticleText(context.Background(), pdf.URL, "")
+	if status != extractionStatusOriginalNA || text != "" {
+		t.Fatalf("pdf without fallback extraction = (%q, %q), want empty/original_unavailable", text, status)
+	}
+}
+
+func TestExtractArticleTextRejectsSniffedBinaryPayloads(t *testing.T) {
+	t.Parallel()
+
+	binary := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte{'%', 'P', 'D', 'F', '-', '1', '.', '7', '\n', 0, 1, 2})
+	}))
+	defer binary.Close()
+
+	text, status := extractArticleText(context.Background(), binary.URL, "fallback excerpt")
+	if status != extractionStatusPartial || text != "" {
+		t.Fatalf("sniffed binary extraction = (%q, %q), want empty/partial_extraction", text, status)
+	}
+}
+
 func TestExtractArticleTextPrefersSemanticReadableContainers(t *testing.T) {
 	t.Parallel()
 

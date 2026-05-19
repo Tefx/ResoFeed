@@ -317,9 +317,15 @@ func fetchArticleReadableText(ctx context.Context, articleURL string) (text stri
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return "", fmt.Errorf("reprocess fetch: status %d", resp.StatusCode)
 	}
+	if !isReadableTextContentType(resp.Header.Get("Content-Type")) {
+		return "", fmt.Errorf("reprocess fetch: unsupported readable content type %q", resp.Header.Get("Content-Type"))
+	}
 	body, err := io.ReadAll(io.LimitReader(resp.Body, 2<<20))
 	if err != nil {
 		return "", fmt.Errorf("reprocess fetch: read body: %w", err)
+	}
+	if looksLikeBinaryReadablePayload(body) {
+		return "", errors.New("reprocess fetch: binary article payload")
 	}
 	text = textFromHTML(string(body))
 	text, _ = sanitizeReadablePayloadText(text)

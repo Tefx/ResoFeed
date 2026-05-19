@@ -655,8 +655,20 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		}
 		return "", extractionStatusOriginalNA
 	}
+	if !isReadableTextContentType(resp.Header.Get("Content-Type")) {
+		if strings.TrimSpace(fallback) != "" {
+			return "", extractionStatusPartial
+		}
+		return "", extractionStatusOriginalNA
+	}
 	body, err := io.ReadAll(io.LimitReader(resp.Body, 2<<20))
 	if err != nil {
+		if strings.TrimSpace(fallback) != "" {
+			return "", extractionStatusPartial
+		}
+		return "", extractionStatusOriginalNA
+	}
+	if looksLikeBinaryReadablePayload(body) {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
 		}

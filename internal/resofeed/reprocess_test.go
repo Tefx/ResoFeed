@@ -265,6 +265,38 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 	}
 }
 
+func TestFetchArticleReadableTextRejectsPDFPayload(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/pdf")
+		_, _ = w.Write([]byte("%PDF-1.7\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<< /Type /Catalog >>\nendobj"))
+	}))
+	t.Cleanup(server.Close)
+
+	text, err := fetchArticleReadableText(context.Background(), server.URL)
+	if err == nil {
+		t.Fatalf("fetchArticleReadableText pdf error = nil, text %q", text)
+	}
+	if text != "" {
+		t.Fatalf("fetchArticleReadableText pdf text = %q, want empty", text)
+	}
+}
+
+func TestFetchArticleReadableTextRejectsSniffedBinaryPayload(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte{'%', 'P', 'D', 'F', '-', '1', '.', '7', '\n', 0, 1, 2})
+	}))
+	t.Cleanup(server.Close)
+
+	text, err := fetchArticleReadableText(context.Background(), server.URL)
+	if err == nil {
+		t.Fatalf("fetchArticleReadableText sniffed binary error = nil, text %q", text)
+	}
+	if text != "" {
+		t.Fatalf("fetchArticleReadableText sniffed binary text = %q, want empty", text)
+	}
+}
+
 type reprocessMatrixLLM struct {
 	failURLSubstring string
 	availableTexts   []string

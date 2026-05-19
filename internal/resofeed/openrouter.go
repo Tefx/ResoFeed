@@ -106,6 +106,15 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	out.FeedExcerpt = strings.TrimSpace(out.FeedExcerpt)
 	out.ExtractedText = strings.TrimSpace(out.ExtractedText)
 	out.ModelStatus = strings.TrimSpace(out.ModelStatus)
+	var sanitized bool
+	if out.Summary, sanitized = sanitizeReadablePayloadText(out.Summary); sanitized && out.Summary == "" {
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: contaminated summary")
+	}
+	if out.CoreInsight, sanitized = sanitizeReadablePayloadText(out.CoreInsight); sanitized && out.CoreInsight == "" {
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: contaminated core_insight")
+	}
+	out.FeedExcerpt, _ = sanitizeReadablePayloadText(out.FeedExcerpt)
+	out.ExtractedText, _ = sanitizeReadablePayloadText(out.ExtractedText)
 	if out.ModelStatus == "" {
 		out.ModelStatus = "ok"
 	}
