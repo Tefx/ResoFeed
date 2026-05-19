@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
@@ -17,6 +18,7 @@ type ManualFetchSourceLedgerProps = {
 };
 
 const ManualSourceLedger = SourceLedger as Component<ManualFetchSourceLedgerProps>;
+const appCss = readFileSync('src/app.css', 'utf8');
 
 const sourceWithFetchTime: Source = {
   id: 'src_ok',
@@ -189,6 +191,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByText('[DETAILS]')).toHaveTextContent(/^\[[A-Z]+\]$/);
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[FETCH]')).toHaveClass('bracket-action');
+    expect(appCss).toMatch(/\.bracket-action\s*\{[\s\S]*cursor:\s*pointer;/);
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
     expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();

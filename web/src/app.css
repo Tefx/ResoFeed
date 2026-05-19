@@ -35,6 +35,13 @@ button {
   background: transparent;
 }
 
+button:not(:disabled):not([aria-disabled='true']),
+a[href],
+details > summary,
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
 select {
   min-height: 44px;
   border: 1px solid var(--rf-color-border);
@@ -45,10 +52,12 @@ select {
   font: inherit;
 }
 
-button:disabled {
+button:disabled,
+button[aria-disabled='true'] {
   border-color: var(--rf-color-border);
   color: var(--rf-color-muted);
   background: transparent;
+  cursor: default;
 }
 
 input {

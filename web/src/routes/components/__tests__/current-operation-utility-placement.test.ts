@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
@@ -7,6 +8,7 @@ import Page from '../../+page.svelte';
 import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
 
 const ownerToken = 'rfeed_operation_utility_surface_0000000000000000000';
+const appCss = readFileSync('src/app.css', 'utf8');
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -150,6 +152,8 @@ describe('current operation and low-frequency utility placement', () => {
 
     expect(menu).not.toHaveAttribute('open');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).toHaveClass('surface-nav-label');
+    expect(appCss).toMatch(/details\s*>\s*summary,\s*\n\[role='button'\]:not\(\[aria-disabled='true'\]\)\s*\{\s*\n\s*cursor:\s*pointer;/);
 
     await user.click(trigger);
     expect(menu).toHaveAttribute('open', '');
