@@ -10,6 +10,7 @@ import SearchRetrieval from '../SearchRetrieval.svelte';
 import SourceLedger from '../SourceLedger.svelte';
 import StatePortability from '../StatePortability.svelte';
 import Page from '../../+page.svelte';
+import { formatLocalClockTime } from '$lib/display-time';
 import {
   expectedRedFallbackItem,
   expectedRedItem,
@@ -450,7 +451,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
     expect(within(ledger).getByText(/src: Example Source · status: ok · last_fetch:/)).toBeVisible();
     expect(within(ledger).getByText('url: https://example.com/feed.xml')).toBeVisible();
-    expect(within(ledger).getByText('last_fetch: 00:00:00')).toBeVisible();
+    expect(within(ledger).getByText(`last_fetch: ${formatLocalClockTime(expectedRedSource.last_fetch_at)}`)).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
     expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
     expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
@@ -475,11 +476,18 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(portability).getByRole('status')).toHaveTextContent('exported state.json');
   });
 
-  it('renders search/retrieval and exposes missing filters plus provenance-rich result anatomy', () => {
+  it('renders search/retrieval with filters collapsed by default and still openable', async () => {
+    const user = userEvent.setup();
     render(SearchRetrieval, { props: { items: [expectedRedItem], query: 'sqlite', onSearch: async () => ({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } }) } });
 
     const search = screen.getByRole('region', { name: 'Search and Retrieval' });
+    const filters = within(search).getByText('filters').closest('details');
+    expect(filters).toBeInstanceOf(HTMLDetailsElement);
+    expect(filters).not.toHaveAttribute('open');
     expect(within(search).getByLabelText('Plain text query')).toHaveValue('sqlite');
+    expect(within(search).getByLabelText('Source filter')).not.toBeVisible();
+    await user.click(within(search).getByText('filters'));
+    expect(filters).toHaveAttribute('open');
     expect(within(search).getByLabelText('Source filter')).toBeVisible();
     expect(within(search).getByLabelText('From date')).toBeVisible();
     expect(within(search).getByLabelText('Resonated only')).toBeVisible();

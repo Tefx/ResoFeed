@@ -3,6 +3,7 @@
   import { processingLanguageRuntimeContract, type CurrentOperationInfo, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
   import { isOperationBlockingManualIngest } from '$lib/current-operation';
+  import { formatLocalClockTime } from '$lib/display-time';
   import StatePortability from './StatePortability.svelte';
 
   interface Props {
@@ -55,25 +56,12 @@
       : null
   );
 
-  function formatTime(timestamp: string | null | undefined): string | null {
-    if (!timestamp) return null;
-    const date = new Date(timestamp);
-    if (Number.isNaN(date.getTime())) return null;
-    return new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'UTC'
-    }).format(date);
-  }
-
   function latestIngestStatusText(candidates: Source[]): string {
     const latest = candidates
       .map((source) => source.last_fetch_at)
       .filter((timestamp): timestamp is string => Boolean(timestamp))
       .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
-    const formatted = formatTime(latest);
+    const formatted = formatLocalClockTime(latest);
     return `last_ingest: ${formatted ?? 'not_run'}`;
   }
 
@@ -166,7 +154,7 @@
       await tick();
       globalIngestStatusText = 'submitting ingest';
       const result = await onRunIngest();
-      const completedAt = formatTime(result.completed_at);
+      const completedAt = formatLocalClockTime(result.completed_at);
       globalIngestStatusText = result.completed
         ? `last_ingest: ${completedAt ?? 'complete'}`
         : rawErrorText(result.errors[0]?.message ?? 'ingest failed');
@@ -186,7 +174,7 @@
       await tick();
       const result = await onFetchSource(source);
       await pendingFrame();
-      const completedAt = formatTime(result.completed_at ?? source.last_fetch_at);
+      const completedAt = formatLocalClockTime(result.completed_at ?? source.last_fetch_at);
       const errorMessage = result.errors.find((candidate) => candidate.source_id === source.id || candidate.source_id === null)?.message;
       setSourceFeedback(
         source.id,
@@ -286,7 +274,7 @@
   {:else}
     <ul class="contract-list source-ledger__list">
       {#each visibleSources as source (source.id)}
-        {@const lastFetch = formatTime(source.last_fetch_at)}
+        {@const lastFetch = formatLocalClockTime(source.last_fetch_at)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}

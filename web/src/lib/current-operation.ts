@@ -1,4 +1,5 @@
 import type { CurrentOperationInfo, OperationActorKind, OperationKind } from '$lib/api-contract';
+import { formatLocalClockTime } from '$lib/display-time';
 
 export const CANONICAL_OPERATION_KINDS = [
   'background_ingest',
@@ -84,15 +85,7 @@ export function isOperationBlockingManualIngest(operation: CurrentOperationInfo 
 
 export function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
   if (!timestamp) return null;
-  const date = new Date(timestamp);
-  if (Number.isNaN(date.getTime())) return timestamp;
-  return new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'UTC'
-  }).format(date);
+  return formatLocalClockTime(timestamp) ?? timestamp;
 }
 
 export function operationDetails(operation: CurrentOperationInfo): string {

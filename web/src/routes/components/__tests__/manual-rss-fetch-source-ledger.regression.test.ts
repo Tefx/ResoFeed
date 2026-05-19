@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
 import type { CurrentOperationInfo, Source, StateBundleV1 } from '$lib/api-contract';
+import { formatLocalClockTime } from '$lib/display-time';
 import SourceLedger from '../SourceLedger.svelte';
 
 type ManualFetchSourceLedgerProps = {
@@ -126,11 +127,13 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     const header = ledger.querySelector('.source-ledger__header');
+    const expectedFetchTime = formatLocalClockTime(sourceWithFetchTime.last_fetch_at);
     expect(header).toBeInstanceOf(HTMLElement);
-    expect(within(header as HTMLElement).getByText('last_ingest: 10:25:31')).toHaveClass('source-ledger__status');
+    expect(within(header as HTMLElement).getByText(`last_ingest: ${expectedFetchTime}`)).toHaveClass('source-ledger__status');
     expect(within(header as HTMLElement).getByRole('button', { name: '[RUN INGEST]' })).toHaveClass('bracket-action--run-ingest');
-    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveTextContent('last_fetch: 10:25:31');
+    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveTextContent(`last_fetch: ${expectedFetchTime}`);
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
+    expect(ledger).not.toHaveTextContent(/UTC|Z/);
   });
 
   it('renders source diagnostics through a visible details disclosure without friendly SaaS copy', async () => {
@@ -201,9 +204,12 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
   it('matches the Source Ledger preview row copy with one primary source string and direct action columns', () => {
     const ledger = renderCanonicalLedger();
     const row = ledger.querySelector('.source-ledger-row');
+    const expectedFetchTime = formatLocalClockTime(sourceWithFetchTime.last_fetch_at);
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent(/src: simonwillison\.net\/feed\.xml\s*· status: ok · last_fetch: 10:25:31\s+url: https:\/\/simonwillison\.net\/atom\/everything\s+last_fetch: 10:25:31\s+\[FETCH\]\s+\[DELETE\]\s+\[DETAILS\]/);
+    expect(row).toHaveTextContent(`src: simonwillison.net/feed.xml · status: ok · last_fetch: ${expectedFetchTime}`);
+    expect(row).toHaveTextContent('url: https://simonwillison.net/atom/everything');
+    expect(row).toHaveTextContent(`last_fetch: ${expectedFetchTime}`);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
     expect(row?.children).toHaveLength(4);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');

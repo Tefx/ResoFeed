@@ -84,7 +84,7 @@
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
       <button type="submit" class="bracket-action">[SEARCH]</button>
     </div>
-    <details class="search-secondary-filters" open={!compactFilters}>
+    <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'}>
       <summary>filters</summary>
       <div class="search-secondary-grid">
         <label for="search-source">Source filter</label>
