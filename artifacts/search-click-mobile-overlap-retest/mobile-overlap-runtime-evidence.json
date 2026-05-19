@@ -1,0 +1,81 @@
+{
+  "build": {
+    "status": 0
+  },
+  "viewport": {
+    "width": 360,
+    "height": 844,
+    "isMobile": true
+  },
+  "restored": {
+    "url": "http://127.0.0.1:4174/?search=long+metadata+fallback+evidence",
+    "query": "long metadata fallback evidence",
+    "scrollY": 180
+  },
+  "screenshot": "mobile-restored-long-metadata.png",
+  "geometry": {
+    "article": {
+      "left": 40,
+      "top": 84,
+      "right": 320,
+      "bottom": 292,
+      "width": 280,
+      "height": 208
+    },
+    "today": {
+      "left": 214.78125,
+      "top": 114,
+      "right": 252,
+      "bottom": 130,
+      "width": 37.21875,
+      "height": 16
+    },
+    "longMeta": {
+      "left": 55,
+      "top": 96,
+      "right": 252,
+      "bottom": 112,
+      "width": 197,
+      "height": 16
+    },
+    "star": {
+      "left": 264,
+      "top": 96,
+      "right": 308,
+      "bottom": 140,
+      "width": 44,
+      "height": 44
+    },
+    "text": "src: Search Contract Source With Extremely Long Publisher Metadata That Should Wrap Or Ellipsize Before Touch Targets And Never Collide With The Resonate Hitbox · 1m TODAY extraction: source excerpt match: lexical index provenance: source-backed quality: source excerpt Long metadata restored search selected item Long metadata row proves compact mobile restored search layout remains touch-safe. ☆",
+    "longMetaText": "src: Search Contract Source With Extremely Long Publisher Metadata That Should Wrap Or Ellipsize Before Touch Targets And Never Collide With The Resonate Hitbox",
+    "longMetaClientWidth": 197,
+    "longMetaScrollWidth": 1191,
+    "longMetaTextOverflow": "ellipsis",
+    "longMetaWhiteSpace": "nowrap",
+    "starLabel": "Resonate item: Long metadata restored search selected item"
+  },
+  "checks": {
+    "hasTodayLabel": true,
+    "hasLongMetadataText": true,
+    "longMetadataWrappedOrEllipsized": true,
+    "starHitboxAtLeast44": true,
+    "todayDoesNotOverlapStar": true,
+    "longMetadataDoesNotOverlapStar": true,
+    "todayDoesNotOverlapLongMetadata": true
+  },
+  "gaps": {
+    "todayToStar": {
+      "horizontal": 12,
+      "vertical": 0
+    },
+    "longMetadataToStar": {
+      "horizontal": 12,
+      "vertical": 0
+    },
+    "todayToLongMetadata": {
+      "horizontal": 0,
+      "vertical": 2
+    }
+  },
+  "serverOutput": "\n> resofeed-web@0.0.0-contract preview\n> vite preview --host 127.0.0.1 --port 4174\n\n  ➜  Local:   http://127.0.0.1:4174/\n"
+}
