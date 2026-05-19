@@ -857,7 +857,7 @@
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions: details owns the opened menu subtree; Escape must close from any focused menu item and return focus to the summary per DESIGN.md App Shell keyboard contract. -->
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
-          <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" onclick={(event) => { if (surfaceMenuOpen) event.preventDefault(); }}>RESOFEED</summary>
+          <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" aria-haspopup="menu" aria-expanded={surfaceMenuOpen ? 'true' : 'false'}>RESOFEED</summary>
           <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
             <p class="utility-label">NAV</p>
             <button

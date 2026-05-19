@@ -142,6 +142,24 @@ describe('current operation and low-frequency utility placement', () => {
     expect(menu.getByText('[REPROCESS LIBRARY]')).toBeVisible();
   });
 
+  it('toggles the RESOFEED utility menu closed from the trigger and updates expanded state', async () => {
+    const { user } = await renderAuthenticatedPage();
+    const menu = document.querySelector('details[aria-label="RESOFEED surface menu"]');
+    expect(menu).toBeInstanceOf(HTMLDetailsElement);
+    const trigger = within(menu as HTMLElement).getByText('RESOFEED');
+
+    expect(menu).not.toHaveAttribute('open');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+    expect(menu).toHaveAttribute('open', '');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(trigger);
+    expect(menu).not.toHaveAttribute('open');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('renders running and blocked operation context in Source Ledger/menu without top-chrome dashboard chrome', async () => {
     let releaseIngest!: () => void;
     const holdIngest = new Promise<void>((resolve) => { releaseIngest = resolve; });
