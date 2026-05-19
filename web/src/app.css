@@ -1373,15 +1373,34 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   .contract-search-meta-primary,
   .contract-search-meta-secondary {
     flex-wrap: wrap;
-    row-gap: 0;
+    column-gap: var(--rf-space-sm);
+    row-gap: var(--rf-space-xxs);
+    height: auto;
+    min-height: 16px;
     overflow: visible;
     white-space: normal;
   }
 
+  .contract-search-meta-primary > span,
+  .contract-search-meta-secondary > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .contract-search-meta-primary .feed-meta-source,
+  .contract-search-meta-secondary .feed-meta-extraction {
+    flex: 1 1 auto;
+  }
+
+  .contract-search-meta-primary .feed-meta-age,
   .contract-search-time-label {
-    display: block;
-    flex-basis: 100%;
-    margin-inline-start: 0;
+    flex: 0 0 auto;
+  }
+
+  .contract-search-time-label {
+    margin-inline-start: auto;
     color: var(--rf-color-muted);
   }
 
