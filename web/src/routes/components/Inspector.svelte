@@ -260,9 +260,6 @@
   function detailText(value: InspectableItem): string {
     const zhModelText = modelBackedZhText(value);
     if (zhModelText) return zhModelText;
-    if (language === 'zh' && !hasModelBackedText(value)) {
-      return localizedChrome('Source text is not yet processed in Chinese; source excerpt remains provenance only.', '源文本尚未完成中文处理；来源摘录仅作为出处证据。');
-    }
     if ('extracted_text' in value) {
       const extractedText = readableText(value.extracted_text);
       if (extractedText) return extractedText;
@@ -274,37 +271,26 @@
     return readableText(value.summary) ?? readableText(value.core_insight) ?? 'summary unavailable';
   }
 
+  function generatedSummaryText(value: InspectableItem): string | null {
+    return value.model_status === 'ok' ? readableText(value.summary) : null;
+  }
+
+  function generatedCoreInsightText(value: InspectableItem): string | null {
+    if (value.model_status !== 'ok') return null;
+    const coreInsight = readableText(value.core_insight);
+    if (coreInsight && coreInsight !== generatedSummaryText(value)) return coreInsight;
+    return null;
+  }
+
   function summaryText(value: InspectableItem): string | null {
     return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null) ?? readableText(value.display_excerpt ?? null);
   }
 
-  function coreInsightText(value: InspectableItem): string | null {
-    const coreInsight = readableText(value.core_insight);
-    if (coreInsight && coreInsight !== summaryText(value)) return coreInsight;
-    return firstSentence(detailText(value));
-  }
-
   function readingSectionLabel(value: InspectableItem): string {
-    if (language === 'zh' && !hasModelBackedText(value)) return localizedChrome('source fallback:', '来源回退：');
+    if (isFallbackEvidenceState(value)) return localizedChrome('Source evidence:', '出处记录：');
     return value.extraction_status === 'partial_extraction'
       ? localizedChrome('source excerpt:', '来源摘录：')
       : localizedChrome('source text:', '来源文本：');
-  }
-
-  function firstSentence(text: string): string {
-    const sentence = text.match(/^[^.!?]+[.!?]/u)?.[0] ?? text;
-    return sentence.trim();
-  }
-
-  function conciseExcerpt(text: string, maxLength: number): string {
-    if (text.length <= maxLength) return text;
-    const candidate = text.slice(0, maxLength).replace(/\s+\S*$/u, '').trim();
-    return `${candidate || text.slice(0, maxLength).trim()}…`;
-  }
-
-  function denseSummaryText(value: InspectableItem): string {
-    if (language === 'zh' && !hasModelBackedText(value)) return detailText(value);
-    return summaryText(value) ?? conciseExcerpt(detailText(value), 240);
   }
 
   function originalHref(value: InspectableItem): string {
@@ -429,6 +415,32 @@
     return localizedChrome('source text: full', '来源文本：全文');
   }
 
+  function sourceEvidenceText(value: InspectableItem): string | null {
+    if ('feed_excerpt' in value) return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null);
+    return readableText(value.display_excerpt ?? null);
+  }
+
+  function isFallbackEvidenceState(value: InspectableItem): boolean {
+    return !hasModelBackedText(value) && Boolean(sourceEvidenceText(value));
+  }
+
+  function processingStateLine(value: InspectableItem): string {
+    if (value.extraction_status === 'original_unavailable') {
+      return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
+    }
+    if (value.model_status === 'model_latency_error') {
+      return sourceEvidenceText(value)
+        ? localizedChrome('target-language processing failed · summary/core unavailable · showing source excerpt', '中文处理失败 · 摘要/核心洞察不可用 · 显示来源摘录')
+        : localizedChrome('target-language processing failed · summary/core unavailable', '中文处理失败 · 摘要/核心洞察不可用');
+    }
+    if (!hasModelBackedText(value)) {
+      return sourceEvidenceText(value)
+        ? localizedChrome('target-language processing incomplete · summary/core unavailable · showing source excerpt', '中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')
+        : localizedChrome('target-language processing incomplete · summary/core unavailable', '中文处理未完成 · 摘要/核心洞察不可用');
+    }
+    return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
+  }
+
   function provenanceDisclosure(value: InspectableItem): string {
     const extraction = extractionLabel(value.extraction_status);
     const tier = value.value_tier ? ` · ${value.value_tier}` : '';
@@ -486,23 +498,35 @@
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
-    <p class="inspector-status-line inspector-evidence-line" class:contract-warning={item.extraction_status !== 'full'}>
-      <span>{extractionDisclosure(item)}</span>
-      <span aria-hidden="true"> · </span>
-      <span>{summaryProvenanceDisclosure(item)}</span>
+    <p class="inspector-status-line inspector-evidence-line">
+      {processingStateLine(item)}
     </p>
-    <section class="inspector-text-section" aria-label={localizedChrome('Summary', '摘要')}>
-      <p class="inspector-section-label">{localizedChrome('summary:', '摘要：')}</p>
-      <p class="inspector-section-copy">{denseSummaryText(item)}</p>
-    </section>
-    <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>
-      <p class="inspector-section-label">{localizedChrome('core insight:', '核心洞察：')}</p>
-      <p class="inspector-section-copy">{coreInsightText(item)}</p>
-    </section>
-    <section class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
-      <p class="inspector-section-label">{readingSectionLabel(item)}</p>
-      <p class="inspector-reading">{detailText(item)}</p>
-    </section>
+    {@const generatedSummary = generatedSummaryText(item)}
+    {@const generatedCoreInsight = generatedCoreInsightText(item)}
+    {#if generatedSummary}
+      <section class="inspector-text-section" aria-label={localizedChrome('Summary', '摘要')}>
+        <p class="inspector-section-label">{localizedChrome('summary:', '摘要：')}</p>
+        <p class="inspector-section-copy">{generatedSummary}</p>
+      </section>
+    {/if}
+    {#if generatedCoreInsight}
+      <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>
+        <p class="inspector-section-label">{localizedChrome('core insight:', '核心洞察：')}</p>
+        <p class="inspector-section-copy">{generatedCoreInsight}</p>
+      </section>
+    {/if}
+    {@const evidenceText = sourceEvidenceText(item)}
+    {#if isFallbackEvidenceState(item) && evidenceText}
+      <section class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
+        <p class="inspector-section-label">{readingSectionLabel(item)}</p>
+        <p class="inspector-source-evidence">{evidenceText}</p>
+      </section>
+    {:else}
+      <section class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
+        <p class="inspector-section-label">{readingSectionLabel(item)}</p>
+        <p class="inspector-reading">{detailText(item)}</p>
+      </section>
+    {/if}
     <p class="contract-muted">why: fresh from configured source</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}

@@ -1026,7 +1026,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   min-width: 0;
 }
 
-.contract-inspector p:not(.contract-muted):not(.contract-warning):not(.inspector-evidence-line):not(.inspector-section-label):not(.inspector-section-copy):not(.inspector-reading):not(.inspector-provenance) {
+.contract-inspector p:not(.contract-muted):not(.contract-warning):not(.inspector-evidence-line):not(.inspector-section-label):not(.inspector-section-copy):not(.inspector-reading):not(.inspector-source-evidence):not(.inspector-provenance) {
   max-width: 68ch;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
@@ -1070,13 +1070,15 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 }
 
 .contract-inspector .inspector-section-copy,
-.contract-inspector .inspector-reading {
+.contract-inspector .inspector-reading,
+.contract-inspector .inspector-source-evidence {
   margin-block: 0;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
 }
 
-.contract-inspector .inspector-reading-section {
+.contract-inspector .inspector-reading-section,
+.contract-inspector .inspector-source-evidence-section {
   padding-block-start: 0;
   border-block-start: 0;
 }

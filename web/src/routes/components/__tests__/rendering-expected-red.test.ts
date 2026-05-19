@@ -262,10 +262,12 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(Inspector, { props: { item: fallbackDetail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: fallbackDetail.title });
-    expect(within(inspector).getByText('来源文本：仅 RSS 摘录')).toBeVisible();
-    expect(within(inspector).getByText('摘要来源：订阅摘录回退')).toBeVisible();
-    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('来源回退：');
-    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('源文本尚未完成中文处理；来源摘录仅作为出处证据。');
+    expect(within(inspector).getByText('中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')).toBeVisible();
+    expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
+    expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
+    expect(within(inspector).queryByLabelText('核心洞察')).not.toBeInTheDocument();
+    expect(within(inspector).getByLabelText('出处记录')).toHaveTextContent('出处记录：');
+    expect(within(inspector).getByLabelText('出处记录')).toHaveTextContent('This raw English RSS excerpt should remain provenance, not the main Chinese body.');
     expect(inspector).not.toHaveTextContent('This raw English body should not appear as completed Chinese reading content.');
   });
 
@@ -307,18 +309,29 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(originalLink).not.toHaveAttribute('role', 'button');
   });
 
-  it('keeps the Inspector reading hierarchy on shared section classes and labels', () => {
-    render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split' } });
+  it('keeps OK model-backed Inspector reading hierarchy on shared section classes and labels', () => {
+    const okDetail: ItemDetail = {
+      ...expectedRedDetail,
+      model_status: 'ok',
+      extraction_status: 'full',
+      summary: 'Dense factual summary for a rendered Inspector section.',
+      core_insight: 'Why this matters for retrieval remains model-backed.',
+      extracted_text: 'Full extracted text shown only in Inspector.'
+    };
 
-    const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });
+    render(Inspector, { props: { item: okDetail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: okDetail.title });
     const sections = Array.from(inspector.querySelectorAll('.inspector-text-section'));
     expect(sections).toHaveLength(3);
     expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Summary', 'Core insight', 'Source text']);
-    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'source excerpt:']);
+    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'source text:']);
     expect(sections[0].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[1].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[2]).toHaveClass('inspector-reading-section');
     expect(sections[2].querySelector('.inspector-reading')).not.toBeNull();
+    expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Dense factual summary for a rendered Inspector section.');
+    expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Why this matters for retrieval remains model-backed.');
   });
 
   it('contracts original-link CSS away from boxed/button-like styling', () => {

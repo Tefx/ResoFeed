@@ -63,7 +63,7 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 
 ## 10. Craft Guardrails & Anti-Slop
 - **No Paternalism:** No "You're all caught up!" messages, no hidden rate limits, no auto-collapsed "spam" folders.
-- **No Cute Error States:** If the AI summary fails, show the raw RSS description or an unstyled error string. No ghost/skeleton loaders or friendly illustrations.
+- **No Cute Error States:** If the AI summary fails, show one terse processing/provenance line and raw RSS source evidence when present. Do not repeat fallback copy as Summary/Core content, and do not use ghost/skeleton loaders, warning banners, retry panels, or friendly illustrations.
 - **No Account Login or Onboarding:** Single-tenant nature means no account screens, no "ghost briefings", no setup wizards. If an owner token is required, show a terse local access gate before feed API calls.
 - **No Numeric Indicators:** Absolutely no numeric badges or bolded unseen states.
 - **No Moderation Consoles / Activity Logs:** We do not expose secondary holding queues or extensive activity logs. Avoid building a second hidden inbox.
