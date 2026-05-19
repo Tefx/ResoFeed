@@ -9,11 +9,12 @@
     onSearch: (params: SearchRequestParams) => Promise<SearchResponse>;
     onSelect?: (item: ItemSummary) => Promise<void> | void;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
+    selectedItemId?: string | null;
     suppressStatusRole?: boolean;
     compactFilters?: boolean;
   }
 
-  let { items, query = '', onSearch, onSelect, onResonanceToggle, suppressStatusRole = false, compactFilters = false }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResonanceToggle, selectedItemId = null, suppressStatusRole = false, compactFilters = false }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -111,7 +112,7 @@
   <div role="region" aria-label="Search results">
     <div role="list" aria-label="Search result items">
       {#each results as item, index (item.id)}
-        <article class="contract-feed-item contract-search-result" role="listitem">
+        <article class="contract-feed-item contract-search-result" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
           <button
             class="contract-feed-open"
             type="button"

@@ -82,6 +82,7 @@
   let routePreviewAnnounces = $state(true);
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
+  let preservedSearchWindowScrollY = $state(0);
   let operationPollGeneration = 0;
   let operationPollInFlight = false;
   let operationPollTimer: number | null = null;
@@ -99,8 +100,8 @@
   const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
   const selectedFeedItemId = $derived(!isNarrow || currentSurface === 'inspector' ? selectedItemId : null);
-  const feedPaneInactive = $derived(currentSurface !== 'feed' && currentSurface !== 'inspector');
-  const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector');
+  const feedPaneInactive = $derived(currentSurface !== 'feed' && (isNarrow || (currentSurface !== 'inspector' && currentSurface !== 'search')));
+  const detailPaneInactive = $derived(isNarrow ? currentSurface !== 'inspector' : currentSurface !== 'feed' && currentSurface !== 'inspector' && currentSurface !== 'search');
   const nextProcessingLanguage = $derived<ProcessingLanguage>(processingLanguage.code === 'en' ? 'zh' : 'en');
   const processingLanguageButtonText = $derived(processingLanguage.code === 'en' ? 'LANG: EN' : '语言: 中文');
   const processingLanguageActionLabel = $derived(
@@ -121,7 +122,9 @@
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
 
-  function surfaceForPath(pathname: string): Surface {
+  function surfaceForPath(pathname: string, search = '', state: unknown = null): Surface {
+    if (typeof state === 'object' && state !== null && 'surface' in state && (state as { surface?: unknown }).surface === 'search') return 'search';
+    if (new URLSearchParams(search).has('search')) return 'search';
     if (pathname === '/doctor') return 'doctor';
     if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
     if (pathname.startsWith('/items/')) return 'inspector';
@@ -146,9 +149,34 @@
     return null;
   }
 
-  function replaceSurfaceFromLocation(): void {
-    const routeSurface = surfaceForPath(window.location.pathname);
+  function replaceSurfaceFromLocation(state: unknown = window.history.state): void {
+    const routeSurface = surfaceForPath(window.location.pathname, window.location.search, state);
+    if (routeSurface === 'search') {
+      const queryFromUrl = new URLSearchParams(window.location.search).get('search');
+      if (queryFromUrl !== null) searchSeedQuery = queryFromUrl;
+      if (typeof state === 'object' && state !== null && 'searchScrollY' in state && typeof (state as { searchScrollY?: unknown }).searchScrollY === 'number') {
+        preservedSearchWindowScrollY = (state as { searchScrollY: number }).searchScrollY;
+      }
+    }
     if (routeSurface !== currentSurface) currentSurface = routeSurface;
+    if (routeSurface === 'search') void restoreSearchScrollPosition();
+  }
+
+  function syncSearchHistory(scrollY = preservedSearchWindowScrollY): void {
+    const params = new URLSearchParams(window.location.search);
+    if (searchSeedQuery) params.set('search', searchSeedQuery);
+    const nextUrl = `/${params.toString() ? `?${params.toString()}` : ''}`;
+    const priorState = typeof window.history.state === 'object' && window.history.state !== null ? window.history.state : {};
+    window.history.replaceState({ ...priorState, surface: 'search', searchQuery: searchSeedQuery, searchScrollY: scrollY }, '', nextUrl);
+  }
+
+  async function restoreSearchScrollPosition(): Promise<void> {
+    if (!isNarrow || currentSurface !== 'search') return;
+    await tick();
+    if (typeof requestAnimationFrame === 'function') {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    window.scrollTo(0, preservedSearchWindowScrollY);
   }
 
   async function focusActiveSurface(surface = currentSurface): Promise<void> {
@@ -450,8 +478,37 @@
       // Inspection marking is provenance-only; keep Inspector navigation usable if a test/runtime stub omits the mutation route.
     }
     await loadItemDetail(item.id);
+    if (isNarrow && window.location.pathname !== `/items/${encodeURIComponent(item.id)}`) return;
     currentSurface = 'inspector';
     await restoreFeedScrollPosition();
+  }
+
+  async function selectSearchItem(item: ItemSummary): Promise<void> {
+    preservedSearchWindowScrollY = window.scrollY;
+    if (isNarrow) {
+      syncSearchHistory(preservedSearchWindowScrollY);
+      await selectItem(item);
+      return;
+    }
+    const searchRegion = document.querySelector<HTMLElement>('.contract-search');
+    const preservedSearchScrollTop = searchRegion?.scrollTop ?? 0;
+    selectedItemId = item.id;
+    selectedItemDetail = null;
+    inspectorFocusRequestId += 1;
+    if (detailPaneElement) detailPaneElement.scrollTop = 0;
+    try {
+      await apiClient().inspect(item.id);
+    } catch {
+      // Inspection marking is provenance-only; keep desktop search selection usable if a focused fixture omits the mutation route.
+    }
+    await loadItemDetail(item.id);
+    currentSurface = 'search';
+    await tick();
+    if (searchRegion) searchRegion.scrollTop = preservedSearchScrollTop;
+    if (typeof requestAnimationFrame === 'function') {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    if (searchRegion) searchRegion.scrollTop = preservedSearchScrollTop;
   }
 
   async function loadMoreFeedItems(): Promise<void> {
@@ -606,7 +663,9 @@
       if (/^(search|find)\s+/i.test(command)) {
         shouldRefocusSteer = false;
         searchSeedQuery = command.replace(/^(search|find)\s+/i, '');
+        preservedSearchWindowScrollY = 0;
         showSurface('search', false);
+        syncSearchHistory(0);
         steerCommand = '';
         steerFeedback = {
           kind: 'receipt',
@@ -804,7 +863,7 @@
     };
     document.addEventListener('mousedown', preserveKeyboardFocusModality);
 
-    const handlePopState = () => replaceSurfaceFromLocation();
+    const handlePopState = (event: PopStateEvent) => replaceSurfaceFromLocation(event.state);
     window.addEventListener('popstate', handlePopState);
 
     const storedToken = window.localStorage.getItem(tokenStorageKey);
@@ -961,13 +1020,15 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label="TODAY surface independent scroll" aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' ? 'Search surface independent scroll' : 'TODAY surface independent scroll'} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">Independent scroll region</span>
         {#if !feedPaneInactive}
           {#if apiError && promptState !== 'rejected'}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {/if}
-          {#if items.length === 0}
+          {#if currentSurface === 'search'}
+            <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
+          {:else if items.length === 0}
             <FirstUseEmptyState state={firstUseState} />
           {:else}
             <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
@@ -976,7 +1037,7 @@
       </section>
 
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
-      <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector'} aria-label="INSPECTOR independent scroll" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
+      <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label="INSPECTOR independent scroll" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
           <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
@@ -1003,12 +1064,14 @@
         suppressStatusRole={steerFeedback.kind === 'receipt'}
       />
     </section>
-    <section class="utility-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
-      {#if currentSurface === 'search'}
-        <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
-      {/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectItem} onResonanceToggle={toggleResonance} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
-    </section>
+    {#if isNarrow}
+      <section class="utility-surface search-surface" class:active-panel={currentSurface === 'search'} aria-label="Search surface">
+        {#if currentSurface === 'search'}
+          <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
+        {/if}
+        <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
+      </section>
+    {/if}
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
         {#if currentSurface === 'doctor'}

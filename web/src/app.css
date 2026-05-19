@@ -1176,8 +1176,14 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
     overscroll-behavior: contain;
   }
 
+  .feed-pane > .contract-search {
+    height: min(420px, calc(100vh - 178px));
+    overflow-y: auto;
+    padding-block-end: calc(var(--rf-space-column) + var(--rf-space-md));
+    overscroll-behavior: contain;
+  }
+
   .shell-grid[data-surface='ledger'],
-  .shell-grid[data-surface='search'],
   .shell-grid[data-surface='doctor'] {
     display: none;
   }
@@ -1263,6 +1269,13 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
     overflow: auto;
     padding: var(--rf-space-lg);
     background: var(--rf-color-background);
+  }
+
+  .utility-surface.search-surface.active-panel {
+    position: static;
+    inset: auto;
+    overflow: visible;
+    min-height: calc(100dvh + 240px);
   }
 
   .back-command {
