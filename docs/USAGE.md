@@ -484,7 +484,7 @@ Example response:
 }
 ```
 
-Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. If ingest, fetch, or reprocess is already running, it returns `409 conflict` with the standard operation-guard details. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
+Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. Setting the runtime language is metadata-only, is allowed while ingest, fetch, or reprocess is already running, and affects future processing or explicit reprocess rather than an already-running operation. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
 
 ### Reprocess existing library
 

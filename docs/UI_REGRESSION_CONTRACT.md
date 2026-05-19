@@ -120,6 +120,8 @@ Fixtures used for browser/visual regression MUST include at least these mess cla
 | `media_enclosure_metadata_item` | Image/audio/video enclosure URLs, MIME types, sizes | Media/enclosure metadata appears only labelled as secondary/provenance, not as article body |
 | `partial_extraction_item` | Extraction status `partial_extraction`, feed excerpt only | Feed/Search compact metadata shows `source excerpt`; Inspector shows `source text: RSS excerpt only`; summary provenance is asserted separately as `summary provenance: model-backed` or `summary provenance: feed excerpt fallback` according to model output |
 | `model_error_item` | Summary unavailable or model error | Uses `summary unavailable` plus labelled model/error provenance in a diagnostic/provenance region when details are available; no raw parser prefix as primary copy, apology art, cute copy, or skeleton |
+| `fragment_distinct_feed_entries` | Multiple unrelated items whose original URLs share host/path but differ by meaningful or synthetic fragments such as `#feed-entry-1`, with `story_key: null` and `duplicate_of_item_id: null` | Feed and Inspector keep separate item identities; no `Grouped story with N source items` marker/disclosure appears; opening each row shows its own original URL including fragment and provenance. |
+| `authoritative_grouped_story` | Multiple related items with backend-provided non-null `story_key` or explicit `duplicate_of_item_id` | Feed/Inspector may show `Grouped story with N source items`; the count and source-list disclosure come from backend grouping data, not frontend URL normalization. |
 
 ## Design artifact screenshot manifest
 
@@ -152,6 +154,7 @@ Tests and audit checks MUST fail on these patterns unless the text appears insid
 - Any required hit target is obstructed by overlay/z-index/pointer-events/dead panel, has zero-size bounds, or is below 44 CSS px where specified for touch/action controls.
 - Hover/focus/selected/loading/error/receipt/manual-ingest states shift layout bounds, translate rows, add bounce, add shimmer/skeleton, or stack noisy shadows/glows.
 - Source Ledger manual controls create or imply folders, tags, source hierarchy, job queue, persisted pending job, retry dashboard, command history, activity ledger, sync/merge UI, portable manual-ingest receipts, settings dashboard, or second source URL paste field.
+- Feed or Inspector shows grouped-source disclosure for items whose backend `story_key` and `duplicate_of_item_id` are both `null`, including by stripping URL fragments from synthetic feed-entry URLs.
 - User-facing folders, tags, unread counts, mark-all-read, archive bins, settings dashboards/sliders, source hierarchy, drag ordering, pause/resume source toggles, moderation queues, or activity ledgers.
 - Mascot/cute SaaS/AI-magic copy or visuals: confetti, ghosts, apologetic empty/error copy, onboarding wizard, decorative gradients/blobs/Memphis filler, purple AI trust palette.
 - Product UI copy exposes internal phrases: `Analyst's Workbench`, `Archival Index`, `low-fatigue`, `single-tenant`, or `no SaaS chrome`.

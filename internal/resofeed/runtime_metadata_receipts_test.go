@@ -89,7 +89,7 @@ func TestRuntimeMetadataStateExportImportExcludesMetadataAndReceipts(t *testing.
 	}
 }
 
-func TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess(t *testing.T) {
+func TestSetProcessingLanguageBypassesOperationGuardWhileHeavyOperationsRemainGuarded(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 
@@ -109,7 +109,7 @@ func TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess(t *te
 		MutationRequestFields: MutationRequestFields{
 			ActorKind:      ActorKindHuman,
 			ActorID:        "owner",
-			IdempotencyKey: "language-conflicts-with-active-operation",
+			IdempotencyKey: "language-bypasses-active-operation",
 		},
 	}
 	if _, err := ManualIngest(ctx, db, IngestConfig{}); !errors.Is(err, errManualFetchConflict) {
@@ -121,23 +121,27 @@ func TestSetProcessingLanguageSharesOperationGuardWithIngestFetchReprocess(t *te
 	if _, err := reprocessLibraryFresh(ctx, db, nil); !errors.Is(err, errManualFetchConflict) {
 		t.Fatalf("reprocessLibraryFresh while guard held err=%v, want conflict", err)
 	}
-	if _, err := SetProcessingLanguage(ctx, db, req); !errors.Is(err, errManualFetchConflict) {
-		t.Fatalf("SetProcessingLanguage while guard held err=%v, want conflict", err)
+	resp, err := SetProcessingLanguage(ctx, db, req)
+	if err != nil {
+		t.Fatalf("SetProcessingLanguage while guard held: %v", err)
+	}
+	if resp.Language.Code != ProcessingLanguageChinese || resp.AlreadyApplied {
+		t.Fatalf("SetProcessingLanguage while guard held response=%+v, want fresh zh", resp)
 	}
 	var stored string
 	err = db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&stored)
-	if !errors.Is(err, sql.ErrNoRows) {
-		t.Fatalf("processing language was written while operation guard held: value=%q err=%v", stored, err)
+	if err != nil || stored != string(ProcessingLanguageChinese) {
+		t.Fatalf("processing language while operation guard held value=%q err=%v, want zh", stored, err)
 	}
 
 	release()
 	guardHeld = false
-	resp, err := SetProcessingLanguage(ctx, db, req)
+	resp, err = SetProcessingLanguage(ctx, db, req)
 	if err != nil {
-		t.Fatalf("SetProcessingLanguage after guard release: %v", err)
+		t.Fatalf("SetProcessingLanguage replay after guard release: %v", err)
 	}
-	if resp.Language.Code != ProcessingLanguageChinese || resp.AlreadyApplied {
-		t.Fatalf("SetProcessingLanguage after guard release response=%+v, want fresh zh", resp)
+	if resp.Language.Code != ProcessingLanguageChinese || !resp.AlreadyApplied {
+		t.Fatalf("SetProcessingLanguage replay after guard release response=%+v, want replayed zh", resp)
 	}
 }
 

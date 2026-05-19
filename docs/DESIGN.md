@@ -162,6 +162,24 @@ components:
     typography: "{typography.chrome}"
     padding: "{spacing.none}"
     rounded: "{rounded.none}"
+  current-operation-status:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
+  current-operation-conflict:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.danger}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
+  utility-menu:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.md}"
+    rounded: "{rounded.none}"
   bracket-action:
     backgroundColor: "transparent"
     textColor: "{colors.muted}"
@@ -309,11 +327,12 @@ Primary surfaces covered by this contract:
 - right-side or full-screen Inspector for item detail;
 - Steer input for natural-language correction, RSS URL subscription, search command entry, and `/doctor` diagnostics;
 - a discreet `RESOFEED` surface menu that may contain `TODAY` and `SOURCE LEDGER` rather than showing persistent top-level navigation links;
-- flat Source Ledger for viewing/deleting sources, lightweight manual `[FETCH]` per source, lightweight manual `[RUN INGEST]` for all sources, importing flattened OPML through `[IMPORT OPML]`, and reaching `[EXPORT STATE]` / `[IMPORT STATE]` actions;
+- flat Source Ledger for viewing/deleting sources, lightweight manual `[FETCH]` per source, lightweight manual `[RUN INGEST]` for all sources, current operation status when work is running or blocking an action, importing flattened OPML through `[IMPORT OPML]`, and reaching `[EXPORT STATE]` / `[IMPORT STATE]` actions;
+- low-chrome `RESOFEED` utility menu for low-frequency global operations: processing language and guarded library reprocess;
 - search and retrieval surfaces;
 - agent receipt/provenance markers.
 
-Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Manual ingest feedback is terminal-synchronous text replacement, never animated loading chrome or job-dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
+Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Heavy-operation feedback is terminal-synchronous text and one current operation snapshot, never animated loading chrome, durable jobs, queues, history, or dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
 
 Product copy rule: internal design metaphors and principles are not user-visible slogans. Do not render “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” in the app UI. The product chrome should use only operational labels such as `RESOFEED`, `TODAY`, `YESTERDAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`, and raw status strings.
 
@@ -370,8 +389,8 @@ Spacing uses a strict 4px/8px mathematical scale: `0, 2, 4, 8, 12, 16, 24, 32, 4
 Desktop layout:
 
 - Shell has no persistent left navigation.
-- Top row contains the Steer input and minimal product label.
-- The product label may act as a discreet `RESOFEED` surface menu; `TODAY` and `SOURCE LEDGER` are allowed to appear only after that menu opens. This is intentional low-chrome navigation, not a missing-link regression.
+- Top row contains the Steer input and minimal product label. Persistent top chrome must not permanently show `LANG: EN`, `LANG: ZH`, `[REPROCESS LIBRARY]`, or their localized equivalents.
+- The product label may act as a discreet `RESOFEED` surface menu; `TODAY`, `SOURCE LEDGER`, processing language, and guarded `[REPROCESS LIBRARY]` are allowed to appear only after that menu opens. This is intentional low-chrome navigation/utility placement, not a missing-link regression.
 - Feed column occupies the left/center and should remain scannable at 640–760px; compact density is the default rather than a settings preference.
 - Inspector opens to the right at 420–560px. If width is below 1080px, Inspector becomes a route/full-screen detail view.
 - Selected item state must not alter feed item dimensions.
@@ -400,7 +419,7 @@ Desktop shell must keep Feed and Inspector as independent vertical scroll region
 
 Mobile keeps the existing single-column behavior: Feed is the main surface and Inspector opens as a full-screen route with preserved Feed scroll.
 
-Processing language is a global operational state, not a per-item display toggle. The language control may appear in low-chrome app chrome or a `/doctor`-class utility surface, but it must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
+Processing language is a global operational state, not a per-item display toggle. The language control lives in the `RESOFEED` utility menu under an `OPERATIONS` micro-heading, with an optional duplicate in `/doctor` raw utility output. It must not be persistent top chrome and must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
 
 ## Elevation
 
@@ -434,22 +453,53 @@ Purpose: hold Steer, feed, and optional Inspector with no settings-sidebar bloat
 
 Anatomy: top command row, feed viewport, detail pane, and utility surfaces reachable through the `RESOFEED` surface menu. The menu may contain `TODAY` and `SOURCE LEDGER`; those labels do not need to be persistent visible links when the menu is closed. States: default, menu open, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; `RESOFEED` menu summary must be keyboard reachable; menu items must be real buttons/links with accessible names; skip-to-feed link may exist but should be visually quiet.
 
+### RESOFEED Utility Menu (`utility-menu`)
+- **Intent**: [SHARP] Keep low-frequency global navigation and operations discoverable without occupying persistent top chrome.
+- **useFor**: `TODAY`, `SOURCE LEDGER`, processing language control, guarded `[REPROCESS LIBRARY]`, and terse current operation context when it affects utility actions.
+- **avoidFor**: Settings dashboard, preference center, task/job dashboard, activity history, command ledger, onboarding wizard, decorative brand menu, or any unrelated product feature.
+
+Anatomy: the closed top chrome shows only the `RESOFEED` label/button and the Steer field. Opening `RESOFEED` reveals a flat menu/panel with two compact groups: `NAV` for `TODAY` and `SOURCE LEDGER`, and `OPERATIONS` for `LANG: EN`/`LANG: ZH` plus guarded `[REPROCESS LIBRARY]`. The panel uses `{components.utility-menu}`, stark 1px rules, no shadow, no blur, no icons, and no preference prose beyond the required reprocess warning. It may appear as a popover on desktop and as a flat full-width utility sheet on narrow screens.
+
+Keyboard and accessibility: the `RESOFEED` trigger is a real button with `aria-haspopup="menu"` or equivalent disclosure semantics and `aria-expanded`. Opening the menu moves focus to the first item; `Escape` closes it and returns focus to `RESOFEED`; tab order remains linear. Menu status/error text uses visible inline text and `aria-live` as specified by each contained operation. Do not hide language/reprocess exclusively behind hover.
+
+### Current Operation Status (`current-operation-status`)
+- **Intent**: [SHARP] Explain one in-memory heavy operation currently occupying the ingest/process/reprocess guard.
+- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, `[FETCH]`, or `[REPROCESS LIBRARY]`; best-effort phase/count text from the shared `GET /api/runtime/operation` HTTP snapshot or matching MCP/UI current-operation data.
+- **avoidFor**: Durable jobs, queues, task dashboards, activity/history ledgers, retry panels, progress timelines, command history, sync status, or persisted audit records.
+
+Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, and `library_reprocess`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, or `scope: library`. Counts are best-effort (`17/128 fetched`, `42 items processed`) and must not imply durable completion guarantees.
+
+Placement: [SHARP] show running current-operation status in the Source Ledger header/status area and in the opened `RESOFEED` utility menu only when relevant. The status must not appear as a persistent global top strip when idle. If a feed-level background ingest is running but no action is blocked, Source Ledger may show the line; the feed itself should remain calm.
+
+States: idle hidden, running, blocked conflict, completed transient receipt, failed raw error. Running state uses `{components.current-operation-status}` and text replacement only. Conflict state uses `{components.current-operation-conflict}` and includes the current operation detail; it must not show only `err: operation already running`.
+
+Conflict copy examples:
+
+- `err: operation already running — op: background_ingest · actor:background · phase:fetch · 17/128 sources · since 14:05:11`
+- `err: reprocess blocked — op: source_fetch · actor:human · scope: simonwillison · phase:fetching · since 14:06:02`
+
+Keyboard and accessibility: status lines are visible text. Running updates use `aria-live="polite"` and should update no more frequently than useful phase/count changes. Conflict/errors use `aria-live="assertive"`. When a user triggers a blocked action, keep focus on the trigger if it remains actionable, or move focus to the adjacent conflict line with `tabindex="-1"` and then restore predictable tab order. Do not use spinner-only or color-only status.
+
 ### Language Control
 
-Purpose: expose the persisted processing language as a terse global pipeline state.
+- **Intent**: [SHARP] Expose the persisted processing language as a terse global pipeline state.
+- **useFor**: Switching future processing language from the `RESOFEED` utility menu; optional `/doctor` raw utility echo; announcing language update success/failure.
+- **avoidFor**: Persistent top-chrome badge, per-item translation toggle, settings panel, preference center, language wizard, or automatic existing-library rewrite.
 
-Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It may live in the app chrome or a `/doctor`-class utility surface. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector.
+Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It lives in the opened `RESOFEED` utility menu under `OPERATIONS`, with an optional raw `/doctor` utility echo. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector. Language switching is not blocked by the current-operation ingest guard; it affects future processing/reprocess.
 
 States: English, Chinese, updating, failed. Updating keeps dimensions stable and uses terse text only. Failure uses raw `err: <diagnostic>` copy and the existing feedback-line style.
 
 Keyboard and accessibility: language control is a real button/control with an accessible name that announces the current processing language and the target action. The document `<html lang>` must reflect the active UI language (`en` or `zh-CN` unless a narrower Chinese locale is chosen later). Successful or failed language updates MUST be announced via an `aria-live="polite"` terse status line (e.g., `Language set to English` or `err: language update failed`).
 ### Reprocess Library Action
 
-Purpose: explicitly rewrite existing stored user-readable item content into the current processing language and rebuild search indexing.
+- **Intent**: [SHARP] Explicitly rewrite existing stored user-readable item content into the current processing language and rebuild search indexing.
+- **useFor**: Low-frequency guarded library reprocess from the `RESOFEED` utility menu; conflict feedback that references the shared current operation snapshot.
+- **avoidFor**: Persistent top chrome, automatic language-change side effect, progress dashboard, durable job, task history, queue, or background sync flow.
 
-Anatomy: a terse operational bracket action, preferably `[REPROCESS LIBRARY]` / `[重处理资料库]`, with warning copy such as `Existing readable item content will be rewritten.` / `已存可读内容将被重写。` and `Source identifiers remain unchanged.` / `来源标识保持不变。`
+Anatomy: a terse operational bracket action, preferably `[REPROCESS LIBRARY]` / `[重处理资料库]`, inside the `RESOFEED` utility menu under `OPERATIONS`, with warning copy such as `Existing readable item content will be rewritten.` / `已存可读内容将被重写。` and `Source identifiers remain unchanged.` / `来源标识保持不变。`
 
-States: default, confirming, running, complete, conflict, failed. Running state uses text replacement only, e.g. `[REPROCESSING...]`; no spinner, progress bar, wizard, dashboard, queue view, or activity log is allowed. Confirming state replaces the default action with two bracket actions: `[CONFIRM REPROCESS]` and `[CANCEL]`. Conflict state uses terse copy `err: ingest already running` (or equivalent).
+States: default, confirming, running, complete, conflict, failed. Running state uses text replacement only, e.g. `[REPROCESSING...]`, plus the Current Operation Status line when available; no spinner, progress bar, wizard, dashboard, queue view, or activity log is allowed. Confirming state replaces the default action with two bracket actions: `[CONFIRM REPROCESS]` and `[CANCEL]`. Conflict state uses terse copy with current operation detail, e.g. `err: reprocess blocked — op: background_ingest · actor:background · phase:fetch · 17/128 sources`.
 
 Keyboard and accessibility: the action must expose its destructive/operational meaning, e.g. `Reprocess existing library and rebuild search index`.
 Focus management across states:
@@ -524,13 +574,13 @@ States:
 - externally surfaced: add compact `agent:<name>` marker;
 - RSS-excerpt source text: text marker `source excerpt` with warning color and explanation in Inspector;
 - raw fallback: show feed excerpt when AI summary is unavailable;
-- grouped duplicate/story: transparent grouping must preserve access to every source item and provenance.
+- grouped duplicate/story: transparent grouping must preserve access to every source item and provenance, and may appear only when the backend item data includes authoritative grouping (`story_key` or `duplicate_of_item_id`). The frontend must not infer a group by stripping URL fragments, collapsing synthetic feed-entry URLs, or comparing host/path alone.
 
 No unseen/bold state. No numeric count. No hidden spam collapsing. No user-facing density mode unless future accessibility research proves one is necessary; compact feed density is the product default while touch targets stay minimum 44 CSS px. On mobile, density is achieved through clamping, flat metadata, and restrained padding—not by reducing tap targets or making the whole surface feel like a spreadsheet.
 
 Time-group labels inside the feed (`TODAY`, `YESTERDAY`, `EARLIER`) must feel anchored without breaking the grid. Use uppercase monospace metadata styling and align them to the far right inside the metadata row of the first item belonging to that group. They should consume zero extra vertical height, preserving a mathematically consistent rhythm between feed row separators.
 
-Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, source-text, and grouped markers need accessible names, e.g. `Source: NYT`, `Extraction: partial_extraction`, `Grouped story with 4 source items`.
+Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, source-text, and grouped markers need accessible names, e.g. `Source: NYT`, `Extraction: partial_extraction`, `Grouped story with 4 source items`. The grouped marker must be absent when `story_key` and `duplicate_of_item_id` are both `null`.
 
 ### Resonate Button
 
@@ -549,10 +599,11 @@ Non-color semantics are mandatory: star shape changes in addition to color.
 Keyboard and accessibility: `Space` or `Enter` toggles. Label must announce state: `Resonate item` / `Remove resonance`. The active star cannot rely on color alone.
 
 ### Inspector Pane
-
 Purpose: deliberate Inspect surface for detail reading and verification.
 
 Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, source-text status, summary provenance, dense summary, full text/excerpt, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, RSS-excerpt source text, unavailable original, grouped-story sources, externally surfaced receipt.
+
+Grouped-source disclosure contract: Inspector may show a source-list disclosure only for authoritative backend grouping: non-null `story_key`, non-null `duplicate_of_item_id`, or non-empty backend `provenance.grouped_source_items` on the selected item/detail. It must list backend-provided source items/provenance without merging client-side identities. It must not compute groups by stripping URL fragments, by treating URLs that differ only by a synthetic feed-entry fragment as identical, or by host/path fallback. If authoritative grouping fields are absent, show the selected item as a standalone item even if URL normalization would make unrelated items look similar. This protects feeds whose entry URLs intentionally use fragments to identify distinct source items.
 
 Source-text status and summary provenance are separate lines of evidence. If full article text is unavailable but RSS excerpt text exists, Inspector uses plain copy such as `source text: RSS excerpt only`; if the model still produced validated summary fields, it separately says `summary provenance: model-backed`. Fallback copy may say `summary provenance: feed excerpt fallback` only when no model-backed summary/core insight exists.
 
@@ -567,12 +618,13 @@ Processing-language addendum: Inspector title, dense summary, core insight, and 
 On desktop, the Inspector is its own scroll container. Opening a different item resets the Inspector scroll position to the top without moving the Feed scroll. On mobile, Inspector remains a full-screen route.
 
 ### Source Ledger
+- **Intent**: [SHARP] Flat source management and operational context without settings-dashboard behavior.
+- **useFor**: Source rows, OPML import, state export/import, manual `[RUN INGEST]`, per-source `[FETCH]`, and visible current operation status when work is running or blocks an action.
+- **avoidFor**: Settings dashboard, durable job list, operation history, task queue, retry dashboard, command ledger, sync/merge controls, source hierarchy, tags, or a second URL-add field.
 
-Purpose: flat source management without settings-dashboard behavior. This is the only UI location for lightweight manual ingestion controls.
+Anatomy: title, global ingest/current-operation status, global `[RUN INGEST]` action, `[IMPORT OPML]` action, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, diagnostic `[DETAILS]`, and terse links to the State Portability `[EXPORT STATE]` / `[IMPORT STATE]` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, adjacent last fetch status or raw diagnostic text, and a right-aligned action block. Bracket action labels are canonical and uppercase exactly as rendered here; prose may describe the capability, but UI text must not render lowercase variants such as `import opml`, `export state`, or `import state`.
 
-Anatomy: title, global ingest status, global `[RUN INGEST]` action, `[IMPORT OPML]` action, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, diagnostic `[DETAILS]`, and terse links to the State Portability `[EXPORT STATE]` / `[IMPORT STATE]` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, adjacent last fetch status or raw diagnostic text, and a right-aligned action block. Bracket action labels are canonical and uppercase exactly as rendered here; prose may describe the capability, but UI text must not render lowercase variants such as `import opml`, `export state`, or `import state`.
-
-Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process ingest concurrency guard described in `docs/ARCHITECTURE.md`; conflict feedback is raw and terse.
+Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process current-operation guard described in `docs/ARCHITECTURE.md`; conflict feedback is raw, terse, and includes current operation detail rather than only `err: operation already running`.
 
 States:
 
@@ -582,12 +634,12 @@ States:
 - OPML import complete: revert to `[IMPORT OPML]` and show `imported N sources; folders flattened`;
 - OPML import failed: revert to `[IMPORT OPML]` and show raw `err: <diagnostic>` text;
 - global ingest default: `[RUN INGEST]` in the Ledger header/action bar;
-- global ingest active: `[INGESTING...]`, disabled, no spinner, no progress animation;
-- global ingest conflict: revert to `[RUN INGEST]` and show raw `err: ingest already running` or equivalent conflict text;
+- global ingest active: `[INGESTING...]`, disabled, no spinner, no progress animation; show `op: manual_ingest · actor:human · phase:<phase> · <counts/message> · since HH:MM:SS` in the header status line when available;
+- global ingest conflict: revert to `[RUN INGEST]` and show raw `err: operation already running — op: <kind> · actor:<actor> · phase:<phase> · <counts/message>` conflict text;
 - global ingest complete: revert to `[RUN INGEST]` and update `last_ingest: HH:MM:SS`;
 - source fetch default: `[FETCH]` on the same row as the source;
-- source fetch active: `[FETCHING...]`, disabled, no spinner, no progress animation;
-- source fetch conflict: revert to `[FETCH]` and show raw `err: ingest already running` or equivalent conflict text adjacent to the source;
+- source fetch active: `[FETCHING...]`, disabled, no spinner, no progress animation; show `op: source_fetch · actor:human · scope: source:<name> · phase:<phase> · since HH:MM:SS` in the source row or Ledger status line;
+- source fetch conflict: revert to `[FETCH]` and show raw current-operation conflict text adjacent to the source;
 - source fetch complete: revert to `[FETCH]` and update `last_fetch: HH:MM:SS`;
 - source fetch failed: revert to `[FETCH]` and show raw `err: <diagnostic>` text adjacent to the source;
 - delete confirmation: terse confirmation for destructive removal;
@@ -597,9 +649,9 @@ States:
 
 Raw diagnostic strings (`err: <diagnostic>`) must not break Source Ledger geometry. Show one line adjacent to the affected source on desktop, clamp visually at approximately 80 characters with an ellipsis, and expose the full diagnostic through the element `title` or an accessible details disclosure. On narrow/mobile layouts, allow wrapping to at most two lines before truncation. Preserve the literal `err:` prefix and never replace raw diagnostics with friendly copy.
 
-Forbidden: folders, tags, pause/resume toggles, drag ordering, scoring sliders, source categories, job dashboards, retry panels, ingest queues, activity ledgers, sync/merge controls, and a second URL subscription field.
+Forbidden: folders, tags, pause/resume toggles, drag ordering, scoring sliders, source categories, job dashboards, durable progress surfaces, retry panels, ingest queues, activity ledgers, operation histories, command histories, sync/merge controls, and a second URL subscription field.
 
-Keyboard and accessibility: source rows are list items; `[RUN INGEST]` and `[FETCH]` are named buttons with stable 44px minimum hit targets; active states keep the same hitbox; delete is a named button (`Delete source: <name>`) and requires a terse confirmation before destructive removal. Focus returns to the next row or Ledger heading after deletion.
+Keyboard and accessibility: source rows are list items; `[RUN INGEST]` and `[FETCH]` are named buttons with stable 44px minimum hit targets; active states keep the same hitbox; delete is a named button (`Delete source: <name>`) and requires a terse confirmation before destructive removal. Current operation status uses `aria-live="polite"`; conflict details use `aria-live="assertive"` and remain visible near the blocked action. Focus returns to the triggering action or adjacent conflict line after a blocked command, and to the next row or Ledger heading after deletion.
 
 Required DOM contract for manual ingest controls:
 
@@ -674,10 +726,11 @@ Do:
 
 - Do keep Inspect, Resonate, and Steer as the only primary primitives.
 - Do use Steer for RSS URL paste, correction, search command entry, and `/doctor` commands.
-- Do allow `SOURCE LEDGER` and `TODAY` to live inside a discreet `RESOFEED` surface menu instead of persistent top-level links.
+- [SHARP] Do allow `SOURCE LEDGER`, `TODAY`, language, and reprocess to live inside a discreet `RESOFEED` surface menu instead of persistent top-level links.
 - Do keep Source Ledger flat: view source rows, delete, details, OPML import, state export/import, and lightweight manual ingest/fetch only.
-- Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
-- Do represent manual ingest work with text replacement only: `[INGESTING...]`, `[FETCHING...]`, updated timestamps, conflict text, or raw `err:` diagnostics.
+- [SHARP] Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
+- [SHARP] Do represent heavy operation work with text replacement and the shared current-operation snapshot only: `[INGESTING...]`, `[FETCHING...]`, `[REPROCESSING...]`, `op: <kind>`, updated timestamps, conflict text, or raw `err:` diagnostics.
+- [SHARP] Do include current operation detail when an action is blocked; users must not see only `err: operation already running`.
 - Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment.
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
@@ -693,15 +746,15 @@ Do:
 Don't:
 
 - Don't add account registration, profile, password-reset, or onboarding wizard surfaces; the owner-token prompt is a local access gate, not account login.
-- Don't add folders, tags, source hierarchy, ranking sliders, or settings dashboards.
-- Don't turn Source Ledger manual controls into a job dashboard, retry panel, queue, command ledger, activity feed, sync/merge control, or backup-management UI.
+- [SHARP] Don't add folders, tags, source hierarchy, ranking sliders, or settings dashboards.
+- [SHARP] Don't turn Source Ledger manual controls or current-operation status into a job dashboard, retry panel, queue, command ledger, activity feed, operation history, sync/merge control, durable progress UI, or backup-management UI.
 - Don't add a second URL paste/add-source field in Source Ledger; source addition remains through Steer.
 - Don't hide high-volume feeds behind paternalistic auto-collapsing.
 - Don't use unread counts, mark-all-read, queue-clearing, or archive workflows.
 - Don't create moderation consoles, hidden review queues, or extensive activity ledgers.
 - Don't communicate errors with cute empty-state art, ghosts, mascots, or apologetic SaaS copy.
 - Don't use decorative gradients, purple AI trust palettes, random blobs, or Memphis filler.
-- Don't use spinners, loaders, pulsing dots, animated ellipses, toast notifications, or background progress fills for manual ingest.
+- [SHARP] Don't use spinners, loaders, pulsing dots, animated ellipses, toast notifications, or background progress fills for ingest/fetch/process/reprocess.
 - Don't spend the `accent` token on Source Ledger fetch actions; reserve it for Resonate.
 - Don't make bracket actions look like SaaS buttons: no filled pills at rest, no shadows, no transform lifts, no fades, no tiny text-only click targets.
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
@@ -712,16 +765,17 @@ Language and reprocessing guardrails:
 
 Do:
 
-- Do treat language as a global processing state, not a cosmetic per-item display toggle.
-- Do keep language controls terse: `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`.
+- [SHARP] Do treat language as a global processing state, not a cosmetic per-item display toggle.
+- [SHARP] Do keep language controls terse and low-chrome inside the `RESOFEED` utility menu: `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`.
+- [SHARP] Do allow language switching during ingest; it affects future processing/reprocess and is not blocked by the ingest guard.
 - Do localize UI chrome, accessibility labels, and user-readable item content for supported languages.
 - Do preserve source identifiers exactly and mark them as non-translatable where possible.
-- Do expose existing-library reprocess as a terse bracket-style operational action.
+- [SHARP] Do expose existing-library reprocess as a terse bracket-style operational action in the `RESOFEED` utility menu, not persistent top chrome.
 - Do state plainly that reprocess rewrites stored readable content and rebuilds search indexing.
 
 Don't:
 
-- Don't add a settings dashboard, preference center, wizard, progress dashboard, or activity log for language or reprocess.
+- [SHARP] Don't add a settings dashboard, preference center, wizard, progress dashboard, durable progress UI, operation history, command history, or activity log for language or reprocess.
 - Don't add per-item original/translation toggles or side-by-side bilingual reading surfaces.
 - Don't translate, summarize, beautify, or transliterate URLs, source titles, source URLs, canonical URLs, or original links.
 - Don't introduce `translation_failed` copy or visual state; use existing extraction/model failure semantics.
