@@ -181,7 +181,12 @@ func resetOwnerTokenHash(ctx context.Context, dbPath string) error {
 }
 
 func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeConfig, int, bool) {
-	cfg := ServeConfig{Addr: DefaultAddr, DBPath: DefaultDBPath}
+	firstFetchLimit, err := firstFetchLimitFromEnv()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		return ServeConfig{}, 2, false
+	}
+	cfg := ServeConfig{Addr: DefaultAddr, DBPath: DefaultDBPath, FirstFetchMaxItems: firstFetchLimit}
 	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	fs.StringVar(&cfg.Addr, "addr", DefaultAddr, "bind address for web UI, HTTP API, and MCP endpoint")
@@ -189,6 +194,7 @@ func parseServeFlags(args []string, stdout io.Writer, stderr io.Writer) (ServeCo
 	fs.StringVar(&cfg.DBPath, "db", DefaultDBPath, "SQLite database path")
 	fs.StringVar(&cfg.OpenRouterModel, "openrouter-model", "", "optional OpenRouter model (empty uses account default)")
 	fs.StringVar(&cfg.OwnerToken, "owner-token", "", "explicit owner token")
+	fs.Var((*firstFetchLimitFlag)(&cfg.FirstFetchMaxItems), "first-fetch-limit", "maximum items to store on a brand-new source's first fetch; 0 means unlimited")
 	fs.Usage = func() {
 		_, _ = io.WriteString(stdout, `Usage: resofeed serve [flags]
 
@@ -205,6 +211,9 @@ Flags:
 		if errors.Is(err, flag.ErrHelp) {
 			return ServeConfig{}, 0, false
 		}
+		if strings.Contains(err.Error(), "first-fetch-limit") {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+		}
 		return ServeConfig{}, 2, false
 	}
 	if fs.NArg() != 0 {
@@ -212,6 +221,43 @@ Flags:
 		return ServeConfig{}, 2, false
 	}
 	return cfg, 0, true
+}
+
+type firstFetchLimitFlag int
+
+func (f *firstFetchLimitFlag) String() string {
+	if f == nil {
+		return strconv.Itoa(DefaultFirstFetchMaxItems)
+	}
+	return strconv.Itoa(int(*f))
+}
+
+func (f *firstFetchLimitFlag) Set(raw string) error {
+	value, err := parseFirstFetchLimitValue(raw, "first-fetch-limit")
+	if err != nil {
+		return err
+	}
+	*f = firstFetchLimitFlag(value)
+	return nil
+}
+
+func firstFetchLimitFromEnv() (int, error) {
+	raw, ok := os.LookupEnv("RESOFEED_FIRST_FETCH_LIMIT")
+	if !ok {
+		return DefaultFirstFetchMaxItems, nil
+	}
+	return parseFirstFetchLimitValue(raw, "RESOFEED_FIRST_FETCH_LIMIT")
+}
+
+func parseFirstFetchLimitValue(raw string, source string) (int, error) {
+	value, err := strconv.Atoi(strings.TrimSpace(raw))
+	if err != nil {
+		return 0, fmt.Errorf("invalid_first_fetch_limit: %s must be an integer from 0 to %d", source, MaxFirstFetchMaxItems)
+	}
+	if value < 0 || value > MaxFirstFetchMaxItems {
+		return 0, fmt.Errorf("invalid_first_fetch_limit: %s must be between 0 and %d", source, MaxFirstFetchMaxItems)
+	}
+	return value, nil
 }
 
 func validateServeConfig(cfg ServeConfig) error {
@@ -235,6 +281,9 @@ func validateServeConfigBeforeSecret(cfg ServeConfig) error {
 		if err := validateOwnerToken(cfg.OwnerToken); err != nil {
 			return fmt.Errorf("invalid_owner_token: expected at least 32 visible non-whitespace characters")
 		}
+	}
+	if cfg.FirstFetchMaxItems < 0 || cfg.FirstFetchMaxItems > MaxFirstFetchMaxItems {
+		return fmt.Errorf("invalid_first_fetch_limit: first-fetch-limit must be between 0 and %d", MaxFirstFetchMaxItems)
 	}
 	return nil
 }
@@ -303,14 +352,14 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 	}
 
 	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
-	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm}
+	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: true}
 	runtimeCfg.Lifecycle = &serveStartupConsoleLifecycle{stdout: stdout, cfg: cfg, publicURL: runtimeCfg.PublicURL, resolution: resolution}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- ServeHTTPAndIngestRuntime(runCtx, runtimeCfg, func(ctx context.Context) error {
-			return RunIngestLoop(ctx, db, IngestConfig{LLM: llm})
+			return RunIngestLoop(ctx, db, IngestConfig{LLM: llm, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: true})
 		})
 	}()
 
@@ -372,6 +421,7 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	_, _ = io.WriteString(w, "mcp: /mcp\n\n")
 	_, _ = fmt.Fprintf(w, "sqlite: %s\n", cfg.DBPath)
 	_, _ = io.WriteString(w, "migrations: ok\n")
+	_, _ = fmt.Fprintf(w, "first-fetch-limit: %s\n", firstFetchLimitDisplay(cfg.FirstFetchMaxItems))
 	_, _ = io.WriteString(w, "ingest: started\n\n")
 	_, _ = io.WriteString(w, "llm: openrouter\n")
 	_, _ = fmt.Fprintf(w, "openrouter-key: present via %s\n", cfg.OpenRouterKeySource)

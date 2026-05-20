@@ -12,6 +12,11 @@ const (
 
 	// DefaultDBPath is the documented SQLite file path for `resofeed serve`.
 	DefaultDBPath = "./data/resofeed.sqlite3"
+
+	// DefaultFirstFetchMaxItems caps brand-new source backfills while preserving
+	// 0 as an explicit unlimited escape hatch.
+	DefaultFirstFetchMaxItems = 50
+	MaxFirstFetchMaxItems     = 500
 )
 
 // ServeConfig is the CLI contract for `resofeed serve`. CLI flags are the
@@ -25,6 +30,7 @@ type ServeConfig struct {
 	OpenRouterKeySource string
 	OpenRouterModel     string
 	OwnerToken          string
+	FirstFetchMaxItems  int
 }
 
 // ErrorBody is the canonical JSON error envelope for HTTP API failures.

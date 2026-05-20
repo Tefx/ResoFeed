@@ -23,6 +23,8 @@ func WriteDoctor(ctx context.Context, db *sql.DB, w io.Writer) error {
 type DoctorConfig struct {
 	ConfiguredOpenRouterModel string
 	ResolvedOpenRouterModel   string
+	FirstFetchMaxItems        int
+	FirstFetchMaxItemsSet     bool
 }
 
 type openRouterRuntimeStatus interface {
@@ -129,7 +131,22 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	} else {
 		lines = append(lines, "ingest: last_run=never")
 	}
+	lines = append(lines, "ingest: first_fetch_limit="+firstFetchLimitDisplay(effectiveDoctorFirstFetchMaxItems(cfg)))
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+func effectiveDoctorFirstFetchMaxItems(cfg DoctorConfig) int {
+	if !cfg.FirstFetchMaxItemsSet && cfg.FirstFetchMaxItems == 0 {
+		return DefaultFirstFetchMaxItems
+	}
+	return cfg.FirstFetchMaxItems
+}
+
+func firstFetchLimitDisplay(limit int) string {
+	if limit == 0 {
+		return "unlimited"
+	}
+	return fmt.Sprintf("%d", limit)
 }
 
 func readSearchFTSStatusLine(ctx context.Context, db *sql.DB) (string, error) {

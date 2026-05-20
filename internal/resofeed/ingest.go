@@ -67,6 +67,11 @@ type IngestConfig struct {
 	Interval           time.Duration
 	SourceFetchTimeout time.Duration
 	LLM                LLMClient
+	FirstFetchMaxItems int
+	// FirstFetchMaxItemsSet distinguishes omitted IngestConfig{} (default 50)
+	// from an explicit zero unlimited cap. It is only needed for direct in-process
+	// callers because the CLI/env parser always materializes an explicit value.
+	FirstFetchMaxItemsSet bool
 }
 
 // RunIngestLoop fetches active sources independently until ctx is canceled. One
@@ -404,7 +409,11 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 		effectiveSource.Title = feed.Title
 	}
 	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
-	for index, entry := range feed.Items {
+	itemsToProcess, err := applyFirstFetchLimit(ctx, db, cfg, source.ID, feed.Items)
+	if err != nil {
+		return result, err
+	}
+	for index, entry := range itemsToProcess {
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(feed.Items)}, "processing feed items")
 		itemID := ingestedItemID(effectiveSource, entry)
 		exists, err := itemExists(ctx, db, itemID)
@@ -429,6 +438,39 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
 	}
 	return result, nil
+}
+
+func applyFirstFetchLimit(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string, items []feedEntry) ([]feedEntry, error) {
+	limit := effectiveFirstFetchMaxItems(cfg)
+	if limit == 0 || len(items) <= limit {
+		return items, nil
+	}
+	count, err := countPersistedItemsForSource(ctx, db, sourceID)
+	if err != nil {
+		return nil, err
+	}
+	if count > 0 {
+		return items, nil
+	}
+	return items[:limit], nil
+}
+
+func effectiveFirstFetchMaxItems(cfg IngestConfig) int {
+	if cfg.FirstFetchMaxItemsSet {
+		return cfg.FirstFetchMaxItems
+	}
+	if cfg.FirstFetchMaxItems > 0 {
+		return cfg.FirstFetchMaxItems
+	}
+	return DefaultFirstFetchMaxItems
+}
+
+func countPersistedItemsForSource(ctx context.Context, db *sql.DB, sourceID string) (int, error) {
+	var count int
+	if err := db.QueryRowContext(ctx, `select count(*) from items where source_id = ?`, sourceID).Scan(&count); err != nil {
+		return 0, fmt.Errorf("ingest source: count persisted items for source %q: %w", sourceID, err)
+	}
+	return count, nil
 }
 
 type parsedFeed struct {

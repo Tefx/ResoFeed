@@ -222,6 +222,10 @@ func setIntFieldForExpectedRedContract(t *testing.T, target any, fieldName strin
 		t.Fatalf("%T.%s must be settable int field", target, fieldName)
 	}
 	field.SetInt(int64(value))
+	setField := v.Elem().FieldByName(fieldName + "Set")
+	if setField.IsValid() && setField.CanSet() && setField.Kind() == reflect.Bool {
+		setField.SetBool(true)
+	}
 }
 
 func assertIntFieldForExpectedRedContract(t *testing.T, target any, fieldName string, want int) {

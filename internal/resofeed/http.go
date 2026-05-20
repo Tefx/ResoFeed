@@ -26,13 +26,15 @@ const maxRuntimeBodyBytes = 100 << 10
 // Authorization: Bearer <OWNER_TOKEN> and returns the canonical JSON error body
 // on auth failure.
 type HTTPServerConfig struct {
-	Addr           string
-	PublicURL      string
-	DB             *sql.DB
-	OwnerToken     string
-	OwnerTokenHash string
-	LLM            LLMClient
-	Lifecycle      RuntimeLifecycleRecorder
+	Addr                  string
+	PublicURL             string
+	DB                    *sql.DB
+	OwnerToken            string
+	OwnerTokenHash        string
+	LLM                   LLMClient
+	Lifecycle             RuntimeLifecycleRecorder
+	FirstFetchMaxItems    int
+	FirstFetchMaxItemsSet bool
 }
 
 type RuntimeLifecycleEvent string
@@ -57,7 +59,7 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api)
-	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM}))
+	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
 	mux.Handle("/", staticUIHandler())
 	return mux
 }
@@ -772,7 +774,7 @@ func (h apiHandler) handleSources(w http.ResponseWriter, r *http.Request) {
 
 func (h apiHandler) handleManualIngest(w http.ResponseWriter, r *http.Request) {
 	started := time.Now().UTC()
-	result, err := ManualIngest(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM})
+	result, err := ManualIngest(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM, FirstFetchMaxItems: h.cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: h.cfg.FirstFetchMaxItemsSet})
 	if err != nil {
 		writeManualFetchError(w, "", err)
 		return
@@ -788,7 +790,7 @@ func (h apiHandler) handleManualSourceFetch(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	started := time.Now().UTC()
-	result, err := ManualFetchSource(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM}, sourceID)
+	result, err := ManualFetchSource(r.Context(), h.cfg.DB, IngestConfig{LLM: h.cfg.LLM, FirstFetchMaxItems: h.cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: h.cfg.FirstFetchMaxItemsSet}, sourceID)
 	if err != nil {
 		writeManualFetchError(w, sourceID, err)
 		return
@@ -861,7 +863,10 @@ func (h apiHandler) handleStateImport(w http.ResponseWriter, r *http.Request) {
 func (h apiHandler) handleDoctor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	if err := WriteDoctorWithConfig(r.Context(), h.cfg.DB, DoctorConfigFromLLM(h.cfg.LLM), w); err != nil {
+	doctorCfg := DoctorConfigFromLLM(h.cfg.LLM)
+	doctorCfg.FirstFetchMaxItems = h.cfg.FirstFetchMaxItems
+	doctorCfg.FirstFetchMaxItemsSet = h.cfg.FirstFetchMaxItemsSet
+	if err := WriteDoctorWithConfig(r.Context(), h.cfg.DB, doctorCfg, w); err != nil {
 		return
 	}
 }

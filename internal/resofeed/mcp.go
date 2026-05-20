@@ -19,10 +19,12 @@ import (
 // HTTP 401 before JSON-RPC dispatch, tool/resource handling, receipt creation,
 // or backend mutation.
 type MCPConfig struct {
-	DB             *sql.DB
-	OwnerToken     string
-	OwnerTokenHash string
-	LLM            LLMClient
+	DB                    *sql.DB
+	OwnerToken            string
+	OwnerTokenHash        string
+	LLM                   LLMClient
+	FirstFetchMaxItems    int
+	FirstFetchMaxItemsSet bool
 }
 
 // NewMCPHandler returns the /mcp Streamable HTTP handler. MCP exposes the same
@@ -31,7 +33,7 @@ type MCPConfig struct {
 // Live audit closure for MCP liveness must prove this handler through the single
 // resofeed serve listener, not only through in-process handler invocation.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM}
+	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM, firstFetchMaxItems: cfg.FirstFetchMaxItems, firstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -365,10 +367,12 @@ on conflict(item_id) do update set
 }
 
 type mcpHandler struct {
-	db             *sql.DB
-	ownerToken     string
-	ownerTokenHash string
-	llm            LLMClient
+	db                    *sql.DB
+	ownerToken            string
+	ownerTokenHash        string
+	llm                   LLMClient
+	firstFetchMaxItems    int
+	firstFetchMaxItemsSet bool
 }
 
 type mcpRequest struct {
@@ -491,7 +495,10 @@ func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (
 	case "resofeed://system/doctor":
 		mimeType = "text/plain"
 		var buf bytes.Buffer
-		err = WriteDoctorWithConfig(ctx, h.db, DoctorConfigFromLLM(h.llm), &buf)
+		doctorCfg := DoctorConfigFromLLM(h.llm)
+		doctorCfg.FirstFetchMaxItems = h.firstFetchMaxItems
+		doctorCfg.FirstFetchMaxItemsSet = h.firstFetchMaxItemsSet
+		err = WriteDoctorWithConfig(ctx, h.db, doctorCfg, &buf)
 		payload = buf.Bytes()
 	case "resofeed://sources":
 		mimeType = "application/json"
