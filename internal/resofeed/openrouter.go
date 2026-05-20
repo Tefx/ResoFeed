@@ -103,6 +103,14 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
 		return OpenRouterSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("openrouter summarize: %w", err)
 	}
+	validated, err := validateSummaryOutputForPersistence(out)
+	if err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, err
+	}
+	return validated, nil
+}
+
+func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRouterSummaryOutput, error) {
 	out.Summary = strings.TrimSpace(out.Summary)
 	out.CoreInsight = strings.TrimSpace(out.CoreInsight)
 	out.ValueTier = strings.TrimSpace(out.ValueTier)

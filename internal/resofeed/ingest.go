@@ -628,6 +628,15 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
+	out, err = validateSummaryOutputForPersistence(out)
+	if err != nil {
+		item.ModelStatus = modelStatusSummaryNA
+		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
+			item.ExtractionStatus = extractionStatusSummaryNA
+		}
+		sanitizeReadableItem(&item)
+		return item, nil
+	}
 	item.ModelStatus = mapModelStatus(out.ModelStatus)
 	if item.ModelStatus == modelStatusOK {
 		if strings.TrimSpace(out.Title) != "" {

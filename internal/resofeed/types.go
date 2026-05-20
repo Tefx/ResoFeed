@@ -21,7 +21,7 @@ const (
 
 // ServeConfig is the CLI contract for `resofeed serve`. CLI flags are the
 // primary non-secret runtime configuration surface: --addr, --public-url,
-// --db, --openrouter-model, and optional --owner-token.
+// --db, --openrouter-model, optional --owner-token, and --first-fetch-limit.
 type ServeConfig struct {
 	Addr                string
 	PublicURL           string

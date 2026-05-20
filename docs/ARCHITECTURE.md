@@ -69,6 +69,7 @@ Required/recognized flags:
 | `--db` | No | `./data/resofeed.sqlite3` | SQLite database path. |
 | `--openrouter-model` | No | empty / account default | Optional OpenRouter model. Empty or omitted means use the OpenRouter account default. Provided values are passed through unchanged with no startup network model validation. |
 | `--owner-token` | No | reuse or auto-generate | Explicit owner token; omitted means reuse or auto-generate. |
+| `--first-fetch-limit` | No | `50` | Maximum items to store on a brand-new source's first fetch; `0` means unlimited. Incremental fetches after any item exists are uncapped. |
 
 When `--openrouter-model` is omitted or empty, diagnostics and startup/runtime status should refer to the configured model as `account_default`. If OpenRouter later returns a concrete resolved model in a response, `/doctor` may include that resolved model; absence of a resolved model is not a startup failure.
 

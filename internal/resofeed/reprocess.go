@@ -206,6 +206,10 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 		}
 		return failedReprocessOutcome(sourceURL, ReprocessErrorModelLatencyError, "model latency error"), nil
 	}
+	out, err = validateSummaryOutputForPersistence(out)
+	if err != nil {
+		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, string(ReprocessErrorSummaryUnavailable)), nil
+	}
 	modelStatus := mapModelStatus(out.ModelStatus)
 	if modelStatus != modelStatusOK {
 		code := ReprocessErrorSummaryUnavailable
