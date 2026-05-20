@@ -152,6 +152,9 @@ func TestStartupConsoleAndDoctorExposeFirstFetchLimitWithoutSecretLeak(t *testin
 		if !strings.Contains(output, "first-fetch-limit: 50") {
 			t.Fatalf("startup output missing first-fetch-limit line; output=%q", redactFirstFetchLimitSecret(output))
 		}
+		if !strings.Contains(output, "openrouter-key: configured") {
+			t.Fatalf("startup output missing safe OpenRouter key status; output=%q", redactFirstFetchLimitSecret(output))
+		}
 		assertFirstFetchLimitOutputDoesNotLeakSecrets(t, output)
 	})
 
@@ -259,7 +262,7 @@ func withoutFirstFetchLimitEnv(t *testing.T) {
 
 func assertFirstFetchLimitOutputDoesNotLeakSecrets(t *testing.T, output string) {
 	t.Helper()
-	for _, forbidden := range []string{firstFetchLimitSecretSentinel} {
+	for _, forbidden := range []string{firstFetchLimitSecretSentinel, "openrouter-key: present via env:OPENROUTER_KEY", "env:OPENROUTER_KEY", "cwd:.env", ".env"} {
 		if strings.Contains(output, forbidden) {
 			t.Fatalf("runtime output leaked secret/config source %q; output=%q", forbidden, redactFirstFetchLimitSecret(output))
 		}

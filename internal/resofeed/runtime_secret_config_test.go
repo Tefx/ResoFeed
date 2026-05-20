@@ -53,7 +53,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 			"migrations: ok\n",
 			"ingest: started\n",
 			"llm: openrouter\n",
-			"openrouter-key: present via env:OPENROUTER_KEY\n",
+			"openrouter-key: configured\n",
 			"model: google/gemini-3.5-flash\n",
 		} {
 			if !strings.Contains(output, want) {
@@ -64,6 +64,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 			t.Fatalf("explicit model startup printed default-model note: %q", redactRuntimeSecretTestOutput(output))
 		}
 		assertRuntimeSecretTestOutputRedacted(t, output)
+		assertRuntimeSecretSourceMetadataRedacted(t, output)
 	})
 
 	t.Run("default model with dotenv key source", func(t *testing.T) {
@@ -72,7 +73,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 		output := stdout.String()
 		for _, want := range []string{
 			"owner-token: generated\n",
-			"openrouter-key: present via cwd:.env\n",
+			"openrouter-key: configured\n",
 			"model: account default\n",
 			"model-note: no --openrouter-model supplied; OpenRouter account default will be used\n",
 		} {
@@ -81,6 +82,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 			}
 		}
 		assertRuntimeSecretTestOutputRedacted(t, output)
+		assertRuntimeSecretSourceMetadataRedacted(t, output)
 	})
 }
 
@@ -263,6 +265,23 @@ func assertRuntimeSecretTestOutputRedacted(t *testing.T, outputs ...string) {
 		for _, secret := range []string{fakeCLISecret, fakeEnvSecret, fakeDotEnvSecret, "rfake_openrouter_secret_for_runtime_tests_only"} {
 			if strings.Contains(output, secret) {
 				t.Fatal("runtime output leaked a fake secret fixture value")
+			}
+		}
+	}
+}
+
+func assertRuntimeSecretSourceMetadataRedacted(t *testing.T, outputs ...string) {
+	t.Helper()
+	for _, output := range outputs {
+		for _, forbidden := range []string{
+			"openrouter-key: present via env:OPENROUTER_KEY",
+			"openrouter-key: present via cwd:.env",
+			"env:OPENROUTER_KEY",
+			"cwd:.env",
+			".env",
+		} {
+			if strings.Contains(output, forbidden) {
+				t.Fatalf("runtime output leaked secret source metadata %q in %q", forbidden, redactRuntimeSecretTestOutput(output))
 			}
 		}
 	}

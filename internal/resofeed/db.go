@@ -424,7 +424,7 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	_, _ = fmt.Fprintf(w, "first-fetch-limit: %s\n", firstFetchLimitDisplay(cfg.FirstFetchMaxItems))
 	_, _ = io.WriteString(w, "ingest: started\n\n")
 	_, _ = io.WriteString(w, "llm: openrouter\n")
-	_, _ = fmt.Fprintf(w, "openrouter-key: present via %s\n", cfg.OpenRouterKeySource)
+	_, _ = io.WriteString(w, "openrouter-key: configured\n")
 	_, _ = fmt.Fprintf(w, "model: %s\n", model)
 	if strings.TrimSpace(cfg.OpenRouterModel) == "" {
 		_, _ = io.WriteString(w, "model-note: no --openrouter-model supplied; OpenRouter account default will be used\n")
