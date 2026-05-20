@@ -91,7 +91,11 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 			"response_json_only":   true,
 			"fields":               []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
 			"model_status_values":  []string{"ok", "summary_unavailable", "model_latency_error"},
-			"target_language_rule": "Write all user-readable output fields in item.target_language. When available_text exists and model_status is ok, translate title, feed_excerpt, extracted_text, summary, and core_insight into item.target_language; do not copy original-language body or excerpt text for feed_excerpt/extracted_text. Keep URLs, source identifiers, and provenance literal and untranslated; source titles also remain literal.",
+			"target_language_rule": "Write all user-readable output fields in item.target_language. When available_text exists and model_status is ok, translate title, feed_excerpt, extracted_text, summary, and core_insight into item.target_language; do not copy original-language body or excerpt text for feed_excerpt/extracted_text. Keep URLs, source identifiers, and provenance literal and untranslated. Also keep source ids and source titles literal and untranslated.",
+			"summary_quality_rule": "Use anti-fluff, anti-blogger style. No filler phrases. Do not write blogger framing such as 'this article discusses', 'the author notes', 'worth reading', or similar throat-clearing. Prefer factual density over commentary.",
+			"factual_density_rule": "Summary and core_insight must be grounded in source-backed fact units: concrete names, numbers, dates, prices, tools, technical specs, and other specifics from available_text. Preserve source-grounded fact units instead of generic claims.",
+			"core_insight_rule":    "When model_status is ok, core_insight must be exactly one sentence in item.target_language.",
+			"value_tier_values":    []string{"high", "brief", "source-claim"},
 		},
 		"item": input,
 	}
@@ -124,7 +128,68 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
 		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: summary and core_insight required")
 	}
+	if out.ModelStatus == "ok" && !isSingleSentenceCoreInsight(out.CoreInsight) {
+		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: core_insight must be exactly one sentence")
+	}
+	if out.ModelStatus == "ok" {
+		valueTier, err := normalizeSummaryValueTier(out.ValueTier)
+		if err != nil {
+			return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, err
+		}
+		out.ValueTier = valueTier
+	}
 	return out, nil
+}
+
+func normalizeSummaryValueTier(value string) (string, error) {
+	stable := strings.ToLower(strings.TrimSpace(value))
+	stable = strings.ReplaceAll(stable, "_", "-")
+	stable = strings.Join(strings.Fields(stable), "-")
+	switch stable {
+	case "high", "brief", "source-claim":
+		return stable, nil
+	default:
+		return "", fmt.Errorf("openrouter summarize: invalid value_tier %q", value)
+	}
+}
+
+func isSingleSentenceCoreInsight(value string) bool {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return false
+	}
+	boundaries := 0
+	for index, r := range trimmed {
+		if !isSentenceTerminal(r) {
+			continue
+		}
+		next := strings.TrimLeftFunc(trimmed[index+len(string(r)):], isClosingSentenceMark)
+		if next == "" || strings.HasPrefix(next, " ") || strings.HasPrefix(next, "\n") || strings.HasPrefix(next, "\t") {
+			boundaries++
+		}
+		if boundaries > 1 {
+			return false
+		}
+	}
+	return boundaries <= 1
+}
+
+func isSentenceTerminal(r rune) bool {
+	switch r {
+	case '.', '!', '?', '。', '！', '？':
+		return true
+	default:
+		return false
+	}
+}
+
+func isClosingSentenceMark(r rune) bool {
+	switch r {
+	case '\'', '"', ')', ']', '}', '”', '’', '）', '】', '》':
+		return true
+	default:
+		return false
+	}
 }
 
 func (c *openRouterHTTPClient) TranslateSteering(ctx context.Context, input OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
