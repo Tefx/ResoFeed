@@ -38,6 +38,52 @@ func TestOpenRouterRuntimeSecretResolutionFromLocalDotEnvFallback(t *testing.T) 
 	assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 }
 
+func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing.T) {
+	t.Run("explicit model with env key source", func(t *testing.T) {
+		var stdout bytes.Buffer
+		printServeStartupConsole(&stdout, ServeConfig{Addr: "127.0.0.1:8080", PublicURL: "http://127.0.0.1:8080", DBPath: "data/resofeed.sqlite3", OpenRouterKey: fakeEnvSecret, OpenRouterKeySource: openRouterKeySourceEnv, OpenRouterModel: "google/gemini-3.5-flash", OwnerToken: contractOwnerToken}, "http://127.0.0.1:8080", OwnerTokenResolution{WasExplicit: true})
+		output := stdout.String()
+		for _, want := range []string{
+			"RESOFEED serve\n",
+			"owner-token: explicit\n",
+			"auth: owner-token required\n",
+			"ui: mounted\n",
+			"api: enabled\n",
+			"mcp: /mcp\n",
+			"migrations: ok\n",
+			"ingest: started\n",
+			"llm: openrouter\n",
+			"openrouter-key: present via env:OPENROUTER_KEY\n",
+			"model: google/gemini-3.5-flash\n",
+		} {
+			if !strings.Contains(output, want) {
+				t.Fatalf("startup stdout missing %q in %q", want, redactRuntimeSecretTestOutput(output))
+			}
+		}
+		if strings.Contains(output, "model-note:") {
+			t.Fatalf("explicit model startup printed default-model note: %q", redactRuntimeSecretTestOutput(output))
+		}
+		assertRuntimeSecretTestOutputRedacted(t, output)
+	})
+
+	t.Run("default model with dotenv key source", func(t *testing.T) {
+		var stdout bytes.Buffer
+		printServeStartupConsole(&stdout, ServeConfig{Addr: "127.0.0.1:8080", PublicURL: "http://127.0.0.1:8080", DBPath: "data/resofeed.sqlite3", OpenRouterKey: fakeDotEnvSecret, OpenRouterKeySource: openRouterKeySourceDotEnv, OwnerToken: contractOwnerToken}, "http://127.0.0.1:8080", OwnerTokenResolution{WasGenerated: true})
+		output := stdout.String()
+		for _, want := range []string{
+			"owner-token: generated\n",
+			"openrouter-key: present via cwd:.env\n",
+			"model: account default\n",
+			"model-note: no --openrouter-model supplied; OpenRouter account default will be used\n",
+		} {
+			if !strings.Contains(output, want) {
+				t.Fatalf("startup stdout missing %q in %q", want, redactRuntimeSecretTestOutput(output))
+			}
+		}
+		assertRuntimeSecretTestOutputRedacted(t, output)
+	})
+}
+
 func TestOpenRouterRuntimeSecretPrecedenceAndEmptyValues(t *testing.T) {
 	t.Run("OS environment beats local dotenv", func(t *testing.T) {
 		t.Setenv("OPENROUTER_KEY", fakeEnvSecret)

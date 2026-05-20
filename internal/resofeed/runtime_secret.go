@@ -10,21 +10,50 @@ import (
 
 const openRouterKeyEnvName = "OPENROUTER_KEY"
 
+const (
+	openRouterKeySourceEnv    = "env:OPENROUTER_KEY"
+	openRouterKeySourceDotEnv = "cwd:.env"
+)
+
+type OpenRouterRuntimeSecret struct {
+	Value  string
+	Source string
+}
+
 // ResolveOpenRouterRuntimeSecret applies the documented runtime-only OpenRouter
 // secret precedence before provider construction: OS environment, then local
-// .env fallback. It never logs or returns source metadata for persistence.
+// .env fallback. It never logs source metadata or returns it for persistence.
 func ResolveOpenRouterRuntimeSecret() (string, error) {
-	if value, ok := os.LookupEnv(openRouterKeyEnvName); ok {
-		return requireRuntimeSecretValue(value)
-	}
-	values, err := readLocalDotEnvRuntimeSecrets(".env")
+	secret, err := ResolveOpenRouterRuntimeSecretWithSource()
 	if err != nil {
 		return "", err
 	}
-	if value, ok := values[openRouterKeyEnvName]; ok {
-		return requireRuntimeSecretValue(value)
+	return secret.Value, nil
+}
+
+// ResolveOpenRouterRuntimeSecretWithSource resolves the OpenRouter secret and a
+// safe source label for startup diagnostics. The label never contains the secret
+// value and must not be persisted.
+func ResolveOpenRouterRuntimeSecretWithSource() (OpenRouterRuntimeSecret, error) {
+	if value, ok := os.LookupEnv(openRouterKeyEnvName); ok {
+		secret, err := requireRuntimeSecretValue(value)
+		if err != nil {
+			return OpenRouterRuntimeSecret{}, err
+		}
+		return OpenRouterRuntimeSecret{Value: secret, Source: openRouterKeySourceEnv}, nil
 	}
-	return "", errors.New("invalid_openrouter_key: value required")
+	values, err := readLocalDotEnvRuntimeSecrets(".env")
+	if err != nil {
+		return OpenRouterRuntimeSecret{}, err
+	}
+	if value, ok := values[openRouterKeyEnvName]; ok {
+		secret, err := requireRuntimeSecretValue(value)
+		if err != nil {
+			return OpenRouterRuntimeSecret{}, err
+		}
+		return OpenRouterRuntimeSecret{Value: secret, Source: openRouterKeySourceDotEnv}, nil
+	}
+	return OpenRouterRuntimeSecret{}, errors.New("invalid_openrouter_key: value required")
 }
 
 func requireRuntimeSecretValue(value string) (string, error) {

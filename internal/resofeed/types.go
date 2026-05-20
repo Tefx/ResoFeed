@@ -18,12 +18,13 @@ const (
 // primary non-secret runtime configuration surface: --addr, --public-url,
 // --db, --openrouter-model, and optional --owner-token.
 type ServeConfig struct {
-	Addr            string
-	PublicURL       string
-	DBPath          string
-	OpenRouterKey   string
-	OpenRouterModel string
-	OwnerToken      string
+	Addr                string
+	PublicURL           string
+	DBPath              string
+	OpenRouterKey       string
+	OpenRouterKeySource string
+	OpenRouterModel     string
+	OwnerToken          string
 }
 
 // ErrorBody is the canonical JSON error envelope for HTTP API failures.

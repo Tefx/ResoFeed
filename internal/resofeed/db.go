@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"unicode"
 	"unicode/utf8"
@@ -51,12 +52,13 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
 		}
-		openRouterKey, err := ResolveOpenRouterRuntimeSecret()
+		openRouterSecret, err := ResolveOpenRouterRuntimeSecretWithSource()
 		if err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
 		}
-		cfg.OpenRouterKey = openRouterKey
+		cfg.OpenRouterKey = openRouterSecret.Value
+		cfg.OpenRouterKeySource = openRouterSecret.Source
 		if err := validateServeConfig(cfg); err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
@@ -302,6 +304,7 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 
 	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
 	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm}
+	runtimeCfg.Lifecycle = &serveStartupConsoleLifecycle{stdout: stdout, cfg: cfg, publicURL: runtimeCfg.PublicURL, resolution: resolution}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	errCh := make(chan error, 1)
@@ -311,7 +314,6 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		})
 	}()
 
-	_, _ = fmt.Fprintf(stdout, "serving ResoFeed on %s (public-url %s)\n", cfg.Addr, runtimeCfg.PublicURL)
 	select {
 	case <-ctx.Done():
 		cancel()
@@ -328,6 +330,54 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 			return 1
 		}
 		return 0
+	}
+}
+
+type serveStartupConsoleLifecycle struct {
+	stdout     io.Writer
+	cfg        ServeConfig
+	publicURL  string
+	resolution OwnerTokenResolution
+	once       sync.Once
+}
+
+func (l *serveStartupConsoleLifecycle) RecordRuntimeLifecycleEvent(event RuntimeLifecycleEvent) {
+	if event != RuntimeLifecycleIngestStart {
+		return
+	}
+	l.once.Do(func() {
+		printServeStartupConsole(l.stdout, l.cfg, l.publicURL, l.resolution)
+	})
+}
+
+func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, resolution OwnerTokenResolution) {
+	ownerStatus := "reused"
+	if resolution.WasExplicit {
+		ownerStatus = "explicit"
+	} else if resolution.WasGenerated {
+		ownerStatus = "generated"
+	}
+	model := strings.TrimSpace(cfg.OpenRouterModel)
+	if model == "" {
+		model = "account default"
+	}
+
+	_, _ = io.WriteString(w, "RESOFEED serve\n")
+	_, _ = fmt.Fprintf(w, "owner-token: %s\n", ownerStatus)
+	_, _ = io.WriteString(w, "auth: owner-token required\n\n")
+	_, _ = fmt.Fprintf(w, "http: listening on %s\n", cfg.Addr)
+	_, _ = fmt.Fprintf(w, "public-url: %s\n", publicURL)
+	_, _ = io.WriteString(w, "ui: mounted\n")
+	_, _ = io.WriteString(w, "api: enabled\n")
+	_, _ = io.WriteString(w, "mcp: /mcp\n\n")
+	_, _ = fmt.Fprintf(w, "sqlite: %s\n", cfg.DBPath)
+	_, _ = io.WriteString(w, "migrations: ok\n")
+	_, _ = io.WriteString(w, "ingest: started\n\n")
+	_, _ = io.WriteString(w, "llm: openrouter\n")
+	_, _ = fmt.Fprintf(w, "openrouter-key: present via %s\n", cfg.OpenRouterKeySource)
+	_, _ = fmt.Fprintf(w, "model: %s\n", model)
+	if strings.TrimSpace(cfg.OpenRouterModel) == "" {
+		_, _ = io.WriteString(w, "model-note: no --openrouter-model supplied; OpenRouter account default will be used\n")
 	}
 }
 
