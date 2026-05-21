@@ -32,6 +32,7 @@ type HTTPServerConfig struct {
 	OwnerToken            string
 	OwnerTokenHash        string
 	LLM                   LLMClient
+	OpenRouter            OpenRouterConfig
 	Lifecycle             RuntimeLifecycleRecorder
 	FirstFetchMaxItems    int
 	FirstFetchMaxItemsSet bool
@@ -256,6 +257,11 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleGetRuntimeLanguage(w, r)
+	case r.Method == http.MethodGet && (r.URL.Path == "/api/runtime/openrouter-models" || r.URL.Path == "/api/runtime/openrouter/models"):
+		if !rejectUnexpectedQuery(w, r) {
+			return
+		}
+		h.handleOpenRouterModels(w, r)
 	case r.Method == http.MethodPut && r.URL.Path == RuntimeLanguageHTTPPath:
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -441,6 +447,39 @@ func (h apiHandler) handleGetRuntimeLanguage(w http.ResponseWriter, r *http.Requ
 	writeJSON(w, http.StatusOK, ProcessingLanguageResponse{Language: language})
 }
 
+func (h apiHandler) handleOpenRouterModels(w http.ResponseWriter, r *http.Request) {
+	cfg, hasKey := h.openRouterModelsConfig()
+	if !hasKey {
+		writeJSON(w, http.StatusOK, OpenRouterModelsResponse{Models: []OpenRouterModelInfo{}})
+		return
+	}
+	models, err := ListOpenRouterModels(r.Context(), cfg)
+	if err != nil {
+		writeAPIError(w, http.StatusServiceUnavailable, "provider_unavailable", "models unavailable", nil)
+		return
+	}
+	if models.Models == nil {
+		models.Models = []OpenRouterModelInfo{}
+	}
+	writeJSON(w, http.StatusOK, models)
+}
+
+func (h apiHandler) openRouterModelsConfig() (OpenRouterConfig, bool) {
+	cfg := h.cfg.OpenRouter
+	if strings.TrimSpace(cfg.Endpoint) == "" {
+		cfg.Endpoint = deterministicOpenRouterEndpointForE2E()
+	}
+	if strings.TrimSpace(cfg.APIKey) != "" {
+		return cfg, true
+	}
+	secret, err := ResolveOpenRouterRuntimeSecret()
+	if err != nil {
+		return cfg, false
+	}
+	cfg.APIKey = secret
+	return cfg, true
+}
+
 func (h apiHandler) handleSetRuntimeLanguage(w http.ResponseWriter, r *http.Request) {
 	var req SetProcessingLanguageRequest
 	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
@@ -519,8 +558,8 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(parts) == 2 && r.Method == http.MethodPost && parts[1] == "reingest" {
-		var req ItemReingestRequest
-		if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
+		req, ok := readItemReingestRequest(w, r)
+		if !ok || !validateMutationFields(w, req.MutationRequestFields) {
 			return
 		}
 		response, err := ReingestItem(r.Context(), h.cfg.DB, h.cfg.LLM, parts[0], req)
@@ -588,6 +627,39 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": r.URL.Path})
+}
+
+func readItemReingestRequest(w http.ResponseWriter, r *http.Request) (ItemReingestRequest, bool) {
+	var wire struct {
+		Model       *string `json:"model"`
+		Prompt      *string `json:"prompt"`
+		ExtraPrompt *string `json:"extra_prompt"`
+		MutationRequestFields
+	}
+	if !readJSONBodyLimit(w, r, &wire, maxRuntimeBodyBytes, "100 KB") {
+		return ItemReingestRequest{}, false
+	}
+	prompt := normalizedOptionalString(wire.Prompt)
+	extraPrompt := normalizedOptionalString(wire.ExtraPrompt)
+	if prompt != nil && extraPrompt != nil && *prompt != *extraPrompt {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "prompt"})
+		return ItemReingestRequest{}, false
+	}
+	if prompt == nil {
+		prompt = extraPrompt
+	}
+	return ItemReingestRequest{Model: normalizedOptionalString(wire.Model), Prompt: prompt, MutationRequestFields: wire.MutationRequestFields}, true
+}
+
+func normalizedOptionalString(value *string) *string {
+	if value == nil {
+		return nil
+	}
+	trimmed := strings.TrimSpace(*value)
+	if trimmed == "" {
+		return nil
+	}
+	return &trimmed
 }
 
 func readDeliveryReportBody(w http.ResponseWriter, r *http.Request) (DeliveryReportRequest, bool) {
@@ -1093,6 +1165,13 @@ func jsonDecodeErrorField(err error) string {
 	message := err.Error()
 	if strings.HasPrefix(message, prefix) {
 		return strings.Trim(message[len(prefix):], `"`)
+	}
+	const structFieldMarker = " into Go struct field ."
+	if idx := strings.Index(message, structFieldMarker); idx >= 0 {
+		field := message[idx+len(structFieldMarker):]
+		if end := strings.Index(field, " "); end >= 0 {
+			return field[:end]
+		}
 	}
 	return "body"
 }
