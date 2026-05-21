@@ -197,4 +197,55 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const conflict = await within(inspector).findByRole('alert', { name: /item re-ingest/i });
     expect(conflict).toHaveTextContent('err: reingest blocked — op: library_reprocess · actor:human · phase:processing_items · 2/5 · library reprocess processing item · since 11:00:00');
   });
+
+  it('clears transient item re-ingest form and status state when the Inspector item changes', async () => {
+    const user = userEvent.setup();
+    const secondDetail: ItemDetail = {
+      ...failedDetail,
+      id: 'item_reingest_expected_red_second',
+      title: 'Second Inspector item starts clean',
+      url: 'https://example.com/second-inspector-item',
+      provenance: {
+        ...failedDetail.provenance,
+        original_url: 'https://example.com/second-inspector-item',
+        canonical_url: 'https://example.com/second-inspector-item'
+      }
+    };
+    const onReingestItem = vi.fn(async () => {
+      throw new Error('err: model retry failed for item 1');
+    });
+    const view = render(Inspector, {
+      props: {
+        item: failedDetail,
+        mode: 'desktop-split',
+        showReingest: true,
+        onReingestItem
+      }
+    });
+
+    const firstInspector = screen.getByRole('complementary', { name: failedDetail.title });
+    const firstPanel = within(firstInspector).getByLabelText('Item re-ingest');
+    await user.type(within(firstPanel).getByLabelText('One-time prompt'), 'Item 1 prompt');
+    await user.click(within(firstPanel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
+
+    await within(firstPanel).findByRole('alert', { name: /item re-ingest/i });
+    expect(within(firstPanel).getByLabelText('One-time prompt')).toHaveValue('Item 1 prompt');
+    expect(within(firstPanel).getByLabelText('Item re-ingest status')).toHaveTextContent('err: model retry failed for item 1');
+
+    await view.rerender({
+      item: secondDetail,
+      mode: 'desktop-split',
+      showReingest: true,
+      onReingestItem
+    });
+
+    const secondInspector = screen.getByRole('complementary', { name: secondDetail.title });
+    const secondPanel = within(secondInspector).getByLabelText('Item re-ingest');
+    expect(within(secondPanel).getByLabelText('One-time prompt')).toHaveValue('');
+    expect(within(secondPanel).getByLabelText('Model')).toHaveValue('default');
+    expect(within(secondPanel).queryByLabelText('Item re-ingest status')).not.toBeInTheDocument();
+    expect(secondInspector).toHaveTextContent('Second Inspector item starts clean');
+    expect(secondInspector).not.toHaveTextContent('Item 1 prompt');
+    expect(secondInspector).not.toHaveTextContent('err: model retry failed for item 1');
+  });
 });

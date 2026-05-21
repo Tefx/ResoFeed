@@ -36,6 +36,7 @@
   let reingestState = $state<'idle' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
   let reingestStatus = $state('');
   let reingestSubmit = $state<HTMLButtonElement | undefined>();
+  let reingestItemId = $state<string | null>(null);
   let handledFocusRequestId = $state(-1);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
@@ -485,15 +486,25 @@
     return error instanceof Error ? error.message : 'err: re-ingest failed';
   }
 
+  function resetReingestTransientState(): void {
+    reingestModel = 'default';
+    reingestPrompt = '';
+    reingestState = 'idle';
+    reingestStatus = '';
+  }
+
   async function submitReingest(): Promise<void> {
     if (!item || !onReingestItem || reingestState === 'submitting') return;
+    const submittedItem = item;
+    const submittedItemId = submittedItem.id;
     reingestState = 'submitting';
     reingestStatus = '';
     try {
-      const response = await onReingestItem(item, {
+      const response = await onReingestItem(submittedItem, {
         model: reingestModel === 'default' ? null : reingestModel,
         prompt: reingestPrompt.trim().length > 0 ? reingestPrompt.trim() : null
       });
+      if (item?.id !== submittedItemId) return;
       reingestPrompt = '';
       reingestModel = 'default';
       reingestState = response.already_applied ? 'replayed' : 'completed';
@@ -501,12 +512,21 @@
       await tick();
       reingestSubmit?.focus();
     } catch (error) {
+      if (item?.id !== submittedItemId) return;
       reingestState = error instanceof ResoFeedApiError && error.status === 409 ? 'conflict' : 'failed';
       reingestStatus = formatReingestError(error);
       await tick();
       reingestSubmit?.focus();
     }
   }
+
+  $effect(() => {
+    const selectedItemId = item?.id ?? null;
+    if (selectedItemId !== reingestItemId) {
+      reingestItemId = selectedItemId;
+      resetReingestTransientState();
+    }
+  });
 
   $effect(() => {
     if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
