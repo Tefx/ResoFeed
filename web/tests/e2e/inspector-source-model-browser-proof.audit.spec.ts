@@ -167,6 +167,16 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await captureEvidence(page, testInfo, 'audit-fallback-source-evidence-expanded');
 
   const panel = inspector.getByLabel('Item re-ingest');
+  await expect(panel).toHaveText(/ITEM RE-INGEST\s+\[RE-INGEST ITEM\]/);
+  await expect.poll(() => inspector.evaluate((root) => {
+    const panelNode = root.querySelector('[data-contract="inspector-reingest"]');
+    const sourceEvidenceNode = root.querySelector('[aria-label="Source evidence"]');
+    if (!panelNode || !sourceEvidenceNode) return false;
+    return (panelNode.compareDocumentPosition(sourceEvidenceNode) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  })).toBe(true);
+  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await expect(panel.getByText('model:')).toBeVisible();
+  await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await expect(panel.getByLabel('Model')).toHaveValue('default');
   await expect(panel.getByRole('option', { name: 'Default model' })).toHaveAttribute('value', 'default');
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
@@ -174,7 +184,7 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
   await panel.getByLabel('One-time prompt').fill('Audit one-time prompt must stay transient.');
   await panel.getByLabel('Model').selectOption('openai/gpt-4.1-mini');
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
   await expect.poll(() => reingestBodies.length).toBe(1);
   await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
   await expect(page.evaluate(() => Object.keys(window.localStorage).sort())).resolves.toEqual(['resofeed.ownerToken']);

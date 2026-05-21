@@ -597,8 +597,9 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   const reingestPanel = page.getByRole('complementary', { name: 'INSPECTOR' }).getByLabel('Item re-ingest');
   await expect(reingestPanel).toBeVisible();
-  await reingestPanel.getByLabel('One-time prompt').fill('Runtime parity re-ingest through selected Inspector item.');
   await reingestPanel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await reingestPanel.getByLabel('One-time prompt').fill('Runtime parity re-ingest through selected Inspector item.');
+  await reingestPanel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
   await expect(reingestPanel.getByLabel('Item re-ingest status')).toHaveText('re-ingest complete', { timeout: 15_000 });
   const apiDetailAfterBrowserReingest = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
   expect(apiDetailAfterBrowserReingest.item.id).toBe(itemID);

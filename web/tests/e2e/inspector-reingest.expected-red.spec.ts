@@ -200,9 +200,19 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
 
   const panel = inspector.getByLabel('Item re-ingest');
   await expect(panel).toBeVisible();
+  await expect(panel).toHaveText(/ITEM RE-INGEST\s+\[RE-INGEST ITEM\]/);
+  await expect.poll(() => inspector.evaluate((root) => {
+    const panelNode = root.querySelector('[data-contract="inspector-reingest"]');
+    const sourceEvidenceNode = root.querySelector('[aria-label="Source evidence"]');
+    if (!panelNode || !sourceEvidenceNode) return false;
+    return (panelNode.compareDocumentPosition(sourceEvidenceNode) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  })).toBe(true);
+  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await expect(panel.getByText('model:')).toBeVisible();
+  await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await expect(panel.getByLabel('Model')).toHaveValue('default');
   await panel.getByLabel('One-time prompt').fill('Retry with article-only extraction.');
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
 
   await expect.poll(() => reingestBodies.length).toBe(1);
   const reingestBody = JSON.parse(reingestBodies[0] ?? '{}') as Record<string, unknown>;
@@ -248,6 +258,7 @@ test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspec
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByLabel('Item re-ingest');
   await expect(panel).toBeVisible();
+  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
   await captureEvidence(page, testInfo, 'inspector-model-list-diagnostics-red');
 
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();

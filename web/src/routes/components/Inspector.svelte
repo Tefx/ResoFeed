@@ -37,6 +37,8 @@
   let reingestPrompt = $state('');
   let reingestState = $state<'idle' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
   let reingestStatus = $state('');
+  let reingestConfiguring = $state(false);
+  let reingestToggle = $state<HTMLButtonElement | undefined>();
   let reingestSubmit = $state<HTMLButtonElement | undefined>();
   let reingestItemId = $state<string | null>(null);
   let handledFocusRequestId = $state(-1);
@@ -493,6 +495,19 @@
     reingestPrompt = '';
     reingestState = 'idle';
     reingestStatus = '';
+    reingestConfiguring = false;
+  }
+
+  async function openReingestConfig(): Promise<void> {
+    reingestConfiguring = true;
+    await tick();
+    reingestSubmit?.focus();
+  }
+
+  async function cancelReingestConfig(): Promise<void> {
+    resetReingestTransientState();
+    await tick();
+    reingestToggle?.focus();
   }
 
   function modelListDiagnostic(): string {
@@ -593,6 +608,34 @@
         <p class="inspector-section-copy">{generatedCoreInsight}</p>
       </section>
     {/if}
+    {#if showReingest}
+      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
+        <p class="inspector-section-label">ITEM RE-INGEST</p>
+        {#if reingestConfiguring}
+          <label class="inspector-reingest-field">
+            <span>model:</span>
+            <select name="reingest-model" bind:value={reingestModel} aria-label="Model" disabled={!onReingestItem || reingestState === 'submitting'}>
+              <option value="default">Default model</option>
+              {#each openRouterModels as model (model.id)}
+                <option value={model.id}>{model.name} ({model.id})</option>
+              {/each}
+            </select>
+          </label>
+          <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
+          <label class="inspector-reingest-field">
+            <span>extra prompt (one-time, not saved)</span>
+            <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label="One-time prompt" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
+          </label>
+          <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem || reingestState === 'submitting'} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? '[RE-INGESTING...]' : '[CONFIRM RE-INGEST]'}</button>
+          <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>[CANCEL]</button>
+          {#if reingestStatus}
+            <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label="Item re-ingest status" aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus}</p>
+          {/if}
+        {:else}
+          <button bind:this={reingestToggle} class="bracket-action inspector-reingest-toggle" type="button" disabled={!onReingestItem} onclick={() => void openReingestConfig()}>[RE-INGEST ITEM]</button>
+        {/if}
+      </section>
+    {/if}
     {@const evidenceText = sourceEvidenceText(item)}
     {#if isFallbackEvidenceState(item) && evidenceText}
       <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
@@ -604,29 +647,6 @@
         <summary class="inspector-section-label">{readingSectionLabel(item)}</summary>
         <p class="inspector-reading">{detailText(item)}</p>
       </details>
-    {/if}
-    {#if showReingest}
-      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
-        <p class="inspector-section-label">ITEM RE-INGEST</p>
-        <label class="inspector-reingest-field">
-          <span>Model</span>
-          <select name="reingest-model" bind:value={reingestModel} aria-label="Model" disabled={!onReingestItem || reingestState === 'submitting'}>
-            <option value="default">Default model</option>
-            {#each openRouterModels as model (model.id)}
-              <option value={model.id}>{model.name} ({model.id})</option>
-            {/each}
-          </select>
-        </label>
-        <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
-        <label class="inspector-reingest-field">
-          <span>One-time prompt</span>
-          <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label="One-time prompt" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
-        </label>
-        <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem || reingestState === 'submitting'} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? '[RE-INGESTING...]' : '[RE-INGEST ITEM]'}</button>
-        {#if reingestStatus}
-          <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label="Item re-ingest status" aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus}</p>
-        {/if}
-      </section>
     {/if}
     <p class="contract-muted">why: fresh from configured source</p>
     {@const groupedItems = groupedSourceItems(item)}
