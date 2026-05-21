@@ -1,0 +1,14 @@
+{
+  "network": [
+    {
+      "method": "GET",
+      "path": "/api/runtime/openrouter-models",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/runtime/openrouter/models",
+      "status": 200
+    }
+  ]
+}

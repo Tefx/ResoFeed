@@ -1,0 +1,26 @@
+{
+  "network": [
+    {
+      "method": "GET",
+      "path": "/api/runtime/openrouter-models",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/runtime/openrouter/models",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/items/item_blind_reingest_i18n/reingest",
+      "status": 200,
+      "payload": {
+        "actor_kind": "human",
+        "actor_id": "owner",
+        "idempotency_key": "reingest-item_blind_reingest_i18n-mpg0grvr",
+        "model": "openai/gpt-4.1-mini",
+        "prompt": "请用中文重写摘要和核心洞察。"
+      }
+    }
+  ]
+}
