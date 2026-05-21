@@ -137,7 +137,7 @@ func TestOpenRouterSummaryValueTierAllowsOnlyStableProductLabels(t *testing.T) {
 }
 
 func decodeOpenRouterSummaryPrompt(r *http.Request) (map[string]any, error) {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {
 		return nil, fmt.Errorf("read body: %w", err)

@@ -51,13 +51,64 @@ func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
 // request time, redact provider/API-key details on failure, and avoid persisting
 // model-list or prompt state.
 func ListOpenRouterModels(ctx context.Context, cfg OpenRouterConfig) (OpenRouterModelsResponse, error) {
-	select {
-	case <-ctx.Done():
-		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: %w", ctx.Err())
-	default:
+	if err := ctx.Err(); err != nil {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: %w", err)
 	}
-	_ = cfg
-	return OpenRouterModelsResponse{}, errors.New("openrouter models: not implemented")
+	apiKey := strings.TrimSpace(cfg.APIKey)
+	if apiKey == "" {
+		return OpenRouterModelsResponse{}, errors.New("openrouter models: api key required")
+	}
+	endpoint := strings.TrimSpace(cfg.Endpoint)
+	if endpoint == "" {
+		endpoint = "https://openrouter.ai"
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, openRouterModelsURL(endpoint), nil)
+	if err != nil {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: create request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	client := &http.Client{Timeout: 20 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: provider request failed")
+	}
+	defer func() { _ = resp.Body.Close() }()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: read provider response")
+	}
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: provider returned status %d", resp.StatusCode)
+	}
+	var wire struct {
+		Data []struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(body, &wire); err != nil {
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: decode provider response")
+	}
+	models := make([]OpenRouterModelInfo, 0, len(wire.Data))
+	for _, entry := range wire.Data {
+		id := strings.TrimSpace(entry.ID)
+		if id == "" {
+			continue
+		}
+		models = append(models, OpenRouterModelInfo{ID: id, Name: strings.TrimSpace(entry.Name)})
+	}
+	return OpenRouterModelsResponse{Models: models}, nil
+}
+
+func openRouterModelsURL(endpoint string) string {
+	base := strings.TrimRight(strings.TrimSpace(endpoint), "/")
+	if strings.HasSuffix(base, "/api/v1/models") {
+		return base
+	}
+	if strings.HasSuffix(base, "/api/v1") {
+		return base + "/models"
+	}
+	return base + "/api/v1/models"
 }
 
 type openRouterHTTPClient struct {
@@ -323,6 +374,9 @@ func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, ds
 	if strings.TrimSpace(c.model) != "" {
 		reqPayload.Model = strings.TrimSpace(c.model)
 	}
+	if summaryInput, ok := payload.(map[string]any)["item"].(OpenRouterSummaryInput); ok && strings.TrimSpace(summaryInput.Model) != "" {
+		reqPayload.Model = strings.TrimSpace(summaryInput.Model)
+	}
 	reqBody, err := json.Marshal(reqPayload)
 	if err != nil {
 		return fmt.Errorf("marshal request: %w", err)
@@ -488,6 +542,8 @@ type OpenRouterSummaryInput struct {
 	URL            string             `json:"url"`
 	AvailableText  string             `json:"available_text"`
 	TargetLanguage ProcessingLanguage `json:"target_language"`
+	Model          string             `json:"model,omitempty"`
+	Prompt         string             `json:"prompt,omitempty"`
 }
 
 // OpenRouterSummaryOutput is validated before saving summary metadata.

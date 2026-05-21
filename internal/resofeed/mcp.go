@@ -624,6 +624,18 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		if err == nil {
 			result, err = ReprocessLibraryForMCP(ctx, h.db, h.llm, input)
 		}
+	case "reingest_item":
+		var input MCPReingestItemInput
+		err = decodeRaw(envelope.Arguments, &input)
+		if err == nil {
+			result, err = ReingestItemForMCP(ctx, h.db, h.llm, input)
+		}
+	case "list_openrouter_models":
+		var input struct{}
+		err = decodeRaw(envelope.Arguments, &input)
+		if err == nil {
+			result, err = ListOpenRouterModels(ctx, OpenRouterConfig{})
+		}
 	default:
 		return nil, notFoundError("tool", envelope.Name)
 	}
@@ -823,6 +835,8 @@ func mcpToolList() []map[string]any {
 		{"name": "get_processing_language", "description": "Read the runtime processing language.", "inputSchema": objectSchema(nil, map[string]any{})},
 		{"name": "set_processing_language", "description": "Set the runtime processing language for future processing.", "inputSchema": objectSchema([]string{"language", "actor_id", "idempotency_key"}, map[string]any{"language": map[string]any{"type": "string", "enum": []string{"en", "zh"}}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "reprocess_library", "description": "Explicitly reprocess existing library items in the current runtime language.", "inputSchema": objectSchema([]string{"actor_id", "idempotency_key"}, map[string]any{"actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "reingest_item", "description": "Re-ingest exactly one selected item using the current runtime language.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required selected item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "list_openrouter_models", "description": "List available OpenRouter models without persisting provider state.", "inputSchema": objectSchema(nil, map[string]any{})},
 	}
 }
 

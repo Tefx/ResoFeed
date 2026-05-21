@@ -518,6 +518,23 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, result)
 		return
 	}
+	if len(parts) == 2 && r.Method == http.MethodPost && parts[1] == "reingest" {
+		var req ItemReingestRequest
+		if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
+			return
+		}
+		response, err := ReingestItem(r.Context(), h.cfg.DB, h.cfg.LLM, parts[0], req)
+		if err != nil {
+			if details, ok := guardConflictDetails(err); ok {
+				writeGuardConflict(w, details)
+				return
+			}
+			writeItemReingestError(w, parts[0], err)
+			return
+		}
+		writeJSON(w, http.StatusOK, response)
+		return
+	}
 	if len(parts) == 2 && r.Method == http.MethodPost && parts[1] == "resonance" {
 		var req ResonanceRequest
 		if !readJSONBody(w, r, &req) || !validateMutationFields(w, req.MutationRequestFields) {
@@ -871,26 +888,6 @@ func (h apiHandler) handleDoctor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func parseLimitQuery(w http.ResponseWriter, r *http.Request, allowed map[string]bool, defaultValue int, maxValue int) (int, bool) {
-	values := r.URL.Query()
-	for key, vals := range values {
-		if !allowed[key] || len(vals) != 1 {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": key})
-			return 0, false
-		}
-	}
-	limit := defaultValue
-	if vals, ok := values["limit"]; ok {
-		parsed, valid := parseBase10Limit(vals[0], maxValue)
-		if !valid {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "limit"})
-			return 0, false
-		}
-		limit = parsed
-	}
-	return limit, true
-}
-
 func parseSearchQuery(w http.ResponseWriter, r *http.Request) (SearchQuery, bool) {
 	allowed := map[string]bool{"q": true, "source": true, "from": true, "to": true, "resonated": true, "limit": true}
 	values := r.URL.Query()
@@ -1222,6 +1219,20 @@ func writeMutationError(w http.ResponseWriter, id string, err error) {
 	var fieldErr mcpFieldError
 	if errors.As(err, &fieldErr) {
 		writeFieldError(w, fieldErr)
+		return
+	}
+	writeNotFoundOrInternal(w, id, err)
+}
+
+func writeItemReingestError(w http.ResponseWriter, id string, err error) {
+	var fieldErr mcpFieldError
+	if errors.As(err, &fieldErr) {
+		writeFieldError(w, fieldErr)
+		return
+	}
+	var notFound mcpNotFoundError
+	if errors.As(err, &notFound) {
+		writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": notFound.id})
 		return
 	}
 	writeNotFoundOrInternal(w, id, err)

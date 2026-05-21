@@ -196,6 +196,11 @@ type OpenRouterModelsResponse struct {
 // It uses the same actor/idempotency boundary as other owner-authorized
 // mutations and intentionally excludes processing-language overrides.
 type ItemReingestRequest struct {
+	// Model and Prompt are request-scoped only. They may influence the current
+	// OpenRouter transform call but are never persisted as durable provider or
+	// prompt state.
+	Model  *string `json:"model"`
+	Prompt *string `json:"prompt"`
 	MutationRequestFields
 }
 

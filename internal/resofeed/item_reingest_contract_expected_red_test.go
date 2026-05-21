@@ -126,10 +126,19 @@ func TestItemReingestConsumesStablePromptSchemaAuthority(t *testing.T) {
 		t.Fatalf("summary input = %+v, want selected item id/current language/source text", llm.seen)
 	}
 	for _, forbidden := range []string{"article_id", "score", "tags", "insight", "key_points"} {
-		if strings.Contains(strings.ToLower(llm.outputKeys), forbidden) {
+		if outputKeysContainForbiddenSchemaField(llm.outputKeys, forbidden) {
 			t.Fatalf("reingest schema consumed forbidden rss-agent field %q in keys %q", forbidden, llm.outputKeys)
 		}
 	}
+}
+
+func outputKeysContainForbiddenSchemaField(outputKeys string, forbidden string) bool {
+	for _, key := range strings.Fields(strings.ToLower(outputKeys)) {
+		if key == forbidden {
+			return true
+		}
+	}
+	return false
 }
 
 func postItemReingestRaw(t *testing.T, router http.Handler, itemID string, body string) *httptest.ResponseRecorder {

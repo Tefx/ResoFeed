@@ -51,16 +51,38 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 // idempotency receipts, and share the same guard/current-operation semantics as
 // ingest/fetch/library reprocess without creating durable jobs or history.
 func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string, req ItemReingestRequest) (ItemReingestResponse, error) {
-	select {
-	case <-ctx.Done():
-		return ItemReingestResponse{}, fmt.Errorf("reingest item: %w", ctx.Err())
-	default:
+	if err := ctx.Err(); err != nil {
+		return ItemReingestResponse{}, fmt.Errorf("reingest item: %w", err)
 	}
-	_ = db
-	_ = llm
-	_ = itemID
-	_ = req
-	return ItemReingestResponse{}, errors.New("reingest item: not implemented")
+	if db == nil {
+		return ItemReingestResponse{}, errors.New("reingest item: db required")
+	}
+	itemID = strings.TrimSpace(itemID)
+	if itemID == "" || strings.Contains(itemID, "/") {
+		return ItemReingestResponse{}, fieldError("item_id")
+	}
+	if err := validateItemReingestRequest(req); err != nil {
+		return ItemReingestResponse{}, err
+	}
+	release, err := tryAcquireIngestGuardWithActor(ctx, "item_reingest", itemID, string(req.ActorKind))
+	if err != nil {
+		return ItemReingestResponse{}, err
+	}
+	updateCurrentOperation("loading_item", &CurrentOperationCount{Current: 0, Total: 1}, "item reingest loading selected item")
+	var retErr error
+	defer releaseGuardRecover(release, &retErr, "reingest item")
+
+	var response ItemReingestResponse
+	applied, err := withIdempotencyReceipt(ctx, db, req.IdempotencyKey, req.ActorID, "reingest_item", itemID, itemReingestFingerprintPayload(req), &response, func() (ItemReingestResponse, error) {
+		return reingestItemUnlocked(ctx, db, llm, itemID, req)
+	})
+	if err != nil {
+		return ItemReingestResponse{}, err
+	}
+	if applied {
+		response.AlreadyApplied = true
+	}
+	return response, retErr
 }
 
 // ReingestItemForMCP maps the MCP contract shape onto the shared selected-item
@@ -68,6 +90,163 @@ func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string,
 func ReingestItemForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReingestItemInput) (ItemReingestResponse, error) {
 	req := ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
 	return ReingestItem(ctx, db, llm, input.ItemID, req)
+}
+
+func validateItemReingestRequest(req ItemReingestRequest) error {
+	if err := validateMutationRequestFields(req.MutationRequestFields); err != nil {
+		return err
+	}
+	if req.Model != nil && len([]byte(strings.TrimSpace(*req.Model))) > 200 {
+		return fieldError("model")
+	}
+	if req.Prompt != nil && len([]byte(strings.TrimSpace(*req.Prompt))) > 4000 {
+		return fieldError("prompt")
+	}
+	return nil
+}
+
+func itemReingestFingerprintPayload(req ItemReingestRequest) struct {
+	ActorKind ActorKind `json:"actor_kind"`
+	ActorID   string    `json:"actor_id"`
+	Model     string    `json:"model,omitempty"`
+	Prompt    string    `json:"prompt,omitempty"`
+} {
+	var model, prompt string
+	if req.Model != nil {
+		model = strings.TrimSpace(*req.Model)
+	}
+	if req.Prompt != nil {
+		prompt = strings.TrimSpace(*req.Prompt)
+	}
+	return struct {
+		ActorKind ActorKind `json:"actor_kind"`
+		ActorID   string    `json:"actor_id"`
+		Model     string    `json:"model,omitempty"`
+		Prompt    string    `json:"prompt,omitempty"`
+	}{ActorKind: req.ActorKind, ActorID: req.ActorID, Model: model, Prompt: prompt}
+}
+
+func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID string, req ItemReingestRequest) (ItemReingestResponse, error) {
+	language, err := readProcessingLanguage(ctx, db)
+	if err != nil {
+		return ItemReingestResponse{}, fmt.Errorf("reingest item: read processing language: %w", err)
+	}
+	item, err := loadReprocessItem(ctx, db, itemID)
+	if err != nil {
+		return ItemReingestResponse{}, err
+	}
+	updateCurrentOperation("processing_items", &CurrentOperationCount{Current: 0, Total: 1}, "item reingest processing selected item")
+	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return ItemReingestResponse{Reingest: itemReingestErrorResult(itemID, language, ReprocessErrorTimeout, "item processing timed out")}, nil
+		}
+		return ItemReingestResponse{}, err
+	}
+	result := ItemReingestResult{ItemID: itemID, Status: ReprocessStatusCompleted, Language: language}
+	if outcome.failed || outcome.unavailable || !outcome.writable() {
+		result.Status = ReprocessStatusCompletedWithErrors
+		code := outcome.errorCode
+		if code == "" {
+			code = ReprocessErrorSummaryUnavailable
+		}
+		message := outcome.errorMessage
+		if strings.TrimSpace(message) == "" {
+			message = string(code)
+		}
+		result.Error = &ReprocessErrorDetail{ItemID: &itemID, Code: code, Message: message}
+	}
+	if outcome.writable() || outcome.unavailable || outcome.storableFailure() {
+		if err := storeReprocessItem(ctx, db, itemID, outcome); err != nil {
+			return ItemReingestResponse{}, err
+		}
+		result.ItemUpdated = true
+		result.FTSUpdated = true
+	}
+	if result.ItemUpdated {
+		detail, err := ReadItemDetail(ctx, db, itemID)
+		if err != nil {
+			return ItemReingestResponse{}, err
+		}
+		result.Item = &detail
+	}
+	updateCurrentOperation("complete", &CurrentOperationCount{Current: 1, Total: 1}, "item reingest complete")
+	return ItemReingestResponse{Reingest: result}, nil
+}
+
+func itemReingestErrorResult(itemID string, language ProcessingLanguage, code ReprocessErrorCode, message string) ItemReingestResult {
+	return ItemReingestResult{ItemID: itemID, Status: ReprocessStatusFailed, Language: language, Error: &ReprocessErrorDetail{ItemID: &itemID, Code: code, Message: message}}
+}
+
+func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reprocessItem, error) {
+	row := db.QueryRowContext(ctx, `select i.id, coalesce(s.title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i left join sources s on s.id = i.source_id where i.id = ?`, itemID)
+	var item reprocessItem
+	if err := row.Scan(&item.id, &item.sourceTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return reprocessItem{}, notFoundError("item", itemID)
+		}
+		return reprocessItem{}, fmt.Errorf("reingest item: load selected item: %w", err)
+	}
+	return item, nil
+}
+
+func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest) (reprocessItemOutcome, error) {
+	sourceURL, sourceText, err := fetchReprocessSourceText(ctx, item)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return reprocessItemOutcome{}, err
+		}
+		fallbackURL, fallbackText, ok := reprocessStoredTextFallback(item)
+		if !ok {
+			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
+		}
+		sourceURL, sourceText = fallbackURL, fallbackText
+	}
+	if llm == nil {
+		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
+	}
+	input := OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableText: sourceText, TargetLanguage: language}
+	if req.Model != nil {
+		input.Model = strings.TrimSpace(*req.Model)
+	}
+	if req.Prompt != nil {
+		input.Prompt = strings.TrimSpace(*req.Prompt)
+	}
+	out, err := llm.SummarizeItem(ctx, input)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return reprocessItemOutcome{}, err
+		}
+		status := classifyModelFailureStatus(err, out.ModelStatus)
+		code := reprocessErrorCodeForModelStatus(status)
+		return failedReprocessOutcome(sourceURL, code, string(code), status), nil
+	}
+	out, err = validateSummaryOutputForPersistence(out)
+	if err != nil {
+		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, string(ReprocessErrorDecodeError), modelStatusDecodeError), nil
+	}
+	modelStatus := mapModelStatus(out.ModelStatus)
+	if modelStatus != modelStatusOK {
+		code := reprocessErrorCodeForModelStatus(modelStatus)
+		return unavailableReprocessOutcome(sourceURL, code, string(code)), nil
+	}
+	title := strings.TrimSpace(out.Title)
+	if isUnusableReprocessOutputTitle(title) {
+		title = reprocessInputTitle(item)
+	}
+	result := reprocessItemOutcome{title: title, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
+	if result.extractedText == nil && language != ProcessingLanguageChinese {
+		result.extractedText = nullableString(sourceText)
+	}
+	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
+	sanitizeReadableItem(&itemForSanitize)
+	result.title = itemForSanitize.Title
+	result.summary = itemForSanitize.Summary
+	result.coreInsight = itemForSanitize.CoreInsight
+	result.feedExcerpt = itemForSanitize.FeedExcerpt
+	result.extractedText = itemForSanitize.ExtractedText
+	result.valueTier = itemForSanitize.ValueTier
+	return result, nil
 }
 
 func reprocessLibraryFresh(ctx context.Context, db *sql.DB, llm LLMClient) (ret ReprocessLibraryResponse, retErr error) {
@@ -232,55 +411,7 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 }
 
 func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage) (reprocessItemOutcome, error) {
-	sourceURL, sourceText, err := fetchReprocessSourceText(ctx, item)
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			return reprocessItemOutcome{}, err
-		}
-		fallbackURL, fallbackText, ok := reprocessStoredTextFallback(item)
-		if !ok {
-			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
-		}
-		sourceURL, sourceText = fallbackURL, fallbackText
-	}
-	if llm == nil {
-		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
-	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableText: sourceText, TargetLanguage: language})
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			return reprocessItemOutcome{}, err
-		}
-		status := classifyModelFailureStatus(err, out.ModelStatus)
-		code := reprocessErrorCodeForModelStatus(status)
-		return failedReprocessOutcome(sourceURL, code, string(code), status), nil
-	}
-	out, err = validateSummaryOutputForPersistence(out)
-	if err != nil {
-		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, string(ReprocessErrorDecodeError), modelStatusDecodeError), nil
-	}
-	modelStatus := mapModelStatus(out.ModelStatus)
-	if modelStatus != modelStatusOK {
-		code := reprocessErrorCodeForModelStatus(modelStatus)
-		return unavailableReprocessOutcome(sourceURL, code, string(code)), nil
-	}
-	title := strings.TrimSpace(out.Title)
-	if isUnusableReprocessOutputTitle(title) {
-		title = reprocessInputTitle(item)
-	}
-	result := reprocessItemOutcome{title: title, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
-	if result.extractedText == nil && language != ProcessingLanguageChinese {
-		result.extractedText = nullableString(sourceText)
-	}
-	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
-	sanitizeReadableItem(&itemForSanitize)
-	result.title = itemForSanitize.Title
-	result.summary = itemForSanitize.Summary
-	result.coreInsight = itemForSanitize.CoreInsight
-	result.feedExcerpt = itemForSanitize.FeedExcerpt
-	result.extractedText = itemForSanitize.ExtractedText
-	result.valueTier = itemForSanitize.ValueTier
-	return result, nil
+	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{})
 }
 
 func reprocessStoredTextFallback(item reprocessItem) (string, string, bool) {
