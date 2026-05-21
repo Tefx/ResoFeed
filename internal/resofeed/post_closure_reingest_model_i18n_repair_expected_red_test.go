@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -57,6 +59,170 @@ func TestPostClosureOpenRouterModelListHTTPRouteCompatibilityExpectedRed(t *test
 			}
 		})
 	}
+}
+
+func TestPostClosureModelListProviderFailureRedactionExpectedRed(t *testing.T) {
+	providerPayload := `{"error":{"message":"OpenRouter upstream rejected key sk-or-provider-secret from /Users/owner/project/.env with owner-token owner-token-provider-leak"}}`
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, providerPayload, http.StatusUnauthorized)
+	}))
+	t.Cleanup(provider.Close)
+
+	t.Setenv("RESOFEED_E2E", "1")
+	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", provider.URL)
+	t.Setenv("OPENROUTER_KEY", "sk-or-local-secret-from-env")
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/runtime/openrouter-models", nil))
+
+	if recorder.Code != http.StatusServiceUnavailable {
+		t.Fatalf("model-list provider failure status = %d, want %d redacted service-unavailable error; body=%s", recorder.Code, http.StatusServiceUnavailable, recorder.Body.String())
+	}
+	assertContentType(t, recorder, "application/json; charset=utf-8")
+	var parsed ErrorBody
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal model-list provider error: %v; body=%s", err, recorder.Body.String())
+	}
+	if parsed.Error.Code != "provider_unavailable" && parsed.Error.Code != "internal" {
+		t.Fatalf("provider failure error.code = %q, want generic provider_unavailable/internal", parsed.Error.Code)
+	}
+	if strings.TrimSpace(parsed.Error.Message) == "" || strings.Contains(strings.ToLower(parsed.Error.Message), "openrouter") {
+		t.Fatalf("provider failure message = %q, want generic redacted message", parsed.Error.Message)
+	}
+	assertResponseOmitsForbiddenSubstrings(t, recorder.Body.String(), []string{
+		"OpenRouter upstream rejected", "sk-or-provider-secret", "sk-or-local-secret-from-env", ".env", "/Users/owner/project/.env", "owner-token-provider-leak", contractOwnerToken, providerPayload,
+	})
+}
+
+func TestPostClosureModelListCanonicalAndCompatRouteSemanticsExpectedRed(t *testing.T) {
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/models" {
+			http.NotFound(w, r)
+			return
+		}
+		if got := r.Header.Get("Authorization"); !strings.HasPrefix(got, "Bearer ") || got == "Bearer " {
+			http.Error(w, `{"error":{"message":"missing provider authorization"}}`, http.StatusUnauthorized)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"data":[{"id":"openrouter/test-model","name":"Test Model"}]}`)
+	}))
+	t.Cleanup(provider.Close)
+	t.Setenv("RESOFEED_E2E", "1")
+	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", provider.URL)
+	t.Setenv("OPENROUTER_KEY", "sk-or-route-equivalence-secret")
+
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	canonical := "/api/runtime/openrouter-models"
+	compat := "/api/runtime/openrouter/models"
+
+	for _, tc := range []struct {
+		name       string
+		pathSuffix string
+		authorized bool
+		token      string
+		wantStatus int
+	}{
+		{name: "missing token", wantStatus: http.StatusUnauthorized},
+		{name: "invalid token", authorized: true, token: "wrong-owner-token", wantStatus: http.StatusUnauthorized},
+		{name: "invalid query", pathSuffix: "?limit=1", authorized: true, token: contractOwnerToken, wantStatus: http.StatusBadRequest},
+		{name: "success", authorized: true, token: contractOwnerToken, wantStatus: http.StatusOK},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			left := exerciseModelListRoute(router, canonical+tc.pathSuffix, tc.authorized, tc.token)
+			right := exerciseModelListRoute(router, compat+tc.pathSuffix, tc.authorized, tc.token)
+			assertModelListRouteEquivalent(t, canonical, left, compat, right)
+			if left.status != tc.wantStatus {
+				t.Fatalf("%s %s status = %d, want %d; body=%s", tc.name, canonical, left.status, tc.wantStatus, left.body)
+			}
+			if tc.wantStatus == http.StatusBadRequest {
+				assertNormalizedError(t, left.body, "bad_request", "bad request", "limit")
+			}
+			if tc.wantStatus == http.StatusOK {
+				assertModelListSuccessShape(t, left.body)
+			}
+		})
+	}
+
+	failingProvider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, `{"error":{"message":"OpenRouter raw provider leak sk-or-route-equivalence-secret /tmp/.env owner-token-route"}}`, http.StatusBadGateway)
+	}))
+	t.Cleanup(failingProvider.Close)
+	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", failingProvider.URL)
+	left := exerciseModelListRoute(router, canonical, true, contractOwnerToken)
+	right := exerciseModelListRoute(router, compat, true, contractOwnerToken)
+	assertModelListRouteEquivalent(t, canonical, left, compat, right)
+	if left.status != http.StatusServiceUnavailable {
+		t.Fatalf("provider failure status = %d, want %d; body=%s", left.status, http.StatusServiceUnavailable, left.body)
+	}
+	assertResponseOmitsForbiddenSubstrings(t, left.body+right.body, []string{"OpenRouter raw provider leak", "sk-or-route-equivalence-secret", ".env", "owner-token-route"})
+}
+
+func TestPostClosureItemReingestPromptModelIdempotencyFingerprintExpectedRed(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedItemReingestFixture(t, ctx, db)
+	llm := &postClosureRecordingLLM{}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
+
+	canonicalBody := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"post-closure-fingerprint","model":"  openrouter/test-model  ","prompt":"  tighten factual density  "}`
+	first := postClosureAuthorizedJSON(router, http.MethodPost, "/api/items/item_reingest_01/reingest", canonicalBody)
+	assertStatus(t, first, http.StatusOK)
+	if llm.calls != 1 || llm.last.Model != "openrouter/test-model" || llm.last.Prompt != "tighten factual density" {
+		t.Fatalf("first model call count/input = %d %+v, want one call with normalized model/prompt", llm.calls, llm.last)
+	}
+
+	replay := postClosureAuthorizedJSON(router, http.MethodPost, "/api/items/item_reingest_01/reingest", canonicalBody)
+	assertStatus(t, replay, http.StatusOK)
+	var replayBody ItemReingestResponse
+	if err := json.Unmarshal(replay.Body.Bytes(), &replayBody); err != nil {
+		t.Fatalf("unmarshal replay response: %v; body=%s", err, replay.Body.String())
+	}
+	if !replayBody.AlreadyApplied {
+		t.Fatalf("same key/model/prompt replay = %+v, want already_applied", replayBody)
+	}
+	if llm.calls != 1 {
+		t.Fatalf("same key/model/prompt replay called model again: calls=%d", llm.calls)
+	}
+
+	changedPrompt := postClosureAuthorizedJSON(router, http.MethodPost, "/api/items/item_reingest_01/reingest", `{"actor_kind":"human","actor_id":"owner","idempotency_key":"post-closure-fingerprint","model":"openrouter/test-model","prompt":"changed retry instruction"}`)
+	assertStatus(t, changedPrompt, http.StatusBadRequest)
+	assertErrorField(t, changedPrompt.Body.Bytes(), "idempotency_key")
+	if llm.calls != 1 {
+		t.Fatalf("changed prompt conflict called model: calls=%d", llm.calls)
+	}
+
+	changedModel := postClosureAuthorizedJSON(router, http.MethodPost, "/api/items/item_reingest_01/reingest", `{"actor_kind":"human","actor_id":"owner","idempotency_key":"post-closure-fingerprint","model":"openrouter/other-model","prompt":"tighten factual density"}`)
+	assertStatus(t, changedModel, http.StatusBadRequest)
+	assertErrorField(t, changedModel.Body.Bytes(), "idempotency_key")
+	if llm.calls != 1 {
+		t.Fatalf("changed model conflict called model: calls=%d", llm.calls)
+	}
+}
+
+func TestPostClosureItemReingestCurrentOperationGuardConflictExpectedRed(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedItemReingestFixture(t, ctx, db)
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: &postClosureRecordingLLM{}})
+
+	release, err := tryAcquireIngestGuardWithActor(ctx, "item_reingest", "item_reingest_01", string(ActorKindHuman))
+	if err != nil {
+		t.Fatalf("hold item reingest guard: %v", err)
+	}
+	t.Cleanup(release)
+
+	recorder := postClosureAuthorizedJSON(router, http.MethodPost, "/api/items/item_reingest_01/reingest", `{"actor_kind":"human","actor_id":"owner","idempotency_key":"post-closure-guard-conflict"}`)
+	assertStatus(t, recorder, http.StatusConflict)
+	var parsed ErrorBody
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal guard conflict: %v; body=%s", err, recorder.Body.String())
+	}
+	if parsed.Error.Code != "conflict" || parsed.Error.Message != "operation already running" {
+		t.Fatalf("guard conflict error = %+v, want conflict operation already running", parsed.Error)
+	}
+	assertHTTPConflictDetailsWithCurrentOperation(t, parsed.Error.Details, "item_reingest", "human")
 }
 
 func TestPostClosureItemReingestHTTPPromptExtraPromptOwnerAuthExpectedRed(t *testing.T) {
@@ -166,6 +332,103 @@ func postClosureAuthorizedJSON(router http.Handler, method string, path string, 
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(recorder, req)
 	return recorder
+}
+
+type postClosureRouteResult struct {
+	status      int
+	contentType string
+	body        string
+	normalized  string
+}
+
+func exerciseModelListRoute(router http.Handler, path string, setToken bool, token string) postClosureRouteResult {
+	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, path, nil)
+	if setToken {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	router.ServeHTTP(recorder, req)
+	body := recorder.Body.String()
+	return postClosureRouteResult{status: recorder.Code, contentType: recorder.Header().Get("Content-Type"), body: body, normalized: normalizeModelListRouteBody(body)}
+}
+
+func normalizeModelListRouteBody(body string) string {
+	var value any
+	if err := json.Unmarshal([]byte(body), &value); err != nil {
+		return strings.TrimSpace(body)
+	}
+	normalized, err := json.Marshal(value)
+	if err != nil {
+		return strings.TrimSpace(body)
+	}
+	return string(normalized)
+}
+
+func assertModelListRouteEquivalent(t *testing.T, leftPath string, left postClosureRouteResult, rightPath string, right postClosureRouteResult) {
+	t.Helper()
+	if left.status != right.status {
+		t.Fatalf("model-list route status drift: %s=%d body=%s; %s=%d body=%s", leftPath, left.status, left.body, rightPath, right.status, right.body)
+	}
+	if left.contentType != right.contentType {
+		t.Fatalf("model-list route content-type drift: %s=%q; %s=%q", leftPath, left.contentType, rightPath, right.contentType)
+	}
+	if left.normalized != right.normalized {
+		t.Fatalf("model-list route body drift:\n%s: %s\n%s: %s", leftPath, left.normalized, rightPath, right.normalized)
+	}
+}
+
+func assertNormalizedError(t *testing.T, body string, wantCode string, wantMessage string, wantField string) {
+	t.Helper()
+	var parsed ErrorBody
+	if err := json.Unmarshal([]byte(body), &parsed); err != nil {
+		t.Fatalf("unmarshal normalized error: %v; body=%s", err, body)
+	}
+	if parsed.Error.Code != wantCode || parsed.Error.Message != wantMessage {
+		t.Fatalf("error = %+v, want code=%q message=%q", parsed.Error, wantCode, wantMessage)
+	}
+	if wantField != "" && parsed.Error.Details["field"] != wantField {
+		t.Fatalf("error.details.field = %#v, want %q", parsed.Error.Details["field"], wantField)
+	}
+}
+
+func assertModelListSuccessShape(t *testing.T, body string) {
+	t.Helper()
+	var parsed OpenRouterModelsResponse
+	if err := json.Unmarshal([]byte(body), &parsed); err != nil {
+		t.Fatalf("unmarshal model-list success: %v; body=%s", err, body)
+	}
+	if len(parsed.Models) != 1 || parsed.Models[0].ID != "openrouter/test-model" || parsed.Models[0].Name != "Test Model" {
+		t.Fatalf("model-list success = %+v, want normalized id/name model payload", parsed)
+	}
+}
+
+func assertResponseOmitsForbiddenSubstrings(t *testing.T, body string, forbidden []string) {
+	t.Helper()
+	for _, marker := range forbidden {
+		if marker == "" {
+			continue
+		}
+		if strings.Contains(body, marker) {
+			t.Fatalf("response leaked forbidden marker %q in body=%s", marker, body)
+		}
+	}
+}
+
+func assertHTTPConflictDetailsWithCurrentOperation(t *testing.T, details map[string]any, wantOperation string, wantActorKind string) {
+	t.Helper()
+	if details["operation_running"] != true || details["retry_allowed"] != true {
+		t.Fatalf("guard details missing retryable operation flags: %+v", details)
+	}
+	if details["operation"] != wantOperation || details["actor_kind"] != wantActorKind {
+		t.Fatalf("guard details operation/actor = %s/%s, want %s/%s; details=%+v", fmt.Sprint(details["operation"]), fmt.Sprint(details["actor_kind"]), wantOperation, wantActorKind, details)
+	}
+	current, ok := details["current_operation"].(map[string]any)
+	if !ok {
+		t.Fatalf("guard details current_operation = %#v, want object", details["current_operation"])
+	}
+	if current["running"] != true || current["kind"] != wantOperation || current["actor_kind"] != wantActorKind {
+		t.Fatalf("current_operation = %+v, want running %s/%s", current, wantOperation, wantActorKind)
+	}
 }
 
 func assertNoPostClosurePromptModelRuntimeState(t *testing.T, ctx context.Context, db *sql.DB, forbidden []string) {
