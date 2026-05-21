@@ -25,14 +25,17 @@ func TestDoctorClassifiesEmptyConfiguredOpenRouterStartupAsNoItemsProcessedYet(t
 
 	mcpDoctor := mcpResourceText(t, NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm}), "resofeed://system/doctor")
 	assertEmptyConfiguredOpenRouterDoctor(t, mcpDoctor)
+	t.Logf("raw /api/doctor response:\n%s", recorder.Body.String())
+	t.Logf("raw MCP doctor response:\n%s", mcpDoctor)
 }
 
 func assertEmptyConfiguredOpenRouterDoctor(t *testing.T, body string) {
 	t.Helper()
+	assertDoctorHasNoSameLineDuplicateKeys(t, body)
 	for _, want := range []string{
-		"openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown",
-		"openrouter: model_resolved=false resolved_model=unknown model_resolved: false",
-		"openrouter: item_transform_failures=0 item_transform_failures: 0",
+		"openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini",
+		"openrouter: model_resolved=false resolved_model=unknown",
+		"openrouter: item_transform_failures=0",
 		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
 		"openrouter: live_summary_successes=0 fallback_only_current_summaries=0",
 		"openrouter: health_classification=no_items_processed_yet",
@@ -47,6 +50,41 @@ func assertEmptyConfiguredOpenRouterDoctor(t *testing.T, body string) {
 			t.Fatalf("empty configured OpenRouter doctor output leaked or confused forbidden text %q:\n%s", forbidden, body)
 		}
 	}
+}
+
+func assertDoctorHasNoSameLineDuplicateKeys(t *testing.T, body string) {
+	t.Helper()
+	for _, line := range strings.Split(body, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		seen := map[string]bool{}
+		for _, field := range strings.Fields(line) {
+			key, ok := doctorLineFieldKey(field)
+			if !ok {
+				continue
+			}
+			if seen[key] {
+				t.Fatalf("doctor line duplicated diagnostic key %q: %s\nfull output:\n%s", key, line, body)
+			}
+			seen[key] = true
+		}
+	}
+}
+
+func doctorLineFieldKey(field string) (string, bool) {
+	field = strings.TrimSpace(field)
+	if field == "" || strings.HasSuffix(field, ":") {
+		return "", false
+	}
+	if before, _, ok := strings.Cut(field, "="); ok && before != "" {
+		return strings.TrimSuffix(before, ":"), true
+	}
+	if before, _, ok := strings.Cut(field, ":"); ok && before != "" {
+		return before, true
+	}
+	return "", false
 }
 
 func TestREG2026051206DoctorClassifiesStalePriorFailuresSeparatelyFromCurrentLiveSuccess(t *testing.T) {
@@ -70,6 +108,7 @@ values
 		t.Fatalf("WriteDoctorWithConfig returned error: %v", err)
 	}
 	body := out.String()
+	assertDoctorHasNoSameLineDuplicateKeys(t, body)
 	for _, want := range []string{
 		"openrouter: item_transform_failures=1",
 		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=1",
@@ -100,9 +139,10 @@ values ('current_model_success_only', 'src_llm_healthy', 'https://llm-healthy.ex
 		t.Fatalf("WriteDoctorWithConfig returned error: %v", err)
 	}
 	body := out.String()
+	assertDoctorHasNoSameLineDuplicateKeys(t, body)
 	for _, want := range []string{
-		"openrouter: provider_reachable=true configured_model=openrouter/configured provider_reachable: true",
-		"openrouter: model_resolved=true resolved_model=openrouter/resolved model_resolved: true",
+		"openrouter: provider_reachable=true configured_model=openrouter/configured",
+		"openrouter: model_resolved=true resolved_model=openrouter/resolved",
 		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
 		"openrouter: live_summary_successes=1 fallback_only_current_summaries=0",
 		"openrouter: health_classification=openrouter_live_summary_ok",

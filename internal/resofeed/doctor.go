@@ -98,7 +98,7 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	}
 	lines = append(lines, openRouterProviderDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
-	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d item_transform_failures: %d", modelFailureCount, modelFailureCount))
+	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d", modelFailureCount))
 	lines = append(lines, fmt.Sprintf("openrouter: current_item_transform_failures=%d historic_item_transform_failures=%d", health.CurrentFailures, health.HistoricFailures))
 	lines = append(lines, fmt.Sprintf("openrouter: live_summary_successes=%d fallback_only_current_summaries=%d", health.CurrentLiveSuccesses, health.CurrentFallbackOnly))
 	lines = append(lines, "openrouter: health_classification="+health.classification(cfg))
@@ -226,7 +226,7 @@ func openRouterProviderDoctorLine(cfg DoctorConfig) string {
 	if strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
 		providerReachable = "true"
 	}
-	return "openrouter: provider_reachable=" + providerReachable + " configured_model=" + configured + " provider_reachable: " + providerReachable
+	return "openrouter: provider_reachable=" + providerReachable + " configured_model=" + configured
 }
 
 func openRouterModelDoctorLine(cfg DoctorConfig) string {
@@ -236,7 +236,7 @@ func openRouterModelDoctorLine(cfg DoctorConfig) string {
 		resolved = "unknown"
 		modelResolved = "false"
 	}
-	return "openrouter: model_resolved=" + modelResolved + " resolved_model=" + resolved + " model_resolved: " + modelResolved
+	return "openrouter: model_resolved=" + modelResolved + " resolved_model=" + resolved
 }
 
 func countItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, column string, failingStatuses []string) (int, error) {
