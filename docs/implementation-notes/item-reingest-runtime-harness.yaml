@@ -1,0 +1,118 @@
+item_reingest_runtime_harness_contract:
+  status: accepted_contract_artifact
+  scope:
+    purpose: >-
+      Define the deterministic runtime harness for later live, smoke, and browser
+      verification of Inspector item re-ingest without changing product runtime or UI
+      implementation.
+    may_touch:
+      - docs/implementation-notes/item-reingest-runtime-harness.yaml
+      - web/tests/e2e/inspector-reingest.expected-red.spec.ts
+      - web/src/lib/playwright-e2e-harness-contract.ts
+    must_not_touch:
+      - internal/resofeed/*.go product implementation
+      - web/src/** product UI implementation
+
+  repo_authoritative_commands:
+    backend_build: "mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed"
+    preferred_browser_script: "npm --prefix web run test:e2e"
+    fallback_browser_command: "npm --prefix web exec playwright test -- --config web/playwright.config.ts"
+    live_smoke_command: "OPENROUTER_KEY=\"$OPENROUTER_KEY\" npm --prefix web exec playwright test -- --config web/playwright.config.ts --grep @live-openrouter"
+
+  launch_shape:
+    binary: ".test-artifacts/bin/resofeed"
+    argv:
+      - serve
+      - "--addr"
+      - "127.0.0.1:<reserved_port>"
+      - "--public-url"
+      - "<baseURL>"
+      - "--db"
+      - "<dbPath>"
+      - "--owner-token"
+      - "<E2E_OWNER_TOKEN>"
+    environment_source: "sanitizedRuntimeEnv(openRouterEndpoint)"
+    cwd: "repo root"
+    readiness_probe: "GET <baseURL>/api/feed/today returns 401, proving the real binary has bound and auth is observable"
+
+  deterministic_runtime_provenance:
+    port_allocation: "reservePort() allocates the browser server port and the OpenRouter stub port before launch"
+    base_url: "baseURL = http://127.0.0.1:<reserved_port>; exported as RESOFEED_E2E_BASE_URL after launch"
+    artifact_root: ".test-artifacts/playwright"
+    binary_dir: ".test-artifacts/bin"
+    run_info_json: ".test-artifacts/playwright/run-info.json; exported as RESOFEED_E2E_RUN_INFO"
+    owner_token_export: "RESOFEED_E2E_OWNER_TOKEN receives E2E_OWNER_TOKEN for Playwright fixtures only"
+    db_path_pattern: ".test-artifacts/playwright/fixtures/resofeed-e2e-<Date.now()>-<process.pid>.sqlite3"
+    seeded_item_contract:
+      fixture_feed_xml: ".test-artifacts/playwright/fixtures/local-feed.xml from fixtureFeedXml"
+      fixture_opml: ".test-artifacts/playwright/fixtures/flattened.opml from fixtureOpml(fixtureServer.url)"
+      item_selection: >-
+        Re-ingest proofs must identify the target item id/title from runtime API or DB
+        after deterministic fixture ingestion, not from a hard-coded browser-only mock.
+      before_after_db_capture:
+        before: "Capture items row fields and search_fts match/count for the seeded item before POST /api/items/<id>/reingest."
+        after: "Capture the same items row fields and search_fts match/count after re-ingest completes."
+        required_fields:
+          - items.id
+          - items.title
+          - items.summary
+          - items.core_insight
+          - items.feed_excerpt
+          - items.extracted_text
+          - items.extraction_status
+          - items.model_status
+          - search_fts row/match evidence for changed readable text
+
+  openrouter_modes:
+    ci_safe_stub:
+      starter: "startOpenRouterStub(stubPort, stubStdoutPath, stubStderrPath)"
+      health_probe: "GET <openRouterEndpoint>/healthz must return ok before launching resofeed"
+      endpoint_env: "RESOFEED_E2E_OPENROUTER_ENDPOINT=<openRouterEndpoint>"
+      key: "E2E_FAKE_OPENROUTER_KEY"
+      default_key_value: "resofeed_e2e_non_secret_openrouter_key"
+    live_openrouter:
+      enabled_by:
+        - "RESOFEED_E2E_LIVE_OPENROUTER=1"
+        - "Playwright argv containing @live-openrouter"
+        - "Playwright argv containing @llm-live"
+      key_source: "OPENROUTER_KEY from OS environment only, trimmed and redacted in evidence"
+      endpoint_env: "RESOFEED_E2E_OPENROUTER_ENDPOINT is not forwarded in live mode when a live key is present"
+
+  redaction_contract:
+    owner_token: "E2E_OWNER_TOKEN and Authorization bearer values are redacted from all logs/artifacts."
+    openrouter_key: "E2E_FAKE_OPENROUTER_KEY and live OPENROUTER_KEY are redacted from all logs/artifacts."
+    redact_log_file_behavior: >-
+      redactLogFile(filePath) must replace E2E_OWNER_TOKEN with <redacted-owner-token>,
+      E2E_FAKE_OPENROUTER_KEY and any live key with <redacted-openrouter-key>,
+      OPENROUTER_KEY=... with OPENROUTER_KEY=<redacted>, and Authorization bearer
+      headers with Authorization: Bearer <redacted>.
+
+  artifacts:
+    server_stdout: ".test-artifacts/playwright/server-logs/server.stdout.log"
+    server_stderr: ".test-artifacts/playwright/server-logs/server.stderr.log"
+    openrouter_stub_stdout: ".test-artifacts/playwright/server-logs/openrouter-stub.stdout.log"
+    openrouter_stub_stderr: ".test-artifacts/playwright/server-logs/openrouter-stub.stderr.log"
+    fixture_server_stdout: ".test-artifacts/playwright/server-logs/fixture-server.stdout.log"
+    fixture_server_stderr: ".test-artifacts/playwright/server-logs/fixture-server.stderr.log"
+    sanitized_environment: ".test-artifacts/playwright/sanitized-environment.md"
+    playwright_html_report: ".test-artifacts/playwright/html-report"
+    playwright_results_json: ".test-artifacts/playwright/results/results.json"
+    playwright_junit: ".test-artifacts/playwright/results/junit.xml"
+    playwright_trace: ".test-artifacts/playwright/test-output/**/trace.zip retained on failure"
+    screenshots: ".test-artifacts/playwright/test-output/**/*.{png,jpg,jpeg} and explicit test attachments"
+    dom_snapshots: ".test-artifacts/playwright/test-output/**/*.dom.html and explicit DOM attachments"
+    aria_snapshots: ".test-artifacts/playwright/test-output/**/*.aria.txt and explicit ARIA attachments"
+
+  item_reingest_browser_proof_contract:
+    must_use_real_runtime: true
+    forbidden_proof_only_modes:
+      - "route-fulfilled happy-path mocks as the only evidence"
+      - "direct component method calls without browser/server runtime"
+    required_sequence:
+      - "Build .test-artifacts/bin/resofeed."
+      - "Launch the real binary with the launch_shape above."
+      - "Seed the deterministic feed/source/item through fixture OPML or API operations."
+      - "Open the Inspector in Playwright using RESOFEED_E2E_BASE_URL and RESOFEED_E2E_OWNER_TOKEN."
+      - "Capture pre-submit screenshot, DOM snapshot, ARIA snapshot, server logs, and DB/FTS before state."
+      - "Submit [RE-INGEST ITEM] against the real /api/items/<id>/reingest endpoint."
+      - "Capture response-visible UI, server logs, DB/FTS after state, screenshot, DOM snapshot, and ARIA snapshot."
