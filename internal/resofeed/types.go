@@ -177,6 +177,57 @@ type ItemState struct {
 	LastActorID        *string    `json:"last_actor_id"`
 }
 
+// OpenRouterModelInfo is the contract-only model listing DTO for the runtime
+// OpenRouter account. It is intentionally ephemeral and must not be persisted as
+// selected model state, prompt state, or provider configuration.
+type OpenRouterModelInfo struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// OpenRouterModelsResponse is the HTTP/MCP model listing response shape. Errors
+// that occur while fetching models must be redacted and must never leak API keys,
+// owner tokens, .env paths, or raw provider payloads.
+type OpenRouterModelsResponse struct {
+	Models []OpenRouterModelInfo `json:"models"`
+}
+
+// ItemReingestRequest is the selected Inspector item re-ingest mutation body.
+// It uses the same actor/idempotency boundary as other owner-authorized
+// mutations and intentionally excludes processing-language overrides.
+type ItemReingestRequest struct {
+	MutationRequestFields
+}
+
+// ItemReingestResult is the selected-item re-ingest response payload. It reports
+// only the current item rewrite and derived search-index refresh, not a job,
+// queue, history entry, or durable progress record.
+type ItemReingestResult struct {
+	ItemID      string                `json:"item_id"`
+	Status      ReprocessStatus       `json:"status"`
+	Language    ProcessingLanguage    `json:"language"`
+	ItemUpdated bool                  `json:"item_updated"`
+	FTSUpdated  bool                  `json:"fts_updated"`
+	Error       *ReprocessErrorDetail `json:"error"`
+	Item        *ItemDetail           `json:"item"`
+}
+
+// ItemReingestResponse is returned by HTTP selected-item re-ingest and MCP
+// reingest_item. Same-key/same-fingerprint replay returns AlreadyApplied=true.
+type ItemReingestResponse struct {
+	Reingest       ItemReingestResult `json:"reingest"`
+	AlreadyApplied bool               `json:"already_applied"`
+}
+
+// MCPReingestItemInput is the MCP parity input schema for selected-item
+// re-ingest. The runtime language is read from persisted metadata; per-call
+// language overrides are deliberately not admitted.
+type MCPReingestItemInput struct {
+	ItemID         string `json:"item_id"`
+	ActorID        string `json:"actor_id"`
+	IdempotencyKey string `json:"idempotency_key"`
+}
+
 // SteerRule is the current steering policy row. Only active rules affect
 // ranking; inactive/superseded rows are not a command history UI. MCP must use
 // the canonical RulesResponse envelope rather than an MCP-only rule shape.

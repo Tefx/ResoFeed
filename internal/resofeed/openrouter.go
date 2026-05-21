@@ -46,6 +46,20 @@ func NewOpenRouterClient(cfg OpenRouterConfig) LLMClient {
 	}
 }
 
+// ListOpenRouterModels is a contract-only declaration for the runtime model
+// listing surface. The implementation must fetch OpenRouter's models endpoint at
+// request time, redact provider/API-key details on failure, and avoid persisting
+// model-list or prompt state.
+func ListOpenRouterModels(ctx context.Context, cfg OpenRouterConfig) (OpenRouterModelsResponse, error) {
+	select {
+	case <-ctx.Done():
+		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: %w", ctx.Err())
+	default:
+	}
+	_ = cfg
+	return OpenRouterModelsResponse{}, errors.New("openrouter models: not implemented")
+}
+
 type openRouterHTTPClient struct {
 	apiKey        string
 	model         string

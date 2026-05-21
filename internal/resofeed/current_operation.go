@@ -134,6 +134,8 @@ func canonicalOperationKind(kind string, scope any) string {
 		return "source_fetch"
 	case "reprocess":
 		return "library_reprocess"
+	case "item_reingest":
+		return "item_reingest"
 	default:
 		return kind
 	}
@@ -160,6 +162,8 @@ func currentOperationStartMessage(kind string) string {
 		return "manual source fetch starting"
 	case "library_reprocess":
 		return "library reprocess starting"
+	case "item_reingest":
+		return "item reingest starting"
 	default:
 		return "operation running"
 	}

@@ -14,6 +14,10 @@ import (
 
 const reprocessLibraryTimeout = 10 * time.Minute
 
+const ItemReingestHTTPPathPrefix = "/api/items/"
+
+const ItemReingestHTTPPathSuffix = "/reingest"
+
 // ReprocessLibrary rewrites existing user-readable item fields into the current
 // runtime processing language and rebuilds FTS at the end. It is intentionally a
 // one-time operation with no durable coordination artifacts.
@@ -39,6 +43,31 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 		response.AlreadyApplied = true
 	}
 	return response, nil
+}
+
+// ReingestItem is a contract-only declaration for the Inspector selected-item
+// re-ingest operation. The future implementation must re-fetch/reprocess exactly
+// one item in the current processing language, refresh that item's FTS row, use
+// idempotency receipts, and share the same guard/current-operation semantics as
+// ingest/fetch/library reprocess without creating durable jobs or history.
+func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string, req ItemReingestRequest) (ItemReingestResponse, error) {
+	select {
+	case <-ctx.Done():
+		return ItemReingestResponse{}, fmt.Errorf("reingest item: %w", ctx.Err())
+	default:
+	}
+	_ = db
+	_ = llm
+	_ = itemID
+	_ = req
+	return ItemReingestResponse{}, errors.New("reingest item: not implemented")
+}
+
+// ReingestItemForMCP maps the MCP contract shape onto the shared selected-item
+// re-ingest declaration. It is intentionally a thin parity boundary.
+func ReingestItemForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReingestItemInput) (ItemReingestResponse, error) {
+	req := ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	return ReingestItem(ctx, db, llm, input.ItemID, req)
 }
 
 func reprocessLibraryFresh(ctx context.Context, db *sql.DB, llm LLMClient) (ret ReprocessLibraryResponse, retErr error) {
