@@ -1,0 +1,43 @@
+{
+  "baseURL": "http://127.0.0.1:57055",
+  "binaryPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/bin/resofeed",
+  "dbPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1779378648042-68270.sqlite3",
+  "ownerToken": "<redacted-owner-token>",
+  "artifactRoot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright",
+  "server": {
+    "pid": 68357,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/server.stderr.log"
+  },
+  "fixtureServer": {
+    "pid": 68271,
+    "url": "http://127.0.0.1:57052/e2e-feed.xml",
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/fixture-server.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/fixture-server.stderr.log"
+  },
+  "openRouterStub": {
+    "endpoint": "http://127.0.0.1:57056",
+    "pid": 68356,
+    "stdoutPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stdout.log",
+    "stderrPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/server-logs/openrouter-stub.stderr.log"
+  },
+  "sanitizedEnvironment": {
+    "allowedVariables": [
+      "PATH",
+      "HOME",
+      "TMPDIR",
+      "RESOFEED_E2E",
+      "RESOFEED_E2E_OPENROUTER_ENDPOINT",
+      "OPENROUTER_KEY"
+    ],
+    "openRouterKey": "ci-safe-fake-key",
+    "notesPath": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/item-reingest-system-verification.runtime-smoke-and-parity-retest/.test-artifacts/playwright/sanitized-environment.md"
+  },
+  "env_exports": {
+    "RESOFEED_E2E_BASE_URL": "http://127.0.0.1:57055",
+    "RESOFEED_E2E_RUN_INFO": ".test-artifacts/playwright/run-info.json",
+    "RESOFEED_E2E_OWNER_TOKEN": "<redacted-owner-token>"
+  },
+  "ownerTokenSource": "global-setup E2E_OWNER_TOKEN supplied to real binary via --owner-token and exported as RESOFEED_E2E_OWNER_TOKEN; value redacted in preserved auditor artifact",
+  "openRouterEndpointSource": "global-setup deterministic local OpenRouter stub via RESOFEED_E2E_OPENROUTER_ENDPOINT; sanitizedEnvironment.openRouterKey=ci-safe-fake-key"
+}
