@@ -220,7 +220,13 @@ export class ResoFeedApiClient {
   }
 
   async reingestItem(id: OpaqueId, request?: Partial<ItemReingestRequest>): Promise<ItemReingestResponse> {
+    const compatibilityRequest = request as (Partial<ItemReingestRequest> & { extra_prompt?: string | null }) | undefined;
+    const model = request?.model?.trim() ?? '';
     const prompt = request?.prompt?.trim() ?? '';
+    const extraPrompt = compatibilityRequest?.extra_prompt?.trim() ?? '';
+    const promptFields = compatibilityRequest && Object.prototype.hasOwnProperty.call(compatibilityRequest, 'extra_prompt')
+      ? { extra_prompt: extraPrompt.length > 0 ? extraPrompt : null }
+      : { prompt: prompt.length > 0 ? prompt : null };
     return this.request<ItemReingestResponse>(`/api/items/${encodeURIComponent(id)}/reingest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -228,9 +234,9 @@ export class ResoFeedApiClient {
         actor_kind: request?.actor_kind ?? 'human',
         actor_id: request?.actor_id ?? 'owner',
         idempotency_key: request?.idempotency_key ?? mutationKey('reingest', id),
-        model: request?.model && request.model.length > 0 ? request.model : null,
-        prompt: prompt.length > 0 ? prompt : null
-      } satisfies ItemReingestRequest)
+        model: model.length > 0 ? model : null,
+        ...promptFields
+      })
     });
   }
 
@@ -352,11 +358,22 @@ export class ResoFeedApiClient {
   }
 
   async openRouterModels(): Promise<OpenRouterModelListResponse> {
-    const response = await this.request<unknown>(runtimeEndpoints.openRouterModels.replace('GET ', ''));
+    const response = await this.openRouterModelsFromCompatibleRoutes();
     if (!isOpenRouterModelListResponse(response)) {
       throw new ResoFeedApiError(500, fallbackError('internal', 'invalid OpenRouter model list response'));
     }
     return response;
+  }
+
+  private async openRouterModelsFromCompatibleRoutes(): Promise<unknown> {
+    try {
+      return await this.request<unknown>(runtimeEndpoints.openRouterModels.replace('GET ', ''));
+    } catch (error) {
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
+        return this.request<unknown>('/api/runtime/openrouter/models');
+      }
+      throw error;
+    }
   }
 
   async setProcessingLanguage(

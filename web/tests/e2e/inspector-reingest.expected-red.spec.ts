@@ -287,7 +287,7 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
     model: null,
     prompt: 'Retry with article-only extraction.'
   });
-  await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
+  await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
   await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).resolves.toBeNull();
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
 

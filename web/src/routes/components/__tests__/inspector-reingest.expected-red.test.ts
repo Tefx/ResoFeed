@@ -272,7 +272,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
       prompt: 'Retry with article-only extraction.'
     });
     expect(body.idempotency_key).not.toBe('');
-    await waitFor(() => expect(within(panel).getByLabelText('One-time prompt')).toHaveValue(''));
+    await waitFor(() => expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument());
     expect(window.localStorage.getItem('resofeed.itemReingestPrompt')).toBeNull();
     expect(window.localStorage.getItem(`resofeed.itemReingestPrompt.${failedItem.id}`)).toBeNull();
     expect(
