@@ -619,6 +619,22 @@ Processing-language addendum: Inspector title, model-backed dense summary, model
 
 On desktop, the Inspector is its own scroll container. Opening a different item resets the Inspector scroll position to the top without moving the Feed scroll. On mobile, Inspector remains a full-screen route.
 
+### Inspector Item Re-Ingest: Inspector Reingest Panel
+
+- **Intent**: [SHARP] Let the owner retry model/extraction processing for the currently selected Inspector item without creating a library-wide job surface, settings flow, or hidden agent-only capability.
+- **useFor**: Selected-item retry from the Inspector when model-backed summary/core insight is missing, stale, or worth a one-time stricter prompt; displaying terse success, replay, and current-operation conflict feedback for that selected item.
+- **avoidFor**: Feed-row buttons, source-level actions, library reprocess, durable prompt settings, model preference dashboards, retry queues, activity history, modal retry dialogs, tags/folders/scoring, or any action outside the selected Inspector item.
+
+Anatomy: a compact panel inside the Inspector after the source/provenance/fallback context, labeled `ITEM RE-INGEST`. It contains a `Model` control whose default option renders as `Default model`, a `One-time prompt` text area/input, and one bracket action `[RE-INGEST ITEM]`. The panel uses existing low-chrome Inspector/bracket-action tokens and must not introduce accent-heavy CTA styling, spinners, wizard copy, or decorative failure art. The one-time prompt is transient request state only: it is cleared after success/replay and must not be written to durable app state or localStorage.
+
+Request contract: submitting the panel sends the canonical selected-item mutation body with `actor_kind`, `actor_id`, `idempotency_key`, `model`, and `prompt`. `Default model` serializes as `model: null`; an empty prompt serializes as `prompt: null` or is normalized by the API client to the same semantic value. The UI must include an `idempotency_key` for every re-ingest submission and must not send per-call `language` or any durable prompt/model preference field.
+
+Response contract: the UI consumes the shared HTTP/MCP/frontend response envelope `{ "already_applied": boolean, "reingest": { ... } }`. The refreshed selected item, when present inside `reingest.item`, is the source for updated Inspector text. `already_applied: true` is a replay/safety state, not a user-facing history item.
+
+States: default, submitting, completed, replayed, conflict, failed. Submitting keeps the same geometry and may render `[RE-INGESTING...]` text without a spinner. Completed/replayed clears the one-time prompt and shows terse inline status only if needed. Conflict renders a raw current-operation line adjacent to the panel, e.g. `err: reingest blocked — op: library_reprocess · actor:human · phase:processing_items · 2/5 · since 11:00:00`. Failed renders raw `err: <diagnostic>` text and preserves the user's transient prompt for correction.
+
+Keyboard and accessibility: the panel has an accessible name `Item re-ingest`; the model control is labeled `Model`; the prompt control is labeled `One-time prompt`; the submit button is named `[RE-INGEST ITEM]`. Status and errors use live regions consistent with the Inspector and Current Operation Status contracts. Focus remains in the panel after blocked/failed submissions and returns predictably after completed submissions. Source identifiers and original links near the panel remain literal with `translate="no"`.
+
 ### Source Ledger
 - **Intent**: [SHARP] Flat source management and operational context without settings-dashboard behavior.
 - **useFor**: Source rows, OPML import, state export/import, manual `[RUN INGEST]`, per-source `[FETCH]`, and visible current operation status when work is running or blocks an action.

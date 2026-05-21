@@ -15,14 +15,20 @@ interface ItemReingestRequest {
 }
 
 interface ItemReingestResponse {
-  item_id: string;
-  status: 'completed' | 'failed' | 'accepted';
-  model: string;
-  summary: string | null;
-  core_insight: string | null;
-  extraction_status: 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
-  model_status: 'ok' | 'summary_unavailable' | 'model_latency_error';
   already_applied: boolean;
+  reingest: {
+    item_id: string;
+    status: 'completed' | 'failed' | 'accepted';
+    item_updated: boolean;
+    fts_updated: boolean;
+    model: string;
+    item: {
+      summary: string | null;
+      core_insight: string | null;
+      extraction_status: 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
+      model_status: 'ok' | 'summary_unavailable' | 'model_latency_error';
+    } | null;
+  };
 }
 
 interface ExpectedItemReingestClient {
@@ -46,14 +52,20 @@ describe('expected-red item re-ingest API client contract', () => {
 
   it('sends Default model as model:null and one-time prompt only in the request body', async () => {
     const fetcher = vi.fn(async () => jsonResponse({
-      item_id: 'item_reingest_expected_red',
-      status: 'completed',
-      model: 'openai/gpt-4.1-mini',
-      summary: 'Fresh summary after item-level re-ingest.',
-      core_insight: 'Fresh core insight after item-level re-ingest.',
-      extraction_status: 'full',
-      model_status: 'ok',
-      already_applied: false
+      already_applied: false,
+      reingest: {
+        item_id: 'item_reingest_expected_red',
+        status: 'completed',
+        item_updated: true,
+        fts_updated: true,
+        model: 'openai/gpt-4.1-mini',
+        item: {
+          summary: 'Fresh summary after item-level re-ingest.',
+          core_insight: 'Fresh core insight after item-level re-ingest.',
+          extraction_status: 'full',
+          model_status: 'ok'
+        }
+      }
     }));
     const client = new ResoFeedApiClient({ ownerToken: 'rfeed_item_reingest_api_000000000000000000', fetcher });
     const reingestItem = (client as Partial<ExpectedItemReingestClient>).reingestItem;

@@ -5,6 +5,7 @@ export type HarnessFlowCategory =
   | 'manual-global-ingest'
   | 'per-source-fetch'
   | 'today-feed'
+  /** Authoritative owner for Inspector item re-ingest browser proof; re-ingest is a selected-item Inspect flow, not a new product surface. */
   | 'inspect-retrieve-search'
   | 'llm-failure-mock'
   | 'llm-live-smoke'
@@ -112,6 +113,7 @@ export const playwrightHarnessContract: PlaywrightHarnessContract = {
     'manual-global-ingest',
     'per-source-fetch',
     'today-feed',
+    // Inspector item re-ingest browser proof is intentionally owned by this selected-item Inspect flow category.
     'inspect-retrieve-search',
     'llm-failure-mock',
     'llm-live-smoke',

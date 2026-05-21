@@ -321,6 +321,103 @@ architecture_basis:
   readiness: READY
 ```
 
+### 3.6 Architecture Basis: Inspector Item Re-Ingest Delta
+
+This basis is authoritative for planning selected Inspector item re-ingest. It is a narrow delta over the existing one-binary, flat `internal/resofeed`, SQLite, HTTP/MCP parity, and OpenRouter JSON-transformer architecture. Rationale: selected-item retry is a current item mutation and content refresh, not a new processing subsystem; keeping it in the existing runtime makes the right thing easy and prevents accidental queue, worker, or schema expansion.
+
+```yaml
+architecture_basis:
+  system_layers:
+    - layer: browser_spa
+      responsibility: "Expose an Inspector-only selected-item re-ingest panel and call the item-scoped HTTP mutation."
+    - layer: http_api
+      responsibility: "Authenticate owner token, validate the canonical item re-ingest request body, and return the shared response envelope."
+    - layer: mcp_surface
+      responsibility: "Expose the same selected-item re-ingest operation to authorized agents with HTTP-equivalent schema and response semantics."
+    - layer: resofeed_core
+      responsibility: "Refresh only the selected item through existing extraction/OpenRouter validation, update that item row, rebuild/update FTS for that item, and record idempotency receipt state."
+    - layer: sqlite
+      responsibility: "Persist current item fields, search_fts derived rows, and transient agent_receipts for replay safety."
+    - layer: openrouter
+      responsibility: "Return the stable ResoFeed summary schema only; it does not own orchestration, state, or schema evolution."
+  source_of_truth_matrix:
+    selected_item_identity: "items.id from the selected Inspector item; clients must not invent a browser-only item id."
+    request_idempotency: "agent_receipts keyed by idempotency_key plus request fingerprint; not portable state and not an activity ledger."
+    refreshed_item_text: "items.title, items.summary, items.core_insight, items.feed_excerpt, items.extracted_text, items.value_tier, extraction_status, and model_status for the selected row only."
+    search_index: "search_fts derived from the refreshed selected item row; no vector/semantic index."
+    response_contract: "HTTP and MCP return { already_applied: boolean, reingest: ItemReingestResult } where ItemReingestResult includes item_id, status, item_updated, fts_updated, and refreshed item detail when available."
+  service_catalog:
+    item_reingest_http: "POST /api/items/{id}/reingest with canonical mutation body."
+    item_reingest_mcp: "reingest_item tool with item_id, actor_id, and idempotency_key; no per-call language override."
+    openrouter_models: "Model-listing support may inform the UI model selector without persisting provider state."
+  runtime_contract:
+    request_body: "JSON object with actor_kind, actor_id, idempotency_key, optional model null|string, and optional prompt null|string; unknown fields such as language are rejected."
+    response_shape: "{ already_applied: boolean, reingest: { item_id, status, item_updated, fts_updated, item, ... } } is canonical across HTTP, MCP, and frontend tests."
+    stable_schema: "OpenRouter output remains title, feed_excerpt, extracted_text, summary, core_insight, value_tier, and model_status until a docs/API/schema replan accepts more fields."
+    concurrency: "Selected-item re-ingest uses the same in-process operation guard class as ingest/fetch/library reprocess and returns conflict with current-operation details when blocked."
+    idempotency: "Same live idempotency_key and same request fingerprint replays the stored result with already_applied true; same key and different fingerprint is a request error."
+  state_strata:
+    portable_state: "N/A: selected item re-ingest does not add portable state."
+    runtime_receipts: "agent_receipts for idempotency/provenance only; not exported and not user-visible activity history."
+    item_cache: "Only the selected items row is refreshed."
+    derived_state: "search_fts row/match state for the selected item is refreshed from canonical item fields."
+  transport_boundary_rules:
+    http: "HTTP owns owner-token auth, body validation, error status mapping, and response envelope serialization."
+    mcp: "MCP accepts the same product operation using MCP input schema; agents do not receive extra product concepts unavailable to HTTP/UI."
+    frontend: "Frontend sends idempotency_key and optional one-time model/prompt values; it does not persist prompt/model as durable runtime state."
+    openrouter: "OpenRouter receives validated selected-item input and returns the stable summary schema only."
+  cross_cutting_governance:
+    registries:
+      - name: "agent_receipts"
+        owner_module: "internal/resofeed"
+        write_policy: "receipt-backed item re-ingest writes/replays only validated mutation fingerprints and compact result snapshots"
+    lifecycle_ordering:
+      - "Frontend authenticates owner token before item re-ingest requests."
+      - "HTTP/MCP validates request fields before acquiring operation guard or calling OpenRouter."
+      - "Core refreshes the selected item and FTS in one consistent mutation path before serializing success."
+    coordination_mechanisms:
+      - "Existing in-process operation guard for ingest/fetch/reprocess exclusivity."
+      - "SQLite transaction boundaries for selected item and FTS consistency."
+    wiring_strategy: "Direct calls inside internal/resofeed; no DI container, event bus, job queue, worker process, or repository layer."
+    governance_owner: "internal/resofeed owns mutation/idempotency/FTS; web owns Inspector-only presentation."
+  shared_abstractions:
+    shared_types:
+      - name: "ItemReingestRequest"
+        owner_module: "internal/resofeed HTTP/MCP contract surface"
+        consumers: ["http", "mcp", "web api client", "Inspector UI tests"]
+        rationale: "The same mutation fields cross HTTP, MCP, and frontend boundaries; sharing the contract prevents missing idempotency_key drift."
+      - name: "ItemReingestResponse"
+        owner_module: "internal/resofeed shared response types"
+        consumers: ["http", "mcp", "web api client", "browser expected-red tests"]
+        rationale: "HTTP/MCP/frontend must agree on the nested reingest envelope and already_applied replay flag."
+    shared_protocols: "N/A: existing LLM client boundary remains sufficient; no new provider abstraction is introduced."
+    shared_utilities: "N/A: keep helpers local until repeated real use justifies extraction."
+    decision: "Share only the request/response contracts that cross transport/frontend boundaries; keep Inspector form behavior and runtime refresh internals module-local."
+  module_split_recommendations:
+    - module: "internal/resofeed item re-ingest operation"
+      owner: "internal/resofeed"
+      reason_to_change: "selected item refresh, FTS consistency, operation guard, and idempotency semantics"
+      dependency_direction: "http/mcp call the operation; operation calls DB/LLM; operation does not import web"
+    - module: "web item re-ingest API contract/client surface"
+      owner: "web/src/lib"
+      reason_to_change: "typed HTTP request/response boundary for the Inspector panel"
+      dependency_direction: "web consumes HTTP schema; it does not define backend persistence truth"
+    - module: "Inspector item re-ingest panel"
+      owner: "web/src/routes/components"
+      reason_to_change: "Inspector-only UX, transient one-time prompt/model controls, and conflict rendering"
+      dependency_direction: "component depends on web API contract; component does not call storage or OpenRouter directly"
+  ux_surfaces:
+    - surface: "Inspector item re-ingest panel"
+      scope: "Inspector-only placement, Default model option, one-time prompt, [RE-INGEST ITEM] action, terse conflict/success state, no modal retry or durable settings."
+    - surface: "HTTP/MCP item re-ingest responses"
+      scope: "Nested reingest envelope, already_applied idempotency replay flag, raw conflict details."
+  open_questions:
+    blocking: []
+    non_blocking:
+      - "Exact model selector option list may depend on the OpenRouter model-listing endpoint, but Default model must serialize as model:null."
+  readiness: READY
+```
+
 ## 4. SQLite Shape
 
 The schema stores current state and small derived/cache fields. It is not an implementation SQL script.

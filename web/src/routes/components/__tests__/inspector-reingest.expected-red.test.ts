@@ -78,14 +78,21 @@ function installAuthenticatedRuntimeFetch(options: { reingestConflict?: boolean 
         }, { status: 409 });
       }
       return jsonResponse({
-        item_id: failedItem.id,
-        status: 'completed',
-        model: 'openai/gpt-4.1-mini',
-        summary: 'Re-ingested summary.',
-        core_insight: 'Re-ingested core insight.',
-        extraction_status: 'full',
-        model_status: 'ok',
-        already_applied: false
+        already_applied: false,
+        reingest: {
+          item_id: failedItem.id,
+          status: 'completed',
+          item_updated: true,
+          fts_updated: true,
+          model: 'openai/gpt-4.1-mini',
+          item: {
+            ...failedDetail,
+            summary: 'Re-ingested summary.',
+            core_insight: 'Re-ingested core insight.',
+            extraction_status: 'full',
+            model_status: 'ok'
+          }
+        }
       });
     }
     if (url.endsWith(`/api/items/${failedItem.id}`)) return jsonResponse({ item: failedDetail });
@@ -166,12 +173,15 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     await user.click(within(inspector).getByRole('button', { name: '[RE-INGEST ITEM]' }));
 
     const request = vi.mocked(fetch).mock.calls.find(([url]) => String(url).endsWith(`/api/items/${failedItem.id}/reingest`));
-    expect(request?.[1]?.body).toBe(JSON.stringify({
+    const body = JSON.parse(String(request?.[1]?.body ?? '{}')) as Record<string, unknown>;
+    expect(body).toEqual({
       actor_kind: 'human',
       actor_id: 'owner',
+      idempotency_key: expect.any(String),
       model: null,
       prompt: 'Retry with article-only extraction.'
-    }));
+    });
+    expect(body.idempotency_key).not.toBe('');
     await waitFor(() => expect(within(inspector).getByLabelText('One-time prompt')).toHaveValue(''));
     expect(window.localStorage.getItem('resofeed.itemReingestPrompt')).toBeNull();
     expect(window.localStorage.getItem(`resofeed.itemReingestPrompt.${failedItem.id}`)).toBeNull();

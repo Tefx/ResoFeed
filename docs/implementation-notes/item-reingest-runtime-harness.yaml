@@ -14,6 +14,8 @@ item_reingest_runtime_harness_contract:
       - web/src/** product UI implementation
 
   repo_authoritative_commands:
+    frontend_dependency_hydration: "npm --prefix web ci"
+    frontend_check_after_hydration: "npm --prefix web ci && npm --prefix web run check"
     backend_build: "mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed"
     preferred_browser_script: "npm --prefix web run test:e2e"
     fallback_browser_command: "npm --prefix web exec playwright test -- --config web/playwright.config.ts"

@@ -108,14 +108,21 @@ async function installApiFixtures(page: Page, ownerToken: string, reingestBodies
     if (apiPath === `/api/items/${item.id}/reingest` && request.method() === 'POST') {
       reingestBodies.push(request.postData() ?? '');
       return fulfillJson(route, {
-        item_id: item.id,
-        status: 'completed',
-        model: 'openai/gpt-4.1-mini',
-        summary: 'Browser re-ingest summary.',
-        core_insight: 'Browser re-ingest core insight.',
-        extraction_status: 'full',
-        model_status: 'ok',
-        already_applied: false
+        already_applied: false,
+        reingest: {
+          item_id: item.id,
+          status: 'completed',
+          item_updated: true,
+          fts_updated: true,
+          model: 'openai/gpt-4.1-mini',
+          item: {
+            ...detail,
+            summary: 'Browser re-ingest summary.',
+            core_insight: 'Browser re-ingest core insight.',
+            extraction_status: 'full',
+            model_status: 'ok'
+          }
+        }
       });
     }
     if (apiPath === `/api/items/${item.id}` && request.method() === 'GET') return fulfillJson(route, { item: detail });
@@ -164,12 +171,16 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
 
   await expect.poll(() => reingestBodies.length).toBe(1);
-  expect(reingestBodies[0]).toBe(JSON.stringify({
+  const reingestBody = JSON.parse(reingestBodies[0] ?? '{}') as Record<string, unknown>;
+  expect(typeof reingestBody.idempotency_key).toBe('string');
+  expect(reingestBody.idempotency_key).not.toBe('');
+  expect(reingestBody).toEqual({
     actor_kind: 'human',
     actor_id: 'owner',
+    idempotency_key: reingestBody.idempotency_key,
     model: null,
     prompt: 'Retry with article-only extraction.'
-  }));
+  });
   await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
   await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).resolves.toBeNull();
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
