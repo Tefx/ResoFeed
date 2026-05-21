@@ -1083,6 +1083,45 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   border-block-start: 0;
 }
 
+.inspector-reingest-panel {
+  display: grid;
+  max-width: 68ch;
+  gap: var(--rf-space-sm);
+  margin-block: var(--rf-space-md);
+  border-block-start: 1px solid var(--rf-color-border);
+  padding-block-start: var(--rf-space-sm);
+  font: var(--rf-typography-chrome);
+}
+
+.inspector-reingest-field {
+  display: grid;
+  gap: var(--rf-space-xs);
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+}
+
+.inspector-reingest-field textarea {
+  min-height: 44px;
+  border: 1px solid var(--rf-color-border);
+  border-radius: var(--rf-radius-sm);
+  padding: var(--rf-space-sm) var(--rf-space-md);
+  color: var(--rf-color-text);
+  background: var(--rf-color-background);
+  font: var(--rf-typography-chrome);
+  resize: vertical;
+}
+
+.inspector-reingest-status {
+  margin: 0;
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-chrome);
+  overflow-wrap: anywhere;
+}
+
+.inspector-reingest-error {
+  color: var(--rf-color-danger);
+}
+
 .contract-source-details {
   margin-block-start: var(--rf-space-lg);
   color: var(--rf-color-muted);

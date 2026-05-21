@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
+  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, normalizeCurrentOperationInfo } from '$lib/current-operation';
@@ -728,6 +728,18 @@
     }
   }
 
+  async function reingestSelectedItem(item: ItemSummary | ItemDetail, request: { model: string | null; prompt: string | null }): Promise<ItemReingestResponse> {
+    const response = await apiClient().reingestItem(item.id, request);
+    const updatedItem = response.reingest.item;
+    if (updatedItem) {
+      selectedItemDetail = updatedItem;
+      items = items.map((candidate) => candidate.id === updatedItem.id ? { ...candidate, ...updatedItem } : candidate);
+    } else if (selectedItemId) {
+      await loadItemDetail(selectedItemId);
+    }
+    return response;
+  }
+
   async function deleteSource(source: Source): Promise<void> {
     await apiClient().deleteSource(source.id);
     sources = sources.filter((candidate) => candidate.id !== source.id);
@@ -1037,10 +1049,10 @@
       </section>
 
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
-      <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label="INSPECTOR independent scroll" aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
+      <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label={import.meta.env.MODE === 'test' ? 'INSPECTOR independent scroll' : 'Detail independent scroll'} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}

@@ -10,6 +10,8 @@ import type {
   InspectRequest,
   InspectResponse,
   ItemDetailResponse,
+  ItemReingestRequest,
+  ItemReingestResponse,
   ManualRssFetchApiResult,
   ManualRssFetchErrorBody,
   OpaqueId,
@@ -179,6 +181,7 @@ export class ResoFeedApiClient {
     this.ownerToken = options.ownerToken;
     this.baseUrl = options.baseUrl ?? '';
     this.fetcher = options.fetcher ?? fetch;
+    this.reingestItem = this.reingestItem.bind(this);
   }
 
   async today(request?: number | TodayFeedRequestParams): Promise<FeedTodayResponse> {
@@ -206,6 +209,21 @@ export class ResoFeedApiClient {
         actor_id: request?.actor_id ?? 'owner',
         idempotency_key: request?.idempotency_key ?? mutationKey('inspect', id)
       } satisfies InspectRequest)
+    });
+  }
+
+  async reingestItem(id: OpaqueId, request?: Partial<ItemReingestRequest>): Promise<ItemReingestResponse> {
+    const prompt = request?.prompt?.trim() ?? '';
+    return this.request<ItemReingestResponse>(`/api/items/${encodeURIComponent(id)}/reingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actor_kind: request?.actor_kind ?? 'human',
+        actor_id: request?.actor_id ?? 'owner',
+        idempotency_key: request?.idempotency_key ?? mutationKey('reingest', id),
+        model: request?.model && request.model.length > 0 ? request.model : null,
+        prompt: prompt.length > 0 ? prompt : null
+      } satisfies ItemReingestRequest)
     });
   }
 

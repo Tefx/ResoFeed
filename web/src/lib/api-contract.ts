@@ -328,6 +328,29 @@ export interface ResonanceResponse {
   already_applied: boolean;
 }
 
+export interface ItemReingestRequest extends InspectRequest {
+  /** null means use the server/runtime default model; never serialize an empty string for default. */
+  model: string | null;
+  /** One-time retry instruction only; not durable runtime or browser state. */
+  prompt: string | null;
+}
+
+export type ItemReingestStatus = 'completed' | 'failed' | 'accepted';
+
+export interface ItemReingestResult {
+  item_id: OpaqueId;
+  status: ItemReingestStatus;
+  item_updated: boolean;
+  fts_updated: boolean;
+  model: string;
+  item: ItemDetail | null;
+}
+
+export interface ItemReingestResponse {
+  already_applied: boolean;
+  reingest: ItemReingestResult;
+}
+
 export interface SteerRequest extends InspectRequest {
   command: string;
 }

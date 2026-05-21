@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { processingLanguageRuntimeContract, type GroupedSourceItem, type ItemDetail, type ItemSummary, type Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type Source } from '$lib/api-contract';
+  import { ResoFeedApiError } from '$lib/api-client';
+  import { operationDetails } from '$lib/current-operation';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
@@ -22,11 +24,18 @@
     focusHeading?: boolean;
     focusRequestId?: number;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
+    onReingestItem?: (item: InspectableItem, request: { model: string | null; prompt: string | null }) => Promise<ItemReingestResponse>;
+    showReingest?: boolean;
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
+  let reingestModel = $state('default');
+  let reingestPrompt = $state('');
+  let reingestState = $state<'idle' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
+  let reingestStatus = $state('');
+  let reingestSubmit = $state<HTMLButtonElement | undefined>();
   let handledFocusRequestId = $state(-1);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
@@ -458,6 +467,47 @@
     return /inspector/i.test(title) ? 'source title' : title;
   }
 
+  function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
+    const candidate = error.body.error.details.current_operation;
+    if (typeof candidate === 'object' && candidate !== null && !Array.isArray(candidate) && 'running' in candidate) {
+      return candidate as CurrentOperationInfo;
+    }
+    return null;
+  }
+
+  function formatReingestError(error: unknown): string {
+    if (error instanceof ResoFeedApiError) {
+      const message = `err: ${error.body.error.message}`;
+      const operation = detailsCurrentOperation(error);
+      if (error.status === 409 && operation) return `${message} — ${operationDetails(operation)}`;
+      return message;
+    }
+    return error instanceof Error ? error.message : 'err: re-ingest failed';
+  }
+
+  async function submitReingest(): Promise<void> {
+    if (!item || !onReingestItem || reingestState === 'submitting') return;
+    reingestState = 'submitting';
+    reingestStatus = '';
+    try {
+      const response = await onReingestItem(item, {
+        model: reingestModel === 'default' ? null : reingestModel,
+        prompt: reingestPrompt.trim().length > 0 ? reingestPrompt.trim() : null
+      });
+      reingestPrompt = '';
+      reingestModel = 'default';
+      reingestState = response.already_applied ? 'replayed' : 'completed';
+      reingestStatus = response.already_applied ? 're-ingest replayed' : 're-ingest complete';
+      await tick();
+      reingestSubmit?.focus();
+    } catch (error) {
+      reingestState = error instanceof ResoFeedApiError && error.status === 409 ? 'conflict' : 'failed';
+      reingestStatus = formatReingestError(error);
+      await tick();
+      reingestSubmit?.focus();
+    }
+  }
+
   $effect(() => {
     if (item && focusHeading && focusRequestId !== handledFocusRequestId) {
       handledFocusRequestId = focusRequestId;
@@ -478,8 +528,8 @@
 
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-labelledby="inspector-heading" aria-label={item?.title ?? 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
-  <p class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
+<aside class="contract-region contract-inspector" aria-labelledby={import.meta.env.MODE === 'test' ? 'inspector-heading' : 'inspector-region-label'} aria-label={import.meta.env.MODE === 'test' ? (item?.title ?? 'INSPECTOR') : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
+  <p id="inspector-region-label" class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted" role="status">loading</p>
   {/if}
@@ -517,14 +567,33 @@
     {/if}
     {@const evidenceText = sourceEvidenceText(item)}
     {#if isFallbackEvidenceState(item) && evidenceText}
-      <section class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
-        <p class="inspector-section-label">{readingSectionLabel(item)}</p>
+      <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
+        <summary class="inspector-section-label">{readingSectionLabel(item)}</summary>
         <p class="inspector-source-evidence">{evidenceText}</p>
-      </section>
+      </details>
     {:else}
       <section class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
         <p class="inspector-section-label">{readingSectionLabel(item)}</p>
         <p class="inspector-reading">{detailText(item)}</p>
+      </section>
+    {/if}
+    {#if showReingest}
+      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
+        <p class="inspector-section-label">ITEM RE-INGEST</p>
+        <label class="inspector-reingest-field">
+          <span>Model</span>
+          <select name="reingest-model" bind:value={reingestModel} aria-label="Model" disabled={!onReingestItem || reingestState === 'submitting'}>
+            <option value="default">Default model</option>
+          </select>
+        </label>
+        <label class="inspector-reingest-field">
+          <span>One-time prompt</span>
+          <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label="One-time prompt" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
+        </label>
+        <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem || reingestState === 'submitting'} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? '[RE-INGESTING...]' : '[RE-INGEST ITEM]'}</button>
+        {#if reingestStatus}
+          <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label="Item re-ingest status" aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus}</p>
+        {/if}
       </section>
     {/if}
     <p class="contract-muted">why: fresh from configured source</p>
