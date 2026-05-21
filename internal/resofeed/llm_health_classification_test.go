@@ -3,10 +3,51 @@ package resofeed
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestDoctorClassifiesEmptyConfiguredOpenRouterStartupAsNoItemsProcessedYet(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	llm := &openRouterHTTPClient{apiKey: "test-openrouter-token-placeholder", model: "openai/gpt-4.1-mini"}
+
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/doctor", nil))
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("/api/doctor status=%d body=%s", recorder.Code, recorder.Body.String())
+	}
+	assertEmptyConfiguredOpenRouterDoctor(t, recorder.Body.String())
+
+	mcpDoctor := mcpResourceText(t, NewMCPHandler(MCPConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm}), "resofeed://system/doctor")
+	assertEmptyConfiguredOpenRouterDoctor(t, mcpDoctor)
+}
+
+func assertEmptyConfiguredOpenRouterDoctor(t *testing.T, body string) {
+	t.Helper()
+	for _, want := range []string{
+		"openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini provider_reachable: unknown",
+		"openrouter: model_resolved=false resolved_model=unknown model_resolved: false",
+		"openrouter: item_transform_failures=0 item_transform_failures: 0",
+		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
+		"openrouter: live_summary_successes=0 fallback_only_current_summaries=0",
+		"openrouter: health_classification=no_items_processed_yet",
+		"fallback_provenance: item_transform_failures=0 summary=none",
+	} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("empty configured OpenRouter doctor output missing %q:\n%s", want, body)
+		}
+	}
+	for _, forbidden := range []string{"unresolved_product_regression", "test-openrouter-token-placeholder", "sk-or", "Authorization", ".env", "secret-source", "choices", "raw provider"} {
+		if strings.Contains(body, forbidden) {
+			t.Fatalf("empty configured OpenRouter doctor output leaked or confused forbidden text %q:\n%s", forbidden, body)
+		}
+	}
+}
 
 func TestREG2026051206DoctorClassifiesStalePriorFailuresSeparatelyFromCurrentLiveSuccess(t *testing.T) {
 	ctx := context.Background()

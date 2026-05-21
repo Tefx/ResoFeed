@@ -167,6 +167,7 @@ func readSearchFTSStatusLine(ctx context.Context, db *sql.DB) (string, error) {
 }
 
 type openRouterHealthMetrics struct {
+	TotalItems           int
 	CurrentFailures      int
 	HistoricFailures     int
 	CurrentLiveSuccesses int
@@ -174,6 +175,9 @@ type openRouterHealthMetrics struct {
 }
 
 func (m openRouterHealthMetrics) classification(cfg DoctorConfig) string {
+	if m.TotalItems == 0 && strings.TrimSpace(cfg.ConfiguredOpenRouterModel) != "" {
+		return "no_items_processed_yet"
+	}
 	if m.CurrentFailures > 0 {
 		return "openrouter_client_timeout_or_error"
 	}
@@ -194,12 +198,13 @@ func readOpenRouterHealthMetrics(ctx context.Context, db *sql.DB, now time.Time)
 	var metrics openRouterHealthMetrics
 	row := db.QueryRowContext(ctx, `
 select
+	  count(*),
   coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) < ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status = ? and coalesce(summary, '') != '' and coalesce(core_insight, '') != '' and coalesce(value_tier, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status != ? and coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0)
 from items`, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff)
-	if err := row.Scan(&metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly); err != nil {
+	if err := row.Scan(&metrics.TotalItems, &metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly); err != nil {
 		return openRouterHealthMetrics{}, fmt.Errorf("read openrouter health metrics: %w", err)
 	}
 	return metrics, nil

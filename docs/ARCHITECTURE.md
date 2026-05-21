@@ -1268,6 +1268,14 @@ Endpoint contracts:
 - when no stale marker exists, diagnostics include the line `search_fts: ok`;
 - diagnostics must not include item text, source text, API keys, or raw model output.
 
+`GET /api/doctor` OpenRouter health classification contract:
+
+- a configured OpenRouter runtime with an empty item table and no resolved live model reports `openrouter: health_classification=no_items_processed_yet`; this is a safe startup/non-regression state and does not prove live provider reachability;
+- current item transform failures remain `openrouter_client_timeout_or_error`;
+- stale prior failures plus a current live model-backed summary remain `stale_database_prior_failures`;
+- a current model-backed summary with a resolved model and no failures remains `openrouter_live_summary_ok`;
+- diagnostics must continue to distinguish provider reachability, model resolution, item-transform failures, and fallback-only summaries without leaking API keys, secret source metadata, `.env` paths, owner tokens, or raw provider payloads.
+
 HTTP error matrix:
 
 | Condition | Status | `error.code` | `details` rule |
