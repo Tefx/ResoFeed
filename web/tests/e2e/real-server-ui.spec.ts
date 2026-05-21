@@ -215,9 +215,22 @@ type ItemSummary = {
 };
 
 type ItemDetail = ItemSummary & {
+  summary?: string | null;
+  core_insight?: string | null;
   provenance: {
     source_url: string;
     original_url: string;
+  };
+};
+
+type ItemReingestResponse = {
+  already_applied: boolean;
+  reingest: {
+    item_id: string;
+    status: 'completed' | 'completed_with_errors' | 'failed' | 'accepted';
+    item_updated: boolean;
+    fts_updated: boolean;
+    item: ItemDetail | null;
   };
 };
 
@@ -572,13 +585,35 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await steer.fill('search Local fixture');
   await page.getByRole('button', { name: 'apply' }).click();
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
-  await page.getByRole('button', { name: 'search', exact: true }).click();
+  await page.getByRole('button', { name: '[SEARCH]' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, isolatedRunInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
   const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });
   expect(apiSearch.query).toMatchObject({ q: 'Local fixture', limit: 20 });
   expect(itemIds(apiSearch.items)).toContain(itemID);
   expect(itemIds(mcpSearch.items)).toEqual(itemIds(apiSearch.items));
+
+  await openToday(page);
+  await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
+  const reingestPanel = page.getByRole('complementary', { name: 'INSPECTOR' }).getByLabel('Item re-ingest');
+  await expect(reingestPanel).toBeVisible();
+  await reingestPanel.getByLabel('One-time prompt').fill('Runtime parity re-ingest through selected Inspector item.');
+  await reingestPanel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await expect(reingestPanel.getByLabel('Item re-ingest status')).toHaveText('re-ingest complete', { timeout: 15_000 });
+  const apiDetailAfterBrowserReingest = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
+  expect(apiDetailAfterBrowserReingest.item.id).toBe(itemID);
+
+  const mcpReingest = await mcpTool<ItemReingestResponse>(request, isolatedRunInfo, ownerToken, 'reingest_item', {
+    item_id: itemID,
+    actor_id: 'parity-agent',
+    idempotency_key: `parity-reingest-${itemID}`
+  });
+  expect(mcpReingest).toMatchObject({
+    already_applied: false,
+    reingest: { item_id: itemID, item_updated: true, fts_updated: true }
+  });
+  expect(mcpReingest.reingest.status).toMatch(/^completed/);
+  expect(mcpReingest.reingest.item?.summary).toBe(apiDetailAfterBrowserReingest.item.summary);
 
   await steer.fill('Push more parity fixture documents.');
   await page.getByRole('button', { name: 'apply' }).click();
@@ -594,9 +629,11 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   expect(toolNames).toEqual([
     'get_processing_language',
     'list_candidate_items',
+    'list_openrouter_models',
     'mark_inspected',
     'preview_steer',
     'read_item',
+    'reingest_item',
     'report_delivery',
     'reprocess_library',
     'resonate_item',
