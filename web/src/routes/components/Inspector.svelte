@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type OpenRouterModelOption, type Source } from '$lib/api-contract';
   import { ResoFeedApiError } from '$lib/api-client';
   import { operationDetails } from '$lib/current-operation';
 
@@ -26,9 +26,11 @@
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
     onReingestItem?: (item: InspectableItem, request: { model: string | null; prompt: string | null }) => Promise<ItemReingestResponse>;
     showReingest?: boolean;
+    openRouterModels?: OpenRouterModelOption[];
+    openRouterModelListState?: 'loading' | 'available' | 'unavailable';
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable' }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let reingestModel = $state('default');
@@ -493,6 +495,12 @@
     reingestStatus = '';
   }
 
+  function modelListDiagnostic(): string {
+    if (openRouterModelListState === 'loading') return 'model list: loading OpenRouter models';
+    if (openRouterModelListState === 'available') return `model list: ${openRouterModels.length} OpenRouter ${openRouterModels.length === 1 ? 'model' : 'models'} available`;
+    return 'model list: OpenRouter models unavailable';
+  }
+
   async function submitReingest(): Promise<void> {
     if (!item || !onReingestItem || reingestState === 'submitting') return;
     const submittedItem = item;
@@ -592,10 +600,10 @@
         <p class="inspector-source-evidence">{evidenceText}</p>
       </details>
     {:else}
-      <section class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
-        <p class="inspector-section-label">{readingSectionLabel(item)}</p>
+      <details class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
+        <summary class="inspector-section-label">{readingSectionLabel(item)}</summary>
         <p class="inspector-reading">{detailText(item)}</p>
-      </section>
+      </details>
     {/if}
     {#if showReingest}
       <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
@@ -604,8 +612,12 @@
           <span>Model</span>
           <select name="reingest-model" bind:value={reingestModel} aria-label="Model" disabled={!onReingestItem || reingestState === 'submitting'}>
             <option value="default">Default model</option>
+            {#each openRouterModels as model (model.id)}
+              <option value={model.id}>{model.name} ({model.id})</option>
+            {/each}
           </select>
         </label>
+        <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
         <label class="inspector-reingest-field">
           <span>One-time prompt</span>
           <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label="One-time prompt" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>

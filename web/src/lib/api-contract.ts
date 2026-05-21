@@ -147,6 +147,15 @@ export interface ProcessingLanguageResponse {
   already_applied?: boolean;
 }
 
+export interface OpenRouterModelOption {
+  id: string;
+  name: string;
+}
+
+export interface OpenRouterModelListResponse {
+  models: OpenRouterModelOption[];
+}
+
 export interface SetProcessingLanguageRequest {
   language: ProcessingLanguage;
   actor_kind: ActorKind;
@@ -214,6 +223,7 @@ export const processingLanguageRuntimeContract = {
     getLanguage: 'GET /api/runtime/language',
     setLanguage: 'PUT /api/runtime/language',
     currentOperation: 'GET /api/runtime/operation',
+    openRouterModels: 'GET /api/runtime/openrouter-models',
     reprocessLibrary: 'POST /api/runtime/reprocess-library',
     reportDelivery: 'POST /api/items/{id}/delivery',
     searchEcho: 'GET /api/search',

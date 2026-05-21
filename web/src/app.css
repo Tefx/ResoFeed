@@ -1111,6 +1111,13 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   resize: vertical;
 }
 
+.inspector-model-list-diagnostic {
+  margin: 0;
+  color: var(--rf-color-muted);
+  font: var(--rf-typography-metadata);
+  overflow-wrap: anywhere;
+}
+
 .inspector-reingest-status {
   margin: 0;
   color: var(--rf-color-muted);

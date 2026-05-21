@@ -251,6 +251,6 @@ test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspec
   await captureEvidence(page, testInfo, 'inspector-model-list-diagnostics-red');
 
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
-  await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveValue('openai/gpt-4.1-mini');
-  await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic\/claude-3.5-sonnet)' })).toHaveValue('anthropic/claude-3.5-sonnet');
+  await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
+  await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic\/claude-3.5-sonnet)' })).toHaveAttribute('value', 'anthropic/claude-3.5-sonnet');
 });

@@ -15,6 +15,7 @@ import type {
   ManualRssFetchApiResult,
   ManualRssFetchErrorBody,
   OpaqueId,
+  OpenRouterModelListResponse,
   ProcessingLanguage,
   ProcessingLanguageResponse,
   ResonanceRequest,
@@ -147,6 +148,12 @@ function isProcessingLanguageResponse(value: unknown): value is ProcessingLangua
   const { code, label } = value.language;
   return isProcessingLanguage(code) && (label === 'English' || label === '中文') &&
     (value.already_applied === undefined || typeof value.already_applied === 'boolean');
+}
+
+function isOpenRouterModelListResponse(value: unknown): value is OpenRouterModelListResponse {
+  return isRecord(value) && Array.isArray(value.models) && value.models.every((model) => (
+    isRecord(model) && typeof model.id === 'string' && model.id.length > 0 && typeof model.name === 'string' && model.name.length > 0
+  ));
 }
 
 function isReprocessLibraryResponse(value: unknown): value is ReprocessLibraryResponse {
@@ -342,6 +349,14 @@ export class ResoFeedApiClient {
       throw new ResoFeedApiError(500, fallbackError('internal', 'invalid current operation response'));
     }
     return normalized;
+  }
+
+  async openRouterModels(): Promise<OpenRouterModelListResponse> {
+    const response = await this.request<unknown>(runtimeEndpoints.openRouterModels.replace('GET ', ''));
+    if (!isOpenRouterModelListResponse(response)) {
+      throw new ResoFeedApiError(500, fallbackError('internal', 'invalid OpenRouter model list response'));
+    }
+    return response;
   }
 
   async setProcessingLanguage(

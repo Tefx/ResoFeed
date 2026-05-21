@@ -167,8 +167,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     expect(inspectorContractSnapshot(inspector)).toMatchInlineSnapshot(`
 "{
-  \"reingestPanelText\": \"ITEM RE-INGEST Model Default model One-time prompt [RE-INGEST ITEM]\",
-  \"modelControl\": \"Default model\",
+  \"reingestPanelText\": \"ITEM RE-INGEST Model Default modelGPT 4.1 Mini (openai/gpt-4.1-mini)Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet) model list: 2 OpenRouter models available One-time prompt [RE-INGEST ITEM]\",
+  \"modelControl\": \"Default modelGPT 4.1 Mini (openai/gpt-4.1-mini)Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)\",
   \"promptControl\": \"present\",
   \"sourceEvidenceCollapsed\": true,
   \"originalLinkTranslate\": \"no\"
@@ -200,7 +200,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const sourceText = within(inspector).getByLabelText('Source text');
     expect(sourceText.tagName, 'product gap: model-backed Source text should be an accessible disclosure').toBe('DETAILS');
     expect(sourceText, 'product gap: Source text disclosure should be collapsed by default').not.toHaveAttribute('open');
-    expect(within(sourceText).getByText('Full source article text remains available for verification behind a collapsed disclosure.')).toBeVisible();
+    expect(within(sourceText).getByText('Full source article text remains available for verification behind a collapsed disclosure.')).toBeInTheDocument();
   });
 
   it('expected-red: surfaces live OpenRouter model options and model-list diagnostics in the Inspector model control', async () => {

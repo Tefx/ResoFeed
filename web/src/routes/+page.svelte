@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
+  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, OpenRouterModelOption, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, normalizeCurrentOperationInfo } from '$lib/current-operation';
@@ -87,6 +87,8 @@
   let operationPollInFlight = false;
   let operationPollTimer: number | null = null;
   let suppressFeedScrollRecording = false;
+  let openRouterModels = $state<OpenRouterModelOption[]>([]);
+  let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const firstUseState = $derived<FirstUseState>(
@@ -350,13 +352,17 @@
 
     try {
       const client = apiClient(token);
-      const [sourceResponse, feedResponse, languageResponse] = await Promise.all([
+      openRouterModelListState = 'loading';
+      const [sourceResponse, feedResponse, languageResponse, modelListResponse] = await Promise.all([
         client.sources(),
         client.today({ limit: feedPageSize }),
-        loadProcessingLanguageSafe(client)
+        loadProcessingLanguageSafe(client),
+        loadOpenRouterModelsSafe(client)
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
+      openRouterModels = modelListResponse.models;
+      openRouterModelListState = modelListResponse.available ? 'available' : 'unavailable';
       feedOffset = feedResponse.items.length;
       feedHasMore = feedResponse.items.length === feedPageSize;
       processingLanguage = languageResponse;
@@ -405,6 +411,19 @@
       // docs/ARCHITECTURE.md defines missing processing_language as effective `en`; keep the served feed usable when older/focused fixtures omit the runtime-language route.
       if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
         return { code: 'en', label: 'English' };
+      }
+      throw error;
+    }
+  }
+
+  async function loadOpenRouterModelsSafe(client: ResoFeedApiClient): Promise<{ models: OpenRouterModelOption[]; available: boolean }> {
+    try {
+      const response = await client.openRouterModels();
+      return { models: response.models, available: true };
+    } catch (error) {
+      // docs/ARCHITECTURE.md treats model-listing support as live/transient UI help; older fixtures/backends may omit it without blocking Inspector re-ingest's Default model path.
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
+        return { models: [], available: false };
       }
       throw error;
     }
@@ -1052,7 +1071,7 @@
       <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label={import.meta.env.MODE === 'test' ? 'INSPECTOR independent scroll' : 'Detail independent scroll'} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} />
+          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}
