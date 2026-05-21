@@ -560,7 +560,7 @@ Failure contract:
 - per-source manual fetch failure returns a request-level error result for that source and also updates source diagnostics where applicable;
 - global manual ingest may complete with source-level failures; source failures are reported in the response summary rather than aborting successful sources;
 - extraction failure maps to `partial_extraction` or `original_unavailable` where appropriate;
-- OpenRouter/model failure maps to `summary_unavailable`, `model_latency_error`, or `/doctor` model diagnostics;
+- OpenRouter/model failure maps to a safe stable status/diagnostic code. Timeouts remain `model_latency_error`/`timeout` where the existing surface requires it, but invalid model/provider responses, provider errors, rate limits, and decode/validation failures must not all collapse to `model_latency_error`; implementations must expose a constrained code such as `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, or `timeout` through item status, reprocess errors, and/or `/doctor` diagnostics without leaking raw provider payloads, API keys, secret source metadata, `.env` paths, owner tokens, or raw runtime provider configuration;
 - extraction status and model status are separate: an item may have model-backed summary metadata while source text is only an RSS excerpt;
 - timeout of the 20-second source fetch limit maps to an RSS/source fetch diagnostic and leaves no persistent pending job;
 - no failure path creates an elaborate UI degradation mode.
@@ -779,7 +779,7 @@ Existing library reprocess behavior:
 
 Failure contract:
 
-- per-item OpenRouter or extraction failures use the same status taxonomy as ingestion;
+- per-item OpenRouter or extraction failures use the same status taxonomy as ingestion. Invalid model/provider, provider error, rate-limit, decode/validation, and timeout failures must remain distinguishable through a safe stable status/diagnostic path such as `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, and `timeout`, rather than collapsing every non-timeout provider/model/decode failure to `model_latency_error`;
 - per-item failures are returned as HTTP `200` with `reprocess.status` of `completed_with_errors` or `completed` according to the result counts;
 - if a fresh fetch succeeds but OpenRouter fails, all of the item's processed readable fields (`summary`, `core_insight`, `extracted_text`, `feed_excerpt`) must be set to `null` because they cannot be reliably provided in the target language. To satisfy the non-null `title` schema requirement without mixing languages, `title` must fall back to the URL or a generic 'Untitled' label. Old prior-language fields are fully overwritten;
 - failure to process one item must not destroy that item's existing provenance identifiers;
@@ -801,11 +801,12 @@ Existing library reprocess transaction and recovery contract:
 
 Reprocess input source precedence:
 
-- reprocess must not use existing stored target-language fields (`title`, `summary`, `core_insight`, `feed_excerpt`, `extracted_text`) as source text to avoid double-translation;
+- reprocess must not use existing stored target-language interpretation fields (`title`, `summary`, `core_insight`) as source text to avoid double-translation;
 - reprocess input must fetch fresh source text using canonical storage fields first, in exact order of precedence: `items.canonical_url` if present and valid HTTP/HTTPS, then `items.url` (exposed publicly as both top-level `url` and `provenance.original_url`) if valid HTTP/HTTPS. If a fetch fails (e.g., timeout, 404, refusal), it proceeds to the next candidate in the precedence list;
 - `sources.url`, `items.source_url`, and public `provenance.source_url` must NOT be used to fetch article text for reprocess, as they point to the RSS/Atom feed rather than the specific item;
-- if all fresh fetches fail, reprocess must mark the item as `original_unavailable` and set its processed readable fields (`summary`, `core_insight`, `feed_excerpt`, `extracted_text`) to `null`. It must not fallback to prior-language stored text, because the original feed title is not independently preserved. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
-- this ensures individual item results do not mix languages and avoids double-translation from prior processed text.
+- if all fresh fetches fail, reprocess may use already persisted readable source fallback text, in order: non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`. This fallback is reprocess-specific; it does not weaken normal ingestion/source-fetch provenance rules, does not permit fetching `sources.url`/`items.source_url` as article text, and does not permit invented content. The LLM input URL/provenance remains the original article URL (`items.url`, or the canonical article URL only when that is the selected article candidate), never the RSS/Atom feed URL;
+- if all fresh fetches fail and no readable fallback remains, reprocess must mark the item as `original_unavailable` and set its processed readable fields (`summary`, `core_insight`, `feed_excerpt`, `extracted_text`) to `null`. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
+- this ensures individual item results do not invent content, preserve source identifiers, and avoid durable queues, jobs, retry dashboards, settings dashboards, or additional state-management surfaces.
 
 Concurrency and background ingest:
 
