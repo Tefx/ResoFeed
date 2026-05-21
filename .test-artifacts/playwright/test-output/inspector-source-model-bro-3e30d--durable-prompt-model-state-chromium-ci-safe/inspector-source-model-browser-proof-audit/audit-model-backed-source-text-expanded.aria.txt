@@ -1,0 +1,58 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - region "Today feed items":
+      - heading "Today feed items" [level=2]
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Audit fallback source disclosure target"':
+            - paragraph: "src: Audit Literal Source 7h full fallback quality: full TODAY"
+            - paragraph: Audit fallback source disclosure target
+            - paragraph: Audit RSS source excerpt is readable only after disclosure expansion.
+          - 'button "Resonate item: Audit fallback source disclosure target"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Audit model-backed source text target"':
+            - paragraph: "src: Audit Literal Source 7h full model-backed quality: source-backed"
+            - paragraph: Audit model-backed source text target
+            - paragraph: Audit model-backed summary is present.
+          - 'button "Resonate item: Audit model-backed source text target"': ☆
+  - complementary "Detail independent scroll":
+    - complementary "INSPECTOR":
+      - paragraph: INSPECTOR
+      - paragraph: "src: Audit Literal Source · full"
+      - heading "Audit model-backed source text target" [level=2]
+      - paragraph:
+        - link "original link":
+          - /url: https://news.example.test/audit-model-backed-source-text
+      - paragraph: "source text: full · summary provenance: model-backed"
+      - region "Summary":
+        - paragraph: "summary:"
+        - paragraph: Audit model-backed summary is present.
+      - region "Core insight":
+        - paragraph: "core insight:"
+        - paragraph: Audit model-backed core insight is present.
+      - group "Source text":
+        - text: "source text:"
+        - paragraph: Audit full source text becomes readable when the Source text disclosure expands.
+      - region "Item re-ingest":
+        - paragraph: ITEM RE-INGEST
+        - text: Model
+        - combobox "Model":
+          - option "Default model" [selected]
+          - option "GPT 4.1 Mini (openai/gpt-4.1-mini)"
+          - option "Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)"
+        - paragraph: "model list: 2 OpenRouter models available"
+        - text: One-time prompt
+        - textbox "One-time prompt"
+        - button "[RE-INGEST ITEM]"
+      - paragraph: "why: fresh from configured source"
