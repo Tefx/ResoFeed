@@ -1,0 +1,44 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - region "Today feed items":
+      - heading "Today feed items" [level=2]
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Audit fallback source disclosure target"':
+            - paragraph: "src: src1 time unavailable full fallback quality: full EARLIER"
+            - paragraph: Audit fallback source disclosure target
+            - paragraph: excerpt
+          - 'button "Resonate item: Audit fallback source disclosure target"': ☆
+  - complementary "Detail independent scroll":
+    - complementary "INSPECTOR":
+      - paragraph: INSPECTOR
+      - paragraph: "src: src1 · full"
+      - heading "Audit fallback source disclosure target" [level=2]
+      - paragraph:
+        - link "original link":
+          - /url: https://test
+      - paragraph: target-language processing failed · summary/core unavailable · showing source excerpt
+      - region "Item re-ingest":
+        - paragraph: ITEM RE-INGEST
+        - text: "model:"
+        - combobox "Model":
+          - option "Default model" [selected]
+          - option "M1 (m1)"
+        - paragraph: "model list: 1 OpenRouter model available"
+        - text: extra prompt (one-time, not saved)
+        - textbox "One-time prompt"
+        - button "[CONFIRM RE-INGEST]"
+        - button "[CANCEL]"
+      - group "Source evidence": "Source evidence:"
+      - paragraph: "why: fresh from configured source"
