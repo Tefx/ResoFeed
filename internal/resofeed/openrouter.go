@@ -90,7 +90,7 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 		"contract": map[string]any{
 			"response_json_only":   true,
 			"fields":               []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
-			"model_status_values":  []string{"ok", "summary_unavailable", "model_latency_error"},
+			"model_status_values":  []string{"ok", "summary_unavailable", "model_latency_error", "invalid_model", "provider_error", "rate_limited", "decode_error", "timeout"},
 			"target_language_rule": "Write all user-readable output fields in item.target_language. When available_text exists and model_status is ok, translate title, feed_excerpt, extracted_text, summary, and core_insight into item.target_language; do not copy original-language body or excerpt text for feed_excerpt/extracted_text. Keep URLs, source identifiers, and provenance literal and untranslated. Also keep source ids and source titles literal and untranslated.",
 			"summary_quality_rule": "Use anti-fluff, anti-blogger style. No filler phrases. Do not write blogger framing such as 'this article discusses', 'the author notes', 'worth reading', or similar throat-clearing. Prefer factual density over commentary.",
 			"factual_density_rule": "Summary and core_insight must be grounded in source-backed fact units: concrete names, numbers, dates, prices, tools, technical specs, and other specifics from available_text. Preserve source-grounded fact units instead of generic claims.",
@@ -101,11 +101,11 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	}
 	var out OpenRouterSummaryOutput
 	if err := c.generateJSON(ctx, prompt, &out); err != nil {
-		return OpenRouterSummaryOutput{ModelStatus: "model_latency_error"}, fmt.Errorf("openrouter summarize: %w", err)
+		return OpenRouterSummaryOutput{ModelStatus: classifyModelFailureStatus(err, "")}, fmt.Errorf("openrouter summarize: %w", err)
 	}
 	validated, err := validateSummaryOutputForPersistence(out)
 	if err != nil {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, err
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
 	return validated, nil
 }
@@ -130,7 +130,7 @@ func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRoute
 	if out.ModelStatus == "" {
 		out.ModelStatus = "ok"
 	}
-	if out.ModelStatus != "ok" && out.ModelStatus != "summary_unavailable" && out.ModelStatus != "model_latency_error" {
+	if mapModelStatus(out.ModelStatus) == modelStatusSummaryNA && out.ModelStatus != modelStatusSummaryNA {
 		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
 	}
 	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
@@ -147,6 +147,63 @@ func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRoute
 		out.ValueTier = valueTier
 	}
 	return out, nil
+}
+
+type openRouterClassifiedError struct {
+	status string
+	err    error
+}
+
+func (e openRouterClassifiedError) Error() string {
+	if e.err == nil {
+		return e.status
+	}
+	return e.err.Error()
+}
+
+func (e openRouterClassifiedError) Unwrap() error { return e.err }
+
+func (e openRouterClassifiedError) modelStatus() string { return e.status }
+
+func classifiedOpenRouterError(status string, err error) error {
+	return openRouterClassifiedError{status: mapModelStatus(status), err: err}
+}
+
+func classifyModelFailureStatus(err error, returnedStatus string) string {
+	if status := mapModelStatus(returnedStatus); status != modelStatusSummaryNA && status != modelStatusOK {
+		return status
+	}
+	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+		return modelStatusTimeout
+	}
+	var classified interface{ modelStatus() string }
+	if errors.As(err, &classified) {
+		if status := mapModelStatus(classified.modelStatus()); status != modelStatusSummaryNA && status != modelStatusOK {
+			return status
+		}
+	}
+	message := strings.ToLower(errString(err))
+	switch {
+	case strings.Contains(message, "timeout") || strings.Contains(message, "deadline") || strings.Contains(message, "context canceled"):
+		return modelStatusTimeout
+	case strings.Contains(message, "rate limit") || strings.Contains(message, "rate_limited") || strings.Contains(message, "status 429"):
+		return modelStatusRateLimited
+	case strings.Contains(message, "invalid model") || strings.Contains(message, "model not found") || strings.Contains(message, "not found"):
+		return modelStatusInvalidModel
+	case strings.Contains(message, "decode") || strings.Contains(message, "invalid json") || strings.Contains(message, "validation"):
+		return modelStatusDecodeError
+	case strings.Contains(message, "provider") || strings.Contains(message, "upstream"):
+		return modelStatusProviderError
+	default:
+		return modelStatusLatencyError
+	}
+}
+
+func errString(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
 }
 
 func normalizeSummaryValueTier(value string) (string, error) {
@@ -271,7 +328,7 @@ func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, ds
 			if attempt == 0 && ctx.Err() == nil {
 				continue
 			}
-			return err
+			return classifiedOpenRouterError(classifyModelFailureStatus(err, ""), err)
 		}
 		body, readErr := io.ReadAll(io.LimitReader(resp.Body, 4<<20))
 		closeErr := resp.Body.Close()
@@ -282,34 +339,64 @@ func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, ds
 			return fmt.Errorf("close response: %w", closeErr)
 		}
 		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
-			lastErr = fmt.Errorf("status %d", resp.StatusCode)
+			status := modelStatusProviderError
+			if resp.StatusCode == http.StatusTooManyRequests {
+				status = modelStatusRateLimited
+			}
+			lastErr = classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))
 			if attempt == 0 {
 				continue
 			}
 			return lastErr
 		}
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
-			return fmt.Errorf("status %d", resp.StatusCode)
+			status := modelStatusProviderError
+			if resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusNotFound {
+				status = classifyOpenRouterErrorBody(body)
+			}
+			return classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))
 		}
 		var providerErr openRouterErrorResponse
 		if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
-			return fmt.Errorf("provider error status %d", resp.StatusCode)
+			return classifiedOpenRouterError(classifyOpenRouterProviderMessage(providerErr.Error.Message), fmt.Errorf("provider error status %d", resp.StatusCode))
 		}
 		var generated openRouterChatResponse
 		if err := json.Unmarshal(body, &generated); err != nil {
-			return fmt.Errorf("decode response: %w", err)
+			return classifiedOpenRouterError(modelStatusDecodeError, fmt.Errorf("decode response: %w", err))
 		}
 		c.setResolvedModel(generated.Model)
 		text := generated.firstText()
 		if text == "" {
-			return errors.New("empty response text")
+			return classifiedOpenRouterError(modelStatusDecodeError, errors.New("empty response text"))
 		}
 		if err := json.Unmarshal([]byte(stripJSONFence(text)), dst); err != nil {
-			return fmt.Errorf("decode model json: %w", err)
+			return classifiedOpenRouterError(modelStatusDecodeError, fmt.Errorf("decode model json: %w", err))
 		}
 		return nil
 	}
 	return lastErr
+}
+
+func classifyOpenRouterErrorBody(body []byte) string {
+	var providerErr openRouterErrorResponse
+	if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
+		return classifyOpenRouterProviderMessage(providerErr.Error.Message)
+	}
+	return modelStatusProviderError
+}
+
+func classifyOpenRouterProviderMessage(message string) string {
+	lower := strings.ToLower(message)
+	switch {
+	case strings.Contains(lower, "rate limit") || strings.Contains(lower, "rate_limited"):
+		return modelStatusRateLimited
+	case strings.Contains(lower, "model not found") || strings.Contains(lower, "invalid model") || strings.Contains(lower, "no endpoints found"):
+		return modelStatusInvalidModel
+	case strings.Contains(lower, "decode") || strings.Contains(lower, "invalid json"):
+		return modelStatusDecodeError
+	default:
+		return modelStatusProviderError
+	}
 }
 
 func (c *openRouterHTTPClient) requestURL() string {

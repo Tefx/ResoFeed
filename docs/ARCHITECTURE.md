@@ -876,7 +876,7 @@ Global JSON request body validation rule: for every JSON request body schema in 
 | `value_tier` | string | Yes | Yes | terse quality/value category, e.g. `high`; `null` when unavailable |
 | `published_at` | RFC3339 string | Yes | Yes | `null` when feed lacks date |
 | `extraction_status` | string enum | Yes | No | `full`, `partial_extraction`, `summary_unavailable`, `original_unavailable` |
-| `model_status` | string enum | Yes | No | `ok`, `summary_unavailable`, `model_latency_error` |
+| `model_status` | string enum | Yes | No | `ok`, `summary_unavailable`, `model_latency_error`, `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, `timeout` |
 | `is_resonated` | boolean | Yes | No | current resonance state |
 | `human_inspected_at` | RFC3339 string | Yes | Yes | `null` when not inspected |
 | `external_surfaced_at` | RFC3339 string | Yes | Yes | `null` when not surfaced by agent |

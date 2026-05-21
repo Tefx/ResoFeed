@@ -99,11 +99,19 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		if outcome.failed {
 			result.ItemsFailed++
 			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
+			if outcome.storableFailure() {
+				if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
+					return ReprocessLibraryResponse{}, err
+				}
+			}
 			continue
 		}
 		if outcome.unavailable {
 			result.ItemsUnavailable++
 			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
+			if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
+				return ReprocessLibraryResponse{}, err
+			}
 			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
 			continue
 		}
@@ -142,11 +150,13 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 }
 
 type reprocessItem struct {
-	id           string
-	sourceTitle  string
-	title        string
-	url          string
-	canonicalURL sql.NullString
+	id            string
+	sourceTitle   string
+	title         string
+	url           string
+	canonicalURL  sql.NullString
+	feedExcerpt   sql.NullString
+	extractedText sql.NullString
 }
 
 type reprocessItemOutcome struct {
@@ -168,8 +178,12 @@ func (o reprocessItemOutcome) writable() bool {
 	return !o.failed && !o.unavailable && o.modelStatus == modelStatusOK
 }
 
+func (o reprocessItemOutcome) storableFailure() bool {
+	return o.failed && strings.TrimSpace(o.modelStatus) != "" && o.errorCode != ReprocessErrorTimeout
+}
+
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {
-	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), i.title, i.url, i.canonical_url from items i join sources s on s.id = i.source_id where s.is_active = 1 order by i.id`)
+	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i join sources s on s.id = i.source_id where s.is_active = 1 order by i.id`)
 	if err != nil {
 		return nil, fmt.Errorf("reprocess library: query items: %w", err)
 	}
@@ -177,7 +191,7 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 	items := []reprocessItem{}
 	for rows.Next() {
 		var item reprocessItem
-		if err := rows.Scan(&item.id, &item.sourceTitle, &item.title, &item.url, &item.canonicalURL); err != nil {
+		if err := rows.Scan(&item.id, &item.sourceTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText); err != nil {
 			return nil, fmt.Errorf("reprocess library: scan item: %w", err)
 		}
 		items = append(items, item)
@@ -194,7 +208,11 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return reprocessItemOutcome{}, err
 		}
-		return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
+		fallbackURL, fallbackText, ok := reprocessStoredTextFallback(item)
+		if !ok {
+			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
+		}
+		sourceURL, sourceText = fallbackURL, fallbackText
 	}
 	if llm == nil {
 		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
@@ -204,7 +222,9 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return reprocessItemOutcome{}, err
 		}
-		return failedReprocessOutcome(sourceURL, ReprocessErrorModelLatencyError, "model latency error"), nil
+		status := classifyModelFailureStatus(err, out.ModelStatus)
+		code := reprocessErrorCodeForModelStatus(status)
+		return failedReprocessOutcome(sourceURL, code, string(code), status), nil
 	}
 	out, err = validateSummaryOutputForPersistence(out)
 	if err != nil {
@@ -212,10 +232,7 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 	}
 	modelStatus := mapModelStatus(out.ModelStatus)
 	if modelStatus != modelStatusOK {
-		code := ReprocessErrorSummaryUnavailable
-		if modelStatus == modelStatusLatencyError {
-			code = ReprocessErrorModelLatencyError
-		}
+		code := reprocessErrorCodeForModelStatus(modelStatus)
 		return unavailableReprocessOutcome(sourceURL, code, string(code)), nil
 	}
 	title := strings.TrimSpace(out.Title)
@@ -235,6 +252,39 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 	result.extractedText = itemForSanitize.ExtractedText
 	result.valueTier = itemForSanitize.ValueTier
 	return result, nil
+}
+
+func reprocessStoredTextFallback(item reprocessItem) (string, string, bool) {
+	if item.extractedText.Valid {
+		if text := strings.TrimSpace(item.extractedText.String); text != "" {
+			return fallbackReprocessSourceURL(item), text, true
+		}
+	}
+	if item.feedExcerpt.Valid {
+		if text := strings.TrimSpace(item.feedExcerpt.String); text != "" {
+			return fallbackReprocessSourceURL(item), text, true
+		}
+	}
+	return "", "", false
+}
+
+func reprocessErrorCodeForModelStatus(status string) ReprocessErrorCode {
+	switch mapModelStatus(status) {
+	case modelStatusInvalidModel:
+		return ReprocessErrorInvalidModel
+	case modelStatusProviderError:
+		return ReprocessErrorProviderError
+	case modelStatusRateLimited:
+		return ReprocessErrorRateLimited
+	case modelStatusDecodeError:
+		return ReprocessErrorDecodeError
+	case modelStatusTimeout:
+		return ReprocessErrorTimeout
+	case modelStatusLatencyError:
+		return ReprocessErrorModelLatencyError
+	default:
+		return ReprocessErrorSummaryUnavailable
+	}
 }
 
 func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, string, error) {
@@ -343,8 +393,12 @@ func unavailableReprocessOutcome(rawURL string, code ReprocessErrorCode, message
 	return reprocessItemOutcome{title: fallbackReprocessTitle(rawURL), extractStatus: extractionStatusOriginalNA, modelStatus: modelStatusSummaryNA, unavailable: true, errorCode: code, errorMessage: message}
 }
 
-func failedReprocessOutcome(rawURL string, code ReprocessErrorCode, message string) reprocessItemOutcome {
-	return reprocessItemOutcome{title: fallbackReprocessTitle(rawURL), extractStatus: extractionStatusOriginalNA, modelStatus: modelStatusLatencyError, failed: true, errorCode: code, errorMessage: message}
+func failedReprocessOutcome(rawURL string, code ReprocessErrorCode, message string, modelStatus ...string) reprocessItemOutcome {
+	status := modelStatusLatencyError
+	if len(modelStatus) > 0 && strings.TrimSpace(modelStatus[0]) != "" {
+		status = mapModelStatus(modelStatus[0])
+	}
+	return reprocessItemOutcome{title: fallbackReprocessTitle(rawURL), extractStatus: extractionStatusSummaryNA, modelStatus: status, failed: true, errorCode: code, errorMessage: message}
 }
 
 func fallbackReprocessTitle(rawURL string) string {

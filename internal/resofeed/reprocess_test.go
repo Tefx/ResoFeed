@@ -53,8 +53,8 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if result.Status != ReprocessStatusCompletedWithErrors || !result.FTSRebuilt || result.ItemsIndexed != 4 {
 		t.Fatalf("result status/indexing = %+v, want completed_with_errors with rebuilt FTS and 4 indexed", result)
 	}
-	if result.ItemsAttempted != 4 || result.ItemsUpdated != 2 || result.ItemsUnavailable != 1 || result.ItemsFailed != 1 {
-		t.Fatalf("result counts = %+v, want attempted=4 updated=2 unavailable=1 failed=1", result)
+	if result.ItemsAttempted != 4 || result.ItemsUpdated != 3 || result.ItemsUnavailable != 0 || result.ItemsFailed != 1 {
+		t.Fatalf("result counts = %+v, want attempted=4 updated=3 unavailable=0 failed=1", result)
 	}
 	if result.ItemsAttempted != result.ItemsUpdated+result.ItemsUnavailable+result.ItemsFailed {
 		t.Fatalf("attempted invariant broken: %+v", result)
@@ -63,8 +63,8 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 		t.Fatalf("unexpected fetch precedence requests: %#v", requests)
 	}
 	for _, available := range llm.availableTexts {
-		if strings.Contains(available, "PRIOR") {
-			t.Fatalf("prior stored target-language field was used as source text: %q", available)
+		if strings.Contains(available, "PRIOR summary") || strings.Contains(available, "PRIOR insight") || strings.Contains(available, "PRIOR title") {
+			t.Fatalf("prior stored interpretation field was used as source text: %q", available)
 		}
 	}
 
@@ -78,10 +78,11 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 	assertNoStaleReadableFTS(t, ctx, db, "item_success")
 	assertNoStaleReadableFTS(t, ctx, db, "item_fallback")
-	assertPreservedReprocessFields(t, ctx, db, "item_unavailable")
-	assertPreservedReprocessFields(t, ctx, db, "item_failed")
-	assertStaleReadableFTS(t, ctx, db, "item_unavailable")
-	assertStaleReadableFTS(t, ctx, db, "item_failed")
+	if count := reprocessFTSCount(t, ctx, db, "item_unavailable", `"PRIOR extracted item_unavailable"`); count != 1 {
+		t.Fatalf("FTS for item_unavailable did not reflect stored extracted_text fallback rewrite; count=%d", count)
+	}
+	assertClearedReprocessFields(t, ctx, db, "item_failed", modelStatusLatencyError)
+	assertNoStaleReadableFTS(t, ctx, db, "item_failed")
 
 	var staleCount int
 	if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleCount); err != nil {
@@ -187,8 +188,8 @@ func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *tes
 			if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
 				t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
 			}
-			assertPreservedReprocessFields(t, ctx, db, "item_"+tc.name)
-			assertStaleReadableFTS(t, ctx, db, "item_"+tc.name)
+			assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA)
+			assertNoStaleReadableFTS(t, ctx, db, "item_"+tc.name)
 		})
 	}
 }
@@ -362,6 +363,17 @@ func assertPreservedReprocessFields(t *testing.T, ctx context.Context, db *sql.D
 	}
 	if title != "PRIOR title "+itemID || summary != "PRIOR summary "+itemID || coreInsight != "PRIOR insight "+itemID || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || valueTier != "prior-tier" || extractionStatus != extractionStatusFull || modelStatus != modelStatusOK {
 		t.Fatalf("item %s was degraded: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, modelStatus)
+	}
+}
+
+func assertClearedReprocessFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, modelStatus string) {
+	t.Helper()
+	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus string
+	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &storedModelStatus); err != nil {
+		t.Fatalf("read cleared item %s: %v", itemID, err)
+	}
+	if title == "" || summary != "" || coreInsight != "" || feedExcerpt != "" || extractedText != "" || valueTier != "" || storedModelStatus != modelStatus {
+		t.Fatalf("item %s was not cleared safely: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus)
 	}
 }
 

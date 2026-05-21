@@ -212,8 +212,8 @@ func TestIngestOnceIsolatesSourceFailuresAndMapsModelFailure(t *testing.T) {
 	if len(state.items) != 1 {
 		t.Fatalf("inserted items = %d, want 1", len(state.items))
 	}
-	if state.items[0].modelStatus != modelStatusLatencyError || state.items[0].extractionStatus != extractionStatusPartial {
-		t.Fatalf("item statuses = extraction %q model %q, want partial_extraction/model_latency_error", state.items[0].extractionStatus, state.items[0].modelStatus)
+	if state.items[0].modelStatus != modelStatusTimeout || state.items[0].extractionStatus != extractionStatusPartial {
+		t.Fatalf("item statuses = extraction %q model %q, want partial_extraction/timeout", state.items[0].extractionStatus, state.items[0].modelStatus)
 	}
 }
 

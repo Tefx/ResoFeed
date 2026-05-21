@@ -211,8 +211,12 @@ func TestOpenRouterAdapterRetryAndSafeErrorMapping(t *testing.T) {
 				if err == nil {
 					t.Fatal("invalid JSON/provider error should return a safe Go error")
 				}
-				if out.ModelStatus != "model_latency_error" {
-					t.Fatalf("safe failure model_status = %q, want model_latency_error", out.ModelStatus)
+				wantStatus := modelStatusProviderError
+				if tc.name == "invalid json" {
+					wantStatus = modelStatusDecodeError
+				}
+				if out.ModelStatus != wantStatus {
+					t.Fatalf("safe failure model_status = %q, want %q", out.ModelStatus, wantStatus)
 				}
 				if strings.Contains(err.Error(), fakeOpenRouterOSKey) {
 					t.Fatal("safe adapter error leaked fake OpenRouter key")

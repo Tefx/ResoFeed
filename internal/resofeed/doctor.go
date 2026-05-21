@@ -84,7 +84,8 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, rssLines...)
-	modelFailureCount, err := countItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
+	modelFailureStatuses := modelDiagnosticFailureStatuses()
+	modelFailureCount, err := countItemStatusDiagnostics(ctx, db, "openrouter", "model_status", modelFailureStatuses)
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
@@ -104,7 +105,7 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if modelFailureCount == 0 {
 		lines = append(lines, "fallback_provenance: item_transform_failures=0 summary=none")
 	}
-	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", []string{modelStatusSummaryNA, modelStatusLatencyError})
+	modelLines, err := readItemStatusDiagnostics(ctx, db, "openrouter", "model_status", modelFailureStatuses)
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
@@ -133,6 +134,10 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	}
 	lines = append(lines, "ingest: first_fetch_limit="+firstFetchLimitDisplay(effectiveDoctorFirstFetchMaxItems(cfg)))
 	return DoctorSnapshot{Lines: lines}, nil
+}
+
+func modelDiagnosticFailureStatuses() []string {
+	return []string{modelStatusSummaryNA, modelStatusLatencyError, modelStatusInvalidModel, modelStatusProviderError, modelStatusRateLimited, modelStatusDecodeError, modelStatusTimeout}
 }
 
 func effectiveDoctorFirstFetchMaxItems(cfg DoctorConfig) int {
@@ -189,11 +194,11 @@ func readOpenRouterHealthMetrics(ctx context.Context, db *sql.DB, now time.Time)
 	var metrics openRouterHealthMetrics
 	row := db.QueryRowContext(ctx, `
 select
-  coalesce(sum(case when model_status in (?, ?) and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
-  coalesce(sum(case when model_status in (?, ?) and coalesce(published_at, first_seen_at) < ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) < ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status = ? and coalesce(summary, '') != '' and coalesce(core_insight, '') != '' and coalesce(value_tier, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status != ? and coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0)
-from items`, modelStatusSummaryNA, modelStatusLatencyError, cutoff, modelStatusSummaryNA, modelStatusLatencyError, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff)
+from items`, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff)
 	if err := row.Scan(&metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly); err != nil {
 		return openRouterHealthMetrics{}, fmt.Errorf("read openrouter health metrics: %w", err)
 	}

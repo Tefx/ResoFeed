@@ -29,6 +29,11 @@ const (
 	modelStatusOK              = "ok"
 	modelStatusSummaryNA       = "summary_unavailable"
 	modelStatusLatencyError    = "model_latency_error"
+	modelStatusInvalidModel    = "invalid_model"
+	modelStatusProviderError   = "provider_error"
+	modelStatusRateLimited     = "rate_limited"
+	modelStatusDecodeError     = "decode_error"
+	modelStatusTimeout         = "timeout"
 )
 
 var ingestGuardState guardedOperationState
@@ -624,7 +629,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	}
 	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage})
 	if err != nil {
-		item.ModelStatus = modelStatusLatencyError
+		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
@@ -1036,6 +1041,16 @@ func mapModelStatus(status string) string {
 		return modelStatusOK
 	case modelStatusLatencyError:
 		return modelStatusLatencyError
+	case modelStatusInvalidModel:
+		return modelStatusInvalidModel
+	case modelStatusProviderError:
+		return modelStatusProviderError
+	case modelStatusRateLimited:
+		return modelStatusRateLimited
+	case modelStatusDecodeError:
+		return modelStatusDecodeError
+	case modelStatusTimeout:
+		return modelStatusTimeout
 	default:
 		return modelStatusSummaryNA
 	}

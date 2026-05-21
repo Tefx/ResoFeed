@@ -76,8 +76,8 @@ func TestOpenRouterModelFailureKeepsItemVisibleWithSafeStatus(t *testing.T) {
 	if len(items) != 1 || items[0].Title != "Visible Despite Model Failure" {
 		t.Fatalf("visible items after model failure = %+v, want failed item still visible", items)
 	}
-	if items[0].Summary != nil || items[0].CoreInsight != nil || items[0].ModelStatus != modelStatusLatencyError {
-		t.Fatalf("failed item summary/core/model_status = %v/%v/%q, want nil/nil/model_latency_error", items[0].Summary, items[0].CoreInsight, items[0].ModelStatus)
+	if items[0].Summary != nil || items[0].CoreInsight != nil || items[0].ModelStatus != modelStatusTimeout {
+		t.Fatalf("failed item summary/core/model_status = %v/%v/%q, want nil/nil/timeout", items[0].Summary, items[0].CoreInsight, items[0].ModelStatus)
 	}
 }
 

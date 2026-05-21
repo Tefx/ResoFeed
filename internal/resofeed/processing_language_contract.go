@@ -91,6 +91,10 @@ const (
 	ReprocessErrorSummaryUnavailable  ReprocessErrorCode = "summary_unavailable"
 	ReprocessErrorOriginalUnavailable ReprocessErrorCode = "original_unavailable"
 	ReprocessErrorTimeout             ReprocessErrorCode = "timeout"
+	ReprocessErrorInvalidModel        ReprocessErrorCode = "invalid_model"
+	ReprocessErrorProviderError       ReprocessErrorCode = "provider_error"
+	ReprocessErrorRateLimited         ReprocessErrorCode = "rate_limited"
+	ReprocessErrorDecodeError         ReprocessErrorCode = "decode_error"
 	ReprocessErrorInternal            ReprocessErrorCode = "internal"
 )
 
