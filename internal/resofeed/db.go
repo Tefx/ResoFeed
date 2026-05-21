@@ -52,13 +52,15 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
 		}
-		openRouterSecret, err := ResolveOpenRouterRuntimeSecretWithSource()
+		openRouterSecret, hasOpenRouterSecret, err := ResolveOpenRouterRuntimeSecretOptional()
 		if err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
 		}
-		cfg.OpenRouterKey = openRouterSecret.Value
-		cfg.OpenRouterKeySource = openRouterSecret.Source
+		if hasOpenRouterSecret {
+			cfg.OpenRouterKey = openRouterSecret.Value
+			cfg.OpenRouterKeySource = openRouterSecret.Source
+		}
 		if err := validateServeConfig(cfg); err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
@@ -264,9 +266,6 @@ func validateServeConfig(cfg ServeConfig) error {
 	if err := validateServeConfigBeforeSecret(cfg); err != nil {
 		return err
 	}
-	if strings.TrimSpace(cfg.OpenRouterKey) == "" {
-		return errors.New("invalid_openrouter_key: value required")
-	}
 	return nil
 }
 
@@ -351,7 +350,10 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 		_, _ = io.WriteString(stdout, "owner token reused: stored hash\n")
 	}
 
-	llm := NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
+	var llm LLMClient
+	if strings.TrimSpace(cfg.OpenRouterKey) != "" {
+		llm = NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
+	}
 	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm, OpenRouter: OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()}, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: true}
 	runtimeCfg.Lifecycle = &serveStartupConsoleLifecycle{stdout: stdout, cfg: cfg, publicURL: runtimeCfg.PublicURL, resolution: resolution}
 	runCtx, cancel := context.WithCancel(ctx)
@@ -424,7 +426,11 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	_, _ = fmt.Fprintf(w, "first-fetch-limit: %s\n", firstFetchLimitDisplay(cfg.FirstFetchMaxItems))
 	_, _ = io.WriteString(w, "ingest: started\n\n")
 	_, _ = io.WriteString(w, "llm: openrouter\n")
-	_, _ = io.WriteString(w, "openrouter-key: configured\n")
+	if strings.TrimSpace(cfg.OpenRouterKey) == "" {
+		_, _ = io.WriteString(w, "openrouter-key: unavailable\n")
+	} else {
+		_, _ = io.WriteString(w, "openrouter-key: configured\n")
+	}
 	_, _ = fmt.Fprintf(w, "model: %s\n", model)
 	if strings.TrimSpace(cfg.OpenRouterModel) == "" {
 		_, _ = io.WriteString(w, "model-note: no --openrouter-model supplied; OpenRouter account default will be used\n")

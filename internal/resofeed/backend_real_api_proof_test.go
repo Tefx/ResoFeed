@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestBackendRealAPIProofThroughHTTPServer(t *testing.T) {
@@ -121,6 +122,65 @@ func TestBackendRealAPIProofThroughHTTPServer(t *testing.T) {
 	}
 
 	t.Logf("network_or_server_logs: provider_path=/api/v1/models provider_auth_header=Bearer <redacted>; llm_calls=%d llm_last_model=%q llm_last_prompt=%q", llm.calls, llm.last.Model, llm.last.Prompt)
+}
+
+func TestBackendReingestSuccessThroughPublicStateImportSetup(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	llm := &postClosureRecordingLLM{}
+
+	article := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/article" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = io.WriteString(w, `<article><h1>Public seeded article</h1><p>Article text available through HTTP for blind re-ingest setup.</p></article>`)
+	}))
+	t.Cleanup(article.Close)
+
+	api := httptest.NewServer(NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm}))
+	t.Cleanup(api.Close)
+
+	bundle := StateBundle{
+		SchemaVersion: StateSchemaVersionV1,
+		ExportedAt:    time.Now().UTC(),
+		Sources:       []SourceState{{ID: "public_setup_source", URL: article.URL + "/feed.xml", Title: "Public Setup Source"}},
+		SteerRules:    []SteerRuleState{},
+		ResonatedItems: []ResonatedItemState{{
+			ItemID:    "public_setup_item",
+			URL:       article.URL + "/article",
+			SourceURL: article.URL + "/feed.xml",
+			Title:     stringPtr("Public Setup Item"),
+		}},
+	}
+	bundleJSON, err := json.Marshal(bundle)
+	if err != nil {
+		t.Fatalf("marshal public setup state bundle: %v", err)
+	}
+
+	imported := realAPIRequest(t, http.MethodPost, api.URL+"/api/state/import", contractOwnerToken, "application/json", bytes.NewReader(bundleJSON))
+	logHTTPProof(t, "curl/public setup state import", fmt.Sprintf("curl -i -X POST %s/api/state/import -H 'Authorization: Bearer <owner-token>' -H 'Content-Type: application/json' --data @public-reingest-state.json", api.URL), imported)
+	if imported.status != http.StatusOK {
+		t.Fatalf("public state import setup status=%d body=%s", imported.status, imported.body)
+	}
+
+	reingestBody := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"public-setup-reingest-success","extra_prompt":"public setup proof"}`
+	reingest := realAPIRequest(t, http.MethodPost, api.URL+"/api/items/public_setup_item/reingest", contractOwnerToken, "application/json", strings.NewReader(reingestBody))
+	logHTTPProof(t, "curl/reingest after public setup", fmt.Sprintf("curl -i -X POST %s/api/items/public_setup_item/reingest -H 'Authorization: Bearer <owner-token>' -H 'Content-Type: application/json' --data '%s'", api.URL, reingestBody), reingest)
+	if reingest.status != http.StatusOK {
+		t.Fatalf("reingest after public setup status=%d body=%s", reingest.status, reingest.body)
+	}
+	if llm.calls != 1 || llm.last.ItemID != "public_setup_item" || llm.last.Prompt != "public setup proof" {
+		t.Fatalf("public setup LLM proof calls=%d last=%+v", llm.calls, llm.last)
+	}
+	var response ItemReingestResponse
+	if err := json.Unmarshal([]byte(reingest.body), &response); err != nil {
+		t.Fatalf("decode public setup reingest response: %v body=%s", err, reingest.body)
+	}
+	if !response.Reingest.ItemUpdated || response.Reingest.Item == nil || valueOfStringPtr(response.Reingest.Item.Summary) != "English summary public_setup_item" {
+		t.Fatalf("public setup reingest did not return refreshed item: %+v", response.Reingest)
+	}
 }
 
 type realAPIHTTPResult struct {

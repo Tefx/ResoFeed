@@ -35,6 +35,27 @@ func ResolveOpenRouterRuntimeSecret() (string, error) {
 // safe source label for startup diagnostics. The label never contains the secret
 // value and must not be persisted.
 func ResolveOpenRouterRuntimeSecretWithSource() (OpenRouterRuntimeSecret, error) {
+	return resolveOpenRouterRuntimeSecretWithSource(false)
+}
+
+// ResolveOpenRouterRuntimeSecretOptional resolves OpenRouter credentials when
+// present. A missing OPENROUTER_KEY in both OS environment and local .env is a
+// provider-unavailable state, not a whole-runtime startup failure. Present but
+// empty values remain invalid so local misconfiguration is still explicit.
+func ResolveOpenRouterRuntimeSecretOptional() (OpenRouterRuntimeSecret, bool, error) {
+	secret, err := resolveOpenRouterRuntimeSecretWithSource(true)
+	if err != nil {
+		if errors.Is(err, errOpenRouterKeyMissing) {
+			return OpenRouterRuntimeSecret{}, false, nil
+		}
+		return OpenRouterRuntimeSecret{}, false, err
+	}
+	return secret, true, nil
+}
+
+var errOpenRouterKeyMissing = errors.New("openrouter key missing")
+
+func resolveOpenRouterRuntimeSecretWithSource(optional bool) (OpenRouterRuntimeSecret, error) {
 	if value, ok := os.LookupEnv(openRouterKeyEnvName); ok {
 		secret, err := requireRuntimeSecretValue(value)
 		if err != nil {
@@ -52,6 +73,9 @@ func ResolveOpenRouterRuntimeSecretWithSource() (OpenRouterRuntimeSecret, error)
 			return OpenRouterRuntimeSecret{}, err
 		}
 		return OpenRouterRuntimeSecret{Value: secret, Source: openRouterKeySourceDotEnv}, nil
+	}
+	if optional {
+		return OpenRouterRuntimeSecret{}, errOpenRouterKeyMissing
 	}
 	return OpenRouterRuntimeSecret{}, errors.New("invalid_openrouter_key: value required")
 }

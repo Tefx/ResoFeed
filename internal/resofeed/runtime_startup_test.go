@@ -30,9 +30,10 @@ func TestServeStartupValidationFailsBeforeSocketBind(t *testing.T) {
 			wantStderr: "invalid_public_url",
 		},
 		{
-			name: "invalid openrouter config",
+			name: "empty openrouter config",
 			args: func(t *testing.T, addr string) []string {
 				t.Helper()
+				t.Setenv("OPENROUTER_KEY", " ")
 				return []string{"serve", "--addr", addr, "--db", filepath.Join(t.TempDir(), "resofeed.sqlite3"), "--owner-token", contractOwnerToken}
 			},
 			wantCode:   2,
@@ -112,11 +113,6 @@ func TestServeStartupValidationOrdersLocalConfigBeforeMissingOpenRouterKey(t *te
 			args:       []string{"serve", "--addr", "127.0.0.1:18080", "--db", "resofeed.sqlite3", "--owner-token", "short"},
 			wantStderr: "invalid_owner_token: expected at least 32 visible non-whitespace characters",
 		},
-		{
-			name:       "missing openrouter key baseline after valid local config",
-			args:       []string{"serve", "--addr", "127.0.0.1:18080", "--db", "resofeed.sqlite3", "--owner-token", contractOwnerToken},
-			wantStderr: "invalid_openrouter_key: value required",
-		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			withoutRuntimeStartupOpenRouterSecretSources(t)
@@ -129,7 +125,7 @@ func TestServeStartupValidationOrdersLocalConfigBeforeMissingOpenRouterKey(t *te
 			if !strings.Contains(stderr.String(), tc.wantStderr) {
 				t.Fatalf("stderr = %q, want %q", stderr.String(), tc.wantStderr)
 			}
-			if tc.wantStderr != "invalid_openrouter_key: value required" && strings.Contains(stderr.String(), "invalid_openrouter_key") {
+			if strings.Contains(stderr.String(), "invalid_openrouter_key") {
 				t.Fatalf("local config validation was masked by missing OpenRouter key: stderr=%q", stderr.String())
 			}
 		})

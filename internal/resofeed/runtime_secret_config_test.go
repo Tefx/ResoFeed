@@ -129,11 +129,11 @@ func TestOpenRouterRuntimeSecretPrecedenceAndEmptyValues(t *testing.T) {
 	}
 }
 
-func TestOpenRouterRuntimeSecretMissingFailureIsDeterministicAndRedacted(t *testing.T) {
+func TestOpenRouterRuntimeSecretMissingStartsWithProviderUnavailableAndRedacted(t *testing.T) {
 	withoutOpenRouterKeyEnv(t)
 	stdout, stderr, code := runServeUntilBindFailure(t, nil)
-	if code != 2 || !strings.Contains(stderr, "invalid_openrouter_key: value required") {
-		t.Fatalf("missing OpenRouter key should fail with deterministic validation error: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+	if code != 1 || !strings.Contains(stderr, "runtime_failed") || strings.Contains(stderr, "invalid_openrouter_key") {
+		t.Fatalf("missing OpenRouter key should allow startup until bind/runtime failure with unavailable provider status: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 	}
 	assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 }
@@ -169,8 +169,8 @@ func TestDotEnvParserSafetyContract(t *testing.T) {
 		withoutOpenRouterKeyEnv(t)
 		writeLocalDotEnv(t, "export OPENROUTER_KEY="+fakeDotEnvSecret+"\n")
 		stdout, stderr, code := runServeUntilBindFailure(t, nil)
-		if code != 2 || !strings.Contains(stderr, "invalid_openrouter_key") {
-			t.Fatalf("unsupported .env shell syntax should not configure OpenRouter key: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
+		if code != 1 || !strings.Contains(stderr, "runtime_failed") || strings.Contains(stderr, "invalid_openrouter_key") {
+			t.Fatalf("unsupported .env shell syntax should not configure OpenRouter key and should continue as provider unavailable: code=%d stdout=%q stderr=%q", code, redactRuntimeSecretTestOutput(stdout), redactRuntimeSecretTestOutput(stderr))
 		}
 		assertRuntimeSecretTestOutputRedacted(t, stdout, stderr)
 	})
