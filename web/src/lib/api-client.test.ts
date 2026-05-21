@@ -152,6 +152,35 @@ describe('ResoFeed API client and rendered sinks', () => {
     } satisfies Partial<ResoFeedApiError>);
   });
 
+  it('expected-red: falls back to the OpenRouter compatibility route instead of a false unavailable model list', async () => {
+    const modelList = {
+      models: [
+        { id: 'openrouter/model-alpha', name: 'Model Alpha' },
+        { id: 'openrouter/model-beta', name: 'Model Beta' }
+      ]
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
+      const url = String(input);
+      if (url.endsWith('/api/runtime/openrouter-models')) {
+        return jsonResponse({ error: { code: 'not_found', message: 'not found: canonical route drift', details: {} } }, 404);
+      }
+      if (url.endsWith('/api/runtime/openrouter/models')) {
+        return new Response(JSON.stringify(modelList), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+      return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, 404);
+    });
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    await expect(client.openRouterModels()).resolves.toEqual(modelList);
+    expect(fetcher).toHaveBeenNthCalledWith(1, '/api/runtime/openrouter-models', {
+      headers: { Authorization: 'Bearer owner-token-123456789012345678901234' }
+    });
+    expect(fetcher).toHaveBeenNthCalledWith(2, '/api/runtime/openrouter/models', {
+      headers: { Authorization: 'Bearer owner-token-123456789012345678901234' }
+    });
+  });
+
   it('accepts the canonical current-operation runtime contract and clears idle display state', async () => {
     const canonicalKind: OperationKind = 'library_reprocess';
     const running: CurrentOperationResponse = {

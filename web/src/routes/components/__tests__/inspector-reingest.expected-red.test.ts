@@ -275,6 +275,49 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     await waitFor(() => expect(within(panel).getByLabelText('One-time prompt')).toHaveValue(''));
     expect(window.localStorage.getItem('resofeed.itemReingestPrompt')).toBeNull();
     expect(window.localStorage.getItem(`resofeed.itemReingestPrompt.${failedItem.id}`)).toBeNull();
+    expect(
+      within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }),
+      'R1 expected-red: successful re-ingest must collapse back to the single idle affordance'
+    ).toBeVisible();
+    expect(within(panel).queryByRole('button', { name: '[CONFIRM RE-INGEST]' })).not.toBeInTheDocument();
+    expect(within(panel).queryByRole('button', { name: '[CANCEL]' })).not.toBeInTheDocument();
+    expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
+    expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
+  });
+
+  it('expected-red: localizes zh Inspector and re-ingest chrome while preserving literal source identifiers', async () => {
+    const user = userEvent.setup();
+    render(Inspector, {
+      props: {
+        item: {
+          ...failedDetail,
+          summary: '显式重处理后的中文摘要。',
+          core_insight: '显式重处理后的核心洞察。',
+          model_status: 'ok'
+        },
+        mode: 'desktop-split',
+        language: 'zh',
+        showReingest: true,
+        onReingestItem: vi.fn(),
+        openRouterModels: [...openRouterModelListing.models],
+        openRouterModelListState: 'available'
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: failedDetail.title });
+    expect(within(inspector).getByText('检查器')).toBeVisible();
+    expect(within(inspector).getByText('摘要：')).toBeVisible();
+    expect(within(inspector).getByText('核心洞察：')).toBeVisible();
+    expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
+    const panel = within(inspector).getByLabelText('Item re-ingest');
+
+    expect(within(panel).getByText('项目重处理')).toBeVisible();
+    await user.click(within(panel).getByRole('button', { name: '[重处理项目]' }));
+    expect(within(panel).getByLabelText('模型')).toBeVisible();
+    expect(within(panel).getByLabelText('一次性提示')).toBeVisible();
+    expect(within(panel).getByRole('button', { name: '[确认重处理]' })).toBeVisible();
+    expect(within(panel).getByRole('button', { name: '[取消]' })).toBeVisible();
+    expect(within(panel).getByText(/模型列表：2 个 OpenRouter 模型可用/u)).toBeVisible();
   });
 
   it('renders current-operation conflict detail when item re-ingest is blocked', async () => {

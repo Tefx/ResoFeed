@@ -164,6 +164,59 @@ async function installApiFixtures(page: Page, ownerToken: string, reingestBodies
   });
 }
 
+async function installApiFixturesWithOptions(page: Page, ownerToken: string, reingestBodies: string[], options: { language?: 'en' | 'zh'; canonicalModelListStatus?: 200 | 404; compatibilityModelListStatus?: 200 | 404 } = {}): Promise<void> {
+  const language = options.language ?? 'en';
+  await page.addInitScript((token) => {
+    window.localStorage.setItem('resofeed.ownerToken', token);
+  }, ownerToken);
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const apiPath = url.pathname;
+
+    if (apiPath === '/api/sources') return fulfillJson(route, { sources: [source] });
+    if (apiPath === '/api/feed/today') return fulfillJson(route, { items: [item] });
+    if (apiPath === '/api/runtime/language') return fulfillJson(route, { language: { code: language, label: language === 'zh' ? '中文' : 'English' } });
+    if (apiPath === '/api/runtime/openrouter-models') {
+      return options.canonicalModelListStatus === 404
+        ? fulfillJson(route, { error: { code: 'not_found', message: 'not found: canonical model list route', details: {} } }, 404)
+        : fulfillJson(route, openRouterModelListing);
+    }
+    if (apiPath === '/api/runtime/openrouter/models') {
+      return options.compatibilityModelListStatus === 404
+        ? fulfillJson(route, { error: { code: 'not_found', message: 'not found: compatibility model list route', details: {} } }, 404)
+        : fulfillJson(route, openRouterModelListing);
+    }
+    if (apiPath === '/api/runtime/operation') return fulfillJson(route, { operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
+    if (apiPath === '/api/steer/active') return fulfillJson(route, { rules: [] });
+    if (apiPath === `/api/items/${item.id}/inspect` && request.method() === 'POST') return fulfillJson(route, { item_id: item.id, human_inspected_at: '2026-05-21T12:00:00Z', already_applied: false });
+    if (apiPath === `/api/items/${item.id}/reingest` && request.method() === 'POST') {
+      reingestBodies.push(request.postData() ?? '');
+      return fulfillJson(route, {
+        already_applied: false,
+        reingest: {
+          item_id: item.id,
+          status: 'completed',
+          item_updated: true,
+          fts_updated: true,
+          model: 'openai/gpt-4.1-mini',
+          item: {
+            ...detail,
+            summary: language === 'zh' ? '显式重处理后的中文摘要。' : 'Browser re-ingest summary.',
+            core_insight: language === 'zh' ? '显式重处理后的核心洞察。' : 'Browser re-ingest core insight.',
+            extracted_text: language === 'zh' ? '显式重处理后的中文正文。' : detail.extracted_text,
+            extraction_status: 'full',
+            model_status: 'ok'
+          }
+        }
+      });
+    }
+    if (apiPath === `/api/items/${item.id}` && request.method() === 'GET') return fulfillJson(route, { item: detail });
+    return fulfillJson(route, { error: { code: 'not_found', message: `not found: ${apiPath}`, details: {} } }, 404);
+  });
+}
+
 async function captureEvidence(page: Page, testInfo: TestInfo, name: string): Promise<void> {
   const evidenceDir = path.join(testInfo.outputDir, 'inspector-reingest-expected-red');
   fs.mkdirSync(evidenceDir, { recursive: true });
@@ -176,6 +229,15 @@ async function captureEvidence(page: Page, testInfo: TestInfo, name: string): Pr
   await testInfo.attach(`${name}.png`, { path: screenshotPath, contentType: 'image/png' });
   await testInfo.attach(`${name}.dom.html`, { path: domPath, contentType: 'text/html' });
   await testInfo.attach(`${name}.aria.txt`, { path: ariaPath, contentType: 'text/plain' });
+}
+
+async function attachJson(testInfo: TestInfo, name: string, payload: object): Promise<string> {
+  const evidenceDir = path.join(testInfo.outputDir, 'inspector-reingest-expected-red');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  const artifactPath = path.join(evidenceDir, `${name}.json`);
+  await fs.promises.writeFile(artifactPath, JSON.stringify(payload, null, 2), 'utf8');
+  await testInfo.attach(`${name}.json`, { path: artifactPath, contentType: 'application/json' });
+  return artifactPath;
 }
 
 test('expected-red browser-visible Inspector item re-ingest flow and evidence contract', async ({ page, ownerToken }, testInfo) => {
@@ -228,6 +290,12 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
   await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).resolves.toBeNull();
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
+
+  await expect(panel.getByRole('button', { name: '[RE-INGEST ITEM]' }), 'R1 DOM proof: success must collapse controls').toBeVisible();
+  await expect(panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' })).toHaveCount(0);
+  await expect(panel.getByRole('button', { name: '[CANCEL]' })).toHaveCount(0);
+  await expect(panel.getByLabel('Model')).toHaveCount(0);
+  await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
 });
 
 test('expected-red browser DOM shows model-backed source text disclosure contract', async ({ page, ownerToken }, testInfo) => {
@@ -264,4 +332,54 @@ test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspec
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
   await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic\/claude-3.5-sonnet)' })).toHaveAttribute('value', 'anthropic/claude-3.5-sonnet');
+});
+
+test('expected-red browser network proof: compatibility OpenRouter route prevents false unavailable state', async ({ page, ownerToken }, testInfo) => {
+  const reingestBodies: string[] = [];
+  const modelRequests: Array<{ path: string; status: number }> = [];
+  await page.setViewportSize({ width: 1280, height: 720 });
+  page.on('response', (response) => {
+    const url = new URL(response.url());
+    if (url.pathname.includes('/api/runtime/openrouter')) modelRequests.push({ path: url.pathname, status: response.status() });
+  });
+  await installApiFixturesWithOptions(page, ownerToken, reingestBodies, { canonicalModelListStatus: 404, compatibilityModelListStatus: 200 });
+  await page.goto('/');
+  await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
+  const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
+  const panel = inspector.getByLabel('Item re-ingest');
+  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await captureEvidence(page, testInfo, 'inspector-model-list-compat-route-red');
+  await attachJson(testInfo, 'inspector-model-list-network-red', { modelRequests });
+
+  await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
+  await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
+  expect(modelRequests).toEqual([
+    { path: '/api/runtime/openrouter-models', status: 404 },
+    { path: '/api/runtime/openrouter/models', status: 200 }
+  ]);
+});
+
+test('expected-red browser zh chrome and post-reingest item text proof', async ({ page, ownerToken }, testInfo) => {
+  const reingestBodies: string[] = [];
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await installApiFixturesWithOptions(page, ownerToken, reingestBodies, { language: 'zh' });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
+  const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
+  await captureEvidence(page, testInfo, 'inspector-zh-before-reingest-red');
+  await expect(inspector.getByText('检查器')).toBeVisible();
+  await expect(inspector.getByText(/中文处理失败|中文处理未完成/u)).toBeVisible();
+  await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
+  const panel = inspector.getByLabel('Item re-ingest');
+  await panel.getByRole('button', { name: '[重处理项目]' }).click();
+  await panel.getByLabel('一次性提示').fill('请用中文重写摘要和核心洞察。');
+  await panel.getByRole('button', { name: '[确认重处理]' }).click();
+  await captureEvidence(page, testInfo, 'inspector-zh-after-reingest-red');
+
+  await expect(inspector.getByText('摘要：')).toBeVisible();
+  await expect(inspector.getByText('核心洞察：')).toBeVisible();
+  await expect(inspector.getByText('显式重处理后的中文摘要。')).toBeVisible();
+  await expect(inspector.getByText('显式重处理后的核心洞察。')).toBeVisible();
+  expect(JSON.parse(reingestBodies[0] ?? '{}')).not.toHaveProperty('language');
 });
