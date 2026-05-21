@@ -1,0 +1,235 @@
+artifact: item-reingest-prompt-schema-authority
+step_id: item-reingest-foundation.prompt-schema-authority
+status: proposed_authority
+authority_sources:
+  - path: docs/ARCHITECTURE.md#resofeed-architecture-spec/1-decisions
+    key_passage: "OpenRouter is the sole LLM backend; it is a request/response JSON transformation and Go validates every structured output before applying or saving it."
+  - path: docs/ARCHITECTURE.md#resofeed-architecture-spec/2-system-boundary
+    key_passage: "There are no internal services; the Go binary owns HTTP, MCP, background ingest, SQLite migrations, and OpenRouter access."
+  - path: /Users/tefx/dotfiles/agent/agents/rss-agent.md
+    key_passage: "The external rss-agent enrichment JSON requires article_id, emoji/Chinese value_tier, score, tags, insight, summary, and key_points."
+  - path: internal/resofeed/openrouter.go
+    key_passage: "The current ResoFeed OpenRouter summary contract asks for title, feed_excerpt, extracted_text, summary, core_insight, value_tier, and model_status, with stable value_tier values high, brief, and source-claim."
+
+decision: REQUIRES_DOCS_API_SCHEMA_REPLAN
+decision_scope: >-
+  This decision governs whether ResoFeed may adopt rss-agent prompt and enrichment
+  schema rules during item reingest work before changing docs, API contracts,
+  persistence schema, HTTP responses, or MCP responses.
+rationale:
+  - >-
+    The current ResoFeed stable output schema is already implemented in
+    internal/resofeed/openrouter.go and persisted/displayed through shared Item
+    fields. Adding rss-agent fields would not be prompt-only; it would alter
+    storage/API/MCP/UI contracts.
+  - >-
+    Architecture decisions require Go to validate structured LLM output before
+    applying or saving it. Therefore any new LLM output field must have a
+    documented validation and product-surface destination before implementation.
+  - >-
+    Compatible quality rules can improve the prompt without changing the stable
+    schema because they constrain generated text inside existing fields.
+trade_offs:
+  accepted:
+    - >-
+      Preserving the stable schema delays richer rss-agent-style metadata, but
+      prevents silent drift across SQLite, HTTP, MCP, search, and UI surfaces.
+    - >-
+      Allowing compatible prompt quality rules captures the anti-fluff benefits
+      now, but does not create first-class key points, tags, or numeric scoring.
+  rejected:
+    - >-
+      Directly adopting the external rss-agent enrichment schema would be faster
+      for prompt authoring, but would bypass ResoFeed's architecture authority
+      and create undocumented API/schema behavior.
+
+resofeed_stable_schema:
+  verdict: preserved_until_replan
+  current_openrouter_summary_output_fields:
+    - title
+    - feed_excerpt
+    - extracted_text
+    - summary
+    - core_insight
+    - value_tier
+    - model_status
+  current_value_tier_values:
+    - high
+    - brief
+    - source-claim
+  current_model_status_values:
+    - ok
+    - summary_unavailable
+    - model_latency_error
+    - invalid_model
+    - provider_error
+    - rate_limited
+    - decode_error
+    - timeout
+  invariant: >-
+    Until docs/API/schema replan is completed, item reingest prompt/schema work
+    must preserve these field names and stable enum values.
+
+rss_agent_field_classification:
+  article_id:
+    classification: reject_requires_replan
+    rationale: >-
+      ResoFeed prompt input has item_id and output does not echo an article_id;
+      adding an output identifier changes the output contract and validator shape.
+  value_tier:
+    classification: preserve_current_schema
+    rationale: >-
+      ResoFeed already has value_tier, but its allowed product labels are stable
+      ASCII values high, brief, and source-claim. The rss-agent emoji/Chinese
+      labels are not compatible values.
+  score:
+    classification: reject_requires_replan
+    rationale: >-
+      ResoFeed has no current score field in OpenRouterSummaryOutput or Item; a
+      numeric score would need docs, storage/API/MCP/search/UI destination and
+      validation semantics.
+  tags:
+    classification: reject_requires_replan
+    rationale: >-
+      ResoFeed architecture and agent instructions forbid adding tags/folders as
+      product concepts without explicit product reversal; tags would be a new
+      user-visible schema surface.
+  insight:
+    classification: reject_requires_replan
+    rationale: >-
+      ResoFeed's stable field is core_insight. Renaming or adding insight would
+      drift the HTTP/MCP schema unless a replan maps or migrates the field.
+  summary:
+    classification: adopt_compatible_rule
+    rationale: >-
+      Summary already exists. Anti-fluff, factual-density, fallback clarity, and
+      user-language rules may constrain its content if they do not add fields or
+      change persistence/API response shape.
+  key_points:
+    classification: reject_requires_replan
+    rationale: >-
+      ResoFeed has no key_points field or API/MCP destination. Embedding a
+      structured list in summary would create hidden schema semantics and should
+      not be done without replan.
+
+emoji_chinese_value_tier_labels:
+  values:
+    - "💎 高价值"
+    - "🔷 较高价值"
+    - "🔹 中等价值"
+    - "🔸 低价值"
+  classification: reject_requires_replan
+  rationale: >-
+    These labels conflict with the current stable ResoFeed value_tier enum
+    high/brief/source-claim and would alter persisted/searchable/displayed item
+    values. They may be considered only in a docs/API/schema replan.
+
+allowed_compatible_rules:
+  - name: anti_fluff
+    applies_to:
+      - summary
+      - core_insight
+    condition: preserve current field names and enum values
+    rationale: >-
+      Already compatible with openrouter.go summary_quality_rule and does not
+      require new product fields.
+  - name: factual_density
+    applies_to:
+      - summary
+      - core_insight
+      - feed_excerpt
+      - extracted_text
+    condition: preserve source-backed provenance and current output schema
+    rationale: >-
+      Strengthens content quality inside existing user-readable fields.
+  - name: fallback_clarity
+    applies_to:
+      - summary
+      - model_status
+    condition: use existing model_status values and do not fabricate unavailable fulltext
+    rationale: >-
+      Aligns with the architecture's safe validation/fallback model without
+      adding rss-agent fallback fields.
+  - name: user_language_output
+    applies_to:
+      - title
+      - feed_excerpt
+      - extracted_text
+      - summary
+      - core_insight
+    condition: keep URLs, source identifiers, and provenance literal
+    rationale: >-
+      Already matches the current target_language_rule in openrouter.go.
+
+forbidden_without_replan:
+  - Add OpenRouterSummaryOutput fields article_id, score, tags, insight, or key_points.
+  - Rename core_insight to insight in any persisted, HTTP, MCP, or frontend contract.
+  - Replace value_tier high/brief/source-claim with emoji/Chinese labels.
+  - Add tags as item metadata or expose tag filters/categories.
+  - Encode key_points as a hidden structured sub-schema inside summary.
+  - Change runtime implementation files to accept rss-agent schema before docs/API/schema replan.
+
+downstream_block:
+  downstream_schema_changing_implementation_blocked: true
+  blocked_until:
+    - docs/ARCHITECTURE.md and product docs specify the new item metadata contract
+    - SQLite migration and validation ownership are planned
+    - HTTP and MCP response schema changes are planned together
+    - Search/FTS and UI display behavior are explicitly accepted or rejected
+  non_blocked_work:
+    - >-
+      Prompt text tightening that preserves the current ResoFeed schema and enum
+      values may proceed.
+    - >-
+      Tests that assert rss-agent schema changes are rejected or require replan
+      may proceed without changing runtime implementation.
+
+decision_matrix:
+  - requirement_ref: rss-agent.md#9.1 article_id
+    requirement: Output article_id as an integer copied from input.
+    current_resofeed_contract: OpenRouterSummaryInput has item_id; OpenRouterSummaryOutput has no article_id.
+    decision: reject_requires_replan
+    rationale: Output identifier echo changes schema and validation contract.
+  - requirement_ref: rss-agent.md#9.1 emoji_chinese_value_tier
+    requirement: Use exactly one emoji/Chinese value_tier label.
+    current_resofeed_contract: value_tier must normalize to high, brief, or source-claim.
+    decision: reject_requires_replan
+    rationale: Direct adoption conflicts with stable persisted enum values.
+  - requirement_ref: rss-agent.md#9.1 score
+    requirement: Output score float from 0.0 to 1.0.
+    current_resofeed_contract: No score field exists in output, Item, HTTP, or MCP contract.
+    decision: reject_requires_replan
+    rationale: Numeric scoring is new product schema and ranking/display semantics.
+  - requirement_ref: rss-agent.md#9.1 tags
+    requirement: Output at least two or three tags.
+    current_resofeed_contract: ResoFeed instructions forbid tags/folders as product concepts.
+    decision: reject_requires_replan
+    rationale: Tags are explicitly out of current product scope.
+  - requirement_ref: rss-agent.md#9.1 insight
+    requirement: Output insight as one sentence.
+    current_resofeed_contract: Existing stable field is core_insight with one-sentence validation.
+    decision: preserve_current_schema
+    rationale: Keep core_insight; do not rename to insight without replan.
+  - requirement_ref: rss-agent.md#9.1 summary
+    requirement: Output detailed summary in user language.
+    current_resofeed_contract: Existing summary field already supports user-readable target-language text.
+    decision: adopt_compatible_rule
+    rationale: Content quality rule is compatible if schema is unchanged.
+  - requirement_ref: rss-agent.md#9.1 key_points
+    requirement: Output list of key_points.
+    current_resofeed_contract: No key_points field exists.
+    decision: reject_requires_replan
+    rationale: Structured bullet list requires docs/API/schema destination.
+  - requirement_ref: rss-agent.md#9.2-9.3 fallback
+    requirement: On fetch failure, still provide complete fallback JSON.
+    current_resofeed_contract: Existing model_status and extraction_status represent fallback/failure; Go validates before saving.
+    decision: adopt_compatible_rule
+    rationale: Fallback clarity is allowed only through existing model_status fields and current schema.
+
+open_questions:
+  - >-
+    If future product work wants score or key_points, should they be first-class
+    item fields, derived display-only text, or rejected as outside ResoFeed scope?
+  - >-
+    Should value_tier remain an internal stable enum with localized UI labels, or
+    should persisted localized labels ever be permitted?
