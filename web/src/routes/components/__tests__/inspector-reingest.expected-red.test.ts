@@ -47,6 +47,31 @@ const failedDetail: ItemDetail = {
   }
 };
 
+const modelBackedDetail: ItemDetail = {
+  ...failedDetail,
+  id: 'item_model_backed_source_disclosure_expected_red',
+  title: 'Model-backed item still exposes source text by disclosure',
+  summary: 'A complete model-backed paragraph explains the source material clearly.',
+  core_insight: 'The source disclosure remains the verification path for model-backed reading.',
+  display_excerpt: 'RSS excerpt remains available as source fallback.',
+  extraction_status: 'full',
+  model_status: 'ok',
+  feed_excerpt: 'RSS excerpt remains available as source fallback.',
+  extracted_text: 'Full source article text remains available for verification behind a collapsed disclosure.',
+  provenance: {
+    ...failedDetail.provenance,
+    original_url: 'https://example.com/model-backed-source-disclosure',
+    canonical_url: 'https://example.com/model-backed-source-disclosure'
+  }
+};
+
+const openRouterModelListing = {
+  models: [
+    { id: 'openai/gpt-4.1-mini', name: 'GPT 4.1 Mini' },
+    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' }
+  ]
+} as const;
+
 function jsonResponse(body: object, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
     status: init.status ?? 200,
@@ -62,6 +87,7 @@ function installAuthenticatedRuntimeFetch(options: { reingestConflict?: boolean 
     if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
     if (url.includes('/api/feed/today')) return jsonResponse({ items: [failedItem] });
     if (url.endsWith('/api/runtime/language')) return jsonResponse({ language: { code: 'en', label: 'English' } });
+    if (url.endsWith('/api/runtime/openrouter-models')) return jsonResponse(openRouterModelListing);
     if (url.endsWith('/api/runtime/operation')) return jsonResponse({ operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
     if (url.endsWith(`/api/items/${failedItem.id}/inspect`) && method === 'POST') {
@@ -161,6 +187,33 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const sourceEvidence = within(inspector).getByLabelText('Source evidence');
     expect(sourceEvidence.tagName, 'product gap: source evidence should be a disclosure details element').toBe('DETAILS');
     expect(sourceEvidence).not.toHaveAttribute('open');
+  });
+
+  it('expected-red: keeps model-backed source text behind an accessible collapsed disclosure', () => {
+    render(Inspector, { props: { item: modelBackedDetail, mode: 'desktop-split', showReingest: true } });
+    const inspector = screen.getByRole('complementary', { name: modelBackedDetail.title });
+
+    expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
+    expect(within(inspector).getByText('A complete model-backed paragraph explains the source material clearly.')).toBeVisible();
+    expect(within(inspector).getByText('The source disclosure remains the verification path for model-backed reading.')).toBeVisible();
+
+    const sourceText = within(inspector).getByLabelText('Source text');
+    expect(sourceText.tagName, 'product gap: model-backed Source text should be an accessible disclosure').toBe('DETAILS');
+    expect(sourceText, 'product gap: Source text disclosure should be collapsed by default').not.toHaveAttribute('open');
+    expect(within(sourceText).getByText('Full source article text remains available for verification behind a collapsed disclosure.')).toBeVisible();
+  });
+
+  it('expected-red: surfaces live OpenRouter model options and model-list diagnostics in the Inspector model control', async () => {
+    const { user } = await renderAuthenticatedPage();
+    await user.click(screen.getByRole('button', { name: `Open Inspector for: ${failedItem.title}` }));
+    const inspector = screen.getByRole('complementary', { name: failedItem.title });
+    const panel = within(inspector).getByLabelText('Item re-ingest');
+    const modelControl = within(panel).getByLabelText('Model');
+
+    expect(within(panel).getByText(/model list: 2 OpenRouter models available/i), 'product gap: model-list diagnostics should be visible next to the selector').toBeVisible();
+    expect(within(modelControl).getByRole('option', { name: 'Default model' })).toHaveValue('default');
+    expect(within(modelControl).getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveValue('openai/gpt-4.1-mini');
+    expect(within(modelControl).getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)' })).toHaveValue('anthropic/claude-3.5-sonnet');
   });
 
   it('sends Default model as null, treats prompt as one-time state, and clears temporary form state after success', async () => {

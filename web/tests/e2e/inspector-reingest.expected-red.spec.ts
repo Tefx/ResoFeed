@@ -83,6 +83,35 @@ const detail: ItemDetail = {
   }
 };
 
+const modelBackedItem: ItemSummary = {
+  ...item,
+  id: 'item_model_backed_source_disclosure_expected_red',
+  title: 'Browser model-backed item source disclosure target',
+  summary: 'Browser model-backed summary is present.',
+  core_insight: 'Browser model-backed core insight is present.',
+  display_excerpt: 'Browser RSS excerpt remains available as fallback source text.',
+  extraction_status: 'full',
+  model_status: 'ok'
+};
+
+const modelBackedDetail: ItemDetail = {
+  ...modelBackedItem,
+  feed_excerpt: 'Browser RSS excerpt remains available as fallback source text.',
+  extracted_text: 'Browser full source text remains available for verification behind a collapsed disclosure.',
+  provenance: {
+    ...detail.provenance,
+    canonical_url: 'https://news.example.test/model-backed-source-disclosure',
+    original_url: 'https://news.example.test/model-backed-source-disclosure'
+  }
+};
+
+const openRouterModelListing = {
+  models: [
+    { id: 'openai/gpt-4.1-mini', name: 'GPT 4.1 Mini' },
+    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' }
+  ]
+} as const;
+
 async function fulfillJson(route: Route, payload: object, status = 200): Promise<void> {
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
 }
@@ -98,8 +127,9 @@ async function installApiFixtures(page: Page, ownerToken: string, reingestBodies
     const apiPath = url.pathname;
 
     if (apiPath === '/api/sources') return fulfillJson(route, { sources: [source] });
-    if (apiPath === '/api/feed/today') return fulfillJson(route, { items: [item] });
+    if (apiPath === '/api/feed/today') return fulfillJson(route, { items: [item, modelBackedItem] });
     if (apiPath === '/api/runtime/language') return fulfillJson(route, { language: { code: 'en', label: 'English' } });
+    if (apiPath === '/api/runtime/openrouter-models') return fulfillJson(route, openRouterModelListing);
     if (apiPath === '/api/runtime/operation') return fulfillJson(route, { operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     if (apiPath === '/api/steer/active') return fulfillJson(route, { rules: [] });
     if (apiPath === `/api/items/${item.id}/inspect` && request.method() === 'POST') {
@@ -126,6 +156,10 @@ async function installApiFixtures(page: Page, ownerToken: string, reingestBodies
       });
     }
     if (apiPath === `/api/items/${item.id}` && request.method() === 'GET') return fulfillJson(route, { item: detail });
+    if (apiPath === `/api/items/${modelBackedItem.id}/inspect` && request.method() === 'POST') {
+      return fulfillJson(route, { item_id: modelBackedItem.id, human_inspected_at: '2026-05-21T12:05:00Z', already_applied: false });
+    }
+    if (apiPath === `/api/items/${modelBackedItem.id}` && request.method() === 'GET') return fulfillJson(route, { item: modelBackedDetail });
     return fulfillJson(route, { error: { code: 'not_found', message: `not found: ${apiPath}`, details: {} } }, 404);
   });
 }
@@ -184,4 +218,39 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
   await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).resolves.toBeNull();
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
+});
+
+test('expected-red browser DOM shows model-backed source text disclosure contract', async ({ page, ownerToken }, testInfo) => {
+  const reingestBodies: string[] = [];
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await installApiFixtures(page, ownerToken, reingestBodies);
+  await page.goto('/');
+
+  await page.getByRole('button', { name: `Open Inspector for: ${modelBackedItem.title}` }).click();
+  const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
+  await expect(inspector).toContainText('Browser model-backed summary is present.');
+  await expect(inspector).toContainText('Browser model-backed core insight is present.');
+  await captureEvidence(page, testInfo, 'inspector-model-backed-source-disclosure-red');
+
+  const sourceText = inspector.locator('[aria-label="Source text"]');
+  await expect(sourceText).toHaveCount(1);
+  await expect(sourceText).toHaveJSProperty('tagName', 'DETAILS');
+  await expect(sourceText).not.toHaveAttribute('open', '');
+});
+
+test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspector selector', async ({ page, ownerToken }, testInfo) => {
+  const reingestBodies: string[] = [];
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await installApiFixtures(page, ownerToken, reingestBodies);
+  await page.goto('/');
+
+  await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
+  const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
+  const panel = inspector.getByLabel('Item re-ingest');
+  await expect(panel).toBeVisible();
+  await captureEvidence(page, testInfo, 'inspector-model-list-diagnostics-red');
+
+  await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
+  await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveValue('openai/gpt-4.1-mini');
+  await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic\/claude-3.5-sonnet)' })).toHaveValue('anthropic/claude-3.5-sonnet');
 });
