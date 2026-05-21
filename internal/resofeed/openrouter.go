@@ -120,10 +120,10 @@ func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRoute
 	out.ModelStatus = strings.TrimSpace(out.ModelStatus)
 	var sanitized bool
 	if out.Summary, sanitized = sanitizeReadablePayloadText(out.Summary); sanitized && out.Summary == "" {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: contaminated summary")
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: contaminated summary")
 	}
 	if out.CoreInsight, sanitized = sanitizeReadablePayloadText(out.CoreInsight); sanitized && out.CoreInsight == "" {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: contaminated core_insight")
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: contaminated core_insight")
 	}
 	out.FeedExcerpt, _ = sanitizeReadablePayloadText(out.FeedExcerpt)
 	out.ExtractedText, _ = sanitizeReadablePayloadText(out.ExtractedText)
@@ -131,18 +131,18 @@ func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRoute
 		out.ModelStatus = "ok"
 	}
 	if mapModelStatus(out.ModelStatus) == modelStatusSummaryNA && out.ModelStatus != modelStatusSummaryNA {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
 	}
 	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: summary and core_insight required")
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: summary and core_insight required")
 	}
 	if out.ModelStatus == "ok" && !isSingleSentenceCoreInsight(out.CoreInsight) {
-		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: core_insight must be exactly one sentence")
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: core_insight must be exactly one sentence")
 	}
 	if out.ModelStatus == "ok" {
 		valueTier, err := normalizeSummaryValueTier(out.ValueTier)
 		if err != nil {
-			return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, err
+			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 		}
 		out.ValueTier = valueTier
 	}

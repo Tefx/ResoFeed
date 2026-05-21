@@ -35,7 +35,8 @@ Status: implemented contract artifact. This file pins public shapes and non-goal
 ## Reprocess source and FTS contracts
 
 - Reprocess source precedence: `items.canonical_url` if valid HTTP/HTTPS, then `items.url` if valid HTTP/HTTPS.
-- Never use `sources.url`, `items.source_url`, public `provenance.source_url`, or existing stored target-language fields as source material.
+- Never use `sources.url`, `items.source_url`, public `provenance.source_url`, or existing stored target-language interpretation fields (`title`, `summary`, `core_insight`) as source material.
+- Narrow reprocess-only stored fallback exception: if every fresh article fetch candidate fails, reprocess may use already persisted readable source fallback text in exact order `items.extracted_text`, then `items.feed_excerpt`. This exception is limited to existing library reprocess, does not apply to normal ingest/source fetch, does not permit invented content, does not permit source feed URL article fetches, and does not permit broad reuse of stored summaries, core insights, or titles as source material. The LLM input URL/provenance remains the original article URL or selected canonical article URL, never the RSS/Atom feed URL.
 - Reprocess preserves source identifiers exactly and rewrites only user-readable processed fields where source/model input is available.
 - Final completion rebuilds or fully refreshes FTS. If the final rebuild does not complete, leave `search_fts_stale_since` set and report stale FTS through `/api/doctor`.
 

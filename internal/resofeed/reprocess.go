@@ -228,7 +228,7 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 	}
 	out, err = validateSummaryOutputForPersistence(out)
 	if err != nil {
-		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, string(ReprocessErrorSummaryUnavailable)), nil
+		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, string(ReprocessErrorDecodeError), modelStatusDecodeError), nil
 	}
 	modelStatus := mapModelStatus(out.ModelStatus)
 	if modelStatus != modelStatusOK {

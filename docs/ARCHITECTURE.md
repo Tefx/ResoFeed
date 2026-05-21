@@ -1354,7 +1354,7 @@ Duplicate idempotency examples for `PUT /api/runtime/language`:
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
 | `item_id` | string | Yes | Yes | `null` for global operation failures, otherwise item ID. |
-| `code` | string enum | Yes | No | `rss_fetch_error`, `model_latency_error`, `summary_unavailable`, `original_unavailable`, `timeout`, `internal`. |
+| `code` | string enum | Yes | No | `rss_fetch_error`, `model_latency_error`, `summary_unavailable`, `original_unavailable`, `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, `timeout`, `internal`. |
 | `message` | string | Yes | No | Terse diagnostic max 200 chars. |
 
 `ReprocessLibraryResult`:

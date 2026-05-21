@@ -89,6 +89,30 @@ func TestOpenRouterModelErrorStatusContractExpectedRed(t *testing.T) {
 	}
 }
 
+func TestOpenRouterValidJSONInvalidSummaryFieldsMapsDecodeErrorExpectedRed(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"summary\":\"Valid summary.\",\"core_insight\":\"First sentence. Second sentence.\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
+	}))
+	t.Cleanup(server.Close)
+
+	client := &openRouterHTTPClient{apiKey: "test-openrouter-key", model: "openrouter/test", endpoint: server.URL, client: server.Client()}
+	out, err := client.SummarizeItem(context.Background(), OpenRouterSummaryInput{ItemID: "item_invalid_structured_json", Title: "Title", SourceTitle: "Source", URL: "https://example.test/article", AvailableText: "article body", TargetLanguage: ProcessingLanguageEnglish})
+	if err == nil {
+		t.Fatalf("SummarizeItem error = nil, want decode_error for syntactically valid JSON with invalid fields")
+	}
+	if out.ModelStatus != modelStatusDecodeError {
+		t.Fatalf("SummarizeItem model_status = %q, want %q", out.ModelStatus, modelStatusDecodeError)
+	}
+	for _, forbidden := range []string{"Valid summary.", "First sentence. Second sentence."} {
+		if strings.Contains(err.Error(), forbidden) {
+			t.Fatalf("validation error leaked raw model payload fragment %q: %v", forbidden, err)
+		}
+	}
+}
+
 func TestModelFailureStatusClassificationForBuildAndReprocessExpectedRed(t *testing.T) {
 	ctx := context.Background()
 	llm := classifyingFailureLLM{err: errors.New("openrouter: invalid model")}
@@ -128,6 +152,43 @@ func TestModelFailureStatusClassificationForBuildAndReprocessExpectedRed(t *test
 	if resp.Reprocess.Errors[0].Code != ReprocessErrorCode("invalid_model") {
 		t.Fatalf("reprocess error code = %q, want invalid_model", resp.Reprocess.Errors[0].Code)
 	}
+}
+
+func TestInvalidStructuredLLMOutputMapsDecodeErrorForBuildAndReprocessExpectedRed(t *testing.T) {
+	ctx := context.Background()
+	llm := invalidStructuredSummaryLLM{}
+	source := Source{ID: "src_invalid_structured", URL: "https://feed.example.test/rss.xml", Title: "Structured Source"}
+	entry := feedEntry{ID: "invalid-structured-entry", Title: "Invalid Structured Entry", URL: "not-a-real-url", Description: "stored RSS excerpt for invalid structured path"}
+
+	item, err := buildItem(ctx, source, entry, llm, ProcessingLanguageEnglish)
+	if err != nil {
+		t.Fatalf("buildItem returned error: %v", err)
+	}
+	if item.ModelStatus != modelStatusDecodeError {
+		t.Fatalf("buildItem model_status = %q, want %q for valid JSON with invalid fields", item.ModelStatus, modelStatusDecodeError)
+	}
+	if item.Summary != nil || item.CoreInsight != nil {
+		t.Fatalf("buildItem persisted invalid structured summary/core: summary=%v core=%v", item.Summary, item.CoreInsight)
+	}
+
+	db := newContractDB(t, ctx)
+	article := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>fresh source text for invalid structured path</article></body></html>`)
+	}))
+	t.Cleanup(article.Close)
+	seedSource(t, ctx, db, "src_invalid_structured_reprocess", article.URL+"/feed.xml", "Invalid Structured Reprocess")
+	seedReprocessItem(t, ctx, db, "item_invalid_structured_reprocess", "src_invalid_structured_reprocess", article.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := reprocessLibraryFresh(ctx, db, llm)
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.ItemsFailed != 1 || resp.Reprocess.ItemsUnavailable != 0 {
+		t.Fatalf("reprocess counts = %+v, want one failed decode_error and no summary_unavailable", resp.Reprocess)
+	}
+	assertReprocessErrorCode(t, resp.Reprocess.Errors, "item_invalid_structured_reprocess", ReprocessErrorDecodeError)
+	assertClearedReprocessFields(t, ctx, db, "item_invalid_structured_reprocess", modelStatusDecodeError)
 }
 
 func TestReprocessFallbackTextContractExpectedRed(t *testing.T) {
@@ -188,6 +249,16 @@ func TestReprocessFallbackTextContractExpectedRed(t *testing.T) {
 
 type classifyingFailureLLM struct {
 	err error
+}
+
+type invalidStructuredSummaryLLM struct{}
+
+func (invalidStructuredSummaryLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{Summary: "Valid summary.", CoreInsight: "First sentence. Second sentence.", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (invalidStructuredSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
 }
 
 func (l classifyingFailureLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {

@@ -30,6 +30,9 @@ func TestMaliciousFakeLLMRejectedBeforeOKPersistenceInBuildItem(t *testing.T) {
 			if item.ModelStatus == modelStatusOK {
 				t.Fatalf("buildItem persisted ok model status for invalid output: %+v", item)
 			}
+			if item.ModelStatus != modelStatusDecodeError {
+				t.Fatalf("buildItem model_status = %q, want %q for invalid structured output", item.ModelStatus, modelStatusDecodeError)
+			}
 			if item.Summary != nil || item.CoreInsight != nil || item.ValueTier != nil {
 				t.Fatalf("buildItem retained invalid LLM fields: summary=%v core=%v value_tier=%v", item.Summary, item.CoreInsight, item.ValueTier)
 			}
@@ -61,8 +64,8 @@ func TestMaliciousFakeLLMRejectedBeforeOKPersistenceInReprocess(t *testing.T) {
 			if outcome.writable() || outcome.modelStatus == modelStatusOK {
 				t.Fatalf("processReprocessItem produced writable ok outcome for invalid output: %+v", outcome)
 			}
-			if !outcome.unavailable || outcome.errorCode != ReprocessErrorSummaryUnavailable {
-				t.Fatalf("processReprocessItem outcome = %+v, want summary-unavailable preservation path", outcome)
+			if !outcome.failed || outcome.errorCode != ReprocessErrorDecodeError || outcome.modelStatus != modelStatusDecodeError {
+				t.Fatalf("processReprocessItem outcome = %+v, want decode_error failure path", outcome)
 			}
 		})
 	}

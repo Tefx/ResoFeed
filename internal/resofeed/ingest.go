@@ -635,7 +635,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 	}
 	out, err = validateSummaryOutputForPersistence(out)
 	if err != nil {
-		item.ModelStatus = modelStatusSummaryNA
+		item.ModelStatus = modelStatusDecodeError
 		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 			item.ExtractionStatus = extractionStatusSummaryNA
 		}
