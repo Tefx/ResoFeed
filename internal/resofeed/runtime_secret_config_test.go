@@ -41,7 +41,8 @@ func TestOpenRouterRuntimeSecretResolutionFromLocalDotEnvFallback(t *testing.T) 
 func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing.T) {
 	t.Run("explicit model with env key source", func(t *testing.T) {
 		var stdout bytes.Buffer
-		printServeStartupConsole(&stdout, ServeConfig{Addr: "127.0.0.1:8080", PublicURL: "http://127.0.0.1:8080", DBPath: "data/resofeed.sqlite3", OpenRouterKey: fakeEnvSecret, OpenRouterKeySource: openRouterKeySourceEnv, OpenRouterModel: "google/gemini-3.5-flash", OwnerToken: contractOwnerToken}, "http://127.0.0.1:8080", OwnerTokenResolution{WasExplicit: true})
+		dbPath := filepath.Join(t.TempDir(), "nested", "resofeed.sqlite3")
+		printServeStartupConsole(&stdout, ServeConfig{Addr: "127.0.0.1:8080", PublicURL: "http://127.0.0.1:8080", DBPath: dbPath, OpenRouterKey: fakeEnvSecret, OpenRouterKeySource: openRouterKeySourceEnv, OpenRouterModel: "google/gemini-3.5-flash", OwnerToken: contractOwnerToken}, "http://127.0.0.1:8080", OwnerTokenResolution{WasExplicit: true})
 		output := stdout.String()
 		for _, want := range []string{
 			"RESOFEED serve\n",
@@ -50,6 +51,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 			"ui: mounted\n",
 			"api: enabled\n",
 			"mcp: /mcp\n",
+			"sqlite: configured local file\n",
 			"migrations: ok\n",
 			"ingest: started\n",
 			"llm: openrouter\n",
@@ -62,6 +64,9 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 		}
 		if strings.Contains(output, "model-note:") {
 			t.Fatalf("explicit model startup printed default-model note: %q", redactRuntimeSecretTestOutput(output))
+		}
+		if strings.Contains(output, dbPath) || strings.Contains(output, filepath.Dir(dbPath)) || strings.Contains(output, filepath.Base(dbPath)) {
+			t.Fatalf("startup stdout leaked sqlite path; output=%q", redactRuntimeSecretTestOutput(output))
 		}
 		assertRuntimeSecretTestOutputRedacted(t, output)
 		assertRuntimeSecretSourceMetadataRedacted(t, output)

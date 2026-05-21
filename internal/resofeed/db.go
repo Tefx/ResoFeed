@@ -419,7 +419,7 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	_, _ = io.WriteString(w, "ui: mounted\n")
 	_, _ = io.WriteString(w, "api: enabled\n")
 	_, _ = io.WriteString(w, "mcp: /mcp\n\n")
-	_, _ = fmt.Fprintf(w, "sqlite: %s\n", cfg.DBPath)
+	_, _ = fmt.Fprintf(w, "sqlite: %s\n", safeSQLiteStartupLabel(cfg.DBPath))
 	_, _ = io.WriteString(w, "migrations: ok\n")
 	_, _ = fmt.Fprintf(w, "first-fetch-limit: %s\n", firstFetchLimitDisplay(cfg.FirstFetchMaxItems))
 	_, _ = io.WriteString(w, "ingest: started\n\n")
@@ -429,6 +429,13 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	if strings.TrimSpace(cfg.OpenRouterModel) == "" {
 		_, _ = io.WriteString(w, "model-note: no --openrouter-model supplied; OpenRouter account default will be used\n")
 	}
+}
+
+func safeSQLiteStartupLabel(dbPath string) string {
+	if dbPath == ":memory:" {
+		return "memory"
+	}
+	return "configured local file"
 }
 
 func deterministicOpenRouterEndpointForE2E() string {
