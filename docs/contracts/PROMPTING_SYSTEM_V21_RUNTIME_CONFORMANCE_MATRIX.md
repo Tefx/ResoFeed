@@ -2,8 +2,8 @@
 
 Status: authoritative pre-implementation contract matrix for Prompting System v2.1, selected-item re-ingest/OpenRouter deltas, MCP parity classification, and R3/R4 repair obligations.
 
-Authoring step: `contract-matrix`  
-Authoring agent: `software-architect`  
+Authoring step: `contract-matrix`
+Authoring agent: `software-architect`
 Authority sources: `docs/PROMPTING_SYSTEM.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `docs/USAGE.md`, `docs/POST_CLOSURE_REINGEST_MODEL_I18N_REPAIR_CONTRACT.md`
 
 ## Scope and Non-Intersection Rules
