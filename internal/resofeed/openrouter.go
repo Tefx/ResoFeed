@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -286,6 +287,9 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 	if err := validatePromptProvenance(out, item); err != nil {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
+	if err := validatePromptSourceGrounding(out, item); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+	}
 	return out, nil
 }
 
@@ -373,6 +377,43 @@ func validatePromptProvenance(out OpenRouterSummaryOutput, item promptingV21Item
 		return promptValidationError(PromptValidationProvenanceMutation, "url", nil)
 	}
 	return nil
+}
+
+func validatePromptSourceGrounding(out OpenRouterSummaryOutput, item promptingV21Item) error {
+	if out.ModelStatus != modelStatusOK {
+		return nil
+	}
+	sourceText := strings.ToLower(strings.Join([]string{item.Title, item.SourceTitle, item.URL, item.AvailableText}, "\n"))
+	if strings.TrimSpace(sourceText) == "" {
+		return nil
+	}
+	for _, claim := range unsupportedNumericClaims(out, sourceText) {
+		if claim != "" {
+			return promptValidationError(PromptValidationPromptInjectionLeakage, "source_grounding", nil)
+		}
+	}
+	return nil
+}
+
+func unsupportedNumericClaims(out OpenRouterSummaryOutput, lowerSource string) []string {
+	fields := strings.ToLower(joinSummaryOutputFields(out))
+	re := regexp.MustCompile(`\b\d+(?:\.\d+)?%`)
+	matches := re.FindAllString(fields, -1)
+	if len(matches) == 0 {
+		return nil
+	}
+	seen := make(map[string]struct{}, len(matches))
+	unsupported := make([]string, 0)
+	for _, match := range matches {
+		if _, ok := seen[match]; ok {
+			continue
+		}
+		seen[match] = struct{}{}
+		if !strings.Contains(lowerSource, match) {
+			unsupported = append(unsupported, match)
+		}
+	}
+	return unsupported
 }
 
 func joinSummaryOutputFields(out OpenRouterSummaryOutput) string {
@@ -760,6 +801,7 @@ func compilePromptingV21SummaryPrompt(input OpenRouterSummaryInput) (promptingV2
 		return promptingV21SummaryPrompt{}, fmt.Errorf("openrouter summarize: invalid available_text_source %q", input.AvailableTextSource)
 	}
 	oneTimePrompt := normalizeOneTimePrompt(input.Prompt)
+	activeSteeringRules := normalizeActiveSteeringRules(input.ActiveSteeringRules)
 	return promptingV21SummaryPrompt{
 		SystemPrompt: promptingV21SystemPrompt,
 		Model:        strings.TrimSpace(input.Model),
@@ -770,7 +812,7 @@ func compilePromptingV21SummaryPrompt(input OpenRouterSummaryInput) (promptingV2
 			QualityProfile: promptingV21DocumentedQualityProfile(),
 			Guidance: promptingV21Guidance{
 				OneTimePrompt:       oneTimePrompt,
-				ActiveSteeringRules: []string{},
+				ActiveSteeringRules: activeSteeringRules,
 			},
 			Item: promptingV21Item{
 				ItemID:              input.ItemID,
@@ -783,6 +825,63 @@ func compilePromptingV21SummaryPrompt(input OpenRouterSummaryInput) (promptingV2
 			},
 		},
 	}, nil
+}
+
+func normalizeActiveSteeringRules(values []string) []string {
+	if len(values) == 0 {
+		return []string{}
+	}
+	seen := make(map[string]struct{}, len(values))
+	rules := make([]string, 0, len(values))
+	for _, value := range values {
+		trimmed := strings.Join(strings.Fields(strings.TrimSpace(value)), " ")
+		if trimmed == "" {
+			continue
+		}
+		if len([]byte(trimmed)) > 1000 {
+			for len([]byte(trimmed)) > 1000 {
+				runes := []rune(trimmed)
+				trimmed = string(runes[:len(runes)-1])
+			}
+		}
+		if _, ok := seen[trimmed]; ok {
+			continue
+		}
+		seen[trimmed] = struct{}{}
+		rules = append(rules, trimmed)
+	}
+	if rules == nil {
+		return []string{}
+	}
+	return rules
+}
+
+func compileActiveSteeringRulesForPrompt(rules []SteerRule) []string {
+	if len(rules) == 0 {
+		return []string{}
+	}
+	compiled := make([]string, 0, len(rules))
+	for _, rule := range rules {
+		if !rule.IsActive {
+			continue
+		}
+		text := strings.TrimSpace(rule.RuleText)
+		id := strings.TrimSpace(rule.ID)
+		if text == "" && id == "" {
+			continue
+		}
+		if id != "" && text != "" {
+			compiled = append(compiled, id+": "+text)
+			continue
+		}
+		if id != "" {
+			compiled = append(compiled, id)
+			continue
+		}
+		compiled = append(compiled, text)
+	}
+	sort.Strings(compiled)
+	return normalizeActiveSteeringRules(compiled)
 }
 
 func normalizeOneTimePrompt(value string) *string {
@@ -1236,9 +1335,10 @@ type OpenRouterSummaryInput struct {
 	TargetLanguage ProcessingLanguage `json:"target_language"`
 	// AvailableTextSource is app-owned provenance for the prompt source depth.
 	// Empty preserves existing call sites and compiles as fresh_full_text.
-	AvailableTextSource string `json:"available_text_source,omitempty"`
-	Model               string `json:"model,omitempty"`
-	Prompt              string `json:"prompt,omitempty"`
+	AvailableTextSource string   `json:"available_text_source,omitempty"`
+	Model               string   `json:"model,omitempty"`
+	Prompt              string   `json:"prompt,omitempty"`
+	ActiveSteeringRules []string `json:"active_steering_rules,omitempty"`
 }
 
 // OpenRouterSummaryOutput is validated before saving summary metadata.

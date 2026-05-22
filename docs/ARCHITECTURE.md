@@ -1,10 +1,10 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Core runtime implemented; Prompting System v2.1 structured-output routing and prompt/model MCP parity are accepted contract targets pending implementation
+Status: Core runtime implemented, including Prompting System v2.1 structured-output routing and prompt/model MCP parity
 Source contracts: `docs/PRD.md`, `docs/DESIGN.md`, `docs/PROMPTING_SYSTEM.md` for prompt compilation, structured-output routing, and OpenRouter summary output schema
 
-Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, and UI language/split-scroll contracts described here are implemented behavior as of the final documentation sync. Prompting System v2.1 dynamic `json_schema` routing and any MCP additions for prompt/model parity are accepted contract targets pending implementation; runtime must not claim v2.1 compliance until it emits `schema_version: "resofeed.summarize.v2.1"`, uses the v2.1 payload, routes structured output according to `docs/PROMPTING_SYSTEM.md`, and validates the v2.1 schema plus Go semantic boundary. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
+Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, UI language/split-scroll, Prompting System v2.1 dynamic `json_schema` routing, and MCP prompt/model parity contracts described here are implemented behavior as of this documentation sync. Runtime v2.1 compliance depends on emitting `schema_version: "resofeed.summarize.v2.1"`, using the v2.1 payload, routing structured output according to `docs/PROMPTING_SYSTEM.md`, and validating the v2.1 schema plus Go semantic boundary. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
 
 ## 1. Decisions
 
@@ -419,7 +419,7 @@ architecture_basis:
       - MCP mutations require owner-token authority, actor_id, and idempotency_key.
       - MCP tools do not get product concepts unavailable to humans.
       - MCP conflict/error data mirrors canonical HTTP shapes.
-      - MCP `list_openrouter_models` is an accepted parity target but must not be documented as provider-backed equivalent to HTTP until runtime OpenRouter config wiring is verified.
+      - MCP `list_openrouter_models` uses the same request-time provider-backed model-list operation as HTTP after runtime OpenRouter secret resolution.
     ui:
       - Inspector is the only human UI surface for item re-ingest.
       - Source Ledger remains source-level ingest/fetch only.
@@ -2048,21 +2048,21 @@ Same key with different request fingerprint:
 
 ### Inspector Item Re-ingest MCP Parity
 
-MCP exposes the same item re-ingest product concept as HTTP so authorized agents can repair one selected item without receiving product capabilities unavailable to the human UI. Prompt/model MCP parity for `reingest_item` is an accepted contract target pending implementation unless the runtime tool DTO already exposes and validates those fields; do not document or log it as implemented behavior until verified against runtime.
+MCP exposes the same item re-ingest product concept as HTTP so authorized agents can repair one selected item without receiving product capabilities unavailable to the human UI. Runtime DTO/schema wiring now exposes and validates request-scoped `model`, canonical `prompt`, and compatibility `extra_prompt` fields for `reingest_item`; these fields are implemented parity with HTTP and remain non-durable request-only inputs.
 
 Additional tools:
 
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
-| `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | Accepted contract target for `GET /api/runtime/openrouter-models` parity; current provider-backed equivalence is limited pending runtime OpenRouter config wiring verification |
-| `reingest_item` | current implemented schema `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
+| `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | Provider-backed parity with `GET /api/runtime/openrouter-models`; missing runtime key returns `{ "models": [] }` |
+| `reingest_item` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "...", "model": null, "prompt": null, "extra_prompt": null }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
 
 Rules:
 
-- `list_openrouter_models` is an accepted authenticated, read-only contract target and must create no receipts, durable cache, provider registry, or portable state;
-- current MCP `list_openrouter_models` runtime behavior must not be documented as HTTP-equivalent provider-backed model listing until OpenRouter runtime config wiring is verified; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model listing;
+- `list_openrouter_models` is an authenticated, read-only parity operation and must create no receipts, durable cache, provider registry, or portable state;
+- current MCP `list_openrouter_models` runtime behavior uses the same OpenRouter model-list function as HTTP after request-time secret resolution, returns `{ "models": [] }` when no key is resolved, and redacts provider errors;
 - `reingest_item` requires owner-token authority, `item_id`, `actor_id`, and `idempotency_key`;
-- `model`, canonical `prompt`, and compatibility `extra_prompt` are pending MCP parity fields. Until runtime exposes them in the MCP DTO/schema, MCP callers must not send them; HTTP remains the implemented one-time prompt/model override surface;
+- `model`, canonical `prompt`, and compatibility `extra_prompt` are optional implemented MCP parity fields with the same validation, alias, idempotency fingerprint, and non-persistence rules as HTTP selected-item re-ingest;
 - `reingest_item` uses the current persisted processing language and does not accept a per-call language override;
 - `reingest_item` must call the same application operation as HTTP item re-ingest;
 - guarded-operation conflicts return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` when available;
@@ -2074,7 +2074,7 @@ Tool required fields:
 | Tool | Required fields | Optional fields |
 |---|---|---|
 | `list_openrouter_models` | none | none |
-| `reingest_item` | `item_id`, `actor_id`, `idempotency_key` | none currently; pending parity fields are `model`, `prompt`, `extra_prompt` |
+| `reingest_item` | `item_id`, `actor_id`, `idempotency_key` | `model`, `prompt`, `extra_prompt` |
 
 ## 8. Frontend Boundary
 
@@ -2325,7 +2325,7 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
 - item re-ingest uses the same source-text precedence as library reprocess and never fetches `sources.url`/`items.source_url` as article text;
 - selected-item readable fields and selected-item `search_fts` row are refreshed consistently after successful or storable failure outcomes;
 - conflicts across background ingest, manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use canonical `409 conflict` current-operation details with item re-ingest reported as `item_reingest`; no work is queued;
-- MCP `list_openrouter_models` is an accepted contract target but current provider-backed parity with HTTP is limited pending runtime OpenRouter config wiring verification; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model-list smoke checks. `reingest_item` prompt/model parity is an accepted contract target pending implementation unless verified in the runtime DTO;
+- MCP `list_openrouter_models` uses the same provider-backed model-list function as HTTP after runtime OpenRouter config resolution, and `reingest_item` exposes request-scoped `model`, canonical `prompt`, and compatibility `extra_prompt` fields through the runtime DTO/schema;
 - Inspector renders item re-ingest as inline bracket-action controls only, with no modal, toast, spinner, settings dashboard, queue, progress dashboard, or operation history;
 - Inspector Source Text/Source Evidence is collapsed by default for every newly opened item while preserving accessible disclosure semantics and fallback/source-evidence rules.
 

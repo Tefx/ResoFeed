@@ -346,6 +346,9 @@ func (c *ingestFakeConn) QueryContext(_ context.Context, query string, args []dr
 		}
 		return &ingestFakeRows{columns: []string{"1"}, values: [][]driver.Value{{int64(1)}}}, nil
 	}
+	if strings.Contains(query, "from steer_rules") {
+		return &ingestFakeRows{columns: []string{"id", "rule_text", "is_active", "superseded_by", "revision", "created_by_actor_kind", "created_by_actor_id"}, values: [][]driver.Value{}}, nil
+	}
 	return nil, driver.ErrSkip
 }
 

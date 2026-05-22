@@ -57,7 +57,7 @@ func TestMaliciousFakeLLMRejectedBeforeOKPersistenceInReprocess(t *testing.T) {
 		{name: "invalid value tier", out: withSummaryOutput(valid, func(out *OpenRouterSummaryOutput) { out.ValueTier = "viral" })},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			outcome, err := processReprocessItem(ctx, reprocessItem{id: "item_" + strings.ReplaceAll(tc.name, " ", "_"), sourceTitle: "Malicious Feed", title: "Stored title", url: server.URL + "/article"}, fakeSummaryLLM{out: tc.out}, ProcessingLanguageEnglish)
+			outcome, err := processReprocessItem(ctx, reprocessItem{id: "item_" + strings.ReplaceAll(tc.name, " ", "_"), sourceTitle: "Malicious Feed", title: "Stored title", url: server.URL + "/article"}, fakeSummaryLLM{out: tc.out}, ProcessingLanguageEnglish, nil)
 			if err != nil {
 				t.Fatalf("processReprocessItem returned error: %v", err)
 			}

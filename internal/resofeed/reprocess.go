@@ -197,12 +197,16 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 	if err != nil {
 		return ItemReingestResponse{}, fmt.Errorf("reingest item: read processing language: %w", err)
 	}
+	activeRules, err := loadActiveSteerRules(ctx, db)
+	if err != nil {
+		return ItemReingestResponse{}, fmt.Errorf("reingest item: load active steering rules: %w", err)
+	}
 	item, err := loadReprocessItem(ctx, db, itemID)
 	if err != nil {
 		return ItemReingestResponse{}, err
 	}
 	updateCurrentOperation("processing_items", &CurrentOperationCount{Current: 0, Total: 1}, "item reingest processing selected item")
-	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req)
+	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req, compileActiveSteeringRulesForPrompt(activeRules))
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return ItemReingestResponse{Reingest: itemReingestErrorResult(itemID, language, ReprocessErrorTimeout, "item processing timed out")}, nil
@@ -256,7 +260,7 @@ func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reproces
 	return item, nil
 }
 
-func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest) (reprocessItemOutcome, error) {
+func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest, activeSteeringRules []string) (reprocessItemOutcome, error) {
 	sourceURL, sourceText, availableTextSource, err := fetchReprocessSourceText(ctx, item)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
@@ -271,7 +275,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if llm == nil {
 		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
 	}
-	input := OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableTextSource: availableTextSource, AvailableText: sourceText, TargetLanguage: language}
+	input := OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableTextSource: availableTextSource, AvailableText: sourceText, TargetLanguage: language, ActiveSteeringRules: activeSteeringRules}
 	if req.Model != nil {
 		model, err := normalizeItemReingestModel(*req.Model)
 		if err != nil {
@@ -346,6 +350,11 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 	if err != nil {
 		return ReprocessLibraryResponse{}, fmt.Errorf("reprocess library: read processing language: %w", err)
 	}
+	activeRules, err := loadActiveSteerRules(ctx, db)
+	if err != nil {
+		return ReprocessLibraryResponse{}, fmt.Errorf("reprocess library: load active steering rules: %w", err)
+	}
+	activeSteeringRules := compileActiveSteeringRulesForPrompt(activeRules)
 	started := time.Now().UTC()
 	result := ReprocessLibraryResult{Status: ReprocessStatusCompleted, Language: language, StartedAt: started, Errors: []ReprocessErrorDetail{}}
 
@@ -370,7 +379,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		}
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(items)}, "library reprocess processing item")
 		result.ItemsAttempted++
-		outcome, err := processReprocessItem(runCtx, item, llm, language)
+		outcome, err := processReprocessItem(runCtx, item, llm, language, activeSteeringRules)
 		if err != nil {
 			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 				outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out")
@@ -488,8 +497,8 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 	return items, nil
 }
 
-func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage) (reprocessItemOutcome, error) {
-	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{})
+func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, activeSteeringRules []string) (reprocessItemOutcome, error) {
+	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{}, activeSteeringRules)
 }
 
 func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {

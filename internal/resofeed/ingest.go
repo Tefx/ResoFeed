@@ -396,6 +396,11 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	if err != nil {
 		return ingestSourceResult{}, fmt.Errorf("ingest source: read processing language: %w", err)
 	}
+	activeRules, err := loadActiveSteerRules(ctx, db)
+	if err != nil {
+		return ingestSourceResult{}, fmt.Errorf("ingest source: load active steering rules: %w", err)
+	}
+	activeSteeringRules := compileActiveSteeringRulesForPrompt(activeRules)
 	timeout := cfg.SourceFetchTimeout
 	if timeout <= 0 {
 		timeout = 20 * time.Second
@@ -429,7 +434,7 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
 			continue
 		}
-		item, err := buildItem(ctx, effectiveSource, entry, cfg.LLM, language)
+		item, err := buildItemWithActiveSteering(ctx, effectiveSource, entry, cfg.LLM, language, activeSteeringRules)
 		if err != nil {
 			return result, err
 		}
@@ -587,6 +592,10 @@ func parseFeed(data []byte) (parsedFeed, error) {
 }
 
 func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClient, targetLanguage ProcessingLanguage) (Item, error) {
+	return buildItemWithActiveSteering(ctx, source, entry, llm, targetLanguage, nil)
+}
+
+func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedEntry, llm LLMClient, targetLanguage ProcessingLanguage, activeSteeringRules []string) (Item, error) {
 	if err := validateProcessingLanguage(targetLanguage); err != nil {
 		return Item{}, fmt.Errorf("build item: target language: %w", err)
 	}
@@ -627,7 +636,7 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if err != nil {
 		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
 		sanitizeReadableItem(&item)

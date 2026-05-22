@@ -302,7 +302,7 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 ```
 
 ### List OpenRouter models for one-time item re-ingest
-The current provider-backed model-list path is HTTP `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted. MCP `list_openrouter_models` is an accepted parity target, but its provider-backed equivalence is currently limited pending runtime OpenRouter config wiring verification; use the HTTP route for current provider-backed model listing.
+The current provider-backed model-list path is HTTP `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted. MCP `list_openrouter_models` uses the same request-time OpenRouter model-list operation and returns the same `{ "models": [{ "id", "name" }] }` envelope, with `{ "models": [] }` when no runtime OpenRouter key is resolved.
 
 ```bash
 curl -sS "http://127.0.0.1:8080/api/runtime/openrouter-models" \
@@ -972,8 +972,8 @@ Target tools:
 | `list_candidate_items` | Retrieve eligible high-priority recent items for external evaluation. |
 | `search_items` | Search the corpus using lexical/metadata search. |
 | `read_item` | Retrieve item detail and provenance. |
-| `list_openrouter_models` | Accepted parity target for listing selectable OpenRouter model IDs for request-scoped item re-ingest. Current provider-backed equivalence to HTTP is limited pending runtime OpenRouter config wiring verification; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model listing. |
-| `reingest_item` | Explicitly reprocess one selected item using the currently implemented MCP fields. Prompt/model MCP parity is a pending contract target; use HTTP `POST /api/items/{id}/reingest` for current one-time prompt/model overrides until runtime MCP exposes those fields. |
+| `list_openrouter_models` | Lists selectable OpenRouter model IDs with the same provider-backed model-list operation as HTTP `GET /api/runtime/openrouter-models`; missing runtime key returns an empty model list. |
+| `reingest_item` | Explicitly reprocess one selected item with MCP parity for request-scoped `model`, canonical `prompt`, and compatibility `extra_prompt` fields. |
 | `mark_inspected` | Forward a human inspection from an external context. |
 | `resonate_item` | Forward or toggle a human-authorized resonance action. |
 | `preview_steer` | Preview how a natural-language steering/search command would be interpreted without mutation. |
@@ -984,7 +984,7 @@ Target tools:
 | `set_processing_language` | Set the runtime processing language for future processing. |
 | `reprocess_library` | Explicitly reprocess existing library items in the current runtime language and rebuild FTS on successful completion. |
 
-Schema source of truth: `docs/ARCHITECTURE.md §7 MCP Surface` defines required fields, defaults, limits, exact output schemas, and pending-vs-implemented MCP parity notes. Examples below are abridged and show current implemented usage unless explicitly marked pending.
+Schema source of truth: `docs/ARCHITECTURE.md §7 MCP Surface` defines required fields, defaults, limits, exact output schemas, and implemented MCP parity notes. Examples below are abridged current implemented usage.
 
 Example tool calls and responses:
 
@@ -1024,7 +1024,7 @@ Example tool calls and responses:
 }
 ```
 
-Current implemented MCP item re-ingest shape:
+MCP item re-ingest with request-scoped prompt/model fields:
 
 ```json
 {
@@ -1032,12 +1032,14 @@ Current implemented MCP item re-ingest shape:
   "arguments": {
     "item_id": "ITEM_ID",
     "actor_id": "briefing-agent",
-    "idempotency_key": "briefing-agent-reingest-ITEM_ID-001"
+    "idempotency_key": "briefing-agent-reingest-ITEM_ID-001",
+    "model": "openai/gpt-4.1-mini",
+    "prompt": "one-time retry instruction"
   }
 }
 ```
 
-Prompt/model fields for MCP `reingest_item` are pending parity with HTTP. Until implemented, MCP callers must not send `model`, `prompt`, or `extra_prompt`; strict runtime schemas may reject them as unknown fields.
+`model`, `prompt`, and `extra_prompt` follow the same request-scoped selected-item rules as HTTP `POST /api/items/{id}/reingest`: `prompt` is canonical, `extra_prompt` is a compatibility alias, empty/default model values use the runtime/account default, unknown fields such as `language` are rejected, and prompt/model values are not persisted.
 
 ```json
 {
