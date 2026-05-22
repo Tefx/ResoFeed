@@ -15,3 +15,13 @@ CLAUDE.md
 plan-dashboard.html
 
 .env
+
+.audit-artifacts/
+
+.test-artifacts/
+
+bin/
+
+data/
+
+dist/
