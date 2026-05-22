@@ -1,8 +1,8 @@
 # Prompting v2.1 Runtime Gate Review
 
-Auditor: gate-reviewer  
-Step: `prompting-v21-runtime-gate`  
-Date: 2026-05-22  
+Auditor: gate-reviewer
+Step: `prompting-v21-runtime-gate`
+Date: 2026-05-22
 Verdict: **FAIL**
 
 ## refs Read Confirmation
