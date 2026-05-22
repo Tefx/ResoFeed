@@ -4,7 +4,7 @@ This document is the authoritative contract for ResoFeed's LLM prompting system.
 
 The LLM remains a bounded JSON transformer. It does not orchestrate work, own durable state, validate itself, classify provider/runtime failures, or write directly to SQLite.
 
-Adoption note: ResoFeed's core runtime exists, but Prompting System v2.1 structured-output routing and any prompt/model MCP parity additions are accepted contract targets pending implementation. Runtime, logs, receipts, or docs must not claim v2.1 compliance until the runtime emits input payload `schema_version: "resofeed.summarize.v2.1"`, uses the v2.1 payload shape, routes structured output exactly as specified below, and validates the v2.1 schema plus Go semantic boundary before persistence.
+Adoption note: ResoFeed's core summarization runtime now implements Prompting System v2.1 structured-output routing, Go validation before persistence, active-steering payload compilation, selected-item re-ingest request-scoped prompt/model handling, and MCP prompt/model parity for selected-item re-ingest/model listing. Runtime, logs, receipts, or docs must still not claim v2.1 compliance for any path unless that path emits input payload `schema_version: "resofeed.summarize.v2.1"`, uses the v2.1 payload shape, routes structured output exactly as specified below, and validates the v2.1 schema plus Go semantic boundary before persistence. Older or future compatibility paths that do not satisfy every gate must be labeled pre-v2.1 or non-v2.1 for that path.
 
 ## Design Goals
 
@@ -335,7 +335,7 @@ Repair prompt boundary:
 
 ## v2.1 Adoption and Migration Note
 
-The core runtime is implemented, but Prompting System v2.1 structured-output routing and any prompt/model MCP parity additions are accepted contract targets pending implementation. Existing runtime paths must not claim v2.1 compliance unless all of the following are true: they emit input payload `schema_version: "resofeed.summarize.v2.1"`, use the v2.1 payload, route structured output according to the OpenRouter Constraint Strategy in this document, validate the strict v2.1 output schema, and apply the v2.1 Go semantic validation boundary before persistence.
+The core summarization runtime implements Prompting System v2.1 structured-output routing and prompt/model MCP parity for the documented selected-item re-ingest/model-list paths. Existing or future runtime paths must not claim v2.1 compliance unless all of the following are true for that path: they emit input payload `schema_version: "resofeed.summarize.v2.1"`, use the v2.1 payload, route structured output according to the OpenRouter Constraint Strategy in this document, validate the strict v2.1 output schema, and apply the v2.1 Go semantic validation boundary before persistence.
 
 Documentation, tests, logs, and runtime receipts may describe older paths as pre-v2.1 compatibility, but they must not label those paths as v2.1-compliant.
 

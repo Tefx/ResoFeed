@@ -339,7 +339,7 @@ architecture_basis:
       responsibility: owner-token auth, strict JSON/query validation, idempotency, conflict serialization, and response shape for item re-ingest and OpenRouter model list.
     mcp_transport:
       owner: internal/resofeed/mcp.go
-      responsibility: parity tool/resource exposure for item re-ingest and model listing when runtime DTO/config wiring supports the same contract; MCP OpenRouter model listing is currently an accepted contract target, not verified provider-backed parity.
+      responsibility: implemented parity tool/resource exposure for selected-item re-ingest and OpenRouter model listing when runtime DTO/config wiring supports the same HTTP product contract; MCP OpenRouter model listing uses the same provider-backed request-time model-list operation as HTTP and remains non-durable.
     application_core:
       owner: internal/resofeed/reprocess.go plus existing ingest helpers
       responsibility: item-scoped reprocess orchestration, source-text precedence, prompt/model request construction, result classification, and per-item FTS refresh.
