@@ -38,6 +38,12 @@ type ItemDetail = ItemSummary & {
   };
 };
 
+type MinimalSelectedItemReingestRequest = {
+  readonly actor_kind: 'human';
+  readonly actor_id: 'owner';
+  readonly idempotency_key: string;
+};
+
 const source = {
   id: 'src_reingest_expected_red',
   url: 'https://feeds.example.test/reingest.xml',
@@ -111,6 +117,12 @@ const openRouterModelListing = {
     { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' }
   ]
 } as const;
+
+const minimalSelectedItemReingestRequest: MinimalSelectedItemReingestRequest = {
+  actor_kind: 'human',
+  actor_id: 'owner',
+  idempotency_key: 'reingest-minimal-default-model-prompt-001'
+};
 
 async function fulfillJson(route: Route, payload: object, status = 200): Promise<void> {
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
@@ -271,7 +283,9 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   })).toBe(true);
   await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
   await expect(panel.getByText('model:')).toBeVisible();
-  await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
+  await expect(panel.getByText('extra prompt (one-time, guidance only, not saved)')).toBeVisible();
+  await expect(panel.getByText(/guidance only; cannot override schema, language, source identifiers, safety, status, or persistence/i)).toBeVisible();
+  await expect(panel.getByText(/may change emphasis, angle, or fact selection only among source-backed facts/i)).toBeVisible();
   await expect(panel.getByLabel('Model')).toHaveValue('default');
   await panel.getByLabel('One-time prompt').fill('Retry with article-only extraction.');
   await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
@@ -287,8 +301,12 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
     model: null,
     prompt: 'Retry with article-only extraction.'
   });
+  expect(reingestBody).not.toHaveProperty('language');
+  expect(reingestBody.model).not.toBe('account_default');
   await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
   await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).resolves.toBeNull();
+  await expect(page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestModel'))).resolves.toBeNull();
+  await expect(page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.toLowerCase().includes('reingest') || key.toLowerCase().includes('prompt') || key.toLowerCase().includes('model')))).resolves.toEqual([]);
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
 
   await expect(panel.getByRole('button', { name: '[RE-INGEST ITEM]' }), 'R1 DOM proof: success must collapse controls').toBeVisible();
@@ -332,6 +350,34 @@ test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspec
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
   await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic\/claude-3.5-sonnet)' })).toHaveAttribute('value', 'anthropic/claude-3.5-sonnet');
+});
+
+test('spec fixture: selected-item re-ingest minimal request omits optional model prompt and language', async ({ page, ownerToken }, testInfo) => {
+  const reingestBodies: string[] = [];
+  await installApiFixtures(page, ownerToken, reingestBodies);
+  await page.goto('/');
+
+  await page.evaluate(async ({ token, body }) => {
+    const response = await fetch('/api/items/item_reingest_expected_red/reingest', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) throw new Error(`fixture reingest failed: ${response.status}`);
+    return response.json();
+  }, { token: ownerToken, body: minimalSelectedItemReingestRequest });
+
+  await expect.poll(() => reingestBodies.length).toBe(1);
+  const sentBody = JSON.parse(reingestBodies[0] ?? '{}') as Record<string, unknown>;
+  await attachJson(testInfo, 'minimal-selected-item-reingest-request', sentBody);
+  expect(sentBody).toEqual(minimalSelectedItemReingestRequest);
+  expect(sentBody).not.toHaveProperty('model');
+  expect(sentBody).not.toHaveProperty('prompt');
+  expect(sentBody).not.toHaveProperty('extra_prompt');
+  expect(sentBody).not.toHaveProperty('language');
 });
 
 test('expected-red browser network proof: compatibility OpenRouter route prevents false unavailable state', async ({ page, ownerToken }, testInfo) => {
