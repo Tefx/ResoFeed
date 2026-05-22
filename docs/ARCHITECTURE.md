@@ -19,12 +19,12 @@ Contract baseline: these decisions are anchored in the current product/design do
 7. **OpenRouter as the sole LLM backend.** LLM calls use OpenRouter chat completions for summaries and steering translation at `https://openrouter.ai/api/v1/chat/completions`. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes; Go validates every structured output before applying or saving it. Rationale: the user explicitly chose an OpenRouter-only migration while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
 8. **Lexical retrieval only.** Search uses SQLite FTS5 and metadata filters. No embeddings, vector DB, built-in RAG, or semantic answer engine. Rationale: explicitly forbidden by product constraints. Fails only by explicit product reversal.
 9. **Single owner token with auto-generation and CLI-only offline reset.** Static web assets are public to load, but every `/api/*` route and every `/mcp` request requires one owner token. If `--owner-token` is omitted, ResoFeed reuses a stored token hash or generates a token, stores its hash, and prints the token once on first startup. If the plaintext token is lost and only the hash remains, recovery is impossible; reset is an offline DB command that deletes only the stored hash so the next `serve` startup can generate or accept a replacement. No accounts, OAuth, roles, teams, registration flow, HTTP reset endpoint, MCP reset tool, or Settings/UI reset control. Rationale: single-tenant tool with low-friction first run, clear offline credential recovery, and no ambiguous public API reads. Fails if shared/team use or online credential administration becomes product scope.
-
 10. **Persisted processing language is runtime state, not portable state.** ResoFeed stores one default processing language for the local owner runtime. Supported values are `en` and `zh`; absent metadata defaults to `en` to preserve existing behavior. Rationale: language controls article processing, UI chrome, search text, and MCP output, but it is not part of the strict portable-state bundle. Fails if product scope later requires cross-instance preference sync.
 11. **One stored processed language per item.** User-readable item fields are stored in the current processing language rather than as original/translated pairs. Rationale: ResoFeed is an intelligence workbench optimized for summaries, analysis, and search, not a bilingual RSS reader. Trade-off: changing language does not automatically rewrite history; the original article remains available through the original link. Fails if side-by-side original/translation reading becomes a product requirement.
 12. **Source identifiers are preservation anchors.** URLs, source titles, source URLs, canonical URLs, and original links remain unchanged by localization. Rationale: users and agents need exact provenance even when readable item content is processed in another language. Fails if source identity itself becomes user-editable display content.
 13. **Existing library reprocess is explicit and non-durable.** Changing the default language affects future processing only. A user-triggered one-time reprocess may rewrite existing user-readable item content into the current language and rebuild FTS, but it must not introduce a durable job queue, activity ledger, sync protocol, or settings dashboard. Rationale: explicit migration preserves user control while keeping the one-process architecture. Fails if reprocess must continue across process restarts as a managed background job.
 14. **Desktop split scroll is frontend containment, not behavioral state.** The feed and Inspector scroll independently on desktop, while mobile keeps a full-screen Inspector route. Rationale: independent scroll preserves triage context without adding persisted reading-position tracking. Fails if scroll depth becomes a ranking or analytics input, which is out of scope.
+15. **Inspector item re-ingest is item-scoped, one-time, and non-durable.** The Inspector may expose a per-article re-ingest action that reprocesses exactly the selected item with an optional request-scoped OpenRouter model override and optional request-scoped extra prompt. The selected model and prompt must not be persisted, exported, reused as defaults, shown as history, or written to item metadata. Rationale: the owner needs a surgical retry/quality repair path without turning ResoFeed into a prompt-management, model-settings, or job-dashboard product. Fails if users require durable per-source/per-item model policies, reusable prompt templates, or multi-provider orchestration.
 
 ## 2. System Boundary
 
@@ -308,7 +308,7 @@ architecture_basis:
     - surface: "Desktop shell"
       scope: "independent feed/Inspector scroll, no coupled global page scroll"
     - surface: "Language control"
-      scope: "terse LANG control, no settings dashboard"
+      scope: "terse LANG control inside opened RESOFEED OPERATIONS menu, optional /doctor raw echo, no persistent chrome or settings dashboard"
     - surface: "Reprocess action"
       scope: "bracket-style explicit operation with warning, no progress dashboard"
     - surface: "MCP item/search/detail outputs"
@@ -316,8 +316,181 @@ architecture_basis:
   open_questions:
     blocking: []
     non_blocking:
-      - "Exact UI placement of LANG control may be chrome or /doctor-class utility surface as constrained by docs/DESIGN.md."
       - "Chinese locale for html lang defaults to zh-CN unless UIUX decides a narrower locale."
+  readiness: READY
+```
+
+
+### 3.6 Architecture Basis: Inspector Item Re-ingest Delta
+
+This basis is authoritative for planning the Inspector item re-ingest change. It is intentionally additive to the existing single-process architecture and does not authorize new services, persistent queues, provider abstractions, settings dashboards, or durable prompt/model state.
+
+```yaml
+architecture_basis:
+  system_layers:
+    browser_ui:
+      owner: web/
+      responsibility: Inspector controls, model-list presentation, extra-prompt entry, source-text disclosure, and refreshed current-item rendering.
+    http_transport:
+      owner: internal/resofeed/http.go
+      responsibility: owner-token auth, strict JSON/query validation, idempotency, conflict serialization, and response shape for item re-ingest and OpenRouter model list.
+    mcp_transport:
+      owner: internal/resofeed/mcp.go
+      responsibility: parity tool/resource exposure for item re-ingest and model listing when exposed to agents.
+    application_core:
+      owner: internal/resofeed/reprocess.go plus existing ingest helpers
+      responsibility: item-scoped reprocess orchestration, source-text precedence, prompt/model request construction, result classification, and per-item FTS refresh.
+    llm_boundary:
+      owner: internal/resofeed/openrouter.go
+      responsibility: OpenRouter chat-completions JSON transform, temporary model override, model-list fetch, failure classification, and no durable state writes.
+    persistence:
+      owner: SQLite via internal/resofeed/*
+      responsibility: final item readable fields, provenance fields, item_state, search_fts, and transient idempotency receipts only.
+  source_of_truth_matrix:
+    item_readable_fields: SQLite items row for the selected item.
+    provenance_identifiers: existing items/sources URL/title/canonical fields; never rewritten by model or UI chrome.
+    search_index: search_fts row for the selected item, refreshed in the same successful item update path.
+    processing_language: runtime_metadata.processing_language; global runtime state only.
+    temporary_model_override: request body only; not a source of truth and not persisted.
+    temporary_extra_prompt: request body only; not a source of truth and not persisted.
+    provider_model_list: live OpenRouter response; no cache in the first implementation, never portable state.
+    operation_status: process-local current-operation snapshot; not a durable job record.
+    idempotency: agent_receipts live TTL snapshot for mutation replay only; not portable state.
+  service_catalog:
+    go_binary:
+      deployable: cmd/resofeed
+      surfaces: static UI, JSON HTTP, MCP Streamable HTTP, background ingest loop.
+    sqlite:
+      role: durable item/source/state/FTS store.
+    openrouter:
+      role: sole external model provider and JSON transformer.
+    browser:
+      role: authenticated owner UI; no independent durable state beyond owner token.
+  runtime_contract:
+    allowed_dependencies:
+      - Go standard library and existing project dependencies
+      - SQLite/FTS5
+      - SvelteKit/static frontend stack already in web/
+      - OpenRouter HTTP API
+    forbidden_dependencies:
+      - vector databases
+      - embeddings/RAG frameworks
+      - provider abstraction frameworks
+      - job queues or sidecar workers
+      - UI component libraries unless DESIGN.md changes explicitly
+    operations:
+      - GET /api/runtime/openrouter-models lists selectable OpenRouter model ids without persisting them; GET /api/runtime/openrouter/models remains a compatibility path.
+      - POST /api/items/{id}/reingest reprocesses exactly one selected item with optional request-scoped model and prompt.
+      - MCP parity exposes equivalent agent-accessible product operations only if the HTTP operation is exposed to humans.
+  state_strata:
+    durable_product_state:
+      - sources
+      - items readable fields and provenance fields
+      - item_state
+      - steer_rules
+      - search_fts
+      - runtime_metadata.processing_language
+    transient_runtime_state:
+      - ingest/reprocess guard
+      - current-operation snapshot
+      - live idempotency receipts
+      - live OpenRouter model-list response data during request handling only
+    request_only_state:
+      - item re-ingest model override
+      - item re-ingest extra prompt
+    forbidden_state:
+      - saved per-item/per-source model preferences
+      - saved prompt templates
+      - operation history
+      - model-list export/import
+      - provider credentials in SQLite/UI responses
+  transport_boundary_rules:
+    http:
+      - All /api/* routes require owner-token auth.
+      - Unknown JSON fields and query parameters are rejected where the contract says no query params.
+      - Model and prompt override fields are accepted only on item re-ingest request bodies.
+      - Provider raw payloads, API keys, secret sources, and .env paths never cross the transport boundary.
+    mcp:
+      - MCP mutations require owner-token authority, actor_id, and idempotency_key.
+      - MCP tools do not get product concepts unavailable to humans.
+      - MCP conflict/error data mirrors canonical HTTP shapes.
+    ui:
+      - Inspector is the only human UI surface for item re-ingest.
+      - Source Ledger remains source-level ingest/fetch only.
+  cross_cutting_governance:
+    registries:
+      - name: operation_guard
+        owner_module: internal/resofeed/ingest.go
+        write_policy: process-local, exclusive guard for background ingest/manual ingest/source fetch/library reprocess/item re-ingest.
+      - name: idempotency_receipts
+        owner_module: internal/resofeed/idempotency path
+        write_policy: live TTL mutation receipts only; not portable state.
+    lifecycle_ordering:
+      - item re-ingest acquires the same guard before source fetch/model call/write.
+      - provider model listing is read-only and does not acquire the ingest/reprocess guard.
+      - item update and per-item FTS refresh commit together; no final library-wide FTS rebuild is required.
+    coordination_mechanisms:
+      - explicit function calls inside internal/resofeed
+      - process-local guard/current-operation snapshot
+      - SQLite transaction boundaries
+    wiring_strategy:
+      - http.go/mcp.go validate and call application functions directly.
+      - OpenRouter-specific model listing and temporary model override stay in openrouter.go.
+      - No DI container, event bus, plugin registry, sidecar worker, or provider registry.
+    governance_owner: internal/resofeed owns runtime coordination; docs/ARCHITECTURE.md owns boundary decisions.
+  shared_abstractions:
+    shared_types:
+      - name: ReprocessErrorCode
+        owner_module: internal/resofeed/processing_language_contract.go
+        consumers: [reprocess.go, http.go, mcp.go, frontend API contract]
+        rationale: item re-ingest must reuse the existing safe diagnostic taxonomy rather than inventing UI-only statuses.
+      - name: CurrentOperationInfo
+        owner_module: internal/resofeed/current-operation contract
+        consumers: [http.go, mcp.go, frontend Inspector conflict UI]
+        rationale: conflicts must expose the same process-local operation fact across HTTP, MCP, and UI.
+      - name: ItemDetail
+        owner_module: internal/resofeed/types.go and frontend API contract mirror
+        consumers: [GET /api/items/{id}, item re-ingest response, MCP read_item, Inspector]
+        rationale: successful item re-ingest refreshes the current item through the existing detail contract.
+    shared_protocols:
+      - name: OpenRouterModelListing
+        owner_module: internal/resofeed/openrouter.go
+        consumers: [http.go, mcp.go, frontend model selector]
+        rationale: model listing is an OpenRouter capability, not a generic provider abstraction.
+      - name: ItemReingestOperation
+        owner_module: internal/resofeed/reprocess.go
+        consumers: [http.go, mcp.go]
+        rationale: HTTP and MCP must share one product operation instead of duplicating item reprocess behavior.
+    shared_utilities:
+      - name: source_text_precedence
+        owner_module: internal/resofeed/reprocess.go
+        consumers: [library reprocess, item re-ingest]
+        rationale: single-item re-ingest must preserve the already-approved fresh-fetch then stored-text fallback rules.
+    decision: share only contracts that appear across HTTP, MCP, frontend, and item/library reprocess; keep UI state and prompt/model request values module-local and request-scoped.
+  module_split_recommendations:
+    - module: internal/resofeed/openrouter.go
+      owner: OpenRouter transport and model listing
+      reason_not_merged: external provider HTTP details and secret handling must remain isolated from item persistence.
+    - module: internal/resofeed/reprocess.go
+      owner: item/library reprocess application logic
+      reason_not_merged: source-text precedence, model-call orchestration, and per-item FTS write logic are product operations, not HTTP serialization.
+    - module: internal/resofeed/http.go
+      owner: HTTP contracts
+      reason_not_merged: route validation/idempotency/error mapping should not own reprocess internals.
+    - module: internal/resofeed/mcp.go
+      owner: MCP parity
+      reason_not_merged: agent transport schema differs from HTTP but must call the same application operation.
+    - module: web/src routes/lib
+      owner: Inspector UI and typed API client contracts
+      reason_not_merged: browser interaction state and accessibility belong to frontend only.
+  ux_surfaces:
+    - surface: Inspector controls
+      scope: bracket action placement, model selector, extra prompt field, inline state text, focus behavior.
+    - surface: Source text disclosure
+      scope: collapsed-by-default source text/evidence with accessible expansion.
+    - surface: HTTP/MCP API errors
+      scope: terse stable diagnostics and conflict detail shapes.
+  open_questions: []
   readiness: READY
 ```
 
@@ -862,6 +1035,8 @@ Language change behavior:
 
 - setting a new processing language persists the runtime setting and affects future ingestion/reprocess only;
 - existing item rows and FTS are not automatically rewritten when language changes;
+- language mutation uses the same process-local exclusion lock as a short atomic check/write so it cannot begin while background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is running;
+- language mutation does not publish its own `CurrentOperationInfo.kind`, does not appear as `language_mutation`, and does not create a long-running current-operation snapshot; requests racing with the short language write serialize on the lock and then observe either the persisted language or a representable running operation;
 - UI chrome and MCP language metadata may reflect the new language immediately, but item text remains whatever is stored until future ingest or explicit reprocess updates it.
 
 Existing library reprocess behavior:
@@ -909,6 +1084,92 @@ Concurrency and background ingest:
 
 - the single-process mutex/guard for ingest/fetch/reprocess exclusivity applies to reprocess;
 - if a background ingest tick fires while a reprocess operation holds the guard, the tick is ignored/skipped rather than queued, exactly mirroring the rule for manual ingest.
+
+
+### 5.7 Inspector Item Re-ingest
+
+Inspector item re-ingest is a selected-item operation, not a library job and not a source-fetch control. It exists to let the owner retry or refine processing for the article currently open in the Inspector. Product/UI language says "re-ingest"; backend implementation may reuse the item-scoped reprocess machinery, but the transport operation is `item_reingest`.
+
+Responsibilities:
+
+- reprocess exactly one existing item row selected by item ID;
+- use the same source-text precedence as library reprocess: fresh article fetch from `items.canonical_url` when valid, then `items.url`, then persisted non-empty `items.extracted_text`, then persisted non-empty `items.feed_excerpt`;
+- pass the current global processing language into OpenRouter exactly like normal ingest/reprocess;
+- optionally pass a request-scoped OpenRouter model override for this call only;
+- optionally pass a request-scoped prompt for this call only (`prompt` canonical, `extra_prompt` compatibility);
+- validate OpenRouter JSON before any item-field update;
+- update the selected item's readable fields and refresh only that item's `search_fts` row in the same successful write path;
+- return the refreshed `ItemDetail` so the Inspector can update in place.
+
+Non-responsibilities:
+
+- does not ingest other items from the same source;
+- does not rewrite the library;
+- does not persist model choice, prompt text, model-list data, prompt templates, or provider settings;
+- does not create durable jobs, queues, operation histories, retry dashboards, activity ledgers, or sync metadata;
+- does not introduce provider switching or a provider abstraction layer;
+- does not change the global processing language.
+
+Temporary model override rules:
+
+- `null`, empty, omitted, or exact `account_default` means use the existing runtime configured OpenRouter model, including account default when no runtime model is configured; this default sentinel is not sent to OpenRouter as a model ID;
+- before validation, trim surrounding Unicode whitespace;
+- after trimming, non-default model overrides must be at most `200` bytes, contain no control characters, and use only visible model-id characters: ASCII letters, digits, `.`, `_`, `-`, `/`, and `:`;
+- malformed model override syntax returns `400 bad_request` with `details.field: "model"` and does not call OpenRouter;
+- syntactically valid but unknown/unavailable model IDs are passed to OpenRouter; provider rejection maps to the existing safe diagnostic taxonomy, especially `invalid_model`, without leaking raw provider payloads;
+- UI model selection should come from the OpenRouter model-list endpoint, but backend correctness must not depend on the browser having fetched a fresh model list first.
+
+Temporary extra prompt rules:
+
+- `prompt` is canonical and `extra_prompt` is a compatibility alias normalized to the same one-time prompt semantic value;
+- if both fields are present with different non-empty normalized values, validation fails before any OpenRouter call;
+- extra prompt is subordinate to the fixed JSON output, provenance, source-grounding, and target-language contracts;
+- extra prompt may refine emphasis or extraction priority for the selected item, but it cannot override required fields, model-status values, source identifier preservation, target language, or safety/secret redaction rules;
+- extra prompt is request-only and must not be persisted, exported, imported, logged as history, copied into item metadata, or reused after the request;
+- before validation, trim surrounding Unicode whitespace;
+- omitted, `null`, or empty after trimming means no extra prompt;
+- non-empty extra prompt must be at most `4000` bytes after trimming and must not contain NUL/control characters other than tab/newline/carriage return;
+- oversized or malformed prompt input is a `400 bad_request` transport validation failure with `details.field: "prompt"` or `"extra_prompt"` as applicable.
+
+Concurrency semantics:
+
+- item re-ingest uses the same process-local non-overlap guard as background ingest, manual ingest, source fetch, the short processing-language mutation check/write, and library reprocess;
+- the canonical current-operation kind for this operation is `item_reingest`;
+- if another guarded operation is running, item re-ingest returns the standard conflict shape with current-operation details when available;
+- if a background ingest tick fires while item re-ingest holds the guard, the tick is skipped rather than queued;
+- provider model listing is read-only and does not acquire this guard.
+
+Failure/status contract:
+
+| Condition | HTTP status | `reingest.status` | `error.code` | Persistence/FTS outcome |
+|---|---:|---|---|---|
+| malformed JSON, unknown fields, invalid `model`, invalid `extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | no item write, no FTS write |
+| missing item ID or item not found | `404` | N/A | `not_found` | no item write, no FTS write |
+| any guarded operation already running | `409` | N/A | `conflict` | no queued work |
+| fresh source succeeds or stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | selected item readable fields updated; selected FTS row refreshed; `item_updated: true`; `search_refreshed: true` |
+| fresh source fails but stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | selected item readable fields updated from fallback input; selected FTS row refreshed; `source_text_mode: "stored_fallback"` |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | `original_unavailable` | selected item is moved to stable unavailable state; selected FTS row refreshed; `item_updated: false`; `search_refreshed: true` |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | `invalid_model` | selected item is moved to stable model-failure state when storable; selected FTS row refreshed when a row is committed |
+| provider error, rate limit, decode/validation error, or summary unavailable | `200` | `completed_with_errors` | `provider_error`, `rate_limited`, `decode_error`, or `summary_unavailable` | selected item is moved to stable model-failure state when storable; selected FTS row refreshed when a row is committed |
+| operation timeout/context cancellation before stable item write | `200` | `failed` | `timeout` | no queued work; `item_updated: false`; `search_refreshed: false` unless a stable row was already committed |
+| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | no queued recovery work; committed transaction state, if any, remains authoritative |
+
+Additional failure rules:
+
+- source fetch failure falls back to stored readable text using the approved reprocess fallback order;
+- model/provider/decode/rate-limit/timeout failures use the same safe diagnostic taxonomy as ingestion and library reprocess;
+- raw provider payloads, API keys, `.env` paths, owner tokens, secret-source metadata, and prompt text must not appear in diagnostics, `/doctor`, UI result lines, or MCP error data;
+- successful completion or storable item-level failure leaves `search_fts` consistent with the final selected item row;
+- fatal SQLite or invariant errors before response construction return canonical internal errors and do not create queued recovery work.
+
+Provider model-list behavior:
+
+- model listing is an OpenRouter capability, not a generic provider registry;
+- the list endpoint returns selectable provider model IDs and the configured/default model context without persisting them;
+- `models[]` contains provider model IDs only and must not include `account_default`; the Inspector may add a local default option that sends `model: null`;
+- first implementation should not add a model-list cache; any future in-memory cache requires an explicit TTL/size/invalidation contract and must still remain non-durable;
+- model-list failures must be safe and terse so the UI can still allow default-model item re-ingest;
+- model-list responses must not expose API keys, account secrets, raw provider errors, pricing dashboards, provider configuration, or secret-source metadata.
 
 ## 6. HTTP Surface
 
@@ -1047,12 +1308,12 @@ Revision contract: `revision` is response metadata only. HTTP and MCP clients do
 
 `CurrentOperationInfo`:
 
-This type is the authoritative HTTP/MCP shape for the process-local current-operation snapshot. It is a best-effort in-memory runtime fact, not durable state. When no guarded ingest/fetch/reprocess operation is running, every nullable field is present as `null` and `running` is `false`. While a guarded operation is running, `running` is `true`; `kind`, `actor_kind`, `phase`, `message`, `started_at`, and `updated_at` are present with non-null values when known; `count` is `null` until a measurable phase exists and then is an object with `current` and `total` integer members. Clients must tolerate `count: null` during startup/transition phases and must not infer durable progress history from the values. `actor_id` remains provenance/idempotency metadata on mutating requests; it is not part of the current-operation snapshot and is never an authorization input.
+This type is the authoritative HTTP/MCP shape for the process-local current-operation snapshot. It is a best-effort in-memory runtime fact, not durable state. When no long-running background ingest, manual ingest, source fetch, library reprocess, or item re-ingest operation is running, every nullable field is present as `null` and `running` is `false`. While one of those representable operations is running, `running` is `true`; `kind`, `actor_kind`, `phase`, `message`, `started_at`, and `updated_at` are present with non-null values when known; `count` is `null` until a measurable phase exists and then is an object with `current` and `total` integer members. Processing-language mutation is intentionally excluded from this enum: it uses the same lock only for a short atomic check/write and never publishes `language_mutation` as a current-operation kind. Clients must tolerate `count: null` during startup/transition phases and must not infer durable progress history from the values. `actor_id` remains provenance/idempotency metadata on mutating requests; it is not part of the current-operation snapshot and is never an authorization input.
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `running` | boolean | Yes | No | `true` only while the in-process guard is held by ingest, fetch, or reprocess. |
-| `kind` | string enum | Yes | Yes | Canonical display/runtime values: `background_ingest`, `manual_ingest`, `source_fetch`, or `library_reprocess`; `null` when idle. |
+| `running` | boolean | Yes | No | `true` only while the in-process guard is held by background ingest, manual ingest, source fetch, library reprocess, or item re-ingest. |
+| `kind` | string enum | Yes | Yes | Canonical display/runtime values: `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, or `item_reingest`; `null` when idle. |
 | `actor_kind` | string enum | Yes | Yes | `background`, `human`, or `agent`; `null` when idle. Owner-token auth remains separate from actor provenance. |
 | `phase` | string | Yes | Yes | Terse phase such as `starting`, `loading_sources`, `fetching_sources`, `fetching_feed`, `processing_items`, `source_complete`, or `complete`; `null` when idle or unknown. |
 | `count` | object | Yes | Yes | `null` when no measurable count is available; otherwise `{ "current": integer, "total": integer }` with non-negative integers. |
@@ -1211,7 +1472,7 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
 
 Manual ingest conflict response schema:
 
-The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, and `POST /api/runtime/reprocess-library`. Conflict responses indicate the current operation holding the guard. When the in-memory snapshot reports `running: true`, `details.current_operation` is included and uses the exact `CurrentOperationInfo` shape above. This object is the same current-operation fact exposed by `GET /api/runtime/operation` and MCP `resofeed://system/operation`; it is not a durable job record.
+The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, the short `PUT /api/runtime/language` check/write, `POST /api/runtime/reprocess-library`, and `POST /api/items/{id}/reingest`. Conflict responses indicate the representable current operation holding the guard. When the in-memory snapshot reports `running: true`, `details.current_operation` is included and uses the exact `CurrentOperationInfo` shape above. This object is the same current-operation fact exposed by `GET /api/runtime/operation` and MCP `resofeed://system/operation`; it is not a durable job record. `PUT /api/runtime/language` can be blocked by a representable running operation, but it does not itself publish a `language_mutation` current-operation kind.
 
 ```json
 {
@@ -1340,8 +1601,8 @@ Endpoint contracts:
 | `GET /api/sources` | none | `200` | `{ "sources": [Source] }` |
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
-| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if any ingest/fetch/reprocess operation is already running |
-| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if any ingest/fetch/reprocess operation is already running |
+| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
+| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
 | `GET /api/search` | optional query params listed in the search query rules | `200` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` |
 | `GET /api/steer/active` | none | `200` | `{ "rules": [SteerRule] }`; intended for inline steering receipts only, not a rule-management UI |
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
@@ -1390,7 +1651,7 @@ HTTP error matrix:
 | invalid state bundle schema or field shape | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
-| manual ingest/fetch/reprocess or language mutation requested while any guarded operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }` when the in-memory snapshot is running |
+| manual ingest/fetch/reprocess/item re-ingest or language mutation requested while a representable long-running operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }` when the in-memory snapshot is running |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
 Idempotency rules:
@@ -1445,7 +1706,8 @@ Rules:
 - no query parameters are accepted;
 - success persists the runtime default and returns the same response shape as `GET /api/runtime/language` with `already_applied: false`;
 - setting language does not rewrite existing item rows and does not rebuild FTS;
-- if ingest/fetch/reprocess is already running, setting language returns `409 conflict` to avoid mixed-language batches;
+- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, setting language returns `409 conflict` with that operation's canonical current-operation detail to avoid mixed-language batches;
+- `PUT /api/runtime/language` itself is a short atomic write and never returns or exposes `language_mutation` as an `operation`/`kind` value;
 - retrying with the same idempotency key while a live receipt exists returns the same response with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same key is no longer recognized, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
 
 Duplicate idempotency examples for `PUT /api/runtime/language`:
@@ -1499,7 +1761,7 @@ Rules:
 - operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global `errors[]` entry whose `code` is `timeout`, unless the server cannot serialize a response;
 - fatal SQLite or invariant failures before result construction return HTTP `500 internal`;
 - if committed item transactions exist but the final FTS rebuild does not complete, `runtime_metadata.search_fts_stale_since` remains set and `/api/doctor` reports stale FTS;
-- if ingest/fetch/reprocess is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"`, `details.actor_kind: "background"|"human"|"agent"`, `details.retry_allowed: true`, and `details.current_operation: CurrentOperationInfo` whenever the in-memory snapshot is running. Conflict details must not expose the legacy internal `kind`/`scope` pair as canonical contract state;
+- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest"`, `details.actor_kind: "background"|"human"|"agent"`, `details.retry_allowed: true`, and `details.current_operation: CurrentOperationInfo` whenever the in-memory snapshot is running. Conflict details must not expose the legacy internal `kind`/`scope` pair as canonical contract state;
 - the endpoint must not create durable jobs, queues, command histories, activity rows, or sync metadata;
 - retrying with the same idempotency key while the operation is still running returns `409 conflict`; retrying after completion while a live receipt exists returns the completed result with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than returning `400` solely because the key was previously used.
 
@@ -1523,14 +1785,175 @@ Endpoint additions:
 |---|---|---:|---|
 | `GET /api/runtime/language` | none | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": false }` |
 | `GET /api/runtime/operation` | none; no query params | `200` | `{ "operation": CurrentOperationInfo }` |
+| `GET /api/runtime/openrouter-models` | none; no query params | `200` | `{ "models": [{ "id": "...", "name": "..." }] }` |
+| `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
 | `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
-| `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if ingest/fetch/reprocess is already running |
+| `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
+| `POST /api/items/{id}/reingest` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ..., "model": null|string, "prompt": null|string }`; no query params | `200` | `{ "already_applied": boolean, "reingest": ItemReingestResult }`; returns `409 conflict` if a guarded operation is already running |
 
 Canonical item response language rule:
 
 - `GET /api/feed/today`, `GET /api/items/{id}`, and `GET /api/search` return the stored item text as-is;
 - callers must not infer that every historical item matches the current processing language unless it was processed after the latest language change or explicit reprocess;
 - source identifier fields remain exact provenance values and are not localized.
+
+### Inspector Item Re-ingest HTTP Addendum
+
+`OpenRouterModelOption`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `id` | string | Yes | No | OpenRouter provider model identifier suitable for request-scoped selection. Must not be `account_default`. |
+| `name` | string | Yes | No | Human-readable name; may equal `id` if no better provider name is available. |
+
+`OpenRouterModelsResponse`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `provider` | string enum | Yes | No | Always `openrouter` in the current architecture. |
+| `configured_model` | string | Yes | No | Configured runtime model or `account_default` when omitted. This is display/context only, not a provider model option. |
+| `models_status` | string enum | Yes | No | `ok` or `unavailable`. |
+| `models` | array of `OpenRouterModelOption` | Yes | No | Provider model IDs only; empty when unavailable; never includes the default sentinel `account_default`. |
+| `error_code` | string | No | Yes | Safe terse code such as `provider_error`, `rate_limited`, or `timeout`; never raw provider payload. |
+
+OpenRouter model-list route rules:
+
+- `GET /api/runtime/openrouter-models` is the canonical model-list path for the frontend model selector;
+- `GET /api/runtime/openrouter/models` is a compatibility path with identical owner-token auth, query rejection, response shape, and failure semantics;
+- owner-token authorization is required like every `/api/*` route;
+- no request body and no query parameters are accepted on either route;
+- success returns `OpenRouterModelsResponse` with selectable `{ "id", "name" }` model entries;
+- provider/model-list failure may still return HTTP `200` with `models_status: "unavailable"`, `models: []`, and a safe `error_code`, so the Inspector can keep default-model re-ingest available;
+- first implementation should not add a model-list cache; any future in-memory cache requires an explicit TTL/size/invalidation contract and must still remain non-durable;
+- HTTP transport or invariant failures that prevent serialization return canonical errors;
+- the endpoint is read-only and creates no receipts, jobs, queues, history rows, model caches in SQLite, or portable state;
+- the endpoint must never expose OpenRouter API keys, secret source, `.env` paths, raw provider JSON, provider account metadata, or pricing/configuration dashboards.
+
+`ItemReingestRequest`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `actor_kind` | string enum | Yes | No | `human` or `agent`. |
+| `actor_id` | string | Yes | No | Non-empty, max 128 bytes; provenance/idempotency only. |
+| `idempotency_key` | string | Yes | No | Non-empty, max 200 bytes. |
+| `model` | string | No | Yes | Optional request-scoped OpenRouter model override. `null`, empty, omitted, or exact `account_default` means configured runtime model/account default and is not sent as a provider model ID. |
+| `prompt` | string | No | Yes | Canonical optional request-scoped one-time instruction, max 4000 bytes after trimming. |
+| `extra_prompt` | string | No | Yes | Compatibility alias for `prompt`, normalized to the same one-time prompt value. |
+
+Model validation rules:
+
+- trim surrounding Unicode whitespace before validation;
+- `null`, empty after trimming, omitted, or exact `account_default` is normalized to default behavior and produces `model_override_applied: false`;
+- non-default model overrides must be at most `200` bytes, contain no control characters, and use only ASCII letters, digits, `.`, `_`, `-`, `/`, and `:`;
+- malformed model override syntax returns `400 bad_request` with `details.field: "model"` and does not call OpenRouter;
+- syntactically valid but unknown/unavailable model IDs are sent to OpenRouter; provider rejection is represented as `invalid_model` in the item re-ingest result.
+
+Extra prompt validation rules:
+
+- trim surrounding Unicode whitespace before validation;
+- `prompt` is canonical; `extra_prompt` is accepted as a compatibility alias normalized to the same one-time prompt semantic value;
+- if both `prompt` and `extra_prompt` are present with different non-empty normalized values, return `400 bad_request` without calling OpenRouter;
+- omitted, `null`, or empty after trimming means no extra prompt;
+- non-empty extra prompt must be at most `4000` bytes and must not contain NUL/control characters other than tab/newline/carriage return;
+- invalid prompt input returns `400 bad_request` with `details.field: "prompt"` or `"extra_prompt"` as applicable;
+- response/error bodies must not echo prompt text from either field.
+
+`ItemReingestResult`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `status` | string enum | Yes | No | `completed`, `completed_with_errors`, or `failed`. |
+| `item_id` | string | Yes | No | Selected item ID. |
+| `language` | string enum | Yes | No | Processing language used for the operation. |
+| `started_at` | RFC3339 string | Yes | No | Start time. |
+| `completed_at` | RFC3339 string | Yes | No | Completion time. |
+| `item_updated` | boolean | Yes | No | True when model-backed readable fields were successfully rewritten. |
+| `search_refreshed` | boolean | Yes | No | True when selected-item `search_fts` reflects the final item row. |
+| `source_text_mode` | string enum | Yes | No | `fresh`, `stored_fallback`, or `unavailable`. |
+| `model_override_applied` | boolean | Yes | No | True only when a non-default request-scoped model ID was sent to OpenRouter for this call. |
+| `error` | `ReprocessErrorDetail` | Yes | Yes | Null on clean completion; otherwise safe terse diagnostic for this item/global failure. |
+
+`ItemReingestResponse`:
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `reingest` | `ItemReingestResult` | Yes | No | Result summary for the selected item. |
+| `already_applied` | boolean | Yes | No | Idempotency replay marker. |
+
+`POST /api/items/{id}/reingest` request body example:
+
+```json
+{
+  "actor_kind": "human",
+  "actor_id": "owner",
+  "idempotency_key": "...",
+  "model": "openai/gpt-4.1-mini",
+  "prompt": "Emphasize concrete product and pricing facts."
+}
+```
+
+Compatibility prompt alias example:
+
+```json
+{
+  "actor_kind": "human",
+  "actor_id": "owner",
+  "idempotency_key": "...",
+  "model": "openai/gpt-4.1-mini",
+  "extra_prompt": "Emphasize concrete product and pricing facts."
+}
+```
+
+Default-model request example:
+
+```json
+{
+  "actor_kind": "human",
+  "actor_id": "owner",
+  "idempotency_key": "...",
+  "model": null,
+  "prompt": null
+}
+```
+
+Rules:
+
+- path `id` is required and must identify an existing item;
+- request body must be a JSON object with required mutation fields and optional `model`, canonical `prompt`, and compatibility `extra_prompt` only;
+- JSON body payload is limited to `100 KB`; field-level limits above also apply;
+- `language` and any other unknown fields are rejected; selected-item re-ingest uses the persisted runtime processing language and has no per-call language override;
+- no query parameters are accepted;
+- success returns `{ "already_applied": false, "reingest": ItemReingestResult }`, with refreshed selected item detail available from the result when returned;
+- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, return `409 conflict` with canonical current-operation details and no queued work;
+- same live idempotency key plus same fingerprint replays the stored response with `already_applied: true` after completion;
+- same live idempotency key plus different fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
+- duplicate key during an active item re-ingest returns `409 conflict`;
+- after crash-loss or receipt TTL expiration, the same valid body/key may be accepted as a fresh request if the operation guard is free;
+- the selected `model` and normalized prompt value are part of the request fingerprint but are not persisted beyond live idempotency receipt storage, and receipt storage must not become user-visible history;
+- response/error bodies must not echo prompt text from either field.
+
+Status/error mapping:
+
+| Condition | HTTP status | `reingest.status` | `error.code` | Persistence/FTS outcome |
+|---|---:|---|---|---|
+| malformed JSON, unknown fields, invalid `model`, invalid `prompt`/`extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | no item write, no FTS write |
+| item not found | `404` | N/A | `not_found` | no item write, no FTS write |
+| any guarded operation already running | `409` | N/A | `conflict` | no queued work |
+| source/fallback text available and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | readable fields updated; selected FTS row refreshed; `item_updated: true`; `search_refreshed: true` |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | `original_unavailable` | stable unavailable item state committed; selected FTS row refreshed; `item_updated: false`; `search_refreshed: true` |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | `invalid_model` | stable model-failure state committed when storable; selected FTS row refreshed when committed |
+| provider error, rate limit, decode/validation error, or summary unavailable | `200` | `completed_with_errors` | `provider_error`, `rate_limited`, `decode_error`, or `summary_unavailable` | stable model-failure state committed when storable; selected FTS row refreshed when committed |
+| timeout/context cancellation before stable item write | `200` | `failed` | `timeout` | no queued work; `item_updated: false`; `search_refreshed: false` unless a stable row already committed |
+| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | no queued recovery work; committed transaction state, if any, remains authoritative |
+
+Endpoint additions:
+
+| Method/path | Request | Success | Response |
+|---|---|---:|---|
+| `GET /api/runtime/openrouter-models` | none; no query params | `200` | `OpenRouterModelsResponse` |
+| `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
+| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params | `200` | `ItemReingestResponse`; returns `409 conflict` if a guarded operation is already running |
+
 ## 7. MCP Surface
 
 MCP is required over Remote Streamable HTTP at `/mcp`. MCP tools/resources expose the same product concepts as the UI: inspect, resonate, steer, retrieve, and report delivery.
@@ -1632,7 +2055,8 @@ Rules:
 - setting language through MCP affects future processing only and does not rewrite existing item rows;
 - `reprocess_library` is explicit, uses the current persisted language, and must not create durable jobs, queues, or activity feeds;
 - `list_candidate_items`, `search_items`, and `read_item` return stored historical item text as-is, which may differ from the current runtime processing language if the item was processed before a language change; source identifiers remain exact provenance anchors;
-- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` whenever the same in-memory snapshot is running: `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }`;
+- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` whenever the same in-memory snapshot is running: `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }`;
+- `set_processing_language` conflicts only when one of those representable operations is running; it does not publish or return `language_mutation` as a current-operation value;
 - `set_processing_language` MCP idempotency behavior: while a live receipt exists, same key + same request fingerprint returns the stored language response with `already_applied: true`; same key + different request fingerprint returns an MCP schema/request error equivalent to HTTP `400 bad_request`; after crash-loss or TTL expiration, the same valid body/key is accepted as a fresh operation with `already_applied: false` if the operation guard is free;
 - `reprocess_library` MCP idempotency behavior: a duplicate key during an active run returns the JSON-RPC conflict error described above; a duplicate key after completion while a live receipt exists returns the same `ReprocessLibraryResult` payload with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns an MCP schema/request error equivalent to HTTP `400 bad_request`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours, which is permitted as transient runtime state. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the tool accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
 
@@ -1691,6 +2115,36 @@ Same key with different request fingerprint:
   }
 }
 ```
+
+### Inspector Item Re-ingest MCP Parity
+
+MCP exposes the same item re-ingest product concept as HTTP so authorized agents can repair one selected item without receiving product capabilities unavailable to the human UI.
+
+Additional tools:
+
+| Tool | Input schema | Output schema | Mutation? | Equivalent operation |
+|---|---|---|---|---|
+| `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | `GET /api/runtime/openrouter-models` canonical path; `GET /api/runtime/openrouter/models` compatibility path |
+| `reingest_item` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "...", "model": null, "prompt": null }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
+
+Rules:
+
+- `list_openrouter_models` is authenticated and read-only; it creates no receipts, durable cache, provider registry, or portable state;
+- `reingest_item` requires owner-token authority, `item_id`, `actor_id`, and `idempotency_key`;
+- `model`, canonical `prompt`, and compatibility `extra_prompt` are optional request-scoped fields with the same validation, non-persistence, aliasing, and redaction rules as HTTP;
+- `reingest_item` uses the current persisted processing language and does not accept a per-call language override;
+- `reingest_item` must call the same application operation as HTTP item re-ingest;
+- guarded-operation conflicts return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` when available;
+- same-key idempotency replay/mismatch/active-run semantics match `POST /api/items/{id}/reingest`;
+- MCP responses and errors must not echo prompt text from either prompt field, raw provider payloads, OpenRouter API keys, secret source metadata, `.env` paths, or owner tokens.
+
+Tool required fields:
+
+| Tool | Required fields | Optional fields |
+|---|---|---|
+| `list_openrouter_models` | none | none |
+| `reingest_item` | `item_id`, `actor_id`, `idempotency_key` | `model`, `prompt`, `extra_prompt` |
+
 ## 8. Frontend Boundary
 
 Frontend implementation lives in `web/` and must preserve `docs/DESIGN.md`.
@@ -1727,6 +2181,17 @@ Processing-language and split-scroll responsibilities:
 - keep desktop feed and Inspector as independent vertical scroll regions; selecting an item must not move the feed scroll, while the Inspector reading container resets to top for a newly selected item;
 - keep mobile Inspector as the existing full-screen route with preserved feed scroll.
 
+Inspector item re-ingest frontend responsibilities:
+
+- expose item re-ingest only inside the currently selected Inspector, not global chrome, Source Ledger, or a settings/dashboard surface;
+- load OpenRouter model choices through the typed API client from canonical `GET /api/runtime/openrouter-models` (with `GET /api/runtime/openrouter/models` as compatibility) and keep default-model re-ingest available when model listing is unavailable;
+- send optional model and canonical one-time `prompt` only in the `POST /api/items/{id}/reingest` request body, while accepting `extra_prompt` only as a compatibility alias;
+- clear temporary model/prompt UI state on cancel, completion, item change, or Inspector close;
+- never persist model/prompt values to local storage, state export/import, item metadata, source settings, or runtime defaults;
+- refresh the current item detail from the item re-ingest response and update any visible feed/search row for that item without creating history;
+- show running, completion, conflict, and failure states as inline text replacement/live-region feedback; no spinner, toast, modal retry, progress dashboard, or operation history;
+- render source text/source evidence as collapsed by default for each newly opened Inspector item while preserving accessible disclosure semantics and the fallback/source-evidence contract.
+
 ## 9. Minimal File Shape
 
 Start with this shape and split only after file size, test locality, or repeated change pressure justifies it:
@@ -1737,10 +2202,11 @@ internal/resofeed/db.go
 internal/resofeed/migrations.go
 internal/resofeed/types.go
 internal/resofeed/ingest.go
+internal/resofeed/reprocess.go
 internal/resofeed/ranking.go
 internal/resofeed/search.go
 internal/resofeed/state.go
-internal/resofeed/llm.go
+internal/resofeed/openrouter.go
 internal/resofeed/http.go
 internal/resofeed/mcp.go
 internal/resofeed/doctor.go
@@ -1750,10 +2216,14 @@ web/
 Module ownership rules:
 
 - `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, the in-process ingest concurrency guard, and the non-overlap semantics for background/manual ingestion.
-- `internal/resofeed/http.go` owns HTTP routing, owner-token enforcement, request validation, response serialization, and mapping `ingest.go` outcomes to the `POST /api/ingest` and `POST /api/sources/{id}/fetch` contracts.
-- `http.go` must not own ingest business logic, queues, job lifecycle, retry scheduling, or source fetch state beyond request/response translation.
-- `ingest.go` must not own HTTP status codes or JSON wire formatting beyond exposing typed outcomes that `http.go` can translate.
-- `state.go` owns only state bundle validation plus transactional backup/restore. It must not own merging, conflict resolution, sync orchestration, or portable agent receipts.
+- `internal/resofeed/reprocess.go` owns library reprocess and Inspector item re-ingest application behavior: source-text precedence, item-scoped model call orchestration, safe result classification, item readable-field updates, and per-item FTS refresh. It must not own HTTP/MCP serialization or UI state.
+- `internal/resofeed/openrouter.go` owns OpenRouter chat-completions transport, temporary per-call model override handling, provider model listing, resolved/configured model reporting, and safe provider error classification. It must not persist model selections, prompt templates, or provider account metadata.
+- `internal/resofeed/http.go` owns HTTP routing, owner-token enforcement, request validation, response serialization, idempotency mapping, and mapping ingest/reprocess outcomes to HTTP contracts.
+- `internal/resofeed/mcp.go` owns MCP schema/resource/tool parity and must call the same application operations as HTTP.
+- `http.go` and `mcp.go` must not own ingest/reprocess business logic, queues, job lifecycle, retry scheduling, provider model caching in SQLite, or source fetch state beyond request/response translation.
+- `ingest.go` and `reprocess.go` must not own HTTP status codes or JSON wire formatting beyond exposing typed outcomes that transports can translate.
+- `state.go` owns only state bundle validation plus transactional backup/restore. It must not own merging, conflict resolution, sync orchestration, portable agent receipts, model settings, or prompt templates.
+- Frontend files under `web/` own Inspector interaction state, model selector presentation, extra-prompt input state, and source-text disclosure state. They must not persist request-scoped model/prompt values.
 
 Do not introduce repositories, factories, DI containers, event buses, plugin registries, service catalogs, storage interfaces, state mergers, conflict resolvers, sync coordinators, provider abstraction layers, persistent ingest queues, or job tables without a new architecture decision and a real second implementation.
 
@@ -1883,7 +2353,7 @@ Processing-language and split-scroll verification additions:
 - source identifier DOM nodes/links use `translate="no"` or equivalent so browser/page translation does not localize provenance anchors;
 - `POST /api/runtime/reprocess-library` explicitly rewrites existing readable item text in the current language and rebuilds FTS without creating durable jobs, queues, or activity ledgers;
 - if a reprocess receipt expires or is lost after restart, resubmitting the same request body and `idempotency_key` while the concurrency guard is free is accepted as a fresh request with `already_applied: false`, not rejected as `400` solely because the key was previously used;
-- operation guard conflicts across manual ingest/fetch/reprocess/language mutation use `409 conflict` details with `operation_running`, canonical `operation`, `actor_kind`, `retry_allowed`, and `current_operation` when the in-memory snapshot is running; MCP returns the matching JSON-RPC error data shape;
+- operation guard conflicts across manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use `409 conflict` details with `operation_running`, canonical `operation`, `actor_kind`, `retry_allowed`, and `current_operation` when the in-memory snapshot is running; MCP returns the matching JSON-RPC error data shape;
 - timeout reprocess outcomes return `reprocess.status: "failed"`, `fts_rebuilt: false`, and error `code: "timeout"` when the server can serialize the response; fatal pre-result SQLite/invariant failures return `500 internal`;
 - `GET /api/search` searches the stored target-language FTS content after reprocess;
 - `GET /api/doctor` reports `search_fts: stale since <RFC3339_UTC>` when the stale marker is set, otherwise `search_fts: ok`, and never includes item text, source text, API keys, or raw model output;
@@ -1910,6 +2380,37 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
   -H "Content-Type: application/json" \
   --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"smoke-test-2"}'
 # expect 200 JSON body: {"reprocess":{"language":"zh","fts_rebuilt":true,...},"already_applied":false}
+```
+
+
+### Inspector item re-ingest verification additions
+
+- canonical `GET /api/runtime/openrouter-models` and compatibility `GET /api/runtime/openrouter/models` require owner-token authorization, reject query parameters, return OpenRouter model-list response data, and never leak API keys, secret source metadata, `.env` paths, raw provider JSON, or provider account configuration;
+- model-list provider failure produces a safe unavailable state that still allows default-model re-ingest in the Inspector;
+- `POST /api/items/{id}/reingest` requires owner-token authorization, strict JSON body validation, `actor_kind`, `actor_id`, and `idempotency_key`;
+- item re-ingest processes exactly one selected item and does not fetch/process other source items or library rows;
+- optional `model`, canonical `prompt`, and compatibility `extra_prompt` affect only the single request and are not persisted in SQLite, local storage, exported state, item metadata, source settings, runtime defaults, `/doctor`, logs, or user-visible history;
+- extra prompt is subordinate to the fixed JSON/provenance/target-language contract and cannot cause source identifiers to be translated or rewritten;
+- item re-ingest uses the same source-text precedence as library reprocess and never fetches `sources.url`/`items.source_url` as article text;
+- selected-item readable fields and selected-item `search_fts` row are refreshed consistently after successful or storable failure outcomes;
+- conflicts across background ingest, manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use canonical `409 conflict` current-operation details with item re-ingest reported as `item_reingest`; no work is queued;
+- MCP `list_openrouter_models` and `reingest_item` mirror HTTP contracts, auth, idempotency, conflict semantics, and redaction rules;
+- Inspector renders item re-ingest as inline bracket-action controls only, with no modal, toast, spinner, settings dashboard, queue, progress dashboard, or operation history;
+- Inspector Source Text/Source Evidence is collapsed by default for every newly opened item while preserving accessible disclosure semantics and fallback/source-evidence rules.
+
+Inspector item re-ingest smoke checks:
+
+```bash
+curl -i http://127.0.0.1:8080/api/runtime/openrouter-models \
+  -H "Authorization: Bearer <OWNER_TOKEN>"
+# expect 200 JSON body with provider "openrouter" and either models_status "ok" or safe "unavailable"
+
+curl -i -X POST http://127.0.0.1:8080/api/items/item_01/reingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"item-reingest-smoke-1","model":null,"prompt":"Prefer concrete source facts."}'
+# expect 200 JSON body: {"already_applied":false,"reingest":{"item_id":"item_01",...}}
+# captured evidence must not echo prompt text, API keys, provider raw payloads, or secret-source metadata
 ```
 
 ## 11. Open Questions

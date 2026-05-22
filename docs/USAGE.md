@@ -296,6 +296,70 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 }
 ```
 
+### List OpenRouter models for one-time item re-ingest
+
+The canonical model-list path is `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted.
+
+```bash
+curl -sS "http://127.0.0.1:8080/api/runtime/openrouter-models" \
+  -H "Authorization: Bearer <OWNER_TOKEN>"
+```
+
+Abridged example response:
+
+```json
+{
+  "models": [
+    { "id": "openai/gpt-4.1-mini", "name": "GPT-4.1 Mini" }
+  ]
+}
+```
+
+Both model-list paths accept no query parameters. Missing or invalid owner-token auth returns the standard `401 unauthorized` JSON error body.
+
+### Re-ingest one selected item
+
+Use item re-ingest when the selected Inspector item needs one explicit retry with an optional request-scoped model and one-time prompt. The operation uses the current persisted processing language; it does not accept a per-call `language` field.
+
+Canonical request body:
+
+```bash
+curl -sS -X POST "http://127.0.0.1:8080/api/items/ITEM_ID/reingest" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"reingest-ITEM_ID-001","model":null,"prompt":"one-time retry instruction"}'
+```
+
+Compatibility body using `extra_prompt`:
+
+```bash
+curl -sS -X POST "http://127.0.0.1:8080/api/items/ITEM_ID/reingest" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"reingest-ITEM_ID-compat-001","model":"openai/gpt-4.1-mini","extra_prompt":"one-time retry instruction"}'
+```
+
+Abridged example response:
+
+```json
+{
+  "already_applied": false,
+  "reingest": {
+    "item_id": "ITEM_ID",
+    "status": "completed",
+    "item_updated": true,
+    "fts_updated": true,
+    "item": {
+      "id": "ITEM_ID",
+      "summary": "Updated target-language summary.",
+      "core_insight": "Updated target-language core insight."
+    }
+  }
+}
+```
+
+Rules: `prompt` is canonical; `extra_prompt` is a compatibility alias. Empty prompts normalize to no one-time prompt. `model: null`, omitted, empty, or whitespace-only means the account/runtime default for that call. Unknown fields, including `language`, are rejected. Reusing the same live idempotency key with changed prompt/model returns `400 bad_request`. Prompt and model are request-scoped only: they are not stored in runtime metadata, state export/import, browser localStorage, provider config, durable preferences, jobs, queues, or history.
+
 ### Mark inspected
 
 ```bash
@@ -484,7 +548,7 @@ Example response:
 }
 ```
 
-Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. Setting the runtime language is metadata-only, is allowed while ingest, fetch, or reprocess is already running, and affects future processing or explicit reprocess rather than an already-running operation. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
+Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. Setting the runtime language is metadata-only and affects future processing or explicit reprocess rather than rewriting existing rows. It is blocked while background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is running; the server returns `409 conflict` with shared current-operation details for the operation holding the guard. The language write itself is a short atomic metadata update and is not exposed as a `language_mutation` current-operation kind. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
 
 ### Reprocess existing library
 
@@ -900,6 +964,7 @@ Target tools:
 | `list_candidate_items` | Retrieve eligible high-priority recent items for external evaluation. |
 | `search_items` | Search the corpus using lexical/metadata search. |
 | `read_item` | Retrieve item detail and provenance. |
+| `reingest_item` | Explicitly reprocess one selected item with optional request-scoped model and one-time prompt. |
 | `mark_inspected` | Forward a human inspection from an external context. |
 | `resonate_item` | Forward or toggle a human-authorized resonance action. |
 | `steer` | Forward a natural-language steering instruction. |
@@ -944,6 +1009,35 @@ Example tool calls and responses:
     "url": "https://example.com/article",
     "summary": "Dense factual summary.",
     "is_resonated": false
+  }
+}
+```
+
+```json
+{
+  "tool": "reingest_item",
+  "arguments": {
+    "item_id": "ITEM_ID",
+    "actor_id": "briefing-agent",
+    "idempotency_key": "briefing-agent-reingest-ITEM_ID-001",
+    "model": null,
+    "prompt": "one-time retry instruction"
+  }
+}
+```
+
+```json
+{
+  "already_applied": false,
+  "reingest": {
+    "item_id": "ITEM_ID",
+    "status": "completed",
+    "item_updated": true,
+    "fts_updated": true,
+    "item": {
+      "id": "ITEM_ID",
+      "summary": "Updated target-language summary."
+    }
   }
 }
 ```
