@@ -3,9 +3,9 @@ export type Rfc3339UtcString = string;
 export type CalendarDateString = string;
 export type OpaqueId = string;
 
-export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'conflict' | 'internal';
+export type ApiErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'conflict' | 'provider_unavailable' | 'internal';
 
-export type OperationKind = 'background_ingest' | 'manual_ingest' | 'source_fetch' | 'library_reprocess';
+export type OperationKind = 'background_ingest' | 'manual_ingest' | 'source_fetch' | 'library_reprocess' | 'item_reingest';
 export type OperationActorKind = 'background' | 'human' | 'agent';
 
 export interface CurrentOperationCount {
@@ -705,4 +705,4 @@ export interface FrontendAcceptanceContractLock {
 
 export type ApiResult<T> =
   | { ok: true; status: 200; body: T }
-  | { ok: false; status: 400 | 401 | 404 | 500; body: ErrorBody };
+  | { ok: false; status: 400 | 401 | 404 | 409 | 500 | 503; body: ErrorBody };

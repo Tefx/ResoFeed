@@ -5,7 +5,8 @@ export const CANONICAL_OPERATION_KINDS = [
   'background_ingest',
   'manual_ingest',
   'source_fetch',
-  'library_reprocess'
+  'library_reprocess',
+  'item_reingest'
 ] as const satisfies readonly OperationKind[];
 
 export const CANONICAL_OPERATION_ACTOR_KINDS = [

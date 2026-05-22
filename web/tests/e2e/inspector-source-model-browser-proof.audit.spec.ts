@@ -178,7 +178,7 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await expect(panel.getByText('model:')).toBeVisible();
   await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await expect(panel.getByLabel('Model')).toHaveValue('default');
-  await expect(panel.getByRole('option', { name: 'Default model' })).toHaveAttribute('value', 'default');
+  await expect(panel.getByRole('option', { name: 'default: account_default' })).toHaveAttribute('value', 'default');
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
   await expect(panel.getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)' })).toHaveAttribute('value', 'anthropic/claude-3.5-sonnet');
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
@@ -186,7 +186,8 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await panel.getByLabel('Model').selectOption('openai/gpt-4.1-mini');
   await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
   await expect.poll(() => reingestBodies.length).toBe(1);
-  await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
+  await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
+  await expect(panel.getByRole('button', { name: '[RE-INGEST ITEM]' })).toBeVisible();
   await expect(page.evaluate(() => Object.keys(window.localStorage).sort())).resolves.toEqual(['resofeed.ownerToken']);
   await expect(inspector.getByText(/settings|history/i)).toHaveCount(0);
   await captureEvidence(page, testInfo, 'audit-after-reingest-no-durable-state');

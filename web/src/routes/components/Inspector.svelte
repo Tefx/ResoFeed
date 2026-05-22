@@ -40,6 +40,7 @@
   let reingestConfiguring = $state(false);
   let reingestToggle = $state<HTMLButtonElement | undefined>();
   let reingestSubmit = $state<HTMLButtonElement | undefined>();
+  let reingestModelSelect = $state<HTMLSelectElement | undefined>();
   let reingestItemId = $state<string | null>(null);
   let handledFocusRequestId = $state(-1);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
@@ -501,7 +502,7 @@
   async function openReingestConfig(): Promise<void> {
     reingestConfiguring = true;
     await tick();
-    reingestSubmit?.focus();
+    reingestModelSelect?.focus();
   }
 
   async function cancelReingestConfig(): Promise<void> {
@@ -511,18 +512,23 @@
   }
 
   function modelListDiagnostic(): string {
-    if (openRouterModelListState === 'loading') return localizedChrome('model list: loading OpenRouter models', '模型列表：正在加载 OpenRouter 模型');
+    if (openRouterModelListState === 'loading') return localizedChrome('models: loading', '模型：加载中');
     if (openRouterModelListState === 'available') {
       return language === 'zh'
         ? `模型列表：${openRouterModels.length} 个 OpenRouter 模型可用`
         : `model list: ${openRouterModels.length} OpenRouter ${openRouterModels.length === 1 ? 'model' : 'models'} available`;
     }
-    return localizedChrome('model list: OpenRouter models unavailable', '模型列表：OpenRouter 模型不可用');
+    return localizedChrome('err: models unavailable', 'err: 模型不可用');
   }
 
-  function reingestStatusText(alreadyApplied: boolean): string {
-    if (alreadyApplied) return localizedChrome('re-ingest replayed', '重处理已重放');
-    return localizedChrome('re-ingest complete', '重处理完成');
+  function reingestStatusText(response: ItemReingestResponse): string {
+    const base = response.already_applied
+      ? localizedChrome('re-ingest replayed', '重处理已重放')
+      : localizedChrome('re-ingest complete', '重处理完成');
+    const search = response.reingest.fts_updated
+      ? localizedChrome('search refreshed', '搜索已刷新')
+      : localizedChrome('search unchanged', '搜索未更新');
+    return `${base} · ${search}`;
   }
 
   async function submitReingest(): Promise<void> {
@@ -540,7 +546,7 @@
       reingestPrompt = '';
       reingestModel = 'default';
       reingestState = response.already_applied ? 'replayed' : 'completed';
-      reingestStatus = reingestStatusText(response.already_applied);
+      reingestStatus = reingestStatusText(response);
       await tick();
       window.setTimeout(() => {
         if (item?.id !== submittedItemId || (reingestState !== 'completed' && reingestState !== 'replayed')) return;
@@ -623,12 +629,12 @@
     {/if}
     {#if showReingest}
       <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
-        <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '项目重处理')}</p>
+        <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '本文重处理')}</p>
         {#if reingestConfiguring}
           <label class="inspector-reingest-field">
             <span>{localizedChrome('model:', '模型：')}</span>
-            <select name="reingest-model" bind:value={reingestModel} aria-label={localizedChrome('Model', '模型')} disabled={!onReingestItem || reingestState === 'submitting'}>
-              <option value="default">Default model</option>
+            <select bind:this={reingestModelSelect} name="reingest-model" bind:value={reingestModel} aria-label={localizedChrome('Model', '模型')} disabled={!onReingestItem || reingestState === 'submitting'}>
+              <option value="default">default: account_default</option>
               {#each openRouterModels as model (model.id)}
                 <option value={model.id}>{model.name} ({model.id})</option>
               {/each}
@@ -636,16 +642,16 @@
           </label>
           <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
           <label class="inspector-reingest-field">
-            <span>{localizedChrome('extra prompt (one-time, not saved)', '一次性提示（不保存）')}</span>
+            <span>{localizedChrome('extra prompt (one-time, not saved)', '额外提示（仅本次，不保存）')}</span>
             <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
           </label>
-          <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem || reingestState === 'submitting'} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RE-INGESTING...]', '[重处理中...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')}</button>
+          <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RE-INGESTING ITEM...]', '[正在重新处理本文...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')}</button>
           <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>{localizedChrome('[CANCEL]', '[取消]')}</button>
           {#if reingestStatus}
             <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label="Item re-ingest status" aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus}</p>
           {/if}
         {:else}
-          <button bind:this={reingestToggle} class="bracket-action inspector-reingest-toggle" type="button" disabled={!onReingestItem} onclick={() => void openReingestConfig()}>{localizedChrome('[RE-INGEST ITEM]', '[重处理项目]')}</button>
+          <button bind:this={reingestToggle} class="bracket-action inspector-reingest-toggle" type="button" disabled={!onReingestItem} onclick={() => void openReingestConfig()}>{localizedChrome('[RE-INGEST ITEM]', '[重新处理本文]')}</button>
           {#if reingestStatus}
             <p class="inspector-reingest-status" role="status" aria-label="Item re-ingest status" aria-live="polite">{reingestStatus}</p>
           {/if}

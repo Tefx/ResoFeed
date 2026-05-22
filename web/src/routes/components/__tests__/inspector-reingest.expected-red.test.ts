@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/svelt
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { CurrentOperationInfo, ItemDetail, ItemSummary } from '$lib/api-contract';
+import type { CurrentOperationInfo, ItemDetail, ItemReingestResponse, ItemSummary } from '$lib/api-contract';
 import Page from '../../+page.svelte';
 import Inspector from '../Inspector.svelte';
 import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
@@ -110,7 +110,8 @@ function installAuthenticatedRuntimeFetch(options: { reingestConflict?: boolean 
           status: 'completed',
           item_updated: true,
           fts_updated: true,
-          model: 'openai/gpt-4.1-mini',
+          language: 'en',
+          error: null,
           item: {
             ...failedDetail,
             summary: 'Re-ingested summary.',
@@ -246,7 +247,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const modelControl = within(panel).getByLabelText('Model');
 
     expect(within(panel).getByText(/model list: 2 OpenRouter models available/i), 'product gap: model-list diagnostics should be visible next to the selector').toBeVisible();
-    expect(within(modelControl).getByRole('option', { name: 'Default model' })).toHaveValue('default');
+    expect(within(modelControl).getByRole('option', { name: 'default: account_default' })).toHaveValue('default');
     expect(within(modelControl).getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveValue('openai/gpt-4.1-mini');
     expect(within(modelControl).getByRole('option', { name: 'Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)' })).toHaveValue('anthropic/claude-3.5-sonnet');
   });
@@ -279,6 +280,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
       within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }),
       'R1 expected-red: successful re-ingest must collapse back to the single idle affordance'
     ).toBeVisible();
+    expect(within(panel).getByRole('status', { name: /item re-ingest status/i })).toHaveTextContent('re-ingest complete · search refreshed');
     expect(within(panel).queryByRole('button', { name: '[CONFIRM RE-INGEST]' })).not.toBeInTheDocument();
     expect(within(panel).queryByRole('button', { name: '[CANCEL]' })).not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
@@ -311,13 +313,73 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
     const panel = within(inspector).getByLabelText('Item re-ingest');
 
-    expect(within(panel).getByText('项目重处理')).toBeVisible();
-    await user.click(within(panel).getByRole('button', { name: '[重处理项目]' }));
+    expect(within(panel).getByText('本文重处理')).toBeVisible();
+    await user.click(within(panel).getByRole('button', { name: '[重新处理本文]' }));
     expect(within(panel).getByLabelText('模型')).toBeVisible();
     expect(within(panel).getByLabelText('一次性提示')).toBeVisible();
     expect(within(panel).getByRole('button', { name: '[确认重处理]' })).toBeVisible();
     expect(within(panel).getByRole('button', { name: '[取消]' })).toBeVisible();
     expect(within(panel).getByText(/模型列表：2 个 OpenRouter 模型可用/u)).toBeVisible();
+  });
+
+  it('renders model-list loading and unavailable states with live status text while preserving default re-ingest', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(Inspector, {
+      props: {
+        item: failedDetail,
+        mode: 'desktop-split',
+        showReingest: true,
+        onReingestItem: vi.fn(),
+        openRouterModelListState: 'loading'
+      }
+    });
+    const inspector = screen.getByRole('complementary', { name: failedDetail.title });
+    const panel = within(inspector).getByLabelText('Item re-ingest');
+
+    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
+    expect(within(panel).getByText('models: loading')).toHaveAttribute('aria-live', 'polite');
+    expect(within(panel).getByLabelText('Model')).toHaveValue('default');
+
+    await rerender({
+      item: failedDetail,
+      mode: 'desktop-split',
+      showReingest: true,
+      onReingestItem: vi.fn(),
+      openRouterModelListState: 'unavailable'
+    });
+    expect(within(panel).getByText('err: models unavailable')).toBeVisible();
+    expect(within(panel).getByLabelText('Model')).toHaveValue('default');
+  });
+
+  it('keeps the running action focused with aria-disabled text instead of removing the submitting trigger', async () => {
+    const user = userEvent.setup();
+    let resolveReingest: ((response: ItemReingestResponse) => void) | undefined;
+    const onReingestItem = vi.fn(() => new Promise<ItemReingestResponse>((resolve) => {
+      resolveReingest = resolve;
+    }));
+    render(Inspector, { props: { item: failedDetail, mode: 'desktop-split', showReingest: true, onReingestItem } });
+    const panel = within(screen.getByRole('complementary', { name: failedDetail.title })).getByLabelText('Item re-ingest');
+
+    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
+    await user.click(within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
+
+    const running = within(panel).getByRole('button', { name: '[RE-INGESTING ITEM...]' });
+    expect(running).toHaveAttribute('aria-disabled', 'true');
+    expect(running).not.toBeDisabled();
+    expect(running).toHaveFocus();
+
+    resolveReingest?.({
+      already_applied: false,
+      reingest: {
+        item_id: failedDetail.id,
+        status: 'completed',
+        language: 'en',
+        item_updated: false,
+        fts_updated: true,
+        error: null,
+        item: null
+      }
+    });
   });
 
   it('renders current-operation conflict detail when item re-ingest is blocked', async () => {

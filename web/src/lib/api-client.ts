@@ -60,10 +60,10 @@ export interface TodayFeedRequestParams {
 }
 
 export class ResoFeedApiError extends Error {
-  readonly status: 400 | 401 | 404 | 409 | 500;
+  readonly status: 400 | 401 | 404 | 409 | 500 | 503;
   readonly body: ErrorBody;
 
-  constructor(status: 400 | 401 | 404 | 409 | 500, body: ErrorBody) {
+  constructor(status: 400 | 401 | 404 | 409 | 500 | 503, body: ErrorBody) {
     super(`err: ${body.error.code}: ${body.error.message}`);
     this.name = 'ResoFeedApiError';
     this.status = status;
@@ -502,6 +502,6 @@ export class ResoFeedApiClient {
     } catch {
       body = fallbackError('internal', 'unexpected api error');
     }
-    throw new ResoFeedApiError(response.status as 400 | 401 | 404 | 409 | 500, body);
+    throw new ResoFeedApiError(response.status as 400 | 401 | 404 | 409 | 500 | 503, body);
   }
 }
