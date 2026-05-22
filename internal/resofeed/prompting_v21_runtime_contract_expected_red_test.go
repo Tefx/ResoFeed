@@ -36,6 +36,10 @@ func TestPromptingV21SummaryRequestUsesSeparateSystemPromptSpecExactPayloadAndSc
 	ctx := context.Background()
 	var captured promptingV21ChatRequest
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+			writeOpenRouterModelsMetadata(t, w, "openrouter/test-model", "response_format")
+			return
+		}
 		body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 		if err != nil {
 			t.Errorf("read OpenRouter request: %v", err)
@@ -172,6 +176,10 @@ func TestPromptingV21OpenRouterJSONSchemaDowngradeRetryUsesSameModelExpectedRed(
 	ctx := context.Background()
 	var seen []promptingV21ChatRequest
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+			writeOpenRouterModelsMetadata(t, w, "openrouter/same-selected-model", "response_format")
+			return
+		}
 		request, err := decodePromptingV21ChatRequest(r)
 		if err != nil {
 			t.Errorf("decode chat request: %v", err)
@@ -399,6 +407,20 @@ func decodePromptingV21ChatRequest(r *http.Request) (promptingV21ChatRequest, er
 		return promptingV21ChatRequest{}, err
 	}
 	return request, nil
+}
+
+func writeOpenRouterModelsMetadata(t *testing.T, w http.ResponseWriter, modelID string, supportedParameters ...string) {
+	t.Helper()
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(map[string]any{
+		"data": []map[string]any{{
+			"id":                   modelID,
+			"name":                 modelID,
+			"supported_parameters": supportedParameters,
+		}},
+	}); err != nil {
+		t.Fatalf("encode model metadata: %v", err)
+	}
 }
 
 func validPromptingV21Output(mutate func(*OpenRouterSummaryOutput)) OpenRouterSummaryOutput {

@@ -98,10 +98,7 @@ func ListOpenRouterModels(ctx context.Context, cfg OpenRouterConfig) (OpenRouter
 		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: provider returned status %d", resp.StatusCode)
 	}
 	var wire struct {
-		Data []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"data"`
+		Data []openRouterModelMetadata `json:"data"`
 	}
 	if err := json.Unmarshal(body, &wire); err != nil {
 		return OpenRouterModelsResponse{}, fmt.Errorf("openrouter models: decode provider response")
@@ -135,6 +132,12 @@ type openRouterHTTPClient struct {
 	client        *http.Client
 	resolvedMu    sync.Mutex
 	resolvedModel string
+}
+
+type openRouterModelMetadata struct {
+	ID                  string   `json:"id"`
+	Name                string   `json:"name"`
+	SupportedParameters []string `json:"supported_parameters"`
 }
 
 func (c *openRouterHTTPClient) ConfiguredModel() string {
@@ -429,10 +432,16 @@ func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, ds
 			if resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusNotFound {
 				status = classifyOpenRouterErrorBody(body)
 			}
+			if isOpenRouterSchemaModeUnsupportedBody(body) || (isOpenRouterJSONSchemaRequest(reqPayload) && resp.StatusCode == http.StatusBadRequest && status != modelStatusInvalidModel) {
+				return openRouterSchemaModeUnsupportedError{err: classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))}
+			}
 			return classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))
 		}
 		var providerErr openRouterErrorResponse
 		if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
+			if isOpenRouterSchemaModeUnsupportedMessage(providerErr.Error.Message) {
+				return openRouterSchemaModeUnsupportedError{err: classifiedOpenRouterError(classifyOpenRouterProviderMessage(providerErr.Error.Message), fmt.Errorf("provider error status %d", resp.StatusCode))}
+			}
 			return classifiedOpenRouterError(classifyOpenRouterProviderMessage(providerErr.Error.Message), fmt.Errorf("provider error status %d", resp.StatusCode))
 		}
 		var generated openRouterChatResponse
@@ -681,10 +690,8 @@ func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled
 		return fmt.Errorf("marshal prompt: %w", err)
 	}
 	reqPayload := openRouterChatRequest{
-		Messages: []openRouterMessage{{Role: "system", Content: compiled.SystemPrompt}, {Role: "user", Content: string(promptBytes)}},
-		ResponseFormat: map[string]any{
-			"type": "json_object",
-		},
+		Messages:       []openRouterMessage{{Role: "system", Content: compiled.SystemPrompt}, {Role: "user", Content: string(promptBytes)}},
+		ResponseFormat: openRouterJSONObjectResponseFormat(),
 	}
 	if strings.TrimSpace(c.model) != "" {
 		reqPayload.Model = strings.TrimSpace(c.model)
@@ -692,7 +699,92 @@ func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled
 	if strings.TrimSpace(compiled.Model) != "" {
 		reqPayload.Model = strings.TrimSpace(compiled.Model)
 	}
+	if supported, err := c.selectedModelSupportsJSONSchema(ctx, client, reqPayload.Model); err != nil {
+		return err
+	} else if supported {
+		reqPayload.ResponseFormat = openRouterJSONSchemaResponseFormat()
+		reqPayload.Provider = map[string]any{"require_parameters": true}
+		if err := c.doOpenRouterJSON(ctx, client, reqPayload, dst); err != nil {
+			if isOpenRouterSchemaModeUnsupported(err) {
+				reqPayload.ResponseFormat = openRouterJSONObjectResponseFormat()
+				reqPayload.Provider = nil
+				return c.doOpenRouterJSON(ctx, client, reqPayload, dst)
+			}
+			return err
+		}
+		return nil
+	}
 	return c.doOpenRouterJSON(ctx, client, reqPayload, dst)
+}
+
+func openRouterJSONObjectResponseFormat() map[string]any {
+	return map[string]any{"type": "json_object"}
+}
+
+func openRouterJSONSchemaResponseFormat() map[string]any {
+	return map[string]any{
+		"type": "json_schema",
+		"json_schema": map[string]any{
+			"name":   "resofeed_summary",
+			"strict": true,
+			"schema": map[string]any{
+				"type":                 "object",
+				"additionalProperties": false,
+				"required":             []string{"title", "feed_excerpt", "extracted_text", "summary", "core_insight", "value_tier", "model_status"},
+				"properties": map[string]any{
+					"title":          map[string]any{"type": "string", "maxLength": 180},
+					"feed_excerpt":   map[string]any{"type": "string", "maxLength": 700},
+					"extracted_text": map[string]any{"type": "string", "maxLength": 1600},
+					"summary":        map[string]any{"type": "string", "maxLength": 1800},
+					"core_insight":   map[string]any{"type": "string", "maxLength": 350},
+					"value_tier":     map[string]any{"type": "string", "enum": []string{"high", "brief", "source-claim"}},
+					"model_status":   map[string]any{"type": "string", "enum": []string{"ok", "summary_unavailable"}},
+				},
+			},
+		},
+	}
+}
+
+func (c *openRouterHTTPClient) selectedModelSupportsJSONSchema(ctx context.Context, client *http.Client, selectedModel string) (bool, error) {
+	selectedModel = strings.TrimSpace(selectedModel)
+	if selectedModel == "" {
+		return false, nil
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, openRouterModelsURL(c.endpoint), nil)
+	if err != nil {
+		return false, fmt.Errorf("openrouter summarize: create model metadata request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(c.apiKey))
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, nil
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return false, nil
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return false, fmt.Errorf("openrouter summarize: read model metadata")
+	}
+	var wire struct {
+		Data []openRouterModelMetadata `json:"data"`
+	}
+	if err := json.Unmarshal(body, &wire); err != nil {
+		return false, nil
+	}
+	for _, model := range wire.Data {
+		if strings.TrimSpace(model.ID) != selectedModel {
+			continue
+		}
+		for _, parameter := range model.SupportedParameters {
+			if parameter == "response_format" {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+	return false, nil
 }
 
 func (c *openRouterHTTPClient) doOpenRouterJSON(ctx context.Context, client *http.Client, reqPayload openRouterChatRequest, dst any) error {
@@ -740,10 +832,16 @@ func (c *openRouterHTTPClient) doOpenRouterJSON(ctx context.Context, client *htt
 			if resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusNotFound {
 				status = classifyOpenRouterErrorBody(body)
 			}
+			if isOpenRouterSchemaModeUnsupportedBody(body) || (isOpenRouterJSONSchemaRequest(reqPayload) && resp.StatusCode == http.StatusBadRequest && status != modelStatusInvalidModel) {
+				return openRouterSchemaModeUnsupportedError{err: classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))}
+			}
 			return classifiedOpenRouterError(status, fmt.Errorf("status %d", resp.StatusCode))
 		}
 		var providerErr openRouterErrorResponse
 		if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
+			if isOpenRouterSchemaModeUnsupportedMessage(providerErr.Error.Message) {
+				return openRouterSchemaModeUnsupportedError{err: classifiedOpenRouterError(classifyOpenRouterProviderMessage(providerErr.Error.Message), fmt.Errorf("provider error status %d", resp.StatusCode))}
+			}
 			return classifiedOpenRouterError(classifyOpenRouterProviderMessage(providerErr.Error.Message), fmt.Errorf("provider error status %d", resp.StatusCode))
 		}
 		var generated openRouterChatResponse
@@ -769,6 +867,46 @@ func classifyOpenRouterErrorBody(body []byte) string {
 		return classifyOpenRouterProviderMessage(providerErr.Error.Message)
 	}
 	return modelStatusProviderError
+}
+
+type openRouterSchemaModeUnsupportedError struct {
+	err error
+}
+
+func (e openRouterSchemaModeUnsupportedError) Error() string {
+	if e.err == nil {
+		return "schema_mode_unsupported"
+	}
+	return e.err.Error()
+}
+
+func (e openRouterSchemaModeUnsupportedError) Unwrap() error { return e.err }
+
+func isOpenRouterSchemaModeUnsupported(err error) bool {
+	var target openRouterSchemaModeUnsupportedError
+	return errors.As(err, &target)
+}
+
+func isOpenRouterSchemaModeUnsupportedBody(body []byte) bool {
+	var providerErr openRouterErrorResponse
+	if err := json.Unmarshal(body, &providerErr); err == nil && providerErr.Error.Message != "" {
+		return isOpenRouterSchemaModeUnsupportedMessage(providerErr.Error.Message)
+	}
+	return isOpenRouterSchemaModeUnsupportedMessage(string(body))
+}
+
+func isOpenRouterSchemaModeUnsupportedMessage(message string) bool {
+	lower := strings.ToLower(message)
+	return strings.Contains(lower, "response_format") ||
+		strings.Contains(lower, "require_parameters") ||
+		strings.Contains(lower, "unsupported parameter") ||
+		strings.Contains(lower, "unsupported parameters") ||
+		strings.Contains(lower, "schema mode")
+}
+
+func isOpenRouterJSONSchemaRequest(reqPayload openRouterChatRequest) bool {
+	mode, _ := reqPayload.ResponseFormat["type"].(string)
+	return mode == "json_schema"
 }
 
 func classifyOpenRouterProviderMessage(message string) string {

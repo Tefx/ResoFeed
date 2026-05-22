@@ -222,6 +222,10 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 
 	var calls int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+			writeOpenRouterModelsMetadata(t, w, "openrouter-test")
+			return
+		}
 		calls++
 		if r.URL.Path != "/api/v1/chat/completions" || r.Header.Get("Authorization") != "Bearer test-key" {
 			t.Fatalf("unexpected OpenRouter request path/auth: path=%s auth=%q", r.URL.Path, r.Header.Get("Authorization"))

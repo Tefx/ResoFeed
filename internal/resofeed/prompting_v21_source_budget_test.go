@@ -16,6 +16,10 @@ func TestPromptingV21CompilerEmitsExactSystemAndDocumentedPayload(t *testing.T) 
 	ctx := context.Background()
 	var captured promptingV21ChatRequest
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+			writeOpenRouterModelsMetadata(t, w, "openrouter/test-model", "response_format")
+			return
+		}
 		body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 		if err != nil {
 			t.Errorf("read OpenRouter request: %v", err)
@@ -134,6 +138,10 @@ func TestPromptingV21SelectedItemReingestInputUsesSamePromptCompiler(t *testing.
 	ctx := context.Background()
 	var captured promptingV21ChatRequest
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+			writeOpenRouterModelsMetadata(t, w, "openrouter/request-scoped-model", "response_format")
+			return
+		}
 		body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 		if err != nil {
 			t.Errorf("read OpenRouter request: %v", err)

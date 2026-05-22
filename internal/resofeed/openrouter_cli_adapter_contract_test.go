@@ -129,6 +129,10 @@ func TestOpenRouterAdapterRequestContractWithFakeServer(t *testing.T) {
 			var gotPath, gotAuth string
 			var gotBody map[string]any
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v1/models" {
+					writeOpenRouterModelsMetadata(t, w, fakeOpenRouterModel)
+					return
+				}
 				gotPath = r.URL.Path
 				gotAuth = r.Header.Get("Authorization")
 				if err := json.NewDecoder(r.Body).Decode(&gotBody); err != nil {
