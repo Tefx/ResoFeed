@@ -641,7 +641,9 @@ Anatomy: source/provenance header, Resonate action (mobile/single-column route o
 
 Placement: [SHARP] the re-ingest affordance appears inside the Inspector only, after provenance/processing metadata and before the source-text disclosure or long reading body. It must not appear in global chrome, Feed rows, Source Ledger, the `RESOFEED` utility menu, `/doctor`, or search controls. Desktop uses the right Inspector scroll container; mobile uses the full-screen Inspector route.
 
-Anatomy and copy: idle state shows one bracket action, `[RE-INGEST ITEM]` or `[重新处理本文]`. Configuring state expands inline into a flat panel using `{components.inspector-reingest-panel}` with a model selector using `{components.inspector-model-selector}`, optional extra prompt textarea using `{components.inspector-extra-prompt}`, and `[CONFIRM RE-INGEST]` plus `[CANCEL]`. The model list is OpenRouter-only; label it as `model:` / `模型：` without provider tabs. The selector's first/default option is a local UI option such as `default: account_default`; selecting it sends `model: null` or omits `model`, never the literal `account_default` as a provider model ID. Extra prompt label must make non-persistence explicit, e.g. `extra prompt (one-time, not saved)` / `额外提示（仅本次，不保存）`.
+Anatomy and copy: idle state shows one bracket action, `[RE-INGEST ITEM]` or `[重新处理本文]`. Configuring state expands inline into a flat panel using `{components.inspector-reingest-panel}` with a model selector using `{components.inspector-model-selector}`, optional extra prompt textarea using `{components.inspector-extra-prompt}`, and `[CONFIRM RE-INGEST]` plus `[CANCEL]`. The model list is OpenRouter-only; label it as `model:` / `模型：` without provider tabs. The selector's first/default option is a local UI option such as `default: account_default`; selecting it sends `model: null` or omits `model`, never the literal `account_default` as a provider model ID. Extra prompt label must make non-persistence explicit, e.g. `extra prompt (one-time, guidance only, not saved)` / `额外提示（仅本次指导，不保存）`.
+
+One-time prompt authority copy: [SHARP] the extra prompt is guidance only for the selected item. Helper text adjacent to the textarea must state that it may change emphasis, angle, or fact selection only among source-backed facts, and that it cannot override schema, source grounding, target language, source identifiers, safety, provenance, runtime/provider status, or persistence boundaries. Suggested terse copy: `guidance only; cannot override schema, language, source identifiers, safety, status, or persistence` / `仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界`. Do not echo prompt text in receipts, errors, diagnostics, screenshots intended as logs, or source/provenance copy.
 
 Persistence boundary: [SHARP] selected model and extra prompt are temporary UI state for the active Inspector item. They are cleared when the panel is cancelled, when another item opens, after completion/failure acknowledgement, or when the Inspector route unmounts. The UI must not store them in local storage, settings, state export, source records, steering receipts, item provenance, or any durable preference.
 
@@ -811,6 +813,7 @@ Do:
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
 - [SHARP] Do keep item re-ingest controls inside Inspector only, scoped to the selected item, and presented as `[RE-INGEST ITEM]` / `[重新处理本文]` with temporary OpenRouter model and optional one-time prompt inputs.
+- [SHARP] Do label Inspector extra prompt as one-time guidance only: it may affect emphasis, angle, and source-backed fact selection, but never schema, source grounding, target language, source identifiers, safety, provenance, runtime/provider status, or persistence boundaries.
 - [SHARP] Do collapse source text/source evidence by default for every newly opened Inspector item while preserving accessible disclosure semantics and literal provenance.
 - Do preserve persistent feed access through time groups and pagination.
 - Do keep the left feed compact by default: flat metadata, 18px serif titles, clamped 1–2 line abstracts, and horizontal rules rather than roomy cards.
@@ -839,6 +842,7 @@ Don't:
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
 - [SHARP] Don't put re-ingest in Feed rows, Source Ledger, persistent global chrome, `/doctor`, provider settings, or a marketplace/provider abstraction surface.
 - [SHARP] Don't save the Inspector re-ingest model or extra prompt as defaults, preferences, steering state, item provenance, local storage, exportable state, or reusable templates.
+- [SHARP] Don't imply that the Inspector extra prompt can request schema changes, a different processing language, translated source identifiers, unsupported facts, provider/runtime status changes, prompt/secrets disclosure, or durable prompt/model state.
 - [SHARP] Don't use modals, toasts, spinners, progress bars, animated ellipses, dashboards, queues, or history surfaces for Inspector item re-ingest.
 
 Language and reprocessing guardrails:
@@ -888,7 +892,8 @@ Motion is functional, brief, and optional.
 | ----------------------------------------- | summary provenance: model-backed   |
 |                                          | [RE-INGEST ITEM]                  |
 |                                          | model: default: account_default    |
-|                                          | extra prompt (one-time, not saved) |
+|                                          | extra prompt (guidance, not saved) |
+|                                          | cannot override schema/lang/status |
 |                                          | [CONFIRM RE-INGEST] [CANCEL]       |
 |                                          | Source text (collapsed) ▸          |
 | src: hn · 4h · agent:delivery-bot         | ---------------------------------- |

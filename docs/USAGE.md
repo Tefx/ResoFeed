@@ -327,7 +327,7 @@ If no OpenRouter key is resolved for the model-list request, both model-list pat
 
 Use item re-ingest when the selected Inspector item needs one explicit retry with an optional request-scoped model and one-time prompt. The operation uses the current persisted processing language; it does not accept a per-call `language` field.
 
-Prompting note: the `prompt` / `extra_prompt` value is one-time editorial guidance for this selected item only. It may affect emphasis, angle, and source-backed fact selection, but it cannot override the output schema, target language, source grounding, source identifier preservation, safety rules, or runtime/provider status handling. The full prompting contract is [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md).
+Prompting note: the `prompt` / `extra_prompt` value is one-time editorial guidance for this selected item only. It may affect emphasis, angle, and source-backed fact selection, but it cannot override the output schema, target language, source grounding, source identifier preservation, safety rules, provenance, runtime/provider status handling, or persistence boundaries. It must not be used to disclose secrets or to ask ResoFeed to echo hidden prompt text. The full prompting contract is [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md).
 
 Canonical request body:
 
