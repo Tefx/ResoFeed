@@ -234,16 +234,18 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			t.Fatalf("decode request: %v", err)
 		}
-		if req.ResponseFormat["type"] != "json_object" || len(req.Messages) != 1 {
+		if req.ResponseFormat["type"] != "json_object" {
 			t.Fatalf("unexpected openrouter request: %+v", req)
 		}
 		if calls == 1 {
 			http.Error(w, "try again", http.StatusTooManyRequests)
 			return
 		}
-		text := `{"summary":"Dense factual summary.","core_insight":"Why this matters.","value_tier":"high","model_status":"ok"}`
-		if strings.Contains(req.Messages[0].Content, "translate_steering") {
+		text := `{"title":"Dense title","feed_excerpt":"Dense excerpt","extracted_text":"Dense extracted text","summary":"Dense factual summary.","core_insight":"Why this matters.","value_tier":"high","model_status":"ok"}`
+		if len(req.Messages) == 1 && strings.Contains(req.Messages[0].Content, "translate_steering") {
 			text = `{"interpreted_as":"steering_policy_update","rule_texts":["Push more systems papers."],"message":"steering updated"}`
+		} else if len(req.Messages) != 2 || req.Messages[0].Role != "system" || req.Messages[1].Role != "user" {
+			t.Fatalf("unexpected summary request messages: %+v", req.Messages)
 		}
 		_ = json.NewEncoder(w).Encode(openRouterChatResponse{Choices: []struct {
 			Message openRouterMessage `json:"message"`

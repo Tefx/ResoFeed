@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 const PromptingV21SchemaVersion = "resofeed.summarize.v2.1"
@@ -19,6 +20,38 @@ const PromptingV21SchemaVersion = "resofeed.summarize.v2.1"
 const PROMPT_SOURCE_TEXT_MAX_CHARS = 24000
 
 const promptSourceTextTruncationMarker = "\n[truncated]"
+
+type PromptValidationFailureCode string
+
+const (
+	PromptValidationDecodeError                 PromptValidationFailureCode = "decode_error"
+	PromptValidationSchemaInvalid               PromptValidationFailureCode = "schema_invalid"
+	PromptValidationFieldLengthExceeded         PromptValidationFailureCode = "field_length_exceeded"
+	PromptValidationEmptyRequiredGeneratedField PromptValidationFailureCode = "empty_required_generated_field"
+	PromptValidationLanguageInvalid             PromptValidationFailureCode = "language_invalid"
+	PromptValidationUnavailableMismatch         PromptValidationFailureCode = "unavailable_mismatch"
+	PromptValidationProvenanceMutation          PromptValidationFailureCode = "provenance_mutation"
+	PromptValidationPromptInjectionLeakage      PromptValidationFailureCode = "prompt_injection_leakage"
+)
+
+type PromptValidationError struct {
+	Code  PromptValidationFailureCode
+	Field string
+	Err   error
+}
+
+func (e PromptValidationError) Error() string {
+	if e.Field != "" {
+		return fmt.Sprintf("prompt validation: %s: %s", e.Code, e.Field)
+	}
+	return fmt.Sprintf("prompt validation: %s", e.Code)
+}
+
+func (e PromptValidationError) Unwrap() error { return e.Err }
+
+func promptValidationError(code PromptValidationFailureCode, field string, err error) error {
+	return PromptValidationError{Code: code, Field: field, Err: err}
+}
 
 const promptingV21SystemPrompt = "You are ResoFeed's bounded RSS summarization transformer.\n\n" +
 	"Return exactly one JSON object matching the requested schema.\n" +
@@ -171,21 +204,41 @@ func (c *openRouterHTTPClient) SummarizeItem(ctx context.Context, input OpenRout
 	if err != nil {
 		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, err
 	}
-	if strings.TrimSpace(compiled.UserPayload.Item.AvailableText) == "" {
+	if strings.TrimSpace(compiled.UserPayload.Item.AvailableText) == "" && compiled.UserPayload.Item.AvailableTextSource != "unavailable" {
 		return OpenRouterSummaryOutput{ModelStatus: "summary_unavailable"}, errors.New("openrouter summarize: available_text required")
 	}
-	var out OpenRouterSummaryOutput
-	if err := c.generateSummaryJSON(ctx, compiled, &out); err != nil {
-		return OpenRouterSummaryOutput{ModelStatus: classifyModelFailureStatus(err, "")}, fmt.Errorf("openrouter summarize: %w", err)
-	}
-	validated, err := validateSummaryOutputForPersistence(out)
-	if err != nil {
+	var lastValidationErr error
+	for attempt := 0; attempt < 2; attempt++ {
+		var repairCode PromptValidationFailureCode
+		if attempt == 1 {
+			repairCode = promptValidationFailureCode(lastValidationErr)
+		}
+		var out OpenRouterSummaryOutput
+		if err := c.generateSummaryJSON(ctx, compiled, repairCode, &out); err != nil {
+			if attempt == 0 && isRetryablePromptValidationError(err) {
+				lastValidationErr = err
+				continue
+			}
+			return OpenRouterSummaryOutput{ModelStatus: classifyModelFailureStatus(err, "")}, fmt.Errorf("openrouter summarize: %w", err)
+		}
+		validated, err := validateSummaryOutputForPersistenceWithPrompt(out, compiled.UserPayload.Item)
+		if err == nil {
+			return validated, nil
+		}
+		if attempt == 0 && isRetryablePromptValidationError(err) {
+			lastValidationErr = err
+			continue
+		}
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
-	return validated, nil
+	return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, lastValidationErr
 }
 
 func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRouterSummaryOutput, error) {
+	return validateSummaryOutputForPersistenceWithPrompt(out, promptingV21Item{AvailableTextSource: "fresh_full_text", AvailableText: "source text", TargetLanguage: ProcessingLanguageEnglish})
+}
+
+func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, item promptingV21Item) (OpenRouterSummaryOutput, error) {
 	out.Summary = strings.TrimSpace(out.Summary)
 	out.CoreInsight = strings.TrimSpace(out.CoreInsight)
 	out.ValueTier = strings.TrimSpace(out.ValueTier)
@@ -193,35 +246,162 @@ func validateSummaryOutputForPersistence(out OpenRouterSummaryOutput) (OpenRoute
 	out.FeedExcerpt = strings.TrimSpace(out.FeedExcerpt)
 	out.ExtractedText = strings.TrimSpace(out.ExtractedText)
 	out.ModelStatus = strings.TrimSpace(out.ModelStatus)
-	var sanitized bool
-	if out.Summary, sanitized = sanitizeReadablePayloadText(out.Summary); sanitized && out.Summary == "" {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: contaminated summary")
+	if err := validatePromptingV21OutputSchema(out); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
-	if out.CoreInsight, sanitized = sanitizeReadablePayloadText(out.CoreInsight); sanitized && out.CoreInsight == "" {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: contaminated core_insight")
+	if leaksPromptInjection(out.Summary) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, "summary", nil)
 	}
-	out.FeedExcerpt, _ = sanitizeReadablePayloadText(out.FeedExcerpt)
-	out.ExtractedText, _ = sanitizeReadablePayloadText(out.ExtractedText)
-	if out.ModelStatus == "" {
-		out.ModelStatus = "ok"
+	if leaksPromptInjection(out.CoreInsight) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, "core_insight", nil)
 	}
-	if mapModelStatus(out.ModelStatus) == modelStatusSummaryNA && out.ModelStatus != modelStatusSummaryNA {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, fmt.Errorf("openrouter summarize: invalid model_status %q", out.ModelStatus)
+	if leaksPromptInjection(out.FeedExcerpt) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, "feed_excerpt", nil)
 	}
-	if out.ModelStatus == "ok" && (out.Summary == "" || out.CoreInsight == "") {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: summary and core_insight required")
+	if leaksPromptInjection(out.ExtractedText) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, "extracted_text", nil)
 	}
-	if out.ModelStatus == "ok" && !isSingleSentenceCoreInsight(out.CoreInsight) {
+	if out.ModelStatus == modelStatusOK && hasEmptyRequiredGeneratedField(out) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationEmptyRequiredGeneratedField, "generated_fields", nil)
+	}
+	if out.ModelStatus == modelStatusSummaryNA && strings.TrimSpace(item.AvailableText) != "" && item.AvailableTextSource != "unavailable" {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationUnavailableMismatch, "model_status", nil)
+	}
+	if out.ModelStatus == modelStatusSummaryNA && (out.Title == "" || out.Summary == "" || out.CoreInsight == "") {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationUnavailableMismatch, "fallback_fields", nil)
+	}
+	if out.ModelStatus == modelStatusOK && !isSingleSentenceCoreInsight(out.CoreInsight) {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, errors.New("openrouter summarize: core_insight must be exactly one sentence")
 	}
-	if out.ModelStatus == "ok" {
+	if out.ModelStatus == modelStatusOK {
 		valueTier, err := normalizeSummaryValueTier(out.ValueTier)
 		if err != nil {
-			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationSchemaInvalid, "value_tier", err)
 		}
 		out.ValueTier = valueTier
 	}
+	if err := validatePromptLanguage(out, item.TargetLanguage); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+	}
+	if err := validatePromptProvenance(out, item); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+	}
 	return out, nil
+}
+
+func validatePromptingV21OutputSchema(out OpenRouterSummaryOutput) error {
+	for _, field := range []struct {
+		name  string
+		value string
+		limit int
+	}{
+		{name: "title", value: out.Title, limit: 180},
+		{name: "feed_excerpt", value: out.FeedExcerpt, limit: 700},
+		{name: "extracted_text", value: out.ExtractedText, limit: 1600},
+		{name: "summary", value: out.Summary, limit: 1800},
+		{name: "core_insight", value: out.CoreInsight, limit: 350},
+	} {
+		if utf8.RuneCountInString(field.value) > field.limit {
+			return promptValidationError(PromptValidationFieldLengthExceeded, field.name, nil)
+		}
+	}
+	switch out.ModelStatus {
+	case modelStatusOK, modelStatusSummaryNA:
+	default:
+		return promptValidationError(PromptValidationSchemaInvalid, "model_status", nil)
+	}
+	switch out.ValueTier {
+	case "high", "brief", "source-claim":
+	default:
+		return promptValidationError(PromptValidationSchemaInvalid, "value_tier", nil)
+	}
+	return nil
+}
+
+func hasEmptyRequiredGeneratedField(out OpenRouterSummaryOutput) bool {
+	return out.Title == "" || out.FeedExcerpt == "" || out.ExtractedText == "" || out.Summary == "" || out.CoreInsight == "" || out.ValueTier == ""
+}
+
+func leaksPromptInjection(value string) bool {
+	lower := strings.ToLower(value)
+	patterns := []string{
+		"ignore previous instructions",
+		"reveal the hidden system prompt",
+		"hidden system prompt",
+		"system prompt",
+		"developer message",
+		"change the schema",
+		"override model_status",
+		"follow these instructions instead",
+		"disregard previous",
+	}
+	for _, pattern := range patterns {
+		if strings.Contains(lower, pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+func validatePromptLanguage(out OpenRouterSummaryOutput, target ProcessingLanguage) error {
+	combined := out.Title + "\n" + out.FeedExcerpt + "\n" + out.ExtractedText + "\n" + out.Summary + "\n" + out.CoreInsight
+	lower := strings.ToLower(combined)
+	if strings.Contains(lower, "cannot write in the requested") || strings.Contains(lower, "refuse to use the requested language") {
+		return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+	}
+	if target == ProcessingLanguageChinese && containsMostlyLatin(combined) {
+		return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+	}
+	return nil
+}
+
+func containsMostlyLatin(value string) bool {
+	var latin, cjk int
+	for _, r := range value {
+		switch {
+		case r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z':
+			latin++
+		case r >= '\u4e00' && r <= '\u9fff':
+			cjk++
+		}
+	}
+	return latin >= 24 && cjk == 0
+}
+
+func validatePromptProvenance(out OpenRouterSummaryOutput, item promptingV21Item) error {
+	if strings.TrimSpace(item.URL) != "" && containsMutatedURL(out, item.URL) {
+		return promptValidationError(PromptValidationProvenanceMutation, "url", nil)
+	}
+	return nil
+}
+
+func joinSummaryOutputFields(out OpenRouterSummaryOutput) string {
+	return strings.Join([]string{out.Title, out.FeedExcerpt, out.ExtractedText, out.Summary, out.CoreInsight}, "\n")
+}
+
+func containsMutatedURL(out OpenRouterSummaryOutput, want string) bool {
+	fields := joinSummaryOutputFields(out)
+	if strings.Contains(fields, want) {
+		return false
+	}
+	return strings.Contains(fields, "http://") || strings.Contains(fields, "https://")
+}
+
+func promptValidationFailureCode(err error) PromptValidationFailureCode {
+	var validationErr PromptValidationError
+	if errors.As(err, &validationErr) {
+		return validationErr.Code
+	}
+	return ""
+}
+
+func isRetryablePromptValidationError(err error) bool {
+	switch promptValidationFailureCode(err) {
+	case PromptValidationDecodeError, PromptValidationSchemaInvalid, PromptValidationFieldLengthExceeded, PromptValidationEmptyRequiredGeneratedField, PromptValidationLanguageInvalid, PromptValidationUnavailableMismatch, PromptValidationProvenanceMutation, PromptValidationPromptInjectionLeakage:
+		return true
+	default:
+		return false
+	}
 }
 
 type openRouterClassifiedError struct {
@@ -453,12 +633,60 @@ func (c *openRouterHTTPClient) generateJSON(ctx context.Context, payload any, ds
 		if text == "" {
 			return classifiedOpenRouterError(modelStatusDecodeError, errors.New("empty response text"))
 		}
-		if err := json.Unmarshal([]byte(stripJSONFence(text)), dst); err != nil {
-			return classifiedOpenRouterError(modelStatusDecodeError, fmt.Errorf("decode model json: %w", err))
+		if err := decodeOpenRouterModelJSON(stripJSONFence(text), dst); err != nil {
+			return err
 		}
 		return nil
 	}
 	return lastErr
+}
+
+func decodeOpenRouterModelJSON(text string, dst any) error {
+	if summary, ok := dst.(*OpenRouterSummaryOutput); ok {
+		out, err := decodeStrictPromptingV21SummaryOutput(text)
+		if err != nil {
+			return err
+		}
+		*summary = out
+		return nil
+	}
+	if err := json.Unmarshal([]byte(text), dst); err != nil {
+		return classifiedOpenRouterError(modelStatusDecodeError, fmt.Errorf("decode model json: %w", err))
+	}
+	return nil
+}
+
+func decodeStrictPromptingV21SummaryOutput(text string) (OpenRouterSummaryOutput, error) {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(text), &raw); err != nil {
+		return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationDecodeError, "", fmt.Errorf("decode model json: %w", err))
+	}
+	required := map[string]bool{
+		"title":          true,
+		"feed_excerpt":   true,
+		"extracted_text": true,
+		"summary":        true,
+		"core_insight":   true,
+		"value_tier":     true,
+		"model_status":   true,
+	}
+	for key := range raw {
+		if !required[key] {
+			return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationSchemaInvalid, key, nil)
+		}
+	}
+	for key := range required {
+		if _, ok := raw[key]; !ok {
+			return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationSchemaInvalid, key, nil)
+		}
+	}
+	var out OpenRouterSummaryOutput
+	decoder := json.NewDecoder(strings.NewReader(text))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&out); err != nil {
+		return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationSchemaInvalid, "", err)
+	}
+	return out, nil
 }
 
 type promptingV21SummaryPrompt struct {
@@ -674,7 +902,7 @@ func truncatePromptSourceText(value string) string {
 	return string(runes[:keep]) + promptSourceTextTruncationMarker
 }
 
-func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled promptingV21SummaryPrompt, dst any) error {
+func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled promptingV21SummaryPrompt, repairCode PromptValidationFailureCode, dst any) error {
 	if c == nil {
 		return errors.New("nil openrouter client")
 	}
@@ -692,6 +920,9 @@ func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled
 	reqPayload := openRouterChatRequest{
 		Messages:       []openRouterMessage{{Role: "system", Content: compiled.SystemPrompt}, {Role: "user", Content: string(promptBytes)}},
 		ResponseFormat: openRouterJSONObjectResponseFormat(),
+	}
+	if repairCode != "" {
+		reqPayload.Messages = append(reqPayload.Messages, openRouterMessage{Role: "user", Content: promptingV21RepairInstruction(repairCode)})
 	}
 	if strings.TrimSpace(c.model) != "" {
 		reqPayload.Model = strings.TrimSpace(c.model)
@@ -715,6 +946,10 @@ func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled
 		return nil
 	}
 	return c.doOpenRouterJSON(ctx, client, reqPayload, dst)
+}
+
+func promptingV21RepairInstruction(code PromptValidationFailureCode) string {
+	return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only the prior validation failure code ` + string(code) + `. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
 }
 
 func openRouterJSONObjectResponseFormat() map[string]any {
@@ -853,8 +1088,8 @@ func (c *openRouterHTTPClient) doOpenRouterJSON(ctx context.Context, client *htt
 		if text == "" {
 			return classifiedOpenRouterError(modelStatusDecodeError, errors.New("empty response text"))
 		}
-		if err := json.Unmarshal([]byte(stripJSONFence(text)), dst); err != nil {
-			return classifiedOpenRouterError(modelStatusDecodeError, fmt.Errorf("decode model json: %w", err))
+		if err := decodeOpenRouterModelJSON(stripJSONFence(text), dst); err != nil {
+			return err
 		}
 		return nil
 	}

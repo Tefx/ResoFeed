@@ -139,7 +139,7 @@ func TestOpenRouterAdapterRequestContractWithFakeServer(t *testing.T) {
 					t.Fatalf("decode fake OpenRouter request body: %v", err)
 				}
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"candidates":[{"content":{"parts":[{"text":"{\"summary\":\"Dense summary\",\"core_insight\":\"Core insight\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}]}}]}`))
+				writeOpenRouterSummaryResponse(t, w, contractValidSummaryOutputForTest("Adapter"))
 			}))
 			defer server.Close()
 
@@ -181,7 +181,7 @@ func TestOpenRouterAdapterRetryAndSafeErrorMapping(t *testing.T) {
 						return
 					}
 					w.Header().Set("Content-Type", "application/json")
-					_, _ = w.Write([]byte(`{"candidates":[{"content":{"parts":[{"text":"{\"summary\":\"Dense summary\",\"core_insight\":\"Core insight\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}]}}]}`))
+					writeOpenRouterSummaryResponse(t, w, contractValidSummaryOutputForTest("Retry"))
 				}))
 				defer server.Close()
 

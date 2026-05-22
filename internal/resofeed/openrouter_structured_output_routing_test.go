@@ -128,13 +128,17 @@ func TestOpenRouterStructuredOutputRoutingDowngradesOnceBeforeGenerationUsingSam
 
 func TestOpenRouterStructuredOutputRoutingDoesNotDowngradeAfterGeneratedResponseFailure(t *testing.T) {
 	ctx := context.Background()
-	attempts := 0
+	var seen []promptingV21ChatRequest
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/models":
 			writeOpenRouterModelsMetadata(t, w, "openrouter/generated-failure", "response_format")
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/chat/completions":
-			attempts++
+			request, err := decodePromptingV21ChatRequest(r)
+			if err != nil {
+				t.Fatalf("decode chat request: %v", err)
+			}
+			seen = append(seen, request)
 			response := openRouterChatResponse{Model: "openrouter/generated-failure", Choices: []struct {
 				Message openRouterMessage `json:"message"`
 			}{{Message: openRouterMessage{Role: "assistant", Content: `not-json`}}}}
@@ -153,8 +157,13 @@ func TestOpenRouterStructuredOutputRoutingDoesNotDowngradeAfterGeneratedResponse
 	if err == nil {
 		t.Fatal("SummarizeItem returned nil error for generated invalid JSON")
 	}
-	if attempts != 1 {
-		t.Fatalf("attempts = %d, want no downgrade after generated response failure", attempts)
+	if len(seen) != 2 {
+		t.Fatalf("attempts = %d, want one normal attempt plus one semantic repair attempt", len(seen))
+	}
+	for i, request := range seen {
+		if request.ResponseFormat["type"] != "json_schema" {
+			t.Fatalf("attempt %d response_format = %q, want json_schema (no generated-response downgrade)", i+1, request.ResponseFormat["type"])
+		}
 	}
 	for _, forbidden := range []string{"fake-openrouter-key", "response_format unsupported before generation", "OPENROUTER_KEY", ".env"} {
 		if strings.Contains(err.Error(), forbidden) {

@@ -59,17 +59,17 @@ func TestSummaryPromptContractIncludesAntiFluffDensityAndProvenanceRules(t *test
 	}
 	promptText := strings.ToLower(string(promptJSON))
 
-	for _, want := range []string{"anti-fluff", "blogger", "no filler", "this article discusses", "the author notes"} {
+	for _, want := range []string{"anti_fluff", "filler", "this article discusses", "the author notes"} {
 		if !strings.Contains(promptText, want) {
 			t.Errorf("summary prompt missing anti-fluff/anti-blogger rule %q; prompt=%s", want, promptJSON)
 		}
 	}
-	for _, want := range []string{"factual density", "names", "numbers", "specifics", "fact units"} {
+	for _, want := range []string{"fact_unit", "numbers", "specific", "concrete source-backed fact units"} {
 		if !strings.Contains(promptText, want) {
 			t.Errorf("summary prompt missing factual-density guidance %q; prompt=%s", want, promptJSON)
 		}
 	}
-	for _, want := range []string{"target_language", "urls", "source ids", "provenance", "literal"} {
+	for _, want := range []string{"target_language", "urls", "source identifiers", "provenance", "literal"} {
 		if !strings.Contains(promptText, want) {
 			t.Errorf("summary prompt missing target-language/provenance preservation rule %q; prompt=%s", want, promptJSON)
 		}
@@ -109,12 +109,9 @@ func TestOpenRouterSummaryValueTierAllowsOnlyStableProductLabels(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
 			model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				writeOpenRouterSummaryResponse(t, w, OpenRouterSummaryOutput{
-					Summary:     "Dense summary with source-backed details.",
-					CoreInsight: "One stable product insight.",
-					ValueTier:   tc.valueTier,
-					ModelStatus: modelStatusOK,
-				})
+				out := contractValidSummaryOutputForTest("Value tier")
+				out.ValueTier = tc.valueTier
+				writeOpenRouterSummaryResponse(t, w, out)
 			}))
 			defer model.Close()
 
@@ -146,11 +143,14 @@ func decodeOpenRouterSummaryPrompt(r *http.Request) (map[string]any, error) {
 	if err := json.Unmarshal(body, &request); err != nil {
 		return nil, fmt.Errorf("decode chat request: %w", err)
 	}
-	if len(request.Messages) != 1 {
-		return nil, fmt.Errorf("message count = %d, want 1", len(request.Messages))
+	if len(request.Messages) != 2 {
+		return nil, fmt.Errorf("message count = %d, want separate system+user messages", len(request.Messages))
+	}
+	if request.Messages[0].Role != "system" || request.Messages[1].Role != "user" {
+		return nil, fmt.Errorf("message roles = %+v, want system then user", request.Messages)
 	}
 	var prompt map[string]any
-	if err := json.Unmarshal([]byte(request.Messages[0].Content), &prompt); err != nil {
+	if err := json.Unmarshal([]byte(request.Messages[1].Content), &prompt); err != nil {
 		return nil, fmt.Errorf("decode prompt content: %w", err)
 	}
 	return prompt, nil

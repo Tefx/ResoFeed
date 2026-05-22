@@ -163,10 +163,11 @@ func TestReprocessLibraryCanceledFetchPreservesReadableFieldsAndItemFTS(t *testi
 func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *testing.T) {
 	ctx := context.Background()
 	for _, tc := range []struct {
-		name string
-		llm  LLMClient
+		name            string
+		llm             LLMClient
+		wantUnavailable bool
 	}{
-		{name: "nil_llm", llm: nil},
+		{name: "nil_llm", llm: nil, wantUnavailable: true},
 		{name: "summary_unavailable", llm: reprocessStatusLLM{status: modelStatusSummaryNA}},
 		{name: "latency_status", llm: reprocessStatusLLM{status: modelStatusLatencyError}},
 	} {
@@ -185,10 +186,17 @@ func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *tes
 			if err != nil {
 				t.Fatalf("reprocessLibraryFresh returned error: %v", err)
 			}
-			if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
-				t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
+			if tc.wantUnavailable {
+				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
+					t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
+				}
+				assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA)
+			} else {
+				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 0 || resp.Reprocess.ItemsFailed != 1 || !resp.Reprocess.FTSRebuilt {
+					t.Fatalf("result = %+v, want one validation-failed item with rebuilt FTS", resp.Reprocess)
+				}
+				assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusDecodeError)
 			}
-			assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA)
 			assertNoStaleReadableFTS(t, ctx, db, "item_"+tc.name)
 		})
 	}
@@ -255,8 +263,8 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 		t.Fatalf("result = %+v, want one updated item", resp.Reprocess)
 	}
 	text := readStoredText(t, ctx, db, "item_zh_blank_reprocess")
-	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || text.feedExcerpt != "" || text.extractedText != "" {
-		t.Fatalf("stored text = %+v, want Chinese summary/insight and no raw English body/excerpt", text)
+	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || strings.Contains(text.feedExcerpt, "Original English") || strings.Contains(text.extractedText, "Original English") {
+		t.Fatalf("stored text = %+v, want Chinese model fields and no raw English body/excerpt", text)
 	}
 	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"Original English"`); count != 0 {
 		t.Fatalf("FTS retained raw English source text with count %d", count)
@@ -312,7 +320,7 @@ type reprocessStatusLLM struct {
 }
 
 func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{ModelStatus: l.status}, nil
+	return OpenRouterSummaryOutput{Title: "Fallback title", Summary: "Fallback summary.", CoreInsight: "Fallback insight.", ValueTier: "high", ModelStatus: l.status}, nil
 }
 
 func (l reprocessStatusLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

@@ -329,8 +329,8 @@ type staticGemini struct {
 	valueTier   string
 }
 
-func (g staticGemini) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Summary: g.summary, CoreInsight: g.coreInsight, ValueTier: g.valueTier, ModelStatus: modelStatusOK}, nil
+func (g staticGemini) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{Title: input.Title, FeedExcerpt: "Static sqlite excerpt.", ExtractedText: "Static sqlite extracted text.", Summary: g.summary, CoreInsight: g.coreInsight, ValueTier: g.valueTier, ModelStatus: modelStatusOK}, nil
 }
 
 func (g staticGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

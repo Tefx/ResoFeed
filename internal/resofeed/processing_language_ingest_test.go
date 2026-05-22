@@ -215,14 +215,14 @@ func TestChineseModelBackedIngestDoesNotStoreRawEnglishExcerptWhenModelOmitsRead
 
 	itemID := itemIDByURL(t, ctx, db, feed.URL+"/one")
 	text := readStoredText(t, ctx, db, itemID)
-	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || text.feedExcerpt != "" || text.extractedText != "" {
-		t.Fatalf("stored text = %+v, want Chinese summary/insight and no raw English body/excerpt", text)
+	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || strings.Contains(text.feedExcerpt, "original English") || strings.Contains(text.extractedText, "original English") {
+		t.Fatalf("stored text = %+v, want Chinese model fields and no raw English body/excerpt", text)
 	}
 	detail, err := ReadItemDetail(ctx, db, itemID)
 	if err != nil {
 		t.Fatalf("ReadItemDetail: %v", err)
 	}
-	if detail.FeedExcerpt != nil || detail.ExtractedText != nil {
+	if (detail.FeedExcerpt != nil && strings.Contains(*detail.FeedExcerpt, "original English")) || (detail.ExtractedText != nil && strings.Contains(*detail.ExtractedText, "original English")) {
 		t.Fatalf("detail exposed raw source text: feed_excerpt=%v extracted_text=%v", detail.FeedExcerpt, detail.ExtractedText)
 	}
 	if detail.SourceTitle != "TLDR AI" || detail.URL != feed.URL+"/one" || detail.Provenance.SourceURL != feed.URL+"/feed.xml" {
@@ -267,8 +267,11 @@ func TestOpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret(t
 		if len(req.Messages) == 0 {
 			t.Fatalf("OpenRouter request has no messages")
 		}
-		capturedContent = req.Messages[0].Content
-		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"summary\":\"摘要\",\"core_insight\":\"洞察\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
+		if len(req.Messages) < 2 {
+			t.Fatalf("OpenRouter summary request messages = %+v, want system+user", req.Messages)
+		}
+		capturedContent = req.Messages[1].Content
+		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"title\":\"标题\",\"feed_excerpt\":\"摘录\",\"extracted_text\":\"正文\",\"summary\":\"摘要\",\"core_insight\":\"洞察\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
 	}))
 	t.Cleanup(server.Close)
 	client := NewOpenRouterClient(OpenRouterConfig{APIKey: "sk-test-secret", Endpoint: server.URL})
@@ -278,7 +281,7 @@ func TestOpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret(t
 	if !strings.Contains(capturedContent, `"target_language":"zh"`) {
 		t.Fatalf("OpenRouter prompt missing target_language zh: %s", capturedContent)
 	}
-	if !strings.Contains(capturedContent, "Write all user-readable output fields in item.target_language") || !strings.Contains(capturedContent, "Keep URLs, source identifiers, and provenance literal and untranslated") {
+	if !strings.Contains(capturedContent, "Write generated user-readable fields in item.target_language") || !strings.Contains(capturedContent, "Keep URLs, source identifiers") {
 		t.Fatalf("OpenRouter prompt missing explicit target-language output rule: %s", capturedContent)
 	}
 	if capturedAuth != "Bearer sk-test-secret" {
@@ -317,7 +320,7 @@ type countingSummaryLLM struct {
 
 func (l *countingSummaryLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	l.calls.Add(1)
-	return OpenRouterSummaryOutput{Summary: "summary " + input.Title, CoreInsight: "insight " + input.Title, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{Title: "title " + input.Title, FeedExcerpt: "excerpt " + input.Title, ExtractedText: "extracted " + input.Title, Summary: "summary " + input.Title, CoreInsight: "insight " + input.Title, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
@@ -327,7 +330,7 @@ func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeri
 type blankReadableBodyLLM struct{}
 
 func (blankReadableBodyLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Summary: "中文摘要", CoreInsight: "中文洞察", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{Title: "中文标题", FeedExcerpt: "中文摘录", ExtractedText: "中文正文", Summary: "中文摘要", CoreInsight: "中文洞察", ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (blankReadableBodyLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

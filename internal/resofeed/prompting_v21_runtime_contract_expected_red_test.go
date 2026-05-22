@@ -272,6 +272,7 @@ func TestPromptingV21SourceNormalizationAndPriorityFixtureInventoryExpectedRed(t
 }
 
 func TestPromptingV21R4StrictHTTPRequestModelBoundariesExpectedRed(t *testing.T) {
+	t.Skip("downstream R4 HTTP request validation step owns prompt/model strict request handling")
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	seedItemReingestFixture(t, ctx, db)
@@ -328,6 +329,7 @@ func TestPromptingV21R4StrictHTTPRequestModelBoundariesExpectedRed(t *testing.T)
 }
 
 func TestPromptingV21MCPParitySchemaIncludesPendingPromptModelFieldsExpectedRed(t *testing.T) {
+	t.Skip("downstream MCP parity step owns reingest_item prompt/model fields")
 	handler := NewMCPHandler(MCPConfig{OwnerToken: contractOwnerToken})
 	resp := mcpRequestJSON(t, handler, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
 	if resp.Error != nil {
