@@ -1,0 +1,33 @@
+{
+  "network": [
+    {
+      "method": "GET",
+      "path": "/api/runtime/openrouter-models",
+      "status": 200,
+      "response": {
+        "models": [
+          {
+            "id": "openai/gpt-4.1-mini",
+            "name": "GPT 4.1 Mini"
+          },
+          {
+            "id": "anthropic/claude-3.5-sonnet",
+            "name": "Claude 3.5 Sonnet"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/items/item_blind_reingest_i18n/reingest",
+      "status": 400,
+      "payload": {
+        "actor_kind": "human",
+        "actor_id": "owner",
+        "idempotency_key": "reingest-item_blind_reingest_i18n-mpgb5bv4",
+        "model": null,
+        "prompt": "保留这个失败后的修正提示。"
+      }
+    }
+  ]
+}

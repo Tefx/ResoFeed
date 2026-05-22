@@ -1,0 +1,238 @@
+{
+  "config": {
+    "configFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/playwright.config.ts",
+    "rootDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/tests/e2e/global-setup.ts",
+    "globalTeardown": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/tests/e2e/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-ci-safe",
+        "name": "chromium-ci-safe",
+        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "live-openrouter",
+        "name": "live-openrouter",
+        "testDir": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/web/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/html-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "post-closure-reingest-model-i18n-blind-browser-proof.spec.ts",
+      "file": "post-closure-reingest-model-i18n-blind-browser-proof.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "blind proof: zh model-list route parity and successful item re-ingest collapse controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ci-safe",
+              "projectName": "chromium-ci-safe",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 774,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-22T02:35:50.605Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "before-positive-confirm.png",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-png-10426681fc374e66e9c7d66c116566c1337b5d21.png"
+                    },
+                    {
+                      "name": "before-positive-confirm.dom.html",
+                      "contentType": "text/html",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-dom-html-bf061a3de33f49b878cdf2f2c1b1cfbcf6241599.html"
+                    },
+                    {
+                      "name": "before-positive-confirm.aria.txt",
+                      "contentType": "text/plain",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-aria-txt-e866f86f767ccf88e408819bce2d02cb82ae59c6.txt"
+                    },
+                    {
+                      "name": "before-positive-confirm.network.json",
+                      "contentType": "application/json",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-network-json-be629de776cf0062b9a5f44c737d6bf6b53083fa.json"
+                    },
+                    {
+                      "name": "after-positive-success-collapse.png",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-png-3a2a8ff6a9f841be5dd122bfd74dbaec223ccfc7.png"
+                    },
+                    {
+                      "name": "after-positive-success-collapse.dom.html",
+                      "contentType": "text/html",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-dom-html-9eacb92d7196281ce4df5deedb65cd860ad1fba6.html"
+                    },
+                    {
+                      "name": "after-positive-success-collapse.aria.txt",
+                      "contentType": "text/plain",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-aria-txt-1967ea0648db9ea0a855da6a3fa739e90311f350.txt"
+                    },
+                    {
+                      "name": "after-positive-success-collapse.network.json",
+                      "contentType": "application/json",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-network-json-0219506350d8d156427e90af282454b522173acf.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e9d748adbd3a1ebf5e2e-278935c8ce9fe2a56ea2",
+          "file": "post-closure-reingest-model-i18n-blind-browser-proof.spec.ts",
+          "line": 161,
+          "column": 1
+        },
+        {
+          "title": "blind proof: negative re-ingest error keeps correction controls and avoids stale completion",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ci-safe",
+              "projectName": "chromium-ci-safe",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 406,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-22T02:35:51.562Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "negative-error-safe-state.png",
+                      "contentType": "image/png",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-png-922575216b96204be3bd168241925449bc83142f.png"
+                    },
+                    {
+                      "name": "negative-error-safe-state.dom.html",
+                      "contentType": "text/html",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-dom-html-6a28af980f41f4eb49db1c8f56736bc6e762188a.html"
+                    },
+                    {
+                      "name": "negative-error-safe-state.aria.txt",
+                      "contentType": "text/plain",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-aria-txt-b6ab27f9333ab87535bcd169706b198881a24a7f.txt"
+                    },
+                    {
+                      "name": "negative-error-safe-state.network.json",
+                      "contentType": "application/json",
+                      "path": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-closure-reingest-model-i18n-repair-strict-independent-retest.fresh-browser-regression-suite/.test-artifacts/playwright/test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-network-json-29e10e1e79018c5d3b9a319d61292e0112546521.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e9d748adbd3a1ebf5e2e-9e9d5d020387c0dbb0fa",
+          "file": "post-closure-reingest-model-i18n-blind-browser-proof.spec.ts",
+          "line": 230,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-22T02:35:45.911Z",
+    "duration": 6092.592,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

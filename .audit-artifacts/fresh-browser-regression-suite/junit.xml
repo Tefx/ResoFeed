@@ -1,0 +1,38 @@
+<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="6.092592">
+<testsuite name="post-closure-reingest-model-i18n-blind-browser-proof.spec.ts" timestamp="2026-05-22T02:35:50.326Z" hostname="chromium-ci-safe" tests="2" failures="0" skipped="0" time="1.18" errors="0">
+<testcase name="blind proof: zh model-list route parity and successful item re-ingest collapse controls" classname="post-closure-reingest-model-i18n-blind-browser-proof.spec.ts" time="0.774">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-png-10426681fc374e66e9c7d66c116566c1337b5d21.png]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-dom-html-bf061a3de33f49b878cdf2f2c1b1cfbcf6241599.html]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-aria-txt-e866f86f767ccf88e408819bce2d02cb82ae59c6.txt]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/before-positive-confirm-network-json-be629de776cf0062b9a5f44c737d6bf6b53083fa.json]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-png-3a2a8ff6a9f841be5dd122bfd74dbaec223ccfc7.png]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-dom-html-9eacb92d7196281ce4df5deedb65cd860ad1fba6.html]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-aria-txt-1967ea0648db9ea0a855da6a3fa739e90311f350.txt]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-8174c-re-ingest-collapse-controls-chromium-ci-safe/attachments/after-positive-success-collapse-network-json-0219506350d8d156427e90af282454b522173acf.json]]
+]]>
+</system-out>
+</testcase>
+<testcase name="blind proof: negative re-ingest error keeps correction controls and avoids stale completion" classname="post-closure-reingest-model-i18n-blind-browser-proof.spec.ts" time="0.406">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-png-922575216b96204be3bd168241925449bc83142f.png]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-dom-html-6a28af980f41f4eb49db1c8f56736bc6e762188a.html]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-aria-txt-b6ab27f9333ab87535bcd169706b198881a24a7f.txt]]
+
+[[ATTACHMENT|../test-output/post-closure-reingest-mode-cb02b-and-avoids-stale-completion-chromium-ci-safe/attachments/negative-error-safe-state-network-json-29e10e1e79018c5d3b9a319d61292e0112546521.json]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
