@@ -1,10 +1,10 @@
 # Prompting v2.1 Spec Conformance Audit
 
-**Headline**: FAIL  
-**Blocking Status**: OPEN  
-**Proof-Gap Status**: BLOCKING  
-**Verdict**: FAIL  
-**Blockers**: [B1, B2, B3]  
+**Headline**: FAIL
+**Blocking Status**: OPEN
+**Proof-Gap Status**: BLOCKING
+**Verdict**: FAIL
+**Blockers**: [B1, B2, B3]
 **Orchestrator Action Hint**: DO_NOT_COMPLETE
 
 Independent spec-verifier audit for `prompting-v21-spec-conformance-audit`. Scope was full-plan-check protection for the final gate, comparing implementation behavior to `docs/PROMPTING_SYSTEM.md`, `docs/ARCHITECTURE.md`, `docs/USAGE.md`, `docs/DESIGN.md`, and `docs/POST_CLOSURE_REINGEST_MODEL_I18N_REPAIR_CONTRACT.md`.
@@ -137,9 +137,9 @@ Independent spec-verifier audit for `prompting-v21-spec-conformance-audit`. Scop
 
 ## Closure Fields
 
-verdict: FAIL  
-blockers: [B1, B2, B3]  
-gate_open_allowed: false  
+verdict: FAIL
+blockers: [B1, B2, B3]
+gate_open_allowed: false
 orchestrator_action_hint: DO_NOT_COMPLETE
 
 ## Programmatic Handoff
