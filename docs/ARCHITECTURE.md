@@ -1,17 +1,17 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Implemented runtime contract
-Source contracts: `docs/PRD.md`, `docs/DESIGN.md`
+Status: Core runtime implemented; Prompting System v2.1 structured-output routing and prompt/model MCP parity are accepted contract targets pending implementation
+Source contracts: `docs/PRD.md`, `docs/DESIGN.md`, `docs/PROMPTING_SYSTEM.md` for prompt compilation, structured-output routing, and OpenRouter summary output schema
 
-Status note: the core runtime, processing-language, reprocess, runtime metadata, HTTP/MCP schema, OpenRouter prompt, FTS, delivery, and UI language/split-scroll contracts described here are implemented behavior as of the final documentation sync. Future changes must keep this file aligned with runtime behavior rather than treating these sections as aspirational targets.
+Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, and UI language/split-scroll contracts described here are implemented behavior as of the final documentation sync. Prompting System v2.1 dynamic `json_schema` routing and any MCP additions for prompt/model parity are accepted contract targets pending implementation; runtime must not claim v2.1 compliance until it emits `schema_version: "resofeed.summarize.v2.1"`, uses the v2.1 payload, routes structured output according to `docs/PROMPTING_SYSTEM.md`, and validates the v2.1 schema plus Go semantic boundary. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
 
 ## 1. Decisions
 
 Contract baseline: these decisions are anchored in the current product/design documents and user constraints.
 
 1. **One deployable Go process.** ResoFeed is one binary started with `resofeed serve`. It serves the static SvelteKit app, JSON HTTP API, MCP Streamable HTTP at `/mcp`, and background ingestion loop. Rationale: the product is a single-tenant tool, not SaaS infrastructure. Fails if team/multi-tenant scale becomes product scope.
-2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, optional OpenRouter model, and optional owner token. OpenRouter API keys must be resolved at startup from runtime-only secret sources and must never be passed by CLI flag, persisted, exported, logged, or committed. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history, process listings, or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
+2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, optional OpenRouter model, and optional owner token. OpenRouter API keys, when present, must be resolved from runtime-only secret sources and must never be passed by CLI flag, persisted, exported, logged, or committed. Normal model-backed processing uses startup/runtime secret configuration; HTTP model listing is the explicit request-time secret-resolution exception so safe env/`.env` changes can be reflected without making secrets durable state. A missing key is allowed as a provider-unavailable runtime state: the server may bind, while model-backed operations are unavailable and model listing returns the safe empty response. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history, process listings, or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
 3. **One SQLite database.** SQLite is the durable source of truth; FTS5 is the lexical index. Rationale: local ownership and operational simplicity matter more than distributed scale. Fails if multi-writer distributed deployment becomes required.
 4. **Current state only.** Store the present state needed for feed display, search, import/export, agent idempotency, and provenance. Do not build event sourcing, JSONL runtime state, or a user-visible activity ledger. Fails if audit-grade historical reconstruction becomes a hard requirement.
 5. **One backend package.** Product behavior lives in `internal/resofeed` as direct functions and SQL, not `app/domain/repository/service` layers. Rationale: there is one runtime and one database. Fails if multiple storage backends or independently deployed services become real requirements.
@@ -69,7 +69,7 @@ Required/recognized flags:
 | `--db` | No | `./data/resofeed.sqlite3` | SQLite database path. |
 | `--openrouter-model` | No | empty / account default | Optional OpenRouter model. Empty or omitted means use the OpenRouter account default. Provided values are passed through unchanged with no startup network model validation. |
 | `--owner-token` | No | reuse or auto-generate | Explicit owner token; omitted means reuse or auto-generate. |
-| `--first-fetch-limit` | No | `50` | Maximum items to store on a brand-new source's first fetch; `0` means unlimited. Incremental fetches after any item exists are uncapped. |
+| `--first-fetch-limit` | No | `50` or `RESOFEED_FIRST_FETCH_LIMIT` when the flag is omitted | Maximum items to store on a brand-new source's first fetch; `0` means unlimited; maximum `500`. Incremental fetches after any item exists are uncapped. |
 
 When `--openrouter-model` is omitted or empty, diagnostics and startup/runtime status should refer to the configured model as `account_default`. If OpenRouter later returns a concrete resolved model in a response, `/doctor` may include that resolved model; absence of a resolved model is not a startup failure.
 
@@ -97,10 +97,11 @@ Rules:
 Runtime OpenRouter LLM contract:
 
 - OpenRouter is the only LLM backend after this migration. Do not preserve prior provider runtime flags in the future runtime contract.
-- OpenRouter API-key resolution happens during startup before LLM client construction.
+- Normal OpenRouter API-key resolution for model-backed processing happens through startup/runtime secret configuration before LLM client use; missing key means no usable LLM client for processing and OpenRouter-backed operations are unavailable, but startup may continue.
+- `GET /api/runtime/openrouter-models` and its compatibility route are explicit request-time secret-resolution exceptions: they may re-read OS environment/local `.env` safely for that request so model-list changes can reflect current secret configuration without persisting the secret or its source.
 - `OPENROUTER_KEY` is the only accepted OpenRouter API-key name for OS environment and local `.env` sources. CLI-passed API keys are forbidden for OpenRouter.
 - Precedence is OS environment variable `OPENROUTER_KEY` first, then local `.env` fallback.
-- Empty or whitespace-only secret values from any source are invalid and must fail startup before binding the server socket.
+- Explicit empty or whitespace-only secret values from a recognized source are invalid and must fail startup before binding the server socket. If no key is resolved from OS environment or local `.env`, startup continues with OpenRouter unavailable.
 - LLM API keys are runtime input only. They must never be written to SQLite, `runtime_metadata`, migrations, state bundles, logs, `/doctor`, HTTP/MCP responses, frontend assets, test fixtures, docs examples, or committed artifacts.
 - State export/import must never include LLM secret values, selected model, provider name, secret-source metadata, `.env` path, or provider configuration. Redacted evidence such as `OPENROUTER_KEY=<redacted>` or `source=os_env/.env` is acceptable; raw key values are not.
 - Parser or validation errors must identify the field/source class tersely without including secret values.
@@ -117,7 +118,7 @@ Local `.env` contract for runtime secret fallback:
 - For `OPENROUTER_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
 - Parser and validation errors must not print the rejected value.
 
-Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, missing/empty resolved OpenRouter API key, invalid `--owner-token`, and failed SQLite migrations.
+Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, invalid `--first-fetch-limit`/`RESOFEED_FIRST_FETCH_LIMIT`, explicit empty/whitespace OpenRouter API key values, invalid `--owner-token`, and failed SQLite migrations. A missing OpenRouter key is not startup-fatal; it is reported as provider unavailable after binding.
 
 Startup validation matrix:
 
@@ -127,7 +128,9 @@ Startup validation matrix:
 | `--public-url` | not absolute `http`/`https`, missing host, has query/fragment, path not empty or `/` | `2` | `err: invalid_public_url: expected absolute http(s) URL without path/query/fragment` | No |
 | omitted `--public-url` | N/A | N/A | derive from `--addr`; `0.0.0.0:PORT` derives to `http://127.0.0.1:PORT`; remove trailing slash | N/A |
 | `--db` | parent directory cannot be created, path cannot be opened as SQLite | `2` | `err: invalid_db: cannot open sqlite database` | No |
-| resolved OpenRouter API key | missing, empty, or all whitespace after applying OS environment `OPENROUTER_KEY` > `.env` fallback precedence | `2` | `err: invalid_openrouter_key: value required` | No |
+| `--first-fetch-limit` / `RESOFEED_FIRST_FETCH_LIMIT` | non-integer, negative, or greater than `500`; flag value takes precedence over environment fallback | `2` | `err: invalid_first_fetch_limit: expected integer 0..500` | No |
+| explicit OpenRouter API key value | empty or all whitespace after applying OS environment `OPENROUTER_KEY` > `.env` fallback precedence | `2` | `err: invalid_openrouter_key: value required` | No |
+| missing OpenRouter API key | no usable `OPENROUTER_KEY` in OS environment or local `.env` | N/A | startup continues; runtime reports `openrouter-key: unavailable` and provider-backed operations are unavailable | Yes |
 | `--owner-token` | fewer than 32 visible non-whitespace characters or contains leading/trailing whitespace | `2` | `err: invalid_owner_token: expected at least 32 visible non-whitespace characters` | No |
 | migrations | migration fails | `1` | `err: migration_failed: <migration id>` | No |
 
@@ -336,7 +339,7 @@ architecture_basis:
       responsibility: owner-token auth, strict JSON/query validation, idempotency, conflict serialization, and response shape for item re-ingest and OpenRouter model list.
     mcp_transport:
       owner: internal/resofeed/mcp.go
-      responsibility: parity tool/resource exposure for item re-ingest and model listing when exposed to agents.
+      responsibility: parity tool/resource exposure for item re-ingest and model listing when runtime DTO/config wiring supports the same contract; MCP OpenRouter model listing is currently an accepted contract target, not verified provider-backed parity.
     application_core:
       owner: internal/resofeed/reprocess.go plus existing ingest helpers
       responsibility: item-scoped reprocess orchestration, source-text precedence, prompt/model request construction, result classification, and per-item FTS refresh.
@@ -353,7 +356,7 @@ architecture_basis:
     processing_language: runtime_metadata.processing_language; global runtime state only.
     temporary_model_override: request body only; not a source of truth and not persisted.
     temporary_extra_prompt: request body only; not a source of truth and not persisted.
-    provider_model_list: live OpenRouter response; no cache in the first implementation, never portable state.
+    provider_model_list: live OpenRouter response shaped as { models: [{ id, name }] }; no cache in the first implementation, never portable state.
     operation_status: process-local current-operation snapshot; not a durable job record.
     idempotency: agent_receipts live TTL snapshot for mutation replay only; not portable state.
   service_catalog:
@@ -379,9 +382,11 @@ architecture_basis:
       - job queues or sidecar workers
       - UI component libraries unless DESIGN.md changes explicitly
     operations:
-      - GET /api/runtime/openrouter-models lists selectable OpenRouter model ids without persisting them; GET /api/runtime/openrouter/models remains a compatibility path.
+      - GET /api/runtime/openrouter-models lists selectable OpenRouter model ids as { models: [{ id, name }] } without persisting them; GET /api/runtime/openrouter/models remains a compatibility path.
       - POST /api/items/{id}/reingest reprocesses exactly one selected item with optional request-scoped model and prompt.
-      - MCP parity exposes equivalent agent-accessible product operations only if the HTTP operation is exposed to humans.
+      - MCP parity exposes equivalent agent-accessible product operations only if the HTTP operation is exposed to humans and the runtime DTO/config wiring has been verified for that operation.
+    item_reingest_response_shape: "{ already_applied: boolean, reingest: { item_id, status, language, item_updated, fts_updated, error, item: ItemDetail|null } } is canonical across HTTP, MCP, and frontend tests."
+    stable_openrouter_summary_schema: "OpenRouter output remains title, feed_excerpt, extracted_text, summary, core_insight, value_tier, and model_status; docs/PROMPTING_SYSTEM.md is canonical for prompt/schema details."
   state_strata:
     durable_product_state:
       - sources
@@ -414,6 +419,7 @@ architecture_basis:
       - MCP mutations require owner-token authority, actor_id, and idempotency_key.
       - MCP tools do not get product concepts unavailable to humans.
       - MCP conflict/error data mirrors canonical HTTP shapes.
+      - MCP `list_openrouter_models` is an accepted parity target but must not be documented as provider-backed equivalent to HTTP until runtime OpenRouter config wiring is verified.
     ui:
       - Inspector is the only human UI surface for item re-ingest.
       - Source Ledger remains source-level ingest/fetch only.
@@ -456,7 +462,7 @@ architecture_basis:
       - name: OpenRouterModelListing
         owner_module: internal/resofeed/openrouter.go
         consumers: [http.go, mcp.go, frontend model selector]
-        rationale: model listing is an OpenRouter capability, not a generic provider abstraction.
+        rationale: model listing is the existing OpenRouter { models: [{ id, name }] } capability, not a generic provider abstraction.
       - name: ItemReingestOperation
         owner_module: internal/resofeed/reprocess.go
         consumers: [http.go, mcp.go]
@@ -494,103 +500,6 @@ architecture_basis:
   readiness: READY
 ```
 
-### 3.6 Architecture Basis: Inspector Item Re-Ingest Delta
-
-This basis is authoritative for planning selected Inspector item re-ingest. It is a narrow delta over the existing one-binary, flat `internal/resofeed`, SQLite, HTTP/MCP parity, and OpenRouter JSON-transformer architecture. Rationale: selected-item retry is a current item mutation and content refresh, not a new processing subsystem; keeping it in the existing runtime makes the right thing easy and prevents accidental queue, worker, or schema expansion.
-
-```yaml
-architecture_basis:
-  system_layers:
-    - layer: browser_spa
-      responsibility: "Expose an Inspector-only selected-item re-ingest panel and call the item-scoped HTTP mutation."
-    - layer: http_api
-      responsibility: "Authenticate owner token, validate the canonical item re-ingest request body, and return the shared response envelope."
-    - layer: mcp_surface
-      responsibility: "Expose the same selected-item re-ingest operation to authorized agents with HTTP-equivalent schema and response semantics."
-    - layer: resofeed_core
-      responsibility: "Refresh only the selected item through existing extraction/OpenRouter validation, update that item row, rebuild/update FTS for that item, and record idempotency receipt state."
-    - layer: sqlite
-      responsibility: "Persist current item fields, search_fts derived rows, and transient agent_receipts for replay safety."
-    - layer: openrouter
-      responsibility: "Return the stable ResoFeed summary schema only; it does not own orchestration, state, or schema evolution."
-  source_of_truth_matrix:
-    selected_item_identity: "items.id from the selected Inspector item; clients must not invent a browser-only item id."
-    request_idempotency: "agent_receipts keyed by idempotency_key plus request fingerprint; not portable state and not an activity ledger."
-    refreshed_item_text: "items.title, items.summary, items.core_insight, items.feed_excerpt, items.extracted_text, items.value_tier, extraction_status, and model_status for the selected row only."
-    search_index: "search_fts derived from the refreshed selected item row; no vector/semantic index."
-    response_contract: "HTTP and MCP return { already_applied: boolean, reingest: ItemReingestResult } where ItemReingestResult includes item_id, status, item_updated, fts_updated, and refreshed item detail when available."
-  service_catalog:
-    item_reingest_http: "POST /api/items/{id}/reingest with canonical mutation body."
-    item_reingest_mcp: "reingest_item tool with item_id, actor_id, and idempotency_key; no per-call language override."
-    openrouter_models: "Model-listing support may inform the UI model selector without persisting provider state."
-  runtime_contract:
-    request_body: "JSON object with actor_kind, actor_id, idempotency_key, optional model null|string, and optional prompt null|string; unknown fields such as language are rejected."
-    response_shape: "{ already_applied: boolean, reingest: { item_id, status, item_updated, fts_updated, item, ... } } is canonical across HTTP, MCP, and frontend tests."
-    stable_schema: "OpenRouter output remains title, feed_excerpt, extracted_text, summary, core_insight, value_tier, and model_status until a docs/API/schema replan accepts more fields."
-    concurrency: "Selected-item re-ingest uses the same in-process operation guard class as ingest/fetch/library reprocess and returns conflict with current-operation details when blocked."
-    idempotency: "Same live idempotency_key and same request fingerprint replays the stored result with already_applied true; same key and different fingerprint is a request error."
-  state_strata:
-    portable_state: "N/A: selected item re-ingest does not add portable state."
-    runtime_receipts: "agent_receipts for idempotency/provenance only; not exported and not user-visible activity history."
-    item_cache: "Only the selected items row is refreshed."
-    derived_state: "search_fts row/match state for the selected item is refreshed from canonical item fields."
-  transport_boundary_rules:
-    http: "HTTP owns owner-token auth, body validation, error status mapping, and response envelope serialization."
-    mcp: "MCP accepts the same product operation using MCP input schema; agents do not receive extra product concepts unavailable to HTTP/UI."
-    frontend: "Frontend sends idempotency_key and optional one-time model/prompt values; it does not persist prompt/model as durable runtime state."
-    openrouter: "OpenRouter receives validated selected-item input and returns the stable summary schema only."
-  cross_cutting_governance:
-    registries:
-      - name: "agent_receipts"
-        owner_module: "internal/resofeed"
-        write_policy: "receipt-backed item re-ingest writes/replays only validated mutation fingerprints and compact result snapshots"
-    lifecycle_ordering:
-      - "Frontend authenticates owner token before item re-ingest requests."
-      - "HTTP/MCP validates request fields before acquiring operation guard or calling OpenRouter."
-      - "Core refreshes the selected item and FTS in one consistent mutation path before serializing success."
-    coordination_mechanisms:
-      - "Existing in-process operation guard for ingest/fetch/reprocess exclusivity."
-      - "SQLite transaction boundaries for selected item and FTS consistency."
-    wiring_strategy: "Direct calls inside internal/resofeed; no DI container, event bus, job queue, worker process, or repository layer."
-    governance_owner: "internal/resofeed owns mutation/idempotency/FTS; web owns Inspector-only presentation."
-  shared_abstractions:
-    shared_types:
-      - name: "ItemReingestRequest"
-        owner_module: "internal/resofeed HTTP/MCP contract surface"
-        consumers: ["http", "mcp", "web api client", "Inspector UI tests"]
-        rationale: "The same mutation fields cross HTTP, MCP, and frontend boundaries; sharing the contract prevents missing idempotency_key drift."
-      - name: "ItemReingestResponse"
-        owner_module: "internal/resofeed shared response types"
-        consumers: ["http", "mcp", "web api client", "browser expected-red tests"]
-        rationale: "HTTP/MCP/frontend must agree on the nested reingest envelope and already_applied replay flag."
-    shared_protocols: "N/A: existing LLM client boundary remains sufficient; no new provider abstraction is introduced."
-    shared_utilities: "N/A: keep helpers local until repeated real use justifies extraction."
-    decision: "Share only the request/response contracts that cross transport/frontend boundaries; keep Inspector form behavior and runtime refresh internals module-local."
-  module_split_recommendations:
-    - module: "internal/resofeed item re-ingest operation"
-      owner: "internal/resofeed"
-      reason_to_change: "selected item refresh, FTS consistency, operation guard, and idempotency semantics"
-      dependency_direction: "http/mcp call the operation; operation calls DB/LLM; operation does not import web"
-    - module: "web item re-ingest API contract/client surface"
-      owner: "web/src/lib"
-      reason_to_change: "typed HTTP request/response boundary for the Inspector panel"
-      dependency_direction: "web consumes HTTP schema; it does not define backend persistence truth"
-    - module: "Inspector item re-ingest panel"
-      owner: "web/src/routes/components"
-      reason_to_change: "Inspector-only UX, transient one-time prompt/model controls, and conflict rendering"
-      dependency_direction: "component depends on web API contract; component does not call storage or OpenRouter directly"
-  ux_surfaces:
-    - surface: "Inspector item re-ingest panel"
-      scope: "Inspector-only placement, Default model option, one-time prompt, [RE-INGEST ITEM] action, terse conflict/success state, no modal retry or durable settings."
-    - surface: "HTTP/MCP item re-ingest responses"
-      scope: "Nested reingest envelope, already_applied idempotency replay flag, raw conflict details."
-  open_questions:
-    blocking: []
-    non_blocking:
-      - "Exact model selector option list may depend on the OpenRouter model-listing endpoint, but Default model must serialize as model:null."
-  readiness: READY
-```
-
 ## 4. SQLite Shape
 
 The schema stores current state and small derived/cache fields. It is not an implementation SQL script.
@@ -625,7 +534,7 @@ Required fields:
 - `source_id`;
 - original URL and normalized/canonical URL when available;
 - title and feed excerpt;
-- extracted text when available;
+- persisted model-generated target-language representative excerpt/detail text in `items.extracted_text` when available; this is not app-owned raw source extraction;
 - dense summary and core insight when available;
 - quality/value tier or equivalent priority category;
 - published and first-seen timestamps;
@@ -712,7 +621,7 @@ Indexed content:
 - source title/name;
 - feed excerpt;
 - summary;
-- extracted text;
+- model-generated target-language representative `extracted_text`;
 - core insight;
 - provenance fields useful for verification.
 
@@ -804,8 +713,8 @@ Extraction semantics:
 - article extraction is best-effort and remains inside the single Go runtime;
 - extraction first selects readable source text from semantic HTML containers in this order: `<article>`, `itemprop="articleBody"`, `<main>`, common content containers such as `article-body`, `article-content`, `post-content`, `entry-content`, `story-body`, and `content-body`, then `<body>` as fallback;
 - HTML block boundaries must be preserved before readable-text sanitation so one boilerplate paragraph does not discard valid article paragraphs;
-- navigation, headers, footers, sidebars, forms, scripts, styles, JSON-LD metadata, diagnostic-token residue, and known readable boilerplate are removed before persistence;
-- `extraction_status='full'` is valid only when non-empty cleaned article text is persisted in `extracted_text`;
+- navigation, headers, footers, sidebars, forms, scripts, styles, JSON-LD metadata, diagnostic-token residue, and known readable boilerplate are removed before model processing or RSS/source fallback use;
+- `extraction_status='full'` means linked-article source acquisition and model processing had non-empty cleaned article evidence available; it does not require raw cleaned article text to be persisted in `items.extracted_text`;
 - if linked-article extraction fails but RSS text exists, the item remains visible with `extraction_status='partial_extraction'` and source text understood as RSS excerpt text.
 
 Runtime limits:
@@ -834,6 +743,23 @@ Failure contract:
 - extraction status and model status are separate: an item may have model-backed summary metadata while source text is only an RSS excerpt;
 - timeout of the 20-second source fetch limit maps to an RSS/source fetch diagnostic and leaves no persistent pending job;
 - no failure path creates an elaborate UI degradation mode.
+
+#### 5.1.1 Prompting System v2.1
+
+Prompting is part of the ingestion contract because the LLM is a bounded JSON transformer, not an orchestrator, state holder, validator, or database writer. The canonical prompting contract is now maintained in [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md).
+
+Architecture-level binding summary:
+
+- use a short system prompt plus a versioned JSON user payload;
+- compile prompts through a single prompt compiler contract rather than ad hoc string assembly;
+- prefer OpenRouter native `json_schema` structured outputs with strict schema when Go determines before the summarization call that the selected model/provider supports it;
+- fall back to `json_object` plus the same Go validation when schema support is unknown, unavailable, or the support check fails; do not silently switch the selected model solely to gain schema support;
+- keep Inspector one-time prompts above durable steering/default style, but below schema, source grounding, target language, safety, and source-identifier preservation;
+- keep top input global-only; per-item one-time prompting belongs only to the selected Inspector re-ingest control;
+- treat RSS-agent density alignment as prompt guidance only, not as a hard schema or validation gate;
+- keep runtime/provider errors, persistence decisions, validation, and retry policy owned by Go.
+
+Implementers must read `docs/PROMPTING_SYSTEM.md` before changing OpenRouter prompt compilation, summary output fields, source-text normalization, one-time prompt behavior, structured-output routing, or prompt-related regression fixtures.
 
 ### 5.2 Ranking and Daily Feed
 
@@ -1076,7 +1002,7 @@ Reprocess input source precedence:
 - reprocess must not use existing stored target-language interpretation fields (`title`, `summary`, `core_insight`) as source text to avoid double-translation;
 - reprocess input must fetch fresh source text using canonical storage fields first, in exact order of precedence: `items.canonical_url` if present and valid HTTP/HTTPS, then `items.url` (exposed publicly as both top-level `url` and `provenance.original_url`) if valid HTTP/HTTPS. If a fetch fails (e.g., timeout, 404, refusal), it proceeds to the next candidate in the precedence list;
 - `sources.url`, `items.source_url`, and public `provenance.source_url` must NOT be used to fetch article text for reprocess, as they point to the RSS/Atom feed rather than the specific item;
-- if all fresh fetches fail, reprocess may use already persisted readable source fallback text, in order: non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`. This fallback is reprocess-specific; it does not weaken normal ingestion/source-fetch provenance rules, does not permit fetching `sources.url`/`items.source_url` as article text, and does not permit invented content. The LLM input URL/provenance remains the original article URL (`items.url`, or the canonical article URL only when that is the selected article candidate), never the RSS/Atom feed URL;
+- if all fresh fetches fail, reprocess may use already persisted readable target-language fallback text as narrow source-like evidence, in order: non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`. `items.extracted_text` remains the previously generated target-language representative text, not raw fulltext. This fallback is reprocess-specific; it does not weaken normal ingestion/source-fetch provenance rules, does not permit fetching `sources.url`/`items.source_url` as article text, and does not permit invented content. The LLM input URL/provenance remains the original article URL (`items.url`, or the canonical article URL only when that is the selected article candidate), never the RSS/Atom feed URL;
 - if all fresh fetches fail and no readable fallback remains, reprocess must mark the item as `original_unavailable` and set its processed readable fields (`summary`, `core_insight`, `feed_excerpt`, `extracted_text`) to `null`. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
 - this ensures individual item results do not invent content, preserve source identifiers, and avoid durable queues, jobs, retry dashboards, settings dashboards, or additional state-management surfaces.
 
@@ -1087,19 +1013,18 @@ Concurrency and background ingest:
 
 
 ### 5.7 Inspector Item Re-ingest
-
 Inspector item re-ingest is a selected-item operation, not a library job and not a source-fetch control. It exists to let the owner retry or refine processing for the article currently open in the Inspector. Product/UI language says "re-ingest"; backend implementation may reuse the item-scoped reprocess machinery, but the transport operation is `item_reingest`.
 
 Responsibilities:
 
 - reprocess exactly one existing item row selected by item ID;
-- use the same source-text precedence as library reprocess: fresh article fetch from `items.canonical_url` when valid, then `items.url`, then persisted non-empty `items.extracted_text`, then persisted non-empty `items.feed_excerpt`;
+- use the same source-text precedence as library reprocess: fresh article fetch from `items.canonical_url` when valid, then `items.url`, then narrow persisted target-language fallback evidence from non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`;
 - pass the current global processing language into OpenRouter exactly like normal ingest/reprocess;
 - optionally pass a request-scoped OpenRouter model override for this call only;
 - optionally pass a request-scoped prompt for this call only (`prompt` canonical, `extra_prompt` compatibility);
 - validate OpenRouter JSON before any item-field update;
-- update the selected item's readable fields and refresh only that item's `search_fts` row in the same successful write path;
-- return the refreshed `ItemDetail` so the Inspector can update in place.
+- update the selected item's readable fields and refresh only that item's `search_fts` row in the same successful or storable-failure write path;
+- return the refreshed `ItemDetail` when the selected item row was committed.
 
 Non-responsibilities:
 
@@ -1141,23 +1066,26 @@ Concurrency semantics:
 
 Failure/status contract:
 
-| Condition | HTTP status | `reingest.status` | `error.code` | Persistence/FTS outcome |
-|---|---:|---|---|---|
-| malformed JSON, unknown fields, invalid `model`, invalid `extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | no item write, no FTS write |
-| missing item ID or item not found | `404` | N/A | `not_found` | no item write, no FTS write |
-| any guarded operation already running | `409` | N/A | `conflict` | no queued work |
-| fresh source succeeds or stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | selected item readable fields updated; selected FTS row refreshed; `item_updated: true`; `search_refreshed: true` |
-| fresh source fails but stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | selected item readable fields updated from fallback input; selected FTS row refreshed; `source_text_mode: "stored_fallback"` |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | `original_unavailable` | selected item is moved to stable unavailable state; selected FTS row refreshed; `item_updated: false`; `search_refreshed: true` |
-| syntactically valid model rejected by provider | `200` | `completed_with_errors` | `invalid_model` | selected item is moved to stable model-failure state when storable; selected FTS row refreshed when a row is committed |
-| provider error, rate limit, decode/validation error, or summary unavailable | `200` | `completed_with_errors` | `provider_error`, `rate_limited`, `decode_error`, or `summary_unavailable` | selected item is moved to stable model-failure state when storable; selected FTS row refreshed when a row is committed |
-| operation timeout/context cancellation before stable item write | `200` | `failed` | `timeout` | no queued work; `item_updated: false`; `search_refreshed: false` unless a stable row was already committed |
-| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | no queued recovery work; committed transaction state, if any, remains authoritative |
+| Condition | HTTP status | `reingest.status` | Top-level `ErrorBody.error.code` | `reingest.error.code` | Persistence/FTS outcome |
+|---|---:|---|---|---|---|
+| malformed JSON, unknown fields, invalid `model`, invalid `extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | N/A | no item write, no FTS write |
+| missing item ID or item not found | `404` | N/A | `not_found` | N/A | no item write, no FTS write |
+| any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
+| fresh source succeeds or stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| fresh source fails but stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated from fallback input; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | stable unavailable state committed: title falls back to URL/`Untitled`, generated readable fields are cleared, extraction/model status reflect unavailable, selected FTS row is refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | stable model-failure state committed when storable: title falls back to URL/`Untitled`, generated readable fields and `value_tier` are cleared, `model_status: "invalid_model"`, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | stable model-failure state committed when storable using the same clear-generated-fields rule and matching `model_status`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | stable model-failure state committed when storable with `model_status: "decode_error"`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | stable unavailable/summary-unavailable state committed; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| operation timeout/context cancellation before stable item write | `200` | `failed` | N/A | `timeout` | no queued work; `item_updated: false`; `fts_updated: false` unless a stable row was already committed; `item` present and non-null if a stable row was committed and detail reload succeeds |
+| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | N/A | no queued recovery work; committed transaction state, if any, remains authoritative |
 
 Additional failure rules:
 
 - source fetch failure falls back to stored readable text using the approved reprocess fallback order;
 - model/provider/decode/rate-limit/timeout failures use the same safe diagnostic taxonomy as ingestion and library reprocess;
+- prompt validation failures use `docs/PROMPTING_SYSTEM.md` `PromptValidationFailureCode` internally; after retry exhaustion all prompt validation failures map to public `ReprocessErrorDetail.code: "decode_error"` unless the source was app-owned unavailable and the model returned a valid `summary_unavailable`;
 - raw provider payloads, API keys, `.env` paths, owner tokens, secret-source metadata, and prompt text must not appear in diagnostics, `/doctor`, UI result lines, or MCP error data;
 - successful completion or storable item-level failure leaves `search_fts` consistent with the final selected item row;
 - fatal SQLite or invariant errors before response construction return canonical internal errors and do not create queued recovery work.
@@ -1165,12 +1093,13 @@ Additional failure rules:
 Provider model-list behavior:
 
 - model listing is an OpenRouter capability, not a generic provider registry;
-- the list endpoint returns selectable provider model IDs and the configured/default model context without persisting them;
+- the list endpoint returns the canonical implemented shape `{ "models": [{ "id": "...", "name": "..." }] }` without configured/default model context or provider status fields;
+- when no resolved `OPENROUTER_KEY` exists, the public model-list routes return `200` with `{ "models": [] }`; explicit empty/whitespace secret values remain startup-invalid as described in the startup validation matrix;
+- successful provider response with no usable models returns `200` with `{ "models": [] }`;
+- provider request failure, provider timeout, provider `401/403`, provider `429`, provider `5xx`, unreadable provider body, or provider JSON decode failure returns the standard HTTP error body with status `503` and `error.code: "provider_unavailable"`, message `"models unavailable"`, and no raw provider details;
 - `models[]` contains provider model IDs only and must not include `account_default`; the Inspector may add a local default option that sends `model: null`;
 - first implementation should not add a model-list cache; any future in-memory cache requires an explicit TTL/size/invalidation contract and must still remain non-durable;
-- model-list failures must be safe and terse so the UI can still allow default-model item re-ingest;
 - model-list responses must not expose API keys, account secrets, raw provider errors, pricing dashboards, provider configuration, or secret-source metadata.
-
 ## 6. HTTP Surface
 
 The HTTP API is for the Svelte UI and authorized direct use. These path names and schemas are part of the interface contract.
@@ -1201,7 +1130,7 @@ Common JSON error body:
 }
 ```
 
-Allowed error codes: `unauthorized`, `bad_request`, `not_found`, `conflict`, `internal`.
+Allowed error codes: `unauthorized`, `bad_request`, `not_found`, `conflict`, `provider_unavailable`, `internal`.
 
 Canonical JSON type rules:
 
@@ -1216,7 +1145,7 @@ Global JSON request body validation rule: for every JSON request body schema in 
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `error.code` | string enum | Yes | No | `unauthorized`, `bad_request`, `not_found`, `conflict`, `internal` |
+| `error.code` | string enum | Yes | No | `unauthorized`, `bad_request`, `not_found`, `conflict`, `provider_unavailable`, `internal`; `provider_unavailable` is limited to redacted upstream provider/model-list failures such as OpenRouter model-list unavailability |
 | `error.message` | string | Yes | No | terse human-readable message |
 | `error.details` | object | Yes | No | `{}` when no structured details exist |
 
@@ -1246,7 +1175,7 @@ Global JSON request body validation rule: for every JSON request body schema in 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
 | `feed_excerpt` | string | Yes | Yes | processed feed excerpt when available |
-| `extracted_text` | string | Yes | Yes | full extracted text when available |
+| `extracted_text` | string | Yes | Yes | persisted model-generated target-language representative excerpt/detail text when available; not app-owned raw source extraction |
 | `provenance` | object | Yes | No | source URL, canonical URL, grouping/duplicate context |
 
 `Provenance`:
@@ -1512,6 +1441,7 @@ HTTP query validation contract:
 | Parameter | Required | Default | Valid values | Invalid when |
 |---|---:|---|---|---|
 | `limit` | No | `50` | base-10 integer string from `1` through `100` | non-integer, below `1`, above `100`, duplicate |
+| `offset` | No | `0` | base-10 integer string from `0` through `10000` | non-integer, below `0`, above `10000`, duplicate |
 
 `GET /api/search` query rules:
 
@@ -1652,6 +1582,7 @@ HTTP error matrix:
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
 | manual ingest/fetch/reprocess/item re-ingest or language mutation requested while a representable long-running operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }` when the in-memory snapshot is running |
+| OpenRouter model-list provider failure, provider timeout, provider auth/rate/decode failure, or unreadable provider response | `503` | `provider_unavailable` | `{}`; no raw provider details, account metadata, or secrets |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
 Idempotency rules:
@@ -1810,11 +1741,7 @@ Canonical item response language rule:
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `provider` | string enum | Yes | No | Always `openrouter` in the current architecture. |
-| `configured_model` | string | Yes | No | Configured runtime model or `account_default` when omitted. This is display/context only, not a provider model option. |
-| `models_status` | string enum | Yes | No | `ok` or `unavailable`. |
-| `models` | array of `OpenRouterModelOption` | Yes | No | Provider model IDs only; empty when unavailable; never includes the default sentinel `account_default`. |
-| `error_code` | string | No | Yes | Safe terse code such as `provider_error`, `rate_limited`, or `timeout`; never raw provider payload. |
+| `models` | array of `OpenRouterModelOption` | Yes | No | Provider model IDs only; empty when no key is resolved or when a provider response succeeds but yields no usable/selectable models; provider failures after a key is configured are not encoded as an empty array and instead use `503 provider_unavailable`; never includes the default sentinel `account_default`. |
 
 OpenRouter model-list route rules:
 
@@ -1823,7 +1750,9 @@ OpenRouter model-list route rules:
 - owner-token authorization is required like every `/api/*` route;
 - no request body and no query parameters are accepted on either route;
 - success returns `OpenRouterModelsResponse` with selectable `{ "id", "name" }` model entries;
-- provider/model-list failure may still return HTTP `200` with `models_status: "unavailable"`, `models: []`, and a safe `error_code`, so the Inspector can keep default-model re-ingest available;
+- when no resolved `OPENROUTER_KEY` exists, the public route returns `200` with `{ "models": [] }`; explicit empty/whitespace secret values remain startup-invalid as described in the startup validation matrix;
+- successful provider response with no usable models returns `200` with `{ "models": [] }`;
+- provider request failure, provider timeout, provider `401/403`, provider `429`, provider `5xx`, unreadable provider body, or provider JSON decode failure returns the standard HTTP error body with status `503` and `error.code: "provider_unavailable"`, message `"models unavailable"`, and no raw provider details;
 - first implementation should not add a model-list cache; any future in-memory cache requires an explicit TTL/size/invalidation contract and must still remain non-durable;
 - HTTP transport or invariant failures that prevent serialization return canonical errors;
 - the endpoint is read-only and creates no receipts, jobs, queues, history rows, model caches in SQLite, or portable state;
@@ -1843,7 +1772,7 @@ OpenRouter model-list route rules:
 Model validation rules:
 
 - trim surrounding Unicode whitespace before validation;
-- `null`, empty after trimming, omitted, or exact `account_default` is normalized to default behavior and produces `model_override_applied: false`;
+- `null`, empty after trimming, omitted, or exact `account_default` is normalized to default behavior and does not send a provider model ID override;
 - non-default model overrides must be at most `200` bytes, contain no control characters, and use only ASCII letters, digits, `.`, `_`, `-`, `/`, and `:`;
 - malformed model override syntax returns `400 bad_request` with `details.field: "model"` and does not call OpenRouter;
 - syntactically valid but unknown/unavailable model IDs are sent to OpenRouter; provider rejection is represented as `invalid_model` in the item re-ingest result.
@@ -1865,13 +1794,10 @@ Extra prompt validation rules:
 | `status` | string enum | Yes | No | `completed`, `completed_with_errors`, or `failed`. |
 | `item_id` | string | Yes | No | Selected item ID. |
 | `language` | string enum | Yes | No | Processing language used for the operation. |
-| `started_at` | RFC3339 string | Yes | No | Start time. |
-| `completed_at` | RFC3339 string | Yes | No | Completion time. |
-| `item_updated` | boolean | Yes | No | True when model-backed readable fields were successfully rewritten. |
-| `search_refreshed` | boolean | Yes | No | True when selected-item `search_fts` reflects the final item row. |
-| `source_text_mode` | string enum | Yes | No | `fresh`, `stored_fallback`, or `unavailable`. |
-| `model_override_applied` | boolean | Yes | No | True only when a non-default request-scoped model ID was sent to OpenRouter for this call. |
+| `item_updated` | boolean | Yes | No | True when the selected item row was committed to a new stable state, including a successful model-backed rewrite, stable unavailable state, or stable model-failure state; false when no selected item row mutation was committed. |
+| `fts_updated` | boolean | Yes | No | True when selected-item `search_fts` reflects the final item row. |
 | `error` | `ReprocessErrorDetail` | Yes | Yes | Null on clean completion; otherwise safe terse diagnostic for this item/global failure. |
+| `item` | `ItemDetail` | Yes | Yes | Refreshed selected item detail or `null`. Present in the JSON object. Must be non-null whenever `item_updated: true`; `null` is allowed only when no selected item row mutation was committed, or when detail production failed due to fatal/internal serialization failure. |
 
 `ItemReingestResponse`:
 
@@ -1923,28 +1849,30 @@ Rules:
 - JSON body payload is limited to `100 KB`; field-level limits above also apply;
 - `language` and any other unknown fields are rejected; selected-item re-ingest uses the persisted runtime processing language and has no per-call language override;
 - no query parameters are accepted;
-- success returns `{ "already_applied": false, "reingest": ItemReingestResult }`, with refreshed selected item detail available from the result when returned;
+- success returns `{ "already_applied": false, "reingest": ItemReingestResult }`, with `reingest.item` present and non-null whenever `item_updated: true`;
 - if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, return `409 conflict` with canonical current-operation details and no queued work;
 - same live idempotency key plus same fingerprint replays the stored response with `already_applied: true` after completion;
 - same live idempotency key plus different fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
 - duplicate key during an active item re-ingest returns `409 conflict`;
 - after crash-loss or receipt TTL expiration, the same valid body/key may be accepted as a fresh request if the operation guard is free;
-- the selected `model` and normalized prompt value are part of the request fingerprint but are not persisted beyond live idempotency receipt storage, and receipt storage must not become user-visible history;
+- the normalized selected `model` and normalized prompt value are part of the request fingerprint/digest calculation, but raw prompt text and raw model override values are not persisted in receipt storage. The live receipt stores only the fingerprint/digest/result snapshot needed for replay and must not become user-visible history;
 - response/error bodies must not echo prompt text from either field.
 
 Status/error mapping:
 
-| Condition | HTTP status | `reingest.status` | `error.code` | Persistence/FTS outcome |
-|---|---:|---|---|---|
-| malformed JSON, unknown fields, invalid `model`, invalid `prompt`/`extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | no item write, no FTS write |
-| item not found | `404` | N/A | `not_found` | no item write, no FTS write |
-| any guarded operation already running | `409` | N/A | `conflict` | no queued work |
-| source/fallback text available and OpenRouter returns valid `ok` output | `200` | `completed` | `null` | readable fields updated; selected FTS row refreshed; `item_updated: true`; `search_refreshed: true` |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | `original_unavailable` | stable unavailable item state committed; selected FTS row refreshed; `item_updated: false`; `search_refreshed: true` |
-| syntactically valid model rejected by provider | `200` | `completed_with_errors` | `invalid_model` | stable model-failure state committed when storable; selected FTS row refreshed when committed |
-| provider error, rate limit, decode/validation error, or summary unavailable | `200` | `completed_with_errors` | `provider_error`, `rate_limited`, `decode_error`, or `summary_unavailable` | stable model-failure state committed when storable; selected FTS row refreshed when committed |
-| timeout/context cancellation before stable item write | `200` | `failed` | `timeout` | no queued work; `item_updated: false`; `search_refreshed: false` unless a stable row already committed |
-| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | no queued recovery work; committed transaction state, if any, remains authoritative |
+| Condition | HTTP status | `reingest.status` | Top-level `ErrorBody.error.code` | `reingest.error.code` | Persistence/FTS outcome |
+|---|---:|---|---|---|---|
+| malformed JSON, unknown fields, invalid `model`, invalid `prompt`/`extra_prompt`, invalid actor/idempotency fields | `400` | N/A | `bad_request` | N/A | no item write, no FTS write |
+| item not found | `404` | N/A | `not_found` | N/A | no item write, no FTS write |
+| any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
+| source/fallback text available and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | stable unavailable state committed: title falls back to URL/`Untitled`, generated readable fields are cleared, extraction/model status reflect unavailable, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | stable model-failure state committed when storable: title falls back to URL/`Untitled`, generated readable fields and `value_tier` are cleared, `model_status: "invalid_model"`, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | stable model-failure state committed when storable using the same clear-generated-fields rule and matching `model_status`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | stable model-failure state committed when storable with `model_status: "decode_error"`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | stable unavailable/summary-unavailable state committed; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| timeout/context cancellation before stable item write | `200` | `failed` | N/A | `timeout` | no queued work; `item_updated: false`; `fts_updated: false` unless a stable row already committed; `item` present and non-null if a stable row was committed and detail reload succeeds |
+| fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | N/A | no queued recovery work; committed transaction state, if any, remains authoritative |
 
 Endpoint additions:
 
@@ -1952,7 +1880,7 @@ Endpoint additions:
 |---|---|---:|---|
 | `GET /api/runtime/openrouter-models` | none; no query params | `200` | `OpenRouterModelsResponse` |
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
-| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params | `200` | `ItemReingestResponse`; returns `409 conflict` if a guarded operation is already running |
+| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if a guarded operation is already running |
 
 ## 7. MCP Surface
 
@@ -2019,7 +1947,9 @@ Tool required fields:
 | `read_item` | `item_id` | none |
 | `mark_inspected` | `item_id`, `actor_id`, `idempotency_key` | none |
 | `resonate_item` | `item_id`, `resonated`, `actor_id`, `idempotency_key` | none |
+| `preview_steer` | `command`, `actor_id` | none |
 | `steer` | `command`, `actor_id`, `idempotency_key` | none |
+| `undo_steer` | `target_kind`, `target_id`, `actor_id`, `idempotency_key` | none |
 | `report_delivery` | `item_id`, `actor_id`, `delivered_at`, `idempotency_key` | none |
 | `get_processing_language` | none | none |
 | `set_processing_language` | `language`, `actor_id`, `idempotency_key` | none |
@@ -2118,20 +2048,21 @@ Same key with different request fingerprint:
 
 ### Inspector Item Re-ingest MCP Parity
 
-MCP exposes the same item re-ingest product concept as HTTP so authorized agents can repair one selected item without receiving product capabilities unavailable to the human UI.
+MCP exposes the same item re-ingest product concept as HTTP so authorized agents can repair one selected item without receiving product capabilities unavailable to the human UI. Prompt/model MCP parity for `reingest_item` is an accepted contract target pending implementation unless the runtime tool DTO already exposes and validates those fields; do not document or log it as implemented behavior until verified against runtime.
 
 Additional tools:
 
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
-| `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | `GET /api/runtime/openrouter-models` canonical path; `GET /api/runtime/openrouter/models` compatibility path |
-| `reingest_item` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "...", "model": null, "prompt": null }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
+| `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | Accepted contract target for `GET /api/runtime/openrouter-models` parity; current provider-backed equivalence is limited pending runtime OpenRouter config wiring verification |
+| `reingest_item` | current implemented schema `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
 
 Rules:
 
-- `list_openrouter_models` is authenticated and read-only; it creates no receipts, durable cache, provider registry, or portable state;
+- `list_openrouter_models` is an accepted authenticated, read-only contract target and must create no receipts, durable cache, provider registry, or portable state;
+- current MCP `list_openrouter_models` runtime behavior must not be documented as HTTP-equivalent provider-backed model listing until OpenRouter runtime config wiring is verified; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model listing;
 - `reingest_item` requires owner-token authority, `item_id`, `actor_id`, and `idempotency_key`;
-- `model`, canonical `prompt`, and compatibility `extra_prompt` are optional request-scoped fields with the same validation, non-persistence, aliasing, and redaction rules as HTTP;
+- `model`, canonical `prompt`, and compatibility `extra_prompt` are pending MCP parity fields. Until runtime exposes them in the MCP DTO/schema, MCP callers must not send them; HTTP remains the implemented one-time prompt/model override surface;
 - `reingest_item` uses the current persisted processing language and does not accept a per-call language override;
 - `reingest_item` must call the same application operation as HTTP item re-ingest;
 - guarded-operation conflicts return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` when available;
@@ -2143,7 +2074,7 @@ Tool required fields:
 | Tool | Required fields | Optional fields |
 |---|---|---|
 | `list_openrouter_models` | none | none |
-| `reingest_item` | `item_id`, `actor_id`, `idempotency_key` | `model`, `prompt`, `extra_prompt` |
+| `reingest_item` | `item_id`, `actor_id`, `idempotency_key` | none currently; pending parity fields are `model`, `prompt`, `extra_prompt` |
 
 ## 8. Frontend Boundary
 
@@ -2232,8 +2163,8 @@ Do not introduce repositories, factories, DI containers, event buses, plugin reg
 Implementation is architecture-conformant when:
 
 - `resofeed serve` is the single runtime command;
-- `resofeed serve` accepts `--addr`, `--public-url`, `--db`, optional `--openrouter-model`, and optional `--owner-token`; it does not require CLI API-key flags in the future runtime contract;
-- OpenRouter startup secret resolution follows OS `OPENROUTER_KEY` > local `.env` fallback, rejects empty/whitespace values, and never persists, exports, logs, prints, or commits raw secrets;
+- `resofeed serve` accepts `--addr`, `--public-url`, `--db`, optional `--openrouter-model`, optional `--owner-token`, and optional `--first-fetch-limit` (`50` default, `RESOFEED_FIRST_FETCH_LIMIT` fallback when the flag is omitted, `0` unlimited, maximum `500`); it does not require CLI API-key flags in the future runtime contract;
+- OpenRouter startup secret resolution follows OS `OPENROUTER_KEY` > local `.env` fallback, rejects explicit empty/whitespace values, allows a missing key as provider-unavailable runtime state, and never persists, exports, logs, prints, or commits raw secrets;
 - omitting `--owner-token` reuses a stored token or generates, stores, and prints a first-run token;
 - one Go process serves static UI, HTTP API, MCP endpoint, and ingest loop;
 - no separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process exists;
@@ -2394,7 +2325,7 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
 - item re-ingest uses the same source-text precedence as library reprocess and never fetches `sources.url`/`items.source_url` as article text;
 - selected-item readable fields and selected-item `search_fts` row are refreshed consistently after successful or storable failure outcomes;
 - conflicts across background ingest, manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use canonical `409 conflict` current-operation details with item re-ingest reported as `item_reingest`; no work is queued;
-- MCP `list_openrouter_models` and `reingest_item` mirror HTTP contracts, auth, idempotency, conflict semantics, and redaction rules;
+- MCP `list_openrouter_models` is an accepted contract target but current provider-backed parity with HTTP is limited pending runtime OpenRouter config wiring verification; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model-list smoke checks. `reingest_item` prompt/model parity is an accepted contract target pending implementation unless verified in the runtime DTO;
 - Inspector renders item re-ingest as inline bracket-action controls only, with no modal, toast, spinner, settings dashboard, queue, progress dashboard, or operation history;
 - Inspector Source Text/Source Evidence is collapsed by default for every newly opened item while preserving accessible disclosure semantics and fallback/source-evidence rules.
 
@@ -2403,7 +2334,7 @@ Inspector item re-ingest smoke checks:
 ```bash
 curl -i http://127.0.0.1:8080/api/runtime/openrouter-models \
   -H "Authorization: Bearer <OWNER_TOKEN>"
-# expect 200 JSON body with provider "openrouter" and either models_status "ok" or safe "unavailable"
+# expect 200 JSON body: {"models":[{"id":"...","name":"..."}]}; no resolved key or a successful provider response with no usable models may return {"models":[]}; provider failures after a key is configured return a standard 503 provider_unavailable error body
 
 curl -i -X POST http://127.0.0.1:8080/api/items/item_01/reingest \
   -H "Authorization: Bearer <OWNER_TOKEN>" \

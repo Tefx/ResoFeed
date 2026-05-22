@@ -32,7 +32,7 @@ go build -o ./bin/resofeed ./cmd/resofeed
 
 ### 2. Configure the OpenRouter API key safely
 
-ResoFeed resolves the OpenRouter API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history.
+ResoFeed resolves the OpenRouter API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. Live HTTP model listing is the explicit request-time secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
 
 Safe options:
 
@@ -53,7 +53,7 @@ Secret-source precedence for OpenRouter is:
 
 `OPENROUTER_KEY` is the only documented OpenRouter API-key name. OpenRouter secrets must not be passed through CLI flags.
 
-Empty or whitespace-only values are invalid. Parser and validation errors must not include the secret value.
+Explicit empty or whitespace-only values are invalid. Parser and validation errors must not include the secret value.
 
 Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are supported; blank lines and `#` comments are ignored. ResoFeed must not source shell scripts, expand variables, run commands, or evaluate command substitution from `.env`.
 
@@ -64,10 +64,13 @@ Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are suppor
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
+  --first-fetch-limit 50 \
   --openrouter-model openai/gpt-4.1-mini
 ```
 
 `--openrouter-model` is optional and non-secret. If it is omitted or empty, ResoFeed uses the OpenRouter account default and reports the configured model as `account_default`. Provided model strings are passed to OpenRouter unchanged; startup does not perform a network model validation check.
+
+`--first-fetch-limit` caps how many items are stored on a brand-new source's first fetch. It defaults to `50`, may fall back to `RESOFEED_FIRST_FETCH_LIMIT` when the flag is omitted, allows `0` for unlimited, and has a maximum of `500`. Non-integer, negative, or greater-than-`500` values are invalid startup configuration and exit before binding with a safe stderr diagnostic. Incremental fetches after any item already exists are uncapped.
 
 `serve` starts everything: web UI, JSON HTTP API, MCP Streamable HTTP at `/mcp`, background ingestion, SQLite open/migrate, and static asset serving.
 
@@ -82,6 +85,7 @@ Flags:
 | `--db` | No | SQLite database file path. Default: `./data/resofeed.sqlite3`. |
 | `--openrouter-model` | No | Optional OpenRouter model. Empty or omitted means account default; provided values are passed through unchanged. |
 | `--owner-token` | No | Explicit owner token. If omitted, ResoFeed generates or reuses one automatically. |
+| `--first-fetch-limit` | No | Maximum items to store on a brand-new source's first fetch. Default: `50`; env fallback: `RESOFEED_FIRST_FETCH_LIMIT`; `0` means unlimited; max `500`. |
 
 ### 4. Owner token behavior
 
@@ -113,7 +117,7 @@ If you still know a valid plaintext token and want to rotate it, start ResoFeed 
   --owner-token "rfeed_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
 ```
 
-This example assumes `OPENROUTER_KEY` is already available through the OS environment or local `.env` fallback.
+This example can start without `OPENROUTER_KEY`, but OpenRouter-backed operations remain unavailable until the key is supplied through the OS environment or local `.env` fallback.
 
 If the plaintext token is lost and only the SQLite hash remains, it cannot be recovered. Stop `serve`, delete only the server-side verifier with the offline reset command, then start `serve` again:
 
@@ -248,10 +252,10 @@ curl -sS "http://127.0.0.1:8080/api/feed/today" \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 ```
 
-With an explicit result cap:
+With an explicit result cap and pagination offset:
 
 ```bash
-curl -sS "http://127.0.0.1:8080/api/feed/today?limit=20" \
+curl -sS "http://127.0.0.1:8080/api/feed/today?limit=20&offset=20" \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 ```
 
@@ -268,6 +272,7 @@ Supported query parameters:
 | Parameter | Meaning |
 |---|---|
 | `limit` | Result cap. Defaults to `50`; maximum `100`. |
+| `offset` | Pagination offset. Defaults to `0`; accepts non-negative integer values through `10000` and may be combined with `limit`. |
 
 Invalid, duplicate, or unknown query parameters return `400 bad_request` with the canonical JSON error body from `docs/ARCHITECTURE.md §6`.
 ### Read an item
@@ -297,8 +302,7 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 ```
 
 ### List OpenRouter models for one-time item re-ingest
-
-The canonical model-list path is `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted.
+The current provider-backed model-list path is HTTP `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted. MCP `list_openrouter_models` is an accepted parity target, but its provider-backed equivalence is currently limited pending runtime OpenRouter config wiring verification; use the HTTP route for current provider-backed model listing.
 
 ```bash
 curl -sS "http://127.0.0.1:8080/api/runtime/openrouter-models" \
@@ -317,9 +321,13 @@ Abridged example response:
 
 Both model-list paths accept no query parameters. Missing or invalid owner-token auth returns the standard `401 unauthorized` JSON error body.
 
+If no OpenRouter key is resolved for the model-list request, both model-list paths return `200` with `{ "models": [] }`. Provider failures after a key is configured return the standard `503 provider_unavailable` JSON error body without raw provider details.
+
 ### Re-ingest one selected item
 
 Use item re-ingest when the selected Inspector item needs one explicit retry with an optional request-scoped model and one-time prompt. The operation uses the current persisted processing language; it does not accept a per-call `language` field.
+
+Prompting note: the `prompt` / `extra_prompt` value is one-time editorial guidance for this selected item only. It may affect emphasis, angle, and source-backed fact selection, but it cannot override the output schema, target language, source grounding, source identifier preservation, safety rules, or runtime/provider status handling. The full prompting contract is [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md).
 
 Canonical request body:
 
@@ -359,7 +367,6 @@ Abridged example response:
 ```
 
 Rules: `prompt` is canonical; `extra_prompt` is a compatibility alias. Empty prompts normalize to no one-time prompt. `model: null`, omitted, empty, or whitespace-only means the account/runtime default for that call. Unknown fields, including `language`, are rejected. Reusing the same live idempotency key with changed prompt/model returns `400 bad_request`. Prompt and model are request-scoped only: they are not stored in runtime metadata, state export/import, browser localStorage, provider config, durable preferences, jobs, queues, or history.
-
 ### Mark inspected
 
 ```bash
@@ -899,8 +906,9 @@ OpenRouter is the sole LLM backend. ResoFeed sends JSON-in/JSON-out requests to 
 https://openrouter.ai/api/v1/chat/completions
 ```
 
-OpenRouter setup and live-smoke docs must use OS environment variables or local `.env` files with redacted evidence only. Do not add examples that paste real API keys into command lines or shell history. ResoFeed does not send OpenRouter attribution headers for now.
+Prompt construction, structured-output routing, source-text handling, one-time prompt priority, and summary output boundaries are governed by [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md). This usage guide covers runtime configuration and public API examples only.
 
+OpenRouter setup and live-smoke docs must use OS environment variables or local `.env` files with redacted evidence only. Do not add examples that paste real API keys into command lines or shell history. ResoFeed does not send OpenRouter attribution headers for now.
 ## External Agent Usage Through MCP
 
 Authorized external agents use MCP Streamable HTTP at `/mcp`.
@@ -952,11 +960,11 @@ Target resources:
 - `resofeed://feed/today` — current eligible feed view;
 - `resofeed://rules/active` — current steering policy;
 - `resofeed://system/doctor` — raw diagnostics;
+- `resofeed://system/operation` — current in-memory runtime operation snapshot;
 - `resofeed://sources` — flat Source Ledger;
 - `resofeed://runtime/language` — current runtime processing language.
 
 ### Tools
-
 Target tools:
 
 | Tool | Purpose |
@@ -964,16 +972,19 @@ Target tools:
 | `list_candidate_items` | Retrieve eligible high-priority recent items for external evaluation. |
 | `search_items` | Search the corpus using lexical/metadata search. |
 | `read_item` | Retrieve item detail and provenance. |
-| `reingest_item` | Explicitly reprocess one selected item with optional request-scoped model and one-time prompt. |
+| `list_openrouter_models` | Accepted parity target for listing selectable OpenRouter model IDs for request-scoped item re-ingest. Current provider-backed equivalence to HTTP is limited pending runtime OpenRouter config wiring verification; use HTTP `GET /api/runtime/openrouter-models` for current provider-backed model listing. |
+| `reingest_item` | Explicitly reprocess one selected item using the currently implemented MCP fields. Prompt/model MCP parity is a pending contract target; use HTTP `POST /api/items/{id}/reingest` for current one-time prompt/model overrides until runtime MCP exposes those fields. |
 | `mark_inspected` | Forward a human inspection from an external context. |
 | `resonate_item` | Forward or toggle a human-authorized resonance action. |
+| `preview_steer` | Preview how a natural-language steering/search command would be interpreted without mutation. |
 | `steer` | Forward a natural-language steering instruction. |
+| `undo_steer` | Undo a previous steering-created source or steer rule with idempotent mutation semantics. |
 | `report_delivery` | Report that an item was externally surfaced or delivered. |
 | `get_processing_language` | Read the persisted runtime processing language. |
 | `set_processing_language` | Set the runtime processing language for future processing. |
 | `reprocess_library` | Explicitly reprocess existing library items in the current runtime language and rebuild FTS on successful completion. |
 
-Schema source of truth: `docs/ARCHITECTURE.md §7 MCP Surface` defines required fields, defaults, limits, and exact output schemas for all MCP resources and tools. Examples below are abridged.
+Schema source of truth: `docs/ARCHITECTURE.md §7 MCP Surface` defines required fields, defaults, limits, exact output schemas, and pending-vs-implemented MCP parity notes. Examples below are abridged and show current implemented usage unless explicitly marked pending.
 
 Example tool calls and responses:
 
@@ -1013,18 +1024,20 @@ Example tool calls and responses:
 }
 ```
 
+Current implemented MCP item re-ingest shape:
+
 ```json
 {
   "tool": "reingest_item",
   "arguments": {
     "item_id": "ITEM_ID",
     "actor_id": "briefing-agent",
-    "idempotency_key": "briefing-agent-reingest-ITEM_ID-001",
-    "model": null,
-    "prompt": "one-time retry instruction"
+    "idempotency_key": "briefing-agent-reingest-ITEM_ID-001"
   }
 }
 ```
+
+Prompt/model fields for MCP `reingest_item` are pending parity with HTTP. Until implemented, MCP callers must not send `model`, `prompt`, or `extra_prompt`; strict runtime schemas may reject them as unknown fields.
 
 ```json
 {
@@ -1182,7 +1195,6 @@ Agent rules:
 - repeated requests with the same idempotency key should not duplicate mutation effects;
 - repeated requests with the same live idempotency key but different request fingerprints fail with `bad_request` / `request_fingerprint_mismatch` rather than overwriting the stored receipt result;
 - human corrections take precedence over agent-mediated signals.
-
 ## What ResoFeed Deliberately Does Not Do
 
 ResoFeed intentionally excludes:

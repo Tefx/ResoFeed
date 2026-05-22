@@ -11,7 +11,7 @@ mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 ```
 
-Configure the OpenRouter API key as a runtime-only secret before starting ResoFeed. Prefer an OS environment variable, service-manager secret, hosting-platform secret, or a local `.env` file that is never committed. Do not paste real API keys into runnable commands, shell history, logs, issue comments, or state exports.
+Configure the OpenRouter API key as a runtime-only secret before using model-backed features. Prefer an OS environment variable, service-manager secret, hosting-platform secret, or a local `.env` file that is never committed. Do not paste real API keys into runnable commands, shell history, logs, issue comments, or state exports. If no key is configured, the server can still bind, but OpenRouter-backed operations are unavailable and model listing returns an empty list. HTTP model listing resolves secrets at request time as the explicit exception so safe env/`.env` changes can be reflected without persisting secrets.
 
 Local `.env` fallback example:
 
@@ -25,10 +25,11 @@ OPENROUTER_KEY=<redacted-local-value>
   --addr 127.0.0.1:8080 \
   --public-url http://127.0.0.1:8080 \
   --db ./data/resofeed.sqlite3 \
+  --first-fetch-limit 50 \
   --openrouter-model openai/gpt-4.1-mini
 ```
 
-`--openrouter-model` is optional and non-secret; omit it to use the OpenRouter account default. OpenRouter API keys must come from the OS environment or local `.env`, not CLI flags.
+`--openrouter-model` is optional and non-secret; omit it to use the OpenRouter account default. `--first-fetch-limit` caps a brand-new source's first stored items: default `50`, `RESOFEED_FIRST_FETCH_LIMIT` fallback when the flag is omitted, `0` means unlimited, and the maximum is `500`; non-integer, negative, or greater-than-`500` values fail startup before binding. OpenRouter API keys must come from the OS environment or local `.env`, not CLI flags.
 
 If `--owner-token` is omitted, first startup generates an owner token, stores only its SHA-256 hash in SQLite runtime metadata, and prints the plaintext token once. Paste that token into the local owner-token prompt at `http://127.0.0.1:8080`.
 
@@ -48,5 +49,6 @@ If `--owner-token` is omitted, first startup generates an owner token, stores on
 
 - Usage and API examples: [`docs/USAGE.md`](docs/USAGE.md)
 - Technical contract: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Prompting contract: [`docs/PROMPTING_SYSTEM.md`](docs/PROMPTING_SYSTEM.md)
 - Product requirements: [`docs/PRD.md`](docs/PRD.md)
 - Visual/interaction contract: [`docs/DESIGN.md`](docs/DESIGN.md)
