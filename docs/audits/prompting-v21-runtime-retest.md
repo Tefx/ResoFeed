@@ -1,7 +1,7 @@
 # Prompting v2.1 Runtime Green Retest
 
-Auditor: integration-verifier  
-Step: `prompting-v21-runtime-retest`  
+Auditor: integration-verifier
+Step: `prompting-v21-runtime-retest`
 Date: 2026-05-22
 
 ## refs Read Confirmation
