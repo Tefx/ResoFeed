@@ -9,6 +9,7 @@ type NetworkEntry = {
   path: string;
   status: number;
   payload?: unknown;
+  response?: unknown;
 };
 
 const source = {
@@ -100,11 +101,11 @@ async function installApiFixtures(
     if (apiPath === '/api/runtime/operation') return fulfillJson(route, { operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     if (apiPath === '/api/steer/active') return fulfillJson(route, { rules: [] });
     if (apiPath === '/api/runtime/openrouter-models') {
-      network.push({ method, path: apiPath, status: 404 });
-      return fulfillJson(route, { error: { code: 'not_found', message: 'canonical route intentionally unavailable in browser proof', details: {} } }, 404);
+      network.push({ method, path: apiPath, status: 200, response: openRouterModels });
+      return fulfillJson(route, openRouterModels);
     }
     if (apiPath === '/api/runtime/openrouter/models') {
-      network.push({ method, path: apiPath, status: 200 });
+      network.push({ method, path: apiPath, status: 200, response: openRouterModels });
       return fulfillJson(route, openRouterModels);
     }
     if (apiPath === `/api/items/${item.id}/inspect` && method === 'POST') {
@@ -157,13 +158,18 @@ async function captureEvidence(page: Page, testInfo: TestInfo, name: string, ext
   await testInfo.attach(`${name}.network.json`, { path: jsonPath, contentType: 'application/json' });
 }
 
-test('blind proof: zh model-list fallback and successful item re-ingest collapse controls', async ({ page, ownerToken }, testInfo) => {
+test('blind proof: zh model-list route parity and successful item re-ingest collapse controls', async ({ page, ownerToken }, testInfo) => {
   const network: NetworkEntry[] = [];
   await page.setViewportSize({ width: 1280, height: 720 });
   await installApiFixtures(page, ownerToken, network, 'positive');
   await page.goto('/');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  const compatibilityModels = await page.evaluate(async (token) => {
+    const response = await fetch('/api/runtime/openrouter/models', { headers: { Authorization: `Bearer ${token}` } });
+    return { status: response.status, body: await response.json() };
+  }, ownerToken);
+  expect(compatibilityModels).toEqual({ status: 200, body: openRouterModels });
   await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   await expect(inspector.getByText('检查器')).toBeVisible();
@@ -188,15 +194,36 @@ test('blind proof: zh model-list fallback and successful item re-ingest collapse
   await expect(panel.getByLabel('模型')).toHaveCount(0);
   await expect(panel.getByLabel('一次性提示')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem('resofeed.itemReingestPrompt'))).toBeNull();
+
+  const extraPromptProof = await page.evaluate(async ({ token, itemId }) => {
+    const response = await fetch(`/api/items/${itemId}/reingest`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actor_kind: 'human',
+        actor_id: 'owner',
+        idempotency_key: 'browser-extra-prompt-compatibility-proof',
+        model: 'openai/gpt-4.1-mini',
+        extra_prompt: '请通过兼容 extra_prompt 字段证明一次性提示。'
+      })
+    });
+    return { status: response.status, body: await response.json() };
+  }, { token: ownerToken, itemId: item.id });
+  expect(extraPromptProof.status).toBe(200);
+  expect(extraPromptProof.body).toMatchObject({ already_applied: false, reingest: { item_id: item.id, status: 'completed', item_updated: true, fts_updated: true } });
   await captureEvidence(page, testInfo, 'after-positive-success-collapse', { network });
 
   const reingest = network.find((entry) => entry.path.endsWith('/reingest'));
   expect(reingest?.status).toBe(200);
   expect(reingest?.payload).toMatchObject({ actor_kind: 'human', actor_id: 'owner', model: 'openai/gpt-4.1-mini', prompt: '请用中文重写摘要和核心洞察。' });
   expect(reingest?.payload).not.toHaveProperty('language');
+  const extraPromptReingest = network.find((entry) => entry.payload && (entry.payload as Record<string, unknown>).extra_prompt === '请通过兼容 extra_prompt 字段证明一次性提示。');
+  expect(extraPromptReingest?.status).toBe(200);
+  expect(extraPromptReingest?.payload).toMatchObject({ actor_kind: 'human', actor_id: 'owner', model: 'openai/gpt-4.1-mini', extra_prompt: '请通过兼容 extra_prompt 字段证明一次性提示。' });
+  expect(extraPromptReingest?.payload).not.toHaveProperty('language');
   expect(network.filter((entry) => entry.path.includes('/api/runtime/openrouter'))).toEqual([
-    { method: 'GET', path: '/api/runtime/openrouter-models', status: 404 },
-    { method: 'GET', path: '/api/runtime/openrouter/models', status: 200 }
+    { method: 'GET', path: '/api/runtime/openrouter-models', status: 200, response: openRouterModels },
+    { method: 'GET', path: '/api/runtime/openrouter/models', status: 200, response: openRouterModels }
   ]);
 });
 
