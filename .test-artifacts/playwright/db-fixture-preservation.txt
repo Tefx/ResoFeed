@@ -1,1 +1,0 @@
-cleaned up SQLite fixture: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/azrv-batched-verification-failure-retest/.test-artifacts/playwright/fixtures/resofeed-e2e-1778945380273-30377.sqlite3

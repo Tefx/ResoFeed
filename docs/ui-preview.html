@@ -106,12 +106,28 @@
     }
 
     .brand {
+      appearance: none;
+      min-width: 44px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      background: transparent;
+      padding: 0 8px;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
       white-space: nowrap;
+      font-family: var(--chrome);
+      cursor: pointer;
+    }
+
+    .brand:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
     }
 
     .chrome-actions {
@@ -140,6 +156,35 @@
 
     .runtime-warning {
       color: var(--warning);
+    }
+
+    .utility-menu {
+      display: grid;
+      grid-template-columns: minmax(120px, auto) minmax(0, 1fr);
+      gap: 16px 32px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .utility-menu__group {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+
+    .utility-menu__heading {
+      color: var(--text);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .utility-menu__note {
+      flex-basis: 100%;
     }
 
     .search-contract-strip {
@@ -385,6 +430,89 @@
       line-height: 16px;
     }
 
+    .reingest-panel {
+      margin: 16px 0;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .reingest-panel__row {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .reingest-panel__label {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .reingest-panel select,
+    .reingest-panel textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    .reingest-panel textarea {
+      min-height: 68px;
+      resize: vertical;
+    }
+
+    .reingest-panel__actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .source-disclosure {
+      margin: 16px 0;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .source-disclosure summary {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .source-disclosure summary:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .source-disclosure__body {
+      padding: 8px 0 0;
+      color: var(--text);
+      font-family: var(--payload);
+      font-size: 18px;
+      line-height: 28px;
+    }
+
     .secondary-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
@@ -572,6 +700,21 @@
       text-align: right;
     }
 
+    .mobile-utility-sheet {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-active);
+    }
+
+    .mobile-utility-sheet .utility-menu__group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 4px 0;
+    }
+
     .mobile-feed {
       padding: 16px 20px 20px;
       flex: 1;
@@ -668,14 +811,22 @@
       <div class="command-bar">
         <div class="steer">search fallback evidence</div>
         <div class="chrome-actions">
-          <button class="bracket-action" type="button" aria-label="Processing language: English; switch to Chinese">LANG: EN</button>
-          <div class="brand">RESOFEED</div>
+          <button class="brand" type="button" aria-expanded="true" aria-controls="preview-utility-menu">RESOFEED</button>
         </div>
       </div>
-      <div class="runtime-strip" aria-label="Processing language controls">
-        <button class="bracket-action" type="button" aria-label="Reprocess existing library and rebuild search index">[REPROCESS LIBRARY]</button>
-        <span class="runtime-warning">Existing readable item content will be rewritten.</span>
-        <span translate="no">Source identifiers remain unchanged.</span>
+      <div id="preview-utility-menu" class="utility-menu" role="region" aria-label="RESOFEED utility menu preview">
+        <div class="utility-menu__group" aria-label="Navigation">
+          <span class="utility-menu__heading">NAV</span>
+          <button class="bracket-action" type="button">TODAY</button>
+          <button class="bracket-action" type="button">SOURCE LEDGER</button>
+        </div>
+        <div class="utility-menu__group" aria-label="Operations">
+          <span class="utility-menu__heading">OPERATIONS</span>
+          <button class="bracket-action" type="button" aria-label="Processing language: English; switch to Chinese">LANG: EN</button>
+          <button class="bracket-action" type="button" aria-label="Reprocess existing library and rebuild search index">[REPROCESS LIBRARY]</button>
+          <span class="runtime-warning utility-menu__note">Existing readable item content will be rewritten.</span>
+          <span class="utility-menu__note" translate="no">Source identifiers remain unchanged.</span>
+        </div>
       </div>
       <div class="search-contract-strip" aria-label="Search selection contract preview">
         <span>SEARCH · <span class="search-contract-query">q: fallback evidence</span> · 3 results · selected opens INSPECTOR</span>
@@ -687,7 +838,7 @@
 
           <article class="item selected" aria-current="true">
             <div class="meta-row">
-              <span class="pill">src: Search Contract Source</span>
+              <span class="pill" translate="no">src: Search Contract Source</span>
               <span class="pill">2h</span>
               <span class="pill warning">source excerpt</span>
               <span class="group-badge">TODAY</span>
@@ -703,7 +854,7 @@
 
           <article class="item" aria-current="false">
             <div class="meta-row">
-              <span class="pill">src: hn.algolia.com</span>
+              <span class="pill" translate="no">src: hn.algolia.com</span>
               <span class="pill">4h</span>
               <span class="pill agent">agent: delivery-bot</span>
             </div>
@@ -719,7 +870,7 @@
           <div class="section-label">YESTERDAY</div>
           <article class="item" aria-current="false">
             <div class="meta-row">
-              <span class="pill">src: blog.example</span>
+              <span class="pill" translate="no">src: blog.example</span>
               <span class="pill">1d</span>
               <span class="pill warning">source excerpt</span>
               <span class="group-badge">YESTERDAY</span>
@@ -737,18 +888,42 @@
         <aside class="inspector" aria-label="Inspector preview">
           <div class="inspector-top">
             <div class="meta-row inspector-meta">
-              <span class="pill">src: Search Contract Source</span>
+              <span class="pill" translate="no">src: Search Contract Source</span>
               <span class="pill warning">source excerpt</span>
-              <span class="pill">original ↗</span>
+              <span class="pill" translate="no">original ↗</span>
             </div>
           </div>
           <h2 class="inspector-title">Search click selected fallback item</h2>
           <div class="evidence-lines" aria-label="Inspector provenance">
             <p>target-language processing incomplete · summary/core unavailable · showing source excerpt</p>
-            <p>Source evidence: Raw RSS excerpt proves fallback source evidence survives search selection.</p>
+            <p>source text: RSS excerpt only · summary/core unavailable</p>
           </div>
+          <div class="reingest-panel" aria-label="Inspector item re-ingest expanded-state preview">
+            <p class="reingest-panel__label">[RE-INGEST ITEM] — expanded state preview</p>
+            <div class="reingest-panel__row">
+              <span class="reingest-panel__label">model:</span>
+              <select aria-label="OpenRouter model for one-time item re-ingest">
+                <option>default: account_default (model:null)</option>
+                <option>anthropic/claude-sonnet-4.5</option>
+                <option>openai/gpt-5.1</option>
+              </select>
+            </div>
+            <div class="reingest-panel__row">
+              <label class="reingest-panel__label" for="extra-prompt">extra prompt<br>(one-time, not saved)</label>
+              <textarea id="extra-prompt" placeholder="example only · optional · not saved"></textarea>
+            </div>
+            <div class="reingest-panel__actions">
+              <button class="bracket-action" type="button">[CONFIRM RE-INGEST]</button>
+              <button class="bracket-action" type="button">[CANCEL]</button>
+              <span class="source-ledger__status" aria-live="polite">models: loaded from OpenRouter</span>
+            </div>
+          </div>
+          <details class="source-disclosure">
+            <summary>Source evidence (collapsed): RSS excerpt</summary>
+            <div class="source-disclosure__body">Raw RSS excerpt proves fallback source evidence survives search selection.</div>
+          </details>
           <div class="rule"></div>
-          <p class="reading">Raw RSS excerpt proves fallback source evidence survives search selection.</p>
+          <p class="reading">Fallback mode keeps synthesized Summary/Core absent until model-backed text exists. Re-ingest is scoped to this inspected item only.</p>
           <p class="why">why: fresh from configured source · interpretation: source evidence, not synthesized summary</p>
         </aside>
       </div>
@@ -770,8 +945,8 @@
 
         <ul class="source-ledger__list">
           <li class="source-ledger__row">
-            <span class="source-ledger__name">src: simonwillison</span>
-            <span class="source-ledger__url">https://simonwillison.net/feed.xml</span>
+            <span class="source-ledger__name" translate="no">src: simonwillison</span>
+            <span class="source-ledger__url" translate="no">https://simonwillison.net/feed.xml</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Simon Willison">[FETCH]</button>
@@ -779,8 +954,8 @@
             </span>
           </li>
           <li class="source-ledger__row">
-            <span class="source-ledger__name">src: hn</span>
-            <span class="source-ledger__url">https://hn.algolia.com/rss</span>
+            <span class="source-ledger__name" translate="no">src: hn</span>
+            <span class="source-ledger__url" translate="no">https://hn.algolia.com/rss</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 12:00:11</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Hacker News">[FETCH]</button>
@@ -788,8 +963,8 @@
             </span>
           </li>
           <li class="source-ledger__row">
-            <span class="source-ledger__name">src: wires</span>
-            <span class="source-ledger__url">https://example.org/wire.xml</span>
+            <span class="source-ledger__name" translate="no">src: wires</span>
+            <span class="source-ledger__url" translate="no">https://example.org/wire.xml</span>
             <span class="source-ledger__status source-ledger__status--error" aria-live="polite" title="err: timeout contacting source">err: timeout contacting source</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source Wires">[FETCH]</button>
@@ -811,12 +986,21 @@ extraction_failures: see source rows</pre>
     </section>
 
     <section class="mobile-wrap">
-      <div class="mobile-card" aria-label="Narrow preview">
-        <div class="mobile-header"><span>RESOFEED</span><span>语言: 中文</span></div>
-        <div class="runtime-strip" aria-label="处理语言控件">
-          <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
-          <span class="runtime-warning">已存可读内容将被重写。</span>
-          <span translate="no">来源标识保持不变。</span>
+      <div class="mobile-card" aria-label="Narrow preview" lang="zh-CN">
+        <div class="mobile-header"><button class="brand" type="button" aria-expanded="true" aria-controls="mobile-utility-menu">RESOFEED</button><span>今日</span></div>
+        <div id="mobile-utility-menu" class="mobile-utility-sheet" role="region" aria-label="RESOFEED 工具菜单预览">
+          <div class="utility-menu__group" aria-label="导航">
+            <span class="utility-menu__heading">NAV</span>
+            <button class="bracket-action" type="button">今日</button>
+            <button class="bracket-action" type="button">来源账本</button>
+          </div>
+          <div class="utility-menu__group" aria-label="操作">
+            <span class="utility-menu__heading">OPERATIONS</span>
+            <button class="bracket-action" type="button" aria-label="处理语言：中文；切换到英文">语言: 中文</button>
+            <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
+            <span class="runtime-warning utility-menu__note">已存可读内容将被重写。</span>
+            <span class="utility-menu__note" translate="no">来源标识保持不变。</span>
+          </div>
         </div>
         <div class="mobile-feed">
           <div class="section-label">今日</div>
@@ -844,25 +1028,47 @@ extraction_failures: see source rows</pre>
         <div class="mobile-steer"><div class="steer">Steer or paste RSS URL...</div></div>
       </div>
 
-      <div class="mobile-card" aria-label="Narrow detail preview">
-        <div class="mobile-header"><span>RESOFEED</span><span>INSPECTOR</span></div>
+      <div class="mobile-card" aria-label="Narrow detail preview" lang="zh-CN">
+        <div class="mobile-header"><button class="brand" type="button" aria-expanded="false" translate="no">RESOFEED</button><span>检查器</span></div>
         <article class="mobile-detail">
           <div class="mobile-detail-head">
-            <button type="button" class="back-action">← feed</button>
-            <button type="button" class="star flush" aria-label="Resonate item">☆</button>
+            <button type="button" class="back-action">← 今日</button>
+            <button type="button" class="star flush" aria-label="标记共鸣">☆</button>
           </div>
           <div class="meta-row">
-            <span class="pill">src: nytimes.com</span>
-            <span class="pill warning">source excerpt</span>
-            <span class="pill">original ↗</span>
+            <span class="pill" translate="no">src: nytimes.com</span>
+            <span class="pill warning">来源摘录</span>
+            <span class="pill" translate="no">original ↗</span>
           </div>
-          <h2>Main headline here</h2>
-          <div class="evidence-lines" aria-label="Inspector provenance">
-            <p>source text: RSS excerpt only</p>
-            <p>summary provenance: feed excerpt fallback</p>
+          <h2>主要标题示例</h2>
+          <div class="evidence-lines" aria-label="检查器出处">
+            <p>中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录</p>
+            <p>来源文本：仅 RSS 摘录</p>
           </div>
+          <div class="reingest-panel" aria-label="检查器重新处理本文已展开状态预览">
+            <p class="reingest-panel__label">[重新处理本文] — 已展开状态预览</p>
+            <div class="reingest-panel__row">
+              <span class="reingest-panel__label">模型：</span>
+              <select aria-label="本次重新处理使用的 OpenRouter 模型">
+                <option>默认：account_default（model:null）</option>
+                <option>anthropic/claude-sonnet-4.5</option>
+              </select>
+            </div>
+            <div class="reingest-panel__row">
+              <label class="reingest-panel__label" for="mobile-extra-prompt">额外提示<br>（仅本次，不保存）</label>
+              <textarea id="mobile-extra-prompt" placeholder="示例 · 可选 · 不保存"></textarea>
+            </div>
+            <div class="reingest-panel__actions">
+              <button class="bracket-action" type="button">[确认重新处理]</button>
+              <button class="bracket-action" type="button">[取消]</button>
+            </div>
+          </div>
+          <details class="source-disclosure">
+            <summary>来源文本（已折叠）：RSS 摘录</summary>
+            <div class="source-disclosure__body">移动详情在紧凑列表之后恢复阅读密度；原始来源证据保留在折叠区域内。</div>
+          </details>
           <div class="rule"></div>
-          <p class="reading">Mobile detail restores reading density after the compact feed: larger serif headline, comfortable body line-height, visible provenance, and no extra recommendation chrome.</p>
+          <p class="reading">移动详情在紧凑列表之后恢复阅读密度：更大的衬线标题、舒适的正文行高、可见出处，以及没有额外推荐界面。</p>
           <p class="why">why: fresh from configured source · interpretation: source claim</p>
         </article>
       </div>

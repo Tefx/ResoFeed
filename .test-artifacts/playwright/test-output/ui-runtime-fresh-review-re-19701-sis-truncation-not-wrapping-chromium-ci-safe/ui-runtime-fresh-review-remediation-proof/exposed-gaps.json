@@ -1,9 +1,0 @@
-{
-  "FR-01/FR-10": "RESOFEED surface menu is closed by default, keyboard reachable, and toggles TODAY/SOURCE LEDGER at desktop and 390x844 mobile.",
-  "FR-02": "Feed time-group labels are contiguous chronological groups, never TODAY > YESTERDAY > TODAY for one feed page.",
-  "FR-04": "Inspector primary story surface discloses grouped duplicate/source items and provenance.",
-  "FR-05": "Each visible [FETCH] button keeps that text but has source-contextual accessible name.",
-  "FR-06": "Collapsed [DETAILS] controls do not inflate every Source Ledger row.",
-  "FR-07": "Source Ledger section is labelled by h1#source-ledger-title through aria-labelledby.",
-  "FR-09": "Mobile feed metadata remains one flat inline monospace truncating line, not multi-line wrapping."
-}

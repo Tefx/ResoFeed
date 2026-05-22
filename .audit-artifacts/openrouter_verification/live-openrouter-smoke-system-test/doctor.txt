@@ -1,4 +1,0 @@
-rss: ok
-openrouter: ok configured_model=account_default resolved_model=unknown
-extraction: ok
-ingest: last_run=never

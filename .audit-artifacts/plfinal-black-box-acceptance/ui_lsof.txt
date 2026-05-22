@@ -1,2 +1,0 @@
-COMMAND    PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
-resofeed 11972 tefx    6u  IPv4 0xb7f6d9bde8573acd      0t0  TCP 127.0.0.1:59123 (LISTEN)

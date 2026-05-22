@@ -132,6 +132,30 @@ components:
     typography: "{typography.payload}"
     padding: "{spacing.xl}"
     rounded: "{rounded.none}"
+  inspector-reingest-panel:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.md}"
+    rounded: "{rounded.none}"
+  inspector-model-selector:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.sm}"
+  inspector-extra-prompt:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm}"
+    rounded: "{rounded.sm}"
+  source-disclosure:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
   source-ledger:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -325,6 +349,7 @@ Primary surfaces covered by this contract:
 - first-use empty state inside the standard shell;
 - unified time-grouped feed;
 - right-side or full-screen Inspector for item detail;
+- Inspector-only item re-ingest controls for one selected item, with temporary OpenRouter model and extra prompt inputs;
 - Steer input for natural-language correction, RSS URL subscription, search command entry, and `/doctor` diagnostics;
 - a discreet `RESOFEED` surface menu that may contain `TODAY` and `SOURCE LEDGER` rather than showing persistent top-level navigation links;
 - flat Source Ledger for viewing/deleting sources, lightweight manual `[FETCH]` per source, lightweight manual `[RUN INGEST]` for all sources, current operation status when work is running or blocking an action, importing flattened OPML through `[IMPORT OPML]`, and reaching `[EXPORT STATE]` / `[IMPORT STATE]` actions;
@@ -464,12 +489,12 @@ Keyboard and accessibility: the `RESOFEED` trigger is a real button with `aria-h
 
 ### Current Operation Status (`current-operation-status`)
 - **Intent**: [SHARP] Explain one in-memory heavy operation currently occupying the ingest/process/reprocess guard.
-- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, `[FETCH]`, or `[REPROCESS LIBRARY]`; best-effort phase/count text from the shared `GET /api/runtime/operation` HTTP snapshot or matching MCP/UI current-operation data.
+- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from the shared `GET /api/runtime/operation` HTTP snapshot or matching MCP/UI current-operation data.
 - **avoidFor**: Durable jobs, queues, task dashboards, activity/history ledgers, retry panels, progress timelines, command history, sync status, or persisted audit records.
 
-Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, and `library_reprocess`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, or `scope: library`. Counts are best-effort (`17/128 fetched`, `42 items processed`) and must not imply durable completion guarantees.
+Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, and `item_reingest`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, `scope: library`, or `scope: item:<title-or-id>`. Counts are best-effort (`17/128 fetched`, `42 items processed`) and must not imply durable completion guarantees.
 
-Placement: [SHARP] show running current-operation status in the Source Ledger header/status area and in the opened `RESOFEED` utility menu only when relevant. The status must not appear as a persistent global top strip when idle. If a feed-level background ingest is running but no action is blocked, Source Ledger may show the line; the feed itself should remain calm.
+Placement: [SHARP] show running current-operation status in the Source Ledger header/status area, in the opened `RESOFEED` utility menu, or adjacent to the Inspector re-ingest action only when relevant. The status must not appear as a persistent global top strip when idle. If a feed-level background ingest is running but no action is blocked, Source Ledger may show the line; the feed itself should remain calm.
 
 States: idle hidden, running, blocked conflict, completed transient receipt, failed raw error. Running state uses `{components.current-operation-status}` and text replacement only. Conflict state uses `{components.current-operation-conflict}` and includes the current operation detail; it must not show only `err: operation already running`.
 
@@ -477,20 +502,22 @@ Conflict copy examples:
 
 - `err: operation already running — op: background_ingest · actor:background · phase:fetch · 17/128 sources · since 14:05:11`
 - `err: reprocess blocked — op: source_fetch · actor:human · scope: simonwillison · phase:fetching · since 14:06:02`
+- `err: re-ingest blocked — op: item_reingest · actor:human · scope: item:item_01 · phase:processing · since 14:07:33`
 
 Keyboard and accessibility: status lines are visible text. Running updates use `aria-live="polite"` and should update no more frequently than useful phase/count changes. Conflict/errors use `aria-live="assertive"`. When a user triggers a blocked action, keep focus on the trigger if it remains actionable, or move focus to the adjacent conflict line with `tabindex="-1"` and then restore predictable tab order. Do not use spinner-only or color-only status.
 
 ### Language Control
 
 - **Intent**: [SHARP] Expose the persisted processing language as a terse global pipeline state.
-- **useFor**: Switching future processing language from the `RESOFEED` utility menu; optional `/doctor` raw utility echo; announcing language update success/failure.
-- **avoidFor**: Persistent top-chrome badge, per-item translation toggle, settings panel, preference center, language wizard, or automatic existing-library rewrite.
+- **useFor**: Switching future processing language from the `RESOFEED` utility menu when no guarded ingest/fetch/reprocess operation is running; optional `/doctor` raw utility echo; announcing language update success/failure/conflict.
+- **avoidFor**: Persistent top-chrome badge, per-item translation toggle, settings panel, preference center, language wizard, automatic existing-library rewrite, or mixed-language batch creation.
 
-Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It lives in the opened `RESOFEED` utility menu under `OPERATIONS`, with an optional raw `/doctor` utility echo. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector. Language switching is not blocked by the current-operation ingest guard; it affects future processing/reprocess.
+Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It lives in the opened `RESOFEED` utility menu under `OPERATIONS`, with an optional raw `/doctor` utility echo. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector. Language switching is guarded: if ingest/fetch/library reprocess/item re-ingest is running, it uses the shared current-operation conflict pattern and does not create a mixed-language batch.
 
-States: English, Chinese, updating, failed. Updating keeps dimensions stable and uses terse text only. Failure uses raw `err: <diagnostic>` copy and the existing feedback-line style.
+States: English, Chinese, updating, conflict, failed. Updating keeps dimensions stable and uses terse text only. Conflict uses the Current Operation Status pattern, e.g. `err: language blocked — op: item_reingest · actor:human · phase:processing`. Failure uses raw `err: <diagnostic>` copy and the existing feedback-line style.
 
-Keyboard and accessibility: language control is a real button/control with an accessible name that announces the current processing language and the target action. The document `<html lang>` must reflect the active UI language (`en` or `zh-CN` unless a narrower Chinese locale is chosen later). Successful or failed language updates MUST be announced via an `aria-live="polite"` terse status line (e.g., `Language set to English` or `err: language update failed`).
+Keyboard and accessibility: language control is a real button/control with an accessible name that announces the current processing language and the target action. The document `<html lang>` must reflect the active UI language (`en` or `zh-CN` unless a narrower Chinese locale is chosen later). Successful, blocked, or failed language updates MUST be announced via an `aria-live="polite"` terse status line for success and `aria-live="assertive"` for conflict/failure.
+
 ### Reprocess Library Action
 
 - **Intent**: [SHARP] Explicitly rewrite existing stored user-readable item content into the current processing language and rebuild search indexing.
@@ -599,15 +626,51 @@ Non-color semantics are mandatory: star shape changes in addition to color.
 Keyboard and accessibility: `Space` or `Enter` toggles. Label must announce state: `Resonate item` / `Remove resonance`. The active star cannot rely on color alone.
 
 ### Inspector Pane
+- **Intent**: [SHARP] Deliberate Inspect surface for detail reading, verification, and one-time selected-item re-ingest.
+- **useFor**: Selected item detail, provenance, fallback/source evidence, grouped-source disclosure, collapsed source text, and inline `[RE-INGEST ITEM]` / `[重新处理本文]` controls scoped to this item only.
+- **avoidFor**: Global ingest controls, Source Ledger operations, provider settings, provider tabs, marketplace UI, durable model/prompt preferences, modals, toasts, dashboards, job history, related-content modules, or client-inferred source grouping.
+
 Purpose: deliberate Inspect surface for detail reading and verification.
 
-Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, one processing/provenance state line, model-backed summary/core sections when available, source text or source evidence, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt.
+Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, one processing/provenance state line, model-backed summary/core sections when available, item-scoped re-ingest panel, collapsed source text or source evidence disclosure, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below.
+
+### Inspector Item Re-ingest (`inspector-reingest-panel`)
+- **Intent**: [SHARP] Re-run model processing for exactly the currently inspected item as a one-time operation.
+- **useFor**: `[RE-INGEST ITEM]` / `[重新处理本文]`, temporary OpenRouter model selection loaded from `GET /api/runtime/openrouter/models`, optional extra prompt text, `[CONFIRM RE-INGEST]`, `[CANCEL]`, and result/conflict/error text for `POST /api/items/{id}/reingest` or matching MCP `reingest_item`.
+- **avoidFor**: Saving default models, saving prompt templates, changing global processing language, reprocessing the library, re-ingesting a source/feed/all items, provider marketplace, provider abstraction UI, provider tabs, settings dashboard, modal confirmation, toast notification, spinner, progress bar, animated ellipsis, or durable job/status history.
+
+Placement: [SHARP] the re-ingest affordance appears inside the Inspector only, after provenance/processing metadata and before the source-text disclosure or long reading body. It must not appear in global chrome, Feed rows, Source Ledger, the `RESOFEED` utility menu, `/doctor`, or search controls. Desktop uses the right Inspector scroll container; mobile uses the full-screen Inspector route.
+
+Anatomy and copy: idle state shows one bracket action, `[RE-INGEST ITEM]` or `[重新处理本文]`. Configuring state expands inline into a flat panel using `{components.inspector-reingest-panel}` with a model selector using `{components.inspector-model-selector}`, optional extra prompt textarea using `{components.inspector-extra-prompt}`, and `[CONFIRM RE-INGEST]` plus `[CANCEL]`. The model list is OpenRouter-only; label it as `model:` / `模型：` without provider tabs. The selector's first/default option is a local UI option such as `default: account_default`; selecting it sends `model: null` or omits `model`, never the literal `account_default` as a provider model ID. Extra prompt label must make non-persistence explicit, e.g. `extra prompt (one-time, not saved)` / `额外提示（仅本次，不保存）`.
+
+Persistence boundary: [SHARP] selected model and extra prompt are temporary UI state for the active Inspector item. They are cleared when the panel is cancelled, when another item opens, after completion/failure acknowledgement, or when the Inspector route unmounts. The UI must not store them in local storage, settings, state export, source records, steering receipts, item provenance, or any durable preference.
+
+States:
+
+- idle: `[RE-INGEST ITEM]` / `[重新处理本文]` only;
+- configuring: inline panel with `model: <select>` and optional prompt field; preview docs may show this expanded state without also implying idle is active;
+- confirming: `[CONFIRM RE-INGEST]` / `[CANCEL]` visible in the same inline panel;
+- model-list-loading: selector row shows `models: loading` with text replacement only;
+- model-list-unavailable: selector row shows raw `err: models unavailable`; default-model re-ingest remains available by sending `model: null`; no fallback marketplace or manual provider setup UI;
+- running: action text becomes `[RE-INGESTING ITEM...]` / `[正在重新处理本文...]` with `aria-disabled="true"`; no spinner, progress bar, animated ellipsis, toast, modal, or dashboard;
+- complete: terse inline receipt such as `re-ingest complete · search refreshed`; refreshed item content appears when available;
+- conflict: raw current-operation conflict detail, e.g. `err: re-ingest blocked — op: item_reingest · actor:human · scope:item_01 · phase:processing · since 14:00:00`;
+- failed: raw `err: <diagnostic>` line adjacent to the panel.
+
+Accessibility and focus: opening configuring state keeps focus inside the inline panel on the model selector or first available model. Loading/unavailable/complete/failed messages use visible text and `aria-live="polite"`; conflict/errors use `aria-live="assertive"`. Running uses `aria-disabled="true"` rather than removing focus from the trigger. `[CANCEL]` returns focus to `[RE-INGEST ITEM]`; completion returns focus to the refreshed Inspector heading or the re-ingest trigger. The panel must be reachable in normal tab order and must not trap focus like a modal.
+
+### Source Text Disclosure (`source-disclosure`)
+- **Intent**: [SHARP] Keep raw/source evidence available while making every newly opened Inspector item begin with the source text collapsed.
+- **useFor**: Raw RSS excerpt, extracted article text, source evidence, and grouped-source evidence sections inside Inspector.
+- **avoidFor**: Hiding provenance permanently, collapsing model-backed Summary/Core, decorative accordions, lazy-loading spinners, or client-inferred source grouping.
+
+Default state: [SHARP] source text/source evidence is collapsed by default for every newly opened Inspector item. Use accessible disclosure semantics (`<details>`/`<summary>` or equivalent button with `aria-expanded`, `aria-controls`, and labelled region). The summary line should be terse, e.g. `Source text (collapsed)` / `来源文本（已折叠）`, and may include provenance such as `RSS excerpt only`. Opening a new item resets the disclosure to collapsed. User expansion state is ephemeral navigation/UI state only and must not be saved.
 
 Grouped-source disclosure contract: Inspector may show a source-list disclosure only for authoritative backend grouping: non-null `story_key`, non-null `duplicate_of_item_id`, or non-empty backend `provenance.grouped_source_items` on the selected item/detail. It must list backend-provided source items/provenance without merging client-side identities. It must not compute groups by stripping URL fragments, by treating URLs that differ only by a synthetic feed-entry fragment as identical, or by host/path fallback. If authoritative grouping fields are absent, show the selected item as a standalone item even if URL normalization would make unrelated items look similar. This protects feeds whose entry URLs intentionally use fragments to identify distinct source items.
 
-Fallback/source-evidence contract: If target-language/model processing has not produced model-backed summary or core insight, Inspector must not render ghost Summary or Core sections. It shows exactly one low-chrome processing state line below title/original-link/provenance metadata, then one source evidence section only if a source excerpt exists. Recommended copy is `target-language processing incomplete · summary/core unavailable · showing source excerpt` / `中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录`, followed by `Source evidence:` / `出处记录：` and the raw RSS excerpt. Model latency/error states use the same one-line pattern with `failed`/`失败`; original-unavailable states use one unavailable line. Fallback source excerpt is provenance evidence, not completed synthesized target-language reading content. Source identifiers, original link, and source title remain literal.
+Fallback/source-evidence contract: If target-language/model processing has not produced model-backed summary or core insight, Inspector must not render ghost Summary or Core sections. It shows exactly one low-chrome processing state line below title/original-link/provenance metadata, then one collapsed source evidence disclosure only if a source excerpt exists. Recommended copy is `target-language processing incomplete · summary/core unavailable · showing source excerpt` / `中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录`, followed by a disclosure summary such as `Source evidence (collapsed): RSS excerpt` / `出处记录（已折叠）：RSS 摘录` and the raw RSS excerpt inside the controlled region. Model latency/error states use the same one-line pattern with `failed`/`失败`; original-unavailable states use one unavailable line. Fallback source excerpt is provenance evidence, not completed synthesized target-language reading content. Source identifiers, original link, and source title remain literal.
 
-OK model-backed contract: If model-backed summary/core exists, Inspector renders processing/provenance normally and shows Summary, Core insight, and Source text sections as available. Source-text status and summary provenance remain evidence, not warning banners. If full article text is unavailable but RSS excerpt text exists and the model still produced validated summary fields, Inspector may say `source text: RSS excerpt only` while separately saying `summary provenance: model-backed`.
+OK model-backed contract: If model-backed summary/core exists, Inspector renders processing/provenance normally and shows Summary and Core insight as available, with Source text available behind the default-collapsed disclosure. Source-text status and summary provenance remain evidence, not warning banners. If full article text is unavailable but RSS excerpt text exists and the model still produced validated summary fields, Inspector may say `source text: RSS excerpt only` while separately saying `summary provenance: model-backed`.
 
 Note on Resonate Action: To maintain a clean, low-fatigue interface, the Inspector only duplicates the Resonate action when presented as a single-column mobile route (where the feed is hidden). In desktop split-pane mode, the Inspector does not show a star; the user relies on the permanently visible star on the selected feed item to their left.
 
@@ -763,6 +826,8 @@ Do:
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
+- [SHARP] Do keep item re-ingest controls inside Inspector only, scoped to the selected item, and presented as `[RE-INGEST ITEM]` / `[重新处理本文]` with temporary OpenRouter model and optional one-time prompt inputs.
+- [SHARP] Do collapse source text/source evidence by default for every newly opened Inspector item while preserving accessible disclosure semantics and literal provenance.
 - Do preserve persistent feed access through time groups and pagination.
 - Do keep the left feed compact by default: flat metadata, 18px serif titles, clamped 1–2 line abstracts, and horizontal rules rather than roomy cards.
 - Do keep accent scarce: Resonate and one active command/focus moment at most.
@@ -788,6 +853,9 @@ Don't:
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
 - Don't display internal design-positioning phrases such as “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” as product UI copy.
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
+- [SHARP] Don't put re-ingest in Feed rows, Source Ledger, persistent global chrome, `/doctor`, provider settings, or a marketplace/provider abstraction surface.
+- [SHARP] Don't save the Inspector re-ingest model or extra prompt as defaults, preferences, steering state, item provenance, local storage, exportable state, or reusable templates.
+- [SHARP] Don't use modals, toasts, spinners, progress bars, animated ellipses, dashboards, queues, or history surfaces for Inspector item re-ingest.
 
 Language and reprocessing guardrails:
 
@@ -795,7 +863,7 @@ Do:
 
 - [SHARP] Do treat language as a global processing state, not a cosmetic per-item display toggle.
 - [SHARP] Do keep language controls terse and low-chrome inside the `RESOFEED` utility menu: `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`.
-- [SHARP] Do allow language switching during ingest; it affects future processing/reprocess and is not blocked by the ingest guard.
+- [SHARP] Do explain blocked language changes with the shared current-operation conflict pattern when ingest/fetch/reprocess work is running; language remains global processing state and must not create mixed-language batches.
 - Do localize UI chrome, accessibility labels, and user-readable item content for supported languages.
 - Do preserve source identifiers exactly and mark them as non-translatable where possible.
 - [SHARP] Do expose existing-library reprocess as a terse bracket-style operational action in the `RESOFEED` utility menu, not persistent top chrome.
@@ -817,6 +885,7 @@ Motion is functional, brief, and optional.
 - Resonate activation: 150ms ease-out star fill/shape change; no bounce.
 - Pane transitions: 150–220ms ease-out for Inspector on desktop; mobile route transitions may use platform defaults.
 - Loading: raw text states only, or clearly labelled non-skeleton static text placeholders; no skeleton loaders, shimmer or static, under this contract. Manual Source Ledger ingest uses only `[INGESTING...]`, `[FETCHING...]`, timestamps, and raw `err:` strings.
+- Inspector item re-ingest loading uses only text replacement such as `[RE-INGESTING ITEM...]`, `models: loading`, current-operation conflict text, or raw `err:` strings.
 - Reduced motion: disable transitions beyond immediate state changes.
 - No layout shift: hover, focus, selected, loading, error, and receipt states must keep component bounds stable.
 - No CSS animations or transitions are permitted on `.bracket-action`, `.source-ledger__status`, or manual ingest controls.
@@ -833,9 +902,14 @@ Motion is functional, brief, and optional.
 | Dense factual summary, clamped to         | The Main Headline Goes Here        |
 | two lines in the index row.               | source text: RSS excerpt only      |
 | ----------------------------------------- | summary provenance: model-backed   |
+|                                          | [RE-INGEST ITEM]                  |
+|                                          | model: default: account_default    |
+|                                          | extra prompt (one-time, not saved) |
+|                                          | [CONFIRM RE-INGEST] [CANCEL]       |
+|                                          | Source text (collapsed) ▸          |
 | src: hn · 4h · agent:delivery-bot         | ---------------------------------- |
-| Secondary Story                     [★]   | Full extracted text, raw excerpt,  |
-| ----------------------------------------- | provenance, original link.         |
+| Secondary Story                     [★]   | Source text stays behind           |
+| ----------------------------------------- | disclosure; original link visible. |
 | src: blog.example · 1d · source excerpt        YESTERDAY | why: fresh from configured source  |
 | Older item remains reachable.       [☆]   |                                    |
 +--------------------------------------------------------------------------------+

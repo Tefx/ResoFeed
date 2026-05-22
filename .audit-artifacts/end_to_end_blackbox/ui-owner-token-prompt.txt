@@ -1,7 +1,0 @@
-RESOFEED
-
-Enter owner token
-Owner token
-submit
-
-Token stays in this browser as resofeed.ownerToken and is sent to local /api/* requests.
