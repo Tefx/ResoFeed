@@ -272,7 +272,6 @@ func TestPromptingV21SourceNormalizationAndPriorityFixtureInventoryExpectedRed(t
 }
 
 func TestPromptingV21R4StrictHTTPRequestModelBoundariesExpectedRed(t *testing.T) {
-	t.Skip("downstream R4 HTTP request validation step owns prompt/model strict request handling")
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	seedItemReingestFixture(t, ctx, db)

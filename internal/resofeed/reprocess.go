@@ -96,13 +96,36 @@ func validateItemReingestRequest(req ItemReingestRequest) error {
 	if err := validateMutationRequestFields(req.MutationRequestFields); err != nil {
 		return err
 	}
-	if req.Model != nil && len([]byte(strings.TrimSpace(*req.Model))) > 200 {
-		return fieldError("model")
+	if req.Model != nil {
+		if _, err := normalizeItemReingestModel(*req.Model); err != nil {
+			return fieldError("model")
+		}
 	}
 	if req.Prompt != nil && len([]byte(strings.TrimSpace(*req.Prompt))) > 4000 {
 		return fieldError("prompt")
 	}
 	return nil
+}
+
+func normalizeItemReingestModel(model string) (string, error) {
+	trimmed := strings.TrimSpace(model)
+	if trimmed == "" || trimmed == "account_default" {
+		return "", nil
+	}
+	if len([]byte(trimmed)) > 200 {
+		return "", fieldError("model")
+	}
+	for _, r := range trimmed {
+		switch {
+		case r >= 'a' && r <= 'z':
+		case r >= 'A' && r <= 'Z':
+		case r >= '0' && r <= '9':
+		case r == '.' || r == '_' || r == '-' || r == '/' || r == ':':
+		default:
+			return "", fieldError("model")
+		}
+	}
+	return trimmed, nil
 }
 
 func itemReingestFingerprintPayload(req ItemReingestRequest) struct {
@@ -113,7 +136,7 @@ func itemReingestFingerprintPayload(req ItemReingestRequest) struct {
 } {
 	var model, prompt string
 	if req.Model != nil {
-		model = strings.TrimSpace(*req.Model)
+		model, _ = normalizeItemReingestModel(*req.Model)
 	}
 	if req.Prompt != nil {
 		prompt = strings.TrimSpace(*req.Prompt)
@@ -191,26 +214,34 @@ func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reproces
 }
 
 func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest) (reprocessItemOutcome, error) {
-	sourceURL, sourceText, err := fetchReprocessSourceText(ctx, item)
+	sourceURL, sourceText, availableTextSource, err := fetchReprocessSourceText(ctx, item)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return reprocessItemOutcome{}, err
 		}
-		fallbackURL, fallbackText, ok := reprocessStoredTextFallback(item)
+		fallbackURL, fallbackText, fallbackTextSource, ok := reprocessStoredTextFallback(item)
 		if !ok {
 			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
 		}
-		sourceURL, sourceText = fallbackURL, fallbackText
+		sourceURL, sourceText, availableTextSource = fallbackURL, fallbackText, fallbackTextSource
 	}
 	if llm == nil {
 		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
 	}
-	input := OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableText: sourceText, TargetLanguage: language}
+	input := OpenRouterSummaryInput{ItemID: item.id, Title: reprocessInputTitle(item), SourceTitle: item.sourceTitle, URL: sourceURL, AvailableTextSource: availableTextSource, AvailableText: sourceText, TargetLanguage: language}
 	if req.Model != nil {
-		input.Model = strings.TrimSpace(*req.Model)
+		model, err := normalizeItemReingestModel(*req.Model)
+		if err != nil {
+			return reprocessItemOutcome{}, err
+		}
+		input.Model = model
 	}
 	if req.Prompt != nil {
 		input.Prompt = strings.TrimSpace(*req.Prompt)
+	}
+	compiled, err := compilePromptingV21SummaryPrompt(input)
+	if err != nil {
+		return reprocessItemOutcome{}, fmt.Errorf("reprocess item: compile v2.1 prompt context: %w", err)
 	}
 	out, err := llm.SummarizeItem(ctx, input)
 	if err != nil {
@@ -221,7 +252,11 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 		code := reprocessErrorCodeForModelStatus(status)
 		return failedReprocessOutcome(sourceURL, code, string(code), status), nil
 	}
-	out, err = validateSummaryOutputForPersistence(out)
+	validationOut := out
+	if isUnusableReprocessOutputTitle(validationOut.Title) {
+		validationOut.Title = reprocessInputTitle(item)
+	}
+	out, err = validateSummaryOutputForPersistenceWithPrompt(validationOut, compiled.UserPayload.Item)
 	if err != nil {
 		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, string(ReprocessErrorDecodeError), modelStatusDecodeError), nil
 	}
@@ -414,18 +449,18 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{})
 }
 
-func reprocessStoredTextFallback(item reprocessItem) (string, string, bool) {
+func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {
 	if item.extractedText.Valid {
 		if text := strings.TrimSpace(item.extractedText.String); text != "" {
-			return fallbackReprocessSourceURL(item), text, true
+			return fallbackReprocessSourceURL(item), text, "stored_extracted_text", true
 		}
 	}
 	if item.feedExcerpt.Valid {
 		if text := strings.TrimSpace(item.feedExcerpt.String); text != "" {
-			return fallbackReprocessSourceURL(item), text, true
+			return fallbackReprocessSourceURL(item), text, "rss_excerpt", true
 		}
 	}
-	return "", "", false
+	return "", "", "", false
 }
 
 func reprocessErrorCodeForModelStatus(status string) ReprocessErrorCode {
@@ -447,18 +482,18 @@ func reprocessErrorCodeForModelStatus(status string) ReprocessErrorCode {
 	}
 }
 
-func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, string, error) {
+func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, string, string, error) {
 	for _, candidate := range reprocessCandidateURLs(item) {
 		text, err := fetchArticleReadableText(ctx, candidate)
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			return "", "", err
+			return "", "", "", err
 		}
 		if err != nil {
 			continue
 		}
-		return candidate, text, nil
+		return candidate, text, "fresh_full_text", nil
 	}
-	return "", "", errors.New("no reprocess source text available")
+	return "", "", "", errors.New("no reprocess source text available")
 }
 
 func reprocessCandidateURLs(item reprocessItem) []string {

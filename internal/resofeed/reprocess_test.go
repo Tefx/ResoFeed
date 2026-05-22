@@ -274,6 +274,28 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 	}
 }
 
+func TestItemReingestPersistenceValidationUsesActualPromptContextBeforeWrite(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedItemReingestFixture(t, ctx, db)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-actual-context-validation"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := ReingestItem(ctx, db, actualContextInvalidReingestLLM{}, "item_reingest_01", ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "actual-context-validation"}})
+	if err != nil {
+		t.Fatalf("ReingestItem returned error: %v", err)
+	}
+	if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorDecodeError || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated {
+		t.Fatalf("reingest result = %+v, want stable decode_error failure with selected FTS refresh", resp.Reingest)
+	}
+	assertClearedReprocessFields(t, ctx, db, "item_reingest_01", modelStatusDecodeError)
+	if count := reprocessFTSCount(t, ctx, db, "item_reingest_01", `"English summary that should fail Chinese validation"`); count != 0 {
+		t.Fatalf("FTS persisted actual-context-invalid English summary, count=%d", count)
+	}
+}
+
 func TestFetchArticleReadableTextRejectsPDFPayload(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/pdf")
@@ -317,6 +339,16 @@ type reprocessTitleLLM struct {
 
 type reprocessStatusLLM struct {
 	status string
+}
+
+type actualContextInvalidReingestLLM struct{}
+
+func (actualContextInvalidReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{Title: "English title", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+}
+
+func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
 }
 
 func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
