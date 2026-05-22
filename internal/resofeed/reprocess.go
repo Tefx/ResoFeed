@@ -88,8 +88,29 @@ func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string,
 // ReingestItemForMCP maps the MCP contract shape onto the shared selected-item
 // re-ingest declaration. It is intentionally a thin parity boundary.
 func ReingestItemForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReingestItemInput) (ItemReingestResponse, error) {
-	req := ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
+	req, err := itemReingestRequestFromInputs(MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}, input.Model, input.Prompt, input.ExtraPrompt)
+	if err != nil {
+		return ItemReingestResponse{}, err
+	}
 	return ReingestItem(ctx, db, llm, input.ItemID, req)
+}
+
+func itemReingestRequestFromInputs(fields MutationRequestFields, model *string, prompt *string, extraPrompt *string) (ItemReingestRequest, error) {
+	normalizedPrompt, err := normalizeItemReingestPromptInput("prompt", prompt)
+	if err != nil {
+		return ItemReingestRequest{}, err
+	}
+	normalizedExtraPrompt, err := normalizeItemReingestPromptInput("extra_prompt", extraPrompt)
+	if err != nil {
+		return ItemReingestRequest{}, err
+	}
+	if normalizedPrompt != nil && normalizedExtraPrompt != nil && *normalizedPrompt != *normalizedExtraPrompt {
+		return ItemReingestRequest{}, fieldError("prompt")
+	}
+	if normalizedPrompt == nil {
+		normalizedPrompt = normalizedExtraPrompt
+	}
+	return ItemReingestRequest{Model: normalizedOptionalString(model), Prompt: normalizedPrompt, MutationRequestFields: fields}, nil
 }
 
 func validateItemReingestRequest(req ItemReingestRequest) error {
@@ -104,7 +125,29 @@ func validateItemReingestRequest(req ItemReingestRequest) error {
 	if req.Prompt != nil && len([]byte(strings.TrimSpace(*req.Prompt))) > 4000 {
 		return fieldError("prompt")
 	}
+	if _, err := normalizeItemReingestPromptInput("prompt", req.Prompt); err != nil {
+		return err
+	}
 	return nil
+}
+
+func normalizeItemReingestPromptInput(field string, value *string) (*string, error) {
+	if value == nil {
+		return nil, nil
+	}
+	trimmed := strings.TrimSpace(*value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	if len([]byte(trimmed)) > 4000 {
+		return nil, fieldError(field)
+	}
+	for _, r := range trimmed {
+		if r == 0 || (r < 0x20 && r != '\t' && r != '\n' && r != '\r') {
+			return nil, fieldError(field)
+		}
+	}
+	return &trimmed, nil
 }
 
 func normalizeItemReingestModel(model string) (string, error) {

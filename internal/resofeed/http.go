@@ -60,7 +60,7 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api)
-	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
+	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, OpenRouter: cfg.OpenRouter, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
 	mux.Handle("/", staticUIHandler())
 	return mux
 }
@@ -639,16 +639,17 @@ func readItemReingestRequest(w http.ResponseWriter, r *http.Request) (ItemReinge
 	if !readJSONBodyLimit(w, r, &wire, maxRuntimeBodyBytes, "100 KB") {
 		return ItemReingestRequest{}, false
 	}
-	prompt := normalizedOptionalString(wire.Prompt)
-	extraPrompt := normalizedOptionalString(wire.ExtraPrompt)
-	if prompt != nil && extraPrompt != nil && *prompt != *extraPrompt {
-		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "prompt"})
+	req, err := itemReingestRequestFromInputs(wire.MutationRequestFields, wire.Model, wire.Prompt, wire.ExtraPrompt)
+	if err != nil {
+		var fieldErr mcpFieldError
+		if errors.As(err, &fieldErr) {
+			writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": fieldErr.field})
+			return ItemReingestRequest{}, false
+		}
+		writeInternal(w)
 		return ItemReingestRequest{}, false
 	}
-	if prompt == nil {
-		prompt = extraPrompt
-	}
-	return ItemReingestRequest{Model: normalizedOptionalString(wire.Model), Prompt: prompt, MutationRequestFields: wire.MutationRequestFields}, true
+	return req, true
 }
 
 func normalizedOptionalString(value *string) *string {

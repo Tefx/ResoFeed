@@ -228,9 +228,12 @@ type ItemReingestResponse struct {
 // re-ingest. The runtime language is read from persisted metadata; per-call
 // language overrides are deliberately not admitted.
 type MCPReingestItemInput struct {
-	ItemID         string `json:"item_id"`
-	ActorID        string `json:"actor_id"`
-	IdempotencyKey string `json:"idempotency_key"`
+	ItemID         string  `json:"item_id"`
+	ActorID        string  `json:"actor_id"`
+	IdempotencyKey string  `json:"idempotency_key"`
+	Model          *string `json:"model"`
+	Prompt         *string `json:"prompt"`
+	ExtraPrompt    *string `json:"extra_prompt"`
 }
 
 // SteerRule is the current steering policy row. Only active rules affect

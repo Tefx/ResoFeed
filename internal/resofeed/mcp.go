@@ -23,6 +23,7 @@ type MCPConfig struct {
 	OwnerToken            string
 	OwnerTokenHash        string
 	LLM                   LLMClient
+	OpenRouter            OpenRouterConfig
 	FirstFetchMaxItems    int
 	FirstFetchMaxItemsSet bool
 }
@@ -33,7 +34,7 @@ type MCPConfig struct {
 // Live audit closure for MCP liveness must prove this handler through the single
 // resofeed serve listener, not only through in-process handler invocation.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM, firstFetchMaxItems: cfg.FirstFetchMaxItems, firstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}
+	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM, openRouter: cfg.OpenRouter, firstFetchMaxItems: cfg.FirstFetchMaxItems, firstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -371,6 +372,7 @@ type mcpHandler struct {
 	ownerToken            string
 	ownerTokenHash        string
 	llm                   LLMClient
+	openRouter            OpenRouterConfig
 	firstFetchMaxItems    int
 	firstFetchMaxItemsSet bool
 }
@@ -634,7 +636,7 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input struct{}
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = ListOpenRouterModels(ctx, OpenRouterConfig{})
+			result, err = ListOpenRouterModelsForMCP(ctx, h.openRouter)
 		}
 	default:
 		return nil, notFoundError("tool", envelope.Name)
@@ -647,6 +649,27 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		return nil, fmt.Errorf("marshal MCP tool result: %w", err)
 	}
 	return map[string]any{"content": []mcpContent{{Type: "text", Text: string(data)}}}, nil
+}
+
+func ListOpenRouterModelsForMCP(ctx context.Context, cfg OpenRouterConfig) (OpenRouterModelsResponse, error) {
+	if strings.TrimSpace(cfg.Endpoint) == "" {
+		cfg.Endpoint = deterministicOpenRouterEndpointForE2E()
+	}
+	if strings.TrimSpace(cfg.APIKey) == "" {
+		secret, err := ResolveOpenRouterRuntimeSecret()
+		if err != nil || strings.TrimSpace(secret) == "" {
+			return OpenRouterModelsResponse{Models: []OpenRouterModelInfo{}}, nil
+		}
+		cfg.APIKey = secret
+	}
+	models, err := ListOpenRouterModels(ctx, cfg)
+	if err != nil {
+		return OpenRouterModelsResponse{}, mcpProviderUnavailableError{}
+	}
+	if models.Models == nil {
+		models.Models = []OpenRouterModelInfo{}
+	}
+	return models, nil
 }
 
 func listSourcesForMCP(ctx context.Context, db *sql.DB) ([]Source, error) {
@@ -742,6 +765,10 @@ type mcpNotFoundError struct {
 	id   string
 }
 
+type mcpProviderUnavailableError struct{}
+
+func (mcpProviderUnavailableError) Error() string { return "models unavailable" }
+
 func (e mcpNotFoundError) Error() string { return e.kind + " not found: " + e.id }
 
 func fieldError(field string) error { return mcpFieldError{field: field} }
@@ -774,6 +801,10 @@ func mcpErrFromError(err error) *mcpError {
 	var notFound mcpNotFoundError
 	if errors.As(err, &notFound) {
 		return &mcpError{Code: -32004, Message: notFound.kind + " not found", Data: nestedMCPErrorData("not_found", "not found", map[string]any{"id": notFound.id})}
+	}
+	var providerUnavailable mcpProviderUnavailableError
+	if errors.As(err, &providerUnavailable) {
+		return &mcpError{Code: -32000, Message: "models unavailable", Data: nestedMCPErrorData("provider_unavailable", "models unavailable", nil)}
 	}
 	return &mcpError{Code: -32603, Message: "internal error"}
 }
@@ -835,7 +866,7 @@ func mcpToolList() []map[string]any {
 		{"name": "get_processing_language", "description": "Read the runtime processing language.", "inputSchema": objectSchema(nil, map[string]any{})},
 		{"name": "set_processing_language", "description": "Set the runtime processing language for future processing.", "inputSchema": objectSchema([]string{"language", "actor_id", "idempotency_key"}, map[string]any{"language": map[string]any{"type": "string", "enum": []string{"en", "zh"}}, "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
 		{"name": "reprocess_library", "description": "Explicitly reprocess existing library items in the current runtime language.", "inputSchema": objectSchema([]string{"actor_id", "idempotency_key"}, map[string]any{"actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
-		{"name": "reingest_item", "description": "Re-ingest exactly one selected item using the current runtime language.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required selected item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200)})},
+		{"name": "reingest_item", "description": "Re-ingest exactly one selected item using the current runtime language with optional request-scoped OpenRouter model and one-time prompt.", "inputSchema": objectSchema([]string{"item_id", "actor_id", "idempotency_key"}, map[string]any{"item_id": stringSchema("Required selected item id.", 1, 0), "actor_id": stringSchema("Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.", 1, 128), "idempotency_key": stringSchema("Required retry idempotency key, max 200 characters.", 1, 200), "model": nullableStringSchema("Optional request-scoped OpenRouter model override; null, empty, or account_default means runtime/account default."), "prompt": nullableStringSchema("Optional canonical one-time prompt for this item only; max 4000 bytes after trimming."), "extra_prompt": nullableStringSchema("Compatibility alias for prompt; rejected when it conflicts with prompt.")})},
 		{"name": "list_openrouter_models", "description": "List available OpenRouter models without persisting provider state.", "inputSchema": objectSchema(nil, map[string]any{})},
 	}
 }
