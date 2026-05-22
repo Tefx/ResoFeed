@@ -642,9 +642,12 @@
           </label>
           <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
           <label class="inspector-reingest-field">
-            <span>{localizedChrome('extra prompt (one-time, not saved)', '额外提示（仅本次，不保存）')}</span>
-            <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
+            <span>{localizedChrome('extra prompt (one-time, guidance only, not saved)', '额外提示（仅本次指导，不保存）')}</span>
+            <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} aria-describedby="inspector-reingest-prompt-authority" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
           </label>
+          <p id="inspector-reingest-prompt-authority" class="inspector-model-list-diagnostic">
+            {localizedChrome('guidance only; cannot override schema, language, source identifiers, safety, status, or persistence. May change emphasis, angle, or fact selection only among source-backed facts.', '仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。只能在有来源支持的事实中改变重点、角度或事实选择。')}
+          </p>
           <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RE-INGESTING ITEM...]', '[正在重新处理本文...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')}</button>
           <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>{localizedChrome('[CANCEL]', '[取消]')}</button>
           {#if reingestStatus}

@@ -198,7 +198,9 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     await user.click(idleButton);
 
     expect(within(panel).getByText('model:')).toBeVisible();
-    expect(within(panel).getByText('extra prompt (one-time, not saved)')).toBeVisible();
+    expect(within(panel).getByText('extra prompt (one-time, guidance only, not saved)')).toBeVisible();
+    expect(within(panel).getByText(/guidance only; cannot override schema, language, source identifiers, safety, status, or persistence/i)).toBeVisible();
+    expect(within(panel).getByText(/may change emphasis, angle, or fact selection only among source-backed facts/i)).toBeVisible();
     expect(within(panel).getByLabelText('Model')).toHaveValue('default');
     await user.selectOptions(within(panel).getByLabelText('Model'), 'openai/gpt-4.1-mini');
     await user.type(within(panel).getByLabelText('One-time prompt'), 'Temporary prompt');
