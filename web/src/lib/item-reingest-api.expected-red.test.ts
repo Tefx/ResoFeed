@@ -1,39 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient } from './api-client';
-
-type ActorKind = 'human' | 'agent';
-
-interface ItemReingestRequest {
-  actor_kind: ActorKind;
-  actor_id: string;
-  idempotency_key: string;
-  /** null means use the server/runtime default model; the UI must not serialize an empty string. */
-  model: string | null;
-  /** One-time instruction for this retry only; it must not become durable runtime state. */
-  prompt: string | null;
-}
+import type { ItemReingestRequest, ItemReingestResponse } from './api-contract';
 
 interface ItemReingestCompatibilityRequest extends Omit<ItemReingestRequest, 'prompt'> {
   /** Backward-compatible alias accepted by the backend contract and normalized to prompt semantics. */
   extra_prompt: string | null;
-}
-
-interface ItemReingestResponse {
-  already_applied: boolean;
-  reingest: {
-    item_id: string;
-    status: 'completed' | 'failed' | 'accepted';
-    item_updated: boolean;
-    fts_updated: boolean;
-    model: string;
-    item: {
-      summary: string | null;
-      core_insight: string | null;
-      extraction_status: 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
-      model_status: 'ok' | 'summary_unavailable' | 'model_latency_error';
-    } | null;
-  };
 }
 
 interface ExpectedItemReingestClient {
@@ -63,12 +35,37 @@ describe('expected-red item re-ingest API client contract', () => {
         status: 'completed',
         item_updated: true,
         fts_updated: true,
-        model: 'openai/gpt-4.1-mini',
+        language: 'en',
+        error: null,
         item: {
+          id: 'item_reingest_expected_red',
+          source_id: 'source_reingest_expected_red',
+          source_title: 'Contract Source',
+          url: 'https://example.test/item',
+          title: 'Contract item',
           summary: 'Fresh summary after item-level re-ingest.',
           core_insight: 'Fresh core insight after item-level re-ingest.',
+          display_excerpt: null,
+          value_tier: null,
+          published_at: null,
+          first_seen_at: null,
           extraction_status: 'full',
-          model_status: 'ok'
+          model_status: 'ok',
+          is_resonated: false,
+          human_inspected_at: null,
+          external_surfaced_at: null,
+          story_key: null,
+          duplicate_of_item_id: null,
+          feed_excerpt: null,
+          extracted_text: null,
+          provenance: {
+            source_url: 'https://example.test/feed.xml',
+            canonical_url: null,
+            original_url: 'https://example.test/item',
+            story_key: null,
+            duplicate_of_item_id: null,
+            grouped_source_items: []
+          }
         }
       }
     }));
@@ -110,7 +107,8 @@ describe('expected-red item re-ingest API client contract', () => {
         status: 'completed',
         item_updated: true,
         fts_updated: true,
-        model: 'openrouter/contract-model',
+        language: 'en',
+        error: null,
         item: null
       }
     }));
@@ -137,6 +135,45 @@ describe('expected-red item re-ingest API client contract', () => {
         extra_prompt: 'one-time compatibility instruction'
       } satisfies ItemReingestCompatibilityRequest)
     }));
+  });
+
+  it('parses the backend-selected item re-ingest response envelope without stale frontend-only fields', async () => {
+    const backendJsonFixture = {
+      reingest: {
+        item_id: 'runtime_item_01',
+        status: 'completed',
+        language: 'zh',
+        item_updated: true,
+        fts_updated: true,
+        error: null,
+        item: null
+      },
+      already_applied: false
+    } satisfies ItemReingestResponse;
+
+    expect(Object.keys(backendJsonFixture.reingest).sort()).toEqual([
+      'error',
+      'fts_updated',
+      'item',
+      'item_id',
+      'item_updated',
+      'language',
+      'status'
+    ]);
+    expect('accepted' in backendJsonFixture.reingest).toBe(false);
+    expect('model' in backendJsonFixture.reingest).toBe(false);
+    expect(backendJsonFixture).toMatchObject({
+      already_applied: false,
+      reingest: {
+        item_id: 'runtime_item_01',
+        status: 'completed',
+        language: 'zh',
+        item_updated: true,
+        fts_updated: true,
+        error: null,
+        item: null
+      }
+    });
   });
 
   it('keeps malformed provider errors generic and does not leak provider secrets through client errors', async () => {

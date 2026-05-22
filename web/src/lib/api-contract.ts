@@ -345,14 +345,15 @@ export interface ItemReingestRequest extends InspectRequest {
   prompt: string | null;
 }
 
-export type ItemReingestStatus = 'completed' | 'failed' | 'accepted';
+export type ItemReingestStatus = ReprocessStatus;
 
 export interface ItemReingestResult {
   item_id: OpaqueId;
   status: ItemReingestStatus;
+  language: ProcessingLanguage;
   item_updated: boolean;
   fts_updated: boolean;
-  model: string;
+  error: ReprocessErrorDetail | null;
   item: ItemDetail | null;
 }
 
