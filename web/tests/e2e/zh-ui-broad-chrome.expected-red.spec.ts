@@ -4,6 +4,13 @@ import { expect, test } from './fixtures';
 
 const redExpect = expect.configure({ timeout: 250, soft: true });
 
+const preAuthLanguageFixtureKey = 'resofeed.e2e.preAuthLanguage';
+const preAuthZhLanguageFixture = {
+  code: 'zh',
+  label: '中文',
+  authority: 'e2e-fixture:zh-ui-preauth-language-test-contract-fix'
+} as const;
+
 type SourceFixture = {
   readonly id: string;
   readonly url: string;
@@ -182,6 +189,15 @@ async function fulfillJson(route: Route, payload: unknown, status = 200): Promis
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
 }
 
+async function installPreAuthZhLanguageFixture(page: Page): Promise<void> {
+  // B-ZH-TOKEN-06: make the expected-red pre-auth zh authority explicit instead of
+  // relying on the authenticated /api/runtime/language ordering from docs/ARCHITECTURE.md.
+  await page.addInitScript(
+    ({ key, value }) => window.localStorage.setItem(key, JSON.stringify(value)),
+    { key: preAuthLanguageFixtureKey, value: preAuthZhLanguageFixture }
+  );
+}
+
 async function installBroadZhFixtures(page: Page, ownerToken: string, mode: 'populated' | 'empty'): Promise<void> {
   await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
 
@@ -215,8 +231,11 @@ async function installBroadZhFixtures(page: Page, ownerToken: string, mode: 'pop
 }
 
 test.describe('expected-red zh UI chrome localization matrix', () => {
-  test('owner token prompt exposes zh auth chrome gap before implementation', async ({ page }) => {
+  test('owner token prompt exposes zh auth chrome gap from explicit pre-auth language fixture', async ({ page }) => {
+    await installPreAuthZhLanguageFixture(page);
     await page.goto('/');
+
+    await expect(page.evaluate((key) => window.localStorage.getItem(key), preAuthLanguageFixtureKey)).resolves.toContain('"authority":"e2e-fixture:zh-ui-preauth-language-test-contract-fix"');
 
     await redExpect(page.getByRole('heading', { name: '输入所有者令牌' })).toBeVisible();
     await redExpect(page.getByLabel('所有者令牌')).toBeVisible();
