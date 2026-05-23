@@ -1,0 +1,52 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 2262
+Content-Type: text/html; charset=utf-8
+Last-Modified: Sat, 23 May 2026 22:25:01 GMT
+Date: Sat, 23 May 2026 22:34:10 GMT
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="./_app/immutable/entry/start.BPqfAfq_.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DJuPrp6c.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DaVcBp4o.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.BtcZq-rG.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/kH4vaPyF.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BdyGKox4.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DoJSQfNp.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/D2c8ttWm.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/0.BwInPy_4.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/2.BRKqaLVp.js" rel="modulepreload">
+		
+		<link href="./_app/immutable/assets/0.CINZNRJE.css" rel="stylesheet">
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div><!--[--><!--[0--><!--[--><!--[--><main class="contract-shell resofeed-shell" aria-label="RESOFEED"><!--[0--><section class="contract-region contract-token-prompt" aria-label="RESOFEED owner token prompt"><p class="contract-label">RESOFEED</p> <h1 id="owner-token-heading">Enter owner token</h1> <form class="contract-token-form"><label class="visually-hidden" for="owner-token-input">Owner token</label> <input id="owner-token-input" value="" name="owner-token" type="password" autocomplete="off" aria-describedby="owner-token-error"/> <button class="bracket-action" type="submit" disabled="">[SUBMIT]</button></form> <!--[-1--><!--]--></section><!--]--></main><!--]--><!----><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_zu4pxs = {
+						base: new URL(".", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("./_app/immutable/entry/start.BPqfAfq_.js"),
+						import("./_app/immutable/entry/app.BtcZq-rG.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+  </body>
+</html>

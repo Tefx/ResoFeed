@@ -1,0 +1,23 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt":
+    - text: "applied: source added: hnrss.org/newest; source ledger records it; background ingest will pick it up"
+    - button "[UNDO]"
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - region "First use":
+      - paragraph: Paste RSS URL in Steer or import OPML.
+      - paragraph: Inspect opens the item.
+      - paragraph: Star preserves durable value.
+      - paragraph: Steer is optional correction.
+  - complementary "Detail independent scroll":
+    - paragraph: INSPECTOR

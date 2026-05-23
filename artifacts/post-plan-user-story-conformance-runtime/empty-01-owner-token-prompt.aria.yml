@@ -1,0 +1,7 @@
+- main "RESOFEED":
+  - region "RESOFEED owner token prompt":
+    - paragraph: RESOFEED
+    - heading "Enter owner token" [level=1]
+    - text: Owner token
+    - textbox "Owner token"
+    - button "[SUBMIT]" [disabled]

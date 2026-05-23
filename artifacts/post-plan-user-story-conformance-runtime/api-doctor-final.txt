@@ -1,0 +1,55 @@
+rss: ok
+openrouter: provider_reachable=unknown configured_model=account_default
+openrouter: model_resolved=false resolved_model=unknown
+openrouter: item_transform_failures=20
+openrouter: current_item_transform_failures=20 historic_item_transform_failures=0
+openrouter: live_summary_successes=0 fallback_only_current_summaries=20
+openrouter: health_classification=openrouter_client_timeout_or_error
+openrouter: failures=20
+openrouter: item=item_338912ef85fd6a728db03efe7a0bcf14 source=src_6a418c5313a09d59 status=summary_unavailable title=Green card seekers must leave U.S. to apply, Trump administration says
+openrouter: item=item_33892a117ffd6a728db03efe839ebac8 source=src_6a418c5313a09d59 status=summary_unavailable title=Hengefinder: Finding When the Sun Aligns with Your Street
+openrouter: item=item_33908aaf1dfd6a728db03f00c6719b57 source=src_6a418c5313a09d59 status=summary_unavailable title=SpaceX launches Starship v3 rocket
+openrouter: item=item_336c7d5a14fd6a728db03ef5cf1e1560 source=src_6a418c5313a09d59 status=summary_unavailable title=Spanish court declines to fine NordVPN over LaLiga piracy blocking order
+openrouter: item=item_336c8229c7fd6a728db03ef5d125675f source=src_6a418c5313a09d59 status=summary_unavailable title=Rubish: A Unix shell written in pure Ruby
+openrouter: item=item_3374873a6dfd6a728db03ef8579c3af5 source=src_6a418c5313a09d59 status=summary_unavailable title=-​-dangerously-skip-reading-code
+openrouter: item=item_33746b68d0fd6a728db03ef84c15c22d source=src_6a418c5313a09d59 status=summary_unavailable title=Making Deep Learning Go Brrrr from First Principles (2022)
+openrouter: item=item_3374702bdbfd6a728db03ef84e151371 source=src_6a418c5313a09d59 status=summary_unavailable title=Electrobun 2.0 will be decoupled from Bun due to the Rust rewrite
+openrouter: item=item_337c03af0ffd6a728db03efaa5f932d7 source=src_6a418c5313a09d59 status=summary_unavailable title=80386 Microcode Disassembled
+openrouter: item=item_337c0d1349fd6a728db03efaa9e35e09 source=src_6a418c5313a09d59 status=summary_unavailable title=The Art of Money Getting
+openrouter: item=item_337bdff8c7fd6a728db03efa97745296 source=src_6a418c5313a09d59 status=summary_unavailable title=Oura says it gets government demands for user data
+openrouter: item=item_337c0883a7fd6a728db03efaa803836b source=src_6a418c5313a09d59 status=summary_unavailable title=On The <dl> (2021)
+openrouter: item=item_3346b6bca9fd6a728db03eea22a74ea1 source=src_6a418c5313a09d59 status=summary_unavailable title=z386: An Open-Source 80386 Built Around Original Microcode
+openrouter: item=item_3346c01c5ffd6a728db03eea268ef299 source=src_6a418c5313a09d59 status=summary_unavailable title=Lisp in Vim (2019)
+openrouter: item=item_334692fc74fd6a728db03eea141c4625 source=src_6a418c5313a09d59 status=summary_unavailable title=Evaluating Spec CPU2026
+openrouter: item=item_3346977ff8fd6a728db03eea15f4c9d6 source=src_6a418c5313a09d59 status=summary_unavailable title=Reverse engineering circuitry in a Spacelab computer from 1980
+openrouter: item=item_3346b23b9ffd6a728db03eea20d05375 source=src_6a418c5313a09d59 status=summary_unavailable title=Italy moves to Airbus A330 tankers
+openrouter: item=item_334e0aad8dfd6a728db03eec607951b9 source=src_6a418c5313a09d59 status=summary_unavailable title=Texas woman arrested for Facebook post about town water quality
+openrouter: item=item_3ef9192d2dfd6a728db041cecb066eec source=src_6a418c5313a09d59 status=summary_unavailable title=It's time to talk about my writerdeck
+openrouter: item=item_3ee9a59c2dfd6a728db041c9fbfd2e28 source=src_6a418c5313a09d59 status=summary_unavailable title=Markdown Is Not LaTeX
+fallback_provenance: item=item_338912ef85fd6a728db03efe7a0bcf14 summary=excerpt model_status=summary_unavailable extraction_status=partial_extraction
+fallback_provenance: item=item_33892a117ffd6a728db03efe839ebac8 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_33908aaf1dfd6a728db03f00c6719b57 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_336c7d5a14fd6a728db03ef5cf1e1560 summary=excerpt model_status=summary_unavailable extraction_status=partial_extraction
+fallback_provenance: item=item_336c8229c7fd6a728db03ef5d125675f summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3374873a6dfd6a728db03ef8579c3af5 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_33746b68d0fd6a728db03ef84c15c22d summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3374702bdbfd6a728db03ef84e151371 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_337c03af0ffd6a728db03efaa5f932d7 summary=excerpt model_status=summary_unavailable extraction_status=partial_extraction
+fallback_provenance: item=item_337c0d1349fd6a728db03efaa9e35e09 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_337bdff8c7fd6a728db03efa97745296 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_337c0883a7fd6a728db03efaa803836b summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3346b6bca9fd6a728db03eea22a74ea1 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3346c01c5ffd6a728db03eea268ef299 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_334692fc74fd6a728db03eea141c4625 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3346977ff8fd6a728db03eea15f4c9d6 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3346b23b9ffd6a728db03eea20d05375 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_334e0aad8dfd6a728db03eec607951b9 summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3ef9192d2dfd6a728db041cecb066eec summary=excerpt model_status=summary_unavailable extraction_status=full
+fallback_provenance: item=item_3ee9a59c2dfd6a728db041c9fbfd2e28 summary=excerpt model_status=summary_unavailable extraction_status=full
+search_fts: ok
+extraction: failures=3
+extraction: item=item_338912ef85fd6a728db03efe7a0bcf14 source=src_6a418c5313a09d59 status=partial_extraction title=Green card seekers must leave U.S. to apply, Trump administration says
+extraction: item=item_336c7d5a14fd6a728db03ef5cf1e1560 source=src_6a418c5313a09d59 status=partial_extraction title=Spanish court declines to fine NordVPN over LaLiga piracy blocking order
+extraction: item=item_337c03af0ffd6a728db03efaa5f932d7 source=src_6a418c5313a09d59 status=partial_extraction title=80386 Microcode Disassembled
+ingest: last_run=2026-05-23T22:33:21Z
+ingest: first_fetch_limit=20

@@ -1,0 +1,1 @@
+"- main \"RESOFEED\":\n  - region \"RESOFEED owner token prompt\":\n    - paragraph: RESOFEED\n    - heading \"Enter owner token\" [level=1]\n    - text: Owner token\n    - textbox \"Owner token\"\n    - button \"[SUBMIT]\" [disabled]"

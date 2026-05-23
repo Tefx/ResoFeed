@@ -1,0 +1,38 @@
+[
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "location": {
+      "url": "http://127.0.0.1:18083/api/sources",
+      "lineNumber": 0,
+      "columnNumber": 0
+    }
+  },
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "location": {
+      "url": "http://127.0.0.1:18083/api/runtime/language",
+      "lineNumber": 0,
+      "columnNumber": 0
+    }
+  },
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "location": {
+      "url": "http://127.0.0.1:18083/api/runtime/openrouter-models",
+      "lineNumber": 0,
+      "columnNumber": 0
+    }
+  },
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "location": {
+      "url": "http://127.0.0.1:18083/api/feed/today?limit=50",
+      "lineNumber": 0,
+      "columnNumber": 0
+    }
+  }
+]

@@ -1,0 +1,17 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+Independent scroll region
+
+Paste RSS URL in Steer or import OPML.
+
+Inspect opens the item.
+
+Star preserves durable value.
+
+Steer is optional correction.
+
+INSPECTOR

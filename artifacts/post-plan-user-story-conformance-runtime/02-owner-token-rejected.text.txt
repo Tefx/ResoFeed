@@ -1,0 +1,7 @@
+RESOFEED
+
+Enter owner token
+Owner token
+[SUBMIT]
+
+err: owner token rejected

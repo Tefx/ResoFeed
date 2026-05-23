@@ -1,0 +1,22 @@
+{
+  "schema_version": "resofeed.state.v1",
+  "exported_at": "2026-05-23T22:33:23.159669Z",
+  "sources": [
+    {
+      "id": "src_6a418c5313a09d59",
+      "url": "https://hnrss.org/frontpage",
+      "title": "Hacker News: Front Page"
+    }
+  ],
+  "steer_rules": [
+    {
+      "id": "rule_a331c11a01f8d960",
+      "rule_text": "boost infrastructure analysis"
+    },
+    {
+      "id": "rule_a71450de20bd48fb",
+      "rule_text": "boost technical about distributed systems"
+    }
+  ],
+  "resonated_items": []
+}

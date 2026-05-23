@@ -1,0 +1,106 @@
+[
+  {
+    "name": "01-owner-token-prompt",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Unauthenticated runtime presents owner-token prompt from real Go server.",
+    "text_sample": "RESOFEED\n\nEnter owner token\nOwner token\n[SUBMIT]"
+  },
+  {
+    "name": "02-owner-token-rejected",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Invalid token interaction yields raw rejection line.",
+    "text_sample": "RESOFEED\n\nEnter owner token\nOwner token\n[SUBMIT]\n\nerr: owner token rejected"
+  },
+  {
+    "name": "03-authenticated-today-feed",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Valid token loads populated Today feed from ingested RSS source.",
+    "text_sample": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nSteer route preview\nURL required\n\nagent:delivery-bot steering active: boost infrastructure analysis · correct in Steer\n\nIndependent scroll region\nToday feed items\n\nsrc: Hacker News: Front Page\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n★\n\nsrc: Hacker News: Front Page\n·\n3h\n·\nfull\n·\nfallback\n·\nquality: full\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\nfull\n·\nfallback\n·\nquality: full\n\nTexas woman arrested for Facebook post about town water quality\n\nArticle URL: https://reclaimthenet. org/texas-woman-arrested-for-facebook-post-about-town-water-quality Comments URL: https://news"
+  },
+  {
+    "name": "04-inspector-after-feed-click",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Feed item click opens Inspector and marks Inspect via UI flow.",
+    "text_sample": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nSteer route preview\nURL required\n\nagent:delivery-bot steering active: boost infrastructure analysis · correct in Steer\n\nIndependent scroll region\nToday feed items\n\nsrc: Hacker News: Front Page\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n★\n\nsrc: Hacker News: Front Page\n·\n3h\n·\nfull\n·\nfallback\n·\nquality: full\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\nfull\n·\nfallback\n·\nquality: full\n\nTexas woman arrested for Facebook post about town water quality\n\nArticle URL: https://reclaimthenet. org/texas-woman-arrested-for-facebook-post-about-town-water-quality Comments URL: https://news"
+  },
+  {
+    "name": "05-resonate-toggle",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Resonate star toggled from feed row; star shape/state visible.",
+    "text_sample": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nSteer route preview\nURL required\n\nagent:delivery-bot steering active: boost infrastructure analysis · correct in Steer\n\nIndependent scroll region\nToday feed items\n\nsrc: Hacker News: Front Page\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n3h\n·\nfull\n·\nfallback\n·\nquality: full\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\nfull\n·\nfallback\n·\nquality: full\n\nTexas woman arrested for Facebook post about town water quality\n\nArticle URL: https://reclaimthenet. org/texas-woman-arrested-for-facebook-post-about-town-water-quality Comments URL: https://news"
+  },
+  {
+    "name": "click:open item re-ingest panel",
+    "url": "http://127.0.0.1:18083/"
+  },
+  {
+    "name": "06-inspector-reingest-prompt-configured",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Inspector-only re-ingest panel accepts one-time prompt; model list unavailable because OPENROUTER_KEY is absent.",
+    "text_sample": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\nSteer route preview\nURL required\n\nagent:delivery-bot steering active: boost infrastructure analysis · correct in Steer\n\nIndependent scroll region\nToday feed items\n\nsrc: Hacker News: Front Page\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n3h\n·\nfull\n·\nfallback\n·\nquality: full\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\nfull\n·\nfallback\n·\nquality: full\n\nTexas woman arrested for Facebook post about town water quality\n\nArticle URL: https://reclaimthenet. org/texas-woman-arrested-for-facebook-post-about-town-water-quality Comments URL: https://news"
+  },
+  {
+    "name": "07-resofeed-menu-open",
+    "url": "http://127.0.0.1:18083/",
+    "note": "RESOFEED menu exposes NAV/OPERATIONS including language/reprocess controls.",
+    "text_sample": "skip to feed\nSteer or paste RSS URL\n>\nRESOFEED\n\nNAV\n\nTODAY\nSOURCE LEDGER\n\nOPERATIONS\n\nLANG: EN\nExisting readable item content will be rewritten.\nSource identifiers remain unchanged.\n[REPROCESS LIBRARY]\nSteer route preview\nURL required\n\nagent:delivery-bot steering active: boost infrastructure analysis · correct in Steer\n\nIndependent scroll region\nToday feed items\n\nsrc: Hacker News: Front Page\n·\n1m\n·\nfull\n·\nfallback\n·\nquality: full\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n3h\n·\nfull\n·\nfallback\n·\nquality: full\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\nfull\n·\nfallback\n·\nquality: full\n\nTexas woman arrested for Facebook post a"
+  },
+  {
+    "name": "08-language-zh-chrome",
+    "url": "http://127.0.0.1:18083/",
+    "note": "Language switch updates html lang and localized chrome; source identifiers remain literal.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n\n导航\n\nTODAY\nSOURCE LEDGER\n\n操作\n\n语言: 中文\n已存可读内容将被重写。\n来源标识保持不变。\n[重处理资料库]\n导向路由预览\nURL required\n\n语言已设为中文\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\n独立滚动区域\n今日订阅条目\n\nsrc: Hacker News: Front Page\n·\n1m\n·\n全文\n·\n回退\n·\n质量: 全文\nTODAY\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n3h\n·\n全文\n·\n回退\n·\n质量: 全文\n\nIt's time to talk about my writerdeck\n\nArticle URL: https://veronicaexplains. net/my-first-writerdeck/ Comments URL: https://news. ycombinator. com/item? id=48250144 Points: 174 # Comments: 99\n\n☆\n\nsrc: Hacker News: Front Page\n·\n4h\n·\n全文\n·\n回退\n·\n质量: 全文\n\nTexas woman arrested for Facebook post about town water quality\n\nArticle URL: https://reclaimthenet. org/texas-woman-arrested-for-facebook-post-about-town-water-quality Comments URL: https://news. ycombinator. com/item? id=48249747 Po"
+  },
+  {
+    "name": "09-source-ledger-zh",
+    "url": "http://127.0.0.1:18083/source-ledger",
+    "note": "Source Ledger reachable from menu; flat source row and state actions visible in zh runtime.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\nSOURCE LEDGER\n上次抓取: 22:32:57\n[运行抓取]\n[导入 OPML]\n[导出状态]\n[导入状态]\n状态 JSON 导入输入\n导入会替换活动来源、规则和星标\nsrc: Hacker News: Front Page · status: ok · 上次抓取: 22:32:57\nurl: https://hnrss.org/frontpage\n上次抓取: 22:32:57\n[抓取]\n[删除]\n[详情]"
+  },
+  {
+    "name": "click:per-source fetch",
+    "url": "http://127.0.0.1:18083/source-ledger"
+  },
+  {
+    "name": "10-source-ledger-after-fetch",
+    "url": "http://127.0.0.1:18083/source-ledger",
+    "note": "Per-source fetch button interaction completed or reported inline status without jobs/dashboard.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\nSOURCE LEDGER\n上次抓取: 22:33:21\n[运行抓取]\n[导入 OPML]\n[导出状态]\n[导入状态]\n状态 JSON 导入输入\n导入会替换活动来源、规则和星标\nsrc: Hacker News: Front Page · status: ok · 上次抓取: 22:33:21\nurl: https://hnrss.org/frontpage\n上次抓取: 22:33:21\n[抓取]\n[删除]\n[详情]"
+  },
+  {
+    "name": "click:export state",
+    "url": "http://127.0.0.1:18083/source-ledger"
+  },
+  {
+    "name": "download:state-export",
+    "suggestedFilename": "state.json"
+  },
+  {
+    "name": "11-state-export-interaction",
+    "url": "http://127.0.0.1:18083/source-ledger",
+    "note": "State export action invoked from Source Ledger utility surface.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\nSOURCE LEDGER\n上次抓取: 22:33:21\n[运行抓取]\n[导入 OPML]\n[导出状态]\n[导入状态]\n状态 JSON 导入输入\n导入会替换活动来源、规则和星标\n已导出 state.json\nsrc: Hacker News: Front Page · status: ok · 上次抓取: 22:33:21\nurl: https://hnrss.org/frontpage\n上次抓取: 22:33:21\n[抓取]\n[删除]\n[详情]"
+  },
+  {
+    "name": "12-doctor-from-steer",
+    "url": "http://127.0.0.1:18083/doctor",
+    "note": "Steer /doctor command renders raw diagnostics text.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\n/doctor\nrss: ok\nopenrouter: provider_reachable=unknown configured_model=account_default\nopenrouter: model_resolved=false resolved_model=unknown\nopenrouter: item_transform_failures=20\nopenrouter: current_item_transform_failures=20 historic_item_transform_failures=0\nopenrouter: live_summary_successes=0 fallback_only_current_summaries=20\nopenrouter: health_classification=openrouter_client_timeout_or_error\nopenrouter: failures=20\nopenrouter: item=item_338912ef85fd6a728db03efe7a0bcf14 source=src_6a418c5313a09d59 status=summary_unavailable title=Green card seekers must leave U.S. to apply, Trump administration says\nopenrouter: item=item_33892a117ffd6a728db03efe839ebac8 source=src_6a418c5313a09d59 status=summary_unavailable title=Hengefinder: Finding When the Sun Aligns with Your Street\nopenrouter: item=item_33908aaf1dfd6a728db03f00c6719b57 source=src_6a418c531"
+  },
+  {
+    "name": "13-search-from-steer",
+    "url": "http://127.0.0.1:18083/?search=Markdown",
+    "note": "Steer search command opens lexical search surface with result/provenance list.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\n检索：词汇搜索\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\n独立滚动区域\n搜索\n纯文本查询\n[搜索]\n筛选\n\n2 条结果\n\nsrc: Hacker News: Front Page\n·\n29m\nTODAY\n\n提取：全文\n匹配：词汇索引\n来源支持\n质量: 全文\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n12h\nYESTERDAY\n\n提取：全文\n匹配：词汇索引\n来源支持\n质量: 全文\n\n-​-dangerously-skip-reading-code\n\nArticle URL: https://olano. dev/blog/dangerously-skip/ Comments URL: https://news. ycombinator. com/item? id=48246232 Points: 75 # Comments: 89\n\n☆\n\nINSPECTOR\n\nsrc: Hacker News: Front Page · 全文\n\nMarkdown Is Not LaTeX\n\n原文链接\nhttps://www.iconoclasts.blog/joe/markdown-is-not-latex\n\nhttps://www.iconoclasts.blog/joe/markdown-is-not-latex\nhttps://hnrss.org/frontpage\n\n中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录\n\n出处记录：\n\n为什么：来自已配置来源的新条目"
+  },
+  {
+    "name": "click:inspect search result",
+    "url": "http://127.0.0.1:18083/?search=Markdown"
+  },
+  {
+    "name": "14-search-result-inspector",
+    "url": "http://127.0.0.1:18083/?search=Markdown",
+    "note": "Search result selection keeps search slice visible and updates Inspector on desktop.",
+    "text_sample": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\nURL required\n\n语言已设为中文\n\n检索：词汇搜索\n\nagent:delivery-bot 导向生效：boost infrastructure analysis · 在导向中修正\n\n独立滚动区域\n搜索\n纯文本查询\n[搜索]\n筛选\n\n2 条结果\n\nsrc: Hacker News: Front Page\n·\n29m\nTODAY\n\n提取：全文\n匹配：词汇索引\n来源支持\n质量: 全文\n\nMarkdown Is Not LaTeX\n\nArticle URL: https://www. iconoclasts. blog/joe/markdown-is-not-latex Comments URL: https://news. ycombinator. com/item? id=48252007 Points: 7 # Comments: 0\n\n☆\n\nsrc: Hacker News: Front Page\n·\n12h\nYESTERDAY\n\n提取：全文\n匹配：词汇索引\n来源支持\n质量: 全文\n\n-​-dangerously-skip-reading-code\n\nArticle URL: https://olano. dev/blog/dangerously-skip/ Comments URL: https://news. ycombinator. com/item? id=48246232 Points: 75 # Comments: 89\n\n☆\n\nINSPECTOR\n\nsrc: Hacker News: Front Page · 全文\n\nMarkdown Is Not LaTeX\n\n原文链接\nhttps://www.iconoclasts.blog/joe/markdown-is-not-latex\n\nhttps://www.iconoclasts.blog/joe/markdown-is-not-latex\nhttps://hnrss.org/frontpage\n\n中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录\n\n出处记录：\n\n为什么：来自已配置来源的新条目"
+  }
+]

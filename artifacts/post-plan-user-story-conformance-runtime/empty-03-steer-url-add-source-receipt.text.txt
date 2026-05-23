@@ -1,0 +1,19 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+applied: source added: hnrss.org/newest; source ledger records it; background ingest will pick it up
+[UNDO]
+Independent scroll region
+
+Paste RSS URL in Steer or import OPML.
+
+Inspect opens the item.
+
+Star preserves durable value.
+
+Steer is optional correction.
+
+INSPECTOR

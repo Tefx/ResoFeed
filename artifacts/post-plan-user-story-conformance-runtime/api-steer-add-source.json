@@ -1,0 +1,1 @@
+{"receipt":{"interpreted_as":"add_source","changed_rules":[],"message":"source added: hnrss.org; visible in SOURCE LEDGER; use [RUN INGEST] or row [FETCH] there for immediate refresh"},"undo_handle":{"route_kind":"source","target":{"kind":"source","id":"src_6a418c5313a09d59"},"revision":1}}
