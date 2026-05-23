@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary } from '$lib/api-contract';
-  import { compareItemsByTimeGroup, itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage } from '$lib/api-contract';
+  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -10,12 +10,14 @@
     hasMore?: boolean;
     loadingMore?: boolean;
     onLoadMore?: () => Promise<void> | void;
+    language?: ProcessingLanguage;
   }
 
-  let { items, selectedItemId = null, onSelect, onResonanceToggle, hasMore = false, loadingMore = false, onLoadMore }: Props = $props();
+  let { items, selectedItemId = null, onSelect, onResonanceToggle, hasMore = false, loadingMore = false, onLoadMore, language = 'en' }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const feedTimeGroupReference = $derived(feedReferenceNow(items));
+  const chrome = $derived(itemAnatomyChrome(language));
   const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item, feedTimeGroupReference) || left.index - right.index)
@@ -50,8 +52,8 @@
 </script>
 
 <section class="contract-region" aria-labelledby="feed-heading">
-  <h2 id="feed-heading" class="visually-hidden" tabindex="-1">Today feed items</h2>
-  <div role="list" aria-label="Today feed items">
+  <h2 id="feed-heading" class="visually-hidden" tabindex="-1">{chrome.feed.listLabel}</h2>
+  <div role="list" aria-label={chrome.feed.listLabel}>
     {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>
         <button
@@ -61,20 +63,20 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span>
-            <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
-            <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>{itemExtractionLabel(item.extraction_status)}</span>
-            <span class="feed-meta-separator feed-meta-secondary" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={`Summary provenance: ${itemSummaryProvenanceLabel(item)}`}>{itemSummaryProvenanceLabel(item)}</span>
-            <span class="feed-meta-separator feed-meta-secondary" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={`Priority signal: ${itemPriorityLabel(item)}`}>{itemPriorityLabel(item)}</span>
+            <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
+            <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
+            <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(itemExtractionLabel(item.extraction_status, language))}>{itemExtractionLabel(item.extraction_status, language)}</span>
+            <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.summaryProvenanceAria(itemSummaryProvenanceLabel(item, language))}>{itemSummaryProvenanceLabel(item, language)}</span>
+            <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
             {#if item.external_surfaced_at}
-              <span class="feed-meta-separator feed-meta-agent" aria-hidden="true">·</span> <span class="feed-meta-agent" aria-label="Externally surfaced by agent">agent:external</span>
+              <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-agent" aria-label={chrome.feed.externallySurfacedByAgent}>agent:external</span>
             {/if}
             {#if shouldShowTimeGroup(groupedItems, index, feedTimeGroupReference)}
               <span class="contract-time-label">{itemTimeGroup(item, feedTimeGroupReference)}</span>
             {/if}
           </p>
           <p class="contract-feed-title">{item.title}</p>
-          <p class="contract-feed-summary">{itemSummaryText(item)}</p>
+          <p class="contract-feed-summary">{itemSummaryText(item, language)}</p>
         </button>
         <button
           class="contract-resonate"
@@ -93,9 +95,9 @@
     <button
       class="bracket-action feed-load-more"
       type="button"
-      aria-label="Load more feed items"
+      aria-label={chrome.feed.loadMoreAria}
       disabled={loadingMore}
       onclick={() => void loadMore()}
-    >{loadingMore ? '[LOADING]' : '[LOAD MORE]'}</button>
+    >{loadingMore ? chrome.feed.loading : chrome.feed.loadMore}</button>
   {/if}
 </section>

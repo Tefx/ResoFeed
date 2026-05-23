@@ -1,7 +1,148 @@
-import type { ItemSummary, Rfc3339UtcString } from '$lib/api-contract';
+import type { ItemSummary, ProcessingLanguage, Rfc3339UtcString } from '$lib/api-contract';
 import { itemDisplayExcerpt, itemDisplayTimestamp } from '$lib/api-contract';
 
 type TimeGroup = 'TODAY' | 'YESTERDAY' | 'EARLIER';
+type ExtractionLabelKey = ItemSummary['extraction_status'];
+type SummaryProvenanceKey = 'model-backed' | 'fallback' | 'source-backed';
+
+interface ItemAnatomyChrome {
+  readonly summaryUnavailable: string;
+  readonly timeUnavailable: string;
+  readonly age: (value: string) => string;
+  readonly extraction: Record<ExtractionLabelKey, string>;
+  readonly provenance: Record<SummaryProvenanceKey, string>;
+  readonly priority: {
+    readonly sourceBacked: string;
+    readonly qualityPrefix: string;
+    readonly valuePrefix: string;
+    readonly valueTier: Record<string, string>;
+  };
+  readonly feed: {
+    readonly listLabel: string;
+    readonly sourceAria: (sourceTitle: string) => string;
+    readonly ageAria: (age: string) => string;
+    readonly extractionAria: (status: string) => string;
+    readonly summaryProvenanceAria: (label: string) => string;
+    readonly priorityAria: (label: string) => string;
+    readonly externallySurfacedByAgent: string;
+    readonly loadMoreAria: string;
+    readonly loadMore: string;
+    readonly loading: string;
+  };
+  readonly search: {
+    readonly resultCount: (count: number) => string;
+    readonly searching: string;
+    readonly noResults: string;
+    readonly sourceAria: (sourceTitle: string) => string;
+    readonly ageAria: (age: string) => string;
+    readonly extractionAria: (status: string) => string;
+    readonly priorityAria: (label: string) => string;
+    readonly matchLexicalIndex: string;
+    readonly provenanceSourceBacked: string;
+    readonly externallySurfacedByAgent: string;
+  };
+}
+
+const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
+  en: {
+    summaryUnavailable: 'summary unavailable',
+    timeUnavailable: 'time unavailable',
+    age: (value) => value,
+    extraction: {
+      full: 'full',
+      partial_extraction: 'source excerpt',
+      summary_unavailable: 'excerpt',
+      original_unavailable: 'excerpt'
+    },
+    provenance: {
+      'model-backed': 'model-backed',
+      fallback: 'fallback',
+      'source-backed': 'source-backed'
+    },
+    priority: {
+      sourceBacked: 'quality: source-backed',
+      qualityPrefix: 'quality',
+      valuePrefix: 'value',
+      valueTier: {}
+    },
+    feed: {
+      listLabel: 'Today feed items',
+      sourceAria: (sourceTitle) => `Source: ${sourceTitle}`,
+      ageAria: (age) => `Age: ${age}`,
+      extractionAria: (status) => `Extraction: ${status}`,
+      summaryProvenanceAria: (label) => `Summary provenance: ${label}`,
+      priorityAria: (label) => `Priority signal: ${label}`,
+      externallySurfacedByAgent: 'Externally surfaced by agent',
+      loadMoreAria: 'Load more feed items',
+      loadMore: '[LOAD MORE]',
+      loading: '[LOADING]'
+    },
+    search: {
+      resultCount: (count) => `${count} results`,
+      searching: 'searching',
+      noResults: 'no results',
+      sourceAria: (sourceTitle) => `Source: ${sourceTitle}`,
+      ageAria: (age) => `Age: ${age}`,
+      extractionAria: (status) => `Extraction: ${status}`,
+      priorityAria: (label) => `Priority signal: ${label}`,
+      matchLexicalIndex: 'match: lexical index',
+      provenanceSourceBacked: 'provenance: source-backed',
+      externallySurfacedByAgent: 'Externally surfaced by agent'
+    }
+  },
+  zh: {
+    summaryUnavailable: '摘要不可用',
+    timeUnavailable: '时间不可用',
+    age: (value) => value,
+    extraction: {
+      full: '全文',
+      partial_extraction: '来源摘录',
+      summary_unavailable: '摘录',
+      original_unavailable: '摘录'
+    },
+    provenance: {
+      'model-backed': '模型支持',
+      fallback: '回退',
+      'source-backed': '来源支持'
+    },
+    priority: {
+      sourceBacked: '质量：来源支持',
+      qualityPrefix: '质量',
+      valuePrefix: '价值',
+      valueTier: {
+        'source-claim': '来源声明'
+      }
+    },
+    feed: {
+      listLabel: '今日订阅条目',
+      sourceAria: (sourceTitle) => `来源：${sourceTitle}`,
+      ageAria: (age) => `时间：${age}`,
+      extractionAria: (status) => `提取：${status}`,
+      summaryProvenanceAria: (label) => `摘要来源：${label}`,
+      priorityAria: (label) => `优先信号：${label}`,
+      externallySurfacedByAgent: '由代理外部推荐',
+      loadMoreAria: '加载更多订阅条目',
+      loadMore: '[加载更多]',
+      loading: '[加载中]'
+    },
+    search: {
+      resultCount: (count) => `${count} 条结果`,
+      searching: '搜索中',
+      noResults: '无结果',
+      sourceAria: (sourceTitle) => `来源：${sourceTitle}`,
+      ageAria: (age) => `时间：${age}`,
+      extractionAria: (status) => `提取：${status}`,
+      priorityAria: (label) => `优先信号：${label}`,
+      matchLexicalIndex: '匹配：词汇索引',
+      provenanceSourceBacked: '来源支持',
+      externallySurfacedByAgent: '由代理外部推荐'
+    }
+  }
+};
+
+export function itemAnatomyChrome(language: ProcessingLanguage = 'en'): ItemAnatomyChrome {
+  return itemChromeByLanguage[language];
+}
 const timeGroupOrder: Record<TimeGroup, number> = {
   TODAY: 0,
   YESTERDAY: 1,
@@ -53,8 +194,8 @@ export function readableItemText(text: string | null | undefined): string | null
   return normalized.length > 0 ? normalized : null;
 }
 
-export function itemSummaryText(item: ItemSummary): string {
-  return readableItemText(itemDisplayExcerpt(item)) ?? 'summary unavailable';
+export function itemSummaryText(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  return readableItemText(itemDisplayExcerpt(item)) ?? itemAnatomyChrome(language).summaryUnavailable;
 }
 
 export function itemTimestamp(item: ItemSummary): Rfc3339UtcString | null {
@@ -76,18 +217,19 @@ export function itemTimeGroup(item: ItemSummary, now = new Date()): TimeGroup {
   return 'EARLIER';
 }
 
-export function itemAgeLabel(item: ItemSummary, now = new Date()): string {
+export function itemAgeLabel(item: ItemSummary, now = new Date(), language: ProcessingLanguage = 'en'): string {
   const timestamp = itemTimestamp(item);
-  if (!timestamp) return 'time unavailable';
+  const chrome = itemAnatomyChrome(language);
+  if (!timestamp) return chrome.timeUnavailable;
   const date = new Date(timestamp);
   const diffMs = Math.max(0, now.getTime() - date.getTime());
   const minutes = Math.floor(diffMs / 60_000);
-  if (minutes < 60) return `${Math.max(1, minutes)}m`;
+  if (minutes < 60) return chrome.age(`${Math.max(1, minutes)}m`);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
+  if (hours < 24) return chrome.age(`${hours}h`);
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }).toLowerCase();
+  if (days < 7) return chrome.age(`${days}d`);
+  return date.toLocaleDateString(language === 'zh' ? 'zh-CN' : undefined, { month: 'short', day: 'numeric' }).toLowerCase();
 }
 
 export function compareItemsByTimeGroup(left: ItemSummary, right: ItemSummary, now = new Date()): number {
@@ -99,24 +241,26 @@ export function compareItemsByTimeGroup(left: ItemSummary, right: ItemSummary, n
   return 0;
 }
 
-export function itemExtractionLabel(status: ItemSummary['extraction_status']): string {
-  if (status === 'full') return 'full';
-  if (status === 'partial_extraction') return 'source excerpt';
-  return 'excerpt';
+export function itemExtractionLabel(status: ItemSummary['extraction_status'], language: ProcessingLanguage = 'en'): string {
+  return itemAnatomyChrome(language).extraction[status];
 }
 
-export function itemSummaryProvenanceLabel(item: ItemSummary): string {
-  if (readableItemText(itemDisplayExcerpt(item))) {
-    return item.model_status === 'ok' ? 'model-backed' : 'fallback';
-  }
-  return 'fallback';
+export function itemSummaryProvenanceLabel(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const provenance = itemAnatomyChrome(language).provenance;
+  if (readableItemText(itemDisplayExcerpt(item))) return item.model_status === 'ok' ? provenance['model-backed'] : provenance.fallback;
+  return provenance.fallback;
 }
 
-export function itemPriorityLabel(item: ItemSummary): string {
-  if (item.value_tier) return `value: ${item.value_tier}`;
-  if (item.model_status !== 'ok') return `quality: ${itemExtractionLabel(item.extraction_status)}`;
-  if (item.extraction_status !== 'full') return `quality: ${itemExtractionLabel(item.extraction_status)}`;
-  return 'quality: source-backed';
+export function itemSourceBackedProvenanceLabel(language: ProcessingLanguage = 'en'): string {
+  return itemAnatomyChrome(language).provenance['source-backed'];
+}
+
+export function itemPriorityLabel(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const chrome = itemAnatomyChrome(language).priority;
+  if (item.value_tier) return chrome.valueTier[item.value_tier] ?? `${chrome.valuePrefix}: ${item.value_tier}`;
+  if (item.model_status !== 'ok') return `${chrome.qualityPrefix}: ${itemExtractionLabel(item.extraction_status, language)}`;
+  if (item.extraction_status !== 'full') return `${chrome.qualityPrefix}: ${itemExtractionLabel(item.extraction_status, language)}`;
+  return chrome.sourceBacked;
 }
 
 export function shouldShowTimeGroup(items: ItemSummary[], index: number, now = new Date()): boolean {

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { processingLanguageRuntimeContract, type ItemSummary, type SearchResponse } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage, type SearchResponse } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
-  import { itemAgeLabel, itemExtractionLabel, itemPriorityLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemSourceBackedProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -12,9 +12,10 @@
     selectedItemId?: string | null;
     suppressStatusRole?: boolean;
     compactFilters?: boolean;
+    language?: ProcessingLanguage;
   }
 
-  let { items, query = '', onSearch, onSelect, onResonanceToggle, selectedItemId = null, suppressStatusRole = false, compactFilters = false }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResonanceToggle, selectedItemId = null, suppressStatusRole = false, compactFilters = false, language = 'en' }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -26,11 +27,12 @@
   let pendingResonanceId = $state<string | null>(null);
   let lastHandledSeedQuery = '';
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
+  const chrome = $derived(itemAnatomyChrome(language));
 
   $effect(() => {
     if (!query) {
       results = [];
-      statusText = '0 results';
+      statusText = chrome.search.resultCount(0);
       lastHandledSeedQuery = '';
       return;
     }
@@ -38,13 +40,13 @@
     if (query !== lastHandledSeedQuery) {
       lastHandledSeedQuery = query;
       results = items;
-      statusText = `${items.length} results`;
+      statusText = chrome.search.resultCount(items.length);
       void submitSearch(false);
     }
   });
 
   async function submitSearch(showLoading = true): Promise<void> {
-    if (showLoading) statusText = 'searching';
+    if (showLoading) statusText = chrome.search.searching;
     try {
       const response = await onSearch({
         q: searchQuery || undefined,
@@ -55,11 +57,11 @@
         limit
       });
       results = response.items;
-      statusText = `${response.items.length} results`;
+      statusText = chrome.search.resultCount(response.items.length);
     } catch (error) {
       results = [];
       const message = error instanceof Error ? error.message : 'err: search failed';
-      statusText = /err:\s*internal/i.test(message) ? '0 results' : message;
+      statusText = /err:\s*internal/i.test(message) ? chrome.search.resultCount(0) : message;
     }
   }
 
@@ -108,7 +110,7 @@
       </div>
     </details>
   </form>
-  <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || `${results.length} results`}</p>
+  <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
   <div role="region" aria-label="Search results">
     <div role="list" aria-label="Search result items">
       {#each results as item, index (item.id)}
@@ -120,24 +122,24 @@
             onclick={() => void openInspector(item)}
           >
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
-              <span class="feed-meta-source" aria-label={`Source: ${item.source_title}`} translate={sourceTitleTranslate}>src: {item.source_title}</span>
+              <span class="feed-meta-source" aria-label={chrome.search.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
               <span aria-hidden="true">·</span>
-              <span class="feed-meta-age" aria-label={`Age: ${itemAgeLabel(item)}`}>{itemAgeLabel(item)}</span>
+              <span class="feed-meta-age" aria-label={chrome.search.ageAria(itemAgeLabel(item, new Date(), language))}>{itemAgeLabel(item, new Date(), language)}</span>
               {#if shouldShowTimeGroup(results, index)}
                 <span class="contract-search-time-label">{itemTimeGroup(item)}</span>
               {/if}
             </p>
             <p class="contract-label contract-search-meta-secondary contract-search-match">
-              <span class="feed-meta-extraction" aria-label={`Extraction: ${item.extraction_status}`}>extraction: {itemExtractionLabel(item.extraction_status)}</span>
-              <span>match: lexical index</span>
-              <span>provenance: source-backed</span>
-              <span aria-label={`Priority signal: ${itemPriorityLabel(item)}`}>{itemPriorityLabel(item)}</span>
+              <span class="feed-meta-extraction" aria-label={chrome.search.extractionAria(itemExtractionLabel(item.extraction_status, language))}>extraction: {itemExtractionLabel(item.extraction_status, language)}</span>
+              <span>{chrome.search.matchLexicalIndex}</span>
+              <span>{language === 'zh' ? itemSourceBackedProvenanceLabel(language) : chrome.search.provenanceSourceBacked}</span>
+              <span aria-label={chrome.search.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
               {#if item.external_surfaced_at}
-                <span aria-label="Externally surfaced by agent">agent:external</span>
+                <span aria-label={chrome.search.externallySurfacedByAgent}>agent:external</span>
               {/if}
             </p>
             <p class="contract-feed-title">{item.title}</p>
-            <p class="contract-feed-summary">{itemSummaryText(item)}</p>
+            <p class="contract-feed-summary">{itemSummaryText(item, language)}</p>
           </button>
           <button
             class="contract-resonate"
@@ -153,7 +155,7 @@
       {/each}
     </div>
     {#if results.length === 0}
-      <p>no results</p>
+      <p>{chrome.search.noResults}</p>
     {/if}
   </div>
 </section>

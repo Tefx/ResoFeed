@@ -1058,11 +1058,11 @@
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {/if}
           {#if currentSurface === 'search'}
-            <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
+            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
           {:else if items.length === 0}
             <FirstUseEmptyState state={firstUseState} />
           {:else}
-            <Feed items={items} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
+            <Feed items={items} language={processingLanguage.code} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
           {/if}
         {/if}
       </section>
@@ -1100,7 +1100,7 @@
         {#if currentSurface === 'search'}
           <button class="back-command" type="button" onclick={() => showSurface('feed')}>back to TODAY</button>
         {/if}
-        <SearchRetrieval items={items} query={searchSeedQuery} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
+        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
       </section>
     {/if}
     {#if steerFeedback.kind === 'doctor'}
