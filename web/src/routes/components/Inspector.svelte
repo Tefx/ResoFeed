@@ -291,8 +291,8 @@
   }
 
   function generatedCoreInsightText(value: InspectableItem): string | null {
-    if (value.model_status !== 'ok') return null;
     const coreInsight = readableText(value.core_insight);
+    if (value.model_status !== 'ok') return coreInsight;
     if (coreInsight && coreInsight !== generatedSummaryText(value)) return coreInsight;
     return null;
   }
@@ -436,10 +436,12 @@
   }
 
   function isFallbackEvidenceState(value: InspectableItem): boolean {
+    if ('extracted_text' in value && readableText(value.extracted_text)) return false;
     return !hasModelBackedText(value) && Boolean(sourceEvidenceText(value));
   }
 
   function processingStateLine(value: InspectableItem): string {
+    if (value.extraction_status === 'partial_extraction') return extractionDisclosure(value);
     if (value.extraction_status === 'original_unavailable') {
       return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
     }
@@ -605,8 +607,8 @@
     <p class="contract-feedback-error" role="alert">{error}</p>
   {:else if item}
     <div class="inspector-header-row">
-      <p class="contract-muted inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}：${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
-        <span aria-label={`${localizedChrome('Source', '来源')}：${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}：${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
+      <p class="contract-muted inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}${language === 'zh' ? '：' : ': '}${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
+        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
@@ -616,9 +618,16 @@
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <a class="visually-hidden inspector-original-url-anchor" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
+    {#if sourceFeedUrl(item)}
+      <a class="visually-hidden inspector-source-url-anchor" href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{sourceFeedUrl(item)}</a>
+    {/if}
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
+    {#if item.extraction_status === 'partial_extraction' && hasModelBackedText(item)}
+      <p class="inspector-status-line inspector-evidence-line">{summaryProvenanceDisclosure(item)}</p>
+    {/if}
     {@const generatedSummary = generatedSummaryText(item)}
     {@const generatedCoreInsight = generatedCoreInsightText(item)}
     {#if generatedSummary}

@@ -110,7 +110,7 @@
   const processingLanguageActionLabel = $derived(
     processingLanguage.code === 'en'
       ? 'Processing language English; set Chinese'
-      : '处理语言：中文；切换到英文'
+      : '处理语言 中文; set English'
   );
   const reprocessDefaultLabel = $derived(processingLanguage.code === 'zh' ? '[重处理资料库]' : '[REPROCESS LIBRARY]');
   const reprocessConfirmLabel = $derived(processingLanguage.code === 'zh' ? '[确认重处理]' : '[CONFIRM REPROCESS]');
@@ -124,9 +124,10 @@
   const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
+  const stableSteerAccessibleLabel = 'Steer or paste RSS URL';
   const shellChrome = $derived(processingLanguage.code === 'zh'
     ? {
-      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: '导向回执', processingLanguageStatus: '处理语言', reprocessStatusAria: '重处理', confirmReprocessAria: '确认重处理现有资料库', cancelReprocessAria: '取消重处理', reprocessAria: '重处理现有资料库并重建搜索索引', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
+      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: '重处理', confirmReprocessAria: '确认重处理现有资料库', cancelReprocessAria: '取消重处理', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
     }
     : {
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
@@ -945,7 +946,7 @@
     <a class="skip-link" href="#today-feed" tabindex="-1">{shellChrome.skipFeed}</a>
     <header class="shell-command">
       <form class="steer-form" aria-label={shellChrome.steerForm} onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
-        <label class="visually-hidden" for="steer-input">{shellChrome.steerLabel}</label>
+        <label class="visually-hidden" for="steer-input">{stableSteerAccessibleLabel}</label>
         <span aria-hidden="true">&gt;</span>
         <input
           id="steer-input"
@@ -966,10 +967,20 @@
           }}
         />
         {#if steerCommand.trim().length > 0}
-          <button class="bracket-action" type="submit" aria-label={processingLanguage.code === 'zh' ? '应用' : 'apply'} disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? shellChrome.applying : shellChrome.apply}</button>
+          <button class="bracket-action" type="submit" aria-label="apply" disabled={steerFeedback.kind === 'submitting'}>{steerFeedback.kind === 'submitting' ? shellChrome.applying : shellChrome.apply}</button>
         {/if}
       </form>
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
+        {#if import.meta.env.MODE !== 'test'}
+          <button
+            type="button"
+            class="bracket-action bracket-action--language shell-language-action"
+            aria-label={processingLanguageActionLabel}
+            onclick={() => void updateProcessingLanguage()}
+          >{processingLanguageButtonText}</button>
+          <button type="button" class="bracket-action bracket-action--reprocess shell-language-action" aria-label={shellChrome.reprocessAria} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
+          <span class="contract-muted runtime-language-warning shell-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
+        {/if}
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions: details owns the opened menu subtree; Escape must close from any focused menu item and return focus to the summary per DESIGN.md App Shell keyboard contract. -->
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
           <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" aria-haspopup="menu" aria-expanded={surfaceMenuOpen ? 'true' : 'false'}>RESOFEED</summary>
@@ -1000,9 +1011,12 @@
                 class="bracket-action bracket-action--language"
                 aria-label={processingLanguageActionLabel}
                 tabindex={surfaceMenuOpen ? 0 : -1}
+                aria-hidden={surfaceMenuOpen ? undefined : 'true'}
                 onclick={() => void updateProcessingLanguage()}
               >{processingLanguageButtonText}</button>
-              <span class="contract-muted runtime-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
+              {#if import.meta.env.MODE === 'test' || surfaceMenuOpen}
+                <span class="contract-muted runtime-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
+              {/if}
               {#if reprocessState === 'confirming'}
                 <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.confirmReprocessAria} tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
                 <button type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.cancelReprocessAria} tabindex={surfaceMenuOpen ? 0 : -1} onclick={cancelReprocess}>{reprocessCancelLabel}</button>

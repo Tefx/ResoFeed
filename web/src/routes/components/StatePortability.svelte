@@ -33,7 +33,7 @@
       exporting: '[EXPORTING STATE...]',
       importState: '[IMPORT STATE]',
       importing: '[IMPORTING STATE...]',
-      input: 'State JSON import input',
+      input: 'Choose state JSON',
       warning: 'import replaces active sources, rules, and stars',
       imported: 'import complete',
       exported: 'exported state.json',

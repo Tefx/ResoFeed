@@ -128,28 +128,53 @@
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
       <button type="submit" class="bracket-action">{searchChrome.submit}</button>
     </div>
-    <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'} open>
-      <summary>{searchChrome.filtersSummary}</summary>
-      <div class="search-secondary-grid">
-        <label for="search-source">{searchChrome.source}</label>
-        <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
-        <label for="search-from">{searchChrome.from}</label>
-        <input id="search-from" name="from" type="date" bind:value={from} />
-        <label for="search-to">{searchChrome.to}</label>
-        <input id="search-to" name="to" type="date" bind:value={to} />
-        <label class="contract-checkbox" for="search-resonated">
-          <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
-          {searchChrome.resonated}
-        </label>
-        <label for="search-limit">{searchChrome.limit}</label>
-        <select id="search-limit" name="limit" bind:value={limit}>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
-      </div>
-    </details>
+    {#if compactFilters}
+      <details class="search-secondary-filters" data-compact-filters="true">
+        <summary>{searchChrome.filtersSummary}</summary>
+        <div class="search-secondary-grid">
+          <label for="search-source">{searchChrome.source}</label>
+          <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
+          <label for="search-from">{searchChrome.from}</label>
+          <input id="search-from" name="from" type="date" bind:value={from} />
+          <label for="search-to">{searchChrome.to}</label>
+          <input id="search-to" name="to" type="date" bind:value={to} />
+          <label class="contract-checkbox" for="search-resonated">
+            <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
+            {searchChrome.resonated}
+          </label>
+          <label for="search-limit">{searchChrome.limit}</label>
+          <select id="search-limit" name="limit" bind:value={limit}>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </div>
+      </details>
+    {:else}
+      <details class="search-secondary-filters" data-compact-filters="false">
+        <summary>{searchChrome.filtersSummary}</summary>
+        <div class="search-secondary-grid">
+          <label for="search-source">{searchChrome.source}</label>
+          <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
+          <label for="search-from">{searchChrome.from}</label>
+          <input id="search-from" name="from" type="date" bind:value={from} />
+          <label for="search-to">{searchChrome.to}</label>
+          <input id="search-to" name="to" type="date" bind:value={to} />
+          <label class="contract-checkbox" for="search-resonated">
+            <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
+            {searchChrome.resonated}
+          </label>
+          <label for="search-limit">{searchChrome.limit}</label>
+          <select id="search-limit" name="limit" bind:value={limit}>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </div>
+      </details>
+    {/if}
   </form>
   <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
   <div role="region" aria-label={searchChrome.resultsRegion}>

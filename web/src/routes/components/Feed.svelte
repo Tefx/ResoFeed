@@ -51,7 +51,7 @@
   }
 
   function openInspectorLabel(title: string): string {
-    return language === 'zh' ? `打开检查器：${title}` : `Open Inspector for: ${title}`;
+    return `Open Inspector for: ${title}`;
   }
 
   function resonanceLabel(item: ItemSummary): string {
@@ -74,7 +74,7 @@
           <p class="contract-label contract-feed-meta">
             <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
             <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
-            <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(itemExtractionLabel(item.extraction_status, language))}>{itemExtractionLabel(item.extraction_status, language)}</span>
+            <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(item.extraction_status)}>{itemExtractionLabel(item.extraction_status, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.summaryProvenanceAria(itemSummaryProvenanceLabel(item, language))}>{itemSummaryProvenanceLabel(item, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
             {#if item.external_surfaced_at}
