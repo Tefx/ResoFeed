@@ -17,6 +17,7 @@
     currentOperation?: CurrentOperationInfo | null;
     currentOperationStatusText?: string;
     suppressStatusRole?: boolean;
+    language?: 'en' | 'zh';
   }
 
   let {
@@ -29,7 +30,8 @@
     onImportState,
     currentOperation = null,
     currentOperationStatusText = '',
-    suppressStatusRole = false
+    suppressStatusRole = false,
+    language = 'en'
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
   let statusText = $state('');
@@ -45,7 +47,7 @@
   let sharedIngestConflictProbeKey: string | null = null;
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
-  const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText === 'ingest complete');
+  const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText.startsWith('上次抓取:') || globalIngestStatusText === 'ingest complete' || globalIngestStatusText === '抓取完成');
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
   const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
@@ -55,6 +57,73 @@
       ? `${currentOperation.kind}:${currentOperation.started_at ?? currentOperation.updated_at ?? 'unknown'}`
       : null
   );
+  const chrome = $derived(language === 'zh'
+    ? {
+      runIngest: '[运行抓取]',
+      ingesting: '[抓取中...]',
+      ledgerActions: '账本操作',
+      importOpml: '[导入 OPML]',
+      importingOpml: '[正在导入 OPML...]',
+      empty: '暂无来源。在导向栏粘贴 RSS URL。',
+      lastIngest: '上次抓取',
+      lastFetch: '上次抓取',
+      submittingIngest: '提交抓取',
+      ingestComplete: '抓取完成',
+      ingestFailed: '抓取失败',
+      fetchFailed: '抓取失败',
+      importComplete: (count: number) => `已导入 ${count} 个来源；文件夹已扁平化`,
+      importCompleteFallback: '已导入来源；文件夹已扁平化',
+      importFailed: 'err: 导入失败',
+      deleting: (title: string) => `正在删除 ${title}`,
+      deleted: (title: string) => `已删除 ${title}`,
+      deleteFailed: 'err: 删除失败',
+      fetch: '[抓取]',
+      fetching: '[抓取中...]',
+      fetchAria: (label: string) => `[抓取] 抓取来源 ${label}`,
+      fetchingAria: (label: string) => `[抓取中...] 抓取来源 ${label}`,
+      confirm: '[确认]',
+      confirmAria: (label: string) => `确认删除来源：${label}`,
+      delete: '[删除]',
+      deleteAria: (label: string) => `删除来源：${label}`,
+      details: '[详情]',
+      detailsAria: (label: string) => `诊断详情：${label}`,
+      notRun: '未运行',
+      notFetched: '未抓取',
+      complete: '完成'
+    }
+    : {
+      runIngest: '[RUN INGEST]',
+      ingesting: '[INGESTING...]',
+      ledgerActions: 'Ledger actions',
+      importOpml: '[IMPORT OPML]',
+      importingOpml: '[IMPORTING OPML...]',
+      empty: 'No sources. Paste RSS URL in Steer.',
+      lastIngest: 'last_ingest',
+      lastFetch: 'last_fetch',
+      submittingIngest: 'submitting ingest',
+      ingestComplete: 'ingest complete',
+      ingestFailed: 'ingest failed',
+      fetchFailed: 'fetch failed',
+      importComplete: (count: number) => `imported ${count} sources; folders flattened`,
+      importCompleteFallback: 'imported sources; folders flattened',
+      importFailed: 'err: import failed',
+      deleting: (title: string) => `deleting ${title}`,
+      deleted: (title: string) => `deleted ${title}`,
+      deleteFailed: 'err: delete failed',
+      fetch: '[FETCH]',
+      fetching: '[FETCHING...]',
+      fetchAria: (label: string) => `[FETCH] Fetch source ${label}`,
+      fetchingAria: (label: string) => `[FETCHING...] Fetch source ${label}`,
+      confirm: '[CONFIRM]',
+      confirmAria: (label: string) => `confirm delete source: ${label}`,
+      delete: '[DELETE]',
+      deleteAria: (label: string) => `Delete source: ${label}`,
+      details: '[DETAILS]',
+      detailsAria: (label: string) => `diagnostic details for ${label}`,
+      notRun: 'not_run',
+      notFetched: 'not_fetched',
+      complete: 'complete'
+    });
 
   function latestIngestStatusText(candidates: Source[]): string {
     const latest = candidates
@@ -62,7 +131,7 @@
       .filter((timestamp): timestamp is string => Boolean(timestamp))
       .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
     const formatted = formatLocalClockTime(latest);
-    return `last_ingest: ${formatted ?? 'not_run'}`;
+    return `${chrome.lastIngest}: ${formatted ?? chrome.notRun}`;
   }
 
   function compactSourceUrl(url: string): string {
@@ -102,14 +171,14 @@
   function statusTextForSource(source: Source, lastFetch: string | null): string {
     const feedback = sourceFeedbackById[source.id];
     if (feedback) return feedback;
-    if (hasGlobalIngestFeedback) return `last_fetch: ${lastFetch ?? 'not_fetched'}`;
+    if (hasGlobalIngestFeedback) return `${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
     if (source.last_fetch_error) return rawErrorText(source.last_fetch_error);
     if (source.last_fetch_status === 'rss_fetch_error') return 'err: rss_fetch_error';
-    return `last_fetch: ${lastFetch ?? 'not_fetched'}`;
+    return `${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
   }
 
   function rowGrammarForSource(source: Source, sourceLabel: string, lastFetch: string | null): string {
-    return `src: ${sourceLabel} · status: ${source.last_fetch_status} · last_fetch: ${lastFetch ?? 'not_fetched'}`;
+    return `src: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
   }
 
   function rawErrorText(message: string): string {
@@ -152,14 +221,14 @@
     globalIngestStatusText = '';
     try {
       await tick();
-      globalIngestStatusText = 'submitting ingest';
+      globalIngestStatusText = chrome.submittingIngest;
       const result = await onRunIngest();
       const completedAt = formatLocalClockTime(result.completed_at);
       globalIngestStatusText = result.completed
-        ? `last_ingest: ${completedAt ?? 'complete'}`
-        : rawErrorText(result.errors[0]?.message ?? 'ingest failed');
+          ? `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`
+          : rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
     } catch (error) {
-      globalIngestStatusText = error instanceof Error ? rawErrorText(error.message) : 'err: ingest failed';
+      globalIngestStatusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.ingestFailed);
     } finally {
       isRunningIngest = false;
     }
@@ -179,11 +248,11 @@
       setSourceFeedback(
         source.id,
         result.completed
-          ? `last_fetch: ${completedAt ?? 'complete'}`
-          : rawErrorText(errorMessage ?? source.last_fetch_error ?? 'fetch failed')
+          ? `${chrome.lastFetch}: ${completedAt ?? chrome.complete}`
+          : rawErrorText(errorMessage ?? source.last_fetch_error ?? chrome.fetchFailed)
       );
     } catch (error) {
-      setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : 'err: fetch failed');
+      setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.fetchFailed));
     } finally {
       if (ownsActivePendingState) fetchingSourceId = null;
     }
@@ -199,13 +268,13 @@
       const result = await onImportOpml(opml);
       importedTitleByUrl = { ...importedTitleByUrl, ...opmlTitleMap(opml) };
       statusText = result
-        ? `imported ${result.imported || result.skipped} sources; folders flattened`
-        : 'imported sources; folders flattened';
+        ? chrome.importComplete(result.imported || result.skipped)
+        : chrome.importCompleteFallback;
       if (importInput) importInput.value = '';
     } catch (error) {
       statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
         ? `imported ${sources.length} sources; folders flattened`
-        : error instanceof Error ? rawErrorText(error.message) : 'err: import failed';
+        : error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
     } finally {
       isImportingOpml = false;
     }
@@ -213,15 +282,15 @@
 
   async function confirmDelete(source: Source): Promise<void> {
     const sourceIndex = visibleSources.findIndex((candidate) => candidate.id === source.id);
-    statusText = `deleting ${source.title}`;
+    statusText = chrome.deleting(source.title);
     try {
       await onDeleteSource(source);
       confirmingSourceId = null;
       deletedSourceIds = new Set([...deletedSourceIds, source.id]);
-      statusText = `deleted ${source.title}`;
+      statusText = chrome.deleted(source.title);
       await focusAfterDeletion(source.id, sourceIndex);
     } catch (error) {
-      statusText = error instanceof Error ? rawErrorText(error.message) : 'err: delete failed';
+      statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.deleteFailed);
     }
   }
 
@@ -260,17 +329,17 @@
   <header class="source-ledger-head source-ledger__header">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
-    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? '[INGESTING...]' : '[RUN INGEST]'}</button>
+    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
   </header>
-  <div class="source-ledger__tools" aria-label="Ledger actions">
-    <button type="button" class="bracket-action bracket-action--import-opml" aria-label="[IMPORT OPML]" disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? '[IMPORTING OPML...]' : '[IMPORT OPML]'}</button>
-    <StatePortability onExportState={onExportState} onImportState={onImportState} />
+  <div class="source-ledger__tools" aria-label={chrome.ledgerActions}>
+    <button type="button" class="bracket-action bracket-action--import-opml" aria-label={chrome.importOpml} disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? chrome.importingOpml : chrome.importOpml}</button>
+    <StatePortability onExportState={onExportState} onImportState={onImportState} language={language} />
     {#if statusText}
       <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
     {/if}
   </div>
   {#if visibleSources.length === 0}
-    <p>No sources. Paste RSS URL in Steer.</p>
+    <p>{chrome.empty}</p>
   {:else}
     <ul class="contract-list source-ledger__list">
       {#each visibleSources as source (source.id)}
@@ -283,14 +352,14 @@
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
           <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" title={rowStatusText}>{rowStatusText}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? `[FETCHING...] Fetch source ${sourceA11yLabel(sourceLabel)}` : `[FETCH] Fetch source ${sourceA11yLabel(sourceLabel)}`} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? '[FETCHING...]' : '[FETCH]'}</button>
+            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? chrome.fetching : chrome.fetch}</button>
             {#if confirmingSourceId === source.id}
-              <button type="button" class="bracket-action bracket-action--confirm" aria-label={`confirm delete source: ${sourceLabel}`} onclick={() => void confirmDelete(source)}>[CONFIRM]</button>
+              <button type="button" class="bracket-action bracket-action--confirm" aria-label={chrome.confirmAria(sourceLabel)} onclick={() => void confirmDelete(source)}>{chrome.confirm}</button>
             {:else}
-              <button type="button" class="bracket-action bracket-action--delete" aria-label={`Delete source: ${sourceA11yLabel(sourceLabel)}`} onclick={() => (confirmingSourceId = source.id)}>[DELETE]</button>
+              <button type="button" class="bracket-action bracket-action--delete" aria-label={chrome.deleteAria(sourceA11yLabel(sourceLabel))} onclick={() => (confirmingSourceId = source.id)}>{chrome.delete}</button>
             {/if}
             <details class="source-diagnostic-details">
-              <summary aria-label={`diagnostic details for ${sourceA11yLabel(sourceLabel)}`} onkeydown={toggleDiagnosticFromKeyboard}>[DETAILS]</summary>
+              <summary aria-label={chrome.detailsAria(sourceA11yLabel(sourceLabel))} onkeydown={toggleDiagnosticFromKeyboard}>{chrome.details}</summary>
               <pre>{sourceDiagnosticText(source, lastFetch)}</pre>
             </details>
           </span>

@@ -49,6 +49,15 @@
   async function loadMore(): Promise<void> {
     await onLoadMore?.();
   }
+
+  function openInspectorLabel(title: string): string {
+    return language === 'zh' ? `打开检查器：${title}; Open Inspector for: ${title}` : `Open Inspector for: ${title}`;
+  }
+
+  function resonanceLabel(item: ItemSummary): string {
+    if (language === 'zh') return item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`;
+    return item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`;
+  }
 </script>
 
 <section class="contract-region" aria-labelledby="feed-heading">
@@ -59,7 +68,7 @@
         <button
           class="contract-feed-open"
           type="button"
-          aria-label={`Open Inspector for: ${item.title}`}
+          aria-label={openInspectorLabel(item.title)}
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
@@ -81,7 +90,7 @@
         <button
           class="contract-resonate"
           type="button"
-          aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
+          aria-label={resonanceLabel(item)}
           aria-pressed={item.is_resonated ? 'true' : 'false'}
           disabled={pendingResonanceId === item.id}
           onclick={() => void toggleResonance(item)}

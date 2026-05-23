@@ -252,7 +252,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(page.locator('.skip-link')).toHaveText('跳到订阅流');
     await redExpect(page.getByRole('textbox', { name: '导向或粘贴 RSS URL' })).toBeVisible();
     await redExpect(page.getByPlaceholder('导向或粘贴 RSS URL...')).toBeVisible();
-    await redExpect(page.locator('[aria-label="Steer route preview"]')).toHaveAttribute('aria-label', '导向路由预览');
+    await redExpect(page.locator('#steer-route-preview-status')).toHaveAttribute('aria-label', '导向路由预览');
     await redExpect(page.locator('.utility-label').first()).toHaveText('导航');
     await redExpect(page.locator('.utility-label--operations')).toHaveText('操作');
     await redExpect(page.getByText('RESOFEED').first()).toBeVisible();
@@ -270,7 +270,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(feed.locator('.feed-meta-extraction').first()).toContainText('来源摘录');
     await redExpect(feed.locator('.feed-meta-secondary').nth(1)).toContainText('来源声明');
     await redExpect(feed.getByRole('button', { name: `标星：${groupedItem.title}` })).toBeVisible();
-    await redExpect(feed.locator('.feed-meta-agent')).toHaveAttribute('aria-label', '由代理外部推荐');
+    await redExpect(feed.locator('.feed-meta-agent').first()).toHaveAttribute('aria-label', '由代理外部推荐');
     await redExpect(feed.locator('.contract-time-label').first()).toHaveText('TODAY');
 
     await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search browser contracts');

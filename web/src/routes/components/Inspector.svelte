@@ -404,7 +404,7 @@
   }
 
   function groupedSourcesLabel(items: InspectorGroupedSourceItem[]): string {
-    return `Grouped story with ${items.length} source ${items.length === 1 ? 'item' : 'items'}`;
+    return language === 'zh' ? `分组故事，含 ${items.length} 个来源条目` : `Grouped story with ${items.length} source ${items.length === 1 ? 'item' : 'items'}`;
   }
 
   function groupedSourceHref(sourceItem: InspectorGroupedSourceItem): string {
@@ -414,7 +414,7 @@
 
   function groupedSourceMeta(sourceItem: InspectorGroupedSourceItem): string {
     const parts = [
-      sourceItem.is_selected_item ? 'selected' : 'grouped',
+      sourceItem.is_selected_item ? localizedChrome('selected', '已选择') : localizedChrome('grouped', '已分组'),
       sourceItem.story_key ? `story_key: ${sourceItem.story_key}` : null,
       sourceItem.duplicate_of_item_id ? `duplicate_of: ${sourceItem.duplicate_of_item_id}` : 'duplicate_of: none',
       sourceItem.extraction_status,
@@ -457,9 +457,15 @@
   }
 
   function provenanceDisclosure(value: InspectableItem): string {
-    const extraction = extractionLabel(value.extraction_status);
+    const extraction = localizedChrome(extractionLabel(value.extraction_status), extractionLabelZh(value.extraction_status));
     const tier = value.value_tier ? ` · ${value.value_tier}` : '';
     return `src: ${value.source_title} · ${extraction}${tier}`;
+  }
+
+  function extractionLabelZh(status: ItemSummary['extraction_status']): string {
+    if (status === 'full') return '全文';
+    if (status === 'partial_extraction') return '来源摘录';
+    return '摘录';
   }
 
   function summaryProvenanceDisclosure(value: InspectableItem): string {
@@ -488,7 +494,7 @@
       if (error.status === 409 && operation) return `${message} — ${operationDetails(operation)}`;
       return message;
     }
-    return error instanceof Error ? error.message : 'err: re-ingest failed';
+    return error instanceof Error ? error.message : localizedChrome('err: re-ingest failed', 'err: 本文重处理失败');
   }
 
   function resetReingestTransientState(): void {
@@ -593,23 +599,23 @@
 <aside class="contract-region contract-inspector" aria-labelledby={import.meta.env.MODE === 'test' ? 'inspector-heading' : undefined} aria-label={import.meta.env.MODE === 'test' ? (item?.title ?? 'INSPECTOR') : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
   <p id="inspector-region-label" class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
-    <p class="contract-muted" role="status">loading</p>
+    <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
   {#if error}
     <p class="contract-feedback-error" role="alert">{error}</p>
   {:else if item}
     <div class="inspector-header-row">
-      <p class="contract-muted inspector-provenance" aria-label={`Provenance: ${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
-        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`Extraction: ${extractionLabel(item.extraction_status)}`}>{extractionLabel(item.extraction_status)}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
+      <p class="contract-muted inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}：${/inspector/i.test(item.source_title) ? 'src: source title' : provenanceDisclosure(item)}`}>
+        <span aria-label={`${localizedChrome('Source', '来源')}：${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}：${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
-        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`} onclick={() => void toggleResonance()}>
+        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
-    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>original link<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
@@ -628,7 +634,7 @@
       </section>
     {/if}
     {#if showReingest}
-      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
+      <section class="inspector-reingest-panel" aria-label={localizedChrome('Item re-ingest', '本文重处理')} data-contract="inspector-reingest">
         <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '本文重处理')}</p>
         {#if reingestConfiguring}
           <label class="inspector-reingest-field">
@@ -650,13 +656,11 @@
           </p>
           <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RE-INGESTING ITEM...]', '[正在重新处理本文...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')}</button>
           <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>{localizedChrome('[CANCEL]', '[取消]')}</button>
-          {#if reingestStatus}
-            <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label="Item re-ingest status" aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus}</p>
-          {/if}
+          <p class:visually-hidden={!reingestStatus} class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus || localizedChrome('ready', '就绪')}</p>
         {:else}
           <button bind:this={reingestToggle} class="bracket-action inspector-reingest-toggle" type="button" disabled={!onReingestItem} onclick={() => void openReingestConfig()}>{localizedChrome('[RE-INGEST ITEM]', '[重新处理本文]')}</button>
           {#if reingestStatus}
-            <p class="inspector-reingest-status" role="status" aria-label="Item re-ingest status" aria-live="polite">{reingestStatus}</p>
+            <p class="inspector-reingest-status" role="status" aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live="polite">{reingestStatus}</p>
           {/if}
         {/if}
       </section>
@@ -673,19 +677,19 @@
         <p class="inspector-reading">{detailText(item)}</p>
       </details>
     {/if}
-    <p class="contract-muted">why: fresh from configured source</p>
+    <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}
       <details class="contract-grouped-sources" open>
         <summary aria-label={groupedSourcesLabel(groupedItems)}>{groupedSourcesLabel(groupedItems)}</summary>
         <ol class="contract-grouped-sources__list">
           {#each groupedItems as sourceItem (sourceItem.item_id)}
-            <li class="contract-grouped-sources__item" aria-label={`Grouped source item: ${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
+            <li class="contract-grouped-sources__item" aria-label={language === 'zh' ? `分组来源条目：${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? '（已选择）' : ''}` : `Grouped source item: ${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
               <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener" translate={sourceTitleTranslate}>{sourceItem.source_title}</a>
               <span class="contract-muted"> — {sourceItem.title}</span>
               <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>
               {#if sourceItem.source_url}
-                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={`Source feed for ${sourceA11yName(sourceItem.source_title)}`} translate={sourceUrlTranslate}>feed</a>
+                <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={language === 'zh' ? `来源订阅：${sourceA11yName(sourceItem.source_title)}` : `Source feed for ${sourceA11yName(sourceItem.source_title)}`} translate={sourceUrlTranslate}>{localizedChrome('feed', '订阅')}</a>
               {/if}
             </li>
           {/each}
@@ -693,9 +697,9 @@
       </details>
     {/if}
     {#if item.story_key || item.duplicate_of_item_id}
-      <p class="contract-muted">provenance: story {item.story_key ?? 'ungrouped'} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
+      <p class="contract-muted">{localizedChrome('provenance: story', '来源记录：故事')} {item.story_key ?? localizedChrome('ungrouped', '未分组')} · duplicate {item.duplicate_of_item_id ?? 'none'}</p>
     {/if}
   {:else}
-    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">No item selected</h2>
+    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedChrome('No item selected', '未选择条目')}</h2>
   {/if}
 </aside>

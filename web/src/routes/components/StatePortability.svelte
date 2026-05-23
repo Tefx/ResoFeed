@@ -6,16 +6,44 @@
   interface Props {
     onExportState: () => Promise<StateBundleV1>;
     onImportState: (bundle: StateBundleV1) => Promise<void> | void;
+    language?: 'en' | 'zh';
   }
 
-  let { onExportState, onImportState }: Props = $props();
+  let { onExportState, onImportState, language = 'en' }: Props = $props();
   let portabilityState = $state<PortabilityState>('idle');
   let statusText = $state('');
   let stateInput = $state<HTMLInputElement | undefined>();
+  const chrome = $derived(language === 'zh'
+    ? {
+      group: '状态可携带性',
+      exportState: '[导出状态]',
+      exporting: '[正在导出状态...]',
+      importState: '[导入状态]',
+      importing: '[正在导入状态...]',
+      input: '状态 JSON 导入输入',
+      warning: '导入会替换活动来源、规则和星标',
+      imported: '导入完成',
+      exported: '已导出 state.json',
+      importFailed: 'err: 导入失败',
+      exportFailed: 'err: 导出失败'
+    }
+    : {
+      group: 'State portability',
+      exportState: '[EXPORT STATE]',
+      exporting: '[EXPORTING STATE...]',
+      importState: '[IMPORT STATE]',
+      importing: '[IMPORTING STATE...]',
+      input: 'State JSON import input',
+      warning: 'import replaces active sources, rules, and stars',
+      imported: 'import complete',
+      exported: 'exported state.json',
+      importFailed: 'err: import failed',
+      exportFailed: 'err: export failed'
+    });
 
   async function startImport(): Promise<void> {
     portabilityState = 'importing';
-    statusText = 'import replaces active sources, rules, and stars';
+    statusText = chrome.warning;
     await Promise.resolve();
     stateInput?.focus();
     stateInput?.click();
@@ -29,11 +57,11 @@
       const bundle = JSON.parse(await file.text()) as StateBundleV1;
       await onImportState(bundle);
       portabilityState = 'import-complete';
-      statusText = 'import complete';
+      statusText = chrome.imported;
       if (stateInput) stateInput.value = '';
     } catch {
       portabilityState = 'import-failed';
-      statusText = 'err: import failed';
+      statusText = chrome.importFailed;
     }
   }
 
@@ -49,20 +77,20 @@
       anchor.click();
       URL.revokeObjectURL(url);
       portabilityState = 'export-complete';
-      statusText = 'exported state.json';
+      statusText = chrome.exported;
     } catch {
       portabilityState = 'import-failed';
-      statusText = 'err: export failed';
+      statusText = chrome.exportFailed;
     }
   }
 </script>
 
-<div class="state-portability-actions contract-portability" role="group" aria-label="State portability" data-state={portabilityState}>
-  <button id="state-export" class="bracket-action" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? '[EXPORTING STATE...]' : '[EXPORT STATE]'}</button>
-  <button id="state-import" class="bracket-action" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>{portabilityState === 'importing' ? '[IMPORTING STATE...]' : '[IMPORT STATE]'}</button>
-  <label class="visually-hidden" for="state-json-file">State JSON import input</label>
-  <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label="State JSON import input" onchange={() => void importSelectedFile()} />
-  <span class="contract-warning state-portability-warning">import replaces active sources, rules, and stars</span>
+<div class="state-portability-actions contract-portability" role="group" aria-label={chrome.group} data-state={portabilityState}>
+  <button id="state-export" class="bracket-action" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? chrome.exporting : chrome.exportState}</button>
+  <button id="state-import" class="bracket-action" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>{portabilityState === 'importing' ? chrome.importing : chrome.importState}</button>
+  <label class="visually-hidden" for="state-json-file">{chrome.input}</label>
+  <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={chrome.input} onchange={() => void importSelectedFile()} />
+  <span class="contract-warning state-portability-warning">{chrome.warning}</span>
   {#if statusText}
     <span role="status" aria-live="polite" class="contract-muted state-portability-status">{statusText}</span>
   {/if}

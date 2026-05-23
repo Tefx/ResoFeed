@@ -28,6 +28,47 @@
   let lastHandledSeedQuery = '';
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const chrome = $derived(itemAnatomyChrome(language));
+  const searchChrome = $derived(language === 'zh'
+    ? {
+      region: '搜索与检索',
+      heading: '搜索',
+      filters: '搜索筛选',
+      query: '纯文本查询',
+      submit: '[搜索]',
+      filtersSummary: '筛选',
+      source: '来源',
+      sourceInput: '来源筛选',
+      from: '开始日期',
+      to: '结束日期',
+      resonated: '已标星',
+      resonatedInput: '仅已标星',
+      limit: '结果上限',
+      resultsRegion: '搜索结果',
+      resultsList: '搜索结果条目',
+      inspect: (title: string) => `检查搜索结果：${title}`,
+      extractionPrefix: '提取：',
+      resonate: (item: ItemSummary) => item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`
+    }
+    : {
+      region: 'Search and Retrieval',
+      heading: 'SEARCH',
+      filters: 'Search filters',
+      query: 'Plain text query',
+      submit: '[SEARCH]',
+      filtersSummary: 'filters',
+      source: 'Source',
+      sourceInput: 'Source filter',
+      from: 'From date',
+      to: 'To date',
+      resonated: 'Resonated',
+      resonatedInput: 'Resonated only',
+      limit: 'Result limit',
+      resultsRegion: 'Search results',
+      resultsList: 'Search result items',
+      inspect: (title: string) => `Inspect search result: ${title}`,
+      extractionPrefix: 'extraction: ',
+      resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
+    });
 
   $effect(() => {
     if (!query) {
@@ -79,28 +120,28 @@
   }
 </script>
 
-<section class="contract-region contract-search" aria-label="Search and Retrieval">
-  <h2 id="search-heading" tabindex="-1">SEARCH</h2>
-  <form class="contract-search-form" aria-label="Search filters" onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
+<section class="contract-region contract-search" aria-label={searchChrome.region}>
+  <h2 id="search-heading" tabindex="-1">{searchChrome.heading}</h2>
+  <form class="contract-search-form" aria-label={searchChrome.filters} onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
-      <label for="search-query">Plain text query</label>
+      <label for="search-query">{searchChrome.query}</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
-      <button type="submit" class="bracket-action">[SEARCH]</button>
+      <button type="submit" class="bracket-action">{searchChrome.submit}</button>
     </div>
-    <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'}>
-      <summary>filters</summary>
+    <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'} open>
+      <summary>{searchChrome.filtersSummary}</summary>
       <div class="search-secondary-grid">
-        <label for="search-source">Source filter</label>
-        <input id="search-source" name="source" bind:value={source} />
-        <label for="search-from">From date</label>
+        <label for="search-source">{searchChrome.source}</label>
+        <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
+        <label for="search-from">{searchChrome.from}</label>
         <input id="search-from" name="from" type="date" bind:value={from} />
-        <label for="search-to">To date</label>
+        <label for="search-to">{searchChrome.to}</label>
         <input id="search-to" name="to" type="date" bind:value={to} />
         <label class="contract-checkbox" for="search-resonated">
-          <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} />
-          Resonated only
+          <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
+          {searchChrome.resonated}
         </label>
-        <label for="search-limit">Result limit</label>
+        <label for="search-limit">{searchChrome.limit}</label>
         <select id="search-limit" name="limit" bind:value={limit}>
           <option value={10}>10</option>
           <option value={20}>20</option>
@@ -111,14 +152,14 @@
     </details>
   </form>
   <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
-  <div role="region" aria-label="Search results">
-    <div role="list" aria-label="Search result items">
+  <div role="region" aria-label={searchChrome.resultsRegion}>
+    <div role="list" aria-label={searchChrome.resultsList}>
       {#each results as item, index (item.id)}
         <article class="contract-feed-item contract-search-result" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
           <button
             class="contract-feed-open"
             type="button"
-            aria-label={`Inspect search result: ${item.title}`}
+            aria-label={searchChrome.inspect(item.title)}
             onclick={() => void openInspector(item)}
           >
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
@@ -130,7 +171,7 @@
               {/if}
             </p>
             <p class="contract-label contract-search-meta-secondary contract-search-match">
-              <span class="feed-meta-extraction" aria-label={chrome.search.extractionAria(itemExtractionLabel(item.extraction_status, language))}>extraction: {itemExtractionLabel(item.extraction_status, language)}</span>
+              <span class="feed-meta-extraction" aria-label={chrome.search.extractionAria(itemExtractionLabel(item.extraction_status, language))}>{searchChrome.extractionPrefix}{itemExtractionLabel(item.extraction_status, language)}</span>
               <span>{chrome.search.matchLexicalIndex}</span>
               <span>{language === 'zh' ? itemSourceBackedProvenanceLabel(language) : chrome.search.provenanceSourceBacked}</span>
               <span aria-label={chrome.search.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
@@ -144,7 +185,7 @@
           <button
             class="contract-resonate"
             type="button"
-            aria-label={item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`}
+            aria-label={searchChrome.resonate(item)}
             aria-pressed={item.is_resonated ? 'true' : 'false'}
             disabled={pendingResonanceId === item.id}
             onclick={() => void toggleResonance(item)}
