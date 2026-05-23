@@ -309,7 +309,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     });
 
     const inspector = screen.getByRole('complementary', { name: failedDetail.title });
-    expect(within(inspector).getByText('检查器')).toBeVisible();
+    expect(within(inspector).getByText('INSPECTOR')).toBeVisible();
+    expect(within(inspector).queryByText('检查器')).not.toBeInTheDocument();
     expect(within(inspector).getByText('摘要：')).toBeVisible();
     expect(within(inspector).getByText('核心洞察：')).toBeVisible();
     expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
