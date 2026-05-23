@@ -273,7 +273,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(feed.locator('.feed-meta-agent').first()).toHaveAttribute('aria-label', '由代理外部推荐');
     await redExpect(feed.locator('.contract-time-label').first()).toHaveText('TODAY');
 
-    await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search browser contracts');
+    await page.getByRole('textbox', { name: '导向或粘贴 RSS URL' }).fill('search browser contracts');
     await page.keyboard.press('Enter');
     const search = page.locator('.contract-search');
     await redExpect(search).toHaveAttribute('aria-label', '搜索与检索');
@@ -318,7 +318,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
 
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'TODAY' }).click();
-    await page.getByRole('button', { name: `Open Inspector for: ${groupedItem.title}` }).click();
+    await feed.getByRole('button', { name: `打开检查器：${groupedItem.title}` }).click();
     const inspector = page.locator('.contract-inspector');
     await redExpect(inspector).toContainText('检查器');
     await redExpect(inspector.locator('.inspector-provenance')).toHaveAttribute('aria-label', /来源：/u);

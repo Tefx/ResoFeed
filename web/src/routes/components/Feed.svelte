@@ -51,7 +51,7 @@
   }
 
   function openInspectorLabel(title: string): string {
-    return language === 'zh' ? `打开检查器：${title}; Open Inspector for: ${title}` : `Open Inspector for: ${title}`;
+    return language === 'zh' ? `打开检查器：${title}` : `Open Inspector for: ${title}`;
   }
 
   function resonanceLabel(item: ItemSummary): string {
