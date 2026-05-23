@@ -1,0 +1,45 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: 导向或粘贴 RSS URL
+    - textbox "导向或粘贴 RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - status "导向路由预览"
+  - text: 导向路由预览 需要 URL
+  - region "TODAY 表面独立滚动":
+    - text: 独立滚动区域
+    - region "今日订阅条目":
+      - heading "今日订阅条目" [level=2]
+      - list "今日订阅条目":
+        - listitem:
+          - button "打开检查器：OpenRouter 模型清单需要运行时密钥边界":
+            - paragraph: "src: Simon Willison 1h 来源摘录 模型支持 价值: brief TODAY"
+            - paragraph: OpenRouter 模型清单需要运行时密钥边界
+            - paragraph: 模型清单是运行时辅助信息，不应成为持久设置或可携带状态。
+          - button "取消星标：OpenRouter 模型清单需要运行时密钥边界" [pressed]: ★
+        - listitem:
+          - button "打开检查器：SQLite 本地索引让 RSS 工作台保持可携带":
+            - paragraph: "src: Hacker News 1m 全文 模型支持 价值: high"
+            - paragraph: SQLite 本地索引让 RSS 工作台保持可携带
+            - paragraph: 这篇文章说明本地 SQLite 索引如何让个人 RSS 情报工作台保持快速、可审计且易迁移。
+          - button "标星：SQLite 本地索引让 RSS 工作台保持可携带": ☆
+  - complementary "详情独立滚动":
+    - complementary "INSPECTOR":
+      - paragraph: 检查器
+      - paragraph: "src: Simon Willison · 来源摘录 · brief"
+      - heading "OpenRouter 模型清单需要运行时密钥边界" [level=2]
+      - paragraph:
+        - link "原文链接":
+          - /url: https://simonwillison.net/2026/may/24/openrouter-notes/
+      - paragraph: 来源文本：仅 RSS 摘录 · 摘要来源：模型支持
+      - region "摘要":
+        - paragraph: 摘要：
+        - paragraph: 模型清单是运行时辅助信息，不应成为持久设置或可携带状态。
+      - region "核心洞察":
+        - paragraph: 核心洞察：
+        - paragraph: 核心洞察：密钥边界必须和用户可见的状态可携带性分开。
+      - group "来源文本": 来源摘录：
+      - paragraph: 为什么：来自已配置来源的新条目
