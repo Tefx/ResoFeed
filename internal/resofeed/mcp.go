@@ -20,6 +20,7 @@ import (
 // or backend mutation.
 type MCPConfig struct {
 	DB                    *sql.DB
+	PublicURL             string
 	OwnerToken            string
 	OwnerTokenHash        string
 	LLM                   LLMClient
@@ -34,7 +35,7 @@ type MCPConfig struct {
 // Live audit closure for MCP liveness must prove this handler through the single
 // resofeed serve listener, not only through in-process handler invocation.
 func NewMCPHandler(cfg MCPConfig) http.Handler {
-	return &mcpHandler{db: cfg.DB, ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM, openRouter: cfg.OpenRouter, firstFetchMaxItems: cfg.FirstFetchMaxItems, firstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}
+	return &mcpHandler{db: cfg.DB, publicURL: normalizePublicURLForMetadata(cfg.PublicURL), ownerToken: cfg.OwnerToken, ownerTokenHash: cfg.OwnerTokenHash, llm: cfg.LLM, openRouter: cfg.OpenRouter, firstFetchMaxItems: cfg.FirstFetchMaxItems, firstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}
 }
 
 // MCPListCandidateItemsInput is the list_candidate_items input schema.
@@ -369,6 +370,7 @@ on conflict(item_id) do update set
 
 type mcpHandler struct {
 	db                    *sql.DB
+	publicURL             string
 	ownerToken            string
 	ownerTokenHash        string
 	llm                   LLMClient
@@ -450,7 +452,7 @@ func (h *mcpHandler) authorized(r *http.Request) bool {
 func (h *mcpHandler) dispatch(ctx context.Context, req mcpRequest) (any, *mcpError) {
 	switch req.Method {
 	case "initialize":
-		return map[string]any{"protocolVersion": "2025-03-26", "serverInfo": map[string]any{"name": "resofeed", "version": "0.0.0"}, "capabilities": map[string]any{"tools": map[string]any{}, "resources": map[string]any{}}}, nil
+		return h.initializeResult(), nil
 	case "tools/list":
 		return map[string]any{"tools": mcpToolList()}, nil
 	case "resources/list":
@@ -464,6 +466,27 @@ func (h *mcpHandler) dispatch(ctx context.Context, req mcpRequest) (any, *mcpErr
 	default:
 		return nil, &mcpError{Code: -32601, Message: "method not found"}
 	}
+}
+
+func (h *mcpHandler) initializeResult() map[string]any {
+	serverInfo := map[string]any{"name": "resofeed", "version": "0.0.0"}
+	if h.publicURL != "" {
+		serverInfo["publicUrl"] = h.publicURL
+		serverInfo["mcpUrl"] = mcpEndpointFromPublicURL(h.publicURL)
+	}
+	return map[string]any{"protocolVersion": "2025-03-26", "serverInfo": serverInfo, "capabilities": map[string]any{"tools": map[string]any{}, "resources": map[string]any{}}}
+}
+
+func normalizePublicURLForMetadata(raw string) string {
+	return strings.TrimRight(strings.TrimSpace(raw), "/")
+}
+
+func mcpEndpointFromPublicURL(publicURL string) string {
+	publicURL = normalizePublicURLForMetadata(publicURL)
+	if publicURL == "" {
+		return ""
+	}
+	return publicURL + "/mcp"
 }
 
 func (h *mcpHandler) readResource(ctx context.Context, params json.RawMessage) (any, error) {

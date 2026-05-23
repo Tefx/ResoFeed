@@ -250,7 +250,8 @@ func TestMCPRealBoundListenerInitializeResourcesAndTools(t *testing.T) {
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})}
+	publicURL := "https://resofeed.example.test"
+	server := &http.Server{Handler: NewRouter(HTTPServerConfig{DB: db, PublicURL: publicURL, OwnerToken: contractOwnerToken})}
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- server.Serve(listener)
@@ -269,6 +270,20 @@ func TestMCPRealBoundListenerInitializeResourcesAndTools(t *testing.T) {
 	initialize := mcpHTTPPost(t, baseURL, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize"})
 	if initialize.Error != nil {
 		t.Fatalf("initialize error: %+v", initialize.Error)
+	}
+	initResult, ok := initialize.Result.(map[string]any)
+	if !ok {
+		t.Fatalf("initialize result has unexpected shape: %#v", initialize.Result)
+	}
+	serverInfo, ok := initResult["serverInfo"].(map[string]any)
+	if !ok {
+		t.Fatalf("initialize result missing serverInfo: %#v", initResult)
+	}
+	if got := serverInfo["publicUrl"]; got != publicURL {
+		t.Fatalf("initialize publicUrl = %v, want %s", got, publicURL)
+	}
+	if got := serverInfo["mcpUrl"]; got != publicURL+"/mcp" {
+		t.Fatalf("initialize mcpUrl = %v, want %s", got, publicURL+"/mcp")
 	}
 	resources := mcpHTTPPost(t, baseURL, map[string]any{"jsonrpc": "2.0", "id": 2, "method": "resources/list"})
 	if resources.Error != nil {

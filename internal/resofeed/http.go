@@ -60,7 +60,7 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	api := apiHandler{cfg: cfg}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api)
-	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, OpenRouter: cfg.OpenRouter, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
+	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, PublicURL: cfg.PublicURL, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, OpenRouter: cfg.OpenRouter, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
 	mux.Handle("/", staticUIHandler())
 	return mux
 }

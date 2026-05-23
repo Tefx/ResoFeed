@@ -91,13 +91,6 @@ func PreviewSteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerPr
 	return SteerPreviewResult{Preview: preview}, nil
 }
 
-// CommitSteering pins the mutating commit signature and delegates future runtime
-// work to the canonical SteerRequest idempotency boundary. Completed mutation
-// logic is intentionally absent from this contract-lock step.
-func CommitSteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerRequest) (SteerResult, error) {
-	return ApplySteering(ctx, db, llm, req)
-}
-
 // UndoSteering pins target-specific undo. Future implementation must use the
 // supplied handle target only and must not maintain command history, a global
 // undo stack, jobs, queues, sync state, or an activity ledger.

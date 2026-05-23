@@ -51,6 +51,7 @@ func TestServeStartupConsoleOutputReportsSafeOpenRouterSourceAndModel(t *testing
 			"ui: mounted\n",
 			"api: enabled\n",
 			"mcp: /mcp\n",
+			"mcp-public-url: http://127.0.0.1:8080/mcp\n",
 			"sqlite: configured local file\n",
 			"migrations: ok\n",
 			"ingest: started\n",

@@ -420,7 +420,11 @@ func printServeStartupConsole(w io.Writer, cfg ServeConfig, publicURL string, re
 	_, _ = fmt.Fprintf(w, "public-url: %s\n", publicURL)
 	_, _ = io.WriteString(w, "ui: mounted\n")
 	_, _ = io.WriteString(w, "api: enabled\n")
-	_, _ = io.WriteString(w, "mcp: /mcp\n\n")
+	_, _ = io.WriteString(w, "mcp: /mcp\n")
+	if endpoint := mcpEndpointFromPublicURL(publicURL); endpoint != "" {
+		_, _ = fmt.Fprintf(w, "mcp-public-url: %s\n", endpoint)
+	}
+	_, _ = io.WriteString(w, "\n")
 	_, _ = fmt.Fprintf(w, "sqlite: %s\n", safeSQLiteStartupLabel(cfg.DBPath))
 	_, _ = io.WriteString(w, "migrations: ok\n")
 	_, _ = fmt.Fprintf(w, "first-fetch-limit: %s\n", firstFetchLimitDisplay(cfg.FirstFetchMaxItems))
