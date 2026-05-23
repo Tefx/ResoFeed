@@ -1,0 +1,44 @@
+viewport: 1470x956
+page: 1470x956
+scroll: (0, 0)
+[294]<div />
+	[335]<a />
+		skip to feed
+	Steer or paste RSS URL
+	|SHADOW(open)|[290]<input id=steer-input type=text autocomplete=off placeholder=Steer or paste RSS URL... />
+	|SHADOW(open)|*[295]<details aria-label=RESOFEED surface menu compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+		[349]<summary expanded=false />
+			RESOFEED
+		NAV
+		TODAY
+		SOURCE LEDGER
+		OPERATIONS
+		LANG: EN
+		[REPROCESS LIBRARY]
+	Steer route preview
+	URL required
+	[430]<h1 id=source-ledger-title level=1 />
+		SOURCE LEDGER
+	last_ingest: not_run
+	[437]<button />
+		[RUN INGEST]
+	[441]<button aria-label=[IMPORT OPML] />
+		[IMPORT OPML]
+	[445]<button id=state-export />
+		[EXPORT STATE]
+	[448]<button id=state-import />
+		[IMPORT STATE]
+	Choose state JSON
+	|SHADOW(open)|*[291]<input id=state-json-file type=file accept=application/json,.json aria-label=Choose state JSON compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
+	import replaces active sources, rules, and stars
+	src: Blind Source · status: not_fetched · last_fetch: not_fetched
+	url: https://example.test/feed.xml
+	last_fetch: not_fetched
+	[475]<button aria-label=[FETCH] Fetch source Blind Source />
+		[FETCH]
+	[478]<button aria-label=Delete source: Blind Source />
+		[DELETE]
+	|SHADOW(open)|*[482]<details compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+		[483]<summary aria-label=diagnostic details for Blind Source expanded=false />
+			[DETAILS]
+	|SHADOW(open)|*[492]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />

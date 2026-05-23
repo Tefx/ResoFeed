@@ -1,0 +1,5 @@
+browser-state-main-ui.txt: forbidden_hits=[]
+browser-state-menu.txt: forbidden_hits=[]
+browser-state-source-ledger.txt: forbidden_hits=[]
+browser-state-search-blackbox.txt: forbidden_hits=[]
+browser-state-inspector.txt: forbidden_hits=[]

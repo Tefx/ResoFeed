@@ -1,0 +1,39 @@
+viewport: 1470x956
+page: 1470x956
+scroll: (0, 0)
+[294]<div />
+	[335]<a />
+		skip to feed
+	Steer or paste RSS URL
+	|SHADOW(open)|[290]<input id=steer-input type=text autocomplete=off placeholder=Steer or paste RSS URL... />
+	|SHADOW(open)|*[295]<details aria-label=RESOFEED surface menu compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+		[349]<summary expanded=false />
+			RESOFEED
+		NAV
+		TODAY
+		SOURCE LEDGER
+		OPERATIONS
+		LANG: EN
+		[REPROCESS LIBRARY]
+	Steer route preview
+	URL required
+	|SHADOW(open)|*[291]<input id=state-json-file type=file accept=application/json,.json aria-label=Choose state JSON compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
+	|SHADOW(open)|*[492]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
+	[840]<h2 id=doctor-heading level=2 />
+		/doctor
+	rss: errors=1
+rss: source=blind_source status=not_fetched url=https://example.test/feed.xml
+openrouter: provider_reachable=unknown configured_model=account_default
+openrouter: model_resolved=false resolved_model=unknown
+openrouter: item_transform_failures=1
+openrouter: current_item_transform_failures=1 historic_item_transform_failures=0
+openrouter: live_summary_successes=0 fallback_only_current_summaries=0
+openrouter: health_classification=openrouter_client_timeout_or_error
+openrouter: failures=1
+openrouter: item=blind_item source=blind_source status=summary_unavailable title=Blind Blackbox Resonance Token
+fallback_provenance: item=blind_item summary=model model_status=summary_unavailable extraction_status=summary_unavailable
+search_fts: ok
+extraction: failures=1
+extraction: item=blind_item source=blind_source status=summary_unavailable title=Blind Blackbox Resonance Token
+ingest: last_run=never
+ingest: first_fetch_limit=5

@@ -1,0 +1,9 @@
+viewport: 1470x956
+page: 1470x956
+scroll: (0, 0)
+[8]<div />
+	RESOFEED
+	Enter owner token
+	Owner token
+	|SHADOW(open)|[3]<input id=owner-token-input name=owner-token type=password autocomplete=off />
+	[SUBMIT]

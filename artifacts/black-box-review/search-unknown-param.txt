@@ -1,0 +1,6 @@
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Date: Sat, 23 May 2026 22:25:42 GMT
+Content-Length: 87
+
+{"error":{"code":"bad_request","message":"bad request","details":{"field":"unknown"}}}

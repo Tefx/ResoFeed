@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 23 May 2026 22:26:06 GMT
+Content-Length: 206
+
+{"sources":[{"id":"blind_source","url":"https://example.test/feed.xml","title":"Blind Source","last_fetch_at":null,"last_fetch_status":"not_fetched","last_fetch_error":null,"is_active":true,"revision":1}]}

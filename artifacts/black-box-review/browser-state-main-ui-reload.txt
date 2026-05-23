@@ -1,0 +1,23 @@
+viewport: 1470x956
+page: 1470x956
+scroll: (0, 0)
+[294]<div />
+	[335]<a />
+		skip to feed
+	Steer or paste RSS URL
+	|SHADOW(open)|[290]<input id=steer-input type=text autocomplete=off placeholder=Steer or paste RSS URL... />
+	|SHADOW(open)|*[295]<details aria-label=RESOFEED surface menu compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+		[349]<summary expanded=false />
+			RESOFEED
+	Steer route preview
+	URL required
+	[292]<section id=today-feed aria-label=TODAY surface independent scroll />
+		Independent scroll region
+		Paste RSS URL in Steer or import OPML.
+		Inspect opens the item.
+		Star preserves durable value.
+		Steer is optional correction.
+	[417]<aside aria-label=Detail independent scroll />
+		INSPECTOR
+	|SHADOW(open)|*[291]<input id=state-json-file type=file accept=application/json,.json aria-label=Choose state JSON compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
+	|SHADOW(open)|*[492]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />

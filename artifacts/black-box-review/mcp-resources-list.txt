@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 23 May 2026 22:26:53 GMT
+Content-Length: 598
+
+{"jsonrpc":"2.0","id":3,"result":{"resources":[{"mimeType":"application/json","name":"Today feed","uri":"resofeed://feed/today"},{"mimeType":"application/json","name":"Active steering rules","uri":"resofeed://rules/active"},{"mimeType":"text/plain","name":"Doctor diagnostics","uri":"resofeed://system/doctor"},{"mimeType":"application/json","name":"Current runtime operation","uri":"resofeed://system/operation"},{"mimeType":"application/json","name":"Sources","uri":"resofeed://sources"},{"mimeType":"application/json","name":"Runtime processing language","uri":"resofeed://runtime/language"}]}}

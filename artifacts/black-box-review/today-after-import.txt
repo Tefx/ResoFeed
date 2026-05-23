@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 23 May 2026 22:26:19 GMT
+Content-Length: 477
+
+{"items":[{"id":"blind_item","source_id":"blind_source","source_title":"Blind Source","url":"https://example.test/article","title":"Blind Blackbox Resonance Token","summary":null,"core_insight":null,"value_tier":null,"published_at":null,"first_seen_at":"2026-05-23T22:26:06Z","extraction_status":"summary_unavailable","model_status":"summary_unavailable","is_resonated":true,"human_inspected_at":null,"external_surfaced_at":null,"story_key":null,"duplicate_of_item_id":null}]}

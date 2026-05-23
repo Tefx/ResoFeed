@@ -1,0 +1,21 @@
+owner token explicit: stored hash
+RESOFEED serve
+owner-token: explicit
+auth: owner-token required
+
+http: listening on 127.0.0.1:18081
+public-url: http://127.0.0.1:18081
+ui: mounted
+api: enabled
+mcp: /mcp
+
+sqlite: configured local file
+migrations: ok
+first-fetch-limit: 5
+ingest: started
+
+llm: openrouter
+openrouter-key: unavailable
+model: account default
+model-note: no --openrouter-model supplied; OpenRouter account default will be used
+shutdown complete

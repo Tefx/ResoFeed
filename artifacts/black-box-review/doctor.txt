@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Date: Sat, 23 May 2026 22:25:42 GMT
+Content-Length: 534
+
+rss: ok
+openrouter: provider_reachable=unknown configured_model=account_default
+openrouter: model_resolved=false resolved_model=unknown
+openrouter: item_transform_failures=0
+openrouter: current_item_transform_failures=0 historic_item_transform_failures=0
+openrouter: live_summary_successes=0 fallback_only_current_summaries=0
+openrouter: health_classification=missing_live_model_configuration
+fallback_provenance: item_transform_failures=0 summary=none
+search_fts: ok
+extraction: ok
+ingest: last_run=never
+ingest: first_fetch_limit=5

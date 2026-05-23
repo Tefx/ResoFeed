@@ -1,0 +1,82 @@
+viewport: 1470x956
+page: 1470x956
+scroll: (0, 0)
+[294]<div />
+	[335]<a />
+		skip to feed
+	Steer or paste RSS URL
+	|SHADOW(open)|[290]<input id=steer-input type=text autocomplete=off placeholder=Steer or paste RSS URL... />
+	|SHADOW(open)|*[295]<details aria-label=RESOFEED surface menu compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+		[349]<summary expanded=false />
+			RESOFEED
+	Steer route preview
+	URL required
+	retrieval: lexical search
+	[288]<div />
+		[292]<section id=today-feed aria-label=Search surface independent scroll />
+			Independent scroll region
+			[566]<section aria-label=Search and Retrieval />
+				[567]<h2 id=search-heading level=2 />
+					SEARCH
+				[568]<form aria-label=Search filters />
+					[569]<div />
+						Plain text query
+						|SHADOW(open)|[571]<input id=search-query />
+						[573]<button type=submit />
+							[SEARCH]
+					|SHADOW(open)|*[574]<details compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+						[579]<summary expanded=false />
+							filters
+						[580]<div />
+							Source
+							|SHADOW(open)|[582]<input id=search-source name=source aria-label=Source filter />
+							From date
+							|SHADOW(open)|[585]<input id=search-from name=from type=date format=YYYY-MM-DD placeholder=YYYY-MM-DD />
+							To date
+							|SHADOW(open)|[596]<input id=search-to name=to type=date format=YYYY-MM-DD placeholder=YYYY-MM-DD />
+							[607]<input id=search-resonated name=resonated type=checkbox aria-label=Resonated only />
+							Resonated
+							Result limit
+							|SHADOW(open)|[609]<select id=search-limit name=limit />
+				[628]<p id=search-status role=status live=polite />
+					1 results
+				[659]<article role=listitem level=1 />
+					[660]<button aria-label=Inspect search result: Blind Blackbox Resonance Token />
+						[662]<span aria-label=Source: Blind Source />
+							src: Blind Source
+						[664]<span aria-label=Age: 1m />
+							1m
+						TODAY
+						[667]<span aria-label=Extraction: excerpt />
+							extraction: excerpt
+						match: lexical index
+						provenance: source-backed
+						[670]<span aria-label=Priority signal: quality: excerpt />
+							quality: excerpt
+						[671]<span aria-label=Externally surfaced by agent />
+							agent:external
+						Blind Blackbox Resonance Token
+						summary unavailable
+					[674]<button aria-label=Remove resonance: Blind Blackbox Resonance Token pressed=true />
+		[417]<aside aria-label=Detail independent scroll />
+			[742]<aside aria-label=INSPECTOR />
+				INSPECTOR
+				src: Blind Source
+				excerpt
+				[748]<h2 id=inspector-heading level=2 />
+					Blind Blackbox Resonance Token
+				[750]<a />
+					original link
+					[751]<span />
+						https://example.test/article
+				[752]<a />
+					https://example.test/article
+				[753]<a />
+					https://example.test/feed.xml
+				summary unavailable · summary provenance: fallback unavailable
+				|SHADOW(open)|*[755]<details aria-label=Source text compound_components=(name=Toggle Disclosure,role=button),(name=Content Area,role=region) />
+					[760]<summary expanded=false />
+						source text:
+				why: fresh from configured source
+	|SHADOW(open)|*[291]<input id=state-json-file type=file accept=application/json,.json aria-label=Choose state JSON compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
+	|SHADOW(open)|*[492]<input id=opml-file type=file accept=.opml,.xml,text/xml,application/xml compound_components=(name=Browse Files,role=button),(name=File Selected,role=textbox,current=None) />
