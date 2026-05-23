@@ -3,6 +3,7 @@ import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { ResoFeedApiClient } from './api-client';
 import type {
   ProcessingLanguageResponse,
+  ReprocessErrorCode,
   ReprocessLibraryResponse,
   SetProcessingLanguageRequest
 } from './api-contract';
@@ -27,6 +28,27 @@ describe('expected-red API client runtime language contract', () => {
     ]>();
     expectTypeOf(client.setProcessingLanguage).returns.resolves.toEqualTypeOf<ProcessingLanguageResponse>();
     expectTypeOf(client.reprocessLibrary).returns.resolves.toEqualTypeOf<ReprocessLibraryResponse>();
+  });
+
+  it('keeps architecture-required reprocess/model failure codes in the frontend contract', () => {
+    const architectureRequiredCodes = [
+      'rss_fetch_error',
+      'model_latency_error',
+      'summary_unavailable',
+      'original_unavailable',
+      'timeout',
+      'invalid_model',
+      'provider_error',
+      'rate_limited',
+      'decode_error',
+      'internal'
+    ] satisfies ReprocessErrorCode[];
+
+    expect(architectureRequiredCodes).toContain('invalid_model');
+    expect(architectureRequiredCodes).toContain('provider_error');
+    expect(architectureRequiredCodes).toContain('rate_limited');
+    expect(architectureRequiredCodes).toContain('decode_error');
+    expect(architectureRequiredCodes).toContain('timeout');
   });
 
   it('calls the strict runtime language and reprocess endpoints with owner-token authorization', async () => {

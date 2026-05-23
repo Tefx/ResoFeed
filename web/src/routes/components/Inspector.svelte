@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type OpenRouterModelOption, type Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type ModelStatus, type OpenRouterModelOption, type Source } from '$lib/api-contract';
   import { ResoFeedApiError } from '$lib/api-client';
   import { operationDetails } from '$lib/current-operation';
 
@@ -55,6 +55,24 @@
 
   function localizedChrome(en: string, zh: string): string {
     return language === 'zh' ? zh : en;
+  }
+
+  const modelFailureStatusLabels: Record<Exclude<ModelStatus, 'ok' | 'summary_unavailable'>, { en: string; zh: string }> = {
+    model_latency_error: { en: 'model latency error', zh: '模型延迟错误' },
+    invalid_model: { en: 'invalid model', zh: '模型无效' },
+    provider_error: { en: 'provider error', zh: '提供方错误' },
+    rate_limited: { en: 'rate limited', zh: '速率受限' },
+    decode_error: { en: 'decode error', zh: '解码错误' },
+    timeout: { en: 'timeout', zh: '超时' }
+  };
+
+  function isModelFailureStatus(status: ModelStatus): status is Exclude<ModelStatus, 'ok' | 'summary_unavailable'> {
+    return status !== 'ok' && status !== 'summary_unavailable';
+  }
+
+  function modelFailureLabel(status: Exclude<ModelStatus, 'ok' | 'summary_unavailable'>): string {
+    const label = modelFailureStatusLabels[status];
+    return localizedChrome(label.en, label.zh);
   }
 
   function decodeEntities(text: string): string {
@@ -438,16 +456,17 @@
   function isFallbackEvidenceState(value: InspectableItem): boolean {
     if (hasModelBackedText(value)) return false;
     if (!sourceEvidenceText(value)) return false;
-    if (value.model_status === 'model_latency_error') return true;
+    if (isModelFailureStatus(value.model_status)) return true;
     if (language === 'zh') return true;
     return !('extracted_text' in value && readableText(value.extracted_text));
   }
 
   function processingStateLine(value: InspectableItem): string {
-    if (value.model_status === 'model_latency_error') {
+    if (isModelFailureStatus(value.model_status)) {
+      const statusLabel = modelFailureLabel(value.model_status);
       return sourceEvidenceText(value)
-        ? localizedChrome('target-language processing failed · summary/core unavailable · showing source excerpt', '中文处理失败 · 摘要/核心洞察不可用 · 显示来源摘录')
-        : localizedChrome('target-language processing failed · summary/core unavailable', '中文处理失败 · 摘要/核心洞察不可用');
+        ? localizedChrome(`target-language processing failed · ${statusLabel} · summary/core unavailable · showing source excerpt`, `中文处理失败 · ${statusLabel} · 摘要/核心洞察不可用 · 显示来源摘录`)
+        : localizedChrome(`target-language processing failed · ${statusLabel} · summary/core unavailable`, `中文处理失败 · ${statusLabel} · 摘要/核心洞察不可用`);
     }
     if (language === 'zh' && !hasModelBackedText(value)) {
       return sourceEvidenceText(value)

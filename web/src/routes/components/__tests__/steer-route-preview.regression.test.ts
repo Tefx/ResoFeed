@@ -51,6 +51,24 @@ function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: bo
       if (url.endsWith('/api/search')) {
         return jsonResponse({ items: [expectedRedItem], query: { q: 'sqlite', source: null, from: null, to: null, resonated: null, limit: 50 } });
       }
+      if (url.endsWith('/api/steer/preview') && init?.method === 'POST') {
+        const body = JSON.parse(String(init.body ?? '{}')) as { command?: string };
+        const command = String(body.command ?? '').trim();
+        const lower = command.toLowerCase();
+        if (lower === 'add source' || lower === 'add rss' || lower === 'subscribe') {
+          return jsonResponse({ preview: { route_kind: 'unknown', interpreted_as: 'source_command_missing_url', will_mutate: false, changed_rules: [], message: 'URL required' } });
+        }
+        if (/^https?:\/\/\S+/i.test(command)) {
+          return jsonResponse({ preview: { route_kind: 'source', interpreted_as: 'add_source', will_mutate: true, changed_rules: [], message: 'RSS URL subscription preview' } });
+        }
+        if (lower === '/doctor') {
+          return jsonResponse({ preview: { route_kind: 'doctor', interpreted_as: 'doctor', will_mutate: false, changed_rules: [], message: 'read-only diagnostics' } });
+        }
+        if (/^(search|find)\s+\S+/i.test(command)) {
+          return jsonResponse({ preview: { route_kind: 'search', interpreted_as: lower.startsWith('find ') ? 'find_alias_warning' : 'search', will_mutate: false, changed_rules: [], message: lower.startsWith('find ') ? 'find maps to SEARCH' : 'retrieval: lexical search' } });
+        }
+        return jsonResponse({ preview: { route_kind: 'policy', interpreted_as: 'steer_rule', will_mutate: true, changed_rules: [{ id: 'preview_rule_expected_red', rule_text: command, is_active: true, superseded_by: null, revision: 1 }], message: 'policy proposal' } });
+      }
       if (url.endsWith('/api/steer') && init?.method === 'POST') {
         if (options.invalid) {
           return jsonResponse({ error: { code: 'bad_request', message: 'url required', details: {} } }, { status: 400 });
@@ -107,28 +125,29 @@ describe('Steer route preview and receipt regression contracts', () => {
   });
 
   it('classifies [ADD SOURCE], [SEARCH], [DOCTOR], [STEER RULE], and [INVALID] previews from exact Steer input copy', async () => {
-    const { steer, user } = await renderAcceptedPage();
+    const { calls, steer, user } = await renderAcceptedPage();
     const preview = screen.getByRole('status', { name: 'Steer route preview' });
 
     await user.type(steer, 'https://example.com/feed.xml');
-    expect(preview).toHaveTextContent('[ADD SOURCE]');
+    await waitFor(() => expect(preview).toHaveTextContent('[ADD SOURCE]'));
 
     await user.clear(steer);
     await user.type(steer, 'search sqlite');
-    expect(preview).toHaveTextContent('[SEARCH]');
+    await waitFor(() => expect(preview).toHaveTextContent('[SEARCH]'));
 
     await user.clear(steer);
     await user.type(steer, '/doctor');
-    expect(preview).toHaveTextContent('[DOCTOR]');
+    await waitFor(() => expect(preview).toHaveTextContent('[DOCTOR]'));
 
     await user.clear(steer);
     await user.type(steer, 'less celebrity coverage');
-    expect(preview).toHaveTextContent('[STEER RULE]');
+    await waitFor(() => expect(preview).toHaveTextContent('[STEER RULE]'));
 
     await user.clear(steer);
     await user.type(steer, 'add source');
-    expect(preview).toHaveTextContent('[INVALID]');
+    await waitFor(() => expect(preview).toHaveTextContent('[INVALID]'));
     expect(preview).toHaveAccessibleDescription(/URL required/i);
+    expect(calls.some((call) => call.url.endsWith('/api/steer/preview'))).toBe(true);
   });
 
   it('retains focus, Escape cancels unsent text, invalid add-source is assertive, and find alias remains warning-only', async () => {
@@ -162,7 +181,7 @@ describe('Steer route preview and receipt regression contracts', () => {
     await user.type(steer, 'less celebrity coverage');
 
     const preview = screen.getByRole('status', { name: 'Steer route preview' });
-    expect(within(preview).getByText('[STEER RULE]')).toBeVisible();
+    await waitFor(() => expect(within(preview).getByText('[STEER RULE]')).toBeVisible());
     expect(within(preview).getByRole('button', { name: 'confirm steer route preview' })).toBeVisible();
     expect(within(preview).getByRole('button', { name: '[CANCEL]' })).toBeVisible();
 
@@ -174,6 +193,7 @@ describe('Steer route preview and receipt regression contracts', () => {
     cleanup();
     const nonRevocable = await renderAcceptedPage({ revocable: false });
     await nonRevocable.user.type(nonRevocable.steer, 'less celebrity coverage');
+    await waitFor(() => expect(screen.getByText('[STEER RULE]')).toBeVisible());
     await nonRevocable.user.click(screen.getByRole('button', { name: 'confirm steer route preview' }));
     await waitFor(() => expect(screen.getByRole('status', { name: 'Steer receipt' })).toHaveTextContent('applied: less celebrity coverage'));
     expect(screen.queryByRole('button', { name: '[UNDO]' })).not.toBeInTheDocument();

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, OpenRouterModelOption, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
+  import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, OpenRouterModelOption, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerPreview, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, normalizeCurrentOperationInfo } from '$lib/current-operation';
@@ -27,6 +27,7 @@
     | { kind: 'doctor'; text: string }
     | { kind: 'error'; text: string };
   type SteerRouteEchoKind = 'idle' | 'add-source' | 'search' | 'doctor' | 'steer-rule' | 'invalid';
+  type SteerPreviewState = 'idle' | 'previewing' | 'ready' | 'error';
   type SteerUndoTarget = { targetKind: SteerUndoRequest['target_kind']; targetId: string };
 
   interface SteerRouteEcho {
@@ -78,6 +79,9 @@
   let feedPaneElement = $state<HTMLElement | undefined>();
   let detailPaneElement = $state<HTMLElement | undefined>();
   let routePreviewElement = $state<HTMLElement | undefined>();
+  let steerPreview = $state<SteerPreview | null>(null);
+  let steerPreviewCommand = $state('');
+  let steerPreviewState = $state<SteerPreviewState>('idle');
   let surfaceMenuSummary = $state<HTMLElement | undefined>();
   let firstSurfaceMenuItem = $state<HTMLButtonElement | undefined>();
   let routePreviewAnnounces = $state(true);
@@ -116,7 +120,7 @@
   const reprocessConfirmLabel = $derived(processingLanguage.code === 'zh' ? '[确认重处理]' : '[CONFIRM REPROCESS]');
   const reprocessCancelLabel = $derived(processingLanguage.code === 'zh' ? '[取消]' : '[CANCEL]');
   const reprocessRunningLabel = $derived(processingLanguage.code === 'zh' ? '[重处理中...]' : '[REPROCESSING...]');
-  const steerRouteEcho = $derived(routeEchoForCommand(steerCommand));
+  const steerRouteEcho = $derived(routeEchoForCommand(steerCommand, steerPreview, steerPreviewCommand, steerPreviewState));
   const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRouteEcho.detail ? ` ${steerRouteEcho.detail}` : ''}`);
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? (processingLanguage.code === 'zh' ? '导向路由预览' : 'Steer route preview') : `${processingLanguage.code === 'zh' ? '导向路由预览' : 'Steer route preview'}: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
@@ -270,34 +274,79 @@
     routePreviewElement.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 20 });
   });
 
+  let steerPreviewRequestSequence = 0;
+
+  $effect(() => {
+    const command = steerCommand.trim();
+    if (!hasOwnerToken || !command) {
+      steerPreviewRequestSequence += 1;
+      steerPreview = null;
+      steerPreviewCommand = '';
+      steerPreviewState = 'idle';
+      return;
+    }
+
+    const sequence = ++steerPreviewRequestSequence;
+    steerPreviewState = 'previewing';
+    steerPreview = null;
+    steerPreviewCommand = command;
+
+    void apiClient().previewSteer(command)
+      .then((response) => {
+        if (sequence !== steerPreviewRequestSequence) return;
+        steerPreview = response.preview;
+        steerPreviewCommand = command;
+        steerPreviewState = 'ready';
+      })
+      .catch(() => {
+        if (sequence !== steerPreviewRequestSequence) return;
+        steerPreview = null;
+        steerPreviewCommand = command;
+        steerPreviewState = 'error';
+      });
+  });
+
   function formatRawApiError(error: unknown, fallback: string): string {
     if (error instanceof ResoFeedApiError) return `err: ${error.body.error.message}`;
     return error instanceof Error ? error.message : fallback;
   }
 
-  function routeEchoForCommand(rawCommand: string): SteerRouteEcho {
+  function routeEchoForCommand(rawCommand: string, preview: SteerPreview | null, previewCommand: string, previewState: SteerPreviewState): SteerRouteEcho {
     const command = rawCommand.trim();
-    const lower = command.toLowerCase();
     if (!command) {
       return { kind: 'idle', label: '', detail: '', live: 'polite', marker: '', writeAction: false };
     }
-    if (lower === 'add source' || lower === 'add rss' || lower === 'subscribe') {
-      return { kind: 'invalid', label: '[INVALID]', detail: 'URL required', live: 'assertive', marker: '!', writeAction: false };
+
+    if (previewState === 'ready' && preview && previewCommand === command) {
+      return routeEchoForServerPreview(preview);
     }
-    if (/^https?:\/\/\S+/i.test(command)) {
-      return { kind: 'add-source', label: '[ADD SOURCE]', detail: 'RSS URL subscription preview', live: 'polite', marker: '+', writeAction: true };
+
+    if (previewState === 'error' && previewCommand === command) {
+      return { kind: 'invalid', label: '[INVALID]', detail: 'err: preview unavailable', live: 'assertive', marker: '!', writeAction: false };
     }
-    if (lower === '/doctor') {
-      return { kind: 'doctor', label: '[DOCTOR]', detail: 'read-only diagnostics', live: 'polite', marker: '>', writeAction: false };
+
+    return { kind: 'idle', label: '', detail: '', live: 'polite', marker: '', writeAction: false };
+  }
+
+  function routeEchoForServerPreview(preview: SteerPreview): SteerRouteEcho {
+    const isZh = processingLanguage.code === 'zh';
+    const message = preview.message || preview.interpreted_as;
+    if (preview.route_kind === 'source') {
+      return { kind: 'add-source', label: '[ADD SOURCE]', detail: message || 'RSS URL subscription preview', live: 'polite', marker: '+', writeAction: preview.will_mutate };
     }
-    if (/^(search|find)\s+\S+/i.test(command)) {
-      const isZh = processingLanguage.code === 'zh';
-      const detail = lower.startsWith('find ')
-        ? (isZh ? 'find 映射到搜索' : 'find maps to SEARCH')
-        : (isZh ? '检索：词汇搜索' : 'retrieval: lexical search');
-      return { kind: 'search', label: isZh ? '[搜索]' : '[SEARCH]', detail, live: 'polite', marker: '?', writeAction: false };
+    if (preview.route_kind === 'doctor') {
+      return { kind: 'doctor', label: '[DOCTOR]', detail: message || 'read-only diagnostics', live: 'polite', marker: '>', writeAction: false };
     }
-    return { kind: 'steer-rule', label: processingLanguage.code === 'zh' ? '[导向规则]' : '[STEER RULE]', detail: processingLanguage.code === 'zh' ? '规则预览' : 'policy proposal', live: 'polite', marker: '*', writeAction: true };
+    if (preview.route_kind === 'search') {
+      return { kind: 'search', label: isZh ? '[搜索]' : '[SEARCH]', detail: message || (isZh ? '检索：词汇搜索' : 'retrieval: lexical search'), live: 'polite', marker: '?', writeAction: false };
+    }
+    if (preview.route_kind === 'policy') {
+      return { kind: 'steer-rule', label: isZh ? '[导向规则]' : '[STEER RULE]', detail: message || (isZh ? '规则预览' : 'policy proposal'), live: 'polite', marker: '*', writeAction: preview.will_mutate };
+    }
+    if (preview.route_kind === 'invariant_conflict' || preview.route_kind === 'unknown') {
+      return { kind: 'invalid', label: '[INVALID]', detail: message || shellChrome.routeRequired, live: 'assertive', marker: '!', writeAction: false };
+    }
+    return { kind: 'invalid', label: '[INVALID]', detail: message || 'err: unknown steer route', live: 'assertive', marker: '!', writeAction: false };
   }
 
   function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
@@ -686,8 +735,8 @@
     let shouldRefocusSteer = true;
     routePreviewAnnounces = false;
 
-    const routeEcho = routeEchoForCommand(command);
-    if (routeEcho.kind === 'invalid') {
+    const routeEcho = steerRouteEcho;
+    if (routeEcho.kind === 'invalid' && routeEcho.detail !== 'err: preview unavailable') {
       steerFeedback = { kind: 'error', text: 'err: url required' };
       await tick();
       steerInput?.focus();

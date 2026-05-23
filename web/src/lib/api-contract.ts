@@ -39,7 +39,17 @@ export interface ErrorBody {
 }
 
 export type ExtractionStatus = 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
-export type ModelStatus = 'ok' | 'summary_unavailable' | 'model_latency_error';
+export const modelStatusValues = [
+  'ok',
+  'summary_unavailable',
+  'model_latency_error',
+  'invalid_model',
+  'provider_error',
+  'rate_limited',
+  'decode_error',
+  'timeout'
+] as const;
+export type ModelStatus = (typeof modelStatusValues)[number];
 export type ActorKind = 'human' | 'agent';
 export type ProcessingLanguage = 'en' | 'zh';
 
@@ -171,6 +181,10 @@ export type ReprocessErrorCode =
   | 'summary_unavailable'
   | 'original_unavailable'
   | 'timeout'
+  | 'invalid_model'
+  | 'provider_error'
+  | 'rate_limited'
+  | 'decode_error'
   | 'internal';
 
 export interface ReprocessErrorDetail {

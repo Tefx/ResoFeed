@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import Inspector from '../Inspector.svelte';
-import type { ItemDetail } from '$lib/api-contract';
+import type { ItemDetail, ModelStatus } from '$lib/api-contract';
 import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
 
 const baseDetail: ItemDetail = {
@@ -64,4 +64,29 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Full article text for normal source text rendering.');
     expect(within(inspector).queryByLabelText('Source evidence')).not.toBeInTheDocument();
   });
+
+  it.each<ModelStatus>(['invalid_model', 'provider_error', 'rate_limited', 'decode_error', 'timeout', 'model_latency_error'])(
+    'renders architecture model failure status %s as visible fallback UI copy',
+    (modelStatus) => {
+      const detail: ItemDetail = {
+        ...baseDetail,
+        id: `model-failure-${modelStatus}`,
+        title: `Model failure ${modelStatus}`,
+        summary: null,
+        core_insight: null,
+        extraction_status: 'partial_extraction',
+        model_status: modelStatus,
+        feed_excerpt: `Fallback excerpt for ${modelStatus}.`,
+        extracted_text: null
+      };
+
+      render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
+
+      const inspector = screen.getByRole('complementary', { name: detail.title });
+      expect(within(inspector).getByText(new RegExp(`target-language processing failed · ${modelStatus.replace(/_/g, ' ')}`))).toBeVisible();
+      expect(within(inspector).getByLabelText('Source evidence')).toHaveTextContent(`Fallback excerpt for ${modelStatus}.`);
+      expect(within(inspector).queryByLabelText('Summary')).not.toBeInTheDocument();
+      expect(within(inspector).queryByLabelText('Core insight')).not.toBeInTheDocument();
+    }
+  );
 });
