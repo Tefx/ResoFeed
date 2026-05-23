@@ -16,7 +16,7 @@ export type HarnessRunClass = 'ci-safe' | 'live-openrouter';
 
 export interface PlaywrightHarnessCommandContract {
   readonly backendBuild: 'mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed';
-  readonly realServerLaunch: '.test-artifacts/bin/resofeed serve --addr 127.0.0.1:<reserved_port> --public-url <baseURL> --db <dbPath> --owner-token <E2E_OWNER_TOKEN>';
+  readonly realServerLaunch: './.test-artifacts/bin/resofeed serve --addr 127.0.0.1:<reserved_port> --public-url <baseURL> --db "$TEST_DB" --owner-token "$RESOFEED_OWNER_TOKEN"';
   readonly browserFallback: 'npm --prefix web exec playwright test -- --config web/playwright.config.ts';
   readonly preferredBrowserScript: 'npm --prefix web run test:e2e';
   readonly liveOpenRouterSmoke: 'OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web exec playwright test -- --config web/playwright.config.ts --grep @live-openrouter';
@@ -123,7 +123,7 @@ export const playwrightHarnessContract: PlaywrightHarnessContract = {
   commands: {
     backendBuild: 'mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed',
     realServerLaunch:
-      '.test-artifacts/bin/resofeed serve --addr 127.0.0.1:<reserved_port> --public-url <baseURL> --db <dbPath> --owner-token <E2E_OWNER_TOKEN>',
+      './.test-artifacts/bin/resofeed serve --addr 127.0.0.1:<reserved_port> --public-url <baseURL> --db "$TEST_DB" --owner-token "$RESOFEED_OWNER_TOKEN"',
     browserFallback: 'npm --prefix web exec playwright test -- --config web/playwright.config.ts',
     preferredBrowserScript: 'npm --prefix web run test:e2e',
     liveOpenRouterSmoke:

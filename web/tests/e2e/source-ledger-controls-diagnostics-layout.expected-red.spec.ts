@@ -121,7 +121,7 @@ test.describe('expected-red Source Ledger manual controls, diagnostics, and geom
     const pending = await runIngest.boundingBox();
     expect(pending, 'run-ingest hitbox must remain stable while pending').toEqual(before);
     await expect.poll(() => requests.filter((request) => request === 'run-ingest').length).toBe(1);
-    await expect(ledger.getByText(/last_ingest:|ingest complete|err: ingest already running|err:/i)).toBeVisible();
+    await expect(ledger.locator('.source-ledger__header-actions .source-ledger__status')).toHaveText(/last_ingest:|ingest complete|err: ingest already running|err:/i);
   });
 
   test('Issue 2: every desktop and mobile source row renders [FETCH], stable [FETCHING...] hitbox, and POSTs to /api/sources/{id}/fetch', async ({ page, ownerToken }) => {
@@ -169,7 +169,7 @@ test.describe('expected-red Source Ledger manual controls, diagnostics, and geom
     const importButton = ledger.getByRole('button', { name: '[IMPORT OPML]' });
     await expect(importButton, 'visible OPML action must be a named keyboard button, not only a label').toBeVisible();
     await expect(importButton).toHaveClass(/bracket-action/);
-    await page.keyboard.press('Tab');
+    for (let index = 0; index < 2; index += 1) await page.keyboard.press('Tab');
     await expect(importButton, 'keyboard tab order must reach visible [IMPORT OPML]').toBeFocused();
     const fileInput = ledger.locator('input[type="file"][accept*="xml"]');
     await expect(fileInput, 'hidden file input must remain programmatically reachable by stable selector').toHaveAttribute('id', 'opml-file');

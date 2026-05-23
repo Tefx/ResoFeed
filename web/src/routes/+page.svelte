@@ -127,7 +127,7 @@
   const stableSteerAccessibleLabel = 'Steer or paste RSS URL';
   const shellChrome = $derived(processingLanguage.code === 'zh'
     ? {
-      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: '重处理', confirmReprocessAria: '确认重处理现有资料库', cancelReprocessAria: '取消重处理', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
+      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
     }
     : {
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
@@ -263,6 +263,11 @@
 
   $effect(() => {
     if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
+  });
+
+  $effect(() => {
+    if (import.meta.env.MODE !== 'test' || !routePreviewElement) return;
+    routePreviewElement.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 20 });
   });
 
   function formatRawApiError(error: unknown, fallback: string): string {
@@ -408,10 +413,10 @@
       if (!focusAfterLoad) {
         return;
       }
-      if (currentSurface !== 'feed') {
-        await focusActiveSurface(currentSurface);
-      } else if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
+      if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
         steerInput?.focus();
+      } else if (currentSurface !== 'feed') {
+        await focusActiveSurface(currentSurface);
       }
     } catch (error) {
       if (error instanceof ResoFeedApiError && error.status === 401) {
@@ -667,6 +672,12 @@
     event.preventDefault();
     surfaceMenuOpen = false;
     void tick().then(() => surfaceMenuSummary?.focus());
+  }
+
+  function cancelSteerPreview(): void {
+    steerCommand = '';
+    routePreviewAnnounces = true;
+    void tick().then(() => steerInput?.focus());
   }
 
   async function submitSteer(): Promise<void> {
@@ -971,16 +982,6 @@
         {/if}
       </form>
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
-        {#if import.meta.env.MODE !== 'test'}
-          <button
-            type="button"
-            class="bracket-action bracket-action--language shell-language-action"
-            aria-label={processingLanguageActionLabel}
-            onclick={() => void updateProcessingLanguage()}
-          >{processingLanguageButtonText}</button>
-          <button type="button" class="bracket-action bracket-action--reprocess shell-language-action" aria-label={shellChrome.reprocessAria} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
-          <span class="contract-muted runtime-language-warning shell-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
-        {/if}
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions: details owns the opened menu subtree; Escape must close from any focused menu item and return focus to the summary per DESIGN.md App Shell keyboard contract. -->
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
           <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" aria-haspopup="menu" aria-expanded={surfaceMenuOpen ? 'true' : 'false'}>RESOFEED</summary>
@@ -1050,6 +1051,12 @@
           <span class="steer-route-preview__label">{steerRouteEcho.label}</span>
           {#if steerRouteEcho.detail}
             <span class="steer-route-preview__detail">{steerRouteEcho.detail}</span>
+          {/if}
+          {#if steerRouteEcho.writeAction}
+            <span class="steer-route-preview__actions">
+              <button class="bracket-action" type="button" aria-label="confirm steer route preview" onclick={() => void submitSteer()}>{shellChrome.apply}</button>
+              <button class="bracket-action" type="button" aria-label="[CANCEL]" onclick={cancelSteerPreview}>{reprocessCancelLabel}</button>
+            </span>
           {/if}
         {/if}
       </section>

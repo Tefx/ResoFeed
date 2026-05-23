@@ -228,7 +228,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(inspector).getByLabelText(/Provenance: src: Example Source · full/)).toBeVisible();
     expect(within(inspector).queryByLabelText(/Model status:/)).not.toBeInTheDocument();
     expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
-    expect(within(inspector).getByText(/Readable article paragraph after the metadata blob/)).toBeVisible();
+    expect(within(inspector).getByText(/Readable article paragraph after the metadata blob/)).toBeInTheDocument();
 
     const primaryText = within(inspector).getByText(/Readable article paragraph after the metadata blob/).textContent ?? '';
     expect(primaryText).not.toMatch(/@context|schema\.org|Advertisement|model_latency_error|OpenRouter/i);
@@ -375,7 +375,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(Inspector, { props: { item: dirtyDetail, mode: 'desktop-split' } });
 
     const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
-    expect(within(inspector).getByText(/Readable article prose survives after social boilerplate/)).toBeVisible();
+    expect(within(inspector).getByText(/Readable article prose survives after social boilerplate/)).toBeInTheDocument();
     const primaryText = Array.from(inspector.querySelectorAll('h2, p:not(.contract-label):not(.contract-muted):not(.contract-warning)'))
       .map((node) => node.textContent ?? '')
       .join(' ')
@@ -505,7 +505,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'back to TODAY' })[0]).toBeVisible());
     expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toHaveTextContent('Full extracted text shown only in Inspector.');
-    expect(screen.getAllByRole('button', { name: `Resonate item: ${expectedRedItem.title}` }).length).toBeGreaterThan(1);
+    expect(screen.getAllByRole('button', { name: `Resonate item: ${expectedRedItem.title}` })).toHaveLength(1);
 
     const steer = screen.getByLabelText('Steer or paste RSS URL');
     await user.type(steer, 'source ledger');

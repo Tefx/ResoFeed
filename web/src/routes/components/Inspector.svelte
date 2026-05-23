@@ -436,24 +436,27 @@
   }
 
   function isFallbackEvidenceState(value: InspectableItem): boolean {
-    if ('extracted_text' in value && readableText(value.extracted_text)) return false;
-    return !hasModelBackedText(value) && Boolean(sourceEvidenceText(value));
+    if (hasModelBackedText(value)) return false;
+    if (!sourceEvidenceText(value)) return false;
+    if (value.model_status === 'model_latency_error') return true;
+    if (language === 'zh') return true;
+    return !('extracted_text' in value && readableText(value.extracted_text));
   }
 
   function processingStateLine(value: InspectableItem): string {
-    if (value.extraction_status === 'partial_extraction') return extractionDisclosure(value);
-    if (value.extraction_status === 'original_unavailable') {
-      return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
-    }
     if (value.model_status === 'model_latency_error') {
       return sourceEvidenceText(value)
         ? localizedChrome('target-language processing failed · summary/core unavailable · showing source excerpt', '中文处理失败 · 摘要/核心洞察不可用 · 显示来源摘录')
         : localizedChrome('target-language processing failed · summary/core unavailable', '中文处理失败 · 摘要/核心洞察不可用');
     }
-    if (!hasModelBackedText(value)) {
+    if (language === 'zh' && !hasModelBackedText(value)) {
       return sourceEvidenceText(value)
         ? localizedChrome('target-language processing incomplete · summary/core unavailable · showing source excerpt', '中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')
         : localizedChrome('target-language processing incomplete · summary/core unavailable', '中文处理未完成 · 摘要/核心洞察不可用');
+    }
+    if (value.extraction_status === 'partial_extraction') return extractionDisclosure(value);
+    if (value.extraction_status === 'original_unavailable') {
+      return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
     }
     return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
   }
@@ -643,7 +646,7 @@
       </section>
     {/if}
     {#if showReingest}
-      <section class="inspector-reingest-panel" aria-label={localizedChrome('Item re-ingest', '本文重处理')} data-contract="inspector-reingest">
+      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
         <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '本文重处理')}</p>
         {#if reingestConfiguring}
           <label class="inspector-reingest-field">

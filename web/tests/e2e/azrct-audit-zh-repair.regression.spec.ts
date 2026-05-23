@@ -257,6 +257,7 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
   test('zh UI parity: html lang, LANG/reprocess/status/receipts/steer preview localize', async ({ page, ownerToken }) => {
     const calls: string[] = [];
     await openShell(page, ownerToken, calls);
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
 
     await page.getByRole('button', { name: /Processing language English; set Chinese/u }).click();
     await expect.soft(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
@@ -278,6 +279,7 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
   test('zh Inspector chrome localizes while source identifiers stay translate=no and unchanged', async ({ page, ownerToken }) => {
     const calls: string[] = [];
     await openShell(page, ownerToken, calls);
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: /Processing language English; set Chinese/u }).click();
     await page.getByRole('button', { name: `Open Inspector for: ${zhItem.title}` }).click();
     const inspector = page.locator('.contract-inspector');
