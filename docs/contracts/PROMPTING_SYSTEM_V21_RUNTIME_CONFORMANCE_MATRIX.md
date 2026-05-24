@@ -1,6 +1,6 @@
 # Prompting System v2.1 Runtime Conformance Matrix
 
-Status: authoritative pre-implementation contract matrix for Prompting System v2.1, selected-item re-ingest/OpenRouter deltas, MCP parity classification, and R3/R4 repair obligations.
+Status: legacy authoritative pre-implementation contract matrix for Prompting System v2.1, selected-item re-ingest/OpenRouter deltas, MCP parity classification, and R3/R4 repair obligations. For the v2.2 generated-content contract (`localized_title`, structured `key_points`, `content_status`, and non-destructive `last_reprocess_*` attempt state), `docs/PROMPTING_SYSTEM.md` and `docs/contracts/CONTENT_CONTRACT_REDESIGN.md` supersede this matrix where field names or schema obligations differ.
 
 Authoring step: `contract-matrix`
 Authoring agent: `software-architect`

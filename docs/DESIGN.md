@@ -138,6 +138,36 @@ components:
     typography: "{typography.chrome}"
     padding: "{spacing.md}"
     rounded: "{rounded.none}"
+  inspector-section-label:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-core-insight:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.payload}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-key-points:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.payload}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-key-point-item:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.payload}"
+    padding: "{spacing.xs} {spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-reingest-attempt-failure:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.warning}"
+    typography: "{typography.chrome}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
   inspector-model-selector:
     backgroundColor: "{colors.background}"
     textColor: "{colors.text}"
@@ -358,6 +388,8 @@ Primary surfaces covered by this contract:
 - agent receipt/provenance markers.
 
 Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Heavy-operation feedback is terminal-synchronous text and one current operation snapshot, never animated loading chrome, durable jobs, queues, history, or dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
+
+Content contract target is **dense comprehension, not paragraph-only compression**. Feed rows remain compact scanning surfaces and MUST NOT render Key Points. Inspector is the structured reading surface and MUST render validated Chinese generated content as `摘要`, `核心洞察`, and `要点`, with `要点` rendered from a controlled 3–5 item structured list rather than raw Markdown. Generated/user-facing content and processing feedback should be Chinese-localized when the processing language is Chinese; URL, source, provenance, model ID, and quoted literal strings remain unchanged.
 
 Product copy rule: internal design metaphors and principles are not user-visible slogans. Do not render “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” in the app UI. The product chrome should use only operational labels such as `RESOFEED`, `TODAY`, `YESTERDAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`, and raw status strings.
 
@@ -586,12 +618,17 @@ Purpose: expose the minimum product-required steering transparency without creat
 Anatomy: raw command excerpt, interpreted summary, actor (`human` or delegated agent name), and terse `undo` or `correct` text action when reversible. Timestamp and superseded marker render only when already present in the API response or local transient UI state; the design does not require new persistent receipt fields. States: applied, superseded, agent-applied, rejected, failed. Receipts are inline near Steer or the affected feed item; they must not accumulate into a dedicated activity ledger.
 
 ### Feed Item
+- **Intent**: [SHARP] Compact scan row for triage, not the full structured reading payload.
+- **useFor**: Source/time/provenance metadata, localized display title when available, 1–2 line Chinese summary/core preview, value/source marker, selected state, and Resonate action.
+- **avoidFor**: Key Points, multi-bullet lists, raw Markdown rendering, full article body, source text disclosure, re-ingest controls, paragraph-only compression that hides needed structure in the Inspector, or any miniature article-card treatment.
 
 Purpose: scan one RSS-derived item.
 
-Anatomy: compact metadata line (`src: <host> · <age> · <full|source excerpt|excerpt> · agent:<name>` when needed), serif feed title, 1–2 line dense summary/core insight, provenance/extraction marker, Resonate action. Required item-understanding outputs are compressed into visible microcopy rather than dashboards: quality/value tier may appear as a terse label (`high`, `brief`, `source-claim`), source-quality provenance appears as `full`, `source excerpt`, or `excerpt`, and reported fact/source claim/model interpretation distinctions appear in Inspector copy when material.
+Anatomy: compact metadata line (`src: <host> · <age> · <全文|来源摘录|摘录> · agent:<name>` when needed), serif localized feed title, 1–2 line dense Chinese summary/core preview, provenance/extraction marker, Resonate action. Required item-understanding outputs are compressed into visible microcopy rather than dashboards: quality/value tier may appear as a terse label (`high`, `brief`, `source-claim`), source-quality provenance appears as `全文`, `来源摘录`, or `摘录` when UI language is Chinese, and reported fact/source claim/model interpretation distinctions appear in Inspector copy when material.
 
 Feed rows are triage surfaces, not miniature article cards. Title uses `{typography.feed-title}` on desktop and mobile; summary uses `{typography.feed-summary}` and clamps to two lines on desktop, one line on narrow/mobile previews. The text stack must stay continuous: metadata, title, and summary sit in one column with 4px title-to-summary separation. The independent 44x44 Resonate action may sit in a side column, but it must not force a blank row or enlarge the title-to-summary rhythm. Full summary, raw excerpt, and full body belong in the Inspector. Bordered source pills are allowed in the Inspector and ledger, but the feed should prefer flat monospace metadata with separators to preserve vertical density.
+
+Key Points exclusion: [SHARP] Feed rows MUST NOT show `key_points`, bullets, numbered lists, Markdown list strings, or inferred mini-lists. If `key_points` exists on the item, the Feed still shows only the compact title/summary/core preview and leaves the 3–5 point structure to the Inspector. This preserves scan speed while still supporting high-density comprehension after Inspect.
 
 States:
 
@@ -627,12 +664,27 @@ Keyboard and accessibility: `Space` or `Enter` toggles. Label must announce stat
 
 ### Inspector Pane
 - **Intent**: [SHARP] Deliberate Inspect surface for detail reading, verification, and one-time selected-item re-ingest.
-- **useFor**: Selected item detail, provenance, fallback/source evidence, grouped-source disclosure, collapsed source text, and inline `[RE-INGEST ITEM]` / `[重新处理本文]` controls scoped to this item only.
+- **useFor**: Selected item detail, provenance, Chinese structured generated content (`摘要`, `核心洞察`, `要点`), 3–5 controlled Key Point list items, fallback/source evidence, grouped-source disclosure, collapsed source text, and inline `[RE-INGEST ITEM]` / `[重新处理本文]` controls scoped to this item only.
 - **avoidFor**: Global ingest controls, Source Ledger operations, provider settings, provider tabs, marketplace UI, durable model/prompt preferences, modals, toasts, dashboards, job history, related-content modules, or client-inferred source grouping.
 
 Purpose: deliberate Inspect surface for detail reading and verification.
 
-Anatomy: source/provenance header, Resonate action (mobile/single-column route only), title, original link, one processing/provenance state line, model-backed summary/core sections when available, item-scoped re-ingest panel, collapsed source text or source evidence disclosure, why-this-appeared line when useful, and source-list disclosure for grouped stories. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below.
+Anatomy: source/provenance header, Resonate action (mobile/single-column route only), localized title, original link, one processing/provenance state line, model-backed structured reading sections when available, item-scoped re-ingest panel, collapsed source text or source evidence disclosure, why-this-appeared line when useful, and source-list disclosure for grouped stories. The structured reading order is [SHARP]: `摘要` section, `核心洞察` section, then `要点` section. `核心洞察` is exactly one concise Chinese sentence; multi-point requests route into `要点`. `要点` is a semantic `<ul>`/list control with 3–5 Chinese `<li>` items from the structured `key_points` array, not a Markdown blob, not generated HTML, and not copied into the Feed. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, OK model-backed Chinese content, latest re-ingest attempt failed while preserved content remains visible, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below.
+
+### Inspector Summary (`摘要`)
+- **Intent**: [SHARP] Chinese contextual explanation of the selected item.
+- **useFor**: Model-backed `summary` text, localized to Chinese when processing language is Chinese, placed before `核心洞察` and `要点` in Inspector.
+- **avoidFor**: Feed-row Key Points, raw Markdown lists, source/provenance literals, fallback ghost text when summary is unavailable, or a catch-all container for schema-changing prompt requests.
+
+### Inspector Core Insight (`核心洞察`)
+- **Intent**: [SHARP] One concise Chinese sentence answering why the selected item matters.
+- **useFor**: Validated `core_insight` only; a single sentence displayed as prose below `摘要`.
+- **avoidFor**: Bullet lists, numbered lists, multi-sentence paragraphs, Markdown, field labels, source identifiers, or any user prompt request to “分点” that should instead populate `key_points`.
+
+### Inspector Key Points (`要点`)
+- **Intent**: [SHARP] High-density structured comprehension for the selected item without bloating Feed rows.
+- **useFor**: Rendering `key_points` as exactly 3–5 Chinese, source-grounded list items in Inspector using controlled list semantics such as `<section aria-label="要点"><ul><li>…</li></ul></section>`.
+- **avoidFor**: Feed rows, raw Markdown strings, generated HTML, decorative bullets without data backing, generic filler, duplicate copies of `核心洞察`, fewer than 3 items, more than 5 items, or source/provenance literals translated into Chinese.
 
 ### Inspector Item Re-ingest (`inspector-reingest-panel`)
 - **Intent**: [SHARP] Re-run model processing for exactly the currently inspected item as a one-time operation.
@@ -657,7 +709,7 @@ States:
 - running: action text becomes `[RE-INGESTING ITEM...]` / `[正在重新处理本文...]` with `aria-disabled="true"`; no spinner, progress bar, animated ellipsis, toast, modal, or dashboard;
 - complete: terse inline receipt such as `re-ingest complete · search refreshed`; refreshed item content appears when available;
 - conflict: raw current-operation conflict detail, e.g. `err: re-ingest blocked — op: item_reingest · actor:human · scope:item_01 · phase:processing · since 14:00:00`;
-- failed: raw `err: <diagnostic>` line adjacent to the panel.
+- failed: [SHARP] non-destructive localized attempt-failure line adjacent to the panel while existing localized title, summary, core insight, and 3–5 Key Points remain visible. Canonical Chinese shape: `上次重处理失败 · 解码错误 · 已保留现有摘要和要点`. The UI must not replace preserved content with a URL-like title, raw error, empty Summary/Core, or fallback source excerpt solely because the latest re-ingest attempt failed. Raw diagnostic detail may remain available to developers where already supported, but user-facing failure text is localized and attempt-scoped.
 
 Accessibility and focus: opening configuring state keeps focus inside the inline panel on the model selector or first available model. Loading/unavailable/complete/failed messages use visible text and `aria-live="polite"`; conflict/errors use `aria-live="assertive"`. Running uses `aria-disabled="true"` rather than removing focus from the trigger. `[CANCEL]` returns focus to `[RE-INGEST ITEM]`; completion returns focus to the refreshed Inspector heading or the re-ingest trigger. The panel must be reachable in normal tab order and must not trap focus like a modal.
 
@@ -672,7 +724,7 @@ Grouped-source disclosure contract: Inspector may show a source-list disclosure 
 
 Fallback/source-evidence contract: If target-language/model processing has not produced model-backed summary or core insight, Inspector must not render ghost Summary or Core sections. It shows exactly one low-chrome processing state line below title/original-link/provenance metadata, then one collapsed source evidence disclosure only if a source excerpt exists. Recommended copy is `target-language processing incomplete · summary/core unavailable · showing source excerpt` / `中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录`, followed by a disclosure summary such as `Source evidence (collapsed): RSS excerpt` / `出处记录（已折叠）：RSS 摘录` and the raw RSS excerpt inside the controlled region. Model latency/error states use the same one-line pattern with `failed`/`失败`; original-unavailable states use one unavailable line. Fallback source excerpt is provenance evidence, not completed synthesized target-language reading content. Source identifiers, original link, and source title remain literal.
 
-OK model-backed contract: If model-backed summary/core exists, Inspector renders processing/provenance normally and shows Summary and Core insight as available, with Source text available behind the default-collapsed disclosure. Source-text status and summary provenance remain evidence, not warning banners. If full article text is unavailable but RSS excerpt text exists and the model still produced validated summary fields, Inspector may say `source text: RSS excerpt only` while separately saying `summary provenance: model-backed`.
+OK model-backed contract: If model-backed summary/core/key_points exist, Inspector renders processing/provenance normally and shows `摘要`, `核心洞察`, and `要点` as available, with Source text available behind the default-collapsed disclosure. Source-text status and summary provenance remain evidence, not warning banners. If full article text is unavailable but RSS excerpt text exists and the model still produced validated summary fields, Inspector may say `source text: RSS excerpt only` / `来源文本：仅 RSS 摘录` while separately saying `summary provenance: model-backed` / `摘要出处：模型支持`. Key Points remain a controlled Inspector list even when source text is RSS-excerpt-only; they are not a Markdown fallback.
 
 Note on Resonate Action: To maintain a clean, low-fatigue interface, the Inspector only duplicates the Resonate action when presented as a single-column mobile route (where the feed is hidden). In desktop split-pane mode, the Inspector does not show a star; the user relies on the permanently visible star on the selected feed item to their left.
 
@@ -812,6 +864,9 @@ Do:
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
+- [SHARP] Do render successful Chinese generated content in Inspector as `摘要`, `核心洞察`, and `要点`, with `要点` as a controlled 3–5 item list sourced from structured `key_points`.
+- [SHARP] Do preserve existing localized title, summary, core insight, and Key Points after a failed re-ingest attempt, while showing localized attempt-scoped failure copy such as `上次重处理失败 · 解码错误 · 已保留现有摘要和要点`.
+- [SHARP] Do keep generated/user-facing content and failure/status text Chinese-localized when processing language is Chinese, while preserving URL/source/provenance/model literals unchanged.
 - [SHARP] Do keep item re-ingest controls inside Inspector only, scoped to the selected item, and presented as `[RE-INGEST ITEM]` / `[重新处理本文]` with temporary OpenRouter model and optional one-time prompt inputs.
 - [SHARP] Do label Inspector extra prompt as one-time guidance only: it may affect emphasis, angle, and source-backed fact selection, but never schema, source grounding, target language, source identifiers, safety, provenance, runtime/provider status, or persistence boundaries.
 - [SHARP] Do collapse source text/source evidence by default for every newly opened Inspector item while preserving accessible disclosure semantics and literal provenance.
@@ -840,6 +895,9 @@ Don't:
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
 - Don't display internal design-positioning phrases such as “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” as product UI copy.
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
+- [SHARP] Don't show Key Points in Feed rows; Feed remains title, compact summary/core preview, metadata, and Resonate only.
+- [SHARP] Don't render Key Points from raw Markdown, generated HTML, paragraph text split heuristics, or bullets inferred by the client; use the structured `key_points` array only.
+- [SHARP] Don't let a failed re-ingest attempt hide, erase, or visually demote preserved title/summary/core/key_points content.
 - [SHARP] Don't put re-ingest in Feed rows, Source Ledger, persistent global chrome, `/doctor`, provider settings, or a marketplace/provider abstraction surface.
 - [SHARP] Don't save the Inspector re-ingest model or extra prompt as defaults, preferences, steering state, item provenance, local storage, exportable state, or reusable templates.
 - [SHARP] Don't imply that the Inspector extra prompt can request schema changes, a different processing language, translated source identifiers, unsupported facts, provider/runtime status changes, prompt/secrets disclosure, or durable prompt/model state.
@@ -885,17 +943,22 @@ Motion is functional, brief, and optional.
 +--------------------------------------------------------------------------------+
 | > Steer or paste RSS URL...                                        RESOFEED    |
 +--------------------------------------------------------------------------------+
-| src: nyt · 2h · fresh                                    TODAY | INSPECTOR     |
-| The Main Headline Goes Here        [☆]    | [src: nyt] [source excerpt]        |
-| Dense factual summary, clamped to         | The Main Headline Goes Here        |
-| two lines in the index row.               | source text: RSS excerpt only      |
-| ----------------------------------------- | summary provenance: model-backed   |
-|                                          | [RE-INGEST ITEM]                  |
+| src: TLDR AI Feed · 2h · 全文                           TODAY | INSPECTOR     |
+| 中国本地化标题示例               [☆]    | [src: TLDR AI Feed] [全文]         |
+| 中文摘要预览保持紧凑；馈送不显示要点。     | 中国本地化标题示例                  |
+| ----------------------------------------- | 摘要：中文上下文摘要。              |
+|                                          | 核心洞察：一句话中文判断。          |
+|                                          | 要点：                             |
+|                                          | • 结构化要点一                     |
+|                                          | • 结构化要点二                     |
+|                                          | • 结构化要点三                     |
+|                                          | 上次重处理失败 · 已保留现有摘要和要点 |
+|                                          | [重新处理本文]                    |
 |                                          | model: default: account_default    |
-|                                          | extra prompt (guidance, not saved) |
-|                                          | cannot override schema/lang/status |
-|                                          | [CONFIRM RE-INGEST] [CANCEL]       |
-|                                          | Source text (collapsed) ▸          |
+|                                          | 额外提示（仅本次，不保存）          |
+|                                          | 不能覆盖结构/语言/状态              |
+|                                          | [确认重新处理] [取消]              |
+|                                          | 来源文本（已折叠） ▸               |
 | src: hn · 4h · agent:delivery-bot         | ---------------------------------- |
 | Secondary Story                     [★]   | Source text stays behind           |
 | ----------------------------------------- | disclosure; original link visible. |

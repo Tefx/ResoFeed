@@ -1,10 +1,10 @@
 # ResoFeed Architecture Spec
 
 Version: 1.2
-Status: Core runtime implemented, including Prompting System v2.1 structured-output routing and prompt/model MCP parity
+Status: Core runtime implemented for the previously documented v2.1 path; Prompting System v2.2/content-contract redesign is the accepted target for generated content fields and re-ingest semantics
 Source contracts: `docs/PRD.md`, `docs/DESIGN.md`, `docs/PROMPTING_SYSTEM.md` for prompt compilation, structured-output routing, and OpenRouter summary output schema
 
-Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, UI language/split-scroll, Prompting System v2.1 dynamic `json_schema` routing, and MCP prompt/model parity contracts described here are implemented behavior as of this documentation sync. Runtime v2.1 compliance depends on emitting `schema_version: "resofeed.summarize.v2.1"`, using the v2.1 payload, routing structured output according to `docs/PROMPTING_SYSTEM.md`, and validating the v2.1 schema plus Go semantic boundary. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
+Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, UI language/split-scroll, Prompting System v2.1 dynamic `json_schema` routing, and MCP prompt/model parity contracts described here were implemented behavior as of the prior documentation sync. `docs/PROMPTING_SYSTEM.md` now defines the v2.2 generated-content contract. Runtime v2.2 compliance depends on emitting `schema_version: "resofeed.summarize.v2.2"`, using the v2.2 payload/output fields, routing structured output according to `docs/PROMPTING_SYSTEM.md`, and validating the v2.2 schema plus Go semantic boundary before persistence. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
 
 ## 1. Decisions
 
@@ -25,6 +25,8 @@ Contract baseline: these decisions are anchored in the current product/design do
 13. **Existing library reprocess is explicit and non-durable.** Changing the default language affects future processing only. A user-triggered one-time reprocess may rewrite existing user-readable item content into the current language and rebuild FTS, but it must not introduce a durable job queue, activity ledger, sync protocol, or settings dashboard. Rationale: explicit migration preserves user control while keeping the one-process architecture. Fails if reprocess must continue across process restarts as a managed background job.
 14. **Desktop split scroll is frontend containment, not behavioral state.** The feed and Inspector scroll independently on desktop, while mobile keeps a full-screen Inspector route. Rationale: independent scroll preserves triage context without adding persisted reading-position tracking. Fails if scroll depth becomes a ranking or analytics input, which is out of scope.
 15. **Inspector item re-ingest is item-scoped, one-time, and non-durable.** The Inspector may expose a per-article re-ingest action that reprocesses exactly the selected item with an optional request-scoped OpenRouter model override and optional request-scoped extra prompt. The selected model and prompt must not be persisted, exported, reused as defaults, shown as history, or written to item metadata. Rationale: the owner needs a surgical retry/quality repair path without turning ResoFeed into a prompt-management, model-settings, or job-dashboard product. Fails if users require durable per-source/per-item model policies, reusable prompt templates, or multi-provider orchestration.
+16. **Generated content uses a structured content contract.** Model-backed item content separates literal provenance (`source_item_title`, source/source URLs, source identifiers) from localized generated display content (`localized_title`, `summary`, `core_insight`, `key_points`, `value_tier`, and model semantic status). `key_points` is a first-class 3-5 item generated field for Inspector rendering, not Markdown embedded in summaries. Rationale: explicit fields remove title-localization ambiguity and give list-shaped user intent a safe schema slot. Fails if a future schema collapses source and localized titles back into one overloaded `title` or renders model-generated lists as raw Markdown.
+17. **Re-ingest failures are attempt state, not destructive content state.** Successful re-ingest may atomically replace generated content fields and refresh selected FTS rows; failed provider/decode/schema/semantic attempts update only app-owned attempt diagnostics such as `last_reprocess_*` and must preserve existing valid generated content and `content_status`. Rationale: a failed repair attempt should not degrade a usable item. Trade-off: status modeling is more explicit because current content health and latest attempt outcome are separate. Fails if UI or transport hides current content solely because the latest attempt failed.
 
 ## 2. System Boundary
 
@@ -186,6 +188,8 @@ Out of scope:
 | Agent idempotency receipts | `agent_receipts` | No by default | Required for retry safety/provenance, not a user-facing activity ledger. |
 | Runtime metadata | `runtime_metadata` | No | Stores owner-token hash, local processing language, and optional runtime diagnostics; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
 | Current operation snapshot | process memory (`currentOperationSnapshot` behind the ingest/reprocess guard) | No | Best-effort description of the guarded operation currently running in this Go process; cleared when the guard releases. |
+| Generated item content | `items` generated-content columns | No by default | Current validated localized content contract for display/search; source provenance remains separate from generated display fields. |
+| Last reprocess attempt | app-owned `last_reprocess_*` diagnostics on the affected item/result surface | No | Latest attempt outcome is operational diagnostics and must not overwrite valid current generated content after a failed attempt. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
 | Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. |
 
@@ -386,7 +390,7 @@ architecture_basis:
       - POST /api/items/{id}/reingest reprocesses exactly one selected item with optional request-scoped model and prompt.
       - MCP parity exposes equivalent agent-accessible product operations only if the HTTP operation is exposed to humans and the runtime DTO/config wiring has been verified for that operation.
     item_reingest_response_shape: "{ already_applied: boolean, reingest: { item_id, status, language, item_updated, fts_updated, error, item: ItemDetail|null } } is canonical across HTTP, MCP, and frontend tests."
-    stable_openrouter_summary_schema: "OpenRouter output remains title, feed_excerpt, extracted_text, summary, core_insight, value_tier, and model_status; docs/PROMPTING_SYSTEM.md is canonical for prompt/schema details."
+    stable_openrouter_summary_schema: "OpenRouter output for the v2.2 content contract is localized_title, summary, core_insight, key_points, value_tier, and model_status; source_item_title is app/source-owned provenance, not model output. docs/PROMPTING_SYSTEM.md is canonical for prompt/schema details."
   state_strata:
     durable_product_state:
       - sources
@@ -533,10 +537,10 @@ Required fields:
 - stable text `id`;
 - `source_id`;
 - original URL and normalized/canonical URL when available;
-- title and feed excerpt;
-- persisted model-generated target-language representative excerpt/detail text in `items.extracted_text` when available; this is not app-owned raw source extraction;
-- dense summary and core insight when available;
+- literal source item title/provenance and localized generated display title as separate concepts; compatibility surfaces may still expose `title`, but architecture must preserve the split between source provenance and localized display output;
+- persisted model-generated target-language generated fields when available, including summary, exactly-one-sentence core insight, and structured 3-5 item `key_points` for Inspector rendering;
 - quality/value tier or equivalent priority category;
+- current generated content status separate from latest reprocess attempt diagnostics;
 - published and first-seen timestamps;
 - extraction/model fallback status;
 - story grouping key and direct-duplicate pointer when known.
@@ -544,6 +548,9 @@ Required fields:
 Invariants:
 
 - original item provenance remains accessible when grouped;
+- source item title/provenance is never localized or rewritten by the LLM;
+- `key_points` is stored and transported as a structured array, not raw Markdown;
+- failed item re-ingest attempts preserve existing generated content and update only attempt diagnostics;
 - grouping never behaves like source suppression or hidden spam filtering;
 - extraction/model failure never deletes the item.
 
@@ -625,7 +632,7 @@ Indexed content:
 - core insight;
 - provenance fields useful for verification.
 
-`search_fts` must include `items.title`, `sources.title`/source title, `items.feed_excerpt`, `items.summary`, `items.extracted_text`, `items.core_insight`, and provenance identifiers useful for verification. `value_tier` is filterable/searchable through ordinary SQL metadata matching when needed; it is not required to be copied into the FTS table.
+`search_fts` must include the current localized display title, source item/source title provenance, `items.feed_excerpt` or compatibility excerpt text where still exposed, `items.summary`, `items.extracted_text` or compatibility detail text where still exposed, `items.core_insight`, structured `key_points` flattened only for indexing, and provenance identifiers useful for verification. `value_tier` is filterable/searchable through ordinary SQL metadata matching when needed; it is not required to be copied into the FTS table.
 
 Invariants:
 
@@ -744,7 +751,7 @@ Failure contract:
 - timeout of the 20-second source fetch limit maps to an RSS/source fetch diagnostic and leaves no persistent pending job;
 - no failure path creates an elaborate UI degradation mode.
 
-#### 5.1.1 Prompting System v2.1
+#### 5.1.1 Prompting System v2.2
 
 Prompting is part of the ingestion contract because the LLM is a bounded JSON transformer, not an orchestrator, state holder, validator, or database writer. The canonical prompting contract is now maintained in [`docs/PROMPTING_SYSTEM.md`](PROMPTING_SYSTEM.md).
 
@@ -755,8 +762,9 @@ Architecture-level binding summary:
 - prefer OpenRouter native `json_schema` structured outputs with strict schema when Go determines before the summarization call that the selected model/provider supports it;
 - fall back to `json_object` plus the same Go validation when schema support is unknown, unavailable, or the support check fails; do not silently switch the selected model solely to gain schema support;
 - keep Inspector one-time prompts above durable steering/default style, but below schema, source grounding, target language, safety, and source-identifier preservation;
+- field-scope Inspector one-time prompts and active Steer effects: they may affect emphasis, source-backed fact selection, `summary`, `core_insight` angle, `key_points` focus/order, and value judgment, but must not alter schema, status values, provenance fields, target language, or `core_insight` shape;
 - keep top input global-only; per-item one-time prompting belongs only to the selected Inspector re-ingest control;
-- treat RSS-agent density alignment as prompt guidance only, not as a hard schema or validation gate;
+- treat RSS-agent density alignment as prompt guidance only, except for the explicit v2.2 content-contract schema fields maintained in `docs/PROMPTING_SYSTEM.md`;
 - keep runtime/provider errors, persistence decisions, validation, and retry policy owned by Go.
 
 Implementers must read `docs/PROMPTING_SYSTEM.md` before changing OpenRouter prompt compilation, summary output fields, source-text normalization, one-time prompt behavior, structured-output routing, or prompt-related regression fixtures.
@@ -1023,7 +1031,8 @@ Responsibilities:
 - optionally pass a request-scoped OpenRouter model override for this call only;
 - optionally pass a request-scoped prompt for this call only (`prompt` canonical, `extra_prompt` compatibility);
 - validate OpenRouter JSON before any item-field update;
-- update the selected item's readable fields and refresh only that item's `search_fts` row in the same successful or storable-failure write path;
+- on successful validation, update the selected item's generated content fields and refresh only that item's `search_fts` row in the same write path;
+- on provider/decode/schema/semantic failure, preserve existing generated content and update only safe latest-attempt diagnostics such as `last_reprocess_*`;
 - return the refreshed `ItemDetail` when the selected item row was committed.
 
 Non-responsibilities:
@@ -1049,7 +1058,7 @@ Temporary extra prompt rules:
 - `prompt` is canonical and `extra_prompt` is a compatibility alias normalized to the same one-time prompt semantic value;
 - if both fields are present with different non-empty normalized values, validation fails before any OpenRouter call;
 - extra prompt is subordinate to the fixed JSON output, provenance, source-grounding, and target-language contracts;
-- extra prompt may refine emphasis or extraction priority for the selected item, but it cannot override required fields, model-status values, source identifier preservation, target language, or safety/secret redaction rules;
+- extra prompt may refine emphasis, source-backed fact selection, `summary` emphasis, `core_insight` angle, and `key_points` focus/order for the selected item, but it cannot override required fields, content/model-status values, source identifier preservation, target language, `core_insight` single-sentence shape, or safety/secret redaction rules;
 - extra prompt is request-only and must not be persisted, exported, imported, logged as history, copied into item metadata, or reused after the request;
 - before validation, trim surrounding Unicode whitespace;
 - omitted, `null`, or empty after trimming means no extra prompt;
@@ -1073,11 +1082,11 @@ Failure/status contract:
 | any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
 | fresh source succeeds or stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
 | fresh source fails but stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated from fallback input; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | stable unavailable state committed: title falls back to URL/`Untitled`, generated readable fields are cleared, extraction/model status reflect unavailable, selected FTS row is refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | stable model-failure state committed when storable: title falls back to URL/`Untitled`, generated readable fields and `value_tier` are cleared, `model_status: "invalid_model"`, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | stable model-failure state committed when storable using the same clear-generated-fields rule and matching `model_status`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | stable model-failure state committed when storable with `model_status: "decode_error"`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | stable unavailable/summary-unavailable state committed; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | no generated-content rewrite; `last_reprocess_*` records the safe invalid-model attempt result; existing `content_status` and selected FTS row are preserved |
+| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | no generated-content rewrite; `last_reprocess_*` records the safe attempt result; existing `content_status` and selected FTS row are preserved |
+| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | no generated-content rewrite; `last_reprocess_*` records the safe validation/decode attempt result; existing `content_status` and selected FTS row are preserved |
+| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | no destructive generated-content rewrite when valid prior content exists; latest-attempt diagnostics record unavailable semantics; existing selected FTS row is preserved unless there was no prior valid generated content to preserve |
 | operation timeout/context cancellation before stable item write | `200` | `failed` | N/A | `timeout` | no queued work; `item_updated: false`; `fts_updated: false` unless a stable row was already committed; `item` present and non-null if a stable row was committed and detail reload succeeds |
 | fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | N/A | no queued recovery work; committed transaction state, if any, remains authoritative |
 
@@ -1086,6 +1095,7 @@ Additional failure rules:
 - source fetch failure falls back to stored readable text using the approved reprocess fallback order;
 - model/provider/decode/rate-limit/timeout failures use the same safe diagnostic taxonomy as ingestion and library reprocess;
 - prompt validation failures use `docs/PROMPTING_SYSTEM.md` `PromptValidationFailureCode` internally; after retry exhaustion all prompt validation failures map to public `ReprocessErrorDetail.code: "decode_error"` unless the source was app-owned unavailable and the model returned a valid `summary_unavailable`;
+- failed item re-ingest attempts are non-destructive: they must not clear `localized_title`, `source_item_title`, `summary`, `core_insight`, `key_points`, `value_tier`, or current `content_status`; they update only latest-attempt diagnostics and response error details;
 - raw provider payloads, API keys, `.env` paths, owner tokens, secret-source metadata, and prompt text must not appear in diagnostics, `/doctor`, UI result lines, or MCP error data;
 - successful completion or storable item-level failure leaves `search_fts` consistent with the final selected item row;
 - fatal SQLite or invariant errors before response construction return canonical internal errors and do not create queued recovery work.
@@ -1794,7 +1804,7 @@ Extra prompt validation rules:
 | `status` | string enum | Yes | No | `completed`, `completed_with_errors`, or `failed`. |
 | `item_id` | string | Yes | No | Selected item ID. |
 | `language` | string enum | Yes | No | Processing language used for the operation. |
-| `item_updated` | boolean | Yes | No | True when the selected item row was committed to a new stable state, including a successful model-backed rewrite, stable unavailable state, or stable model-failure state; false when no selected item row mutation was committed. |
+| `item_updated` | boolean | Yes | No | True when the selected item row's generated content was successfully replaced, or when only latest-attempt diagnostics were committed for a failed attempt; false when no selected item row mutation was committed. |
 | `fts_updated` | boolean | Yes | No | True when selected-item `search_fts` reflects the final item row. |
 | `error` | `ReprocessErrorDetail` | Yes | Yes | Null on clean completion; otherwise safe terse diagnostic for this item/global failure. |
 | `item` | `ItemDetail` | Yes | Yes | Refreshed selected item detail or `null`. Present in the JSON object. Must be non-null whenever `item_updated: true`; `null` is allowed only when no selected item row mutation was committed, or when detail production failed due to fatal/internal serialization failure. |
@@ -1866,11 +1876,11 @@ Status/error mapping:
 | item not found | `404` | N/A | `not_found` | N/A | no item write, no FTS write |
 | any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
 | source/fallback text available and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | stable unavailable state committed: title falls back to URL/`Untitled`, generated readable fields are cleared, extraction/model status reflect unavailable, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | stable model-failure state committed when storable: title falls back to URL/`Untitled`, generated readable fields and `value_tier` are cleared, `model_status: "invalid_model"`, selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | stable model-failure state committed when storable using the same clear-generated-fields rule and matching `model_status`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | stable model-failure state committed when storable with `model_status: "decode_error"`; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | stable unavailable/summary-unavailable state committed; when committed, `item_updated: true`, selected FTS row refreshed, and `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
+| syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | no generated-content rewrite; `last_reprocess_*` records the safe invalid-model attempt result; existing `content_status` and selected FTS row are preserved |
+| provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | no generated-content rewrite; `last_reprocess_*` records the safe attempt result; existing `content_status` and selected FTS row are preserved |
+| OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | no generated-content rewrite; `last_reprocess_*` records the safe validation/decode attempt result; existing `content_status` and selected FTS row are preserved |
+| valid model output reports `summary_unavailable` for app-owned unavailable source | `200` | `completed_with_errors` | N/A | `summary_unavailable` | no destructive generated-content rewrite when valid prior content exists; latest-attempt diagnostics record unavailable semantics; existing selected FTS row is preserved unless there was no prior valid generated content to preserve |
 | timeout/context cancellation before stable item write | `200` | `failed` | N/A | `timeout` | no queued work; `item_updated: false`; `fts_updated: false` unless a stable row already committed; `item` present and non-null if a stable row was committed and detail reload succeeds |
 | fatal SQLite/invariant failure before result serialization | `500` | N/A | `internal` | N/A | no queued recovery work; committed transaction state, if any, remains authoritative |
 

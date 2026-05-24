@@ -85,6 +85,10 @@ This vocabulary defines product semantics only. Architecture and UI/UX own imple
 | **Fresh / recent** | Newly arrived or time-sensitive enough to deserve daily attention. | A fixed implementation window dictated by the PRD. |
 | **Old** | No longer naturally competing for daily attention unless renewed by a related development. | Deleted, forgotten, or inaccessible. |
 | **Inspect** | A deliberate allocation of attention to an item or externally delivered item. | Agreement, durable preference, or passive dwell-time tracking. |
+| **Inspector** | The structured reading surface for a selected item, including generated summary, core insight, Key Points, provenance, and applicable status messages. | A second feed, a mini-article embedded in feed rows, or a place to hide provenance. |
+| **Key Points** | A first-class generated content concept: a fixed set of 3–5 source-grounded, high-density points for structured reading. | Raw Markdown emitted by the model, optional decorative bullets, or content shown directly in feed rows. |
+| **Source/provenance title** | The literal title captured from the RSS/source item and preserved as evidence. | A localized or model-rewritten display headline. |
+| **Localized display title** | The Chinese display title generated for reading when Chinese is the processing language. | A replacement for literal source provenance. |
 | **Resonate** | Durable value worth remembering and amplifying. | Agreement, ideological endorsement, pinning, or save-for-later. |
 | **Steer** | Explicit natural-language correction to future system behavior. | Casual chat or a hidden configuration language. |
 | **Trusted source** | A configured or justifiable source whose provenance is visible enough for coverage decisions. | A hardcoded source list hidden from the user. |
@@ -301,17 +305,27 @@ Requirements:
 
 ### 7.5 Item understanding outputs
 
-Every processed item must provide enough information to support scanning, ranking, retrieval, and agent handoff.
+Every processed item must provide enough information to support scanning, structured reading, ranking, retrieval, and agent handoff.
 
 Required product-level outputs:
 
 - objective quality assessment;
 - value tier or equivalent priority category;
-- concise core insight;
+- localized display title when generated reading content is available in Chinese;
+- preserved source/provenance title that remains literal and distinguishable from the localized display title;
+- concise core insight as exactly one generated sentence;
 - dense factual summary;
+- Key Points as a first-class generated content concept with a fixed 3–5 source-grounded items for successful generated output;
 - source and extraction provenance;
 - topical metadata and searchable text for retrieval and ranking;
-- concise rationale for why the item may deserve attention when surfaced.
+- concise rationale for why the item may deserve attention when surfaced;
+- processing and re-ingest status messages that are user-facing and Chinese-localized when Chinese is the processing language.
+
+Generated reading content must be Chinese-localized when Chinese is the processing language. Source and provenance literals, including URLs, source IDs, source names, source titles, product/company names without conventional Chinese renderings, and exact source quotes, must remain unchanged.
+
+Failed re-ingest or reprocessing attempts must be non-destructive: the current usable generated content remains visible, and the latest attempt failure is recorded separately for user-facing status and diagnostics.
+
+Historical items should be re-ingested after the new content contract is implemented so older content can gain localized display titles and Key Points where source data allows.
 
 Exact data shapes, models, schemas, and storage choices are architecture-owned and not specified by this PRD.
 
@@ -320,6 +334,8 @@ Exact data shapes, models, schemas, and storage choices are architecture-owned a
 ### 8.1 Unified daily attention surface
 
 ResoFeed must provide a primary daily experience that lets the human quickly understand what is new, relevant, and worth inspecting without managing folders, numeric indicators, or archive states.
+
+The feed list is the scanning surface. It may show compact item identity, localized display title, summary preview, provenance, and value/provenance labels, but it must not show Key Points. Users who need structured reading details should open the Inspector.
 
 The product requirement is a unified low-friction daily experience. Specific layout, navigation, density, and visual hierarchy are UI/UX-owned.
 
@@ -472,15 +488,17 @@ The explanation must not expose implementation details, but should help the user
 
 ### 12.2 Summary reliability
 
-ResoFeed summaries **must** expose extraction limitations to enable objective verification.
+ResoFeed summaries and generated reading content **must** expose extraction limitations to enable objective verification.
 
 Requirements:
 
-- users **must** be able to tell when a summary is based on full article text versus RSS excerpt source text;
+- users **must** be able to tell when generated reading content is based on full article text versus RSS excerpt source text;
 - source-text labels **must not** imply model failure when `model_status='ok'`; use plain provenance such as `source text: RSS excerpt only` alongside separate summary provenance such as `summary provenance: model-backed`;
+- source/provenance titles and localized display titles **must** remain conceptually distinguishable so localization does not erase literal evidence;
 - uncertainty, disagreement, or extraction limitations **must** be visible when material;
-- source provenance **must** remain accessible from summaries and search results;
-- summaries **must** avoid unsupported synthesis across unrelated sources.
+- source provenance **must** remain accessible from summaries, Key Points, and search results;
+- summaries, core insights, and Key Points **must** avoid unsupported synthesis across unrelated sources;
+- re-ingest failures **must** preserve existing usable content and communicate the latest attempt failure without presenting the item as newly empty or unusable.
 
 ## 13. Experience Requirements
 
@@ -492,7 +510,10 @@ ResoFeed must feel:
 - predictable, with no requirement to clear a queue;
 - transparent enough that users understand why surprising items appear;
 - correctable through natural language rather than configuration panels;
-- consistent across human and agent-mediated workflows.
+- consistent across human and agent-mediated workflows;
+- localized for Chinese reading workflows, with generated reading content and user-facing processing/re-ingest messages in Chinese while source/provenance literals remain unchanged.
+
+The feed list must remain optimized for scanning, while Inspector must serve as the structured reading surface for summary, core insight, Key Points, provenance, and re-ingest status.
 
 UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details. Frontend details such as design tokens and font fallbacks are explicitly deferred to the later `docs/DESIGN.md` phase.
 
@@ -599,6 +620,30 @@ Given a manual fetch encounters an RSS/network/source error, when the request co
 Given a manual fetch exceeds the architecture's source fetch timeout, when the request completes, then the system must report the timeout as a fetch error and must not leave a persistent job, queue item, activity entry, or pending UI state behind.
 
 Given Source Ledger renders these controls, when viewed in desktop or mobile web, then the controls must remain lightweight bracket actions and must not introduce folders, tags, source hierarchy, job dashboards, retry panels, settings screens, or activity ledgers.
+
+### AC-19 Key Points contract
+
+Given an item has successful generated reading content, when the item is inspected, then the Inspector must present Key Points as a first-class structured reading element containing exactly 3–5 source-grounded items, not as raw model-emitted Markdown.
+
+### AC-20 Feed excludes Key Points
+
+Given an item has generated Key Points, when the item appears in the feed list, then the feed row must not render those Key Points; opening the item must make the structured Key Points available in Inspector.
+
+### AC-21 Chinese localization with literal provenance
+
+Given Chinese is the processing language, when generated reading content or user-facing processing/re-ingest status is shown, then the localized display title, summary, core insight, Key Points, and status text must be Chinese, while source/provenance literals such as URLs, source IDs, source names, source titles, exact quoted terms, and company/product names without conventional Chinese renderings must remain unchanged.
+
+### AC-22 Source title versus display title
+
+Given source content has a literal source/provenance title and model-backed generated content, when the item is shown in feed, Inspector, search, or provenance context, then the user must be able to distinguish the localized display title from the source/provenance title, and a failed re-ingest must not replace a valid existing title with a URL-like or fallback string.
+
+### AC-23 Non-destructive re-ingest failure
+
+Given an item already has usable generated content, when a re-ingest attempt fails validation, times out, returns provider/decode error, or produces unavailable output, then ResoFeed must preserve the current usable title, summary, core insight, Key Points, value tier, and content status while recording and displaying the latest attempt failure as a separate user-facing status.
+
+### AC-24 Historical content-contract re-ingest
+
+Given the new content contract is implemented, when historical items eligible for re-ingest are processed, then successful attempts should update generated reading fields to the new contract, including localized display titles and Key Points, while failed attempts must preserve existing usable historical content and record only latest-attempt failure status.
 
 ## 16. Ownership Boundaries
 
