@@ -28,7 +28,7 @@ func TestServeRuntimeWiresOpenRouterThroughIngestHTTPMCPDoctor(t *testing.T) {
 
 	model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"id":"chatcmpl_runtime","model":"openrouter/resolved-runtime","choices":[{"message":{"role":"assistant","content":"{\"title\":\"Runtime OpenRouter Item\",\"feed_excerpt\":\"Runtime excerpt.\",\"extracted_text\":\"Runtime extracted text.\",\"summary\":\"Runtime dense summary.\",\"core_insight\":\"Runtime validated insight.\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
+		_, _ = io.WriteString(w, `{"id":"chatcmpl_runtime","model":"openrouter/resolved-runtime","choices":[{"message":{"role":"assistant","content":"{\"localized_title\":\"Runtime OpenRouter Item\",\"summary\":\"Runtime dense summary.\",\"core_insight\":\"Runtime validated insight.\",\"key_points\":[\"Runtime specific point one.\",\"Runtime specific point two.\",\"Runtime specific point three.\"],\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
 	}))
 	defer model.Close()
 	llm := &openRouterHTTPClient{apiKey: "fake-openrouter-runtime-key", model: "openrouter/configured-runtime", endpoint: model.URL, client: model.Client()}

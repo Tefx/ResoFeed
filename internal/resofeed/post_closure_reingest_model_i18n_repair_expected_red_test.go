@@ -454,9 +454,12 @@ func (l *postClosureRecordingLLM) SummarizeItem(_ context.Context, input OpenRou
 	l.calls++
 	l.last = input
 	if input.TargetLanguage == ProcessingLanguageChinese {
-		return OpenRouterSummaryOutput{Title: "中文标题 " + input.ItemID, Summary: "中文摘要 " + input.ItemID, CoreInsight: "中文洞察 " + input.ItemID + "。", FeedExcerpt: "中文摘录 " + input.ItemID, ExtractedText: "中文正文 " + input.ItemID, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+		return OpenRouterSummaryOutput{LocalizedTitle: "中文本地名", Title: "中文本地名", Summary: "中文摘要 " + input.ItemID, CoreInsight: "中文洞察 " + input.ItemID + "。", FeedExcerpt: "中文摘录 " + input.ItemID, ExtractedText: "中文正文 " + input.ItemID, KeyPoints: []string{"中文要点一说明事实。", "中文要点二说明事实。", "中文要点三说明事实。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 	}
-	return OpenRouterSummaryOutput{Title: "English title " + input.ItemID, Summary: "English summary " + input.ItemID, CoreInsight: "English insight " + input.ItemID + ".", FeedExcerpt: "English excerpt " + input.ItemID, ExtractedText: "English body " + input.ItemID, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("English title "+input.ItemID, "English summary "+input.ItemID, "English insight "+input.ItemID+".", "high")
+	out.FeedExcerpt = "English excerpt " + input.ItemID
+	out.ExtractedText = "English body " + input.ItemID
+	return out, nil
 }
 
 func (l *postClosureRecordingLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

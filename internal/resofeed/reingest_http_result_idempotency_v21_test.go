@@ -274,7 +274,10 @@ type v21RecordingReingestLLM struct {
 func (l *v21RecordingReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	l.calls++
 	l.last = input
-	return OpenRouterSummaryOutput{Title: "V21 title", Summary: "V21 summary from " + input.AvailableText, CoreInsight: "V21 insight.", FeedExcerpt: "V21 excerpt", ExtractedText: "V21 extracted", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("V21 title", "V21 summary from "+input.AvailableText, "V21 insight.", "high")
+	out.FeedExcerpt = "V21 excerpt"
+	out.ExtractedText = "V21 extracted"
+	return out, nil
 }
 
 func (l *v21RecordingReingestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

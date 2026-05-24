@@ -344,7 +344,7 @@ type reprocessStatusLLM struct {
 type actualContextInvalidReingestLLM struct{}
 
 func (actualContextInvalidReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Title: "English title", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{LocalizedTitle: "English title", Title: "English title", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", KeyPoints: []string{"English source-backed point one.", "English source-backed point two.", "English source-backed point three."}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
@@ -352,7 +352,9 @@ func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRo
 }
 
 func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Title: "Fallback title", Summary: "Fallback summary.", CoreInsight: "Fallback insight.", ValueTier: "high", ModelStatus: l.status}, nil
+	out := ccrTestSummaryOutput("Fallback title", "Fallback summary.", "Fallback insight.", "high")
+	out.ModelStatus = l.status
+	return out, nil
 }
 
 func (l reprocessStatusLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
@@ -364,7 +366,10 @@ func (l *reprocessMatrixLLM) SummarizeItem(_ context.Context, input OpenRouterSu
 		return OpenRouterSummaryOutput{}, errors.New("synthetic model failure")
 	}
 	l.availableTexts = append(l.availableTexts, input.AvailableText)
-	return OpenRouterSummaryOutput{Title: "processed " + input.URL, Summary: "summary " + input.AvailableText, CoreInsight: "core insight " + input.AvailableText, FeedExcerpt: "excerpt " + input.AvailableText, ExtractedText: "extracted " + input.AvailableText, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("processed "+input.URL, "summary "+input.AvailableText, "core insight "+input.AvailableText, "high")
+	out.FeedExcerpt = "excerpt " + input.AvailableText
+	out.ExtractedText = "extracted " + input.AvailableText
+	return out, nil
 }
 
 func (l *reprocessTitleLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
@@ -373,9 +378,9 @@ func (l *reprocessTitleLLM) SummarizeItem(_ context.Context, input OpenRouterSum
 	}
 	l.inputTitles[input.ItemID] = input.Title
 	if input.ItemID == "item_url_title" {
-		return OpenRouterSummaryOutput{Title: "https://github.com/raindrop-ai/workshop?utm_source=tldrai", Summary: "中文摘要：保留标题", CoreInsight: "中文洞察：保留标题", FeedExcerpt: "中文摘录：保留标题", ExtractedText: "中文全文：保留标题", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+		return OpenRouterSummaryOutput{LocalizedTitle: "PRIOR title item_url_title", Title: "https://github.com/raindrop-ai/workshop?utm_source=tldrai", Summary: "中文摘要：保留标题", CoreInsight: "中文洞察：保留标题", FeedExcerpt: "中文摘录：保留标题", ExtractedText: "中文全文：保留标题", KeyPoints: []string{"中文要点一说明保留标题。", "中文要点二说明保留标题。", "中文要点三说明保留标题。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 	}
-	return OpenRouterSummaryOutput{Title: "真正的中文标题", Summary: "中文摘要：更新标题", CoreInsight: "中文洞察：更新标题", FeedExcerpt: "中文摘录：更新标题", ExtractedText: "中文全文：更新标题", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{LocalizedTitle: "真正的中文标题", Title: "真正的中文标题", Summary: "中文摘要：更新标题", CoreInsight: "中文洞察：更新标题", FeedExcerpt: "中文摘录：更新标题", ExtractedText: "中文全文：更新标题", KeyPoints: []string{"中文要点一说明更新标题。", "中文要点二说明更新标题。", "中文要点三说明更新标题。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (l *reprocessTitleLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

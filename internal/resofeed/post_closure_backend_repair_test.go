@@ -65,7 +65,7 @@ func TestPostClosureBackendRepairReingestStrictJSONAndPromptSafety(t *testing.T)
 			t.Fatalf("read OpenRouter request: %v", err)
 		}
 		captured = string(body)
-		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"title\":\"Safe title\",\"feed_excerpt\":\"Safe excerpt\",\"extracted_text\":\"Safe body\",\"summary\":\"Safe summary\",\"core_insight\":\"Safe insight.\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
+		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"localized_title\":\"Safe title\",\"summary\":\"Safe summary\",\"core_insight\":\"Safe insight.\",\"key_points\":[\"Safe specific point one.\",\"Safe specific point two.\",\"Safe specific point three.\"],\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
 	}))
 	t.Cleanup(provider.Close)
 	client := NewOpenRouterClient(OpenRouterConfig{APIKey: "sk-test-prompt", Endpoint: provider.URL})

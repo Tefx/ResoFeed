@@ -13,7 +13,7 @@ import (
 
 func TestMaliciousFakeLLMRejectedBeforeOKPersistenceInBuildItem(t *testing.T) {
 	ctx := context.Background()
-	valid := OpenRouterSummaryOutput{Summary: "Dense source backed summary.", CoreInsight: "One source backed insight.", ValueTier: "high", ModelStatus: modelStatusOK}
+	valid := ccrTestSummaryOutput("Processed title", "Dense source backed summary.", "One source backed insight.", "high")
 	for _, tc := range []struct {
 		name string
 		out  OpenRouterSummaryOutput
@@ -47,7 +47,9 @@ func TestMaliciousFakeLLMRejectedBeforeOKPersistenceInReprocess(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	valid := OpenRouterSummaryOutput{Title: "Processed title", Summary: "Dense source backed summary.", CoreInsight: "One source backed insight.", FeedExcerpt: "Processed excerpt.", ExtractedText: "Processed body.", ValueTier: "high", ModelStatus: modelStatusOK}
+	valid := ccrTestSummaryOutput("Processed title", "Dense source backed summary.", "One source backed insight.", "high")
+	valid.FeedExcerpt = "Processed excerpt."
+	valid.ExtractedText = "Processed body."
 	for _, tc := range []struct {
 		name string
 		out  OpenRouterSummaryOutput

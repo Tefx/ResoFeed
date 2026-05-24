@@ -241,7 +241,7 @@ func TestOpenRouterClientHandlesJSONSummarySteeringAndRetry(t *testing.T) {
 			http.Error(w, "try again", http.StatusTooManyRequests)
 			return
 		}
-		text := `{"title":"Dense title","feed_excerpt":"Dense excerpt","extracted_text":"Dense extracted text","summary":"Dense factual summary.","core_insight":"Why this matters.","value_tier":"high","model_status":"ok"}`
+		text := `{"localized_title":"Dense title","summary":"Dense factual summary.","core_insight":"Why this matters.","key_points":["Specific source-backed point one.","Specific source-backed point two.","Specific source-backed point three."],"value_tier":"high","model_status":"ok"}`
 		if len(req.Messages) == 1 && strings.Contains(req.Messages[0].Content, "translate_steering") {
 			text = `{"interpreted_as":"steering_policy_update","rule_texts":["Push more systems papers."],"message":"steering updated"}`
 		} else if len(req.Messages) != 2 || req.Messages[0].Role != "system" || req.Messages[1].Role != "user" {
@@ -365,9 +365,9 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 		return driver.RowsAffected(1), nil
 	case strings.HasPrefix(query, "insert into items"):
 		itemID, _ := args[0].Value.(string)
-		valueTier, _ := args[7].Value.(string)
-		extractionStatus, _ := args[10].Value.(string)
-		modelStatus, _ := args[11].Value.(string)
+		valueTier, _ := args[10].Value.(string)
+		extractionStatus, _ := args[18].Value.(string)
+		modelStatus, _ := args[19].Value.(string)
 		c.state.itemIDs[itemID] = true
 		c.state.items = append(c.state.items, ingestFakeItem{extractionStatus: extractionStatus, modelStatus: modelStatus, valueTier: valueTier})
 		return driver.RowsAffected(1), nil

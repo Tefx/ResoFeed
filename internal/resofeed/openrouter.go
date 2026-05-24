@@ -253,9 +253,6 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 	for i := range out.KeyPoints {
 		out.KeyPoints[i] = strings.TrimSpace(out.KeyPoints[i])
 	}
-	if err := validatePromptingV21OutputSchema(out); err != nil {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
-	}
 	if leaksPromptInjection(out.Summary) {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, "summary", nil)
 	}
@@ -276,6 +273,9 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationPromptInjectionLeakage, fmt.Sprintf("key_points[%d]", i), nil)
 		}
 	}
+	if err := validatePromptingV21OutputSchema(out); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+	}
 	if out.ModelStatus == modelStatusOK && hasEmptyRequiredGeneratedField(out) {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationEmptyRequiredGeneratedField, "generated_fields", nil)
 	}
@@ -291,7 +291,7 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 	if err := validatePromptLanguage(out, item.TargetLanguage); err != nil {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
-	if out.ModelStatus == modelStatusOK && len(out.KeyPoints) > 0 {
+	if out.ModelStatus == modelStatusOK {
 		if err := validateKeyPoints(out.KeyPoints, out.CoreInsight, item.TargetLanguage); err != nil {
 			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 		}
@@ -339,6 +339,9 @@ func validatePromptingV21OutputSchema(out OpenRouterSummaryOutput) error {
 	default:
 		return promptValidationError(PromptValidationSchemaInvalid, "model_status", nil)
 	}
+	if out.ModelStatus == modelStatusOK && (len(out.KeyPoints) < 3 || len(out.KeyPoints) > 5) {
+		return promptValidationError(PromptValidationSchemaInvalid, "v2.2_required_fields", nil)
+	}
 	switch out.ValueTier {
 	case "high", "brief", "source-claim":
 	default:
@@ -348,10 +351,7 @@ func validatePromptingV21OutputSchema(out OpenRouterSummaryOutput) error {
 }
 
 func hasEmptyRequiredGeneratedField(out OpenRouterSummaryOutput) bool {
-	if out.LocalizedTitle != "" || len(out.KeyPoints) > 0 {
-		return generatedTitle(out) == "" || out.Summary == "" || out.CoreInsight == "" || out.ValueTier == "" || len(out.KeyPoints) == 0
-	}
-	return out.Title == "" || out.FeedExcerpt == "" || out.ExtractedText == "" || out.Summary == "" || out.CoreInsight == "" || out.ValueTier == ""
+	return out.LocalizedTitle == "" || out.Summary == "" || out.CoreInsight == "" || out.ValueTier == "" || len(out.KeyPoints) == 0
 }
 
 func generatedTitle(out OpenRouterSummaryOutput) string {
@@ -897,25 +897,13 @@ func decodeStrictPromptingV21SummaryOutput(text string) (OpenRouterSummaryOutput
 	if err := json.Unmarshal([]byte(text), &raw); err != nil {
 		return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationDecodeError, "", fmt.Errorf("decode model json: %w", err))
 	}
-	newContract := raw["localized_title"] != nil || raw["key_points"] != nil
 	required := map[string]bool{
-		"title":          true,
-		"feed_excerpt":   true,
-		"extracted_text": true,
-		"summary":        true,
-		"core_insight":   true,
-		"value_tier":     true,
-		"model_status":   true,
-	}
-	if newContract {
-		required = map[string]bool{
-			"localized_title": true,
-			"summary":         true,
-			"core_insight":    true,
-			"key_points":      true,
-			"value_tier":      true,
-			"model_status":    true,
-		}
+		"localized_title": true,
+		"summary":         true,
+		"core_insight":    true,
+		"key_points":      true,
+		"value_tier":      true,
+		"model_status":    true,
 	}
 	for key := range raw {
 		if !required[key] {
@@ -936,7 +924,7 @@ func decodeStrictPromptingV21SummaryOutput(text string) (OpenRouterSummaryOutput
 	if err := validatePromptingV21OutputSchema(out); err != nil {
 		return OpenRouterSummaryOutput{}, err
 	}
-	if newContract && (len(out.KeyPoints) < 3 || len(out.KeyPoints) > 5) {
+	if out.ModelStatus == modelStatusOK && (len(out.KeyPoints) < 3 || len(out.KeyPoints) > 5) {
 		return OpenRouterSummaryOutput{}, promptValidationError(PromptValidationSchemaInvalid, "key_points", nil)
 	}
 	return out, nil

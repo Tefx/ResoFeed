@@ -330,7 +330,10 @@ type staticGemini struct {
 }
 
 func (g staticGemini) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Title: input.Title, FeedExcerpt: "Static sqlite excerpt.", ExtractedText: "Static sqlite extracted text.", Summary: g.summary, CoreInsight: g.coreInsight, ValueTier: g.valueTier, ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput(input.Title, g.summary, g.coreInsight, g.valueTier)
+	out.FeedExcerpt = "Static sqlite excerpt."
+	out.ExtractedText = "Static sqlite extracted text."
+	return out, nil
 }
 
 func (g staticGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

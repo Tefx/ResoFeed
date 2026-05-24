@@ -279,7 +279,10 @@ func (l *capturingReprocessLLM) SummarizeItem(_ context.Context, input OpenRoute
 	}
 	l.inputs[input.ItemID] = input
 	clean := strings.TrimSpace(input.AvailableText)
-	return OpenRouterSummaryOutput{Title: "rewritten " + input.ItemID, Summary: "summary " + clean, CoreInsight: "insight " + clean, FeedExcerpt: "excerpt " + clean, ExtractedText: "extracted " + clean, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("rewritten "+input.ItemID, "summary "+clean, "insight "+clean, "high")
+	out.FeedExcerpt = "excerpt " + clean
+	out.ExtractedText = "extracted " + clean
+	return out, nil
 }
 
 func (l *capturingReprocessLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

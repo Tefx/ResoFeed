@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -603,18 +604,23 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		entry.URL = source.URL + "#" + stableID("entry", entry.Title+entry.Description)
 	}
 	item := Item{
-		ID:          stableID("item", source.ID+"|"+entryIdentity(entry)),
-		SourceID:    source.ID,
-		SourceTitle: source.Title,
-		URL:         entry.URL,
-		Title:       entry.Title,
-		PublishedAt: entry.PublishedAt,
-		FeedExcerpt: nullableString(entry.Description),
-		Provenance:  Provenance{SourceURL: source.URL, OriginalURL: entry.URL},
-		ModelStatus: modelStatusSummaryNA,
+		ID:              stableID("item", source.ID+"|"+entryIdentity(entry)),
+		SourceID:        source.ID,
+		SourceTitle:     source.Title,
+		URL:             entry.URL,
+		Title:           entry.Title,
+		SourceItemTitle: entry.Title,
+		PublishedAt:     entry.PublishedAt,
+		FeedExcerpt:     nullableString(entry.Description),
+		Provenance:      Provenance{SourceURL: source.URL, OriginalURL: entry.URL},
+		ModelStatus:     modelStatusSummaryNA,
+		ContentStatus:   modelStatusSummaryNA,
 	}
 	if item.Title == "" {
 		item.Title = entry.URL
+	}
+	if strings.TrimSpace(item.SourceItemTitle) == "" {
+		item.SourceItemTitle = item.Title
 	}
 	sanitizeReadableItem(&item)
 	extracted, extractionStatus := extractArticleText(ctx, entry.URL, entry.Description)
@@ -642,8 +648,8 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	out, err = validateSummaryOutputForPersistence(out)
-	if err != nil {
+	compiled, compileErr := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	if compileErr != nil {
 		item.ModelStatus = modelStatusDecodeError
 		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 			item.ExtractionStatus = extractionStatusSummaryNA
@@ -651,11 +657,27 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
+	out, err = validateSummaryOutputForPersistenceWithPrompt(out, compiled.UserPayload.Item)
+	if err != nil {
+		item.ModelStatus = modelStatusDecodeError
+		item.ContentStatus = modelStatusDecodeError
+		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
+			item.ExtractionStatus = extractionStatusSummaryNA
+		}
+		sanitizeReadableItem(&item)
+		return item, nil
+	}
 	item.ModelStatus = mapModelStatus(out.ModelStatus)
+	item.ContentStatus = item.ModelStatus
 	if item.ModelStatus == modelStatusOK {
-		if strings.TrimSpace(out.Title) != "" {
+		if strings.TrimSpace(out.LocalizedTitle) != "" {
+			item.LocalizedTitle = nullableString(out.LocalizedTitle)
+			item.Title = out.LocalizedTitle
+		} else if strings.TrimSpace(out.Title) != "" {
+			item.LocalizedTitle = nullableString(out.Title)
 			item.Title = out.Title
 		}
+		item.KeyPoints = append([]string(nil), out.KeyPoints...)
 		if strings.TrimSpace(out.FeedExcerpt) != "" {
 			item.FeedExcerpt = nullableString(out.FeedExcerpt)
 		} else if targetLanguage == ProcessingLanguageChinese {
@@ -770,7 +792,11 @@ func itemExists(ctx context.Context, db *sql.DB, itemID string) (bool, error) {
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error) {
 	sanitizeReadableItem(&item)
-	res, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.Summary, item.CoreInsight, item.ValueTier, formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
+	keyPointsJSON, marshalErr := json.Marshal(item.KeyPoints)
+	if marshalErr != nil {
+		return false, fmt.Errorf("ingest item %q: marshal key points: %w", item.ID, marshalErr)
+	}
+	res, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, item.LastReprocessStatus, item.LastReprocessErrorCode, item.LastReprocessErrorMessage, formatTimePtr(item.LastReprocessAt), formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return false, fmt.Errorf("ingest item %q: %w", item.ID, err)
 	}
@@ -788,12 +814,16 @@ func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error
 }
 
 func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
+	keyPointsJSON, marshalErr := json.Marshal(item.KeyPoints)
+	if marshalErr != nil {
+		return fmt.Errorf("refresh search index %q: marshal key points: %w", item.ID, marshalErr)
+	}
 	provenance := strings.Join([]string{item.Provenance.SourceURL, item.Provenance.OriginalURL, derefString(item.Provenance.CanonicalURL), derefString(item.StoryKey), derefString(item.DuplicateOfItemID)}, " ")
 	_, err := db.ExecContext(ctx, `delete from search_fts where item_id = ?`, item.ID)
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: delete old row: %w", item.ID, err)
 	}
-	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary), stringValue(item.CoreInsight), stringValue(item.ExtractedText), provenance)
+	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_item_title, localized_title, source_title, feed_excerpt, summary, core_insight, key_points, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceItemTitle, stringValue(item.LocalizedTitle), item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary)+" "+stringValue(item.ValueTier), stringValue(item.CoreInsight), string(keyPointsJSON), stringValue(item.ExtractedText), provenance+" "+stringValue(item.ValueTier))
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: insert row: %w", item.ID, err)
 	}

@@ -193,7 +193,10 @@ func (itemReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryI
 	if strings.TrimSpace(input.AvailableText) == "" {
 		return OpenRouterSummaryOutput{}, errors.New("available text required")
 	}
-	return OpenRouterSummaryOutput{Title: "title " + input.ItemID, Summary: "summary " + input.AvailableText, CoreInsight: "core " + input.AvailableText, FeedExcerpt: "excerpt " + input.AvailableText, ExtractedText: "extracted " + input.AvailableText, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("title "+input.ItemID, "summary "+input.AvailableText, "core "+input.AvailableText, "high")
+	out.FeedExcerpt = "excerpt " + input.AvailableText
+	out.ExtractedText = "extracted " + input.AvailableText
+	return out, nil
 }
 
 func (itemReingestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

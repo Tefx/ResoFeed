@@ -36,7 +36,7 @@ func TestOpenRouterChatCompletionSummaryResponseValidatesAndPersists(t *testing.
 
 	model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"id":"chatcmpl_test","model":"openrouter/fake-resolved","choices":[{"message":{"role":"assistant","content":"{\"title\":\"OpenRouter Article\",\"feed_excerpt\":\"OpenRouter excerpt.\",\"extracted_text\":\"OpenRouter extracted text.\",\"summary\":\"OpenRouter dense summary.\",\"core_insight\":\"OpenRouter validated insight.\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`))
+		_, _ = w.Write([]byte(`{"id":"chatcmpl_test","model":"openrouter/fake-resolved","choices":[{"message":{"role":"assistant","content":"{\"localized_title\":\"OpenRouter Article\",\"summary\":\"OpenRouter dense summary.\",\"core_insight\":\"OpenRouter validated insight.\",\"key_points\":[\"OpenRouter specific point one.\",\"OpenRouter specific point two.\",\"OpenRouter specific point three.\"],\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`))
 	}))
 	defer model.Close()
 
@@ -344,7 +344,10 @@ func (c *countingOpenRouterLLM) SummarizeItem(context.Context, OpenRouterSummary
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.n++
-	return OpenRouterSummaryOutput{Title: "OpenRouter title", FeedExcerpt: "OpenRouter excerpt.", ExtractedText: "OpenRouter extracted text.", Summary: "OpenRouter dense summary.", CoreInsight: "OpenRouter validated insight.", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("OpenRouter title", "OpenRouter dense summary.", "OpenRouter validated insight.", "high")
+	out.FeedExcerpt = "OpenRouter excerpt."
+	out.ExtractedText = "OpenRouter extracted text."
+	return out, nil
 }
 
 func (c *countingOpenRouterLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

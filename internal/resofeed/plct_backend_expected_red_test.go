@@ -258,7 +258,7 @@ type plctLanguageRecordingLLM struct {
 
 func (l *plctLanguageRecordingLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	l.lastTarget = input.TargetLanguage
-	return OpenRouterSummaryOutput{Summary: "summary", CoreInsight: "insight", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return ccrTestSummaryOutput("title", "summary", "insight", "high"), nil
 }
 
 func (l *plctLanguageRecordingLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {

@@ -271,7 +271,7 @@ func TestOpenRouterSummaryRequestIncludesTargetLanguageWithoutPersistingSecret(t
 			t.Fatalf("OpenRouter summary request messages = %+v, want system+user", req.Messages)
 		}
 		capturedContent = req.Messages[1].Content
-		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"title\":\"标题\",\"feed_excerpt\":\"摘录\",\"extracted_text\":\"正文\",\"summary\":\"摘要\",\"core_insight\":\"洞察\",\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
+		_, _ = io.WriteString(w, `{"choices":[{"message":{"role":"assistant","content":"{\"localized_title\":\"标题\",\"summary\":\"摘要\",\"core_insight\":\"洞察\",\"key_points\":[\"中文要点一说明来源事实。\",\"中文要点二说明来源事实。\",\"中文要点三说明来源事实。\"],\"value_tier\":\"high\",\"model_status\":\"ok\"}"}}]}`)
 	}))
 	t.Cleanup(server.Close)
 	client := NewOpenRouterClient(OpenRouterConfig{APIKey: "sk-test-secret", Endpoint: server.URL})
@@ -300,13 +300,15 @@ type languageAwareLLM struct{}
 
 func (l *languageAwareLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	return OpenRouterSummaryOutput{
-		Title:         string(input.TargetLanguage) + " title " + input.Title,
-		FeedExcerpt:   string(input.TargetLanguage) + " excerpt " + input.Title,
-		ExtractedText: string(input.TargetLanguage) + " extracted " + input.Title,
-		Summary:       string(input.TargetLanguage) + " summary " + input.Title,
-		CoreInsight:   string(input.TargetLanguage) + " insight " + input.Title,
-		ValueTier:     "high",
-		ModelStatus:   modelStatusOK,
+		LocalizedTitle: string(input.TargetLanguage) + " title " + input.Title,
+		Title:          string(input.TargetLanguage) + " title " + input.Title,
+		FeedExcerpt:    string(input.TargetLanguage) + " excerpt " + input.Title,
+		ExtractedText:  string(input.TargetLanguage) + " extracted " + input.Title,
+		Summary:        string(input.TargetLanguage) + " summary " + input.Title,
+		CoreInsight:    string(input.TargetLanguage) + " insight " + input.Title,
+		KeyPoints:      []string{string(input.TargetLanguage) + " point one for " + input.Title, string(input.TargetLanguage) + " point two for " + input.Title, string(input.TargetLanguage) + " point three for " + input.Title},
+		ValueTier:      "high",
+		ModelStatus:    modelStatusOK,
 	}, nil
 }
 
@@ -320,7 +322,10 @@ type countingSummaryLLM struct {
 
 func (l *countingSummaryLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	l.calls.Add(1)
-	return OpenRouterSummaryOutput{Title: "title " + input.Title, FeedExcerpt: "excerpt " + input.Title, ExtractedText: "extracted " + input.Title, Summary: "summary " + input.Title, CoreInsight: "insight " + input.Title, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	out := ccrTestSummaryOutput("title "+input.Title, "summary "+input.Title, "insight "+input.Title, "high")
+	out.FeedExcerpt = "excerpt " + input.Title
+	out.ExtractedText = "extracted " + input.Title
+	return out, nil
 }
 
 func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
@@ -330,7 +335,7 @@ func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeri
 type blankReadableBodyLLM struct{}
 
 func (blankReadableBodyLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{Title: "中文标题", FeedExcerpt: "中文摘录", ExtractedText: "中文正文", Summary: "中文摘要", CoreInsight: "中文洞察", ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{LocalizedTitle: "中文标题", Title: "中文标题", FeedExcerpt: "中文摘录", ExtractedText: "中文正文", Summary: "中文摘要", CoreInsight: "中文洞察", KeyPoints: []string{"中文要点一说明来源事实。", "中文要点二说明来源事实。", "中文要点三说明来源事实。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (blankReadableBodyLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
