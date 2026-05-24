@@ -1,0 +1,65 @@
+{
+  "today-populated-item": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/today-populated-item.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/today-populated-item.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region err: provider_unavailable: models unavailable Today feed items src: Live Audit Source · 1m · source excerpt · fallback · quality: source excerpt TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. ☆ INSPECTOR src: Live Audit Source · source excerpt Live audit item one original link https://live-audit.example.test/items/one https://live-audit.example.test/items/one http://127.0.0.1:57788/policy-feed.xml target-language processing failed · model latency error · summary/core unavailable · showing source excerpt Source evidence: why: fresh from configured source"
+  },
+  "inspector": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/inspector.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/inspector.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region err: provider_unavailable: models unavailable Today feed items src: Live Audit Source · 1m · source excerpt · fallback · quality: source excerpt TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. ☆ INSPECTOR src: Live Audit Source · source excerpt Live audit item one original link https://live-audit.example.test/items/one https://live-audit.example.test/items/one http://127.0.0.1:57788/policy-feed.xml target-language processing failed · model latency error · summary/core unavailable · showing source excerpt ITEM RE-INGEST [RE-INGEST ITEM] Source evidence: why: fresh from configured source"
+  },
+  "search": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/search.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/search.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required retrieval: lexical search Independent scroll region err: provider_unavailable: models unavailable SEARCH Plain text query [SEARCH] FILTERS 1 results src: Live Audit Source · may 15 EARLIER extraction: source excerpt match: lexical index provenance: source-backed quality: source excerpt Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. ☆ INSPECTOR src: Live Audit Source · source excerpt Live audit item one original link https://live-audit.example.test/items/one https://live-audit.example.test/items/one http://127.0.0.1:57788/policy-feed.xml target-language processing failed · model latency error · summary/core unavailable · showing source excerpt Source evidence: why: fresh from configured source"
+  },
+  "doctor": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/doctor.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/doctor.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required /doctor rss: ok openrouter: provider_reachable=true configured_model=account_default openrouter: model_resolved=true resolved_model=openrouter/e2e-deterministic openrouter: item_transform_failures=1 openrouter: current_item_transform_failures=0 historic_item_transform_failures=1 openrouter: live_summary_successes=0 fallback_only_current_summaries=0 openrouter: health_classification=unresolved_product_regression openrouter: failures=1 openrouter: item=item_b59cc873fcd463e9a126a32d56cc76b0 source=src_e130dede32a1b42c1a48acb6650da0ee status=model_latency_error title=Live audit item one fallback_provenance: item=item_b59cc873fcd463e9a126a32d56cc76b0 summary=excerpt model_status=model_latency_error extraction_status=partial_extraction search_fts: ok extraction: failures=1 extraction: item=item_b59cc873fcd463e9a126a32d56cc76b0 source=src_e130dede32a1b42c1a48acb6650da0ee status=partial_extraction title=Live audit "
+  },
+  "mobile-feed": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-feed.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-feed.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region err: provider_unavailable: models unavailable Today feed items src: Live Audit Source · · TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. ☆"
+  },
+  "mobile-inspector": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-inspector.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-inspector.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today back to TODAY INSPECTOR src: Live Audit Source · source excerpt ☆ Live audit item one original link https://live-audit.example.test/items/one https://live-audit.example.test/items/one http://127.0.0.1:57788/policy-feed.xml target-language processing failed · model latency error · summary/core unavailable · showing source excerpt ITEM RE-INGEST [RE-INGEST ITEM] Source evidence: why: fresh from configured source"
+  },
+  "mobile-source-ledger": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-source-ledger.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/post-plan-user-story-conformance-retest-and-final-audit.post-repair-browser-runtime-proof/.test-artifacts/manual/live-audit-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-source-ledger.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required source ledger back to TODAY SOURCE LEDGER last_ingest: 01:27:56 [RUN INGEST] [IMPORT OPML] [EXPORT STATE] [IMPORT STATE] Choose state JSON import replaces active sources, rules, and stars imported 1 sources; folders flattened src: Live Audit Source · status: ok · last_fetch: 01:27:56 url: http://127.0.0.1:57788/policy-feed.xml last_fetch: 01:27:56 [FETCH] [DELETE] [DETAILS]"
+  }
+}

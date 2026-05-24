@@ -1,0 +1,51 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - status "Steer route preview"
+  - text: 导向路由预览 URL required
+  - region "TODAY 表面独立滚动":
+    - text: 独立滚动区域
+    - region "今日订阅条目":
+      - heading "今日订阅条目" [level=2]
+      - list "今日订阅条目":
+        - listitem:
+          - button "打开检查器：Browser i18n re-ingest target":
+            - paragraph: "src: Literal Source Identifier 1m 全文 回退 质量: 全文 TODAY"
+            - paragraph: Browser i18n re-ingest target
+            - paragraph: RSS excerpt before explicit re-ingest.
+          - button "标星：Browser i18n re-ingest target": ☆
+  - complementary "详情独立滚动":
+    - complementary "INSPECTOR":
+      - paragraph: INSPECTOR
+      - paragraph: "src: Literal Source Identifier · 全文"
+      - heading "Browser i18n re-ingest target" [level=2]
+      - paragraph:
+        - link "原文链接":
+          - /url: https://news.example.test/blind-reingest-original-link
+      - link "https://news.example.test/blind-reingest-original-link":
+        - /url: https://news.example.test/blind-reingest-original-link
+      - link "https://feeds.example.test/blind-i18n.xml":
+        - /url: https://feeds.example.test/blind-i18n.xml
+      - paragraph: 中文处理失败 · 模型延迟错误 · 摘要/核心洞察不可用 · 显示来源摘录
+      - region "Item re-ingest":
+        - paragraph: 本文重处理
+        - text: 模型：
+        - combobox "模型":
+          - 'option "default: account_default"'
+          - option "GPT 4.1 Mini (openai/gpt-4.1-mini)" [selected]
+          - option "Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)"
+        - paragraph: 模型列表：2 个 OpenRouter 模型可用
+        - text: 额外提示（仅本次指导，不保存）
+        - textbox "一次性提示": 请用中文重写摘要和核心洞察。
+        - paragraph: 仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。只能在有来源支持的事实中改变重点、角度或事实选择。
+        - button "[确认重处理]"
+        - button "[取消]"
+        - status "本文重处理状态": 就绪
+      - group "出处记录": 出处记录：
+      - paragraph: 为什么：来自已配置来源的新条目

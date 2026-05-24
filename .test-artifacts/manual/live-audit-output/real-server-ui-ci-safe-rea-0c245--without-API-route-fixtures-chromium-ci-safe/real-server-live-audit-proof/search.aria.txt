@@ -1,0 +1,47 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": "retrieval: lexical search"
+  - region "Search surface independent scroll":
+    - text: Independent scroll region
+    - alert: "err: provider_unavailable: models unavailable"
+    - region "Search and Retrieval":
+      - heading "SEARCH" [level=2]
+      - form "Search filters":
+        - text: Plain text query
+        - textbox "Plain text query": Live audit
+        - button "[SEARCH]"
+        - group: filters
+      - status: 1 results
+      - region "Search results":
+        - list "Search result items":
+          - listitem:
+            - 'button "Inspect search result: Live audit item one"':
+              - paragraph: "src: Live Audit Source may 15 EARLIER"
+              - paragraph: "extraction: source excerpt match: lexical index provenance: source-backed quality: source excerpt"
+              - paragraph: Live audit item one
+              - paragraph: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.
+            - 'button "Resonate item: Live audit item one"': ☆
+  - complementary "Detail independent scroll":
+    - complementary "INSPECTOR":
+      - paragraph: INSPECTOR
+      - paragraph: "src: Live Audit Source · source excerpt"
+      - heading "Live audit item one" [level=2]
+      - paragraph:
+        - link "original link":
+          - /url: https://live-audit.example.test/items/one
+      - link "https://live-audit.example.test/items/one":
+        - /url: https://live-audit.example.test/items/one
+      - link "http://127.0.0.1:57788/policy-feed.xml":
+        - /url: http://127.0.0.1:57788/policy-feed.xml
+      - paragraph: target-language processing failed · model latency error · summary/core unavailable · showing source excerpt
+      - group "Source evidence": "Source evidence:"
+      - paragraph: "why: fresh from configured source"
