@@ -50,6 +50,9 @@ export const modelStatusValues = [
   'timeout'
 ] as const;
 export type ModelStatus = (typeof modelStatusValues)[number];
+export type ContentStatus = 'ok' | 'summary_unavailable';
+export type LastReprocessStatus = 'ok' | 'failed' | null;
+export type LastReprocessErrorCode = 'decode_error' | 'provider_error' | 'invalid_model' | 'timeout' | null;
 export type ActorKind = 'human' | 'agent';
 export type ProcessingLanguage = 'en' | 'zh';
 
@@ -58,11 +61,24 @@ export interface ItemSummary {
   source_id: OpaqueId;
   source_title: string;
   url: string;
+  /** Literal RSS/source item title; provenance, not localized or rewritten. */
+  source_item_title: string;
+  /** Generated display title when available; null when no current generated title exists. */
+  localized_title: string | null;
   title: string;
   summary: string | null;
   core_insight: string | null;
+  /** Structured generated key points; never derived from summary/core_insight Markdown. */
+  key_points: string[];
   display_excerpt?: string | null;
   value_tier: string | null;
+  /** Status of currently persisted generated content, not the latest attempt. */
+  content_status: ContentStatus;
+  /** Latest reprocess/re-ingest attempt status; null when no attempt has run. */
+  last_reprocess_status: LastReprocessStatus;
+  last_reprocess_error_code: LastReprocessErrorCode;
+  last_reprocess_error_message: string | null;
+  last_reprocess_at: Rfc3339UtcString | null;
   published_at: Rfc3339UtcString | null;
   first_seen_at?: Rfc3339UtcString | null;
   extraction_status: ExtractionStatus;
@@ -89,6 +105,8 @@ export interface GroupedSourceItem {
   source_title: string;
   source_url: string;
   url: string;
+  source_item_title?: string;
+  localized_title?: string | null;
   canonical_url: string | null;
   title: string;
   published_at: Rfc3339UtcString | null;
