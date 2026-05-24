@@ -102,6 +102,8 @@ func TestContentContractRedesignValidationFailureCodeMatrixExpectedRed(t *testin
 		string(PromptValidationLanguageInvalid):             PromptValidationLanguageInvalid,
 		string(PromptValidationUnavailableMismatch):         PromptValidationUnavailableMismatch,
 		string(PromptValidationProvenanceMutation):          PromptValidationProvenanceMutation,
+		string(PromptValidationCoreInsightShapeInvalid):     PromptValidationCoreInsightShapeInvalid,
+		string(PromptValidationKeyPointsInvalid):            PromptValidationKeyPointsInvalid,
 		string(PromptValidationPromptInjectionLeakage):      PromptValidationPromptInjectionLeakage,
 	}
 	for _, code := range contentContractExpectedPromptValidationCodes() {

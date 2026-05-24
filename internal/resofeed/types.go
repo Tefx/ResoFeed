@@ -64,25 +64,33 @@ type Source struct {
 // use ItemSummary for list/search/MCP candidate surfaces and ItemDetail for
 // inspect/read surfaces so detail-only fields cannot leak into summaries.
 type Item struct {
-	ID                 string
-	SourceID           string
-	SourceTitle        string
-	URL                string
-	Title              string
-	Summary            *string
-	CoreInsight        *string
-	ValueTier          *string
-	PublishedAt        *time.Time
-	ExtractionStatus   string
-	ModelStatus        string
-	IsResonated        bool
-	HumanInspectedAt   *time.Time
-	ExternalSurfacedAt *time.Time
-	StoryKey           *string
-	DuplicateOfItemID  *string
-	FeedExcerpt        *string
-	ExtractedText      *string
-	Provenance         Provenance
+	ID                        string
+	SourceID                  string
+	SourceTitle               string
+	URL                       string
+	Title                     string
+	SourceItemTitle           string
+	LocalizedTitle            *string
+	Summary                   *string
+	CoreInsight               *string
+	KeyPoints                 []string
+	ValueTier                 *string
+	ContentStatus             string
+	LastReprocessStatus       *string
+	LastReprocessErrorCode    *string
+	LastReprocessErrorMessage *string
+	LastReprocessAt           *time.Time
+	PublishedAt               *time.Time
+	ExtractionStatus          string
+	ModelStatus               string
+	IsResonated               bool
+	HumanInspectedAt          *time.Time
+	ExternalSurfacedAt        *time.Time
+	StoryKey                  *string
+	DuplicateOfItemID         *string
+	FeedExcerpt               *string
+	ExtractedText             *string
+	Provenance                Provenance
 }
 
 // ItemSummary is the canonical HTTP/MCP list, search, and candidate item shape.
@@ -95,6 +103,8 @@ type ItemSummary struct {
 	SourceTitle        string     `json:"source_title"`
 	URL                string     `json:"url"`
 	Title              string     `json:"title"`
+	SourceItemTitle    string     `json:"source_item_title"`
+	LocalizedTitle     *string    `json:"localized_title"`
 	Summary            *string    `json:"summary"`
 	CoreInsight        *string    `json:"core_insight"`
 	DisplayExcerpt     *string    `json:"display_excerpt,omitempty"`
@@ -103,6 +113,7 @@ type ItemSummary struct {
 	FirstSeenAt        *time.Time `json:"first_seen_at,omitempty"`
 	ExtractionStatus   string     `json:"extraction_status"`
 	ModelStatus        string     `json:"model_status"`
+	ContentStatus      string     `json:"content_status"`
 	IsResonated        bool       `json:"is_resonated"`
 	HumanInspectedAt   *time.Time `json:"human_inspected_at"`
 	ExternalSurfacedAt *time.Time `json:"external_surfaced_at"`
@@ -114,25 +125,33 @@ type ItemSummary struct {
 // are present as null when unavailable; provenance is always present as an
 // object so original source context remains accessible.
 type ItemDetail struct {
-	ID                 string     `json:"id"`
-	SourceID           string     `json:"source_id"`
-	SourceTitle        string     `json:"source_title"`
-	URL                string     `json:"url"`
-	Title              string     `json:"title"`
-	Summary            *string    `json:"summary"`
-	CoreInsight        *string    `json:"core_insight"`
-	ValueTier          *string    `json:"value_tier"`
-	PublishedAt        *time.Time `json:"published_at"`
-	ExtractionStatus   string     `json:"extraction_status"`
-	ModelStatus        string     `json:"model_status"`
-	IsResonated        bool       `json:"is_resonated"`
-	HumanInspectedAt   *time.Time `json:"human_inspected_at"`
-	ExternalSurfacedAt *time.Time `json:"external_surfaced_at"`
-	StoryKey           *string    `json:"story_key"`
-	DuplicateOfItemID  *string    `json:"duplicate_of_item_id"`
-	FeedExcerpt        *string    `json:"feed_excerpt"`
-	ExtractedText      *string    `json:"extracted_text"`
-	Provenance         Provenance `json:"provenance"`
+	ID                        string     `json:"id"`
+	SourceID                  string     `json:"source_id"`
+	SourceTitle               string     `json:"source_title"`
+	URL                       string     `json:"url"`
+	Title                     string     `json:"title"`
+	SourceItemTitle           string     `json:"source_item_title"`
+	LocalizedTitle            *string    `json:"localized_title"`
+	Summary                   *string    `json:"summary"`
+	CoreInsight               *string    `json:"core_insight"`
+	KeyPoints                 []string   `json:"key_points"`
+	ValueTier                 *string    `json:"value_tier"`
+	PublishedAt               *time.Time `json:"published_at"`
+	ExtractionStatus          string     `json:"extraction_status"`
+	ModelStatus               string     `json:"model_status"`
+	ContentStatus             string     `json:"content_status"`
+	LastReprocessStatus       *string    `json:"last_reprocess_status"`
+	LastReprocessErrorCode    *string    `json:"last_reprocess_error_code"`
+	LastReprocessErrorMessage *string    `json:"last_reprocess_error_message"`
+	LastReprocessAt           *time.Time `json:"last_reprocess_at"`
+	IsResonated               bool       `json:"is_resonated"`
+	HumanInspectedAt          *time.Time `json:"human_inspected_at"`
+	ExternalSurfacedAt        *time.Time `json:"external_surfaced_at"`
+	StoryKey                  *string    `json:"story_key"`
+	DuplicateOfItemID         *string    `json:"duplicate_of_item_id"`
+	FeedExcerpt               *string    `json:"feed_excerpt"`
+	ExtractedText             *string    `json:"extracted_text"`
+	Provenance                Provenance `json:"provenance"`
 }
 
 // GroupedSourceItem is a terse source-list disclosure for every persisted item

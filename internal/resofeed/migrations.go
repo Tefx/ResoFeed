@@ -165,5 +165,42 @@ from items i
 left join sources s on s.id = i.source_id;
 `,
 		},
+		{
+			ID: "004_content_contract_redesign_fields",
+			SQL: `
+alter table items add column source_item_title text;
+alter table items add column localized_title text;
+alter table items add column key_points text;
+alter table items add column content_status text;
+alter table items add column last_reprocess_status text;
+alter table items add column last_reprocess_error_code text;
+alter table items add column last_reprocess_error_message text;
+alter table items add column last_reprocess_at text;
+update items
+set source_item_title = coalesce(source_item_title, title),
+    localized_title = coalesce(localized_title, title),
+    key_points = coalesce(key_points, '[]'),
+    content_status = coalesce(content_status, model_status);
+drop table if exists search_fts;
+create virtual table search_fts using fts5(
+  item_id unindexed,
+  title,
+  source_item_title,
+  localized_title,
+  source_title,
+  feed_excerpt,
+  summary,
+  core_insight,
+  key_points,
+  extracted_text,
+  provenance
+);
+insert into search_fts (item_id, title, source_item_title, localized_title, source_title, feed_excerpt, summary, core_insight, key_points, extracted_text, provenance)
+select i.id, i.title, coalesce(i.source_item_title, i.title, ''), coalesce(i.localized_title, i.title, ''), coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.key_points, ''), coalesce(i.extracted_text, ''),
+       coalesce(i.source_url, s.url, '') || ' ' || coalesce(i.url, '') || ' ' || coalesce(i.canonical_url, '') || ' ' || coalesce(i.story_key, '') || ' ' || coalesce(i.duplicate_of_item_id, '') || ' ' || coalesce(i.value_tier, '')
+from items i
+left join sources s on s.id = i.source_id;
+`,
+		},
 	}
 }

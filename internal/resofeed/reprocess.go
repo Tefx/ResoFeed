@@ -3,6 +3,7 @@ package resofeed
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -231,7 +232,7 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 			return ItemReingestResponse{}, err
 		}
 		result.ItemUpdated = true
-		result.FTSUpdated = true
+		result.FTSUpdated = outcome.writable()
 	}
 	if result.ItemUpdated {
 		detail, err := ReadItemDetail(ctx, db, itemID)
@@ -312,11 +313,11 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 		code := reprocessErrorCodeForModelStatus(modelStatus)
 		return unavailableReprocessOutcome(sourceURL, code, string(code)), nil
 	}
-	title := strings.TrimSpace(out.Title)
+	title := strings.TrimSpace(generatedTitle(out))
 	if isUnusableReprocessOutputTitle(title) {
 		title = reprocessInputTitle(item)
 	}
-	result := reprocessItemOutcome{title: title, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
+	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
 	if result.extractedText == nil && language != ProcessingLanguageChinese {
 		result.extractedText = nullableString(sourceText)
 	}
@@ -455,18 +456,20 @@ type reprocessItem struct {
 }
 
 type reprocessItemOutcome struct {
-	title         string
-	summary       *string
-	coreInsight   *string
-	feedExcerpt   *string
-	extractedText *string
-	valueTier     *string
-	extractStatus string
-	modelStatus   string
-	unavailable   bool
-	failed        bool
-	errorCode     ReprocessErrorCode
-	errorMessage  string
+	title          string
+	summary        *string
+	coreInsight    *string
+	feedExcerpt    *string
+	extractedText  *string
+	localizedTitle *string
+	keyPoints      []string
+	valueTier      *string
+	extractStatus  string
+	modelStatus    string
+	unavailable    bool
+	failed         bool
+	errorCode      ReprocessErrorCode
+	errorMessage   string
 }
 
 func (o reprocessItemOutcome) writable() bool {
@@ -663,19 +666,25 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 	defer func() { _ = tx.Rollback() }()
 
 	if outcome.failed || outcome.unavailable {
-		_, err = tx.ExecContext(ctx, `update items set model_status = ? where id = ?`, outcome.modelStatus, itemID)
+		_, err = tx.ExecContext(ctx, `update items set last_reprocess_status = 'failed', last_reprocess_error_code = ?, last_reprocess_error_message = ?, last_reprocess_at = ? where id = ?`, outcome.errorCode, outcome.errorMessage, time.Now().UTC().Format(time.RFC3339), itemID)
 		if err != nil {
 			return fmt.Errorf("reprocess item %q: update failed status: %w", itemID, err)
 		}
 	} else {
-		_, err = tx.ExecContext(ctx, `update items set title = ?, summary = ?, core_insight = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, model_status = ? where id = ?`, outcome.title, outcome.summary, outcome.coreInsight, outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.modelStatus, itemID)
+		keyPointsJSON, marshalErr := json.Marshal(outcome.keyPoints)
+		if marshalErr != nil {
+			return fmt.Errorf("reprocess item %q: marshal key points: %w", itemID, marshalErr)
+		}
+		_, err = tx.ExecContext(ctx, `update items set title = ?, source_item_title = coalesce(source_item_title, ?), localized_title = ?, summary = ?, core_insight = ?, key_points = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, model_status = ?, content_status = ?, last_reprocess_status = 'ok', last_reprocess_error_code = null, last_reprocess_error_message = null, last_reprocess_at = ? where id = ?`, outcome.title, outcome.title, outcome.localizedTitle, outcome.summary, outcome.coreInsight, string(keyPointsJSON), outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.modelStatus, outcome.modelStatus, time.Now().UTC().Format(time.RFC3339), itemID)
 		if err != nil {
 			return fmt.Errorf("reprocess item %q: update: %w", itemID, err)
 		}
 	}
 
-	if err := refreshSearchIndexForItemTx(ctx, tx, itemID); err != nil {
-		return fmt.Errorf("reprocess item %q: refresh FTS: %w", itemID, err)
+	if !outcome.failed && !outcome.unavailable {
+		if err := refreshSearchIndexForItemTx(ctx, tx, itemID); err != nil {
+			return fmt.Errorf("reprocess item %q: refresh FTS: %w", itemID, err)
+		}
 	}
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("reprocess item %q: commit: %w", itemID, err)
@@ -688,8 +697,8 @@ func refreshSearchIndexForItemTx(ctx context.Context, tx *sql.Tx, itemID string)
 		return fmt.Errorf("clear search index row: %w", err)
 	}
 	_, err := tx.ExecContext(ctx, `
-insert into search_fts (item_id, title, source_title, feed_excerpt, summary, core_insight, extracted_text, provenance)
-select i.id, i.title, coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.extracted_text, ''),
+insert into search_fts (item_id, title, source_item_title, localized_title, source_title, feed_excerpt, summary, core_insight, key_points, extracted_text, provenance)
+select i.id, i.title, coalesce(i.source_item_title, i.title, ''), coalesce(i.localized_title, i.title, ''), coalesce(s.title, ''), coalesce(i.feed_excerpt, ''), coalesce(i.summary, '') || ' ' || coalesce(i.value_tier, ''), coalesce(i.core_insight, ''), coalesce(i.key_points, ''), coalesce(i.extracted_text, ''),
        coalesce(i.source_url, s.url, '') || ' ' || coalesce(i.url, '') || ' ' || coalesce(i.canonical_url, '') || ' ' || coalesce(i.story_key, '') || ' ' || coalesce(i.duplicate_of_item_id, '') || ' ' || coalesce(i.value_tier, '')
 from items i
 left join sources s on s.id = i.source_id
