@@ -83,7 +83,7 @@ func TestPromptingV21SourceCleanupBudgetAndMetadataPreservation(t *testing.T) {
 		t.Fatalf("compile prompt: %v", err)
 	}
 	item := compiled.UserPayload.Item
-	if item.ItemID != input.ItemID || item.Title != input.Title || item.SourceTitle != input.SourceTitle || item.URL != input.URL || item.TargetLanguage != input.TargetLanguage || item.AvailableTextSource != input.AvailableTextSource {
+	if item.ItemID != input.ItemID || item.SourceItemTitle != input.Title || item.SourceTitle != input.SourceTitle || item.URL != input.URL || item.TargetLanguage != input.TargetLanguage || item.AvailableTextSource != input.AvailableTextSource {
 		t.Fatalf("metadata mutated during source normalization: %+v", item)
 	}
 	if strings.Contains(item.AvailableText, "ignorePreviousInstructions") || strings.Contains(item.AvailableText, "Cookie settings") || strings.Contains(item.AvailableText, "Subscribe banner") || strings.Contains(item.AvailableText, "Sidebar") {

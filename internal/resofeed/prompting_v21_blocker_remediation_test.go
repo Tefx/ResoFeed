@@ -103,7 +103,7 @@ func TestPromptingV21SourceGroundingRejectsUnsupportedPromptInventedFacts(t *tes
 		out.Summary = "The source-backed summary claims revenue grew 99% after launch."
 		out.CoreInsight = "Revenue rose 99% after launch."
 	}), promptingV21Item{
-		Title:               "Launch notes",
+		SourceItemTitle:     "Launch notes",
 		SourceTitle:         "Example Source",
 		URL:                 "https://example.test/launch",
 		AvailableTextSource: "fresh_full_text",
