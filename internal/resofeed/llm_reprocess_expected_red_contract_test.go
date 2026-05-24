@@ -188,7 +188,7 @@ func TestInvalidStructuredLLMOutputMapsDecodeErrorForBuildAndReprocessExpectedRe
 		t.Fatalf("reprocess counts = %+v, want one failed decode_error and no summary_unavailable", resp.Reprocess)
 	}
 	assertReprocessErrorCode(t, resp.Reprocess.Errors, "item_invalid_structured_reprocess", ReprocessErrorDecodeError)
-	assertClearedReprocessFields(t, ctx, db, "item_invalid_structured_reprocess", modelStatusDecodeError)
+	assertPreservedOriginalFields(t, ctx, db, "item_invalid_structured_reprocess", modelStatusDecodeError, "PRIOR summary item_invalid_structured_reprocess", "PRIOR insight item_invalid_structured_reprocess")
 }
 
 func TestReprocessFallbackTextContractExpectedRed(t *testing.T) {

@@ -661,10 +661,19 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 		return fmt.Errorf("reprocess item %q: begin transaction: %w", itemID, err)
 	}
 	defer func() { _ = tx.Rollback() }()
-	_, err = tx.ExecContext(ctx, `update items set title = ?, summary = ?, core_insight = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, model_status = ? where id = ?`, outcome.title, outcome.summary, outcome.coreInsight, outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.modelStatus, itemID)
-	if err != nil {
-		return fmt.Errorf("reprocess item %q: update: %w", itemID, err)
+
+	if outcome.failed || outcome.unavailable {
+		_, err = tx.ExecContext(ctx, `update items set model_status = ? where id = ?`, outcome.modelStatus, itemID)
+		if err != nil {
+			return fmt.Errorf("reprocess item %q: update failed status: %w", itemID, err)
+		}
+	} else {
+		_, err = tx.ExecContext(ctx, `update items set title = ?, summary = ?, core_insight = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, model_status = ? where id = ?`, outcome.title, outcome.summary, outcome.coreInsight, outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.modelStatus, itemID)
+		if err != nil {
+			return fmt.Errorf("reprocess item %q: update: %w", itemID, err)
+		}
 	}
+
 	if err := refreshSearchIndexForItemTx(ctx, tx, itemID); err != nil {
 		return fmt.Errorf("reprocess item %q: refresh FTS: %w", itemID, err)
 	}

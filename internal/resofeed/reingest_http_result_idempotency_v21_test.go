@@ -205,8 +205,8 @@ func TestV21ItemReingestStorableFailureRefreshesSelectedFTSAndItem(t *testing.T)
 			if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != tc.wantCode || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated || resp.Reingest.Item == nil {
 				t.Fatalf("reingest %s result = %+v, want storable failure with refreshed item/FTS", tc.name, resp.Reingest)
 			}
-			assertClearedReprocessFields(t, ctx, db, "item_reingest_01", tc.wantStatus)
-			assertNoStaleReadableFTS(t, ctx, db, "item_reingest_01")
+			assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", tc.wantStatus, "PRIOR summary selected", "PRIOR insight selected")
+			assertNoStaleReadableFTS(t, ctx, db, "item_reingest_01", true)
 		})
 	}
 

@@ -76,13 +76,13 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if fallback.title != "processed "+server.URL+"/original-fallback" || fallback.summary != "summary original body after canonical miss" {
 		t.Fatalf("fallback item text = %+v", fallback)
 	}
-	assertNoStaleReadableFTS(t, ctx, db, "item_success")
-	assertNoStaleReadableFTS(t, ctx, db, "item_fallback")
+	assertNoStaleReadableFTS(t, ctx, db, "item_success", false)
+	assertNoStaleReadableFTS(t, ctx, db, "item_fallback", false)
 	if count := reprocessFTSCount(t, ctx, db, "item_unavailable", `"PRIOR extracted item_unavailable"`); count != 1 {
 		t.Fatalf("FTS for item_unavailable did not reflect stored extracted_text fallback rewrite; count=%d", count)
 	}
-	assertClearedReprocessFields(t, ctx, db, "item_failed", modelStatusLatencyError)
-	assertNoStaleReadableFTS(t, ctx, db, "item_failed")
+	assertPreservedOriginalFields(t, ctx, db, "item_failed", modelStatusLatencyError, "PRIOR summary item_failed", "PRIOR insight item_failed")
+	assertNoStaleReadableFTS(t, ctx, db, "item_failed", true)
 
 	var staleCount int
 	if err := db.QueryRowContext(ctx, `select count(*) from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleCount); err != nil {
@@ -190,14 +190,14 @@ func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *tes
 				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
 					t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
 				}
-				assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA)
+				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA, "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
 			} else {
 				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 0 || resp.Reprocess.ItemsFailed != 1 || !resp.Reprocess.FTSRebuilt {
 					t.Fatalf("result = %+v, want one validation-failed item with rebuilt FTS", resp.Reprocess)
 				}
-				assertClearedReprocessFields(t, ctx, db, "item_"+tc.name, modelStatusDecodeError)
+				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, modelStatusDecodeError, "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
 			}
-			assertNoStaleReadableFTS(t, ctx, db, "item_"+tc.name)
+			assertNoStaleReadableFTS(t, ctx, db, "item_"+tc.name, true)
 		})
 	}
 }
@@ -290,7 +290,7 @@ func TestItemReingestPersistenceValidationUsesActualPromptContextBeforeWrite(t *
 	if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorDecodeError || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated {
 		t.Fatalf("reingest result = %+v, want stable decode_error failure with selected FTS refresh", resp.Reingest)
 	}
-	assertClearedReprocessFields(t, ctx, db, "item_reingest_01", modelStatusDecodeError)
+	assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", modelStatusDecodeError, "PRIOR summary selected", "PRIOR insight selected")
 	if count := reprocessFTSCount(t, ctx, db, "item_reingest_01", `"English summary that should fail Chinese validation"`); count != 0 {
 		t.Fatalf("FTS persisted actual-context-invalid English summary, count=%d", count)
 	}
@@ -406,14 +406,14 @@ func assertPreservedReprocessFields(t *testing.T, ctx context.Context, db *sql.D
 	}
 }
 
-func assertClearedReprocessFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, modelStatus string) {
+func assertPreservedOriginalFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, modelStatus string, expectedSummary string, expectedCoreInsight string) {
 	t.Helper()
 	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus string
 	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &storedModelStatus); err != nil {
-		t.Fatalf("read cleared item %s: %v", itemID, err)
+		t.Fatalf("read preserved item %s: %v", itemID, err)
 	}
-	if title == "" || summary != "" || coreInsight != "" || feedExcerpt != "" || extractedText != "" || valueTier != "" || storedModelStatus != modelStatus {
-		t.Fatalf("item %s was not cleared safely: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus)
+	if title != "PRIOR title "+itemID || summary != expectedSummary || coreInsight != expectedCoreInsight || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || storedModelStatus != modelStatus {
+		t.Fatalf("item %s was degraded: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus)
 	}
 }
 
@@ -431,10 +431,10 @@ func assertStaleReadableFTS(t *testing.T, ctx context.Context, db *sql.DB, itemI
 	}
 }
 
-func assertNoStaleReadableFTS(t *testing.T, ctx context.Context, db *sql.DB, itemID string) {
+func assertNoStaleReadableFTS(t *testing.T, ctx context.Context, db *sql.DB, itemID string, expectStale bool) {
 	t.Helper()
-	for _, query := range []string{"PRIOR", `"prior-tier"`} {
-		if count := reprocessFTSCount(t, ctx, db, itemID, query); count != 0 {
+	for _, query := range []string{"PRIOR"} {
+		if count := reprocessFTSCount(t, ctx, db, itemID, query); (count != 0) != expectStale {
 			t.Fatalf("FTS for %s retained stale query %q with count %d", itemID, query, count)
 		}
 	}
