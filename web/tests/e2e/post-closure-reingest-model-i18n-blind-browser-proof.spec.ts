@@ -173,10 +173,11 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
   expect(compatibilityModels).toEqual({ status: 200, body: openRouterModels });
   await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-  await expect(inspector.getByText('检查器')).toBeVisible();
+  await expect(inspector.getByText('INSPECTOR')).toBeVisible();
+  await expect(inspector.getByText('检查器')).toHaveCount(0);
   await expect(inspector.getByText(/中文处理失败|中文处理未完成/u)).toBeVisible();
   await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
-  await expect(inspector.getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
+  await expect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
 
   const panel = inspector.getByLabel('Item re-ingest');
   await panel.getByRole('button', { name: '[重新处理本文]' }).click();
@@ -190,7 +191,7 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
   await expect(inspector.getByText('显式重处理后的中文摘要，足以证明目标语言内容已更新。')).toBeVisible();
   await expect(inspector.getByText('显式重处理后的中文核心洞察，说明修复后的浏览器状态。')).toBeVisible();
   await expect(panel.getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
-  await expect(panel.getByRole('status', { name: /item re-ingest status/i })).toContainText('重处理完成 · 搜索已刷新');
+  await expect(panel.getByRole('status', { name: /item re-ingest status|本文重处理状态/i })).toContainText('重处理完成 · 搜索已刷新');
   await expect(panel.getByRole('button', { name: '[确认重处理]' })).toHaveCount(0);
   await expect(panel.getByRole('button', { name: '[取消]' })).toHaveCount(0);
   await expect(panel.getByLabel('模型')).toHaveCount(0);

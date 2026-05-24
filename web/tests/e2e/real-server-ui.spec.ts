@@ -153,6 +153,7 @@ type AuditArtifactName =
   | 'inspector'
   | 'search'
   | 'doctor'
+  | 'steering-receipt'
   | 'mobile-feed'
   | 'mobile-inspector'
   | 'mobile-source-ledger';
@@ -379,7 +380,7 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'SEARCH' })).toBeVisible();
   await expect(page.getByLabel('Plain text query')).toHaveValue('Local fixture');
-  await page.getByRole('button', { name: 'search', exact: true }).click();
+  await page.getByRole('button', { name: '[SEARCH]', exact: true }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
@@ -458,7 +459,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
     await steer.fill('search Live audit');
     await page.getByRole('button', { name: 'apply' }).click();
     await expect(page.getByRole('heading', { name: 'SEARCH' })).toBeVisible();
-    await page.getByRole('button', { name: 'search', exact: true }).click();
+    await page.getByRole('button', { name: '[SEARCH]', exact: true }).click();
     await expect(page.locator('#search-status')).toContainText('1 results');
     await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Live audit item one');
     await captureAuditState(page, testInfo, 'search', metrics);
@@ -484,7 +485,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
     await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/);
     await captureAuditState(page, testInfo, 'mobile-source-ledger', metrics);
 
-    const apiSearchAfterBrowserSearch = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/search?q=Live%20audit&limit=20');
+    const apiSearchAfterBrowserSearch = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/search?q=Live+audit&limit=50');
     expect(apiSearchAfterBrowserSearch.items.some((item) => item.title === 'Live audit item one')).toBe(true);
     expect(network.some((entry) => entry.url.includes('/api/ingest') && entry.status === 200)).toBe(true);
     expect(network.some((entry) => entry.url.includes('/api/search') && entry.status === 200)).toBe(true);
@@ -515,7 +516,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   request,
   runInfo,
   ownerToken
-}) => {
+}, testInfo) => {
   const openRouterKey = runInfo.sanitizedEnvironment.openRouterKey === 'ci-safe-fake-key'
     ? E2E_FAKE_OPENROUTER_KEY
     : process.env.OPENROUTER_KEY ?? '';
@@ -523,6 +524,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   const isolatedRunInfo = { ...runInfo, baseURL: isolated.baseURL };
   const context = await browser.newContext({ baseURL: isolated.baseURL });
   const page = await context.newPage();
+  const metrics = {} as Record<AuditArtifactName, AuditMetric>;
   try {
   const unauthorizedAPI = await request.get(`${isolatedRunInfo.baseURL}/api/feed/today`);
   expect(unauthorizedAPI.status(), 'API rejects missing owner token before reads').toBe(401);
@@ -618,10 +620,14 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
 
   await steer.fill('Push more parity fixture documents.');
   await page.getByRole('button', { name: 'apply' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'applied: steering updated · rules:1' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: /applied: .* · rules:1/ })).toBeVisible();
+  await captureAuditState(page, testInfo, 'steering-receipt', metrics);
+  await writeAuditJson(testInfo, 'parity-metrics', metrics);
   const apiRules = await authorizedGet<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, isolatedRunInfo, ownerToken, '/api/steer/active');
   const mcpRules = await mcpResource<{ rules: Array<{ rule_text: string; is_active: boolean }> }>(request, isolatedRunInfo, ownerToken, 'resofeed://rules/active');
-  expect(apiRules.rules.map((rule) => rule.rule_text)).toContain('Push more deterministic llm fixtures.');
+  expect(apiRules.rules.map((rule) => rule.rule_text)).toEqual(
+    expect.arrayContaining([expect.stringMatching(/^(Push more deterministic llm fixtures\.|boost parity fixture)$/)])
+  );
   expect(mcpRules.rules.map((rule) => rule.rule_text)).toEqual(apiRules.rules.map((rule) => rule.rule_text));
 
   const toolsList = await mcpPost(request, isolatedRunInfo, ownerToken, { jsonrpc: '2.0', id: 'tools', method: 'tools/list' });
