@@ -241,7 +241,8 @@ func seedCCRTransportFixture(t *testing.T, ctx context.Context, db *sql.DB) {
 	t.Helper()
 	now := time.Date(2026, 5, 25, 9, 0, 0, 0, time.UTC)
 	seedSource(t, ctx, db, "ccr_src", "https://ccr.example/feed.xml", "CCR Source Ledger")
-	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, summary, core_insight, feed_excerpt, extracted_text, value_tier, published_at, first_seen_at, extraction_status, model_status) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'full', 'ok')`, "ccr_item_01", "ccr_src", "https://ccr.example/feed.xml", "https://ccr.example/article", "https://ccr.example/article", "Prior localized title", "保留的中文摘要 contractunique", "保留的一句话洞察。", "源摘录 contractunique", "保留的详情文本 contractunique", "high", now.Format(time.RFC3339), now.Format(time.RFC3339))
+	keyPoints := `["保留的中文要点一 contractunique。","保留的中文要点二 contractunique。","保留的中文要点三 contractunique。"]`
+	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, source_item_title, localized_title, summary, core_insight, key_points, feed_excerpt, extracted_text, value_tier, content_status, published_at, first_seen_at, extraction_status, model_status) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ok', ?, ?, 'full', 'ok')`, "ccr_item_01", "ccr_src", "https://ccr.example/feed.xml", "https://ccr.example/article", "https://ccr.example/article", "Prior localized title", "Original Source Headline", "Prior localized title", "保留的中文摘要 contractunique", "保留的一句话洞察。", keyPoints, "源摘录 contractunique", "保留的详情文本 contractunique", "high", now.Format(time.RFC3339), now.Format(time.RFC3339))
 	if err != nil {
 		t.Fatalf("insert CCR transport fixture: %v", err)
 	}

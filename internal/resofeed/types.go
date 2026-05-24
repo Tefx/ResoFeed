@@ -98,27 +98,32 @@ type Item struct {
 // those fields belong only on ItemDetail. Display fallback fields are derived
 // from canonical item columns for compact list/search rendering.
 type ItemSummary struct {
-	ID                 string     `json:"id"`
-	SourceID           string     `json:"source_id"`
-	SourceTitle        string     `json:"source_title"`
-	URL                string     `json:"url"`
-	Title              string     `json:"title"`
-	SourceItemTitle    string     `json:"source_item_title"`
-	LocalizedTitle     *string    `json:"localized_title"`
-	Summary            *string    `json:"summary"`
-	CoreInsight        *string    `json:"core_insight"`
-	DisplayExcerpt     *string    `json:"display_excerpt,omitempty"`
-	ValueTier          *string    `json:"value_tier"`
-	PublishedAt        *time.Time `json:"published_at"`
-	FirstSeenAt        *time.Time `json:"first_seen_at,omitempty"`
-	ExtractionStatus   string     `json:"extraction_status"`
-	ModelStatus        string     `json:"model_status"`
-	ContentStatus      string     `json:"content_status"`
-	IsResonated        bool       `json:"is_resonated"`
-	HumanInspectedAt   *time.Time `json:"human_inspected_at"`
-	ExternalSurfacedAt *time.Time `json:"external_surfaced_at"`
-	StoryKey           *string    `json:"story_key"`
-	DuplicateOfItemID  *string    `json:"duplicate_of_item_id"`
+	ID                        string     `json:"id"`
+	SourceID                  string     `json:"source_id"`
+	SourceTitle               string     `json:"source_title"`
+	URL                       string     `json:"url"`
+	Title                     string     `json:"title"`
+	SourceItemTitle           string     `json:"source_item_title"`
+	LocalizedTitle            *string    `json:"localized_title"`
+	Summary                   *string    `json:"summary"`
+	CoreInsight               *string    `json:"core_insight"`
+	DisplayExcerpt            *string    `json:"display_excerpt,omitempty"`
+	KeyPoints                 []string   `json:"key_points"`
+	ValueTier                 *string    `json:"value_tier"`
+	PublishedAt               *time.Time `json:"published_at"`
+	FirstSeenAt               *time.Time `json:"first_seen_at,omitempty"`
+	ExtractionStatus          string     `json:"extraction_status"`
+	ModelStatus               string     `json:"model_status"`
+	ContentStatus             string     `json:"content_status"`
+	LastReprocessStatus       *string    `json:"last_reprocess_status"`
+	LastReprocessErrorCode    *string    `json:"last_reprocess_error_code"`
+	LastReprocessErrorMessage *string    `json:"last_reprocess_error_message"`
+	LastReprocessAt           *time.Time `json:"last_reprocess_at"`
+	IsResonated               bool       `json:"is_resonated"`
+	HumanInspectedAt          *time.Time `json:"human_inspected_at"`
+	ExternalSurfacedAt        *time.Time `json:"external_surfaced_at"`
+	StoryKey                  *string    `json:"story_key"`
+	DuplicateOfItemID         *string    `json:"duplicate_of_item_id"`
 }
 
 // ItemDetail is the canonical HTTP/MCP inspect/read item shape. Nullable fields

@@ -93,6 +93,7 @@ func buildSearchSQL(query SearchQuery, echo SearchQueryEcho) (string, []any) {
 select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title, coalesce(i.source_item_title, i.title), i.localized_title,
        i.summary, i.core_insight, i.value_tier, i.published_at,
        i.extraction_status, i.model_status, coalesce(i.content_status, i.model_status),
+       i.key_points, i.last_reprocess_status, i.last_reprocess_error_code, i.last_reprocess_error_message, i.last_reprocess_at,
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
        i.story_key, i.duplicate_of_item_id, i.first_seen_at, i.feed_excerpt
 from items i
@@ -248,16 +249,21 @@ left join sources s on s.id = i.source_id`)
 
 func scanItemSummary(rows *sql.Rows) (ItemSummary, error) {
 	var item ItemSummary
-	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
-	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.ContentStatus, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
+	var summary, coreInsight, valueTier, publishedAt, keyPoints, lastStatus, lastCode, lastMessage, lastAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.ContentStatus, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
 		return ItemSummary{}, fmt.Errorf("scan item summary: %w", err)
 	}
 	item.Summary = stringPtrFromNull(summary)
 	item.CoreInsight = stringPtrFromNull(coreInsight)
 	item.DisplayExcerpt = displayExcerptFallback(item.Summary, item.CoreInsight, feedExcerpt)
+	item.KeyPoints = keyPointsFromNull(keyPoints)
 	item.ValueTier = stringPtrFromNull(valueTier)
 	item.PublishedAt = timePtrFromNull(publishedAt)
 	item.FirstSeenAt = firstSeenFallback(item.PublishedAt, firstSeen)
+	item.LastReprocessStatus = stringPtrFromNull(lastStatus)
+	item.LastReprocessErrorCode = stringPtrFromNull(lastCode)
+	item.LastReprocessErrorMessage = stringPtrFromNull(lastMessage)
+	item.LastReprocessAt = timePtrFromNull(lastAt)
 	item.HumanInspectedAt = timePtrFromNull(inspectedAt)
 	item.ExternalSurfacedAt = timePtrFromNull(surfacedAt)
 	item.StoryKey = stringPtrFromNull(storyKey)
