@@ -210,7 +210,20 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req, compileActiveSteeringRulesForPrompt(activeRules))
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			return ItemReingestResponse{Reingest: itemReingestErrorResult(itemID, language, ReprocessErrorTimeout, "item processing timed out")}, nil
+			outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out", modelStatusTimeout)
+			writeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+			defer cancel()
+			if storeErr := storeReprocessItem(writeCtx, db, itemID, outcome); storeErr != nil {
+				return ItemReingestResponse{}, storeErr
+			}
+			result := itemReingestErrorResult(itemID, language, ReprocessErrorTimeout, "item processing timed out")
+			result.ItemUpdated = true
+			detail, detailErr := ReadItemDetail(writeCtx, db, itemID)
+			if detailErr != nil {
+				return ItemReingestResponse{}, detailErr
+			}
+			result.Item = &detail
+			return ItemReingestResponse{Reingest: result}, nil
 		}
 		return ItemReingestResponse{}, err
 	}
@@ -477,7 +490,7 @@ func (o reprocessItemOutcome) writable() bool {
 }
 
 func (o reprocessItemOutcome) storableFailure() bool {
-	return o.failed && strings.TrimSpace(o.modelStatus) != "" && o.errorCode != ReprocessErrorTimeout
+	return o.failed && strings.TrimSpace(o.modelStatus) != ""
 }
 
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {

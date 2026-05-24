@@ -81,7 +81,7 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if count := reprocessFTSCount(t, ctx, db, "item_unavailable", `"PRIOR extracted item_unavailable"`); count != 1 {
 		t.Fatalf("FTS for item_unavailable did not reflect stored extracted_text fallback rewrite; count=%d", count)
 	}
-	assertPreservedOriginalFields(t, ctx, db, "item_failed", modelStatusLatencyError, "PRIOR summary item_failed", "PRIOR insight item_failed")
+	assertPreservedOriginalFields(t, ctx, db, "item_failed", string(ReprocessErrorModelLatencyError), "PRIOR summary item_failed", "PRIOR insight item_failed")
 	assertNoStaleReadableFTS(t, ctx, db, "item_failed", true)
 
 	var staleCount int
@@ -190,12 +190,12 @@ func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *tes
 				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 || !resp.Reprocess.FTSRebuilt {
 					t.Fatalf("result = %+v, want one unavailable item with rebuilt FTS", resp.Reprocess)
 				}
-				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, modelStatusSummaryNA, "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
+				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, string(ReprocessErrorSummaryUnavailable), "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
 			} else {
 				if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 0 || resp.Reprocess.ItemsUnavailable != 0 || resp.Reprocess.ItemsFailed != 1 || !resp.Reprocess.FTSRebuilt {
 					t.Fatalf("result = %+v, want one validation-failed item with rebuilt FTS", resp.Reprocess)
 				}
-				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, modelStatusDecodeError, "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
+				assertPreservedOriginalFields(t, ctx, db, "item_"+tc.name, string(ReprocessErrorDecodeError), "PRIOR summary item_"+tc.name, "PRIOR insight item_"+tc.name)
 			}
 			assertNoStaleReadableFTS(t, ctx, db, "item_"+tc.name, true)
 		})
@@ -287,10 +287,10 @@ func TestItemReingestPersistenceValidationUsesActualPromptContextBeforeWrite(t *
 	if err != nil {
 		t.Fatalf("ReingestItem returned error: %v", err)
 	}
-	if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorDecodeError || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated {
-		t.Fatalf("reingest result = %+v, want stable decode_error failure with selected FTS refresh", resp.Reingest)
+	if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorDecodeError || !resp.Reingest.ItemUpdated || resp.Reingest.FTSUpdated {
+		t.Fatalf("reingest result = %+v, want stable decode_error attempt without selected FTS refresh", resp.Reingest)
 	}
-	assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", modelStatusDecodeError, "PRIOR summary selected", "PRIOR insight selected")
+	assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", string(ReprocessErrorDecodeError), "PRIOR summary selected", "PRIOR insight selected")
 	if count := reprocessFTSCount(t, ctx, db, "item_reingest_01", `"English summary that should fail Chinese validation"`); count != 0 {
 		t.Fatalf("FTS persisted actual-context-invalid English summary, count=%d", count)
 	}
@@ -406,14 +406,14 @@ func assertPreservedReprocessFields(t *testing.T, ctx context.Context, db *sql.D
 	}
 }
 
-func assertPreservedOriginalFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, modelStatus string, expectedSummary string, expectedCoreInsight string) {
+func assertPreservedOriginalFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string, expectedLastReprocessCode string, expectedSummary string, expectedCoreInsight string) {
 	t.Helper()
-	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus string
-	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &storedModelStatus); err != nil {
+	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus, contentStatus, lastStatus, lastCode string
+	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status, coalesce(content_status, model_status), coalesce(last_reprocess_status, ''), coalesce(last_reprocess_error_code, '') from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &storedModelStatus, &contentStatus, &lastStatus, &lastCode); err != nil {
 		t.Fatalf("read preserved item %s: %v", itemID, err)
 	}
-	if title != "PRIOR title "+itemID || summary != expectedSummary || coreInsight != expectedCoreInsight || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || storedModelStatus != modelStatus {
-		t.Fatalf("item %s was degraded: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus)
+	if title != "PRIOR title "+itemID || summary != expectedSummary || coreInsight != expectedCoreInsight || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || (valueTier != "prior-tier" && valueTier != "brief") || extractionStatus != extractionStatusFull || storedModelStatus != modelStatusOK || contentStatus != modelStatusOK || lastStatus != "failed" || lastCode != expectedLastReprocessCode {
+		t.Fatalf("item %s was degraded or missing attempt diagnostics: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q content:%q last_status:%q last_code:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus, contentStatus, lastStatus, lastCode)
 	}
 }
 

@@ -183,14 +183,13 @@ func TestV21ItemReingestStrictHTTPModelPromptAndReceiptSemantics(t *testing.T) {
 func TestV21ItemReingestStorableFailureRefreshesSelectedFTSAndItem(t *testing.T) {
 	ctx := context.Background()
 	for _, tc := range []struct {
-		name       string
-		llm        LLMClient
-		wantCode   ReprocessErrorCode
-		wantStatus string
+		name     string
+		llm      LLMClient
+		wantCode ReprocessErrorCode
 	}{
-		{name: "provider invalid model", llm: v21FailingReingestLLM{err: classifiedOpenRouterError(modelStatusInvalidModel, errors.New("provider invalid model"))}, wantCode: ReprocessErrorInvalidModel, wantStatus: modelStatusInvalidModel},
-		{name: "provider unavailable", llm: v21FailingReingestLLM{err: classifiedOpenRouterError(modelStatusProviderError, errors.New("provider unavailable"))}, wantCode: ReprocessErrorProviderError, wantStatus: modelStatusProviderError},
-		{name: "decode schema semantic exhausted", llm: v21DecodeInvalidReingestLLM{}, wantCode: ReprocessErrorDecodeError, wantStatus: modelStatusDecodeError},
+		{name: "provider invalid model", llm: v21FailingReingestLLM{err: classifiedOpenRouterError(modelStatusInvalidModel, errors.New("provider invalid model"))}, wantCode: ReprocessErrorInvalidModel},
+		{name: "provider unavailable", llm: v21FailingReingestLLM{err: classifiedOpenRouterError(modelStatusProviderError, errors.New("provider unavailable"))}, wantCode: ReprocessErrorProviderError},
+		{name: "decode schema semantic exhausted", llm: v21DecodeInvalidReingestLLM{}, wantCode: ReprocessErrorDecodeError},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db := newContractDB(t, ctx)
@@ -202,10 +201,10 @@ func TestV21ItemReingestStorableFailureRefreshesSelectedFTSAndItem(t *testing.T)
 			if err != nil {
 				t.Fatalf("ReingestItem %s returned error: %v", tc.name, err)
 			}
-			if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != tc.wantCode || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated || resp.Reingest.Item == nil {
-				t.Fatalf("reingest %s result = %+v, want storable failure with refreshed item/FTS", tc.name, resp.Reingest)
+			if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.Error == nil || resp.Reingest.Error.Code != tc.wantCode || !resp.Reingest.ItemUpdated || resp.Reingest.FTSUpdated || resp.Reingest.Item == nil {
+				t.Fatalf("reingest %s result = %+v, want non-destructive failed attempt without selected FTS refresh", tc.name, resp.Reingest)
 			}
-			assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", tc.wantStatus, "PRIOR summary selected", "PRIOR insight selected")
+			assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", string(tc.wantCode), "PRIOR summary selected", "PRIOR insight selected")
 			assertNoStaleReadableFTS(t, ctx, db, "item_reingest_01", true)
 		})
 	}
@@ -217,10 +216,10 @@ func TestV21ItemReingestStorableFailureRefreshesSelectedFTSAndItem(t *testing.T)
 	if err != nil {
 		t.Fatalf("timeout ReingestItem returned error: %v", err)
 	}
-	if resp.Reingest.Status != ReprocessStatusFailed || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorTimeout || resp.Reingest.ItemUpdated || resp.Reingest.FTSUpdated || resp.Reingest.Item != nil {
-		t.Fatalf("timeout reingest result = %+v, want failed without selected row/FTS write", resp.Reingest)
+	if resp.Reingest.Status != ReprocessStatusFailed || resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorTimeout || !resp.Reingest.ItemUpdated || resp.Reingest.FTSUpdated || resp.Reingest.Item == nil {
+		t.Fatalf("timeout reingest result = %+v, want failed attempt diagnostics without selected FTS refresh", resp.Reingest)
 	}
-	assertPreservedItemReingestFixtureFields(t, ctx, db, "item_reingest_01")
+	assertPreservedOriginalFields(t, ctx, db, "item_reingest_01", string(ReprocessErrorTimeout), "PRIOR summary selected", "PRIOR insight selected")
 	assertStaleReadableFTS(t, ctx, db, "item_reingest_01")
 }
 
@@ -264,17 +263,6 @@ func assertStateExportOmits(t *testing.T, ctx context.Context, db *sql.DB, forbi
 		if strings.Contains(body, value) {
 			t.Fatalf("state export leaked %q in %s", value, body)
 		}
-	}
-}
-
-func assertPreservedItemReingestFixtureFields(t *testing.T, ctx context.Context, db *sql.DB, itemID string) {
-	t.Helper()
-	var title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, modelStatus string
-	if err := db.QueryRowContext(ctx, `select title, coalesce(summary, ''), coalesce(core_insight, ''), coalesce(feed_excerpt, ''), coalesce(extracted_text, ''), coalesce(value_tier, ''), extraction_status, model_status from items where id = ?`, itemID).Scan(&title, &summary, &coreInsight, &feedExcerpt, &extractedText, &valueTier, &extractionStatus, &modelStatus); err != nil {
-		t.Fatalf("read preserved reingest fixture item %s: %v", itemID, err)
-	}
-	if title != "PRIOR title "+itemID || summary != "PRIOR summary selected" || coreInsight != "PRIOR insight selected" || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || valueTier != "brief" || extractionStatus != extractionStatusFull || modelStatus != modelStatusOK {
-		t.Fatalf("item %s was degraded: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, modelStatus)
 	}
 }
 
