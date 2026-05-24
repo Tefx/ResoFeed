@@ -28,6 +28,7 @@ interface ItemAnatomyChrome {
     readonly loadMoreAria: string;
     readonly loadMore: string;
     readonly loading: string;
+    readonly openInspectorAria: (title: string) => string;
   };
   readonly search: {
     readonly resultCount: (count: number) => string;
@@ -75,7 +76,8 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
       externallySurfacedByAgent: 'Externally surfaced by agent',
       loadMoreAria: 'Load more feed items',
       loadMore: '[LOAD MORE]',
-      loading: '[LOADING]'
+      loading: '[LOADING]',
+      openInspectorAria: (title) => `Open Inspector for: ${title}`
     },
     search: {
       resultCount: (count) => `${count} results`,
@@ -123,7 +125,8 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
       externallySurfacedByAgent: '由代理外部推荐',
       loadMoreAria: '加载更多订阅条目',
       loadMore: '[加载更多]',
-      loading: '[加载中]'
+      loading: '[加载中]',
+      openInspectorAria: (title) => `打开检查器：${title}`
     },
     search: {
       resultCount: (count) => `${count} 条结果`,

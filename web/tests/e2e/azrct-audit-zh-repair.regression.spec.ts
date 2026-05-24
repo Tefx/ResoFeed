@@ -164,6 +164,30 @@ async function installAuditZhApi(page: Page, ownerToken: string, calls: string[]
     if (path === '/api/search') {
       return fulfillJson(route, { items, query: { q: url.searchParams.get('q') ?? '', source: null, from: null, to: null, resonated: null, limit: 50 } });
     }
+    if (path === '/api/steer/preview' && request.method() === 'POST') {
+      const body = JSON.parse(request.postData() ?? '{}') as { command?: unknown };
+      const command = typeof body.command === 'string' ? body.command : '';
+      if (/^(search|find)\s+/iu.test(command)) {
+        return fulfillJson(route, {
+          preview: {
+            route_kind: 'search',
+            interpreted_as: 'search',
+            will_mutate: false,
+            changed_rules: [],
+            message: '检索：词汇搜索'
+          }
+        });
+      }
+      return fulfillJson(route, {
+        preview: {
+          route_kind: 'policy',
+          interpreted_as: 'steer_rule',
+          will_mutate: true,
+          changed_rules: [{ id: 'rule_zh_preview', rule_text: '增加中文来源。', is_active: true, superseded_by: null, revision: 1 }],
+          message: '规则预览'
+        }
+      });
+    }
     if (path === '/api/steer' && request.method() === 'POST') {
       return fulfillJson(route, {
         receipt: { interpreted_as: 'steer_rule', changed_rules: [{ id: 'rule_zh', rule_text: '增加中文来源。' }], message: 'applied: 增加中文来源。' },
@@ -281,7 +305,7 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     await openShell(page, ownerToken, calls);
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: /Processing language English; set Chinese/u }).click();
-    await page.getByRole('button', { name: `Open Inspector for: ${zhItem.title}` }).click();
+    await page.getByRole('button', { name: `打开检查器：${zhItem.title}` }).click();
     const inspector = page.locator('.contract-inspector');
     await expect.soft(inspector).toContainText('检查器');
     await expect.soft(inspector).toContainText('来源文本：仅 RSS 摘录');

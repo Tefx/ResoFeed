@@ -51,7 +51,7 @@
   }
 
   function openInspectorLabel(title: string): string {
-    return `Open Inspector for: ${title}`;
+    return chrome.feed.openInspectorAria(title);
   }
 
   function resonanceLabel(item: ItemSummary): string {

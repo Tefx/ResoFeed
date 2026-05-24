@@ -171,7 +171,10 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
     return { status: response.status, body: await response.json() };
   }, ownerToken);
   expect(compatibilityModels).toEqual({ status: 200, body: openRouterModels });
-  await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
+  await expect(page.getByRole('button', { name: `Open Inspector for: ${item.title}` })).toHaveCount(0);
+  const zhOpenInspector = page.getByRole('button', { name: `打开检查器：${item.title}` });
+  await expect(zhOpenInspector).toBeVisible();
+  await zhOpenInspector.click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   await expect(inspector.getByText('INSPECTOR')).toBeVisible();
   await expect(inspector.getByText('检查器')).toHaveCount(0);
@@ -235,7 +238,7 @@ test('blind proof: negative re-ingest error keeps correction controls and avoids
   await page.setViewportSize({ width: 1280, height: 720 });
   await installApiFixtures(page, ownerToken, network, 'negative');
   await page.goto('/');
-  await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
+  await page.getByRole('button', { name: `打开检查器：${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByLabel('Item re-ingest');
   await panel.getByRole('button', { name: '[重新处理本文]' }).click();
