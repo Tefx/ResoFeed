@@ -288,6 +288,9 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 	if out.ModelStatus == modelStatusOK && !isSingleSentenceCoreInsight(out.CoreInsight) {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationCoreInsightShapeInvalid, "core_insight", nil)
 	}
+	if err := validatePromptLanguage(out, item.TargetLanguage); err != nil {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
+	}
 	if out.ModelStatus == modelStatusOK && len(out.KeyPoints) > 0 {
 		if err := validateKeyPoints(out.KeyPoints, out.CoreInsight, item.TargetLanguage); err != nil {
 			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
@@ -299,9 +302,6 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, promptValidationError(PromptValidationSchemaInvalid, "value_tier", err)
 		}
 		out.ValueTier = valueTier
-	}
-	if err := validatePromptLanguage(out, item.TargetLanguage); err != nil {
-		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
 	if err := validatePromptProvenance(out, item); err != nil {
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
@@ -394,8 +394,17 @@ func validatePromptLanguage(out OpenRouterSummaryOutput, target ProcessingLangua
 	if strings.Contains(lower, "cannot write in the requested") || strings.Contains(lower, "refuse to use the requested language") {
 		return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
 	}
-	if target == ProcessingLanguageChinese && containsMostlyLatin(combined) {
-		return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+	if target == ProcessingLanguageChinese {
+		for _, value := range []string{generatedTitle(out), out.Summary, out.CoreInsight} {
+			if containsMostlyLatin(value) {
+				return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+			}
+		}
+		for _, point := range out.KeyPoints {
+			if containsMostlyLatin(point) {
+				return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+			}
+		}
 	}
 	return nil
 }

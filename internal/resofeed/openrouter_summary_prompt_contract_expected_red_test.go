@@ -27,13 +27,12 @@ func TestSummaryPromptContractIncludesAntiFluffDensityAndProvenanceRules(t *test
 		}
 		prompt = capturedPrompt
 		writeOpenRouterSummaryResponse(t, w, OpenRouterSummaryOutput{
-			Title:         "中文标题",
-			FeedExcerpt:   "中文来源摘录",
-			ExtractedText: "中文全文摘录",
-			Summary:       "中文摘要包含 OpenRouter、SQLite FTS5 和 2026 迁移细节。",
-			CoreInsight:   "ResoFeed needs dense source-backed summaries.",
-			ValueTier:     "high",
-			ModelStatus:   modelStatusOK,
+			LocalizedTitle: "中文标题",
+			Summary:        "中文摘要包含 OpenRouter、SQLite FTS5 和 2026 迁移细节。",
+			CoreInsight:    "ResoFeed 需要密集且来源支撑的摘要。",
+			KeyPoints:      []string{"OpenRouter 只作为 JSON 转换器。", "SQLite FTS5 仍是检索边界。", "来源 URL 和标题必须保持字面量。"},
+			ValueTier:      "high",
+			ModelStatus:    modelStatusOK,
 		})
 	}))
 	defer model.Close()
@@ -158,7 +157,21 @@ func decodeOpenRouterSummaryPrompt(r *http.Request) (map[string]any, error) {
 
 func writeOpenRouterSummaryResponse(t *testing.T, w http.ResponseWriter, out OpenRouterSummaryOutput) {
 	t.Helper()
-	content, err := json.Marshal(out)
+	content, err := json.Marshal(struct {
+		LocalizedTitle string   `json:"localized_title"`
+		Summary        string   `json:"summary"`
+		CoreInsight    string   `json:"core_insight"`
+		KeyPoints      []string `json:"key_points"`
+		ValueTier      string   `json:"value_tier"`
+		ModelStatus    string   `json:"model_status"`
+	}{
+		LocalizedTitle: out.LocalizedTitle,
+		Summary:        out.Summary,
+		CoreInsight:    out.CoreInsight,
+		KeyPoints:      out.KeyPoints,
+		ValueTier:      out.ValueTier,
+		ModelStatus:    out.ModelStatus,
+	})
 	if err != nil {
 		t.Fatalf("marshal summary output: %v", err)
 	}

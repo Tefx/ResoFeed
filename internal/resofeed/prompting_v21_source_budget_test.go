@@ -111,7 +111,7 @@ func TestPromptingV21PriorityAndInjectionBoundariesAreCompiledDeterministically(
 		t.Fatalf("compile prompt: %v", err)
 	}
 	if compiled.SystemPrompt != promptingV21SystemPrompt {
-		t.Fatal("system prompt is not request-compiled exact v2.1 text")
+		t.Fatal("system prompt is not request-compiled exact v2.2 text")
 	}
 	policy := compiled.UserPayload.Contract.OneTimePromptPolicy
 	if policy.Priority != "below contract, above active_steering_rules" {

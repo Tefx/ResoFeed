@@ -171,3 +171,79 @@ func TestOpenRouterStructuredOutputRoutingDoesNotDowngradeAfterGeneratedResponse
 		}
 	}
 }
+
+func TestOpenRouterListShapedOneTimePromptsRouteToKeyPoints(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		prompt string
+	}{
+		{name: "chinese split core insight", prompt: "核心洞察要分点"},
+		{name: "english list risks", prompt: "List the implementation risks as bullets."},
+		{name: "english key takeaways", prompt: "Give me the top takeaways as a numbered list."},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			var captured promptingV21UserPayload
+			provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch {
+				case r.Method == http.MethodGet && r.URL.Path == "/api/v1/models":
+					writeOpenRouterModelsMetadata(t, w, "openrouter/list-routing", "response_format")
+				case r.Method == http.MethodPost && r.URL.Path == "/api/v1/chat/completions":
+					request, err := decodePromptingV21ChatRequest(r)
+					if err != nil {
+						t.Fatalf("decode chat request: %v", err)
+					}
+					if len(request.Messages) != 2 {
+						t.Fatalf("messages len = %d, want system+user", len(request.Messages))
+					}
+					if err := json.Unmarshal([]byte(request.Messages[1].Content), &captured); err != nil {
+						t.Fatalf("decode user payload: %v", err)
+					}
+					writeOpenRouterSummaryResponse(t, w, validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+						out.CoreInsight = "List-shaped guidance is routed into structured key points."
+						out.KeyPoints = []string{
+							"Source-backed implementation risk point one.",
+							"Source-backed implementation risk point two.",
+							"Source-backed implementation risk point three.",
+						}
+					}))
+				default:
+					http.NotFound(w, r)
+				}
+			}))
+			t.Cleanup(provider.Close)
+
+			client := &openRouterHTTPClient{apiKey: "fake-openrouter-key", endpoint: provider.URL, client: provider.Client(), model: "openrouter/list-routing"}
+			out, err := client.SummarizeItem(ctx, OpenRouterSummaryInput{
+				ItemID:         "item_list_routing",
+				Title:          "List Routing",
+				SourceTitle:    "Contract Source",
+				URL:            "https://example.test/list-routing",
+				AvailableText:  "The source describes implementation risks, rollback plans, and operational takeaways.",
+				TargetLanguage: ProcessingLanguageEnglish,
+				Prompt:         tc.prompt,
+			})
+			if err != nil {
+				t.Fatalf("SummarizeItem returned error: %v", err)
+			}
+			if captured.Guidance.OneTimePrompt == nil || *captured.Guidance.OneTimePrompt != tc.prompt {
+				t.Fatalf("one-time prompt not field-scoped in payload: %+v", captured.Guidance)
+			}
+			contractJSON, err := json.Marshal(captured.Contract)
+			if err != nil {
+				t.Fatalf("marshal contract: %v", err)
+			}
+			for _, want := range []string{"key_points", "one sentence", "schema", "target language", "provenance", "model_status"} {
+				if !strings.Contains(string(contractJSON), want) {
+					t.Fatalf("compiled contract missing %q for list routing: %s", want, contractJSON)
+				}
+			}
+			if len(out.KeyPoints) != 3 {
+				t.Fatalf("key_points len = %d, want 3; out=%+v", len(out.KeyPoints), out)
+			}
+			if !isSingleSentenceCoreInsight(out.CoreInsight) || isListLikeText(out.CoreInsight) {
+				t.Fatalf("core_insight shape invalid after list prompt: %q", out.CoreInsight)
+			}
+		})
+	}
+}

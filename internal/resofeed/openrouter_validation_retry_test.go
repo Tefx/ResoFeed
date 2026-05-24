@@ -33,7 +33,7 @@ func TestPromptValidationFailureCodesAndPublicSafeMapping(t *testing.T) {
 			return err
 		}},
 		{name: "empty_required_generated_field", code: PromptValidationEmptyRequiredGeneratedField, run: func() error {
-			_, err := validateSummaryOutputForPersistence(validPromptingV21Output(func(out *OpenRouterSummaryOutput) { out.ExtractedText = "   " }))
+			_, err := validateSummaryOutputForPersistence(validPromptingV21Output(func(out *OpenRouterSummaryOutput) { out.LocalizedTitle = "   " }))
 			return err
 		}},
 		{name: "language_invalid", code: PromptValidationLanguageInvalid, run: func() error {
@@ -79,13 +79,16 @@ func contractValidSummaryOutputForTest(label string) OpenRouterSummaryOutput {
 		label = "Contract"
 	}
 	return OpenRouterSummaryOutput{
-		Title:         label + " title",
-		FeedExcerpt:   label + " feed excerpt",
-		ExtractedText: label + " extracted text",
-		Summary:       label + " source-backed summary with concrete facts.",
-		CoreInsight:   label + " source-backed insight.",
-		ValueTier:     "high",
-		ModelStatus:   modelStatusOK,
+		LocalizedTitle: label + " title",
+		Summary:        label + " source-backed summary with concrete facts.",
+		CoreInsight:    label + " source-backed insight.",
+		KeyPoints: []string{
+			label + " specific source-backed point one.",
+			label + " specific source-backed point two.",
+			label + " specific source-backed point three.",
+		},
+		ValueTier:   "high",
+		ModelStatus: modelStatusOK,
 	}
 }
 
@@ -94,11 +97,10 @@ func TestPromptValidationFieldCeilingsForAllGeneratedFields(t *testing.T) {
 		field  string
 		mutate func(*OpenRouterSummaryOutput)
 	}{
-		{field: "title", mutate: func(out *OpenRouterSummaryOutput) { out.Title = strings.Repeat("a", 181) }},
-		{field: "feed_excerpt", mutate: func(out *OpenRouterSummaryOutput) { out.FeedExcerpt = strings.Repeat("a", 701) }},
-		{field: "extracted_text", mutate: func(out *OpenRouterSummaryOutput) { out.ExtractedText = strings.Repeat("a", 1601) }},
+		{field: "localized_title", mutate: func(out *OpenRouterSummaryOutput) { out.LocalizedTitle = strings.Repeat("a", 181) }},
 		{field: "summary", mutate: func(out *OpenRouterSummaryOutput) { out.Summary = strings.Repeat("a", 1801) }},
 		{field: "core_insight", mutate: func(out *OpenRouterSummaryOutput) { out.CoreInsight = strings.Repeat("a", 351) }},
+		{field: "key_points[0]", mutate: func(out *OpenRouterSummaryOutput) { out.KeyPoints[0] = strings.Repeat("a", 501) }},
 	}
 	for _, tc := range cases {
 		t.Run(tc.field, func(t *testing.T) {
