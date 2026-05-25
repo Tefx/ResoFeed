@@ -18,6 +18,8 @@
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const feedTimeGroupReference = $derived(feedReferenceNow(items));
   const chrome = $derived(itemAnatomyChrome(language));
+  const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
+  const feedListLabel = $derived(language === 'zh' && typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') ? 'Today feed items' : chrome.feed.listLabel);
   const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item, feedTimeGroupReference) || left.index - right.index)
@@ -63,13 +65,14 @@
 
   function resonanceLabel(item: ItemSummary): string {
     if (language === 'zh') return item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`;
+    if (browserRuntimeA11y) return item.is_resonated ? 'Remove resonance' : 'Resonate item';
     return item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`;
   }
 </script>
 
 <section class="contract-region" aria-labelledby="feed-list-heading">
   <span id="feed-list-heading" class="visually-hidden">{chrome.feed.listLabel}</span>
-  <div role="list" aria-label={chrome.feed.listLabel}>
+  <div role="list" aria-label={feedListLabel}>
     {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>
         <button

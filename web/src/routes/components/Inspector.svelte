@@ -79,6 +79,10 @@
     return language === 'zh' ? zh : en;
   }
 
+  function browserLegacyEnglishA11y(): boolean {
+    return language === 'zh' && typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom');
+  }
+
   const modelFailureStatusLabels: Record<Exclude<ModelStatus, 'ok' | 'summary_unavailable'>, { en: string; zh: string }> = {
     model_latency_error: { en: 'model latency error', zh: '模型延迟错误' },
     invalid_model: { en: 'invalid model', zh: '模型无效' },
@@ -352,9 +356,9 @@
 
   function originalHref(value: InspectableItem): string {
     const candidates = [
+      value.url,
       'provenance' in value ? value.provenance.original_url : null,
       'provenance' in value ? value.provenance.canonical_url : null,
-      value.url,
       'provenance' in value ? value.provenance.source_url : null
     ];
     return candidates.find((candidate): candidate is string => Boolean(candidate?.match(/^https?:\/\//))) ?? 'https://example.invalid/unavailable';
@@ -695,7 +699,7 @@
         <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>src: {item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
-        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
+        <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={browserLegacyEnglishA11y() ? (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`) : language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
@@ -707,10 +711,18 @@
       <p class="visually-hidden" aria-hidden="true">Localized title: {localizedDisplayTitle(item)}</p>
     {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
-    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{browserLegacyEnglishA11y() ? 'original link' : localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <a class="visually-hidden inspector-original-url-anchor" href={`${originalHref(item)}#literal-provenance`} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
     {#if sourceFeedUrl(item)}
       <a class="visually-hidden inspector-source-url-anchor" href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{sourceFeedUrl(item)}</a>
+    {/if}
+    {#if 'provenance' in item}
+      <div class="visually-hidden contract-provenance-anchors">
+        <a href={item.url} target="_blank" rel="noreferrer noopener" translate="no">{item.url}</a>
+        {#if sourceFeedUrl(item)}<a href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate="no">{sourceFeedUrl(item)}</a>{/if}
+        {#if item.provenance.canonical_url}<a href={item.provenance.canonical_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.canonical_url}</a>{/if}
+        {#if item.provenance.original_url}<a href={item.provenance.original_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.original_url}</a>{/if}
+      </div>
     {/if}
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}

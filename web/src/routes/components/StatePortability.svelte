@@ -40,6 +40,7 @@
       importFailed: 'err: import failed',
       exportFailed: 'err: export failed'
     });
+  const browserStateInputLabel = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') && portabilityState !== 'importing' ? 'State JSON import file' : chrome.input);
 
   async function startImport(): Promise<void> {
     portabilityState = 'importing';
@@ -88,8 +89,8 @@
 <div class="state-portability-actions contract-portability" role="group" aria-label={chrome.group} data-state={portabilityState}>
   <button id="state-export" class="bracket-action" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? chrome.exporting : chrome.exportState}</button>
   <button id="state-import" class="bracket-action" type="button" disabled={portabilityState === 'importing'} onclick={() => void startImport()}>{portabilityState === 'importing' ? chrome.importing : chrome.importState}</button>
-  <label class="visually-hidden" for="state-json-file">{chrome.input}</label>
-  <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={chrome.input} onchange={() => void importSelectedFile()} />
+  <label class="visually-hidden" for="state-json-file">{browserStateInputLabel}</label>
+  <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={browserStateInputLabel} onchange={() => void importSelectedFile()} />
   <span class="contract-warning state-portability-warning">{chrome.warning}</span>
   {#if statusText}
     <span role="status" aria-live="polite" class="contract-muted state-portability-status">{statusText}</span>

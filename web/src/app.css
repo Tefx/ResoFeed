@@ -186,7 +186,7 @@ a:focus,
 
 .source-ledger__header > .source-ledger__status,
 .source-ledger__header-actions:not(.source-ledger__header) > .source-ledger__status {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .source-ledger__header > .source-ledger__status {
@@ -461,8 +461,8 @@ a:focus,
 }
 
 .steer-route-preview[data-route-kind='idle'] {
-  min-height: 0;
-  height: 0;
+  min-height: 20px;
+  height: 20px;
   border-block-end: 0;
   padding-block: 0;
   overflow: hidden;
@@ -571,7 +571,7 @@ details.surface-nav {
 
 details.surface-nav summary {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 20px;
   align-items: center;
   list-style: none;
 }
@@ -605,14 +605,27 @@ details.surface-nav .surface-nav-menu {
   pointer-events: none;
 }
 
+.surface-nav-assistive-menu {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+details.surface-nav[open] + .surface-nav-assistive-menu {
+  display: none;
+}
+
 details.surface-nav[open] .surface-nav-menu--closed {
   position: absolute;
   opacity: 1;
   pointer-events: auto;
 }
 
-details.surface-nav button,
-.surface-nav-quick {
+details.surface-nav button {
   min-height: 44px;
   border: 0;
   padding: 0 var(--rf-space-row);
@@ -624,34 +637,15 @@ details.surface-nav button,
   cursor: pointer;
 }
 
-.surface-nav-quick-group {
-  display: inline-flex;
-  gap: var(--rf-space-xs);
-  align-items: center;
-}
-
-.surface-nav-quick {
-  width: 44px;
-  justify-content: center;
-}
-
 details.surface-nav button[aria-pressed='true'],
 details.surface-nav button:hover,
-details.surface-nav button:focus-visible,
-.surface-nav-quick[aria-pressed='true'],
-.surface-nav-quick:hover,
-.surface-nav-quick:focus-visible {
+details.surface-nav button:focus-visible {
   color: var(--rf-color-text);
 }
 
-details.surface-nav button:focus-visible,
-.surface-nav-quick:focus-visible {
+details.surface-nav button:focus-visible {
   outline: 2px solid var(--rf-color-focus);
   outline-offset: 2px;
-}
-
-details.surface-nav[open] ~ .surface-nav-quick-group {
-  display: none;
 }
 
 .runtime-language-controls {
@@ -765,6 +759,10 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   min-height: 100%;
   max-height: calc(100vh - 130px);
   overflow-y: auto;
+}
+
+.detail-pane.active-panel .inspector-stable-landmark {
+  min-height: calc(100vh + 200px);
 }
 
 .contract-provenance-anchors {
@@ -1037,7 +1035,13 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 .contract-inspector .inspector-original-link:focus,
 .contract-inspector .inspector-original-link:focus-visible {
   color: var(--rf-color-focus);
+  outline: 2px solid var(--rf-color-focus);
+  outline-offset: 2px;
   text-decoration-color: var(--rf-color-focus);
+}
+
+.contract-inspector .inspector-original-link:focus-visible {
+  outline: 0;
 }
 
 .inspector-header-row {
