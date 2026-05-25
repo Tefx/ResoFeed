@@ -1,6 +1,6 @@
 <script lang="ts">
   import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage } from '$lib/api-contract';
-  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemCompactPreviewText, itemExtractionLabel, itemLocalizedDisplayTitle, itemPriorityLabel, itemSourceProvenanceTitle, itemSummaryProvenanceLabel, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -54,6 +54,12 @@
     return chrome.feed.openInspectorAria(title);
   }
 
+  function titleDistinctionLabel(item: ItemSummary): string {
+    return language === 'zh'
+      ? `来源标题：${itemSourceProvenanceTitle(item)}`
+      : `source title: ${itemSourceProvenanceTitle(item)}`;
+  }
+
   function resonanceLabel(item: ItemSummary): string {
     if (language === 'zh') return item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`;
     return item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`;
@@ -73,6 +79,9 @@
         >
           <p class="contract-label contract-feed-meta">
             <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
+            {#if itemSourceProvenanceTitle(item) !== itemLocalizedDisplayTitle(item, language)}
+              <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-source-title" aria-label={titleDistinctionLabel(item)} translate="no"><span>{language === 'zh' ? '来源标题：' : 'source title: '}</span><span>{itemSourceProvenanceTitle(item)}</span></span>
+            {/if}
             <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
             <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(item.extraction_status)}>{itemExtractionLabel(item.extraction_status, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.summaryProvenanceAria(itemSummaryProvenanceLabel(item, language))}>{itemSummaryProvenanceLabel(item, language)}</span>
@@ -84,8 +93,8 @@
               <span class="contract-time-label">{itemTimeGroup(item, feedTimeGroupReference)}</span>
             {/if}
           </p>
-          <p class="contract-feed-title">{item.title}</p>
-          <p class="contract-feed-summary">{itemSummaryText(item, language)}</p>
+          <p class="contract-feed-title" aria-label={language === 'zh' ? `本地化标题：${itemLocalizedDisplayTitle(item, language)}` : `Localized title: ${itemLocalizedDisplayTitle(item, language)}`}>{itemLocalizedDisplayTitle(item, language)}</p>
+          <p class="contract-feed-summary">{itemCompactPreviewText(item, language)}</p>
         </button>
         <button
           class="contract-resonate"

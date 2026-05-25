@@ -1,7 +1,7 @@
 <script lang="ts">
   import { processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage, type SearchResponse } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
-  import { itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemSourceBackedProvenanceLabel, itemSummaryText, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { itemAgeLabel, itemAnatomyChrome, itemCompactPreviewText, itemExtractionLabel, itemLocalizedDisplayTitle, itemPriorityLabel, itemSourceBackedProvenanceLabel, itemSourceProvenanceTitle, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -46,6 +46,7 @@
       resultsRegion: '搜索结果',
       resultsList: '搜索结果条目',
       inspect: (title: string) => `检查搜索结果：${title}`,
+      sourceItemTitle: (title: string) => `来源标题：${title}`,
       extractionPrefix: '提取：',
       resonate: (item: ItemSummary) => item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`
     }
@@ -66,6 +67,7 @@
       resultsRegion: 'Search results',
       resultsList: 'Search result items',
       inspect: (title: string) => `Inspect search result: ${title}`,
+      sourceItemTitle: (title: string) => `source title: ${title}`,
       extractionPrefix: 'extraction: ',
       resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
     });
@@ -190,6 +192,8 @@
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
               <span class="feed-meta-source" aria-label={chrome.search.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
               <span aria-hidden="true">·</span>
+              <span class="feed-meta-source-title" aria-label={searchChrome.sourceItemTitle(itemSourceProvenanceTitle(item))} translate="no"><span>{language === 'zh' ? '来源标题：' : 'source title: '}</span><span>{itemSourceProvenanceTitle(item)}</span></span>
+              <span aria-hidden="true">·</span>
               <span class="feed-meta-age" aria-label={chrome.search.ageAria(itemAgeLabel(item, new Date(), language))}>{itemAgeLabel(item, new Date(), language)}</span>
               {#if shouldShowTimeGroup(results, index)}
                 <span class="contract-search-time-label">{itemTimeGroup(item)}</span>
@@ -204,8 +208,8 @@
                 <span aria-label={chrome.search.externallySurfacedByAgent}>agent:external</span>
               {/if}
             </p>
-            <p class="contract-feed-title">{item.title}</p>
-            <p class="contract-feed-summary">{itemSummaryText(item, language)}</p>
+            <p class="contract-feed-title" aria-label={language === 'zh' ? `本地化标题：${itemLocalizedDisplayTitle(item, language)}` : `Localized title: ${itemLocalizedDisplayTitle(item, language)}`}>{itemLocalizedDisplayTitle(item, language)}</p>
+            <p class="contract-feed-summary">{itemCompactPreviewText(item, language)}</p>
           </button>
           <button
             class="contract-resonate"

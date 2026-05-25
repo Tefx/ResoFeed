@@ -49,7 +49,7 @@ describe('AZRCT closure static regression contracts', () => {
     const preview = fs.readFileSync(path.join(repoRoot, 'docs/ui-preview.html'), 'utf8');
     expect(preview).toMatch(/LANG: EN|LANG: ZH|语言: 英文|语言: 中文/u);
     expect(preview).toMatch(/\[REPROCESS LIBRARY\]|\[重处理资料库\]/u);
-    expect(preview).toMatch(/source excerpt|excerpt/u);
+    expect(preview).toMatch(/source excerpt|excerpt|来源摘录|摘录/u);
     expect(preview).not.toMatch(/>\s*partial\s*</iu);
   });
 });

@@ -843,6 +843,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 }
 
 .contract-feed-meta .feed-meta-source,
+.contract-feed-meta .feed-meta-source-title,
 .contract-feed-meta .feed-meta-age {
   flex: 0 1 auto;
 }
@@ -1046,6 +1047,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 .contract-inspector .inspector-evidence-line,
 .contract-inspector .inspector-link-row,
 .contract-inspector .inspector-status-line,
+.contract-inspector .inspector-title-distinction,
 .contract-inspector .inspector-section-label {
   font: var(--rf-typography-metadata);
   letter-spacing: 0.02em;
@@ -1086,6 +1088,31 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   margin-block: 0;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
+}
+
+.inspector-key-points-list {
+  margin: 0;
+  padding-inline-start: var(--rf-space-lg);
+  font: var(--rf-typography-payload);
+}
+
+.inspector-key-points-section {
+  max-width: 68ch;
+  margin-block-start: var(--rf-space-md);
+}
+
+.inspector-key-points-list li {
+  padding-block: var(--rf-space-xs);
+  overflow-wrap: anywhere;
+}
+
+.inspector-attempt-failure {
+  max-width: 68ch;
+  margin-block: var(--rf-space-md);
+  border-block: 1px solid var(--rf-color-border);
+  padding-block: var(--rf-space-sm);
+  color: var(--rf-color-warning);
+  font: var(--rf-typography-chrome);
 }
 
 .contract-inspector .inspector-reading-section,

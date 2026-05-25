@@ -201,6 +201,28 @@ export function itemSummaryText(item: ItemSummary, language: ProcessingLanguage 
   return readableItemText(itemDisplayExcerpt(item)) ?? itemAnatomyChrome(language).summaryUnavailable;
 }
 
+export function itemLocalizedDisplayTitle(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const transportTitle = readableItemText(item.title);
+  const sourceTitle = readableItemText(item.source_item_title);
+  if (transportTitle && sourceTitle && transportTitle !== sourceTitle) return transportTitle;
+  if (language === 'zh') {
+    const localizedTitle = readableItemText(item.localized_title);
+    return localizedTitle ?? sourceTitle ?? transportTitle ?? item.title;
+  }
+  return sourceTitle ?? transportTitle ?? item.title;
+}
+
+export function itemSourceProvenanceTitle(item: ItemSummary): string {
+  return readableItemText(item.source_item_title) ?? readableItemText(item.title) ?? item.title;
+}
+
+export function itemCompactPreviewText(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const summary = readableItemText(item.summary);
+  const coreInsight = readableItemText(item.core_insight);
+  const preview = [summary, coreInsight].filter((part): part is string => Boolean(part)).join(' · ');
+  return preview || itemSummaryText(item, language);
+}
+
 export function itemTimestamp(item: ItemSummary): Rfc3339UtcString | null {
   return itemDisplayTimestamp(item);
 }

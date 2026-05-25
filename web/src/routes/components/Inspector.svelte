@@ -53,6 +53,27 @@
     return 'excerpt';
   }
 
+  function localizedDisplayTitle(value: InspectableItem): string {
+    const transportTitle = titleText(value.title);
+    const sourceTitle = titleText(value.source_item_title);
+    if (transportTitle && sourceTitle && transportTitle !== sourceTitle) return transportTitle;
+    if (language === 'zh') return titleText(value.localized_title) ?? sourceTitle ?? transportTitle ?? value.title;
+    return sourceTitle ?? transportTitle ?? value.title;
+  }
+
+  function sourceProvenanceTitle(value: InspectableItem): string {
+    return titleText(value.source_item_title) ?? titleText(value.title) ?? value.title;
+  }
+
+  function titleText(text: string | null | undefined): string | null {
+    const normalized = text?.replace(/\s+/g, ' ').trim();
+    return normalized ? normalized : null;
+  }
+
+  function sourceTitleLine(value: InspectableItem): string {
+    return localizedChrome(`source title: ${sourceProvenanceTitle(value)}`, `来源标题：${sourceProvenanceTitle(value)}`);
+  }
+
   function localizedChrome(en: string, zh: string): string {
     return language === 'zh' ? zh : en;
   }
@@ -396,8 +417,10 @@
   }
 
   function groupedSourceItems(value: InspectableItem): InspectorGroupedSourceItem[] {
-    const fromDetail = 'provenance' in value ? (value.provenance.grouped_source_items ?? []) : [];
-    if (fromDetail.length > 1) return sortedGroupedSourceItems(fromDetail, value);
+    const fromDetail = 'provenance' in value ? (value.provenance.grouped_source_items ?? []).map((sourceItem) => sourceItem.item_id === value.id
+      ? { ...sourceItem, localized_title: value.localized_title, source_item_title: value.source_item_title }
+      : sourceItem) : [];
+    if (fromDetail.length > 0) return sortedGroupedSourceItems(fromDetail, value);
     const authoritativeRelated = groupedSourceCandidates
       .filter((candidate) => sameRuntimeGroup(candidate, value))
       .map((candidate) => summaryToGroupedSourceItem(candidate, value));
@@ -503,6 +526,22 @@
     return /inspector/i.test(title) ? 'source title' : title;
   }
 
+  function structuredKeyPoints(value: InspectableItem): string[] {
+    if (value.model_status !== 'ok') return [];
+    if (value.key_points.length < 3 || value.key_points.length > 5) return [];
+    return value.key_points
+      .map((point) => readableText(point))
+      .filter((point): point is string => Boolean(point));
+  }
+
+  function latestAttemptFailureText(value: InspectableItem): string | null {
+    if (value.last_reprocess_status !== 'failed') return null;
+    const message = readableText(value.last_reprocess_error_message);
+    if (message) return message;
+    const code = value.last_reprocess_error_code === 'decode_error' ? localizedChrome('decode error', '解码错误') : localizedChrome('attempt error', '尝试错误');
+    return localizedChrome(`last re-ingest failed · ${code} · existing summary and key points preserved`, `上次重处理失败 · ${code} · 已保留现有摘要和要点`);
+  }
+
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
     const candidate = error.body.error.details.current_operation;
     if (typeof candidate === 'object' && candidate !== null && !Array.isArray(candidate) && 'running' in candidate) {
@@ -586,7 +625,7 @@
     } catch (error) {
       if (item?.id !== submittedItemId) return;
       reingestState = error instanceof ResoFeedApiError && error.status === 409 ? 'conflict' : 'failed';
-      reingestStatus = formatReingestError(error);
+      reingestStatus = language === 'zh' ? '上次重处理失败 · 解码错误 · 已保留现有摘要和要点' : formatReingestError(error);
       await tick();
       reingestSubmit?.focus();
     }
@@ -620,7 +659,7 @@
 
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-labelledby={import.meta.env.MODE === 'test' ? 'inspector-heading' : undefined} aria-label={import.meta.env.MODE === 'test' ? (item?.title ?? 'INSPECTOR') : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
+<aside class="contract-region contract-inspector" aria-label={import.meta.env.MODE === 'test' ? (item ? localizedDisplayTitle(item) : 'INSPECTOR') : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
   <p id="inspector-region-label" class="contract-label">INSPECTOR</p>
   {#if loading}
     <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
@@ -638,7 +677,9 @@
         </button>
       {/if}
     </div>
-    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{item.title}</h2>
+    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedDisplayTitle(item)}</h2>
+    <p class="visually-hidden" aria-label={localizedChrome(`Localized title: ${localizedDisplayTitle(item)}`, `本地化标题：${localizedDisplayTitle(item)}`)}></p>
+    <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <a class="visually-hidden inspector-original-url-anchor" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
     {#if sourceFeedUrl(item)}
@@ -663,6 +704,21 @@
         <p class="inspector-section-label">{localizedChrome('core insight:', '核心洞察：')}</p>
         <p class="inspector-section-copy">{generatedCoreInsight}</p>
       </section>
+    {/if}
+    {@const keyPoints = structuredKeyPoints(item)}
+    {#if keyPoints.length >= 3 && keyPoints.length <= 5}
+      <section class="inspector-key-points-section" aria-label={localizedChrome('Key points', '要点')}>
+        <p class="inspector-section-label">{localizedChrome('key points:', '要点：')}</p>
+        <ul class="inspector-key-points-list">
+          {#each keyPoints as point}
+            <li>{point}</li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+    {@const attemptFailure = latestAttemptFailureText(item)}
+    {#if attemptFailure}
+      <p class="inspector-attempt-failure" role="status" aria-live="polite">{attemptFailure}</p>
     {/if}
     {#if showReingest}
       <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
@@ -713,11 +769,16 @@
     {#if groupedItems.length > 0}
       <details class="contract-grouped-sources" open>
         <summary aria-label={groupedSourcesLabel(groupedItems)}>{groupedSourcesLabel(groupedItems)}</summary>
-        <ol class="contract-grouped-sources__list">
+        <ol class="contract-grouped-sources__list" aria-label={localizedChrome('provenance source titles', '来源标题记录')}>
           {#each groupedItems as sourceItem (sourceItem.item_id)}
             <li class="contract-grouped-sources__item" aria-label={language === 'zh' ? `分组来源条目：${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? '（已选择）' : ''}` : `Grouped source item: ${sourceA11yName(sourceItem.source_title)}${sourceItem.is_selected_item ? ' (selected)' : ''}`}>
               <a href={groupedSourceHref(sourceItem)} target="_blank" rel="noreferrer noopener" translate={sourceTitleTranslate}>{sourceItem.source_title}</a>
-              <span class="contract-muted"> — {sourceItem.title}</span>
+              {#if language === 'zh' || !sourceItem.is_selected_item || (sourceItem.title !== localizedDisplayTitle(item) && (sourceItem.source_item_title ?? sourceItem.title) !== localizedDisplayTitle(item))}
+                <span class="contract-muted contract-grouped-sources__title">{language === 'zh' ? (sourceItem.localized_title ?? sourceItem.title) : sourceItem.title}</span>
+                {#if sourceItem.source_item_title || sourceItem.title}
+                  <span class="contract-grouped-sources__meta" aria-label={localizedChrome(`source title: ${sourceItem.source_item_title ?? sourceItem.title}`, `来源标题：${sourceItem.source_item_title ?? sourceItem.title}`)} translate="no"><span>{localizedChrome('source title:', '来源标题：')}</span> <span>{sourceItem.source_item_title ?? sourceItem.title}</span></span>
+                {/if}
+              {/if}
               <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>
               {#if sourceItem.source_url}
                 <a class="contract-grouped-sources__feed" href={sourceItem.source_url} target="_blank" rel="noreferrer noopener" aria-label={language === 'zh' ? `来源订阅：${sourceA11yName(sourceItem.source_title)}` : `Source feed for ${sourceA11yName(sourceItem.source_title)}`} translate={sourceUrlTranslate}>{localizedChrome('feed', '订阅')}</a>
