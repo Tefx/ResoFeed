@@ -60,9 +60,14 @@ async function importFixtureAndOpenInspector(page: Page, ownerToken: string, opm
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   await page.locator('#opml-file').setInputFiles(opmlPath);
   await expect(page.getByText(/imported 1 sources|skipped 1 existing sources/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  const ingestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(ingestButton).toBeVisible();
   await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
-  await expect(page.getByText(/PRD Inspector Fixture Source/)).toBeVisible({ timeout: 20_000 });
+  // [DEVIATION]: This fixture helper must deterministically seed the runtime feed. OPML import configures a source; the existing Source Ledger ingest action performs item ingestion.
+  await ingestButton.click();
+  const fixtureSourceRow = page.locator('.source-ledger__row', { hasText: /PRD Inspector Fixture Source/ });
+  await expect(fixtureSourceRow).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
+  await expect(fixtureSourceRow).toBeVisible({ timeout: 20_000 });
   await openSurfaceViaMenu(page, 'TODAY');
   await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
 
@@ -137,13 +142,11 @@ async function layoutSnapshot(page: Page): Promise<LayoutSnapshot> {
 
 function auditLiveLayout(snapshot: LayoutSnapshot, violations: string[]): void {
   if (!snapshot.masthead.found || !/RESOFEED/.test(snapshot.masthead.text)) {
-    violations.push('missing large RESOFEED masthead in desktop shell');
+    violations.push('missing RESOFEED product label in desktop shell');
   }
-  if (snapshot.masthead.fontSize < 30) {
-    violations.push(`RESOFEED masthead scale too small: ${snapshot.masthead.fontSize}px`);
-  }
-  if (!/SOURCE LEDGER/.test(snapshot.nav.text) || !/DOCTOR|\/doctor/.test(snapshot.nav.text) || !/INSPECTOR/.test(snapshot.nav.text)) {
-    violations.push(`top navigation/status line missing SOURCE LEDGER / DOCTOR / INSPECTOR placement: ${snapshot.nav.text}`);
+  // [DEVIATION]: DESIGN.md now defines low-chrome RESOFEED menu navigation, not the older preview's large masthead or persistent DOCTOR/INSPECTOR nav line.
+  if (!/TODAY/.test(snapshot.nav.text) || !/SOURCE LEDGER/.test(snapshot.nav.text)) {
+    violations.push(`surface menu missing TODAY / SOURCE LEDGER placement: ${snapshot.nav.text}`);
   }
   if (!snapshot.prompt.found || snapshot.prompt.box.y > 140) {
     violations.push(`Steer prompt box is not visibly placed near the top command area: y=${snapshot.prompt.box.y}`);

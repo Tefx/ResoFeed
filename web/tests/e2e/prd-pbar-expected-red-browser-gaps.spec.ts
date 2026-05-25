@@ -24,18 +24,19 @@ async function steer(page: Page, command: string, submit: 'enter' | 'apply' = 'e
   await page.getByRole('button', { name: 'apply' }).click();
 }
 
-async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string }, ownerToken: string): Promise<void> {
+async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string; fixtureServer: { url: string } }, ownerToken: string): Promise<void> {
   await enterOwnerToken(page, ownerToken);
   await steer(page, 'source ledger');
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  const emptyLedger = page.getByText('No sources. Paste RSS URL in Steer.');
-  if (await emptyLedger.isVisible().catch(() => false)) {
-    await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-    await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
-  }
+  await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
+  await expect(page.getByText(/imported \d+ sources; folders flattened|skipped \d+ existing sources/)).toBeVisible();
   const feedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-  await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  const ingestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
+  await expect(ingestButton).toBeVisible();
   await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
+  // [DEVIATION]: This expected-red helper owns fixture seeding. OPML import/source-add only configures sources; the production runtime requires the existing explicit Source Ledger ingest action to create TODAY rows.
+  await ingestButton.click();
+  await expect(page.locator('.source-ledger__row', { hasText: runInfo.fixtureServer.url })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
   await steer(page, 'today');
   await expect(feedItem).toBeVisible({ timeout: 10_000 });
 }

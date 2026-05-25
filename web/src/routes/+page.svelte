@@ -1061,10 +1061,10 @@
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
           <summary
             bind:this={surfaceMenuSummary}
-            class="contract-label surface-nav-label"
+            class="contract-label contract-brand surface-nav-label"
             aria-haspopup="menu"
             aria-expanded={surfaceMenuOpen ? 'true' : 'false'}
-          ><span class="contract-brand visually-hidden" aria-hidden="true"></span>RESOFEED</summary>
+          >RESOFEED</summary>
           <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
             <p class="utility-label">{shellChrome.nav}</p>
             <button
@@ -1180,11 +1180,12 @@
       <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' && !isNarrow ? shellChrome.searchSurface : shellChrome.todayScroll} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">{shellChrome.independentScroll}</span>
         {#if !feedPaneInactive}
+          <h1 id="feed-heading" class="contract-label contract-surface-heading" tabindex="-1">TODAY</h1>
           {#if apiError && promptState !== 'rejected'}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {/if}
           {#if currentSurface === 'search'}
-            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={false} compactFilters={isNarrow} />
+            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
           {:else if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
           {:else}
@@ -1229,7 +1230,7 @@
         {#if currentSurface === 'search'}
           <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
         {/if}
-        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={false} compactFilters={isNarrow} />
+        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
       </section>
     {/if}
     {#if steerFeedback.kind === 'doctor'}

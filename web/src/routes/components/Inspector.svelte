@@ -715,6 +715,9 @@
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
+    <p class="inspector-evidence-line">
+      {summaryProvenanceDisclosure(item)} · quality: {item.value_tier ?? item.extraction_status}
+    </p>
     {#if item.extraction_status === 'partial_extraction'}
       <p class="visually-hidden">{extractionDisclosure(item)}</p>
     {/if}
@@ -725,6 +728,8 @@
         <p class="inspector-section-label">{localizedChrome('summary:', '摘要：')}</p>
         <p class="inspector-section-copy">{generatedSummary}</p>
       </section>
+    {:else}
+      <p class="inspector-evidence-line">summary: unavailable</p>
     {/if}
     {#if generatedCoreInsight}
       <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>

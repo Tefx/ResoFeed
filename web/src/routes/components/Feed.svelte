@@ -67,8 +67,8 @@
   }
 </script>
 
-<section class="contract-region" aria-labelledby="feed-heading">
-  <h2 id="feed-heading" class="visually-hidden" tabindex="-1">{chrome.feed.listLabel}</h2>
+<section class="contract-region" aria-labelledby="feed-list-heading">
+  <span id="feed-list-heading" class="visually-hidden">{chrome.feed.listLabel}</span>
   <div role="list" aria-label={chrome.feed.listLabel}>
     {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>
