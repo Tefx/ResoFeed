@@ -983,9 +983,9 @@
     <section class="secondary-grid">
       <section class="panel ledger source-ledger" aria-labelledby="source-ledger-title">
         <header class="source-ledger__header">
-          <h1 class="source-ledger__title" id="source-ledger-title">来源账本</h1>
-          <span class="source-ledger__status" aria-live="polite">[摄取中...] · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00</span>
-          <button class="bracket-action bracket-action--run-ingest" type="button" disabled>[摄取中...]</button>
+          <h2 class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER</h2>
+          <span class="source-ledger__status" aria-live="polite">last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00</span>
+          <button class="bracket-action bracket-action--run-ingest" type="button">[RUN INGEST]</button>
         </header>
 
         <div class="source-ledger__tools" aria-label="账本操作">
@@ -1000,8 +1000,8 @@
             <span class="source-ledger__url" translate="no">https://simonwillison.net/feed.xml</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Simon Willison">[抓取]</button>
-              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Simon Willison">[删除]</button>
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Simon Willison">[FETCH]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Simon Willison">[DELETE]</button>
             </span>
           </li>
           <li class="source-ledger__row">
@@ -1009,8 +1009,8 @@
             <span class="source-ledger__url" translate="no">https://hn.algolia.com/rss</span>
             <span class="source-ledger__status" aria-live="polite">last_fetch: 12:00:11</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Hacker News">[抓取]</button>
-              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Hacker News">[删除]</button>
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Hacker News">[FETCH]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Hacker News">[DELETE]</button>
             </span>
           </li>
           <li class="source-ledger__row">
@@ -1018,8 +1018,8 @@
             <span class="source-ledger__url" translate="no">https://example.org/wire.xml</span>
             <span class="source-ledger__status source-ledger__status--error" aria-live="polite" title="err: timeout contacting source">err: 来源连接超时</span>
             <span class="source-ledger__actions">
-              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Wires">[抓取]</button>
-              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Wires">[删除]</button>
+              <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Wires">[FETCH]</button>
+              <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Wires">[DELETE]</button>
             </span>
           </li>
         </ul>

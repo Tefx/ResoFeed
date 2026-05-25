@@ -40,7 +40,7 @@
       importFailed: 'err: import failed',
       exportFailed: 'err: export failed'
     });
-  const browserStateInputLabel = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') && portabilityState !== 'importing' ? 'State JSON import file' : chrome.input);
+  const browserStateInputLabel = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') && language === 'en' ? 'State JSON import file' : chrome.input);
 
   async function startImport(): Promise<void> {
     portabilityState = 'importing';

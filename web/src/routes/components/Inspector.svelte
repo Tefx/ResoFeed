@@ -80,7 +80,7 @@
   }
 
   function browserLegacyEnglishA11y(): boolean {
-    return language === 'zh' && typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom');
+    return false;
   }
 
   const modelFailureStatusLabels: Record<Exclude<ModelStatus, 'ok' | 'summary_unavailable'>, { en: string; zh: string }> = {
@@ -712,18 +712,6 @@
     {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{browserLegacyEnglishA11y() ? 'original link' : localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
-    <a class="visually-hidden inspector-original-url-anchor" href={`${originalHref(item)}#literal-provenance`} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
-    {#if sourceFeedUrl(item)}
-      <a class="visually-hidden inspector-source-url-anchor" href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{sourceFeedUrl(item)}</a>
-    {/if}
-    {#if 'provenance' in item}
-      <div class="visually-hidden contract-provenance-anchors">
-        <a href={item.url} target="_blank" rel="noreferrer noopener" translate="no">{item.url}</a>
-        {#if sourceFeedUrl(item)}<a href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate="no">{sourceFeedUrl(item)}</a>{/if}
-        {#if item.provenance.canonical_url}<a href={item.provenance.canonical_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.canonical_url}</a>{/if}
-        {#if item.provenance.original_url}<a href={item.provenance.original_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.original_url}</a>{/if}
-      </div>
-    {/if}
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
@@ -809,6 +797,12 @@
         <p class="inspector-reading">{detailText(item)}</p>
       </details>
     {/if}
+    <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>
+      <summary>{localizedChrome('source details', '来源详情')}</summary>
+      <pre translate="no">source_url: {sourceFeedUrl(item) ?? 'unavailable'}
+original_url: {originalHref(item)}{#if 'provenance' in item && item.provenance.canonical_url}
+canonical_url: {item.provenance.canonical_url}{/if}</pre>
+    </details>
     <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}

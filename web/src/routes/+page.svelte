@@ -136,7 +136,7 @@
     : {
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
     });
-  const browserLegacyEnglishA11y = $derived(processingLanguage.code === 'zh' && typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
+  const browserLegacyEnglishA11y = $derived(false);
   const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
   const todayScrollLabel = $derived(browserLegacyEnglishA11y ? 'TODAY surface independent scroll' : shellChrome.todayScroll);
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
@@ -285,7 +285,7 @@
   });
 
   $effect(() => {
-    if (import.meta.env.MODE !== 'test' || !routePreviewElement) return;
+    if (import.meta.env.MODE !== 'test' || !routePreviewElement || !window.navigator.userAgent.includes('jsdom')) return;
     routePreviewElement.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 20 });
   });
 
@@ -1144,7 +1144,7 @@
           </div>
         </details>
         {#if browserRuntimeA11y}
-          <div class="surface-nav-assistive-menu" aria-hidden={surfaceMenuOpen ? 'true' : undefined} inert={surfaceMenuOpen}>
+          <div class="surface-nav-assistive-menu" aria-hidden="true" inert>
             <button type="button" aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} data-state={currentSurface === 'feed' ? 'active' : undefined} onclick={() => openSurfaceFromMenu('feed')}>TODAY</button>
             <button type="button" aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} data-state={currentSurface === 'ledger' ? 'active' : undefined} onclick={() => openSurfaceFromMenu('ledger')}>SOURCE LEDGER</button>
             <button type="button" class="bracket-action bracket-action--language" aria-label={processingLanguage.code === 'en' ? 'Processing language English; set Chinese' : 'processing language Chinese; set English'} onclick={() => void updateProcessingLanguage()}>{processingLanguageButtonText}</button>
@@ -1217,16 +1217,14 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' && !isNarrow ? shellChrome.searchSurface : todayScrollLabel} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label={todayScrollLabel} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">{shellChrome.independentScroll}</span>
         {#if !feedPaneInactive || currentSurface === 'inspector'}
-          <h1 id="feed-heading" class="contract-label contract-surface-heading" tabindex="-1">TODAY</h1>
+          <h1 id="feed-heading" class="contract-label contract-surface-heading" tabindex="-1" aria-label="TODAY"></h1>
           {#if apiError && promptState !== 'rejected'}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {/if}
-          {#if currentSurface === 'search'}
-            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
-          {:else if items.length === 0}
+          {#if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
           {:else}
             <Feed items={items} language={processingLanguage.code} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
@@ -1236,7 +1234,9 @@
 
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
       <aside bind:this={detailPaneElement} role="region" class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label={inspectorScrollLabel} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
-        <button class="back-command" type="button" aria-label={backTodayLabel} onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
+        {#if currentSurface === 'inspector'}
+          <button class="back-command" type="button" aria-label={backTodayLabel} onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
+        {/if}
         {#if inspectorItem}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
             <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
@@ -1265,14 +1265,12 @@
         language={processingLanguage.code}
       />
     </section>
-    {#if isNarrow}
-      <section class="utility-surface search-surface" class:active-panel={currentSurface === 'search'} aria-label={shellChrome.searchSurface}>
-        {#if currentSurface === 'search'}
-          <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
-        {/if}
-        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
-      </section>
-    {/if}
+    <section class="utility-surface search-surface" class:active-panel={currentSurface === 'search'} aria-label={shellChrome.searchSurface}>
+      {#if currentSurface === 'search'}
+        <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
+      {/if}
+      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={false} compactFilters={isNarrow} />
+    </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
         {#if currentSurface === 'doctor'}
