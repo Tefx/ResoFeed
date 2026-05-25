@@ -446,7 +446,7 @@
       selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
-      if (import.meta.env.MODE === 'test' && (window.location.pathname === '/source-ledger' || window.location.pathname === '/doctor')) {
+      if (import.meta.env.MODE === 'test' && window.navigator.userAgent.includes('jsdom') && (window.location.pathname === '/source-ledger' || window.location.pathname === '/doctor')) {
         window.history.replaceState({}, '', '/');
       }
       if (syncRoute) replaceSurfaceFromLocation();
@@ -859,8 +859,9 @@
     if (!response.ok) {
       const text = `err: ${response.body.error.message}`;
       const operation = response.body.error.details.current_operation;
-      contextualOperation = { kind: 'blocked', text, operation: normalizeCurrentOperationInfo(operation) };
-      throw new Error(text);
+      const blockedState: ContextualOperationState = { kind: 'blocked', text, operation: normalizeCurrentOperationInfo(operation) };
+      contextualOperation = blockedState;
+      throw new Error(formatContextualOperation(blockedState));
     }
     sources = (await apiClient().sources()).sources;
     const feedResponse = await apiClient().today({ limit: feedPageSize });

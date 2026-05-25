@@ -86,6 +86,8 @@ export function isOperationBlockingManualIngest(operation: CurrentOperationInfo 
 
 export function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {
   if (!timestamp) return null;
+  const utcClock = timestamp.match(/^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2}:\d{2})/u)?.[1];
+  if (utcClock) return utcClock;
   return formatLocalClockTime(timestamp) ?? timestamp;
 }
 

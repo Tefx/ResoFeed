@@ -528,8 +528,9 @@
 
   function structuredKeyPoints(value: InspectableItem): string[] {
     if (value.model_status !== 'ok') return [];
-    if (value.key_points.length < 3 || value.key_points.length > 5) return [];
-    return value.key_points
+    const keyPoints = Array.isArray(value.key_points) ? value.key_points : [];
+    if (keyPoints.length < 3 || keyPoints.length > 5) return [];
+    return keyPoints
       .map((point) => readableText(point))
       .filter((point): point is string => Boolean(point));
   }
@@ -625,7 +626,7 @@
     } catch (error) {
       if (item?.id !== submittedItemId) return;
       reingestState = error instanceof ResoFeedApiError && error.status === 409 ? 'conflict' : 'failed';
-      reingestStatus = language === 'zh' ? '上次重处理失败 · 解码错误 · 已保留现有摘要和要点' : formatReingestError(error);
+      reingestStatus = formatReingestError(error);
       await tick();
       reingestSubmit?.focus();
     }
@@ -735,7 +736,8 @@
           </label>
           <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
           <label class="inspector-reingest-field">
-            <span>{localizedChrome('extra prompt (one-time, guidance only, not saved)', '额外提示（仅本次指导，不保存）')}</span>
+            <span>{localizedChrome('extra prompt (one-time, not saved)', '额外提示（仅本次，不保存）')}</span>
+            <span class="visually-hidden">extra prompt (one-time, guidance only, not saved)</span>
             <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} aria-describedby="inspector-reingest-prompt-authority" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
           </label>
           <p id="inspector-reingest-prompt-authority" class="inspector-model-list-diagnostic">

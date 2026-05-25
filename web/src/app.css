@@ -161,7 +161,7 @@ a:focus,
 
 .source-ledger__header {
   display: grid;
-  grid-template-columns: minmax(160px, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(160px, auto) minmax(0, 1fr) auto;
   gap: var(--rf-space-md);
   align-items: baseline;
   border-block-end: 1px solid var(--rf-color-border);
@@ -175,7 +175,7 @@ a:focus,
   letter-spacing: 0.08em;
 }
 
-.source-ledger__header-actions {
+.source-ledger__header-actions:not(.source-ledger__header) {
   display: inline-flex;
   min-width: 0;
   gap: var(--rf-space-row);
@@ -184,8 +184,20 @@ a:focus,
   justify-self: end;
 }
 
-.source-ledger__header-actions > .source-ledger__status {
+.source-ledger__header > .source-ledger__status,
+.source-ledger__header-actions:not(.source-ledger__header) > .source-ledger__status {
   white-space: nowrap;
+}
+
+.source-ledger__header > .source-ledger__status {
+  grid-column: 2;
+  justify-self: end;
+  overflow: visible;
+}
+
+.source-ledger__header > .bracket-action--run-ingest {
+  grid-column: 3;
+  justify-self: end;
 }
 
 .source-ledger-row {
@@ -230,7 +242,7 @@ a:focus,
   white-space: normal;
 }
 
-.source-ledger__header-actions > .source-ledger__status {
+.source-ledger__header-actions:not(.source-ledger__header) > .source-ledger__status {
   overflow: visible;
 }
 
