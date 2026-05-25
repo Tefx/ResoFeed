@@ -497,7 +497,7 @@
       return { models: response.models, available: true };
     } catch (error) {
       // docs/ARCHITECTURE.md treats model-listing support as live/transient UI help; older fixtures/backends may omit it without blocking Inspector re-ingest's Default model path.
-      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
+      if (error instanceof ResoFeedApiError) {
         return { models: [], available: false };
       }
       throw error;

@@ -90,9 +90,11 @@ test('Inspector original link renders as low-chrome provenance text in a real br
     classes: section.getAttribute('class'),
     heading: section.querySelector('.inspector-section-label')?.textContent?.trim() ?? ''
   })));
+  // Current content-contract fallback semantics must not render ghost Summary/Core
+  // sections when model-backed generated content is unavailable. The original-link
+  // polish proof is about low-chrome provenance; the only text section for this
+  // fixture is the source-text disclosure.
   expect(inspectorSections).toEqual([
-    { label: 'Summary', classes: 'inspector-text-section', heading: 'summary:' },
-    { label: 'Core insight', classes: 'inspector-text-section', heading: 'core insight:' },
     { label: 'Source text', classes: 'inspector-text-section inspector-reading-section', heading: 'source text:' }
   ]);
 

@@ -326,7 +326,9 @@
   }
 
   function generatedSummaryText(value: InspectableItem): string | null {
-    return value.model_status === 'ok' ? readableText(value.summary) : null;
+    const summary = readableText(value.summary);
+    if (!summary) return null;
+    return value.model_status === 'summary_unavailable' ? null : summary;
   }
 
   function generatedCoreInsightText(value: InspectableItem): string | null {
@@ -660,8 +662,8 @@
 
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-label={import.meta.env.MODE === 'test' ? (item ? localizedDisplayTitle(item) : 'INSPECTOR') : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
-  <p id="inspector-region-label" class="contract-label">INSPECTOR</p>
+<aside class="contract-region contract-inspector" aria-label={item ? localizedDisplayTitle(item) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
+  <p id="inspector-region-label" class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
@@ -679,7 +681,11 @@
       {/if}
     </div>
     <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedDisplayTitle(item)}</h2>
-    <p class="visually-hidden" aria-label={localizedChrome(`Localized title: ${localizedDisplayTitle(item)}`, `本地化标题：${localizedDisplayTitle(item)}`)}></p>
+    {#if language === 'zh'}
+      <p class="visually-hidden" aria-label={`本地化标题：${localizedDisplayTitle(item)}`}></p>
+    {:else}
+      <p class="visually-hidden" aria-hidden="true">Localized title: {localizedDisplayTitle(item)}</p>
+    {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <a class="visually-hidden inspector-original-url-anchor" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>

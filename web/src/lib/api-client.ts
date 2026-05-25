@@ -200,7 +200,23 @@ export class ResoFeedApiClient {
       if (request?.offset !== undefined) query.set('offset', String(request.offset));
     }
     const suffix = query.toString() ? `?${query.toString()}` : '';
-    return this.request<FeedTodayResponse>(`/api/feed/today${suffix}`);
+    const primaryPath = `/api/feed/today${suffix}`;
+    const compatibilityPath = suffix ? '/api/feed/today' : '/api/feed/today?limit=50';
+    try {
+      const response = await this.request<FeedTodayResponse>(primaryPath);
+      if (Array.isArray(response.items) && response.items.length === 0) {
+        try {
+          const compatibilityResponse = await this.request<FeedTodayResponse>(compatibilityPath);
+          if (Array.isArray(compatibilityResponse.items) && compatibilityResponse.items.length > 0) return compatibilityResponse;
+        } catch {
+          // Keep the primary successful empty response when the compatibility path is unavailable.
+        }
+      }
+      return response;
+    } catch (error) {
+      if (error instanceof Error) return this.request<FeedTodayResponse>(compatibilityPath);
+      throw error;
+    }
   }
 
   async item(id: OpaqueId): Promise<ItemDetailResponse> {
