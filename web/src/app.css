@@ -461,7 +461,8 @@ a:focus,
 }
 
 .steer-route-preview[data-route-kind='idle'] {
-  min-height: 20px;
+  min-height: 0;
+  height: 0;
   border-block-end: 0;
   padding-block: 0;
   overflow: hidden;
@@ -1225,6 +1226,11 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
 }
 
 .contract-grouped-sources__meta {
+  display: block;
+  color: var(--rf-color-muted);
+}
+
+.contract-grouped-sources__source-title {
   display: block;
   color: var(--rf-color-muted);
 }

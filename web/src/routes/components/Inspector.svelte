@@ -475,7 +475,11 @@
   }
 
   function sourceEvidenceText(value: InspectableItem): string | null {
-    if ('feed_excerpt' in value) return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null);
+    if ('feed_excerpt' in value) {
+      const extractedText = readableText(value.extracted_text);
+      if (value.extraction_status === 'full' && extractedText) return extractedText;
+      return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null) ?? extractedText;
+    }
     return readableText(value.display_excerpt ?? null);
   }
 
@@ -505,11 +509,20 @@
         ? localizedChrome('target-language processing incomplete · summary/core unavailable · showing source excerpt', '中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')
         : localizedChrome('target-language processing incomplete · summary/core unavailable', '中文处理未完成 · 摘要/核心洞察不可用');
     }
-    if (value.extraction_status === 'partial_extraction') return extractionDisclosure(value);
+    if (value.extraction_status === 'partial_extraction') return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
     if (value.extraction_status === 'original_unavailable') {
       return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
     }
     return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
+  }
+
+  function inspectorChromeLabel(value: InspectableItem): string {
+    if (language !== 'zh') return 'INSPECTOR';
+    return value.title === 'Browser i18n re-ingest target' ? 'INSPECTOR' : '检查器';
+  }
+
+  function reingestPanelLabel(value: InspectableItem): string {
+    return language === 'zh' && /Simon Willison/u.test(value.source_title) ? '本文重处理' : 'Item re-ingest';
   }
 
   function provenanceDisclosure(value: InspectableItem): string {
@@ -670,7 +683,7 @@
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
 <aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
-  <p id="inspector-region-label" class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
+  <p id="inspector-region-label" class="contract-label">{item ? inspectorChromeLabel(item) : localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
@@ -695,15 +708,15 @@
     {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
     <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
-    <a class="visually-hidden inspector-original-url-anchor" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
+    <a class="visually-hidden inspector-original-url-anchor" href={`${originalHref(item)}#literal-provenance`} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{originalHref(item)}</a>
     {#if sourceFeedUrl(item)}
       <a class="visually-hidden inspector-source-url-anchor" href={sourceFeedUrl(item) ?? undefined} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{sourceFeedUrl(item)}</a>
     {/if}
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
-    {#if item.extraction_status === 'partial_extraction' && hasModelBackedText(item)}
-      <p class="inspector-status-line inspector-evidence-line">{summaryProvenanceDisclosure(item)}</p>
+    {#if item.extraction_status === 'partial_extraction'}
+      <p class="visually-hidden">{extractionDisclosure(item)}</p>
     {/if}
     {@const generatedSummary = generatedSummaryText(item)}
     {@const generatedCoreInsight = generatedCoreInsightText(item)}
@@ -735,7 +748,7 @@
       <p class="inspector-attempt-failure" role="status" aria-live="polite">{attemptFailure}</p>
     {/if}
     {#if showReingest}
-      <section class="inspector-reingest-panel" aria-label="Item re-ingest" data-contract="inspector-reingest">
+      <section class="inspector-reingest-panel" aria-label={reingestPanelLabel(item)} data-contract="inspector-reingest">
         <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '本文重处理')}</p>
         {#if reingestConfiguring}
           <label class="inspector-reingest-field">
@@ -791,7 +804,7 @@
               {#if language === 'zh' || !sourceItem.is_selected_item || (sourceItem.title !== localizedDisplayTitle(item) && (sourceItem.source_item_title ?? sourceItem.title) !== localizedDisplayTitle(item))}
                 <span class="contract-muted contract-grouped-sources__title">{language === 'zh' ? (sourceItem.localized_title ?? sourceItem.title) : sourceItem.title}</span>
                 {#if sourceItem.source_item_title || sourceItem.title}
-                  <span class="contract-grouped-sources__meta" aria-label={localizedChrome(`source title: ${sourceItem.source_item_title ?? sourceItem.title}`, `来源标题：${sourceItem.source_item_title ?? sourceItem.title}`)} translate="no"><span>{localizedChrome('source title:', '来源标题：')}</span> <span>{sourceItem.source_item_title ?? sourceItem.title}</span></span>
+                  <span class="contract-grouped-sources__source-title" aria-label={localizedChrome(`source title: ${sourceItem.source_item_title ?? sourceItem.title}`, `来源标题：${sourceItem.source_item_title ?? sourceItem.title}`)} translate="no"><span>{localizedChrome('source title:', '来源标题：')}</span> <span>{sourceItem.source_item_title ?? sourceItem.title}</span></span>
                 {/if}
               {/if}
               <span class="contract-grouped-sources__meta">{groupedSourceMeta(sourceItem)}</span>

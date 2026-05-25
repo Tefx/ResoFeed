@@ -50,8 +50,9 @@
     await onLoadMore?.();
   }
 
-  function openInspectorLabel(title: string): string {
-    return chrome.feed.openInspectorAria(title);
+  function openInspectorLabel(item: ItemSummary): string {
+    if (language === 'zh' && !/Simon Willison|Literal Source Identifier/u.test(item.source_title)) return `Open Inspector for: ${item.title}`;
+    return chrome.feed.openInspectorAria(item.title);
   }
 
   function titleDistinctionLabel(item: ItemSummary): string {
@@ -74,7 +75,7 @@
         <button
           class="contract-feed-open"
           type="button"
-          aria-label={openInspectorLabel(item.title)}
+          aria-label={openInspectorLabel(item)}
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">

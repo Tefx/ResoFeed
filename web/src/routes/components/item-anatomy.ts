@@ -126,7 +126,7 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
       loadMoreAria: '加载更多订阅条目',
       loadMore: '[加载更多]',
       loading: '[加载中]',
-      openInspectorAria: (title) => `Open Inspector for: ${title}`
+      openInspectorAria: (title) => `打开检查器：${title}`
     },
     search: {
       resultCount: (count) => `${count} 条结果`,

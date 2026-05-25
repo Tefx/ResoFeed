@@ -9,7 +9,7 @@
   let { state, language = 'en' }: Props = $props();
   const chrome = $derived(language === 'zh'
     ? {
-      aria: 'First use',
+      aria: '订阅流空状态',
       lines: ['在导向栏粘贴 RSS URL，或导入 OPML。', '检查器会打开条目。', '星标会保留持久价值。', '导向是可选修正。']
     }
     : {

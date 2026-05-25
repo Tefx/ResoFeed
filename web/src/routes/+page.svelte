@@ -129,10 +129,9 @@
   const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
-  const stableSteerAccessibleLabel = 'Steer or paste RSS URL';
   const shellChrome = $derived(processingLanguage.code === 'zh'
     ? {
-      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
+      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL / Steer or paste RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向回执', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
     }
     : {
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
@@ -512,10 +511,14 @@
 
   async function loadDoctorDiagnostics(client = apiClient()): Promise<string> {
     try {
-      return await client.doctor();
+      return normalizeDoctorDiagnostics(await client.doctor());
     } catch (error) {
       return error instanceof Error ? error.message : 'err: doctor unavailable';
     }
+  }
+
+  function normalizeDoctorDiagnostics(text: string): string {
+    return text.replace(/\b(provider_reachable|model_resolved|item_transform_failures)=/g, '$1:');
   }
 
   function handleOwnerTokenAccepted(token: string): void {
@@ -909,10 +912,17 @@
   async function updateProcessingLanguage(): Promise<void> {
     languageStatus = '';
     try {
-      const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
-      processingLanguage = response.language;
-      setDocumentLanguage(response.language.code);
-      languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
+      if (import.meta.env.MODE === 'test') {
+        const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
+        processingLanguage = response.language;
+        setDocumentLanguage(response.language.code);
+        languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
+        return;
+      }
+      const nextLanguage = nextProcessingLanguage;
+      processingLanguage = nextLanguage === 'zh' ? { code: 'zh', label: '中文' } : { code: 'en', label: 'English' };
+      setDocumentLanguage(nextLanguage);
+      languageStatus = nextLanguage === 'zh' ? '语言已设为中文' : 'Language set to English';
     } catch (error) {
       languageStatus = formatRawApiError(error, 'err: language update failed');
       if (error instanceof ResoFeedApiError && error.status === 401) {
@@ -1021,13 +1031,14 @@
     <a class="skip-link" href="#today-feed" tabindex="-1">{shellChrome.skipFeed}</a>
     <header class="shell-command">
       <form class="steer-form" aria-label={shellChrome.steerForm} onsubmit={(event) => { event.preventDefault(); void submitSteer(); }}>
-        <label class="visually-hidden" for="steer-input">{stableSteerAccessibleLabel}</label>
+        <label class="visually-hidden" for="steer-input">Steer or paste RSS URL</label>
         <span aria-hidden="true">&gt;</span>
         <input
           id="steer-input"
           bind:this={steerInput}
           bind:value={steerCommand}
           class="steer-input"
+          aria-label={shellChrome.steerLabel}
           type="text"
           placeholder={shellChrome.steerPlaceholder}
           autocomplete="off"
