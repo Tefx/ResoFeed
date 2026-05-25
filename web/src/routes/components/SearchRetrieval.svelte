@@ -128,7 +128,7 @@
     <div class="search-primary-row">
       <label for="search-query">{searchChrome.query}</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
-      <button type="submit" class="bracket-action">{searchChrome.submit}</button>
+      <button type="submit" class="bracket-action" aria-label={language === 'zh' ? '提交搜索' : 'submit search'}>{searchChrome.submit}</button>
     </div>
     {#if compactFilters}
       <details class="search-secondary-filters" data-compact-filters="true">

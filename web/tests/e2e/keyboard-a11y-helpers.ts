@@ -34,6 +34,8 @@ export async function enterOwnerToken(page: Page, ownerToken: string): Promise<v
 }
 
 export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): Promise<void> {
+  // [DEVIATION]: DESIGN.md places SOURCE LEDGER inside the RESOFEED utility menu; opening the menu preserves the low-chrome contract instead of assuming forbidden persistent shortcut chrome.
+  await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
   await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   const sourceText = page.getByTestId('source-row').filter({ hasText: /ResoFeed E2E Local Source/ });
@@ -48,6 +50,7 @@ export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): P
   await runIngest.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
+  await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
   await page.getByRole('button', { name: 'TODAY' }).click();
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 }

@@ -88,7 +88,8 @@ test.describe('pbar expected-red PRD browser gaps', () => {
     await expect.soft(page.getByRole('button', { name: 'submit search' }), 'B3: Search submit control needs an unambiguous accessible name').toBeVisible();
 
     await page.getByLabel('Plain text query').fill('no-match-pbar-expected-red-zzzz');
-    await page.getByRole('button', { name: 'search', exact: true }).click();
+    // [DEVIATION]: The Search submit control's accessible name is `submit search` to satisfy the same test's unambiguous-name requirement while preserving exactly one visible submit control.
+    await page.getByRole('button', { name: 'submit search' }).click();
     await captureEvidence(page, testInfo, 'desktop-search-no-match');
     await expect.soft(page.locator('#search-status'), 'B2: no-match should be a stable empty state').toContainText('0 results');
     await expect.soft(page.getByRole('region', { name: 'Search results' }), 'B2: no-match should clear stale/default feed rows').not.toContainText('Local fixture item one');
@@ -96,7 +97,7 @@ test.describe('pbar expected-red PRD browser gaps', () => {
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.getByLabel('Plain text query').fill('Local fixture');
-    await page.getByRole('button', { name: 'search', exact: true }).click();
+    await page.getByRole('button', { name: 'submit search' }).click();
     await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
     await captureEvidence(page, testInfo, 'mobile-search-result-anatomy');
     const searchFormBox = await page.locator('.contract-search-form').boundingBox();

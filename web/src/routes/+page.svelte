@@ -84,6 +84,7 @@
   let steerPreviewState = $state<SteerPreviewState>('idle');
   let surfaceMenuSummary = $state<HTMLElement | undefined>();
   let firstSurfaceMenuItem = $state<HTMLButtonElement | undefined>();
+  let surfaceMenuJustOpened = false;
   let routePreviewAnnounces = $state(true);
   let preservedFeedScrollTop = $state(0);
   let preservedWindowScrollY = $state(0);
@@ -718,10 +719,18 @@
     surfaceMenuOpen = details.open;
     if (!details.open) return;
     await tick();
+    surfaceMenuJustOpened = true;
     firstSurfaceMenuItem?.focus();
   }
 
   function handleSurfaceMenuKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && !event.shiftKey && surfaceMenuJustOpened && document.activeElement === firstSurfaceMenuItem) {
+      event.preventDefault();
+      surfaceMenuJustOpened = false;
+      firstSurfaceMenuItem?.focus();
+      return;
+    }
+    if (event.key === 'Tab') surfaceMenuJustOpened = false;
     if (event.key !== 'Escape') return;
     event.preventDefault();
     surfaceMenuOpen = false;
@@ -1039,7 +1048,12 @@
       <nav class="surface-nav" class:surface-nav--steering={steerCommand.trim().length > 0} aria-label="RESOFEED surfaces">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions: details owns the opened menu subtree; Escape must close from any focused menu item and return focus to the summary per DESIGN.md App Shell keyboard contract. -->
         <details class="surface-nav" aria-label="RESOFEED surface menu" bind:open={surfaceMenuOpen} ontoggle={(event) => { void handleSurfaceMenuToggle(event); }} onkeydown={handleSurfaceMenuKeydown}>
-          <summary bind:this={surfaceMenuSummary} class="contract-label surface-nav-label" aria-haspopup="menu" aria-expanded={surfaceMenuOpen ? 'true' : 'false'}>RESOFEED</summary>
+          <summary
+            bind:this={surfaceMenuSummary}
+            class="contract-label surface-nav-label"
+            aria-haspopup="menu"
+            aria-expanded={surfaceMenuOpen ? 'true' : 'false'}
+          ><span class="contract-brand visually-hidden" aria-hidden="true"></span>RESOFEED</summary>
           <div class="surface-nav-menu" class:surface-nav-menu--closed={!surfaceMenuOpen}>
             <p class="utility-label">{shellChrome.nav}</p>
             <button
@@ -1152,7 +1166,7 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' ? shellChrome.searchScroll : shellChrome.todayScroll} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' && !isNarrow ? shellChrome.searchSurface : shellChrome.todayScroll} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">{shellChrome.independentScroll}</span>
         {#if !feedPaneInactive}
           {#if apiError && promptState !== 'rejected'}

@@ -482,6 +482,7 @@
   function isFallbackEvidenceState(value: InspectableItem): boolean {
     if (hasModelBackedText(value)) return false;
     if (!sourceEvidenceText(value)) return false;
+    if (value.model_status === 'summary_unavailable' && !readableText(value.summary) && !readableText(value.core_insight)) return true;
     if (isModelFailureStatus(value.model_status)) return true;
     if (language === 'zh') return true;
     return !('extracted_text' in value && readableText(value.extracted_text));
@@ -493,6 +494,11 @@
       return sourceEvidenceText(value)
         ? localizedChrome(`target-language processing failed · ${statusLabel} · summary/core unavailable · showing source excerpt`, `中文处理失败 · ${statusLabel} · 摘要/核心洞察不可用 · 显示来源摘录`)
         : localizedChrome(`target-language processing failed · ${statusLabel} · summary/core unavailable`, `中文处理失败 · ${statusLabel} · 摘要/核心洞察不可用`);
+    }
+    if (value.model_status === 'summary_unavailable' && !readableText(value.summary) && !readableText(value.core_insight)) {
+      return sourceEvidenceText(value)
+        ? localizedChrome('target-language processing incomplete · summary/core unavailable · showing source excerpt', '中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')
+        : localizedChrome('target-language processing incomplete · summary/core unavailable', '中文处理未完成 · 摘要/核心洞察不可用');
     }
     if (language === 'zh' && !hasModelBackedText(value)) {
       return sourceEvidenceText(value)

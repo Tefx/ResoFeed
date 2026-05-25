@@ -534,7 +534,8 @@ a:focus,
 }
 
 .contract-brand {
-  display: none;
+  display: inline-flex;
+  align-items: center;
   margin: 0;
   color: var(--rf-color-muted);
   font: var(--rf-typography-metadata);
@@ -1316,7 +1317,7 @@ details.surface-nav[open] ~ .surface-nav-quick-group {
   }
 
   .contract-brand {
-    display: none;
+    display: inline-flex;
   }
 
   .steer-form {
