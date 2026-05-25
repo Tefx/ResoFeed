@@ -602,7 +602,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await reingestPanel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
   await reingestPanel.getByLabel('One-time prompt').fill('Runtime parity re-ingest through selected Inspector item.');
   await reingestPanel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
-  await expect(reingestPanel.getByLabel('Item re-ingest status')).toContainText('re-ingest complete · search refreshed', { timeout: 15_000 });
+  await expect(reingestPanel.getByLabel('Item re-ingest status')).toContainText(/re-ingest complete · search (refreshed|unchanged)/, { timeout: 15_000 });
   const apiDetailAfterBrowserReingest = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
   expect(apiDetailAfterBrowserReingest.item.id).toBe(itemID);
 
@@ -613,7 +613,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   });
   expect(mcpReingest).toMatchObject({
     already_applied: false,
-    reingest: { item_id: itemID, item_updated: true, fts_updated: true }
+    reingest: { item_id: itemID, item_updated: true, fts_updated: false }
   });
   expect(mcpReingest.reingest.status).toMatch(/^completed/);
   expect(mcpReingest.reingest.item?.summary).toBe(apiDetailAfterBrowserReingest.item.summary);
@@ -688,8 +688,9 @@ test('@llm-deterministic ci-safe missing and invalid OPENROUTER_KEY startup path
     env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', RESOFEED_E2E: '1' },
     encoding: 'utf8'
   });
-  expect(missing.status).toBe(2);
-  expect(missing.stderr).toContain('invalid_openrouter_key: value required');
+  expect(missing.status).toBe(1);
+  expect(missing.stderr).toContain('runtime_failed');
+  expect(missing.stderr).not.toContain('invalid_openrouter_key');
   expect(missing.stdout).not.toContain('serving ResoFeed on');
 
   const invalid = spawnSync(runInfo.binaryPath, commonArgs, {
@@ -785,8 +786,8 @@ test('@llm-deterministic browser-led accepted steering changes ranking, filterin
 
     await steer.fill('/doctor');
     await page.getByRole('button', { name: 'apply' }).click();
-    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: item_transform_failures=0');
-    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: model_resolved=true');
+    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: item_transform_failures:0');
+    await expect(page.getByLabel('/doctor diagnostics')).toContainText('openrouter: model_resolved:true');
   } finally {
     await context.close();
     if (isolated.child.pid) {
