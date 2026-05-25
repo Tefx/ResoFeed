@@ -389,6 +389,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 			result.Status = ReprocessStatusFailed
 			appendReprocessError(&result, nil, ReprocessErrorTimeout, "operation timed out")
 			result.CompletedAt = time.Now().UTC()
+			result.FTSStale = true
 			return ReprocessLibraryResponse{Reprocess: result}, nil
 		}
 		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(items)}, "library reprocess processing item")
@@ -409,6 +410,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 			result.ItemsFailed++
 			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
 			if outcome.storableFailure() {
+				result.ItemsPreservedFailures++
 				if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
 					return ReprocessLibraryResponse{}, err
 				}
@@ -441,6 +443,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		result.Status = ReprocessStatusFailed
 		appendReprocessError(&result, nil, ReprocessErrorTimeout, "operation timed out")
 		result.CompletedAt = time.Now().UTC()
+		result.FTSStale = true
 		return ReprocessLibraryResponse{Reprocess: result}, nil
 	}
 	updateCurrentOperation("rebuilding_search", &CurrentOperationCount{Current: len(items), Total: len(items)}, "library reprocess rebuilding search index")
@@ -450,6 +453,7 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 	}
 	result.ItemsIndexed = indexed
 	result.FTSRebuilt = true
+	result.FTSStale = false
 	result.CompletedAt = time.Now().UTC()
 	if result.ItemsFailed > 0 || result.ItemsUnavailable > 0 {
 		result.Status = ReprocessStatusCompletedWithErrors

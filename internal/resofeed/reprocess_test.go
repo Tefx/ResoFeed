@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -53,8 +54,11 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if result.Status != ReprocessStatusCompletedWithErrors || !result.FTSRebuilt || result.ItemsIndexed != 4 {
 		t.Fatalf("result status/indexing = %+v, want completed_with_errors with rebuilt FTS and 4 indexed", result)
 	}
-	if result.ItemsAttempted != 4 || result.ItemsUpdated != 3 || result.ItemsUnavailable != 0 || result.ItemsFailed != 1 {
-		t.Fatalf("result counts = %+v, want attempted=4 updated=3 unavailable=0 failed=1", result)
+	if result.ItemsAttempted != 4 || result.ItemsUpdated != 3 || result.ItemsUnavailable != 0 || result.ItemsFailed != 1 || result.ItemsPreservedFailures != 1 {
+		t.Fatalf("result counts = %+v, want attempted=4 updated=3 unavailable=0 failed=1 preserved_failures=1", result)
+	}
+	if result.FTSStale {
+		t.Fatalf("successful final rebuild reported stale FTS: %+v", result)
 	}
 	if result.ItemsAttempted != result.ItemsUpdated+result.ItemsUnavailable+result.ItemsFailed {
 		t.Fatalf("attempted invariant broken: %+v", result)
@@ -122,6 +126,9 @@ func TestReprocessLibraryTimeoutPreservesReadableFieldsAndItemFTS(t *testing.T) 
 	if resp.Reprocess.Status != ReprocessStatusFailed || resp.Reprocess.FTSRebuilt || resp.Reprocess.ItemsIndexed != 0 || resp.Reprocess.ItemsFailed != 1 {
 		t.Fatalf("timeout result = %+v, want failed without FTS rebuild and one failed item", resp.Reprocess)
 	}
+	if !resp.Reprocess.FTSStale {
+		t.Fatalf("timeout result = %+v, want fts_stale=true", resp.Reprocess)
+	}
 	var staleSince string
 	if err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeySearchFTSStaleSince).Scan(&staleSince); err != nil {
 		t.Fatalf("read stale marker after timeout: %v", err)
@@ -131,6 +138,54 @@ func TestReprocessLibraryTimeoutPreservesReadableFieldsAndItemFTS(t *testing.T) 
 	}
 	assertPreservedReprocessFields(t, ctx, db, "item_timeout")
 	assertStaleReadableFTS(t, ctx, db, "item_timeout")
+}
+
+func TestHistoricalCompatibilityMigrationSeedsOldRowsWithoutFabricatingSourceTitle(t *testing.T) {
+	ctx := context.Background()
+	db, err := OpenDB(ctx, filepath.Join(t.TempDir(), "old-resofeed.sqlite3"))
+	if err != nil {
+		t.Fatalf("open old db: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("close old db: %v", err)
+		}
+	})
+	if _, err := db.ExecContext(ctx, `create table schema_migrations (id text primary key, applied_at integer not null)`); err != nil {
+		t.Fatalf("create old schema_migrations: %v", err)
+	}
+	for _, migration := range Migrations()[:3] {
+		if _, err := db.ExecContext(ctx, migration.SQL); err != nil {
+			t.Fatalf("apply old migration %s: %v", migration.ID, err)
+		}
+		if _, err := db.ExecContext(ctx, `insert into schema_migrations (id, applied_at) values (?, unixepoch())`, migration.ID); err != nil {
+			t.Fatalf("record old migration %s: %v", migration.ID, err)
+		}
+	}
+	seedSource(t, ctx, db, "src_historical_compat", "https://compat.example/feed.xml", "Compat Feed")
+	now := time.Now().UTC().Format(time.RFC3339)
+	if _, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, summary, core_insight, feed_excerpt, extracted_text, value_tier, first_seen_at, extraction_status, model_status) values ('historical_old_row', 'src_historical_compat', 'https://compat.example/feed.xml', 'https://compat.example/item', 'Current overwritten title', 'Historical summary', 'Historical insight.', 'Historical excerpt', 'Historical extracted', 'brief', ?, 'full', 'ok')`, now); err != nil {
+		t.Fatalf("seed old item: %v", err)
+	}
+
+	if err := RunMigrations(ctx, db); err != nil {
+		t.Fatalf("run compatibility migration: %v", err)
+	}
+
+	var sourceItemTitle, localizedTitle, keyPoints, contentStatus string
+	var lastStatus, lastCode, lastMessage, lastAt sql.NullString
+	if err := db.QueryRowContext(ctx, `select source_item_title, localized_title, key_points, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at from items where id = 'historical_old_row'`).Scan(&sourceItemTitle, &localizedTitle, &keyPoints, &contentStatus, &lastStatus, &lastCode, &lastMessage, &lastAt); err != nil {
+		t.Fatalf("read migrated old item: %v", err)
+	}
+	if sourceItemTitle != "Current overwritten title" || localizedTitle != "Current overwritten title" || keyPoints != "[]" || contentStatus != modelStatusOK {
+		t.Fatalf("compat fields = source_item_title=%q localized_title=%q key_points=%q content_status=%q, want current title/current title/[]/ok", sourceItemTitle, localizedTitle, keyPoints, contentStatus)
+	}
+	if lastStatus.Valid || lastCode.Valid || lastMessage.Valid || lastAt.Valid {
+		t.Fatalf("last_reprocess fields were fabricated: status=%v code=%v message=%v at=%v", lastStatus, lastCode, lastMessage, lastAt)
+	}
+	if sourceItemTitle == "Compat Feed" || strings.Contains(sourceItemTitle, "feed.xml") || strings.Contains(sourceItemTitle, "item") && sourceItemTitle != "Current overwritten title" {
+		t.Fatalf("source_item_title appears fabricated from source/feed/url: %q", sourceItemTitle)
+	}
 }
 
 func TestReprocessLibraryCanceledFetchPreservesReadableFieldsAndItemFTS(t *testing.T) {

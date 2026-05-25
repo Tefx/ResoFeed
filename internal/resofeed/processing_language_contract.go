@@ -108,18 +108,23 @@ type ReprocessErrorDetail struct {
 // ReprocessLibraryResult is the shared HTTP/MCP result shape. items_attempted
 // must equal items_updated + items_unavailable + items_failed. items_indexed is
 // non-zero only for rows indexed by the successful final FTS rebuild transaction.
+// items_preserved_failures separately reports failed attempts whose current
+// readable content was preserved non-destructively. fts_stale is true only when
+// the operation leaves the rebuildable FTS index diagnostically stale.
 type ReprocessLibraryResult struct {
-	Status           ReprocessStatus        `json:"status"`
-	Language         ProcessingLanguage     `json:"language"`
-	StartedAt        time.Time              `json:"started_at"`
-	CompletedAt      time.Time              `json:"completed_at"`
-	ItemsAttempted   int                    `json:"items_attempted"`
-	ItemsUpdated     int                    `json:"items_updated"`
-	ItemsIndexed     int                    `json:"items_indexed"`
-	ItemsUnavailable int                    `json:"items_unavailable"`
-	ItemsFailed      int                    `json:"items_failed"`
-	FTSRebuilt       bool                   `json:"fts_rebuilt"`
-	Errors           []ReprocessErrorDetail `json:"errors"`
+	Status                 ReprocessStatus        `json:"status"`
+	Language               ProcessingLanguage     `json:"language"`
+	StartedAt              time.Time              `json:"started_at"`
+	CompletedAt            time.Time              `json:"completed_at"`
+	ItemsAttempted         int                    `json:"items_attempted"`
+	ItemsUpdated           int                    `json:"items_updated"`
+	ItemsIndexed           int                    `json:"items_indexed"`
+	ItemsUnavailable       int                    `json:"items_unavailable"`
+	ItemsFailed            int                    `json:"items_failed"`
+	ItemsPreservedFailures int                    `json:"items_preserved_failures"`
+	FTSRebuilt             bool                   `json:"fts_rebuilt"`
+	FTSStale               bool                   `json:"fts_stale"`
+	Errors                 []ReprocessErrorDetail `json:"errors"`
 }
 
 // ReprocessLibraryResponse is POST /api/runtime/reprocess-library and MCP
