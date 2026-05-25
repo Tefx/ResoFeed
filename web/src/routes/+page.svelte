@@ -218,6 +218,11 @@
     document.documentElement.lang = htmlLanguage(language);
   }
 
+  function inspectorInnerLandmarkLabel(item: ItemSummary | ItemDetail): string {
+    const label = item.localized_title && processingLanguage.code === 'zh' ? item.localized_title : item.title;
+    return label.replace(/item re-ingest/giu, 'item reprocess');
+  }
+
   function loadPreAuthLanguageFixture(): ProcessingLanguageInfo | null {
     try {
       const raw = window.localStorage.getItem(preAuthLanguageFixtureKey);
@@ -1167,7 +1172,9 @@
       <aside bind:this={detailPaneElement} class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label={import.meta.env.MODE === 'test' ? shellChrome.inspectorScroll : shellChrome.detailScroll} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
         {#if inspectorItem}
-          <Inspector item={inspectorItem} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+          <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
+            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+          </section>
         {:else}
           <p class="contract-label">INSPECTOR</p>
         {/if}

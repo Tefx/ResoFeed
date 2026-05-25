@@ -28,9 +28,10 @@
     showReingest?: boolean;
     openRouterModels?: OpenRouterModelOption[];
     openRouterModelListState?: 'loading' | 'available' | 'unavailable';
+    landmarkLabel?: string | null;
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable' }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let reingestModel = $state('default');
@@ -662,7 +663,7 @@
 
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-label={item ? localizedDisplayTitle(item) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
+<aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
   <p id="inspector-region-label" class="contract-label">{localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
