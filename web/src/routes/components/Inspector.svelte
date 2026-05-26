@@ -711,7 +711,7 @@
       <p class="visually-hidden" aria-hidden="true">Localized title: {localizedDisplayTitle(item)}</p>
     {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
-    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{browserLegacyEnglishA11y() ? 'original link' : localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
