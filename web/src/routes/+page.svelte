@@ -1239,7 +1239,7 @@
         {/if}
         {#if inspectorItem}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
-            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={!isNarrow || currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
           </section>
         {:else}
           <p class="contract-label">INSPECTOR</p>

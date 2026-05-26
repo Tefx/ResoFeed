@@ -515,9 +515,18 @@
     }
     if (value.extraction_status === 'partial_extraction') return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
     if (value.extraction_status === 'original_unavailable') {
-      return localizedChrome('original unavailable · summary/core unavailable', '原文不可用 · 摘要/核心洞察不可用');
+      return `${extractionDisclosure(value)} · ${generatedContentAvailabilityDisclosure(value)}`;
     }
     return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
+  }
+
+  function generatedContentAvailabilityDisclosure(value: InspectableItem): string {
+    const hasSummary = Boolean(generatedSummaryText(value));
+    const hasCoreInsight = Boolean(generatedCoreInsightText(value));
+    if (hasSummary && hasCoreInsight) return localizedChrome('summary/core available', '摘要/核心洞察可用');
+    if (hasSummary) return localizedChrome('summary available', '摘要可用');
+    if (hasCoreInsight) return localizedChrome('core insight available', '核心洞察可用');
+    return localizedChrome('summary/core unavailable', '摘要/核心洞察不可用');
   }
 
   function inspectorChromeLabel(value: InspectableItem): string {

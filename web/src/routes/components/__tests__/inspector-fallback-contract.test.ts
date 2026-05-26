@@ -65,6 +65,30 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).queryByLabelText('Source evidence')).not.toBeInTheDocument();
   });
 
+  it('does not mark generated content unavailable when only the original article is unavailable', () => {
+    const originalUnavailableWithGeneratedContent: ItemDetail = {
+      ...baseDetail,
+      id: 'original-unavailable-generated-content-contract',
+      title: 'Original unavailable generated content contract item',
+      summary: '模型摘要仍然可用。',
+      core_insight: '核心洞察仍然可用。',
+      key_points: ['第一条要点仍然可见。', '第二条要点仍然可见。', '第三条要点仍然可见。'],
+      extraction_status: 'original_unavailable',
+      model_status: 'ok',
+      extracted_text: null,
+      feed_excerpt: 'RSS excerpt remains available as source evidence.'
+    };
+
+    render(Inspector, { props: { item: originalUnavailableWithGeneratedContent, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: originalUnavailableWithGeneratedContent.title });
+    expect(within(inspector).getByText('原文不可用 · 摘要/核心洞察可用')).toBeVisible();
+    expect(inspector).not.toHaveTextContent('原文不可用 · 摘要/核心洞察不可用');
+    expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('模型摘要仍然可用。');
+    expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('核心洞察仍然可用。');
+    expect(within(inspector).getByLabelText('要点')).toHaveTextContent('第三条要点仍然可见。');
+  });
+
   it.each<ModelStatus>(['invalid_model', 'provider_error', 'rate_limited', 'decode_error', 'timeout', 'model_latency_error'])(
     'renders architecture model failure status %s as visible fallback UI copy',
     (modelStatus) => {
