@@ -460,10 +460,10 @@ a:focus,
 }
 
 .steer-route-preview[data-route-kind='idle'] {
-  min-height: 0;
-  height: 0;
+  min-height: 20px;
+  height: 20px;
   border-block-end: 0;
-  padding: 0;
+  padding: 0 var(--rf-space-md);
   overflow: hidden;
   color: transparent;
 }

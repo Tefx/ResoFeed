@@ -11,14 +11,15 @@
     loadingMore?: boolean;
     onLoadMore?: () => Promise<void> | void;
     language?: ProcessingLanguage;
+    listLabelOverride?: string;
   }
 
-  let { items, selectedItemId = null, onSelect, onResonanceToggle, hasMore = false, loadingMore = false, onLoadMore, language = 'en' }: Props = $props();
+  let { items, selectedItemId = null, onSelect, onResonanceToggle, hasMore = false, loadingMore = false, onLoadMore, language = 'en', listLabelOverride }: Props = $props();
   let pendingResonanceId = $state<string | null>(null);
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const feedTimeGroupReference = $derived(feedReferenceNow(items));
   const chrome = $derived(itemAnatomyChrome(language));
-  const feedListLabel = $derived(chrome.feed.listLabel);
+  const feedListLabel = $derived(listLabelOverride ?? chrome.feed.listLabel);
   const groupedItems = $derived(items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => compareItemsByTimeGroup(left.item, right.item, feedTimeGroupReference) || left.index - right.index)

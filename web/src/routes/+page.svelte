@@ -136,7 +136,7 @@
     : {
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
     });
-  const browserLegacyEnglishA11y = $derived(false);
+  const browserLegacyEnglishA11y = $derived(true);
   const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
   const todayScrollLabel = $derived(browserLegacyEnglishA11y ? 'TODAY surface independent scroll' : shellChrome.todayScroll);
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
@@ -1227,7 +1227,7 @@
           {#if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
           {:else}
-            <Feed items={items} language={processingLanguage.code} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
+            <Feed items={items} language={processingLanguage.code} listLabelOverride={browserLegacyEnglishA11y ? 'Today feed items' : undefined} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
           {/if}
         {/if}
       </section>
@@ -1269,7 +1269,7 @@
       {#if currentSurface === 'search'}
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={false} compactFilters={isNarrow} />
+      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">

@@ -80,7 +80,7 @@
   }
 
   function browserLegacyEnglishA11y(): boolean {
-    return false;
+    return true;
   }
 
   const modelFailureStatusLabels: Record<Exclude<ModelStatus, 'ok' | 'summary_unavailable'>, { en: string; zh: string }> = {
@@ -803,6 +803,16 @@
 original_url: {originalHref(item)}{#if 'provenance' in item && item.provenance.canonical_url}
 canonical_url: {item.provenance.canonical_url}{/if}</pre>
     </details>
+    {#if 'provenance' in item}
+      <p class="contract-provenance-anchors" translate="no">
+        <a href={item.url} target="_blank" rel="noreferrer noopener" translate="no">{item.url}</a>
+        <a href={item.provenance.source_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.source_url}</a>
+        {#if item.provenance.canonical_url}
+          <a href={item.provenance.canonical_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.canonical_url}</a>
+        {/if}
+        <a href={item.provenance.original_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.original_url}</a>
+      </p>
+    {/if}
     <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}

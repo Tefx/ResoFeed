@@ -226,9 +226,11 @@ test.describe('expected-red Source Ledger hit targets, negative UX, and split sc
     await installContractApi(page, ownerToken);
     await page.goto('/');
     await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+    // [DEVIATION]: DESIGN.md keeps processing language and library reprocess inside the opened RESOFEED utility menu, not persistent top chrome; open the canonical menu before asserting their accessible names.
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await expect(page.getByRole('button', { name: /processing language|LANG:/i })).toHaveClass(/bracket-action/);
     await expect(page.getByRole('button', { name: /Reprocess existing library and rebuild search index/i })).toHaveText(/\[REPROCESS LIBRARY\]|\[重处理资料库\]/);
     await expect(page.getByRole('heading', { name: /settings|preferences|onboarding|language dashboard/i })).toHaveCount(0);
-    await expect(page.getByText(/Existing readable item content will be rewritten\.|Source identifiers remain unchanged\./)).toBeVisible();
+    await expect(page.getByText(/Existing readable item content will be rewritten\.|Source identifiers remain unchanged\./).first()).toBeVisible();
   });
 });

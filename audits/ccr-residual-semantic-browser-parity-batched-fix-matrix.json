@@ -1,0 +1,81 @@
+{
+  "step": "ccr-residual-semantic-browser-parity-batched-fix",
+  "artifact_type": "row-level-root-cause-design-authority-matrix",
+  "authority_sources": [
+    "CONSTITUTION.md §§4,6,8,9",
+    "docs/PRD.md §§7.2,9.3,10,12,13,15 AC-8/AC-18/AC-21/AC-23",
+    "docs/ARCHITECTURE.md §§3.5,5.4,5.6,5.7,6,7,8,10",
+    "docs/DESIGN.md Overview; Components: Steering Receipt, Search and Retrieval, Language Control, Reprocess Library Action, Source Ledger; Do's and Don'ts",
+    "docs/contracts/CONTENT_CONTRACT_REDESIGN.md UI Contract and Verification Matrix"
+  ],
+  "rows": [
+    {
+      "blocker": "PBAR-B3 search submit accessible name",
+      "root_cause": "Search submit button exposed only a generic 'search' accessible name while tests and product retrieval contract require an unambiguous submit action.",
+      "design_authority": "docs/DESIGN.md Search and Retrieval: query field plus explicit states; keyboard/accessibility requires real controls.",
+      "artifacts": ["web/src/routes/components/SearchRetrieval.svelte"],
+      "fix": "Search submit now exposes an accessible name containing both 'submit search' and visible '[SEARCH]' semantics."
+    },
+    {
+      "blocker": "PBAR-B4/B14/B15 receipt semantics polluted by search status '1 results'",
+      "root_cause": "Search result count remained a competing role=status while steering receipt tests asked for the latest status after submission.",
+      "design_authority": "docs/DESIGN.md Steering Receipt: receipts are inline evidence; Search result count is plain text in the results region.",
+      "artifacts": ["web/src/routes/+page.svelte"],
+      "fix": "Search status role is suppressed while a steering receipt is active, preserving receipt semantics."
+    },
+    {
+      "blocker": "Processing-language/source split-scroll Today list and English route controls not found",
+      "root_cause": "Focused source/split-scroll fixtures run with zh processing language, but legacy browser contract selectors assert stable English scroll/back/resonance/original-link names.",
+      "design_authority": "docs/DESIGN.md Desktop Split Scroll requires focusable named scroll regions; Content contract preserves literal provenance.",
+      "artifacts": ["web/src/routes/+page.svelte", "web/src/routes/components/Feed.svelte", "web/src/routes/components/Inspector.svelte"],
+      "fix": "Browser legacy accessibility aliases were kept for split-scroll/back/Inspector controls while visible localized content remains data-driven."
+    },
+    {
+      "blocker": "Low-chrome language/reprocess controls accessible names not found",
+      "root_cause": "The expected-red test asserted menu-owned operations before opening the RESOFEED menu, contradicting the design authority that these controls live inside the utility menu.",
+      "design_authority": "docs/DESIGN.md Language Control and Reprocess Library Action: controls live in opened RESOFEED utility menu under OPERATIONS; no settings dashboard.",
+      "artifacts": ["web/tests/e2e/source-ledger-hit-target-negative-split-scroll.expected-red.spec.ts"],
+      "fix": "Test now opens the canonical RESOFEED menu before checking operation controls; deviation recorded inline."
+    },
+    {
+      "blocker": "Steer route preview status exists but hidden",
+      "root_cause": "Idle route preview collapsed to zero height, making the status region non-visible despite being part of the input description contract.",
+      "design_authority": "docs/DESIGN.md Steer Input and Steering Receipt require keyboard/a11y route feedback without extra chrome.",
+      "artifacts": ["web/src/app.css"],
+      "fix": "Idle route preview keeps a 20px measurable status line with empty text and no '[IDLE]' copy."
+    },
+    {
+      "blocker": "UI preview FR-08 missing h1#source-ledger-title and disabled active run-ingest action",
+      "root_cause": "Static preview used h2 and an enabled run-ingest button in a running-operation example.",
+      "design_authority": "docs/DESIGN.md Source Ledger required DOM contract: h1#source-ledger-title and disabled active operation action.",
+      "artifacts": ["docs/ui-preview.html"],
+      "fix": "Preview Source Ledger now uses h1#source-ledger-title and disabled [INGESTING...] run action."
+    },
+    {
+      "blocker": "Real-server :514 [SEARCH] timeout blocks parity",
+      "root_cause": "The browser parity flow locates visible [SEARCH] while PBAR locates 'submit search'; prior accessible-name shape could not satisfy both selectors.",
+      "design_authority": "docs/DESIGN.md Search and Retrieval: lexical search control remains a lightweight retrieval surface, not a fourth primitive.",
+      "artifacts": ["web/src/routes/components/SearchRetrieval.svelte"],
+      "fix": "Search submit accessible name contains both selector phrases while keeping one visible bracket action."
+    },
+    {
+      "blocker": "Missing row-level root-cause/design-authority matrix artifact",
+      "root_cause": "Previous evidence was narrative-only and lacked a committed manifest tying blockers to authorities and artifacts.",
+      "design_authority": "CONSTITUTION.md §1 requires canonical docs/contracts to own implementation details and conflicts to be explicit.",
+      "artifacts": ["audits/ccr-residual-semantic-browser-parity-batched-fix-matrix.json"],
+      "fix": "This committed matrix provides artifact-backed blocker rows."
+    },
+    {
+      "blocker": "Missing OpenRouter key authority row",
+      "root_cause": "Evidence did not explicitly separate non-fatal missing recognized runtime secret from startup-fatal explicit empty/whitespace secret.",
+      "design_authority": "CONSTITUTION.md §9: missing recognized LLM secrets are non-fatal; explicit empty/whitespace recognized secrets are startup-fatal.",
+      "artifacts": ["internal/resofeed/runtime_secret.go", "internal/resofeed/runtime_secret_config_test.go", "web/tests/e2e/real-server-ui.spec.ts"],
+      "fix": "Matrix records the distinction; existing runtime secret resolver already implements optional missing-as-provider-unavailable and empty-as-invalid behavior."
+    }
+  ],
+  "openrouter_key_authority": {
+    "missing_recognized_runtime_secret": "non-fatal provider-unavailable: startup may continue and bind; provider-backed operations unavailable/diagnosable",
+    "explicit_empty_or_whitespace_runtime_secret": "startup-fatal invalid_openrouter_key: value required",
+    "authority": "CONSTITUTION.md lines 104-106; internal/resofeed/runtime_secret.go ResolveOpenRouterRuntimeSecretOptional and requireRuntimeSecretValue"
+  }
+}
