@@ -1227,7 +1227,7 @@
           {#if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
           {:else}
-            <Feed items={items} language={processingLanguage.code} listLabelOverride={browserLegacyEnglishA11y ? 'Today feed items' : undefined} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
+            <Feed items={items} language={processingLanguage.code} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
           {/if}
         {/if}
       </section>
@@ -1269,7 +1269,7 @@
       {#if currentSurface === 'search'}
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} suppressStatusRole={steerFeedback.kind === 'receipt'} compactFilters={isNarrow} />
+      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={isNarrow} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
