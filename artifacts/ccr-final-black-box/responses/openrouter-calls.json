@@ -1,0 +1,48 @@
+[
+  {
+    "model": "ccr/zh-ok",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/zh-ok",
+    "task": "translate_steering",
+    "steering": {
+      "command": "today",
+      "actor_kind": "human",
+      "active_rules": null
+    },
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/zh-ok",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/decode-error",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/decode-error",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/decode-error",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  },
+  {
+    "model": "ccr/decode-error",
+    "task": "summarize_rss_item",
+    "steering": null,
+    "one_time_prompt": null
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "status": 200,
+  "body": {
+    "ingest": {
+      "scope": "all",
+      "source_id": null,
+      "status": "completed",
+      "started_at": "2026-05-26T09:44:24Z",
+      "completed_at": "2026-05-26T09:44:24Z",
+      "duration_ms": 5,
+      "sources_attempted": 1,
+      "sources_succeeded": 1,
+      "sources_failed": 0,
+      "items_upserted": 1,
+      "errors": []
+    }
+  },
+  "raw": "{\"ingest\":{\"scope\":\"all\",\"source_id\":null,\"status\":\"completed\",\"started_at\":\"2026-05-26T09:44:24Z\",\"completed_at\":\"2026-05-26T09:44:24Z\",\"duration_ms\":5,\"sources_attempted\":1,\"sources_succeeded\":1,\"sources_failed\":0,\"items_upserted\":1,\"errors\":[]}}\n"
+}

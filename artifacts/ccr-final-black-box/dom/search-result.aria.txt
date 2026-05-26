@@ -1,0 +1,78 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: Steer or paste RSS URL
+    - textbox "导向或粘贴 RSS URL / Steer or paste RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "导向路由预览"
+  - text: 导向路由预览 需要 URL
+  - status "Steer receipt": 检索：词汇搜索
+  - region "INSPECTOR independent scroll":
+    - complementary "INSPECTOR":
+      - complementary "中国监管令改写 AI 并购退出路径":
+        - paragraph: 检查器
+        - paragraph: "src: TLDR AI Feed · 摘录 · high"
+        - heading "中国监管令改写 AI 并购退出路径" [level=2]
+        - paragraph
+        - paragraph: 来源标题：Manus scraps Meta deal after Chinese regulator order
+        - paragraph:
+          - link "原文链接":
+            - /url: http://127.0.0.1:60605/article/manus-meta-regulator
+        - paragraph: 原文不可用 · 摘要/核心洞察不可用
+        - paragraph: "摘要来源：模型支持 · quality: high"
+        - region "摘要":
+          - paragraph: 摘要：
+          - paragraph: Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。
+        - region "核心洞察":
+          - paragraph: 核心洞察：
+          - paragraph: 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。
+        - region "要点":
+          - paragraph: 要点：
+          - list:
+            - listitem: Manus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。
+            - listitem: Meta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。
+            - listitem: 读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。
+        - group "来源文本": 来源文本：
+        - group "来源详情"
+        - paragraph:
+          - link "http://127.0.0.1:60605/article/manus-meta-regulator":
+            - /url: http://127.0.0.1:60605/article/manus-meta-regulator
+          - link "http://127.0.0.1:60605/feed.xml":
+            - /url: http://127.0.0.1:60605/feed.xml
+          - link "http://127.0.0.1:60605/article/manus-meta-regulator":
+            - /url: http://127.0.0.1:60605/article/manus-meta-regulator
+        - paragraph: 为什么：来自已配置来源的新条目
+  - region "搜索表面":
+    - region "搜索与检索":
+      - heading "搜索" [level=2]
+      - form "搜索筛选":
+        - text: 纯文本查询
+        - textbox "纯文本查询": 监管
+        - button "[搜索]"
+        - group:
+          - text: 筛选 来源
+          - textbox "来源筛选"
+          - text: 开始日期
+          - textbox "开始日期"
+          - text: 结束日期
+          - textbox "结束日期"
+          - checkbox "仅已标星"
+          - text: 已标星 结果上限
+          - combobox "结果上限":
+            - option "10"
+            - option "20"
+            - option "50" [selected]
+            - option "100"
+      - status: 1 条结果
+      - region "搜索结果":
+        - list "搜索结果条目":
+          - listitem:
+            - button "检查搜索结果：中国监管令改写 AI 并购退出路径":
+              - paragraph: "src: TLDR AI Feed 来源标题：Manus scraps Meta deal after Chinese regulator order 1m TODAY"
+              - paragraph: "提取：全文 匹配：词汇索引 来源支持 价值: high"
+              - paragraph: 中国监管令改写 AI 并购退出路径
+              - paragraph: Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。
+            - button "标星：中国监管令改写 AI 并购退出路径": ☆

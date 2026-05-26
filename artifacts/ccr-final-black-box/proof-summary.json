@@ -1,0 +1,68 @@
+{
+  "baseURL": "http://127.0.0.1:60604",
+  "itemID": "item_ed6bf4fe119ef865fd059f648eb85b16",
+  "fixtureFeedUrl": "http://127.0.0.1:60605/feed.xml",
+  "browserArtifacts": {
+    "feed": {
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/screenshots/feed.png",
+      "dom": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/feed.html",
+      "aria": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/feed.aria.txt"
+    },
+    "inspector": {
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/screenshots/inspector.png",
+      "dom": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/inspector.html",
+      "aria": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/inspector.aria.txt"
+    },
+    "provenance": {
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/screenshots/provenance-context.png",
+      "dom": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/provenance-context.html",
+      "aria": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/provenance-context.aria.txt"
+    },
+    "search": {
+      "screenshot": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/screenshots/search-result.png",
+      "dom": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/search-result.html",
+      "aria": "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/dom/search-result.aria.txt"
+    }
+  },
+  "texts": {
+    "feedText": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\n需要 URL\nTODAY 已打开\n独立滚动区域\n今日订阅条目\n\nsrc: TLDR AI Feed\n·\n来源标题：Manus scraps Meta deal after Chinese regulator order\n·\n1m\n·\n全文\n·\n模型支持\n·\n价值: high\nTODAY\n\n中国监管令改写 AI 并购退出路径\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n☆\n\n检查器\n\nsrc: TLDR AI Feed · 摘录 · high\n\n中国监管令改写 AI 并购退出路径\n\n来源标题：Manus scraps Meta deal after Chinese regulator order\n\n原文链接\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n原文不可用 · 摘要/核心洞察不可用\n\n摘要来源：模型支持 · quality: high\n\n摘要：\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。\n\n核心洞察：\n\n这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n要点：\n\nManus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。\nMeta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。\n读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。\n来源文本：\n来源详情\n\nhttp://127.0.0.1:60605/article/manus-meta-regulator\nhttp://127.0.0.1:60605/feed.xml\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n为什么：来自已配置来源的新条目",
+    "feedRowText": "src: TLDR AI Feed\n·\n来源标题：Manus scraps Meta deal after Chinese regulator order\n·\n1m\n·\n全文\n·\n模型支持\n·\n价值: high\nTODAY\n\n中国监管令改写 AI 并购退出路径\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。",
+    "inspectorTextBefore": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\n需要 URL\nTODAY 已打开\n独立滚动区域\n今日订阅条目\n\nsrc: TLDR AI Feed\n·\n来源标题：Manus scraps Meta deal after Chinese regulator order\n·\n1m\n·\n全文\n·\n模型支持\n·\n价值: high\nTODAY\n\n中国监管令改写 AI 并购退出路径\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n☆\n\n检查器\n\nsrc: TLDR AI Feed · 摘录 · high\n\n中国监管令改写 AI 并购退出路径\n\n来源标题：Manus scraps Meta deal after Chinese regulator order\n\n原文链接\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n原文不可用 · 摘要/核心洞察不可用\n\n摘要来源：模型支持 · quality: high\n\n摘要：\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。\n\n核心洞察：\n\n这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n要点：\n\nManus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。\nMeta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。\n读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。\n来源文本：\n来源详情\n\nhttp://127.0.0.1:60605/article/manus-meta-regulator\nhttp://127.0.0.1:60605/feed.xml\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n为什么：来自已配置来源的新条目",
+    "searchText": "跳到订阅流\nSteer or paste RSS URL\n>\nRESOFEED\n导向路由预览\n需要 URL\n检索：词汇搜索\n\n检查器\n\nsrc: TLDR AI Feed · 摘录 · high\n\n中国监管令改写 AI 并购退出路径\n\n来源标题：Manus scraps Meta deal after Chinese regulator order\n\n原文链接\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n原文不可用 · 摘要/核心洞察不可用\n\n摘要来源：模型支持 · quality: high\n\n摘要：\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。\n\n核心洞察：\n\n这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n要点：\n\nManus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。\nMeta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。\n读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。\n来源文本：\n来源详情\n\nhttp://127.0.0.1:60605/article/manus-meta-regulator\nhttp://127.0.0.1:60605/feed.xml\nhttp://127.0.0.1:60605/article/manus-meta-regulator\n\n为什么：来自已配置来源的新条目\n\n搜索\n纯文本查询\n[搜索]\n筛选\n来源\n开始日期\n结束日期\n 已标星\n结果上限\n10\n20\n50\n100\n\n1 条结果\n\nsrc: TLDR AI Feed\n·\n来源标题：Manus scraps Meta deal after Chinese regulator order\n·\n1m\nTODAY\n\n提取：全文\n匹配：词汇索引\n来源支持\n价值: high\n\n中国监管令改写 AI 并购退出路径\n\nManus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\n\n☆"
+  },
+  "responseFiles": [
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/browser-network.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-detail-after-failed-decode.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-detail-after-ingest.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-detail-after-list-intent.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-detail-after-mcp-failed.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-feed-after-ingest.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-manual-ingest.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-reingest-failed-decode.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-reingest-list-intent.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/http-search-localized.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/mcp-read-item.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/mcp-reingest-failed.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/mcp-search-items.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/mcp-tools-list.json",
+    "/Users/tefx/Projects/ResoFeed/.vectl/worktrees/content-contract-redesign-final-verification-and-deep-review.ccr-final-black-box-browser-api-mcp-verification/artifacts/ccr-final-black-box/responses/openrouter-calls.json"
+  ],
+  "expected": {
+    "localizedTitle": "中国监管令改写 AI 并购退出路径",
+    "sourceItemTitle": "Manus scraps Meta deal after Chinese regulator order",
+    "sourceTitle": "TLDR AI Feed",
+    "summary": "Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。",
+    "coreInsight": "这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。",
+    "keyPoints": [
+      "Manus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。",
+      "Meta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。",
+      "读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。"
+    ],
+    "listIntentKeyPoints": [
+      "中国监管指令直接改变了 Manus 与 Meta 交易的可执行性，而不是只影响谈判节奏。",
+      "Meta 的收购意愿没有消除跨境 AI 交易面临的监管不确定性。",
+      "AI 初创公司的退出预期需要同时评估技术吸引力、买方资本和监管批准。",
+      "这类交易风险会改变投资人和创始人对跨境退出路径的定价。"
+    ]
+  }
+}

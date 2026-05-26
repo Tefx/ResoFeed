@@ -1,0 +1,7 @@
+- list "今日订阅条目":
+  - listitem:
+    - 'button "Open Inspector for: 中国监管令改写 AI 并购退出路径"':
+      - paragraph: "src: TLDR AI Feed 来源标题：Manus scraps Meta deal after Chinese regulator order 1m 全文 模型支持 价值: high TODAY"
+      - paragraph: 中国监管令改写 AI 并购退出路径
+      - paragraph: Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。 · 这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。
+    - button "标星：中国监管令改写 AI 并购退出路径": ☆

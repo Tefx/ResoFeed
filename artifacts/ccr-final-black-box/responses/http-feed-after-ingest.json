@@ -1,0 +1,38 @@
+{
+  "status": 200,
+  "body": {
+    "items": [
+      {
+        "id": "item_ed6bf4fe119ef865fd059f648eb85b16",
+        "source_id": "src_945b615a25c80e6564e2e1c6ea512239",
+        "source_title": "TLDR AI Feed",
+        "url": "http://127.0.0.1:60605/article/manus-meta-regulator",
+        "title": "中国监管令改写 AI 并购退出路径",
+        "source_item_title": "Manus scraps Meta deal after Chinese regulator order",
+        "localized_title": "中国监管令改写 AI 并购退出路径",
+        "summary": "Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。",
+        "core_insight": "这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。",
+        "key_points": [
+          "Manus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。",
+          "Meta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。",
+          "读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。"
+        ],
+        "value_tier": "high",
+        "published_at": "2026-05-26T10:00:00Z",
+        "extraction_status": "full",
+        "model_status": "ok",
+        "content_status": "ok",
+        "last_reprocess_status": null,
+        "last_reprocess_error_code": null,
+        "last_reprocess_error_message": null,
+        "last_reprocess_at": null,
+        "is_resonated": false,
+        "human_inspected_at": null,
+        "external_surfaced_at": null,
+        "story_key": null,
+        "duplicate_of_item_id": null
+      }
+    ]
+  },
+  "raw": "{\"items\":[{\"id\":\"item_ed6bf4fe119ef865fd059f648eb85b16\",\"source_id\":\"src_945b615a25c80e6564e2e1c6ea512239\",\"source_title\":\"TLDR AI Feed\",\"url\":\"http://127.0.0.1:60605/article/manus-meta-regulator\",\"title\":\"中国监管令改写 AI 并购退出路径\",\"source_item_title\":\"Manus scraps Meta deal after Chinese regulator order\",\"localized_title\":\"中国监管令改写 AI 并购退出路径\",\"summary\":\"Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。\",\"core_insight\":\"这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。\",\"key_points\":[\"Manus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。\",\"Meta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。\",\"读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。\"],\"value_tier\":\"high\",\"published_at\":\"2026-05-26T10:00:00Z\",\"extraction_status\":\"full\",\"model_status\":\"ok\",\"content_status\":\"ok\",\"last_reprocess_status\":null,\"last_reprocess_error_code\":null,\"last_reprocess_error_message\":null,\"last_reprocess_at\":null,\"is_resonated\":false,\"human_inspected_at\":null,\"external_surfaced_at\":null,\"story_key\":null,\"duplicate_of_item_id\":null}]}\n"
+}

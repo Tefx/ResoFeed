@@ -1,0 +1,448 @@
+{
+  "status": 200,
+  "body": {
+    "jsonrpc": "2.0",
+    "id": "tools-list",
+    "result": {
+      "tools": [
+        {
+          "description": "Retrieve eligible feed candidates.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "default": 20,
+                "description": "Result limit. Defaults to 20; maximum 50.",
+                "maximum": 50,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "name": "list_candidate_items"
+        },
+        {
+          "description": "Lexical and metadata item search. query is required for MCP; use list_candidate_items for empty-feed browsing.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "default": null,
+                "description": "Optional inclusive lower calendar date, YYYY-MM-DD.",
+                "format": "date",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "limit": {
+                "default": 20,
+                "description": "Result limit. Defaults to 20; maximum 50.",
+                "maximum": 50,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "query": {
+                "description": "Plain text lexical query; required for MCP search_items.",
+                "maxLength": 500,
+                "minLength": 1,
+                "type": "string"
+              },
+              "resonated": {
+                "default": null,
+                "description": "Optional resonance filter.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "source": {
+                "default": null,
+                "description": "Optional source name or source id filter.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "to": {
+                "default": null,
+                "description": "Optional inclusive upper calendar date, YYYY-MM-DD.",
+                "format": "date",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "type": "object"
+          },
+          "name": "search_items"
+        },
+        {
+          "description": "Read item detail and provenance.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "item_id": {
+                "description": "Required non-empty item id.",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_id"
+            ],
+            "type": "object"
+          },
+          "name": "read_item"
+        },
+        {
+          "description": "Forward human inspection from an external context.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "item_id": {
+                "description": "Required non-empty item id.",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_id",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "mark_inspected"
+        },
+        {
+          "description": "Set resonance state.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "item_id": {
+                "description": "Required non-empty item id.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "resonated": {
+                "description": "Required target resonance state.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "item_id",
+              "resonated",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "resonate_item"
+        },
+        {
+          "description": "Preview Steer route classification without mutation.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "command": {
+                "description": "Required natural-language steering command, max 4000 bytes.",
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "actor_id"
+            ],
+            "type": "object"
+          },
+          "name": "preview_steer"
+        },
+        {
+          "description": "Apply natural-language steering.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "command": {
+                "description": "Required natural-language steering command, max 4000 bytes.",
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "steer"
+        },
+        {
+          "description": "Undo one target-specific Steer target.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_id": {
+                "description": "Required target id from a Steer undo handle.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_kind": {
+                "description": "Required target kind from a Steer undo handle; no global undo stack is consulted.",
+                "enum": [
+                  "steer_rule",
+                  "source"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "target_kind",
+              "target_id",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "undo_steer"
+        },
+        {
+          "description": "Record external surfacing.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "delivered_at": {
+                "description": "Required RFC3339 time the item was externally surfaced.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "item_id": {
+                "description": "Required non-empty item id.",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_id",
+              "actor_id",
+              "delivered_at",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "report_delivery"
+        },
+        {
+          "description": "Read the runtime processing language.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "name": "get_processing_language"
+        },
+        {
+          "description": "Set the runtime processing language for future processing.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "language": {
+                "enum": [
+                  "en",
+                  "zh"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "language",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "set_processing_language"
+        },
+        {
+          "description": "Explicitly reprocess existing library items in the current runtime language.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "reprocess_library"
+        },
+        {
+          "description": "Re-ingest exactly one selected item using the current runtime language with optional request-scoped OpenRouter model and one-time prompt.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_id": {
+                "description": "Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.",
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "extra_prompt": {
+                "default": null,
+                "description": "Compatibility alias for prompt; rejected when it conflicts with prompt.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "idempotency_key": {
+                "description": "Required retry idempotency key, max 200 characters.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "item_id": {
+                "description": "Required selected item id.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "model": {
+                "default": null,
+                "description": "Optional request-scoped OpenRouter model override; null, empty, or account_default means runtime/account default.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prompt": {
+                "default": null,
+                "description": "Optional canonical one-time prompt for this item only; max 4000 bytes after trimming.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "item_id",
+              "actor_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "name": "reingest_item"
+        },
+        {
+          "description": "List available OpenRouter models without persisting provider state.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "name": "list_openrouter_models"
+        }
+      ]
+    }
+  },
+  "raw": "{\"jsonrpc\":\"2.0\",\"id\":\"tools-list\",\"result\":{\"tools\":[{\"description\":\"Retrieve eligible feed candidates.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"default\":20,\"description\":\"Result limit. Defaults to 20; maximum 50.\",\"maximum\":50,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_candidate_items\"},{\"description\":\"Lexical and metadata item search. query is required for MCP; use list_candidate_items for empty-feed browsing.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"from\":{\"default\":null,\"description\":\"Optional inclusive lower calendar date, YYYY-MM-DD.\",\"format\":\"date\",\"type\":[\"string\",\"null\"]},\"limit\":{\"default\":20,\"description\":\"Result limit. Defaults to 20; maximum 50.\",\"maximum\":50,\"minimum\":1,\"type\":\"integer\"},\"query\":{\"description\":\"Plain text lexical query; required for MCP search_items.\",\"maxLength\":500,\"minLength\":1,\"type\":\"string\"},\"resonated\":{\"default\":null,\"description\":\"Optional resonance filter.\",\"type\":[\"boolean\",\"null\"]},\"source\":{\"default\":null,\"description\":\"Optional source name or source id filter.\",\"type\":[\"string\",\"null\"]},\"to\":{\"default\":null,\"description\":\"Optional inclusive upper calendar date, YYYY-MM-DD.\",\"format\":\"date\",\"type\":[\"string\",\"null\"]}},\"required\":[\"query\"],\"type\":\"object\"},\"name\":\"search_items\"},{\"description\":\"Read item detail and provenance.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"item_id\":{\"description\":\"Required non-empty item id.\",\"minLength\":1,\"type\":\"string\"}},\"required\":[\"item_id\"],\"type\":\"object\"},\"name\":\"read_item\"},{\"description\":\"Forward human inspection from an external context.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"item_id\":{\"description\":\"Required non-empty item id.\",\"minLength\":1,\"type\":\"string\"}},\"required\":[\"item_id\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"mark_inspected\"},{\"description\":\"Set resonance state.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"item_id\":{\"description\":\"Required non-empty item id.\",\"minLength\":1,\"type\":\"string\"},\"resonated\":{\"description\":\"Required target resonance state.\",\"type\":\"boolean\"}},\"required\":[\"item_id\",\"resonated\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"resonate_item\"},{\"description\":\"Preview Steer route classification without mutation.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"command\":{\"description\":\"Required natural-language steering command, max 4000 bytes.\",\"maxLength\":4000,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"command\",\"actor_id\"],\"type\":\"object\"},\"name\":\"preview_steer\"},{\"description\":\"Apply natural-language steering.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"command\":{\"description\":\"Required natural-language steering command, max 4000 bytes.\",\"maxLength\":4000,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"command\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"steer\"},{\"description\":\"Undo one target-specific Steer target.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"target_id\":{\"description\":\"Required target id from a Steer undo handle.\",\"minLength\":1,\"type\":\"string\"},\"target_kind\":{\"description\":\"Required target kind from a Steer undo handle; no global undo stack is consulted.\",\"enum\":[\"steer_rule\",\"source\"],\"type\":\"string\"}},\"required\":[\"target_kind\",\"target_id\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"undo_steer\"},{\"description\":\"Record external surfacing.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"delivered_at\":{\"description\":\"Required RFC3339 time the item was externally surfaced.\",\"format\":\"date-time\",\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"item_id\":{\"description\":\"Required non-empty item id.\",\"minLength\":1,\"type\":\"string\"}},\"required\":[\"item_id\",\"actor_id\",\"delivered_at\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"report_delivery\"},{\"description\":\"Read the runtime processing language.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{},\"type\":\"object\"},\"name\":\"get_processing_language\"},{\"description\":\"Set the runtime processing language for future processing.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"language\":{\"enum\":[\"en\",\"zh\"],\"type\":\"string\"}},\"required\":[\"language\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"set_processing_language\"},{\"description\":\"Explicitly reprocess existing library items in the current runtime language.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"reprocess_library\"},{\"description\":\"Re-ingest exactly one selected item using the current runtime language with optional request-scoped OpenRouter model and one-time prompt.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"actor_id\":{\"description\":\"Attribution actor id; required, non-empty, max 128 characters. Not an authorization lookup.\",\"maxLength\":128,\"minLength\":1,\"type\":\"string\"},\"extra_prompt\":{\"default\":null,\"description\":\"Compatibility alias for prompt; rejected when it conflicts with prompt.\",\"type\":[\"string\",\"null\"]},\"idempotency_key\":{\"description\":\"Required retry idempotency key, max 200 characters.\",\"maxLength\":200,\"minLength\":1,\"type\":\"string\"},\"item_id\":{\"description\":\"Required selected item id.\",\"minLength\":1,\"type\":\"string\"},\"model\":{\"default\":null,\"description\":\"Optional request-scoped OpenRouter model override; null, empty, or account_default means runtime/account default.\",\"type\":[\"string\",\"null\"]},\"prompt\":{\"default\":null,\"description\":\"Optional canonical one-time prompt for this item only; max 4000 bytes after trimming.\",\"type\":[\"string\",\"null\"]}},\"required\":[\"item_id\",\"actor_id\",\"idempotency_key\"],\"type\":\"object\"},\"name\":\"reingest_item\"},{\"description\":\"List available OpenRouter models without persisting provider state.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{},\"type\":\"object\"},\"name\":\"list_openrouter_models\"}]}}\n"
+}

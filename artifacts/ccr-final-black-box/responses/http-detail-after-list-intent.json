@@ -1,0 +1,47 @@
+{
+  "status": 200,
+  "body": {
+    "item": {
+      "id": "item_ed6bf4fe119ef865fd059f648eb85b16",
+      "source_id": "src_945b615a25c80e6564e2e1c6ea512239",
+      "source_title": "TLDR AI Feed",
+      "url": "http://127.0.0.1:60605/article/manus-meta-regulator",
+      "title": "中国监管令改写 AI 并购退出路径",
+      "source_item_title": "Manus scraps Meta deal after Chinese regulator order",
+      "localized_title": "中国监管令改写 AI 并购退出路径",
+      "summary": "Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。",
+      "core_insight": "一次性提示把多点分析放入要点，同时保留一句核心洞察。",
+      "key_points": [
+        "中国监管指令直接改变了 Manus 与 Meta 交易的可执行性，而不是只影响谈判节奏。",
+        "Meta 的收购意愿没有消除跨境 AI 交易面临的监管不确定性。",
+        "AI 初创公司的退出预期需要同时评估技术吸引力、买方资本和监管批准。",
+        "这类交易风险会改变投资人和创始人对跨境退出路径的定价。"
+      ],
+      "value_tier": "high",
+      "published_at": "2026-05-26T10:00:00Z",
+      "extraction_status": "original_unavailable",
+      "model_status": "ok",
+      "content_status": "ok",
+      "last_reprocess_status": "ok",
+      "last_reprocess_error_code": null,
+      "last_reprocess_error_message": null,
+      "last_reprocess_at": "2026-05-26T09:44:58Z",
+      "is_resonated": false,
+      "human_inspected_at": "2026-05-26T09:44:25.259466Z",
+      "external_surfaced_at": null,
+      "story_key": null,
+      "duplicate_of_item_id": null,
+      "feed_excerpt": null,
+      "extracted_text": null,
+      "provenance": {
+        "source_url": "http://127.0.0.1:60605/feed.xml",
+        "canonical_url": null,
+        "original_url": "http://127.0.0.1:60605/article/manus-meta-regulator",
+        "story_key": null,
+        "duplicate_of_item_id": null,
+        "grouped_source_items": []
+      }
+    }
+  },
+  "raw": "{\"item\":{\"id\":\"item_ed6bf4fe119ef865fd059f648eb85b16\",\"source_id\":\"src_945b615a25c80e6564e2e1c6ea512239\",\"source_title\":\"TLDR AI Feed\",\"url\":\"http://127.0.0.1:60605/article/manus-meta-regulator\",\"title\":\"中国监管令改写 AI 并购退出路径\",\"source_item_title\":\"Manus scraps Meta deal after Chinese regulator order\",\"localized_title\":\"中国监管令改写 AI 并购退出路径\",\"summary\":\"Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。\",\"core_insight\":\"一次性提示把多点分析放入要点，同时保留一句核心洞察。\",\"key_points\":[\"中国监管指令直接改变了 Manus 与 Meta 交易的可执行性，而不是只影响谈判节奏。\",\"Meta 的收购意愿没有消除跨境 AI 交易面临的监管不确定性。\",\"AI 初创公司的退出预期需要同时评估技术吸引力、买方资本和监管批准。\",\"这类交易风险会改变投资人和创始人对跨境退出路径的定价。\"],\"value_tier\":\"high\",\"published_at\":\"2026-05-26T10:00:00Z\",\"extraction_status\":\"original_unavailable\",\"model_status\":\"ok\",\"content_status\":\"ok\",\"last_reprocess_status\":\"ok\",\"last_reprocess_error_code\":null,\"last_reprocess_error_message\":null,\"last_reprocess_at\":\"2026-05-26T09:44:58Z\",\"is_resonated\":false,\"human_inspected_at\":\"2026-05-26T09:44:25.259466Z\",\"external_surfaced_at\":null,\"story_key\":null,\"duplicate_of_item_id\":null,\"feed_excerpt\":null,\"extracted_text\":null,\"provenance\":{\"source_url\":\"http://127.0.0.1:60605/feed.xml\",\"canonical_url\":null,\"original_url\":\"http://127.0.0.1:60605/article/manus-meta-regulator\",\"story_key\":null,\"duplicate_of_item_id\":null,\"grouped_source_items\":[]}}}\n"
+}
