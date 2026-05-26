@@ -52,7 +52,7 @@ export const modelStatusValues = [
 export type ModelStatus = (typeof modelStatusValues)[number];
 export type ContentStatus = 'ok' | 'summary_unavailable';
 export type LastReprocessStatus = 'ok' | 'failed' | null;
-export type LastReprocessErrorCode = 'decode_error' | 'provider_error' | 'invalid_model' | 'timeout' | null;
+export type LastReprocessErrorCode = ReprocessErrorCode | null;
 export type ActorKind = 'human' | 'agent';
 export type ProcessingLanguage = 'en' | 'zh';
 

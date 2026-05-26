@@ -561,14 +561,14 @@ architecture_basis:
     last_reprocess_status: latest reprocess attempt state
     source_urls_and_identifiers: source/provenance extraction, never localized
 
-  service_catalog:
+  internal_module_map:
     prompt_contract:
       owner: internal/resofeed
       responsibilities:
         - JSON schema
         - field-scoped prompt rules
         - Steer and one-time prompt fusion policy
-    reprocess_service:
+    reprocess_module:
       owner: internal/resofeed
       responsibilities:
         - candidate generation
@@ -645,7 +645,7 @@ architecture_basis:
     wiring_strategy:
       - direct module calls inside existing Go binary
       - no DI container or event bus
-    governance_owner: internal/resofeed content contract and reprocess modules
+    governance_owner: internal/resofeed content contract and direct reprocess functions
 
   shared_abstractions:
     shared_types:
@@ -661,7 +661,7 @@ architecture_basis:
       - name: ReprocessAttemptState
         owner_module: internal/resofeed
         consumers:
-          - reprocess service
+          - reprocess module/direct functions
           - HTTP API
           - MCP API
           - Inspector UI

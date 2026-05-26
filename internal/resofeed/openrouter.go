@@ -292,7 +292,7 @@ func validateSummaryOutputForPersistenceWithPrompt(out OpenRouterSummaryOutput, 
 		return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 	}
 	if out.ModelStatus == modelStatusOK {
-		if err := validateKeyPoints(out.KeyPoints, out.CoreInsight, item.TargetLanguage); err != nil {
+		if err := validateKeyPoints(out.KeyPoints, out.CoreInsight, item); err != nil {
 			return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, err
 		}
 	}
@@ -685,7 +685,7 @@ func isSingleSentenceCoreInsight(value string) bool {
 	return boundaries <= 1
 }
 
-func validateKeyPoints(points []string, coreInsight string, target ProcessingLanguage) error {
+func validateKeyPoints(points []string, coreInsight string, item promptingV21Item) error {
 	if len(points) < 3 || len(points) > 5 {
 		return promptValidationError(PromptValidationSchemaInvalid, "key_points", nil)
 	}
@@ -703,11 +703,52 @@ func validateKeyPoints(points []string, coreInsight string, target ProcessingLan
 			return promptValidationError(PromptValidationKeyPointsInvalid, field, nil)
 		}
 		seen[trimmed] = struct{}{}
-		if target == ProcessingLanguageChinese && containsMostlyLatin(trimmed) {
+		if item.TargetLanguage == ProcessingLanguageChinese && containsMostlyLatin(trimmed) {
+			return promptValidationError(PromptValidationKeyPointsInvalid, field, nil)
+		}
+		if hasUnsupportedKeyPointClaim(trimmed, item) {
 			return promptValidationError(PromptValidationKeyPointsInvalid, field, nil)
 		}
 	}
 	return nil
+}
+
+func hasUnsupportedKeyPointClaim(point string, item promptingV21Item) bool {
+	if item.TargetLanguage != ProcessingLanguageEnglish {
+		return false
+	}
+	source := strings.ToLower(strings.Join([]string{item.SourceItemTitle, item.SourceTitle, item.URL, item.AvailableText}, "\n"))
+	if strings.TrimSpace(source) == "" {
+		return false
+	}
+	for _, claim := range distinctiveUnsupportedClaimTokens(point) {
+		if !strings.Contains(source, strings.ToLower(claim)) {
+			return true
+		}
+	}
+	return false
+}
+
+func distinctiveUnsupportedClaimTokens(value string) []string {
+	matches := regexp.MustCompile(`\b(?:[A-Z][a-z0-9]+(?:\s+[A-Z][a-z0-9]+)+|[A-Z]{2,}[A-Za-z0-9-]*)\b`).FindAllString(value, -1)
+	claims := make([]string, 0, len(matches))
+	for _, match := range matches {
+		trimmed := strings.TrimSpace(match)
+		if trimmed == "" || isCommonKeyPointCapitalizedPhrase(trimmed) {
+			continue
+		}
+		claims = append(claims, trimmed)
+	}
+	return claims
+}
+
+func isCommonKeyPointCapitalizedPhrase(value string) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "the source", "source", "rss", "url":
+		return true
+	default:
+		return false
+	}
 }
 
 func isGenericKeyPoint(value string) bool {

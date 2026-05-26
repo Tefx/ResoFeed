@@ -113,6 +113,27 @@ func TestPromptValidationFieldCeilingsForAllGeneratedFields(t *testing.T) {
 	}
 }
 
+func TestPromptValidationKeyPointsRejectUnsupportedNonNumericClaims(t *testing.T) {
+	_, err := validateSummaryOutputForPersistenceWithPrompt(validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+		out.KeyPoints = []string{
+			"The source-backed migration plan includes Acme Cloud failover.",
+			"The source-backed migration plan includes rollback windows.",
+			"The source-backed migration plan includes database checks.",
+		}
+	}), promptingV21Item{
+		SourceItemTitle:     "Migration plan",
+		SourceTitle:         "Reliability Notes",
+		URL:                 "https://example.test/migration",
+		AvailableTextSource: "fresh_full_text",
+		AvailableText:       "The migration plan describes rollback windows and database checks, but names no cloud provider.",
+		TargetLanguage:      ProcessingLanguageEnglish,
+	})
+	var validationErr PromptValidationError
+	if !errors.As(err, &validationErr) || validationErr.Code != PromptValidationKeyPointsInvalid || validationErr.Field != "key_points[0]" {
+		t.Fatalf("validation error = %T %[1]v, want key_points_invalid for unsupported non-numeric source-grounding claim", err)
+	}
+}
+
 func TestPromptValidationRetryOneNormalThenOneRepair(t *testing.T) {
 	ctx := context.Background()
 	var attempts int

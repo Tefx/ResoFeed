@@ -3,6 +3,7 @@ package resofeed
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -329,6 +330,52 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 	}
 }
 
+func TestReprocessAndReingestPromptUseLiteralSourceItemTitle(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>literal provenance article body for prompt capture</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_literal_title", server.URL+"/feed.xml", "Literal Feed")
+	now := time.Now().UTC().Format(time.RFC3339)
+	originalPoints, err := json.Marshal([]string{"保留要点一。", "保留要点二。", "保留要点三。"})
+	if err != nil {
+		t.Fatalf("marshal original key points: %v", err)
+	}
+	_, err = db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text) values (?, 'src_literal_title', ?, ?, ?, ?, ?, '原始摘要', '原始洞察。', ?, 'high', 'ok', ?, 'full', 'ok', '原始摘录', '原始正文')`, "item_literal_title", server.URL+"/feed.xml", server.URL+"/article", "生成的中文标题", "Literal RSS Headline", "生成的中文标题", string(originalPoints), now)
+	if err != nil {
+		t.Fatalf("insert literal title item: %v", err)
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := &literalTitleCaptureLLM{}
+	resp, err := ReprocessLibrary(ctx, db, llm, ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "literal-title-library"}})
+	if err != nil {
+		t.Fatalf("ReprocessLibrary: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 1 {
+		t.Fatalf("library reprocess result = %+v, want one completed update", resp.Reprocess)
+	}
+	if got := llm.titles["item_literal_title"]; got != "Literal RSS Headline" {
+		t.Fatalf("library prompt source_item_title = %q, want literal persisted title", got)
+	}
+	assertStoredSourceItemTitle(t, ctx, db, "item_literal_title", "Literal RSS Headline")
+
+	respItem, err := ReingestItem(ctx, db, llm, "item_literal_title", ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "literal-title-reingest"}})
+	if err != nil {
+		t.Fatalf("ReingestItem: %v", err)
+	}
+	if respItem.Reingest.Status != ReprocessStatusCompleted || !respItem.Reingest.ItemUpdated || !respItem.Reingest.FTSUpdated {
+		t.Fatalf("item reingest result = %+v, want completed item/FTS update", respItem.Reingest)
+	}
+	if got := llm.titles["item_literal_title"]; got != "Literal RSS Headline" {
+		t.Fatalf("reingest prompt source_item_title = %q, want literal persisted title", got)
+	}
+	assertStoredSourceItemTitle(t, ctx, db, "item_literal_title", "Literal RSS Headline")
+}
+
 func TestItemReingestPersistenceValidationUsesActualPromptContextBeforeWrite(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -397,6 +444,28 @@ type reprocessStatusLLM struct {
 }
 
 type actualContextInvalidReingestLLM struct{}
+
+type literalTitleCaptureLLM struct {
+	titles map[string]string
+}
+
+func (l *literalTitleCaptureLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	if l.titles == nil {
+		l.titles = map[string]string{}
+	}
+	l.titles[input.ItemID] = input.Title
+	out := ccrTestSummaryOutput("localized rewritten title", "summary literal provenance article body.", "insight literal provenance article body.", "high")
+	out.KeyPoints = []string{
+		"source-backed point one from article body.",
+		"source-backed point two from article body.",
+		"source-backed point three from article body.",
+	}
+	return out, nil
+}
+
+func (l *literalTitleCaptureLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
 
 func (actualContextInvalidReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	return OpenRouterSummaryOutput{LocalizedTitle: "English title", Title: "English title", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", KeyPoints: []string{"English source-backed point one.", "English source-backed point two.", "English source-backed point three."}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
@@ -474,6 +543,17 @@ func assertPreservedOriginalFields(t *testing.T, ctx context.Context, db *sql.DB
 	}
 	if title != "PRIOR title "+itemID || summary != expectedSummary || coreInsight != expectedCoreInsight || feedExcerpt != "PRIOR excerpt "+itemID || extractedText != "PRIOR extracted "+itemID || (valueTier != "prior-tier" && valueTier != "brief") || extractionStatus != extractionStatusFull || storedModelStatus != modelStatusOK || contentStatus != modelStatusOK || lastStatus != "failed" || lastCode != expectedLastReprocessCode {
 		t.Fatalf("item %s was degraded or missing attempt diagnostics: title:%q summary:%q core:%q feed:%q extracted:%q tier:%q extraction:%q model:%q content:%q last_status:%q last_code:%q", itemID, title, summary, coreInsight, feedExcerpt, extractedText, valueTier, extractionStatus, storedModelStatus, contentStatus, lastStatus, lastCode)
+	}
+}
+
+func assertStoredSourceItemTitle(t *testing.T, ctx context.Context, db *sql.DB, itemID string, want string) {
+	t.Helper()
+	var got string
+	if err := db.QueryRowContext(ctx, `select coalesce(source_item_title, '') from items where id = ?`, itemID).Scan(&got); err != nil {
+		t.Fatalf("read source_item_title for %s: %v", itemID, err)
+	}
+	if got != want {
+		t.Fatalf("source_item_title for %s = %q, want %q", itemID, got, want)
 	}
 }
 

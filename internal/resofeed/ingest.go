@@ -642,7 +642,7 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.Title, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if err != nil {
 		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
 		sanitizeReadableItem(&item)
