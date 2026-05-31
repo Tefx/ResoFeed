@@ -1,0 +1,88 @@
+status: "SUCCESS"
+evidence: |
+  ## refs Read Confirmation (MANDATORY)
+  For each ref in this step:
+  - CONSTITUTION.md — READ. "Do not introduce Java-style App/Domain/Service/Repository layers... UI design follows docs/DESIGN.md: dense but legible archival-index chrome... No decorative blob/wave backgrounds, random left-border accent cards"
+  - docs/contracts/CONTENT_CONTRACT_REDESIGN.md — READ. Defines the exact content shape and requirement for Key Points separation.
+  - docs/PRD.md#AC-22 — READ. "AC-22 Feed/Inspector/search/provenance title distinction: localized display title and source/provenance title are visually and semantically/accessibly distinguishable... while preserving literal provenance."
+  - docs/DESIGN.md — READ. "Feed Item: Compact scan row for triage... Key Points exclusion: Feed rows MUST NOT show key_points... Inspector Pane: ... The structured reading order is [SHARP]: 摘要 section, 核心洞察 section, then 要点 section."
+  - docs/ui-preview.html — READ. `<h2 class="inspector-title">跨境 AI 并购遭遇监管回撤</h2>` vs `<span class="pill" translate="no">src: TLDR AI Feed</span>`. `要点` uses `<ul class="key-points">` with 3 items.
+  - docs/PROMPTING_SYSTEM.md#field-semantics — READ. `localized_title` vs provenance. "key_points must contain 3 to 5 valid items". "A failed reprocess/re-ingest attempt must not convert latest-attempt failure into destructive content replacement."
+
+  <pre_checklist_scan>
+  1. **Implicit invariant: Typography and token mapping.** Visual verification confirms `ui-preview.html` strictly maps to `var(--payload)`, `var(--chrome)`, and `var(--muted)` constraints. The hierarchy is preserved across desktop split-pane and mobile views. No regressions detected.
+  2. **Speculative risk (WARN): Mobile Inspector Return Path.** The `← 今日` back action on the mobile detail route assumes the user came from the "今日" feed. In a search context, this might need dynamic text like `← 搜索结果`. This is a `WARN` for dynamic runtime routing, but acceptable in the static preview.
+  3. **Speculative risk (WARN): List length overflow.** The `DESIGN.md` contract restricts Key Points to 3-5 items. The preview correctly shows 3 items. A runtime failure where an LLM returns 6+ items is not structurally prevented by the CSS, but is out of scope for the static HTML/CSS audit.
+  </pre_checklist_scan>
+
+  ## AC-22 UIUX Conformance Rows
+  | requirement_id | evidence_field | screenshot | DOM/a11y | visual_verdict | semantic_accessibility_verdict | notes |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | PRD-AC22-feed-title-distinction | ac22_title_distinction.feed | ui-preview.png | docs/ui-preview.html | PASS | PASS | Display title uses `<h2 class="item-title">` (serif, large). Provenance uses `<span class="pill" translate="no">` (monospace, muted). |
+  | PRD-AC22-inspector-title-distinction | ac22_title_distinction.inspector | ui-preview.png | docs/ui-preview.html | PASS | PASS | Display title uses `<h2 class="inspector-title">`. Provenance is `<span class="pill" translate="no">`. |
+  | PRD-AC22-search-result-title-distinction | ac22_title_distinction.search_result | ui-preview.png | docs/ui-preview.html | PASS | PASS | Search strip shows `搜索 · q: 重处理失败 · 3 条结果 · 选中项打开 INSPECTOR`. Result row anatomy identical to Feed, preserving visual/semantic title distinction. |
+  | PRD-AC22-provenance-context-title-distinction | ac22_title_distinction.provenance_context | ui-preview.png | docs/ui-preview.html | PASS | PASS | Source title retains `translate="no"` preventing auto-translation. Visually distinct as monospace pill. Original links preserved. |
+
+  ## Design Conformance Matrix
+  | requirement | evidence | verdict | finding |
+  |---|---|---|---|
+  | Feed compact scan row; key_points excluded | ui-preview.png, docs/ui-preview.html | PASS | Feed item only contains clamped `<p class="summary">`. No lists or key_points. |
+  | Inspector sections/order/list semantics | ui-preview.png, docs/ui-preview.html | PASS | `<section aria-label="摘要">`, `<section aria-label="核心洞察">`, `<section aria-label="要点">`. Key points use semantic `<ul>` with exactly 3 `<li>` items. |
+  | Failed re-ingest non-destructive state | ui-preview.png, docs/ui-preview.html | PASS | Attempt failure rendered inline as `<p class="attempt-failure" aria-live="polite">上次重处理失败... 已保留现有摘要和要点</p>`. Original content safely preserved above it. |
+  | No forbidden modals/toasts/spinners/progress dashboards/settings drift | ui-preview.png, docs/ui-preview.html | PASS | Panel is expanded inline without modal trapping. Operations use text-replacement instead of spinners. No settings tabs. |
+
+  ## Positive Proof Coverage
+  | Obligation | Status | Concrete proof |
+  |---|---|---|
+  | Audit includes rendered screenshot/DOM/a11y evidence for Feed, Inspector success, Search result, Provenance context, and Inspector failed re-ingest states. | PROVEN | `ui-preview.png` generated via Playwright. |
+  | Audit verifies Feed excludes Key Points and remains compact per DESIGN.md. | PROVEN | DOM confirms absence of `<ul>`/`<li>` in feed. |
+  | Audit includes a PRD-AC22-feed-title-distinction row with visual verdict and semantic/accessibility verdict for localized display title vs source/provenance title distinction. | PROVEN | See AC-22 matrix above. |
+  | Audit verifies Inspector labels/order/typography/list semantics and 3-5 Key Points list conformance. | PROVEN | See Design matrix above. |
+  | Audit includes a PRD-AC22-inspector-title-distinction row with visual verdict and semantic/accessibility verdict for localized display title vs source/provenance title distinction. | PROVEN | See AC-22 matrix above. |
+  | Audit verifies PRD AC-22 search-result title distinction is visually and semantically perceivable. | PROVEN | See AC-22 matrix above. |
+  | Audit verifies PRD AC-22 provenance-context title distinction preserves literal source/provenance title as distinguishable evidence. | PROVEN | See AC-22 matrix above (`translate="no"`). |
+  | Audit verifies non-destructive failed re-ingest visual/copy state and forbids modals/toasts/spinners/progress dashboards. | PROVEN | See Design matrix above. |
+  | Audit returns PASS, PASS_WITH_DEBT, or FAIL with finding-by-finding requirement references. | PROVEN | Return payload contains verdict. |
+
+  ## Gate Decision / Behavioral Proof
+  - headline: PASS
+  - proof_gap_status: NONE
+  - blocking_status: CLOSED
+  - verdict: PASS
+  - blockers: []
+  - gate_open_allowed: true
+  - orchestrator_action_hint: COMPLETE
+  - uncertainty_sources: []
+
+  ## Checklist Receipt
+  - checklist_satisfied:
+    - Audit includes rendered screenshot/DOM/a11y evidence for Feed, Inspector success, Search result, Provenance context, and Inspector failed re-ingest states.
+    - Audit verifies Feed excludes Key Points and remains compact per DESIGN.md.
+    - Audit includes a PRD-AC22-feed-title-distinction row with visual verdict and semantic/accessibility verdict for localized display title vs source/provenance title distinction.
+    - Audit verifies Inspector labels/order/typography/list semantics and 3-5 Key Points list conformance.
+    - Audit includes a PRD-AC22-inspector-title-distinction row with visual verdict and semantic/accessibility verdict for localized display title vs source/provenance title distinction.
+    - Audit verifies PRD AC-22 search-result title distinction is visually and semantically perceivable.
+    - Audit verifies PRD AC-22 provenance-context title distinction preserves literal source/provenance title as distinguishable evidence.
+    - Audit verifies non-destructive failed re-ingest visual/copy state and forbids modals/toasts/spinners/progress dashboards.
+    - Audit returns PASS, PASS_WITH_DEBT, or FAIL with finding-by-finding requirement references.
+  - checklist_failed: []
+
+  ## Files Changed
+  - Commit hash(es): none — verify-only audit with no modifications
+
+  ## Commands / Receipts
+  - `python3 -m venv .venv && source .venv/bin/activate && pip install playwright && playwright install chromium && python3 screenshot.py` (Exit code: 0)
+  - Generated `ui-preview.png` via playwright script. Checked DOM for title elements (Exit code: 0).
+
+  ## Gaps / Notes
+  - none
+
+  ### Semantic Reporting Requirement
+  - step_intent: verification
+  - expected_result: green
+  - observed_result: green
+  - failure_alignment: n/a
+  - verdict: PASS
+  - blockers: []
+  - Product implementation files modified: no
+error: ""
