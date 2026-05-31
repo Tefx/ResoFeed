@@ -853,6 +853,7 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-feed-meta span {
+  flex: 0 0 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -860,13 +861,16 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-feed-meta .feed-meta-source,
-.contract-feed-meta .feed-meta-source-title,
-.contract-feed-meta .feed-meta-age {
-  flex: 0 1 auto;
+.contract-feed-meta .feed-meta-source-title {
+  flex: 0 100000 auto;
 }
 
-.contract-feed-meta .feed-meta-extraction {
-  flex: 1 2 auto;
+.contract-feed-meta .feed-meta-age,
+.contract-feed-meta .feed-meta-extraction,
+.contract-feed-meta .feed-meta-secondary,
+.contract-feed-meta .feed-meta-agent,
+.contract-search-time-label {
+  flex: 0 0 auto;
 }
 
 .contract-time-label {
