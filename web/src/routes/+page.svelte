@@ -922,7 +922,13 @@
 
   async function fetchSource(source: Source): Promise<FetchSourceSuccessResponse> {
     const response = await apiClient().fetchSource(source.id);
-    if (!response.ok) throw new Error(`err: ${response.body.error.message}`);
+    if (!response.ok) {
+      const text = `err: ${response.body.error.message}`;
+      const operation = response.body.error.details.current_operation;
+      const blockedState: ContextualOperationState = { kind: 'blocked', text, operation: normalizeCurrentOperationInfo(operation) };
+      contextualOperation = blockedState;
+      throw new Error(formatContextualOperation(blockedState));
+    }
     sources = (await apiClient().sources()).sources;
     return response.body;
   }
