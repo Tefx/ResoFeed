@@ -23,7 +23,7 @@
       --dark: #20231f;
       --dark-text: #e8e2d4;
       --payload: Newsreader, Georgia, "Times New Roman", serif;
-      --chrome: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --chrome: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -68,6 +68,21 @@
       line-height: 16px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+    }
+
+    .checkpoint-strip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 8px 12px;
+      margin: -8px 0 24px;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .checkpoint-strip code {
+      color: var(--text);
+      font-family: var(--chrome);
     }
 
     .panel {
@@ -839,8 +854,14 @@
       <div>
         <h1>RESOFEED</h1>
       </div>
-      <p class="subtitle">静态设计契约预览</p>
+      <p class="subtitle">静态设计契约预览 · Stitch checkpoint 2026-06-01</p>
     </header>
+
+    <aside class="checkpoint-strip" aria-label="Stitch checkpoint alignment note">
+      Stitch concrete-design inputs: <code>0363936b</code> main workspace, <code>2e38d6a8</code> auth/empty/menu/operation states,
+      <code>38c91458</code> Source Ledger matrix, <code>7e4d3cf9</code> bilingual responsive matrix. This local preview adopts only
+      constitutional-conformant details; persistent nav tabs, counts, icon-dependence, retry/job semantics, shadows, and animated loading are intentionally excluded.
+    </aside>
 
     <section class="panel">
       <div class="command-bar">

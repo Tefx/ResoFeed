@@ -23,8 +23,8 @@ colors:
   warning: "#7E5B00"
   success: "#276749"
 typography:
-  chrome: "500 14px/20px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
-  metadata: "500 12px/16px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
+  chrome: "500 14px/20px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
+  metadata: "500 12px/16px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
   feed-title: "600 18px/24px Newsreader, Georgia, 'Times New Roman', serif"
   feed-summary: "400 14px/20px Newsreader, Georgia, 'Times New Roman', serif"
   payload: "400 18px/28px Newsreader, Georgia, 'Times New Roman', serif"
@@ -235,7 +235,7 @@ components:
     padding: "{spacing.md}"
     rounded: "{rounded.none}"
   bracket-action:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
     typography: "{typography.chrome}"
     padding: "{spacing.sm}"
@@ -247,7 +247,7 @@ components:
     padding: "{spacing.sm}"
     rounded: "{rounded.none}"
   bracket-action-active:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
     typography: "{typography.chrome}"
     padding: "{spacing.sm}"
@@ -259,7 +259,7 @@ components:
     padding: "{spacing.sm}"
     rounded: "{rounded.none}"
   bracket-action-disabled:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
     typography: "{typography.chrome}"
     padding: "{spacing.sm}"
@@ -415,7 +415,7 @@ If a future non-web shell is created, it should inherit semantic labels (`src:`,
 Typography separates payload from chrome.
 
 - **Payload family:** `Newsreader, Georgia, 'Times New Roman', serif` for titles, summaries, and article body. This keeps the reading surface editorial without softening the tool.
-- **Chrome family:** `IBM Plex Mono` or equivalent monospace for source pills, timestamps, Steer input, URLs, diagnostics, and Source Ledger rows. This should read as an archival index, not terminal cosplay.
+- **Chrome family:** `JetBrains Mono`, with `IBM Plex Mono` or equivalent monospace fallback, for source pills, timestamps, Steer input, URLs, diagnostics, and Source Ledger rows. This should read as an archival index, not terminal cosplay. The 2026-06-01 Stitch checkpoint used JetBrains Mono in concrete screen HTML; local implementation may retain IBM Plex Mono only as a compatible fallback if font loading or bundle policy requires it.
 - **System fallback:** system sans may appear only for browser/platform controls that cannot reasonably use the chrome stack.
 
 Scale uses a strictly mathematical modular rhythm tied to the 4px/8px vertical grid. Line heights are explicitly calculated to hit exact pixel multiples (16, 20, 24, 28, 32, 40) ensuring vertical rhythm across the UI:
@@ -860,7 +860,7 @@ Do:
 - [SHARP] Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
 - [SHARP] Do represent heavy operation work with text replacement and the shared current-operation snapshot only: `[INGESTING...]`, `[FETCHING...]`, `[REPROCESSING...]`, `op: <kind>`, updated timestamps, conflict text, or raw `err:` diagnostics.
 - [SHARP] Do include current operation detail when an action is blocked; users must not see only `err: operation already running`.
-- Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment.
+- [SHARP] Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment. Rest/active/disabled bracket-action tokens use `{colors.surface}` as the explicit accessible paired background for `{colors.muted}` text; implementations may render optical transparency only when the inherited warm surface preserves the same contrast and does not resolve to transparent black.
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
@@ -970,6 +970,21 @@ Motion is functional, brief, and optional.
 ```
 
 Mobile structure: Steer command at bottom, feed as a touch-safe compact single column with inline metadata and one-line abstracts; item tap opens a full-screen Inspector route that becomes generous again for reading; Source Ledger opens as a flat full-screen list.
+
+## Stitch Design Checkpoint — 2026-06-01
+
+Latest Stitch source project: `projects/16485408683705488556` (`ResoFeed Design Improvement`). Durable ingestion record: [`docs/audits/stitch-design-ingestion-2026-06-01.md`](audits/stitch-design-ingestion-2026-06-01.md). The accepted concrete-screen set for local contract alignment is:
+
+| Stitch screen | Role in local contract | Local disposition |
+| --- | --- | --- |
+| `0363936b97974a199e9a559c939d46fc` — `ResoFeed Workbench - Main Workspace (Refined)` | Desktop feed + Inspector split-pane visual exploration. | Accept split-pane rhythm, warm archival palette, JetBrains Mono chrome, and 44px star target. Reject persistent top navigation/counts, Material-symbol structural icons, shadowed sticky header, and `[INGEST FEED]` global shortcut as canonical UI. |
+| `2e38d6a81f764f2f911477eab184daac` — `ResoFeed State Matrix — Auth, Empty, Menu, Operation States` | Owner token, first-use empty state, utility menu, and current-operation state exploration. | Accept terse state coverage. Reject overlay/menu shadow, warning icon dependency, and `[AUTHENTICATE]` copy; canonical token action remains `[SUBMIT]` and raw `err:` lines. |
+| `38c91458d5f942f0a885e1e46f4747fd` — `SOURCE LEDGER — State Matrix` | Source Ledger roster and operational state exploration. | Accept flat table/list density and operation cluster. Reject `[RETRY]`, `syncing...`, `animate-pulse`, persistent `OPERATIONS` nav, and second-order job/retry semantics. Canonical actions remain `[RUN INGEST]`, `[FETCH]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[DETAILS]`. |
+| `7e4d3cf967da4a34b476c4f656e57045` — `ResoFeed - Bilingual + Responsive Matrix` | Responsive/bilingual state coverage. | Accept as visual coverage input only when it preserves Feed/Inspector separation, Chinese generated content, literal source identifiers, and touch-safe mobile behavior. |
+| `0945e90ac2ce4b408576a0d3b063228f` — `ResoFeed Workbench - Editorial Atlas` | Broad editorial atlas board. | Reference for overall mood only; local component, navigation, and runtime constraints remain stricter than this atlas. |
+| `116c49ba79224f2fb04f1c0dbde52c09` — `ResoFeed Atlas Specification` | Stitch-generated inventory of page families. | Accept page-family inventory as non-authoritative summary: TODAY + INSPECTOR, SOURCE LEDGER, SEARCH RETRIEVAL, FULL INSPECTOR, OWNER TOKEN, FIRST USE EMPTY, RESOFEED MENU, CURRENT OPERATION. |
+
+This checkpoint is an input artifact, not a schema override. `docs/PRD.md`, `CONSTITUTION.md`, `docs/ARCHITECTURE.md`, this `docs/DESIGN.md`, and active contracts remain authoritative. If Stitch concrete screens conflict with constitutional constraints, this document adopts only the conforming design intent and records the rest as rejected drift.
 
 ## Trend / Platform Evidence
 

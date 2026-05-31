@@ -39,6 +39,13 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 - **Agent Handoffs:** Items delivered by external agents receive a subtle visual "Receipt Pill" but live within the same unified feed.
 - **The Source Ledger:** A barebones, flat list of subscribed URLs accessible via the `RESOFEED` menu. No folders, no tags, no drag-and-drop. It is a strictly read/delete/fetch text roster, not a settings dashboard. OPML imports are instantly flattened. Manual ingestion lives here only as lightweight bracket actions: global `[RUN INGEST]` in the ledger header and per-source `[FETCH]` on source rows. These actions must not become jobs, queues, retry dashboards, or activity ledgers.
 
+### 7.1 Stitch Checkpoint Interpretation (2026-06-01)
+Stitch's latest concrete boards add useful coverage, but they do not override the PRD/Constitution. Treat them as visual evidence to mine, not as runtime requirements.
+
+- **Adopt:** warm archival palette; tactile, flat editorial density; JetBrains Mono-style operational chrome; split Feed/Inspector workspace; Source Ledger as a dense roster; explicit auth/empty/menu/operation state boards; bilingual responsive coverage.
+- **Reject:** persistent SaaS-like nav tabs, counts as inbox pressure, `[INGEST FEED]` top-level shortcut outside Source Ledger semantics, structural Material icons, animated/pulsing loading, shadowed overlays, `[RETRY]` job semantics, and any copy implying settings/dashboard/provider/chat/RAG behavior.
+- **Canonical local reading:** the concrete boards should strengthen `docs/ui-preview.html` and `docs/DESIGN.md` by showing the surface families, while local contract language keeps the stricter no-drift boundaries.
+
 ## 8. Feed Lifecycle & Pagination
 - **Persistent Feed:** The feed is durable by default. There is no automatic expiration or midnight deletion mechanism. Users shouldn't lose their feed if they miss a few days.
 - **Time Grouping:** Items are grouped softly by time (e.g., "Today", "Yesterday", "Earlier") to aid orientation without creating an artificial deadline.
@@ -89,6 +96,16 @@ Typography separates "Payload" (content) from "Chrome" (utility):
 - **Inspector Pane:** The detailed reading view, containing the reading payload, inline item re-ingest controls, and a collapsed-by-default source evidence block.
 - **Source Ledger Row:** Flat source name, URL, adjacent fetch status, right-aligned bracket actions (`[FETCH]`, `[DELETE]`) that do not shift source metadata when the action text changes.
 - **Global Ingest Action:** Header-level `[RUN INGEST]` command paired with `last_ingest` status; it is a manual override for all sources, not a dashboard job monitor.
+
+### 12.1 Stitch Concrete Board Inventory
+The latest Stitch board set maps to local components as follows:
+
+- `Main Workspace (Refined)`: Feed Row, Resonate Button, Inspector Pane, collapsed source detail, item re-ingest affordance.
+- `State Matrix`: Owner Token Prompt, First-Use Empty State, RESOFEED Utility Menu, Current Operation conflict line.
+- `SOURCE LEDGER — State Matrix`: Source Ledger Row, Global Ingest Action, State Portability actions, raw source diagnostics.
+- `Bilingual + Responsive Matrix`: Mobile feed route, mobile Inspector route, bilingual generated-content labels, literal source identifiers.
+- `Editorial Atlas`: broad mood reference only; it does not loosen local component, navigation, or runtime constraints.
+- `Atlas Specification`: page-family inventory only; it is not an authorization to add new nav primitives or dashboards.
 
 ## 13. Functional Mapping (PRD to UI)
 | PRD Requirement | UI/UX Representation |
