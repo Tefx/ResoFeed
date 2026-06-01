@@ -8,7 +8,7 @@ This contract artifact translates the authoritative Stitch checkpoint and local 
 - `docs/ARCHITECTURE.md` — read. Key passages: §8 lines 2089-2113 place frontend implementation in `web/`, require `docs/DESIGN.md`, flat Source Ledger, bracket/manual controls, contextual current-operation feedback, and forbid Tailwind/component libraries plus dashboard/job/queue/history UI; §8 lines 2115-2123 require processing language chrome, literal source identifiers, desktop independent Feed/Inspector scroll, and mobile full-screen Inspector route; §8 lines 2125-2134 scope item re-ingest to Inspector and inline text states only.
 - `docs/DESIGN.md` — read. Key passages: lines 373-392 describe archival-index chrome, dense-but-legible surfaces, Chinese Inspector sections, and no jobs/queues/history/dashboard state; lines 396-409 define warm near-monochrome palette and rare Resonate accent; lines 413-436 specify JetBrains Mono-first chrome and stable wrapping/clamping; lines 438-480 define desktop/mobile layout, 640-760px Feed, 420-560px Inspector, split-scroll, and mobile full-screen Inspector; lines 620-647 define compact Feed rows and selected 3px non-layout-shifting marker; lines 649-663 define 44px Resonate target with non-color star semantics; lines 672-688 define Inspector `摘要` / `核心洞察` / `要点`; lines 739-798 define flat Source Ledger, bracket actions, inline operation status, and no job/retry/sync drift; lines 974-987 define the Stitch Design Checkpoint dispositions.
 - `docs/audits/stitch-design-ingestion-2026-06-01.md` — read. Key passages: lines 5-16 declare Stitch as evidence, not product authority; lines 27-42 accept warm archival palette, fixed grid, no shadows, bracket actions, 44px star, JetBrains Mono chrome, and reject Material/icon/SaaS drift; lines 46-53 inventory concrete Stitch screens and dispositions; lines 66-84 list accepted deltas and rejected drift.
-- `web/tests/e2e/stitch-runtime-ingestion-matrix.expected-red.spec.ts` — read. Key passages: lines 105-181 already encode expected-red DOM probes for owner token/first-use copy, low-chrome menu, Feed not showing Key Points, Inspector structured sections, lexical search, Source Ledger conflict details, and rejected retry/sync/pulse/icon drift.
+- `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts` — read. Key passages: lines 152-229 encode the reviewed expected-red runtime contract. Requirement IDs are embedded in assertion labels/comments: `DESIGN.CHROME.MONO`, `DESIGN.FEED.COMPACT`, and `DESIGN.RESONATE.44` at lines 153-170; `DESIGN.INSPECTOR.SECTIONS` and `ARCH.MOBILE.INSPECTOR.ROUTE` at lines 173-188; `ARCH.SOURCE_LEDGER.BRACKET`, `DESIGN.SOURCE_LEDGER.FLAT`, and `CONSTITUTION.NO.DURABLE.OPERATIONS` at lines 191-208; `STITCH.REJECT.TOP_NAV.COUNTS.INGEST`, `STITCH.REJECT.RETRY.SYNC.PULSE`, `STITCH.REJECT.ICON.SHADOW`, and `ARCH.NO.JOBS.QUEUES.HISTORY` at lines 211-227.
 
 ## Requirement-to-Checklist Traceability Matrix
 
@@ -62,5 +62,28 @@ This contract artifact translates the authoritative Stitch checkpoint and local 
 ## Contract Purity
 
 - production_files_modified: none expected.
-- test_or_contract_files_modified:
+- reviewed_test_or_contract_artifacts:
   - `web/tests/e2e/traceability-gap-matrix.md`
+  - `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts`
+- stale_artifact_routing_guard: `web/tests/e2e/stitch-runtime-ingestion-matrix.expected-red.spec.ts` is not the artifact under review for this contract-readiness pass; implementation and gate review must use `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts`.
+
+## Expected-Red Gate Disposition
+
+- targeted_expected_red_artifact: `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts`
+- latest_targeted_expected_red_run:
+  - command: `npm --prefix web run test:e2e -- expected-red-runtime-ui-refresh-gaps.spec.ts`
+  - hydrated_context: worktree-local `npm --prefix web install` completed with no git-tracked dependency churn; Playwright executed Chromium tests and reached assertions.
+  - observed_result: 2 failed / 2 passed; failure output came from Playwright `expect.soft` assertions, not package import, browser install, or environment setup.
+  - assertion_level_red_failures:
+    - `DESIGN.CHROME.MONO computed_font_family_chrome` — expected JetBrains Mono-first stack; received IBM Plex Mono-first stack.
+    - `DESIGN.FEED.COMPACT row_height_density_metrics` — expected row height `<= 112`; received `116`.
+    - `DESIGN.FEED.COMPACT no Inspector-only section labels in Feed` — Feed row contained Inspector-only `核心洞察` label text.
+    - `ARCH.MOBILE.INSPECTOR.ROUTE mobile_route_inspector_fullscreen_width` — expected Inspector width `>= 360`; received `342`.
+  - environmental_failures: none.
+  - gate_open_allowed: true — expected-red failures are assertion-level, requirement-mapped visible UI gaps owned by downstream runtime implementation; this remediation must not make them green.
+- expected_red_requirement_mapping:
+  - `DESIGN.CHROME.MONO` / `DESIGN.FEED.COMPACT` / `DESIGN.RESONATE.44` — desktop Feed chrome, compact row, and star hit-target assertions in `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts:153-170`.
+  - `DESIGN.INSPECTOR.SECTIONS` / `ARCH.MOBILE.INSPECTOR.ROUTE` — mobile full-screen Inspector and structured Chinese section assertions in `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts:173-188`.
+  - `ARCH.SOURCE_LEDGER.BRACKET` / `DESIGN.SOURCE_LEDGER.FLAT` / `CONSTITUTION.NO.DURABLE.OPERATIONS` — Source Ledger bracket controls and inline operation language assertions in `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts:191-208`.
+  - `STITCH.REJECT.TOP_NAV.COUNTS.INGEST` / `STITCH.REJECT.RETRY.SYNC.PULSE` / `STITCH.REJECT.ICON.SHADOW` / `ARCH.NO.JOBS.QUEUES.HISTORY` — negative drift assertions in `web/tests/e2e/expected-red-runtime-ui-refresh-gaps.spec.ts:211-227`.
+- gate_open_policy: `gate_open_allowed` may be true only when the targeted expected-red run reaches Playwright assertion evaluation and any red failures are requirement-mapped visible UI gaps owned by downstream runtime implementation; false if the run fails before assertions, cites stale artifacts, or produces unmapped/environmental failures.
