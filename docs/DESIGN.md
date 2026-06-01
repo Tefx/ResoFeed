@@ -829,7 +829,7 @@ Accessibility: diagnostics output uses a labelled `status`/`log` region. Long li
 
 Purpose: retrieve corpus by keyword/plain text, source, time, and resonance status. This surface is not a RAG chat or semantic answer engine.
 
-Anatomy: query field may reuse Steer chrome or a dedicated search field if implementation separates modes; results use feed-item anatomy with extra match/provenance line. States: empty query, loading, no results, partial results, error. Results must explain enough provenance to verify the match.
+Anatomy: query field may reuse Steer chrome or a dedicated search field if implementation separates modes; results use feed-item anatomy with extra match/provenance line. Search uses exactly one submit affordance in the active form; it is a low-chrome bracket action with an accessible name equivalent to `submit search` even when the visible label is localized. States: empty query, loading, no results, partial results, error. Results must explain enough provenance to verify the match.
 
 Search result click/Inspector contract:
 
