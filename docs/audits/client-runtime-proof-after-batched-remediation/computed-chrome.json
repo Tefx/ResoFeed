@@ -1,0 +1,50 @@
+{
+  "computedChrome": {
+    "main.contract-shell": {
+      "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "20px",
+      "letterSpacing": "normal"
+    },
+    "details.surface-nav summary": {
+      "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "lineHeight": "16px",
+      "letterSpacing": "0.96px"
+    },
+    ".source-ledger": {
+      "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "20px",
+      "letterSpacing": "normal"
+    },
+    ".source-ledger__row": {
+      "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "20px",
+      "letterSpacing": "normal"
+    },
+    ".bracket-action": {
+      "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "20px",
+      "letterSpacing": "0.28px"
+    },
+    "input[aria-label=\"Steer or paste RSS URL\"]": null
+  },
+  "selectedRowMarker": {
+    "firstRowClass": "contract-feed-item",
+    "rowMarker": {
+      "className": "contract-feed-item",
+      "borderLeftWidth": "0px",
+      "beforeWidth": "3px",
+      "beforeBackground": "rgb(59, 62, 55)",
+      "beforeContent": "\"\""
+    }
+  }
+}

@@ -1,0 +1,5 @@
+$ go build -o /Users/tefx/Projects/ResoFeed/.vectl/worktrees/client-runtime-proof-after-batched-remediation/.test-artifacts/client-runtime-proof-after-batched-remediation/bin/resofeed ./cmd/resofeed
+exit=0
+--- stdout ---
+
+--- stderr ---

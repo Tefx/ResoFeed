@@ -1,0 +1,30 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: Steer or paste RSS URL
+    - textbox "导向或粘贴 RSS URL / Steer or paste RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "导向路由预览"
+  - text: 导向路由预览 需要 URL
+  - status "Steer receipt": TODAY 已打开
+  - region "TODAY surface independent scroll":
+    - text: 独立滚动区域
+    - paragraph: TODAY feed
+    - region "今日订阅条目 / Today feed items":
+      - text: 今日订阅条目 / Today feed items
+      - list "今日订阅条目 / Today feed items":
+        - listitem:
+          - 'button "打开检查器：后修复结构化洞察条目 / Open Inspector for: 后修复结构化洞察条目"':
+            - paragraph: "src: Post Remediation Runtime Source 来源标题：Post remediation structured insight item TODAY"
+            - paragraph: 后修复结构化洞察条目
+            - paragraph: 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。
+          - 'button "取消星标：后修复结构化洞察条目 / Remove resonance: 后修复结构化洞察条目" [pressed]': ★
+        - listitem:
+          - 'button "打开检查器：后修复结构化洞察条目 / Open Inspector for: 后修复结构化洞察条目"':
+            - paragraph: "src: Post Remediation Runtime Source 来源标题：Post remediation second compact row"
+            - paragraph: 后修复结构化洞察条目
+            - paragraph: 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。
+          - 'button "标星：后修复结构化洞察条目 / Resonate item: 后修复结构化洞察条目"': ☆

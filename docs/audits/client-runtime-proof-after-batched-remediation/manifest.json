@@ -1,0 +1,457 @@
+{
+  "launchedAt": "2026-06-01T10:45:26.743Z",
+  "completedAt": "2026-06-01T10:45:32.795Z",
+  "postRemediationContext": {
+    "gitHead": "fb369ff322daaba4d6e38dd872f9df5ceb2a35aa",
+    "gitBranch": "vectl/step-client-runtime-proof-after-batched-remediation",
+    "recentCommits": [
+      "fb369ff3 mcp: claim step client-runtime-proof-after-batched-remediation by client-runtime-verifier",
+      "ec9bace5 mcp: complete step retest-green-runtime-ui-after-batched-remediation",
+      "3c2a0edd mcp: deterministic checklist retest-green-runtime-ui-after-batched-remediation",
+      "33233be9 mcp: claim step retest-green-runtime-ui-after-batched-remediation by integration-verifier",
+      "cf06d5ce mcp: complete step batched-broad-e2e-ui-remediation"
+    ],
+    "staleArtifactReuse": false,
+    "upstreamCompletedBeforeHead": [
+      "batched-broad-e2e-ui-remediation",
+      "retest-green-runtime-ui-after-batched-remediation"
+    ]
+  },
+  "launch": {
+    "buildCommands": [
+      {
+        "command": "npm --prefix web run build",
+        "exitCode": 0,
+        "logPath": "docs/audits/client-runtime-proof-after-batched-remediation/npm-build.log"
+      },
+      {
+        "command": "go build -o /Users/tefx/Projects/ResoFeed/.vectl/worktrees/client-runtime-proof-after-batched-remediation/.test-artifacts/client-runtime-proof-after-batched-remediation/bin/resofeed ./cmd/resofeed",
+        "exitCode": 0,
+        "logPath": "docs/audits/client-runtime-proof-after-batched-remediation/go-build.log"
+      }
+    ],
+    "serveCommand": ".test-artifacts/client-runtime-proof-after-batched-remediation/bin/resofeed serve --addr 127.0.0.1:56576 --public-url http://127.0.0.1:56576 --db .test-artifacts/client-runtime-proof-after-batched-remediation/fixtures/runtime-proof-1780310731413.sqlite3 --owner-token <redacted>",
+    "url": "http://127.0.0.1:56576",
+    "routes": [
+      "/",
+      "/api/runtime/language",
+      "/api/sources",
+      "/api/feed/today",
+      "/api/runtime/operation"
+    ],
+    "viewports": {
+      "desktop": {
+        "width": 1280,
+        "height": 720
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    "fixtureFeedURL": "http://127.0.0.1:56574/runtime-proof-feed.xml",
+    "openRouterEndpoint": "http://127.0.0.1:56575",
+    "logs": {
+      "stdout": "docs/audits/client-runtime-proof-after-batched-remediation/resofeed-serve.stdout.log",
+      "stderr": "docs/audits/client-runtime-proof-after-batched-remediation/resofeed-serve.stderr.log"
+    }
+  },
+  "apiState": {
+    "language": {
+      "language": {
+        "code": "zh",
+        "label": "中文"
+      },
+      "already_applied": false
+    },
+    "feedItemCount": 2,
+    "sourceCount": 1,
+    "operation": {
+      "operation": {
+        "running": false,
+        "kind": null,
+        "actor_kind": null,
+        "phase": null,
+        "count": null,
+        "message": null,
+        "started_at": null,
+        "updated_at": null
+      }
+    }
+  },
+  "artifacts": {
+    "desktopSourceLedgerImported": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-imported.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-imported.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-imported.aria.txt",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL SOURCE LEDGER 已打开 SOURCE LEDGER 上次抓取: 未运行 [运行抓取] [导入 OPML] [导出状态] [导入状态] 状态 JSON 导入输入 导入会替换活动来源、规则和星标 已导入 1 个来源；文件夹已扁平化 src: Post Remediation Runtime Source · status: not_fetched · 上次抓取: 未抓取 url: http://127.0.0.1:56574/runtime-proof-feed.xml 上次抓取: 未抓取 [抓取] [删除] [详情]"
+    },
+    "desktopSourceLedger": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-after-ingest.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-after-ingest.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-source-ledger-after-ingest.aria.txt",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL SOURCE LEDGER 已打开 SOURCE LEDGER 上次抓取: 10:45:32 [运行抓取] [导入 OPML] [导出状态] [导入状态] 状态 JSON 导入输入 导入会替换活动来源、规则和星标 已导入 1 个来源；文件夹已扁平化 src: Post Remediation Runtime Source · status: ok · 上次抓取: 10:45:32 url: http://127.0.0.1:56574/runtime-proof-feed.xml 上次抓取: 10:45:32 [抓取] [删除] [详情]"
+    },
+    "desktopFeed": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-feed-before-selection.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-feed-before-selection.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-feed-before-selection.aria.txt",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL TODAY 已打开 独立滚动区域 TODAY feed 今日订阅条目 / Today feed items src: Post Remediation Runtime Source · 来源标题：Post remediation structured insight item · 1m · 来源摘录 · 模型支持 · 价值: high TODAY 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆ src: Post Remediation Runtime Source · 来源标题：Post remediation second compact row · 1h · 来源摘录 · 模型支持 · 价值: high 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆ 检查器 src: Post Remediation Runtime Source · 来源摘录 · high 后修复结构化洞察条目 来源标题：Post remediation structured insight item 原文链接 https://post-remediation.example.test/items/structured 条目 URL https://post-remediation.example.test/items/structured 来源 URL http://127.0.0.1:56574/runtime-proof-feed.xml 来源文本：仅 RSS 摘录 · 摘要来源：模型支持 摘要来源：模型支持 · quality: high 来源文本：仅 RSS 摘录 摘要： 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器"
+    },
+    "desktopInspector": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-inspector-selected.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-inspector-selected.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-inspector-selected.aria.txt",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL TODAY 已打开 独立滚动区域 TODAY feed 今日订阅条目 / Today feed items src: Post Remediation Runtime Source · 来源标题：Post remediation structured insight item · 1m · 来源摘录 · 模型支持 · 价值: high TODAY 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆ src: Post Remediation Runtime Source · 来源标题：Post remediation second compact row · 1h · 来源摘录 · 模型支持 · 价值: high 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆ 检查器 src: Post Remediation Runtime Source · 来源摘录 · high 后修复结构化洞察条目 来源标题：Post remediation structured insight item 原文链接 https://post-remediation.example.test/items/structured 条目 URL https://post-remediation.example.test/items/structured 来源 URL http://127.0.0.1:56574/runtime-proof-feed.xml 来源文本：仅 RSS 摘录 · 摘要来源：模型支持 摘要来源：模型支持 · quality: high 来源文本：仅 RSS 摘录 摘要： 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器"
+    },
+    "interaction": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-interaction-resonated.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-interaction-resonated.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/desktop-interaction-resonated.aria.txt",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL TODAY 已打开 独立滚动区域 TODAY feed 今日订阅条目 / Today feed items src: Post Remediation Runtime Source · 来源标题：Post remediation structured insight item · 1m · 来源摘录 · 模型支持 · 价值: high TODAY 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ★ src: Post Remediation Runtime Source · 来源标题：Post remediation second compact row · 1h · 来源摘录 · 模型支持 · 价值: high 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆ 检查器 src: Post Remediation Runtime Source · 来源摘录 · high 后修复结构化洞察条目 来源标题：Post remediation structured insight item 原文链接 https://post-remediation.example.test/items/structured 条目 URL https://post-remediation.example.test/items/structured 来源 URL http://127.0.0.1:56574/runtime-proof-feed.xml 来源文本：仅 RSS 摘录 · 摘要来源：模型支持 摘要来源：模型支持 · quality: high 来源文本：仅 RSS 摘录 摘要： 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器"
+    },
+    "computedChrome": {
+      "main.contract-shell": {
+        "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "lineHeight": "20px",
+        "letterSpacing": "normal"
+      },
+      "details.surface-nav summary": {
+        "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+        "fontSize": "12px",
+        "fontWeight": "500",
+        "lineHeight": "16px",
+        "letterSpacing": "0.96px"
+      },
+      ".source-ledger": {
+        "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "lineHeight": "20px",
+        "letterSpacing": "normal"
+      },
+      ".source-ledger__row": {
+        "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "lineHeight": "20px",
+        "letterSpacing": "normal"
+      },
+      ".bracket-action": {
+        "fontFamily": "\"JetBrains Mono\", \"IBM Plex Mono\", SFMono-Regular, Consolas, \"Liberation Mono\", monospace",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "lineHeight": "20px",
+        "letterSpacing": "0.28px"
+      },
+      "input[aria-label=\"Steer or paste RSS URL\"]": null
+    },
+    "selectedRowMarker": {
+      "firstRowClass": "contract-feed-item",
+      "rowMarker": {
+        "className": "contract-feed-item",
+        "borderLeftWidth": "0px",
+        "beforeWidth": "3px",
+        "beforeBackground": "rgb(59, 62, 55)",
+        "beforeContent": "\"\""
+      }
+    },
+    "mobileFeed": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-feed.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-feed.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-feed.aria.txt",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL TODAY 已打开 独立滚动区域 TODAY feed 今日订阅条目 / Today feed items src: Post Remediation Runtime Source 来源标题：Post remediation structured insight item · · TODAY 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ★ src: Post Remediation Runtime Source 来源标题：Post remediation second compact row · · 后修复结构化洞察条目 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 ☆"
+    },
+    "mobileInspector": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-inspector.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-inspector.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-inspector.aria.txt",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL TODAY 已打开 返回 TODAY 检查器 src: Post Remediation Runtime Source · 来源摘录 · high ★ 后修复结构化洞察条目 来源标题：Post remediation structured insight item 原文链接 https://post-remediation.example.test/items/structured 条目 URL https://post-remediation.example.test/items/structured 来源 URL http://127.0.0.1:56574/runtime-proof-feed.xml 来源文本：仅 RSS 摘录 · 摘要来源：模型支持 摘要来源：模型支持 · quality: high 来源文本：仅 RSS 摘录 摘要： 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 核心洞察： 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。 要点： 信息流保留来源、时间与摘要，适合快速扫描。 检查器按照摘要、核心洞察、要点的顺序呈现结构化内容。 来源台账保留扁平括号操作和当前操作状态区域。 本文重处理 [重新处理本文] 来源摘录： 来源详情 为什么：来自已配置来源的新条目"
+    },
+    "mobileSourceLedger": {
+      "screenshot": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-source-ledger.png",
+      "dom": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-source-ledger.dom.html",
+      "aria": "docs/audits/client-runtime-proof-after-batched-remediation/mobile-source-ledger.aria.txt",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "visibleTextSample": "跳到订阅流 Steer or paste RSS URL > RESOFEED 导向路由预览 需要 URL SOURCE LEDGER 已打开 返回 TODAY SOURCE LEDGER 上次抓取: 10:45:32 [运行抓取] [导入 OPML] [导出状态] [导入状态] 状态 JSON 导入输入 导入会替换活动来源、规则和星标 已导入 1 个来源；文件夹已扁平化 src: Post Remediation Runtime Source · status: ok · 上次抓取: 10:45:32 url: http://127.0.0.1:56574/runtime-proof-feed.xml 上次抓取: 10:45:32 [抓取] [删除] [详情]"
+    }
+  },
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    }
+  ],
+  "network": [
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/language",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/openrouter-models",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/language",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/openrouter-models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today?limit=50",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/steer/active",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "/api/runtime/language",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "/api/runtime/language",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/language",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/openrouter-models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today?limit=50",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/steer/active",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/steer/preview",
+      "status": 500
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/operation",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/sources/import-opml",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/ingest",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/steer/preview",
+      "status": 500
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/steer/active",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/items/item_7f3ce25932e83f40dc2c5b8014100e35/inspect",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/items/item_7f3ce25932e83f40dc2c5b8014100e35",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/items/item_7f3ce25932e83f40dc2c5b8014100e35/resonance",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/steer/preview",
+      "status": 500
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/steer/active",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/items/item_7f3ce25932e83f40dc2c5b8014100e35/inspect",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/items/item_7f3ce25932e83f40dc2c5b8014100e35",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "/api/steer/preview",
+      "status": 500
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/operation",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/operation",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/runtime/language",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/feed/today?limit=10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "/api/sources",
+      "status": 200
+    }
+  ]
+}

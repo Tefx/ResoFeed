@@ -1,0 +1,71 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: Steer or paste RSS URL
+    - textbox "导向或粘贴 RSS URL / Steer or paste RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "导向路由预览"
+  - text: 导向路由预览 需要 URL
+  - status "Steer receipt": TODAY 已打开
+  - region "TODAY surface independent scroll":
+    - text: 独立滚动区域
+    - paragraph: TODAY feed
+    - region "今日订阅条目 / Today feed items":
+      - text: 今日订阅条目 / Today feed items
+      - list "今日订阅条目 / Today feed items":
+        - listitem:
+          - 'button "打开检查器：后修复结构化洞察条目 / Open Inspector for: 后修复结构化洞察条目"':
+            - paragraph: "src: Post Remediation Runtime Source 来源标题：Post remediation structured insight item 1m 来源摘录 模型支持 价值: high TODAY"
+            - paragraph: 后修复结构化洞察条目
+            - paragraph: 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。
+          - 'button "取消星标：后修复结构化洞察条目 / Remove resonance: 后修复结构化洞察条目" [pressed]': ★
+        - listitem:
+          - 'button "打开检查器：后修复结构化洞察条目 / Open Inspector for: 后修复结构化洞察条目"':
+            - paragraph: "src: Post Remediation Runtime Source 来源标题：Post remediation second compact row 1h 来源摘录 模型支持 价值: high"
+            - paragraph: 后修复结构化洞察条目
+            - paragraph: 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。 · 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。
+          - 'button "标星：后修复结构化洞察条目 / Resonate item: 后修复结构化洞察条目"': ☆
+  - region "INSPECTOR independent scroll":
+    - complementary "INSPECTOR":
+      - complementary "后修复结构化洞察条目":
+        - paragraph: 检查器
+        - paragraph: "src: Post Remediation Runtime Source · 来源摘录 · high"
+        - heading "后修复结构化洞察条目" [level=2]
+        - paragraph
+        - paragraph: 来源标题：Post remediation structured insight item
+        - paragraph:
+          - link "原文链接 / original link":
+            - /url: https://post-remediation.example.test/items/structured
+            - text: 原文链接
+        - term: 条目 URL
+        - definition:
+          - link "https://post-remediation.example.test/items/structured":
+            - /url: https://post-remediation.example.test/items/structured
+        - term: 来源 URL
+        - definition:
+          - link "http://127.0.0.1:56574/runtime-proof-feed.xml":
+            - /url: http://127.0.0.1:56574/runtime-proof-feed.xml
+        - paragraph: 来源文本：仅 RSS 摘录 · 摘要来源：模型支持
+        - paragraph: "摘要来源：模型支持 · quality: high"
+        - paragraph: 来源文本：仅 RSS 摘录
+        - region "摘要":
+          - paragraph: 摘要：
+          - paragraph: 后修复运行时证据显示，真实网页应用已加载紧凑信息流、结构化检查器与来源台账。
+        - region "核心洞察":
+          - paragraph: 核心洞察：
+          - paragraph: 这条证据证明批量修复后的界面不是空壳，而是可交互的真实运行时。
+        - region "要点":
+          - paragraph: 要点：
+          - list:
+            - listitem: 信息流保留来源、时间与摘要，适合快速扫描。
+            - listitem: 检查器按照摘要、核心洞察、要点的顺序呈现结构化内容。
+            - listitem: 来源台账保留扁平括号操作和当前操作状态区域。
+        - region "Item re-ingest":
+          - paragraph: 本文重处理
+          - button "[重新处理本文]"
+        - group "来源文本": 来源摘录：
+        - group "来源详情"
+        - paragraph: 为什么：来自已配置来源的新条目

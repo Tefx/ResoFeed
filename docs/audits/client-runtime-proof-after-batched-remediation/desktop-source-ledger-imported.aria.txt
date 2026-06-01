@@ -1,0 +1,31 @@
+- main "RESOFEED":
+  - link "跳到订阅流":
+    - /url: "#today-feed"
+  - form "导向":
+    - text: Steer or paste RSS URL
+    - textbox "导向或粘贴 RSS URL / Steer or paste RSS URL":
+      - /placeholder: 导向或粘贴 RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "导向路由预览"
+  - text: 导向路由预览 需要 URL
+  - status "Steer receipt": SOURCE LEDGER 已打开
+  - region "SOURCE LEDGER 表面":
+    - region "SOURCE LEDGER":
+      - heading "SOURCE LEDGER" [level=1]
+      - text: "上次抓取: 未运行"
+      - button "[运行抓取]"
+      - button "[导入 OPML]"
+      - group "状态可携带性":
+        - button "[导出状态]"
+        - button "[导入状态]"
+        - text: 状态 JSON 导入输入
+        - button "状态 JSON 导入输入"
+        - text: 导入会替换活动来源、规则和星标
+      - text: 已导入 1 个来源；文件夹已扁平化
+      - list:
+        - listitem:
+          - text: "src: Post Remediation Runtime Source · status: not_fetched · 上次抓取: 未抓取 url: http://127.0.0.1:56574/runtime-proof-feed.xml 上次抓取: 未抓取"
+          - button "[抓取] 抓取来源 Post Remediation Runtime Source": "[抓取]"
+          - button "删除来源：Post Remediation Runtime Source": "[删除]"
+          - group: "[详情]"
