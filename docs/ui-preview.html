@@ -106,6 +106,7 @@
       min-height: 44px;
       display: flex;
       align-items: center;
+      gap: 8px;
       padding: 0 14px;
       border: 1px solid var(--border);
       background: var(--background);
@@ -118,6 +119,46 @@
       content: ">";
       color: var(--focus);
       margin-right: 8px;
+    }
+
+    .steer input {
+      appearance: none;
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      padding: 0;
+      outline: 0;
+    }
+
+    .steer input::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+
+    .steer:focus-within {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .steer-submit {
+      appearance: none;
+      min-width: 44px;
+      min-height: 44px;
+      border: 0;
+      background: transparent;
+      color: var(--focus);
+      font: inherit;
+      padding: 0;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .steer-submit:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
     }
 
     .brand {
@@ -221,17 +262,26 @@
     .desktop {
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) 480px;
+      height: 680px;
       min-height: 680px;
     }
 
     .feed {
       padding: 24px;
       border-right: 1px solid var(--border);
+      overflow-y: auto;
     }
 
     .inspector {
       padding: 32px;
       background: var(--surface);
+      overflow-y: auto;
+    }
+
+    .feed:focus-visible,
+    .inspector:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: -2px;
     }
 
     .section-label {
@@ -336,22 +386,50 @@
     .pill.agent { color: var(--focus); }
 
     .item-head {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 44px;
       gap: 12px;
       align-items: start;
     }
 
+    .item-copy {
+      grid-column: 1;
+      min-width: 0;
+    }
+
+    .item-activate {
+      appearance: none;
+      position: absolute;
+      z-index: 1;
+      inset: 0 56px 0 0;
+      min-height: 44px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .item-activate:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
     .item-title {
+      display: block;
       font-family: var(--payload);
       font-size: 18px;
       line-height: 24px;
       letter-spacing: -0.01em;
       font-weight: 600;
-      margin-bottom: 4px;
+      margin: 0 0 4px;
     }
 
     .summary {
+      margin: 0;
       max-width: 66ch;
       color: var(--muted);
       font-family: var(--payload);
@@ -361,6 +439,12 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .star {
+      position: relative;
+      z-index: 2;
+      grid-column: 2;
     }
     
     @media (max-width: 1079px) {
@@ -395,7 +479,7 @@
       font-size: 28px;
       line-height: 32px;
       letter-spacing: -0.02em;
-      margin: 12px 0 24px;
+      margin: 0 0 12px;
     }
 
     .rule {
@@ -480,6 +564,44 @@
       line-height: 16px;
     }
 
+    .frontmatter {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 4px 16px;
+      margin: 0 0 18px;
+      padding: 8px 0 12px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--chrome);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .frontmatter dt {
+      margin: 0;
+      color: var(--muted);
+      text-align: right;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .frontmatter dd {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .frontmatter a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .frontmatter a:hover {
+      color: var(--text);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
     .reingest-panel {
       margin: 16px 0;
       padding: 16px;
@@ -506,6 +628,14 @@
       line-height: 16px;
     }
 
+    .reingest-panel__helper {
+      grid-column: 2;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+      margin-top: -4px;
+    }
+
     .reingest-panel select,
     .reingest-panel textarea {
       width: 100%;
@@ -517,6 +647,10 @@
       line-height: 20px;
       padding: 8px;
       border-radius: 4px;
+    }
+
+    .reingest-panel select {
+      min-height: 44px;
     }
 
     .reingest-panel textarea {
@@ -594,7 +728,7 @@
 
     .source-ledger__header {
       display: grid;
-      grid-template-columns: minmax(160px, 1fr) auto auto;
+      grid-template-columns: minmax(160px, 1fr) minmax(0, 2fr) auto;
       align-items: baseline;
       gap: 16px;
       padding: 0 0 8px;
@@ -612,6 +746,10 @@
 
     .source-ledger__header .source-ledger__status {
       justify-self: end;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .source-ledger__header .bracket-action--run-ingest {
@@ -634,7 +772,7 @@
 
     .source-ledger__row {
       display: grid;
-      grid-template-columns: 124px minmax(180px, 1fr) 190px minmax(176px, auto);
+      grid-template-columns: 124px minmax(180px, 1fr) 190px minmax(264px, auto);
       align-items: baseline;
       gap: 16px;
       min-height: 44px;
@@ -658,7 +796,7 @@
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      min-width: 176px;
+      min-width: 264px;
       white-space: nowrap;
     }
 
@@ -699,6 +837,7 @@
       background: transparent;
       color: var(--muted);
       cursor: default;
+      opacity: 1;
     }
 
     .bracket-action[disabled]:hover,
@@ -727,12 +866,15 @@
     }
 
     .mobile-card {
-      width: 390px;
+      width: min(390px, 100%);
+      max-width: 100%;
+      height: min(720px, calc(100dvh - 48px));
       min-height: 640px;
       background: var(--surface);
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .mobile-header {
@@ -768,6 +910,9 @@
     .mobile-feed {
       padding: 16px 20px 20px;
       flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .mobile-feed .item {
@@ -788,10 +933,14 @@
     .mobile-detail {
       padding: 24px 24px 32px;
       flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .back-action {
       appearance: none;
+      min-width: 44px;
       min-height: 44px;
       border: 0;
       background: transparent;
@@ -829,22 +978,77 @@
     }
 
     .mobile-steer {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      flex: 0 0 auto;
       border-top: 1px solid var(--border);
-      padding: 12px;
+      padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
       background: var(--surface);
     }
 
     .mobile-steer .steer { width: 100%; }
 
+    @media (max-width: 1279px) {
+      .secondary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .source-ledger__header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 16px;
+      }
+
+      .source-ledger__header .source-ledger__status {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-self: start;
+      }
+
+      .source-ledger__row {
+        grid-template-columns: minmax(96px, max-content) minmax(0, 1fr);
+        gap: 4px 16px;
+      }
+
+      .source-ledger__url,
+      .source-ledger__status {
+        min-width: 0;
+      }
+
+      .source-ledger__actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        min-width: 0;
+        white-space: normal;
+      }
+    }
+
     @media (max-width: 1079px) {
       .page { padding: 20px; }
-      .desktop { display: block; }
+      .desktop { display: block; height: auto; min-height: 0; }
       .feed { border-right: 0; border-bottom: 1px solid var(--border); display: block; }
       .inspector { display: none; } /* Inspector becomes a separate route on narrow screens */
       .secondary-grid { grid-template-columns: 1fr; }
       .source-ledger__header,
       .source-ledger__row { grid-template-columns: 1fr; gap: 4px; }
-      .source-ledger__actions { justify-content: flex-start; }
+      .source-ledger__header .source-ledger__status { justify-self: start; }
+      .source-ledger .source-ledger__url,
+      .source-ledger .source-ledger__status {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        overflow: hidden;
+        text-overflow: clip;
+      }
+      .source-ledger__actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        min-width: 0;
+        white-space: normal;
+      }
     }
   </style>
 </head>
@@ -865,7 +1069,10 @@
 
     <section class="panel">
       <div class="command-bar">
-        <div class="steer">搜索 重处理失败 保留要点</div>
+        <form class="steer" role="search" aria-label="Steer command input preview">
+          <input id="preview-steer" name="steer" type="text" value="搜索 重处理失败 保留要点" aria-label="Steer command or RSS URL" />
+          <button class="steer-submit" type="submit" aria-label="提交 Steer 命令">[提交]</button>
+        </form>
         <div class="chrome-actions">
           <button class="brand" type="button" aria-expanded="true" aria-controls="preview-utility-menu">RESOFEED</button>
         </div>
@@ -881,94 +1088,95 @@
           <button class="bracket-action" type="button" aria-label="处理语言：中文；切换到英文">语言: 中文</button>
           <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
           <span class="runtime-warning utility-menu__note">已存可读内容将被重写。</span>
-          <span class="utility-menu__note" translate="no">Source identifiers remain unchanged.</span>
+          <span class="utility-menu__note">来源标识保持不变。</span>
         </div>
       </div>
       <div class="search-contract-strip" aria-label="Search selection contract preview">
         <span>搜索 · <span class="search-contract-query">q: 重处理失败</span> · 3 条结果 · 选中项打开 INSPECTOR</span>
-        <button class="bracket-action" type="button" aria-label="submit search">[搜索]</button>
+        <span aria-hidden="true">搜索由上方 Steer 表单提交</span>
         <span>桌面保留列表、查询和滚动位置</span>
       </div>
       <div class="desktop">
-        <section class="feed" aria-label="搜索结果预览（馈送不显示要点）">
-          <div class="section-label">今日</div>
-
+        <section class="feed" aria-label="搜索结果预览（独立可滚动馈送，不显示要点）" tabindex="0">
           <article class="item selected" aria-current="true">
-            <div class="meta-row">
-              <span class="pill" translate="no">src: TLDR AI Feed</span>
-              <span class="pill">2h</span>
-              <span class="pill">全文</span>
-              <span class="group-badge">今日</span>
-            </div>
             <div class="item-head">
-              <div>
-                <h2 class="item-title">跨境 AI 并购遭遇监管回撤</h2>
-                <p class="summary">中文摘要预览保持紧凑，帮助快速判断价值；结构化要点只在检查器中显示。</p>
+              <div class="item-copy">
+                <span class="meta-row" id="desktop-feed-item-1-meta">
+                  <span class="pill" translate="no">TLDR AI FEED</span>
+                  <span class="pill">1m</span>
+                  <span class="pill">全文</span>
+                  <span class="pill">模型支持</span>
+                  <span class="pill">high</span>
+                  <span class="group-badge">今日</span>
+                </span>
+                <h2 class="item-title" id="desktop-feed-item-1-title">Agent Judge：针对生产级 AI 代理的长上下文评估方案</h2>
+                <p class="summary" id="desktop-feed-item-1-summary">随着长周期自主 AI 代理的应用日益普及，传统单一 LLM 作为评估判断者已显现局限。</p>
               </div>
+              <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-1-title" aria-describedby="desktop-feed-item-1-meta desktop-feed-item-1-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
             </div>
           </article>
 
           <article class="item" aria-current="false">
-            <div class="meta-row">
-              <span class="pill" translate="no">src: hn.algolia.com</span>
-              <span class="pill">4h</span>
-              <span class="pill agent">agent: delivery-bot</span>
-            </div>
             <div class="item-head">
-              <div>
-                <h2 class="item-title">不依赖平台的边缘 SQLite 部署</h2>
-                <p class="summary">项目笔记说明如何靠近用户放置 SQLite 副本，同时避免绑定特定托管平台。</p>
+              <div class="item-copy">
+                <span class="meta-row" id="desktop-feed-item-2-meta">
+                  <span class="pill" translate="no">HN ALGOLIA</span>
+                  <span class="pill">4h</span>
+                  <span class="pill agent">agent: delivery-bot</span>
+                </span>
+                <h2 class="item-title" id="desktop-feed-item-2-title">不依赖平台的边缘 SQLite 部署</h2>
+                <p class="summary" id="desktop-feed-item-2-summary">项目笔记说明如何靠近用户放置 SQLite 副本，同时避免绑定特定托管平台。</p>
               </div>
+              <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-2-title" aria-describedby="desktop-feed-item-2-meta desktop-feed-item-2-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star active" aria-label="移除共鸣">★</button>
             </div>
           </article>
 
-          <div class="section-label">昨日</div>
           <article class="item" aria-current="false">
-            <div class="meta-row">
-              <span class="pill" translate="no">src: blog.example</span>
-              <span class="pill">1d</span>
-              <span class="pill warning">来源摘录</span>
-              <span class="group-badge">昨日</span>
-            </div>
             <div class="item-head">
-              <div>
-                <h2 class="item-title">关于本地优先软件的笔记</h2>
-                <p class="summary">短文权衡本地优先同步取舍，主张简单可导出的状态优先于账号绑定数据。</p>
+              <div class="item-copy">
+                <span class="meta-row" id="desktop-feed-item-3-meta">
+                  <span class="pill" translate="no">BLOG EXAMPLE</span>
+                  <span class="pill">1d</span>
+                  <span class="pill warning">来源摘录</span>
+                  <span class="group-badge">昨日</span>
+                </span>
+                <h2 class="item-title" id="desktop-feed-item-3-title">关于本地优先软件的笔记</h2>
+                <p class="summary" id="desktop-feed-item-3-summary">短文权衡本地优先同步取舍，主张简单可导出的状态优先于账号绑定数据。</p>
               </div>
+              <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-3-title" aria-describedby="desktop-feed-item-3-meta desktop-feed-item-3-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
             </div>
           </article>
         </section>
 
-        <aside class="inspector" aria-label="检查器预览">
-          <div class="inspector-top">
-            <div class="meta-row inspector-meta">
-              <span class="pill" translate="no">src: TLDR AI Feed</span>
-              <span class="pill">全文</span>
-              <span class="pill" translate="no">original ↗</span>
-            </div>
-          </div>
-          <h2 class="inspector-title">跨境 AI 并购遭遇监管回撤</h2>
-          <div class="evidence-lines" aria-label="检查器出处">
-            <p>摘要出处：模型支持 · 价值: high · 来源标识保持不变</p>
-            <p>来源文本：全文 · 上次尝试状态：失败但未覆盖现有内容</p>
-          </div>
+        <aside id="preview-inspector" class="inspector" aria-label="检查器预览（独立可滚动详情）" tabindex="0">
+          <h2 class="inspector-title">Agent Judge：针对生产级 AI 代理的长上下文评估方案</h2>
+          <dl class="frontmatter" aria-label="检查器出处">
+            <dt>ORIGINAL</dt>
+            <dd translate="no">Agent Judge: Solving Long-Context Evals for Production Agents</dd>
+            <dt>LINKS</dt>
+            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文 ↗</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源 ↗</a></dd>
+            <dt>AI STATUS</dt>
+            <dd>模型支持 · 全文 · quality: high</dd>
+            <dt>ATTEMPT</dt>
+            <dd>失败 · 已保留现有摘要和要点</dd>
+          </dl>
           <section class="reading-section" aria-label="摘要">
             <p class="reading-label">摘要</p>
-            <p class="reading">Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。</p>
+            <p class="reading">随着长周期自主 AI 代理的应用日益普及，传统的单一 LLM 作为评估判断者已显现明显局限。</p>
           </section>
           <section class="reading-section" aria-label="核心洞察">
             <p class="reading-label">核心洞察</p>
-            <p class="reading">这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。</p>
+            <p class="reading">生产级代理评估需要可验证的长上下文证据链，而不是一次性模型判断。</p>
           </section>
           <section class="reading-section" aria-label="要点">
             <p class="reading-label">要点</p>
             <ul class="key-points">
-              <li>Manus 撤销交易不是产品失败，而是监管指令改变了并购可执行性。</li>
-              <li>Meta 等大型买方的收购意愿不再等同于 AI 初创公司的退出确定性。</li>
-              <li>读者评估 AI 公司价值时，需要同时考虑技术、资本和跨境监管三条线。</li>
+              <li>长代理轨迹往往超过普通上下文窗口，评估需要拆解执行证据。</li>
+              <li>外部系统状态修改必须被验证，不能只相信代理自述。</li>
+              <li>评估准则会随模型和工具迭代变化，需要保持可复审。</li>
             </ul>
           </section>
           <p class="attempt-failure" aria-live="polite">上次重处理失败 · 解码错误 · 已保留现有摘要和要点</p>
@@ -984,7 +1192,8 @@
             </div>
             <div class="reingest-panel__row">
               <label class="reingest-panel__label" for="extra-prompt">额外提示<br>（仅本次，不保存）</label>
-              <textarea id="extra-prompt" placeholder="示例 · 可选 · 不保存"></textarea>
+              <textarea id="extra-prompt" aria-describedby="extra-prompt-helper" placeholder="示例 · 可选 · 不保存"></textarea>
+              <p class="reingest-panel__helper" id="extra-prompt-helper">仅作本条目一次性指导；只能调整重点、角度或有来源支撑的事实选择，不能覆盖结构、处理语言、来源标识、安全/出处、运行时/供应商状态或持久化边界。</p>
             </div>
             <div class="reingest-panel__actions">
               <button class="bracket-action" type="button">[确认重新处理]</button>
@@ -1006,41 +1215,44 @@
       <section class="panel ledger source-ledger" aria-labelledby="source-ledger-title">
         <header class="source-ledger__header">
           <h1 class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER</h1>
-          <span class="source-ledger__status" aria-live="polite">last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00</span>
-          <button class="bracket-action bracket-action--run-ingest" type="button" disabled>[RUN INGEST]</button>
+          <span class="source-ledger__status" aria-live="polite" title="last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00">last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00</span>
+          <button class="bracket-action bracket-action--run-ingest" type="button" disabled>[INGESTING...]</button>
         </header>
 
         <div class="source-ledger__tools" aria-label="账本操作">
-          <button class="bracket-action" type="button">[导入 OPML]</button>
-          <button class="bracket-action" type="button">[导出状态]</button>
-          <button class="bracket-action" type="button">[导入状态]</button>
+          <button class="bracket-action" type="button" aria-label="导入 OPML">[IMPORT OPML]</button>
+          <button class="bracket-action" type="button" aria-label="导出状态">[EXPORT STATE]</button>
+          <button class="bracket-action" type="button" aria-label="导入状态">[IMPORT STATE]</button>
         </div>
 
         <ul class="source-ledger__list">
           <li class="source-ledger__row">
             <span class="source-ledger__name" translate="no">src: simonwillison</span>
-            <span class="source-ledger__url" translate="no">https://simonwillison.net/feed.xml</span>
-            <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
+            <span class="source-ledger__url" translate="no" title="https://simonwillison.net/feed.xml">https://simonwillison.net/feed.xml</span>
+            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 14:02:05">last_fetch: 14:02:05</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Simon Willison">[FETCH]</button>
+              <button class="bracket-action bracket-action--details" type="button" aria-label="查看来源详情 Simon Willison">[DETAILS]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Simon Willison">[DELETE]</button>
             </span>
           </li>
           <li class="source-ledger__row">
             <span class="source-ledger__name" translate="no">src: hn</span>
-            <span class="source-ledger__url" translate="no">https://hn.algolia.com/rss</span>
-            <span class="source-ledger__status" aria-live="polite">last_fetch: 12:00:11</span>
+            <span class="source-ledger__url" translate="no" title="https://hn.algolia.com/rss">https://hn.algolia.com/rss</span>
+            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 12:00:11">last_fetch: 12:00:11</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Hacker News">[FETCH]</button>
+              <button class="bracket-action bracket-action--details" type="button" aria-label="查看来源详情 Hacker News">[DETAILS]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Hacker News">[DELETE]</button>
             </span>
           </li>
           <li class="source-ledger__row">
             <span class="source-ledger__name" translate="no">src: wires</span>
-            <span class="source-ledger__url" translate="no">https://example.org/wire.xml</span>
-            <span class="source-ledger__status source-ledger__status--error" aria-live="polite" title="err: timeout contacting source">err: 来源连接超时</span>
+            <span class="source-ledger__url" translate="no" title="https://example.org/wire.xml">https://example.org/wire.xml</span>
+            <span class="source-ledger__status source-ledger__status--error" aria-live="polite" title="err: timeout contacting source">err: timeout contacting source</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Wires">[FETCH]</button>
+              <button class="bracket-action bracket-action--details" type="button" aria-label="查看来源详情 Wires">[DETAILS]</button>
               <button class="bracket-action bracket-action--delete" type="button" aria-label="删除来源 Wires">[DELETE]</button>
             </span>
           </li>
@@ -1048,9 +1260,9 @@
         <p class="why">来源添加仍通过 Steer；手动摄取控件只更新时间戳或原始诊断。</p>
       </section>
 
-      <div class="panel doctor">
-        <h2>/doctor</h2>
-        <pre>doctor:
+      <div class="panel doctor" aria-labelledby="doctor-heading">
+        <h2 id="doctor-heading">/doctor</h2>
+        <pre role="log" aria-label="/doctor diagnostics log">doctor:
 rss_fetch_errors: 0
 last_poll: 2026-05-09T10:25Z
 model_latency_ms: 842
@@ -1072,66 +1284,87 @@ extraction_failures: see source rows</pre>
             <button class="bracket-action" type="button" aria-label="处理语言：中文；切换到英文">语言: 中文</button>
             <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
             <span class="runtime-warning utility-menu__note">已存可读内容将被重写。</span>
-            <span class="utility-menu__note" translate="no">来源标识保持不变。</span>
+            <span class="utility-menu__note">来源标识保持不变。</span>
           </div>
         </div>
-        <div class="mobile-feed">
-          <div class="section-label">今日</div>
+        <div class="mobile-feed" tabindex="0" aria-label="移动端今日馈送预览（独立可滚动）">
           <article class="item">
-            <div class="meta-row"><span class="pill" translate="no">src: nytimes.com</span><span class="pill">2h</span><span class="pill">全文</span><span class="group-badge">今日</span></div>
             <div class="item-head">
-              <div>
-                <h2 class="item-title">主要标题示例</h2>
-                <p class="summary">密集摘要文本保持可扫读；要点不出现在馈送列表。</p>
+              <div class="item-copy">
+                <span class="meta-row" id="mobile-feed-item-1-meta"><span class="pill" translate="no">TLDR AI FEED</span><span class="pill">1m</span><span class="pill">全文</span><span class="pill">high</span><span class="group-badge">今日</span></span>
+                <h2 class="item-title" id="mobile-feed-item-1-title">Agent Judge：长上下文评估方案</h2>
+                <p class="summary" id="mobile-feed-item-1-summary">密集摘要文本保持可扫读；要点不出现在馈送列表。</p>
               </div>
+              <button class="item-activate" type="button" aria-labelledby="mobile-feed-item-1-title" aria-describedby="mobile-feed-item-1-meta mobile-feed-item-1-summary" aria-controls="mobile-preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
             </div>
           </article>
           <article class="item">
-            <div class="meta-row"><span class="pill" translate="no">src: blog.example</span><span class="pill">4h</span><span class="pill warning">摘录</span></div>
             <div class="item-head">
-              <div>
-                <h2 class="item-title">另一条目</h2>
-                <p class="summary">单列馈送保持紧凑；检查器作为详情视图打开。</p>
+              <div class="item-copy">
+                <span class="meta-row" id="mobile-feed-item-2-meta"><span class="pill" translate="no">BLOG EXAMPLE</span><span class="pill">4h</span><span class="pill warning">摘录</span></span>
+                <h2 class="item-title" id="mobile-feed-item-2-title">另一条目</h2>
+                <p class="summary" id="mobile-feed-item-2-summary">单列馈送保持紧凑；检查器作为详情视图打开。</p>
               </div>
+              <button class="item-activate" type="button" aria-labelledby="mobile-feed-item-2-title" aria-describedby="mobile-feed-item-2-meta mobile-feed-item-2-summary" aria-controls="mobile-preview-inspector"></button>
               <button type="button" class="star active" aria-label="移除共鸣">★</button>
             </div>
           </article>
         </div>
-          <div class="mobile-steer"><div class="steer">Steer 或粘贴 RSS URL...</div></div>
+          <div class="mobile-steer">
+            <form class="steer" aria-label="移动端 Steer 命令输入">
+              <input name="mobile-steer" type="text" value="添加 https://example.org/feed.xml" placeholder="Steer 或粘贴 RSS URL..." aria-label="Steer 命令或 RSS URL" />
+              <button class="steer-submit" type="submit" aria-label="提交移动端 Steer 命令">[提交]</button>
+            </form>
+          </div>
       </div>
 
       <div class="mobile-card" aria-label="窄屏详情预览" lang="zh-CN">
-        <div class="mobile-header"><button class="brand" type="button" aria-expanded="false" translate="no">RESOFEED</button><span>检查器</span></div>
-        <article class="mobile-detail">
+        <div class="mobile-header"><button class="brand" type="button" translate="no" aria-expanded="false" aria-controls="mobile-detail-utility-menu">RESOFEED</button><span>检查器</span></div>
+        <div id="mobile-detail-utility-menu" class="mobile-utility-sheet" role="region" aria-label="RESOFEED 工具菜单预览" hidden>
+          <div class="utility-menu__group" aria-label="导航">
+            <span class="utility-menu__heading">NAV</span>
+            <button class="bracket-action" type="button">今日</button>
+            <button class="bracket-action" type="button">来源账本</button>
+          </div>
+          <div class="utility-menu__group" aria-label="操作">
+            <span class="utility-menu__heading">OPERATIONS</span>
+            <button class="bracket-action" type="button" aria-label="处理语言：中文；切换到英文">语言: 中文</button>
+            <button class="bracket-action" type="button" aria-label="重处理现有资料库并重建搜索索引">[重处理资料库]</button>
+            <span class="runtime-warning utility-menu__note">已存可读内容将被重写。</span>
+            <span class="utility-menu__note">来源标识保持不变。</span>
+          </div>
+        </div>
+        <article id="mobile-preview-inspector" class="mobile-detail" tabindex="0" aria-label="移动端检查器详情预览（独立可滚动）">
           <div class="mobile-detail-head">
             <button type="button" class="back-action">← 今日</button>
             <button type="button" class="star flush" aria-label="标记共鸣">☆</button>
           </div>
-          <div class="meta-row">
-            <span class="pill" translate="no">src: nytimes.com</span>
-            <span class="pill warning">来源摘录</span>
-            <span class="pill" translate="no">original ↗</span>
-          </div>
-          <h2>跨境 AI 并购遭遇监管回撤</h2>
-          <div class="evidence-lines" aria-label="检查器出处">
-            <p>摘要出处：模型支持 · 价值: high · 来源标识保持不变</p>
-            <p>上次重处理失败 · 已保留现有标题、摘要、核心洞察和要点</p>
-          </div>
+          <h2>Agent Judge：针对生产级 AI 代理的长上下文评估方案</h2>
+          <dl class="frontmatter" aria-label="检查器出处">
+            <dt>ORIGINAL</dt>
+            <dd translate="no">Agent Judge: Solving Long-Context Evals for Production Agents</dd>
+            <dt>LINKS</dt>
+            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文 ↗</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源 ↗</a></dd>
+            <dt>AI STATUS</dt>
+            <dd>模型支持 · 来源摘录 · quality: high</dd>
+            <dt>ATTEMPT</dt>
+            <dd>失败 · 已保留现有摘要和要点</dd>
+          </dl>
           <section class="reading-section" aria-label="摘要">
             <p class="reading-label">摘要</p>
-            <p class="reading">Manus 因中国监管指令撤销 Meta 收购案，显示跨境 AI 并购已经从商业谈判问题转向监管确定性问题。</p>
+            <p class="reading">随着长周期自主 AI 代理的应用日益普及，传统的单一 LLM 作为评估判断者已显现明显局限。</p>
           </section>
           <section class="reading-section" aria-label="核心洞察">
             <p class="reading-label">核心洞察</p>
-            <p class="reading">这件事说明 AI 初创公司的退出路径正在被地缘监管重新定价。</p>
+            <p class="reading">生产级代理评估需要可验证的长上下文证据链。</p>
           </section>
           <section class="reading-section" aria-label="要点">
             <p class="reading-label">要点</p>
             <ul class="key-points">
-              <li>监管指令直接改变了交易可执行性，而不是只影响交易节奏。</li>
-              <li>买方、创始人和投资人需要重新评估跨境退出的时间成本。</li>
-              <li>对读者的价值在于把 AI 公司估值放进技术、资本和监管的共同框架。</li>
+              <li>长代理轨迹往往超过普通上下文窗口。</li>
+              <li>外部系统状态修改必须被验证。</li>
+              <li>评估准则会随模型和工具迭代变化。</li>
             </ul>
           </section>
           <p class="attempt-failure" aria-live="polite">上次重处理失败 · 解码错误 · 已保留现有摘要和要点</p>
@@ -1146,7 +1379,8 @@ extraction_failures: see source rows</pre>
             </div>
             <div class="reingest-panel__row">
               <label class="reingest-panel__label" for="mobile-extra-prompt">额外提示<br>（仅本次，不保存）</label>
-              <textarea id="mobile-extra-prompt" placeholder="示例 · 可选 · 不保存"></textarea>
+              <textarea id="mobile-extra-prompt" aria-describedby="mobile-extra-prompt-helper" placeholder="示例 · 可选 · 不保存"></textarea>
+              <p class="reingest-panel__helper" id="mobile-extra-prompt-helper">仅作本条目一次性指导；只能调整重点、角度或有来源支撑的事实选择，不能覆盖结构、处理语言、来源标识、安全/出处、运行时/供应商状态或持久化边界。</p>
             </div>
             <div class="reingest-panel__actions">
               <button class="bracket-action" type="button">[确认重新处理]</button>

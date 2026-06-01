@@ -108,12 +108,30 @@ components:
     typography: "{typography.metadata}"
     padding: "{spacing.none}"
     rounded: "{rounded.none}"
+  list-meta-row:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.muted}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  metadata-token:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.muted}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
   source-pill:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
     typography: "{typography.metadata}"
     rounded: "{rounded.xs}"
     padding: "{spacing.xs}"
+  compact-evidence-link:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
   resonate-button:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
@@ -131,6 +149,30 @@ components:
     textColor: "{colors.text}"
     typography: "{typography.payload}"
     padding: "{spacing.xl}"
+    rounded: "{rounded.none}"
+  inspector-title:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.inspector-title}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-frontmatter:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.sm} {spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-frontmatter-label:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.muted}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.none}"
+    rounded: "{rounded.none}"
+  inspector-frontmatter-value:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.metadata}"
+    padding: "{spacing.none}"
     rounded: "{rounded.none}"
   inspector-reingest-panel:
     backgroundColor: "{colors.surface}"
@@ -387,7 +429,7 @@ Primary surfaces covered by this contract:
 - search and retrieval surfaces;
 - agent receipt/provenance markers.
 
-Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Heavy-operation feedback is terminal-synchronous text and one current operation snapshot, never animated loading chrome, durable jobs, queues, history, or dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
+Density target is **dense but legible**: metadata is compact like an archival index; article content breathes. Repeated metadata labels are treated as waste in reader surfaces. Feed rows compress source/time/extraction/value into one flat metadata rail; Inspector provenance moves into a tight Frontmatter grid below the title so the reading payload begins higher. Emotional effect is precise, low-fatigue, and tool-like rather than friendly SaaS. Heavy-operation feedback is terminal-synchronous text and one current operation snapshot, never animated loading chrome, durable jobs, queues, history, or dashboard state. Assumption: the first implementation targets responsive web/mobile web; native shells may adapt platform chrome while preserving the same primitives.
 
 Content contract target is **dense comprehension, not paragraph-only compression**. Feed rows remain compact scanning surfaces and MUST NOT render Key Points. Inspector is the structured reading surface and MUST render validated Chinese generated content as `摘要`, `核心洞察`, and `要点`, with `要点` rendered from a controlled 3–5 item structured list rather than raw Markdown. Generated/user-facing content and processing feedback should be Chinese-localized when the processing language is Chinese; URL, source, provenance, model ID, and quoted literal strings remain unchanged.
 
@@ -441,6 +483,7 @@ Spacing uses a strict 4px/8px mathematical scale: `0, 2, 4, 8, 12, 16, 24, 32, 4
 
 - **Proximity (Gestalt):** Elements that belong together must have inner margins smaller than outer margins. E.g., Title and Summary (`4px` gap) vs Metadata and Title (`8px` gap).
 - **Data-Ink Ratio:** Horizontal lines divide content. Full-width colored blocks or pill backgrounds are omitted wherever spacing + alignment can convey structure alone.
+- **Metadata Compression:** Known fields in the Feed and Inspector are communicated by position, order, typography, and accessible names. Do not spend visual space on repeated `src:`, `来源标题:`, `条目 URL`, `来源 URL`, or `价值:` prefixes in the main reading flow.
 - **Rhythm:** Feed rows use `12px` top padding, `11px` bottom padding, and a `1px` separator to cleanly add up to an exact `24px` vertical shift per item boundary, preserving the 8-point grid rhythm exactly.
 
 Desktop layout:
@@ -478,6 +521,18 @@ Mobile keeps the existing single-column behavior: Feed is the main surface and I
 
 Processing language is a global operational state, not a per-item display toggle. The language control lives in the `RESOFEED` utility menu under an `OPERATIONS` micro-heading, with an optional duplicate in `/doctor` raw utility output. It must not be persistent top chrome and must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
 
+### High-Density Acceptance and Mechanical Gates
+
+These gates are [SHARP] because they preserve the dense reader optimization without sacrificing provenance or accessibility:
+
+- Reader surfaces (Feed rows and compact Inspector Frontmatter) MUST NOT visually render repeated prefixes `src:`, `来源标题:`, `条目 URL`, `来源 URL`, or `价值:`. Source Ledger and diagnostics may render raw management labels because managing/verifying sources is their task.
+- Raw visible URLs MUST NOT appear in Feed, Inspector reading sections, or compact Inspector Frontmatter. Raw visible URLs are reserved for Source Ledger source management and `/doctor`/diagnostic output.
+- Feed rows MUST NOT render `key_points`, bullets, numbered lists, Markdown list strings, or inferred mini-lists; the Feed remains metadata, title, compact summary/core preview, and Resonate only.
+- Inspector Frontmatter order is fixed: `ORIGINAL`, `LINKS`, `AI STATUS`, then `ATTEMPT` when present. Omit irrelevant rows rather than reordering them.
+- Compact evidence links MUST keep visible text compact (`原文 ↗`, `条目 ↗`, `来源 ↗`, `Article ↗`, `Feed ↗`) while the DOM uses a literal non-secret `href` and an accessible name that exposes destination/provenance.
+- All independent controls and touch/click targets, including bracket actions and Resonate, MUST maintain at least 44 CSS px hit targets.
+- Desktop Feed and Inspector MUST be independent bounded scroll containers with `overflow-y: auto` or equivalent, keyboard-focusable scroll regions (`tabindex="0"` or native focusability), and accessible names that distinguish Feed from Inspector.
+
 ## Elevation
 
 Depth is conveyed by z-order, borders, type scale, indentation, and tonal selection—not shadows. Maximum elevation levels:
@@ -503,6 +558,56 @@ Shape language is utilitarian and square. Default radius is `0px` to `4px`.
 Pills are exceptions for compact provenance only. They must not inflate left-feed row height. Avatars, decorative blobs, Memphis shapes, and random accent-sidebars are forbidden.
 
 ## Components
+### Primary Ink (`primary`)
+- **Intent**: [SHARP] The hard editorial/chrome ink that anchors the ResoFeed workbench.
+- **useFor**: Product wordmark, terminal-style diagnostic blocks, high-emphasis chrome, and dark-on-paper UI anchors.
+- **avoidFor**: Large filled marketing panels, decorative backgrounds, unread emphasis, or priority/ranking decoration.
+
+### Reading Text (`text`)
+- **Intent**: [SHARP] Main reading color for titles, body prose, and inspector values.
+- **useFor**: Feed titles, Inspector titles, structured reading payload, frontmatter values, and accessible action labels.
+- **avoidFor**: Metadata texture, disabled text, status-only meaning, or decorative borders.
+
+### Workbench Background (`background`)
+- **Intent**: [SHARP] Warm paper canvas for low-fatigue scanning and reading.
+- **useFor**: App shell, feed column, Steer input interior, and flat list rows.
+- **avoidFor**: Filled callouts, selected-state meaning by itself, modal scrims, or dashboard cards.
+
+### Paper Surface (`surface`)
+- **Intent**: [FLEXIBLE] Slightly raised paper plane for Inspector, menus, ledger, and compact controls.
+- **useFor**: Inspector pane, Source Ledger, RESOFEED menu, source disclosures, and star button rest state.
+- **avoidFor**: Creating card mazes around every feed row, decorative tiles, or status severity.
+
+### Active Surface (`surface-active`)
+- **Intent**: [FLEXIBLE] Quiet tonal distinction for selected/focused compact regions.
+- **useFor**: Selected feed row background on narrow layouts, focused Steer state, and temporary operation rows.
+- **avoidFor**: Unread counts, priority/ranking emphasis, permanent panels, or hover effects that reduce contrast.
+
+### Metadata Ink (`muted`)
+- **Intent**: [SHARP] Dense archival metadata color that stays readable at 12px.
+- **useFor**: Source names, times, extraction labels, frontmatter labels, link affordance text, and secondary command hints.
+- **avoidFor**: Long-form body copy, disabled text below contrast threshold, placeholder-only explanations, or hiding provenance.
+
+### Rule Line (`border`)
+- **Intent**: [SHARP] Hairline separation that preserves information density without boxed cards.
+- **useFor**: Feed row separators, Inspector frontmatter rules, Source Ledger row rules, and disclosure boundaries.
+- **avoidFor**: Nested border mazes, thick outlines, decorative grids, or zebra-striping substitutes.
+
+### Resonate Accent (`accent`)
+- **Intent**: [SHARP] Scarce marker for the owner's explicit Resonate state.
+- **useFor**: Active star/resonated item only, plus rare matching state text when directly tied to Resonate.
+- **avoidFor**: Fetch buttons, generic primary buttons, AI magic, charts, alerts, selected rows, links, or decoration.
+
+### Focus Ink (`focus`)
+- **Intent**: [SHARP] Keyboard focus and navigational certainty independent of accent state.
+- **useFor**: Focus-visible outlines, active command caret, and accessible selection markers where keyboard position must be clear.
+- **avoidFor**: Brand accents, hover decoration, status color, or permanent selected-item styling.
+
+### Status Colors (`danger`, `warning`, `success`)
+- **Intent**: [SHARP] Terse operational severity with text labels, never color alone.
+- **useFor**: Raw `err:` lines, extraction warnings, successful fetch/ingest timestamps, and guarded destructive/delete states.
+- **avoidFor**: Decorative badges, confetti states, priority ranking, AI confidence, or replacing explicit status text.
+
 
 ### App Shell
 
@@ -617,16 +722,31 @@ Purpose: expose the minimum product-required steering transparency without creat
 
 Anatomy: raw command excerpt, interpreted summary, actor (`human` or delegated agent name), and terse `undo` or `correct` text action when reversible. Timestamp and superseded marker render only when already present in the API response or local transient UI state; the design does not require new persistent receipt fields. States: applied, superseded, agent-applied, rejected, failed. Receipts are inline near Steer or the affected feed item; they must not accumulate into a dedicated activity ledger.
 
+### List Meta Row (`list-meta-row`)
+- **Intent**: [SHARP] One-line machine-texture metadata rail for high-density scanning.
+- **useFor**: Source display name, relative age, extraction availability, optional agent receipt, value tier, and inline time-group badge.
+- **avoidFor**: Verbose `key: value` labels, raw URLs, original source title, multi-line provenance, chips with borders, or any metadata that pushes the title downward.
+
+Rules: The list metadata row is a flat inline flex row using `{typography.metadata}`, `{colors.muted}`, and dot separators. It MUST render known fields by value and position, not by repeated prefixes: use `TLDR AI FEED · 1m · 全文 · 模型支持 · high`, not `src: TLDR AI Feed · 来源标题: ... · 价值: high`. Source labels are accessible via `aria-label`, not visual prefixes. The row wraps only at narrow widths; before wrapping, less important tokens drop in this order: value tier, model provenance, extraction label, source title. `TODAY`, `YESTERDAY`, and `EARLIER` may occupy the far-right slot on the first row in each group without adding vertical height.
+
+### Metadata Token (`metadata-token`)
+- **Intent**: [FLEXIBLE] Atomic metadata text value inside a flat row or frontmatter value.
+- **useFor**: Short source names, `1m`, `全文`, `来源摘录`, `模型支持`, `high`, `brief`, `agent:delivery-bot`, or `quality: high` where a qualifier is genuinely needed.
+- **avoidFor**: Pills, badges, navigation, long labels, URLs, or translated/laundered source identifiers.
+
+Rules: Metadata tokens are text atoms; use spacing, order, and separators to communicate meaning. Use explicit words only when the value would be ambiguous without them, e.g. `quality: high` inside Inspector frontmatter is acceptable, but `价值: high` in the feed is not.
+
+
 ### Feed Item
 - **Intent**: [SHARP] Compact scan row for triage, not the full structured reading payload.
-- **useFor**: Source/time/provenance metadata, localized display title when available, 1–2 line Chinese summary/core preview, value/source marker, selected state, and Resonate action.
-- **avoidFor**: Key Points, multi-bullet lists, raw Markdown rendering, full article body, source text disclosure, re-ingest controls, paragraph-only compression that hides needed structure in the Inspector, or any miniature article-card treatment.
+- **useFor**: Source/time/provenance metadata, localized display title when available, 1–2 line Chinese summary/core preview, value/source marker when space allows, selected state, and Resonate action.
+- **avoidFor**: `src:`/`来源标题:`/`价值:` visual prefixes, raw URLs, original source title duplication, Key Points, multi-bullet lists, full article body, source text disclosure, re-ingest controls, or miniature article-card treatment.
 
-Purpose: scan one RSS-derived item.
+Purpose: scan one RSS-derived item with maximum data-ink efficiency.
 
-Anatomy: compact metadata line (`src: <host> · <age> · <全文|来源摘录|摘录> · agent:<name>` when needed), serif localized feed title, 1–2 line dense Chinese summary/core preview, provenance/extraction marker, Resonate action. Required item-understanding outputs are compressed into visible microcopy rather than dashboards: quality/value tier may appear as a terse label (`high`, `brief`, `source-claim`), source-quality provenance appears as `全文`, `来源摘录`, or `摘录` when UI language is Chinese, and reported fact/source claim/model interpretation distinctions appear in Inspector copy when material.
+Anatomy: `List Meta Row` → localized feed title → clamped summary/core preview → independent 44x44 Resonate action. The metadata row renders values by position and separator, not repeated labels: `TLDR AI FEED · 1m · 全文 · 模型支持 · high` is correct; `src: TLDR AI Feed · 来源标题: ... · 价值: high` is not. Source/title/provenance meaning remains available through accessible names and the Inspector Frontmatter, not through redundant visual prefixes in every row.
 
-Feed rows are triage surfaces, not miniature article cards. Title uses `{typography.feed-title}` on desktop and mobile; summary uses `{typography.feed-summary}` and clamps to two lines on desktop, one line on narrow/mobile previews. The text stack must stay continuous: metadata, title, and summary sit in one column with 4px title-to-summary separation. The independent 44x44 Resonate action may sit in a side column, but it must not force a blank row or enlarge the title-to-summary rhythm. Full summary, raw excerpt, and full body belong in the Inspector. Bordered source pills are allowed in the Inspector and ledger, but the feed should prefer flat monospace metadata with separators to preserve vertical density.
+Feed rows are triage surfaces, not miniature article cards. Title uses `{typography.feed-title}` on desktop and mobile; summary uses `{typography.feed-summary}` and clamps to two lines on desktop, one line on narrow/mobile previews. The text stack must stay continuous: metadata, title, and summary sit in one column with 4px title-to-summary separation. The independent 44x44 Resonate action may sit in a side column, but it must not force a blank row or enlarge the title-to-summary rhythm. Full summary, raw excerpt, full body, source title, original link, and provenance audit belong in the Inspector. Bordered source pills are allowed in the ledger and low-frequency utility contexts, but the feed must use flat monospace metadata with separators to preserve vertical density.
 
 Key Points exclusion: [SHARP] Feed rows MUST NOT show `key_points`, bullets, numbered lists, Markdown list strings, or inferred mini-lists. If `key_points` exists on the item, the Feed still shows only the compact title/summary/core preview and leaves the 3–5 point structure to the Inspector. This preserves scan speed while still supporting high-density comprehension after Inspect.
 
@@ -635,8 +755,8 @@ States:
 - default;
 - hover/focus: tonal shift or outline only, no translation;
 - selected: non-layout-shifting 3px left marker only by default; optional `surface-active` tonal background is reserved for compact/narrow layouts where it does not create large empty color blocks. Selected state means "currently open in Inspector," not keyboard focus, importance, recommendation, unread, or priority. Use focus rings only for true keyboard focus;
-- externally surfaced: add compact `agent:<name>` marker;
-- RSS-excerpt source text: text marker `source excerpt` with warning color and explanation in Inspector;
+- externally surfaced: add compact `agent:<name>` marker only when the item was actually delivered by an external agent;
+- RSS-excerpt source text: text marker `来源摘录` / `source excerpt` with warning color and explanation in Inspector;
 - raw fallback: show feed excerpt when AI summary is unavailable;
 - grouped duplicate/story: transparent grouping must preserve access to every source item and provenance, and may appear only when the backend item data includes authoritative grouping (`story_key` or `duplicate_of_item_id`). The frontend must not infer a group by stripping URL fragments, collapsing synthetic feed-entry URLs, or comparing host/path alone.
 
@@ -644,7 +764,7 @@ No unseen/bold state. No numeric count. No hidden spam collapsing. No user-facin
 
 Time-group labels inside the feed (`TODAY`, `YESTERDAY`, `EARLIER`) must feel anchored without breaking the grid. Use uppercase monospace metadata styling and align them to the far right inside the metadata row of the first item belonging to that group. They should consume zero extra vertical height, preserving a mathematically consistent rhythm between feed row separators.
 
-Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, source-text, and grouped markers need accessible names, e.g. `Source: NYT`, `Extraction: partial_extraction`, `Grouped story with 4 source items`. The grouped marker must be absent when `story_key` and `duplicate_of_item_id` are both `null`.
+Keyboard and accessibility: feed items are reachable in reading order; `Enter` or `Space` opens Inspector, arrow-key roving focus is allowed only if normal `Tab` order still works. Source, agent, source-text, and grouped markers need accessible names, e.g. `Source: TLDR AI Feed`, `Extraction: full`, `Grouped story with 4 source items`. The grouped marker must be absent when `story_key` and `duplicate_of_item_id` are both `null`.
 
 ### Resonate Button
 
@@ -662,14 +782,51 @@ Non-color semantics are mandatory: star shape changes in addition to color.
 
 Keyboard and accessibility: `Space` or `Enter` toggles. Label must announce state: `Resonate item` / `Remove resonance`. The active star cannot rely on color alone.
 
+### Compact Evidence Link (`compact-evidence-link`)
+- **Intent**: [SHARP] Short text link to source evidence without exposing raw URL strings in the reading flow.
+- **useFor**: `原文 ↗`, `条目 ↗`, `来源 ↗`, `Article ↗`, `Feed ↗`, and other explicit source/provenance link anchors.
+- **avoidFor**: Displaying full `https://...` strings, decorative outbound icons, generic `click here`, or replacing raw URLs inside Source Ledger where URL management is the task.
+
+Rules: Reader and Inspector surfaces MUST NOT show raw URLs unless the source-management task itself requires URL editing or verification. Keep the literal URL in the DOM target and accessible name; show a compact anchor in visible text.
+
+
+### Inspector Frontmatter (`inspector-frontmatter`)
+- **Intent**: [SHARP] Compact provenance table that keeps the Inspector reading-first while preserving auditability.
+- **useFor**: Original source title, compact article/feed links, extraction availability, summary provenance, quality/value tier, grouped-source count, and latest attempt state.
+- **avoidFor**: Full URLs, duplicate top metadata strips, raw paragraph blocks before the title, dashboard status, provider settings, or replacing the structured reading sections.
+
+Rules: Render as a semantic `<dl>` or equivalent accessible key/value grid directly below the Inspector title. Labels are uppercase metadata texture (`ORIGINAL`, `LINKS`, `AI STATUS`, `ATTEMPT`) and values are concise. The grid MUST be visually smaller than the title and reading sections. It replaces the previous repeated blocks (`src:`, `来源标题:`, `原文链接`, `条目 URL`, `来源 URL`) with a 2-column compact structure.
+
+### Inspector Frontmatter Label (`inspector-frontmatter-label`)
+- **Intent**: [SHARP] Right-aligned metadata key for fast visual parsing.
+- **useFor**: `ORIGINAL`, `LINKS`, `AI STATUS`, `ATTEMPT`, `SOURCES`, or localized equivalents when UI language is Chinese.
+- **avoidFor**: Sentence-length explanations, raw backend field names, decorative captions, or body section labels such as `摘要`.
+
+### Inspector Frontmatter Value (`inspector-frontmatter-value`)
+- **Intent**: [SHARP] Concise provenance payload paired with a frontmatter label.
+- **useFor**: Source title, `原文 ↗ · 来源 ↗`, `模型支持 · quality: high`, `失败 · 已保留现有摘要和要点`, and other short audit values.
+- **avoidFor**: Long paragraphs, raw URLs, full article excerpts, Key Points, or re-ingest form controls.
+
+
 ### Inspector Pane
 - **Intent**: [SHARP] Deliberate Inspect surface for detail reading, verification, and one-time selected-item re-ingest.
-- **useFor**: Selected item detail, provenance, Chinese structured generated content (`摘要`, `核心洞察`, `要点`), 3–5 controlled Key Point list items, fallback/source evidence, grouped-source disclosure, collapsed source text, and inline `[RE-INGEST ITEM]` / `[重新处理本文]` controls scoped to this item only.
-- **avoidFor**: Global ingest controls, Source Ledger operations, provider settings, provider tabs, marketplace UI, durable model/prompt preferences, modals, toasts, dashboards, job history, related-content modules, or client-inferred source grouping.
+- **useFor**: Selected item detail, compact provenance Frontmatter, Chinese structured generated content (`摘要`, `核心洞察`, `要点`), 3–5 controlled Key Point list items, fallback/source evidence, grouped-source disclosure, collapsed source text, and inline `[RE-INGEST ITEM]` / `[重新处理本文]` controls scoped to this item only.
+- **avoidFor**: Duplicate top metadata strips, full raw URLs, global ingest controls, Source Ledger operations, provider settings, provider tabs, marketplace UI, durable model/prompt preferences, modals, toasts, dashboards, job history, related-content modules, or client-inferred source grouping.
 
 Purpose: deliberate Inspect surface for detail reading and verification.
 
-Anatomy: source/provenance header, Resonate action (mobile/single-column route only), localized title, original link, one processing/provenance state line, model-backed structured reading sections when available, item-scoped re-ingest panel, collapsed source text or source evidence disclosure, why-this-appeared line when useful, and source-list disclosure for grouped stories. The structured reading order is [SHARP]: `摘要` section, `核心洞察` section, then `要点` section. `核心洞察` is exactly one concise Chinese sentence; multi-point requests route into `要点`. `要点` is a semantic `<ul>`/list control with 3–5 Chinese `<li>` items from the structured `key_points` array, not a Markdown blob, not generated HTML, and not copied into the Feed. States: empty/no-selection (shows minimal placeholder text indicating no item is selected), loading raw detail, OK model-backed Chinese content, latest re-ingest attempt failed while preserved content remains visible, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below.
+Anatomy: localized title first, then `Inspector Frontmatter`, then structured reading sections, item-scoped re-ingest panel, collapsed source text/source evidence disclosure, why-this-appeared line when useful, and source-list disclosure for grouped stories. The title must begin above the fold; metadata audit must not occupy the dominant vertical band. The previous verbose metadata block (`src: ...`, `来源标题: ...`, `原文链接`, `条目 URL`, `来源 URL`) is replaced by the Frontmatter grid.
+
+Inspector Frontmatter rows are [SHARP]:
+
+- `ORIGINAL`: the original source title only when it differs from the display title or is needed for provenance.
+- `LINKS`: compact evidence anchors such as `原文 ↗ · 来源 ↗`; raw URL strings are forbidden in the reading flow.
+- `AI STATUS`: summary provenance, extraction status, and quality/value tier, e.g. `模型支持 · 全文 · quality: high`.
+- `ATTEMPT`: latest item re-ingest attempt only when relevant, e.g. `失败 · 已保留现有摘要和要点`.
+
+The structured reading order is [SHARP]: `摘要` section, `核心洞察` section, then `要点` section. `核心洞察` is exactly one concise Chinese sentence; multi-point requests route into `要点`. `要点` is a semantic `<ul>`/list control with 3–5 Chinese `<li>` items from the structured `key_points` array, not a Markdown blob, not generated HTML, and not copied into the Feed.
+
+States: empty/no-selection (minimal placeholder indicating no item is selected), loading raw detail, OK model-backed Chinese content, latest re-ingest attempt failed while preserved content remains visible, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below.
 
 ### Inspector Summary (`摘要`)
 - **Intent**: [SHARP] Chinese contextual explanation of the selected item.
@@ -688,12 +845,12 @@ Anatomy: source/provenance header, Resonate action (mobile/single-column route o
 
 ### Inspector Item Re-ingest (`inspector-reingest-panel`)
 - **Intent**: [SHARP] Re-run model processing for exactly the currently inspected item as a one-time operation.
-- **useFor**: `[RE-INGEST ITEM]` / `[重新处理本文]`, temporary OpenRouter model selection loaded from canonical `GET /api/runtime/openrouter-models` (with `GET /api/runtime/openrouter/models` compatibility-only), optional extra prompt text, `[CONFIRM RE-INGEST]`, `[CANCEL]`, and result/conflict/error text for `POST /api/items/{id}/reingest` or matching MCP `reingest_item`.
+- **useFor**: `[RE-INGEST ITEM]` / `[重新处理本文]`, temporary OpenRouter model selection loaded from canonical `GET /api/runtime/openrouter-models` (with `GET /api/runtime/openrouter/models` compatibility-only), optional extra prompt text, `[CONFIRM RE-INGEST]` / `[确认重新处理]`, `[CANCEL]` / `[取消]`, and result/conflict/error text for `POST /api/items/{id}/reingest` or matching MCP `reingest_item`.
 - **avoidFor**: Saving default models, saving prompt templates, changing global processing language, reprocessing the library, re-ingesting a source/feed/all items, provider marketplace, provider abstraction UI, provider tabs, settings dashboard, modal confirmation, toast notification, spinner, progress bar, animated ellipsis, or durable job/status history.
 
 Placement: [SHARP] the re-ingest affordance appears inside the Inspector only, after provenance/processing metadata and before the source-text disclosure or long reading body. It must not appear in global chrome, Feed rows, Source Ledger, the `RESOFEED` utility menu, `/doctor`, or search controls. Desktop uses the right Inspector scroll container; mobile uses the full-screen Inspector route.
 
-Anatomy and copy: idle state shows one bracket action, `[RE-INGEST ITEM]` or `[重新处理本文]`. Configuring state expands inline into a flat panel using `{components.inspector-reingest-panel}` with a model selector using `{components.inspector-model-selector}`, optional extra prompt textarea using `{components.inspector-extra-prompt}`, and `[CONFIRM RE-INGEST]` plus `[CANCEL]`. The model list is OpenRouter-only; label it as `model:` / `模型：` without provider tabs. The selector's first/default option is a local UI option such as `default: account_default`; selecting it sends `model: null` or omits `model`, never the literal `account_default` as a provider model ID. Extra prompt label must make non-persistence explicit, e.g. `extra prompt (one-time, guidance only, not saved)` / `额外提示（仅本次指导，不保存）`.
+Anatomy and copy: idle state shows one bracket action, `[RE-INGEST ITEM]` or `[重新处理本文]`. Configuring state expands inline into a flat panel using `{components.inspector-reingest-panel}` with a model selector using `{components.inspector-model-selector}`, optional extra prompt textarea using `{components.inspector-extra-prompt}`, and confirm/cancel bracket actions. English UI uses `[CONFIRM RE-INGEST]` plus `[CANCEL]`; Chinese UI may use deterministic localized equivalents `[确认重新处理]` plus `[取消]`. The model list is OpenRouter-only; label it as `model:` / `模型：` without provider tabs. The selector's first/default option is a local UI option such as `default: account_default`; selecting it sends `model: null` or omits `model`, never the literal `account_default` as a provider model ID. Extra prompt label must make non-persistence explicit, e.g. `extra prompt (one-time, guidance only, not saved)` / `额外提示（仅本次指导，不保存）`.
 
 One-time prompt authority copy: [SHARP] the extra prompt is guidance only for the selected item. Helper text adjacent to the textarea must state that it may change emphasis, angle, or fact selection only among source-backed facts, and that it cannot override schema, source grounding, target language, source identifiers, safety, provenance, runtime/provider status, or persistence boundaries. Suggested terse copy: `guidance only; cannot override schema, language, source identifiers, safety, status, or persistence` / `仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界`. Do not echo prompt text in receipts, errors, diagnostics, screenshots intended as logs, or source/provenance copy.
 
@@ -703,7 +860,7 @@ States:
 
 - idle: `[RE-INGEST ITEM]` / `[重新处理本文]` only;
 - configuring: inline panel with `model: <select>` and optional prompt field; preview docs may show this expanded state without also implying idle is active;
-- confirming: `[CONFIRM RE-INGEST]` / `[CANCEL]` visible in the same inline panel;
+- confirming: `[CONFIRM RE-INGEST]` / `[CANCEL]` visible in the same inline panel for English UI; `[确认重新处理]` / `[取消]` are the authorized deterministic zh-CN equivalents;
 - model-list-loading: selector row shows `models: loading` with text replacement only;
 - model-list-unavailable: selector row shows raw `err: models unavailable`; default-model re-ingest remains available by sending `model: null`; no fallback marketplace or manual provider setup UI;
 - running: action text becomes `[RE-INGESTING ITEM...]` / `[正在重新处理本文...]` with `aria-disabled="true"`; no spinner, progress bar, animated ellipsis, toast, modal, or dashboard;
@@ -711,7 +868,7 @@ States:
 - conflict: raw current-operation conflict detail, e.g. `err: re-ingest blocked — op: item_reingest · actor:human · scope:item_01 · phase:processing · since 14:00:00`;
 - failed: [SHARP] non-destructive localized attempt-failure line adjacent to the panel while existing localized title, summary, core insight, and 3–5 Key Points remain visible. Canonical Chinese shape: `上次重处理失败 · 解码错误 · 已保留现有摘要和要点`. The UI must not replace preserved content with a URL-like title, raw error, empty Summary/Core, or fallback source excerpt solely because the latest re-ingest attempt failed. Raw diagnostic detail may remain available to developers where already supported, but user-facing failure text is localized and attempt-scoped.
 
-Accessibility and focus: opening configuring state keeps focus inside the inline panel on the model selector or first available model. Loading/unavailable/complete/failed messages use visible text and `aria-live="polite"`; conflict/errors use `aria-live="assertive"`. Running uses `aria-disabled="true"` rather than removing focus from the trigger. `[CANCEL]` returns focus to `[RE-INGEST ITEM]`; completion returns focus to the refreshed Inspector heading or the re-ingest trigger. The panel must be reachable in normal tab order and must not trap focus like a modal.
+Accessibility and focus: opening configuring state keeps focus inside the inline panel on the model selector or first available model. Loading/unavailable/complete/failed messages use visible text and `aria-live="polite"`; conflict/errors use `aria-live="assertive"`. Running uses `aria-disabled="true"` rather than removing focus from the trigger. `[CANCEL]` or `[取消]` returns focus to `[RE-INGEST ITEM]` or `[重新处理本文]`; completion returns focus to the refreshed Inspector heading or the re-ingest trigger. The panel must be reachable in normal tab order and must not trap focus like a modal.
 
 ### Source Text Disclosure (`source-disclosure`)
 - **Intent**: [SHARP] Keep raw/source evidence available while making every newly opened Inspector item begin with the source text collapsed.
@@ -741,7 +898,7 @@ On desktop, the Inspector is its own scroll container. Opening a different item 
 - **useFor**: Source rows, OPML import, state export/import, manual `[RUN INGEST]`, per-source `[FETCH]`, and visible current operation status when work is running or blocks an action.
 - **avoidFor**: Settings dashboard, durable job list, operation history, task queue, retry dashboard, command ledger, sync/merge controls, source hierarchy, tags, or a second URL-add field.
 
-Anatomy: title, global ingest/current-operation status, global `[RUN INGEST]` action, `[IMPORT OPML]` action, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, diagnostic `[DETAILS]`, and terse links to the State Portability `[EXPORT STATE]` / `[IMPORT STATE]` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, adjacent last fetch status or raw diagnostic text, and a right-aligned action block. Bracket action labels are canonical and uppercase exactly as rendered here; prose may describe the capability, but UI text must not render lowercase variants such as `import opml`, `export state`, or `import state`.
+Anatomy: title, global ingest/current-operation status, global `[RUN INGEST]` action, `[IMPORT OPML]` action, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, diagnostic `[DETAILS]`, and terse links to the State Portability `[EXPORT STATE]` / `[IMPORT STATE]` actions. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields: source name, URL, adjacent last fetch status or raw diagnostic text, and a right-aligned action block. Source Ledger bracket action labels are [SHARP] exact English tokens across locales: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`, `[IMPORT OPML]`, `[IMPORTING OPML...]`, `[EXPORT STATE]`, `[EXPORTING STATE...]`, `[IMPORT STATE]`, `[IMPORTING STATE...]`, `[DELETE]`, and `[DETAILS]`. Localize surrounding prose and accessible names, not these visible Source Ledger bracket tokens. UI text must not render lowercase variants such as `import opml`, `export state`, or `import state`, and must not render localized Source Ledger bracket labels such as `[导入 OPML]`, `[导出状态]`, or `[导入状态]` unless this contract is explicitly revised.
 
 Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process current-operation guard described in `docs/ARCHITECTURE.md`; conflict feedback is raw, terse, and includes current operation detail rather than only `err: operation already running`.
 
@@ -788,6 +945,7 @@ Required DOM contract for manual ingest controls:
       <span class="source-ledger__status" aria-live="polite">last_fetch: 14:02:05</span>
       <span class="source-ledger__actions">
         <button class="bracket-action bracket-action--fetch" type="button" aria-label="Fetch source NYT">[FETCH]</button>
+        <button class="bracket-action bracket-action--details" type="button" aria-label="Source details NYT">[DETAILS]</button>
         <button class="bracket-action bracket-action--delete" type="button" aria-label="Delete source NYT">[DELETE]</button>
       </span>
     </li>
@@ -860,7 +1018,7 @@ Do:
 - [SHARP] Do place manual ingest controls only in Source Ledger: `[RUN INGEST]` in the header and `[FETCH]` per source row.
 - [SHARP] Do represent heavy operation work with text replacement and the shared current-operation snapshot only: `[INGESTING...]`, `[FETCHING...]`, `[REPROCESSING...]`, `op: <kind>`, updated timestamps, conflict text, or raw `err:` diagnostics.
 - [SHARP] Do include current operation detail when an action is blocked; users must not see only `err: operation already running`.
-- [SHARP] Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment. Rest/active/disabled bracket-action tokens use `{colors.surface}` as the explicit accessible paired background for `{colors.muted}` text; implementations may render optical transparency only when the inherited warm surface preserves the same contrast and does not resolve to transparent black.
+- [SHARP] Do make bracket actions (`[FETCH]`, `[RUN INGEST]`, `[IMPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[REPROCESS LIBRARY]`, or non-Source-Ledger localized equivalents explicitly defined in their component sections) monospace buttons with invisible enlarged hitboxes and terminal-style instantaneous hover/focus treatment. Source Ledger visible bracket tokens stay exact English across locales. Rest/active/disabled bracket-action tokens use `{colors.surface}` as the explicit accessible paired background for `{colors.muted}` text; implementations may render optical transparency only when the inherited warm surface preserves the same contrast and does not resolve to transparent black.
 - Do expose active state export/import as terse text actions covering active sources, active steering rules, and currently resonated items.
 - Do show steering receipts as concise inline evidence, not as a policy roster.
 - Do show raw provenance, extraction limits, source names, and original links.
@@ -872,6 +1030,8 @@ Do:
 - [SHARP] Do collapse source text/source evidence by default for every newly opened Inspector item while preserving accessible disclosure semantics and literal provenance.
 - Do preserve persistent feed access through time groups and pagination.
 - Do keep the left feed compact by default: flat metadata, 18px serif titles, clamped 1–2 line abstracts, and horizontal rules rather than roomy cards.
+- [SHARP] Do strip visual metadata prefixes in reader surfaces: source names, time, extraction status, model support, and value tier belong in `list-meta-row` order, while full provenance belongs in `inspector-frontmatter`.
+- [SHARP] Do convert original/article/feed/source URLs into compact evidence links (`原文 ↗`, `条目 ↗`, `来源 ↗`) in the Inspector; raw URL strings are reserved for Source Ledger management and diagnostics.
 - Do keep accent scarce: Resonate and one active command/focus moment at most.
 - Do enforce minimum 44 CSS px touch targets on mobile web surfaces.
 - Do support keyboard navigation for every action.
@@ -895,6 +1055,8 @@ Don't:
 - Don't use emoji as structural icons; use text, professional SVG icons, or plain glyphs.
 - Don't display internal design-positioning phrases such as “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” as product UI copy.
 - Don't solve feed density with settings bloat, unread states, sortable spreadsheet columns, zebra striping, or monospace-only titles.
+- [SHARP] Don't display `src:`, `来源标题:`, `原文链接`, `条目 URL`, `来源 URL`, or `价值:` as repeated visual prefixes in Feed rows or the compact Inspector header.
+- [SHARP] Don't let metadata blocks occupy more vertical space than the Inspector title before the first reading section; Frontmatter is compact audit texture, not a preface.
 - [SHARP] Don't show Key Points in Feed rows; Feed remains title, compact summary/core preview, metadata, and Resonate only.
 - [SHARP] Don't render Key Points from raw Markdown, generated HTML, paragraph text split heuristics, or bullets inferred by the client; use the structured `key_points` array only.
 - [SHARP] Don't let a failed re-ingest attempt hide, erase, or visually demote preserved title/summary/core/key_points content.
@@ -938,38 +1100,38 @@ Motion is functional, brief, and optional.
 - Bracket actions use immediate terminal feedback: transparent enlarged hitbox at rest, stark color inversion or equivalent hard highlight on hover/focus, strict monospace text, and zero transform/shadow/fade behavior.
 
 ## Low-Fidelity Wireframe
-
 ```text
 +--------------------------------------------------------------------------------+
 | > Steer or paste RSS URL...                                        RESOFEED    |
 +--------------------------------------------------------------------------------+
-| src: TLDR AI Feed · 2h · 全文                           TODAY | INSPECTOR     |
-| 中国本地化标题示例               [☆]    | [src: TLDR AI Feed] [全文]         |
-| 中文摘要预览保持紧凑；馈送不显示要点。     | 中国本地化标题示例                  |
-| ----------------------------------------- | 摘要：中文上下文摘要。              |
-|                                          | 核心洞察：一句话中文判断。          |
-|                                          | 要点：                             |
-|                                          | • 结构化要点一                     |
-|                                          | • 结构化要点二                     |
-|                                          | • 结构化要点三                     |
-|                                          | 上次重处理失败 · 已保留现有摘要和要点 |
-|                                          | [重新处理本文]                    |
-|                                          | model: default: account_default    |
-|                                          | 额外提示（仅本次，不保存）          |
-|                                          | 不能覆盖结构/语言/状态              |
-|                                          | [确认重新处理] [取消]              |
-|                                          | 来源文本（已折叠） ▸               |
-| src: hn · 4h · agent:delivery-bot         | ---------------------------------- |
-| Secondary Story                     [★]   | Source text stays behind           |
-| ----------------------------------------- | disclosure; original link visible. |
-| src: blog.example · 1d · source excerpt        YESTERDAY | why: fresh from configured source  |
-| Older item remains reachable.       [☆]   |                                    |
+| TLDR AI FEED · 1m · 全文 · 模型支持 · high                 TODAY | INSPECTOR  |
+| Agent Judge：针对生产级 AI 代理的长上下文评估方案       [☆]    | Agent Judge：针对生产级 AI 代理... |
+| 随着长周期自主 AI 代理的应用日益普及，传统单一 LLM...          | ---------------------------------- |
+| ---------------------------------------------------------------- | ORIGINAL  Agent Judge: Solving... |
+| TLDR AI FEED · 1m · 来源摘录 · high                             | LINKS     原文 ↗ · 来源 ↗         |
+| 波士顿咨询公司（BCG）首席执行官：人工智能正在...         [☆]    | AI STATUS 模型支持 · quality: high |
+| ---------------------------------------------------------------- | ATTEMPT   失败 · 已保留现有摘要和要点 |
+| MINIMAX · 1m · 摘录 · brief                                      | ---------------------------------- |
+| MiniMax 预告 M3 模型：引入稀疏注意力机制...             [☆]     | 摘要                              |
+|                                                                    | 随着长周期自主 AI 代理的应用日益普及，|
+|                                                                    | 传统的单一 LLM 作为评估判断者已显现局限。|
+|                                                                    |                                  |
+|                                                                    | 核心洞察                          |
+|                                                                    | 评估生产级代理需要可验证的长上下文证据链。|
+|                                                                    |                                  |
+|                                                                    | 要点                              |
+|                                                                    | • 长代理轨迹超过普通上下文窗口。        |
+|                                                                    | • 外部系统状态修改必须被验证。          |
+|                                                                    | • 评估准则会随模型和工具迭代而变化。      |
+|                                                                    | [重新处理本文]                     |
+|                                                                    | 来源文本（已折叠）：全文 ▸             |
 +--------------------------------------------------------------------------------+
-| /doctor is raw text; Source Ledger is flat; export/import are terse JSON actions |
+| Source Ledger may show literal URLs because it manages sources; reader surfaces |
+| replace raw URLs with compact evidence links and accessible labels.             |
 +--------------------------------------------------------------------------------+
 ```
 
-Mobile structure: Steer command at bottom, feed as a touch-safe compact single column with inline metadata and one-line abstracts; item tap opens a full-screen Inspector route that becomes generous again for reading; Source Ledger opens as a flat full-screen list.
+Mobile structure: Steer command at bottom, feed as a touch-safe compact single column with inline metadata and one-line abstracts; item tap opens a full-screen Inspector route where title appears first, Frontmatter stays compact, and the reading sections regain generous prose rhythm; Source Ledger opens as a flat full-screen list.
 
 ## Stitch Design Checkpoint — 2026-06-01
 
