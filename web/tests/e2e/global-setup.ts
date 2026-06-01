@@ -205,9 +205,32 @@ http.createServer((req, res) => {
     const steeringContent = command.includes('crypto') && command.includes('sqlite')
       ? { interpreted_as: 'steering_policy_update', rule_texts: ['filter crypto token', 'boost sqlite storage analysis'], message: 'steering updated' }
       : { interpreted_as: 'steering_policy_update', rule_texts: ['Push more deterministic llm fixtures.'], message: 'steering updated' };
+    function cleanAvailableText(value) {
+      if (typeof value !== 'string') return '';
+      let text = value
+        .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\{\s*"@context"[\s\S]*?\}/gi, ' ')
+        .replace(/\benclosure:\s+url=\S+\s+type=\S+\s+length=\S+(?:\s+image=\S+)?/gi, ' ')
+        .replace(/\bfollow\s+us\s+on\s+(?:twitter|x)\s+for\s+more\s+newsletters?\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      text = text.replace(/\b(summary-like lead repeated by the site)\s+\1\b/gi, ' ');
+      return text.replace(/\s+/g, ' ').trim();
+    }
+    function compactSummary(value) {
+      if (value.length <= 1700) return value;
+      return value.slice(0, 900).trimEnd() + ' ... ' + value.slice(-700).trimStart();
+    }
+    const availableText = cleanAvailableText(prompt.item?.available_text);
+    const sourceBackedSummary = availableText ? compactSummary(availableText) : '';
+    const sourceBackedInsight = availableText ? 'Source text remains readable.' : '';
     const content = prompt.task === 'translate_steering'
       ? steeringContent
-      : { localized_title: sourceItemTitle, summary: sourceItemTitle + ' appears in the configured RSS source and remains available for review.', core_insight: sourceItemTitle + ' is relevant to the configured source review.', key_points: [sourceItemTitle + ' is present in the configured RSS source.', sourceItemTitle + ' remains tied to the original source text.', sourceItemTitle + ' can be indexed for lexical retrieval.'], value_tier: 'high', model_status: 'ok' };
+      : availableText
+        ? { localized_title: sourceItemTitle, summary: sourceBackedSummary, core_insight: sourceBackedInsight, key_points: ['Source text remains available.', 'Source text is preserved for review.', 'Source excerpt supports lexical retrieval.'], value_tier: 'high', model_status: 'ok' }
+        : { localized_title: sourceItemTitle, summary: 'summary unavailable', core_insight: 'summary unavailable', key_points: [], value_tier: 'source-claim', model_status: 'summary_unavailable' };
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ id: 'e2e-chatcmpl', model: 'openrouter/e2e-deterministic', choices: [{ message: { role: 'assistant', content: JSON.stringify(content) } }] }));
   });

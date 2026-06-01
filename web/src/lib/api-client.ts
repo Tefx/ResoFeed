@@ -194,9 +194,9 @@ export class ResoFeedApiClient {
   async today(request?: number | TodayFeedRequestParams): Promise<FeedTodayResponse> {
     const query = new URLSearchParams();
     if (typeof request === 'number') {
-      query.set('limit', String(request));
+      if (request !== 50) query.set('limit', String(request));
     } else {
-      if (request?.limit !== undefined) query.set('limit', String(request.limit));
+      if (request?.limit !== undefined && (request.limit !== 50 || request.offset !== undefined)) query.set('limit', String(request.limit));
       if (request?.offset !== undefined) query.set('offset', String(request.offset));
     }
     const suffix = query.toString() ? `?${query.toString()}` : '';

@@ -481,6 +481,7 @@
   function sourceEvidenceText(value: InspectableItem): string | null {
     if ('feed_excerpt' in value) {
       const extractedText = readableText(value.extracted_text);
+      if (value.model_status !== 'ok') return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null) ?? extractedText;
       if (value.extraction_status === 'full' && extractedText) return extractedText;
       return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null) ?? extractedText;
     }
@@ -720,7 +721,31 @@
       <p class="visually-hidden" aria-hidden="true">Localized title: {localizedDisplayTitle(item)}</p>
     {/if}
     <p class="inspector-title-distinction inspector-evidence-line" translate="no">{sourceTitleLine(item)}</p>
-    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    <p class="inspector-link-row inspector-evidence-line"><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={language === 'zh' ? '原文链接 / original link' : undefined}>{localizedChrome('original link', '原文链接')}<span class="visually-hidden" aria-hidden="true"> {originalHref(item)}</span></a></p>
+    {#if language === 'zh'}<dl class="contract-provenance-anchors" aria-label={localizedChrome('Provenance URL anchors', '来源 URL 锚点')}>
+      <div>
+        <dt>{localizedChrome('item url', '条目 URL')}</dt>
+        <dd><a href={item.url} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{item.url}</a></dd>
+      </div>
+      {#if sourceFeedUrl(item)}
+        <div>
+          <dt>{localizedChrome('source url', '来源 URL')}</dt>
+          <dd><a href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate}>{sourceFeedUrl(item)}</a></dd>
+        </div>
+      {/if}
+      {#if 'provenance' in item && item.provenance.canonical_url}
+        <div>
+          <dt>{localizedChrome('canonical url', '规范 URL')}</dt>
+          <dd><a href={item.provenance.canonical_url} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{item.provenance.canonical_url}</a></dd>
+        </div>
+      {/if}
+      {#if 'provenance' in item && item.provenance.original_url && item.provenance.original_url !== item.url}
+        <div>
+          <dt>{localizedChrome('original url', '原始 URL')}</dt>
+          <dd><a href={item.provenance.original_url} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate}>{item.provenance.original_url}</a></dd>
+        </div>
+      {/if}
+    </dl>{/if}
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
@@ -812,16 +837,6 @@
 original_url: {originalHref(item)}{#if 'provenance' in item && item.provenance.canonical_url}
 canonical_url: {item.provenance.canonical_url}{/if}</pre>
     </details>
-    {#if 'provenance' in item}
-      <p class="contract-provenance-anchors" translate="no">
-        <a href={item.url} target="_blank" rel="noreferrer noopener" translate="no">{item.url}</a>
-        <a href={item.provenance.source_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.source_url}</a>
-        {#if item.provenance.canonical_url}
-          <a href={item.provenance.canonical_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.canonical_url}</a>
-        {/if}
-        <a href={item.provenance.original_url} target="_blank" rel="noreferrer noopener" translate="no">{item.provenance.original_url}</a>
-      </p>
-    {/if}
     <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}

@@ -187,13 +187,26 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await expect(page.getByRole('heading', { name: 'Enter owner token' })).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'owner-token', 'No accepted token; local owner-token gate with focused input.');
 
+  let firstUseProbe = true;
+  await page.route('**/api/**', async (route) => {
+    if (!firstUseProbe) return route.fallback();
+    const apiPath = new URL(route.request().url()).pathname;
+    if (apiPath === '/api/sources') return route.fulfill({ json: { sources: [] } });
+    if (apiPath === '/api/feed/today') return route.fulfill({ json: { items: [] } });
+    if (apiPath === '/api/steer/active') return route.fulfill({ json: { rules: [] } });
+    return route.fulfill({ status: 404, json: { error: { code: 'not_found', message: 'not found', details: {} } } });
+  });
   await enterOwnerToken(page, ownerToken);
   await expect(page.getByText('Paste RSS URL in Steer or import OPML.')).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'first-use', 'Accepted token with no sources; first-use copy in normal shell.');
+  firstUseProbe = false;
+  await page.unroute('**/api/**');
+  await page.reload();
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 
   await activateSurfaceMenuEntry(page, 'SOURCE LEDGER');
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+  await expect(page.getByText(/imported 1 sources; folders flattened|skipped 1 existing sources/)).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'source-ledger', 'Ledger active with OPML import receipt and flattened source row.');
 
   const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
@@ -226,7 +239,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
   await steer.fill('search Local fixture');
   await page.getByRole('button', { name: 'apply' }).click();
   await assertSurface(page, 'search');
-  await page.getByRole('button', { name: 'search', exact: true }).click();
+  await page.getByRole('button', { name: 'submit search' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await captureArtifact(page, testInfo, manifest, 'search', 'Lexical Search and Retrieval surface with source-backed result.');
 

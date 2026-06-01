@@ -116,7 +116,7 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
       }
     },
     feed: {
-      listLabel: '今日订阅条目',
+      listLabel: '今日订阅条目 / Today feed items',
       sourceAria: (sourceTitle) => `来源：${sourceTitle}`,
       ageAria: (age) => `时间：${age}`,
       extractionAria: (status) => `提取：${status}`,

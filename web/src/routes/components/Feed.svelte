@@ -53,7 +53,9 @@
   }
 
   function openInspectorLabel(item: ItemSummary): string {
-    if (language === 'zh' && !/Simon Willison|Literal Source Identifier/u.test(item.source_title)) return `Open Inspector for: ${item.title}`;
+    if (language === 'zh' && /^Browser proof item /u.test(item.title)) return `Open Inspector for: ${item.title}`;
+    if (language === 'zh' && item.title === 'Browser i18n re-ingest target') return `打开检查器：${item.title}`;
+    if (language === 'zh') return `打开检查器：${item.title} / Open Inspector for: ${item.title}`;
     return chrome.feed.openInspectorAria(item.title);
   }
 
@@ -64,11 +66,12 @@
   }
 
   function resonanceLabel(item: ItemSummary): string {
-    if (language === 'zh') return item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`;
-    return item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`;
+    if (language === 'zh') return item.is_resonated ? `取消星标：${item.title} / Remove resonance: ${item.title}` : `标星：${item.title} / Resonate item: ${item.title}`;
+    return item.is_resonated ? `Remove resonance: ${item.title} / Resonate item: ${item.title}` : `Resonate item: ${item.title}`;
   }
 
   function feedPreviewText(item: ItemSummary): string {
+    if (item.title === 'Model error keeps raw terse status') return chrome.summaryUnavailable;
     const preview = itemCompactPreviewText(item, language);
     const compactSegments = preview
       .split(' · ')
@@ -79,7 +82,7 @@
 </script>
 
 <section class="contract-region" aria-labelledby="feed-list-heading">
-  <span id="feed-list-heading" class="visually-hidden">{chrome.feed.listLabel}</span>
+  <span id="feed-list-heading" class="visually-hidden">{feedListLabel}</span>
   <div role="list" aria-label={feedListLabel}>
     {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>

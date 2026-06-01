@@ -380,7 +380,7 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'SEARCH' })).toBeVisible();
   await expect(page.getByLabel('Plain text query')).toHaveValue('Local fixture');
-  await page.getByRole('button', { name: '[SEARCH]', exact: true }).click();
+  await page.getByRole('button', { name: 'submit search' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
@@ -459,7 +459,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
     await steer.fill('search Live audit');
     await page.getByRole('button', { name: 'apply' }).click();
     await expect(page.getByRole('heading', { name: 'SEARCH' })).toBeVisible();
-    await page.getByRole('button', { name: '[SEARCH]', exact: true }).click();
+    await page.getByRole('button', { name: 'submit search' }).click();
     await expect(page.locator('#search-status')).toContainText('1 results');
     await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Live audit item one');
     await captureAuditState(page, testInfo, 'search', metrics);
@@ -587,7 +587,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await steer.fill('search Local fixture');
   await page.getByRole('button', { name: 'apply' }).click();
   await expect(page.getByText('retrieval: lexical search')).toBeVisible();
-  await page.getByRole('button', { name: '[SEARCH]' }).click();
+  await page.getByRole('button', { name: 'submit search' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   const apiSearch = await authorizedGet<{ items: ItemSummary[]; query: { q: string; limit: number } }>(request, isolatedRunInfo, ownerToken, '/api/search?q=Local%20fixture&limit=20');
   const mcpSearch = await mcpTool<{ items: ItemSummary[] }>(request, isolatedRunInfo, ownerToken, 'search_items', { query: 'Local fixture', limit: 20 });

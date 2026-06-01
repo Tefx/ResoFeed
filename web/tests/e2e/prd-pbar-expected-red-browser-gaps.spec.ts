@@ -39,6 +39,12 @@ async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string; fix
   await expect(page.locator('.source-ledger__row', { hasText: runInfo.fixtureServer.url })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
   await steer(page, 'today');
   await expect(feedItem).toBeVisible({ timeout: 10_000 });
+  const localFixtureRow = page.locator('.contract-feed-item', { has: feedItem });
+  const activeLocalFixtureResonance = localFixtureRow.getByRole('button', { name: /^Remove resonance/ });
+  if (await activeLocalFixtureResonance.isVisible().catch(() => false)) {
+    await activeLocalFixtureResonance.click();
+    await expect(localFixtureRow.getByRole('button', { name: /^Resonate item/ })).toHaveAttribute('aria-pressed', 'false');
+  }
 }
 
 async function captureEvidence(page: Page, testInfo: TestInfo, label: string): Promise<string[]> {
@@ -150,10 +156,10 @@ test.describe('pbar expected-red PRD browser gaps', () => {
     const itemButton = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
     await expect.soft(itemButton, 'B21: Feed rows need visible quality/value tier metadata').toContainText(/value:|quality:|tier:/i);
 
-    const resonate = page.getByRole('button', { name: 'Resonate item' }).first();
+    const resonate = page.locator('.contract-feed-item', { has: itemButton }).getByRole('button', { name: /^Resonate item/ });
     await expect.soft(resonate, 'B8: Resonate starts with programmatic unpressed state').toHaveAttribute('aria-pressed', 'false');
     await resonate.click();
-    await expect.soft(page.getByRole('button', { name: 'Remove resonance' }).first(), 'B8: Resonate state changes after click').toHaveAttribute('aria-pressed', 'true');
+    await expect.soft(page.locator('.contract-feed-item', { has: itemButton }).getByRole('button', { name: /^Remove resonance/ }), 'B8: Resonate state changes after click').toHaveAttribute('aria-pressed', 'true');
 
     await itemButton.click();
     await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();

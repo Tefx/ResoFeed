@@ -35,6 +35,7 @@
       filters: '搜索筛选',
       query: '纯文本查询',
       submit: '[搜索]',
+      submitAria: undefined,
       filtersSummary: '筛选',
       source: '来源',
       sourceInput: '来源筛选',
@@ -56,6 +57,7 @@
       filters: 'Search filters',
       query: 'Plain text query',
       submit: '[SEARCH]',
+      submitAria: 'submit search',
       filtersSummary: 'filters',
       source: 'Source',
       sourceInput: 'Source filter',
@@ -128,7 +130,7 @@
     <div class="search-primary-row">
       <label for="search-query">{searchChrome.query}</label>
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
-      <button type="submit" class="bracket-action">{searchChrome.submit}</button>
+      <button type="submit" class="bracket-action" aria-label={searchChrome.submitAria}>{searchChrome.submit}</button>
     </div>
     {#if compactFilters}
       <details class="search-secondary-filters" data-compact-filters="true">

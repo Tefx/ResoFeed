@@ -69,7 +69,8 @@ async function importFixtureAndOpenInspector(page: Page, ownerToken: string, opm
   await expect(fixtureSourceRow).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
   await expect(fixtureSourceRow).toBeVisible({ timeout: 20_000 });
   await openSurfaceViaMenu(page, 'TODAY');
-  await expect(page.getByRole('heading', { name: 'TODAY' })).toBeVisible();
+  // [DEVIATION]: Feed/Search Shared Anatomy now forbids a standalone visible TODAY heading; the active TODAY surface is proven by the feed list landmark and inline time labels instead.
+  await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
 
   const feedItem = page.getByRole('button', { name: `Open Inspector for: ${fixtureTitle}` });
   await expect(feedItem).toBeVisible({ timeout: 15_000 });

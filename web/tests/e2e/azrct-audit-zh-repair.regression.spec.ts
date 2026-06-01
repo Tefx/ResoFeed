@@ -296,7 +296,7 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     await expect.soft(page.getByRole('status').filter({ hasText: /检索：词汇搜索/u })).toBeVisible();
 
     await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('增加中文来源');
-    await page.keyboard.press('Enter');
+    await page.getByRole('button', { name: 'apply' }).click();
     await expect.soft(page.getByRole('status', { name: 'Steer receipt' })).toContainText('已应用');
   });
 

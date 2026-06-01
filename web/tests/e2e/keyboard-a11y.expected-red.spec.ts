@@ -110,11 +110,14 @@ test('expected-red keyboard a11y Steer submit doctor log and Inspector original 
 
 test('expected-red keyboard a11y Source Ledger OPML state with manual fetch controls', async ({ page, ownerToken, runInfo }, testInfo) => {
   await enterOwnerToken(page, ownerToken);
-  const ledgerNav = page.getByRole('button', { name: 'SOURCE LEDGER' });
+  // [DEVIATION]: DESIGN.md makes SOURCE LEDGER available through the opened RESOFEED utility menu, not as persistent closed-menu top chrome.
+  await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+  const ledgerNav = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]').getByRole('button', { name: 'SOURCE LEDGER' });
   await ledgerNav.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-  await expectActiveState(ledgerNav, 'SOURCE LEDGER nav active state before ledger controls');
+  await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+  await expectActiveState(page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]').getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav active state before ledger controls');
 
   const opmlButton = page.getByRole('button', { name: '[IMPORT OPML]' });
   await focusAndAudit(opmlButton, 'OPML import visible button');

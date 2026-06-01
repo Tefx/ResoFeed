@@ -60,6 +60,7 @@
   let inspectorState = $state<ApiLoadState>('idle');
   let inspectorError = $state<string | null>(null);
   let inspectorFocusRequestId = $state(0);
+  let inspectorActivated = $state(false);
   let steerCommand = $state('');
   let searchSeedQuery = $state('');
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
@@ -519,7 +520,7 @@
       return response.language;
     } catch (error) {
       // docs/ARCHITECTURE.md defines missing processing_language as effective `en`; keep the served feed usable when older/focused fixtures omit the runtime-language route.
-      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) {
+      if (error instanceof ResoFeedApiError) {
         return { code: 'en', label: 'English' };
       }
       throw error;
@@ -599,6 +600,7 @@
   async function selectItem(item: ItemSummary): Promise<void> {
     rememberFeedScrollPosition();
     selectedItemId = item.id;
+    inspectorActivated = true;
     selectedItemDetail = null;
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
@@ -1149,15 +1151,6 @@
             </div>
           </div>
         </details>
-        {#if browserRuntimeA11y}
-          <div class="surface-nav-assistive-menu" aria-hidden="true" inert>
-            <button type="button" aria-pressed={currentSurface === 'feed' ? 'true' : 'false'} data-state={currentSurface === 'feed' ? 'active' : undefined} onclick={() => openSurfaceFromMenu('feed')}>TODAY</button>
-            <button type="button" aria-pressed={currentSurface === 'ledger' ? 'true' : 'false'} data-state={currentSurface === 'ledger' ? 'active' : undefined} onclick={() => openSurfaceFromMenu('ledger')}>SOURCE LEDGER</button>
-            <button type="button" class="bracket-action bracket-action--language" aria-label={processingLanguage.code === 'en' ? 'Processing language English; set Chinese' : 'processing language Chinese; set English'} onclick={() => void updateProcessingLanguage()}>{processingLanguageButtonText}</button>
-            <button type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.reprocessAria} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
-            <span>Existing readable item content will be rewritten. Source identifiers remain unchanged.</span>
-          </div>
-        {/if}
       </nav>
       </header>
 
@@ -1226,7 +1219,7 @@
       <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label={todayScrollLabel} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">{shellChrome.independentScroll}</span>
         {#if !feedPaneInactive || currentSurface === 'inspector'}
-          <h1 id="feed-heading" class="contract-label contract-surface-heading" tabindex="-1" aria-label="TODAY"></h1>
+          <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if apiError && promptState !== 'rejected'}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {/if}
@@ -1245,7 +1238,7 @@
         {/if}
         {#if inspectorItem}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
-            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={!isNarrow || currentSurface === 'inspector'} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
           </section>
         {:else}
           <p class="contract-label">INSPECTOR</p>
@@ -1275,7 +1268,7 @@
       {#if currentSurface === 'search'}
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={isNarrow} />
+      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={isNarrow} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
