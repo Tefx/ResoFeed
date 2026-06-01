@@ -67,6 +67,15 @@
     if (language === 'zh') return item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`;
     return item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`;
   }
+
+  function feedPreviewText(item: ItemSummary): string {
+    const preview = itemCompactPreviewText(item, language);
+    const compactSegments = preview
+      .split(' · ')
+      .map((segment) => segment.trim())
+      .filter((segment) => segment.length > 0 && !/要点|核心洞察|Key Points/i.test(segment));
+    return compactSegments.join(' · ') || preview.replace(/要点|核心洞察|Key Points/gi, '').replace(/\s+/g, ' ').trim();
+  }
 </script>
 
 <section class="contract-region" aria-labelledby="feed-list-heading">
@@ -97,7 +106,7 @@
             {/if}
           </p>
           <p class="contract-feed-title" aria-label={language === 'zh' ? `本地化标题：${itemLocalizedDisplayTitle(item, language)}` : `Localized title: ${itemLocalizedDisplayTitle(item, language)}`}>{itemLocalizedDisplayTitle(item, language)}</p>
-          <p class="contract-feed-summary">{itemCompactPreviewText(item, language)}</p>
+          <p class="contract-feed-summary">{feedPreviewText(item)}</p>
         </button>
         <button
           class="contract-resonate"
