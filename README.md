@@ -49,6 +49,8 @@ If `--owner-token` is omitted, first startup generates an owner token, stores on
 
 - Usage and API examples: [`docs/USAGE.md`](docs/USAGE.md)
 - Technical contract: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Container packaging and runtime usage: [`docs/CONTAINER.md`](docs/CONTAINER.md)
+- Non-core Tailscale deployment example: [`docs/examples/TAILSCALE_CONTAINER.md`](docs/examples/TAILSCALE_CONTAINER.md)
 - Prompting contract: [`docs/PROMPTING_SYSTEM.md`](docs/PROMPTING_SYSTEM.md)
 - Product requirements: [`docs/PRD.md`](docs/PRD.md)
 - Visual/interaction contract: [`docs/DESIGN.md`](docs/DESIGN.md)

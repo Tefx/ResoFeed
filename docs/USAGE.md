@@ -173,6 +173,21 @@ Reprocess is an immediate owner-authorized operation. It preserves source identi
 
 The web UI renders the control tersely as `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`; updates are announced through live status text and `<html lang>` follows `en` or `zh-CN`. Source identifiers such as URLs, source titles, source URLs, canonical URLs, and original links remain unchanged and are marked non-translatable in the DOM where rendered.
 
+## Container Deployment
+
+Container packaging is documented in [`docs/CONTAINER.md`](CONTAINER.md). The core container contract remains one `resofeed serve` process, one persistent SQLite volume, and one HTTP port that serves the UI, JSON HTTP API, and MCP at `/mcp`.
+
+With the image `ENTRYPOINT`, pass ResoFeed CLI arguments to the container. Prefer these container command arguments:
+
+```text
+serve \
+  --addr 0.0.0.0:8080 \
+  --public-url http://<host>:8080 \
+  --db /data/resofeed.sqlite3
+```
+
+The effective process invocation is `/app/resofeed serve ...` in the documented image contract. Full Docker run examples are in [`docs/CONTAINER.md`](CONTAINER.md). `--db` is optional in the binary, but container deployments should use an explicit `/data` volume path. If `--owner-token` is omitted, the generated token is printed once to stdout and can be read from container logs. HTTPS and private-network access are deployment-layer choices; a non-core Tailscale example is available in [`docs/examples/TAILSCALE_CONTAINER.md`](examples/TAILSCALE_CONTAINER.md).
+
 ## HTTP Command Reference
 
 All `/api/*` HTTP requests use the owner token from startup output or the explicit `--owner-token` value. Static UI assets can load without the token so the browser can show the token prompt.
@@ -1254,8 +1269,10 @@ ResoFeed intentionally excludes:
 
 ## Related Documents
 
-- Product requirements: `docs/PRD.md`
-- Visual/interaction contract: `docs/DESIGN.md`
-- Technical architecture: `docs/ARCHITECTURE.md`
+- Product requirements: [`docs/PRD.md`](PRD.md)
+- Visual/interaction contract: [`docs/DESIGN.md`](DESIGN.md)
+- Technical architecture: [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)
+- Container packaging and runtime usage: [`docs/CONTAINER.md`](CONTAINER.md)
+- Non-core Tailscale deployment example: [`docs/examples/TAILSCALE_CONTAINER.md`](examples/TAILSCALE_CONTAINER.md)
 
 State portability scope: `docs/ARCHITECTURE.md §5.5 State Portability` is authoritative for implementation. ResoFeed exports/imports the minimal current-state bundle, not history or activity-ledger data.
