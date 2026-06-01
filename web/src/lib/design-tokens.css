@@ -10,6 +10,7 @@
   --rf-color-muted: #68645b;
   --rf-color-muted-dark: #b8b1a2;
   --rf-color-border: #d7d0c0;
+  --rf-color-rule: #c8bfad;
   --rf-color-border-dark: #3b3e37;
   --rf-color-accent: #7a4600;
   --rf-color-accent-contrast: #fff2d0;
@@ -19,8 +20,8 @@
   --rf-color-warning: #7e5b00;
   --rf-color-success: #276749;
 
-  --rf-typography-chrome: 500 14px/20px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  --rf-typography-metadata: 500 12px/16px 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --rf-typography-chrome: 500 14px/20px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --rf-typography-metadata: 500 12px/16px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --rf-typography-feed-title: 600 18px/24px Newsreader, Georgia, 'Times New Roman', serif;
   --rf-typography-feed-summary: 400 14px/20px Newsreader, Georgia, 'Times New Roman', serif;
   --rf-typography-payload: 400 18px/28px Newsreader, Georgia, 'Times New Roman', serif;

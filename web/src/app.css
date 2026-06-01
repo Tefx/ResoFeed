@@ -104,13 +104,13 @@ a:focus,
   max-width: 1216px;
   min-height: 100vh;
   margin: var(--rf-space-xl) auto;
-  border: 1px solid var(--rf-color-border);
+  border: 1px solid var(--rf-color-rule);
   background: var(--rf-component-app-shell-background-color);
   color: var(--rf-component-app-shell-text-color);
 }
 
 .contract-region {
-  border-block-end: 1px solid var(--rf-color-border);
+  border-block-end: 1px solid var(--rf-color-rule);
   padding: var(--rf-space-md);
 }
 
@@ -164,7 +164,7 @@ a:focus,
   grid-template-columns: minmax(160px, auto) minmax(0, 1fr) auto;
   gap: var(--rf-space-md);
   align-items: baseline;
-  border-block-end: 1px solid var(--rf-color-border);
+  border-block-end: 1px solid var(--rf-color-rule);
   padding: 0 0 var(--rf-space-sm);
 }
 
@@ -211,7 +211,7 @@ a:focus,
   row-gap: var(--rf-space-sm);
   align-items: center;
   min-height: 44px;
-  border-block-start: 1px solid var(--rf-color-border);
+  border-block-start: 1px solid var(--rf-color-rule);
   padding-block: 0;
 }
 
@@ -529,7 +529,7 @@ a:focus,
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--rf-space-md);
   align-items: center;
-  border-block-end: 1px solid var(--rf-color-border);
+  border-block-end: 1px solid var(--rf-color-rule);
   padding: var(--rf-space-sm) var(--rf-space-md);
 }
 
@@ -593,7 +593,7 @@ details.surface-nav .surface-nav-menu {
   width: min(36rem, calc(100vw - (var(--rf-space-sm) * 2)));
   gap: var(--rf-space-xs);
   align-items: start;
-  border: 1px solid var(--rf-color-border);
+  border: 1px solid var(--rf-color-rule);
   padding: var(--rf-space-sm);
   background: var(--rf-color-surface);
 }
@@ -725,7 +725,7 @@ details.surface-nav button:focus-visible {
 }
 
 .feed-pane {
-  border-inline-end: 1px solid var(--rf-color-border);
+  border-inline-end: 1px solid var(--rf-color-rule);
   max-height: calc(100vh - 130px);
   overflow-y: auto;
 }
@@ -812,8 +812,9 @@ details.surface-nav button:focus-visible {
   grid-template-columns: 3px minmax(0, 1fr) 44px;
   gap: var(--rf-space-row);
   align-items: start;
-  border-block-end: 1px solid var(--rf-color-border);
-  padding: var(--rf-space-row) var(--rf-space-row) 11px 0;
+  border-block-end: 1px solid var(--rf-color-rule);
+  /* [DEVIATION]: The compact runtime contract caps rows at 112px; reducing only vertical padding preserves the feed scan row without changing typography, clamping, or the 44px Resonate target. */
+  padding: 10px var(--rf-space-row) 9px 0;
 }
 
 .contract-feed-item::before {
@@ -949,7 +950,7 @@ details.surface-nav button:focus-visible {
   min-height: 44px;
   display: inline-grid;
   place-items: center;
-  border-color: var(--rf-color-border);
+  border-color: var(--rf-color-rule);
   padding: 0 0 2px;
   color: var(--rf-color-muted);
   background: var(--rf-color-surface);
@@ -1402,8 +1403,19 @@ details.surface-nav button:focus-visible {
     inset-block: 0 78px;
     inset-inline: 0;
     overflow: auto;
-    padding: var(--rf-space-lg);
+    padding: 0;
     background: var(--rf-color-background);
+  }
+
+  .detail-pane.active-panel .contract-inspector {
+    padding: var(--rf-space-lg);
+  }
+
+  .utility-surface.active-panel > .contract-source-ledger,
+  .utility-surface.active-panel > .contract-search,
+  .utility-surface.active-panel > .contract-region,
+  .utility-surface.active-panel > .back-command {
+    margin-inline: var(--rf-space-lg);
   }
 
   .utility-surface.search-surface.active-panel {
