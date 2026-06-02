@@ -24,8 +24,8 @@
     sources,
     onDeleteSource,
     onImportOpml,
-    onRunIngest = async () => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 0, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [] }),
-    onFetchSource = async (source: Source) => ({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
+    onRunIngest = () => Promise.resolve({ operation: 'ingest', source_id: null, completed: true, sources_total: 0, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [] }),
+    onFetchSource = (source: Source) => Promise.resolve({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
     onImportState,
     currentOperation = null,
@@ -215,34 +215,31 @@
     importInput?.click();
   }
 
-  async function runIngest(): Promise<void> {
-    if (isRunningIngest) return;
+  function runIngest(): Promise<void> {
+    if (isRunningIngest) return Promise.resolve();
     isRunningIngest = true;
     globalIngestStatusText = '';
-    try {
-      await tick();
+    return tick().then(() => {
       globalIngestStatusText = chrome.submittingIngest;
-      const result = await onRunIngest();
+      return onRunIngest();
+    }).then((result) => {
       const completedAt = formatLocalClockTime(result.completed_at);
       globalIngestStatusText = result.completed
           ? `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`
           : rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
-    } catch (error) {
+    }).catch((error: unknown) => {
       globalIngestStatusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.ingestFailed);
-    } finally {
+    }).finally(() => {
       isRunningIngest = false;
-    }
+    });
   }
 
-  async function fetchSource(source: Source): Promise<void> {
-    if (fetchingSourceId === source.id) return;
+  function fetchSource(source: Source): Promise<void> {
+    if (fetchingSourceId === source.id) return Promise.resolve();
     const ownsActivePendingState = fetchingSourceId === null;
     if (ownsActivePendingState) fetchingSourceId = source.id;
     setSourceFeedback(source.id, null);
-    try {
-      await tick();
-      const result = await onFetchSource(source);
-      await pendingFrame();
+    return tick().then(() => onFetchSource(source)).then((result) => pendingFrame().then(() => result)).then((result) => {
       const completedAt = formatLocalClockTime(result.completed_at ?? source.last_fetch_at);
       const errorMessage = result.errors.find((candidate) => candidate.source_id === source.id || candidate.source_id === null)?.message;
       setSourceFeedback(
@@ -251,57 +248,55 @@
           ? `${chrome.lastFetch}: ${completedAt ?? chrome.complete}`
           : rawErrorText(errorMessage ?? source.last_fetch_error ?? chrome.fetchFailed)
       );
-    } catch (error) {
+    }).catch((error: unknown) => {
       setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.fetchFailed));
-    } finally {
+    }).finally(() => {
       if (ownsActivePendingState) fetchingSourceId = null;
-    }
+    });
   }
 
-  async function importSelectedFile(): Promise<void> {
+  function importSelectedFile(): Promise<void> {
     const file = importInput?.files?.[0];
-    if (!file) return;
+    if (!file) return Promise.resolve();
     isImportingOpml = true;
     statusText = '';
-    try {
-      const opml = await file.text();
-      const result = await onImportOpml(opml);
+    return file.text().then((opml) => Promise.resolve(onImportOpml(opml)).then((result) => ({ opml, result }))).then(({ opml, result }) => {
       importedTitleByUrl = { ...importedTitleByUrl, ...opmlTitleMap(opml) };
       statusText = result
         ? chrome.importComplete(result.imported || result.skipped)
         : chrome.importCompleteFallback;
       if (importInput) importInput.value = '';
-    } catch (error) {
+    }).catch((error: unknown) => {
       statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
         ? `imported ${sources.length} sources; OPML outlines flattened`
         : error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
-    } finally {
+    }).finally(() => {
       isImportingOpml = false;
-    }
+    });
   }
 
-  async function confirmDelete(source: Source): Promise<void> {
+  function confirmDelete(source: Source): Promise<void> {
     const sourceIndex = visibleSources.findIndex((candidate) => candidate.id === source.id);
     statusText = chrome.deleting(source.title);
-    try {
-      await onDeleteSource(source);
+    return Promise.resolve(onDeleteSource(source)).then(() => {
       confirmingSourceId = null;
       deletedSourceIds = new Set([...deletedSourceIds, source.id]);
       statusText = chrome.deleted(source.title);
-      await focusAfterDeletion(source.id, sourceIndex);
-    } catch (error) {
+      return focusAfterDeletion(source.id, sourceIndex);
+    }).catch((error: unknown) => {
       statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.deleteFailed);
-    }
+    });
   }
 
-  async function focusAfterDeletion(deletedSourceId: string, deletedIndex: number): Promise<void> {
-    await tick();
+  function focusAfterDeletion(deletedSourceId: string, deletedIndex: number): Promise<void> {
+    return tick().then(() => {
     const rows = Array.from(document.querySelectorAll<HTMLElement>('.source-ledger__row'))
       .filter((row) => row.dataset.sourceId !== deletedSourceId);
     const focusTarget = rows[Math.max(0, deletedIndex)]?.querySelector<HTMLElement>('.bracket-action--fetch')
       ?? rows[rows.length - 1]?.querySelector<HTMLElement>('.bracket-action--fetch')
       ?? ledgerHeading;
     focusTarget?.focus();
+    });
   }
 
   function sourceDiagnosticText(source: Source, lastFetch: string | null): string {

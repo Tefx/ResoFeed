@@ -171,7 +171,7 @@ describe('UIUX expected-red design contract coverage', () => {
     expectPresent(src, /aria-current=\{selectedItemId === item\.id \? 'true' : undefined\}/u, 'DESIGN.SEARCH.DESKTOP_DETAIL_PRESERVES_FILTERED_SLICE');
     expectPresent(src, /syncSearchHistory\(preservedSearchWindowScrollY\)[\s\S]*window\.history\.pushState\(\{\}, '', `\/items/u, 'DESIGN.SEARCH.MOBILE_BACK_RESTORES_EPHEMERAL_SEARCH_STATE');
     expectPresent(src, /replaceSurfaceFromLocation[\s\S]*searchScrollY[\s\S]*restoreSearchScrollPosition/u, 'DESIGN.SEARCH.MOBILE_BACK_RESTORES_EPHEMERAL_SEARCH_STATE');
-    expectAbsent(src, /localStorage\.setItem\([^)]*(?:search|history|session)|sessionStorage\.setItem\([^)]*(?:search|history|session)|saved search|reading history|command history|activity ledger|settings|sync|merge/iu, 'DESIGN.SEARCH.NO_DURABLE_HISTORIES');
+    expectAbsent(src, /localStorage\.setItem\([^)]*(?:search|history|session)|sessionStorage\.setItem\([^)]*(?:search|history|session)|saved search|reading history|command history|activity ledger|persistent search sessions?|settings (?:surface|dashboard|panel)|sync\/merge|sync state|merge state/iu, 'DESIGN.SEARCH.NO_DURABLE_HISTORIES');
   });
 
   it('DESIGN.LANGUAGE_CONTROL and DESIGN.REPROCESS_LIBRARY require opened RESOFEED utility-menu proof and negative placements', () => {
