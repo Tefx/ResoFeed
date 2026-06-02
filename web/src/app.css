@@ -1545,20 +1545,20 @@ details.surface-nav button:focus-visible {
 
   .contract-feed-meta {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-height: 16px;
-    height: auto;
-    max-height: 34px;
+    height: 16px;
+    max-height: 16px;
     line-height: 16px;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta span {
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .contract-feed-meta .feed-meta-age,

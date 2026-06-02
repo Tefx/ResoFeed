@@ -14,7 +14,7 @@ const exposedGaps = {
   'FR-05': 'Each visible [FETCH] button keeps that text but has source-contextual accessible name.',
   'FR-06': 'Collapsed [DETAILS] controls do not inflate every Source Ledger row.',
   'FR-07': 'Source Ledger section is labelled by h1#source-ledger-title through aria-labelledby.',
-  'FR-09': 'Mobile feed metadata remains one flat inline monospace truncating line, not multi-line wrapping.'
+  'FR-09': 'Mobile feed metadata remains one flat inline monospace truncating line with ellipsis, not multi-line wrapping.'
 } as const;
 
 type ItemFixture = {
@@ -151,7 +151,7 @@ const runtimeSameUrlItems: readonly ItemFixture[] = [
     url: 'https://fresh-runtime.example.test/alpha-today-primary-story',
     title: 'Alpha Today Primary Story',
     summary: 'Primary same-URL runtime story from source A.',
-    core_insight: 'The Inspector must disclose both same-URL source rows on mobile.',
+    core_insight: 'The Inspector must not infer grouped-source rows from same runtime URLs on mobile.',
     value_tier: 'high',
     published_at: '2026-05-15T10:00:00Z',
     first_seen_at: '2026-05-15T10:00:00Z',
@@ -170,7 +170,7 @@ const runtimeSameUrlItems: readonly ItemFixture[] = [
     url: 'https://fresh-runtime.example.test/alpha-today-primary-story',
     title: 'Alpha Today Primary Story',
     summary: 'Same URL runtime story from source B.',
-    core_insight: 'The grouped source disclosure must not rely solely on mocked detail provenance.',
+    core_insight: 'Same URL without backend grouping authority remains standalone provenance.',
     value_tier: 'high',
     published_at: '2026-05-15T09:50:00Z',
     first_seen_at: '2026-05-15T09:50:00Z',
@@ -389,7 +389,7 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     })));
   });
 
-  test('B1: mobile served-app Inspector discloses both Fresh Runtime same-URL grouped sources when detail provenance is sparse', async ({ page }, testInfo) => {
+  test('B1: mobile served-app Inspector does not infer grouped sources from exact same runtime URLs', async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installRuntimeSameUrlApi(page);
     await page.reload();
@@ -400,16 +400,17 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     const inspector = page.locator('.contract-inspector');
     await expect(inspector).toBeVisible();
     await expect(inspector, 'mobile Inspector must still show the primary source provenance').toContainText('Fresh Runtime A');
-    await expect(inspector, 'mobile Inspector must disclose the grouped same-URL source from the runtime feed list').toContainText('Fresh Runtime B');
-    await expect(inspector, 'mobile Inspector must disclose both same-URL source items').toContainText(/Grouped story with 2 source items/i);
-    await writeProof(testInfo, 'b1-mobile-runtime-same-url-grouped-sources', await inspector.locator('.contract-grouped-sources').evaluate((element) => ({
+    await expect(inspector, 'mobile Inspector must not disclose a same-URL source without backend grouping authority').not.toContainText('Fresh Runtime B');
+    await expect(inspector.locator('.contract-grouped-sources'), 'same URL alone must not create grouped-source disclosure').toHaveCount(0);
+    await writeProof(testInfo, 'b1-mobile-runtime-same-url-no-client-inference', {
       viewport: { width: 390, height: 844 },
-      text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
-      sourceLinks: Array.from(element.querySelectorAll('a')).map((anchor) => anchor.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
+      inspectorText: await inspector.evaluate((element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
+      groupedSourceDisclosureCount: await inspector.locator('.contract-grouped-sources').count(),
       detailProvidedGroupedItems: 0,
       feedProvidedSameUrlItems: 2,
-      exposedGap: 'B1 public runtime mobile Inspector must expose both Fresh Runtime A and Fresh Runtime B for same-URL items.'
-    })));
+      authority: 'docs/DESIGN.md Source Text Disclosure: grouped-source disclosure only for backend story_key, duplicate_of_item_id, or provenance.grouped_source_items; never by URL equality/normalization.',
+      exposedGap: 'B1 public runtime mobile Inspector must not expose Fresh Runtime B solely because it has the same URL as Fresh Runtime A.'
+    });
   });
 
   test('FR-05/FR-07: Source Ledger DOM contract and contextual [FETCH] accessible names hold at desktop and mobile', async ({ page }, testInfo) => {
@@ -459,8 +460,9 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     });
     await writeProof(testInfo, 'fr-09-mobile-feed-metadata-style', { proof, exposedGap: exposedGaps['FR-09'] });
     expect(proof.fontFamily, 'metadata must use monospace chrome typography').toMatch(/Mono|monospace|Consolas|SFMono/i);
-    expect(proof.whiteSpace, 'mobile metadata may wrap to avoid source clipping under UI_REGRESSION_CONTRACT mobile overflow expectations').toBe('normal');
-    expect(proof.overflow, 'mobile metadata remains visible rather than clipping the source label').toBe('visible');
+    expect(proof.whiteSpace, 'mobile metadata must remain a single flat inline row').toBe('nowrap');
+    expect(proof.overflow, 'mobile metadata uses ellipsis instead of wrapping into a second line').toBe('hidden');
+    expect(proof.textOverflow, 'mobile metadata truncates with ellipsis when the viewport is narrow').toBe('ellipsis');
     expect(proof.height, 'one metadata line should stay within the 16px metadata line-height plus minor browser rounding').toBeLessThanOrEqual(18);
   });
 });
