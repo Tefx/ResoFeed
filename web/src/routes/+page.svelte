@@ -1216,14 +1216,15 @@
 
     <div class="shell-grid" data-surface={currentSurface}>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Feed scroll region itself to be keyboard-focusable. -->
-      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && currentSurface === 'inspector')} aria-label={todayScrollLabel} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
+      <section id="today-feed" bind:this={feedPaneElement} class="feed-pane utility-surface" class:active-panel={currentSurface === 'feed' || (!isNarrow && (currentSurface === 'inspector' || currentSurface === 'search'))} aria-label={currentSurface === 'search' && !isNarrow ? shellChrome.searchScroll : todayScrollLabel} aria-describedby="today-feed-scroll-contract" aria-hidden={feedPaneInactive ? 'true' : undefined} inert={feedPaneInactive} tabindex="0" data-scroll-region="feed-independent" onscroll={rememberFeedScrollPosition}>
         <span id="today-feed-scroll-contract" class="visually-hidden">{shellChrome.independentScroll}</span>
         {#if !feedPaneInactive || currentSurface === 'inspector'}
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
-          {#if apiError && promptState !== 'rejected'}
+          {#if currentSurface === 'search' && !isNarrow}
+            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+          {:else if apiError && promptState !== 'rejected'}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
-          {/if}
-          {#if items.length === 0}
+          {:else if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
           {:else}
             <Feed items={items} language={processingLanguage.code} selectedItemId={selectedFeedItemId} onSelect={selectItem} onResonanceToggle={toggleResonance} hasMore={feedHasMore} loadingMore={feedLoadingMore} onLoadMore={loadMoreFeedItems} />
@@ -1264,11 +1265,13 @@
         language={processingLanguage.code}
       />
     </section>
-    <section class="utility-surface search-surface" class:active-panel={currentSurface === 'search'} aria-label={shellChrome.searchSurface}>
+    <section class="utility-surface search-surface" class:active-panel={currentSurface === 'search' && isNarrow} aria-label={shellChrome.searchSurface}>
       {#if currentSurface === 'search'}
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
-      <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={isNarrow} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+      {#if isNarrow}
+        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+      {/if}
     </section>
     {#if steerFeedback.kind === 'doctor'}
       <section class="utility-surface doctor-surface" class:active-panel={currentSurface === 'doctor'} aria-labelledby="doctor-heading">
